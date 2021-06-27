@@ -1,0 +1,4 @@
+/target
+.env
+Rocket.toml
+setup.sh
