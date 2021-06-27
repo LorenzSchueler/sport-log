@@ -1,44 +1,29 @@
 use super::*;
 use repo::account;
 
-#[get("/")]
-pub fn get_accounts(connection: Db) -> Result<Json<Vec<Account>>, Status> {
-    account::get_accounts(&connection)
-        .map(Json)
-        .map_err(|_| Status::InternalServerError)
+#[post("/", format = "application/json", data = "<new_account>")]
+pub fn create_account(new_account: Json<NewAccount>, conn: Db) -> Result<Json<Account>, Status> {
+    to_json(account::create_account(new_account.into_inner(), &conn))
 }
 
-#[post("/", format = "application/json", data = "<new_account>")]
-pub fn create_account(
-    new_account: Json<NewAccount>,
-    connection: Db,
-) -> Result<Json<Account>, Status> {
-    account::create_account(new_account.into_inner(), &connection)
-        .map(Json)
-        .map_err(|_| Status::InternalServerError)
+#[get("/")]
+pub fn get_accounts(conn: Db) -> Result<Json<Vec<Account>>, Status> {
+    to_json(account::get_accounts(&conn))
 }
 
 #[get("/<id>")]
-pub fn get_account(id: i32, connection: Db) -> Result<Json<Account>, Status> {
-    account::get_account(id, &connection)
-        .map(Json)
-        .map_err(|_| Status::InternalServerError)
+pub fn get_account(id: i32, conn: Db) -> Result<Json<Account>, Status> {
+    to_json(account::get_account(id, &conn))
 }
 
 #[put("/<id>", format = "application/json", data = "<account>")]
-pub fn update_account(
-    id: i32,
-    account: Json<Account>,
-    connection: Db,
-) -> Result<Json<Account>, Status> {
-    account::update_account(id, account.into_inner(), &connection)
-        .map(Json)
-        .map_err(|_| Status::InternalServerError)
+pub fn update_account(id: i32, account: Json<Account>, conn: Db) -> Result<Json<Account>, Status> {
+    to_json(account::update_account(id, account.into_inner(), &conn))
 }
 
 #[delete("/<id>")]
-pub fn delete_account(id: i32, connection: Db) -> Result<Status, Status> {
-    account::delete_account(id, &connection)
+pub fn delete_account(id: i32, conn: Db) -> Result<Status, Status> {
+    account::delete_account(id, &conn)
         .map(|_| Status::NoContent)
         .map_err(|_| Status::InternalServerError)
 }
