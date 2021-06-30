@@ -4,11 +4,11 @@ use super::*;
 use crate::schema::platform_credentials::{columns, table as platform_credentials};
 
 pub fn create_platform_credentials(
-    new_credentials: NewPlatformCredentials,
+    credentials: NewPlatformCredentials,
     conn: &PgConnection,
 ) -> QueryResult<PlatformCredentials> {
     diesel::insert_into(platform_credentials)
-        .values(new_credentials)
+        .values(credentials)
         .get_result(conn)
 }
 
@@ -33,11 +33,11 @@ pub fn get_platform_credentials_by_account_and_platform(
 }
 
 pub fn update_platform_credentials(
-    new_platform_credentials: PlatformCredentials,
+    credentials: PlatformCredentials,
     conn: &PgConnection,
 ) -> QueryResult<PlatformCredentials> {
-    diesel::update(platform_credentials.find(new_platform_credentials.id))
-        .set(new_platform_credentials)
+    diesel::update(platform_credentials.find(credentials.id))
+        .set(credentials)
         .get_result(conn)
 }
 

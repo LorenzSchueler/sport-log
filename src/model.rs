@@ -1,4 +1,6 @@
-use serde::{Serialize, Deserialize};
+use chrono::{NaiveDateTime, NaiveTime};
+use serde::{Deserialize, Serialize};
+use diesel_derive_enum::DbEnum;
 
 use crate::schema::*;
 
@@ -36,8 +38,8 @@ pub type PlatformCredentialsId = i32;
 #[table_name = "platform_credentials"]
 pub struct PlatformCredentials {
     pub id: PlatformCredentialsId,
-    pub account_id: i32,
-    pub platform_id: i32,
+    pub account_id: AccountId,
+    pub platform_id: PlatformId,
     pub username: String,
     pub password: String,
 }
@@ -45,8 +47,80 @@ pub struct PlatformCredentials {
 #[derive(Insertable, Serialize, Deserialize)]
 #[table_name = "platform_credentials"]
 pub struct NewPlatformCredentials {
-    pub account_id: i32,
-    pub platform_id: i32,
+    pub account_id: AccountId,
+    pub platform_id: PlatformId,
     pub username: String,
     pub password: String,
+}
+
+pub type ActionId = i32;
+
+#[derive(Queryable, AsChangeset, Serialize, Deserialize, Debug)]
+#[table_name = "action"]
+pub struct Action {
+    pub id: AccountId,
+    pub platform_id: PlatformId,
+    pub name: String,
+}
+
+#[derive(Insertable, Serialize, Deserialize)]
+#[table_name = "action"]
+pub struct NewAction {
+    pub platform_id: PlatformId,
+    pub name: String,
+}
+
+#[derive(DbEnum , Debug, Serialize, Deserialize)]
+pub enum Weekday {
+    Monday,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday,
+    Sunday,
+}
+
+pub type ActionRuleId = i32;
+
+#[derive(Queryable, AsChangeset, Serialize, Deserialize, Debug)]
+#[table_name = "action_rule"]
+pub struct ActionRule {
+    pub id: ActionRuleId,
+    pub account_id: AccountId,
+    pub action_id: ActionId,
+    pub weekday: Weekday,
+    pub time: NaiveTime,
+    pub enabled: bool,
+}
+
+#[derive(Insertable, Serialize, Deserialize)]
+#[table_name = "action_rule"]
+pub struct NewActionRule {
+    pub account_id: AccountId,
+    pub action_id: ActionId,
+    pub weekday: Weekday,
+    pub time: NaiveTime,
+    pub enabled: bool,
+}
+
+pub type ActionEventId = i32;
+
+#[derive(Queryable, AsChangeset, Serialize, Deserialize, Debug)]
+#[table_name = "action_event"]
+pub struct ActionEvent {
+    pub id: ActionEventId,
+    pub account_id: AccountId,
+    pub action_id: ActionId,
+    pub datetime: NaiveDateTime,
+    pub enabled: bool,
+}
+
+#[derive(Insertable, Serialize, Deserialize)]
+#[table_name = "action_event"]
+pub struct NewActionEvent {
+    pub account_id: AccountId,
+    pub action_id: ActionId,
+    pub datetime: NaiveDateTime,
+    pub enabled: bool,
 }

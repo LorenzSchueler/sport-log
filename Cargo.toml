@@ -3,13 +3,13 @@ name = "sport-backend"
 version = "0.1.0"
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 #rocket = "0.5.0-rc.1"
 rocket = "0.4.10"
 rocket_contrib = { version = "*", default-features = false, features = ["json", "diesel_postgres_pool"] }
 #rocket_codegen = "0.4.5"
-diesel = { version = "1.4.4", features = ["postgres", "r2d2"] }
+diesel = { version = "1.4.4", features = ["postgres", "r2d2", "chrono"] }
+diesel-derive-enum = "1.1.1"
 serde = { version = "1.0.116", features = ["derive"]}
 dotenv = "0.15.0"
+chrono = { verison = "0.4.19", features = ["serde"] }
