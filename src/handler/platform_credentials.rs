@@ -1,7 +1,11 @@
 use super::*;
 use repo::platform_credentials;
 
-#[post("/", format = "application/json", data = "<new_credentials>")]
+#[post(
+    "/platform_credentials",
+    format = "application/json",
+    data = "<new_credentials>"
+)]
 pub fn create_platform_credentials(
     new_credentials: Json<NewPlatformCredentials>,
     conn: Db,
@@ -12,7 +16,7 @@ pub fn create_platform_credentials(
     ))
 }
 
-#[get("/account/<account_id>")]
+#[get("/platform_creadentials/account/<account_id>")]
 pub fn get_own_platform_credentials(
     account_id: AccountId,
     conn: Db,
@@ -22,7 +26,7 @@ pub fn get_own_platform_credentials(
     ))
 }
 
-#[get("/account/<account_id>/platform/<platform_id>")]
+#[get("/platform_creadentials/account/<account_id>/platform/<platform_id>")]
 pub fn get_own_platform_credentials_by_platform(
     account_id: AccountId,
     platform_id: PlatformId,
@@ -37,7 +41,11 @@ pub fn get_own_platform_credentials_by_platform(
     )
 }
 
-#[put("/", format = "application/json", data = "<new_platform_credentials>")]
+#[put(
+    "/platform_credentials",
+    format = "application/json",
+    data = "<new_platform_credentials>"
+)]
 pub fn update_platform_credentials(
     new_platform_credentials: Json<PlatformCredentials>,
     conn: Db,
@@ -48,7 +56,7 @@ pub fn update_platform_credentials(
     ))
 }
 
-#[delete("/<platform_credentials_id>")]
+#[delete("/platform_credentials/<platform_credentials_id>")]
 pub fn delete_platform_credentials(
     platform_credentials_id: PlatformCredentialsId,
     conn: Db,

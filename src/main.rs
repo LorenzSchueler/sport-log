@@ -13,6 +13,8 @@ mod model;
 mod repository;
 mod schema;
 
+const BASE: &str = "/v1";
+
 #[database("sport_diary")]
 pub struct Db(PgConnection);
 
@@ -24,28 +26,20 @@ pub fn main() {
     rocket::ignite()
         .attach(Db::fairing())
         .mount(
-            "/v1/account",
+            BASE,
             routes![
                 account::create_account,
                 account::get_accounts,
                 account::get_account,
                 account::update_account,
                 account::delete_account
-            ],
-        )
-        .mount(
-            "/v1/platform_credentials",
-            routes![
+
                 platform_credentials::create_platform_credentials,
                 platform_credentials::get_own_platform_credentials,
                 platform_credentials::get_own_platform_credentials_by_platform,
                 platform_credentials::update_platform_credentials,
                 platform_credentials::delete_platform_credentials
-            ],
-        )
-        .mount(
-            "/v1",
-            routes![
+
                 action::create_action,
                 action::get_action,
                 action::get_actions_by_platform,
