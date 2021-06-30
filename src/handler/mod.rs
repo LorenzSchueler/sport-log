@@ -6,7 +6,7 @@ use crate::Db;
 
 pub mod account;
 pub mod action;
-pub mod platform_credentials;
+pub mod platform;
 
 fn to_json<T>(query_result: QueryResult<T>) -> Result<Json<T>, Status> {
     query_result

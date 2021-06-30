@@ -1,7 +1,7 @@
 pub mod account;
 pub mod action;
-pub mod platform_credentials;
+pub mod platform;
 
 pub use account::*;
 pub use action::*;
-pub use platform_credentials::*;
+pub use platform::*;
