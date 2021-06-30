@@ -1,17 +1,51 @@
 use super::*;
-use repo::platform_credentials;
+use crate::{
+    model::{
+        AccountId, NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials,
+        PlatformCredentialsId, PlatformId,
+    },
+    repository::platform_credentials,
+};
+
+#[post("/platform", format = "application/json", data = "<platfrom>")]
+pub fn create_platform(platfrom: Json<NewPlatform>, conn: Db) -> Result<Json<Platform>, Status> {
+    to_json(platform_credentials::create_platform(
+        platfrom.into_inner(),
+        &conn,
+    ))
+}
+
+#[get("/platform")]
+pub fn get_platforms(conn: Db) -> Result<Json<Vec<Platform>>, Status> {
+    to_json(platform_credentials::get_platforms(&conn))
+}
+
+#[put("/platform", format = "application/json", data = "<platform>")]
+pub fn update_platform(platform: Json<Platform>, conn: Db) -> Result<Json<Platform>, Status> {
+    to_json(platform_credentials::update_platform(
+        platform.into_inner(),
+        &conn,
+    ))
+}
+
+#[delete("/platform/<platform_id>")]
+pub fn delete_platform(platform_id: PlatformId, conn: Db) -> Result<Status, Status> {
+    platform_credentials::delete_platform(platform_id, &conn)
+        .map(|_| Status::NoContent)
+        .map_err(|_| Status::InternalServerError)
+}
 
 #[post(
     "/platform_credentials",
     format = "application/json",
-    data = "<new_credentials>"
+    data = "<credentials>"
 )]
 pub fn create_platform_credentials(
-    new_credentials: Json<NewPlatformCredentials>,
+    credentials: Json<NewPlatformCredentials>,
     conn: Db,
 ) -> Result<Json<PlatformCredentials>, Status> {
     to_json(platform_credentials::create_platform_credentials(
-        new_credentials.into_inner(),
+        credentials.into_inner(),
         &conn,
     ))
 }
@@ -44,14 +78,14 @@ pub fn get_own_platform_credentials_by_platform(
 #[put(
     "/platform_credentials",
     format = "application/json",
-    data = "<new_platform_credentials>"
+    data = "<platform_credentials>"
 )]
 pub fn update_platform_credentials(
-    new_platform_credentials: Json<PlatformCredentials>,
+    platform_credentials: Json<PlatformCredentials>,
     conn: Db,
 ) -> Result<Json<PlatformCredentials>, Status> {
     to_json(platform_credentials::update_platform_credentials(
-        new_platform_credentials.into_inner(),
+        platform_credentials.into_inner(),
         &conn,
     ))
 }

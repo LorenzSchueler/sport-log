@@ -1,9 +1,12 @@
 use super::*;
-use repo::account;
+use crate::{
+    model::{Account, AccountId, NewAccount},
+    repository::account,
+};
 
-#[post("/account", format = "application/json", data = "<new_account>")]
-pub fn create_account(new_account: Json<NewAccount>, conn: Db) -> Result<Json<Account>, Status> {
-    to_json(account::create_account(new_account.into_inner(), &conn))
+#[post("/account", format = "application/json", data = "<account>")]
+pub fn create_account(account: Json<NewAccount>, conn: Db) -> Result<Json<Account>, Status> {
+    to_json(account::create_account(account.into_inner(), &conn))
 }
 
 #[get("/account")]
@@ -12,7 +15,7 @@ pub fn get_accounts(conn: Db) -> Result<Json<Vec<Account>>, Status> {
 }
 
 #[get("/account/<account_id>")]
-pub fn get_account(account_id: i32, conn: Db) -> Result<Json<Account>, Status> {
+pub fn get_account(account_id: AccountId, conn: Db) -> Result<Json<Account>, Status> {
     to_json(account::get_account(account_id, &conn))
 }
 
@@ -22,7 +25,7 @@ pub fn get_account(account_id: i32, conn: Db) -> Result<Json<Account>, Status> {
     data = "<account>"
 )]
 pub fn update_account(
-    account_id: i32,
+    account_id: AccountId,
     account: Json<Account>,
     conn: Db,
 ) -> Result<Json<Account>, Status> {
@@ -34,7 +37,7 @@ pub fn update_account(
 }
 
 #[delete("/account/<account_id>")]
-pub fn delete_account(account_id: i32, conn: Db) -> Result<Status, Status> {
+pub fn delete_account(account_id: AccountId, conn: Db) -> Result<Status, Status> {
     account::delete_account(account_id, &conn)
         .map(|_| Status::NoContent)
         .map_err(|_| Status::InternalServerError)

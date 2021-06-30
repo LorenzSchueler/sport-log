@@ -2,7 +2,7 @@ use diesel::QueryResult;
 use rocket::http::Status;
 use rocket_contrib::json::Json;
 
-use crate::{model::*, repository as repo, Db};
+use crate::Db;
 
 pub mod account;
 pub mod action;

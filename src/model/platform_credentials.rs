@@ -12,6 +12,12 @@ pub struct Platform {
     pub name: String,
 }
 
+#[derive(Insertable, Serialize, Deserialize)]
+#[table_name = "platform"]
+pub struct NewPlatform {
+    pub name: String,
+}
+
 pub type PlatformCredentialsId = i32;
 
 #[derive(Queryable, AsChangeset, Serialize, Deserialize, Debug)]

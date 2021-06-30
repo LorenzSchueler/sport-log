@@ -1,9 +1,16 @@
-use super::*;
-use crate::schema::{action, action_event, action_rule};
+use diesel::prelude::*;
 
-pub fn create_action(new_action: NewAction, conn: &PgConnection) -> QueryResult<Action> {
+use crate::{
+    model::{
+        AccountId, Action, ActionEvent, ActionEventId, ActionId, ActionRule, ActionRuleId,
+        NewAction, NewActionEvent, NewActionRule, PlatformId,
+    },
+    schema::{action, action_event, action_rule},
+};
+
+pub fn create_action(action: NewAction, conn: &PgConnection) -> QueryResult<Action> {
     diesel::insert_into(action::table)
-        .values(new_action)
+        .values(action)
         .get_result(conn)
 }
 
@@ -25,11 +32,11 @@ pub fn delete_action(action_id: ActionId, conn: &PgConnection) -> QueryResult<us
 }
 
 pub fn create_action_rule(
-    new_action_rule: NewActionRule,
+    action_rule: NewActionRule,
     conn: &PgConnection,
 ) -> QueryResult<ActionRule> {
     diesel::insert_into(action_rule::table)
-        .values(new_action_rule)
+        .values(action_rule)
         .get_result(conn)
 }
 
@@ -95,4 +102,80 @@ pub fn update_action_rule(
 
 pub fn delete_action_rule(action_rule_id: ActionRuleId, conn: &PgConnection) -> QueryResult<usize> {
     diesel::delete(action_rule::table.find(action_rule_id)).execute(conn)
+}
+
+pub fn create_action_event(
+    action_event: NewActionEvent,
+    conn: &PgConnection,
+) -> QueryResult<ActionEvent> {
+    diesel::insert_into(action_event::table)
+        .values(action_event)
+        .get_result(conn)
+}
+
+pub fn get_action_event(
+    action_event_id: ActionEventId,
+    conn: &PgConnection,
+) -> QueryResult<ActionEvent> {
+    action_event::table.find(action_event_id).get_result(conn)
+}
+
+pub fn get_action_events_by_account(
+    account_id: AccountId,
+    conn: &PgConnection,
+) -> QueryResult<Vec<ActionEvent>> {
+    action_event::table
+        .filter(action_event::columns::account_id.eq(account_id))
+        .get_results(conn)
+}
+
+pub fn get_action_events_by_platform(
+    platform_id: PlatformId,
+    conn: &PgConnection,
+) -> QueryResult<Vec<ActionEvent>> {
+    action_event::table
+        .filter(
+            action_event::columns::action_id.eq_any(
+                action::table
+                    .select(action::columns::id)
+                    .filter(action::columns::platform_id.eq(platform_id))
+                    .get_results::<ActionId>(conn)?,
+            ),
+        )
+        .get_results(conn)
+}
+
+pub fn get_action_events_by_account_and_platform(
+    account_id: AccountId,
+    platform_id: PlatformId,
+    conn: &PgConnection,
+) -> QueryResult<Vec<ActionEvent>> {
+    action_event::table
+        .filter(action_event::columns::account_id.eq(account_id))
+        .filter(
+            action_event::columns::action_id.eq_any(
+                action::table
+                    .select(action::columns::id)
+                    .filter(action::columns::platform_id.eq(platform_id))
+                    .get_results::<ActionId>(conn)?,
+            ),
+        )
+        .get_results(conn)
+}
+
+pub fn update_action_event(
+    action_event_id: ActionEventId,
+    action_event: ActionEvent,
+    conn: &PgConnection,
+) -> QueryResult<ActionEvent> {
+    diesel::update(action_event::table.find(action_event_id))
+        .set(&action_event)
+        .get_result(conn)
+}
+
+pub fn delete_action_event(
+    action_event_id: ActionEventId,
+    conn: &PgConnection,
+) -> QueryResult<usize> {
+    diesel::delete(action_event::table.find(action_event_id)).execute(conn)
 }

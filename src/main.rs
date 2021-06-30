@@ -33,6 +33,10 @@ pub fn main() {
                 account::get_account,
                 account::update_account,
                 account::delete_account,
+                platform_credentials::create_platform,
+                platform_credentials::get_platforms,
+                platform_credentials::update_platform,
+                platform_credentials::delete_platform,
                 platform_credentials::create_platform_credentials,
                 platform_credentials::get_own_platform_credentials,
                 platform_credentials::get_own_platform_credentials_by_platform,
@@ -48,7 +52,14 @@ pub fn main() {
                 action::get_action_rules_by_platform,
                 action::get_action_rules_by_account_and_platform,
                 action::update_action_rule,
-                action::delete_action_rule
+                action::delete_action_rule,
+                action::create_action_event,
+                action::get_action_event,
+                action::get_action_events_by_account,
+                action::get_action_events_by_platform,
+                action::get_action_events_by_account_and_platform,
+                action::update_action_event,
+                action::delete_action_event
             ],
         )
         .launch();
