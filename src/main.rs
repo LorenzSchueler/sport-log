@@ -32,14 +32,12 @@ pub fn main() {
                 account::get_accounts,
                 account::get_account,
                 account::update_account,
-                account::delete_account
-
+                account::delete_account,
                 platform_credentials::create_platform_credentials,
                 platform_credentials::get_own_platform_credentials,
                 platform_credentials::get_own_platform_credentials_by_platform,
                 platform_credentials::update_platform_credentials,
-                platform_credentials::delete_platform_credentials
-
+                platform_credentials::delete_platform_credentials,
                 action::create_action,
                 action::get_action,
                 action::get_actions_by_platform,
