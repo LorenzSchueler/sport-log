@@ -1,6 +1,6 @@
 use chrono::{NaiveDateTime, NaiveTime};
-use serde::{Deserialize, Serialize};
 use diesel_derive_enum::DbEnum;
+use serde::{Deserialize, Serialize};
 
 use crate::schema::*;
 
@@ -70,7 +70,7 @@ pub struct NewAction {
     pub name: String,
 }
 
-#[derive(DbEnum , Debug, Serialize, Deserialize)]
+#[derive(DbEnum, Debug, Serialize, Deserialize)]
 pub enum Weekday {
     Monday,
     Tuesday,

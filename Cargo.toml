@@ -9,7 +9,7 @@ rocket = "0.4.10"
 rocket_contrib = { version = "*", default-features = false, features = ["json", "diesel_postgres_pool"] }
 #rocket_codegen = "0.4.5"
 diesel = { version = "1.4.4", features = ["postgres", "r2d2", "chrono"] }
-diesel-derive-enum = "1.1.1"
+diesel-derive-enum = { version = "1.1.1", features = ["postgres"] }
 serde = { version = "1.0.116", features = ["derive"]}
 dotenv = "0.15.0"
 chrono = { verison = "0.4.19", features = ["serde"] }

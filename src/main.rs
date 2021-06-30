@@ -43,5 +43,21 @@ pub fn main() {
                 platform_credentials::delete_platform_credentials
             ],
         )
+        .mount(
+            "/v1",
+            routes![
+                action::create_action,
+                action::get_action,
+                action::get_actions_by_platform,
+                action::delete_action,
+                action::create_action_rule,
+                action::get_action_rule,
+                action::get_action_rules_by_account,
+                action::get_action_rules_by_platform,
+                action::get_action_rules_by_account_and_platform,
+                action::update_action_rule,
+                action::delete_action_rule
+            ],
+        )
         .launch();
 }
