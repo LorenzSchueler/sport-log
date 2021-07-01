@@ -1,4 +1,7 @@
-use chrono::NaiveDateTime;
+use std::ops::Deref;
+
+use chrono::{NaiveDateTime, NaiveTime};
+use rocket::{http::RawStr, request::FromParam};
 
 use super::*;
 use crate::{
@@ -187,16 +190,49 @@ pub fn get_executable_action_events_by_platform_name(
 #[get("/executable_action_event/platform/<platform_name>/timerange/<start_time>/<end_time>")]
 pub fn get_executable_action_events_by_platform_name_and_timerange(
     platform_name: String,
-    start_time: UNIXSeconds,
-    end_time: UNIXSeconds,
+    start_time: NaiveDateTimeWrapper,
+    end_time: NaiveDateTimeWrapper,
     conn: Db,
 ) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
     to_json(
         action::get_executable_action_events_by_platform_name_and_timerange(
             platform_name,
-            NaiveDateTime::from_timestamp(start_time, 0),
-            NaiveDateTime::from_timestamp(end_time, 0),
+            *start_time,
+            *end_time,
             &conn,
         ),
     )
+}
+
+pub struct NaiveTimeWrapper(NaiveTime);
+pub struct NaiveDateTimeWrapper(NaiveDateTime);
+
+impl<'v> FromParam<'v> for NaiveTimeWrapper {
+    type Error = &'v RawStr;
+
+    fn from_param(param: &'v RawStr) -> Result<Self, Self::Error> {
+        Ok(NaiveTimeWrapper(param.parse().map_err(|_| param)?))
+    }
+}
+
+impl<'v> FromParam<'v> for NaiveDateTimeWrapper {
+    type Error = &'v RawStr;
+
+    fn from_param(param: &'v RawStr) -> Result<NaiveDateTimeWrapper, Self::Error> {
+        Ok(NaiveDateTimeWrapper(param.parse().map_err(|_| param)?))
+    }
+}
+
+impl Deref for NaiveTimeWrapper {
+    type Target = NaiveTime;
+    fn deref(&self) -> &NaiveTime {
+        &self.0
+    }
+}
+
+impl Deref for NaiveDateTimeWrapper {
+    type Target = NaiveDateTime;
+    fn deref(&self) -> &NaiveDateTime {
+        &self.0
+    }
 }
