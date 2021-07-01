@@ -76,3 +76,11 @@ pub struct NewActionEvent {
     pub datetime: NaiveDateTime,
     pub enabled: bool,
 }
+
+#[derive(Queryable, Serialize, Deserialize, Debug)]
+pub struct ExecutableActionEvent {
+    pub action_name: String,
+    pub datetime: NaiveDateTime,
+    pub username: String,
+    pub password: String,
+}

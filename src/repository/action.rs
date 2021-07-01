@@ -3,9 +3,9 @@ use diesel::prelude::*;
 use crate::{
     model::{
         AccountId, Action, ActionEvent, ActionEventId, ActionId, ActionRule, ActionRuleId,
-        NewAction, NewActionEvent, NewActionRule, PlatformId,
+        ExecutableActionEvent, NewAction, NewActionEvent, NewActionRule, PlatformId,
     },
-    schema::{action, action_event, action_rule, platform},
+    schema::{action, action_event, action_rule, platform, platform_credentials},
 };
 
 pub fn create_action(action: NewAction, conn: &PgConnection) -> QueryResult<Action> {
@@ -154,10 +154,12 @@ pub fn get_action_events_by_platform_name(
             action_event::columns::action_id.eq_any(
                 action::table
                     .select(action::columns::id)
-                    .filter(action::columns::platform_id.eq(platform::table
-                        .select(platform::columns::id)
-                        .filter(platform::columns::name.eq(platform_name))
-                        .first::<PlatformId>(conn)?))
+                    .filter(
+                        action::columns::platform_id.eq(platform::table
+                            .select(platform::columns::id)
+                            .filter(platform::columns::name.eq(platform_name))
+                            .first::<PlatformId>(conn)?),
+                    )
                     .get_results::<ActionId>(conn)?,
             ),
         )
@@ -197,4 +199,28 @@ pub fn delete_action_event(
     conn: &PgConnection,
 ) -> QueryResult<usize> {
     diesel::delete(action_event::table.find(action_event_id)).execute(conn)
+}
+
+pub fn get_executable_action_events_by_platform_name(
+    platform_name: String,
+    conn: &PgConnection,
+) -> QueryResult<Vec<ExecutableActionEvent>> {
+    action_event::table
+        .inner_join(action::table.inner_join(platform::table))
+        .inner_join(
+            platform_credentials::table.on(platform_credentials::columns::platform_id
+                .eq(platform::columns::id)
+                .and(
+                    platform_credentials::columns::account_id.eq(action_event::columns::account_id),
+                )),
+        )
+        .filter(platform::columns::name.eq(platform_name))
+        .filter(action_event::columns::enabled.eq(true))
+        .select((
+            action::columns::name,
+            action_event::columns::datetime,
+            platform_credentials::columns::username,
+            platform_credentials::columns::password,
+        ))
+        .get_results::<ExecutableActionEvent>(conn)
 }

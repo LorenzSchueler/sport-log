@@ -2,7 +2,7 @@ use super::*;
 use crate::{
     model::{
         AccountId, Action, ActionEvent, ActionEventId, ActionId, ActionRule, ActionRuleId,
-        NewAction, NewActionEvent, NewActionRule, PlatformId,
+        ExecutableActionEvent, NewAction, NewActionEvent, NewActionRule, PlatformId,
     },
     repository::action,
 };
@@ -169,4 +169,15 @@ pub fn delete_action_event(action_event_id: ActionEventId, conn: Db) -> Result<S
     action::delete_action_event(action_event_id, &conn)
         .map(|_| Status::NoContent)
         .map_err(|_| Status::InternalServerError)
+}
+
+#[get("/executable_action_event/platform/<platform_name>")]
+pub fn get_executable_action_events_by_platform_name(
+    platform_name: String,
+    conn: Db,
+) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
+    to_json(action::get_executable_action_events_by_platform_name(
+        platform_name,
+        &conn,
+    ))
 }
