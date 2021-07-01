@@ -1,4 +1,7 @@
 table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
     account (id) {
         id -> Int4,
         username -> Varchar,
@@ -8,6 +11,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
     action (id) {
         id -> Int4,
         platform_id -> Int4,
@@ -16,6 +22,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
     action_event (id) {
         id -> Int4,
         account_id -> Int4,
@@ -26,19 +35,23 @@ table! {
 }
 
 table! {
-    use crate::model::WeekdayMapping;
-    use diesel::sql_types::{Integer, Time, Bool};
+    use diesel::sql_types::*;
+    use crate::model::*;
+
     action_rule (id) {
-        id -> Integer,
-        account_id -> Integer,
-        action_id -> Integer,
-        weekday -> WeekdayMapping,
+        id -> Int4,
+        account_id -> Int4,
+        action_id -> Int4,
+        weekday -> Weekday,
         time -> Time,
         enabled -> Bool,
     }
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
     platform (id) {
         id -> Int4,
         name -> Varchar,
@@ -46,6 +59,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
     platform_credentials (id) {
         id -> Int4,
         account_id -> Int4,
