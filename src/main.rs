@@ -57,6 +57,7 @@ pub fn main() {
                 action::get_action_event,
                 action::get_action_events_by_account,
                 action::get_action_events_by_platform,
+                action::get_action_events_by_platform_name,
                 action::get_action_events_by_account_and_platform,
                 action::update_action_event,
                 action::delete_action_event

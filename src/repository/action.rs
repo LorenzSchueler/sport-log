@@ -5,7 +5,7 @@ use crate::{
         AccountId, Action, ActionEvent, ActionEventId, ActionId, ActionRule, ActionRuleId,
         NewAction, NewActionEvent, NewActionRule, PlatformId,
     },
-    schema::{action, action_event, action_rule},
+    schema::{action, action_event, action_rule, platform},
 };
 
 pub fn create_action(action: NewAction, conn: &PgConnection) -> QueryResult<Action> {
@@ -139,6 +139,25 @@ pub fn get_action_events_by_platform(
                 action::table
                     .select(action::columns::id)
                     .filter(action::columns::platform_id.eq(platform_id))
+                    .get_results::<ActionId>(conn)?,
+            ),
+        )
+        .get_results(conn)
+}
+
+pub fn get_action_events_by_platform_name(
+    platform_name: String,
+    conn: &PgConnection,
+) -> QueryResult<Vec<ActionEvent>> {
+    action_event::table
+        .filter(
+            action_event::columns::action_id.eq_any(
+                action::table
+                    .select(action::columns::id)
+                    .filter(action::columns::platform_id.eq(platform::table
+                        .select(platform::columns::id)
+                        .filter(platform::columns::name.eq(platform_name))
+                        .first::<PlatformId>(conn)?))
                     .get_results::<ActionId>(conn)?,
             ),
         )

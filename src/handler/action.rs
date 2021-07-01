@@ -120,12 +120,23 @@ pub fn get_action_events_by_account(
     to_json(action::get_action_events_by_account(account_id, &conn))
 }
 
-#[get("/action_event/platform/<platform_id>")]
+#[get("/action_event/platform/<platform_id>", rank = 1)]
 pub fn get_action_events_by_platform(
     platform_id: PlatformId,
     conn: Db,
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
     to_json(action::get_action_events_by_platform(platform_id, &conn))
+}
+
+#[get("/action_event/platform/<platform_name>", rank = 2)]
+pub fn get_action_events_by_platform_name(
+    platform_name: String,
+    conn: Db,
+) -> Result<Json<Vec<ActionEvent>>, Status> {
+    to_json(action::get_action_events_by_platform_name(
+        platform_name,
+        &conn,
+    ))
 }
 
 #[get("/action_event/account/<account_id>/platform/<platform_id>")]
