@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 table! {
     use diesel::sql_types::*;
     use crate::model::*;
@@ -42,7 +43,7 @@ table! {
         id -> Int4,
         account_id -> Int4,
         action_id -> Int4,
-        weekday -> Weekday,
+        weekday -> WeekdayMapping,
         time -> Time,
         enabled -> Bool,
     }

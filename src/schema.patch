@@ -1,0 +1,7 @@
+0a2
+> #![allow(unused_imports)]
+> 
+45c45
+<         weekday -> Weekday,
+---
+>         weekday -> WeekdayMapping,
