@@ -7,7 +7,7 @@ use super::*;
 use crate::{
     model::{
         AccountId, Action, ActionEvent, ActionEventId, ActionId, ActionRule, ActionRuleId,
-        ExecutableActionEvent, NewAction, NewActionEvent, NewActionRule, PlatformId, UNIXSeconds,
+        ExecutableActionEvent, NewAction, NewActionEvent, NewActionRule, PlatformId,
     },
     repository::action,
 };

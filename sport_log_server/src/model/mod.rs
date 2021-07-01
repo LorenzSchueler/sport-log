@@ -5,5 +5,3 @@ pub mod platform;
 pub use account::*;
 pub use action::*;
 pub use platform::*;
-
-pub type UNIXSeconds = i64;
