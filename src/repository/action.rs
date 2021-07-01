@@ -1,3 +1,4 @@
+use chrono::NaiveDateTime;
 use diesel::prelude::*;
 
 use crate::{
@@ -216,6 +217,34 @@ pub fn get_executable_action_events_by_platform_name(
         )
         .filter(platform::columns::name.eq(platform_name))
         .filter(action_event::columns::enabled.eq(true))
+        .select((
+            action::columns::name,
+            action_event::columns::datetime,
+            platform_credentials::columns::username,
+            platform_credentials::columns::password,
+        ))
+        .get_results::<ExecutableActionEvent>(conn)
+}
+
+pub fn get_executable_action_events_by_platform_name_and_timerange(
+    platform_name: String,
+    start_time: NaiveDateTime,
+    end_time: NaiveDateTime,
+    conn: &PgConnection,
+) -> QueryResult<Vec<ExecutableActionEvent>> {
+    action_event::table
+        .inner_join(action::table.inner_join(platform::table))
+        .inner_join(
+            platform_credentials::table.on(platform_credentials::columns::platform_id
+                .eq(platform::columns::id)
+                .and(
+                    platform_credentials::columns::account_id.eq(action_event::columns::account_id),
+                )),
+        )
+        .filter(platform::columns::name.eq(platform_name))
+        .filter(action_event::columns::enabled.eq(true))
+        .filter(action_event::columns::datetime.ge(start_time))
+        .filter(action_event::columns::datetime.le(end_time))
         .select((
             action::columns::name,
             action_event::columns::datetime,

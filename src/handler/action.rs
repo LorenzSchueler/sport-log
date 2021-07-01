@@ -1,8 +1,10 @@
+use chrono::NaiveDateTime;
+
 use super::*;
 use crate::{
     model::{
         AccountId, Action, ActionEvent, ActionEventId, ActionId, ActionRule, ActionRuleId,
-        ExecutableActionEvent, NewAction, NewActionEvent, NewActionRule, PlatformId,
+        ExecutableActionEvent, NewAction, NewActionEvent, NewActionRule, PlatformId, UNIXSeconds,
     },
     repository::action,
 };
@@ -180,4 +182,21 @@ pub fn get_executable_action_events_by_platform_name(
         platform_name,
         &conn,
     ))
+}
+
+#[get("/executable_action_event/platform/<platform_name>/timerange/<start_time>/<end_time>")]
+pub fn get_executable_action_events_by_platform_name_and_timerange(
+    platform_name: String,
+    start_time: UNIXSeconds,
+    end_time: UNIXSeconds,
+    conn: Db,
+) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
+    to_json(
+        action::get_executable_action_events_by_platform_name_and_timerange(
+            platform_name,
+            NaiveDateTime::from_timestamp(start_time, 0),
+            NaiveDateTime::from_timestamp(end_time, 0),
+            &conn,
+        ),
+    )
 }
