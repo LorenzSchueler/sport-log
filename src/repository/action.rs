@@ -177,9 +177,8 @@ pub fn get_action_events_by_account_and_platform(
         .filter(
             action_event::columns::action_id.eq_any(
                 action::table
-                    .select(action::columns::id)
                     .filter(action::columns::platform_id.eq(platform_id))
-                    .get_results::<ActionId>(conn)?,
+                    .select(action::columns::id),
             ),
         )
         .get_results(conn)
@@ -218,6 +217,7 @@ pub fn get_executable_action_events_by_platform_name(
         .filter(platform::columns::name.eq(platform_name))
         .filter(action_event::columns::enabled.eq(true))
         .select((
+            action_event::columns::id,
             action::columns::name,
             action_event::columns::datetime,
             platform_credentials::columns::username,
@@ -246,10 +246,12 @@ pub fn get_executable_action_events_by_platform_name_and_timerange(
         .filter(action_event::columns::datetime.ge(start_time))
         .filter(action_event::columns::datetime.le(end_time))
         .select((
+            action_event::columns::id,
             action::columns::name,
             action_event::columns::datetime,
             platform_credentials::columns::username,
             platform_credentials::columns::password,
         ))
+        .order_by(action_event::columns::datetime)
         .get_results::<ExecutableActionEvent>(conn)
 }

@@ -79,6 +79,7 @@ pub struct NewActionEvent {
 
 #[derive(Queryable, Serialize, Deserialize, Debug)]
 pub struct ExecutableActionEvent {
+    pub action_event_id: ActionEventId,
     pub action_name: String,
     pub datetime: NaiveDateTime,
     pub username: String,
