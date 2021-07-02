@@ -1,0 +1,13 @@
+[package]
+name = "sport_log_server_derive"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "1.0"
+quote = "1.0"
+Inflector = "0.11.4"
+proc-macro2 = "1.0.27"
