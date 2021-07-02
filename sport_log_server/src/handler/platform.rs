@@ -11,7 +11,7 @@ pub fn create_platform(platfrom: Json<NewPlatform>, conn: Db) -> Result<Json<Pla
 
 #[get("/platform")]
 pub fn get_platforms(conn: Db) -> Result<Json<Vec<Platform>>, Status> {
-    to_json(Platform::get(&conn))
+    to_json(Platform::get_all(&conn))
 }
 
 #[put("/platform", format = "application/json", data = "<platform>")]

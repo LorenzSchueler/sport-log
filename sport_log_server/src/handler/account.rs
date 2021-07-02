@@ -16,17 +16,9 @@ pub fn get_account(account_id: AccountId, conn: Db) -> Result<Json<Account>, Sta
     to_json(Account::get_by_id(account_id, &conn))
 }
 
-#[put(
-    "/account/<account_id>",
-    format = "application/json",
-    data = "<account>"
-)]
-pub fn update_account(
-    account_id: AccountId,
-    account: Json<Account>,
-    conn: Db,
-) -> Result<Json<Account>, Status> {
-    to_json(Account::update(account_id, account.into_inner(), &conn))
+#[put("/account", format = "application/json", data = "<account>")]
+pub fn update_account(account: Json<Account>, conn: Db) -> Result<Json<Account>, Status> {
+    to_json(Account::update(account.into_inner(), &conn))
 }
 
 #[delete("/account/<account_id>")]

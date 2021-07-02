@@ -81,11 +81,7 @@ pub fn update_action_rule(
     action_rule: Json<ActionRule>,
     conn: Db,
 ) -> Result<Json<ActionRule>, Status> {
-    to_json(ActionRule::update(
-        action_rule.id,
-        action_rule.into_inner(),
-        &conn,
-    ))
+    to_json(ActionRule::update(action_rule.into_inner(), &conn))
 }
 
 #[delete("/action_rule/<action_rule_id>")]
@@ -153,11 +149,7 @@ pub fn update_action_event(
     action_event: Json<ActionEvent>,
     conn: Db,
 ) -> Result<Json<ActionEvent>, Status> {
-    to_json(ActionEvent::update(
-        action_event.id,
-        action_event.into_inner(),
-        &conn,
-    ))
+    to_json(ActionEvent::update(action_event.into_inner(), &conn))
 }
 
 #[delete("/action_event/<action_event_id>")]
