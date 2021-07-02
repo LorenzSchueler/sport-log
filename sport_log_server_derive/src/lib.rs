@@ -88,7 +88,7 @@ fn impl_get_all(ast: &syn::DeriveInput) -> TokenStream {
         use diesel::prelude::*;
 
         impl #typename {
-            pub fn get_all(conn: &PgConnection) -> QueryResult<Vec<Account>> {
+            pub fn get_all(conn: &PgConnection) -> QueryResult<Vec<#typename>> {
                 #tablename::table.load(conn)
             }
         }
