@@ -8,6 +8,7 @@ use diesel::pg::PgConnection;
 use dotenv::dotenv;
 use rocket_contrib::databases::database;
 
+mod auth;
 mod handler;
 mod model;
 mod repository;
@@ -67,3 +68,4 @@ pub fn main() {
         )
         .launch();
 }
+// http://username:password@host

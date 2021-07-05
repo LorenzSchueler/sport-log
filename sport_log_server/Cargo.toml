@@ -3,6 +3,8 @@ name = "sport-log-server"
 version = "0.1.0"
 edition = "2018"
 
+default-run = "sport-log-server"
+
 [dependencies]
 
 sport_log_server_derive = { path = "../sport_log_server_derive" }
@@ -16,3 +18,4 @@ diesel-derive-enum = { version = "1.1.1", features = ["postgres"] }
 serde = { version = "1.0.116", features = ["derive"]}
 dotenv = "0.15.0"
 chrono = { version = "0.4.19", features = ["serde"] }
+base64 = "0.13.0"
