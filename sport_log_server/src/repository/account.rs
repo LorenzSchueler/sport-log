@@ -7,8 +7,8 @@ use crate::{
 
 impl Account {
     pub fn authenticate(
-        username: String,
-        password: String,
+        username: &str,
+        password: &str,
         conn: &PgConnection,
     ) -> QueryResult<AccountId> {
         account::table
