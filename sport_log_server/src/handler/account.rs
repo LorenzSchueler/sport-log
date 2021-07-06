@@ -1,5 +1,8 @@
 use super::*;
-use crate::model::{Account, AccountId, NewAccount};
+use crate::{
+    auth::AuthenticatedAccount,
+    model::{Account, AccountId, NewAccount},
+};
 
 #[post("/account", format = "application/json", data = "<account>")]
 pub fn create_account(account: Json<NewAccount>, conn: Db) -> Result<Json<Account>, Status> {
@@ -22,7 +25,11 @@ pub fn update_account(account: Json<Account>, conn: Db) -> Result<Json<Account>,
 }
 
 #[delete("/account/<account_id>")]
-pub fn delete_account(account_id: AccountId, conn: Db) -> Result<Status, Status> {
+pub fn delete_account(
+    account_id: AccountId,
+    account: AuthenticatedAccount,
+    conn: Db,
+) -> Result<Status, Status> {
     Account::delete(account_id, &conn)
         .map(|_| Status::NoContent)
         .map_err(|_| Status::InternalServerError)
