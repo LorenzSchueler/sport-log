@@ -15,7 +15,11 @@ pub fn get_accounts(conn: Db) -> Result<Json<Vec<Account>>, Status> {
 }
 
 #[get("/account/<account_id>")]
-pub fn get_account(account_id: AccountId, conn: Db) -> Result<Json<Account>, Status> {
+pub fn get_account(
+    account_id: AccountId,
+    auth: AuthenticatedAccount,
+    conn: Db,
+) -> Result<Json<Account>, Status> {
     to_json(Account::get_by_id(account_id, &conn))
 }
 
@@ -27,7 +31,7 @@ pub fn update_account(account: Json<Account>, conn: Db) -> Result<Json<Account>,
 #[delete("/account/<account_id>")]
 pub fn delete_account(
     account_id: AccountId,
-    account: AuthenticatedAccount,
+    auth: AuthenticatedAccount,
     conn: Db,
 ) -> Result<Status, Status> {
     Account::delete(account_id, &conn)

@@ -1,6 +1,7 @@
 use std::ops::Deref;
 
 use base64;
+use diesel::PgSortExpressionMethods;
 use rocket::{
     http::Status,
     outcome::Outcome,
@@ -23,20 +24,22 @@ impl<'r> FromRequest<'_, '_> for AuthenticatedAccount {
     fn from_request(request: &'_ Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
         match request.headers().get("Authorization").next() {
             Some(auth_header) if auth_header.len() >= 7 && &auth_header[..6] == "Basic " => {
-                let auth_str = match String::from_utf8(match base64::decode(auth_header) {
+                let auth_str = match String::from_utf8(match base64::decode(&auth_header[6..]) {
                     Ok(data) => data,
                     Err(_) => return Outcome::Failure((Status::BadRequest, ())),
                 }) {
                     Ok(string) => string,
                     Err(_) => return Outcome::Failure((Status::BadRequest, ())),
                 };
-                let username_password: Vec<&str> = auth_str.splitn(2, ":").collect();
-
-                if username_password.len() < 2 {
-                    return Outcome::Failure((Status::BadRequest, ()));
-                }
-                let username = username_password.get(0).unwrap();
-                let password = username_password.get(1).unwrap();
+                let mut username_password = auth_str.splitn(2, ":");
+                let username = match username_password.next() {
+                    Some(username) => username,
+                    None => return Outcome::Failure((Status::BadRequest, ())),
+                };
+                let password = match username_password.next() {
+                    Some(password) => password,
+                    None => return Outcome::Failure((Status::BadRequest, ())),
+                };
 
                 let conn = match Db::from_request(request) {
                     Outcome::Success(conn) => conn,
@@ -49,7 +52,7 @@ impl<'r> FromRequest<'_, '_> for AuthenticatedAccount {
                     Err(_) => Outcome::Failure((Status::Unauthorized, ())),
                 }
             }
-            _ => Outcome::Forward(()),
+            _ => Outcome::Failure((Status::Unauthorized, ())),
         }
     }
 }
