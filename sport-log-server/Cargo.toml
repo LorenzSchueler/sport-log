@@ -7,7 +7,7 @@ default-run = "sport-log-server"
 
 [dependencies]
 
-sport_log_server_derive = { path = "../sport_log_server_derive" }
+sport-log-server-derive = { path = "../sport-log-server-derive" }
 
 #rocket = "0.5.0-rc.1"
 rocket = "0.4.10"

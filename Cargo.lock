@@ -1382,11 +1382,11 @@ dependencies = [
  "rocket",
  "rocket_contrib",
  "serde",
- "sport_log_server_derive",
+ "sport-log-server-derive",
 ]
 
 [[package]]
-name = "sport_log_server_derive"
+name = "sport-log-server-derive"
 version = "0.1.0"
 dependencies = [
  "Inflector",

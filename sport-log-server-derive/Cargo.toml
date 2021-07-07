@@ -1,5 +1,5 @@
 [package]
-name = "sport_log_server_derive"
+name = "sport-log-server-derive"
 version = "0.1.0"
 edition = "2018"
 
