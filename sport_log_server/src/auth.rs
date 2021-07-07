@@ -1,7 +1,6 @@
 use std::ops::Deref;
 
 use base64;
-use diesel::PgSortExpressionMethods;
 use rocket::{
     http::Status,
     outcome::Outcome,

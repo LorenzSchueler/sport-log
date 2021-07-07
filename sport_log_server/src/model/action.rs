@@ -5,23 +5,42 @@ use serde::{Deserialize, Serialize};
 use sport_log_server_derive::{Create, Delete, GetById, Update};
 
 use super::*;
-use crate::schema::{action, action_event, action_rule};
+use crate::schema::{action, action_event, action_provider, action_rule};
+
+pub type ActionProviderId = i32;
+
+#[derive(Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, Delete)]
+#[table_name = "action_provider"]
+pub struct ActionProvider {
+    pub id: ActionId,
+    pub name: String,
+    pub password: String,
+    pub platform_id: PlatformId,
+}
+
+#[derive(Insertable, Serialize, Deserialize)]
+#[table_name = "action_provider"]
+pub struct NewActionProvider {
+    pub name: String,
+    pub password: String,
+    pub platform_id: PlatformId,
+}
 
 pub type ActionId = i32;
 
 #[derive(Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, Delete)]
 #[table_name = "action"]
 pub struct Action {
-    pub id: AccountId,
-    pub platform_id: PlatformId,
+    pub id: ActionId,
     pub name: String,
+    pub action_provider_id: ActionProviderId,
 }
 
 #[derive(Insertable, Serialize, Deserialize)]
 #[table_name = "action"]
 pub struct NewAction {
-    pub platform_id: PlatformId,
     pub name: String,
+    pub action_provider_id: ActionProviderId,
 }
 
 #[derive(DbEnum, Debug, Serialize, Deserialize)]

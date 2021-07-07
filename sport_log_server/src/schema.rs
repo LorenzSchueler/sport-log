@@ -17,8 +17,8 @@ table! {
 
     action (id) {
         id -> Int4,
-        platform_id -> Int4,
         name -> Varchar,
+        action_provider_id -> Int4,
     }
 }
 
@@ -32,6 +32,18 @@ table! {
         action_id -> Int4,
         datetime -> Timestamp,
         enabled -> Bool,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
+    action_provider (id) {
+        id -> Int4,
+        name -> Varchar,
+        password -> Varchar,
+        platform_id -> Int4,
     }
 }
 
@@ -72,9 +84,10 @@ table! {
     }
 }
 
-joinable!(action -> platform (platform_id));
+joinable!(action -> action_provider (action_provider_id));
 joinable!(action_event -> account (account_id));
 joinable!(action_event -> action (action_id));
+joinable!(action_provider -> platform (platform_id));
 joinable!(action_rule -> account (account_id));
 joinable!(action_rule -> action (action_id));
 joinable!(platform_credentials -> account (account_id));
@@ -84,6 +97,7 @@ allow_tables_to_appear_in_same_query!(
     account,
     action,
     action_event,
+    action_provider,
     action_rule,
     platform,
     platform_credentials,

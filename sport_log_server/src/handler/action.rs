@@ -5,8 +5,8 @@ use rocket::{http::RawStr, request::FromParam};
 
 use super::*;
 use crate::model::{
-    AccountId, Action, ActionEvent, ActionEventId, ActionId, ActionRule, ActionRuleId,
-    ExecutableActionEvent, NewAction, NewActionEvent, NewActionRule, PlatformId,
+    AccountId, Action, ActionEvent, ActionEventId, ActionId, ActionProviderId, ActionRule,
+    ActionRuleId, ExecutableActionEvent, NewAction, NewActionEvent, NewActionRule,
 };
 
 #[post("/action", format = "application/json", data = "<action>")]
@@ -19,12 +19,12 @@ pub fn get_action(action_id: ActionId, conn: Db) -> Result<Json<Action>, Status>
     to_json(Action::get_by_id(action_id, &conn))
 }
 
-#[get("/action/platform/<platform_id>")]
+#[get("/action/platform/<action_provider_id>")]
 pub fn get_actions_by_platform(
-    platform_id: PlatformId,
+    action_provider_id: ActionProviderId,
     conn: Db,
 ) -> Result<Json<Vec<Action>>, Status> {
-    to_json(Action::get_by_platform(platform_id, &conn))
+    to_json(Action::get_by_action_provider(action_provider_id, &conn))
 }
 
 #[delete("/action/<action_id>")]
@@ -55,26 +55,26 @@ pub fn get_action_rules_by_account(
     to_json(ActionRule::get_by_account(account_id, &conn))
 }
 
-#[get("/action_rule/platform/<platform_id>")]
-pub fn get_action_rules_by_platform(
-    platform_id: PlatformId,
-    conn: Db,
-) -> Result<Json<Vec<ActionRule>>, Status> {
-    to_json(ActionRule::get_by_platform(platform_id, &conn))
-}
+//#[get("/action_rule/platform/<platform_id>")]
+//pub fn get_action_rules_by_platform(
+//platform_id: PlatformId,
+//conn: Db,
+//) -> Result<Json<Vec<ActionRule>>, Status> {
+//to_json(ActionRule::get_by_platform(platform_id, &conn))
+//}
 
-#[get("/action_rule/account/<account_id>/platform/<platform_id>")]
-pub fn get_action_rules_by_account_and_platform(
-    account_id: AccountId,
-    platform_id: PlatformId,
-    conn: Db,
-) -> Result<Json<Vec<ActionRule>>, Status> {
-    to_json(ActionRule::get_by_account_and_platform(
-        account_id,
-        platform_id,
-        &conn,
-    ))
-}
+//#[get("/action_rule/account/<account_id>/platform/<platform_id>")]
+//pub fn get_action_rules_by_account_and_platform(
+//account_id: AccountId,
+//platform_id: PlatformId,
+//conn: Db,
+//) -> Result<Json<Vec<ActionRule>>, Status> {
+//to_json(ActionRule::get_by_account_and_platform(
+//account_id,
+//platform_id,
+//&conn,
+//))
+//}
 
 #[put("/action_rule", format = "application/json", data = "<action_rule>")]
 pub fn update_action_rule(
@@ -115,34 +115,34 @@ pub fn get_action_events_by_account(
     to_json(ActionEvent::get_by_account(account_id, &conn))
 }
 
-#[get("/action_event/platform/<platform_id>", rank = 1)]
-pub fn get_action_events_by_platform(
-    platform_id: PlatformId,
-    conn: Db,
-) -> Result<Json<Vec<ActionEvent>>, Status> {
-    to_json(ActionEvent::get_by_platform(platform_id, &conn))
-}
+//#[get("/action_event/platform/<platform_id>", rank = 1)]
+//pub fn get_action_events_by_platform(
+//platform_id: PlatformId,
+//conn: Db,
+//) -> Result<Json<Vec<ActionEvent>>, Status> {
+//to_json(ActionEvent::get_by_platform(platform_id, &conn))
+//}
 
-#[get("/action_event/platform/<platform_name>", rank = 2)]
-pub fn get_action_events_by_platform_name(
-    platform_name: String,
-    conn: Db,
-) -> Result<Json<Vec<ActionEvent>>, Status> {
-    to_json(ActionEvent::get_by_platform_name(platform_name, &conn))
-}
+//#[get("/action_event/platform/<platform_name>", rank = 2)]
+//pub fn get_action_events_by_platform_name(
+//platform_name: String,
+//conn: Db,
+//) -> Result<Json<Vec<ActionEvent>>, Status> {
+//to_json(ActionEvent::get_by_platform_name(platform_name, &conn))
+//}
 
-#[get("/action_event/account/<account_id>/platform/<platform_id>")]
-pub fn get_action_events_by_account_and_platform(
-    account_id: AccountId,
-    platform_id: PlatformId,
-    conn: Db,
-) -> Result<Json<Vec<ActionEvent>>, Status> {
-    to_json(ActionEvent::get_by_account_and_platform(
-        account_id,
-        platform_id,
-        &conn,
-    ))
-}
+//#[get("/action_event/account/<account_id>/platform/<platform_id>")]
+//pub fn get_action_events_by_account_and_platform(
+//account_id: AccountId,
+//platform_id: PlatformId,
+//conn: Db,
+//) -> Result<Json<Vec<ActionEvent>>, Status> {
+//to_json(ActionEvent::get_by_account_and_platform(
+//account_id,
+//platform_id,
+//&conn,
+//))
+//}
 
 #[put("/action_event", format = "application/json", data = "<action_event>")]
 pub fn update_action_event(
@@ -159,30 +159,32 @@ pub fn delete_action_event(action_event_id: ActionEventId, conn: Db) -> Result<S
         .map_err(|_| Status::InternalServerError)
 }
 
-#[get("/executable_action_event/platform/<platform_name>")]
-pub fn get_executable_action_events_by_platform_name(
-    platform_name: String,
+#[get("/executable_action_event/platform/<action_provider_name>")]
+pub fn get_executable_action_events_by_action_provider_name(
+    action_provider_name: String,
     conn: Db,
 ) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
-    to_json(ExecutableActionEvent::get_by_platform_name(
-        platform_name,
+    to_json(ExecutableActionEvent::get_by_action_provider_name(
+        action_provider_name,
         &conn,
     ))
 }
 
-#[get("/executable_action_event/platform/<platform_name>/timerange/<start_time>/<end_time>")]
-pub fn get_executable_action_events_by_platform_name_and_timerange(
-    platform_name: String,
+#[get("/executable_action_event/platform/<action_provider_name>/timerange/<start_time>/<end_time>")]
+pub fn get_executable_action_events_by_action_provider_name_and_timerange(
+    action_provider_name: String,
     start_time: NaiveDateTimeWrapper,
     end_time: NaiveDateTimeWrapper,
     conn: Db,
 ) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
-    to_json(ExecutableActionEvent::get_by_platform_name_and_timerange(
-        platform_name,
-        *start_time,
-        *end_time,
-        &conn,
-    ))
+    to_json(
+        ExecutableActionEvent::get_by_action_provider_name_and_timerange(
+            action_provider_name,
+            *start_time,
+            *end_time,
+            &conn,
+        ),
+    )
 }
 
 pub struct NaiveTimeWrapper(NaiveTime);

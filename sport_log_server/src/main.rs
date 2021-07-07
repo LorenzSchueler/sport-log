@@ -50,20 +50,20 @@ pub fn main() {
                 action::create_action_rule,
                 action::get_action_rule,
                 action::get_action_rules_by_account,
-                action::get_action_rules_by_platform,
-                action::get_action_rules_by_account_and_platform,
+                //action::get_action_rules_by_platform,
+                //action::get_action_rules_by_account_and_platform,
                 action::update_action_rule,
                 action::delete_action_rule,
                 action::create_action_event,
                 action::get_action_event,
                 action::get_action_events_by_account,
-                action::get_action_events_by_platform,
-                action::get_action_events_by_platform_name,
-                action::get_action_events_by_account_and_platform,
+                //action::get_action_events_by_platform,
+                //action::get_action_events_by_platform_name,
+                //action::get_action_events_by_account_and_platform,
                 action::update_action_event,
                 action::delete_action_event,
-                action::get_executable_action_events_by_platform_name,
-                action::get_executable_action_events_by_platform_name_and_timerange
+                action::get_executable_action_events_by_action_provider_name,
+                action::get_executable_action_events_by_action_provider_name_and_timerange
             ],
         )
         .launch();

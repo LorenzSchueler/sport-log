@@ -1,16 +1,27 @@
 create type weekday as enum('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
 
+create table action_provider (
+    id serial primary key,
+    name varchar(80) not null unique,
+    password varchar(80) not null,
+    platform_id integer not null references platform on delete cascade
+);
+insert into action_provider (name, password, platform_id) values
+    ('wodify-login', 'wodify-login-passwd', 1),
+    ('wodify-wod', 'wodify-wod-passwd', 1),
+    ('sportstracker-fetch', 'sportstracker-fetch-passwd', 2);
+
 create table action (
     id serial primary key,
-    platform_id integer not null references platform on delete cascade,
     name varchar(80) not null,
-    unique (platform_id, name)
+    action_provider_id integer not null references action_provider on delete cascade,
+    unique (action_provider_id, name)
 );
-insert into action (platform_id, name) values 
-    (1, 'Crossfit'), 
-    (1, 'Weightlifting'), 
-    (1, 'Open Fridge'),
-    (2, 'fetch');
+insert into action (name, action_provider_id) values 
+    ('Crossfit', 1), 
+    ('Weightlifting', 1), 
+    ('Open Fridge', 1),
+    ('fetch', 3);
 
 create table action_rule (
     id serial primary key,
