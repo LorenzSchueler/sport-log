@@ -1,6 +1,5 @@
 use std::ops::Deref;
 
-use base64;
 use diesel::{PgConnection, QueryResult};
 use rocket::{
     http::Status,
@@ -39,7 +38,7 @@ impl Deref for AuthenticatedActionProvider {
 
 fn parse_username_password(auth_header: &str) -> Option<(String, String)> {
     let auth_str = String::from_utf8(base64::decode(&auth_header[6..]).ok()?).ok()?;
-    let mut username_password = auth_str.splitn(2, ":");
+    let mut username_password = auth_str.splitn(2, ':');
     let username = username_password.next()?;
     let password = username_password.next()?;
 
@@ -78,9 +77,9 @@ impl<'r> FromRequest<'_, '_> for AuthenticatedAccount {
 
     fn from_request(request: &'_ Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
         match authenticate::<AccountId>(request, Account::authenticate) {
-            Outcome::Success(account_id) => return Outcome::Success(Self { account_id }),
-            Outcome::Failure(f) => return Outcome::Failure(f),
-            Outcome::Forward(f) => return Outcome::Forward(f),
+            Outcome::Success(account_id) => Outcome::Success(Self { account_id }),
+            Outcome::Failure(f) => Outcome::Failure(f),
+            Outcome::Forward(f) => Outcome::Forward(f),
         }
     }
 }
@@ -90,11 +89,9 @@ impl<'r> FromRequest<'_, '_> for AuthenticatedActionProvider {
 
     fn from_request(request: &'_ Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
         match authenticate::<ActionProviderId>(request, ActionProvider::authenticate) {
-            Outcome::Success(action_provider_id) => {
-                return Outcome::Success(Self { action_provider_id })
-            }
-            Outcome::Failure(f) => return Outcome::Failure(f),
-            Outcome::Forward(f) => return Outcome::Forward(f),
+            Outcome::Success(action_provider_id) => Outcome::Success(Self { action_provider_id }),
+            Outcome::Failure(f) => Outcome::Failure(f),
+            Outcome::Forward(f) => Outcome::Forward(f),
         }
     }
 }
