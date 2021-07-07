@@ -2,9 +2,25 @@ use chrono::NaiveDateTime;
 use diesel::prelude::*;
 
 use crate::{
-    model::{AccountId, Action, ActionEvent, ActionProviderId, ActionRule, ExecutableActionEvent},
+    model::{
+        AccountId, Action, ActionEvent, ActionProvider, ActionProviderId, ActionRule,
+        ExecutableActionEvent,
+    },
     schema::{action, action_event, action_provider, action_rule, platform_credentials},
 };
+impl ActionProvider {
+    pub fn authenticate(
+        name: &str,
+        password: &str,
+        conn: &PgConnection,
+    ) -> QueryResult<ActionProviderId> {
+        action_provider::table
+            .filter(action_provider::columns::name.eq(name))
+            .filter(action_provider::columns::password.eq(password)) // TODO use hash function
+            .select(action_provider::columns::id)
+            .get_result(conn)
+    }
+}
 
 impl Action {
     pub fn get_by_action_provider(
