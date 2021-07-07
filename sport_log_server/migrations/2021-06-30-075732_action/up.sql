@@ -25,26 +25,26 @@ insert into action (name, action_provider_id) values
 
 create table action_rule (
     id serial primary key,
-    account_id integer not null references account on delete cascade,
+    user_id integer not null references "user" on delete cascade,
     action_id integer not null references action on delete cascade,
     weekday weekday not null, 
     time time not null,
     enabled boolean not null,
-    unique (account_id, action_id, weekday, time, enabled)
+    unique (user_id, action_id, weekday, time, enabled)
 );
-insert into action_rule (account_id, action_id, weekday, time, enabled) values 
+insert into action_rule (user_id, action_id, weekday, time, enabled) values 
     (1, 1, 'monday', '09:00:00', true), 
     (1, 3, 'tuesday', '19:00:00', true);
 
 create table action_event (
     id serial primary key,
-    account_id integer not null references account on delete cascade,
+    user_id integer not null references "user" on delete cascade,
     action_id integer not null references action on delete cascade,
     datetime timestamp not null,
     enabled boolean not null,
-    unique (account_id, action_id, datetime, enabled)
+    unique (user_id, action_id, datetime, enabled)
 );
-insert into action_event (account_id, action_id, datetime, enabled) values 
+insert into action_event (user_id, action_id, datetime, enabled) values 
     (1, 1, '2021-07-01 09:00:00', true), 
     (1, 1, '2021-07-02 09:00:00', true), 
     (1, 1, '2021-07-03 09:00:00', true), 

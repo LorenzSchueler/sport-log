@@ -62,7 +62,7 @@ pub type ActionRuleId = i32;
 #[table_name = "action_rule"]
 pub struct ActionRule {
     pub id: ActionRuleId,
-    pub account_id: AccountId,
+    pub user_id: UserId,
     pub action_id: ActionId,
     pub weekday: Weekday,
     pub time: NaiveTime,
@@ -72,7 +72,7 @@ pub struct ActionRule {
 #[derive(Insertable, Serialize, Deserialize)]
 #[table_name = "action_rule"]
 pub struct NewActionRule {
-    pub account_id: AccountId,
+    pub user_id: UserId,
     pub action_id: ActionId,
     pub weekday: Weekday,
     pub time: NaiveTime,
@@ -87,7 +87,7 @@ pub type ActionEventId = i32;
 #[table_name = "action_event"]
 pub struct ActionEvent {
     pub id: ActionEventId,
-    pub account_id: AccountId,
+    pub user_id: UserId,
     pub action_id: ActionId,
     pub datetime: NaiveDateTime,
     pub enabled: bool,
@@ -96,7 +96,7 @@ pub struct ActionEvent {
 #[derive(Insertable, Serialize, Deserialize)]
 #[table_name = "action_event"]
 pub struct NewActionEvent {
-    pub account_id: AccountId,
+    pub user_id: UserId,
     pub action_id: ActionId,
     pub datetime: NaiveDateTime,
     pub enabled: bool,

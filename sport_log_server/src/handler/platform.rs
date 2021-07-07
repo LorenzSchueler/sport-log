@@ -1,7 +1,7 @@
 use super::*;
 use crate::model::{
-    AccountId, NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials,
-    PlatformCredentialsId, PlatformId,
+    NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials, PlatformCredentialsId,
+    PlatformId, UserId,
 };
 
 #[post("/platform", format = "application/json", data = "<platfrom>")]
@@ -38,22 +38,22 @@ pub fn create_platform_credentials(
     to_json(PlatformCredentials::create(credentials.into_inner(), &conn))
 }
 
-#[get("/platform_creadentials/account/<account_id>")]
+#[get("/platform_creadentials/user/<user_id>")]
 pub fn get_own_platform_credentials(
-    account_id: AccountId,
+    user_id: UserId,
     conn: Db,
 ) -> Result<Json<Vec<PlatformCredentials>>, Status> {
-    to_json(PlatformCredentials::get_by_account(account_id, &conn))
+    to_json(PlatformCredentials::get_by_user(user_id, &conn))
 }
 
-#[get("/platform_creadentials/account/<account_id>/platform/<platform_id>")]
+#[get("/platform_creadentials/user/<user_id>/platform/<platform_id>")]
 pub fn get_own_platform_credentials_by_platform(
-    account_id: AccountId,
+    user_id: UserId,
     platform_id: PlatformId,
     conn: Db,
 ) -> Result<Json<PlatformCredentials>, Status> {
-    to_json(PlatformCredentials::get_by_account_and_platform(
-        account_id,
+    to_json(PlatformCredentials::get_by_user_and_platform(
+        user_id,
         platform_id,
         &conn,
     ))

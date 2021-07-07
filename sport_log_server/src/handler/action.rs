@@ -5,8 +5,8 @@ use rocket::{http::RawStr, request::FromParam};
 
 use super::*;
 use crate::model::{
-    AccountId, Action, ActionEvent, ActionEventId, ActionId, ActionProviderId, ActionRule,
-    ActionRuleId, ExecutableActionEvent, NewAction, NewActionEvent, NewActionRule,
+    Action, ActionEvent, ActionEventId, ActionId, ActionProviderId, ActionRule, ActionRuleId,
+    ExecutableActionEvent, NewAction, NewActionEvent, NewActionRule, UserId,
 };
 
 #[post("/action", format = "application/json", data = "<action>")]
@@ -47,12 +47,12 @@ pub fn get_action_rule(action_rule_id: ActionRuleId, conn: Db) -> Result<Json<Ac
     to_json(ActionRule::get_by_id(action_rule_id, &conn))
 }
 
-#[get("/action_rule/account/<account_id>")]
-pub fn get_action_rules_by_account(
-    account_id: AccountId,
+#[get("/action_rule/user/<user_id>")]
+pub fn get_action_rules_by_user(
+    user_id: UserId,
     conn: Db,
 ) -> Result<Json<Vec<ActionRule>>, Status> {
-    to_json(ActionRule::get_by_account(account_id, &conn))
+    to_json(ActionRule::get_by_user(user_id, &conn))
 }
 
 //#[get("/action_rule/platform/<platform_id>")]
@@ -63,14 +63,14 @@ pub fn get_action_rules_by_account(
 //to_json(ActionRule::get_by_platform(platform_id, &conn))
 //}
 
-//#[get("/action_rule/account/<account_id>/platform/<platform_id>")]
-//pub fn get_action_rules_by_account_and_platform(
-//account_id: AccountId,
+//#[get("/action_rule/user/<user_id>/platform/<platform_id>")]
+//pub fn get_action_rules_by_user_and_platform(
+//user_id: UserId,
 //platform_id: PlatformId,
 //conn: Db,
 //) -> Result<Json<Vec<ActionRule>>, Status> {
-//to_json(ActionRule::get_by_account_and_platform(
-//account_id,
+//to_json(ActionRule::get_by_user_and_platform(
+//user_id,
 //platform_id,
 //&conn,
 //))
@@ -107,12 +107,12 @@ pub fn get_action_event(
     to_json(ActionEvent::get_by_id(action_event_id, &conn))
 }
 
-#[get("/action_event/account/<account_id>")]
-pub fn get_action_events_by_account(
-    account_id: AccountId,
+#[get("/action_event/user/<user_id>")]
+pub fn get_action_events_by_user(
+    user_id: UserId,
     conn: Db,
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
-    to_json(ActionEvent::get_by_account(account_id, &conn))
+    to_json(ActionEvent::get_by_user(user_id, &conn))
 }
 
 //#[get("/action_event/platform/<platform_id>", rank = 1)]
@@ -131,14 +131,14 @@ pub fn get_action_events_by_account(
 //to_json(ActionEvent::get_by_platform_name(platform_name, &conn))
 //}
 
-//#[get("/action_event/account/<account_id>/platform/<platform_id>")]
-//pub fn get_action_events_by_account_and_platform(
-//account_id: AccountId,
+//#[get("/action_event/user/<user_id>/platform/<platform_id>")]
+//pub fn get_action_events_by_user_and_platform(
+//user_id: UserId,
 //platform_id: PlatformId,
 //conn: Db,
 //) -> Result<Json<Vec<ActionEvent>>, Status> {
-//to_json(ActionEvent::get_by_account_and_platform(
-//account_id,
+//to_json(ActionEvent::get_by_user_and_platform(
+//user_id,
 //platform_id,
 //&conn,
 //))

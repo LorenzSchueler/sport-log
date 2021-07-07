@@ -8,19 +8,19 @@ use rocket::{
 };
 
 use crate::{
-    model::{Account, AccountId, ActionProvider, ActionProviderId},
+    model::{ActionProvider, ActionProviderId, User, UserId},
     Db,
 };
 
-pub struct AuthenticatedAccount {
-    account_id: AccountId,
+pub struct AuthenticatedUser {
+    user_id: UserId,
 }
 
-impl Deref for AuthenticatedAccount {
-    type Target = AccountId;
+impl Deref for AuthenticatedUser {
+    type Target = UserId;
 
     fn deref(&self) -> &Self::Target {
-        &self.account_id
+        &self.user_id
     }
 }
 
@@ -63,7 +63,7 @@ fn authenticate<R>(
             };
 
             match auth_method(&username, &password, &conn) {
-                Ok(account_id) => Outcome::Success(account_id),
+                Ok(user_id) => Outcome::Success(user_id),
                 Err(_) => Outcome::Failure((Status::Unauthorized, ())),
             }
         }
@@ -72,12 +72,12 @@ fn authenticate<R>(
 }
 
 //#[rocket::async_trait]
-impl<'r> FromRequest<'_, '_> for AuthenticatedAccount {
+impl<'r> FromRequest<'_, '_> for AuthenticatedUser {
     type Error = ();
 
     fn from_request(request: &'_ Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
-        match authenticate::<AccountId>(request, Account::authenticate) {
-            Outcome::Success(account_id) => Outcome::Success(Self { account_id }),
+        match authenticate::<UserId>(request, User::authenticate) {
+            Outcome::Success(user_id) => Outcome::Success(Self { user_id }),
             Outcome::Failure(f) => Outcome::Failure(f),
             Outcome::Forward(f) => Outcome::Forward(f),
         }

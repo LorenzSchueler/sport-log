@@ -26,7 +26,7 @@ pub type PlatformCredentialsId = i32;
 #[table_name = "platform_credentials"]
 pub struct PlatformCredentials {
     pub id: PlatformCredentialsId,
-    pub account_id: AccountId,
+    pub user_id: UserId,
     pub platform_id: PlatformId,
     pub username: String,
     pub password: String,
@@ -35,7 +35,7 @@ pub struct PlatformCredentials {
 #[derive(Insertable, Serialize, Deserialize)]
 #[table_name = "platform_credentials"]
 pub struct NewPlatformCredentials {
-    pub account_id: AccountId,
+    pub user_id: UserId,
     pub platform_id: PlatformId,
     pub username: String,
     pub password: String,

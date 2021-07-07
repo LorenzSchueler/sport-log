@@ -3,8 +3,8 @@ use diesel::prelude::*;
 
 use crate::{
     model::{
-        AccountId, Action, ActionEvent, ActionProvider, ActionProviderId, ActionRule,
-        ExecutableActionEvent,
+        Action, ActionEvent, ActionProvider, ActionProviderId, ActionRule, ExecutableActionEvent,
+        UserId,
     },
     schema::{action, action_event, action_provider, action_rule, platform_credentials},
 };
@@ -34,12 +34,9 @@ impl Action {
 }
 
 impl ActionRule {
-    pub fn get_by_account(
-        account_id: AccountId,
-        conn: &PgConnection,
-    ) -> QueryResult<Vec<ActionRule>> {
+    pub fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<ActionRule>> {
         action_rule::table
-            .filter(action_rule::columns::account_id.eq(account_id))
+            .filter(action_rule::columns::user_id.eq(user_id))
             .get_results(conn)
     }
 
@@ -59,13 +56,13 @@ impl ActionRule {
     //.get_results(conn)
     //}
 
-    //pub fn get_by_account_and_platform(
-    //account_id: AccountId,
+    //pub fn get_by_user_and_platform(
+    //user_id: UserId,
     //platform_id: PlatformId,
     //conn: &PgConnection,
     //) -> QueryResult<Vec<ActionRule>> {
     //action_rule::table
-    //.filter(action_rule::columns::account_id.eq(account_id))
+    //.filter(action_rule::columns::user_id.eq(user_id))
     //.filter(
     //action_rule::columns::action_id.eq_any(
     //action::table
@@ -79,12 +76,9 @@ impl ActionRule {
 }
 
 impl ActionEvent {
-    pub fn get_by_account(
-        account_id: AccountId,
-        conn: &PgConnection,
-    ) -> QueryResult<Vec<ActionEvent>> {
+    pub fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<ActionEvent>> {
         action_event::table
-            .filter(action_event::columns::account_id.eq(account_id))
+            .filter(action_event::columns::user_id.eq(user_id))
             .get_results(conn)
     }
 
@@ -125,13 +119,13 @@ impl ActionEvent {
     //.get_results(conn)
     //}
 
-    //pub fn get_by_account_and_platform(
-    //account_id: AccountId,
+    //pub fn get_by_user_and_platform(
+    //user_id: UserId,
     //platform_id: PlatformId,
     //conn: &PgConnection,
     //) -> QueryResult<Vec<ActionEvent>> {
     //action_event::table
-    //.filter(action_event::columns::account_id.eq(account_id))
+    //.filter(action_event::columns::user_id.eq(user_id))
     //.filter(
     //action_event::columns::action_id.eq_any(
     //action::table
@@ -154,8 +148,7 @@ impl ExecutableActionEvent {
                 platform_credentials::table.on(platform_credentials::columns::platform_id
                     .eq(action_provider::columns::platform_id)
                     .and(
-                        platform_credentials::columns::account_id
-                            .eq(action_event::columns::account_id),
+                        platform_credentials::columns::user_id.eq(action_event::columns::user_id),
                     )),
             )
             .filter(action_provider::columns::name.eq(action_provider_name))
@@ -182,8 +175,7 @@ impl ExecutableActionEvent {
                 platform_credentials::table.on(platform_credentials::columns::platform_id
                     .eq(action_provider::columns::platform_id)
                     .and(
-                        platform_credentials::columns::account_id
-                            .eq(action_event::columns::account_id),
+                        platform_credentials::columns::user_id.eq(action_event::columns::user_id),
                     )),
             )
             .filter(action_provider::columns::name.eq(action_provider_name))

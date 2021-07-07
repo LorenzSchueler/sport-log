@@ -1,1 +1,1 @@
-drop table account;
+drop table "user";
