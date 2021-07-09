@@ -59,7 +59,7 @@ pub fn create_platform_credentials(
     ))
 }
 
-#[get("/platform_creadentials")]
+#[get("/platform_credentials")]
 pub fn get_own_platform_credentials(
     auth: AuthenticatedUser,
     conn: Db,
@@ -67,7 +67,7 @@ pub fn get_own_platform_credentials(
     to_json(PlatformCredentials::get_by_user(*auth, &conn))
 }
 
-#[get("/platform_creadentials/platform/<platform_id>")]
+#[get("/platform_credentials/platform/<platform_id>")]
 pub fn get_own_platform_credentials_by_platform(
     platform_id: PlatformId,
     auth: AuthenticatedUser,

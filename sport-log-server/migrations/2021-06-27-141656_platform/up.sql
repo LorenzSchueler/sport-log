@@ -17,4 +17,4 @@ create table platform_credentials (
 insert into platform_credentials (user_id, platform_id, username, password) values
     (1, 1, 'woduser1', 'wodpasswd1'),
     (2, 1, 'woduser2', 'wodpasswd2'),
-    (3, 2, 'stuser1', 'stpasswd3');
+    (3, 2, 'stuser3', 'stpasswd3');
