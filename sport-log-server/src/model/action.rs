@@ -28,7 +28,9 @@ pub struct NewActionProvider {
 
 pub type ActionId = i32;
 
-#[derive(Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, Delete)]
+#[derive(
+    Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Delete,
+)]
 #[table_name = "action"]
 pub struct Action {
     pub id: ActionId,

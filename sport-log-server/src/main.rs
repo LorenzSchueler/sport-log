@@ -51,6 +51,7 @@ pub fn main() {
                 action::create_action,
                 action::get_action,
                 action::get_actions_by_action_provider,
+                action::get_actions,
                 action::delete_action,
                 action::create_action_rule,
                 action::get_action_rule,

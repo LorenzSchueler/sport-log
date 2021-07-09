@@ -76,6 +76,11 @@ pub fn get_actions_by_action_provider(
     to_json(Action::get_by_action_provider(*auth, &conn))
 }
 
+#[get("/action")]
+pub fn get_actions(_auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Action>>, Status> {
+    to_json(Action::get_all(&conn))
+}
+
 #[delete("/ap/action/<action_id>")]
 pub fn delete_action(
     action_id: UnverifiedActionId,
