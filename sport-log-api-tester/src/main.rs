@@ -1,6 +1,6 @@
 use std::env::{self, Args};
 
-use reqwest::blocking::Client;
+use reqwest::{blocking::Client, header::CONTENT_TYPE};
 use serde_json::Value;
 
 fn main() {
@@ -38,14 +38,17 @@ fn handle(args: Args) -> Result<(), ()> {
         request = request.basic_auth(credentials.get(0).unwrap(), credentials.get(1));
     }
     if !data.is_empty() {
-        request = request.json(&data);
+        //request = request.json(&data);
+        request = request.body(data.to_owned());
+        request = request.header(CONTENT_TYPE, "application/json");
     }
     let response = request.send().unwrap();
 
     println!("{}\n", response.status());
     println!("{:#?}\n", response.headers());
     if response.status().is_success() {
-        println!("{:#?}", response.json::<Value>().unwrap());
+        let response = response.json::<Value>().unwrap();
+        println!("{}", serde_json::to_string_pretty(&response).unwrap());
     } else {
         println!("{}", response.text().unwrap());
     }
