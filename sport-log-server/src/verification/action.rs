@@ -5,9 +5,62 @@ use rocket_contrib::json::Json;
 use sport_log_server_derive::UnverifiedFromParamToVerified;
 
 use crate::{
-    auth::AuthenticatedUser,
-    model::{ActionEvent, ActionEventId, ActionRule, ActionRuleId, NewActionEvent, NewActionRule},
+    auth::{AuthenticatedActionProvider, AuthenticatedUser},
+    model::{
+        Action, ActionEvent, ActionEventId, ActionId, ActionRule, ActionRuleId, NewAction,
+        NewActionEvent, NewActionRule,
+    },
 };
+
+impl NewAction {
+    pub fn verify(action: Json<Self>, auth: AuthenticatedActionProvider) -> Result<Self, Status> {
+        let action = action.into_inner();
+        if action.action_provider_id == *auth {
+            Ok(action)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+impl Action {
+    pub fn verify(
+        action: Json<Action>,
+        auth: AuthenticatedActionProvider,
+    ) -> Result<Action, Status> {
+        let action = action.into_inner();
+        if action.action_provider_id == *auth {
+            Ok(action)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+pub struct UnverifiedActionId(ActionId);
+
+impl<'v> rocket::request::FromParam<'v> for UnverifiedActionId {
+    type Error = &'v rocket::http::RawStr;
+
+    fn from_param(param: &'v rocket::http::RawStr) -> Result<Self, Self::Error> {
+        Ok(Self(ActionId::from_param(param)?))
+    }
+}
+
+impl UnverifiedActionId {
+    pub fn verify(
+        self,
+        auth: AuthenticatedActionProvider,
+        conn: &PgConnection,
+    ) -> Result<ActionId, rocket::http::Status> {
+        let entity = Action::get_by_id(self.0, conn)
+            .map_err(|_| rocket::http::Status::InternalServerError)?;
+        if entity.action_provider_id == *auth {
+            Ok(self.0)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
 
 impl NewActionRule {
     pub fn verify(

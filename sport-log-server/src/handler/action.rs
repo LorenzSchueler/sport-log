@@ -11,38 +11,46 @@ use crate::{
     auth::{AuthenticatedActionProvider, AuthenticatedUser},
     handler::to_json,
     model::{
-        Action, ActionEvent, ActionId, ActionProviderId, ActionRule, ExecutableActionEvent,
-        NewAction, NewActionEvent, NewActionRule,
+        Action, ActionEvent, ActionProviderId, ActionRule, ExecutableActionEvent, NewAction,
+        NewActionEvent, NewActionRule,
     },
-    verification::{UnverifiedActionEventId, UnverifiedActionRuleId},
+    verification::{UnverifiedActionEventId, UnverifiedActionId, UnverifiedActionRuleId},
     Db,
 };
 
-// TODO authentification
-#[post("/action", format = "application/json", data = "<action>")]
-pub fn create_action(action: Json<NewAction>, conn: Db) -> Result<Json<Action>, Status> {
-    to_json(Action::create(action.into_inner(), &conn))
+#[post("/ap/action", format = "application/json", data = "<action>")]
+pub fn create_action(
+    action: Json<NewAction>,
+    auth: AuthenticatedActionProvider,
+    conn: Db,
+) -> Result<Json<Action>, Status> {
+    to_json(Action::create(NewAction::verify(action, auth)?, &conn))
 }
 
-// TODO authentification
-#[get("/action/<action_id>")]
-pub fn get_action(action_id: ActionId, conn: Db) -> Result<Json<Action>, Status> {
-    to_json(Action::get_by_id(action_id, &conn))
+#[get("/ap/action/<action_id>")]
+pub fn get_action(
+    action_id: UnverifiedActionId,
+    auth: AuthenticatedActionProvider,
+    conn: Db,
+) -> Result<Json<Action>, Status> {
+    to_json(Action::get_by_id(action_id.verify(auth, &conn)?, &conn))
 }
 
-// TODO authentification
-#[get("/action/platform/<action_provider_id>")]
-pub fn get_actions_by_platform(
-    action_provider_id: ActionProviderId,
+#[get("/ap/action")]
+pub fn get_actions_by_action_provider(
+    auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Vec<Action>>, Status> {
-    to_json(Action::get_by_action_provider(action_provider_id, &conn))
+    to_json(Action::get_by_action_provider(*auth, &conn))
 }
 
-// TODO authentification
-#[delete("/action/<action_id>")]
-pub fn delete_action(action_id: ActionId, conn: Db) -> Result<Status, Status> {
-    Action::delete(action_id, &conn)
+#[delete("/ap/action/<action_id>")]
+pub fn delete_action(
+    action_id: UnverifiedActionId,
+    auth: AuthenticatedActionProvider,
+    conn: Db,
+) -> Result<Status, Status> {
+    Action::delete(action_id.verify(auth, &conn)?, &conn)
         .map(|_| Status::NoContent)
         .map_err(|_| Status::InternalServerError)
 }
