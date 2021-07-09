@@ -36,38 +36,40 @@ impl Deref for AuthenticatedActionProvider {
     }
 }
 
-fn parse_username_password(auth_header: &str) -> Option<(String, String)> {
-    let auth_str = String::from_utf8(base64::decode(&auth_header[6..]).ok()?).ok()?;
-    let mut username_password = auth_str.splitn(2, ':');
-    let username = username_password.next()?;
-    let password = username_password.next()?;
+pub struct AuthenticatedAdmin;
 
-    Some((username.to_owned(), password.to_owned()))
+fn parse_username_password(request: &'_ Request<'_>) -> Option<(String, String)> {
+    let auth_header = request.headers().get("Authorization").next()?;
+    if auth_header.len() >= 7 && &auth_header[..6] == "Basic " {
+        let auth_str = String::from_utf8(base64::decode(&auth_header[6..]).ok()?).ok()?;
+        let mut username_password = auth_str.splitn(2, ':');
+        let username = username_password.next()?;
+        let password = username_password.next()?;
+
+        Some((username.to_owned(), password.to_owned()))
+    } else {
+        None
+    }
 }
 
 fn authenticate<R>(
     request: &'_ Request<'_>,
     auth_method: fn(&str, &str, &PgConnection) -> QueryResult<R>,
 ) -> Outcome<R, (Status, ()), ()> {
-    match request.headers().get("Authorization").next() {
-        Some(auth_header) if auth_header.len() >= 7 && &auth_header[..6] == "Basic " => {
-            let (username, password) = match parse_username_password(auth_header) {
-                Some((username, password)) => (username, password),
-                None => return Outcome::Failure((Status::BadRequest, ())),
-            };
+    let (username, password) = match parse_username_password(request) {
+        Some((username, password)) => (username, password),
+        None => return Outcome::Failure((Status::Unauthorized, ())),
+    };
 
-            let conn = match Db::from_request(request) {
-                Outcome::Success(conn) => conn,
-                Outcome::Failure(f) => return Outcome::Failure(f),
-                Outcome::Forward(f) => return Outcome::Forward(f),
-            };
+    let conn = match Db::from_request(request) {
+        Outcome::Success(conn) => conn,
+        Outcome::Failure(f) => return Outcome::Failure(f),
+        Outcome::Forward(f) => return Outcome::Forward(f),
+    };
 
-            match auth_method(&username, &password, &conn) {
-                Ok(user_id) => Outcome::Success(user_id),
-                Err(_) => Outcome::Failure((Status::Unauthorized, ())),
-            }
-        }
-        _ => Outcome::Failure((Status::Unauthorized, ())),
+    match auth_method(&username, &password, &conn) {
+        Ok(user_id) => Outcome::Success(user_id),
+        Err(_) => Outcome::Failure((Status::Unauthorized, ())),
     }
 }
 
@@ -92,6 +94,21 @@ impl<'r> FromRequest<'_, '_> for AuthenticatedActionProvider {
             Outcome::Success(action_provider_id) => Outcome::Success(Self { action_provider_id }),
             Outcome::Failure(f) => Outcome::Failure(f),
             Outcome::Forward(f) => Outcome::Forward(f),
+        }
+    }
+}
+
+impl<'r> FromRequest<'_, '_> for AuthenticatedAdmin {
+    type Error = ();
+
+    fn from_request(request: &'_ Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
+        match parse_username_password(request) {
+            Some((username, password))
+                if username == "admin" && password == crate::ADMIN_PASSWORD =>
+            {
+                Outcome::Success(Self)
+            }
+            _ => Outcome::Failure((Status::Unauthorized, ())),
         }
     }
 }

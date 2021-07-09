@@ -17,6 +17,8 @@ mod verification;
 
 const BASE: &str = "/v1";
 
+const ADMIN_PASSWORD: &str = "adminpasswd";
+
 #[database("sport_diary")]
 pub struct Db(PgConnection);
 
@@ -45,7 +47,7 @@ pub fn main() {
                 platform::delete_platform_credentials,
                 action::create_action,
                 action::get_action,
-                action::get_actions_by_platform,
+                action::get_actions_by_action_provider,
                 action::delete_action,
                 action::create_action_rule,
                 action::get_action_rule,

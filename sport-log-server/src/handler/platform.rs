@@ -2,34 +2,42 @@ use rocket::http::Status;
 use rocket_contrib::json::Json;
 
 use crate::{
-    auth::AuthenticatedUser,
+    auth::{AuthenticatedAdmin, AuthenticatedUser},
     handler::to_json,
     model::{NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials, PlatformId},
     verification::UnverifiedPlatformCredentialsId,
     Db,
 };
 
-// TODO authentification
-#[post("/platform", format = "application/json", data = "<platfrom>")]
-pub fn create_platform(platfrom: Json<NewPlatform>, conn: Db) -> Result<Json<Platform>, Status> {
+#[post("/adm/platform", format = "application/json", data = "<platfrom>")]
+pub fn create_platform(
+    platfrom: Json<NewPlatform>,
+    _auth: AuthenticatedAdmin,
+    conn: Db,
+) -> Result<Json<Platform>, Status> {
     to_json(Platform::create(platfrom.into_inner(), &conn))
 }
 
-// TODO authentification
-#[get("/platform")]
-pub fn get_platforms(conn: Db) -> Result<Json<Vec<Platform>>, Status> {
+#[get("/adm/platform")]
+pub fn get_platforms(_auth: AuthenticatedAdmin, conn: Db) -> Result<Json<Vec<Platform>>, Status> {
     to_json(Platform::get_all(&conn))
 }
 
-// TODO authentification
-#[put("/platform", format = "application/json", data = "<platform>")]
-pub fn update_platform(platform: Json<Platform>, conn: Db) -> Result<Json<Platform>, Status> {
+#[put("/adm/platform", format = "application/json", data = "<platform>")]
+pub fn update_platform(
+    platform: Json<Platform>,
+    _auth: AuthenticatedAdmin,
+    conn: Db,
+) -> Result<Json<Platform>, Status> {
     to_json(Platform::update(platform.into_inner(), &conn))
 }
 
-// TODO authentification
-#[delete("/platform/<platform_id>")]
-pub fn delete_platform(platform_id: PlatformId, conn: Db) -> Result<Status, Status> {
+#[delete("/adm/platform/<platform_id>")]
+pub fn delete_platform(
+    platform_id: PlatformId,
+    _auth: AuthenticatedAdmin,
+    conn: Db,
+) -> Result<Status, Status> {
     Platform::delete(platform_id, &conn)
         .map(|_| Status::NoContent)
         .map_err(|_| Status::InternalServerError)
