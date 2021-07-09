@@ -1,3 +1,3 @@
 [workspace]
 #members = ["sport_log_server", "sport-log-api-tester", "sport_log_server_derive", "sport_log_action_provider_sportstracker"]
-members = ["sport-log-server", "sport-log-server-derive", "sport-log-api-tester"]
+members = ["sport-log-server", "sport-log-server-derive", "sport-log-api-tester", "sport-log-action-provider-sportstracker"]
