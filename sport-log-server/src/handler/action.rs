@@ -8,15 +8,47 @@ use rocket::{
 use rocket_contrib::json::Json;
 
 use crate::{
-    auth::{AuthenticatedActionProvider, AuthenticatedUser},
+    auth::{AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser},
     handler::to_json,
     model::{
-        Action, ActionEvent, ActionProviderId, ActionRule, ExecutableActionEvent, NewAction,
-        NewActionEvent, NewActionRule,
+        Action, ActionEvent, ActionProvider, ActionProviderId, ActionRule, ExecutableActionEvent,
+        NewAction, NewActionEvent, NewActionProvider, NewActionRule,
     },
     verification::{UnverifiedActionEventId, UnverifiedActionId, UnverifiedActionRuleId},
     Db,
 };
+
+#[post(
+    "/adm/action_provider",
+    format = "application/json",
+    data = "<action_provider>"
+)]
+pub fn create_action_provider(
+    action_provider: Json<NewActionProvider>,
+    _auth: AuthenticatedAdmin,
+    conn: Db,
+) -> Result<Json<ActionProvider>, Status> {
+    to_json(ActionProvider::create(action_provider.into_inner(), &conn))
+}
+
+#[get("/adm/action_provider")]
+pub fn get_action_providers(
+    _auth: AuthenticatedAdmin,
+    conn: Db,
+) -> Result<Json<Vec<ActionProvider>>, Status> {
+    to_json(ActionProvider::get_all(&conn))
+}
+
+#[delete("/adm/action_provider/<action_provider_id>")]
+pub fn delete_action_provider(
+    action_provider_id: ActionProviderId,
+    _auth: AuthenticatedAdmin,
+    conn: Db,
+) -> Result<Status, Status> {
+    Action::delete(action_provider_id, &conn)
+        .map(|_| Status::NoContent)
+        .map_err(|_| Status::InternalServerError)
+}
 
 #[post("/ap/action", format = "application/json", data = "<action>")]
 pub fn create_action(

@@ -2,14 +2,14 @@ use chrono::{NaiveDateTime, NaiveTime};
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
-use sport_log_server_derive::{Create, Delete, GetById, Update};
+use sport_log_server_derive::{Create, Delete, GetAll, GetById, Update};
 
 use super::*;
 use crate::schema::{action, action_event, action_provider, action_rule};
 
 pub type ActionProviderId = i32;
 
-#[derive(Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, Delete)]
+#[derive(Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetAll, Delete)]
 #[table_name = "action_provider"]
 pub struct ActionProvider {
     pub id: ActionId,
