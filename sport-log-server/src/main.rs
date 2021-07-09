@@ -67,6 +67,7 @@ pub fn main() {
                 action::get_action_events_by_user_and_action_provider,
                 action::update_action_event,
                 action::delete_action_event,
+                action::delete_action_event_ap,
                 action::get_executable_action_events_by_action_provider,
                 action::get_executable_action_events_by_action_provider_and_timerange
             ],

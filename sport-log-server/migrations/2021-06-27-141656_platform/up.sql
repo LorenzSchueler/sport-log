@@ -4,7 +4,7 @@ create table platform (
 );
 insert into platform (name) values 
     ('wodify'),
-    ('sportstacker');
+    ('sportstracker');
 
 create table platform_credentials (
     id serial primary key,

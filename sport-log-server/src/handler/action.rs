@@ -65,7 +65,7 @@ pub fn get_action(
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Action>, Status> {
-    to_json(Action::get_by_id(action_id.verify(auth, &conn)?, &conn))
+    to_json(Action::get_by_id(action_id.verify_ap(auth, &conn)?, &conn))
 }
 
 #[get("/ap/action")]
@@ -87,7 +87,7 @@ pub fn delete_action(
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Status, Status> {
-    Action::delete(action_id.verify(auth, &conn)?, &conn)
+    Action::delete(action_id.verify_ap(auth, &conn)?, &conn)
         .map(|_| Status::NoContent)
         .map_err(|_| Status::InternalServerError)
 }
@@ -232,6 +232,17 @@ pub fn delete_action_event(
     conn: Db,
 ) -> Result<Status, Status> {
     ActionEvent::delete(action_event_id.verify(auth, &conn)?, &conn)
+        .map(|_| Status::NoContent)
+        .map_err(|_| Status::InternalServerError)
+}
+
+#[delete("/ap/action_event/<action_event_id>")]
+pub fn delete_action_event_ap(
+    action_event_id: UnverifiedActionEventId,
+    auth: AuthenticatedActionProvider,
+    conn: Db,
+) -> Result<Status, Status> {
+    ActionEvent::delete(action_event_id.verify_ap(auth, &conn)?, &conn)
         .map(|_| Status::NoContent)
         .map_err(|_| Status::InternalServerError)
 }

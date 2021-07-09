@@ -2,7 +2,7 @@ use diesel::PgConnection;
 use rocket::http::Status;
 use rocket_contrib::json::Json;
 
-use sport_log_server_derive::UnverifiedFromParamToVerified;
+use sport_log_server_derive::{FromParam, UnverifiedFromParamToVerifiedForUser};
 
 use crate::{
     auth::AuthenticatedUser,
@@ -37,5 +37,5 @@ impl PlatformCredentials {
     }
 }
 
-#[derive(UnverifiedFromParamToVerified)]
+#[derive(UnverifiedFromParamToVerifiedForUser, FromParam)]
 pub struct UnverifiedPlatformCredentialsId(PlatformCredentialsId);
