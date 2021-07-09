@@ -13,6 +13,7 @@ mod handler;
 mod model;
 mod repository;
 mod schema;
+mod verification;
 
 const BASE: &str = "/v1";
 
@@ -30,7 +31,6 @@ pub fn main() {
             BASE,
             routes![
                 user::create_user,
-                user::get_users,
                 user::get_user,
                 user::update_user,
                 user::delete_user,
@@ -50,22 +50,19 @@ pub fn main() {
                 action::create_action_rule,
                 action::get_action_rule,
                 action::get_action_rules_by_user,
-                //action::get_action_rules_by_platform,
-                //action::get_action_rules_by_user_and_platform,
+                action::get_action_rules_by_user_and_action_provider,
                 action::update_action_rule,
                 action::delete_action_rule,
                 action::create_action_event,
                 action::get_action_event,
                 action::get_action_events_by_user,
-                //action::get_action_events_by_platform,
-                //action::get_action_events_by_platform_name,
-                //action::get_action_events_by_user_and_platform,
+                action::get_action_events_by_action_provider,
+                action::get_action_events_by_user_and_action_provider,
                 action::update_action_event,
                 action::delete_action_event,
-                action::get_executable_action_events_by_action_provider_name,
-                action::get_executable_action_events_by_action_provider_name_and_timerange
+                action::get_executable_action_events_by_action_provider,
+                action::get_executable_action_events_by_action_provider_and_timerange
             ],
         )
         .launch();
 }
-// http://username:password@host

@@ -1392,6 +1392,7 @@ dependencies = [
  "Inflector",
  "proc-macro2 1.0.27",
  "quote 1.0.9",
+ "rocket",
  "syn 1.0.73",
 ]
 

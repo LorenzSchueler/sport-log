@@ -3,8 +3,8 @@ use diesel::prelude::*;
 
 use crate::{
     model::{
-        Action, ActionEvent, ActionProvider, ActionProviderId, ActionRule, ExecutableActionEvent,
-        UserId,
+        Action, ActionEvent, ActionId, ActionProvider, ActionProviderId, ActionRule,
+        ExecutableActionEvent, UserId,
     },
     schema::{action, action_event, action_provider, action_rule, platform_credentials},
 };
@@ -40,39 +40,39 @@ impl ActionRule {
             .get_results(conn)
     }
 
-    //pub fn get_by_platform(
-    //platform_id: PlatformId,
-    //conn: &PgConnection,
-    //) -> QueryResult<Vec<ActionRule>> {
-    //action_rule::table
-    //.filter(
-    //action_rule::columns::action_id.eq_any(
-    //action::table
-    //.select(action::columns::id)
-    //.filter(action::columns::platform_id.eq(platform_id))
-    //.get_results::<ActionId>(conn)?,
-    //),
-    //)
-    //.get_results(conn)
-    //}
+    pub fn get_by_action_provider(
+        action_provider_id: ActionProviderId,
+        conn: &PgConnection,
+    ) -> QueryResult<Vec<ActionRule>> {
+        action_rule::table
+            .filter(
+                action_rule::columns::action_id.eq_any(
+                    action::table
+                        .select(action::columns::id)
+                        .filter(action::columns::action_provider_id.eq(action_provider_id))
+                        .get_results::<ActionId>(conn)?,
+                ),
+            )
+            .get_results(conn)
+    }
 
-    //pub fn get_by_user_and_platform(
-    //user_id: UserId,
-    //platform_id: PlatformId,
-    //conn: &PgConnection,
-    //) -> QueryResult<Vec<ActionRule>> {
-    //action_rule::table
-    //.filter(action_rule::columns::user_id.eq(user_id))
-    //.filter(
-    //action_rule::columns::action_id.eq_any(
-    //action::table
-    //.select(action::columns::id)
-    //.filter(action::columns::platform_id.eq(platform_id))
-    //.get_results::<ActionId>(conn)?,
-    //),
-    //)
-    //.get_results(conn)
-    //}
+    pub fn get_by_user_and_action_provider(
+        user_id: UserId,
+        action_provider_id: ActionProviderId,
+        conn: &PgConnection,
+    ) -> QueryResult<Vec<ActionRule>> {
+        action_rule::table
+            .filter(action_rule::columns::user_id.eq(user_id))
+            .filter(
+                action_rule::columns::action_id.eq_any(
+                    action::table
+                        .select(action::columns::id)
+                        .filter(action::columns::action_provider_id.eq(action_provider_id))
+                        .get_results::<ActionId>(conn)?,
+                ),
+            )
+            .get_results(conn)
+    }
 }
 
 impl ActionEvent {
@@ -82,64 +82,64 @@ impl ActionEvent {
             .get_results(conn)
     }
 
-    //pub fn get_by_platform(
-    //platform_id: PlatformId,
-    //conn: &PgConnection,
-    //) -> QueryResult<Vec<ActionEvent>> {
-    //action_event::table
-    //.filter(
-    //action_event::columns::action_id.eq_any(
-    //action::table
-    //.select(action::columns::id)
-    //.filter(action::columns::platform_id.eq(platform_id))
-    //.get_results::<ActionId>(conn)?,
-    //),
-    //)
-    //.get_results(conn)
-    //}
+    pub fn get_by_action_provider(
+        action_provider_id: ActionProviderId,
+        conn: &PgConnection,
+    ) -> QueryResult<Vec<ActionEvent>> {
+        action_event::table
+            .filter(
+                action_event::columns::action_id.eq_any(
+                    action::table
+                        .select(action::columns::id)
+                        .filter(action::columns::action_provider_id.eq(action_provider_id))
+                        .get_results::<ActionId>(conn)?,
+                ),
+            )
+            .get_results(conn)
+    }
 
-    //pub fn get_by_platform_name(
-    //platform_name: String,
-    //conn: &PgConnection,
-    //) -> QueryResult<Vec<ActionEvent>> {
-    //action_event::table
-    //.filter(
-    //action_event::columns::action_id.eq_any(
-    //action::table
-    //.select(action::columns::id)
-    //.filter(
-    //action::columns::platform_id.eq(platform::table
-    //.select(platform::columns::id)
-    //.filter(platform::columns::name.eq(platform_name))
-    //.first::<PlatformId>(conn)?),
-    //)
-    //.get_results::<ActionId>(conn)?,
-    //),
-    //)
-    //.get_results(conn)
-    //}
+    // pub fn get_by_platform_name(
+    // action_provider_name: String,
+    // conn: &PgConnection,
+    // ) -> QueryResult<Vec<ActionEvent>> {
+    // action_event::table
+    // .filter(
+    // action_event::columns::action_id.eq_any(
+    // action::table
+    // .select(action::columns::id)
+    // .filter(
+    // action::columns::action_provider_id.eq(action_provider::table
+    // .select(action_provider::columns::id)
+    // .filter(action_provider::columns::name.eq(action_provider_name))
+    // .first::<ActionProviderId>(conn)?),
+    // )
+    // .get_results::<ActionId>(conn)?,
+    // ),
+    // )
+    // .get_results(conn)
+    // }
 
-    //pub fn get_by_user_and_platform(
-    //user_id: UserId,
-    //platform_id: PlatformId,
-    //conn: &PgConnection,
-    //) -> QueryResult<Vec<ActionEvent>> {
-    //action_event::table
-    //.filter(action_event::columns::user_id.eq(user_id))
-    //.filter(
-    //action_event::columns::action_id.eq_any(
-    //action::table
-    //.filter(action::columns::platform_id.eq(platform_id))
-    //.select(action::columns::id),
-    //),
-    //)
-    //.get_results(conn)
-    //}
+    pub fn get_by_user_and_action_provider(
+        user_id: UserId,
+        action_provider_id: ActionProviderId,
+        conn: &PgConnection,
+    ) -> QueryResult<Vec<ActionEvent>> {
+        action_event::table
+            .filter(action_event::columns::user_id.eq(user_id))
+            .filter(
+                action_event::columns::action_id.eq_any(
+                    action::table
+                        .filter(action::columns::action_provider_id.eq(action_provider_id))
+                        .select(action::columns::id),
+                ),
+            )
+            .get_results(conn)
+    }
 }
 
 impl ExecutableActionEvent {
-    pub fn get_by_action_provider_name(
-        action_provider_name: String,
+    pub fn get_by_action_provider(
+        action_provider_id: ActionProviderId,
         conn: &PgConnection,
     ) -> QueryResult<Vec<ExecutableActionEvent>> {
         action_event::table
@@ -151,7 +151,7 @@ impl ExecutableActionEvent {
                         platform_credentials::columns::user_id.eq(action_event::columns::user_id),
                     )),
             )
-            .filter(action_provider::columns::name.eq(action_provider_name))
+            .filter(action_provider::columns::id.eq(action_provider_id))
             .filter(action_event::columns::enabled.eq(true))
             .select((
                 action_event::columns::id,
@@ -163,8 +163,8 @@ impl ExecutableActionEvent {
             .get_results::<ExecutableActionEvent>(conn)
     }
 
-    pub fn get_by_action_provider_name_and_timerange(
-        action_provider_name: String,
+    pub fn get_by_action_provider_and_timerange(
+        action_provider_id: ActionProviderId,
         start_time: NaiveDateTime,
         end_time: NaiveDateTime,
         conn: &PgConnection,
@@ -178,7 +178,7 @@ impl ExecutableActionEvent {
                         platform_credentials::columns::user_id.eq(action_event::columns::user_id),
                     )),
             )
-            .filter(action_provider::columns::name.eq(action_provider_name))
+            .filter(action_provider::columns::id.eq(action_provider_id))
             .filter(action_event::columns::enabled.eq(true))
             .filter(action_event::columns::datetime.ge(start_time))
             .filter(action_event::columns::datetime.le(end_time))

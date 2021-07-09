@@ -1,24 +1,36 @@
 use std::ops::Deref;
 
 use chrono::{NaiveDateTime, NaiveTime};
-use rocket::{http::RawStr, request::FromParam};
+use rocket::{
+    http::{RawStr, Status},
+    request::FromParam,
+};
+use rocket_contrib::json::Json;
 
-use super::*;
-use crate::model::{
-    Action, ActionEvent, ActionEventId, ActionId, ActionProviderId, ActionRule, ActionRuleId,
-    ExecutableActionEvent, NewAction, NewActionEvent, NewActionRule, UserId,
+use crate::{
+    auth::{AuthenticatedActionProvider, AuthenticatedUser},
+    handler::to_json,
+    model::{
+        Action, ActionEvent, ActionId, ActionProviderId, ActionRule, ExecutableActionEvent,
+        NewAction, NewActionEvent, NewActionRule,
+    },
+    verification::{UnverifiedActionEventId, UnverifiedActionRuleId},
+    Db,
 };
 
+// TODO authentification
 #[post("/action", format = "application/json", data = "<action>")]
 pub fn create_action(action: Json<NewAction>, conn: Db) -> Result<Json<Action>, Status> {
     to_json(Action::create(action.into_inner(), &conn))
 }
 
+// TODO authentification
 #[get("/action/<action_id>")]
 pub fn get_action(action_id: ActionId, conn: Db) -> Result<Json<Action>, Status> {
     to_json(Action::get_by_id(action_id, &conn))
 }
 
+// TODO authentification
 #[get("/action/platform/<action_provider_id>")]
 pub fn get_actions_by_platform(
     action_provider_id: ActionProviderId,
@@ -27,6 +39,7 @@ pub fn get_actions_by_platform(
     to_json(Action::get_by_action_provider(action_provider_id, &conn))
 }
 
+// TODO authentification
 #[delete("/action/<action_id>")]
 pub fn delete_action(action_id: ActionId, conn: Db) -> Result<Status, Status> {
     Action::delete(action_id, &conn)
@@ -37,56 +50,67 @@ pub fn delete_action(action_id: ActionId, conn: Db) -> Result<Status, Status> {
 #[post("/action_rule", format = "application/json", data = "<action_rule>")]
 pub fn create_action_rule(
     action_rule: Json<NewActionRule>,
+    auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<ActionRule>, Status> {
-    to_json(ActionRule::create(action_rule.into_inner(), &conn))
+    to_json(ActionRule::create(
+        NewActionRule::verify(action_rule, auth)?,
+        &conn,
+    ))
 }
 
 #[get("/action_rule/<action_rule_id>")]
-pub fn get_action_rule(action_rule_id: ActionRuleId, conn: Db) -> Result<Json<ActionRule>, Status> {
-    to_json(ActionRule::get_by_id(action_rule_id, &conn))
+pub fn get_action_rule(
+    action_rule_id: UnverifiedActionRuleId,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<ActionRule>, Status> {
+    to_json(ActionRule::get_by_id(
+        action_rule_id.verify(auth, &conn)?,
+        &conn,
+    ))
 }
 
-#[get("/action_rule/user/<user_id>")]
+#[get("/action_rule")]
 pub fn get_action_rules_by_user(
-    user_id: UserId,
+    auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<ActionRule>>, Status> {
-    to_json(ActionRule::get_by_user(user_id, &conn))
+    to_json(ActionRule::get_by_user(*auth, &conn))
 }
 
-//#[get("/action_rule/platform/<platform_id>")]
-//pub fn get_action_rules_by_platform(
-//platform_id: PlatformId,
-//conn: Db,
-//) -> Result<Json<Vec<ActionRule>>, Status> {
-//to_json(ActionRule::get_by_platform(platform_id, &conn))
-//}
-
-//#[get("/action_rule/user/<user_id>/platform/<platform_id>")]
-//pub fn get_action_rules_by_user_and_platform(
-//user_id: UserId,
-//platform_id: PlatformId,
-//conn: Db,
-//) -> Result<Json<Vec<ActionRule>>, Status> {
-//to_json(ActionRule::get_by_user_and_platform(
-//user_id,
-//platform_id,
-//&conn,
-//))
-//}
+#[get("/action_rule/action_provider/<action_provider_id>")]
+pub fn get_action_rules_by_user_and_action_provider(
+    action_provider_id: ActionProviderId,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<ActionRule>>, Status> {
+    to_json(ActionRule::get_by_user_and_action_provider(
+        *auth,
+        action_provider_id,
+        &conn,
+    ))
+}
 
 #[put("/action_rule", format = "application/json", data = "<action_rule>")]
 pub fn update_action_rule(
     action_rule: Json<ActionRule>,
+    auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<ActionRule>, Status> {
-    to_json(ActionRule::update(action_rule.into_inner(), &conn))
+    to_json(ActionRule::update(
+        ActionRule::verify(action_rule, auth)?,
+        &conn,
+    ))
 }
 
 #[delete("/action_rule/<action_rule_id>")]
-pub fn delete_action_rule(action_rule_id: ActionRuleId, conn: Db) -> Result<Status, Status> {
-    ActionRule::delete(action_rule_id, &conn)
+pub fn delete_action_rule(
+    action_rule_id: UnverifiedActionRuleId,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    ActionRule::delete(action_rule_id.verify(auth, &conn)?, &conn)
         .map(|_| Status::NoContent)
         .map_err(|_| Status::InternalServerError)
 }
@@ -94,97 +118,100 @@ pub fn delete_action_rule(action_rule_id: ActionRuleId, conn: Db) -> Result<Stat
 #[post("/action_event", format = "application/json", data = "<action_event>")]
 pub fn create_action_event(
     action_event: Json<NewActionEvent>,
+    auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<ActionEvent>, Status> {
-    to_json(ActionEvent::create(action_event.into_inner(), &conn))
-}
-
-#[get("/action_event/<action_event_id>")]
-pub fn get_action_event(
-    action_event_id: ActionEventId,
-    conn: Db,
-) -> Result<Json<ActionEvent>, Status> {
-    to_json(ActionEvent::get_by_id(action_event_id, &conn))
-}
-
-#[get("/action_event/user/<user_id>")]
-pub fn get_action_events_by_user(
-    user_id: UserId,
-    conn: Db,
-) -> Result<Json<Vec<ActionEvent>>, Status> {
-    to_json(ActionEvent::get_by_user(user_id, &conn))
-}
-
-//#[get("/action_event/platform/<platform_id>", rank = 1)]
-//pub fn get_action_events_by_platform(
-//platform_id: PlatformId,
-//conn: Db,
-//) -> Result<Json<Vec<ActionEvent>>, Status> {
-//to_json(ActionEvent::get_by_platform(platform_id, &conn))
-//}
-
-//#[get("/action_event/platform/<platform_name>", rank = 2)]
-//pub fn get_action_events_by_platform_name(
-//platform_name: String,
-//conn: Db,
-//) -> Result<Json<Vec<ActionEvent>>, Status> {
-//to_json(ActionEvent::get_by_platform_name(platform_name, &conn))
-//}
-
-//#[get("/action_event/user/<user_id>/platform/<platform_id>")]
-//pub fn get_action_events_by_user_and_platform(
-//user_id: UserId,
-//platform_id: PlatformId,
-//conn: Db,
-//) -> Result<Json<Vec<ActionEvent>>, Status> {
-//to_json(ActionEvent::get_by_user_and_platform(
-//user_id,
-//platform_id,
-//&conn,
-//))
-//}
-
-#[put("/action_event", format = "application/json", data = "<action_event>")]
-pub fn update_action_event(
-    action_event: Json<ActionEvent>,
-    conn: Db,
-) -> Result<Json<ActionEvent>, Status> {
-    to_json(ActionEvent::update(action_event.into_inner(), &conn))
-}
-
-#[delete("/action_event/<action_event_id>")]
-pub fn delete_action_event(action_event_id: ActionEventId, conn: Db) -> Result<Status, Status> {
-    ActionEvent::delete(action_event_id, &conn)
-        .map(|_| Status::NoContent)
-        .map_err(|_| Status::InternalServerError)
-}
-
-#[get("/executable_action_event/platform/<action_provider_name>")]
-pub fn get_executable_action_events_by_action_provider_name(
-    action_provider_name: String,
-    conn: Db,
-) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
-    to_json(ExecutableActionEvent::get_by_action_provider_name(
-        action_provider_name,
+    to_json(ActionEvent::create(
+        NewActionEvent::verify(action_event, auth)?,
         &conn,
     ))
 }
 
-#[get("/executable_action_event/platform/<action_provider_name>/timerange/<start_time>/<end_time>")]
-pub fn get_executable_action_events_by_action_provider_name_and_timerange(
-    action_provider_name: String,
-    start_time: NaiveDateTimeWrapper,
-    end_time: NaiveDateTimeWrapper,
+#[get("/action_event/<action_event_id>")]
+pub fn get_action_event(
+    action_event_id: UnverifiedActionEventId,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<ActionEvent>, Status> {
+    to_json(ActionEvent::get_by_id(
+        action_event_id.verify(auth, &conn)?,
+        &conn,
+    ))
+}
+
+#[get("/action_event")]
+pub fn get_action_events_by_user(
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<ActionEvent>>, Status> {
+    to_json(ActionEvent::get_by_user(*auth, &conn))
+}
+
+#[get("/ap/action_event")]
+pub fn get_action_events_by_action_provider(
+    auth: AuthenticatedActionProvider,
+    conn: Db,
+) -> Result<Json<Vec<ActionEvent>>, Status> {
+    to_json(ActionEvent::get_by_action_provider(*auth, &conn))
+}
+
+#[get("/action_event/action_provider/<action_provider_id>")]
+pub fn get_action_events_by_user_and_action_provider(
+    action_provider_id: ActionProviderId,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<ActionEvent>>, Status> {
+    to_json(ActionEvent::get_by_user_and_action_provider(
+        *auth,
+        action_provider_id,
+        &conn,
+    ))
+}
+
+#[put("/action_event", format = "application/json", data = "<action_event>")]
+pub fn update_action_event(
+    action_event: Json<ActionEvent>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<ActionEvent>, Status> {
+    to_json(ActionEvent::update(
+        ActionEvent::verify(action_event, auth)?,
+        &conn,
+    ))
+}
+
+#[delete("/action_event/<action_event_id>")]
+pub fn delete_action_event(
+    action_event_id: UnverifiedActionEventId,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    ActionEvent::delete(action_event_id.verify(auth, &conn)?, &conn)
+        .map(|_| Status::NoContent)
+        .map_err(|_| Status::InternalServerError)
+}
+
+#[get("/ap/executable_action_event")]
+pub fn get_executable_action_events_by_action_provider(
+    auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
-    to_json(
-        ExecutableActionEvent::get_by_action_provider_name_and_timerange(
-            action_provider_name,
-            *start_time,
-            *end_time,
-            &conn,
-        ),
-    )
+    to_json(ExecutableActionEvent::get_by_action_provider(*auth, &conn))
+}
+
+#[get("/ap/executable_action_event/timerange/<start_time>/<end_time>")]
+pub fn get_executable_action_events_by_action_provider_and_timerange(
+    start_time: NaiveDateTimeWrapper,
+    end_time: NaiveDateTimeWrapper,
+    auth: AuthenticatedActionProvider,
+    conn: Db,
+) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
+    to_json(ExecutableActionEvent::get_by_action_provider_and_timerange(
+        *auth,
+        *start_time,
+        *end_time,
+        &conn,
+    ))
 }
 
 pub struct NaiveTimeWrapper(NaiveTime);

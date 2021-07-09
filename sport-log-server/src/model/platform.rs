@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use sport_log_server_derive::{Create, Delete, GetAll, Update};
+use sport_log_server_derive::{Create, Delete, GetAll, GetById, Update};
 
 use super::*;
 use crate::schema::{platform, platform_credentials};
@@ -22,7 +22,9 @@ pub struct NewPlatform {
 
 pub type PlatformCredentialsId = i32;
 
-#[derive(Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetAll, Update, Delete)]
+#[derive(
+    Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, Update, Delete,
+)]
 #[table_name = "platform_credentials"]
 pub struct PlatformCredentials {
     pub id: PlatformCredentialsId,

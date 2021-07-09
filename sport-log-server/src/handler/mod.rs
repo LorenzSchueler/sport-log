@@ -2,8 +2,6 @@ use diesel::QueryResult;
 use rocket::http::Status;
 use rocket_contrib::json::Json;
 
-use crate::Db;
-
 pub mod action;
 pub mod platform;
 pub mod user;
