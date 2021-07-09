@@ -23,6 +23,11 @@ pub fn get_platforms(_auth: AuthenticatedAdmin, conn: Db) -> Result<Json<Vec<Pla
     to_json(Platform::get_all(&conn))
 }
 
+#[get("/platform")]
+pub fn get_platforms_u(_auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Platform>>, Status> {
+    to_json(Platform::get_all(&conn))
+}
+
 #[put("/adm/platform", format = "application/json", data = "<platform>")]
 pub fn update_platform(
     platform: Json<Platform>,

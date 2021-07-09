@@ -38,6 +38,7 @@ pub fn main() {
                 user::delete_user,
                 platform::create_platform,
                 platform::get_platforms,
+                platform::get_platforms_u,
                 platform::update_platform,
                 platform::delete_platform,
                 platform::create_platform_credentials,
