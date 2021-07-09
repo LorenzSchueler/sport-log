@@ -141,3 +141,46 @@ fn impl_delete(ast: &syn::DeriveInput) -> TokenStream {
     };
     gen.into()
 }
+
+#[proc_macro_derive(UnverifiedFromParamToVerified)]
+pub fn unverfied_from_param_to_verified_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_unverfied_from_param_to_verified(&ast)
+}
+
+fn impl_unverfied_from_param_to_verified(ast: &syn::DeriveInput) -> TokenStream {
+    let unverified_id_typename = &ast.ident;
+    let unverified_id_typename_str = unverified_id_typename.to_string();
+    let id_typename = Ident::new(&unverified_id_typename_str[10..], Span::call_site());
+    let typename = Ident::new(
+        &unverified_id_typename_str[10..unverified_id_typename_str.len() - 2],
+        Span::call_site(),
+    );
+
+    let gen = quote! {
+        impl<'v> rocket::request::FromParam<'v> for #unverified_id_typename{
+            type Error = &'v rocket::http::RawStr;
+
+            fn from_param(param: &'v rocket::http::RawStr) -> Result<Self, Self::Error> {
+                Ok(Self(#id_typename::from_param(param)?))
+            }
+        }
+
+        impl #unverified_id_typename {
+            pub fn verify(
+                self,
+                auth: AuthenticatedUser,
+                conn: &PgConnection,
+            ) -> Result<#id_typename, rocket::http::Status> {
+                let entity = #typename::get_by_id(self.0, conn)
+                    .map_err(|_| rocket::http::Status::InternalServerError)?;
+                if entity.user_id == *auth {
+                    Ok(self.0)
+                } else {
+                    Err(rocket::http::Status::Forbidden)
+                }
+            }
+        }
+    };
+    gen.into()
+}
