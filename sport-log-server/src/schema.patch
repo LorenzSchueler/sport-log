@@ -5,3 +5,7 @@
 <         weekday -> Weekday,
 ---
 >         weekday -> WeekdayMapping,
+85c85
+<         category -> Movement_category,
+---
+>         category -> MovementCategoryMapping,
