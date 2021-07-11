@@ -1257,7 +1257,7 @@ dependencies = [
  "rocket_http",
  "state",
  "time",
- "toml",
+ "toml 0.4.10",
  "version_check 0.9.3",
  "yansi",
 ]
@@ -1478,9 +1478,13 @@ checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 name = "sport-log-action-provider-sportstracker"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "reqwest",
+ "serde",
  "serde_json",
+ "sport-log-types",
  "tokio",
+ "toml 0.5.8",
 ]
 
 [[package]]
@@ -1515,6 +1519,14 @@ dependencies = [
  "quote 1.0.9",
  "rocket",
  "syn 1.0.73",
+]
+
+[[package]]
+name = "sport-log-types"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "serde",
 ]
 
 [[package]]
@@ -1638,6 +1650,15 @@ name = "toml"
 version = "0.4.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "758664fc71a3a69038656bee8b6be6477d2a6c315a6b81f7081f591bffa4111f"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "toml"
+version = "0.5.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a31142970826733df8241ef35dc040ef98c679ab14d7c3e54d827099b3acecaa"
 dependencies = [
  "serde",
 ]

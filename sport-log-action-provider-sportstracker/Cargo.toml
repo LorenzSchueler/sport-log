@@ -2,8 +2,27 @@
 name = "sport-log-action-provider-sportstracker"
 version = "0.1.0"
 edition = "2018"
+default-run = "sport-log-action-provider-sportstracker"
 
 [dependencies]
+
+sport-log-types = { path = "../sport-log-types" }
+
 tokio = { version = "1", features = ["full"] }
 reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls"] }
+chrono = { version = "0.4.19", features = ["serde"] }
+serde = { version = "1.0.117", features = ["derive"] }
 serde_json = "1.0.59"
+toml = "0.5.8"
+
+[[bin]]
+name = "sport-log-action-provider-sportstracker"
+path = "src/main.rs"
+
+[[bin]]
+name = "sport-log-action-provider-sportstracker-schedule"
+path = "src/schedule.rs"
+
+[lib]
+name = "sport_log_action_provider_sportstracker_config"
+path = "src/config.rs"

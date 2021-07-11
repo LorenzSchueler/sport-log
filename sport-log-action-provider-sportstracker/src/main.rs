@@ -1,39 +1,36 @@
 use reqwest::Client;
-use serde_json::Value;
+use serde_json::{self, Value};
 use tokio;
+
+use sport_log_action_provider_sportstracker_config::Config;
+use sport_log_types::ExecutableActionEvent;
 
 #[tokio::main]
 async fn main() {
-    let username = "sportstracker-fetch";
-    let password = "sportstracker-fetch-passwd";
+    let config = Config::get();
 
     let client = Client::new();
 
     // TODO use timespan
-    let action_events = client
-        .get("http://localhost:8000/v1/ap/executable_action_event")
-        .basic_auth(username, Some(password))
+    let exec_action_events: Vec<ExecutableActionEvent> = client
+        .get(format!("{}/v1/ap/executable_action_event", config.base_url))
+        .basic_auth(&config.username, Some(&config.password))
         .send()
         .await
         .unwrap()
-        .json::<Value>()
+        .json()
         .await
         .unwrap();
-    println!("{}", serde_json::to_string_pretty(&action_events).unwrap());
+    println!("{:?}", exec_action_events);
 
-    for action_event in action_events.as_array().unwrap() {
-        if let Some(()) = get_data(
-            action_event["username"].as_str().unwrap(),
-            action_event["password"].as_str().unwrap(),
-        )
-        .await
-        {
+    for action_event in exec_action_events {
+        if let Some(()) = get_data(&action_event.username, &action_event.password).await {
             client
                 .delete(format!(
-                    "http://localhost:8000/v1/ap/action_event/{}",
-                    action_event["action_event_id"].to_string()
+                    "{}/v1/ap/action_event/{}",
+                    config.base_url, action_event.action_event_id
                 ))
-                .basic_auth(username, Some(password))
+                .basic_auth(&config.username, Some(&config.password))
                 .send()
                 .await
                 .unwrap();
@@ -69,7 +66,7 @@ async fn get_data(username: &str, password: &str) -> Option<()> {
         .json::<Value>()
         .await
         .unwrap();
-    //println!("{}", serde_json::to_string_pretty(&workouts).unwrap());
+
     let payload = &workouts["payload"];
     let body = &payload[0];
     println!("{}", body["startPosition"]);
@@ -106,7 +103,7 @@ async fn get_data(username: &str, password: &str) -> Option<()> {
         .json::<Value>()
         .await
         .unwrap();
-    //println!("{}", serde_json::to_string_pretty(&response).unwrap());
+
     let payload = &response["payload"];
     let points = &payload["locations"];
     let point0 = &points[0];
@@ -115,8 +112,5 @@ async fn get_data(username: &str, password: &str) -> Option<()> {
     Some(())
 }
 
-// get workout stats
-//https://api.sports-tracker.com/apiserver/v1/workouts/60cf04fbcee4044c273c0b4a?token=f7oelv8crr39qv517n7lbgevo9v001st
-
-// get gpx
-//https://api.sports-tracker.com/apiserver/v1/workout/exportGpx/60cf04fbcee4044c273c0b4a?token=f7oelv8crr39qv517n7lbgevo9v001st
+// get workout stats: https://api.sports-tracker.com/apiserver/v1/workouts/<workout_id>?token=sessionkey
+// get gpx: https://api.sports-tracker.com/apiserver/v1/workout/exportGpx/<workout_id>?token=sessionkey
