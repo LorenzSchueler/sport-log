@@ -4,18 +4,18 @@ use serde::{Deserialize, Serialize};
 #[derive(DbEnum, Debug, Serialize, Deserialize)]
 #[allow(non_camel_case_types)]
 pub enum MovementCategory {
-    cardio,
-    strength,
+    Cardio,
+    Strength,
 }
 
 #[derive(DbEnum, Debug, Serialize, Deserialize)]
 #[allow(non_camel_case_types)]
 pub enum MovementUnit {
-    reps,
-    cal,
-    m,
-    km,
-    yard,
-    foot,
-    mile,
+    Reps,
+    Cal,
+    Meter,
+    Km,
+    Yard,
+    Foot,
+    Mile,
 }
