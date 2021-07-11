@@ -5,8 +5,12 @@ pub mod action;
 pub mod platform;
 pub mod user;
 
-fn to_json<T>(query_result: QueryResult<T>) -> Result<Json<T>, Status> {
-    query_result
-        .map(Json)
-        .map_err(|_| Status::InternalServerError)
+trait ToJson<T> {
+    fn to_json(self) -> Result<Json<T>, Status>;
+}
+
+impl<T> ToJson<T> for QueryResult<T> {
+    fn to_json(self) -> Result<Json<T>, Status> {
+        self.map(Json).map_err(|_| Status::InternalServerError)
+    }
 }
