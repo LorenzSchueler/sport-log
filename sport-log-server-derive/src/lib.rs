@@ -165,7 +165,7 @@ fn impl_unverfied_from_param_to_verified_for_user(ast: &syn::DeriveInput) -> Tok
                 conn: &PgConnection,
             ) -> Result<#id_typename, rocket::http::Status> {
                 let entity = #typename::get_by_id(self.0, conn)
-                    .map_err(|_| rocket::http::Status::InternalServerError)?;
+                    .map_err(|_| rocket::http::Status::Forbidden)?;
                 if entity.user_id == *auth {
                     Ok(self.0)
                 } else {
