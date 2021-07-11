@@ -1,0 +1,9 @@
+[package]
+name = "sport-log-types"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+
+serde = { version = "1.0.117", features = ["derive"] }
+chrono = { version = "0.4.19", features = ["serde"] }
