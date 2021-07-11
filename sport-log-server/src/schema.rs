@@ -77,6 +77,52 @@ table! {
     use diesel::sql_types::*;
     use crate::model::*;
 
+    metcon (id) {
+        id -> Int4,
+        user_id -> Int4,
+        name -> Nullable<Varchar>,
+        #[sql_name = "type"]
+        type_ -> MetconTypeMapping,
+        rounds -> Nullable<Int4>,
+        timecap -> Nullable<Interval>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
+    metcon_movements (id) {
+        id -> Int4,
+        movement_id -> Int4,
+        metcon_id -> Int4,
+        count -> Int4,
+        unit -> MovementUnitMapping,
+        weight -> Nullable<Float8>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
+    metcon_session (id) {
+        id -> Int4,
+        user_id -> Int4,
+        metcon_id -> Int4,
+        datetime -> Timestamp,
+        time -> Nullable<Interval>,
+        rounds -> Nullable<Int4>,
+        reps -> Nullable<Int4>,
+        rx -> Bool,
+        comments -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
     movement (id) {
         id -> Int4,
         user_id -> Int4,
@@ -166,6 +212,11 @@ joinable!(action_provider -> platform (platform_id));
 joinable!(action_rule -> action (action_id));
 joinable!(action_rule -> user (user_id));
 joinable!(diary -> user (user_id));
+joinable!(metcon -> user (user_id));
+joinable!(metcon_movements -> metcon (metcon_id));
+joinable!(metcon_movements -> movement (movement_id));
+joinable!(metcon_session -> metcon (metcon_id));
+joinable!(metcon_session -> user (user_id));
 joinable!(movement -> user (user_id));
 joinable!(platform_credentials -> platform (platform_id));
 joinable!(platform_credentials -> user (user_id));
@@ -180,6 +231,9 @@ allow_tables_to_appear_in_same_query!(
     action_rule,
     diary,
     e1rm,
+    metcon,
+    metcon_movements,
+    metcon_session,
     movement,
     platform,
     platform_credentials,

@@ -5,11 +5,19 @@
 <         weekday -> Weekday,
 ---
 >         weekday -> WeekdayMapping,
-85c85
+84c84
+<         type_ -> Metcon_type,
+---
+>         type_ -> MetconTypeMapping,
+99c99
+<         unit -> Movement_unit,
+---
+>         unit -> MovementUnitMapping,
+130c130
 <         category -> Movement_category,
 ---
 >         category -> MovementCategoryMapping,
-133c133
+178c178
 <         unit -> Movement_unit,
 ---
 >         unit -> MovementUnitMapping,
