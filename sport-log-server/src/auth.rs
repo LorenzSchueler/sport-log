@@ -9,7 +9,7 @@ use rocket::{
 
 use crate::{
     model::{ActionProvider, ActionProviderId, User, UserId},
-    Db,
+    Db, CONFIG,
 };
 
 pub struct AuthenticatedUser {
@@ -106,7 +106,7 @@ impl<'r> FromRequest<'r> for AuthenticatedAdmin {
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
         match parse_username_password(request) {
             Some((username, password))
-                if username == "admin" && password == crate::ADMIN_PASSWORD =>
+                if username == CONFIG.admin_username && password == CONFIG.admin_password =>
             {
                 Outcome::Success(Self)
             }

@@ -1,3 +1,5 @@
+use std::fs;
+
 #[macro_use]
 extern crate diesel;
 #[macro_use]
@@ -5,7 +7,10 @@ extern crate rocket;
 
 use diesel::pg::PgConnection;
 use dotenv::dotenv;
+use lazy_static::lazy_static;
 use rocket_sync_db_pools::database;
+use serde::Deserialize;
+use toml;
 
 mod auth;
 mod handler;
@@ -14,9 +19,23 @@ mod repository;
 mod schema;
 mod verification;
 
-const BASE: &str = "/v1";
+#[derive(Deserialize)]
+pub struct Config {
+    pub admin_username: String,
+    pub admin_password: String,
+}
 
-const ADMIN_PASSWORD: &str = "adminpasswd";
+impl Config {
+    pub fn get() -> Self {
+        toml::from_str(&fs::read_to_string("config.toml").unwrap()).unwrap()
+    }
+}
+
+lazy_static! {
+    static ref CONFIG: Config = Config::get();
+}
+
+const BASE: &str = "/v1";
 
 #[database("sport_diary")]
 pub struct Db(PgConnection);
