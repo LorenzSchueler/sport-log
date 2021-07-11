@@ -129,7 +129,8 @@ table! {
     strength_set (id) {
         id -> Int4,
         strength_session_id -> Int4,
-        reps -> Int4,
+        count -> Int4,
+        unit -> MovementUnitMapping,
         weight -> Nullable<Float8>,
     }
 }

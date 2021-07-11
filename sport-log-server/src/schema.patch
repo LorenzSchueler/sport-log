@@ -9,3 +9,7 @@
 <         category -> Movement_category,
 ---
 >         category -> MovementCategoryMapping,
+133c133
+<         unit -> Movement_unit,
+---
+>         unit -> MovementUnitMapping,

@@ -1,4 +1,5 @@
-create type movement_category as enum('Strength', 'Cardio');
+create type movement_category as enum('strength', 'cardio');
+create type movement_unit as enum('reps', 'cal', 'm', 'km', 'yard', 'foot', 'mile');
 
 create table movement (
     id serial primary key,

@@ -10,7 +10,8 @@ create table strength_session (
 create table strength_set (
     id serial primary key,
     strength_session_id integer not null references strength_session on delete cascade,
-    reps integer not null,
+    count integer not null,
+    unit movement_unit not null,
     weight float
     --effort effort
 );
