@@ -113,6 +113,31 @@ table! {
     use diesel::sql_types::*;
     use crate::model::*;
 
+    strength_session (id) {
+        id -> Int4,
+        user_id -> Int4,
+        datetime -> Timestamp,
+        interval -> Nullable<Int4>,
+        comments -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
+    strength_set (id) {
+        id -> Int4,
+        strength_session_id -> Int4,
+        reps -> Int4,
+        weight -> Nullable<Float8>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
     user (id) {
         id -> Int4,
         username -> Varchar,
@@ -143,6 +168,8 @@ joinable!(diary -> user (user_id));
 joinable!(movement -> user (user_id));
 joinable!(platform_credentials -> platform (platform_id));
 joinable!(platform_credentials -> user (user_id));
+joinable!(strength_session -> user (user_id));
+joinable!(strength_set -> strength_session (strength_session_id));
 joinable!(wod -> user (user_id));
 
 allow_tables_to_appear_in_same_query!(
@@ -155,6 +182,8 @@ allow_tables_to_appear_in_same_query!(
     movement,
     platform,
     platform_credentials,
+    strength_session,
+    strength_set,
     user,
     wod,
 );
