@@ -52,7 +52,7 @@ fn parse_username_password(request: &'_ Request<'_>) -> Option<(String, String)>
     }
 }
 
-fn authenticate<R>(
+async fn authenticate<R: Send + 'static>(
     request: &'_ Request<'_>,
     auth_method: fn(&str, &str, &PgConnection) -> QueryResult<R>,
 ) -> Outcome<R, (Status, ()), ()> {
@@ -61,24 +61,24 @@ fn authenticate<R>(
         None => return Outcome::Failure((Status::Unauthorized, ())),
     };
 
-    let conn = match Db::from_request(request) {
+    let conn = match Db::from_request(request).await {
         Outcome::Success(conn) => conn,
         Outcome::Failure(f) => return Outcome::Failure(f),
         Outcome::Forward(f) => return Outcome::Forward(f),
     };
-
-    match auth_method(&username, &password, &conn) {
+    conn.run(move |c| match auth_method(&username, &password, c) {
         Ok(user_id) => Outcome::Success(user_id),
         Err(_) => Outcome::Failure((Status::Unauthorized, ())),
-    }
+    })
+    .await
 }
 
-//#[rocket::async_trait]
-impl<'r> FromRequest<'_, '_> for AuthenticatedUser {
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for AuthenticatedUser {
     type Error = ();
 
-    fn from_request(request: &'_ Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
-        match authenticate::<UserId>(request, User::authenticate) {
+    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
+        match authenticate::<UserId>(request, User::authenticate).await {
             Outcome::Success(user_id) => Outcome::Success(Self { user_id }),
             Outcome::Failure(f) => Outcome::Failure(f),
             Outcome::Forward(f) => Outcome::Forward(f),
@@ -86,11 +86,12 @@ impl<'r> FromRequest<'_, '_> for AuthenticatedUser {
     }
 }
 
-impl<'r> FromRequest<'_, '_> for AuthenticatedActionProvider {
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for AuthenticatedActionProvider {
     type Error = ();
 
-    fn from_request(request: &'_ Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
-        match authenticate::<ActionProviderId>(request, ActionProvider::authenticate) {
+    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
+        match authenticate::<ActionProviderId>(request, ActionProvider::authenticate).await {
             Outcome::Success(action_provider_id) => Outcome::Success(Self { action_provider_id }),
             Outcome::Failure(f) => Outcome::Failure(f),
             Outcome::Forward(f) => Outcome::Forward(f),
@@ -98,10 +99,11 @@ impl<'r> FromRequest<'_, '_> for AuthenticatedActionProvider {
     }
 }
 
-impl<'r> FromRequest<'_, '_> for AuthenticatedAdmin {
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for AuthenticatedAdmin {
     type Error = ();
 
-    fn from_request(request: &'_ Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
+    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
         match parse_username_password(request) {
             Some((username, password))
                 if username == "admin" && password == crate::ADMIN_PASSWORD =>

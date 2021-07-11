@@ -1,6 +1,5 @@
 use diesel::QueryResult;
-use rocket::http::Status;
-use rocket_contrib::json::Json;
+use rocket::{http::Status, serde::json::Json};
 
 pub mod action;
 pub mod platform;

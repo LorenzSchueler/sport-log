@@ -2,17 +2,13 @@
 name = "sport-log-server"
 version = "0.1.0"
 edition = "2018"
-
 default-run = "sport-log-server"
 
 [dependencies]
-
 sport-log-server-derive = { path = "../sport-log-server-derive" }
 
-#rocket = "0.5.0-rc.1"
-rocket = "0.4.10"
-rocket_contrib = { version = "*", default-features = false, features = ["json", "diesel_postgres_pool"] }
-#rocket_codegen = "0.4.5"
+rocket = { version = "0.5.0-rc.1", features = ["json"] }
+rocket_sync_db_pools = { version = "0.1.0-rc.1", features = ["diesel_postgres_pool"] }
 diesel = { version = "1.4.4", features = ["postgres", "r2d2", "chrono"] }
 diesel-derive-enum = { version = "1.1.1", features = ["postgres"] }
 serde = { version = "1.0.116", features = ["derive"]}

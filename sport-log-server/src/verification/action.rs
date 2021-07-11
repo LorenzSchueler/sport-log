@@ -1,6 +1,5 @@
 use diesel::PgConnection;
-use rocket::http::Status;
-use rocket_contrib::json::Json;
+use rocket::{http::Status, serde::json::Json};
 
 use sport_log_server_derive::{FromParam, UnverifiedFromParamToVerifiedForUser};
 

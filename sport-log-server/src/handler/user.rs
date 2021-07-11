@@ -1,5 +1,4 @@
-use rocket::http::Status;
-use rocket_contrib::json::Json;
+use rocket::{http::Status, serde::json::Json};
 
 use crate::{
     auth::AuthenticatedUser,
@@ -9,27 +8,31 @@ use crate::{
 };
 
 #[post("/user", format = "application/json", data = "<user>")]
-pub fn create_user(user: Json<NewUser>, conn: Db) -> Result<Json<User>, Status> {
-    to_json(User::create(user.into_inner(), &conn))
+pub async fn create_user(user: Json<NewUser>, conn: Db) -> Result<Json<User>, Status> {
+    to_json(conn.run(|c| User::create(user.into_inner(), c)).await)
 }
 
 #[get("/user")]
-pub fn get_user(auth: AuthenticatedUser, conn: Db) -> Result<Json<User>, Status> {
-    to_json(User::get_by_id(*auth, &conn))
+pub async fn get_user(auth: AuthenticatedUser, conn: Db) -> Result<Json<User>, Status> {
+    to_json(conn.run(move |c| User::get_by_id(*auth, c)).await)
 }
 
 #[put("/user", format = "application/json", data = "<user>")]
-pub fn update_user(
+pub async fn update_user(
     user: Json<User>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<User>, Status> {
-    to_json(User::update(User::verify(user, auth)?, &conn))
+    let user = User::verify(user, auth)?;
+    to_json(conn.run(|c| User::update(user, c)).await)
 }
 
 #[delete("/user")]
-pub fn delete_user(auth: AuthenticatedUser, conn: Db) -> Result<Status, Status> {
-    User::delete(*auth, &conn)
-        .map(|_| Status::NoContent)
-        .map_err(|_| Status::InternalServerError)
+pub async fn delete_user(auth: AuthenticatedUser, conn: Db) -> Result<Status, Status> {
+    conn.run(move |c| {
+        User::delete(*auth, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
 }

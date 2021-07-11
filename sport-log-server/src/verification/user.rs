@@ -1,5 +1,4 @@
-use rocket::http::Status;
-use rocket_contrib::json::Json;
+use rocket::{http::Status, serde::json::Json};
 
 use crate::{auth::AuthenticatedUser, model::User};
 

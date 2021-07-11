@@ -190,9 +190,9 @@ fn impl_unverfied_from_param(ast: &syn::DeriveInput) -> TokenStream {
 
     let gen = quote! {
         impl<'v> rocket::request::FromParam<'v> for #unverified_id_typename{
-            type Error = &'v rocket::http::RawStr;
+            type Error = &'v str;
 
-            fn from_param(param: &'v rocket::http::RawStr) -> Result<Self, Self::Error> {
+            fn from_param(param: &'v str) -> Result<Self, Self::Error> {
                 Ok(Self(#id_typename::from_param(param)?))
             }
         }
