@@ -1,23 +1,27 @@
 0a2
 > #![allow(unused_imports)]
 > 
-45c45
+46c46
 <         weekday -> Weekday,
 ---
 >         weekday -> WeekdayMapping,
-84c84
-<         type_ -> Metcon_type,
+59c59
+<         cardio_type -> Cardio_type,
 ---
->         type_ -> MetconTypeMapping,
-99c99
+>         cardio_type -> CardioTypeMapping,
+108c108
+<         metcon_type -> Metcon_type,
+---
+>         metcon_type -> MetconTypeMapping,
+123c123
 <         unit -> Movement_unit,
 ---
 >         unit -> MovementUnitMapping,
-130c130
+154c154
 <         category -> Movement_category,
 ---
 >         category -> MovementCategoryMapping,
-178c178
+217c217
 <         unit -> Movement_unit,
 ---
 >         unit -> MovementUnitMapping,

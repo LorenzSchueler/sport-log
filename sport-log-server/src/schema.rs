@@ -53,6 +53,30 @@ table! {
     use diesel::sql_types::*;
     use crate::model::*;
 
+    cardio_session (id) {
+        id -> Int4,
+        user_id -> Int4,
+        cardio_type -> CardioTypeMapping,
+        datetime -> Timestamp,
+        distance -> Nullable<Int4>,
+        ascent -> Nullable<Int4>,
+        descent -> Nullable<Int4>,
+        time -> Nullable<Interval>,
+        calories -> Nullable<Int4>,
+        track -> Nullable<Array<Position>>,
+        avg_cycles -> Nullable<Int4>,
+        cycles -> Nullable<Array<Float8>>,
+        avg_heart_rate -> Nullable<Int4>,
+        heart_rate -> Nullable<Array<Float8>>,
+        route_id -> Nullable<Int4>,
+        comments -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
     diary (id) {
         id -> Int4,
         user_id -> Int4,
@@ -81,8 +105,7 @@ table! {
         id -> Int4,
         user_id -> Int4,
         name -> Nullable<Varchar>,
-        #[sql_name = "type"]
-        type_ -> MetconTypeMapping,
+        metcon_type -> MetconTypeMapping,
         rounds -> Nullable<Int4>,
         timecap -> Nullable<Interval>,
     }
@@ -159,6 +182,21 @@ table! {
     use diesel::sql_types::*;
     use crate::model::*;
 
+    route (id) {
+        id -> Int4,
+        user_id -> Int4,
+        name -> Varchar,
+        distance -> Int4,
+        ascent -> Nullable<Int4>,
+        descent -> Nullable<Int4>,
+        track -> Nullable<Array<Position>>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
     strength_session (id) {
         id -> Int4,
         user_id -> Int4,
@@ -211,6 +249,8 @@ joinable!(action_event -> user (user_id));
 joinable!(action_provider -> platform (platform_id));
 joinable!(action_rule -> action (action_id));
 joinable!(action_rule -> user (user_id));
+joinable!(cardio_session -> route (route_id));
+joinable!(cardio_session -> user (user_id));
 joinable!(diary -> user (user_id));
 joinable!(metcon -> user (user_id));
 joinable!(metcon_movements -> metcon (metcon_id));
@@ -220,6 +260,7 @@ joinable!(metcon_session -> user (user_id));
 joinable!(movement -> user (user_id));
 joinable!(platform_credentials -> platform (platform_id));
 joinable!(platform_credentials -> user (user_id));
+joinable!(route -> user (user_id));
 joinable!(strength_session -> user (user_id));
 joinable!(strength_set -> strength_session (strength_session_id));
 joinable!(wod -> user (user_id));
@@ -229,6 +270,7 @@ allow_tables_to_appear_in_same_query!(
     action_event,
     action_provider,
     action_rule,
+    cardio_session,
     diary,
     e1rm,
     metcon,
@@ -237,6 +279,7 @@ allow_tables_to_appear_in_same_query!(
     movement,
     platform,
     platform_credentials,
+    route,
     strength_session,
     strength_set,
     user,

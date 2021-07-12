@@ -4,7 +4,7 @@ create table metcon (
     id serial primary key,
     user_id integer not null references "user" on delete cascade,
     name varchar(80) unique,
-    type metcon_type not null,
+    metcon_type metcon_type not null,
     rounds integer,
     timecap interval
 );
