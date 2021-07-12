@@ -56,6 +56,7 @@ table! {
     cardio_session (id) {
         id -> Int4,
         user_id -> Int4,
+        movement_id -> Int4,
         cardio_type -> CardioTypeMapping,
         datetime -> Timestamp,
         distance -> Nullable<Int4>,
@@ -201,6 +202,8 @@ table! {
         id -> Int4,
         user_id -> Int4,
         datetime -> Timestamp,
+        movement_id -> Int4,
+        movement_unit -> MovementUnitMapping,
         interval -> Nullable<Int4>,
         comments -> Nullable<Text>,
     }
@@ -214,7 +217,6 @@ table! {
         id -> Int4,
         strength_session_id -> Int4,
         count -> Int4,
-        unit -> MovementUnitMapping,
         weight -> Nullable<Float8>,
     }
 }
@@ -249,6 +251,7 @@ joinable!(action_event -> user (user_id));
 joinable!(action_provider -> platform (platform_id));
 joinable!(action_rule -> action (action_id));
 joinable!(action_rule -> user (user_id));
+joinable!(cardio_session -> movement (movement_id));
 joinable!(cardio_session -> route (route_id));
 joinable!(cardio_session -> user (user_id));
 joinable!(diary -> user (user_id));
@@ -261,6 +264,7 @@ joinable!(movement -> user (user_id));
 joinable!(platform_credentials -> platform (platform_id));
 joinable!(platform_credentials -> user (user_id));
 joinable!(route -> user (user_id));
+joinable!(strength_session -> movement (movement_id));
 joinable!(strength_session -> user (user_id));
 joinable!(strength_set -> strength_session (strength_session_id));
 joinable!(wod -> user (user_id));

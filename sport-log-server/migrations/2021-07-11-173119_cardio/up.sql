@@ -21,6 +21,7 @@ create table route (
 create table cardio_session (
     id serial primary key,
     user_id integer not null references "user" on delete cascade,
+    movement_id integer not null references movement on delete no action,
     cardio_type cardio_type not null,
     datetime timestamp not null default now(),
     distance integer,

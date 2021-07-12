@@ -22,6 +22,6 @@
 ---
 >         category -> MovementCategoryMapping,
 217c217
-<         unit -> Movement_unit,
+<         movement_unit -> Movement_unit,
 ---
->         unit -> MovementUnitMapping,
+>         movement_unit -> MovementUnitMapping,
