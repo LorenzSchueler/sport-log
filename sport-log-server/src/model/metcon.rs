@@ -5,6 +5,6 @@ use serde::{Deserialize, Serialize};
 pub enum MetconType {
     Amrap,
     Emom,
-    For_time,
+    ForTime,
     Ladder,
 }
