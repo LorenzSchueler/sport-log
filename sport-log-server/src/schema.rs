@@ -102,6 +102,27 @@ table! {
     use diesel::sql_types::*;
     use crate::model::*;
 
+    group (id) {
+        id -> Int4,
+        name -> Varchar,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
+    group_user (id) {
+        id -> Int4,
+        group_id -> Int4,
+        user_id -> Int4,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
     metcon (id) {
         id -> Int4,
         user_id -> Int4,
@@ -198,6 +219,50 @@ table! {
     use diesel::sql_types::*;
     use crate::model::*;
 
+    shared_cardio_session (id) {
+        id -> Int4,
+        group_id -> Int4,
+        cardio_session_id -> Int4,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
+    shared_diary (id) {
+        id -> Int4,
+        group_id -> Int4,
+        diary_id -> Int4,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
+    shared_metcon_session (id) {
+        id -> Int4,
+        group_id -> Int4,
+        metcon_session_id -> Int4,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
+    shared_strength_session (id) {
+        id -> Int4,
+        group_id -> Int4,
+        strength_session_id -> Int4,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::model::*;
+
     strength_session (id) {
         id -> Int4,
         user_id -> Int4,
@@ -255,6 +320,8 @@ joinable!(cardio_session -> movement (movement_id));
 joinable!(cardio_session -> route (route_id));
 joinable!(cardio_session -> user (user_id));
 joinable!(diary -> user (user_id));
+joinable!(group_user -> group (group_id));
+joinable!(group_user -> user (user_id));
 joinable!(metcon -> user (user_id));
 joinable!(metcon_movements -> metcon (metcon_id));
 joinable!(metcon_movements -> movement (movement_id));
@@ -264,6 +331,14 @@ joinable!(movement -> user (user_id));
 joinable!(platform_credentials -> platform (platform_id));
 joinable!(platform_credentials -> user (user_id));
 joinable!(route -> user (user_id));
+joinable!(shared_cardio_session -> cardio_session (cardio_session_id));
+joinable!(shared_cardio_session -> group (group_id));
+joinable!(shared_diary -> diary (diary_id));
+joinable!(shared_diary -> group (group_id));
+joinable!(shared_metcon_session -> group (group_id));
+joinable!(shared_metcon_session -> metcon_session (metcon_session_id));
+joinable!(shared_strength_session -> group (group_id));
+joinable!(shared_strength_session -> strength_session (strength_session_id));
 joinable!(strength_session -> movement (movement_id));
 joinable!(strength_session -> user (user_id));
 joinable!(strength_set -> strength_session (strength_session_id));
@@ -277,6 +352,8 @@ allow_tables_to_appear_in_same_query!(
     cardio_session,
     diary,
     e1rm,
+    group,
+    group_user,
     metcon,
     metcon_movements,
     metcon_session,
@@ -284,6 +361,10 @@ allow_tables_to_appear_in_same_query!(
     platform,
     platform_credentials,
     route,
+    shared_cardio_session,
+    shared_diary,
+    shared_metcon_session,
+    shared_strength_session,
     strength_session,
     strength_set,
     user,
