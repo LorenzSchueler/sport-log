@@ -44,13 +44,12 @@ impl UnverifiedActionId {
         self,
         auth: AuthenticatedActionProvider,
         conn: &PgConnection,
-    ) -> Result<ActionId, rocket::http::Status> {
-        let entity = Action::get_by_id(self.0, conn)
-            .map_err(|_| rocket::http::Status::InternalServerError)?;
+    ) -> Result<ActionId, Status> {
+        let entity = Action::get_by_id(self.0, conn).map_err(|_| Status::InternalServerError)?;
         if entity.action_provider_id == *auth {
             Ok(self.0)
         } else {
-            Err(rocket::http::Status::Forbidden)
+            Err(Status::Forbidden)
         }
     }
 }
@@ -122,15 +121,15 @@ impl UnverifiedActionEventId {
         self,
         auth: AuthenticatedActionProvider,
         conn: &PgConnection,
-    ) -> Result<ActionEventId, rocket::http::Status> {
-        let action_event = ActionEvent::get_by_id(self.0, conn)
-            .map_err(|_| rocket::http::Status::InternalServerError)?;
+    ) -> Result<ActionEventId, Status> {
+        let action_event =
+            ActionEvent::get_by_id(self.0, conn).map_err(|_| Status::InternalServerError)?;
         let entity = Action::get_by_id(action_event.action_id, conn)
-            .map_err(|_| rocket::http::Status::InternalServerError)?;
+            .map_err(|_| Status::InternalServerError)?;
         if entity.action_provider_id == *auth {
             Ok(self.0)
         } else {
-            Err(rocket::http::Status::Forbidden)
+            Err(Status::Forbidden)
         }
     }
 }
