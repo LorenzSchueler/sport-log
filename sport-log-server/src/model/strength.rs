@@ -3,9 +3,10 @@ use serde::{Deserialize, Serialize};
 
 use sport_log_server_derive::{Create, Delete, GetAll, GetById, Update};
 
-use crate::schema::{strength_session, strength_set};
-
-use super::{MovementId, MovementUnit, UserId};
+use crate::{
+    model::{MovementId, MovementUnit, UserId},
+    schema::{strength_session, strength_set},
+};
 
 pub type StrengthSessionId = i32;
 

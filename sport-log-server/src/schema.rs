@@ -129,7 +129,7 @@ table! {
         name -> Nullable<Varchar>,
         metcon_type -> MetconTypeMapping,
         rounds -> Nullable<Int4>,
-        timecap -> Nullable<Interval>,
+        timecap -> Nullable<Int4>,
     }
 }
 
@@ -137,7 +137,7 @@ table! {
     use diesel::sql_types::*;
     use crate::model::*;
 
-    metcon_movements (id) {
+    metcon_movement (id) {
         id -> Int4,
         movement_id -> Int4,
         metcon_id -> Int4,
@@ -156,7 +156,7 @@ table! {
         user_id -> Int4,
         metcon_id -> Int4,
         datetime -> Timestamp,
-        time -> Nullable<Interval>,
+        time -> Nullable<Int4>,
         rounds -> Nullable<Int4>,
         reps -> Nullable<Int4>,
         rx -> Bool,
@@ -323,8 +323,8 @@ joinable!(diary -> user (user_id));
 joinable!(group_user -> group (group_id));
 joinable!(group_user -> user (user_id));
 joinable!(metcon -> user (user_id));
-joinable!(metcon_movements -> metcon (metcon_id));
-joinable!(metcon_movements -> movement (movement_id));
+joinable!(metcon_movement -> metcon (metcon_id));
+joinable!(metcon_movement -> movement (movement_id));
 joinable!(metcon_session -> metcon (metcon_id));
 joinable!(metcon_session -> user (user_id));
 joinable!(movement -> user (user_id));
@@ -355,7 +355,7 @@ allow_tables_to_appear_in_same_query!(
     group,
     group_user,
     metcon,
-    metcon_movements,
+    metcon_movement,
     metcon_session,
     movement,
     platform,
