@@ -4,9 +4,39 @@ use rocket::{http::Status, serde::json::Json};
 use sport_log_server_derive::{FromParam, UnverifiedFromParamToVerifiedForUser};
 
 use crate::{
-    auth::AuthenticatedUser,
-    model::{NewPlatformCredentials, PlatformCredentials, PlatformCredentialsId},
+    auth::{AuthenticatedAdmin, AuthenticatedUser},
+    model::{
+        NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials, PlatformCredentialsId,
+        PlatformId,
+    },
 };
+
+impl NewPlatform {
+    pub fn verify_adm(
+        platform: Json<NewPlatform>,
+        _auth: AuthenticatedAdmin,
+    ) -> Result<NewPlatform, Status> {
+        Ok(platform.into_inner())
+    }
+}
+
+impl Platform {
+    pub fn verify_adm(
+        platform: Json<Platform>,
+        _auth: AuthenticatedAdmin,
+    ) -> Result<Platform, Status> {
+        Ok(platform.into_inner())
+    }
+}
+
+#[derive(FromParam)]
+pub struct UnverifiedPlatformId(PlatformId);
+
+impl UnverifiedPlatformId {
+    pub fn verify_adm(self, _auth: AuthenticatedAdmin) -> Result<PlatformId, Status> {
+        Ok(self.0)
+    }
+}
 
 impl NewPlatformCredentials {
     pub fn verify(

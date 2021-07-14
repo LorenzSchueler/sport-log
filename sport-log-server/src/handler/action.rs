@@ -10,7 +10,10 @@ use crate::{
         Action, ActionEvent, ActionProvider, ActionProviderId, ActionRule, ExecutableActionEvent,
         NewAction, NewActionEvent, NewActionProvider, NewActionRule,
     },
-    verification::{UnverifiedActionEventId, UnverifiedActionId, UnverifiedActionRuleId},
+    verification::{
+        UnverifiedActionEventId, UnverifiedActionId, UnverifiedActionProviderId,
+        UnverifiedActionRuleId,
+    },
     Db,
 };
 
@@ -21,10 +24,11 @@ use crate::{
 )]
 pub async fn create_action_provider(
     action_provider: Json<NewActionProvider>,
-    _auth: AuthenticatedAdmin,
+    auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Json<ActionProvider>, Status> {
-    conn.run(|c| ActionProvider::create(action_provider.into_inner(), c))
+    let action_provider = NewActionProvider::verify_adm(action_provider, auth)?;
+    conn.run(|c| ActionProvider::create(action_provider, c))
         .await
         .into_json()
 }
@@ -39,10 +43,11 @@ pub async fn get_action_providers(
 
 #[delete("/adm/action_provider/<action_provider_id>")]
 pub async fn delete_action_provider(
-    action_provider_id: ActionProviderId,
-    _auth: AuthenticatedAdmin,
+    action_provider_id: UnverifiedActionProviderId,
+    auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Status, Status> {
+    let action_provider_id = action_provider_id.verify_adm(auth)?;
     conn.run(move |c| {
         Action::delete(action_provider_id, c)
             .map(|_| Status::NoContent)

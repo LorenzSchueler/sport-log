@@ -4,17 +4,18 @@ use crate::{
     auth::{AuthenticatedAdmin, AuthenticatedUser},
     handler::IntoJson,
     model::{NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials, PlatformId},
-    verification::UnverifiedPlatformCredentialsId,
+    verification::{UnverifiedPlatformCredentialsId, UnverifiedPlatformId},
     Db,
 };
 
-#[post("/adm/platform", format = "application/json", data = "<platfrom>")]
+#[post("/adm/platform", format = "application/json", data = "<platform>")]
 pub async fn create_platform(
-    platfrom: Json<NewPlatform>,
-    _auth: AuthenticatedAdmin,
+    platform: Json<NewPlatform>,
+    auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Json<Platform>, Status> {
-    conn.run(|c| Platform::create(platfrom.into_inner(), c))
+    let platform = NewPlatform::verify_adm(platform, auth)?;
+    conn.run(|c| Platform::create(platform, c))
         .await
         .into_json()
 }
@@ -38,20 +39,22 @@ pub async fn get_platforms_u(
 #[put("/adm/platform", format = "application/json", data = "<platform>")]
 pub async fn update_platform(
     platform: Json<Platform>,
-    _auth: AuthenticatedAdmin,
+    auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Json<Platform>, Status> {
-    conn.run(|c| Platform::update(platform.into_inner(), c))
+    let platform = Platform::verify_adm(platform, auth)?;
+    conn.run(|c| Platform::update(platform, c))
         .await
         .into_json()
 }
 
 #[delete("/adm/platform/<platform_id>")]
 pub async fn delete_platform(
-    platform_id: PlatformId,
-    _auth: AuthenticatedAdmin,
+    platform_id: UnverifiedPlatformId,
+    auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Status, Status> {
+    let platform_id = platform_id.verify_adm(auth)?;
     conn.run(move |c| {
         Platform::delete(platform_id, c)
             .map(|_| Status::NoContent)

@@ -4,10 +4,10 @@ use rocket::{http::Status, serde::json::Json};
 use sport_log_server_derive::{FromParam, UnverifiedFromParamToVerifiedForUser};
 
 use crate::{
-    auth::{AuthenticatedActionProvider, AuthenticatedUser},
+    auth::{AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser},
     model::{
-        Action, ActionEvent, ActionEventId, ActionId, ActionRule, ActionRuleId, NewAction,
-        NewActionEvent, NewActionRule,
+        Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
+        ActionRuleId, NewAction, NewActionEvent, NewActionProvider, NewActionRule,
     },
 };
 
@@ -131,5 +131,32 @@ impl UnverifiedActionEventId {
         } else {
             Err(Status::Forbidden)
         }
+    }
+}
+
+impl NewActionProvider {
+    pub fn verify_adm(
+        action_provider: Json<NewActionProvider>,
+        _auth: AuthenticatedAdmin,
+    ) -> Result<NewActionProvider, Status> {
+        Ok(action_provider.into_inner())
+    }
+}
+
+impl ActionProvider {
+    pub fn verify_adm(
+        action_provider: Json<ActionProvider>,
+        _auth: AuthenticatedAdmin,
+    ) -> Result<ActionProvider, Status> {
+        Ok(action_provider.into_inner())
+    }
+}
+
+#[derive(FromParam)]
+pub struct UnverifiedActionProviderId(ActionProviderId);
+
+impl UnverifiedActionProviderId {
+    pub fn verify_adm(self, _auth: AuthenticatedAdmin) -> Result<ActionProviderId, Status> {
+        Ok(self.0)
     }
 }
