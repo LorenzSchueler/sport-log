@@ -1,6 +1,5 @@
 use chrono::{Datelike, Duration, Local, NaiveDateTime};
 use reqwest::Client;
-use tokio;
 
 use sport_log_action_provider_sportstracker_config::Config;
 use sport_log_types::{ActionEvent, ActionRule, NewActionEvent};

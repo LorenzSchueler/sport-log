@@ -1,6 +1,5 @@
 use reqwest::Client;
 use serde_json::{self, Value};
-use tokio;
 
 use sport_log_action_provider_sportstracker_config::Config;
 use sport_log_types::ExecutableActionEvent;
