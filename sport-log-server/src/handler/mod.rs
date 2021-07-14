@@ -8,11 +8,11 @@ pub mod action;
 pub mod platform;
 pub mod user;
 
-trait ToJson<T> {
+trait IntoJson<T> {
     fn into_json(self) -> Result<Json<T>, Status>;
 }
 
-impl<T> ToJson<T> for QueryResult<T> {
+impl<T> IntoJson<T> for QueryResult<T> {
     fn into_json(self) -> Result<Json<T>, Status> {
         self.map(Json).map_err(|diesel_error| match diesel_error {
             DieselError::NotFound => Status::NoContent,

@@ -2,7 +2,7 @@ use rocket::{http::Status, serde::json::Json};
 
 use crate::{
     auth::AuthenticatedUser,
-    handler::ToJson,
+    handler::IntoJson,
     model::{NewUser, User},
     Db,
 };
@@ -16,7 +16,9 @@ pub async fn create_user(user: Json<NewUser>, conn: Db) -> Result<Json<User>, St
 
 #[get("/user")]
 pub async fn get_user(auth: AuthenticatedUser, conn: Db) -> Result<Json<User>, Status> {
-    conn.run(move |c| User::get_by_id(*auth, c)).await.into_json()
+    conn.run(move |c| User::get_by_id(*auth, c))
+        .await
+        .into_json()
 }
 
 #[put("/user", format = "application/json", data = "<user>")]

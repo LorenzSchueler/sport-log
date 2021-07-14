@@ -5,7 +5,7 @@ use rocket::{http::Status, request::FromParam, serde::json::Json};
 
 use crate::{
     auth::{AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser},
-    handler::ToJson,
+    handler::IntoJson,
     model::{
         Action, ActionEvent, ActionProvider, ActionProviderId, ActionRule, ExecutableActionEvent,
         NewAction, NewActionEvent, NewActionProvider, NewActionRule,

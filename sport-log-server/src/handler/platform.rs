@@ -2,7 +2,7 @@ use rocket::{http::Status, serde::json::Json};
 
 use crate::{
     auth::{AuthenticatedAdmin, AuthenticatedUser},
-    handler::ToJson,
+    handler::IntoJson,
     model::{NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials, PlatformId},
     verification::UnverifiedPlatformCredentialsId,
     Db,
