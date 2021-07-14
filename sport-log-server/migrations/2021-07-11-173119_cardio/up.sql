@@ -27,7 +27,7 @@ create table cardio_session (
     distance integer,
     ascent integer,
     descent integer,
-    time interval, -- integer as seconds better ?
+    time integer, -- seconds
     calories integer,
     track "position"[],
     avg_cycles integer, 

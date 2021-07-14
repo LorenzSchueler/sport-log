@@ -62,7 +62,7 @@ table! {
         distance -> Nullable<Int4>,
         ascent -> Nullable<Int4>,
         descent -> Nullable<Int4>,
-        time -> Nullable<Interval>,
+        time -> Nullable<Int4>,
         calories -> Nullable<Int4>,
         track -> Nullable<Array<Position>>,
         avg_cycles -> Nullable<Int4>,
