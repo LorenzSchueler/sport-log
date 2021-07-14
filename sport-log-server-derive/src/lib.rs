@@ -185,15 +185,13 @@ pub fn unverfied_from_param(input: TokenStream) -> TokenStream {
 
 fn impl_unverfied_from_param(ast: &syn::DeriveInput) -> TokenStream {
     let unverified_id_typename = &ast.ident;
-    let unverified_id_typename_str = unverified_id_typename.to_string();
-    let id_typename = Ident::new(&unverified_id_typename_str[10..], Span::call_site());
 
     let gen = quote! {
         impl<'v> rocket::request::FromParam<'v> for #unverified_id_typename{
             type Error = &'v str;
 
             fn from_param(param: &'v str) -> Result<Self, Self::Error> {
-                Ok(Self(#id_typename::from_param(param)?))
+                Ok(Self(i32::from_param(param)?))
             }
         }
     };

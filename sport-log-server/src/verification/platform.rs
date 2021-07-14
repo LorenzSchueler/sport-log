@@ -30,11 +30,15 @@ impl Platform {
 }
 
 #[derive(FromParam)]
-pub struct UnverifiedPlatformId(PlatformId);
+pub struct UnverifiedPlatformId(i32);
 
 impl UnverifiedPlatformId {
+    pub fn verify(self, _auth: &AuthenticatedUser) -> Result<PlatformId, Status> {
+        Ok(PlatformId(self.0))
+    }
+
     pub fn verify_adm(self, _auth: AuthenticatedAdmin) -> Result<PlatformId, Status> {
-        Ok(self.0)
+        Ok(PlatformId(self.0))
     }
 }
 
