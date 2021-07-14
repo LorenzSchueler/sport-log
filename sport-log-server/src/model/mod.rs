@@ -1,12 +1,14 @@
-pub mod action;
-pub mod cardio;
-pub mod metcon;
-pub mod movement;
-pub mod platform;
-pub mod user;
+mod action;
+mod cardio;
+mod diary_wod;
+mod metcon;
+mod movement;
+mod platform;
+mod user;
 
 pub use action::*;
 pub use cardio::*;
+pub use diary_wod::*;
 pub use metcon::*;
 pub use movement::*;
 pub use platform::*;
