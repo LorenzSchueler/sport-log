@@ -9,11 +9,11 @@ pub mod platform;
 pub mod user;
 
 trait ToJson<T> {
-    fn to_json(self) -> Result<Json<T>, Status>;
+    fn into_json(self) -> Result<Json<T>, Status>;
 }
 
 impl<T> ToJson<T> for QueryResult<T> {
-    fn to_json(self) -> Result<Json<T>, Status> {
+    fn into_json(self) -> Result<Json<T>, Status> {
         self.map(Json).map_err(|diesel_error| match diesel_error {
             DieselError::NotFound => Status::NoContent,
             DieselError::DatabaseError(db_error, _db_error_info) => match db_error {

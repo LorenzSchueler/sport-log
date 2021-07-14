@@ -26,7 +26,7 @@ pub async fn create_action_provider(
 ) -> Result<Json<ActionProvider>, Status> {
     conn.run(|c| ActionProvider::create(action_provider.into_inner(), c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[get("/adm/action_provider")]
@@ -34,7 +34,7 @@ pub async fn get_action_providers(
     _auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Json<Vec<ActionProvider>>, Status> {
-    conn.run(|c| ActionProvider::get_all(c)).await.to_json()
+    conn.run(|c| ActionProvider::get_all(c)).await.into_json()
 }
 
 #[delete("/adm/action_provider/<action_provider_id>")]
@@ -58,7 +58,7 @@ pub async fn create_action(
     conn: Db,
 ) -> Result<Json<Action>, Status> {
     let action = NewAction::verify(action, auth)?;
-    conn.run(|c| Action::create(action, c)).await.to_json()
+    conn.run(|c| Action::create(action, c)).await.into_json()
 }
 
 #[get("/ap/action/<action_id>")]
@@ -70,7 +70,7 @@ pub async fn get_action(
     let action_id = conn.run(|c| action_id.verify_ap(auth, c)).await?;
     conn.run(move |c| Action::get_by_id(action_id, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[get("/ap/action")]
@@ -80,12 +80,12 @@ pub async fn get_actions_by_action_provider(
 ) -> Result<Json<Vec<Action>>, Status> {
     conn.run(move |c| Action::get_by_action_provider(*auth, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[get("/action")]
 pub async fn get_actions(_auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Action>>, Status> {
-    conn.run(|c| Action::get_all(c)).await.to_json()
+    conn.run(|c| Action::get_all(c)).await.into_json()
 }
 
 #[delete("/ap/action/<action_id>")]
@@ -111,7 +111,7 @@ pub async fn create_action_rule(
     let action_rule = NewActionRule::verify(action_rule, auth)?;
     conn.run(|c| ActionRule::create(action_rule, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[get("/action_rule/<action_rule_id>")]
@@ -123,7 +123,7 @@ pub async fn get_action_rule(
     let action_rule_id = conn.run(|c| action_rule_id.verify(auth, c)).await?;
     conn.run(move |c| ActionRule::get_by_id(action_rule_id, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[get("/action_rule")]
@@ -133,7 +133,7 @@ pub async fn get_action_rules_by_user(
 ) -> Result<Json<Vec<ActionRule>>, Status> {
     conn.run(move |c| ActionRule::get_by_user(*auth, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[get("/action_rule/action_provider/<action_provider_id>")]
@@ -144,7 +144,7 @@ pub async fn get_action_rules_by_user_and_action_provider(
 ) -> Result<Json<Vec<ActionRule>>, Status> {
     conn.run(move |c| ActionRule::get_by_user_and_action_provider(*auth, action_provider_id, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[put("/action_rule", format = "application/json", data = "<action_rule>")]
@@ -156,7 +156,7 @@ pub async fn update_action_rule(
     let action_rule = ActionRule::verify(action_rule, auth)?;
     conn.run(|c| ActionRule::update(action_rule, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[delete("/action_rule/<action_rule_id>")]
@@ -182,7 +182,7 @@ pub async fn create_action_event(
     let action_event = NewActionEvent::verify(action_event, auth)?;
     conn.run(|c| ActionEvent::create(action_event, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[get("/action_event/<action_event_id>")]
@@ -194,7 +194,7 @@ pub async fn get_action_event(
     let action_event_id = conn.run(|c| action_event_id.verify(auth, c)).await?;
     conn.run(move |c| ActionEvent::get_by_id(action_event_id, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[get("/action_event")]
@@ -204,7 +204,7 @@ pub async fn get_action_events_by_user(
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
     conn.run(move |c| ActionEvent::get_by_user(*auth, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[get("/ap/action_event")]
@@ -214,7 +214,7 @@ pub async fn get_action_events_by_action_provider(
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
     conn.run(move |c| ActionEvent::get_by_action_provider(*auth, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[get("/action_event/action_provider/<action_provider_id>")]
@@ -225,7 +225,7 @@ pub async fn get_action_events_by_user_and_action_provider(
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
     conn.run(move |c| ActionEvent::get_by_user_and_action_provider(*auth, action_provider_id, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[put("/action_event", format = "application/json", data = "<action_event>")]
@@ -237,7 +237,7 @@ pub async fn update_action_event(
     let action_event = ActionEvent::verify(action_event, auth)?;
     conn.run(|c| ActionEvent::update(action_event, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[delete("/action_event/<action_event_id>")]
@@ -275,7 +275,7 @@ pub async fn get_executable_action_events_by_action_provider(
 ) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
     conn.run(move |c| ExecutableActionEvent::get_by_action_provider(*auth, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[get("/ap/executable_action_event/timerange/<start_time>/<end_time>")]
@@ -294,7 +294,7 @@ pub async fn get_executable_action_events_by_action_provider_and_timerange(
         )
     })
     .await
-    .to_json()
+    .into_json()
 }
 
 pub struct NaiveTimeWrapper(NaiveTime);

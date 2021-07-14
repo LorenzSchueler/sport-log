@@ -16,7 +16,7 @@ pub async fn create_platform(
 ) -> Result<Json<Platform>, Status> {
     conn.run(|c| Platform::create(platfrom.into_inner(), c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[get("/adm/platform")]
@@ -24,7 +24,7 @@ pub async fn get_platforms(
     _auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Json<Vec<Platform>>, Status> {
-    conn.run(|c| Platform::get_all(c)).await.to_json()
+    conn.run(|c| Platform::get_all(c)).await.into_json()
 }
 
 #[get("/platform")]
@@ -32,7 +32,7 @@ pub async fn get_platforms_u(
     _auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<Platform>>, Status> {
-    conn.run(|c| Platform::get_all(c)).await.to_json()
+    conn.run(|c| Platform::get_all(c)).await.into_json()
 }
 
 #[put("/adm/platform", format = "application/json", data = "<platform>")]
@@ -43,7 +43,7 @@ pub async fn update_platform(
 ) -> Result<Json<Platform>, Status> {
     conn.run(|c| Platform::update(platform.into_inner(), c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[delete("/adm/platform/<platform_id>")]
@@ -73,7 +73,7 @@ pub async fn create_platform_credentials(
     let platform_credentials = NewPlatformCredentials::verify(platform_credentials, auth)?;
     conn.run(|c| PlatformCredentials::create(platform_credentials, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[get("/platform_credentials")]
@@ -83,7 +83,7 @@ pub async fn get_own_platform_credentials(
 ) -> Result<Json<Vec<PlatformCredentials>>, Status> {
     conn.run(move |c| PlatformCredentials::get_by_user(*auth, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[get("/platform_credentials/platform/<platform_id>")]
@@ -94,7 +94,7 @@ pub async fn get_own_platform_credentials_by_platform(
 ) -> Result<Json<PlatformCredentials>, Status> {
     conn.run(move |c| PlatformCredentials::get_by_user_and_platform(*auth, platform_id, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[put(
@@ -110,7 +110,7 @@ pub async fn update_platform_credentials(
     let platform_credentials = PlatformCredentials::verify(platform_credentials, auth)?;
     conn.run(|c| PlatformCredentials::update(platform_credentials, c))
         .await
-        .to_json()
+        .into_json()
 }
 
 #[delete("/platform_credentials/<platform_credentials_id>")]

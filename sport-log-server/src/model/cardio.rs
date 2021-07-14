@@ -13,9 +13,10 @@ use serde::{Deserialize, Serialize};
 
 use sport_log_server_derive::{Create, Delete, GetAll, GetById, Update};
 
-use crate::schema::{cardio_session, route};
-
-use super::{MovementId, UserId};
+use crate::{
+    model::{MovementId, UserId},
+    schema::{cardio_session, route},
+};
 
 #[derive(DbEnum, Debug, Serialize, Deserialize)]
 pub enum CardioType {

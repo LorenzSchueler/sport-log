@@ -10,7 +10,6 @@ use dotenv::dotenv;
 use lazy_static::lazy_static;
 use rocket_sync_db_pools::database;
 use serde::Deserialize;
-use toml;
 
 mod auth;
 mod handler;
