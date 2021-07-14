@@ -3,7 +3,7 @@ create type cardio_type as enum('training', 'active_recovery', 'freetime');
 create type "position" as (
     longitude double precision, --numeric(8, 5)
     latitude double precision, --numeric(9, 6)
-    elevation double precision, --numeric(5, 1)
+    elevation real, --numeric(5, 1)
     time interval
 );
 
@@ -31,9 +31,9 @@ create table cardio_session (
     calories integer,
     track "position"[],
     avg_cycles integer, 
-    cycles double precision[], -- = secs since start
+    cycles real[], -- = secs since start
     avg_heart_rate integer,
-    heart_rate double precision[], -- = secs since start
+    heart_rate real[], -- = secs since start
     route_id integer references route on delete set null,
     comments text
 );

@@ -11,8 +11,8 @@ create table movement (
 );
 --create index on movement (user_id, name);
 
-create table e1rm (
+create table eorm (
     id serial primary key,
     reps integer not null unique,
-    percentage float not null
+    percentage real not null
 );

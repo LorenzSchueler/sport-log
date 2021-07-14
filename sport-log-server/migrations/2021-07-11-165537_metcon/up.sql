@@ -16,7 +16,7 @@ create table metcon_movements (
     metcon_id integer not null references metcon on delete cascade,
     count integer not null,
     unit movement_unit not null,
-    weight float
+    weight real
 );
 
 create table metcon_session (

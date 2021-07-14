@@ -66,9 +66,9 @@ table! {
         calories -> Nullable<Int4>,
         track -> Nullable<Array<Position>>,
         avg_cycles -> Nullable<Int4>,
-        cycles -> Nullable<Array<Float8>>,
+        cycles -> Nullable<Array<Float4>>,
         avg_heart_rate -> Nullable<Int4>,
-        heart_rate -> Nullable<Array<Float8>>,
+        heart_rate -> Nullable<Array<Float4>>,
         route_id -> Nullable<Int4>,
         comments -> Nullable<Text>,
     }
@@ -91,10 +91,10 @@ table! {
     use diesel::sql_types::*;
     use crate::model::*;
 
-    e1rm (id) {
+    eorm (id) {
         id -> Int4,
         reps -> Int4,
-        percentage -> Float8,
+        percentage -> Float4,
     }
 }
 
@@ -143,7 +143,7 @@ table! {
         metcon_id -> Int4,
         count -> Int4,
         unit -> MovementUnitMapping,
-        weight -> Nullable<Float8>,
+        weight -> Nullable<Float4>,
     }
 }
 
@@ -282,7 +282,7 @@ table! {
         id -> Int4,
         strength_session_id -> Int4,
         count -> Int4,
-        weight -> Nullable<Float8>,
+        weight -> Nullable<Float4>,
     }
 }
 
@@ -351,7 +351,7 @@ allow_tables_to_appear_in_same_query!(
     action_rule,
     cardio_session,
     diary,
-    e1rm,
+    eorm,
     group,
     group_user,
     metcon,
