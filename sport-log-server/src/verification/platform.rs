@@ -1,7 +1,7 @@
 use diesel::PgConnection;
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_server_derive::{FromParam, UnverifiedFromParamToVerifiedForUser};
+use sport_log_server_derive::{FromParam, ToVerifiedForUser};
 
 use crate::{
     auth::{AuthenticatedAdmin, AuthenticatedUser},
@@ -14,7 +14,7 @@ use crate::{
 impl NewPlatform {
     pub fn verify_adm(
         platform: Json<NewPlatform>,
-        _auth: AuthenticatedAdmin,
+        _auth: &AuthenticatedAdmin,
     ) -> Result<NewPlatform, Status> {
         Ok(platform.into_inner())
     }
@@ -23,7 +23,7 @@ impl NewPlatform {
 impl Platform {
     pub fn verify_adm(
         platform: Json<Platform>,
-        _auth: AuthenticatedAdmin,
+        _auth: &AuthenticatedAdmin,
     ) -> Result<Platform, Status> {
         Ok(platform.into_inner())
     }
@@ -37,7 +37,7 @@ impl UnverifiedPlatformId {
         Ok(PlatformId(self.0))
     }
 
-    pub fn verify_adm(self, _auth: AuthenticatedAdmin) -> Result<PlatformId, Status> {
+    pub fn verify_adm(self, _auth: &AuthenticatedAdmin) -> Result<PlatformId, Status> {
         Ok(PlatformId(self.0))
     }
 }
@@ -45,10 +45,10 @@ impl UnverifiedPlatformId {
 impl NewPlatformCredentials {
     pub fn verify(
         platform_credentials: Json<NewPlatformCredentials>,
-        auth: AuthenticatedUser,
+        auth: &AuthenticatedUser,
     ) -> Result<NewPlatformCredentials, Status> {
         let platform_credentials = platform_credentials.into_inner();
-        if platform_credentials.user_id == *auth {
+        if platform_credentials.user_id == **auth {
             Ok(platform_credentials)
         } else {
             Err(Status::Forbidden)
@@ -59,10 +59,10 @@ impl NewPlatformCredentials {
 impl PlatformCredentials {
     pub fn verify(
         platform_credentials: Json<PlatformCredentials>,
-        auth: AuthenticatedUser,
+        auth: &AuthenticatedUser,
     ) -> Result<PlatformCredentials, Status> {
         let platform_credentials = platform_credentials.into_inner();
-        if platform_credentials.user_id == *auth {
+        if platform_credentials.user_id == **auth {
             Ok(platform_credentials)
         } else {
             Err(Status::Forbidden)
@@ -70,5 +70,5 @@ impl PlatformCredentials {
     }
 }
 
-#[derive(UnverifiedFromParamToVerifiedForUser, FromParam)]
+#[derive(ToVerifiedForUser, FromParam)]
 pub struct UnverifiedPlatformCredentialsId(PlatformCredentialsId);

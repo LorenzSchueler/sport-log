@@ -3,7 +3,7 @@ use rocket::{http::Status, serde::json::Json};
 use crate::{
     auth::{AuthenticatedAdmin, AuthenticatedUser},
     handler::IntoJson,
-    model::{NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials, PlatformId},
+    model::{NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials},
     verification::{UnverifiedPlatformCredentialsId, UnverifiedPlatformId},
     Db,
 };
@@ -14,7 +14,7 @@ pub async fn create_platform(
     auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Json<Platform>, Status> {
-    let platform = NewPlatform::verify_adm(platform, auth)?;
+    let platform = NewPlatform::verify_adm(platform, &auth)?;
     conn.run(|c| Platform::create(platform, c))
         .await
         .into_json()
@@ -42,7 +42,7 @@ pub async fn update_platform(
     auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Json<Platform>, Status> {
-    let platform = Platform::verify_adm(platform, auth)?;
+    let platform = Platform::verify_adm(platform, &auth)?;
     conn.run(|c| Platform::update(platform, c))
         .await
         .into_json()
@@ -54,7 +54,7 @@ pub async fn delete_platform(
     auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Status, Status> {
-    let platform_id = platform_id.verify_adm(auth)?;
+    let platform_id = platform_id.verify_adm(&auth)?;
     conn.run(move |c| {
         Platform::delete(platform_id, c)
             .map(|_| Status::NoContent)
@@ -73,7 +73,7 @@ pub async fn create_platform_credentials(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<PlatformCredentials>, Status> {
-    let platform_credentials = NewPlatformCredentials::verify(platform_credentials, auth)?;
+    let platform_credentials = NewPlatformCredentials::verify(platform_credentials, &auth)?;
     conn.run(|c| PlatformCredentials::create(platform_credentials, c))
         .await
         .into_json()
@@ -111,7 +111,7 @@ pub async fn update_platform_credentials(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<PlatformCredentials>, Status> {
-    let platform_credentials = PlatformCredentials::verify(platform_credentials, auth)?;
+    let platform_credentials = PlatformCredentials::verify(platform_credentials, &auth)?;
     conn.run(|c| PlatformCredentials::update(platform_credentials, c))
         .await
         .into_json()
@@ -123,8 +123,8 @@ pub async fn delete_platform_credentials(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Status, Status> {
-    conn.run(|c| {
-        PlatformCredentials::delete(platform_credentials_id.verify(auth, c)?, c)
+    conn.run(move |c| {
+        PlatformCredentials::delete(platform_credentials_id.verify(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })

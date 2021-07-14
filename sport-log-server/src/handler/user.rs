@@ -27,7 +27,7 @@ pub async fn update_user(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<User>, Status> {
-    let user = User::verify(user, auth)?;
+    let user = User::verify(user, &auth)?;
     conn.run(|c| User::update(user, c)).await.into_json()
 }
 
