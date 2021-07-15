@@ -98,27 +98,6 @@ impl ActionEvent {
             .get_results(conn)
     }
 
-    // pub fn get_by_platform_name(
-    // action_provider_name: String,
-    // conn: &PgConnection,
-    // ) -> QueryResult<Vec<ActionEvent>> {
-    // action_event::table
-    // .filter(
-    // action_event::columns::action_id.eq_any(
-    // action::table
-    // .select(action::columns::id)
-    // .filter(
-    // action::columns::action_provider_id.eq(action_provider::table
-    // .select(action_provider::columns::id)
-    // .filter(action_provider::columns::name.eq(action_provider_name))
-    // .first::<ActionProviderId>(conn)?),
-    // )
-    // .get_results::<ActionId>(conn)?,
-    // ),
-    // )
-    // .get_results(conn)
-    // }
-
     pub fn get_by_user_and_action_provider(
         user_id: UserId,
         action_provider_id: ActionProviderId,

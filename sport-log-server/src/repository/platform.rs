@@ -5,9 +5,6 @@ use crate::{
     schema::platform_credentials,
 };
 
-//impl Platform {
-//}
-
 impl PlatformCredentials {
     pub fn get_by_user(
         user_id: UserId,
