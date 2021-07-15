@@ -142,31 +142,32 @@ fn impl_delete(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
-#[proc_macro_derive(ToVerifiedForUser)]
-pub fn to_verified_for_user_derive(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(VerifyForUser)]
+pub fn verify_for_user_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_to_verified_for_user(&ast)
+    impl_verify_for_user(&ast)
 }
 
-fn impl_to_verified_for_user(ast: &syn::DeriveInput) -> TokenStream {
+fn impl_verify_for_user(ast: &syn::DeriveInput) -> TokenStream {
     let unverified_id_typename = &ast.ident;
     let unverified_id_typename_str = unverified_id_typename.to_string();
     let typename = Ident::new(
         &unverified_id_typename_str[10..unverified_id_typename_str.len() - 2],
         Span::call_site(),
     );
+    let id_typename = Ident::new(&unverified_id_typename_str[10..], Span::call_site());
 
     let gen = quote! {
         impl #unverified_id_typename {
             pub fn verify(
                 self,
-                auth: &AuthenticatedUser,
-                conn: &PgConnection,
-            ) -> Result<i32, rocket::http::Status> {
-                let entity = #typename::get_by_id(self.0, conn)
+                auth: &crate::auth::AuthenticatedUser,
+                conn: &diesel::pg::PgConnection,
+            ) -> Result<crate::model::#id_typename, rocket::http::Status> {
+                let entity = crate::model::#typename::get_by_id(crate::model::#id_typename(self.0), conn)
                     .map_err(|_| rocket::http::Status::Forbidden)?;
                 if entity.user_id == **auth {
-                    Ok(self.0)
+                    Ok(crate::model::#id_typename(self.0))
                 } else {
                     Err(rocket::http::Status::Forbidden)
                 }
@@ -176,13 +177,13 @@ fn impl_to_verified_for_user(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
-#[proc_macro_derive(FromParam)]
-pub fn unverfied_from_param(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(InnerIntFromParam)]
+pub fn inner_int_from_param_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_unverfied_from_param(&ast)
+    impl_inner_int_from_param(&ast)
 }
 
-fn impl_unverfied_from_param(ast: &syn::DeriveInput) -> TokenStream {
+fn impl_inner_int_from_param(ast: &syn::DeriveInput) -> TokenStream {
     let unverified_id_typename = &ast.ident;
 
     let gen = quote! {
@@ -229,7 +230,7 @@ fn impl_inner_int_from_sql(ast: &syn::DeriveInput) -> TokenStream {
         impl  diesel::types::FromSql<diesel::sql_types::Integer, diesel::pg::Pg> for #typename {
             fn from_sql(bytes: Option<&[u8]>) -> diesel::deserialize::Result<Self> {
                 let id = diesel::types::FromSql::<diesel::sql_types::Integer, diesel::pg::Pg>::from_sql(bytes)?;
-                Ok(PlatformId(id))
+                Ok(#typename(id))
             }
         }
     };

@@ -1,14 +1,10 @@
-use diesel::PgConnection;
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_server_derive::{FromParam, ToVerifiedForUser};
+use sport_log_server_derive::{InnerIntFromParam, VerifyForUser};
 
 use crate::{
     auth::{AuthenticatedAdmin, AuthenticatedUser},
-    model::{
-        NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials, PlatformCredentialsId,
-        PlatformId,
-    },
+    model::{NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials, PlatformId},
 };
 
 impl NewPlatform {
@@ -29,7 +25,7 @@ impl Platform {
     }
 }
 
-#[derive(FromParam)]
+#[derive(InnerIntFromParam)]
 pub struct UnverifiedPlatformId(i32);
 
 impl UnverifiedPlatformId {
@@ -70,5 +66,5 @@ impl PlatformCredentials {
     }
 }
 
-#[derive(ToVerifiedForUser, FromParam)]
-pub struct UnverifiedPlatformCredentialsId(PlatformCredentialsId);
+#[derive(VerifyForUser, InnerIntFromParam)]
+pub struct UnverifiedPlatformCredentialsId(i32);

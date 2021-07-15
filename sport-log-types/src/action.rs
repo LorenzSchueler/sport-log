@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{PlatformId, UserId};
 
-pub type ActionProviderId = i32;
+pub struct ActionProviderId(pub i32);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ActionProvider {
@@ -20,7 +20,7 @@ pub struct NewActionProvider {
     pub platform_id: PlatformId,
 }
 
-pub type ActionId = i32;
+pub struct ActionId(pub i32);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Action {
@@ -60,7 +60,7 @@ impl Weekday {
     }
 }
 
-pub type ActionRuleId = i32;
+pub struct ActionRuleId(pub i32);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ActionRule {
@@ -81,7 +81,7 @@ pub struct NewActionRule {
     pub enabled: bool,
 }
 
-pub type ActionEventId = i32;
+pub struct ActionEventId(pub i32);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ActionEvent {

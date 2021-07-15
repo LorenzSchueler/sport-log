@@ -7,8 +7,8 @@ use crate::{
     auth::{AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser},
     handler::IntoJson,
     model::{
-        Action, ActionEvent, ActionProvider, ActionProviderId, ActionRule, ExecutableActionEvent,
-        NewAction, NewActionEvent, NewActionProvider, NewActionRule,
+        Action, ActionEvent, ActionProvider, ActionRule, ExecutableActionEvent, NewAction,
+        NewActionEvent, NewActionProvider, NewActionRule,
     },
     verification::{
         UnverifiedActionEventId, UnverifiedActionId, UnverifiedActionProviderId,
@@ -49,7 +49,7 @@ pub async fn delete_action_provider(
 ) -> Result<Status, Status> {
     let action_provider_id = action_provider_id.verify_adm(&auth)?;
     conn.run(move |c| {
-        Action::delete(action_provider_id, c)
+        ActionProvider::delete(action_provider_id, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
@@ -143,10 +143,11 @@ pub async fn get_action_rules_by_user(
 
 #[get("/action_rule/action_provider/<action_provider_id>")]
 pub async fn get_action_rules_by_user_and_action_provider(
-    action_provider_id: ActionProviderId,
+    action_provider_id: UnverifiedActionProviderId,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<ActionRule>>, Status> {
+    let action_provider_id = action_provider_id.verify(&auth)?;
     conn.run(move |c| ActionRule::get_by_user_and_action_provider(*auth, action_provider_id, c))
         .await
         .into_json()
@@ -224,10 +225,11 @@ pub async fn get_action_events_by_action_provider(
 
 #[get("/action_event/action_provider/<action_provider_id>")]
 pub async fn get_action_events_by_user_and_action_provider(
-    action_provider_id: ActionProviderId,
+    action_provider_id: UnverifiedActionProviderId,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
+    let action_provider_id = action_provider_id.verify(&auth)?;
     conn.run(move |c| ActionEvent::get_by_user_and_action_provider(*auth, action_provider_id, c))
         .await
         .into_json()

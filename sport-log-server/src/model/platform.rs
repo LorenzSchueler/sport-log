@@ -15,6 +15,8 @@ use crate::schema::{platform, platform_credentials};
     Debug,
     Clone,
     Copy,
+    PartialEq,
+    Eq,
     InnerIntToSql,
     InnerIntFromSql,
 )]
@@ -34,7 +36,21 @@ pub struct NewPlatform {
     pub name: String,
 }
 
-pub type PlatformCredentialsId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct PlatformCredentialsId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, Update, Delete,

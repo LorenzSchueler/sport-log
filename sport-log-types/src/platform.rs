@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::UserId;
 
-pub type PlatformId = i32;
+pub struct PlatformId(pub i32);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Platform {
@@ -15,7 +15,7 @@ pub struct NewPlatform {
     pub name: String,
 }
 
-pub type PlatformCredentialsId = i32;
+pub struct PlatformCredentialsId(pub i32);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PlatformCredentials {

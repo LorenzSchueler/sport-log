@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-pub type UserId = i32;
+pub struct UserId(pub i32);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct User {

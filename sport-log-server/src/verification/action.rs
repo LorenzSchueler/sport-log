@@ -1,13 +1,13 @@
 use diesel::PgConnection;
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_server_derive::{FromParam, ToVerifiedForUser};
+use sport_log_server_derive::{InnerIntFromParam, VerifyForUser};
 
 use crate::{
     auth::{AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser},
     model::{
         Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
-        ActionRuleId, NewAction, NewActionEvent, NewActionProvider, NewActionRule,
+        NewAction, NewActionEvent, NewActionProvider, NewActionRule,
     },
 };
 
@@ -36,8 +36,8 @@ impl Action {
     }
 }
 
-#[derive(FromParam)]
-pub struct UnverifiedActionId(ActionId);
+#[derive(InnerIntFromParam)]
+pub struct UnverifiedActionId(i32);
 
 impl UnverifiedActionId {
     pub fn verify_ap(
@@ -45,9 +45,10 @@ impl UnverifiedActionId {
         auth: &AuthenticatedActionProvider,
         conn: &PgConnection,
     ) -> Result<ActionId, Status> {
-        let entity = Action::get_by_id(self.0, conn).map_err(|_| Status::InternalServerError)?;
+        let entity =
+            Action::get_by_id(ActionId(self.0), conn).map_err(|_| Status::InternalServerError)?;
         if entity.action_provider_id == **auth {
-            Ok(self.0)
+            Ok(ActionId(self.0))
         } else {
             Err(Status::Forbidden)
         }
@@ -82,8 +83,8 @@ impl ActionRule {
     }
 }
 
-#[derive(ToVerifiedForUser, FromParam)]
-pub struct UnverifiedActionRuleId(ActionRuleId);
+#[derive(VerifyForUser, InnerIntFromParam)]
+pub struct UnverifiedActionRuleId(i32);
 
 impl NewActionEvent {
     pub fn verify(
@@ -113,8 +114,8 @@ impl ActionEvent {
     }
 }
 
-#[derive(ToVerifiedForUser, FromParam)]
-pub struct UnverifiedActionEventId(ActionEventId);
+#[derive(VerifyForUser, InnerIntFromParam)]
+pub struct UnverifiedActionEventId(i32);
 
 impl UnverifiedActionEventId {
     pub fn verify_ap(
@@ -122,12 +123,12 @@ impl UnverifiedActionEventId {
         auth: &AuthenticatedActionProvider,
         conn: &PgConnection,
     ) -> Result<ActionEventId, Status> {
-        let action_event =
-            ActionEvent::get_by_id(self.0, conn).map_err(|_| Status::InternalServerError)?;
+        let action_event = ActionEvent::get_by_id(ActionEventId(self.0), conn)
+            .map_err(|_| Status::InternalServerError)?;
         let entity = Action::get_by_id(action_event.action_id, conn)
             .map_err(|_| Status::InternalServerError)?;
         if entity.action_provider_id == **auth {
-            Ok(self.0)
+            Ok(ActionEventId(self.0))
         } else {
             Err(Status::Forbidden)
         }
@@ -152,11 +153,15 @@ impl ActionProvider {
     }
 }
 
-#[derive(FromParam)]
-pub struct UnverifiedActionProviderId(ActionProviderId);
+#[derive(InnerIntFromParam)]
+pub struct UnverifiedActionProviderId(i32);
 
 impl UnverifiedActionProviderId {
     pub fn verify_adm(self, _auth: &AuthenticatedAdmin) -> Result<ActionProviderId, Status> {
-        Ok(self.0)
+        Ok(ActionProviderId(self.0))
+    }
+
+    pub fn verify(self, _auth: &AuthenticatedUser) -> Result<ActionProviderId, Status> {
+        Ok(ActionProviderId(self.0))
     }
 }

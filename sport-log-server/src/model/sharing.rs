@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-use sport_log_server_derive::{Create, Delete, GetAll, GetById, Update};
+use sport_log_server_derive::{
+    Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
+};
 
 use crate::{
     model::{CardioSessionId, DiaryId, MetconSessionId, StrengthSessionId, UserId},
@@ -10,7 +12,21 @@ use crate::{
     },
 };
 
-pub type GroupId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct GroupId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,
@@ -27,7 +43,21 @@ pub struct NewGroup {
     pub name: String,
 }
 
-pub type GroupUserId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct GroupUserId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,
@@ -46,7 +76,21 @@ pub struct NewGroupUser {
     pub user_id: UserId,
 }
 
-pub type SharedMetconSessionId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct SharedMetconSessionId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,
@@ -65,7 +109,21 @@ pub struct NewSharedMetconSession {
     pub metcon_session_id: MetconSessionId,
 }
 
-pub type SharedStrengthSessionId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct SharedStrengthSessionId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,
@@ -84,7 +142,21 @@ pub struct NewSharedStrengthSession {
     pub strength_session_id: StrengthSessionId,
 }
 
-pub type SharedCardioSessionId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct SharedCardioSessionId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,
@@ -103,7 +175,21 @@ pub struct NewSharedCardioSession {
     pub cardio_session_id: CardioSessionId,
 }
 
-pub type SharedDiaryId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct SharedDiaryId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,

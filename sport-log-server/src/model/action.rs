@@ -2,12 +2,28 @@ use chrono::{NaiveDateTime, NaiveTime};
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
-use sport_log_server_derive::{Create, Delete, GetAll, GetById, Update};
+use sport_log_server_derive::{
+    Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
+};
 
 use super::*;
 use crate::schema::{action, action_event, action_provider, action_rule};
 
-pub type ActionProviderId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct ActionProviderId(pub i32);
 
 #[derive(Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetAll, Delete)]
 #[table_name = "action_provider"]
@@ -26,7 +42,21 @@ pub struct NewActionProvider {
     pub platform_id: PlatformId,
 }
 
-pub type ActionId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct ActionId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Delete,
@@ -56,7 +86,21 @@ pub enum Weekday {
     Sunday,
 }
 
-pub type ActionRuleId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct ActionRuleId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, Update, Delete,
@@ -81,7 +125,21 @@ pub struct NewActionRule {
     pub enabled: bool,
 }
 
-pub type ActionEventId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct ActionEventId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, Update, Delete,

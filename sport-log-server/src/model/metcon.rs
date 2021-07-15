@@ -2,7 +2,9 @@ use chrono::NaiveDateTime;
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
-use sport_log_server_derive::{Create, Delete, GetAll, GetById, Update};
+use sport_log_server_derive::{
+    Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
+};
 
 use crate::{
     model::{MovementId, MovementUnit, UserId},
@@ -17,7 +19,21 @@ pub enum MetconType {
     Ladder,
 }
 
-pub type MetconId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct MetconId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,
@@ -42,7 +58,21 @@ pub struct NewMetcon {
     pub timecap: Option<i32>,
 }
 
-pub type MetconMovementId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct MetconMovementId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,
@@ -67,7 +97,21 @@ pub struct NewMetconMovement {
     pub weight: Option<f32>,
 }
 
-pub type MetconSessionId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct MetconSessionId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,

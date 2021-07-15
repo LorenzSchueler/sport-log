@@ -11,7 +11,9 @@ use diesel::{
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
-use sport_log_server_derive::{Create, Delete, GetAll, GetById, Update};
+use sport_log_server_derive::{
+    Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
+};
 
 use crate::{
     model::{MovementId, UserId},
@@ -56,7 +58,21 @@ impl FromSql<Position, Pg> for Position {
     }
 }
 
-pub type RouteId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct RouteId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,
@@ -83,7 +99,21 @@ pub struct NewRoute {
     pub track: Option<Vec<Position>>,
 }
 
-pub type CardioSessionId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct CardioSessionId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,

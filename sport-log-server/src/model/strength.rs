@@ -1,14 +1,30 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 
-use sport_log_server_derive::{Create, Delete, GetAll, GetById, Update};
+use sport_log_server_derive::{
+    Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
+};
 
 use crate::{
     model::{MovementId, MovementUnit, UserId},
     schema::{strength_session, strength_set},
 };
 
-pub type StrengthSessionId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct StrengthSessionId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,
@@ -35,7 +51,21 @@ pub struct NewStrengthSession {
     pub comments: Option<String>,
 }
 
-pub type StrengthSetId = i32;
+#[derive(
+    FromSqlRow,
+    AsExpression,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    InnerIntToSql,
+    InnerIntFromSql,
+)]
+#[sql_type = "diesel::sql_types::Integer"]
+pub struct StrengthSetId(pub i32);
 
 #[derive(
     Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,
