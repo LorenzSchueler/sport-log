@@ -35,6 +35,25 @@ impl Action {
         }
     }
 }
+// impl Action {
+// pub fn verify(
+// action: Json<Action>,
+// auth: &AuthenticatedActionProvider,
+// conn: &PgConnection,
+// ) -> Result<Action, Status> {
+// let action = action.into_inner();
+// if action.action_provider_id == **auth
+// && Action::get_by_id(action.id, conn)
+// .map_err(|_| Status::InternalServerError)?
+// .action_provider_id
+// == **auth
+// {
+// Ok(action)
+// } else {
+// Err(Status::Forbidden)
+// }
+// }
+// }
 
 #[derive(InnerIntFromParam)]
 pub struct UnverifiedActionId(i32);
