@@ -196,3 +196,42 @@ fn impl_unverfied_from_param(ast: &syn::DeriveInput) -> TokenStream {
     };
     gen.into()
 }
+
+#[proc_macro_derive(InnerIntToSql)]
+pub fn unverfied_inner_int_to_sql(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_inner_int_to_sql(&ast)
+}
+
+fn impl_inner_int_to_sql(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+
+    let gen = quote! {
+        impl diesel::types::ToSql<diesel::sql_types::Integer, diesel::pg::Pg> for #typename {
+            fn to_sql<W: std::io::Write>(&self, out: &mut diesel::serialize::Output<W, diesel::pg::Pg>) -> diesel::serialize::Result {
+                diesel::types::ToSql::<diesel::sql_types::Integer, diesel::pg::Pg>::to_sql(&self.0, out)
+            }
+        }
+    };
+    gen.into()
+}
+
+#[proc_macro_derive(InnerIntFromSql)]
+pub fn unverfied_inner_int_drom_sql(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_inner_int_from_sql(&ast)
+}
+
+fn impl_inner_int_from_sql(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+
+    let gen = quote! {
+        impl  diesel::types::FromSql<diesel::sql_types::Integer, diesel::pg::Pg> for #typename {
+            fn from_sql(bytes: Option<&[u8]>) -> diesel::deserialize::Result<Self> {
+                let id = diesel::types::FromSql::<diesel::sql_types::Integer, diesel::pg::Pg>::from_sql(bytes)?;
+                Ok(PlatformId(id))
+            }
+        }
+    };
+    gen.into()
+}
