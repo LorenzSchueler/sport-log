@@ -1,7 +1,7 @@
 use diesel::PgConnection;
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_server_derive::{InnerIntFromParam, VerifyForUser};
+use sport_log_server_derive::{InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUser};
 
 use crate::{
     auth::{AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser},
@@ -105,7 +105,7 @@ impl ActionRule {
     }
 }
 
-#[derive(VerifyForUser, InnerIntFromParam)]
+#[derive(VerifyIdForUser, InnerIntFromParam)]
 pub struct UnverifiedActionRuleId(i32);
 
 impl NewActionEvent {
@@ -136,7 +136,7 @@ impl ActionEvent {
     }
 }
 
-#[derive(VerifyForUser, InnerIntFromParam)]
+#[derive(VerifyIdForUser, InnerIntFromParam)]
 pub struct UnverifiedActionEventId(i32);
 
 impl UnverifiedActionEventId {
@@ -175,14 +175,10 @@ impl ActionProvider {
     }
 }
 
-#[derive(InnerIntFromParam)]
+#[derive(InnerIntFromParam, VerifyIdForAdmin)]
 pub struct UnverifiedActionProviderId(i32);
 
 impl UnverifiedActionProviderId {
-    pub fn verify_adm(self, _auth: &AuthenticatedAdmin) -> Result<ActionProviderId, Status> {
-        Ok(ActionProviderId(self.0))
-    }
-
     pub fn verify(self, _auth: &AuthenticatedUser) -> Result<ActionProviderId, Status> {
         Ok(ActionProviderId(self.0))
     }
