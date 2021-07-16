@@ -1,10 +1,12 @@
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_server_derive::{InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUser};
+use sport_log_server_derive::{
+    InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUser, VerifyIdForUserWithoutCheck,
+};
 
 use crate::{
     auth::{AuthenticatedAdmin, AuthenticatedUser},
-    model::{NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials, PlatformId},
+    model::{NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials},
 };
 
 impl NewPlatform {
@@ -25,14 +27,8 @@ impl Platform {
     }
 }
 
-#[derive(InnerIntFromParam, VerifyIdForAdmin)]
+#[derive(InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUserWithoutCheck)]
 pub struct UnverifiedPlatformId(i32);
-
-impl UnverifiedPlatformId {
-    pub fn verify(self, _auth: &AuthenticatedUser) -> Result<PlatformId, Status> {
-        Ok(PlatformId(self.0))
-    }
-}
 
 impl NewPlatformCredentials {
     pub fn verify(

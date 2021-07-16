@@ -1,13 +1,16 @@
 use diesel::PgConnection;
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_server_derive::{InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUser};
+use sport_log_server_derive::{
+    InnerIntFromParam, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
+    VerifyIdForUserWithoutCheck,
+};
 
 use crate::{
     auth::{AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser},
     model::{
-        Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
-        NewAction, NewActionEvent, NewActionProvider, NewActionRule,
+        Action, ActionEvent, ActionEventId, ActionProvider, ActionRule, NewAction, NewActionEvent,
+        NewActionProvider, NewActionRule,
     },
 };
 
@@ -58,24 +61,8 @@ impl Action {
 // }
 // }
 
-#[derive(InnerIntFromParam)]
+#[derive(InnerIntFromParam, VerifyIdForActionProvider)]
 pub struct UnverifiedActionId(i32);
-
-impl UnverifiedActionId {
-    pub fn verify_ap(
-        self,
-        auth: &AuthenticatedActionProvider,
-        conn: &PgConnection,
-    ) -> Result<ActionId, Status> {
-        let entity =
-            Action::get_by_id(ActionId(self.0), conn).map_err(|_| Status::InternalServerError)?;
-        if entity.action_provider_id == **auth {
-            Ok(ActionId(self.0))
-        } else {
-            Err(Status::Forbidden)
-        }
-    }
-}
 
 impl NewActionRule {
     pub fn verify(
@@ -175,11 +162,5 @@ impl ActionProvider {
     }
 }
 
-#[derive(InnerIntFromParam, VerifyIdForAdmin)]
+#[derive(InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUserWithoutCheck)]
 pub struct UnverifiedActionProviderId(i32);
-
-impl UnverifiedActionProviderId {
-    pub fn verify(self, _auth: &AuthenticatedUser) -> Result<ActionProviderId, Status> {
-        Ok(ActionProviderId(self.0))
-    }
-}
