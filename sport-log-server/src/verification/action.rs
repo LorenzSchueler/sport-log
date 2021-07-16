@@ -1,5 +1,5 @@
 use diesel::PgConnection;
-use rocket::{http::Status, serde::json::Json};
+use rocket::http::Status;
 
 use sport_log_server_derive::{
     InnerIntFromParam, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
@@ -7,121 +7,15 @@ use sport_log_server_derive::{
 };
 
 use crate::{
-    auth::{AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser},
-    model::{
-        Action, ActionEvent, ActionEventId, ActionProvider, ActionRule, NewAction, NewActionEvent,
-        NewActionProvider, NewActionRule,
-    },
+    auth::AuthenticatedActionProvider,
+    model::{Action, ActionEvent, ActionEventId},
 };
-
-impl NewAction {
-    pub fn verify_ap(
-        action: Json<Self>,
-        auth: &AuthenticatedActionProvider,
-    ) -> Result<Self, Status> {
-        let action = action.into_inner();
-        if action.action_provider_id == **auth {
-            Ok(action)
-        } else {
-            Err(Status::Forbidden)
-        }
-    }
-}
-
-impl Action {
-    pub fn verify_ap(
-        action: Json<Action>,
-        auth: &AuthenticatedActionProvider,
-    ) -> Result<Action, Status> {
-        let action = action.into_inner();
-        if action.action_provider_id == **auth {
-            Ok(action)
-        } else {
-            Err(Status::Forbidden)
-        }
-    }
-}
-// impl Action {
-// pub fn verify(
-// action: Json<Action>,
-// auth: &AuthenticatedActionProvider,
-// conn: &PgConnection,
-// ) -> Result<Action, Status> {
-// let action = action.into_inner();
-// if action.action_provider_id == **auth
-// && Action::get_by_id(action.id, conn)
-// .map_err(|_| Status::InternalServerError)?
-// .action_provider_id
-// == **auth
-// {
-// Ok(action)
-// } else {
-// Err(Status::Forbidden)
-// }
-// }
-// }
 
 #[derive(InnerIntFromParam, VerifyIdForActionProvider)]
 pub struct UnverifiedActionId(i32);
 
-impl NewActionRule {
-    pub fn verify(
-        action_rule: Json<NewActionRule>,
-        auth: &AuthenticatedUser,
-    ) -> Result<NewActionRule, Status> {
-        let action_rule = action_rule.into_inner();
-        if action_rule.user_id == **auth {
-            Ok(action_rule)
-        } else {
-            Err(Status::Forbidden)
-        }
-    }
-}
-
-impl ActionRule {
-    pub fn verify(
-        action_rule: Json<ActionRule>,
-        auth: &AuthenticatedUser,
-    ) -> Result<ActionRule, Status> {
-        let action_rule = action_rule.into_inner();
-        if action_rule.user_id == **auth {
-            Ok(action_rule)
-        } else {
-            Err(Status::Forbidden)
-        }
-    }
-}
-
 #[derive(VerifyIdForUser, InnerIntFromParam)]
 pub struct UnverifiedActionRuleId(i32);
-
-impl NewActionEvent {
-    pub fn verify(
-        action_event: Json<NewActionEvent>,
-        auth: &AuthenticatedUser,
-    ) -> Result<NewActionEvent, Status> {
-        let action_event = action_event.into_inner();
-        if action_event.user_id == **auth {
-            Ok(action_event)
-        } else {
-            Err(Status::Forbidden)
-        }
-    }
-}
-
-impl ActionEvent {
-    pub fn verify(
-        action_event: Json<ActionEvent>,
-        auth: &AuthenticatedUser,
-    ) -> Result<ActionEvent, Status> {
-        let action_event = action_event.into_inner();
-        if action_event.user_id == **auth {
-            Ok(action_event)
-        } else {
-            Err(Status::Forbidden)
-        }
-    }
-}
 
 #[derive(VerifyIdForUser, InnerIntFromParam)]
 pub struct UnverifiedActionEventId(i32);
@@ -141,24 +35,6 @@ impl UnverifiedActionEventId {
         } else {
             Err(Status::Forbidden)
         }
-    }
-}
-
-impl NewActionProvider {
-    pub fn verify_adm(
-        action_provider: Json<NewActionProvider>,
-        _auth: &AuthenticatedAdmin,
-    ) -> Result<NewActionProvider, Status> {
-        Ok(action_provider.into_inner())
-    }
-}
-
-impl ActionProvider {
-    pub fn verify_adm(
-        action_provider: Json<ActionProvider>,
-        _auth: &AuthenticatedAdmin,
-    ) -> Result<ActionProvider, Status> {
-        Ok(action_provider.into_inner())
     }
 }
 

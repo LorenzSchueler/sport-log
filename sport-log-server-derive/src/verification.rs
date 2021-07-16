@@ -84,7 +84,7 @@ pub fn impl_verify_for_action_provider_with_db(ast: &syn::DeriveInput) -> TokenS
 
     let gen = quote! {
         impl #typename {
-            pub fn verify(
+            pub fn verify_ap(
                 entity: rocket::serde::json::Json<Self>,
                 auth: &crate::auth::AuthenticatedActionProvider,
                 conn: &diesel::pg::PgConnection,
@@ -111,7 +111,7 @@ pub fn impl_verify_for_action_provider_without_db(ast: &syn::DeriveInput) -> Tok
 
     let gen = quote! {
         impl #typename {
-            pub fn verify(
+            pub fn verify_ap(
                 entity: rocket::serde::json::Json<Self>,
                 auth: &crate::auth::AuthenticatedActionProvider,
             ) -> Result<Self, rocket::http::Status> {
@@ -132,7 +132,7 @@ pub fn impl_verify_for_admin_without_db(ast: &syn::DeriveInput) -> TokenStream {
 
     let gen = quote! {
         impl #typename {
-            pub fn verify(
+            pub fn verify_adm(
                 entity: rocket::serde::json::Json<Self>,
                 auth: &crate::auth::AuthenticatedAdmin,
             ) -> Result<Self, rocket::http::Status> {

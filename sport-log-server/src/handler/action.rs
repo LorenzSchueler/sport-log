@@ -159,7 +159,9 @@ pub async fn update_action_rule(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<ActionRule>, Status> {
-    let action_rule = ActionRule::verify(action_rule, &auth)?;
+    let action_rule = conn
+        .run(move |c| ActionRule::verify(action_rule, &auth, c))
+        .await?;
     conn.run(|c| ActionRule::update(action_rule, c))
         .await
         .into_json()
@@ -241,7 +243,9 @@ pub async fn update_action_event(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<ActionEvent>, Status> {
-    let action_event = ActionEvent::verify(action_event, &auth)?;
+    let action_event = conn
+        .run(move |c| ActionEvent::verify(action_event, &auth, c))
+        .await?;
     conn.run(|c| ActionEvent::update(action_event, c))
         .await
         .into_json()

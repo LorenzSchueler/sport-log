@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 
 use sport_log_server_derive::{
     Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
+    VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
+    VerifyForUserWithDb, VerifyForUserWithoutDb,
 };
 
 use super::*;
@@ -25,7 +27,17 @@ use crate::schema::{action, action_event, action_provider, action_rule};
 #[sql_type = "diesel::sql_types::Integer"]
 pub struct ActionProviderId(pub i32);
 
-#[derive(Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetAll, Delete)]
+#[derive(
+    Queryable,
+    AsChangeset,
+    Serialize,
+    Deserialize,
+    Debug,
+    Create,
+    GetAll,
+    Delete,
+    VerifyForAdminWithoutDb,
+)]
 #[table_name = "action_provider"]
 pub struct ActionProvider {
     pub id: ActionId,
@@ -34,7 +46,7 @@ pub struct ActionProvider {
     pub platform_id: PlatformId,
 }
 
-#[derive(Insertable, Serialize, Deserialize)]
+#[derive(Insertable, Serialize, Deserialize, VerifyForAdminWithoutDb)]
 #[table_name = "action_provider"]
 pub struct NewActionProvider {
     pub name: String,
@@ -59,7 +71,16 @@ pub struct NewActionProvider {
 pub struct ActionId(pub i32);
 
 #[derive(
-    Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Delete,
+    Queryable,
+    AsChangeset,
+    Serialize,
+    Deserialize,
+    Debug,
+    Create,
+    GetById,
+    GetAll,
+    Delete,
+    VerifyForActionProviderWithDb,
 )]
 #[table_name = "action"]
 pub struct Action {
@@ -68,7 +89,7 @@ pub struct Action {
     pub action_provider_id: ActionProviderId,
 }
 
-#[derive(Insertable, Serialize, Deserialize)]
+#[derive(Insertable, Serialize, Deserialize, VerifyForActionProviderWithoutDb)]
 #[table_name = "action"]
 pub struct NewAction {
     pub name: String,
@@ -103,7 +124,16 @@ pub enum Weekday {
 pub struct ActionRuleId(pub i32);
 
 #[derive(
-    Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, Update, Delete,
+    Queryable,
+    AsChangeset,
+    Serialize,
+    Deserialize,
+    Debug,
+    Create,
+    GetById,
+    Update,
+    Delete,
+    VerifyForUserWithDb,
 )]
 #[table_name = "action_rule"]
 pub struct ActionRule {
@@ -115,7 +145,7 @@ pub struct ActionRule {
     pub enabled: bool,
 }
 
-#[derive(Insertable, Serialize, Deserialize)]
+#[derive(Insertable, Serialize, Deserialize, VerifyForUserWithoutDb)]
 #[table_name = "action_rule"]
 pub struct NewActionRule {
     pub user_id: UserId,
@@ -142,7 +172,16 @@ pub struct NewActionRule {
 pub struct ActionEventId(pub i32);
 
 #[derive(
-    Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, Update, Delete,
+    Queryable,
+    AsChangeset,
+    Serialize,
+    Deserialize,
+    Debug,
+    Create,
+    GetById,
+    Update,
+    Delete,
+    VerifyForUserWithDb,
 )]
 #[table_name = "action_event"]
 pub struct ActionEvent {
@@ -153,7 +192,7 @@ pub struct ActionEvent {
     pub enabled: bool,
 }
 
-#[derive(Insertable, Serialize, Deserialize)]
+#[derive(Insertable, Serialize, Deserialize, VerifyForUserWithoutDb)]
 #[table_name = "action_event"]
 pub struct NewActionEvent {
     pub user_id: UserId,

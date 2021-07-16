@@ -111,7 +111,9 @@ pub async fn update_platform_credentials(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<PlatformCredentials>, Status> {
-    let platform_credentials = PlatformCredentials::verify(platform_credentials, &auth)?;
+    let platform_credentials = conn
+        .run(move |c| PlatformCredentials::verify(platform_credentials, &auth, c))
+        .await?;
     conn.run(|c| PlatformCredentials::update(platform_credentials, c))
         .await
         .into_json()
