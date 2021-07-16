@@ -30,6 +30,23 @@ pub fn impl_verify_for_user(ast: &syn::DeriveInput) -> TokenStream {
     };
     gen.into()
 }
+pub fn impl_verify_for_user_without_check(ast: &syn::DeriveInput) -> TokenStream {
+    let unverified_id_typename = &ast.ident;
+    let unverified_id_typename_str = unverified_id_typename.to_string();
+    let id_typename = Ident::new(&unverified_id_typename_str[10..], Span::call_site());
+
+    let gen = quote! {
+        impl #unverified_id_typename {
+            pub fn verify(
+                self,
+                auth: &crate::auth::AuthenticatedUser,
+            ) -> Result<crate::model::#id_typename, rocket::http::Status> {
+                    Ok(crate::model::#id_typename(self.0))
+            }
+        }
+    };
+    gen.into()
+}
 
 pub fn impl_verify_for_action_provider(ast: &syn::DeriveInput) -> TokenStream {
     let unverified_id_typename = &ast.ident;
@@ -42,9 +59,9 @@ pub fn impl_verify_for_action_provider(ast: &syn::DeriveInput) -> TokenStream {
 
     let gen = quote! {
         impl #unverified_id_typename {
-            pub fn verify(
+            pub fn verify_ap(
                 self,
-                auth: &crate::auth::AuthenticatedUser,
+                auth: &crate::auth::AuthenticatedActionProvider,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<crate::model::#id_typename, rocket::http::Status> {
                 let entity = crate::model::#typename::get_by_id(crate::model::#id_typename(self.0), conn)
