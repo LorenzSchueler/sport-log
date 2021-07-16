@@ -1,7 +1,7 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_server_derive::{
-    InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUser, VerifyIdForUserWithoutCheck,
+    InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUser, VerifyIdForUserUnchecked,
 };
 
 use crate::{
@@ -27,7 +27,7 @@ impl Platform {
     }
 }
 
-#[derive(InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUserWithoutCheck)]
+#[derive(InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUserUnchecked)]
 pub struct UnverifiedPlatformId(i32);
 
 impl NewPlatformCredentials {

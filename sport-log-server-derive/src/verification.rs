@@ -30,7 +30,7 @@ pub fn impl_verify_for_user(ast: &syn::DeriveInput) -> TokenStream {
     };
     gen.into()
 }
-pub fn impl_verify_for_user_without_check(ast: &syn::DeriveInput) -> TokenStream {
+pub fn impl_verify_for_user_unchecked(ast: &syn::DeriveInput) -> TokenStream {
     let unverified_id_typename = &ast.ident;
     let unverified_id_typename_str = unverified_id_typename.to_string();
     let id_typename = Ident::new(&unverified_id_typename_str[10..], Span::call_site());

@@ -43,10 +43,10 @@ pub fn verify_for_user_derive(input: TokenStream) -> TokenStream {
     impl_verify_for_user(&ast)
 }
 
-#[proc_macro_derive(VerifyIdForUserWithoutCheck)]
-pub fn verify_for_user_without_check_derive(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(VerifyIdForUserUnchecked)]
+pub fn verify_for_user_unchecked_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_verify_for_user_without_check(&ast)
+    impl_verify_for_user_unchecked(&ast)
 }
 
 #[proc_macro_derive(VerifyIdForActionProvider)]

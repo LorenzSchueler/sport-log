@@ -3,7 +3,7 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_server_derive::{
     InnerIntFromParam, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
-    VerifyIdForUserWithoutCheck,
+    VerifyIdForUserUnchecked,
 };
 
 use crate::{
@@ -162,5 +162,5 @@ impl ActionProvider {
     }
 }
 
-#[derive(InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUserWithoutCheck)]
+#[derive(InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUserUnchecked)]
 pub struct UnverifiedActionProviderId(i32);
