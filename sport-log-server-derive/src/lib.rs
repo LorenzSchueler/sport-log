@@ -49,10 +49,34 @@ pub fn verify_it_for_user_unchecked_derive(input: TokenStream) -> TokenStream {
     impl_verify_id_for_user_unchecked(&ast)
 }
 
-#[proc_macro_derive(VerifyForUser)]
-pub fn verify_for_user_derive(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(VerifyForUserWithDb)]
+pub fn verify_for_user_with_db_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_verify_for_user_with_db(&ast)
+}
+
+#[proc_macro_derive(VerifyForUserWithoutDb)]
+pub fn verify_for_user_without_db_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_verify_for_user_without_db(&ast)
+}
+
+#[proc_macro_derive(VerifyForActionProviderWithDb)]
+pub fn verify_for_action_provider_with_db_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_verify_for_action_provider_with_db(&ast)
+}
+
+#[proc_macro_derive(VerifyForActionProviderWithoutDb)]
+pub fn verify_for_action_provider_without_db_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_verify_for_action_provider_without_db(&ast)
+}
+
+#[proc_macro_derive(VerifyForAdminWithoutDb)]
+pub fn verify_for_admin_without_db_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_verify_for_admin_without_db(&ast)
 }
 
 #[proc_macro_derive(VerifyIdForActionProvider)]

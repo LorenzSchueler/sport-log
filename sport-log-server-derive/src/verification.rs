@@ -58,6 +58,91 @@ pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
+pub fn impl_verify_for_user_without_db(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+
+    let gen = quote! {
+        impl #typename {
+            pub fn verify(
+                entity: rocket::serde::json::Json<Self>,
+                auth: &crate::auth::AuthenticatedUser,
+            ) -> Result<Self, rocket::http::Status> {
+                let entity = entity.into_inner();
+                if entity.user_id == **auth {
+                    Ok(entity)
+                } else {
+                    Err(rocket::http::Status::Forbidden)
+                }
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_verify_for_action_provider_with_db(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+
+    let gen = quote! {
+        impl #typename {
+            pub fn verify(
+                entity: rocket::serde::json::Json<Self>,
+                auth: &crate::auth::AuthenticatedActionProvider,
+                conn: &diesel::pg::PgConnection,
+            ) -> Result<Self, rocket::http::Status> {
+                let entity = entity.into_inner();
+                if entity.action_provider_id == **auth
+                    && Self::get_by_id(entity.id, conn)
+                    .map_err(|_| rocket::http::Status::InternalServerError)?
+                    .action_provider_id
+                    == **auth
+                {
+                    Ok(entity)
+                } else {
+                    Err(rocket::http::Status::Forbidden)
+                }
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_verify_for_action_provider_without_db(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+
+    let gen = quote! {
+        impl #typename {
+            pub fn verify(
+                entity: rocket::serde::json::Json<Self>,
+                auth: &crate::auth::AuthenticatedActionProvider,
+            ) -> Result<Self, rocket::http::Status> {
+                let entity = entity.into_inner();
+                if entity.action_provider_id == **auth {
+                    Ok(entity)
+                } else {
+                    Err(rocket::http::Status::Forbidden)
+                }
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_verify_for_admin_without_db(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+
+    let gen = quote! {
+        impl #typename {
+            pub fn verify(
+                entity: rocket::serde::json::Json<Self>,
+                auth: &crate::auth::AuthenticatedAdmin,
+            ) -> Result<Self, rocket::http::Status> {
+                Ok(entity.into_inner())
+            }
+        }
+    };
+    gen.into()
+}
+
 pub fn impl_verify_id_for_user_unchecked(ast: &syn::DeriveInput) -> TokenStream {
     let unverified_id_typename = &ast.ident;
     let unverified_id_typename_str = unverified_id_typename.to_string();
