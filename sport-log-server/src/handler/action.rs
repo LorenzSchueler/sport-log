@@ -62,7 +62,7 @@ pub async fn create_action(
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Action>, Status> {
-    let action = NewAction::verify(action, &auth)?;
+    let action = NewAction::verify_ap(action, &auth)?;
     conn.run(|c| Action::create(action, c)).await.into_json()
 }
 

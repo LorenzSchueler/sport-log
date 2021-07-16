@@ -12,7 +12,10 @@ use crate::{
 };
 
 impl NewAction {
-    pub fn verify(action: Json<Self>, auth: &AuthenticatedActionProvider) -> Result<Self, Status> {
+    pub fn verify_ap(
+        action: Json<Self>,
+        auth: &AuthenticatedActionProvider,
+    ) -> Result<Self, Status> {
         let action = action.into_inner();
         if action.action_provider_id == **auth {
             Ok(action)
@@ -23,7 +26,7 @@ impl NewAction {
 }
 
 impl Action {
-    pub fn verify(
+    pub fn verify_ap(
         action: Json<Action>,
         auth: &AuthenticatedActionProvider,
     ) -> Result<Action, Status> {
