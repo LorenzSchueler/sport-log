@@ -2,7 +2,7 @@ use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::quote;
 
-pub fn impl_verify_for_user(ast: &syn::DeriveInput) -> TokenStream {
+pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
     let unverified_id_typename = &ast.ident;
     let unverified_id_typename_str = unverified_id_typename.to_string();
     let typename = Ident::new(
@@ -30,7 +30,35 @@ pub fn impl_verify_for_user(ast: &syn::DeriveInput) -> TokenStream {
     };
     gen.into()
 }
-pub fn impl_verify_for_user_unchecked(ast: &syn::DeriveInput) -> TokenStream {
+
+pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+
+    let gen = quote! {
+        impl #typename {
+            pub fn verify(
+                entity: rocket::serde::json::Json<Self>,
+                auth: &crate::auth::AuthenticatedUser,
+                conn: &diesel::pg::PgConnection,
+            ) -> Result<Self, rocket::http::Status> {
+                let entity = entity.into_inner();
+                if entity.user_id == **auth
+                    && Self::get_by_id(entity.id, conn)
+                    .map_err(|_| rocket::http::Status::InternalServerError)?
+                    .user_id
+                    == **auth
+                {
+                    Ok(entity)
+                } else {
+                    Err(rocket::http::Status::Forbidden)
+                }
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_verify_id_for_user_unchecked(ast: &syn::DeriveInput) -> TokenStream {
     let unverified_id_typename = &ast.ident;
     let unverified_id_typename_str = unverified_id_typename.to_string();
     let id_typename = Ident::new(&unverified_id_typename_str[10..], Span::call_site());
@@ -48,7 +76,7 @@ pub fn impl_verify_for_user_unchecked(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
-pub fn impl_verify_for_action_provider(ast: &syn::DeriveInput) -> TokenStream {
+pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream {
     let unverified_id_typename = &ast.ident;
     let unverified_id_typename_str = unverified_id_typename.to_string();
     let typename = Ident::new(
@@ -76,7 +104,8 @@ pub fn impl_verify_for_action_provider(ast: &syn::DeriveInput) -> TokenStream {
     };
     gen.into()
 }
-pub fn impl_verify_for_admin(ast: &syn::DeriveInput) -> TokenStream {
+
+pub fn impl_verify_id_for_admin(ast: &syn::DeriveInput) -> TokenStream {
     let unverified_id_typename = &ast.ident;
     let unverified_id_typename_str = unverified_id_typename.to_string();
     let id_typename = Ident::new(&unverified_id_typename_str[10..], Span::call_site());
@@ -93,6 +122,8 @@ pub fn impl_verify_for_admin(ast: &syn::DeriveInput) -> TokenStream {
     };
     gen.into()
 }
+
+// TODO other mod
 pub fn impl_inner_int_from_param(ast: &syn::DeriveInput) -> TokenStream {
     let unverified_id_typename = &ast.ident;
 

@@ -38,27 +38,33 @@ pub fn delete_derive(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_derive(VerifyIdForUser)]
-pub fn verify_for_user_derive(input: TokenStream) -> TokenStream {
+pub fn verify_id_for_user_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_verify_for_user(&ast)
+    impl_verify_id_for_user(&ast)
 }
 
 #[proc_macro_derive(VerifyIdForUserUnchecked)]
-pub fn verify_for_user_unchecked_derive(input: TokenStream) -> TokenStream {
+pub fn verify_it_for_user_unchecked_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_verify_for_user_unchecked(&ast)
+    impl_verify_id_for_user_unchecked(&ast)
+}
+
+#[proc_macro_derive(VerifyForUser)]
+pub fn verify_for_user_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_verify_for_user_with_db(&ast)
 }
 
 #[proc_macro_derive(VerifyIdForActionProvider)]
-pub fn verify_for_action_provider_derive(input: TokenStream) -> TokenStream {
+pub fn verify_id_for_action_provider_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_verify_for_action_provider(&ast)
+    impl_verify_id_for_action_provider(&ast)
 }
 
 #[proc_macro_derive(VerifyIdForAdmin)]
-pub fn verify_for_admin_derive(input: TokenStream) -> TokenStream {
+pub fn verify_id_for_admin_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_verify_for_admin(&ast)
+    impl_verify_id_for_admin(&ast)
 }
 
 #[proc_macro_derive(InnerIntFromParam)]
