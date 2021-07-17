@@ -2,7 +2,8 @@ use chrono::{NaiveDate, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 
 use sport_log_server_derive::{
-    Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
+    Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update, VerifyForUserWithDb,
+    VerifyForUserWithoutDb,
 };
 
 use crate::{
@@ -64,17 +65,27 @@ pub struct NewDiary {
 pub struct WodId(pub i32);
 
 #[derive(
-    Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,
+    Queryable,
+    AsChangeset,
+    Serialize,
+    Deserialize,
+    Debug,
+    Create,
+    GetById,
+    GetAll,
+    Update,
+    Delete,
+    VerifyForUserWithDb,
 )]
 #[table_name = "wod"]
 pub struct Wod {
-    pub id: DiaryId,
+    pub id: WodId,
     pub user_id: UserId,
     pub datetime: NaiveDateTime,
     pub description: Option<String>,
 }
 
-#[derive(Insertable, Serialize, Deserialize)]
+#[derive(Insertable, Serialize, Deserialize, VerifyForUserWithoutDb)]
 #[table_name = "wod"]
 pub struct NewWod {
     pub user_id: UserId,
