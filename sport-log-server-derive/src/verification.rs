@@ -31,6 +31,69 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
+pub fn impl_verify_id_for_user_unchecked(ast: &syn::DeriveInput) -> TokenStream {
+    let unverified_id_typename = &ast.ident;
+    let id_typename = Ident::new(&unverified_id_typename.to_string()[10..], Span::call_site());
+
+    let gen = quote! {
+        impl #unverified_id_typename {
+            pub fn verify(
+                self,
+                auth: &crate::auth::AuthenticatedUser,
+            ) -> Result<crate::model::#id_typename, rocket::http::Status> {
+                    Ok(crate::model::#id_typename(self.0))
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream {
+    let unverified_id_typename = &ast.ident;
+    let unverified_id_typename_str = unverified_id_typename.to_string();
+    let typename = Ident::new(
+        &unverified_id_typename_str[10..unverified_id_typename_str.len() - 2],
+        Span::call_site(),
+    );
+    let id_typename = Ident::new(&unverified_id_typename_str[10..], Span::call_site());
+
+    let gen = quote! {
+        impl #unverified_id_typename {
+            pub fn verify_ap(
+                self,
+                auth: &crate::auth::AuthenticatedActionProvider,
+                conn: &diesel::pg::PgConnection,
+            ) -> Result<crate::model::#id_typename, rocket::http::Status> {
+                let entity = crate::model::#typename::get_by_id(crate::model::#id_typename(self.0), conn)
+                    .map_err(|_| rocket::http::Status::Forbidden)?;
+                if entity.action_provider_id == **auth {
+                    Ok(crate::model::#id_typename(self.0))
+                } else {
+                    Err(rocket::http::Status::Forbidden)
+                }
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_verify_id_for_admin(ast: &syn::DeriveInput) -> TokenStream {
+    let unverified_id_typename = &ast.ident;
+    let id_typename = Ident::new(&unverified_id_typename.to_string()[10..], Span::call_site());
+
+    let gen = quote! {
+        impl #unverified_id_typename {
+            pub fn verify_adm(
+                self,
+                auth: &crate::auth::AuthenticatedAdmin,
+            ) -> Result<crate::model::#id_typename, rocket::http::Status> {
+                    Ok(crate::model::#id_typename(self.0))
+            }
+        }
+    };
+    gen.into()
+}
+
 pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
 
@@ -127,6 +190,22 @@ pub fn impl_verify_for_action_provider_without_db(ast: &syn::DeriveInput) -> Tok
     gen.into()
 }
 
+pub fn impl_verify_for_action_provider_unchecked(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+
+    let gen = quote! {
+        impl #typename {
+            pub fn verify_ap(
+                entity: rocket::serde::json::Json<Self>,
+                auth: &crate::auth::AuthenticatedActionProvider,
+            ) -> Result<Self, rocket::http::Status> {
+                Ok(entity.into_inner())
+            }
+        }
+    };
+    gen.into()
+}
+
 pub fn impl_verify_for_admin_without_db(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
 
@@ -137,71 +216,6 @@ pub fn impl_verify_for_admin_without_db(ast: &syn::DeriveInput) -> TokenStream {
                 auth: &crate::auth::AuthenticatedAdmin,
             ) -> Result<Self, rocket::http::Status> {
                 Ok(entity.into_inner())
-            }
-        }
-    };
-    gen.into()
-}
-
-pub fn impl_verify_id_for_user_unchecked(ast: &syn::DeriveInput) -> TokenStream {
-    let unverified_id_typename = &ast.ident;
-    let unverified_id_typename_str = unverified_id_typename.to_string();
-    let id_typename = Ident::new(&unverified_id_typename_str[10..], Span::call_site());
-
-    let gen = quote! {
-        impl #unverified_id_typename {
-            pub fn verify(
-                self,
-                auth: &crate::auth::AuthenticatedUser,
-            ) -> Result<crate::model::#id_typename, rocket::http::Status> {
-                    Ok(crate::model::#id_typename(self.0))
-            }
-        }
-    };
-    gen.into()
-}
-
-pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream {
-    let unverified_id_typename = &ast.ident;
-    let unverified_id_typename_str = unverified_id_typename.to_string();
-    let typename = Ident::new(
-        &unverified_id_typename_str[10..unverified_id_typename_str.len() - 2],
-        Span::call_site(),
-    );
-    let id_typename = Ident::new(&unverified_id_typename_str[10..], Span::call_site());
-
-    let gen = quote! {
-        impl #unverified_id_typename {
-            pub fn verify_ap(
-                self,
-                auth: &crate::auth::AuthenticatedActionProvider,
-                conn: &diesel::pg::PgConnection,
-            ) -> Result<crate::model::#id_typename, rocket::http::Status> {
-                let entity = crate::model::#typename::get_by_id(crate::model::#id_typename(self.0), conn)
-                    .map_err(|_| rocket::http::Status::Forbidden)?;
-                if entity.action_provider_id == **auth {
-                    Ok(crate::model::#id_typename(self.0))
-                } else {
-                    Err(rocket::http::Status::Forbidden)
-                }
-            }
-        }
-    };
-    gen.into()
-}
-
-pub fn impl_verify_id_for_admin(ast: &syn::DeriveInput) -> TokenStream {
-    let unverified_id_typename = &ast.ident;
-    let unverified_id_typename_str = unverified_id_typename.to_string();
-    let id_typename = Ident::new(&unverified_id_typename_str[10..], Span::call_site());
-
-    let gen = quote! {
-        impl #unverified_id_typename {
-            pub fn verify_adm(
-                self,
-                auth: &crate::auth::AuthenticatedAdmin,
-            ) -> Result<crate::model::#id_typename, rocket::http::Status> {
-                    Ok(crate::model::#id_typename(self.0))
             }
         }
     };
