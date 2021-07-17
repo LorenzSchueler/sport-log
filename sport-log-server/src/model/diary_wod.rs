@@ -81,7 +81,7 @@ pub struct WodId(pub i32);
 pub struct Wod {
     pub id: WodId,
     pub user_id: UserId,
-    pub datetime: NaiveDateTime,
+    pub date: NaiveDate,
     pub description: Option<String>,
 }
 
@@ -89,6 +89,6 @@ pub struct Wod {
 #[table_name = "wod"]
 pub struct NewWod {
     pub user_id: UserId,
-    pub datetime: NaiveDateTime,
+    pub date: NaiveDate,
     pub description: Option<String>,
 }

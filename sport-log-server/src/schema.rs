@@ -305,7 +305,7 @@ table! {
     wod (id) {
         id -> Int4,
         user_id -> Int4,
-        datetime -> Timestamp,
+        date -> Date,
         description -> Nullable<Text>,
     }
 }

@@ -11,8 +11,8 @@ create table diary (
 create table wod (
     id serial primary key,
     user_id integer not null references "user" on delete cascade,
-    datetime timestamp not null default now(),
+    date date not null default now()::date,
     description text,
-    unique (user_id, datetime)
+    unique (user_id, date)
 );
 --create index on wod (user_id, datetime desc);
