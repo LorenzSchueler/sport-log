@@ -86,10 +86,10 @@ fn rocket() -> _ {
             action::get_executable_action_events_by_action_provider,
             action::get_executable_action_events_by_action_provider_and_timerange,
             diary_wod::create_wod,
+            diary_wod::create_wod_ap,
             diary_wod::get_wods_by_user,
             diary_wod::update_wod,
             diary_wod::delete_wod,
-
         ],
     )
 }

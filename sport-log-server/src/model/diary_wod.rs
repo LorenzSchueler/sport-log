@@ -1,9 +1,9 @@
-use chrono::{NaiveDate, NaiveDateTime};
+use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
 use sport_log_server_derive::{
-    Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update, VerifyForUserWithDb,
-    VerifyForUserWithoutDb,
+    Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
+    VerifyForActionProviderUnchecked, VerifyForUserWithDb, VerifyForUserWithoutDb,
 };
 
 use crate::{
@@ -85,7 +85,9 @@ pub struct Wod {
     pub description: Option<String>,
 }
 
-#[derive(Insertable, Serialize, Deserialize, VerifyForUserWithoutDb)]
+#[derive(
+    Insertable, Serialize, Deserialize, VerifyForUserWithoutDb, VerifyForActionProviderUnchecked,
+)]
 #[table_name = "wod"]
 pub struct NewWod {
     pub user_id: UserId,

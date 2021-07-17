@@ -8,6 +8,16 @@ use crate::{
     Db,
 };
 
+#[post("/ap/wod", format = "application/json", data = "<wod>")]
+pub async fn create_wod_ap(
+    wod: Json<NewWod>,
+    auth: AuthenticatedActionProvider,
+    conn: Db,
+) -> Result<Json<Wod>, Status> {
+    let wod = NewWod::verify_ap(wod, &auth)?;
+    conn.run(|c| Wod::create(wod, c)).await.into_json()
+}
+
 #[post("/wod", format = "application/json", data = "<wod>")]
 pub async fn create_wod(
     wod: Json<NewWod>,
