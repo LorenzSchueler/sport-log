@@ -98,14 +98,14 @@ pub fn impl_update(ast: &syn::DeriveInput) -> TokenStream {
 
 pub fn impl_delete(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
-    let (_, idtypename, paramname, _, tablename) = get_identifiers(typename);
+    let (_, idtypename, _, idparamname, tablename) = get_identifiers(typename);
 
     let gen = quote! {
         use diesel::prelude::*;
 
         impl #typename {
-            pub fn delete(#paramname: #idtypename, conn: &PgConnection) -> QueryResult<usize> {
-                diesel::delete(#tablename::table.find(#paramname)).execute(conn)
+            pub fn delete(#idparamname: #idtypename, conn: &PgConnection) -> QueryResult<usize> {
+                diesel::delete(#tablename::table.find(#idparamname)).execute(conn)
             }
         }
     };
