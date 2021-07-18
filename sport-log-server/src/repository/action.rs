@@ -8,6 +8,7 @@ use crate::{
         ExecutableActionEvent, UserId,
     },
 };
+
 impl ActionProvider {
     pub fn authenticate(
         name: &str,

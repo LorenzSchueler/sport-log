@@ -4,7 +4,6 @@ use rocket::{
     serde::json::Json,
     Data, Request,
 };
-
 use serde::Deserialize;
 
 mod action;

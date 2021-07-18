@@ -1,8 +1,8 @@
 use diesel::prelude::*;
 
 use crate::{
-    types::{UserId, Wod},
     schema::{diary, wod},
+    types::{UserId, Wod},
 };
 
 impl Wod {

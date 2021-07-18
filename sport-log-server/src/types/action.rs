@@ -10,10 +10,10 @@ use sport_log_server_derive::{
     VerifyIdForUser, VerifyIdForUserUnchecked,
 };
 
-use super::*;
 use crate::{
     auth::AuthenticatedActionProvider,
     schema::{action, action_event, action_provider, action_rule},
+    types::{PlatformId, UserId},
 };
 
 #[derive(

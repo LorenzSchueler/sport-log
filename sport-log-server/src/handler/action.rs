@@ -8,11 +8,8 @@ use crate::{
     handler::IntoJson,
     types::{
         Action, ActionEvent, ActionProvider, ActionRule, ExecutableActionEvent, NewAction,
-        NewActionEvent, NewActionProvider, NewActionRule,
-    },
-    types::{
-        Unverified, UnverifiedActionEventId, UnverifiedActionId, UnverifiedActionProviderId,
-        UnverifiedActionRuleId,
+        NewActionEvent, NewActionProvider, NewActionRule, Unverified, UnverifiedActionEventId,
+        UnverifiedActionId, UnverifiedActionProviderId, UnverifiedActionRuleId,
     },
     Db,
 };

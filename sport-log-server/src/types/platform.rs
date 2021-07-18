@@ -6,8 +6,10 @@ use sport_log_server_derive::{
     VerifyIdForUser, VerifyIdForUserUnchecked,
 };
 
-use super::*;
-use crate::schema::{platform, platform_credentials};
+use crate::{
+    schema::{platform, platform_credentials},
+    types::UserId,
+};
 
 #[derive(
     FromSqlRow,
