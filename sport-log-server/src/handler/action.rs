@@ -11,7 +11,7 @@ use crate::{
         NewActionEvent, NewActionProvider, NewActionRule,
     },
     verification::{
-        UnverifiedActionEventId, UnverifiedActionId, UnverifiedActionProviderId,
+        Unverified, UnverifiedActionEventId, UnverifiedActionId, UnverifiedActionProviderId,
         UnverifiedActionRuleId,
     },
     Db,
@@ -23,11 +23,11 @@ use crate::{
     data = "<action_provider>"
 )]
 pub async fn create_action_provider(
-    action_provider: Json<NewActionProvider>,
+    action_provider: Unverified<NewActionProvider>,
     auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Json<ActionProvider>, Status> {
-    let action_provider = NewActionProvider::verify_adm(action_provider, &auth)?;
+    let action_provider = action_provider.verify_adm(&auth)?;
     conn.run(|c| ActionProvider::create(action_provider, c))
         .await
         .into_json()
@@ -58,11 +58,11 @@ pub async fn delete_action_provider(
 
 #[post("/ap/action", format = "application/json", data = "<action>")]
 pub async fn create_action(
-    action: Json<NewAction>,
+    action: Unverified<NewAction>,
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Action>, Status> {
-    let action = NewAction::verify_ap(action, &auth)?;
+    let action = action.verify_ap(&auth)?;
     conn.run(|c| Action::create(action, c)).await.into_json()
 }
 
@@ -109,11 +109,11 @@ pub async fn delete_action(
 
 #[post("/action_rule", format = "application/json", data = "<action_rule>")]
 pub async fn create_action_rule(
-    action_rule: Json<NewActionRule>,
+    action_rule: Unverified<NewActionRule>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<ActionRule>, Status> {
-    let action_rule = NewActionRule::verify(action_rule, &auth)?;
+    let action_rule = action_rule.verify(&auth)?;
     conn.run(|c| ActionRule::create(action_rule, c))
         .await
         .into_json()
@@ -155,13 +155,11 @@ pub async fn get_action_rules_by_user_and_action_provider(
 
 #[put("/action_rule", format = "application/json", data = "<action_rule>")]
 pub async fn update_action_rule(
-    action_rule: Json<ActionRule>,
+    action_rule: Unverified<ActionRule>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<ActionRule>, Status> {
-    let action_rule = conn
-        .run(move |c| ActionRule::verify(action_rule, &auth, c))
-        .await?;
+    let action_rule = conn.run(move |c| action_rule.verify(&auth, c)).await?;
     conn.run(|c| ActionRule::update(action_rule, c))
         .await
         .into_json()
@@ -183,11 +181,11 @@ pub async fn delete_action_rule(
 
 #[post("/action_event", format = "application/json", data = "<action_event>")]
 pub async fn create_action_event(
-    action_event: Json<NewActionEvent>,
+    action_event: Unverified<NewActionEvent>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<ActionEvent>, Status> {
-    let action_event = NewActionEvent::verify(action_event, &auth)?;
+    let action_event = action_event.verify(&auth)?;
     conn.run(|c| ActionEvent::create(action_event, c))
         .await
         .into_json()
@@ -239,13 +237,11 @@ pub async fn get_action_events_by_user_and_action_provider(
 
 #[put("/action_event", format = "application/json", data = "<action_event>")]
 pub async fn update_action_event(
-    action_event: Json<ActionEvent>,
+    action_event: Unverified<ActionEvent>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<ActionEvent>, Status> {
-    let action_event = conn
-        .run(move |c| ActionEvent::verify(action_event, &auth, c))
-        .await?;
+    let action_event = conn.run(move |c| action_event.verify(&auth, c)).await?;
     conn.run(|c| ActionEvent::update(action_event, c))
         .await
         .into_json()

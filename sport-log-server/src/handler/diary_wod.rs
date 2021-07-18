@@ -4,27 +4,27 @@ use crate::{
     auth::{AuthenticatedActionProvider, AuthenticatedUser},
     handler::IntoJson,
     model::{NewWod, Wod},
-    verification::UnverifiedWodId,
+    verification::{Unverified, UnverifiedWodId},
     Db,
 };
 
 #[post("/ap/wod", format = "application/json", data = "<wod>")]
 pub async fn create_wod_ap(
-    wod: Json<NewWod>,
+    wod: Unverified<NewWod>,
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Wod>, Status> {
-    let wod = NewWod::verify_ap(wod, &auth)?;
+    let wod = wod.verify_ap(&auth)?;
     conn.run(|c| Wod::create(wod, c)).await.into_json()
 }
 
 #[post("/wod", format = "application/json", data = "<wod>")]
 pub async fn create_wod(
-    wod: Json<NewWod>,
+    wod: Unverified<NewWod>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Wod>, Status> {
-    let wod = NewWod::verify(wod, &auth)?;
+    let wod = wod.verify(&auth)?;
     conn.run(|c| Wod::create(wod, c)).await.into_json()
 }
 
@@ -37,11 +37,11 @@ pub async fn get_wods_by_user(auth: AuthenticatedUser, conn: Db) -> Result<Json<
 
 #[put("/wod", format = "application/json", data = "<wod>")]
 pub async fn update_wod(
-    wod: Json<Wod>,
+    wod: Unverified<Wod>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Wod>, Status> {
-    let wod = conn.run(move |c| Wod::verify(wod, &auth, c)).await?;
+    let wod = conn.run(move |c| wod.verify(&auth, c)).await?;
     conn.run(|c| Wod::update(wod, c)).await.into_json()
 }
 

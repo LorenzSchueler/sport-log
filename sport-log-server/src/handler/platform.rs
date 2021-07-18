@@ -4,17 +4,17 @@ use crate::{
     auth::{AuthenticatedAdmin, AuthenticatedUser},
     handler::IntoJson,
     model::{NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials},
-    verification::{UnverifiedPlatformCredentialsId, UnverifiedPlatformId},
+    verification::{Unverified, UnverifiedPlatformCredentialsId, UnverifiedPlatformId},
     Db,
 };
 
 #[post("/adm/platform", format = "application/json", data = "<platform>")]
 pub async fn create_platform(
-    platform: Json<NewPlatform>,
+    platform: Unverified<NewPlatform>,
     auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Json<Platform>, Status> {
-    let platform = NewPlatform::verify_adm(platform, &auth)?;
+    let platform = platform.verify_adm(&auth)?;
     conn.run(|c| Platform::create(platform, c))
         .await
         .into_json()
@@ -38,11 +38,11 @@ pub async fn get_platforms_u(
 
 #[put("/adm/platform", format = "application/json", data = "<platform>")]
 pub async fn update_platform(
-    platform: Json<Platform>,
+    platform: Unverified<Platform>,
     auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Json<Platform>, Status> {
-    let platform = Platform::verify_adm(platform, &auth)?;
+    let platform = platform.verify_adm(&auth)?;
     conn.run(|c| Platform::update(platform, c))
         .await
         .into_json()
@@ -69,11 +69,11 @@ pub async fn delete_platform(
     data = "<platform_credentials>"
 )]
 pub async fn create_platform_credentials(
-    platform_credentials: Json<NewPlatformCredentials>,
+    platform_credentials: Unverified<NewPlatformCredentials>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<PlatformCredentials>, Status> {
-    let platform_credentials = NewPlatformCredentials::verify(platform_credentials, &auth)?;
+    let platform_credentials = platform_credentials.verify(&auth)?;
     conn.run(|c| PlatformCredentials::create(platform_credentials, c))
         .await
         .into_json()
@@ -107,12 +107,12 @@ pub async fn get_own_platform_credentials_by_platform(
     data = "<platform_credentials>"
 )]
 pub async fn update_platform_credentials(
-    platform_credentials: Json<PlatformCredentials>,
+    platform_credentials: Unverified<PlatformCredentials>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<PlatformCredentials>, Status> {
     let platform_credentials = conn
-        .run(move |c| PlatformCredentials::verify(platform_credentials, &auth, c))
+        .run(move |c| platform_credentials.verify(&auth, c))
         .await?;
     conn.run(|c| PlatformCredentials::update(platform_credentials, c))
         .await

@@ -4,14 +4,14 @@ use crate::{
     auth::AuthenticatedUser,
     handler::IntoJson,
     model::{NewUser, User},
+    verification::Unverified,
     Db,
 };
 
 #[post("/user", format = "application/json", data = "<user>")]
-pub async fn create_user(user: Json<NewUser>, conn: Db) -> Result<Json<User>, Status> {
-    conn.run(|c| User::create(user.into_inner(), c))
-        .await
-        .into_json()
+pub async fn create_user(user: Unverified<NewUser>, conn: Db) -> Result<Json<User>, Status> {
+    let user = user.verify()?;
+    conn.run(|c| User::create(user, c)).await.into_json()
 }
 
 #[get("/user")]
@@ -23,11 +23,11 @@ pub async fn get_user(auth: AuthenticatedUser, conn: Db) -> Result<Json<User>, S
 
 #[put("/user", format = "application/json", data = "<user>")]
 pub async fn update_user(
-    user: Json<User>,
+    user: Unverified<User>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<User>, Status> {
-    let user = User::verify(user, &auth)?;
+    let user = conn.run(move |c| user.verify(&auth, c)).await?;
     conn.run(|c| User::update(user, c)).await.into_json()
 }
 
