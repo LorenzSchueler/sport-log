@@ -26,7 +26,7 @@ pub use sharing::*;
 pub use strength::*;
 pub use user::*;
 
-pub struct Unverified<T>(pub Json<T>);
+pub struct Unverified<T>(Json<T>);
 
 #[rocket::async_trait]
 impl<'r, T: Deserialize<'r>> FromData<'r> for Unverified<T> {
