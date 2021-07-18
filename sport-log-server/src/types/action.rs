@@ -1,15 +1,20 @@
 use chrono::{NaiveDateTime, NaiveTime};
 use diesel_derive_enum::DbEnum;
+use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 use sport_log_server_derive::{
-    Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
+    Create, Delete, GetAll, GetById, InnerIntFromParam, InnerIntFromSql, InnerIntToSql, Update,
     VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
-    VerifyForUserWithDb, VerifyForUserWithoutDb,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin,
+    VerifyIdForUser, VerifyIdForUserUnchecked,
 };
 
 use super::*;
-use crate::schema::{action, action_event, action_provider, action_rule};
+use crate::{
+    auth::AuthenticatedActionProvider,
+    schema::{action, action_event, action_provider, action_rule},
+};
 
 #[derive(
     FromSqlRow,
@@ -26,6 +31,9 @@ use crate::schema::{action, action_event, action_provider, action_rule};
 )]
 #[sql_type = "diesel::sql_types::Integer"]
 pub struct ActionProviderId(pub i32);
+
+#[derive(InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUserUnchecked)]
+pub struct UnverifiedActionProviderId(i32);
 
 #[derive(
     Queryable,
@@ -69,6 +77,9 @@ pub struct NewActionProvider {
 )]
 #[sql_type = "diesel::sql_types::Integer"]
 pub struct ActionId(pub i32);
+
+#[derive(InnerIntFromParam, VerifyIdForActionProvider)]
+pub struct UnverifiedActionId(i32);
 
 #[derive(
     Queryable,
@@ -123,6 +134,9 @@ pub enum Weekday {
 #[sql_type = "diesel::sql_types::Integer"]
 pub struct ActionRuleId(pub i32);
 
+#[derive(VerifyIdForUser, InnerIntFromParam)]
+pub struct UnverifiedActionRuleId(i32);
+
 #[derive(
     Queryable,
     AsChangeset,
@@ -170,6 +184,27 @@ pub struct NewActionRule {
 )]
 #[sql_type = "diesel::sql_types::Integer"]
 pub struct ActionEventId(pub i32);
+
+#[derive(VerifyIdForUser, InnerIntFromParam)]
+pub struct UnverifiedActionEventId(i32);
+
+impl UnverifiedActionEventId {
+    pub fn verify_ap(
+        self,
+        auth: &AuthenticatedActionProvider,
+        conn: &PgConnection,
+    ) -> Result<ActionEventId, Status> {
+        let action_event = ActionEvent::get_by_id(ActionEventId(self.0), conn)
+            .map_err(|_| Status::InternalServerError)?;
+        let entity = Action::get_by_id(action_event.action_id, conn)
+            .map_err(|_| Status::InternalServerError)?;
+        if entity.action_provider_id == **auth {
+            Ok(ActionEventId(self.0))
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
 
 #[derive(
     Queryable,

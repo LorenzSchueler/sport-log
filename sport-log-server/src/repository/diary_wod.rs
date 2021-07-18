@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 
 use crate::{
-    model::{UserId, Wod},
+    types::{UserId, Wod},
     schema::{diary, wod},
 };
 

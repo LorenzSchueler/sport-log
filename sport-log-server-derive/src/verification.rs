@@ -17,11 +17,11 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
                 self,
                 auth: &crate::auth::AuthenticatedUser,
                 conn: &diesel::pg::PgConnection,
-            ) -> Result<crate::model::#id_typename, rocket::http::Status> {
-                let entity = crate::model::#typename::get_by_id(crate::model::#id_typename(self.0), conn)
+            ) -> Result<crate::types::#id_typename, rocket::http::Status> {
+                let entity = crate::types::#typename::get_by_id(crate::types::#id_typename(self.0), conn)
                     .map_err(|_| rocket::http::Status::Forbidden)?;
                 if entity.user_id == **auth {
-                    Ok(crate::model::#id_typename(self.0))
+                    Ok(crate::types::#id_typename(self.0))
                 } else {
                     Err(rocket::http::Status::Forbidden)
                 }
@@ -40,8 +40,8 @@ pub fn impl_verify_id_for_user_unchecked(ast: &syn::DeriveInput) -> TokenStream 
             pub fn verify(
                 self,
                 auth: &crate::auth::AuthenticatedUser,
-            ) -> Result<crate::model::#id_typename, rocket::http::Status> {
-                    Ok(crate::model::#id_typename(self.0))
+            ) -> Result<crate::types::#id_typename, rocket::http::Status> {
+                    Ok(crate::types::#id_typename(self.0))
             }
         }
     };
@@ -63,11 +63,11 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
                 self,
                 auth: &crate::auth::AuthenticatedActionProvider,
                 conn: &diesel::pg::PgConnection,
-            ) -> Result<crate::model::#id_typename, rocket::http::Status> {
-                let entity = crate::model::#typename::get_by_id(crate::model::#id_typename(self.0), conn)
+            ) -> Result<crate::types::#id_typename, rocket::http::Status> {
+                let entity = crate::types::#typename::get_by_id(crate::types::#id_typename(self.0), conn)
                     .map_err(|_| rocket::http::Status::Forbidden)?;
                 if entity.action_provider_id == **auth {
-                    Ok(crate::model::#id_typename(self.0))
+                    Ok(crate::types::#id_typename(self.0))
                 } else {
                     Err(rocket::http::Status::Forbidden)
                 }
@@ -86,8 +86,8 @@ pub fn impl_verify_id_for_admin(ast: &syn::DeriveInput) -> TokenStream {
             pub fn verify_adm(
                 self,
                 auth: &crate::auth::AuthenticatedAdmin,
-            ) -> Result<crate::model::#id_typename, rocket::http::Status> {
-                    Ok(crate::model::#id_typename(self.0))
+            ) -> Result<crate::types::#id_typename, rocket::http::Status> {
+                    Ok(crate::types::#id_typename(self.0))
             }
         }
     };
@@ -98,7 +98,7 @@ pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
 
     let gen = quote! {
-        impl crate::verification::Unverified<#typename> {
+        impl crate::types::Unverified<#typename> {
             pub fn verify(
                 self,
                 auth: &crate::auth::AuthenticatedUser,
@@ -125,7 +125,7 @@ pub fn impl_verify_for_user_without_db(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
 
     let gen = quote! {
-        impl crate::verification::Unverified<#typename> {
+        impl crate::types::Unverified<#typename> {
             pub fn verify(
                 self,
                 auth: &crate::auth::AuthenticatedUser,
@@ -146,7 +146,7 @@ pub fn impl_verify_for_action_provider_with_db(ast: &syn::DeriveInput) -> TokenS
     let typename = &ast.ident;
 
     let gen = quote! {
-        impl crate::verification::Unverified<#typename> {
+        impl crate::types::Unverified<#typename> {
             pub fn verify_ap(
                 self,
                 auth: &crate::auth::AuthenticatedActionProvider,
@@ -173,7 +173,7 @@ pub fn impl_verify_for_action_provider_without_db(ast: &syn::DeriveInput) -> Tok
     let typename = &ast.ident;
 
     let gen = quote! {
-        impl crate::verification::Unverified<#typename> {
+        impl crate::types::Unverified<#typename> {
             pub fn verify_ap(
                 self,
                 auth: &crate::auth::AuthenticatedActionProvider,
@@ -194,7 +194,7 @@ pub fn impl_verify_for_action_provider_unchecked(ast: &syn::DeriveInput) -> Toke
     let typename = &ast.ident;
 
     let gen = quote! {
-        impl crate::verification::Unverified<#typename> {
+        impl crate::types::Unverified<#typename> {
             pub fn verify_ap(
                 self,
                 auth: &crate::auth::AuthenticatedActionProvider,
@@ -210,7 +210,7 @@ pub fn impl_verify_for_admin_without_db(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
 
     let gen = quote! {
-        impl crate::verification::Unverified<#typename> {
+        impl crate::types::Unverified<#typename> {
             pub fn verify_adm(
                 self,
                 auth: &crate::auth::AuthenticatedAdmin,

@@ -5,11 +5,11 @@ use sport_log_server_derive::{
 };
 
 use crate::{
-    model::{CardioSessionId, DiaryId, MetconSessionId, StrengthSessionId, UserId},
     schema::{
         group, group_user, shared_cardio_session, shared_diary, shared_metcon_session,
         shared_strength_session,
     },
+    types::{CardioSessionId, DiaryId, MetconSessionId, StrengthSessionId, UserId},
 };
 
 #[derive(

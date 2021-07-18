@@ -2,13 +2,13 @@ use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
 use sport_log_server_derive::{
-    Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
-    VerifyForActionProviderUnchecked, VerifyForUserWithDb, VerifyForUserWithoutDb,
+    Create, Delete, GetAll, GetById, InnerIntFromParam, InnerIntFromSql, InnerIntToSql, Update,
+    VerifyForActionProviderUnchecked, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
 use crate::{
-    model::UserId,
     schema::{diary, wod},
+    types::UserId,
 };
 
 #[derive(
@@ -63,6 +63,9 @@ pub struct NewDiary {
 )]
 #[sql_type = "diesel::sql_types::Integer"]
 pub struct WodId(pub i32);
+
+#[derive(InnerIntFromParam, VerifyIdForUser)]
+pub struct UnverifiedWodId(i32);
 
 #[derive(
     Queryable,

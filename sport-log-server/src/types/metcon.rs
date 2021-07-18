@@ -7,8 +7,8 @@ use sport_log_server_derive::{
 };
 
 use crate::{
-    model::{MovementId, MovementUnit, UserId},
     schema::{metcon, metcon_movement, metcon_session},
+    types::{MovementId, MovementUnit, UserId},
 };
 
 #[derive(DbEnum, Debug, Serialize, Deserialize)]

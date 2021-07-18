@@ -4,7 +4,7 @@ use sport_log_server_derive::{
     Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
 };
 
-use crate::schema::user;
+use crate::{schema::user, types::Unverified};
 
 #[derive(
     FromSqlRow,
@@ -33,7 +33,7 @@ pub struct User {
     pub email: String,
 }
 
-impl crate::verification::Unverified<User> {
+impl Unverified<User> {
     pub fn verify(
         self,
         auth: &crate::auth::AuthenticatedUser,
@@ -61,7 +61,7 @@ pub struct NewUser {
     pub email: String,
 }
 
-impl crate::verification::Unverified<NewUser> {
+impl Unverified<NewUser> {
     pub fn verify(self) -> Result<NewUser, rocket::http::Status> {
         Ok(self.0.into_inner())
     }

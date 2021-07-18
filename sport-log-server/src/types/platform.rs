@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
 
 use sport_log_server_derive::{
-    Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
-    VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
+    Create, Delete, GetAll, GetById, InnerIntFromParam, InnerIntFromSql, InnerIntToSql, Update,
+    VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForAdmin,
+    VerifyIdForUser, VerifyIdForUserUnchecked,
 };
 
 use super::*;
@@ -23,6 +24,9 @@ use crate::schema::{platform, platform_credentials};
 )]
 #[sql_type = "diesel::sql_types::Integer"]
 pub struct PlatformId(pub i32);
+
+#[derive(InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUserUnchecked)]
+pub struct UnverifiedPlatformId(i32);
 
 #[derive(
     Queryable,
@@ -63,6 +67,9 @@ pub struct NewPlatform {
 )]
 #[sql_type = "diesel::sql_types::Integer"]
 pub struct PlatformCredentialsId(pub i32);
+
+#[derive(InnerIntFromParam, VerifyIdForUser)]
+pub struct UnverifiedPlatformCredentialsId(i32);
 
 #[derive(
     Queryable,

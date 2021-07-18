@@ -3,8 +3,8 @@ use rocket::{http::Status, serde::json::Json};
 use crate::{
     auth::AuthenticatedUser,
     handler::IntoJson,
-    model::{NewUser, User},
-    verification::Unverified,
+    types::Unverified,
+    types::{NewUser, User},
     Db,
 };
 

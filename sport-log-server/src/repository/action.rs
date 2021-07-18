@@ -2,11 +2,11 @@ use chrono::NaiveDateTime;
 use diesel::prelude::*;
 
 use crate::{
-    model::{
+    schema::{action, action_event, action_provider, action_rule, platform_credentials},
+    types::{
         Action, ActionEvent, ActionId, ActionProvider, ActionProviderId, ActionRule,
         ExecutableActionEvent, UserId,
     },
-    schema::{action, action_event, action_provider, action_rule, platform_credentials},
 };
 impl ActionProvider {
     pub fn authenticate(

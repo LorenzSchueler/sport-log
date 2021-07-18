@@ -6,8 +6,8 @@ use sport_log_server_derive::{
 };
 
 use crate::{
-    model::UserId,
     schema::{eorm, movement},
+    types::UserId,
 };
 
 #[derive(DbEnum, Debug, Serialize, Deserialize)]

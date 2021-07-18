@@ -8,7 +8,7 @@ use rocket::{
 };
 
 use crate::{
-    model::{ActionProvider, ActionProviderId, User, UserId},
+    types::{ActionProvider, ActionProviderId, User, UserId},
     Db, CONFIG,
 };
 

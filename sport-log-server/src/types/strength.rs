@@ -6,8 +6,8 @@ use sport_log_server_derive::{
 };
 
 use crate::{
-    model::{MovementId, MovementUnit, UserId},
     schema::{strength_session, strength_set},
+    types::{MovementId, MovementUnit, UserId},
 };
 
 #[derive(

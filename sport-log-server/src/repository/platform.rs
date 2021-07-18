@@ -1,8 +1,8 @@
 use diesel::prelude::*;
 
 use crate::{
-    model::{PlatformCredentials, PlatformId, UserId},
     schema::platform_credentials,
+    types::{PlatformCredentials, PlatformId, UserId},
 };
 
 impl PlatformCredentials {

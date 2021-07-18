@@ -1,8 +1,8 @@
 use diesel::prelude::*;
 
 use crate::{
-    model::{User, UserId},
     schema::user,
+    types::{User, UserId},
 };
 
 impl User {

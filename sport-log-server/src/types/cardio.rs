@@ -16,8 +16,8 @@ use sport_log_server_derive::{
 };
 
 use crate::{
-    model::{MovementId, UserId},
     schema::{cardio_session, route},
+    types::{MovementId, UserId},
 };
 
 #[derive(DbEnum, Debug, Serialize, Deserialize)]

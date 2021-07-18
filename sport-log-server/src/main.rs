@@ -13,10 +13,9 @@ use serde::Deserialize;
 
 mod auth;
 mod handler;
-mod model;
+mod types;
 mod repository;
 mod schema;
-mod verification;
 
 #[derive(Deserialize)]
 pub struct Config {
