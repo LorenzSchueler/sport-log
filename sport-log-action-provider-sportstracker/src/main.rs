@@ -20,7 +20,7 @@ async fn main() {
         .json()
         .await
         .unwrap();
-    println!("{:?}", exec_action_events);
+    println!("{:#?}", exec_action_events);
 
     for action_event in exec_action_events {
         if let Some(()) = get_data(&action_event.username, &action_event.password).await {

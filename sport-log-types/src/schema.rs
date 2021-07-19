@@ -1,7 +1,7 @@
 #![allow(unused_imports)]
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     action (id) {
         id -> Int4,
@@ -12,7 +12,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     action_event (id) {
         id -> Int4,
@@ -25,7 +25,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     action_provider (id) {
         id -> Int4,
@@ -37,7 +37,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     action_rule (id) {
         id -> Int4,
@@ -51,7 +51,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     cardio_session (id) {
         id -> Int4,
@@ -76,7 +76,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     diary (id) {
         id -> Int4,
@@ -89,7 +89,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     eorm (id) {
         id -> Int4,
@@ -100,7 +100,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     group (id) {
         id -> Int4,
@@ -110,7 +110,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     group_user (id) {
         id -> Int4,
@@ -121,7 +121,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     metcon (id) {
         id -> Int4,
@@ -135,7 +135,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     metcon_movement (id) {
         id -> Int4,
@@ -149,7 +149,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     metcon_session (id) {
         id -> Int4,
@@ -166,7 +166,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     movement (id) {
         id -> Int4,
@@ -179,7 +179,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     platform (id) {
         id -> Int4,
@@ -189,7 +189,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     platform_credentials (id) {
         id -> Int4,
@@ -202,7 +202,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     route (id) {
         id -> Int4,
@@ -217,7 +217,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     shared_cardio_session (id) {
         id -> Int4,
@@ -228,7 +228,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     shared_diary (id) {
         id -> Int4,
@@ -239,7 +239,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     shared_metcon_session (id) {
         id -> Int4,
@@ -250,7 +250,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     shared_strength_session (id) {
         id -> Int4,
@@ -261,7 +261,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     strength_session (id) {
         id -> Int4,
@@ -276,7 +276,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     strength_set (id) {
         id -> Int4,
@@ -288,7 +288,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     user (id) {
         id -> Int4,
@@ -300,7 +300,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::model::*;
 
     wod (id) {
         id -> Int4,
