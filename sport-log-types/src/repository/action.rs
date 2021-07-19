@@ -35,12 +35,6 @@ impl Action {
 }
 
 impl ActionRule {
-    pub fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<ActionRule>> {
-        action_rule::table
-            .filter(action_rule::columns::user_id.eq(user_id))
-            .get_results(conn)
-    }
-
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
         conn: &PgConnection,
@@ -77,12 +71,6 @@ impl ActionRule {
 }
 
 impl ActionEvent {
-    pub fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<ActionEvent>> {
-        action_event::table
-            .filter(action_event::columns::user_id.eq(user_id))
-            .get_results(conn)
-    }
-
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
         conn: &PgConnection,

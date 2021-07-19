@@ -6,15 +6,6 @@ use crate::{
 };
 
 impl PlatformCredentials {
-    pub fn get_by_user(
-        user_id: UserId,
-        conn: &PgConnection,
-    ) -> QueryResult<Vec<PlatformCredentials>> {
-        platform_credentials::table
-            .filter(platform_credentials::columns::user_id.eq(user_id))
-            .get_results(conn)
-    }
-
     pub fn get_by_user_and_platform(
         user_id: UserId,
         platform_id: PlatformId,
