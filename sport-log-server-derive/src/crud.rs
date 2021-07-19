@@ -62,6 +62,24 @@ pub fn impl_get_by_id(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
+pub fn impl_get_by_user(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+    let (_, _, _, _, tablename) = get_identifiers(typename);
+
+    let gen = quote! {
+        use diesel::prelude::*;
+
+        impl #typename {
+            pub fn get_by_user(user_id: crate::types::UserId, conn: &PgConnection) -> QueryResult<Vec<#typename>> {
+                #tablename::table
+                    .filter(#tablename::columns::user_id.eq(user_id))
+                    .get_results(conn)
+            }
+        }
+    };
+    gen.into()
+}
+
 pub fn impl_get_all(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
     let (_, _, _, _, tablename) = get_identifiers(typename);

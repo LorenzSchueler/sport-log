@@ -19,6 +19,12 @@ pub fn get_by_id_derive(input: TokenStream) -> TokenStream {
     impl_get_by_id(&ast)
 }
 
+#[proc_macro_derive(GetByUser)]
+pub fn get_by_user_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_get_by_user(&ast)
+}
+
 #[proc_macro_derive(GetAll)]
 pub fn get_all_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();

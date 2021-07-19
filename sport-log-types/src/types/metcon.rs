@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_server_derive::{
-    Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
+    Create, Delete, GetAll, GetById, GetByUser, InnerIntFromSql, InnerIntToSql, Update,
 };
 
 #[cfg(feature = "full")]
@@ -40,7 +40,16 @@ pub struct MetconId(pub i32);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
+    derive(
+        Queryable,
+        AsChangeset,
+        Create,
+        GetById,
+        GetByUser,
+        GetAll,
+        Update,
+        Delete,
+    )
 )]
 #[cfg_attr(feature = "full", table_name = "metcon")]
 pub struct Metcon {
@@ -124,7 +133,16 @@ pub struct MetconSessionId(pub i32);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
+    derive(
+        Queryable,
+        AsChangeset,
+        Create,
+        GetById,
+        GetByUser,
+        GetAll,
+        Update,
+        Delete,
+    )
 )]
 #[cfg_attr(feature = "full", table_name = "metcon_session")]
 pub struct MetconSession {

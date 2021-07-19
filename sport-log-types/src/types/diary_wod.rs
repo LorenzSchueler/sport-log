@@ -3,8 +3,9 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_server_derive::{
-    Create, Delete, GetAll, GetById, InnerIntFromParam, InnerIntFromSql, InnerIntToSql, Update,
-    VerifyForActionProviderUnchecked, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
+    Create, Delete, GetAll, GetById, GetByUser, InnerIntFromParam, InnerIntFromSql, InnerIntToSql,
+    Update, VerifyForActionProviderUnchecked, VerifyForUserWithDb, VerifyForUserWithoutDb,
+    VerifyIdForUser,
 };
 
 #[cfg(feature = "full")]
@@ -30,7 +31,16 @@ pub struct DiaryId(pub i32);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
+    derive(
+        Queryable,
+        AsChangeset,
+        Create,
+        GetById,
+        GetByUser,
+        GetAll,
+        Update,
+        Delete,
+    )
 )]
 #[cfg_attr(feature = "full", table_name = "diary")]
 pub struct Diary {
@@ -79,6 +89,7 @@ pub struct UnverifiedWodId(i32);
         AsChangeset,
         Create,
         GetById,
+        GetByUser,
         GetAll,
         Update,
         Delete,
