@@ -1,7 +1,9 @@
 use chrono::NaiveDateTime;
+#[cfg(feature = "full")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "full")]
 use sport_log_server_derive::{
     Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
 };

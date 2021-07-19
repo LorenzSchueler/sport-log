@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
-sport-log-server-derive = { path = "../sport-log-server-derive" }
+sport-log-server-derive = { path = "../sport-log-server-derive", optional = true }
 
 rocket = { version = "0.5.0-rc.1", features = ["json"], optional = true }
 rocket_sync_db_pools = { version = "0.1.0-rc.1", features = ["diesel_postgres_pool"], optional = true }
@@ -17,4 +17,4 @@ toml = { version = "0.5.8", optional = true }
 lazy_static = { version = "1.4.0", optional = true }
 
 [features]
-full = ["rocket", "rocket_sync_db_pools", "diesel", "diesel-derive-enum", "base64", "toml", "lazy_static"]
+full = ["sport-log-server-derive", "rocket", "rocket_sync_db_pools", "diesel", "diesel-derive-enum", "base64", "toml", "lazy_static"]
