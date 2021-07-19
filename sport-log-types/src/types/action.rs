@@ -130,6 +130,20 @@ pub enum Weekday {
     Sunday,
 }
 
+impl Weekday {
+    pub fn to_u32(&self) -> u32 {
+        match self {
+            Weekday::Monday => 0,
+            Weekday::Tuesday => 1,
+            Weekday::Wednesday => 2,
+            Weekday::Thursday => 3,
+            Weekday::Friday => 4,
+            Weekday::Saturday => 5,
+            Weekday::Sunday => 6,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",

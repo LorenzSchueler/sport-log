@@ -2,7 +2,7 @@ use reqwest::Client;
 use serde_json::{self, Value};
 
 use sport_log_action_provider_sportstracker_config::Config;
-use sport_log_types::ExecutableActionEvent;
+use sport_log_types::types::ExecutableActionEvent;
 
 #[tokio::main]
 async fn main() {
@@ -27,7 +27,7 @@ async fn main() {
             client
                 .delete(format!(
                     "{}/v1/ap/action_event/{}",
-                    config.base_url, action_event.action_event_id
+                    config.base_url, action_event.action_event_id.0
                 ))
                 .basic_auth(&config.username, Some(&config.password))
                 .send()

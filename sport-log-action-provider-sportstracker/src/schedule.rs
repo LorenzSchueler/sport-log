@@ -2,7 +2,7 @@ use chrono::{Datelike, Duration, Local, NaiveDateTime};
 use reqwest::Client;
 
 use sport_log_action_provider_sportstracker_config::Config;
-use sport_log_types::{ActionEvent, ActionRule, NewActionEvent};
+use sport_log_types::types::{ActionEvent, ActionRule, NewActionEvent};
 
 #[tokio::main]
 async fn main() {
@@ -25,7 +25,7 @@ async fn main() {
             client
                 .delete(format!(
                     "{}/v1/ap/action_event/{}",
-                    config.base_url, action_event.id
+                    config.base_url, action_event.id.0
                 ))
                 .basic_auth(&config.username, Some(&config.password))
                 .send()
