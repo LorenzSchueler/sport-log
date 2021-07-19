@@ -2,8 +2,7 @@ use rocket::{http::Status, serde::json::Json};
 
 use crate::{
     handler::IntoJson,
-    types::{AuthenticatedUser, NewUser, Unverified, User},
-    Db,
+    types::{AuthenticatedUser, Db, NewUser, Unverified, User},
 };
 
 #[post("/user", format = "application/json", data = "<user>")]

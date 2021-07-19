@@ -3,9 +3,9 @@ use rocket::{http::Status, serde::json::Json};
 use crate::{
     handler::IntoJson,
     types::{
-        AuthenticatedActionProvider, AuthenticatedUser, NewWod, Unverified, UnverifiedWodId, Wod,
+        AuthenticatedActionProvider, AuthenticatedUser, Db, NewWod, Unverified, UnverifiedWodId,
+        Wod,
     },
-    Db,
 };
 
 #[post("/ap/wod", format = "application/json", data = "<wod>")]

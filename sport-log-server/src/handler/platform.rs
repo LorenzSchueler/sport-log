@@ -3,10 +3,9 @@ use rocket::{http::Status, serde::json::Json};
 use crate::{
     handler::IntoJson,
     types::{
-        AuthenticatedAdmin, AuthenticatedUser, NewPlatform, NewPlatformCredentials, Platform,
+        AuthenticatedAdmin, AuthenticatedUser, Db, NewPlatform, NewPlatformCredentials, Platform,
         PlatformCredentials, Unverified, UnverifiedPlatformCredentialsId, UnverifiedPlatformId,
     },
-    Db,
 };
 
 #[post("/adm/platform", format = "application/json", data = "<platform>")]

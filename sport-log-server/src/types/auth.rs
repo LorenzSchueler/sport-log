@@ -7,10 +7,7 @@ use rocket::{
     request::{FromRequest, Request},
 };
 
-use crate::{
-    types::{ActionProvider, ActionProviderId, User, UserId},
-    Db, CONFIG,
-};
+use crate::types::{ActionProvider, ActionProviderId, Db, User, UserId, CONFIG};
 
 pub struct AuthenticatedUser {
     user_id: UserId,

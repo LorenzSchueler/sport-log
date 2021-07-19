@@ -1,10 +1,14 @@
+use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 use sport_log_server_derive::{
     Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
 };
 
-use crate::{schema::user, types::Unverified};
+use crate::{
+    schema::user,
+    types::{AuthenticatedUser, Unverified},
+};
 
 #[derive(
     FromSqlRow,
@@ -34,21 +38,17 @@ pub struct User {
 }
 
 impl Unverified<User> {
-    pub fn verify(
-        self,
-        auth: &crate::types::AuthenticatedUser,
-        conn: &diesel::pg::PgConnection,
-    ) -> Result<User, rocket::http::Status> {
+    pub fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<User, Status> {
         let entity = self.0.into_inner();
         if entity.id == **auth
             && User::get_by_id(entity.id, conn)
-                .map_err(|_| rocket::http::Status::InternalServerError)?
+                .map_err(|_| Status::InternalServerError)?
                 .id
                 == **auth
         {
             Ok(entity)
         } else {
-            Err(rocket::http::Status::Forbidden)
+            Err(Status::Forbidden)
         }
     }
 }
@@ -62,7 +62,7 @@ pub struct NewUser {
 }
 
 impl Unverified<NewUser> {
-    pub fn verify(self) -> Result<NewUser, rocket::http::Status> {
+    pub fn verify(self) -> Result<NewUser, Status> {
         Ok(self.0.into_inner())
     }
 }

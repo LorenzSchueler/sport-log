@@ -1,47 +1,21 @@
-use std::fs;
-
 #[macro_use]
 extern crate diesel;
 #[macro_use]
 extern crate rocket;
-
-use diesel::pg::PgConnection;
-use dotenv::dotenv;
-use lazy_static::lazy_static;
-use rocket_sync_db_pools::database;
-use serde::Deserialize;
 
 mod handler;
 mod repository;
 mod schema;
 mod types;
 
-#[derive(Deserialize)]
-pub struct Config {
-    pub admin_username: String,
-    pub admin_password: String,
-}
-
-impl Config {
-    pub fn get() -> Self {
-        toml::from_str(&fs::read_to_string("config.toml").unwrap()).unwrap()
-    }
-}
-
-lazy_static! {
-    static ref CONFIG: Config = Config::get();
-}
-
 const BASE: &str = "/v1";
-
-#[database("sport_diary")]
-pub struct Db(PgConnection);
 
 #[launch]
 fn rocket() -> _ {
-    dotenv().ok();
+    dotenv::dotenv().ok();
 
     use handler::*;
+    use types::Db;
     rocket::build().attach(Db::fairing()).mount(
         BASE,
         routes![

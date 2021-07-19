@@ -7,11 +7,10 @@ use crate::{
     handler::IntoJson,
     types::{
         Action, ActionEvent, ActionProvider, ActionRule, AuthenticatedActionProvider,
-        AuthenticatedAdmin, AuthenticatedUser, ExecutableActionEvent, NewAction, NewActionEvent,
-        NewActionProvider, NewActionRule, Unverified, UnverifiedActionEventId, UnverifiedActionId,
-        UnverifiedActionProviderId, UnverifiedActionRuleId,
+        AuthenticatedAdmin, AuthenticatedUser, Db, ExecutableActionEvent, NewAction,
+        NewActionEvent, NewActionProvider, NewActionRule, Unverified, UnverifiedActionEventId,
+        UnverifiedActionId, UnverifiedActionProviderId, UnverifiedActionRuleId,
     },
-    Db,
 };
 
 #[post(
