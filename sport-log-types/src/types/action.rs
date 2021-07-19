@@ -21,15 +21,12 @@ use crate::{
 
 use crate::types::{PlatformId, UserId};
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -41,20 +38,15 @@ use crate::types::{PlatformId, UserId};
 pub struct ActionProviderId(pub i32);
 
 #[cfg(feature = "full")]
-#[cfg_attr(
-    feature = "full",
-    derive(InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUserUnchecked)
-)]
+#[derive(InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUserUnchecked)]
 pub struct UnverifiedActionProviderId(i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         Queryable,
         AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
         Create,
         GetAll,
         Delete,
@@ -69,10 +61,8 @@ pub struct ActionProvider {
     pub platform_id: PlatformId,
 }
 
-#[cfg_attr(
-    feature = "full",
-    derive(Insertable, Serialize, Deserialize, VerifyForAdminWithoutDb)
-)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyForAdminWithoutDb))]
 #[cfg_attr(feature = "full", table_name = "action_provider")]
 pub struct NewActionProvider {
     pub name: String,
@@ -80,15 +70,12 @@ pub struct NewActionProvider {
     pub platform_id: PlatformId,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -100,17 +87,15 @@ pub struct NewActionProvider {
 pub struct ActionId(pub i32);
 
 #[cfg(feature = "full")]
-#[cfg_attr(feature = "full", derive(InnerIntFromParam, VerifyIdForActionProvider))]
+#[derive(InnerIntFromParam, VerifyIdForActionProvider)]
 pub struct UnverifiedActionId(i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         Queryable,
         AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
         Create,
         GetById,
         GetAll,
@@ -125,17 +110,16 @@ pub struct Action {
     pub action_provider_id: ActionProviderId,
 }
 
-#[cfg_attr(
-    feature = "full",
-    derive(Insertable, Serialize, Deserialize, VerifyForActionProviderWithoutDb)
-)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyForActionProviderWithoutDb))]
 #[cfg_attr(feature = "full", table_name = "action")]
 pub struct NewAction {
     pub name: String,
     pub action_provider_id: ActionProviderId,
 }
 
-#[cfg_attr(feature = "full", derive(DbEnum, Debug, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(DbEnum))]
 pub enum Weekday {
     Monday,
     Tuesday,
@@ -146,15 +130,12 @@ pub enum Weekday {
     Sunday,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -166,17 +147,15 @@ pub enum Weekday {
 pub struct ActionRuleId(pub i32);
 
 #[cfg(feature = "full")]
-#[cfg_attr(feature = "full", derive(VerifyIdForUser, InnerIntFromParam))]
+#[derive(VerifyIdForUser, InnerIntFromParam)]
 pub struct UnverifiedActionRuleId(i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         Queryable,
         AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
         Create,
         GetById,
         Update,
@@ -194,10 +173,8 @@ pub struct ActionRule {
     pub enabled: bool,
 }
 
-#[cfg_attr(
-    feature = "full",
-    derive(Insertable, Serialize, Deserialize, VerifyForUserWithoutDb)
-)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
 #[cfg_attr(feature = "full", table_name = "action_rule")]
 pub struct NewActionRule {
     pub user_id: UserId,
@@ -207,15 +184,12 @@ pub struct NewActionRule {
     pub enabled: bool,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -227,7 +201,7 @@ pub struct NewActionRule {
 pub struct ActionEventId(pub i32);
 
 #[cfg(feature = "full")]
-#[cfg_attr(feature = "full", derive(VerifyIdForUser, InnerIntFromParam))]
+#[derive(VerifyIdForUser, InnerIntFromParam)]
 pub struct UnverifiedActionEventId(i32);
 
 #[cfg(feature = "full")]
@@ -249,14 +223,12 @@ impl UnverifiedActionEventId {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         Queryable,
         AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
         Create,
         GetById,
         Update,
@@ -273,10 +245,8 @@ pub struct ActionEvent {
     pub enabled: bool,
 }
 
-#[cfg_attr(
-    feature = "full",
-    derive(Insertable, Serialize, Deserialize, VerifyForUserWithoutDb)
-)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
 #[cfg_attr(feature = "full", table_name = "action_event")]
 pub struct NewActionEvent {
     pub user_id: UserId,
@@ -285,7 +255,8 @@ pub struct NewActionEvent {
     pub enabled: bool,
 }
 
-#[cfg_attr(feature = "full", derive(Queryable, Serialize, Deserialize, Debug))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Queryable))]
 pub struct ExecutableActionEvent {
     pub action_event_id: ActionEventId,
     pub action_name: String,

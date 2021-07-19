@@ -9,15 +9,12 @@ use sport_log_server_derive::{
 use crate::schema::{strength_session, strength_set};
 use crate::types::{MovementId, MovementUnit, UserId};
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -28,20 +25,10 @@ use crate::types::{MovementId, MovementUnit, UserId};
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct StrengthSessionId(pub i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
-        Create,
-        GetById,
-        GetAll,
-        Update,
-        Delete,
-    )
+    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "strength_session")]
 pub struct StrengthSession {
@@ -54,7 +41,8 @@ pub struct StrengthSession {
     pub comments: Option<String>,
 }
 
-#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "strength_session")]
 pub struct NewStrengthSession {
     pub user_id: UserId,
@@ -65,15 +53,12 @@ pub struct NewStrengthSession {
     pub comments: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -84,20 +69,10 @@ pub struct NewStrengthSession {
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct StrengthSetId(pub i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
-        Create,
-        GetById,
-        GetAll,
-        Update,
-        Delete,
-    )
+    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "strength_set")]
 pub struct StrengthSet {
@@ -107,7 +82,8 @@ pub struct StrengthSet {
     pub weight: Option<f32>,
 }
 
-#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "strength_set")]
 pub struct NewStrengthSet {
     pub strength_session_id: StrengthSessionId,

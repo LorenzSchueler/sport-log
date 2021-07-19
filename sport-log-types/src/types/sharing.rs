@@ -11,15 +11,12 @@ use crate::schema::{
 };
 use crate::types::{CardioSessionId, DiaryId, MetconSessionId, StrengthSessionId, UserId};
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -30,20 +27,10 @@ use crate::types::{CardioSessionId, DiaryId, MetconSessionId, StrengthSessionId,
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct GroupId(pub i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
-        Create,
-        GetById,
-        GetAll,
-        Update,
-        Delete,
-    )
+    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "group")]
 pub struct Group {
@@ -51,21 +38,19 @@ pub struct Group {
     pub name: String,
 }
 
-#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "group")]
 pub struct NewGroup {
     pub name: String,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -76,20 +61,10 @@ pub struct NewGroup {
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct GroupUserId(pub i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
-        Create,
-        GetById,
-        GetAll,
-        Update,
-        Delete,
-    )
+    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "group_user")]
 pub struct GroupUser {
@@ -98,22 +73,20 @@ pub struct GroupUser {
     pub user_id: UserId,
 }
 
-#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "group_user")]
 pub struct NewGroupUser {
     pub group_id: GroupId,
     pub user_id: UserId,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -124,20 +97,10 @@ pub struct NewGroupUser {
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct SharedMetconSessionId(pub i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
-        Create,
-        GetById,
-        GetAll,
-        Update,
-        Delete,
-    )
+    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "shared_metcon_session")]
 pub struct SharedMetconSession {
@@ -146,22 +109,20 @@ pub struct SharedMetconSession {
     pub metcon_session_id: MetconSessionId,
 }
 
-#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "shared_metcon_session")]
 pub struct NewSharedMetconSession {
     pub group_id: GroupId,
     pub metcon_session_id: MetconSessionId,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -172,20 +133,10 @@ pub struct NewSharedMetconSession {
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct SharedStrengthSessionId(pub i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
-        Create,
-        GetById,
-        GetAll,
-        Update,
-        Delete,
-    )
+    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "shared_strength_session")]
 pub struct SharedStrengthSession {
@@ -194,22 +145,20 @@ pub struct SharedStrengthSession {
     pub strength_session_id: StrengthSessionId,
 }
 
-#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "shared_strength_session")]
 pub struct NewSharedStrengthSession {
     pub group_id: GroupId,
     pub strength_session_id: StrengthSessionId,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -220,20 +169,10 @@ pub struct NewSharedStrengthSession {
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct SharedCardioSessionId(pub i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
-        Create,
-        GetById,
-        GetAll,
-        Update,
-        Delete,
-    )
+    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "shared_cardio_session")]
 pub struct SharedCardioSession {
@@ -242,22 +181,20 @@ pub struct SharedCardioSession {
     pub cardio_session_id: CardioSessionId,
 }
 
-#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "shared_cardio_session")]
 pub struct NewSharedCardioSession {
     pub group_id: GroupId,
     pub cardio_session_id: CardioSessionId,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -268,20 +205,10 @@ pub struct NewSharedCardioSession {
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct SharedDiaryId(pub i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
-        Create,
-        GetById,
-        GetAll,
-        Update,
-        Delete,
-    )
+    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "shared_diary")]
 pub struct SharedDiary {
@@ -290,7 +217,8 @@ pub struct SharedDiary {
     pub diary_id: DiaryId,
 }
 
-#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "shared_diary")]
 pub struct NewSharedDiary {
     pub group_id: GroupId,

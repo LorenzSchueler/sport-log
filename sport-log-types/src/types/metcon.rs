@@ -10,7 +10,8 @@ use sport_log_server_derive::{
 use crate::schema::{metcon, metcon_movement, metcon_session};
 use crate::types::{MovementId, MovementUnit, UserId};
 
-#[cfg_attr(feature = "full", derive(DbEnum, Debug, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(DbEnum))]
 pub enum MetconType {
     Amrap,
     Emom,
@@ -18,15 +19,12 @@ pub enum MetconType {
     Ladder,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -37,20 +35,10 @@ pub enum MetconType {
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconId(pub i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
-        Create,
-        GetById,
-        GetAll,
-        Update,
-        Delete,
-    )
+    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "metcon")]
 pub struct Metcon {
@@ -62,7 +50,8 @@ pub struct Metcon {
     pub timecap: Option<i32>,
 }
 
-#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "metcon")]
 pub struct NewMetcon {
     pub user_id: UserId,
@@ -72,15 +61,12 @@ pub struct NewMetcon {
     pub timecap: Option<i32>,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -91,20 +77,10 @@ pub struct NewMetcon {
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconMovementId(pub i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
-        Create,
-        GetById,
-        GetAll,
-        Update,
-        Delete,
-    )
+    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "metcon_movement")]
 pub struct MetconMovement {
@@ -116,7 +92,8 @@ pub struct MetconMovement {
     pub weight: Option<f32>,
 }
 
-#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "metcon_movement")]
 pub struct NewMetconMovement {
     pub movement_id: MovementId,
@@ -126,15 +103,12 @@ pub struct NewMetconMovement {
     pub weight: Option<f32>,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -145,20 +119,10 @@ pub struct NewMetconMovement {
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconSessionId(pub i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
-        Create,
-        GetById,
-        GetAll,
-        Update,
-        Delete,
-    )
+    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "metcon_session")]
 pub struct MetconSession {
@@ -173,7 +137,8 @@ pub struct MetconSession {
     pub comments: Option<String>,
 }
 
-#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "metcon_session")]
 pub struct NewMetconSession {
     pub user_id: UserId,

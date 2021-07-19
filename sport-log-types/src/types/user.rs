@@ -11,15 +11,12 @@ use crate::{
     types::{AuthenticatedUser, Unverified},
 };
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -30,20 +27,10 @@ use crate::{
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct UserId(pub i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
-        Create,
-        GetById,
-        GetAll,
-        Update,
-        Delete,
-    )
+    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "user")]
 pub struct User {
@@ -70,7 +57,8 @@ impl Unverified<User> {
     }
 }
 
-#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "user")]
 pub struct NewUser {
     pub username: String,

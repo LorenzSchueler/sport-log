@@ -9,13 +9,15 @@ use sport_log_server_derive::{
 use crate::schema::{eorm, movement};
 use crate::types::UserId;
 
-#[cfg_attr(feature = "full", derive(DbEnum, Debug, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(DbEnum))]
 pub enum MovementCategory {
     Cardio,
     Strength,
 }
 
-#[cfg_attr(feature = "full", derive(DbEnum, Debug, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(DbEnum))]
 pub enum MovementUnit {
     Reps,
     Cal,
@@ -26,15 +28,12 @@ pub enum MovementUnit {
     Mile,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -45,20 +44,10 @@ pub enum MovementUnit {
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MovementId(pub i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
-        Create,
-        GetById,
-        GetAll,
-        Update,
-        Delete,
-    )
+    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "movement")]
 pub struct Movement {
@@ -69,7 +58,8 @@ pub struct Movement {
     pub category: MovementCategory,
 }
 
-#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "movement")]
 pub struct NewMovement {
     pub user_id: UserId,
@@ -78,15 +68,12 @@ pub struct NewMovement {
     pub category: MovementCategory,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Serialize,
-        Deserialize,
-        Debug,
-        Clone,
         Copy,
         PartialEq,
         Eq,
@@ -97,20 +84,10 @@ pub struct NewMovement {
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct EormId(pub i32);
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Serialize,
-        Deserialize,
-        Debug,
-        Create,
-        GetById,
-        GetAll,
-        Update,
-        Delete,
-    )
+    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "eorm")]
 pub struct Eorm {
@@ -119,7 +96,8 @@ pub struct Eorm {
     pub percentage: f32,
 }
 
-#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "eorm")]
 pub struct NewEorm {
     pub reps: i32,
