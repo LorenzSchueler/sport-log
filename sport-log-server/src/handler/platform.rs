@@ -1,12 +1,11 @@
 use rocket::{http::Status, serde::json::Json};
 
-use crate::{
-    handler::IntoJson,
-    types::{
-        AuthenticatedAdmin, AuthenticatedUser, Db, NewPlatform, NewPlatformCredentials, Platform,
-        PlatformCredentials, Unverified, UnverifiedPlatformCredentialsId, UnverifiedPlatformId,
-    },
+use sport_log_types::types::{
+    AuthenticatedAdmin, AuthenticatedUser, Db, NewPlatform, NewPlatformCredentials, Platform,
+    PlatformCredentials, Unverified, UnverifiedPlatformCredentialsId, UnverifiedPlatformId,
 };
+
+use crate::handler::IntoJson;
 
 #[post("/adm/platform", format = "application/json", data = "<platform>")]
 pub async fn create_platform(

@@ -1,12 +1,9 @@
 #[macro_use]
-extern crate diesel;
-#[macro_use]
 extern crate rocket;
 
+use sport_log_types::types::Db;
+
 mod handler;
-mod repository;
-mod schema;
-mod types;
 
 const BASE: &str = "/v1";
 
@@ -15,7 +12,6 @@ fn rocket() -> _ {
     dotenv::dotenv().ok();
 
     use handler::*;
-    use types::Db;
     rocket::build().attach(Db::fairing()).mount(
         BASE,
         routes![

@@ -1,9 +1,8 @@
 use rocket::{http::Status, serde::json::Json};
 
-use crate::{
-    handler::IntoJson,
-    types::{AuthenticatedUser, Db, NewUser, Unverified, User},
-};
+use sport_log_types::types::{AuthenticatedUser, Db, NewUser, Unverified, User};
+
+use crate::handler::IntoJson;
 
 #[post("/user", format = "application/json", data = "<user>")]
 pub async fn create_user(user: Unverified<NewUser>, conn: Db) -> Result<Json<User>, Status> {

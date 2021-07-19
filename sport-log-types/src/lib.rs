@@ -1,7 +1,6 @@
-mod action;
-mod platform;
-mod user;
+#[macro_use]
+extern crate diesel;
 
-pub use action::*;
-pub use platform::*;
-pub use user::*;
+pub mod repository;
+pub mod schema;
+pub mod types;

@@ -6,6 +6,7 @@ default-run = "sport-log-server"
 
 [dependencies]
 sport-log-server-derive = { path = "../sport-log-server-derive" }
+sport-log-types = { path = "../sport-log-types" }
 
 rocket = { version = "0.5.0-rc.1", features = ["json"] }
 rocket_sync_db_pools = { version = "0.1.0-rc.1", features = ["diesel_postgres_pool"] }

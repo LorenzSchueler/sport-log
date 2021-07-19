@@ -3,15 +3,14 @@ use std::ops::Deref;
 use chrono::{NaiveDateTime, NaiveTime};
 use rocket::{http::Status, request::FromParam, serde::json::Json};
 
-use crate::{
-    handler::IntoJson,
-    types::{
-        Action, ActionEvent, ActionProvider, ActionRule, AuthenticatedActionProvider,
-        AuthenticatedAdmin, AuthenticatedUser, Db, ExecutableActionEvent, NewAction,
-        NewActionEvent, NewActionProvider, NewActionRule, Unverified, UnverifiedActionEventId,
-        UnverifiedActionId, UnverifiedActionProviderId, UnverifiedActionRuleId,
-    },
+use sport_log_types::types::{
+    Action, ActionEvent, ActionProvider, ActionRule, AuthenticatedActionProvider,
+    AuthenticatedAdmin, AuthenticatedUser, Db, ExecutableActionEvent, NewAction, NewActionEvent,
+    NewActionProvider, NewActionRule, Unverified, UnverifiedActionEventId, UnverifiedActionId,
+    UnverifiedActionProviderId, UnverifiedActionRuleId,
 };
+
+use crate::handler::IntoJson;
 
 #[post(
     "/adm/action_provider",

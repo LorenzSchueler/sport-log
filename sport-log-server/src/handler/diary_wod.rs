@@ -1,12 +1,10 @@
 use rocket::{http::Status, serde::json::Json};
 
-use crate::{
-    handler::IntoJson,
-    types::{
-        AuthenticatedActionProvider, AuthenticatedUser, Db, NewWod, Unverified, UnverifiedWodId,
-        Wod,
-    },
+use sport_log_types::types::{
+    AuthenticatedActionProvider, AuthenticatedUser, Db, NewWod, Unverified, UnverifiedWodId, Wod,
 };
+
+use crate::handler::IntoJson;
 
 #[post("/ap/wod", format = "application/json", data = "<wod>")]
 pub async fn create_wod_ap(
