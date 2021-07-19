@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 table! {
     use diesel::sql_types::*;
     use crate::types::*;
@@ -42,7 +43,7 @@ table! {
         id -> Int4,
         user_id -> Int4,
         action_id -> Int4,
-        weekday -> Weekday,
+        weekday -> WeekdayMapping,
         time -> Time,
         enabled -> Bool,
     }
@@ -56,7 +57,7 @@ table! {
         id -> Int4,
         user_id -> Int4,
         movement_id -> Int4,
-        cardio_type -> Cardio_type,
+        cardio_type -> CardioTypeMapping,
         datetime -> Timestamp,
         distance -> Nullable<Int4>,
         ascent -> Nullable<Int4>,
@@ -126,7 +127,7 @@ table! {
         id -> Int4,
         user_id -> Int4,
         name -> Nullable<Varchar>,
-        metcon_type -> Metcon_type,
+        metcon_type -> MetconTypeMapping,
         rounds -> Nullable<Int4>,
         timecap -> Nullable<Int4>,
     }
@@ -141,7 +142,7 @@ table! {
         movement_id -> Int4,
         metcon_id -> Int4,
         count -> Int4,
-        unit -> Movement_unit,
+        unit -> MovementUnitMapping,
         weight -> Nullable<Float4>,
     }
 }
@@ -172,7 +173,7 @@ table! {
         user_id -> Int4,
         name -> Varchar,
         description -> Nullable<Text>,
-        category -> Movement_category,
+        category -> MovementCategoryMapping,
     }
 }
 
@@ -267,7 +268,7 @@ table! {
         user_id -> Int4,
         datetime -> Timestamp,
         movement_id -> Int4,
-        movement_unit -> Movement_unit,
+        movement_unit -> MovementUnitMapping,
         interval -> Nullable<Int4>,
         comments -> Nullable<Text>,
     }
