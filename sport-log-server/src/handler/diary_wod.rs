@@ -1,7 +1,8 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::types::{
-    AuthenticatedActionProvider, AuthenticatedUser, Db, NewWod, Unverified, UnverifiedWodId, Wod,
+    AuthenticatedActionProvider, AuthenticatedUser, Db, Diary, NewDiary, NewWod, Unverified,
+    UnverifiedDiaryId, UnverifiedWodId, Wod,
 };
 
 use crate::handler::IntoJson;
@@ -51,6 +52,62 @@ pub async fn delete_wod(
 ) -> Result<Status, Status> {
     conn.run(move |c| {
         Wod::delete(wod_id.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
+#[post("/diary", format = "application/json", data = "<diary>")]
+pub async fn create_diary(
+    diary: Unverified<NewDiary>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Diary>, Status> {
+    let diary = diary.verify(&auth)?;
+    conn.run(|c| Diary::create(diary, c)).await.into_json()
+}
+
+#[get("/diary/<diary_id>")]
+pub async fn get_diary(
+    diary_id: UnverifiedDiaryId,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Diary>, Status> {
+    let diary_id = conn.run(move |c| diary_id.verify(&auth, c)).await?;
+    conn.run(move |c| Diary::get_by_id(diary_id, c))
+        .await
+        .into_json()
+}
+
+#[get("/diary")]
+pub async fn get_diarys_by_user(
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<Diary>>, Status> {
+    conn.run(move |c| Diary::get_by_user(*auth, c))
+        .await
+        .into_json()
+}
+
+#[put("/diary", format = "application/json", data = "<diary>")]
+pub async fn update_diary(
+    diary: Unverified<Diary>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Diary>, Status> {
+    let diary = conn.run(move |c| diary.verify(&auth, c)).await?;
+    conn.run(|c| Diary::update(diary, c)).await.into_json()
+}
+
+#[delete("/diary/<diary_id>")]
+pub async fn delete_diary(
+    diary_id: UnverifiedDiaryId,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        Diary::delete(diary_id.verify(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })

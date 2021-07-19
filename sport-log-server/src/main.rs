@@ -58,6 +58,11 @@ fn rocket() -> _ {
             diary_wod::get_wods_by_user,
             diary_wod::update_wod,
             diary_wod::delete_wod,
+            diary_wod::create_diary,
+            diary_wod::get_diary,
+            diary_wod::get_diarys_by_user,
+            diary_wod::update_diary,
+            diary_wod::delete_diary,
         ],
     )
 }
