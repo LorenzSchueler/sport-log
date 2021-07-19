@@ -6,86 +6,103 @@ use sport_log_server_derive::{
     VerifyIdForUser, VerifyIdForUserUnchecked,
 };
 
-use crate::{
-    schema::{platform, platform_credentials},
-    types::UserId,
-};
+#[cfg(feature = "full")]
+use crate::schema::{platform, platform_credentials};
+use crate::types::UserId;
 
-#[derive(
-    FromSqlRow,
-    AsExpression,
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    InnerIntToSql,
-    InnerIntFromSql,
+#[cfg_attr(
+    feature = "full",
+    derive(
+        FromSqlRow,
+        AsExpression,
+        Serialize,
+        Deserialize,
+        Debug,
+        Clone,
+        Copy,
+        PartialEq,
+        Eq,
+        InnerIntToSql,
+        InnerIntFromSql,
+    )
 )]
-#[sql_type = "diesel::sql_types::Integer"]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct PlatformId(pub i32);
 
-#[derive(InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUserUnchecked)]
+#[cfg_attr(
+    feature = "full",
+    derive(InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUserUnchecked)
+)]
 pub struct UnverifiedPlatformId(i32);
 
-#[derive(
-    Queryable,
-    AsChangeset,
-    Serialize,
-    Deserialize,
-    Debug,
-    Create,
-    GetAll,
-    Update,
-    Delete,
-    VerifyForAdminWithoutDb,
+#[cfg_attr(
+    feature = "full",
+    derive(
+        Queryable,
+        AsChangeset,
+        Serialize,
+        Deserialize,
+        Debug,
+        Create,
+        GetAll,
+        Update,
+        Delete,
+        VerifyForAdminWithoutDb,
+    )
 )]
-#[table_name = "platform"]
+#[cfg_attr(feature = "full", table_name = "platform")]
 pub struct Platform {
     pub id: PlatformId,
     pub name: String,
 }
 
-#[derive(Insertable, Serialize, Deserialize, VerifyForAdminWithoutDb)]
-#[table_name = "platform"]
+#[cfg_attr(
+    feature = "full",
+    derive(Insertable, Serialize, Deserialize, VerifyForAdminWithoutDb)
+)]
+#[cfg_attr(feature = "full", table_name = "platform")]
 pub struct NewPlatform {
     pub name: String,
 }
 
-#[derive(
-    FromSqlRow,
-    AsExpression,
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    InnerIntToSql,
-    InnerIntFromSql,
+#[cfg_attr(
+    feature = "full",
+    derive(
+        FromSqlRow,
+        AsExpression,
+        Serialize,
+        Deserialize,
+        Debug,
+        Clone,
+        Copy,
+        PartialEq,
+        Eq,
+        InnerIntToSql,
+        InnerIntFromSql,
+    )
 )]
-#[sql_type = "diesel::sql_types::Integer"]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct PlatformCredentialsId(pub i32);
 
-#[derive(InnerIntFromParam, VerifyIdForUser)]
+#[cfg_attr(feature = "full", derive(InnerIntFromParam, VerifyIdForUser))]
 pub struct UnverifiedPlatformCredentialsId(i32);
 
-#[derive(
-    Queryable,
-    AsChangeset,
-    Serialize,
-    Deserialize,
-    Debug,
-    Create,
-    GetById,
-    Update,
-    Delete,
-    VerifyForUserWithDb,
+#[cfg_attr(
+    feature = "full",
+    derive(
+        Queryable,
+        AsChangeset,
+        Serialize,
+        Deserialize,
+        Debug,
+        Create,
+        GetById,
+        Update,
+        Delete,
+        VerifyForUserWithDb,
+    )
 )]
-#[table_name = "platform_credentials"]
+#[cfg_attr(feature = "full", table_name = "platform_credentials")]
 pub struct PlatformCredentials {
     pub id: PlatformCredentialsId,
     pub user_id: UserId,
@@ -94,8 +111,11 @@ pub struct PlatformCredentials {
     pub password: String,
 }
 
-#[derive(Insertable, Serialize, Deserialize, VerifyForUserWithoutDb)]
-#[table_name = "platform_credentials"]
+#[cfg_attr(
+    feature = "full",
+    derive(Insertable, Serialize, Deserialize, VerifyForUserWithoutDb)
+)]
+#[cfg_attr(feature = "full", table_name = "platform_credentials")]
 pub struct NewPlatformCredentials {
     pub user_id: UserId,
     pub platform_id: PlatformId,

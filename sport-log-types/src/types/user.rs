@@ -5,31 +5,47 @@ use sport_log_server_derive::{
     Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
 };
 
+#[cfg(feature = "full")]
 use crate::{
     schema::user,
     types::{AuthenticatedUser, Unverified},
 };
 
-#[derive(
-    FromSqlRow,
-    AsExpression,
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    InnerIntToSql,
-    InnerIntFromSql,
+#[cfg_attr(
+    feature = "full",
+    derive(
+        FromSqlRow,
+        AsExpression,
+        Serialize,
+        Deserialize,
+        Debug,
+        Clone,
+        Copy,
+        PartialEq,
+        Eq,
+        InnerIntToSql,
+        InnerIntFromSql,
+    )
 )]
-#[sql_type = "diesel::sql_types::Integer"]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct UserId(pub i32);
 
-#[derive(
-    Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,
+#[cfg_attr(
+    feature = "full",
+    derive(
+        Queryable,
+        AsChangeset,
+        Serialize,
+        Deserialize,
+        Debug,
+        Create,
+        GetById,
+        GetAll,
+        Update,
+        Delete,
+    )
 )]
-#[table_name = "user"]
+#[cfg_attr(feature = "full", table_name = "user")]
 pub struct User {
     pub id: UserId,
     pub username: String,
@@ -37,6 +53,7 @@ pub struct User {
     pub email: String,
 }
 
+#[cfg(feature = "full")]
 impl Unverified<User> {
     pub fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<User, Status> {
         let entity = self.0.into_inner();
@@ -53,14 +70,15 @@ impl Unverified<User> {
     }
 }
 
-#[derive(Insertable, Serialize, Deserialize)]
-#[table_name = "user"]
+#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[cfg_attr(feature = "full", table_name = "user")]
 pub struct NewUser {
     pub username: String,
     pub password: String,
     pub email: String,
 }
 
+#[cfg(feature = "full")]
 impl Unverified<NewUser> {
     pub fn verify(self) -> Result<NewUser, Status> {
         Ok(self.0.into_inner())

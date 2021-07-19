@@ -1,6 +1,8 @@
+#[cfg(feature = "full")]
 use std::io::Write;
 
 use chrono::NaiveDateTime;
+#[cfg(feature = "full")]
 use diesel::{
     deserialize,
     pg::Pg,
@@ -8,27 +10,28 @@ use diesel::{
     sql_types::{Double, Float, Integer},
     types::{FromSql, Record, ToSql},
 };
+#[cfg(feature = "full")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "full")]
 use sport_log_server_derive::{
     Create, Delete, GetAll, GetById, InnerIntFromSql, InnerIntToSql, Update,
 };
 
-use crate::{
-    schema::{cardio_session, route},
-    types::{MovementId, UserId},
-};
+#[cfg(feature = "full")]
+use crate::schema::{cardio_session, route};
+use crate::types::{MovementId, UserId};
 
-#[derive(DbEnum, Debug, Serialize, Deserialize)]
+#[cfg_attr(feature = "full", derive(DbEnum, Debug, Serialize, Deserialize))]
 pub enum CardioType {
     Training,
     ActiveRecovery,
     Freetime,
 }
 
-#[derive(SqlType, Serialize, Deserialize, Debug)]
-#[postgres(type_name = "position")]
+#[cfg_attr(feature = "full", derive(SqlType, Serialize, Deserialize, Debug))]
+#[cfg_attr(feature = "full", postgres(type_name = "position"))]
 pub struct Position {
     longitude: f64,
     latitude: f64,
@@ -36,6 +39,7 @@ pub struct Position {
     time: i32,
 }
 
+#[cfg(feature = "full")]
 impl ToSql<Position, Pg> for Position {
     fn to_sql<W: Write>(&self, out: &mut Output<W, Pg>) -> serialize::Result {
         WriteTuple::<(Double, Double, Float, Integer)>::write_tuple(
@@ -45,6 +49,7 @@ impl ToSql<Position, Pg> for Position {
     }
 }
 
+#[cfg(feature = "full")]
 impl FromSql<Position, Pg> for Position {
     fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
         let (longitude, latitude, elevation, time) =
@@ -58,26 +63,41 @@ impl FromSql<Position, Pg> for Position {
     }
 }
 
-#[derive(
-    FromSqlRow,
-    AsExpression,
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    InnerIntToSql,
-    InnerIntFromSql,
+#[cfg_attr(
+    feature = "full",
+    derive(
+        FromSqlRow,
+        AsExpression,
+        Serialize,
+        Deserialize,
+        Debug,
+        Clone,
+        Copy,
+        PartialEq,
+        Eq,
+        InnerIntToSql,
+        InnerIntFromSql,
+    )
 )]
-#[sql_type = "diesel::sql_types::Integer"]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct RouteId(pub i32);
 
-#[derive(
-    Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,
+#[cfg_attr(
+    feature = "full",
+    derive(
+        Queryable,
+        AsChangeset,
+        Serialize,
+        Deserialize,
+        Debug,
+        Create,
+        GetById,
+        GetAll,
+        Update,
+        Delete,
+    )
 )]
-#[table_name = "route"]
+#[cfg_attr(feature = "full", table_name = "route")]
 pub struct Route {
     pub id: RouteId,
     pub user_id: UserId,
@@ -88,8 +108,8 @@ pub struct Route {
     pub track: Option<Vec<Position>>,
 }
 
-#[derive(Insertable, Serialize, Deserialize)]
-#[table_name = "route"]
+#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[cfg_attr(feature = "full", table_name = "route")]
 pub struct NewRoute {
     pub user_id: UserId,
     pub name: String,
@@ -99,26 +119,41 @@ pub struct NewRoute {
     pub track: Option<Vec<Position>>,
 }
 
-#[derive(
-    FromSqlRow,
-    AsExpression,
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    InnerIntToSql,
-    InnerIntFromSql,
+#[cfg_attr(
+    feature = "full",
+    derive(
+        FromSqlRow,
+        AsExpression,
+        Serialize,
+        Deserialize,
+        Debug,
+        Clone,
+        Copy,
+        PartialEq,
+        Eq,
+        InnerIntToSql,
+        InnerIntFromSql,
+    )
 )]
-#[sql_type = "diesel::sql_types::Integer"]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct CardioSessionId(pub i32);
 
-#[derive(
-    Queryable, AsChangeset, Serialize, Deserialize, Debug, Create, GetById, GetAll, Update, Delete,
+#[cfg_attr(
+    feature = "full",
+    derive(
+        Queryable,
+        AsChangeset,
+        Serialize,
+        Deserialize,
+        Debug,
+        Create,
+        GetById,
+        GetAll,
+        Update,
+        Delete,
+    )
 )]
-#[table_name = "cardio_session"]
+#[cfg_attr(feature = "full", table_name = "cardio_session")]
 pub struct CardioSession {
     pub id: CardioSessionId,
     pub user_id: UserId,
@@ -139,8 +174,8 @@ pub struct CardioSession {
     pub comments: Option<String>,
 }
 
-#[derive(Insertable, Serialize, Deserialize)]
-#[table_name = "cardio_session"]
+#[cfg_attr(feature = "full", derive(Insertable, Serialize, Deserialize))]
+#[cfg_attr(feature = "full", table_name = "cardio_session")]
 pub struct NewCardioSession {
     pub user_id: UserId,
     pub movement_id: MovementId,

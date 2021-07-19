@@ -3,7 +3,7 @@ use std::fs;
 use lazy_static::lazy_static;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[cfg_attr(feature = "full", derive(Deserialize))]
 pub struct Config {
     pub admin_username: String,
     pub admin_password: String,

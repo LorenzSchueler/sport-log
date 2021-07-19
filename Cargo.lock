@@ -1377,18 +1377,13 @@ dependencies = [
 name = "sport-log-server"
 version = "0.1.0"
 dependencies = [
- "base64",
  "chrono",
  "diesel",
- "diesel-derive-enum",
  "dotenv",
- "lazy_static",
  "rocket",
  "rocket_sync_db_pools",
  "serde",
- "sport-log-server-derive",
  "sport-log-types",
- "toml",
 ]
 
 [[package]]
@@ -1409,7 +1404,6 @@ dependencies = [
  "chrono",
  "diesel",
  "diesel-derive-enum",
- "dotenv",
  "lazy_static",
  "rocket",
  "rocket_sync_db_pools",
