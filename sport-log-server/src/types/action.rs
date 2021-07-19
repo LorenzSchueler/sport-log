@@ -11,9 +11,8 @@ use sport_log_server_derive::{
 };
 
 use crate::{
-    auth::AuthenticatedActionProvider,
     schema::{action, action_event, action_provider, action_rule},
-    types::{PlatformId, UserId},
+    types::{AuthenticatedActionProvider, PlatformId, UserId},
 };
 
 #[derive(

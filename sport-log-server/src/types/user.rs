@@ -36,7 +36,7 @@ pub struct User {
 impl Unverified<User> {
     pub fn verify(
         self,
-        auth: &crate::auth::AuthenticatedUser,
+        auth: &crate::types::AuthenticatedUser,
         conn: &diesel::pg::PgConnection,
     ) -> Result<User, rocket::http::Status> {
         let entity = self.0.into_inner();

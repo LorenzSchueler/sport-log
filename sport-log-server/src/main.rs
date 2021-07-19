@@ -11,11 +11,10 @@ use lazy_static::lazy_static;
 use rocket_sync_db_pools::database;
 use serde::Deserialize;
 
-mod auth;
 mod handler;
-mod types;
 mod repository;
 mod schema;
+mod types;
 
 #[derive(Deserialize)]
 pub struct Config {

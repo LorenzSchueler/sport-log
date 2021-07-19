@@ -7,6 +7,7 @@ use rocket::{
 use serde::Deserialize;
 
 mod action;
+mod auth;
 mod cardio;
 mod diary_wod;
 mod metcon;
@@ -17,6 +18,7 @@ mod strength;
 mod user;
 
 pub use action::*;
+pub use auth::*;
 pub use cardio::*;
 pub use diary_wod::*;
 pub use metcon::*;

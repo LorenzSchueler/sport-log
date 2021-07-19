@@ -4,12 +4,12 @@ use chrono::{NaiveDateTime, NaiveTime};
 use rocket::{http::Status, request::FromParam, serde::json::Json};
 
 use crate::{
-    auth::{AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser},
     handler::IntoJson,
     types::{
-        Action, ActionEvent, ActionProvider, ActionRule, ExecutableActionEvent, NewAction,
-        NewActionEvent, NewActionProvider, NewActionRule, Unverified, UnverifiedActionEventId,
-        UnverifiedActionId, UnverifiedActionProviderId, UnverifiedActionRuleId,
+        Action, ActionEvent, ActionProvider, ActionRule, AuthenticatedActionProvider,
+        AuthenticatedAdmin, AuthenticatedUser, ExecutableActionEvent, NewAction, NewActionEvent,
+        NewActionProvider, NewActionRule, Unverified, UnverifiedActionEventId, UnverifiedActionId,
+        UnverifiedActionProviderId, UnverifiedActionRuleId,
     },
     Db,
 };

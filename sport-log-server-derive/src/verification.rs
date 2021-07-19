@@ -15,7 +15,7 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
         impl #unverified_id_typename {
             pub fn verify(
                 self,
-                auth: &crate::auth::AuthenticatedUser,
+                auth: &crate::types::AuthenticatedUser,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<crate::types::#id_typename, rocket::http::Status> {
                 let entity = crate::types::#typename::get_by_id(crate::types::#id_typename(self.0), conn)
@@ -39,7 +39,7 @@ pub fn impl_verify_id_for_user_unchecked(ast: &syn::DeriveInput) -> TokenStream 
         impl #unverified_id_typename {
             pub fn verify(
                 self,
-                auth: &crate::auth::AuthenticatedUser,
+                auth: &crate::types::AuthenticatedUser,
             ) -> Result<crate::types::#id_typename, rocket::http::Status> {
                     Ok(crate::types::#id_typename(self.0))
             }
@@ -61,7 +61,7 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
         impl #unverified_id_typename {
             pub fn verify_ap(
                 self,
-                auth: &crate::auth::AuthenticatedActionProvider,
+                auth: &crate::types::AuthenticatedActionProvider,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<crate::types::#id_typename, rocket::http::Status> {
                 let entity = crate::types::#typename::get_by_id(crate::types::#id_typename(self.0), conn)
@@ -85,7 +85,7 @@ pub fn impl_verify_id_for_admin(ast: &syn::DeriveInput) -> TokenStream {
         impl #unverified_id_typename {
             pub fn verify_adm(
                 self,
-                auth: &crate::auth::AuthenticatedAdmin,
+                auth: &crate::types::AuthenticatedAdmin,
             ) -> Result<crate::types::#id_typename, rocket::http::Status> {
                     Ok(crate::types::#id_typename(self.0))
             }
@@ -101,7 +101,7 @@ pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::types::Unverified<#typename> {
             pub fn verify(
                 self,
-                auth: &crate::auth::AuthenticatedUser,
+                auth: &crate::types::AuthenticatedUser,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<#typename, rocket::http::Status> {
                 let entity = self.0.into_inner();
@@ -128,7 +128,7 @@ pub fn impl_verify_for_user_without_db(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::types::Unverified<#typename> {
             pub fn verify(
                 self,
-                auth: &crate::auth::AuthenticatedUser,
+                auth: &crate::types::AuthenticatedUser,
             ) -> Result<#typename, rocket::http::Status> {
                 let entity = self.0.into_inner();
                 if entity.user_id == **auth {
@@ -149,7 +149,7 @@ pub fn impl_verify_for_action_provider_with_db(ast: &syn::DeriveInput) -> TokenS
         impl crate::types::Unverified<#typename> {
             pub fn verify_ap(
                 self,
-                auth: &crate::auth::AuthenticatedActionProvider,
+                auth: &crate::types::AuthenticatedActionProvider,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<#typename, rocket::http::Status> {
                 let entity = self.0.into_inner();
@@ -176,7 +176,7 @@ pub fn impl_verify_for_action_provider_without_db(ast: &syn::DeriveInput) -> Tok
         impl crate::types::Unverified<#typename> {
             pub fn verify_ap(
                 self,
-                auth: &crate::auth::AuthenticatedActionProvider,
+                auth: &crate::types::AuthenticatedActionProvider,
             ) -> Result<#typename, rocket::http::Status> {
                 let entity = self.0.into_inner();
                 if entity.action_provider_id == **auth {
@@ -197,7 +197,7 @@ pub fn impl_verify_for_action_provider_unchecked(ast: &syn::DeriveInput) -> Toke
         impl crate::types::Unverified<#typename> {
             pub fn verify_ap(
                 self,
-                auth: &crate::auth::AuthenticatedActionProvider,
+                auth: &crate::types::AuthenticatedActionProvider,
             ) -> Result<#typename, rocket::http::Status> {
                 Ok(self.0.into_inner())
             }
@@ -213,7 +213,7 @@ pub fn impl_verify_for_admin_without_db(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::types::Unverified<#typename> {
             pub fn verify_adm(
                 self,
-                auth: &crate::auth::AuthenticatedAdmin,
+                auth: &crate::types::AuthenticatedAdmin,
             ) -> Result<#typename, rocket::http::Status> {
                 Ok(self.0.into_inner())
             }
