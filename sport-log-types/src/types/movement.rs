@@ -63,7 +63,7 @@ pub struct MovementId(pub i32);
 #[cfg_attr(feature = "full", table_name = "movement")]
 pub struct Movement {
     pub id: MovementId,
-    pub user_id: UserId,
+    pub user_id: Option<UserId>,
     pub name: String,
     pub description: Option<String>,
     pub category: MovementCategory,
@@ -73,7 +73,7 @@ pub struct Movement {
 #[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "movement")]
 pub struct NewMovement {
-    pub user_id: UserId,
+    pub user_id: Option<UserId>,
     pub name: String,
     pub description: Option<String>,
     pub category: MovementCategory,

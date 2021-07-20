@@ -54,7 +54,7 @@ pub struct MetconId(pub i32);
 #[cfg_attr(feature = "full", table_name = "metcon")]
 pub struct Metcon {
     pub id: MetconId,
-    pub user_id: UserId,
+    pub user_id: Option<UserId>,
     pub name: Option<String>,
     pub metcon_type: MetconType,
     pub rounds: Option<i32>,
@@ -65,7 +65,7 @@ pub struct Metcon {
 #[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "metcon")]
 pub struct NewMetcon {
-    pub user_id: UserId,
+    pub user_id: Option<UserId>,
     pub name: Option<String>,
     pub metcon_type: MetconType,
     pub rounds: Option<i32>,

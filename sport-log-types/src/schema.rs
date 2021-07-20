@@ -125,7 +125,7 @@ table! {
 
     metcon (id) {
         id -> Int4,
-        user_id -> Int4,
+        user_id -> Nullable<Int4>,
         name -> Nullable<Varchar>,
         metcon_type -> MetconTypeMapping,
         rounds -> Nullable<Int4>,
@@ -170,7 +170,7 @@ table! {
 
     movement (id) {
         id -> Int4,
-        user_id -> Int4,
+        user_id -> Nullable<Int4>,
         name -> Varchar,
         description -> Nullable<Text>,
         category -> MovementCategoryMapping,

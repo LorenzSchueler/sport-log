@@ -2,7 +2,7 @@ create type metcon_type as enum('amrap', 'emom', 'for_time', 'ladder');
 
 create table metcon (
     id serial primary key,
-    user_id integer not null references "user" on delete cascade,
+    user_id integer references "user" on delete cascade,
     name varchar(80) unique,
     metcon_type metcon_type not null,
     rounds integer,
