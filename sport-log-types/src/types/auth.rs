@@ -9,27 +9,23 @@ use rocket::{
 
 use crate::types::{ActionProvider, ActionProviderId, Db, User, UserId, CONFIG};
 
-pub struct AuthenticatedUser {
-    user_id: UserId,
-}
+pub struct AuthenticatedUser(UserId);
 
 impl Deref for AuthenticatedUser {
     type Target = UserId;
 
     fn deref(&self) -> &Self::Target {
-        &self.user_id
+        &self.0
     }
 }
 
-pub struct AuthenticatedActionProvider {
-    action_provider_id: ActionProviderId,
-}
+pub struct AuthenticatedActionProvider(ActionProviderId);
 
 impl Deref for AuthenticatedActionProvider {
     type Target = ActionProviderId;
 
     fn deref(&self) -> &Self::Target {
-        &self.action_provider_id
+        &self.0
     }
 }
 
@@ -76,7 +72,7 @@ impl<'r> FromRequest<'r> for AuthenticatedUser {
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
         match authenticate::<UserId>(request, User::authenticate).await {
-            Outcome::Success(user_id) => Outcome::Success(Self { user_id }),
+            Outcome::Success(user_id) => Outcome::Success(Self(user_id)),
             Outcome::Failure(f) => Outcome::Failure(f),
             Outcome::Forward(f) => Outcome::Forward(f),
         }
@@ -89,7 +85,7 @@ impl<'r> FromRequest<'r> for AuthenticatedActionProvider {
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
         match authenticate::<ActionProviderId>(request, ActionProvider::authenticate).await {
-            Outcome::Success(action_provider_id) => Outcome::Success(Self { action_provider_id }),
+            Outcome::Success(action_provider_id) => Outcome::Success(Self(action_provider_id)),
             Outcome::Failure(f) => Outcome::Failure(f),
             Outcome::Forward(f) => Outcome::Forward(f),
         }
