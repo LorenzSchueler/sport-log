@@ -1,8 +1,8 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::types::{
-    AuthenticatedActionProvider, AuthenticatedUser, Db, Diary, NewDiary, NewWod, Unverified,
-    UnverifiedDiaryId, UnverifiedWodId, Wod,
+    AuthenticatedActionProvider, AuthenticatedUser, Db, Diary, DiaryId, NewDiary, NewWod,
+    Unverified, UnverifiedId, Wod, WodId,
 };
 
 use crate::handler::IntoJson;
@@ -46,7 +46,7 @@ pub async fn update_wod(
 
 #[delete("/wod/<wod_id>")]
 pub async fn delete_wod(
-    wod_id: UnverifiedWodId,
+    wod_id: UnverifiedId<WodId>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Status, Status> {
@@ -70,7 +70,7 @@ pub async fn create_diary(
 
 #[get("/diary/<diary_id>")]
 pub async fn get_diary(
-    diary_id: UnverifiedDiaryId,
+    diary_id: UnverifiedId<DiaryId>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Diary>, Status> {
@@ -102,7 +102,7 @@ pub async fn update_diary(
 
 #[delete("/diary/<diary_id>")]
 pub async fn delete_diary(
-    diary_id: UnverifiedDiaryId,
+    diary_id: UnverifiedId<DiaryId>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Status, Status> {

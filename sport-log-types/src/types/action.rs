@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_server_derive::{
-    Create, Delete, FromSql, GetAll, GetById, GetByUser, InnerIntFromParam, ToSql, Update,
+    Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
     VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin,
     VerifyIdForUser, VerifyIdForUserUnchecked,
@@ -16,7 +16,7 @@ use sport_log_server_derive::{
 #[cfg(feature = "full")]
 use crate::{
     schema::{action, action_event, action_provider, action_rule},
-    types::AuthenticatedActionProvider,
+    types::{AuthenticatedActionProvider, UnverifiedId},
 };
 
 use crate::types::{PlatformId, UserId};
@@ -24,14 +24,21 @@ use crate::types::{PlatformId, UserId};
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
+    derive(
+        FromSqlRow,
+        AsExpression,
+        Copy,
+        PartialEq,
+        Eq,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForAdmin,
+        VerifyIdForUserUnchecked
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct ActionProviderId(pub i32);
-
-#[cfg(feature = "full")]
-#[derive(InnerIntFromParam, VerifyIdForAdmin, VerifyIdForUserUnchecked)]
-pub struct UnverifiedActionProviderId(i32);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
@@ -65,14 +72,20 @@ pub struct NewActionProvider {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
+    derive(
+        FromSqlRow,
+        AsExpression,
+        Copy,
+        PartialEq,
+        Eq,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForActionProvider
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct ActionId(pub i32);
-
-#[cfg(feature = "full")]
-#[derive(InnerIntFromParam, VerifyIdForActionProvider)]
-pub struct UnverifiedActionId(i32);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
@@ -131,14 +144,20 @@ impl Weekday {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
+    derive(
+        FromSqlRow,
+        AsExpression,
+        Copy,
+        PartialEq,
+        Eq,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct ActionRuleId(pub i32);
-
-#[cfg(feature = "full")]
-#[derive(VerifyIdForUser, InnerIntFromParam)]
-pub struct UnverifiedActionRuleId(i32);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
@@ -178,28 +197,34 @@ pub struct NewActionRule {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
+    derive(
+        FromSqlRow,
+        AsExpression,
+        Copy,
+        PartialEq,
+        Eq,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct ActionEventId(pub i32);
 
 #[cfg(feature = "full")]
-#[derive(VerifyIdForUser, InnerIntFromParam)]
-pub struct UnverifiedActionEventId(i32);
-
-#[cfg(feature = "full")]
-impl UnverifiedActionEventId {
+impl UnverifiedId<ActionEventId> {
     pub fn verify_ap(
         self,
         auth: &AuthenticatedActionProvider,
         conn: &PgConnection,
     ) -> Result<ActionEventId, Status> {
-        let action_event = ActionEvent::get_by_id(ActionEventId(self.0), conn)
+        let action_event = ActionEvent::get_by_id(ActionEventId(self.0 .0), conn)
             .map_err(|_| Status::InternalServerError)?;
         let entity = Action::get_by_id(action_event.action_id, conn)
             .map_err(|_| Status::InternalServerError)?;
         if entity.action_provider_id == **auth {
-            Ok(ActionEventId(self.0))
+            Ok(self.0)
         } else {
             Err(Status::Forbidden)
         }

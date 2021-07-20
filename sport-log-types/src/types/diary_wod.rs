@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_server_derive::{
-    Create, Delete, FromSql, GetAll, GetById, GetByUser, InnerIntFromParam, ToSql, Update,
+    Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
     VerifyForActionProviderUnchecked, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
@@ -14,14 +14,20 @@ use crate::types::UserId;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
+    derive(
+        FromSqlRow,
+        AsExpression,
+        Copy,
+        PartialEq,
+        Eq,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct DiaryId(pub i32);
-
-#[cfg(feature = "full")]
-#[derive(InnerIntFromParam, VerifyIdForUser)]
-pub struct UnverifiedDiaryId(i32);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
@@ -60,14 +66,20 @@ pub struct NewDiary {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
+    derive(
+        FromSqlRow,
+        AsExpression,
+        Copy,
+        PartialEq,
+        Eq,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct WodId(pub i32);
-
-#[cfg(feature = "full")]
-#[derive(InnerIntFromParam, VerifyIdForUser)]
-pub struct UnverifiedWodId(i32);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(

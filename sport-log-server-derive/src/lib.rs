@@ -103,10 +103,10 @@ pub fn verify_for_admin_without_db_derive(input: TokenStream) -> TokenStream {
     impl_verify_for_admin_without_db(&ast)
 }
 
-#[proc_macro_derive(InnerIntFromParam)]
-pub fn inner_int_from_param_derive(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(FromI32)]
+pub fn form_i32_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_inner_int_from_param(&ast)
+    impl_from_i32(&ast)
 }
 
 #[proc_macro_derive(ToSql)]

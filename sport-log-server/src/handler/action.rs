@@ -4,10 +4,10 @@ use chrono::{NaiveDateTime, NaiveTime};
 use rocket::{http::Status, request::FromParam, serde::json::Json};
 
 use sport_log_types::types::{
-    Action, ActionEvent, ActionProvider, ActionRule, AuthenticatedActionProvider,
-    AuthenticatedAdmin, AuthenticatedUser, Db, ExecutableActionEvent, NewAction, NewActionEvent,
-    NewActionProvider, NewActionRule, Unverified, UnverifiedActionEventId, UnverifiedActionId,
-    UnverifiedActionProviderId, UnverifiedActionRuleId,
+    Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
+    ActionRuleId, AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser, Db,
+    ExecutableActionEvent, NewAction, NewActionEvent, NewActionProvider, NewActionRule, Unverified,
+    UnverifiedId,
 };
 
 use crate::handler::IntoJson;
@@ -38,7 +38,7 @@ pub async fn get_action_providers(
 
 #[delete("/adm/action_provider/<action_provider_id>")]
 pub async fn delete_action_provider(
-    action_provider_id: UnverifiedActionProviderId,
+    action_provider_id: UnverifiedId<ActionProviderId>,
     auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Status, Status> {
@@ -63,7 +63,7 @@ pub async fn create_action(
 
 #[get("/ap/action/<action_id>")]
 pub async fn get_action(
-    action_id: UnverifiedActionId,
+    action_id: UnverifiedId<ActionId>,
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Action>, Status> {
@@ -90,7 +90,7 @@ pub async fn get_actions(_auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<
 
 #[delete("/ap/action/<action_id>")]
 pub async fn delete_action(
-    action_id: UnverifiedActionId,
+    action_id: UnverifiedId<ActionId>,
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Status, Status> {
@@ -116,7 +116,7 @@ pub async fn create_action_rule(
 
 #[get("/action_rule/<action_rule_id>")]
 pub async fn get_action_rule(
-    action_rule_id: UnverifiedActionRuleId,
+    action_rule_id: UnverifiedId<ActionRuleId>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<ActionRule>, Status> {
@@ -138,7 +138,7 @@ pub async fn get_action_rules_by_user(
 
 #[get("/action_rule/action_provider/<action_provider_id>")]
 pub async fn get_action_rules_by_user_and_action_provider(
-    action_provider_id: UnverifiedActionProviderId,
+    action_provider_id: UnverifiedId<ActionProviderId>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<ActionRule>>, Status> {
@@ -162,7 +162,7 @@ pub async fn update_action_rule(
 
 #[delete("/action_rule/<action_rule_id>")]
 pub async fn delete_action_rule(
-    action_rule_id: UnverifiedActionRuleId,
+    action_rule_id: UnverifiedId<ActionRuleId>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Status, Status> {
@@ -188,7 +188,7 @@ pub async fn create_action_event(
 
 #[get("/action_event/<action_event_id>")]
 pub async fn get_action_event(
-    action_event_id: UnverifiedActionEventId,
+    action_event_id: UnverifiedId<ActionEventId>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<ActionEvent>, Status> {
@@ -220,7 +220,7 @@ pub async fn get_action_events_by_action_provider(
 
 #[get("/action_event/action_provider/<action_provider_id>")]
 pub async fn get_action_events_by_user_and_action_provider(
-    action_provider_id: UnverifiedActionProviderId,
+    action_provider_id: UnverifiedId<ActionProviderId>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
@@ -244,7 +244,7 @@ pub async fn update_action_event(
 
 #[delete("/action_event/<action_event_id>")]
 pub async fn delete_action_event(
-    action_event_id: UnverifiedActionEventId,
+    action_event_id: UnverifiedId<ActionEventId>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Status, Status> {
@@ -258,7 +258,7 @@ pub async fn delete_action_event(
 
 #[delete("/ap/action_event/<action_event_id>")]
 pub async fn delete_action_event_ap(
-    action_event_id: UnverifiedActionEventId,
+    action_event_id: UnverifiedId<ActionEventId>,
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Status, Status> {

@@ -2,7 +2,7 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::types::{
     AuthenticatedAdmin, AuthenticatedUser, Db, NewPlatform, NewPlatformCredentials, Platform,
-    PlatformCredentials, Unverified, UnverifiedPlatformCredentialsId, UnverifiedPlatformId,
+    PlatformCredentials, PlatformCredentialsId, PlatformId, Unverified, UnverifiedId,
 };
 
 use crate::handler::IntoJson;
@@ -49,7 +49,7 @@ pub async fn update_platform(
 
 #[delete("/adm/platform/<platform_id>")]
 pub async fn delete_platform(
-    platform_id: UnverifiedPlatformId,
+    platform_id: UnverifiedId<PlatformId>,
     auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Status, Status> {
@@ -90,7 +90,7 @@ pub async fn get_own_platform_credentials(
 
 #[get("/platform_credentials/platform/<platform_id>")]
 pub async fn get_own_platform_credentials_by_platform(
-    platform_id: UnverifiedPlatformId,
+    platform_id: UnverifiedId<PlatformId>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<PlatformCredentials>, Status> {
@@ -120,7 +120,7 @@ pub async fn update_platform_credentials(
 
 #[delete("/platform_credentials/<platform_credentials_id>")]
 pub async fn delete_platform_credentials(
-    platform_credentials_id: UnverifiedPlatformCredentialsId,
+    platform_credentials_id: UnverifiedId<PlatformCredentialsId>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Status, Status> {

@@ -15,7 +15,9 @@ use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
-use sport_log_server_derive::{Create, Delete, FromSql, GetAll, GetById, GetByUser, ToSql, Update};
+use sport_log_server_derive::{
+    Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
+};
 
 #[cfg(feature = "full")]
 use crate::schema::{cardio_session, route};
@@ -66,7 +68,7 @@ impl FromSql<Position, Pg> for Position {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
+    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, FromI32, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct RouteId(pub i32);
@@ -111,7 +113,7 @@ pub struct NewRoute {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
+    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, FromI32, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct CardioSessionId(pub i32);
