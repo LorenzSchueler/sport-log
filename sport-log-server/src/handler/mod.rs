@@ -6,6 +6,7 @@ use rocket::{http::Status, serde::json::Json};
 
 pub mod action;
 pub mod diary_wod;
+pub mod movement;
 pub mod platform;
 pub mod user;
 

@@ -63,6 +63,11 @@ fn rocket() -> _ {
             diary_wod::get_diarys_by_user,
             diary_wod::update_diary,
             diary_wod::delete_diary,
+            movement::create_movement,
+            movement::get_movement,
+            movement::get_movements_by_user,
+            movement::update_movement,
+            movement::delete_movement
         ],
     )
 }
