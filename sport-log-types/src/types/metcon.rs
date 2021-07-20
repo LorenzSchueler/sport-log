@@ -4,9 +4,7 @@ use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
-use sport_log_server_derive::{
-    Create, Delete, GetAll, GetById, GetByUser, InnerIntFromSql, InnerIntToSql, Update,
-};
+use sport_log_server_derive::{Create, Delete, FromSql, GetAll, GetById, GetByUser, ToSql, Update};
 
 #[cfg(feature = "full")]
 use crate::schema::{metcon, metcon_movement, metcon_session};
@@ -24,15 +22,7 @@ pub enum MetconType {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        FromSqlRow,
-        AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
-        InnerIntToSql,
-        InnerIntFromSql,
-    )
+    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconId(pub i32);
@@ -75,15 +65,7 @@ pub struct NewMetcon {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        FromSqlRow,
-        AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
-        InnerIntToSql,
-        InnerIntFromSql,
-    )
+    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconMovementId(pub i32);
@@ -117,15 +99,7 @@ pub struct NewMetconMovement {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        FromSqlRow,
-        AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
-        InnerIntToSql,
-        InnerIntFromSql,
-    )
+    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconSessionId(pub i32);

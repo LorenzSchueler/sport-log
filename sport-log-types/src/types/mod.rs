@@ -52,3 +52,30 @@ impl<'r, T: Deserialize<'r>> FromData<'r> for Unverified<T> {
         Outcome::Success(Self(Json::<T>::from_data(req, data).await.unwrap()))
     }
 }
+
+pub trait FromI32 {
+    fn from_i32(value: i32) -> Self;
+}
+
+impl FromI32 for MovementId {
+    fn from_i32(value: i32) -> Self {
+        MovementId(value)
+    }
+}
+
+#[cfg(feature = "full")]
+struct UnverifiedId<I>(I);
+
+impl<'v, I: FromI32> rocket::request::FromParam<'v> for UnverifiedId<I> {
+    type Error = &'v str;
+
+    fn from_param(param: &'v str) -> Result<Self, Self::Error> {
+        Ok(Self(I::from_i32(i32::from_param(param)?)))
+    }
+}
+
+//impl UnverifiedId<MovementId> {
+//pub fn verify(&self) -> MovementId {
+//self.0
+//}
+//}

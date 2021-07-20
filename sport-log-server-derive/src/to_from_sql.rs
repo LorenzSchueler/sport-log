@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 use quote::quote;
 
-pub fn impl_inner_int_to_sql(ast: &syn::DeriveInput) -> TokenStream {
+pub fn impl_to_sql(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
 
     let gen = quote! {
@@ -14,11 +14,11 @@ pub fn impl_inner_int_to_sql(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
-pub fn impl_inner_int_from_sql(ast: &syn::DeriveInput) -> TokenStream {
+pub fn impl_from_sql(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
 
     let gen = quote! {
-        impl  diesel::types::FromSql<diesel::sql_types::Integer, diesel::pg::Pg> for #typename {
+        impl diesel::types::FromSql<diesel::sql_types::Integer, diesel::pg::Pg> for #typename {
             fn from_sql(bytes: Option<&[u8]>) -> diesel::deserialize::Result<Self> {
                 let id = diesel::types::FromSql::<diesel::sql_types::Integer, diesel::pg::Pg>::from_sql(bytes)?;
                 Ok(#typename(id))

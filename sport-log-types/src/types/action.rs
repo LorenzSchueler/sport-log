@@ -7,10 +7,10 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_server_derive::{
-    Create, Delete, GetAll, GetById, GetByUser, InnerIntFromParam, InnerIntFromSql, InnerIntToSql,
-    Update, VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb,
-    VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
-    VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser, VerifyIdForUserUnchecked,
+    Create, Delete, FromSql, GetAll, GetById, GetByUser, InnerIntFromParam, ToSql, Update,
+    VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin,
+    VerifyIdForUser, VerifyIdForUserUnchecked,
 };
 
 #[cfg(feature = "full")]
@@ -24,15 +24,7 @@ use crate::types::{PlatformId, UserId};
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        FromSqlRow,
-        AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
-        InnerIntToSql,
-        InnerIntFromSql,
-    )
+    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct ActionProviderId(pub i32);
@@ -73,15 +65,7 @@ pub struct NewActionProvider {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        FromSqlRow,
-        AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
-        InnerIntToSql,
-        InnerIntFromSql,
-    )
+    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct ActionId(pub i32);
@@ -147,15 +131,7 @@ impl Weekday {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        FromSqlRow,
-        AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
-        InnerIntToSql,
-        InnerIntFromSql,
-    )
+    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct ActionRuleId(pub i32);
@@ -202,15 +178,7 @@ pub struct NewActionRule {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        FromSqlRow,
-        AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
-        InnerIntToSql,
-        InnerIntFromSql,
-    )
+    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, ToSql, FromSql,)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct ActionEventId(pub i32);

@@ -109,14 +109,14 @@ pub fn inner_int_from_param_derive(input: TokenStream) -> TokenStream {
     impl_inner_int_from_param(&ast)
 }
 
-#[proc_macro_derive(InnerIntToSql)]
-pub fn unverfied_inner_int_to_sql(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(ToSql)]
+pub fn unverified_inner_int_to_sql(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_inner_int_to_sql(&ast)
+    impl_to_sql(&ast)
 }
 
-#[proc_macro_derive(InnerIntFromSql)]
-pub fn unverfied_inner_int_drom_sql(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(FromSql)]
+pub fn unverified_inner_int_drom_sql(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_inner_int_from_sql(&ast)
+    impl_from_sql(&ast)
 }
