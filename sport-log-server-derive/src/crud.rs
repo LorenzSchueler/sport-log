@@ -105,7 +105,7 @@ pub fn impl_update(ast: &syn::DeriveInput) -> TokenStream {
 
         impl #typename {
             pub fn update(#paramname: #typename, conn: &PgConnection) -> QueryResult<#typename> {
-                diesel::update(#tablename::table.find(#tablename.id))
+                diesel::update(#tablename::table.find(#paramname.id))
                     .set(#paramname)
                     .get_result(conn)
             }

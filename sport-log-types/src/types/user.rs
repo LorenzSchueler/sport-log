@@ -3,7 +3,7 @@ use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
-use sport_log_server_derive::{Create, Delete, FromI32, FromSql, GetAll, GetById, ToSql, Update};
+use sport_log_server_derive::{Delete, FromI32, FromSql, GetAll, GetById, ToSql};
 
 #[cfg(feature = "full")]
 use crate::{
@@ -22,7 +22,7 @@ pub struct UserId(pub i32);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
+    derive(Queryable, AsChangeset, GetById, GetAll, Delete,)
 )]
 #[cfg_attr(feature = "full", table_name = "user")]
 pub struct User {
