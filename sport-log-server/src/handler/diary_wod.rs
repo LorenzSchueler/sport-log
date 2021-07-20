@@ -13,7 +13,7 @@ pub async fn create_wod_ap(
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Wod>, Status> {
-    let wod = wod.verify_ap(&auth)?;
+    let wod = wod.verify_unchecked_ap(&auth)?;
     conn.run(|c| Wod::create(wod, c)).await.into_json()
 }
 

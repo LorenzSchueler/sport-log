@@ -142,7 +142,7 @@ pub async fn get_action_rules_by_user_and_action_provider(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<ActionRule>>, Status> {
-    let action_provider_id = action_provider_id.verify(&auth)?;
+    let action_provider_id = action_provider_id.verify_unchecked(&auth)?;
     conn.run(move |c| ActionRule::get_by_user_and_action_provider(*auth, action_provider_id, c))
         .await
         .into_json()
@@ -224,7 +224,7 @@ pub async fn get_action_events_by_user_and_action_provider(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
-    let action_provider_id = action_provider_id.verify(&auth)?;
+    let action_provider_id = action_provider_id.verify_unchecked(&auth)?;
     conn.run(move |c| ActionEvent::get_by_user_and_action_provider(*auth, action_provider_id, c))
         .await
         .into_json()

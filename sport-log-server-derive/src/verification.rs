@@ -35,7 +35,7 @@ pub fn impl_verify_id_for_user_unchecked(ast: &syn::DeriveInput) -> TokenStream 
 
     let gen = quote! {
         impl crate::types::UnverifiedId<#id_typename> {
-            pub fn verify(
+            pub fn verify_unchecked(
                 self,
                 auth: &crate::types::AuthenticatedUser,
             ) -> Result<crate::types::#id_typename, rocket::http::Status> {
@@ -191,7 +191,7 @@ pub fn impl_verify_for_action_provider_unchecked(ast: &syn::DeriveInput) -> Toke
 
     let gen = quote! {
         impl crate::types::Unverified<#typename> {
-            pub fn verify_ap(
+            pub fn verify_unchecked_ap(
                 self,
                 auth: &crate::types::AuthenticatedActionProvider,
             ) -> Result<#typename, rocket::http::Status> {

@@ -94,7 +94,7 @@ pub async fn get_own_platform_credentials_by_platform(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<PlatformCredentials>, Status> {
-    let platform_id = platform_id.verify(&auth)?;
+    let platform_id = platform_id.verify_unchecked(&auth)?;
     conn.run(move |c| PlatformCredentials::get_by_user_and_platform(*auth, platform_id, c))
         .await
         .into_json()
