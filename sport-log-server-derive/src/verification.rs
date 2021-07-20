@@ -17,7 +17,7 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
                 auth: &crate::types::AuthenticatedUser,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<crate::types::#id_typename, rocket::http::Status> {
-                let entity = crate::types::#typename::get_by_id(crate::types::#id_typename(self.0.0), conn)
+                let entity = crate::types::#typename::get_by_id(self.0, conn)
                     .map_err(|_| rocket::http::Status::Forbidden)?;
                 if entity.user_id == **auth {
                     Ok(self.0)
@@ -61,7 +61,7 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
                 auth: &crate::types::AuthenticatedActionProvider,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<crate::types::#id_typename, rocket::http::Status> {
-                let entity = crate::types::#typename::get_by_id(crate::types::#id_typename(self.0.0), conn)
+                let entity = crate::types::#typename::get_by_id(self.0, conn)
                     .map_err(|_| rocket::http::Status::Forbidden)?;
                 if entity.action_provider_id == **auth {
                     Ok(self.0)
