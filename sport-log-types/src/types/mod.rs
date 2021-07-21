@@ -60,6 +60,7 @@ pub trait FromI32 {
 #[cfg(feature = "full")]
 pub struct UnverifiedId<I>(I);
 
+#[cfg(feature = "full")]
 impl<'v, I: FromI32> rocket::request::FromParam<'v> for UnverifiedId<I> {
     type Error = &'v str;
 
