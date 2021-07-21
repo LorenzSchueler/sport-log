@@ -1,3 +1,70 @@
+//! The sport-log-api-tester sends HTTP request to the server and prints the formatted response.
+//!
+//! # Usage
+//!
+//! sport-log-api-tester [OPTIONS]
+//!
+//! ### OPTIONS
+//!
+//! POST `endpoint` `data`
+//!
+//! POST `endpoint` `username` `password` `data`
+//!
+//! GET `endpoint` `username` `password`
+//!
+//! PUT `endpoint` `username` `password` `data`
+//!
+//! DELETE `endpoint` `username` `password`
+//!
+//! # Examples
+//!
+//! Create a [User](../sport_log_types/types/struct.User.html)
+//!
+//! ```sh
+//! sport-log-api-tester POST /v1/user '
+//! {
+//!     "username": "MyUsername",
+//!     "password": "MyPassword",
+//!     "email": "MyEmail"
+//! }'
+//! ```
+//!
+//! Create new [PlatformCredentials](../sport_log_types/types/struct.PlatformCredentials.html)
+//!
+//! ```sh
+//! sport-log-api-tester POST /v1/platform_credentials MyUsername MyPassword '
+//! {
+//!     "user_id": 4,
+//!     "platform_id": 1,
+//!     "username": "MyUsernameForPlatform1",
+//!     "password": "MyPasswordForPlatform1"
+//! }'
+//! ```
+//!
+//! Get own [User](../sport_log_types/types/struct.User.html)
+//!
+//! ```sh
+//! sport-log-api-tester GET /v1/user MyUsername MyPassword
+//! ```
+//!
+//! Update own [User](../sport_log_types/types/struct.User.html)
+//!
+//! ```sh
+//! sport-log-api-tester PUT /v1/user MyUsername MyPassword '
+//! {
+//!     "id": 4,
+//!     "username": "MyNewUsername",
+//!     "password": "MyNewPassword",
+//!     "email": "MyNewEmail"
+//! }'
+//! ```
+//!
+//! Delete own [User](../sport_log_types/types/struct.User.html)
+//!
+//! ```sh
+//! sport-log-api-tester DELETE /v1/user MyUsername MyPassword
+//! ```
+
 use std::{
     env::{self},
     process,
