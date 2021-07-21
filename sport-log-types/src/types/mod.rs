@@ -10,6 +10,8 @@ use serde::Deserialize;
 
 mod action;
 #[cfg(feature = "full")]
+mod admin;
+#[cfg(feature = "full")]
 mod auth;
 mod cardio;
 #[cfg(feature = "full")]
@@ -25,6 +27,8 @@ mod strength;
 mod user;
 
 pub use action::*;
+#[cfg(feature = "full")]
+pub use admin::*;
 #[cfg(feature = "full")]
 pub use auth::*;
 pub use cardio::*;

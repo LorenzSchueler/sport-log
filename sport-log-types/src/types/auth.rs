@@ -7,7 +7,7 @@ use rocket::{
     request::{FromRequest, Request},
 };
 
-use crate::types::{ActionProvider, ActionProviderId, Db, User, UserId, CONFIG};
+use crate::types::{ActionProvider, ActionProviderId, Admin, Db, User, UserId};
 
 pub struct AuthenticatedUser(UserId);
 
@@ -97,13 +97,10 @@ impl<'r> FromRequest<'r> for AuthenticatedAdmin {
     type Error = ();
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
-        match parse_username_password(request) {
-            Some((username, password))
-                if username == CONFIG.admin_username && password == CONFIG.admin_password =>
-            {
-                Outcome::Success(Self)
-            }
-            _ => Outcome::Failure((Status::Unauthorized, ())),
+        match authenticate::<()>(request, Admin::authenticate).await {
+            Outcome::Success(()) => Outcome::Success(Self),
+            Outcome::Failure(f) => Outcome::Failure(f),
+            Outcome::Forward(f) => Outcome::Forward(f),
         }
     }
 }
