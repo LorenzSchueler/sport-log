@@ -1,44 +1,58 @@
-use std::env::{self, Args};
+use std::{
+    env::{self},
+    process,
+};
 
-use reqwest::{blocking::Client, header::CONTENT_TYPE};
+use reqwest::{
+    blocking::Client,
+    header::{HeaderValue, CONTENT_TYPE},
+};
 use serde_json::Value;
 
+const BASE_URL: &str = "http://localhost:8000";
+
 fn main() {
-    let args = env::args();
-
-    if let Err(()) = handle(args) {
-        println!(
-            "sport-log-api-tester <method> <endpoint> <credentials> <data>\n\n\
-            makes as <method> request to http://localhost:8000<endpoint> \n\
-            credentials (http basic auth) and data are optionally"
-        );
-    }
-}
-
-fn handle(args: Args) -> Result<(), ()> {
-    let args: Vec<_> = args.collect();
-    let method = args.get(1).ok_or(())?;
-    let endpoint = args.get(2).ok_or(())?;
-    let credentials = args.get(3).ok_or(())?;
-    let data = args.get(4).ok_or(())?;
-
-    let url = format!("http://localhost:8000{}", endpoint);
-    println!("{} {}\n", method, url);
-
-    let client = Client::new();
-    let mut request = match method.as_str() {
-        "GET" => client.get(url),
-        "POST" => client.post(url),
-        "PUT" => client.put(url),
-        "DELETE" => client.delete(url),
-        _ => return Err(()),
+    let args: Vec<_> = env::args().collect();
+    let (mut request, credentials, data) = match &args[1..] {
+        [method, endpoint, data] if method == "POST" => {
+            let request = Client::new().post(format!("{}{}", BASE_URL, endpoint));
+            (request, None, Some(data))
+        }
+        [method, endpoint, username, password, data] if method == "POST" => {
+            let request = Client::new().post(format!("{}{}", BASE_URL, endpoint));
+            (request, Some((username, password)), Some(data))
+        }
+        [method, endpoint, username, password] if method == "GET" => {
+            let request = Client::new().get(format!("{}{}", BASE_URL, endpoint));
+            (request, Some((username, password)), None)
+        }
+        [method, endpoint, username, password, data] if method == "PUT" => {
+            let request = Client::new().put(format!("{}{}", BASE_URL, endpoint));
+            (request, Some((username, password)), Some(data))
+        }
+        [method, endpoint, username, password] if method == "DELETE" => {
+            let request = Client::new().delete(format!("{}{}", BASE_URL, endpoint));
+            (request, Some((username, password)), None)
+        }
+        _ => {
+            println!(
+                "sport-log-api-tester\n\n\
+                
+                OPTIONS:\n\
+                POST <endpoint> <data>\n\
+                POST <endpoint> <username> <password> <data>\n\
+                GET <endpoint> <username> <password>\n\
+                PUT <endpoint> <username> <password> <data>\n\
+                DELETE <endpoint> <username> <password>"
+            );
+            process::exit(1);
+        }
     };
-    if !credentials.is_empty() {
-        let credentials: Vec<_> = credentials.splitn(2, ':').collect();
-        request = request.basic_auth(credentials.get(0).unwrap(), credentials.get(1));
+
+    if let Some((username, password)) = credentials {
+        request = request.basic_auth(username, Some(password));
     }
-    if !data.is_empty() {
-        //request = request.json(&data);
+    if let Some(data) = data {
         request = request.body(data.to_owned());
         request = request.header(CONTENT_TYPE, "application/json");
     }
@@ -46,12 +60,10 @@ fn handle(args: Args) -> Result<(), ()> {
 
     println!("{}\n", response.status());
     println!("{:#?}\n", response.headers());
-    if response.status().is_success() {
+    if response.headers().get(CONTENT_TYPE) == Some(&HeaderValue::from_static("application/json")) {
         let response = response.json::<Value>().unwrap();
         println!("{}", serde_json::to_string_pretty(&response).unwrap());
     } else {
         println!("{}", response.text().unwrap());
     }
-
-    Ok(())
 }
