@@ -13,3 +13,4 @@ diesel = { version = "1.4.4", features = ["postgres", "r2d2", "chrono"] }
 serde = { version = "1.0.116", features = ["derive"]}
 dotenv = "0.15.0"
 chrono = { version = "0.4.19", features = ["serde"] }
+lazy_static = "1.4.0"

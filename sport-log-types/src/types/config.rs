@@ -3,7 +3,7 @@ use std::fs;
 use lazy_static::lazy_static;
 use serde::Deserialize;
 
-#[cfg_attr(feature = "full", derive(Deserialize))]
+#[derive(Deserialize)]
 pub struct Config {
     pub admin_username: String,
     pub admin_password: String,
@@ -11,7 +11,8 @@ pub struct Config {
 
 impl Config {
     pub fn get() -> Self {
-        toml::from_str(&fs::read_to_string("config.toml").unwrap()).unwrap()
+        toml::from_str(&fs::read_to_string("config.toml").expect("config.toml not found"))
+            .expect("config.toml is not valid TOML")
     }
 }
 

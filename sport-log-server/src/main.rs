@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate rocket;
 
-use sport_log_types::types::Db;
+use sport_log_types::types::{Db, CONFIG};
 
 mod handler;
 
@@ -10,6 +10,8 @@ const BASE: &str = "/v1";
 #[launch]
 fn rocket() -> _ {
     dotenv::dotenv().ok();
+
+    lazy_static::initialize(&CONFIG);
 
     use handler::*;
     rocket::build().attach(Db::fairing()).mount(
