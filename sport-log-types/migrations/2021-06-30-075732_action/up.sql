@@ -7,9 +7,9 @@ create table action_provider (
     platform_id integer not null references platform on delete cascade
 );
 insert into action_provider (name, password, platform_id) values
-    ('wodify-login', 'wodify-login-passwd', 1),
-    ('wodify-wod', 'wodify-wod-passwd', 1),
-    ('sportstracker-fetch', 'sportstracker-fetch-passwd', 2);
+    ('wodify-login', '$argon2id$v=19$m=4096,t=3,p=1$NZeOJg1K37UlxV5wB7yFhg$C7HNfVK9yLZTJyvJNSOhvYRfUK+nGo1rz0lIck1aO6c', 1), -- "wodify-login-passwd"
+    ('wodify-wod', '$argon2id$v=19$m=4096,t=3,p=1$FscunZHcMdL3To4Zxc5z5w$InsqwdstEFdkszaokG1rk0HS0oazMm4zTynD6pjQEgw', 1), -- "wodify-wod-passwd"
+    ('sportstracker-fetch', '$argon2id$v=19$m=4096,t=3,p=1$mmRowryKPKBhRSvrRZRFmg$VPInpHpMq47ZEymwSojrst+CWVOoHopBlvSIwybchAg', 2); -- "sportstracker-fetch-passwd"
 
 create table action (
     id serial primary key,
