@@ -1,3 +1,19 @@
+//! The sport-log-password-hasher can hash passwords and verify if a password matches a password hash.
+//!
+//! The hashing method is the same as the one used in [sport-log-server](../sport_log_server/index.html).
+//!
+//! # Usage
+//!
+//! sport-log-password-hasher [OPTIONS]
+//!
+//! ### OPTIONS
+//!
+//! #### generate hash:
+//! -g `password`
+
+//! #### verify password:
+//! -v `hash` `password`
+
 use std::env;
 
 use argon2::{
