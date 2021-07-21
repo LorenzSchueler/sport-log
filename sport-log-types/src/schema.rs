@@ -30,7 +30,7 @@ table! {
     action_provider (id) {
         id -> Int4,
         name -> Varchar,
-        password -> Varchar,
+        password -> Bpchar,
         platform_id -> Int4,
     }
 }
@@ -293,7 +293,7 @@ table! {
     user (id) {
         id -> Int4,
         username -> Varchar,
-        password -> Varchar,
+        password -> Bpchar,
         email -> Varchar,
     }
 }
