@@ -43,18 +43,11 @@ pub struct ActionProviderId(pub i32);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Queryable,
-        AsChangeset,
-        Create,
-        GetAll,
-        Delete,
-        VerifyForAdminWithoutDb,
-    )
+    derive(Queryable, AsChangeset, GetAll, Delete, VerifyForAdminWithoutDb,)
 )]
 #[cfg_attr(feature = "full", table_name = "action_provider")]
 pub struct ActionProvider {
-    pub id: ActionId,
+    pub id: ActionProviderId,
     pub name: String,
     pub password: String,
     pub platform_id: PlatformId,

@@ -13,13 +13,10 @@ use crate::{
 impl User {
     pub fn create(mut user: NewUser, conn: &PgConnection) -> QueryResult<User> {
         let salt = SaltString::generate(&mut OsRng);
-        let argon2 = Argon2::default();
-        let password_hash = argon2
+        user.password = Argon2::default()
             .hash_password_simple(user.password.as_bytes(), salt.as_ref())
             .unwrap()
             .to_string();
-
-        user.password = password_hash;
 
         diesel::insert_into(user::table)
             .values(user)
@@ -28,13 +25,10 @@ impl User {
 
     pub fn update(mut user: User, conn: &PgConnection) -> QueryResult<User> {
         let salt = SaltString::generate(&mut OsRng);
-        let argon2 = Argon2::default();
-        let password_hash = argon2
+        user.password = Argon2::default()
             .hash_password_simple(user.password.as_bytes(), salt.as_ref())
             .unwrap()
             .to_string();
-
-        user.password = password_hash;
 
         diesel::update(user::table.find(user.id))
             .set(user)
