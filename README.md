@@ -13,7 +13,7 @@ This way you own your data, and we can provide functionality to export it easily
 Additionally, the concept of action provides tries to make this project easily extensible.
 Use cases are for example fetching data from external sources or automatic login/ reservation in you gym.
 
-# Roadmap and supported features
+## Roadmap and supported features
 
 see [#1](https://github.com/LorenzSchueler/sport-log/issues/1)
 

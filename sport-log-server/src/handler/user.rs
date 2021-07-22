@@ -1,11 +1,20 @@
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_types::types::{AuthenticatedUser, Db, NewUser, Unverified, User};
+use sport_log_types::types::{
+    AuthenticatedAdmin, AuthenticatedUser, Db, NewUser, Unverified, User, CONFIG,
+};
 
 use crate::handler::IntoJson;
 
-#[post("/user", format = "application/json", data = "<user>")]
-pub async fn create_user(user: Unverified<NewUser>, conn: Db) -> Result<Json<User>, Status> {
+#[post("/user", format = "application/json", data = "<user>", rank = 1)]
+pub async fn create_user(
+    user: Unverified<NewUser>,
+    auth: Result<AuthenticatedAdmin, ()>,
+    conn: Db,
+) -> Result<Json<User>, Status> {
+    if !CONFIG.self_registration {
+        auth.map_err(|()| Status::Unauthorized)?;
+    }
     let user = user.verify()?;
     conn.run(|c| User::create(user, c)).await.into_json()
 }

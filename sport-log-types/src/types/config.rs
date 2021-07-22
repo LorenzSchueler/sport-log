@@ -7,6 +7,7 @@ use serde::Deserialize;
 pub struct Config {
     pub admin_username: String,
     pub admin_password: String,
+    pub self_registration: bool,
 }
 
 impl Config {
