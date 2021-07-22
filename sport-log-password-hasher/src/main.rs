@@ -10,7 +10,7 @@
 //!
 //! #### generate hash:
 //! -g `password`
-
+//!
 //! #### verify password:
 //! -v `hash` `password`
 
