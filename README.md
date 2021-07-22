@@ -15,7 +15,7 @@ Use cases are for example fetching data from external sources or automatic login
 
 # Roadmap and supported features
 
-see #1
+see [#1](https://github.com/LorenzSchueler/sport-log/issues/1)
 
 ## Project Structure
 
