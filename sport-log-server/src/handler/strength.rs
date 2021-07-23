@@ -101,7 +101,7 @@ pub async fn get_strength_set(
         .into_json()
 }
 
-#[get("/strength_set/<strength_session_id>")]
+#[get("/strength_set/strength_session/<strength_session_id>")]
 pub async fn get_strength_sets_by_strength_session(
     strength_session_id: UnverifiedId<StrengthSessionId>,
     auth: AuthenticatedUser,

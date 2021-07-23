@@ -93,7 +93,7 @@ pub async fn get_metcon_movement(
         .into_json()
 }
 
-#[get("/metcon_movement/<metcon_id>")]
+#[get("/metcon_movement/metcon/<metcon_id>")]
 pub async fn get_metcon_movements_by_metcon(
     metcon_id: UnverifiedId<MetconId>,
     auth: AuthenticatedUser,
