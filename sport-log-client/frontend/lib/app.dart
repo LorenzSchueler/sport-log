@@ -73,6 +73,11 @@ class _AppViewState extends State<AppView> {
         );
       },
       onGenerateRoute: (_) => SplashPage.route(),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+      ),
+      themeMode: ThemeMode.dark,
+      debugShowCheckedModeBanner: false,
     );
   }
 }
