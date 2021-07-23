@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_server_derive::{
     Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
 #[cfg(feature = "full")]
@@ -13,7 +14,17 @@ use crate::types::{MovementId, MovementUnit, UserId};
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, FromI32, ToSql, FromSql)
+    derive(
+        FromSqlRow,
+        AsExpression,
+        Copy,
+        PartialEq,
+        Eq,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct StrengthSessionId(pub i32);
@@ -30,6 +41,7 @@ pub struct StrengthSessionId(pub i32);
         GetAll,
         Update,
         Delete,
+        VerifyForUserWithDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "strength_session")]
@@ -44,7 +56,7 @@ pub struct StrengthSession {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
 #[cfg_attr(feature = "full", table_name = "strength_session")]
 pub struct NewStrengthSession {
     pub user_id: UserId,

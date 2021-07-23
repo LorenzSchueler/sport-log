@@ -8,6 +8,7 @@ pub mod action;
 pub mod diary_wod;
 pub mod movement;
 pub mod platform;
+pub mod strength;
 pub mod user;
 
 trait IntoJson<T> {

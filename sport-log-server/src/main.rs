@@ -71,7 +71,12 @@ fn rocket() -> _ {
             movement::get_movements_by_user,
             movement::update_movement,
             movement::delete_movement,
-            movement::get_eorms
+            movement::get_eorms,
+            strength::create_strength_session,
+            strength::get_strength_session,
+            strength::get_strength_sessions_by_user,
+            strength::update_strength_session,
+            strength::delete_strength_session,
         ],
     )
 }
