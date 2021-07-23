@@ -1,5 +1,4 @@
-name: user_repository
-description: responsible for user management
+name: models
 publish_to: none
 
 environment:
@@ -7,4 +6,3 @@ environment:
 
 dependencies:
   equatable: ^2.0.0
-  uuid: ^3.0.0

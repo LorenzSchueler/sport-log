@@ -39,10 +39,10 @@ dependencies:
 
   formz: ^0.4.0 # easy form handling
   equatable: ^2.0.0 # makes classes equatable with little boilerplate code
-  authentication_repository:
-    path: packages/authentication_repository
-  user_repository:
-    path: packages/user_repository
+  models:
+    path: packages/models
+  repositories:
+    path: packages/repositories
 
 dev_dependencies:
   flutter_test:

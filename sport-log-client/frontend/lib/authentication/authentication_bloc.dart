@@ -1,72 +1,72 @@
 
-import 'dart:async';
+import 'package:models/authentication_state.dart';
+import 'package:models/user.dart';
+import 'package:repositories/authentication_repository.dart';
 
-import 'package:authentication_repository/authentication_repository.dart';
+import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:user_repository/user_repository.dart';
 
 part 'authentication_event.dart';
-part 'authentication_state.dart';
 
-class AuthenticationBloc
-    extends Bloc<AuthenticationEvent, AuthenticationState> {
+const int apiDelay = 500;
+
+class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
   AuthenticationBloc({
-    required AuthenticationRepository authenticationRepository,
-    required UserRepository userRepository,
-  })  : _authenticationRepository = authenticationRepository,
-        _userRepository = userRepository,
-        super(const AuthenticationState.unknown()) {
-    _authenticationStatusSubscription = _authenticationRepository.status.listen(
-          (status) => add(AuthenticationStatusChanged(status)),
-    );
-  }
+    required AuthenticationRepository authenticationRepository
+  }) : _authenticationRepository = authenticationRepository,
+        super(UnauthenticatedAuthenticationState());
 
   final AuthenticationRepository _authenticationRepository;
-  final UserRepository _userRepository;
-  late StreamSubscription<AuthenticationStatus>
-  _authenticationStatusSubscription;
 
   @override
   Stream<AuthenticationState> mapEventToState(
-      AuthenticationEvent event,
-      ) async* {
-    if (event is AuthenticationStatusChanged) {
-      yield await _mapAuthenticationStatusChangedToState(event);
-    } else if (event is AuthenticationLogoutRequested) {
-      _authenticationRepository.logOut();
+    AuthenticationEvent event,
+  ) async* {
+    if (event is LogoutEvent) {
+      yield* _logoutStream(event);
+    } else if (event is LoginEvent) {
+      yield* _loginStream(event);
+    } else if (event is RegisterEvent) {
+      yield* _registrationStream(event);
+    } else {
+      throw UnimplementedError("Unknwon AuthenticationEvent");
     }
   }
 
-  @override
-  Future<void> close() {
-    _authenticationStatusSubscription.cancel();
-    _authenticationRepository.dispose();
-    return super.close();
+  Stream<AuthenticationState> _logoutStream(LogoutEvent event) async* {
+    _authenticationRepository.deleteUser(); // TODO: extra state
+    yield UnauthenticatedAuthenticationState();
   }
 
-  Future<AuthenticationState> _mapAuthenticationStatusChangedToState(
-      AuthenticationStatusChanged event,
-      ) async {
-    switch (event.status) {
-      case AuthenticationStatus.unauthenticated:
-        return const AuthenticationState.unauthenticated();
-      case AuthenticationStatus.authenticated:
-        final user = await _tryGetUser();
-        return user != null
-            ? AuthenticationState.authenticated(user)
-            : const AuthenticationState.unauthenticated();
-      default:
-        return const AuthenticationState.unknown();
-    }
+  Stream<AuthenticationState> _loginStream(LoginEvent event) async* {
+    yield UnauthenticatedAuthenticationState(state: AsyncAuth.loginPending);
+    // TODO: use api
+    User user = await Future.delayed(
+        const Duration(milliseconds: apiDelay), () => User(
+        id: 1,
+        username: event.username,
+        password: event.password,
+        email: "email@email.com",
+    )
+    );
+    await _authenticationRepository.createUser(user);
+    yield AuthenticatedAuthenticationState(user: user);
   }
 
-  Future<User?> _tryGetUser() async {
-    try {
-      final user = await _userRepository.getUser();
-      return user;
-    } on Exception {
-      return null;
-    }
+  Stream<AuthenticationState> _registrationStream(RegisterEvent event) async* {
+    yield UnauthenticatedAuthenticationState(
+        state: AsyncAuth.registrationPending);
+    // TODO: use api
+    User user = await Future.delayed(
+        const Duration(milliseconds: apiDelay), () => User(
+        id: 1,
+        username: event.username,
+        password: event.password,
+        email: event.email,
+    )
+    );
+    await _authenticationRepository.createUser(user);
+    yield AuthenticatedAuthenticationState(user: user);
   }
 }
