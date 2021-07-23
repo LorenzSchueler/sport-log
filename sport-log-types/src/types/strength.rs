@@ -10,9 +10,7 @@ use sport_log_server_derive::{
 
 #[cfg(feature = "full")]
 use crate::schema::{strength_session, strength_set};
-use crate::types::{MovementId, MovementUnit, UserId};
-
-use super::{AuthenticatedUser, Unverified, UnverifiedId};
+use crate::types::{AuthenticatedUser, MovementId, MovementUnit, Unverified, UnverifiedId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(

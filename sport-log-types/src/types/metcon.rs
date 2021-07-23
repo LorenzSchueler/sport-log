@@ -1,6 +1,7 @@
 use chrono::NaiveDateTime;
 #[cfg(feature = "full")]
 use diesel_derive_enum::DbEnum;
+use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
@@ -11,6 +12,8 @@ use sport_log_server_derive::{
 #[cfg(feature = "full")]
 use crate::schema::{metcon, metcon_movement, metcon_session};
 use crate::types::{MovementId, MovementUnit, UserId};
+
+use super::{AuthenticatedUser, Unverified, UnverifiedId};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(DbEnum))]
@@ -28,6 +31,33 @@ pub enum MetconType {
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconId(pub i32);
+
+#[cfg(feature = "full")]
+impl UnverifiedId<MetconId> {
+    pub fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<MetconId, Status> {
+        let metcon =
+            Metcon::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
+        if metcon.user_id == Some(**auth) {
+            Ok(self.0)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+
+    pub fn verify_if_owned(
+        self,
+        auth: &AuthenticatedUser,
+        conn: &PgConnection,
+    ) -> Result<MetconId, Status> {
+        let metcon =
+            Metcon::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
+        if metcon.user_id.is_none() || metcon.user_id.unwrap() == **auth {
+            Ok(self.0)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
@@ -53,6 +83,23 @@ pub struct Metcon {
     pub timecap: Option<i32>,
 }
 
+#[cfg(feature = "full")]
+impl Unverified<Metcon> {
+    pub fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Metcon, Status> {
+        let metcon = self.0.into_inner();
+        if metcon.user_id == Some(**auth)
+            && Metcon::get_by_id(metcon.id, conn)
+                .map_err(|_| Status::InternalServerError)?
+                .user_id
+                == Some(**auth)
+        {
+            Ok(metcon)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "metcon")]
@@ -62,6 +109,18 @@ pub struct NewMetcon {
     pub metcon_type: MetconType,
     pub rounds: Option<i32>,
     pub timecap: Option<i32>,
+}
+
+#[cfg(feature = "full")]
+impl Unverified<NewMetcon> {
+    pub fn verify(self, auth: &AuthenticatedUser) -> Result<NewMetcon, Status> {
+        let metcon = self.0.into_inner();
+        if metcon.user_id == Some(**auth) {
+            Ok(metcon)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -82,6 +82,11 @@ fn rocket() -> _ {
             strength::get_strength_sets_by_strength_session,
             strength::update_strength_set,
             strength::delete_strength_set,
+            metcon::create_metcon,
+            metcon::get_metcon,
+            metcon::get_metcons_by_user,
+            metcon::update_metcon,
+            metcon::delete_metcon,
         ],
     )
 }
