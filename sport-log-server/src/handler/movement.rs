@@ -1,7 +1,7 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::types::{
-    AuthenticatedUser, Db, Movement, MovementId, NewMovement, Unverified, UnverifiedId,
+    AuthenticatedUser, Db, Eorm, Movement, MovementId, NewMovement, Unverified, UnverifiedId,
 };
 
 use crate::handler::IntoJson;
@@ -66,4 +66,9 @@ pub async fn delete_movement(
             .map_err(|_| Status::InternalServerError)
     })
     .await
+}
+
+#[get("/eorm")]
+pub async fn get_eorms(_auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Eorm>>, Status> {
+    conn.run(move |c| Eorm::get_all(c)).await.into_json()
 }

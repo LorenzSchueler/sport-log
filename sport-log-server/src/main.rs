@@ -70,7 +70,8 @@ fn rocket() -> _ {
             movement::get_movement,
             movement::get_movements_by_user,
             movement::update_movement,
-            movement::delete_movement
+            movement::delete_movement,
+            movement::get_eorms
         ],
     )
 }
