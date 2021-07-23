@@ -19,7 +19,7 @@ jobs:
       uses: actions/checkout@v2
     - name: Build
       run: cargo check --manifest-path sport-log-action-provider-sportstracker/Cargo.toml &&
-           cargo check --manifest-path sport-log-apit-tester/Cargo.toml &&
+           cargo check --manifest-path sport-log-api-tester/Cargo.toml &&
            cargo check --manifest-path sport-log-password-hasher/Cargo.toml &&
            cargo check --manifest-path sport-log-server-derive/Cargo.toml &&
            cargo check --manifest-path sport-log-types/Cargo.toml
