@@ -77,6 +77,11 @@ fn rocket() -> _ {
             strength::get_strength_sessions_by_user,
             strength::update_strength_session,
             strength::delete_strength_session,
+            strength::create_strength_set,
+            strength::get_strength_set,
+            strength::get_strength_sets_by_strength_session,
+            strength::update_strength_set,
+            strength::delete_strength_set,
         ],
     )
 }
