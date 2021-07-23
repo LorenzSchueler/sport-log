@@ -17,6 +17,7 @@ fn rocket() -> _ {
     rocket::build().attach(Db::fairing()).mount(
         BASE,
         routes![
+            user::create_user_adm,
             user::create_user,
             user::get_user,
             user::update_user,

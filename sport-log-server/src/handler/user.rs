@@ -6,14 +6,20 @@ use sport_log_types::types::{
 
 use crate::handler::IntoJson;
 
-#[post("/user", format = "application/json", data = "<user>", rank = 1)]
-pub async fn create_user(
+#[post("/adm/user", format = "application/json", data = "<user>")]
+pub async fn create_user_adm(
     user: Unverified<NewUser>,
-    auth: Result<AuthenticatedAdmin, ()>,
+    _auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Json<User>, Status> {
+    let user = user.verify()?;
+    conn.run(|c| User::create(user, c)).await.into_json()
+}
+
+#[post("/user", format = "application/json", data = "<user>")]
+pub async fn create_user(user: Unverified<NewUser>, conn: Db) -> Result<Json<User>, Status> {
     if !CONFIG.self_registration {
-        auth.map_err(|()| Status::Unauthorized)?;
+        return Err(Status::Unauthorized);
     }
     let user = user.verify()?;
     conn.run(|c| User::create(user, c)).await.into_json()
