@@ -57,19 +57,28 @@ class LoginPageState extends State<LoginPage> {
               obscureText: true,
             ),
             const Padding(padding: EdgeInsets.all(12)),
-            ElevatedButton(
-              onPressed: () {
-                debugPrint("pressed1");
-                // context.read<AuthenticationBloc>().add(
-                //   LoginEvent(
-                //     username: _usernameController.text,
-                //     password: _passwordController.text
-                //   )
-                // );
-                debugPrint("pressed2");
-                Navigator.of(context).pushNamed(Routes.home);
+            BlocConsumer<AuthenticationBloc, AuthenticationState>(
+              listener: (context, AuthenticationState state) {
+                if (state is AuthenticatedAuthenticationState) {
+                  Navigator.of(context).pushNamed(Routes.home);
+                }
               },
-              child: const Text("Login"),
+              builder: (context, AuthenticationState state) {
+                if (state is UnauthenticatedAuthenticationState) {
+                  return ElevatedButton(
+                    onPressed: () {
+                      context.read<AuthenticationBloc>().add(
+                          LoginEvent(
+                              username: _usernameController.text,
+                              password: _passwordController.text
+                          ));
+                    },
+                    child: (state.state == AsyncAuth.loginPending)
+                      ? const CircularProgressIndicator() : const Text("Login"),
+                  );
+                }
+                return const Text("Authenticated State");
+              }
             ),
           ],
         ),
