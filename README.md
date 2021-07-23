@@ -3,7 +3,7 @@
 Sport Log is a sports tracking app written in Flutter together with a server backend written in Rust.
 Additionally, there are action providers which are intended to do scheduled repetitive actions like fetching and inserting data from other sources.
 The client and action providers communicate with the server via a REST API.
-In later releases it is planned to equip the client with an own database that synchronizes with the server when connectivity is available in order to allow offline use of the app while still allowing synchronization between multiple devices.
+In later releases it is planned to equip the client with its own database that synchronizes with the server when connectivity is available in order to allow offline use of the app while still allowing synchronization between multiple devices.
 
 ## Goals
 
@@ -29,6 +29,32 @@ The sport-log consists of multiple crates:
 - **sport-log-password-hasher** hash passwords and verify hashes and passwords that can be stored in the server backend
 - **sport-log-action-provider-<name>** various action providers
 
+## Setup
+
+* `apt install libpq-dev postgresql-client-common postgresql` for postgresql
+* `sudo -u postgres createuser <username>`
+* `sudo -u postgres createdb sport_log`
+* `sudo -u postgres psql`
+    * `alter user <username> with encrypted password '<password>';`
+    * `grant all privileges on database sport_log to <username> ;`
+* `sudo nano /etc/postgresql/<version>/main/pg_hba.conf`
+  * add entry `local sport_log sport_admin md5`
+* `sudo service postgresql restart`
+* `sudo service postgresql reload`
+* create .env file in repo root with the following content:
+```
+DATABASE_URL=postgres://sport_admin:<password>@localhost/sport_log
+ROCKET_DATABASES='{sport_log={url="postgres://<username>:<password>@localhost/sport_log"}}'
+```
+* `cargo install diesel-cli --no-default-features --features postgres`
+* `cd sport-log-types`
+* `diesel migration run`
+* `./patch.sh`
+
+* `cd ../sport-log-server`
+* run the server:`cargo run`
+
+
 ## License
 
-[GPL-3.0 License](LICENSE.md)
+[GPL-3.0 License](LICENSE)
