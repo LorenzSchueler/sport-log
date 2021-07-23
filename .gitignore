@@ -2,5 +2,3 @@
 /.idea
 .env
 private_data.sh
-Rocket.toml
-setup.sh
