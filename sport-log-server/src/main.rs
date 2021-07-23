@@ -87,6 +87,11 @@ fn rocket() -> _ {
             metcon::get_metcons_by_user,
             metcon::update_metcon,
             metcon::delete_metcon,
+            metcon::create_metcon_movement,
+            metcon::get_metcon_movement,
+            metcon::get_metcon_movements_by_metcon,
+            metcon::update_metcon_movement,
+            metcon::delete_metcon_movement,
         ],
     )
 }

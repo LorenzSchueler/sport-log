@@ -51,7 +51,7 @@ impl UnverifiedId<MetconId> {
     ) -> Result<MetconId, Status> {
         let metcon =
             Metcon::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
-        if metcon.user_id.is_none() || metcon.user_id.unwrap() == **auth {
+        if metcon.user_id.is_none() || metcon.user_id == Some(**auth) {
             Ok(self.0)
         } else {
             Err(rocket::http::Status::Forbidden)
@@ -131,6 +131,41 @@ impl Unverified<NewMetcon> {
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconMovementId(pub i32);
 
+#[cfg(feature = "full")]
+impl UnverifiedId<MetconMovementId> {
+    pub fn verify(
+        self,
+        auth: &AuthenticatedUser,
+        conn: &PgConnection,
+    ) -> Result<MetconMovementId, Status> {
+        let metcon_movement =
+            MetconMovement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
+        let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
+            .map_err(|_| rocket::http::Status::Forbidden)?;
+        if metcon.user_id == Some(**auth) {
+            Ok(self.0)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+
+    pub fn verify_if_owned(
+        self,
+        auth: &AuthenticatedUser,
+        conn: &PgConnection,
+    ) -> Result<MetconMovementId, Status> {
+        let metcon_movement =
+            MetconMovement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
+        let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
+            .map_err(|_| rocket::http::Status::Forbidden)?;
+        if metcon.user_id.is_none() || metcon.user_id == Some(**auth) {
+            Ok(self.0)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
@@ -146,6 +181,24 @@ pub struct MetconMovement {
     pub weight: Option<f32>,
 }
 
+#[cfg(feature = "full")]
+impl Unverified<MetconMovement> {
+    pub fn verify(
+        self,
+        auth: &AuthenticatedUser,
+        conn: &PgConnection,
+    ) -> Result<MetconMovement, Status> {
+        let metcon_movement = self.0.into_inner();
+        let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
+            .map_err(|_| rocket::http::Status::Forbidden)?;
+        if metcon.user_id == Some(**auth) {
+            Ok(metcon_movement)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "metcon_movement")]
@@ -155,6 +208,24 @@ pub struct NewMetconMovement {
     pub count: i32,
     pub unit: MovementUnit,
     pub weight: Option<f32>,
+}
+
+#[cfg(feature = "full")]
+impl Unverified<NewMetconMovement> {
+    pub fn verify(
+        self,
+        auth: &AuthenticatedUser,
+        conn: &PgConnection,
+    ) -> Result<NewMetconMovement, Status> {
+        let metcon_movement = self.0.into_inner();
+        let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
+            .map_err(|_| rocket::http::Status::Forbidden)?;
+        if metcon.user_id == Some(**auth) {
+            Ok(metcon_movement)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

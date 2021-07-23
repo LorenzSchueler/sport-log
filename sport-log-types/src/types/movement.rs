@@ -78,7 +78,7 @@ impl UnverifiedId<MovementId> {
     ) -> Result<MovementId, Status> {
         let movement =
             Movement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
-        if movement.user_id.is_none() || movement.user_id.unwrap() == **auth {
+        if movement.user_id.is_none() || movement.user_id == Some(**auth) {
             Ok(self.0)
         } else {
             Err(rocket::http::Status::Forbidden)
