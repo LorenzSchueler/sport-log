@@ -1,4 +1,5 @@
 use chrono::NaiveDateTime;
+#[cfg(feature = "full")]
 use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
@@ -8,9 +9,12 @@ use sport_log_server_derive::{
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
+use crate::types::{MovementId, MovementUnit, UserId};
 #[cfg(feature = "full")]
-use crate::schema::{strength_session, strength_set};
-use crate::types::{AuthenticatedUser, MovementId, MovementUnit, Unverified, UnverifiedId, UserId};
+use crate::{
+    schema::{strength_session, strength_set},
+    types::{AuthenticatedUser, Unverified, UnverifiedId},
+};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(

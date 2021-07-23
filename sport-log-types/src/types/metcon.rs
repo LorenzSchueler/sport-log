@@ -1,6 +1,7 @@
 use chrono::NaiveDateTime;
 #[cfg(feature = "full")]
 use diesel_derive_enum::DbEnum;
+#[cfg(feature = "full")]
 use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
@@ -9,11 +10,12 @@ use sport_log_server_derive::{
     Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
 };
 
-#[cfg(feature = "full")]
-use crate::schema::{metcon, metcon_movement, metcon_session};
 use crate::types::{MovementId, MovementUnit, UserId};
-
-use super::{AuthenticatedUser, Unverified, UnverifiedId};
+#[cfg(feature = "full")]
+use crate::{
+    schema::{metcon, metcon_movement, metcon_session},
+    types::{AuthenticatedUser, Unverified, UnverifiedId},
+};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(DbEnum))]
