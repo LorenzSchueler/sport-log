@@ -17,7 +17,7 @@ use crate::handler::IntoJson;
     format = "application/json",
     data = "<action_provider>"
 )]
-pub async fn create_action_provider(
+pub async fn adm_create_action_provider(
     action_provider: Unverified<NewActionProvider>,
     auth: AuthenticatedAdmin,
     conn: Db,
@@ -29,7 +29,7 @@ pub async fn create_action_provider(
 }
 
 #[get("/adm/action_provider")]
-pub async fn get_action_providers(
+pub async fn adm_get_action_providers(
     _auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Json<Vec<ActionProvider>>, Status> {
@@ -37,7 +37,7 @@ pub async fn get_action_providers(
 }
 
 #[delete("/adm/action_provider/<action_provider_id>")]
-pub async fn delete_action_provider(
+pub async fn adm_delete_action_provider(
     action_provider_id: UnverifiedId<ActionProviderId>,
     auth: AuthenticatedAdmin,
     conn: Db,
@@ -52,7 +52,7 @@ pub async fn delete_action_provider(
 }
 
 #[post("/ap/action", format = "application/json", data = "<action>")]
-pub async fn create_action(
+pub async fn ap_create_action(
     action: Unverified<NewAction>,
     auth: AuthenticatedActionProvider,
     conn: Db,
@@ -62,7 +62,7 @@ pub async fn create_action(
 }
 
 #[get("/ap/action/<action_id>")]
-pub async fn get_action(
+pub async fn ap_get_action(
     action_id: UnverifiedId<ActionId>,
     auth: AuthenticatedActionProvider,
     conn: Db,
@@ -74,7 +74,7 @@ pub async fn get_action(
 }
 
 #[get("/ap/action")]
-pub async fn get_actions_by_action_provider(
+pub async fn ap_get_actions_by_action_provider(
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Vec<Action>>, Status> {
@@ -89,7 +89,7 @@ pub async fn get_actions(_auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<
 }
 
 #[delete("/ap/action/<action_id>")]
-pub async fn delete_action(
+pub async fn ap_delete_action(
     action_id: UnverifiedId<ActionId>,
     auth: AuthenticatedActionProvider,
     conn: Db,
@@ -209,7 +209,7 @@ pub async fn get_action_events_by_user(
 }
 
 #[get("/ap/action_event")]
-pub async fn get_action_events_by_action_provider(
+pub async fn ap_get_action_events_by_action_provider(
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
@@ -257,7 +257,7 @@ pub async fn delete_action_event(
 }
 
 #[delete("/ap/action_event/<action_event_id>")]
-pub async fn delete_action_event_ap(
+pub async fn ap_delete_action_event(
     action_event_id: UnverifiedId<ActionEventId>,
     auth: AuthenticatedActionProvider,
     conn: Db,
@@ -271,7 +271,7 @@ pub async fn delete_action_event_ap(
 }
 
 #[get("/ap/executable_action_event")]
-pub async fn get_executable_action_events_by_action_provider(
+pub async fn ap_get_executable_action_events_by_action_provider(
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
@@ -281,7 +281,7 @@ pub async fn get_executable_action_events_by_action_provider(
 }
 
 #[get("/ap/executable_action_event/timerange/<start_time>/<end_time>")]
-pub async fn get_executable_action_events_by_action_provider_and_timerange(
+pub async fn ap_get_executable_action_events_by_action_provider_and_timerange(
     start_time: NaiveDateTimeWrapper,
     end_time: NaiveDateTimeWrapper,
     auth: AuthenticatedActionProvider,

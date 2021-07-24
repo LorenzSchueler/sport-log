@@ -8,7 +8,7 @@ use sport_log_types::types::{
 use crate::handler::IntoJson;
 
 #[post("/ap/wod", format = "application/json", data = "<wod>")]
-pub async fn create_wod_ap(
+pub async fn ap_create_wod(
     wod: Unverified<NewWod>,
     auth: AuthenticatedActionProvider,
     conn: Db,
