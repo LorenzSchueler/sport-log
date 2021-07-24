@@ -110,19 +110,6 @@ pub struct Movement {
 }
 
 #[cfg(feature = "full")]
-impl Movement {
-    pub fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Movement>> {
-        movement::table
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.eq(Option::<UserId>::None)),
-            )
-            .get_results(conn)
-    }
-}
-
-#[cfg(feature = "full")]
 impl Unverified<Movement> {
     pub fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Movement, Status> {
         let movement = self.0.into_inner();

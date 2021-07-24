@@ -10,7 +10,7 @@ impl PlatformCredentials {
         user_id: UserId,
         platform_id: PlatformId,
         conn: &PgConnection,
-    ) -> QueryResult<PlatformCredentials> {
+    ) -> QueryResult<Self> {
         platform_credentials::table
             .filter(platform_credentials::columns::user_id.eq(user_id))
             .filter(platform_credentials::columns::platform_id.eq(platform_id))

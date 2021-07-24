@@ -6,10 +6,7 @@ use crate::{
 };
 
 impl MetconMovement {
-    pub fn get_by_metcon(
-        metcon_id: MetconId,
-        conn: &PgConnection,
-    ) -> QueryResult<Vec<MetconMovement>> {
+    pub fn get_by_metcon(metcon_id: MetconId, conn: &PgConnection) -> QueryResult<Vec<Self>> {
         metcon_movement::table
             .filter(metcon_movement::columns::metcon_id.eq(metcon_id))
             .get_results(conn)
