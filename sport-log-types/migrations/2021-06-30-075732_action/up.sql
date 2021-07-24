@@ -21,6 +21,7 @@ insert into action (name, action_provider_id) values
     ('Crossfit', 1), 
     ('Weightlifting', 1), 
     ('Open Fridge', 1),
+    ('fetch', 2),
     ('fetch', 3);
 
 create table action_rule (
@@ -34,7 +35,14 @@ create table action_rule (
 );
 insert into action_rule (user_id, action_id, weekday, time, enabled) values 
     (1, 1, 'monday', '09:00:00', true), 
-    (1, 3, 'tuesday', '19:00:00', true);
+    (1, 3, 'tuesday', '19:00:00', true),
+    (1, 4, 'monday', '00:00:00', true),
+    (1, 4, 'tuesday', '00:00:00', true),
+    (1, 4, 'wednesday', '00:00:00', true),
+    (1, 4, 'thursday', '00:00:00', true),
+    (1, 4, 'friday', '00:00:00', true),
+    (1, 4, 'saturday', '00:00:00', true),
+    (1, 4, 'sunday', '00:00:00', true);
 
 create table action_event (
     id serial primary key,
@@ -53,9 +61,11 @@ insert into action_event (user_id, action_id, datetime, enabled) values
     (2, 2, '2021-07-02 09:00:00', true), 
     (2, 1, '2021-07-03 09:00:00', true), 
     (2, 2, '2021-07-04 19:00:00', false),
-    (1, 4, '2021-07-01 09:00:00', true), 
-    (1, 4, '2021-07-01 10:00:00', true), 
-    (1, 4, '2021-07-01 11:00:00', true),
-    (3, 4, '2021-07-01 09:00:00', true), 
-    (3, 4, '2021-07-01 10:00:00', true), 
-    (3, 4, '2021-07-01 11:00:00', true); 
+    (1, 4, '2021-08-29 00:00:00', true), 
+    (1, 4, '2021-08-30 00:00:00', true), 
+    (1, 5, '2021-07-01 09:00:00', true), 
+    (1, 5, '2021-07-01 10:00:00', true), 
+    (1, 5, '2021-07-01 11:00:00', true),
+    (3, 5, '2021-07-01 09:00:00', true), 
+    (3, 5, '2021-07-01 10:00:00', true), 
+    (3, 5, '2021-07-01 11:00:00', true); 

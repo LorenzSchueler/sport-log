@@ -18,6 +18,9 @@ create table route (
 );
 --create index on route (user_id, name);
 
+insert into route (user_id, name, distance, ascent, descent, track) values
+    (1, 'around the lake', 26500, 43, 43, null);
+
 create table cardio_session (
     id serial primary key,
     user_id integer not null references "user" on delete cascade,
@@ -38,3 +41,10 @@ create table cardio_session (
     comments text
 );
 --create index on cardio_session (user_id, datetime desc);
+
+insert into cardio_session (user_id, movement_id, cardio_type, datetime, 
+        distance, ascent, descent, time, calories, track, avg_cycles, 
+        cycles, avg_heart_rate, heart_rate, route_id, comments) values
+    (1, 5, 'training', '2021-08-22 10:25:34', 
+        26742, 35, 43, 9134, null, null, 167, 
+        null, 156, null, 1, null);
