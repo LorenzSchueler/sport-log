@@ -1,5 +1,4 @@
 
-import 'package:models/authentication_state.dart';
 import 'package:models/user.dart';
 import 'package:repositories/authentication_repository.dart';
 
@@ -8,6 +7,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 part 'authentication_event.dart';
+part 'authentication_state.dart';
 
 const int apiDelay = 500;
 
@@ -30,43 +30,21 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     } else if (event is RegisterEvent) {
       yield* _registrationStream(event);
     } else {
-      throw UnimplementedError("Unknwon AuthenticationEvent");
+      throw UnimplementedError("Unknown AuthenticationEvent");
     }
   }
 
   Stream<AuthenticationState> _logoutStream(LogoutEvent event) async* {
-    _authenticationRepository.deleteUser(); // TODO: extra state
+    _authenticationRepository.deleteUser(); // TODO: this should be in another bloc
     yield UnauthenticatedAuthenticationState();
   }
 
   Stream<AuthenticationState> _loginStream(LoginEvent event) async* {
-    yield UnauthenticatedAuthenticationState(state: AsyncAuth.loginPending);
-    // TODO: use api
-    User user = await Future.delayed(
-        const Duration(milliseconds: apiDelay), () => User(
-        id: 1,
-        username: event.username,
-        password: event.password,
-        email: "email@email.com",
-    )
-    );
-    await _authenticationRepository.createUser(user);
-    yield AuthenticatedAuthenticationState(user: user);
+    yield AuthenticatedAuthenticationState(user: event.user);
   }
 
   Stream<AuthenticationState> _registrationStream(RegisterEvent event) async* {
-    yield UnauthenticatedAuthenticationState(
-        state: AsyncAuth.registrationPending);
-    // TODO: use api
-    User user = await Future.delayed(
-        const Duration(milliseconds: apiDelay), () => User(
-        id: 1,
-        username: event.username,
-        password: event.password,
-        email: event.email,
-    )
-    );
-    await _authenticationRepository.createUser(user);
-    yield AuthenticatedAuthenticationState(user: user);
+    await _authenticationRepository.createUser(event.user);
+    yield AuthenticatedAuthenticationState(user: event.user);
   }
 }
