@@ -1,9 +1,8 @@
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:models/authentication_state.dart';
 import 'package:models/user.dart';
-import 'package:sport_log/authentication/authentication_bloc.dart';
+import 'package:sport_log/authentication/authentication_bloc.dart' as Auth;
 
 const int apiDelay = 500; // ms
 
@@ -32,11 +31,11 @@ class SubmitLogin extends LoginEvent {
 class RestartLogin extends LoginEvent {}
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
-  LoginBloc(AuthenticationBloc bloc)
+  LoginBloc(Auth.AuthenticationBloc bloc)
       : _authenticationBloc = bloc,
         super(LoginState.idle);
 
-  final AuthenticationBloc _authenticationBloc;
+  final Auth.AuthenticationBloc _authenticationBloc;
 
   @override
   Stream<LoginState> mapEventToState(LoginEvent event) async* {
@@ -59,6 +58,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         )
     );
     yield LoginState.successful;
-    _authenticationBloc.add(AuthenticatedEvent(user: user));
+    _authenticationBloc.add(Auth.LoginEvent(user: user));
   }
 }
