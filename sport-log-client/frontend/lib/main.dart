@@ -5,10 +5,14 @@ import 'package:flutter/widgets.dart';
 import 'package:sport_log/authentication/authentication_bloc.dart';
 
 void main() {
+  final AuthenticationRepository authRepo = AuthenticationRepository();
   runApp(BlocProvider(
     create: (context) => AuthenticationBloc(
-        authenticationRepository: AuthenticationRepository()
+        authenticationRepository: authRepo,
     ),
-    child: const App(),
+    child: RepositoryProvider.value(
+      value: authRepo,
+      child: const App(),
+    ),
   ));
 }

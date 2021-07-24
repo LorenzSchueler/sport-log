@@ -4,7 +4,8 @@
 ## Next Steps
 
 * [x] make navigation use "real" routes
-* [ ] use sub blocs for login (with pending/failure/success)
+* [x] use sub blocs for login (with pending/failure/success)
+* [ ] create custom textfield/button widgets for disabling
 * [ ] create splash screen with options for registration and login
 * [ ] login page
 * [ ] registration page
