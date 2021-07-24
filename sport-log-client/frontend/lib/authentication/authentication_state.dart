@@ -6,10 +6,10 @@ abstract class AuthenticationState extends Equatable {
   List<Object?> get props => [];
 }
 
-class UnauthenticatedAuthenticationState extends AuthenticationState {}
+class Unauthenticated extends AuthenticationState {}
 
-class AuthenticatedAuthenticationState extends AuthenticationState {
-  AuthenticatedAuthenticationState({
+class Authenticated extends AuthenticationState {
+  Authenticated({
     required this.user
   }) : super();
 

@@ -14,7 +14,7 @@ class ProtectedRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (BlocProvider.of<AuthenticationBloc>(context).state == UnauthenticatedAuthenticationState()) {
+    if (BlocProvider.of<AuthenticationBloc>(context).state == Unauthenticated()) {
       return Scaffold(
         appBar: AppBar(
           title: const Text("Not logged in"),

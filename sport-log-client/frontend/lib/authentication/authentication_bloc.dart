@@ -17,8 +17,8 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     User? user,
   }) : _authenticationRepository = authenticationRepository,
         super(user == null
-          ? UnauthenticatedAuthenticationState()
-          : AuthenticatedAuthenticationState(user: user));
+          ? Unauthenticated()
+          : Authenticated(user: user));
 
   final AuthenticationRepository _authenticationRepository;
 
@@ -39,15 +39,15 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
 
   Stream<AuthenticationState> _logoutStream(LogoutEvent event) async* {
     _authenticationRepository.deleteUser(); // TODO: this should be in another bloc
-    yield UnauthenticatedAuthenticationState();
+    yield Unauthenticated();
   }
 
   Stream<AuthenticationState> _loginStream(LoginEvent event) async* {
-    yield AuthenticatedAuthenticationState(user: event.user);
+    yield Authenticated(user: event.user);
   }
 
   Stream<AuthenticationState> _registrationStream(RegisterEvent event) async* {
     await _authenticationRepository.createUser(event.user);
-    yield AuthenticatedAuthenticationState(user: event.user);
+    yield Authenticated(user: event.user);
   }
 }
