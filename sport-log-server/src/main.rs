@@ -92,6 +92,11 @@ fn rocket() -> _ {
             metcon::get_metcon_movements_by_metcon,
             metcon::update_metcon_movement,
             metcon::delete_metcon_movement,
+            cardio::create_route,
+            cardio::get_route,
+            cardio::get_routes_by_user,
+            cardio::update_route,
+            cardio::delete_route,
         ],
     )
 }

@@ -17,6 +17,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_server_derive::{
     Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
 #[cfg(feature = "full")]
@@ -68,7 +69,17 @@ impl FromSql<Position, Pg> for Position {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, FromI32, ToSql, FromSql)
+    derive(
+        FromSqlRow,
+        AsExpression,
+        Copy,
+        PartialEq,
+        Eq,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct RouteId(pub i32);
@@ -85,6 +96,7 @@ pub struct RouteId(pub i32);
         GetAll,
         Update,
         Delete,
+        VerifyForUserWithDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "route")]
@@ -99,7 +111,7 @@ pub struct Route {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
 #[cfg_attr(feature = "full", table_name = "route")]
 pub struct NewRoute {
     pub user_id: UserId,
