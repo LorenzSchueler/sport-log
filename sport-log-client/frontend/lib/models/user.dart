@@ -16,4 +16,22 @@ class User extends Equatable {
 
   @override
   List<Object?> get props => [id, username, password, email];
+
+  static const String idKey = "id";
+  static const String usernameKey = "username";
+  static const String passwordKey = "password";
+  static const String emailKey = "email";
+
+  User.fromJson(Map<String, dynamic> json)
+    : id = json[idKey],
+      username = json[usernameKey],
+      password = json[passwordKey],
+      email = json[emailKey];
+
+  Map<String, dynamic> toJson() => {
+    idKey: id,
+    usernameKey: username,
+    passwordKey: password,
+    emailKey: email,
+  };
 }
