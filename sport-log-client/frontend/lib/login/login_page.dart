@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/authentication/authentication_bloc.dart';
-import 'package:models/authentication_state.dart';
 import 'package:sport_log/routes.dart';
 
 class LoginPage extends StatefulWidget {

@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:models/user.dart';
 import 'package:sport_log/authentication/authentication_bloc.dart' as Auth;
+import 'package:repositories/authentication_repository.dart';
 
 const int apiDelay = 500; // ms
 
@@ -31,11 +32,16 @@ class SubmitLogin extends LoginEvent {
 class RestartLogin extends LoginEvent {}
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
-  LoginBloc(Auth.AuthenticationBloc bloc)
-      : _authenticationBloc = bloc,
+  LoginBloc({
+    required Auth.AuthenticationBloc authenticationBloc,
+    required AuthenticationRepository authenticationRepository,
+  })
+      : _authenticationBloc = authenticationBloc,
+        _authenticationRepository = authenticationRepository,
         super(LoginState.idle);
 
   final Auth.AuthenticationBloc _authenticationBloc;
+  final AuthenticationRepository _authenticationRepository;
 
   @override
   Stream<LoginState> mapEventToState(LoginEvent event) async* {
@@ -57,6 +63,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
             email: "email@domain.com"
         )
     );
+    await _authenticationRepository.createUser(user);
     yield LoginState.successful;
     _authenticationBloc.add(Auth.LoginEvent(user: user));
   }
