@@ -13,9 +13,12 @@ const int apiDelay = 500;
 
 class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
   AuthenticationBloc({
-    required AuthenticationRepository authenticationRepository
+    required AuthenticationRepository authenticationRepository,
+    User? user,
   }) : _authenticationRepository = authenticationRepository,
-        super(UnauthenticatedAuthenticationState());
+        super(user == null
+          ? UnauthenticatedAuthenticationState()
+          : AuthenticatedAuthenticationState(user: user));
 
   final AuthenticationRepository _authenticationRepository;
 

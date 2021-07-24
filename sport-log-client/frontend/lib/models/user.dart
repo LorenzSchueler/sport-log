@@ -1,8 +1,9 @@
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 
 class User extends Equatable {
-  User({
+  const User({
     required this.id,
     required this.username,
     required this.password,
@@ -22,16 +23,29 @@ class User extends Equatable {
   static const String passwordKey = "password";
   static const String emailKey = "email";
 
-  User.fromJson(Map<String, dynamic> json)
-    : id = json[idKey],
-      username = json[usernameKey],
-      password = json[passwordKey],
-      email = json[emailKey];
+  static const List<String> allKeys = [idKey, usernameKey, passwordKey, emailKey];
 
-  Map<String, dynamic> toJson() => {
-    idKey: id,
+  Map<String, String> toMap() => {
+    idKey: id.toString(),
     usernameKey: username,
     passwordKey: password,
     emailKey: email,
   };
+
+  static User? fromMap(Map<String, String> map) {
+    if (map.containsKey(idKey) && map.containsKey(usernameKey)
+      && map.containsKey(passwordKey) && map.containsKey(emailKey)) {
+      final id = int.tryParse(map[idKey]!);
+      if (id == null) {
+        return null;
+      }
+      return User(
+          id: id,
+          username: map[usernameKey]!,
+          password: map[passwordKey]!,
+          email: map[emailKey]!
+      );
+    }
+    return null;
+  }
 }

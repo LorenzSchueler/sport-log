@@ -8,7 +8,11 @@ import 'package:sport_log/pages/registration/registrations_page.dart';
 import 'routes.dart';
 
 class App extends StatefulWidget {
-  const App({Key? key}) : super(key: key);
+  const App({
+    Key? key,
+    required this.isAuthenticatedAtStart,
+  }) : super(key: key);
+  final bool isAuthenticatedAtStart;
 
   @override
   State<StatefulWidget> createState() => AppState();
@@ -24,7 +28,7 @@ class AppState extends State<App> {
         Routes.registration: (_) => const RegistrationPage(),
         Routes.home: (_) => ProtectedRoute(builder: (_) => const HomePage()),
       },
-      initialRoute: Routes.landing,
+      initialRoute: widget.isAuthenticatedAtStart ? Routes.home : Routes.landing,
       debugShowCheckedModeBanner: false,
       darkTheme: ThemeData(
         brightness: Brightness.dark,

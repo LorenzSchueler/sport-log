@@ -4,15 +4,23 @@ import 'package:sport_log/app.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sport_log/authentication/authentication_bloc.dart';
 
-void main() {
+import 'models/user.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final AuthenticationRepository authRepo = AuthenticationRepository();
-  runApp(BlocProvider(
-    create: (context) => AuthenticationBloc(
-        authenticationRepository: authRepo,
-    ),
+  User? user = await authRepo.getUser();
+  final authBloc = AuthenticationBloc(
+    authenticationRepository: authRepo,
+    user: user
+  );
+  runApp(BlocProvider.value(
+    value: authBloc,
     child: RepositoryProvider.value(
       value: authRepo,
-      child: const App(),
+      child: App(
+        isAuthenticatedAtStart: user != null,
+      ),
     ),
   ));
 }
