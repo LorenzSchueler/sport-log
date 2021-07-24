@@ -125,7 +125,17 @@ pub struct NewRoute {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, FromI32, ToSql, FromSql)
+    derive(
+        FromSqlRow,
+        AsExpression,
+        Copy,
+        PartialEq,
+        Eq,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct CardioSessionId(pub i32);
@@ -142,6 +152,7 @@ pub struct CardioSessionId(pub i32);
         GetAll,
         Update,
         Delete,
+        VerifyForUserWithDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "cardio_session")]
@@ -166,7 +177,7 @@ pub struct CardioSession {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
 #[cfg_attr(feature = "full", table_name = "cardio_session")]
 pub struct NewCardioSession {
     pub user_id: UserId,

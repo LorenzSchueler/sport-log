@@ -97,6 +97,11 @@ fn rocket() -> _ {
             cardio::get_routes_by_user,
             cardio::update_route,
             cardio::delete_route,
+            cardio::create_cardio_session,
+            cardio::get_cardio_session,
+            cardio::get_cardio_sessions_by_user,
+            cardio::update_cardio_session,
+            cardio::delete_cardio_session,
         ],
     )
 }

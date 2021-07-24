@@ -1,7 +1,8 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::types::{
-    AuthenticatedUser, Db, NewRoute, Route, RouteId, Unverified, UnverifiedId,
+    AuthenticatedUser, CardioSession, CardioSessionId, Db, NewCardioSession, NewRoute, Route,
+    RouteId, Unverified, UnverifiedId,
 };
 
 use crate::handler::IntoJson;
@@ -56,6 +57,76 @@ pub async fn delete_route(
 ) -> Result<Status, Status> {
     conn.run(move |c| {
         Route::delete(route_id.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
+#[post(
+    "/cardio_session",
+    format = "application/json",
+    data = "<cardio_session>"
+)]
+pub async fn create_cardio_session(
+    cardio_session: Unverified<NewCardioSession>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<CardioSession>, Status> {
+    let cardio_session = cardio_session.verify(&auth)?;
+    conn.run(|c| CardioSession::create(cardio_session, c))
+        .await
+        .into_json()
+}
+
+#[get("/cardio_session/<cardio_session_id>")]
+pub async fn get_cardio_session(
+    cardio_session_id: UnverifiedId<CardioSessionId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<CardioSession>, Status> {
+    let cardio_session_id = conn
+        .run(move |c| cardio_session_id.verify(&auth, c))
+        .await?;
+    conn.run(move |c| CardioSession::get_by_id(cardio_session_id, c))
+        .await
+        .into_json()
+}
+
+#[get("/cardio_session")]
+pub async fn get_cardio_sessions_by_user(
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<CardioSession>>, Status> {
+    conn.run(move |c| CardioSession::get_by_user(*auth, c))
+        .await
+        .into_json()
+}
+
+#[put(
+    "/cardio_session",
+    format = "application/json",
+    data = "<cardio_session>"
+)]
+pub async fn update_cardio_session(
+    cardio_session: Unverified<CardioSession>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<CardioSession>, Status> {
+    let cardio_session = conn.run(move |c| cardio_session.verify(&auth, c)).await?;
+    conn.run(|c| CardioSession::update(cardio_session, c))
+        .await
+        .into_json()
+}
+
+#[delete("/cardio_session/<cardio_session_id>")]
+pub async fn delete_cardio_session(
+    cardio_session_id: UnverifiedId<CardioSessionId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        CardioSession::delete(cardio_session_id.verify(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
