@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/repositories/authentication_repository.dart';
 import 'package:sport_log/app.dart';
 import 'package:flutter/widgets.dart';
@@ -14,6 +15,7 @@ void main() async {
     authenticationRepository: authRepo,
     user: user
   );
+  Bloc.observer = SimpleBlocObserver();
   runApp(BlocProvider.value(
     value: authBloc,
     child: RepositoryProvider.value(
