@@ -8,6 +8,7 @@
 * [x] protect /home route from unauthenticated access
 * [x] get rid of additional packages
 * [x] use local storage for saving user
+* [x] logout button
 * [ ] create custom textfield/button widgets for disabling input
 * [ ] improve landing screen
 * [ ] login page
