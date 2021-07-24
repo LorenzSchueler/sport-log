@@ -17,6 +17,8 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
                 auth: &crate::types::AuthenticatedUser,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<crate::types::#id_typename, rocket::http::Status> {
+                use crate::types::GetById;
+
                 let entity = crate::types::#typename::get_by_id(self.0, conn)
                     .map_err(|_| rocket::http::Status::Forbidden)?;
                 if entity.user_id == **auth {
@@ -61,6 +63,8 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
                 auth: &crate::types::AuthenticatedActionProvider,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<crate::types::#id_typename, rocket::http::Status> {
+                use crate::types::GetById;
+
                 let entity = crate::types::#typename::get_by_id(self.0, conn)
                     .map_err(|_| rocket::http::Status::Forbidden)?;
                 if entity.action_provider_id == **auth {
@@ -100,6 +104,8 @@ pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
                 auth: &crate::types::AuthenticatedUser,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<#typename, rocket::http::Status> {
+                use crate::types::GetById;
+
                 let entity = self.0.into_inner();
                 if entity.user_id == **auth
                     && #typename::get_by_id(entity.id, conn)
@@ -148,6 +154,8 @@ pub fn impl_verify_for_action_provider_with_db(ast: &syn::DeriveInput) -> TokenS
                 auth: &crate::types::AuthenticatedActionProvider,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<#typename, rocket::http::Status> {
+                use crate::types::GetById;
+
                 let entity = self.0.into_inner();
                 if entity.action_provider_id == **auth
                     && #typename::get_by_id(entity.id, conn)

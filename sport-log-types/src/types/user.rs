@@ -8,7 +8,7 @@ use sport_log_server_derive::{Delete, FromI32, FromSql, GetAll, GetById, ToSql};
 #[cfg(feature = "full")]
 use crate::{
     schema::user,
-    types::{AuthenticatedUser, Unverified},
+    types::{AuthenticatedUser, GetById, Unverified},
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

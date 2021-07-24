@@ -14,7 +14,7 @@ use crate::types::UserId;
 #[cfg(feature = "full")]
 use crate::{
     schema::{eorm, movement},
-    types::{AuthenticatedUser, Unverified, UnverifiedId},
+    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId},
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

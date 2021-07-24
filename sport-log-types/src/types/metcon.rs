@@ -14,7 +14,7 @@ use crate::types::{MovementId, MovementUnit, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
-    types::{AuthenticatedUser, Unverified, UnverifiedId},
+    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId},
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

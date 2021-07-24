@@ -1,4 +1,7 @@
 #[cfg(feature = "full")]
+use diesel::PgConnection;
+use diesel::QueryResult;
+#[cfg(feature = "full")]
 use rocket::{
     data::{self, FromData},
     outcome::Outcome,
@@ -71,4 +74,50 @@ impl<'v, I: FromI32> rocket::request::FromParam<'v> for UnverifiedId<I> {
     fn from_param(param: &'v str) -> Result<Self, Self::Error> {
         Ok(Self(I::from_i32(i32::from_param(param)?)))
     }
+}
+
+#[cfg(feature = "full")]
+pub trait Create {
+    type New;
+
+    fn create(entity: Self::New, conn: &PgConnection) -> QueryResult<Self>
+    where
+        Self: Sized;
+}
+
+#[cfg(feature = "full")]
+pub trait GetById {
+    type Id;
+
+    fn get_by_id(entity: Self::Id, conn: &PgConnection) -> QueryResult<Self>
+    where
+        Self: Sized;
+}
+
+#[cfg(feature = "full")]
+pub trait GetByUser {
+    fn get_by_user(entity: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized;
+}
+
+#[cfg(feature = "full")]
+pub trait GetAll {
+    fn get_all(conn: &PgConnection) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized;
+}
+
+#[cfg(feature = "full")]
+pub trait Update {
+    fn update(entity: Self, conn: &PgConnection) -> QueryResult<Self>
+    where
+        Self: Sized;
+}
+
+#[cfg(feature = "full")]
+pub trait Delete {
+    type Id;
+
+    fn delete(entity: Self::Id, conn: &PgConnection) -> QueryResult<usize>;
 }

@@ -5,9 +5,9 @@ use rocket::{http::Status, request::FromParam, serde::json::Json};
 
 use sport_log_types::types::{
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
-    ActionRuleId, AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser, Db,
-    ExecutableActionEvent, NewAction, NewActionEvent, NewActionProvider, NewActionRule, Unverified,
-    UnverifiedId,
+    ActionRuleId, AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser, Create, Db,
+    Delete, ExecutableActionEvent, GetAll, GetById, GetByUser, NewAction, NewActionEvent,
+    NewActionProvider, NewActionRule, Unverified, UnverifiedId, Update,
 };
 
 use crate::handler::IntoJson;

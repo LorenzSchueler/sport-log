@@ -16,7 +16,7 @@ use sport_log_server_derive::{
 #[cfg(feature = "full")]
 use crate::{
     schema::{action, action_event, action_provider, action_rule},
-    types::{AuthenticatedActionProvider, UnverifiedId},
+    types::{AuthenticatedActionProvider, GetById, UnverifiedId},
 };
 
 use crate::types::{PlatformId, UserId};
