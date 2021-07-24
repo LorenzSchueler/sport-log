@@ -4,7 +4,7 @@
 //!
 //! # Usage
 //!
-//! sport-log-password-hasher [OPTIONS]
+//! sport-log-password-hasher \[OPTIONS\]
 //!
 //! ### OPTIONS
 //!
