@@ -83,6 +83,7 @@ pub struct Metcon {
     pub metcon_type: MetconType,
     pub rounds: Option<i32>,
     pub timecap: Option<i32>,
+    pub description: Option<String>,
 }
 
 #[cfg(feature = "full")]
@@ -111,6 +112,7 @@ pub struct NewMetcon {
     pub metcon_type: MetconType,
     pub rounds: Option<i32>,
     pub timecap: Option<i32>,
+    pub description: Option<String>,
 }
 
 #[cfg(feature = "full")]

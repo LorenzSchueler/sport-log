@@ -130,6 +130,7 @@ table! {
         metcon_type -> MetconTypeMapping,
         rounds -> Nullable<Int4>,
         timecap -> Nullable<Int4>,
+        description -> Nullable<Text>,
     }
 }
 

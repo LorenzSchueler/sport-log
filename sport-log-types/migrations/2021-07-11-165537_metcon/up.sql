@@ -6,14 +6,15 @@ create table metcon (
     name varchar(80) unique,
     metcon_type metcon_type not null,
     rounds integer,
-    timecap integer -- seconds
+    timecap integer, -- seconds
+    description text
 );
 --create index on metcon (user_id, name);
 
-insert into metcon (user_id, name, metcon_type, rounds, timecap) values
-    (null, 'Cindy', 'amrap', null, 1200),
-    (null, 'Murph', 'for_time', 1, null),
-    (1, '5k Row', 'for_time', 1, 1800);
+insert into metcon (user_id, name, metcon_type, rounds, timecap, description) values
+    (null, 'Cindy', 'amrap', null, 1200, null),
+    (null, 'Murph', 'for_time', 1, null, 'wear a weight vest (20/14) lbs'),
+    (1, '5k Row', 'for_time', 1, 1800, null);
 
 create table metcon_movement (
     id serial primary key,
