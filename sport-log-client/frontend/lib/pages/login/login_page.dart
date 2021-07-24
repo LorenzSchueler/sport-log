@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:repositories/authentication_repository.dart';
+import 'package:sport_log/repositories/authentication_repository.dart';
 import 'package:sport_log/authentication/authentication_bloc.dart';
 import 'package:sport_log/pages/login/login_bloc.dart';
 import 'package:sport_log/routes.dart';

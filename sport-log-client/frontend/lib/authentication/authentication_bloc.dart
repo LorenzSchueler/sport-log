@@ -1,6 +1,6 @@
 
-import 'package:models/user.dart';
-import 'package:repositories/authentication_repository.dart';
+import 'package:sport_log/models/user.dart';
+import 'package:sport_log/repositories/authentication_repository.dart';
 
 import 'dart:async';
 import 'package:bloc/bloc.dart';

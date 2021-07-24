@@ -1,9 +1,9 @@
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:models/user.dart';
-import 'package:sport_log/authentication/authentication_bloc.dart' as Auth;
-import 'package:repositories/authentication_repository.dart';
+import 'package:sport_log/models/user.dart';
+import 'package:sport_log/authentication/authentication_bloc.dart' as auth;
+import 'package:sport_log/repositories/authentication_repository.dart';
 
 const int apiDelay = 500; // ms
 
@@ -33,14 +33,14 @@ class RestartLogin extends LoginEvent {}
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc({
-    required Auth.AuthenticationBloc authenticationBloc,
+    required auth.AuthenticationBloc authenticationBloc,
     required AuthenticationRepository authenticationRepository,
   })
       : _authenticationBloc = authenticationBloc,
         _authenticationRepository = authenticationRepository,
         super(LoginState.idle);
 
-  final Auth.AuthenticationBloc _authenticationBloc;
+  final auth.AuthenticationBloc _authenticationBloc;
   final AuthenticationRepository _authenticationRepository;
 
   @override
@@ -65,6 +65,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     );
     await _authenticationRepository.createUser(user);
     yield LoginState.successful;
-    _authenticationBloc.add(Auth.LoginEvent(user: user));
+    _authenticationBloc.add(auth.LoginEvent(user: user));
   }
 }

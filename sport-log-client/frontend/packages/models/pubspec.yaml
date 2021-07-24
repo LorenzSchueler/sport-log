@@ -1,8 +1,0 @@
-name: models
-publish_to: none
-
-environment:
-  sdk: ">=2.12.0-0 <3.0.0"
-
-dependencies:
-  equatable: ^2.0.0
