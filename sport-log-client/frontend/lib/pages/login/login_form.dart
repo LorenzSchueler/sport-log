@@ -110,7 +110,7 @@ class LoginFormState extends State<LoginForm> {
 
   Widget _submitButton(BuildContext context, LoginState state) {
     return ElevatedButton(
-      child: const Text("Login"),
+      child: const Text("Login", style: TextStyle(fontSize: 18),), // TODO: use theme for this
       onPressed: (state != LoginState.pending && _inputsAreValid)
           ? () => _submit(context) : null,
       style: ElevatedButton.styleFrom(

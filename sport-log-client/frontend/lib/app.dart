@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:sport_log/authentication/protected_route.dart';
+import 'package:sport_log/helpers/material_color_generator.dart';
 import 'package:sport_log/pages/home/home_page.dart';
 import 'package:sport_log/pages/landing/landing_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
@@ -21,6 +22,7 @@ class App extends StatefulWidget {
 class AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
+    final primarySwatch = generateMaterialColor(const Color(0xff55d2db));
     return MaterialApp(
       routes: {
         Routes.landing: (_) => const LandingPage(),
@@ -32,6 +34,10 @@ class AppState extends State<App> {
       debugShowCheckedModeBanner: false,
       darkTheme: ThemeData(
         brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: primarySwatch,
+          brightness: Brightness.dark,
+        ),
       ),
       themeMode: ThemeMode.dark,
     );
