@@ -21,39 +21,34 @@ see [#1](https://github.com/LorenzSchueler/sport-log/issues/1)
 
 The sport-log consists of multiple crates:
 
-- **sport-log-client** flutter app
 - **sport-log-types** rust types for use in all rust crates (also includes SQL files and methods for database access)
 - **sport-log-server** central server backend
 - **sport-log-server-derive** macros for central server backend
 - **sport-log-api-tester** command line HTTP client for API testing and manual communication with the server
 - **sport-log-password-hasher** hash passwords and verify hashes and passwords that can be stored in the server backend
-- **sport-log-action-provider-<name>** various action providers
+- **sport-log-action-provider-\<name\>** various action providers
+
+the flutter app lives in **sport-log-client/frontend**
 
 ## Setup
 
-* `apt install libpq-dev postgresql-client-common postgresql` for postgresql
-* `sudo -u postgres createuser <username>`
-* `sudo -u postgres createdb sport_log`
+* install postgresql: `apt install libpq-dev postgresql-client-common postgresql`
+* create db user: `sudo -u postgres createuser <username>`
+* create db: `sudo -u postgres createdb sport_log`
 * `sudo -u postgres psql`
     * `alter user <username> with encrypted password '<password>';`
-    * `grant all privileges on database sport_log to <username> ;`
-* `sudo nano /etc/postgresql/<version>/main/pg_hba.conf`
-  * add entry `local sport_log sport_admin md5`
-* `sudo service postgresql restart`
-* `sudo service postgresql reload`
-* create .env file in repo root with the following content:
+    * `grant all privileges on database sport_log to <username>;`
+* enable password auth: `sudo nano /etc/postgresql/<version>/main/pg_hba.conf`
+    * add entry `local sport_log <username> md5`
+* `sudo service postgresql restart && sudo service postgresql reload`
+* create `.env` file in repo root with the following content:
 ```
-DATABASE_URL=postgres://sport_admin:<password>@localhost/sport_log
+DATABASE_URL=postgres://<username>:<password>@localhost/sport_log
 ROCKET_DATABASES='{sport_log={url="postgres://<username>:<password>@localhost/sport_log"}}'
 ```
 * `cargo install diesel-cli --no-default-features --features postgres`
-* `cd sport-log-types`
-* `diesel migration run`
-* `./patch.sh`
-
-* `cd ../sport-log-server`
-* run the server:`cargo run`
-
+* set up tables: `cd sport-log-types && diesel migration run && ./patch.sh && cd ..`
+* run the server: `cd sport-log-server && cargo run`
 
 ## License
 
