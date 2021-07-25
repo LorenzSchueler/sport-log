@@ -54,17 +54,19 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Stream<LoginState> _submitLogin(SubmitLogin event) async* {
     yield LoginState.pending;
-    User user = await Future.delayed(
-      const Duration(milliseconds: apiDelay),
-        () => User(
-            id: 1,
-            username: event.username,
-            password: event.password,
-            email: "email@domain.com"
-        )
-    );
-    await _authenticationRepository.createUser(user);
-    yield LoginState.successful;
-    _authenticationBloc.add(auth.LoginEvent(user: user));
+    await Future.delayed(const Duration(milliseconds: apiDelay));
+    if (event.username == "nonexistent") {
+      yield LoginState.failed;
+    } else {
+      final user = User(
+          id: 1,
+          username: event.username,
+          password: event.password,
+          email: "email@domain.com"
+      );
+      await _authenticationRepository.createUser(user);
+      yield LoginState.successful;
+      _authenticationBloc.add(auth.LoginEvent(user: user));
+    }
   }
 }
