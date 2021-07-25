@@ -78,6 +78,7 @@ class LoginFormState extends State<LoginForm> {
       style: _inputsEnabled(state) ? null : TextStyle(
         color: Theme.of(context).disabledColor
       ),
+      textInputAction: TextInputAction.next,
     );
   }
 
@@ -100,7 +101,10 @@ class LoginFormState extends State<LoginForm> {
       style: _inputsEnabled(state) ? null : TextStyle(
           color: Theme.of(context).disabledColor
       ),
+      textInputAction: TextInputAction.done,
       obscureText: true,
+      onFieldSubmitted: (state != LoginState.pending && _inputsAreValid)
+          ? (_) => _submit(context) : null,
     );
   }
 
