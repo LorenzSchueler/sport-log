@@ -34,14 +34,14 @@ class RestartLogin extends LoginEvent {}
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc({
     required auth.AuthenticationBloc authenticationBloc,
-    required AuthenticationRepository authenticationRepository,
+    required AuthenticationRepository? authenticationRepository,
   })
       : _authenticationBloc = authenticationBloc,
         _authenticationRepository = authenticationRepository,
         super(LoginState.idle);
 
   final auth.AuthenticationBloc _authenticationBloc;
-  final AuthenticationRepository _authenticationRepository;
+  final AuthenticationRepository? _authenticationRepository;
 
   @override
   Stream<LoginState> mapEventToState(LoginEvent event) async* {
@@ -64,7 +64,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           password: event.password,
           email: "email@domain.com"
       );
-      await _authenticationRepository.createUser(user);
+      await _authenticationRepository?.createUser(user);
       yield LoginState.successful;
       _authenticationBloc.add(auth.LoginEvent(user: user));
     }

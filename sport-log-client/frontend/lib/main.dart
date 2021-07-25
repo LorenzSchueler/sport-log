@@ -1,3 +1,5 @@
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/repositories/authentication_repository.dart';
@@ -9,11 +11,15 @@ import 'models/user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final AuthenticationRepository authRepo = AuthenticationRepository();
-  User? user = await authRepo.getUser();
+  User? user;
+  AuthenticationRepository? authRepo;
+  if (!kIsWeb) {
+    authRepo = AuthenticationRepository();
+    user = await authRepo.getUser();
+  }
   final authBloc = AuthenticationBloc(
-    authenticationRepository: authRepo,
-    user: user
+      authenticationRepository: authRepo,
+      user: user
   );
   Bloc.observer = SimpleBlocObserver();
   runApp(BlocProvider.value(

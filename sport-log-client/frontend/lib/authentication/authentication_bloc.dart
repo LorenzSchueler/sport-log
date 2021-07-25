@@ -13,14 +13,14 @@ const int apiDelay = 500;
 
 class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
   AuthenticationBloc({
-    required AuthenticationRepository authenticationRepository,
+    required AuthenticationRepository? authenticationRepository,
     User? user,
   }) : _authenticationRepository = authenticationRepository,
         super(user == null
           ? Unauthenticated()
           : Authenticated(user: user));
 
-  final AuthenticationRepository _authenticationRepository;
+  final AuthenticationRepository? _authenticationRepository;
 
   @override
   Stream<AuthenticationState> mapEventToState(
@@ -38,7 +38,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
   }
 
   Stream<AuthenticationState> _logoutStream(LogoutEvent event) async* {
-    _authenticationRepository.deleteUser(); // TODO: this should be in another bloc
+    _authenticationRepository?.deleteUser();
     yield Unauthenticated();
   }
 
@@ -47,7 +47,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
   }
 
   Stream<AuthenticationState> _registrationStream(RegisterEvent event) async* {
-    await _authenticationRepository.createUser(event.user);
+    await _authenticationRepository?.createUser(event.user);
     yield Authenticated(user: event.user);
   }
 }

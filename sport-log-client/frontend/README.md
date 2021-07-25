@@ -9,10 +9,9 @@
 * [x] get rid of additional packages
 * [x] use local storage for saving user
 * [x] logout button
-* [ ] create custom textfield/button widgets for disabling input
-* [ ] improve landing screen
-* [ ] login page
+* [x] login page
 * [ ] registration page
+* [ ] improve landing screen
 * [ ] connect to backend user routes
-* [ ] use Formz for loginPending and registrationPending
 * [ ] create bottom nav bar (logging, actions, ...)
+* [ ] save user credentials in web

@@ -36,8 +36,6 @@ dependencies:
   cupertino_icons: ^1.0.2
 
   flutter_bloc: ^7.0.1 # state management library
-
-  formz: ^0.4.0 # easy form handling
   equatable: ^2.0.0 # makes classes equatable with little boilerplate code
   flutter_secure_storage: ^4.2.0
 
