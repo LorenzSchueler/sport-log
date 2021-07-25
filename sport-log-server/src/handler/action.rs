@@ -1,7 +1,4 @@
-use std::ops::Deref;
-
-use chrono::{NaiveDateTime, NaiveTime};
-use rocket::{http::Status, request::FromParam, serde::json::Json};
+use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::types::{
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
@@ -10,7 +7,7 @@ use sport_log_types::types::{
     NewActionProvider, NewActionRule, Unverified, UnverifiedId, Update,
 };
 
-use crate::handler::IntoJson;
+use crate::handler::{IntoJson, NaiveDateTimeWrapper};
 
 #[post(
     "/adm/action_provider",
@@ -280,54 +277,21 @@ pub async fn ap_get_executable_action_events_by_action_provider(
         .into_json()
 }
 
-#[get("/ap/executable_action_event/timerange/<start_time>/<end_time>")]
-pub async fn ap_get_executable_action_events_by_action_provider_and_timerange(
-    start_time: NaiveDateTimeWrapper,
-    end_time: NaiveDateTimeWrapper,
+#[get("/ap/executable_action_event/timerange/<start_datetime>/<end_datetime>")]
+pub async fn ap_get_ordered_executable_action_events_by_action_provider_and_timerange(
+    start_datetime: NaiveDateTimeWrapper,
+    end_datetime: NaiveDateTimeWrapper,
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
     conn.run(move |c| {
-        ExecutableActionEvent::get_by_action_provider_and_timerange(
+        ExecutableActionEvent::get_ordered_by_action_provider_and_timerange(
             *auth,
-            *start_time,
-            *end_time,
+            *start_datetime,
+            *end_datetime,
             c,
         )
     })
     .await
     .into_json()
-}
-
-pub struct NaiveTimeWrapper(NaiveTime);
-pub struct NaiveDateTimeWrapper(NaiveDateTime);
-
-impl<'v> FromParam<'v> for NaiveTimeWrapper {
-    type Error = &'v str;
-
-    fn from_param(param: &'v str) -> Result<Self, Self::Error> {
-        Ok(NaiveTimeWrapper(param.parse().map_err(|_| param)?))
-    }
-}
-
-impl<'v> FromParam<'v> for NaiveDateTimeWrapper {
-    type Error = &'v str;
-
-    fn from_param(param: &'v str) -> Result<NaiveDateTimeWrapper, Self::Error> {
-        Ok(NaiveDateTimeWrapper(param.parse().map_err(|_| param)?))
-    }
-}
-
-impl Deref for NaiveTimeWrapper {
-    type Target = NaiveTime;
-    fn deref(&self) -> &NaiveTime {
-        &self.0
-    }
-}
-
-impl Deref for NaiveDateTimeWrapper {
-    type Target = NaiveDateTime;
-    fn deref(&self) -> &NaiveDateTime {
-        &self.0
-    }
 }

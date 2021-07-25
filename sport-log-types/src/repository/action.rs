@@ -162,10 +162,10 @@ impl ExecutableActionEvent {
             .get_results::<ExecutableActionEvent>(conn)
     }
 
-    pub fn get_by_action_provider_and_timerange(
+    pub fn get_ordered_by_action_provider_and_timerange(
         action_provider_id: ActionProviderId,
-        start_time: NaiveDateTime,
-        end_time: NaiveDateTime,
+        start_datetime: NaiveDateTime,
+        end_datetime: NaiveDateTime,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action_event::table
@@ -179,8 +179,8 @@ impl ExecutableActionEvent {
             )
             .filter(action_provider::columns::id.eq(action_provider_id))
             .filter(action_event::columns::enabled.eq(true))
-            .filter(action_event::columns::datetime.ge(start_time))
-            .filter(action_event::columns::datetime.le(end_time))
+            .filter(action_event::columns::datetime.ge(start_datetime))
+            .filter(action_event::columns::datetime.le(end_datetime))
             .select((
                 action_event::columns::id,
                 action::columns::name,

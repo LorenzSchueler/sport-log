@@ -1,8 +1,11 @@
+use std::ops::Deref;
+
+use chrono::{NaiveDateTime, NaiveTime};
 use diesel::{
     result::{DatabaseErrorKind as DbError, Error as DieselError},
     QueryResult,
 };
-use rocket::{http::Status, serde::json::Json};
+use rocket::{http::Status, request::FromParam, serde::json::Json};
 
 pub mod action;
 pub mod cardio;
@@ -28,5 +31,38 @@ impl<T> IntoJson<T> for QueryResult<T> {
             },
             _ => Status::InternalServerError,
         })
+    }
+}
+
+pub struct NaiveTimeWrapper(NaiveTime);
+pub struct NaiveDateTimeWrapper(NaiveDateTime);
+
+impl<'v> FromParam<'v> for NaiveTimeWrapper {
+    type Error = &'v str;
+
+    fn from_param(param: &'v str) -> Result<Self, Self::Error> {
+        Ok(NaiveTimeWrapper(param.parse().map_err(|_| param)?))
+    }
+}
+
+impl<'v> FromParam<'v> for NaiveDateTimeWrapper {
+    type Error = &'v str;
+
+    fn from_param(param: &'v str) -> Result<NaiveDateTimeWrapper, Self::Error> {
+        Ok(NaiveDateTimeWrapper(param.parse().map_err(|_| param)?))
+    }
+}
+
+impl Deref for NaiveTimeWrapper {
+    type Target = NaiveTime;
+    fn deref(&self) -> &NaiveTime {
+        &self.0
+    }
+}
+
+impl Deref for NaiveDateTimeWrapper {
+    type Target = NaiveDateTime;
+    fn deref(&self) -> &NaiveDateTime {
+        &self.0
     }
 }

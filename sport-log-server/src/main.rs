@@ -55,7 +55,7 @@ fn rocket() -> _ {
             action::delete_action_event,
             action::ap_delete_action_event,
             action::ap_get_executable_action_events_by_action_provider,
-            action::ap_get_executable_action_events_by_action_provider_and_timerange,
+            action::ap_get_ordered_executable_action_events_by_action_provider_and_timerange,
             diary_wod::create_wod,
             diary_wod::ap_create_wod,
             diary_wod::get_wods_by_user,
