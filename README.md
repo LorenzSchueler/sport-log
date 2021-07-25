@@ -46,6 +46,16 @@ ROCKET_DATABASES='{sport_log={url="postgres://sport_admin:<password>@localhost/s
     * add entry `local sport_log sport_admin md5` as second entry (after entry for user postgres) to `/etc/postgresql/<pg_version>/main/pg_hba.conf`
     * `sudo service postgresql reload`
 
+## Update DB Schema
+
+`cd sport-log-types && diesel database reset && ./patch.sh && cd ..`
+
+## Contributing
+
+We would be grateful for any Issues and PRs. Please file your PRs against `server`, `client` or `action-provider` respectively.
+
+For Questions please use the [discussions](https://github.com/LorenzSchueler/sport-log/discussions)
+
 ## License
 
 [GPL-3.0 License](LICENSE)
