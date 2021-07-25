@@ -10,7 +10,7 @@
 * [x] use local storage for saving user
 * [x] logout button
 * [x] login page
-* [ ] registration page
+* [x] registration page
 * [ ] improve landing screen
 * [ ] connect to backend user routes
 * [ ] create bottom nav bar (logging, actions, ...)

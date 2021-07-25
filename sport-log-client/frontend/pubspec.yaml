@@ -38,6 +38,7 @@ dependencies:
   flutter_bloc: ^7.0.1 # state management library
   equatable: ^2.0.0 # makes classes equatable with little boilerplate code
   flutter_secure_storage: ^4.2.0
+  email_validator: '^2.0.1'
 
 dev_dependencies:
   flutter_test:

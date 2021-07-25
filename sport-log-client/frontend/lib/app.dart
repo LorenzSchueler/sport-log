@@ -5,7 +5,7 @@ import 'package:sport_log/helpers/material_color_generator.dart';
 import 'package:sport_log/pages/home/home_page.dart';
 import 'package:sport_log/pages/landing/landing_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
-import 'package:sport_log/pages/registration/registrations_page.dart';
+import 'package:sport_log/pages/registration/registration_page.dart';
 import 'routes.dart';
 
 class App extends StatefulWidget {
