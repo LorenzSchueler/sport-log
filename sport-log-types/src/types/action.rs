@@ -21,15 +21,12 @@ use crate::{
 
 use crate::types::{PlatformId, UserId};
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
         FromI32,
         ToSql,
         FromSql,
@@ -62,15 +59,12 @@ pub struct NewActionProvider {
     pub platform_id: PlatformId,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
         FromI32,
         ToSql,
         FromSql,
@@ -108,7 +102,7 @@ pub struct NewAction {
     pub action_provider_id: ActionProviderId,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]
 pub enum Weekday {
     Monday,
@@ -134,20 +128,10 @@ impl Weekday {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        FromSqlRow,
-        AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
-        FromI32,
-        ToSql,
-        FromSql,
-        VerifyIdForUser
-    )
+    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForUser)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct ActionRuleId(pub i32);
@@ -187,20 +171,10 @@ pub struct NewActionRule {
     pub enabled: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        FromSqlRow,
-        AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
-        FromI32,
-        ToSql,
-        FromSql,
-        VerifyIdForUser
-    )
+    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForUser)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct ActionEventId(pub i32);

@@ -24,7 +24,7 @@ use sport_log_server_derive::{
 use crate::schema::{cardio_session, route};
 use crate::types::{MovementId, UserId};
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]
 pub enum CardioType {
     Training,
@@ -66,20 +66,10 @@ impl FromSql<Position, Pg> for Position {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        FromSqlRow,
-        AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
-        FromI32,
-        ToSql,
-        FromSql,
-        VerifyIdForUser
-    )
+    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForUser)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct RouteId(pub i32);
@@ -122,20 +112,10 @@ pub struct NewRoute {
     pub track: Option<Vec<Position>>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        FromSqlRow,
-        AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
-        FromI32,
-        ToSql,
-        FromSql,
-        VerifyIdForUser
-    )
+    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForUser)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct CardioSessionId(pub i32);

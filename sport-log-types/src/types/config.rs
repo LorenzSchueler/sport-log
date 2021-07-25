@@ -1,9 +1,9 @@
 use std::fs;
 
 use lazy_static::lazy_static;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Config {
     pub admin_username: String,
     pub admin_password: String,

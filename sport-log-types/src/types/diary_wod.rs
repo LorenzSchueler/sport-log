@@ -11,20 +11,10 @@ use sport_log_server_derive::{
 use crate::schema::{diary, wod};
 use crate::types::UserId;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        FromSqlRow,
-        AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
-        FromI32,
-        ToSql,
-        FromSql,
-        VerifyIdForUser
-    )
+    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForUser)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct DiaryId(pub i32);
@@ -63,20 +53,10 @@ pub struct NewDiary {
     pub comments: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        FromSqlRow,
-        AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
-        FromI32,
-        ToSql,
-        FromSql,
-        VerifyIdForUser
-    )
+    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForUser)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct WodId(pub i32);

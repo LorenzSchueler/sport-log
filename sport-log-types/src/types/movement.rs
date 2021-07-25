@@ -17,14 +17,14 @@ use crate::{
     types::{AuthenticatedUser, GetById, Unverified, UnverifiedId},
 };
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]
 pub enum MovementCategory {
     Cardio,
     Strength,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]
 pub enum MovementUnit {
     Reps,
@@ -36,15 +36,12 @@ pub enum MovementUnit {
     Mile,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
     derive(
         FromSqlRow,
         AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
         FromI32,
         ToSql,
         FromSql,
@@ -148,20 +145,10 @@ impl Unverified<NewMovement> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        FromSqlRow,
-        AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
-        FromI32,
-        ToSql,
-        FromSql,
-        VerifyIdForAdmin
-    )
+    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForAdmin)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct EormId(pub i32);

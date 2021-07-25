@@ -50,6 +50,7 @@ pub use strength::*;
 pub use user::*;
 
 #[cfg(feature = "full")]
+#[derive(Debug)]
 pub struct Unverified<T>(Json<T>);
 
 #[cfg(feature = "full")]
@@ -67,6 +68,7 @@ pub trait FromI32 {
 }
 
 #[cfg(feature = "full")]
+#[derive(Debug, Clone)]
 pub struct UnverifiedId<I>(I);
 
 #[cfg(feature = "full")]
