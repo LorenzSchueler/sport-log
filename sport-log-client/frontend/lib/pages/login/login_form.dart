@@ -33,7 +33,7 @@ class LoginFormState extends State<LoginForm> {
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           }
         },
-        builder: (context, state) {
+        builder: (context, LoginState state) {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -44,6 +44,11 @@ class LoginFormState extends State<LoginForm> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  if (state == LoginState.pending)
+                    Container(
+                      child: const CircularProgressIndicator(),
+                      margin: const EdgeInsets.only(right: 20),
+                    ),
                   _submitButton(context, state),
                 ],
               )
@@ -101,9 +106,8 @@ class LoginFormState extends State<LoginForm> {
 
   Widget _submitButton(BuildContext context, LoginState state) {
     return ElevatedButton(
-      child: (state != LoginState.pending)
-          ? const Text("Login") : const CircularProgressIndicator(),
-      onPressed: (state != LoginState.successful && _inputsAreValid)
+      child: const Text("Login"),
+      onPressed: (state != LoginState.pending && _inputsAreValid)
           ? () => _submit(context) : null,
       style: ElevatedButton.styleFrom(
         shape: const RoundedRectangleBorder(
