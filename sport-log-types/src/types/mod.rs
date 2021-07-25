@@ -12,6 +12,7 @@ use rocket::{
 use serde::Deserialize;
 
 mod action;
+mod activity;
 #[cfg(feature = "full")]
 mod admin;
 #[cfg(feature = "full")]
@@ -30,6 +31,7 @@ mod strength;
 mod user;
 
 pub use action::*;
+pub use activity::*;
 #[cfg(feature = "full")]
 pub use admin::*;
 #[cfg(feature = "full")]

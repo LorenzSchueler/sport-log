@@ -102,6 +102,7 @@ fn rocket() -> _ {
             cardio::get_cardio_sessions_by_user,
             cardio::update_cardio_session,
             cardio::delete_cardio_session,
+            activity::get_activities_ordered_by_user_and_timespan,
         ],
     )
 }
