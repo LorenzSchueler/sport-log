@@ -1,3 +1,4 @@
+pub mod account;
 pub mod action;
 pub mod activity;
 pub mod admin;

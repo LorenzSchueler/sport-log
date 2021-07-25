@@ -7,6 +7,7 @@ use diesel::{
 };
 use rocket::{http::Status, request::FromParam, serde::json::Json};
 
+pub mod account;
 pub mod action;
 pub mod activity;
 pub mod cardio;

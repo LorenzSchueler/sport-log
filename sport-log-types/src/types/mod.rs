@@ -11,6 +11,7 @@ use rocket::{
 #[cfg(feature = "full")]
 use serde::Deserialize;
 
+mod account;
 mod action;
 mod activity;
 #[cfg(feature = "full")]
@@ -30,6 +31,7 @@ mod sharing;
 mod strength;
 mod user;
 
+pub use account::*;
 pub use action::*;
 pub use activity::*;
 #[cfg(feature = "full")]
@@ -93,14 +95,14 @@ pub trait Create {
 pub trait GetById {
     type Id;
 
-    fn get_by_id(entity: Self::Id, conn: &PgConnection) -> QueryResult<Self>
+    fn get_by_id(id: Self::Id, conn: &PgConnection) -> QueryResult<Self>
     where
         Self: Sized;
 }
 
 #[cfg(feature = "full")]
 pub trait GetByUser {
-    fn get_by_user(entity: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>>
+    fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>>
     where
         Self: Sized;
 }
