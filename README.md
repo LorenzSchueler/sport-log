@@ -33,22 +33,18 @@ the flutter app lives in **sport-log-client/frontend**
 ## Setup
 
 * install postgresql: `apt install libpq-dev postgresql-client-common postgresql`
-* create db user: `sudo -u postgres createuser <username>`
-* create db: `sudo -u postgres createdb sport_log`
-* `sudo -u postgres psql`
-    * `alter user <username> with encrypted password '<password>';`
-    * `grant all privileges on database sport_log to <username>;`
-* enable password auth: `sudo nano /etc/postgresql/<version>/main/pg_hba.conf`
-    * add entry `local sport_log <username> md5`
-* `sudo service postgresql restart && sudo service postgresql reload`
+* install diesel cli: `cargo install diesel-cli --no-default-features --features postgres`
+* create db user: `sudo -u postgres createuser --createdb --pwprompt sport_admin`
 * create `.env` file in repo root with the following content:
 ```
-DATABASE_URL=postgres://<username>:<password>@localhost/sport_log
-ROCKET_DATABASES='{sport_log={url="postgres://<username>:<password>@localhost/sport_log"}}'
+DATABASE_URL=postgres://sport_admin:<password>@localhost/sport_log
+ROCKET_DATABASES='{sport_log={url="postgres://sport_admin:<password>@localhost/sport_log"}}'
 ```
-* `cargo install diesel-cli --no-default-features --features postgres`
-* set up tables: `cd sport-log-types && diesel migration run && ./patch.sh && cd ..`
+* set up tables: `cd sport-log-types && diesel database setup && ./patch.sh && cd ..`
 * run the server: `cd sport-log-server && cargo run`
+* (optional) enable password auth for Unix Domain Socket connections (for psql): 
+    * add entry `local sport_log sport_admin md5` as second entry (after entry for user postgres) to `/etc/postgresql/<pg_version>/main/pg_hba.conf`
+    * `sudo service postgresql reload`
 
 ## License
 
