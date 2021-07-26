@@ -11,10 +11,9 @@
 * [x] logout button
 * [x] login page
 * [x] registration page
+* [x] better code in Api class (esp. authentication)
+* [x] connect to backend user routes
 * [ ] improve landing screen
-* [ ] better code in Api class (esp. authentication)
-* [ ] connect to backend user routes
-* [ ] create bottom nav bar (logging, actions, ...)
 * [ ] save user credentials in web
 * [ ] i18n
-* [ ] refactor login/registration pages
+* [ ] create bottom nav bar (logging, actions, ...)
