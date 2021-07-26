@@ -20,9 +20,12 @@ use sport_log_server_derive::{
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
-#[cfg(feature = "full")]
-use crate::schema::{cardio_session, route};
 use crate::types::{Movement, MovementId, UserId};
+#[cfg(feature = "full")]
+use crate::{
+    schema::{cardio_session, route},
+    types::User,
+};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]
@@ -103,6 +106,7 @@ pub struct RouteId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "route")]
+#[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Route {
     pub id: RouteId,
     pub user_id: UserId,
@@ -159,6 +163,8 @@ pub struct CardioSessionId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "cardio_session")]
+#[cfg_attr(feature = "full", belongs_to(User))]
+#[cfg_attr(feature = "full", belongs_to(Movement))]
 pub struct CardioSession {
     pub id: CardioSessionId,
     pub user_id: UserId,

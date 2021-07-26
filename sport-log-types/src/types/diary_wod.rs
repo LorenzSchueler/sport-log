@@ -7,9 +7,12 @@ use sport_log_server_derive::{
     VerifyForActionProviderUnchecked, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
-#[cfg(feature = "full")]
-use crate::schema::{diary, wod};
 use crate::types::UserId;
+#[cfg(feature = "full")]
+use crate::{
+    schema::{diary, wod},
+    types::User,
+};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
@@ -45,6 +48,7 @@ pub struct DiaryId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "diary")]
+#[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Diary {
     pub id: DiaryId,
     pub user_id: UserId,
@@ -97,6 +101,7 @@ pub struct WodId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "wod")]
+#[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Wod {
     pub id: WodId,
     pub user_id: UserId,

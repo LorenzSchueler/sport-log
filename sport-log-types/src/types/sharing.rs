@@ -5,12 +5,15 @@ use sport_log_server_derive::{
     Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
 };
 
-#[cfg(feature = "full")]
-use crate::schema::{
-    group, group_user, shared_cardio_session, shared_diary, shared_metcon_session,
-    shared_strength_session,
-};
 use crate::types::{CardioSessionId, DiaryId, MetconSessionId, StrengthSessionId, UserId};
+#[cfg(feature = "full")]
+use crate::{
+    schema::{
+        group, group_user, shared_cardio_session, shared_diary, shared_metcon_session,
+        shared_strength_session,
+    },
+    types::{CardioSession, Diary, MetconSession, StrengthSession, User},
+};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
@@ -73,6 +76,8 @@ pub struct GroupUserId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "group_user")]
+#[cfg_attr(feature = "full", belongs_to(Group))]
+#[cfg_attr(feature = "full", belongs_to(User))]
 pub struct GroupUser {
     pub id: GroupUserId,
     pub group_id: GroupId,
@@ -111,6 +116,8 @@ pub struct SharedMetconSessionId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "shared_metcon_session")]
+#[cfg_attr(feature = "full", belongs_to(Group))]
+#[cfg_attr(feature = "full", belongs_to(MetconSession))]
 pub struct SharedMetconSession {
     pub id: GroupUserId,
     pub group_id: GroupId,
@@ -149,6 +156,8 @@ pub struct SharedStrengthSessionId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "shared_strength_session")]
+#[cfg_attr(feature = "full", belongs_to(Group))]
+#[cfg_attr(feature = "full", belongs_to(StrengthSession))]
 pub struct SharedStrengthSession {
     pub id: GroupUserId,
     pub group_id: GroupId,
@@ -187,6 +196,8 @@ pub struct SharedCardioSessionId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "shared_cardio_session")]
+#[cfg_attr(feature = "full", belongs_to(Group))]
+#[cfg_attr(feature = "full", belongs_to(CardioSession))]
 pub struct SharedCardioSession {
     pub id: GroupUserId,
     pub group_id: GroupId,
@@ -225,6 +236,8 @@ pub struct SharedDiaryId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "shared_diary")]
+#[cfg_attr(feature = "full", belongs_to(Group))]
+#[cfg_attr(feature = "full", belongs_to(Diary))]
 pub struct SharedDiary {
     pub id: GroupUserId,
     pub group_id: GroupId,

@@ -16,7 +16,7 @@ use sport_log_server_derive::{
 #[cfg(feature = "full")]
 use crate::{
     schema::{action, action_event, action_provider, action_rule},
-    types::{AuthenticatedActionProvider, GetById, UnverifiedId},
+    types::{AuthenticatedActionProvider, GetById, Platform, UnverifiedId, User},
 };
 
 use crate::types::{PlatformId, UserId};
@@ -52,6 +52,7 @@ pub struct ActionProviderId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "action_provider")]
+#[cfg_attr(feature = "full", belongs_to(Platform))]
 pub struct ActionProvider {
     pub id: ActionProviderId,
     pub name: String,
@@ -100,6 +101,7 @@ pub struct ActionId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "action")]
+#[cfg_attr(feature = "full", belongs_to(ActionProvider))]
 pub struct Action {
     pub id: ActionId,
     pub name: String,
@@ -173,6 +175,8 @@ pub struct ActionRuleId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "action_rule")]
+#[cfg_attr(feature = "full", belongs_to(User))]
+#[cfg_attr(feature = "full", belongs_to(Action))]
 pub struct ActionRule {
     pub id: ActionRuleId,
     pub user_id: UserId,
@@ -245,6 +249,8 @@ impl UnverifiedId<ActionEventId> {
     )
 )]
 #[cfg_attr(feature = "full", table_name = "action_event")]
+#[cfg_attr(feature = "full", belongs_to(User))]
+#[cfg_attr(feature = "full", belongs_to(Action))]
 pub struct ActionEvent {
     pub id: ActionEventId,
     pub user_id: UserId,

@@ -14,7 +14,7 @@ use crate::types::{Movement, MovementId, MovementUnit, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
-    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId},
+    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId, User},
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -86,6 +86,7 @@ impl UnverifiedId<MetconId> {
     )
 )]
 #[cfg_attr(feature = "full", table_name = "metcon")]
+#[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Metcon {
     pub id: MetconId,
     pub user_id: Option<UserId>,
@@ -197,6 +198,8 @@ impl UnverifiedId<MetconMovementId> {
     )
 )]
 #[cfg_attr(feature = "full", table_name = "metcon_movement")]
+#[cfg_attr(feature = "full", belongs_to(Movement))]
+#[cfg_attr(feature = "full", belongs_to(Metcon))]
 pub struct MetconMovement {
     pub id: MetconMovementId,
     pub movement_id: MovementId,
@@ -278,6 +281,8 @@ pub struct MetconSessionId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "metcon_session")]
+#[cfg_attr(feature = "full", belongs_to(User))]
+#[cfg_attr(feature = "full", belongs_to(Metcon))]
 pub struct MetconSession {
     pub id: MetconSessionId,
     pub user_id: UserId,

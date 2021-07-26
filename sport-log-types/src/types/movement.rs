@@ -14,7 +14,7 @@ use crate::types::UserId;
 #[cfg(feature = "full")]
 use crate::{
     schema::{eorm, movement},
-    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId},
+    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId, User},
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -106,6 +106,7 @@ impl UnverifiedId<MovementId> {
     )
 )]
 #[cfg_attr(feature = "full", table_name = "movement")]
+#[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Movement {
     pub id: MovementId,
     pub user_id: Option<UserId>,
