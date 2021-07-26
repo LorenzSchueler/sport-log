@@ -51,35 +51,27 @@ impl Activity {
             }),
         );
 
-        //activities.extend(
-        //metcon_session::table
-        //.filter(metcon_session::columns::user_id.ge(user_id))
-        //.filter(metcon_session::columns::datetime.ge(start))
-        //.filter(metcon_session::columns::datetime.le(end))
-        //.get_results::<MetconSession>(conn)?
-        //.into_iter()
-        //.map(|metcon_session| {
-        //(
-        //metcon_session.datetime,
-        //Activity::MetconSession(metcon_session),
-        //)
-        //}),
-        //);
+        activities.extend(
+            MetconSessionDescription::get_ordered_by_user_and_timespan(user_id, start, end, conn)?
+                .into_iter()
+                .map(|metcon_session_description| {
+                    (
+                        metcon_session_description.metcon_session.datetime,
+                        Activity::MetconSession(metcon_session_description),
+                    )
+                }),
+        );
 
-        //activities.extend(
-        //cardio_session::table
-        //.filter(cardio_session::columns::user_id.ge(user_id))
-        //.filter(cardio_session::columns::datetime.ge(start))
-        //.filter(cardio_session::columns::datetime.le(end))
-        //.get_results::<CardioSession>(conn)?
-        //.into_iter()
-        //.map(|cardio_session| {
-        //(
-        //cardio_session.datetime,
-        //Activity::CardioSession(cardio_session),
-        //)
-        //}),
-        //);
+        activities.extend(
+            CardioSessionDescription::get_ordered_by_user_and_timespan(user_id, start, end, conn)?
+                .into_iter()
+                .map(|cardio_session_description| {
+                    (
+                        cardio_session_description.cardio_session.datetime,
+                        Activity::CardioSession(cardio_session_description),
+                    )
+                }),
+        );
 
         activities.sort_by(|a, b| b.0.cmp(&a.0));
 

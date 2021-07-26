@@ -313,5 +313,5 @@ pub struct NewMetconSession {
 pub struct MetconSessionDescription {
     pub metcon_session: MetconSession,
     pub metcon: Metcon,
-    pub movements: Vec<Movement>,
+    pub movements: Vec<(MetconMovement, Movement)>,
 }
