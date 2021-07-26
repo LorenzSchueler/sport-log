@@ -1,6 +1,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sport_log/api/api.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/repositories/authentication_repository.dart';
 import 'package:sport_log/app.dart';
@@ -22,10 +23,14 @@ void main() async {
       user: user
   );
   Bloc.observer = SimpleBlocObserver();
+  final api = Api(urlBase: "http://10.0.2.2:8000");
   runApp(BlocProvider.value(
     value: authBloc,
-    child: RepositoryProvider.value(
-      value: authRepo,
+    child: MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(value: authRepo),
+        RepositoryProvider.value(value: api),
+      ],
       child: App(
         isAuthenticatedAtStart: user != null,
       ),

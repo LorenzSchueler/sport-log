@@ -54,7 +54,6 @@ class User extends Equatable {
 
   @override
   String toString() {
-    return '''User(${Keys.idKey}: $id, ${Keys.usernameKey}: $username,
-      ${Keys.passwordKey}: $password, ${Keys.emailKey}: $email)''';
+    return '''User(${Keys.idKey}: $id, ${Keys.usernameKey}: $username, ${Keys.passwordKey}: $password, ${Keys.emailKey}: $email)''';
   }
 }

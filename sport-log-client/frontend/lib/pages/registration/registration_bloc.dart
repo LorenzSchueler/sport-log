@@ -1,6 +1,8 @@
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sport_log/api/api.dart';
+import 'package:sport_log/models/new_user.dart';
 import 'package:sport_log/models/user.dart';
 import 'package:sport_log/authentication/authentication_bloc.dart' as auth;
 import 'package:sport_log/repositories/authentication_repository.dart';
@@ -29,6 +31,12 @@ class SubmitRegistration extends RegistrationEvent {
 
   @override
   List<Object?> get props => [username, email, password];
+
+  NewUser toNewUser() => NewUser(
+      username: username,
+      password: password,
+      email: email
+  );
 }
 
 class RestartRegistration extends RegistrationEvent {}
@@ -37,13 +45,16 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   RegistrationBloc({
     required auth.AuthenticationBloc authenticationBloc,
     required AuthenticationRepository? authenticationRepository,
+    required Api api,
   })
       : _authenticationBloc = authenticationBloc,
         _authenticationRepository = authenticationRepository,
+        _api = api,
         super(RegistrationState.idle);
 
   final auth.AuthenticationBloc _authenticationBloc;
   final AuthenticationRepository? _authenticationRepository;
+  final Api _api;
 
   @override
   Stream<RegistrationState> mapEventToState(RegistrationEvent event) async* {
@@ -56,19 +67,19 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
 
   Stream<RegistrationState> _submitRegistration(SubmitRegistration event) async* {
     yield RegistrationState.pending;
-    await Future.delayed(const Duration(milliseconds: apiDelay));
-    if (event.username == "nonexistent") {
-      yield RegistrationState.failed;
-    } else {
-      final user = User(
-          id: 1,
-          username: event.username,
-          password: event.password,
-          email: event.email,
-      );
+    try {
+      final user = await _api.createUser(event.toNewUser());
       await _authenticationRepository?.createUser(user);
       yield RegistrationState.successful;
       _authenticationBloc.add(auth.RegisterEvent(user: user));
+    } on ApiError catch (e) {
+      if (e != ApiError.usernameTaken) {
+        addError(e);
+      }
+      yield RegistrationState.failed;
+    } catch (e) {
+      addError(e);
+      yield RegistrationState.failed;
     }
   }
 }

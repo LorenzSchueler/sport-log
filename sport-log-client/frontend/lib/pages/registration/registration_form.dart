@@ -31,7 +31,7 @@ class RegistrationFormState extends State<RegistrationForm> {
                     (route) => false);
           } else if (state == RegistrationState.failed) {
             const snackBar = SnackBar(
-                content: Text("Email already registered. Use login instead."),
+                content: Text("Username already registered. Use login instead."),
             );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           }
