@@ -47,4 +47,9 @@ class User extends Equatable {
     }
     return null;
   }
+
+  @override
+  String toString() {
+    return "User($idKey: $id, $usernameKey: $username, $passwordKey: $password, $emailKey: $email)";
+  }
 }
