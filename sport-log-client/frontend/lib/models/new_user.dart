@@ -1,6 +1,8 @@
 
 import 'package:equatable/equatable.dart';
 
+import 'keys.dart';
+
 class NewUser extends Equatable {
   const NewUser({
     required this.username,
@@ -15,20 +17,18 @@ class NewUser extends Equatable {
   @override
   List<Object?> get props => [username, password, email];
 
-  static const String usernameKey = "username";
-  static const String passwordKey = "password";
-  static const String emailKey = "email";
-
-  static const List<String> allKeys = [usernameKey, passwordKey, emailKey];
+  static const List<String> allKeys
+    = [Keys.usernameKey, Keys.passwordKey, Keys.emailKey];
 
   Map<String, dynamic> toJson() => {
-    usernameKey: username,
-    passwordKey: password,
-    emailKey: email,
+    Keys.usernameKey: username,
+    Keys.passwordKey: password,
+    Keys.emailKey: email,
   };
 
   @override
   String toString() {
-    return "NewUser($usernameKey: $username, $passwordKey: $password, $emailKey: $email)";
+    return '''NewUser(${Keys.usernameKey}: $username,
+      ${Keys.passwordKey}: $password, ${Keys.emailKey}: $email)''';
   }
 }

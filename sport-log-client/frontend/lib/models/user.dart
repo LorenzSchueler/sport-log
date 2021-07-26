@@ -1,5 +1,6 @@
 
 import 'package:equatable/equatable.dart';
+import 'package:sport_log/models/keys.dart';
 
 class User extends Equatable {
   const User({
@@ -17,39 +18,43 @@ class User extends Equatable {
   @override
   List<Object?> get props => [id, username, password, email];
 
-  static const String idKey = "id";
-  static const String usernameKey = "username";
-  static const String passwordKey = "password";
-  static const String emailKey = "email";
-
-  static const List<String> allKeys = [idKey, usernameKey, passwordKey, emailKey];
+  static const List<String> allKeys = [Keys.idKey, Keys.usernameKey,
+    Keys.passwordKey, Keys.emailKey];
 
   Map<String, String> toMap() => {
-    idKey: id.toString(),
-    usernameKey: username,
-    passwordKey: password,
-    emailKey: email,
+    Keys.idKey: id.toString(),
+    Keys.usernameKey: username,
+    Keys.passwordKey: password,
+    Keys.emailKey: email,
   };
 
+  /// used for storing key value pairs in local storage
   static User? fromMap(Map<String, String> map) {
-    if (map.containsKey(idKey) && map.containsKey(usernameKey)
-      && map.containsKey(passwordKey) && map.containsKey(emailKey)) {
-      final id = int.tryParse(map[idKey]!);
+    if (map.containsKey(Keys.idKey) && map.containsKey(Keys.usernameKey)
+      && map.containsKey(Keys.passwordKey) && map.containsKey(Keys.emailKey)) {
+      final id = int.tryParse(map[Keys.idKey]!);
       if (id == null) {
         return null;
       }
       return User(
           id: id,
-          username: map[usernameKey]!,
-          password: map[passwordKey]!,
-          email: map[emailKey]!
+          username: map[Keys.usernameKey]!,
+          password: map[Keys.passwordKey]!,
+          email: map[Keys.emailKey]!
       );
     }
     return null;
   }
 
+  User.fromJson(Map<String, dynamic> map)
+    : id = map[Keys.idKey]!,
+      username = map[Keys.usernameKey]!,
+      password = map[Keys.passwordKey]!,
+      email = map[Keys.emailKey]!;
+
   @override
   String toString() {
-    return "User($idKey: $id, $usernameKey: $username, $passwordKey: $password, $emailKey: $email)";
+    return '''User(${Keys.idKey}: $id, ${Keys.usernameKey}: $username,
+      ${Keys.passwordKey}: $password, ${Keys.emailKey}: $email)''';
   }
 }
