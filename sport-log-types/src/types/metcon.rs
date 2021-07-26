@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_server_derive::{
     Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
 use crate::types::{Movement, MovementId, MovementUnit, UserId};
@@ -259,7 +260,15 @@ impl Unverified<NewMetconMovement> {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(
+        Hash,
+        FromSqlRow,
+        AsExpression,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconSessionId(pub i32);
@@ -278,6 +287,7 @@ pub struct MetconSessionId(pub i32);
         GetAll,
         Update,
         Delete,
+        VerifyForUserWithDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "metcon_session")]
@@ -296,7 +306,7 @@ pub struct MetconSession {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
 #[cfg_attr(feature = "full", table_name = "metcon_session")]
 pub struct NewMetconSession {
     pub user_id: UserId,

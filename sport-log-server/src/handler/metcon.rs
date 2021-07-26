@@ -2,11 +2,81 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::types::{
     AuthenticatedUser, Create, Db, Delete, GetById, GetByUser, Metcon, MetconId, MetconMovement,
-    MetconMovementId, MetconSessionDescription, MetconSessionId, NewMetcon, NewMetconMovement,
-    Unverified, UnverifiedId, Update,
+    MetconMovementId, MetconSession, MetconSessionDescription, MetconSessionId, NewMetcon,
+    NewMetconMovement, NewMetconSession, Unverified, UnverifiedId, Update,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
+
+#[post(
+    "/metcon_session",
+    format = "application/json",
+    data = "<metcon_session>"
+)]
+pub async fn create_metcon_session(
+    metcon_session: Unverified<NewMetconSession>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<MetconSession>, Status> {
+    let metcon_session = metcon_session.verify(&auth)?;
+    conn.run(|c| MetconSession::create(metcon_session, c))
+        .await
+        .into_json()
+}
+
+#[get("/metcon_session/<metcon_session_id>")]
+pub async fn get_metcon_session(
+    metcon_session_id: UnverifiedId<MetconSessionId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<MetconSession>, Status> {
+    let metcon_session_id = conn
+        .run(move |c| metcon_session_id.verify(&auth, c))
+        .await?;
+    conn.run(move |c| MetconSession::get_by_id(metcon_session_id, c))
+        .await
+        .into_json()
+}
+
+#[get("/metcon_session")]
+pub async fn get_metcon_sessions_by_user(
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<MetconSession>>, Status> {
+    conn.run(move |c| MetconSession::get_by_user(*auth, c))
+        .await
+        .into_json()
+}
+
+#[put(
+    "/metcon_session",
+    format = "application/json",
+    data = "<metcon_session>"
+)]
+pub async fn update_metcon_session(
+    metcon_session: Unverified<MetconSession>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<MetconSession>, Status> {
+    let metcon_session = conn.run(move |c| metcon_session.verify(&auth, c)).await?;
+    conn.run(|c| MetconSession::update(metcon_session, c))
+        .await
+        .into_json()
+}
+
+#[delete("/metcon_session/<metcon_session_id>")]
+pub async fn delete_metcon_session(
+    metcon_session_id: UnverifiedId<MetconSessionId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        MetconSession::delete(metcon_session_id.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
 
 #[post("/metcon", format = "application/json", data = "<metcon>")]
 pub async fn create_metcon(
