@@ -1,4 +1,4 @@
-create type metcon_type as enum('amrap', 'emom', 'for_time', 'ladder');
+create type metcon_type as enum('amrap', 'emom', 'for_time');
 
 create table metcon (
     id serial primary key,

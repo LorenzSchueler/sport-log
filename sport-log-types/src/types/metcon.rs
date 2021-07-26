@@ -23,7 +23,6 @@ pub enum MetconType {
     Amrap,
     Emom,
     ForTime,
-    Ladder, // TODO remove
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
