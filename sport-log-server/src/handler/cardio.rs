@@ -31,10 +31,7 @@ pub async fn get_route(
 }
 
 #[get("/route")]
-pub async fn get_routes_by_user(
-    auth: AuthenticatedUser,
-    conn: Db,
-) -> Result<Json<Vec<Route>>, Status> {
+pub async fn get_routes(auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Route>>, Status> {
     conn.run(move |c| Route::get_by_user(*auth, c))
         .await
         .into_json()
@@ -95,7 +92,7 @@ pub async fn get_cardio_session(
 }
 
 #[get("/cardio_session")]
-pub async fn get_cardio_sessions_by_user(
+pub async fn get_cardio_sessions(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<CardioSession>>, Status> {
@@ -149,7 +146,7 @@ pub async fn get_cardio_session_description(
 }
 
 #[get("/cardio_session_description")]
-pub async fn get_cardio_session_descriptions_by_user(
+pub async fn get_cardio_session_descriptions(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<CardioSessionDescription>>, Status> {
@@ -159,7 +156,7 @@ pub async fn get_cardio_session_descriptions_by_user(
 }
 
 #[get("/cardio_session_description/timespan/<start_datetime>/<end_datetime>")]
-pub async fn get_ordered_cardio_session_descriptions_by_user_and_timespan(
+pub async fn get_ordered_cardio_session_descriptions_by_timespan(
     start_datetime: NaiveDateTimeWrapper,
     end_datetime: NaiveDateTimeWrapper,
     auth: AuthenticatedUser,

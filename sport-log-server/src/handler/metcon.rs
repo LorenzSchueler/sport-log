@@ -39,7 +39,7 @@ pub async fn get_metcon_session(
 }
 
 #[get("/metcon_session")]
-pub async fn get_metcon_sessions_by_user(
+pub async fn get_metcon_sessions(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<MetconSession>>, Status> {
@@ -101,10 +101,7 @@ pub async fn get_metcon(
 }
 
 #[get("/metcon")]
-pub async fn get_metcons_by_user(
-    auth: AuthenticatedUser,
-    conn: Db,
-) -> Result<Json<Vec<Metcon>>, Status> {
+pub async fn get_metcons(auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Metcon>>, Status> {
     conn.run(move |c| Metcon::get_by_user(*auth, c))
         .await
         .into_json()
@@ -221,7 +218,7 @@ pub async fn get_metcon_session_description(
 }
 
 #[get("/metcon_session_description")]
-pub async fn get_metcon_session_descriptions_by_user(
+pub async fn get_metcon_session_descriptions(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<MetconSessionDescription>>, Status> {
@@ -231,7 +228,7 @@ pub async fn get_metcon_session_descriptions_by_user(
 }
 
 #[get("/metcon_session_description/timespan/<start_datetime>/<end_datetime>")]
-pub async fn get_ordered_metcon_session_descriptions_by_user_and_timespan(
+pub async fn get_ordered_metcon_session_descriptions_by_timespan(
     start_datetime: NaiveDateTimeWrapper,
     end_datetime: NaiveDateTimeWrapper,
     auth: AuthenticatedUser,

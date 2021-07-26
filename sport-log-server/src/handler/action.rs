@@ -196,7 +196,7 @@ pub async fn get_action_event(
 }
 
 #[get("/action_event")]
-pub async fn get_action_events_by_user(
+pub async fn get_action_events(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
@@ -206,7 +206,7 @@ pub async fn get_action_events_by_user(
 }
 
 #[get("/ap/action_event")]
-pub async fn ap_get_action_events_by_action_provider(
+pub async fn ap_get_action_events(
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
@@ -216,7 +216,7 @@ pub async fn ap_get_action_events_by_action_provider(
 }
 
 #[get("/action_event/action_provider/<action_provider_id>")]
-pub async fn get_action_events_by_user_and_action_provider(
+pub async fn get_action_events_by_action_provider(
     action_provider_id: UnverifiedId<ActionProviderId>,
     auth: AuthenticatedUser,
     conn: Db,
@@ -268,7 +268,7 @@ pub async fn ap_delete_action_event(
 }
 
 #[get("/ap/executable_action_event")]
-pub async fn ap_get_executable_action_events_by_action_provider(
+pub async fn ap_get_executable_action_events(
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
@@ -278,7 +278,7 @@ pub async fn ap_get_executable_action_events_by_action_provider(
 }
 
 #[get("/ap/executable_action_event/timespan/<start_datetime>/<end_datetime>")]
-pub async fn ap_get_ordered_executable_action_events_by_action_provider_and_timespan(
+pub async fn ap_get_ordered_executable_action_events_by_timespan(
     start_datetime: NaiveDateTimeWrapper,
     end_datetime: NaiveDateTimeWrapper,
     auth: AuthenticatedActionProvider,

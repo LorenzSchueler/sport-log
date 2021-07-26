@@ -28,7 +28,7 @@ pub async fn create_wod(
 }
 
 #[get("/wod")]
-pub async fn get_wods_by_user(auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Wod>>, Status> {
+pub async fn get_wods(auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Wod>>, Status> {
     conn.run(move |c| Wod::get_by_user(*auth, c))
         .await
         .into_json()
@@ -81,10 +81,7 @@ pub async fn get_diary(
 }
 
 #[get("/diary")]
-pub async fn get_diarys_by_user(
-    auth: AuthenticatedUser,
-    conn: Db,
-) -> Result<Json<Vec<Diary>>, Status> {
+pub async fn get_diarys(auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Diary>>, Status> {
     conn.run(move |c| Diary::get_by_user(*auth, c))
         .await
         .into_json()

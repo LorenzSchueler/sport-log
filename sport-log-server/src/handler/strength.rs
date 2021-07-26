@@ -39,7 +39,7 @@ pub async fn get_strength_session(
 }
 
 #[get("/strength_session")]
-pub async fn get_strength_sessions_by_user(
+pub async fn get_strength_sessions(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<StrengthSession>>, Status> {
@@ -157,7 +157,7 @@ pub async fn get_strength_session_description(
 }
 
 #[get("/strength_session_description")]
-pub async fn get_strength_session_descriptions_by_user(
+pub async fn get_strength_session_descriptions(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<StrengthSessionDescription>>, Status> {
@@ -167,7 +167,7 @@ pub async fn get_strength_session_descriptions_by_user(
 }
 
 #[get("/strength_session_description/timespan/<start_datetime>/<end_datetime>")]
-pub async fn get_ordered_strength_session_descriptions_by_user_and_timespan(
+pub async fn get_ordered_strength_session_descriptions_by_timespan(
     start_datetime: NaiveDateTimeWrapper,
     end_datetime: NaiveDateTimeWrapper,
     auth: AuthenticatedUser,

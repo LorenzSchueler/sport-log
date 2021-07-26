@@ -129,7 +129,7 @@ pub enum Weekday {
 }
 
 impl Weekday {
-    pub fn to_u32(&self) -> u32 {
+    pub fn to_u32(self) -> u32 {
         match self {
             Weekday::Monday => 0,
             Weekday::Tuesday => 1,

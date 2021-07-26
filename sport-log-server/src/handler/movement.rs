@@ -34,7 +34,7 @@ pub async fn get_movement(
 }
 
 #[get("/movement")]
-pub async fn get_movements_by_user(
+pub async fn get_movements(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<Movement>>, Status> {
