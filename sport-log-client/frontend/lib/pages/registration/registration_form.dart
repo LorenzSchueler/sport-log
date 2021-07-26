@@ -104,6 +104,7 @@ class RegistrationFormState extends State<RegistrationForm> {
           color: Theme.of(context).disabledColor
       ),
       textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.emailAddress,
     );
   }
 

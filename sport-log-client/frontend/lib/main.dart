@@ -22,7 +22,7 @@ void main() async {
   final authBloc = AuthenticationBloc(
       authenticationRepository: authRepo,
       api: api,
-      user: user
+      user: user,
   );
   Bloc.observer = SimpleBlocObserver();
   runApp(BlocProvider.value(
