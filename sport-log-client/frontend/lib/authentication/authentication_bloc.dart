@@ -1,4 +1,5 @@
 
+import 'package:sport_log/api/api.dart';
 import 'package:sport_log/models/user.dart';
 import 'package:sport_log/repositories/authentication_repository.dart';
 
@@ -14,13 +15,16 @@ const int apiDelay = 500;
 class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
   AuthenticationBloc({
     required AuthenticationRepository? authenticationRepository,
+    required Api api,
     User? user,
   }) : _authenticationRepository = authenticationRepository,
+       _api = api,
         super(user == null
           ? Unauthenticated()
           : Authenticated(user: user));
 
   final AuthenticationRepository? _authenticationRepository;
+  final Api _api;
 
   @override
   Stream<AuthenticationState> mapEventToState(
@@ -39,16 +43,19 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
 
   Stream<AuthenticationState> _logoutStream(LogoutEvent event) async* {
     _authenticationRepository?.deleteUser();
+    _api.removeCredentials();
     yield Unauthenticated();
   }
 
   Stream<AuthenticationState> _loginStream(LoginEvent event) async* {
     _authenticationRepository?.createUser(event.user);
+    _api.setCredentials(event.user.username, event.user.password);
     yield Authenticated(user: event.user);
   }
 
   Stream<AuthenticationState> _registrationStream(RegisterEvent event) async* {
     _authenticationRepository?.createUser(event.user);
+    _api.setCredentials(event.user.username, event.user.password);
     yield Authenticated(user: event.user);
   }
 }

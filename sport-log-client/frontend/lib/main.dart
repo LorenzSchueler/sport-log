@@ -18,12 +18,13 @@ void main() async {
     authRepo = AuthenticationRepository();
     user = await authRepo.getUser();
   }
+  final api = Api(urlBase: "http://10.0.2.2:8000");
   final authBloc = AuthenticationBloc(
       authenticationRepository: authRepo,
+      api: api,
       user: user
   );
   Bloc.observer = SimpleBlocObserver();
-  final api = Api(urlBase: "http://10.0.2.2:8000");
   runApp(BlocProvider.value(
     value: authBloc,
     child: MultiRepositoryProvider(

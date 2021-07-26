@@ -32,6 +32,17 @@ class Api {
   final _client = http.Client();
   Credentials? _credentials;
 
+  void setCredentials(String username, String password) {
+    _credentials = Credentials(
+        username: username,
+        password: password,
+    );
+  }
+
+  void removeCredentials() {
+    _credentials = null;
+  }
+
   void _handleUnknownStatusCode(http.Response response) {
     log("${response.statusCode}\n${response.body}", name: "unknown api error");
   }
