@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/authentication/authentication_bloc.dart' as auth;
-import 'package:sport_log/repositories/authentication_repository.dart';
 
 enum LoginState {
   idle, pending, failed, successful
@@ -32,18 +31,15 @@ class RestartLogin extends LoginEvent {}
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc({
     required auth.AuthenticationBloc authenticationBloc,
-    required AuthenticationRepository? authenticationRepository,
     required Api api,
     required Function(String) showErrorSnackBar,
   })
       : _authenticationBloc = authenticationBloc,
-        _authenticationRepository = authenticationRepository,
         _api = api,
         _showErrorSnackBar = showErrorSnackBar,
         super(LoginState.idle);
 
   final auth.AuthenticationBloc _authenticationBloc;
-  final AuthenticationRepository? _authenticationRepository;
   final Api _api;
   final Function(String) _showErrorSnackBar;
 
@@ -60,7 +56,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     yield LoginState.pending;
     try {
       final user = await _api.getUser(event.username, event.password);
-      await _authenticationRepository?.createUser(user);
       yield LoginState.successful;
       _authenticationBloc.add(auth.LoginEvent(user: user));
     } on ApiError catch (e) {

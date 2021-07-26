@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/pages/registration/registration_form.dart';
-import 'package:sport_log/repositories/authentication_repository.dart';
 import 'package:sport_log/authentication/authentication_bloc.dart';
 
 import 'registration_bloc.dart';
@@ -24,7 +23,6 @@ class RegistrationPage extends StatelessWidget {
               create: (context) {
                 return RegistrationBloc(
                   authenticationBloc: context.read<AuthenticationBloc>(),
-                  authenticationRepository: context.read<AuthenticationRepository?>(),
                   api: context.read<Api>(),
                   showErrorSnackBar: (text) {
                     final snackBar = SnackBar(

@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/models/new_user.dart';
 import 'package:sport_log/authentication/authentication_bloc.dart' as auth;
-import 'package:sport_log/repositories/authentication_repository.dart';
 
 enum RegistrationState {
   idle, pending, failed, successful
@@ -41,18 +40,15 @@ class RestartRegistration extends RegistrationEvent {}
 class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   RegistrationBloc({
     required auth.AuthenticationBloc authenticationBloc,
-    required AuthenticationRepository? authenticationRepository,
     required Api api,
     required showErrorSnackBar,
   })
       : _authenticationBloc = authenticationBloc,
-        _authenticationRepository = authenticationRepository,
         _api = api,
         _showErrorSnackBar = showErrorSnackBar,
         super(RegistrationState.idle);
 
   final auth.AuthenticationBloc _authenticationBloc;
-  final AuthenticationRepository? _authenticationRepository;
   final Api _api;
   final Function(String) _showErrorSnackBar;
 
@@ -69,7 +65,6 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     yield RegistrationState.pending;
     try {
       final user = await _api.createUser(event.toNewUser());
-      await _authenticationRepository?.createUser(user);
       yield RegistrationState.successful;
       _authenticationBloc.add(auth.RegisterEvent(user: user));
     } on ApiError catch (e) {

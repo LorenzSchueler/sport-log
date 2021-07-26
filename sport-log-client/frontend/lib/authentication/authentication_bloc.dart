@@ -43,11 +43,12 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
   }
 
   Stream<AuthenticationState> _loginStream(LoginEvent event) async* {
+    _authenticationRepository?.createUser(event.user);
     yield Authenticated(user: event.user);
   }
 
   Stream<AuthenticationState> _registrationStream(RegisterEvent event) async* {
-    await _authenticationRepository?.createUser(event.user);
+    _authenticationRepository?.createUser(event.user);
     yield Authenticated(user: event.user);
   }
 }
