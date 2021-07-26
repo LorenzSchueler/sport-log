@@ -12,6 +12,7 @@
 * [x] login page
 * [x] registration page
 * [ ] improve landing screen
+* [ ] better code in Api class (esp. authentication)
 * [ ] connect to backend user routes
 * [ ] create bottom nav bar (logging, actions, ...)
 * [ ] save user credentials in web

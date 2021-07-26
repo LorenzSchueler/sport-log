@@ -9,7 +9,7 @@ import 'package:sport_log/models/user.dart';
 import 'package:http/http.dart' as http;
 
 enum ApiError {
-  usernameTaken, unknown, noInternetConnection
+  usernameTaken, unknown, noInternetConnection, loginFailed
 }
 
 class Api {
@@ -21,7 +21,6 @@ class Api {
   final _client = http.Client();
 
   Future<User> createUser(NewUser newUser) async {
-    // TODO: Error handling
     try {
       final response = await _client.post(
           Uri.parse(urlBase + BackendRoutes.user),
@@ -35,7 +34,29 @@ class Api {
       } else if (response.statusCode == 200) {
         return User.fromJson(jsonDecode(response.body));
       } else {
-        log("${response.statusCode}\n${response.body}", name: "api error");
+        log("${response.statusCode}\n${response.body}", name: "unknown api error");
+        throw ApiError.unknown;
+      }
+    } on SocketException {
+      throw ApiError.noInternetConnection;
+    }
+  }
+
+  Future<User> getUser(String username, String password) async {
+    try {
+      String basicAuth = 'Basic ' + base64Encode(utf8.encode('$username:$password'));
+      final response = await _client.get(
+        Uri.parse(urlBase + BackendRoutes.user),
+        headers: {
+          'authorization': basicAuth,
+        }
+      );
+      if (response.statusCode == 401) {
+        throw ApiError.loginFailed;
+      } else if (response.statusCode == 200) {
+        return User.fromJson(jsonDecode(response.body));
+      } else {
+        log("${response.statusCode}\n${response.body}", name: "unknown api error");
         throw ApiError.unknown;
       }
     } on SocketException {

@@ -1,11 +1,9 @@
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sport_log/models/user.dart';
+import 'package:sport_log/api/api.dart';
 import 'package:sport_log/authentication/authentication_bloc.dart' as auth;
 import 'package:sport_log/repositories/authentication_repository.dart';
-
-const int apiDelay = 500; // ms
 
 enum LoginState {
   idle, pending, failed, successful
@@ -35,13 +33,19 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc({
     required auth.AuthenticationBloc authenticationBloc,
     required AuthenticationRepository? authenticationRepository,
+    required Api api,
+    required Function(String) showErrorSnackBar,
   })
       : _authenticationBloc = authenticationBloc,
         _authenticationRepository = authenticationRepository,
+        _api = api,
+        _showErrorSnackBar = showErrorSnackBar,
         super(LoginState.idle);
 
   final auth.AuthenticationBloc _authenticationBloc;
   final AuthenticationRepository? _authenticationRepository;
+  final Api _api;
+  final Function(String) _showErrorSnackBar;
 
   @override
   Stream<LoginState> mapEventToState(LoginEvent event) async* {
@@ -54,19 +58,33 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Stream<LoginState> _submitLogin(SubmitLogin event) async* {
     yield LoginState.pending;
-    await Future.delayed(const Duration(milliseconds: apiDelay));
-    if (event.username == "nonexistent") {
-      yield LoginState.failed;
-    } else {
-      final user = User(
-          id: 1,
-          username: event.username,
-          password: event.password,
-          email: "email@domain.com"
-      );
+    try {
+      final user = await _api.getUser(event.username, event.password);
       await _authenticationRepository?.createUser(user);
       yield LoginState.successful;
       _authenticationBloc.add(auth.LoginEvent(user: user));
+    } on ApiError catch (e) {
+      _handleApiError(e);
+      yield LoginState.failed;
+    } catch (e) {
+      addError(e);
+      yield LoginState.failed;
+    }
+  }
+
+  void _handleApiError(ApiError error) {
+    switch (error) {
+      case ApiError.loginFailed:
+        _showErrorSnackBar("Wrong credentials.");
+        break;
+      case ApiError.unknown:
+        _showErrorSnackBar("An unknown api error occurred.");
+        break;
+      case ApiError.noInternetConnection:
+        _showErrorSnackBar("No internet connection.");
+        break;
+      default:
+        _showErrorSnackBar("An unhandled error occurred.");
     }
   }
 }

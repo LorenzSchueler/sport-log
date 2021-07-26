@@ -3,11 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/models/new_user.dart';
-import 'package:sport_log/models/user.dart';
 import 'package:sport_log/authentication/authentication_bloc.dart' as auth;
 import 'package:sport_log/repositories/authentication_repository.dart';
-
-const int apiDelay = 500; // ms
 
 enum RegistrationState {
   idle, pending, failed, successful
@@ -90,11 +87,13 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
         _showErrorSnackBar("Username already taken. Use login instead.");
         break;
       case ApiError.unknown:
-        _showErrorSnackBar("Unknown error occurred.");
+        _showErrorSnackBar("An unknown api error occurred.");
         break;
       case ApiError.noInternetConnection:
         _showErrorSnackBar("No internet connection.");
         break;
+      default:
+        _showErrorSnackBar("An unhandled error occurred.");
     }
   }
 }

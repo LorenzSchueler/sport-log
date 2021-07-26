@@ -27,10 +27,7 @@ class LoginFormState extends State<LoginForm> {
             Navigator.of(context).pushNamedAndRemoveUntil(Routes.home,
                     (route) => false);
           } else if (state == LoginState.failed) {
-            const snackBar = SnackBar(
-                content: Text("Invalid credentials. Please try again."),
-            );
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
           }
         },
         builder: (context, LoginState state) {
