@@ -32,14 +32,17 @@ pub enum CardioType {
     Freetime,
 }
 
+/// A GPS position.
+///
+/// `time` is the time in seconds since the start of the recording.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(SqlType,))]
 #[cfg_attr(feature = "full", postgres(type_name = "position"))]
 pub struct Position {
-    longitude: f64,
-    latitude: f64,
-    elevation: f32,
-    time: i32,
+    pub longitude: f64,
+    pub latitude: f64,
+    pub elevation: f32,
+    pub time: i32,
 }
 
 #[cfg(feature = "full")]

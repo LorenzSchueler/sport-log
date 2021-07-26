@@ -3,6 +3,11 @@ use std::fs;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 
+/// Server configuration.
+///
+/// `admin_username` and `admin_password` are the credentials for the admin endpoints.
+///
+/// `self_registration` determines if users can register themself or if only the admin can create new users.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Config {
     pub admin_username: String,

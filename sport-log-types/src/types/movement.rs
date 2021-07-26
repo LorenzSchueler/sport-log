@@ -83,6 +83,11 @@ impl UnverifiedId<MovementId> {
     }
 }
 
+/// [Movement]
+///
+/// Movements can be predefined (`user_id` is [None]) or can be user-defined (`user_id` contains the id of the user).
+///
+/// `category` decides whether the Movement can be used in Cardio or Strength Sessions. For Metcons the category does not matter.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
@@ -123,6 +128,7 @@ impl Unverified<Movement> {
     }
 }
 
+/// Please refer to [Movement].
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "movement")]

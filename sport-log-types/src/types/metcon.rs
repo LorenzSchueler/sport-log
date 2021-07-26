@@ -23,7 +23,7 @@ pub enum MetconType {
     Amrap,
     Emom,
     ForTime,
-    Ladder,
+    Ladder, // TODO remove
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -61,6 +61,15 @@ impl UnverifiedId<MetconId> {
     }
 }
 
+/// [Metcon] acts like a template for a [MetconSession].
+///
+/// Metcons can be predefined (`user_id` is [None]) or can be user-defined (`user_id` contains the id of the user).
+///
+/// If `metcon_type` is [MetconType::Amrap] `rounds` should be `None` and `timecap` should be set.
+///
+/// If `metcon_type` is [MetconType::Emom] rounds and timecap should be set (rounds determines how many rounds should be performed and `timecap`/`rounds` determines how long each round takes).
+///
+/// If `metcon_type` is [MetconType::ForTime] `rounds` should be set and `timecap` can be None or have a value.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
@@ -103,6 +112,7 @@ impl Unverified<Metcon> {
     }
 }
 
+/// Please refer to [Metcon].
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "metcon")]
