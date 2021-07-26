@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:sport_log/authentication/protected_route.dart';
+import 'package:sport_log/widgets/protected_route.dart';
 import 'package:sport_log/helpers/material_color_generator.dart';
 import 'package:sport_log/pages/home/home_page.dart';
 import 'package:sport_log/pages/landing/landing_page.dart';

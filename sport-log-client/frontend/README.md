@@ -15,3 +15,5 @@
 * [ ] connect to backend user routes
 * [ ] create bottom nav bar (logging, actions, ...)
 * [ ] save user credentials in web
+* [ ] i18n
+* [ ] refactor login/registration pages
