@@ -28,7 +28,7 @@ pub enum MetconType {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconId(pub i32);
@@ -73,6 +73,8 @@ impl UnverifiedId<MetconId> {
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
@@ -139,7 +141,7 @@ impl Unverified<NewMetcon> {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconMovementId(pub i32);
@@ -182,7 +184,17 @@ impl UnverifiedId<MetconMovementId> {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
+    derive(
+        Associations,
+        Identifiable,
+        Queryable,
+        AsChangeset,
+        Create,
+        GetById,
+        GetAll,
+        Update,
+        Delete,
+    )
 )]
 #[cfg_attr(feature = "full", table_name = "metcon_movement")]
 pub struct MetconMovement {
@@ -244,7 +256,7 @@ impl Unverified<NewMetconMovement> {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconSessionId(pub i32);
@@ -253,6 +265,8 @@ pub struct MetconSessionId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,

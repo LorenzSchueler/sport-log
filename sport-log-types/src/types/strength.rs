@@ -19,7 +19,15 @@ use crate::{
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForUser)
+    derive(
+        Hash,
+        FromSqlRow,
+        AsExpression,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct StrengthSessionId(pub i32);
@@ -28,6 +36,8 @@ pub struct StrengthSessionId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
@@ -65,7 +75,7 @@ pub struct NewStrengthSession {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct StrengthSetId(pub i32);
@@ -94,9 +104,20 @@ impl UnverifiedId<StrengthSetId> {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
+    derive(
+        Associations,
+        Identifiable,
+        Queryable,
+        AsChangeset,
+        Create,
+        GetById,
+        GetAll,
+        Update,
+        Delete,
+    )
 )]
 #[cfg_attr(feature = "full", table_name = "strength_set")]
+#[cfg_attr(feature = "full", belongs_to(StrengthSession))]
 pub struct StrengthSet {
     pub id: StrengthSetId,
     pub strength_session_id: StrengthSessionId,

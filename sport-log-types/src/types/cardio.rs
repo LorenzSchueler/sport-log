@@ -72,7 +72,15 @@ impl FromSql<Position, Pg> for Position {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForUser)
+    derive(
+        Hash,
+        FromSqlRow,
+        AsExpression,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct RouteId(pub i32);
@@ -81,6 +89,8 @@ pub struct RouteId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
@@ -118,7 +128,15 @@ pub struct NewRoute {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForUser)
+    derive(
+        Hash,
+        FromSqlRow,
+        AsExpression,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct CardioSessionId(pub i32);
@@ -127,6 +145,8 @@ pub struct CardioSessionId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,

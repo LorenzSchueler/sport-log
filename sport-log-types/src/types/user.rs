@@ -14,7 +14,7 @@ use crate::{
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct UserId(pub i32);
@@ -22,7 +22,15 @@ pub struct UserId(pub i32);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(Queryable, AsChangeset, GetById, GetAll, Delete,)
+    derive(
+        Associations,
+        Identifiable,
+        Queryable,
+        AsChangeset,
+        GetById,
+        GetAll,
+        Delete,
+    )
 )]
 #[cfg_attr(feature = "full", table_name = "user")]
 pub struct User {

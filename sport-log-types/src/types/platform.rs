@@ -15,7 +15,7 @@ use crate::types::UserId;
 #[cfg_attr(
     feature = "full",
     derive(
-        FromSqlRow,
+        Hash, FromSqlRow,
         AsExpression,
         FromI32,
         ToSql,
@@ -31,6 +31,8 @@ pub struct PlatformId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
@@ -56,7 +58,7 @@ pub struct NewPlatform {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForUser)
+    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForUser)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct PlatformCredentialsId(pub i32);
@@ -65,6 +67,8 @@ pub struct PlatformCredentialsId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,

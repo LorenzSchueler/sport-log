@@ -40,6 +40,7 @@ pub enum MovementUnit {
 #[cfg_attr(
     feature = "full",
     derive(
+        Hash,
         FromSqlRow,
         AsExpression,
         FromI32,
@@ -92,6 +93,8 @@ impl UnverifiedId<MovementId> {
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
@@ -154,7 +157,15 @@ impl Unverified<NewMovement> {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForAdmin)
+    derive(
+        Hash,
+        FromSqlRow,
+        AsExpression,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForAdmin
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct EormId(pub i32);
@@ -162,7 +173,17 @@ pub struct EormId(pub i32);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
+    derive(
+        Associations,
+        Identifiable,
+        Queryable,
+        AsChangeset,
+        Create,
+        GetById,
+        GetAll,
+        Update,
+        Delete,
+    )
 )]
 #[cfg_attr(feature = "full", table_name = "eorm")]
 pub struct Eorm {

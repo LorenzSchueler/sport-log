@@ -25,6 +25,7 @@ use crate::types::{PlatformId, UserId};
 #[cfg_attr(
     feature = "full",
     derive(
+        Hash,
         FromSqlRow,
         AsExpression,
         FromI32,
@@ -40,7 +41,15 @@ pub struct ActionProviderId(pub i32);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(Queryable, AsChangeset, GetAll, Delete, VerifyForAdminWithoutDb,)
+    derive(
+        Associations,
+        Identifiable,
+        Queryable,
+        AsChangeset,
+        GetAll,
+        Delete,
+        VerifyForAdminWithoutDb,
+    )
 )]
 #[cfg_attr(feature = "full", table_name = "action_provider")]
 pub struct ActionProvider {
@@ -63,6 +72,7 @@ pub struct NewActionProvider {
 #[cfg_attr(
     feature = "full",
     derive(
+        Hash,
         FromSqlRow,
         AsExpression,
         FromI32,
@@ -78,6 +88,8 @@ pub struct ActionId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
@@ -131,7 +143,15 @@ impl Weekday {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForUser)
+    derive(
+        Hash,
+        FromSqlRow,
+        AsExpression,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct ActionRuleId(pub i32);
@@ -140,6 +160,8 @@ pub struct ActionRuleId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
@@ -174,7 +196,15 @@ pub struct NewActionRule {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, FromI32, ToSql, FromSql, VerifyIdForUser)
+    derive(
+        Hash,
+        FromSqlRow,
+        AsExpression,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct ActionEventId(pub i32);
@@ -202,6 +232,8 @@ impl UnverifiedId<ActionEventId> {
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
