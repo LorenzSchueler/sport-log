@@ -8,8 +8,19 @@ import 'package:sport_log/models/new_user.dart';
 import 'package:sport_log/models/user.dart';
 import 'package:http/http.dart' as http;
 
+part 'user_api.dart';
+
 enum ApiError {
   usernameTaken, unknown, noInternetConnection, loginFailed
+}
+
+class Credentials {
+  Credentials({
+    required this.username,
+    required this.password,
+  });
+
+  String username, password;
 }
 
 class Api {
@@ -19,48 +30,28 @@ class Api {
 
   final String urlBase;
   final _client = http.Client();
+  Credentials? _credentials;
 
-  Future<User> createUser(NewUser newUser) async {
-    try {
-      final response = await _client.post(
-          Uri.parse(urlBase + BackendRoutes.user),
-          body: jsonEncode(newUser.toJson()),
-          headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-          }
-      );
-      if (response.statusCode == 409) {
-        throw ApiError.usernameTaken;
-      } else if (response.statusCode == 200) {
-        return User.fromJson(jsonDecode(response.body));
-      } else {
-        log("${response.statusCode}\n${response.body}", name: "unknown api error");
-        throw ApiError.unknown;
-      }
-    } on SocketException {
-      throw ApiError.noInternetConnection;
-    }
+  void _handleUnknownStatusCode(http.Response response) {
+    log("${response.statusCode}\n${response.body}", name: "unknown api error");
   }
 
-  Future<User> getUser(String username, String password) async {
-    try {
-      String basicAuth = 'Basic ' + base64Encode(utf8.encode('$username:$password'));
-      final response = await _client.get(
-        Uri.parse(urlBase + BackendRoutes.user),
-        headers: {
-          'authorization': basicAuth,
-        }
-      );
-      if (response.statusCode == 401) {
-        throw ApiError.loginFailed;
-      } else if (response.statusCode == 200) {
-        return User.fromJson(jsonDecode(response.body));
-      } else {
-        log("${response.statusCode}\n${response.body}", name: "unknown api error");
-        throw ApiError.unknown;
-      }
-    } on SocketException {
-      throw ApiError.noInternetConnection;
-    }
+  Map<String, String> _makeAuthorizedHeader(String username, String password) {
+    final basicAuth = 'Basic '
+        + base64Encode(utf8.encode('$username:$password'));
+    return {
+      'authorization': basicAuth
+    };
   }
+
+  Map<String, String> get _authorizedHeader {
+    assert(_credentials != null);
+    final username = _credentials!.username;
+    final password = _credentials!.password;
+    return _makeAuthorizedHeader(username, password);
+  }
+
+  static const _jsonContentTypeHeader = {
+    'Content-Type': 'application/json; charset=UTF-8',
+  };
 }
