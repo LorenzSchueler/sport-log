@@ -28,7 +28,6 @@ impl CardioSession {
 impl GetById for CardioSessionDescription {
     type Id = CardioSessionId;
 
-    // TODO add endpoint
     fn get_by_id(cardio_session_id: Self::Id, conn: &PgConnection) -> QueryResult<Self> {
         let cardio_session = CardioSession::get_by_id(cardio_session_id, conn)?;
         CardioSessionDescription::from_session(cardio_session, conn)
@@ -36,7 +35,6 @@ impl GetById for CardioSessionDescription {
 }
 
 impl GetByUser for CardioSessionDescription {
-    // TODO add endpoint
     fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>> {
         let cardio_sessions = CardioSession::get_by_user(user_id, conn)?;
         CardioSessionDescription::from_sessions(cardio_sessions, conn)
@@ -86,15 +84,18 @@ impl CardioSessionDescription {
             .collect())
     }
 
-    // TODO add endpoint
     pub fn get_ordered_by_user_and_timespan(
         user_id: UserId,
-        start: NaiveDateTime,
-        end: NaiveDateTime,
+        start_datetime: NaiveDateTime,
+        end_datetime: NaiveDateTime,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
-        let cardio_sessions =
-            CardioSession::get_ordered_by_user_and_timespan(user_id, start, end, conn)?;
+        let cardio_sessions = CardioSession::get_ordered_by_user_and_timespan(
+            user_id,
+            start_datetime,
+            end_datetime,
+            conn,
+        )?;
         CardioSessionDescription::from_sessions(cardio_sessions, conn)
     }
 }

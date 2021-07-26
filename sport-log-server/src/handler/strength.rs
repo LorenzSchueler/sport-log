@@ -2,11 +2,11 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::types::{
     AuthenticatedUser, Create, Db, Delete, GetById, GetByUser, NewStrengthSession, NewStrengthSet,
-    StrengthSession, StrengthSessionId, StrengthSet, StrengthSetId, Unverified, UnverifiedId,
-    Update,
+    StrengthSession, StrengthSessionDescription, StrengthSessionId, StrengthSet, StrengthSetId,
+    Unverified, UnverifiedId, Update,
 };
 
-use crate::handler::IntoJson;
+use crate::handler::{IntoJson, NaiveDateTimeWrapper};
 
 #[post(
     "/strength_session",
@@ -140,4 +140,47 @@ pub async fn delete_strength_set(
             .map_err(|_| Status::InternalServerError)
     })
     .await
+}
+
+#[get("/strength_session_description/<strength_session_id>")]
+pub async fn get_strength_session_description(
+    strength_session_id: UnverifiedId<StrengthSessionId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<StrengthSessionDescription>, Status> {
+    let strength_session_id = conn
+        .run(move |c| strength_session_id.verify(&auth, c))
+        .await?;
+    conn.run(move |c| StrengthSessionDescription::get_by_id(strength_session_id, c))
+        .await
+        .into_json()
+}
+
+#[get("/strength_session_description")]
+pub async fn get_strength_session_descriptions_by_user(
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<StrengthSessionDescription>>, Status> {
+    conn.run(move |c| StrengthSessionDescription::get_by_user(*auth, c))
+        .await
+        .into_json()
+}
+
+#[get("/strength_session_description/timespan/<start_datetime>/<end_datetime>")]
+pub async fn get_ordered_strength_session_descriptions_by_user_and_timespan(
+    start_datetime: NaiveDateTimeWrapper,
+    end_datetime: NaiveDateTimeWrapper,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<StrengthSessionDescription>>, Status> {
+    conn.run(move |c| {
+        StrengthSessionDescription::get_ordered_by_user_and_timespan(
+            *auth,
+            *start_datetime,
+            *end_datetime,
+            c,
+        )
+    })
+    .await
+    .into_json()
 }

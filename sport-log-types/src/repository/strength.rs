@@ -54,7 +54,6 @@ impl StrengthSet {
 impl GetById for StrengthSessionDescription {
     type Id = StrengthSessionId;
 
-    // TODO add endpoint
     fn get_by_id(strength_session_id: Self::Id, conn: &PgConnection) -> QueryResult<Self> {
         let strength_session = StrengthSession::get_by_id(strength_session_id, conn)?;
         StrengthSessionDescription::from_session(strength_session, conn)
@@ -62,7 +61,6 @@ impl GetById for StrengthSessionDescription {
 }
 
 impl GetByUser for StrengthSessionDescription {
-    // TODO add endpoint
     fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>> {
         let strength_sessions = StrengthSession::get_by_user(user_id, conn)?;
         StrengthSessionDescription::from_sessions(strength_sessions, conn)
@@ -105,15 +103,18 @@ impl StrengthSessionDescription {
             .collect())
     }
 
-    // TODO add endpoint
     pub fn get_ordered_by_user_and_timespan(
         user_id: UserId,
-        start: NaiveDateTime,
-        end: NaiveDateTime,
+        start_datetime: NaiveDateTime,
+        end_datetime: NaiveDateTime,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
-        let strength_sessions =
-            StrengthSession::get_ordered_by_user_and_timespan(user_id, start, end, conn)?;
+        let strength_sessions = StrengthSession::get_ordered_by_user_and_timespan(
+            user_id,
+            start_datetime,
+            end_datetime,
+            conn,
+        )?;
         StrengthSessionDescription::from_sessions(strength_sessions, conn)
     }
 }

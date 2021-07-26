@@ -51,7 +51,6 @@ impl MetconMovement {
 impl GetById for MetconSessionDescription {
     type Id = MetconSessionId;
 
-    // TODO add endpoint
     fn get_by_id(metcon_session_id: Self::Id, conn: &PgConnection) -> QueryResult<Self> {
         let metcon_session = MetconSession::get_by_id(metcon_session_id, conn)?;
         MetconSessionDescription::from_session(metcon_session, conn)
@@ -59,7 +58,6 @@ impl GetById for MetconSessionDescription {
 }
 
 impl GetByUser for MetconSessionDescription {
-    // TODO add endpoint
     fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>> {
         let metcon_sessions = MetconSession::get_by_user(user_id, conn)?;
         MetconSessionDescription::from_sessions(metcon_sessions, conn)
@@ -125,15 +123,18 @@ impl MetconSessionDescription {
             .collect())
     }
 
-    // TODO add endpoint
     pub fn get_ordered_by_user_and_timespan(
         user_id: UserId,
-        start: NaiveDateTime,
-        end: NaiveDateTime,
+        start_datetime: NaiveDateTime,
+        end_datetime: NaiveDateTime,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
-        let metcon_sessions =
-            MetconSession::get_ordered_by_user_and_timespan(user_id, start, end, conn)?;
+        let metcon_sessions = MetconSession::get_ordered_by_user_and_timespan(
+            user_id,
+            start_datetime,
+            end_datetime,
+            conn,
+        )?;
         MetconSessionDescription::from_sessions(metcon_sessions, conn)
     }
 }

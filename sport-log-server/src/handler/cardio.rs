@@ -1,11 +1,12 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::types::{
-    AuthenticatedUser, CardioSession, CardioSessionId, Create, Db, Delete, GetById, GetByUser,
-    NewCardioSession, NewRoute, Route, RouteId, Unverified, UnverifiedId, Update,
+    AuthenticatedUser, CardioSession, CardioSessionDescription, CardioSessionId, Create, Db,
+    Delete, GetById, GetByUser, NewCardioSession, NewRoute, Route, RouteId, Unverified,
+    UnverifiedId, Update,
 };
 
-use crate::handler::IntoJson;
+use crate::handler::{IntoJson, NaiveDateTimeWrapper};
 
 #[post("/route", format = "application/json", data = "<route>")]
 pub async fn create_route(
@@ -131,4 +132,47 @@ pub async fn delete_cardio_session(
             .map_err(|_| Status::InternalServerError)
     })
     .await
+}
+
+#[get("/cardio_session_description/<cardio_session_id>")]
+pub async fn get_cardio_session_description(
+    cardio_session_id: UnverifiedId<CardioSessionId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<CardioSessionDescription>, Status> {
+    let cardio_session_id = conn
+        .run(move |c| cardio_session_id.verify(&auth, c))
+        .await?;
+    conn.run(move |c| CardioSessionDescription::get_by_id(cardio_session_id, c))
+        .await
+        .into_json()
+}
+
+#[get("/cardio_session_description")]
+pub async fn get_cardio_session_descriptions_by_user(
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<CardioSessionDescription>>, Status> {
+    conn.run(move |c| CardioSessionDescription::get_by_user(*auth, c))
+        .await
+        .into_json()
+}
+
+#[get("/cardio_session_description/timespan/<start_datetime>/<end_datetime>")]
+pub async fn get_ordered_cardio_session_descriptions_by_user_and_timespan(
+    start_datetime: NaiveDateTimeWrapper,
+    end_datetime: NaiveDateTimeWrapper,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<CardioSessionDescription>>, Status> {
+    conn.run(move |c| {
+        CardioSessionDescription::get_ordered_by_user_and_timespan(
+            *auth,
+            *start_datetime,
+            *end_datetime,
+            c,
+        )
+    })
+    .await
+    .into_json()
 }
