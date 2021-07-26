@@ -14,7 +14,7 @@ void main() async {
   User? user;
   AuthenticationRepository? authRepo;
   if (!Config.isWeb) {
-    authRepo = AuthenticationRepository();
+    authRepo = await AuthenticationRepository.getInstance();
     user = await authRepo.getUser();
   }
   final api = Api(urlBase: await Config.apiUrlBase);
