@@ -209,7 +209,7 @@ pub struct NewCardioSession {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CardioSessionDescription {
-    cardio_session: CardioSession,
-    route: Option<Route>,
-    movement: Movement,
+    pub cardio_session: CardioSession,
+    pub route: Option<Route>,
+    pub movement: Movement,
 }

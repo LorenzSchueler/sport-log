@@ -311,7 +311,7 @@ pub struct NewMetconSession {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MetconSessionDescription {
-    metcon_session: MetconSession,
-    metcon: Metcon,
-    movements: Vec<Movement>,
+    pub metcon_session: MetconSession,
+    pub metcon: Metcon,
+    pub movements: Vec<Movement>,
 }

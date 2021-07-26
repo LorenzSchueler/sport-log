@@ -176,7 +176,7 @@ impl Unverified<NewStrengthSet> {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct StrengthSessionDescription {
-    strength_session: StrengthSession,
-    strength_sets: Vec<StrengthSet>,
-    movement: Movement,
+    pub strength_session: StrengthSession,
+    pub strength_sets: Vec<StrengthSet>,
+    pub movement: Movement,
 }

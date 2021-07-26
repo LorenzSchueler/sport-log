@@ -2,8 +2,11 @@ use chrono::NaiveDateTime;
 use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
-    schema::{cardio_session, diary, metcon_session, strength_session, wod},
-    types::{Activity, CardioSession, Diary, MetconSession, StrengthSession, UserId, Wod},
+    schema::{diary, wod},
+    types::{
+        Activity, CardioSessionDescription, Diary, MetconSessionDescription,
+        StrengthSessionDescription, UserId, Wod,
+    },
 };
 
 impl Activity {
@@ -36,49 +39,47 @@ impl Activity {
         );
 
         activities.extend(
-            strength_session::table
-                .filter(strength_session::columns::user_id.ge(user_id))
-                .filter(strength_session::columns::datetime.ge(start))
-                .filter(strength_session::columns::datetime.le(end))
-                .get_results::<StrengthSession>(conn)?
-                .into_iter()
-                .map(|strength_session| {
-                    (
-                        strength_session.datetime,
-                        Activity::StrengthSession(strength_session),
-                    )
-                }),
+            StrengthSessionDescription::get_ordered_by_user_and_timespan(
+                user_id, start, end, conn,
+            )?
+            .into_iter()
+            .map(|strength_session_description| {
+                (
+                    strength_session_description.strength_session.datetime,
+                    Activity::StrengthSession(strength_session_description),
+                )
+            }),
         );
 
-        activities.extend(
-            metcon_session::table
-                .filter(metcon_session::columns::user_id.ge(user_id))
-                .filter(metcon_session::columns::datetime.ge(start))
-                .filter(metcon_session::columns::datetime.le(end))
-                .get_results::<MetconSession>(conn)?
-                .into_iter()
-                .map(|metcon_session| {
-                    (
-                        metcon_session.datetime,
-                        Activity::MetconSession(metcon_session),
-                    )
-                }),
-        );
+        //activities.extend(
+        //metcon_session::table
+        //.filter(metcon_session::columns::user_id.ge(user_id))
+        //.filter(metcon_session::columns::datetime.ge(start))
+        //.filter(metcon_session::columns::datetime.le(end))
+        //.get_results::<MetconSession>(conn)?
+        //.into_iter()
+        //.map(|metcon_session| {
+        //(
+        //metcon_session.datetime,
+        //Activity::MetconSession(metcon_session),
+        //)
+        //}),
+        //);
 
-        activities.extend(
-            cardio_session::table
-                .filter(cardio_session::columns::user_id.ge(user_id))
-                .filter(cardio_session::columns::datetime.ge(start))
-                .filter(cardio_session::columns::datetime.le(end))
-                .get_results::<CardioSession>(conn)?
-                .into_iter()
-                .map(|cardio_session| {
-                    (
-                        cardio_session.datetime,
-                        Activity::CardioSession(cardio_session),
-                    )
-                }),
-        );
+        //activities.extend(
+        //cardio_session::table
+        //.filter(cardio_session::columns::user_id.ge(user_id))
+        //.filter(cardio_session::columns::datetime.ge(start))
+        //.filter(cardio_session::columns::datetime.le(end))
+        //.get_results::<CardioSession>(conn)?
+        //.into_iter()
+        //.map(|cardio_session| {
+        //(
+        //cardio_session.datetime,
+        //Activity::CardioSession(cardio_session),
+        //)
+        //}),
+        //);
 
         activities.sort_by(|a, b| b.0.cmp(&a.0));
 
