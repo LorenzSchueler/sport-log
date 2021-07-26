@@ -21,11 +21,11 @@ create table metcon_movement (
     movement_id integer not null references movement on delete no action,
     metcon_id integer not null references metcon on delete cascade,
     count integer not null,
-    unit movement_unit not null,
+    movement_unit movement_unit not null,
     weight real
 );
 
-insert into metcon_movement (movement_id, metcon_id, count, unit, weight) values
+insert into metcon_movement (movement_id, metcon_id, count, movement_unit, weight) values
     (9, 1, 5, 'reps', null),
     (10, 1, 10, 'reps', null),
     (11, 1, 15, 'reps', null),

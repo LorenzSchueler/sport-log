@@ -191,7 +191,7 @@ pub struct MetconMovement {
     pub movement_id: MovementId,
     pub metcon_id: MetconId,
     pub count: i32,
-    pub unit: MovementUnit,
+    pub movement_unit: MovementUnit,
     pub weight: Option<f32>,
 }
 
@@ -220,7 +220,7 @@ pub struct NewMetconMovement {
     pub movement_id: MovementId,
     pub metcon_id: MetconId,
     pub count: i32,
-    pub unit: MovementUnit,
+    pub movement_unit: MovementUnit,
     pub weight: Option<f32>,
 }
 
