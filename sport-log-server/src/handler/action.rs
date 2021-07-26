@@ -277,15 +277,15 @@ pub async fn ap_get_executable_action_events_by_action_provider(
         .into_json()
 }
 
-#[get("/ap/executable_action_event/timerange/<start_datetime>/<end_datetime>")]
-pub async fn ap_get_ordered_executable_action_events_by_action_provider_and_timerange(
+#[get("/ap/executable_action_event/timespan/<start_datetime>/<end_datetime>")]
+pub async fn ap_get_ordered_executable_action_events_by_action_provider_and_timespan(
     start_datetime: NaiveDateTimeWrapper,
     end_datetime: NaiveDateTimeWrapper,
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
     conn.run(move |c| {
-        ExecutableActionEvent::get_ordered_by_action_provider_and_timerange(
+        ExecutableActionEvent::get_ordered_by_action_provider_and_timespan(
             *auth,
             *start_datetime,
             *end_datetime,
