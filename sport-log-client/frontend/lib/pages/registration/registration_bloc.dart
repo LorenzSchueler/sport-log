@@ -46,15 +46,18 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     required auth.AuthenticationBloc authenticationBloc,
     required AuthenticationRepository? authenticationRepository,
     required Api api,
+    required showErrorSnackBar,
   })
       : _authenticationBloc = authenticationBloc,
         _authenticationRepository = authenticationRepository,
         _api = api,
+        _showErrorSnackBar = showErrorSnackBar,
         super(RegistrationState.idle);
 
   final auth.AuthenticationBloc _authenticationBloc;
   final AuthenticationRepository? _authenticationRepository;
   final Api _api;
+  final Function(String) _showErrorSnackBar;
 
   @override
   Stream<RegistrationState> mapEventToState(RegistrationEvent event) async* {
@@ -73,13 +76,25 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       yield RegistrationState.successful;
       _authenticationBloc.add(auth.RegisterEvent(user: user));
     } on ApiError catch (e) {
-      if (e != ApiError.usernameTaken) {
-        addError(e);
-      }
+      _handleApiError(e);
       yield RegistrationState.failed;
     } catch (e) {
       addError(e);
       yield RegistrationState.failed;
+    }
+  }
+
+  void _handleApiError(ApiError error) {
+    switch (error) {
+      case ApiError.usernameTaken:
+        _showErrorSnackBar("Username already taken. Use login instead.");
+        break;
+      case ApiError.unknown:
+        _showErrorSnackBar("Unknown error occurred.");
+        break;
+      case ApiError.noInternetConnection:
+        _showErrorSnackBar("No internet connection.");
+        break;
     }
   }
 }

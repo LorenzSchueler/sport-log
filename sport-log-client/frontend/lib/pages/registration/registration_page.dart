@@ -26,6 +26,12 @@ class RegistrationPage extends StatelessWidget {
                   authenticationBloc: context.read<AuthenticationBloc>(),
                   authenticationRepository: context.read<AuthenticationRepository?>(),
                   api: context.read<Api>(),
+                  showErrorSnackBar: (text) {
+                    final snackBar = SnackBar(
+                      content: Text(text),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  },
                 );
               },
               child: const RegistrationForm(),

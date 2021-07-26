@@ -29,11 +29,6 @@ class RegistrationFormState extends State<RegistrationForm> {
           if (state == RegistrationState.successful) {
             Navigator.of(context).pushNamedAndRemoveUntil(Routes.home,
                     (route) => false);
-          } else if (state == RegistrationState.failed) {
-            const snackBar = SnackBar(
-                content: Text("Username already registered. Use login instead."),
-            );
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
           }
         },
         builder: (context, RegistrationState state) {
