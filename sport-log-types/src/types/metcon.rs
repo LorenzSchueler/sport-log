@@ -10,7 +10,7 @@ use sport_log_server_derive::{
     Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
 };
 
-use crate::types::{MovementId, MovementUnit, UserId};
+use crate::types::{Movement, MovementId, MovementUnit, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
@@ -288,4 +288,11 @@ pub struct NewMetconSession {
     pub reps: Option<i32>,
     pub rx: bool,
     pub comments: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct MetconSessionDescription {
+    metcon_session: MetconSession,
+    metcon: Metcon,
+    movements: Vec<Movement>,
 }

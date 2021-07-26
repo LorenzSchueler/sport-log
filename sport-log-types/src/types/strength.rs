@@ -9,7 +9,7 @@ use sport_log_server_derive::{
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
-use crate::types::{MovementId, MovementUnit, UserId};
+use crate::types::{Movement, MovementId, MovementUnit, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{strength_session, strength_set},
@@ -151,4 +151,11 @@ impl Unverified<NewStrengthSet> {
             Err(Status::Forbidden)
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct StrengthSessionDescription {
+    strength_session: StrengthSession,
+    strength_sets: Vec<StrengthSet>,
+    movement: Movement,
 }

@@ -22,7 +22,7 @@ use sport_log_server_derive::{
 
 #[cfg(feature = "full")]
 use crate::schema::{cardio_session, route};
-use crate::types::{MovementId, UserId};
+use crate::types::{Movement, MovementId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]
@@ -179,4 +179,11 @@ pub struct NewCardioSession {
     pub heart_rate: Option<Vec<f32>>,
     pub route_id: Option<RouteId>,
     pub comments: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct CardioSessionDescription {
+    cardio_session: CardioSession,
+    route: Option<Route>,
+    movement: Movement,
 }

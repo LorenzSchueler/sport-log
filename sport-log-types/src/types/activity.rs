@@ -1,18 +1,17 @@
 use serde::{Deserialize, Serialize};
 
-use crate::types::{CardioSession, Diary, MetconSession, StrengthSession, Wod};
+use crate::types::{
+    CardioSessionDescription, Diary, MetconSessionDescription, StrengthSessionDescription, Wod,
+};
 
-/// Enum of all possible Activities.
+/// Enum of all possible Activities and all their correlated types.
 ///
 /// Used for the activity endpoint which provides a single endpoint for retrieving all Activities in a given timerange.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Activity {
     Diary(Diary),
     Wod(Wod),
-    StrengthSession(StrengthSession),
-    MetconSession(MetconSession),
-    CardioSession(CardioSession),
-    //StrengthSession((StrengthSession, Vec<StrengthSet>)), // TODO
-    //MetconSession((MetconSession, Metcon, Vec<MetconMovement>)),
-    //CardioSession((CardioSession, Option<Route>)),
+    StrengthSession(StrengthSessionDescription),
+    MetconSession(MetconSessionDescription),
+    CardioSession(CardioSessionDescription),
 }

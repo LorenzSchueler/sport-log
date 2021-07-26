@@ -1,6 +1,5 @@
 #[cfg(feature = "full")]
-use diesel::PgConnection;
-use diesel::QueryResult;
+use diesel::{PgConnection, QueryResult};
 #[cfg(feature = "full")]
 use rocket::{
     data::{self, FromData},
