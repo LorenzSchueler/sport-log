@@ -4,7 +4,7 @@ import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 enum BottomNavPage {
-  workout, strength, cardio
+  workout, strength, cardio, other
 }
 
 class WorkoutPage extends StatefulWidget {
@@ -29,6 +29,7 @@ class WorkoutPageState extends State<WorkoutPage> {
         items: BottomNavPage.values.map(_toBottomNavItem).toList(),
         currentIndex: _currentPage.index,
         onTap: _onBottomNavItemTapped,
+        type: BottomNavigationBarType.fixed,
       ),
       drawer: const MainDrawer(),
     );
@@ -47,6 +48,10 @@ class WorkoutPageState extends State<WorkoutPage> {
       case BottomNavPage.cardio:
         return const Center(
           child: Text("Cardio"),
+        );
+      case BottomNavPage.other:
+        return const Center(
+          child: Text("Weight and Comments"),
         );
     }
   }
@@ -67,6 +72,11 @@ class WorkoutPageState extends State<WorkoutPage> {
         return const BottomNavigationBarItem(
           icon: Icon(CustomIcons.heart),
           label: "Cardio",
+        );
+      case BottomNavPage.other:
+        return const BottomNavigationBarItem(
+          icon: Icon(Icons.edit),
+          label: "Other",
         );
     }
   }
