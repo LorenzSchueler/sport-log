@@ -19,19 +19,13 @@ impl Activity {
         let mut activities = vec![];
 
         activities.extend(
-            diary::table
-                .filter(diary::columns::user_id.ge(user_id))
-                .filter(diary::columns::date.between(start.date(), end.date()))
-                .get_results::<Diary>(conn)?
+            Diary::get_ordered_by_user_and_timespan(user_id, start, end, conn)?
                 .into_iter()
                 .map(|diary| (diary.date.and_hms(0, 0, 0), Activity::Diary(diary))),
         );
 
         activities.extend(
-            wod::table
-                .filter(wod::columns::user_id.ge(user_id))
-                .filter(wod::columns::date.between(start.date(), end.date()))
-                .get_results::<Wod>(conn)?
+            Wod::get_ordered_by_user_and_timespan(user_id, start, end, conn)?
                 .into_iter()
                 .map(|wod| (wod.date.and_hms(0, 0, 0), Activity::Wod(wod))),
         );

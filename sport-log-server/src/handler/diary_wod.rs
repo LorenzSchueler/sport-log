@@ -5,7 +5,7 @@ use sport_log_types::{
     GetByUser, NewDiary, NewWod, Unverified, UnverifiedId, Update, Wod, WodId,
 };
 
-use crate::handler::IntoJson;
+use crate::handler::{IntoJson, NaiveDateTimeWrapper};
 
 #[post("/ap/wod", format = "application/json", data = "<wod>")]
 pub async fn ap_create_wod(
@@ -25,6 +25,20 @@ pub async fn create_wod(
 ) -> Result<Json<Wod>, Status> {
     let wod = wod.verify(&auth)?;
     conn.run(|c| Wod::create(wod, c)).await.into_json()
+}
+
+#[get("/wod/timespan/<start_datetime>/<end_datetime>")]
+pub async fn get_ordered_wods_by_timespan(
+    start_datetime: NaiveDateTimeWrapper,
+    end_datetime: NaiveDateTimeWrapper,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<Wod>>, Status> {
+    conn.run(move |c| {
+        Wod::get_ordered_by_user_and_timespan(*auth, *start_datetime, *end_datetime, c)
+    })
+    .await
+    .into_json()
 }
 
 #[get("/wod")]
@@ -78,6 +92,20 @@ pub async fn get_diary(
     conn.run(move |c| Diary::get_by_id(diary_id, c))
         .await
         .into_json()
+}
+
+#[get("/diary/timespan/<start_datetime>/<end_datetime>")]
+pub async fn get_ordered_diarys_by_timespan(
+    start_datetime: NaiveDateTimeWrapper,
+    end_datetime: NaiveDateTimeWrapper,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<Diary>>, Status> {
+    conn.run(move |c| {
+        Diary::get_ordered_by_user_and_timespan(*auth, *start_datetime, *end_datetime, c)
+    })
+    .await
+    .into_json()
 }
 
 #[get("/diary")]
