@@ -1,24 +1,20 @@
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sport_log/authentication/authentication_bloc.dart';
-import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
-import 'package:sport_log/helpers/navigator_extension.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 enum BottomNavPage {
   workout, strength, cardio
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class WorkoutPage extends StatefulWidget {
+  const WorkoutPage({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => HomePageState();
+  State<StatefulWidget> createState() => WorkoutPageState();
 }
 
-class HomePageState extends State<HomePage> {
+class WorkoutPageState extends State<WorkoutPage> {
 
   BottomNavPage _currentPage = BottomNavPage.workout;
 

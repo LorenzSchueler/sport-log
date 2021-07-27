@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/pages/syncing/syncing_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
 import 'package:sport_log/helpers/material_color_generator.dart';
-import 'package:sport_log/pages/home/home_page.dart';
+import 'package:sport_log/pages/workout/workout_page.dart';
 import 'package:sport_log/pages/landing/landing_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
@@ -29,7 +29,7 @@ class AppState extends State<App> {
         Routes.landing: (_) => const LandingPage(),
         Routes.login: (_) => const LoginPage(),
         Routes.registration: (_) => const RegistrationPage(),
-        Routes.workout: (_) => ProtectedRoute(builder: (_) => const HomePage()),
+        Routes.workout: (_) => ProtectedRoute(builder: (_) => const WorkoutPage()),
         Routes.syncing: (_) => ProtectedRoute(builder: (_) => const SyncingPage()),
       },
       initialRoute: widget.isAuthenticatedAtStart ? Routes.syncing : Routes.landing,
