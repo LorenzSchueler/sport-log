@@ -44,6 +44,26 @@ class HomePageState extends State<HomePage> {
         currentIndex: _currentPage.index,
         onTap: _onBottomNavItemTapped,
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              child: Text("Sport Log"),
+            ),
+            ListTile(
+              title: const Text("Workout"),
+              leading: const Icon(CustomIcons.dumbbell_rotated),
+              onTap: () {},
+            ),
+            ListTile(
+              title: const Text("Syncing"),
+              leading: const Icon(Icons.sync),
+              onTap: () {},
+            )
+          ],
+        ),
+      ),
     );
   }
 
