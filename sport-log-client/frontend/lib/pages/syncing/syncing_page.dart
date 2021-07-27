@@ -14,8 +14,14 @@ class SyncingPageState extends State<SyncingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Syncing")),
-      body: Center(child: Text("Syncing")),
+      body: const Center(child: Text("Syncing")),
       drawer: const MainDrawer(),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+
+        },
+      ),
     );
   }
 }

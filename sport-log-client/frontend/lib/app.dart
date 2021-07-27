@@ -32,7 +32,7 @@ class AppState extends State<App> {
         Routes.workout: (_) => ProtectedRoute(builder: (_) => const HomePage()),
         Routes.syncing: (_) => ProtectedRoute(builder: (_) => const SyncingPage()),
       },
-      initialRoute: widget.isAuthenticatedAtStart ? Routes.workout : Routes.landing,
+      initialRoute: widget.isAuthenticatedAtStart ? Routes.syncing : Routes.landing,
       debugShowCheckedModeBanner: false,
       darkTheme: ThemeData(
         brightness: Brightness.dark,
