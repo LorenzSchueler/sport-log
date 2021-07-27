@@ -80,7 +80,6 @@ impl UnverifiedId<MetconId> {
         AsChangeset,
         Create,
         GetById,
-        GetByUser,
         GetAll,
         Update,
         Delete,

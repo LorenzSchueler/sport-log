@@ -11,7 +11,7 @@ impl GetByUser for Movement {
             .filter(
                 movement::columns::user_id
                     .eq(user_id)
-                    .or(movement::columns::user_id.eq(Option::<UserId>::None)),
+                    .or(movement::columns::user_id.is_null()),
             )
             .get_results(conn)
     }

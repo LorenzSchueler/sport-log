@@ -9,6 +9,18 @@ use crate::{
     },
 };
 
+impl GetByUser for Metcon {
+    fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+        metcon::table
+            .filter(
+                metcon::columns::user_id
+                    .eq(user_id)
+                    .or(metcon::columns::user_id.is_null()),
+            )
+            .get_results(conn)
+    }
+}
+
 impl MetconSession {
     pub fn get_ordered_by_user_and_timespan(
         user_id: UserId,
