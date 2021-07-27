@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:sport_log/pages/logs/logs_page.dart';
 import 'package:sport_log/pages/syncing/syncing_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
 import 'package:sport_log/helpers/material_color_generator.dart';
@@ -31,6 +32,7 @@ class AppState extends State<App> {
         Routes.registration: (_) => const RegistrationPage(),
         Routes.workout: (_) => ProtectedRoute(builder: (_) => const WorkoutPage()),
         Routes.syncing: (_) => ProtectedRoute(builder: (_) => const SyncingPage()),
+        Routes.logs: (_) => ProtectedRoute(builder: (_) => const LogsPage()),
       },
       initialRoute: widget.isAuthenticatedAtStart ? Routes.syncing : Routes.landing,
       debugShowCheckedModeBanner: false,
