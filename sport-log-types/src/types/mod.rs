@@ -50,6 +50,9 @@ pub use sharing::*;
 pub use strength::*;
 pub use user::*;
 
+/// Wrapper around incoming json data for which the access permissions for the [AuthenticatedUser], [AuthenticatedActionProvider] or [AuthenticatedAdmin] have not been checked.
+///
+/// The data can be retrieved by using the appropriate verification function.
 #[cfg(feature = "full")]
 #[derive(Debug)]
 pub struct Unverified<T>(Json<T>);
@@ -64,10 +67,14 @@ impl<'r, T: Deserialize<'r>> FromData<'r> for Unverified<T> {
     }
 }
 
+/// Indicated that the type can be build from an [i32].
 pub trait FromI32 {
     fn from_i32(value: i32) -> Self;
 }
 
+/// Wrapper around Id types for which the access permissions for the [AuthenticatedUser], [AuthenticatedActionProvider] or [AuthenticatedAdmin] have not been checked.
+///
+/// The Id type can be retrieved by using the appropriate verification function.
 #[cfg(feature = "full")]
 #[derive(Debug, Clone)]
 pub struct UnverifiedId<I>(I);
@@ -81,6 +88,13 @@ impl<'v, I: FromI32> rocket::request::FromParam<'v> for UnverifiedId<I> {
     }
 }
 
+/// A type for which a new database entry can be created.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(Create)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_server_derive::Create].
 #[cfg(feature = "full")]
 pub trait Create {
     type New;
@@ -90,6 +104,13 @@ pub trait Create {
         Self: Sized;
 }
 
+/// A type for which an entry can be retrieved by id from the database.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(GetById)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_server_derive::GetById].
 #[cfg(feature = "full")]
 pub trait GetById {
     type Id;
@@ -99,6 +120,13 @@ pub trait GetById {
         Self: Sized;
 }
 
+/// A type for which entries can be retrieved by user from the database.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(GetByUser)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_server_derive::GetByUser].
 #[cfg(feature = "full")]
 pub trait GetByUser {
     fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>>
@@ -106,6 +134,13 @@ pub trait GetByUser {
         Self: Sized;
 }
 
+/// A type for which all entries can be retrieved from the database.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(GetAll)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_server_derive::GetAll].
 #[cfg(feature = "full")]
 pub trait GetAll {
     fn get_all(conn: &PgConnection) -> QueryResult<Vec<Self>>
@@ -113,6 +148,13 @@ pub trait GetAll {
         Self: Sized;
 }
 
+/// A type which can be used to update an entry in the database.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(Update)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_server_derive::Update].
 #[cfg(feature = "full")]
 pub trait Update {
     fn update(entity: Self, conn: &PgConnection) -> QueryResult<Self>
@@ -120,6 +162,13 @@ pub trait Update {
         Self: Sized;
 }
 
+/// A type for which an entry can be deleted by id from the database.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(Delete)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_server_derive::Delete].
 #[cfg(feature = "full")]
 pub trait Delete {
     type Id;
