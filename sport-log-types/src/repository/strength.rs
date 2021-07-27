@@ -12,14 +12,13 @@ use crate::{
 impl StrengthSession {
     pub fn get_ordered_by_user_and_timespan(
         user_id: UserId,
-        start: NaiveDateTime,
-        end: NaiveDateTime,
+        start_datetime: NaiveDateTime,
+        end_datetime: NaiveDateTime,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         strength_session::table
             .filter(strength_session::columns::user_id.ge(user_id))
-            .filter(strength_session::columns::datetime.ge(start))
-            .filter(strength_session::columns::datetime.le(end))
+            .filter(strength_session::columns::datetime.between(start_datetime, end_datetime))
             .order_by(strength_session::columns::datetime)
             .get_results(conn)
     }

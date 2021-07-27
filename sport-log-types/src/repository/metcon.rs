@@ -24,14 +24,13 @@ impl GetByUser for Metcon {
 impl MetconSession {
     pub fn get_ordered_by_user_and_timespan(
         user_id: UserId,
-        start: NaiveDateTime,
-        end: NaiveDateTime,
+        start_datetime: NaiveDateTime,
+        end_datetime: NaiveDateTime,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         metcon_session::table
             .filter(metcon_session::columns::user_id.ge(user_id))
-            .filter(metcon_session::columns::datetime.ge(start))
-            .filter(metcon_session::columns::datetime.le(end))
+            .filter(metcon_session::columns::datetime.between(start_datetime, end_datetime))
             .order_by(metcon_session::columns::datetime)
             .get_results(conn)
     }

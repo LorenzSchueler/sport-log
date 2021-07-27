@@ -21,8 +21,7 @@ impl Activity {
         activities.extend(
             diary::table
                 .filter(diary::columns::user_id.ge(user_id))
-                .filter(diary::columns::date.ge(start.date()))
-                .filter(diary::columns::date.le(end.date()))
+                .filter(diary::columns::date.between(start.date(), end.date()))
                 .get_results::<Diary>(conn)?
                 .into_iter()
                 .map(|diary| (diary.date.and_hms(0, 0, 0), Activity::Diary(diary))),
@@ -31,8 +30,7 @@ impl Activity {
         activities.extend(
             wod::table
                 .filter(wod::columns::user_id.ge(user_id))
-                .filter(wod::columns::date.ge(start.date()))
-                .filter(wod::columns::date.le(end.date()))
+                .filter(wod::columns::date.between(start.date(), end.date()))
                 .get_results::<Wod>(conn)?
                 .into_iter()
                 .map(|wod| (wod.date.and_hms(0, 0, 0), Activity::Wod(wod))),

@@ -12,14 +12,13 @@ use crate::{
 impl CardioSession {
     pub fn get_ordered_by_user_and_timespan(
         user_id: UserId,
-        start: NaiveDateTime,
-        end: NaiveDateTime,
+        start_datetime: NaiveDateTime,
+        end_datetime: NaiveDateTime,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         cardio_session::table
             .filter(cardio_session::columns::user_id.ge(user_id))
-            .filter(cardio_session::columns::datetime.ge(start))
-            .filter(cardio_session::columns::datetime.le(end))
+            .filter(cardio_session::columns::datetime.between(start_datetime, end_datetime))
             .order_by(cardio_session::columns::datetime)
             .get_results(conn)
     }
