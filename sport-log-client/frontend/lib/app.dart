@@ -28,9 +28,9 @@ class AppState extends State<App> {
         Routes.landing: (_) => const LandingPage(),
         Routes.login: (_) => const LoginPage(),
         Routes.registration: (_) => const RegistrationPage(),
-        Routes.home: (_) => ProtectedRoute(builder: (_) => const HomePage()),
+        Routes.workout: (_) => ProtectedRoute(builder: (_) => const HomePage()),
       },
-      initialRoute: widget.isAuthenticatedAtStart ? Routes.home : Routes.landing,
+      initialRoute: widget.isAuthenticatedAtStart ? Routes.workout : Routes.landing,
       debugShowCheckedModeBanner: false,
       darkTheme: ThemeData(
         brightness: Brightness.dark,

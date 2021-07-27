@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/authentication/authentication_bloc.dart';
+import 'package:sport_log/helpers/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 
 class ProtectedRoute extends StatelessWidget {
@@ -31,8 +32,7 @@ class ProtectedRoute extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, Routes.landing, (route) => false);
+                    Nav.changeNamed(context, Routes.landing);
                   },
                   child: const Text("Go back..."),
                 ),

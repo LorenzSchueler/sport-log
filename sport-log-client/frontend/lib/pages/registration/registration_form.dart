@@ -2,6 +2,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sport_log/helpers/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 
 import 'registration_bloc.dart';
@@ -27,8 +28,7 @@ class RegistrationFormState extends State<RegistrationForm> {
       child: BlocConsumer<RegistrationBloc, RegistrationState>(
         listener: (context, state) {
           if (state == RegistrationState.successful) {
-            Navigator.of(context).pushNamedAndRemoveUntil(Routes.home,
-                    (route) => false);
+            Nav.changeNamed(context, Routes.workout);
           }
         },
         builder: (context, RegistrationState state) {

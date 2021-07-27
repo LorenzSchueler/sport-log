@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/authentication/authentication_bloc.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/helpers/navigator_extension.dart';
 
 enum BottomNavPage {
   workout, strength, cardio
@@ -25,18 +26,6 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home"),
-        actions: [
-          IconButton(
-            onPressed: () {
-              context.read<AuthenticationBloc>().add(const LogoutEvent());
-              Navigator.pushNamedAndRemoveUntil(
-                  context, Routes.landing, (route) => false);
-            },
-            icon: const Icon(
-                Icons.logout
-            ),
-          ),
-        ],
       ),
       body: _mainPage,
       bottomNavigationBar: BottomNavigationBar(
@@ -45,22 +34,34 @@ class HomePageState extends State<HomePage> {
         onTap: _onBottomNavItemTapped,
       ),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
+        child: Column(
           children: [
             const DrawerHeader(
-              child: Text("Sport Log"),
+              child: null,
             ),
             ListTile(
               title: const Text("Workout"),
               leading: const Icon(CustomIcons.dumbbell_rotated),
-              onTap: () {},
+              onTap: () {
+
+              },
             ),
             ListTile(
               title: const Text("Syncing"),
               leading: const Icon(Icons.sync),
-              onTap: () {},
-            )
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            const Spacer(),
+            ListTile(
+              title: const Text("Logout"),
+              leading: const Icon(Icons.logout),
+              onTap: () {
+                context.read<AuthenticationBloc>().add(const LogoutEvent());
+                Nav.changeNamed(context, Routes.landing);
+              },
+            ),
           ],
         ),
       ),

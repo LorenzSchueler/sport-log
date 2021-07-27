@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sport_log/helpers/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 
 import 'login_bloc.dart';
@@ -24,8 +25,7 @@ class LoginFormState extends State<LoginForm> {
       child: BlocConsumer<LoginBloc, LoginState>(
         listener: (context, state) {
           if (state == LoginState.successful) {
-            Navigator.of(context).pushNamedAndRemoveUntil(Routes.home,
-                    (route) => false);
+            Nav.changeNamed(context, Routes.workout);
           } else if (state == LoginState.failed) {
 
           }
