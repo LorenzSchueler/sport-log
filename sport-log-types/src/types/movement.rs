@@ -109,8 +109,10 @@ impl UnverifiedId<MovementId> {
 #[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Movement {
     pub id: MovementId,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub user_id: Option<UserId>,
     pub name: String,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
     pub category: MovementCategory,
 }

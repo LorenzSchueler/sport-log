@@ -56,7 +56,9 @@ pub struct StrengthSession {
     pub datetime: NaiveDateTime,
     pub movement_id: MovementId,
     pub movement_unit: MovementUnit,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub interval: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
 }
 
@@ -122,6 +124,7 @@ pub struct StrengthSet {
     pub id: StrengthSetId,
     pub strength_session_id: StrengthSessionId,
     pub count: i32,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub weight: Option<f32>,
 }
 

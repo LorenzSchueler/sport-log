@@ -53,7 +53,9 @@ pub struct Diary {
     pub id: DiaryId,
     pub user_id: UserId,
     pub date: NaiveDate,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub bodyweight: Option<f32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
 }
 
@@ -106,6 +108,7 @@ pub struct Wod {
     pub id: WodId,
     pub user_id: UserId,
     pub date: NaiveDate,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
 }
 

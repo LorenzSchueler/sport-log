@@ -112,8 +112,11 @@ pub struct Route {
     pub user_id: UserId,
     pub name: String,
     pub distance: i32,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub ascent: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub descent: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub track: Option<Vec<Position>>,
 }
 
@@ -171,17 +174,29 @@ pub struct CardioSession {
     pub movement_id: MovementId,
     pub cardio_type: CardioType,
     pub datetime: NaiveDateTime,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub distance: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub ascent: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub descent: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub time: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub calories: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub track: Option<Vec<Position>>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub avg_cycles: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub cycles: Option<Vec<f32>>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub avg_heart_rate: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub heart_rate: Option<Vec<f32>>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub route_id: Option<RouteId>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
 }
 

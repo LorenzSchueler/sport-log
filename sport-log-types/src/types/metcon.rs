@@ -90,11 +90,16 @@ impl UnverifiedId<MetconId> {
 #[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Metcon {
     pub id: MetconId,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub user_id: Option<UserId>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub name: Option<String>,
     pub metcon_type: MetconType,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub rounds: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub timecap: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
 }
 
@@ -207,6 +212,7 @@ pub struct MetconMovement {
     pub metcon_id: MetconId,
     pub count: i32,
     pub movement_unit: MovementUnit,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub weight: Option<f32>,
 }
 
@@ -298,10 +304,14 @@ pub struct MetconSession {
     pub user_id: UserId,
     pub metcon_id: MetconId,
     pub datetime: NaiveDateTime,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub time: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub rounds: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub reps: Option<i32>,
     pub rx: bool,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
 }
 
