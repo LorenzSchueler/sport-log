@@ -1,6 +1,6 @@
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_types::types::{
+use sport_log_types::{
     AuthenticatedUser, Create, Db, Delete, GetById, GetByUser, Metcon, MetconId, MetconMovement,
     MetconMovementId, MetconSession, MetconSessionDescription, MetconSessionId, NewMetcon,
     NewMetconMovement, NewMetconSession, Unverified, UnverifiedId, Update,

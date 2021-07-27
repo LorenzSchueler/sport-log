@@ -1,6 +1,6 @@
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_types::types::{
+use sport_log_types::{
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
     ActionRuleId, AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser, Create, Db,
     Delete, ExecutableActionEvent, GetAll, GetById, GetByUser, NewAction, NewActionEvent,

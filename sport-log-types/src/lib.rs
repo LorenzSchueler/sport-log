@@ -6,4 +6,5 @@ extern crate diesel;
 pub mod repository;
 #[cfg(feature = "full")]
 pub mod schema;
-pub mod types;
+mod types;
+pub use types::*;

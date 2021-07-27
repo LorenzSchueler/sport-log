@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate rocket;
 
-use sport_log_types::types::{Db, CONFIG};
+use sport_log_types::{Db, CONFIG};
 
 mod handler;
 

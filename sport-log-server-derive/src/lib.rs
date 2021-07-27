@@ -9,7 +9,7 @@ use crud::*;
 use to_from_sql::*;
 use verification::*;
 
-/// Derives `sport_log_types::types::Create`.
+/// Derives `sport_log_types::Create`.
 ///
 /// This macro only works if the following conditions are satisfied:
 ///
@@ -21,7 +21,7 @@ pub fn create_derive(input: TokenStream) -> TokenStream {
     impl_create(&ast)
 }
 
-/// Derives `sport_log_types::types::GetById`.
+/// Derives `sport_log_types::GetById`.
 ///
 /// This macro only works if the following conditions are satisfied:
 /// - the corresponding table has the same name like this type but in snake_case
@@ -32,7 +32,7 @@ pub fn get_by_id_derive(input: TokenStream) -> TokenStream {
     impl_get_by_id(&ast)
 }
 
-/// Derives `sport_log_types::types::GetByUser`.
+/// Derives `sport_log_types::GetByUser`.
 ///
 /// This macro only works if the following conditions are satisfied:
 /// - the corresponding table has the same name like this type but in snake_case
@@ -43,7 +43,7 @@ pub fn get_by_user_derive(input: TokenStream) -> TokenStream {
     impl_get_by_user(&ast)
 }
 
-/// Derives `sport_log_types::types::GetAll`.
+/// Derives `sport_log_types::GetAll`.
 ///
 /// This macro only works if the following condition is satisfied:
 /// - the corresponding table has the same name like this type but in snake_case
@@ -53,7 +53,7 @@ pub fn get_all_derive(input: TokenStream) -> TokenStream {
     impl_get_all(&ast)
 }
 
-/// Derives `sport_log_types::types::Update`.
+/// Derives `sport_log_types::Update`.
 ///
 /// This macro only works if the following conditions are satisfied:
 /// - the corresponding table has the same name like this type but in snake_case
@@ -64,7 +64,7 @@ pub fn update_derive(input: TokenStream) -> TokenStream {
     impl_update(&ast)
 }
 
-/// Derives `sport_log_types::types::Delete`.
+/// Derives `sport_log_types::Delete`.
 ///
 /// This macro only works if the following conditions are satisfied:
 /// - the corresponding table has the same name like this type but in snake_case
@@ -135,7 +135,7 @@ pub fn verify_for_admin_without_db_derive(input: TokenStream) -> TokenStream {
     impl_verify_for_admin_without_db(&ast)
 }
 
-/// Derives `sport_log_types::types::FromI32`.
+/// Derives `sport_log_types::FromI32`.
 ///
 /// This macro only works if the type is a one tuple struct of i32.
 #[proc_macro_derive(FromI32)]
@@ -146,7 +146,7 @@ pub fn form_i32_derive(input: TokenStream) -> TokenStream {
 
 /// Derives `diesel::types::ToSql<diesel::sql_types::Integer, diesel::pg::Pg>`.
 ///
-/// This macro only works if the type implements `sport_log_types::types::FromI32` which can also be derived using [FromI32].
+/// This macro only works if the type implements `sport_log_types::FromI32` which can also be derived using [FromI32].
 #[proc_macro_derive(ToSql)]
 pub fn unverified_inner_int_to_sql(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
@@ -155,7 +155,7 @@ pub fn unverified_inner_int_to_sql(input: TokenStream) -> TokenStream {
 
 /// Derives `diesel::types::FromSql<diesel::sql_types::Integer, diesel::pg::Pg>`.
 ///
-/// This macro only works if the type implements `sport_log_types::types::FromI32` which can also be derived using [FromI32].
+/// This macro only works if the type implements `sport_log_types::FromI32` which can also be derived using [FromI32].
 #[proc_macro_derive(FromSql)]
 pub fn unverified_inner_int_drom_sql(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();

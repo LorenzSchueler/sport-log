@@ -1,6 +1,6 @@
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_types::types::{AccountData, AuthenticatedUser, Db};
+use sport_log_types::{AccountData, AuthenticatedUser, Db};
 
 use crate::handler::IntoJson;
 

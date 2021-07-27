@@ -1,6 +1,6 @@
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_types::types::{Activity, AuthenticatedUser, Db};
+use sport_log_types::{Activity, AuthenticatedUser, Db};
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
 
