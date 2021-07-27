@@ -34,7 +34,7 @@ class AppState extends State<App> {
         Routes.syncing: (_) => ProtectedRoute(builder: (_) => const SyncingPage()),
         Routes.logs: (_) => ProtectedRoute(builder: (_) => const LogsPage()),
       },
-      initialRoute: widget.isAuthenticatedAtStart ? Routes.syncing : Routes.landing,
+      initialRoute: widget.isAuthenticatedAtStart ? Routes.workout : Routes.landing,
       debugShowCheckedModeBanner: false,
       darkTheme: ThemeData(
         brightness: Brightness.dark,
