@@ -119,6 +119,7 @@ fn rocket() -> _ {
             cardio::get_cardio_session_descriptions,
             cardio::get_ordered_cardio_session_descriptions_by_timespan,
             activity::get_ordered_activities_by_timespan,
+            activity::get_activities,
             account::get_account_data,
         ],
     )
