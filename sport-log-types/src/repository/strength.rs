@@ -17,7 +17,7 @@ impl StrengthSession {
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         strength_session::table
-            .filter(strength_session::columns::user_id.ge(user_id))
+            .filter(strength_session::columns::user_id.eq(user_id))
             .filter(strength_session::columns::datetime.between(start_datetime, end_datetime))
             .order_by(strength_session::columns::datetime)
             .get_results(conn)

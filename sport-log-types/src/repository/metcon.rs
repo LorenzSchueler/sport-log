@@ -29,7 +29,7 @@ impl MetconSession {
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         metcon_session::table
-            .filter(metcon_session::columns::user_id.ge(user_id))
+            .filter(metcon_session::columns::user_id.eq(user_id))
             .filter(metcon_session::columns::datetime.between(start_datetime, end_datetime))
             .order_by(metcon_session::columns::datetime)
             .get_results(conn)

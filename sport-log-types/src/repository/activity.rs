@@ -1,12 +1,9 @@
 use chrono::NaiveDateTime;
-use diesel::{prelude::*, PgConnection, QueryResult};
+use diesel::{PgConnection, QueryResult};
 
-use crate::{
-    schema::{diary, wod},
-    types::{
-        Activity, CardioSessionDescription, Diary, MetconSessionDescription,
-        StrengthSessionDescription, UserId, Wod,
-    },
+use crate::types::{
+    Activity, CardioSessionDescription, Diary, MetconSessionDescription,
+    StrengthSessionDescription, UserId, Wod,
 };
 
 impl Activity {

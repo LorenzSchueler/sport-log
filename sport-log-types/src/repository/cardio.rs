@@ -17,7 +17,7 @@ impl CardioSession {
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         cardio_session::table
-            .filter(cardio_session::columns::user_id.ge(user_id))
+            .filter(cardio_session::columns::user_id.eq(user_id))
             .filter(cardio_session::columns::datetime.between(start_datetime, end_datetime))
             .order_by(cardio_session::columns::datetime)
             .get_results(conn)
