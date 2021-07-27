@@ -28,7 +28,7 @@ class MainDrawer extends StatelessWidget {
             title: const Text("Syncing"),
             leading: const Icon(Icons.sync),
             onTap: () {
-              Navigator.pop(context);
+              Nav.changeNamed(context, Routes.syncing);
             },
           ),
           const Spacer(),
