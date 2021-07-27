@@ -21,7 +21,7 @@ class MainDrawer extends StatelessWidget {
             title: const Text("Workout"),
             leading: const Icon(CustomIcons.dumbbell_rotated),
             onTap: () {
-
+              Nav.changeNamed(context, Routes.workout);
             },
           ),
           ListTile(
