@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
@@ -31,7 +32,7 @@ class WorkoutPageState extends State<WorkoutPage> {
         onTap: _onBottomNavItemTapped,
         type: BottomNavigationBarType.fixed,
       ),
-      drawer: const MainDrawer(),
+      drawer: const MainDrawer(selectedRoute: Routes.workout),
     );
   }
 

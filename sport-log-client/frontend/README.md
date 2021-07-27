@@ -13,7 +13,8 @@
 * [x] registration page
 * [x] better code in Api class (esp. authentication)
 * [x] connect to backend user routes
+* [x] create bottom nav bar (logging, actions, ...)
+* [ ] drawer tabs don't restart scaffold
 * [ ] improve landing screen
 * [ ] save user credentials in web
 * [ ] i18n
-* [ ] create bottom nav bar (logging, actions, ...)

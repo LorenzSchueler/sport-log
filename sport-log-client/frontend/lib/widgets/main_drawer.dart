@@ -1,13 +1,18 @@
 
 import 'package:flutter/material.dart';
-import 'package:provider/src/provider.dart';
 import 'package:sport_log/authentication/authentication_bloc.dart';
 import 'package:sport_log/helpers/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:provider/provider.dart';
 
 class MainDrawer extends StatelessWidget {
-  const MainDrawer({Key? key}) : super(key: key);
+  const MainDrawer({
+    Key? key,
+    required this.selectedRoute,
+  }) : super(key: key);
+
+  final String selectedRoute;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +28,7 @@ class MainDrawer extends StatelessWidget {
             onTap: () {
               Nav.changeNamed(context, Routes.workout);
             },
+            selected: selectedRoute == Routes.workout,
           ),
           ListTile(
             title: const Text("Syncing"),
@@ -30,6 +36,7 @@ class MainDrawer extends StatelessWidget {
             onTap: () {
               Nav.changeNamed(context, Routes.syncing);
             },
+            selected: selectedRoute == Routes.syncing
           ),
           const Spacer(),
           ListTile(

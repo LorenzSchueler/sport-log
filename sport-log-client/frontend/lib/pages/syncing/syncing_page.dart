@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 class SyncingPage extends StatefulWidget {
@@ -15,7 +16,7 @@ class SyncingPageState extends State<SyncingPage> {
     return Scaffold(
       appBar: AppBar(title: const Text("Syncing")),
       body: const Center(child: Text("Syncing")),
-      drawer: const MainDrawer(),
+      drawer: const MainDrawer(selectedRoute: Routes.syncing),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
