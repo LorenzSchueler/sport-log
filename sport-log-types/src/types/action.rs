@@ -6,7 +6,7 @@ use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
-use sport_log_server_derive::{
+use sport_log_types_derive::{
     Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
     VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin,

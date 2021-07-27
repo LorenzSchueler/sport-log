@@ -3,7 +3,7 @@ use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
-use sport_log_server_derive::{Delete, FromI32, FromSql, GetAll, GetById, ToSql};
+use sport_log_types_derive::{Delete, FromI32, FromSql, GetAll, GetById, ToSql};
 
 #[cfg(feature = "full")]
 use crate::{

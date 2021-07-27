@@ -94,7 +94,7 @@ impl<'v, I: FromI32> rocket::request::FromParam<'v> for UnverifiedId<I> {
 ///
 /// This trait can be automatically derived by adding `#[derive(Create)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [sport_log_server_derive::Create].
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::Create].
 #[cfg(feature = "full")]
 pub trait Create {
     type New;
@@ -110,7 +110,7 @@ pub trait Create {
 ///
 /// This trait can be automatically derived by adding `#[derive(GetById)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [sport_log_server_derive::GetById].
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::GetById].
 #[cfg(feature = "full")]
 pub trait GetById {
     type Id;
@@ -126,7 +126,7 @@ pub trait GetById {
 ///
 /// This trait can be automatically derived by adding `#[derive(GetByUser)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [sport_log_server_derive::GetByUser].
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::GetByUser].
 #[cfg(feature = "full")]
 pub trait GetByUser {
     fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>>
@@ -140,7 +140,7 @@ pub trait GetByUser {
 ///
 /// This trait can be automatically derived by adding `#[derive(GetAll)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [sport_log_server_derive::GetAll].
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::GetAll].
 #[cfg(feature = "full")]
 pub trait GetAll {
     fn get_all(conn: &PgConnection) -> QueryResult<Vec<Self>>
@@ -154,7 +154,7 @@ pub trait GetAll {
 ///
 /// This trait can be automatically derived by adding `#[derive(Update)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [sport_log_server_derive::Update].
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::Update].
 #[cfg(feature = "full")]
 pub trait Update {
     fn update(entity: Self, conn: &PgConnection) -> QueryResult<Self>
@@ -168,7 +168,7 @@ pub trait Update {
 ///
 /// This trait can be automatically derived by adding `#[derive(Delete)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [sport_log_server_derive::Delete].
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::Delete].
 #[cfg(feature = "full")]
 pub trait Delete {
     type Id;
