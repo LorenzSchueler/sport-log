@@ -3,6 +3,8 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/repositories/authentication_repository.dart';
+import 'package:sport_log/repositories/movement_repository.dart';
+import 'package:sport_log/repositories/metcon_repository.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
 import 'package:sport_log/models/user.dart';
@@ -30,6 +32,8 @@ void main() async {
       providers: [
         RepositoryProvider.value(value: authRepo),
         RepositoryProvider.value(value: api),
+        RepositoryProvider.value(value: MovementRepository()),
+        RepositoryProvider.value(value: MetconRepository()),
       ],
       child: App(
         isAuthenticatedAtStart: user != null,

@@ -19,6 +19,7 @@ class WorkoutPage extends StatefulWidget {
 class WorkoutPageState extends State<WorkoutPage> {
 
   BottomNavPage _currentPage = BottomNavPage.workout;
+  bool get _showFab => _currentPage == BottomNavPage.workout;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +35,10 @@ class WorkoutPageState extends State<WorkoutPage> {
         type: BottomNavigationBarType.fixed,
       ),
       drawer: const MainDrawer(selectedRoute: Routes.workout),
+      floatingActionButton: _showFab ? FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: _onFabTapped,
+      ) : null,
     );
   }
 
@@ -85,5 +90,13 @@ class WorkoutPageState extends State<WorkoutPage> {
     setState(() {
       _currentPage = BottomNavPage.values[index];
     });
+  }
+
+  void _onFabTapped() {
+    switch (_currentPage) {
+      case BottomNavPage.workout:
+        break;
+      default:
+    }
   }
 }
