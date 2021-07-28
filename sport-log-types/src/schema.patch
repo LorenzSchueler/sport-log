@@ -14,9 +14,9 @@
 ---
 >         metcon_type -> MetconTypeMapping,
 123c123
-<         unit -> Movement_unit,
+<         movement_unit -> Movement_unit,
 ---
->         unit -> MovementUnitMapping,
+>         movement_unit -> MovementUnitMapping,
 154c154
 <         category -> Movement_category,
 ---

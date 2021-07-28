@@ -1,42 +1,44 @@
 use chrono::NaiveDateTime;
 #[cfg(feature = "full")]
+use diesel::PgConnection;
+#[cfg(feature = "full")]
 use diesel_derive_enum::DbEnum;
 #[cfg(feature = "full")]
 use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
-use sport_log_server_derive::{
+use sport_log_types_derive::{
     Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
-use crate::types::{MovementId, MovementUnit, UserId};
+use crate::types::{Movement, MovementId, MovementUnit, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
-    types::{AuthenticatedUser, Unverified, UnverifiedId},
+    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId, User, VerifyIdForUser},
 };
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]
 pub enum MetconType {
     Amrap,
     Emom,
     ForTime,
-    Ladder,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconId(pub i32);
 
 #[cfg(feature = "full")]
-impl UnverifiedId<MetconId> {
-    pub fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<MetconId, Status> {
+impl VerifyIdForUser<MetconId> for UnverifiedId<MetconId> {
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<MetconId, Status> {
         let metcon =
             Metcon::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if metcon.user_id == Some(**auth) {
@@ -45,7 +47,10 @@ impl UnverifiedId<MetconId> {
             Err(rocket::http::Status::Forbidden)
         }
     }
+}
 
+#[cfg(feature = "full")]
+impl UnverifiedId<MetconId> {
     pub fn verify_if_owned(
         self,
         auth: &AuthenticatedUser,
@@ -61,28 +66,45 @@ impl UnverifiedId<MetconId> {
     }
 }
 
+/// [Metcon] acts like a template for a [MetconSession].
+///
+/// Metcons can be predefined (`user_id` is [None]) or can be user-defined (`user_id` contains the id of the user).
+///
+/// If `metcon_type` is [MetconType::Amrap] `rounds` should be `None` and `timecap` should be set.
+///
+/// If `metcon_type` is [MetconType::Emom] rounds and timecap should be set (rounds determines how many rounds should be performed and `timecap`/`rounds` determines how long each round takes).
+///
+/// If `metcon_type` is [MetconType::ForTime] `rounds` should be set and `timecap` can be None or have a value.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
         GetById,
-        GetByUser,
         GetAll,
         Update,
         Delete,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "metcon")]
+#[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Metcon {
     pub id: MetconId,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub user_id: Option<UserId>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub name: Option<String>,
     pub metcon_type: MetconType,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub rounds: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub timecap: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    pub description: Option<String>,
 }
 
 #[cfg(feature = "full")]
@@ -102,6 +124,7 @@ impl Unverified<Metcon> {
     }
 }
 
+/// Please refer to [Metcon].
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "metcon")]
@@ -111,6 +134,7 @@ pub struct NewMetcon {
     pub metcon_type: MetconType,
     pub rounds: Option<i32>,
     pub timecap: Option<i32>,
+    pub description: Option<String>,
 }
 
 #[cfg(feature = "full")]
@@ -125,17 +149,17 @@ impl Unverified<NewMetcon> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconMovementId(pub i32);
 
 #[cfg(feature = "full")]
-impl UnverifiedId<MetconMovementId> {
-    pub fn verify(
+impl VerifyIdForUser<MetconMovementId> for UnverifiedId<MetconMovementId> {
+    fn verify(
         self,
         auth: &AuthenticatedUser,
         conn: &PgConnection,
@@ -150,7 +174,10 @@ impl UnverifiedId<MetconMovementId> {
             Err(rocket::http::Status::Forbidden)
         }
     }
+}
 
+#[cfg(feature = "full")]
+impl UnverifiedId<MetconMovementId> {
     pub fn verify_if_owned(
         self,
         auth: &AuthenticatedUser,
@@ -171,15 +198,28 @@ impl UnverifiedId<MetconMovementId> {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(Queryable, AsChangeset, Create, GetById, GetAll, Update, Delete,)
+    derive(
+        Associations,
+        Identifiable,
+        Queryable,
+        AsChangeset,
+        Create,
+        GetById,
+        GetAll,
+        Update,
+        Delete,
+    )
 )]
 #[cfg_attr(feature = "full", table_name = "metcon_movement")]
+#[cfg_attr(feature = "full", belongs_to(Movement))]
+#[cfg_attr(feature = "full", belongs_to(Metcon))]
 pub struct MetconMovement {
     pub id: MetconMovementId,
     pub movement_id: MovementId,
     pub metcon_id: MetconId,
     pub count: i32,
-    pub unit: MovementUnit,
+    pub movement_unit: MovementUnit,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub weight: Option<f32>,
 }
 
@@ -208,7 +248,7 @@ pub struct NewMetconMovement {
     pub movement_id: MovementId,
     pub metcon_id: MetconId,
     pub count: i32,
-    pub unit: MovementUnit,
+    pub movement_unit: MovementUnit,
     pub weight: Option<f32>,
 }
 
@@ -230,10 +270,18 @@ impl Unverified<NewMetconMovement> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, FromI32, ToSql, FromSql)
+    derive(
+        Hash,
+        FromSqlRow,
+        AsExpression,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MetconSessionId(pub i32);
@@ -242,6 +290,8 @@ pub struct MetconSessionId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
@@ -250,11 +300,32 @@ pub struct MetconSessionId(pub i32);
         GetAll,
         Update,
         Delete,
+        VerifyForUserWithDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "metcon_session")]
+#[cfg_attr(feature = "full", belongs_to(User))]
+#[cfg_attr(feature = "full", belongs_to(Metcon))]
 pub struct MetconSession {
     pub id: MetconSessionId,
+    pub user_id: UserId,
+    pub metcon_id: MetconId,
+    pub datetime: NaiveDateTime,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    pub time: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    pub rounds: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    pub reps: Option<i32>,
+    pub rx: bool,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    pub comments: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
+#[cfg_attr(feature = "full", table_name = "metcon_session")]
+pub struct NewMetconSession {
     pub user_id: UserId,
     pub metcon_id: MetconId,
     pub datetime: NaiveDateTime,
@@ -266,15 +337,8 @@ pub struct MetconSession {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "metcon_session")]
-pub struct NewMetconSession {
-    pub user_id: UserId,
-    pub metcon_id: MetconId,
-    pub datetime: NaiveDateTime,
-    pub time: Option<i32>,
-    pub rounds: Option<i32>,
-    pub reps: Option<i32>,
-    pub rx: bool,
-    pub comments: Option<String>,
+pub struct MetconSessionDescription {
+    pub metcon_session: MetconSession,
+    pub metcon: Metcon,
+    pub movements: Vec<(MetconMovement, Movement)>,
 }

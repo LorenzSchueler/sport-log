@@ -1,23 +1,23 @@
-use std::ops::Deref;
+use rocket::{http::Status, serde::json::Json};
 
-use chrono::{NaiveDateTime, NaiveTime};
-use rocket::{http::Status, request::FromParam, serde::json::Json};
-
-use sport_log_types::types::{
+use sport_log_types::{
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
-    ActionRuleId, AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser, Db,
-    ExecutableActionEvent, NewAction, NewActionEvent, NewActionProvider, NewActionRule, Unverified,
-    UnverifiedId,
+    ActionRuleId, AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser, Create, Db,
+    Delete, ExecutableActionEvent, GetAll, GetById, GetByUser, NewAction, NewActionEvent,
+    NewActionProvider, NewActionRule, Unverified, UnverifiedId, Update,
+    VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
+    VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
+    VerifyIdForUserUnchecked,
 };
 
-use crate::handler::IntoJson;
+use crate::handler::{IntoJson, NaiveDateTimeWrapper};
 
 #[post(
     "/adm/action_provider",
     format = "application/json",
     data = "<action_provider>"
 )]
-pub async fn create_action_provider(
+pub async fn adm_create_action_provider(
     action_provider: Unverified<NewActionProvider>,
     auth: AuthenticatedAdmin,
     conn: Db,
@@ -29,7 +29,7 @@ pub async fn create_action_provider(
 }
 
 #[get("/adm/action_provider")]
-pub async fn get_action_providers(
+pub async fn adm_get_action_providers(
     _auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Json<Vec<ActionProvider>>, Status> {
@@ -37,7 +37,7 @@ pub async fn get_action_providers(
 }
 
 #[delete("/adm/action_provider/<action_provider_id>")]
-pub async fn delete_action_provider(
+pub async fn adm_delete_action_provider(
     action_provider_id: UnverifiedId<ActionProviderId>,
     auth: AuthenticatedAdmin,
     conn: Db,
@@ -52,7 +52,7 @@ pub async fn delete_action_provider(
 }
 
 #[post("/ap/action", format = "application/json", data = "<action>")]
-pub async fn create_action(
+pub async fn ap_create_action(
     action: Unverified<NewAction>,
     auth: AuthenticatedActionProvider,
     conn: Db,
@@ -62,7 +62,7 @@ pub async fn create_action(
 }
 
 #[get("/ap/action/<action_id>")]
-pub async fn get_action(
+pub async fn ap_get_action(
     action_id: UnverifiedId<ActionId>,
     auth: AuthenticatedActionProvider,
     conn: Db,
@@ -74,7 +74,7 @@ pub async fn get_action(
 }
 
 #[get("/ap/action")]
-pub async fn get_actions_by_action_provider(
+pub async fn ap_get_actions_by_action_provider(
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Vec<Action>>, Status> {
@@ -89,7 +89,7 @@ pub async fn get_actions(_auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<
 }
 
 #[delete("/ap/action/<action_id>")]
-pub async fn delete_action(
+pub async fn ap_delete_action(
     action_id: UnverifiedId<ActionId>,
     auth: AuthenticatedActionProvider,
     conn: Db,
@@ -199,7 +199,7 @@ pub async fn get_action_event(
 }
 
 #[get("/action_event")]
-pub async fn get_action_events_by_user(
+pub async fn get_action_events(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
@@ -209,7 +209,7 @@ pub async fn get_action_events_by_user(
 }
 
 #[get("/ap/action_event")]
-pub async fn get_action_events_by_action_provider(
+pub async fn ap_get_action_events(
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
@@ -219,7 +219,7 @@ pub async fn get_action_events_by_action_provider(
 }
 
 #[get("/action_event/action_provider/<action_provider_id>")]
-pub async fn get_action_events_by_user_and_action_provider(
+pub async fn get_action_events_by_action_provider(
     action_provider_id: UnverifiedId<ActionProviderId>,
     auth: AuthenticatedUser,
     conn: Db,
@@ -257,7 +257,7 @@ pub async fn delete_action_event(
 }
 
 #[delete("/ap/action_event/<action_event_id>")]
-pub async fn delete_action_event_ap(
+pub async fn ap_delete_action_event(
     action_event_id: UnverifiedId<ActionEventId>,
     auth: AuthenticatedActionProvider,
     conn: Db,
@@ -271,7 +271,7 @@ pub async fn delete_action_event_ap(
 }
 
 #[get("/ap/executable_action_event")]
-pub async fn get_executable_action_events_by_action_provider(
+pub async fn ap_get_executable_action_events(
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
@@ -280,54 +280,21 @@ pub async fn get_executable_action_events_by_action_provider(
         .into_json()
 }
 
-#[get("/ap/executable_action_event/timerange/<start_time>/<end_time>")]
-pub async fn get_executable_action_events_by_action_provider_and_timerange(
-    start_time: NaiveDateTimeWrapper,
-    end_time: NaiveDateTimeWrapper,
+#[get("/ap/executable_action_event/timespan/<start_datetime>/<end_datetime>")]
+pub async fn ap_get_ordered_executable_action_events_by_timespan(
+    start_datetime: NaiveDateTimeWrapper,
+    end_datetime: NaiveDateTimeWrapper,
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
     conn.run(move |c| {
-        ExecutableActionEvent::get_by_action_provider_and_timerange(
+        ExecutableActionEvent::get_ordered_by_action_provider_and_timespan(
             *auth,
-            *start_time,
-            *end_time,
+            *start_datetime,
+            *end_datetime,
             c,
         )
     })
     .await
     .into_json()
-}
-
-pub struct NaiveTimeWrapper(NaiveTime);
-pub struct NaiveDateTimeWrapper(NaiveDateTime);
-
-impl<'v> FromParam<'v> for NaiveTimeWrapper {
-    type Error = &'v str;
-
-    fn from_param(param: &'v str) -> Result<Self, Self::Error> {
-        Ok(NaiveTimeWrapper(param.parse().map_err(|_| param)?))
-    }
-}
-
-impl<'v> FromParam<'v> for NaiveDateTimeWrapper {
-    type Error = &'v str;
-
-    fn from_param(param: &'v str) -> Result<NaiveDateTimeWrapper, Self::Error> {
-        Ok(NaiveDateTimeWrapper(param.parse().map_err(|_| param)?))
-    }
-}
-
-impl Deref for NaiveTimeWrapper {
-    type Target = NaiveTime;
-    fn deref(&self) -> &NaiveTime {
-        &self.0
-    }
-}
-
-impl Deref for NaiveDateTimeWrapper {
-    type Target = NaiveDateTime;
-    fn deref(&self) -> &NaiveDateTime {
-        &self.0
-    }
 }

@@ -1,14 +1,16 @@
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_types::types::{
-    AuthenticatedActionProvider, AuthenticatedUser, Db, Diary, DiaryId, NewDiary, NewWod,
-    Unverified, UnverifiedId, Wod, WodId,
+use sport_log_types::{
+    AuthenticatedActionProvider, AuthenticatedUser, Create, Db, Delete, Diary, DiaryId, GetById,
+    GetByUser, NewDiary, NewWod, Unverified, UnverifiedId, Update,
+    VerifyForActionProviderUnchecked, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
+    Wod, WodId,
 };
 
-use crate::handler::IntoJson;
+use crate::handler::{IntoJson, NaiveDateTimeWrapper};
 
 #[post("/ap/wod", format = "application/json", data = "<wod>")]
-pub async fn create_wod_ap(
+pub async fn ap_create_wod(
     wod: Unverified<NewWod>,
     auth: AuthenticatedActionProvider,
     conn: Db,
@@ -27,8 +29,22 @@ pub async fn create_wod(
     conn.run(|c| Wod::create(wod, c)).await.into_json()
 }
 
+#[get("/wod/timespan/<start_datetime>/<end_datetime>")]
+pub async fn get_ordered_wods_by_timespan(
+    start_datetime: NaiveDateTimeWrapper,
+    end_datetime: NaiveDateTimeWrapper,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<Wod>>, Status> {
+    conn.run(move |c| {
+        Wod::get_ordered_by_user_and_timespan(*auth, *start_datetime, *end_datetime, c)
+    })
+    .await
+    .into_json()
+}
+
 #[get("/wod")]
-pub async fn get_wods_by_user(auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Wod>>, Status> {
+pub async fn get_wods(auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Wod>>, Status> {
     conn.run(move |c| Wod::get_by_user(*auth, c))
         .await
         .into_json()
@@ -80,11 +96,22 @@ pub async fn get_diary(
         .into_json()
 }
 
-#[get("/diary")]
-pub async fn get_diarys_by_user(
+#[get("/diary/timespan/<start_datetime>/<end_datetime>")]
+pub async fn get_ordered_diarys_by_timespan(
+    start_datetime: NaiveDateTimeWrapper,
+    end_datetime: NaiveDateTimeWrapper,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<Diary>>, Status> {
+    conn.run(move |c| {
+        Diary::get_ordered_by_user_and_timespan(*auth, *start_datetime, *end_datetime, c)
+    })
+    .await
+    .into_json()
+}
+
+#[get("/diary")]
+pub async fn get_diarys(auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Diary>>, Status> {
     conn.run(move |c| Diary::get_by_user(*auth, c))
         .await
         .into_json()

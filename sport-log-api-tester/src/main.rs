@@ -2,7 +2,7 @@
 //!
 //! # Usage
 //!
-//! sport-log-api-tester [OPTIONS]
+//! sport-log-api-tester \[OPTIONS\]
 //!
 //! ### OPTIONS
 //!

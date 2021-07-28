@@ -1,14 +1,16 @@
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_types::types::{
-    AuthenticatedAdmin, AuthenticatedUser, Db, NewPlatform, NewPlatformCredentials, Platform,
-    PlatformCredentials, PlatformCredentialsId, PlatformId, Unverified, UnverifiedId,
+use sport_log_types::{
+    AuthenticatedAdmin, AuthenticatedUser, Create, Db, Delete, GetAll, GetByUser, NewPlatform,
+    NewPlatformCredentials, Platform, PlatformCredentials, PlatformCredentialsId, PlatformId,
+    Unverified, UnverifiedId, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb,
+    VerifyForUserWithoutDb, VerifyIdForAdmin, VerifyIdForUser, VerifyIdForUserUnchecked,
 };
 
 use crate::handler::IntoJson;
 
 #[post("/adm/platform", format = "application/json", data = "<platform>")]
-pub async fn create_platform(
+pub async fn adm_create_platform(
     platform: Unverified<NewPlatform>,
     auth: AuthenticatedAdmin,
     conn: Db,
@@ -20,7 +22,7 @@ pub async fn create_platform(
 }
 
 #[get("/adm/platform")]
-pub async fn get_platforms(
+pub async fn adm_get_platforms(
     _auth: AuthenticatedAdmin,
     conn: Db,
 ) -> Result<Json<Vec<Platform>>, Status> {
@@ -28,7 +30,7 @@ pub async fn get_platforms(
 }
 
 #[get("/platform")]
-pub async fn get_platforms_u(
+pub async fn get_platforms(
     _auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<Platform>>, Status> {
@@ -36,7 +38,7 @@ pub async fn get_platforms_u(
 }
 
 #[put("/adm/platform", format = "application/json", data = "<platform>")]
-pub async fn update_platform(
+pub async fn adm_update_platform(
     platform: Unverified<Platform>,
     auth: AuthenticatedAdmin,
     conn: Db,
@@ -48,7 +50,7 @@ pub async fn update_platform(
 }
 
 #[delete("/adm/platform/<platform_id>")]
-pub async fn delete_platform(
+pub async fn adm_delete_platform(
     platform_id: UnverifiedId<PlatformId>,
     auth: AuthenticatedAdmin,
     conn: Db,
@@ -79,7 +81,7 @@ pub async fn create_platform_credentials(
 }
 
 #[get("/platform_credentials")]
-pub async fn get_own_platform_credentials(
+pub async fn get_platform_credentials(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<PlatformCredentials>>, Status> {
@@ -89,7 +91,7 @@ pub async fn get_own_platform_credentials(
 }
 
 #[get("/platform_credentials/platform/<platform_id>")]
-pub async fn get_own_platform_credentials_by_platform(
+pub async fn get_platform_credentials_by_platform(
     platform_id: UnverifiedId<PlatformId>,
     auth: AuthenticatedUser,
     conn: Db,

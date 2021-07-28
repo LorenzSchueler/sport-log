@@ -21,7 +21,7 @@ pub fn impl_from_sql(ast: &syn::DeriveInput) -> TokenStream {
         impl diesel::types::FromSql<diesel::sql_types::Integer, diesel::pg::Pg> for #typename {
             fn from_sql(bytes: Option<&[u8]>) -> diesel::deserialize::Result<Self> {
                 let id = diesel::types::FromSql::<diesel::sql_types::Integer, diesel::pg::Pg>::from_sql(bytes)?;
-                Ok(#typename(id))
+                Ok(crate::types::FromI32::from_i32(id))
             }
         }
     };

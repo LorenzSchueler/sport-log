@@ -15,15 +15,19 @@ use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
-use sport_log_server_derive::{
+use sport_log_types_derive::{
     Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
+use crate::types::{Movement, MovementId, UserId};
 #[cfg(feature = "full")]
-use crate::schema::{cardio_session, route};
-use crate::types::{MovementId, UserId};
+use crate::{
+    schema::{cardio_session, route},
+    types::User,
+};
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]
 pub enum CardioType {
     Training,
@@ -31,14 +35,17 @@ pub enum CardioType {
     Freetime,
 }
 
+/// A GPS position.
+///
+/// `time` is the time in seconds since the start of the recording.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(SqlType,))]
 #[cfg_attr(feature = "full", postgres(type_name = "position"))]
 pub struct Position {
-    longitude: f64,
-    latitude: f64,
-    elevation: f32,
-    time: i32,
+    pub longitude: f64,
+    pub latitude: f64,
+    pub elevation: f32,
+    pub time: i32,
 }
 
 #[cfg(feature = "full")]
@@ -65,10 +72,18 @@ impl FromSql<Position, Pg> for Position {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, FromI32, ToSql, FromSql)
+    derive(
+        Hash,
+        FromSqlRow,
+        AsExpression,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct RouteId(pub i32);
@@ -77,6 +92,8 @@ pub struct RouteId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
@@ -85,21 +102,26 @@ pub struct RouteId(pub i32);
         GetAll,
         Update,
         Delete,
+        VerifyForUserWithDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "route")]
+#[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Route {
     pub id: RouteId,
     pub user_id: UserId,
     pub name: String,
     pub distance: i32,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub ascent: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub descent: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub track: Option<Vec<Position>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
 #[cfg_attr(feature = "full", table_name = "route")]
 pub struct NewRoute {
     pub user_id: UserId,
@@ -110,10 +132,18 @@ pub struct NewRoute {
     pub track: Option<Vec<Position>>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(FromSqlRow, AsExpression, Copy, PartialEq, Eq, FromI32, ToSql, FromSql)
+    derive(
+        Hash,
+        FromSqlRow,
+        AsExpression,
+        FromI32,
+        ToSql,
+        FromSql,
+        VerifyIdForUser
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct CardioSessionId(pub i32);
@@ -122,6 +152,8 @@ pub struct CardioSessionId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
@@ -130,31 +162,46 @@ pub struct CardioSessionId(pub i32);
         GetAll,
         Update,
         Delete,
+        VerifyForUserWithDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "cardio_session")]
+#[cfg_attr(feature = "full", belongs_to(User))]
+#[cfg_attr(feature = "full", belongs_to(Movement))]
 pub struct CardioSession {
     pub id: CardioSessionId,
     pub user_id: UserId,
     pub movement_id: MovementId,
     pub cardio_type: CardioType,
     pub datetime: NaiveDateTime,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub distance: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub ascent: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub descent: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub time: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub calories: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub track: Option<Vec<Position>>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub avg_cycles: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub cycles: Option<Vec<f32>>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub avg_heart_rate: Option<i32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub heart_rate: Option<Vec<f32>>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub route_id: Option<RouteId>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
 #[cfg_attr(feature = "full", table_name = "cardio_session")]
 pub struct NewCardioSession {
     pub user_id: UserId,
@@ -173,4 +220,11 @@ pub struct NewCardioSession {
     pub heart_rate: Option<Vec<f32>>,
     pub route_id: Option<RouteId>,
     pub comments: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct CardioSessionDescription {
+    pub cardio_session: CardioSession,
+    pub route: Option<Route>,
+    pub movement: Movement,
 }

@@ -2,24 +2,25 @@ use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
-use sport_log_server_derive::{
+use sport_log_types_derive::{
     Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
     VerifyForActionProviderUnchecked, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
-#[cfg(feature = "full")]
-use crate::schema::{diary, wod};
 use crate::types::UserId;
+#[cfg(feature = "full")]
+use crate::{
+    schema::{diary, wod},
+    types::User,
+};
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Hash,
         FromSqlRow,
         AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
         FromI32,
         ToSql,
         FromSql,
@@ -33,6 +34,8 @@ pub struct DiaryId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
@@ -45,11 +48,14 @@ pub struct DiaryId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "diary")]
+#[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Diary {
     pub id: DiaryId,
     pub user_id: UserId,
     pub date: NaiveDate,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub bodyweight: Option<f32>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
 }
 
@@ -63,15 +69,13 @@ pub struct NewDiary {
     pub comments: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Hash,
         FromSqlRow,
         AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
         FromI32,
         ToSql,
         FromSql,
@@ -85,6 +89,8 @@ pub struct WodId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
@@ -97,10 +103,12 @@ pub struct WodId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "wod")]
+#[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Wod {
     pub id: WodId,
     pub user_id: UserId,
     pub date: NaiveDate,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
 }
 

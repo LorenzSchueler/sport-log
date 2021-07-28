@@ -14,7 +14,7 @@ from selenium.common.exceptions import NoSuchElementException
 start_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 end_time = (datetime.now() + timedelta(hours = 24, minutes = 1)).strftime("%Y-%m-%dT%H:%M:%S")
 response = requests.get(
-    f"http://localhost:8000/v1/ap/executable_action_event/timerange/{start_time}/{end_time}", 
+    f"http://localhost:8000/v1/ap/executable_action_event/timespan/{start_time}/{end_time}", 
     auth=HTTPBasicAuth('wodify-login', 'wodify-login-passwd'))  
 if response.status_code != 200:
     exit(1)

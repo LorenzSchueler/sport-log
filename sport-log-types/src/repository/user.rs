@@ -7,11 +7,13 @@ use rand_core::OsRng;
 
 use crate::{
     schema::user,
-    types::{NewUser, User, UserId},
+    types::{Create, NewUser, Update, User, UserId},
 };
 
-impl User {
-    pub fn create(mut user: NewUser, conn: &PgConnection) -> QueryResult<User> {
+impl Create for User {
+    type New = NewUser;
+
+    fn create(mut user: Self::New, conn: &PgConnection) -> QueryResult<Self> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
             .hash_password_simple(user.password.as_bytes(), salt.as_ref())
@@ -22,8 +24,10 @@ impl User {
             .values(user)
             .get_result(conn)
     }
+}
 
-    pub fn update(mut user: User, conn: &PgConnection) -> QueryResult<User> {
+impl Update for User {
+    fn update(mut user: Self, conn: &PgConnection) -> QueryResult<Self> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
             .hash_password_simple(user.password.as_bytes(), salt.as_ref())
@@ -34,7 +38,9 @@ impl User {
             .set(user)
             .get_result(conn)
     }
+}
 
+impl User {
     pub fn authenticate(
         username: &str,
         password: &str,

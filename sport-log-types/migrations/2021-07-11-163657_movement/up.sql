@@ -18,7 +18,10 @@ insert into movement (user_id, name, description, category) values
     (null, 'Running', 'road running without significant altitude change', 'cardio'),
     (null, 'Trailrunning', null, 'cardio'),
     (null, 'Swimming Freestyle', 'indoor freestyle swimming', 'cardio'),
-    (1, 'Rowing', null, 'cardio');
+    (1, 'Rowing', null, 'cardio'),
+    (null, 'Pull-Up', null, 'strength'),
+    (null, 'Push-Up', null, 'strength'),
+    (null, 'Air Squat', null, 'strength');
 
 create table eorm (
     id serial primary key,

@@ -1,13 +1,14 @@
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_types::types::{
-    AuthenticatedAdmin, AuthenticatedUser, Db, NewUser, Unverified, User, CONFIG,
+use sport_log_types::{
+    AuthenticatedAdmin, AuthenticatedUser, Create, Db, Delete, GetById, NewUser, Unverified,
+    Update, User, CONFIG,
 };
 
 use crate::handler::IntoJson;
 
 #[post("/adm/user", format = "application/json", data = "<user>")]
-pub async fn create_user_adm(
+pub async fn adm_create_user(
     user: Unverified<NewUser>,
     _auth: AuthenticatedAdmin,
     conn: Db,

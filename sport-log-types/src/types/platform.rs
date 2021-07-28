@@ -1,25 +1,26 @@
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
-use sport_log_server_derive::{
+use sport_log_types_derive::{
     Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
     VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForAdmin,
     VerifyIdForUser, VerifyIdForUserUnchecked,
 };
 
-#[cfg(feature = "full")]
-use crate::schema::{platform, platform_credentials};
 use crate::types::UserId;
+#[cfg(feature = "full")]
+use crate::{
+    schema::{platform, platform_credentials},
+    types::User,
+};
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Hash,
         FromSqlRow,
         AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
         FromI32,
         ToSql,
         FromSql,
@@ -34,6 +35,8 @@ pub struct PlatformId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
@@ -56,15 +59,13 @@ pub struct NewPlatform {
     pub name: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Hash,
         FromSqlRow,
         AsExpression,
-        Copy,
-        PartialEq,
-        Eq,
         FromI32,
         ToSql,
         FromSql,
@@ -78,6 +79,8 @@ pub struct PlatformCredentialsId(pub i32);
 #[cfg_attr(
     feature = "full",
     derive(
+        Associations,
+        Identifiable,
         Queryable,
         AsChangeset,
         Create,
@@ -89,6 +92,8 @@ pub struct PlatformCredentialsId(pub i32);
     )
 )]
 #[cfg_attr(feature = "full", table_name = "platform_credentials")]
+#[cfg_attr(feature = "full", belongs_to(User))]
+#[cfg_attr(feature = "full", belongs_to(Platform))]
 pub struct PlatformCredentials {
     pub id: PlatformCredentialsId,
     pub user_id: UserId,

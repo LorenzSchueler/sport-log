@@ -35,8 +35,10 @@ pub fn impl_create(ast: &syn::DeriveInput) -> TokenStream {
     let gen = quote! {
         use diesel::prelude::*;
 
-        impl #typename {
-            pub fn create(#paramname: #newtypename, conn: &PgConnection) -> QueryResult<#typename> {
+        impl crate::types::Create for #typename {
+            type New = #newtypename;
+
+            fn create(#paramname: Self::New, conn: &PgConnection) -> QueryResult<Self> {
                 diesel::insert_into(#tablename::table)
                     .values(#paramname)
                     .get_result(conn)
@@ -53,8 +55,10 @@ pub fn impl_get_by_id(ast: &syn::DeriveInput) -> TokenStream {
     let gen = quote! {
         use diesel::prelude::*;
 
-        impl #typename {
-            pub fn get_by_id(#idparamname: #idtypename, conn: &PgConnection) -> QueryResult<#typename> {
+        impl crate::types::GetById for #typename {
+            type Id = #idtypename;
+
+            fn get_by_id(#idparamname: Self::Id, conn: &PgConnection) -> QueryResult<Self> {
                 #tablename::table.find(#idparamname).get_result(conn)
             }
         }
@@ -69,8 +73,8 @@ pub fn impl_get_by_user(ast: &syn::DeriveInput) -> TokenStream {
     let gen = quote! {
         use diesel::prelude::*;
 
-        impl #typename {
-            pub fn get_by_user(user_id: crate::types::UserId, conn: &PgConnection) -> QueryResult<Vec<#typename>> {
+        impl crate::types::GetByUser for #typename {
+            fn get_by_user(user_id: crate::types::UserId, conn: &PgConnection) -> QueryResult<Vec<Self>> {
                 #tablename::table
                     .filter(#tablename::columns::user_id.eq(user_id))
                     .get_results(conn)
@@ -87,8 +91,8 @@ pub fn impl_get_all(ast: &syn::DeriveInput) -> TokenStream {
     let gen = quote! {
         use diesel::prelude::*;
 
-        impl #typename {
-            pub fn get_all(conn: &PgConnection) -> QueryResult<Vec<#typename>> {
+        impl crate::types::GetAll for #typename {
+            fn get_all(conn: &PgConnection) -> QueryResult<Vec<Self>> {
                 #tablename::table.load(conn)
             }
         }
@@ -103,8 +107,8 @@ pub fn impl_update(ast: &syn::DeriveInput) -> TokenStream {
     let gen = quote! {
         use diesel::prelude::*;
 
-        impl #typename {
-            pub fn update(#paramname: #typename, conn: &PgConnection) -> QueryResult<#typename> {
+        impl crate::types::Update for #typename {
+            fn update(#paramname: #typename, conn: &PgConnection) -> QueryResult<Self> {
                 diesel::update(#tablename::table.find(#paramname.id))
                     .set(#paramname)
                     .get_result(conn)
@@ -121,8 +125,10 @@ pub fn impl_delete(ast: &syn::DeriveInput) -> TokenStream {
     let gen = quote! {
         use diesel::prelude::*;
 
-        impl #typename {
-            pub fn delete(#idparamname: #idtypename, conn: &PgConnection) -> QueryResult<usize> {
+        impl crate::types::Delete for #typename {
+            type Id = #idtypename;
+
+            fn delete(#idparamname: Self::Id, conn: &PgConnection) -> QueryResult<usize> {
                 diesel::delete(#tablename::table.find(#idparamname)).execute(conn)
             }
         }

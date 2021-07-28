@@ -130,6 +130,7 @@ table! {
         metcon_type -> MetconTypeMapping,
         rounds -> Nullable<Int4>,
         timecap -> Nullable<Int4>,
+        description -> Nullable<Text>,
     }
 }
 
@@ -142,7 +143,7 @@ table! {
         movement_id -> Int4,
         metcon_id -> Int4,
         count -> Int4,
-        unit -> MovementUnitMapping,
+        movement_unit -> MovementUnitMapping,
         weight -> Nullable<Float4>,
     }
 }

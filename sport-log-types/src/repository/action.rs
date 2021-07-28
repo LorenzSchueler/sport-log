@@ -6,16 +6,15 @@ use rand_core::OsRng;
 use crate::{
     schema::{action, action_event, action_provider, action_rule, platform_credentials},
     types::{
-        Action, ActionEvent, ActionId, ActionProvider, ActionProviderId, ActionRule,
+        Action, ActionEvent, ActionId, ActionProvider, ActionProviderId, ActionRule, Create,
         ExecutableActionEvent, NewActionProvider, UserId,
     },
 };
 
-impl ActionProvider {
-    pub fn create(
-        mut action_provider: NewActionProvider,
-        conn: &PgConnection,
-    ) -> QueryResult<ActionProvider> {
+impl Create for ActionProvider {
+    type New = NewActionProvider;
+
+    fn create(mut action_provider: Self::New, conn: &PgConnection) -> QueryResult<Self> {
         let salt = SaltString::generate(&mut OsRng);
         action_provider.password = Argon2::default()
             .hash_password_simple(action_provider.password.as_bytes(), salt.as_ref())
@@ -26,7 +25,9 @@ impl ActionProvider {
             .values(action_provider)
             .get_result(conn)
     }
+}
 
+impl ActionProvider {
     pub fn authenticate(
         name: &str,
         password: &str,
@@ -57,7 +58,7 @@ impl Action {
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
         conn: &PgConnection,
-    ) -> QueryResult<Vec<Action>> {
+    ) -> QueryResult<Vec<Self>> {
         action::table
             .filter(action::columns::action_provider_id.eq(action_provider_id))
             .get_results(conn)
@@ -68,7 +69,7 @@ impl ActionRule {
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
         conn: &PgConnection,
-    ) -> QueryResult<Vec<ActionRule>> {
+    ) -> QueryResult<Vec<Self>> {
         action_rule::table
             .filter(
                 action_rule::columns::action_id.eq_any(
@@ -85,7 +86,7 @@ impl ActionRule {
         user_id: UserId,
         action_provider_id: ActionProviderId,
         conn: &PgConnection,
-    ) -> QueryResult<Vec<ActionRule>> {
+    ) -> QueryResult<Vec<Self>> {
         action_rule::table
             .filter(action_rule::columns::user_id.eq(user_id))
             .filter(
@@ -104,7 +105,7 @@ impl ActionEvent {
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
         conn: &PgConnection,
-    ) -> QueryResult<Vec<ActionEvent>> {
+    ) -> QueryResult<Vec<Self>> {
         action_event::table
             .filter(
                 action_event::columns::action_id.eq_any(
@@ -121,7 +122,7 @@ impl ActionEvent {
         user_id: UserId,
         action_provider_id: ActionProviderId,
         conn: &PgConnection,
-    ) -> QueryResult<Vec<ActionEvent>> {
+    ) -> QueryResult<Vec<Self>> {
         action_event::table
             .filter(action_event::columns::user_id.eq(user_id))
             .filter(
@@ -139,7 +140,7 @@ impl ExecutableActionEvent {
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
         conn: &PgConnection,
-    ) -> QueryResult<Vec<ExecutableActionEvent>> {
+    ) -> QueryResult<Vec<Self>> {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
             .inner_join(
@@ -161,12 +162,12 @@ impl ExecutableActionEvent {
             .get_results::<ExecutableActionEvent>(conn)
     }
 
-    pub fn get_by_action_provider_and_timerange(
+    pub fn get_ordered_by_action_provider_and_timespan(
         action_provider_id: ActionProviderId,
-        start_time: NaiveDateTime,
-        end_time: NaiveDateTime,
+        start_datetime: NaiveDateTime,
+        end_datetime: NaiveDateTime,
         conn: &PgConnection,
-    ) -> QueryResult<Vec<ExecutableActionEvent>> {
+    ) -> QueryResult<Vec<Self>> {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
             .inner_join(
@@ -178,8 +179,7 @@ impl ExecutableActionEvent {
             )
             .filter(action_provider::columns::id.eq(action_provider_id))
             .filter(action_event::columns::enabled.eq(true))
-            .filter(action_event::columns::datetime.ge(start_time))
-            .filter(action_event::columns::datetime.le(end_time))
+            .filter(action_event::columns::datetime.between(start_datetime, end_datetime))
             .select((
                 action_event::columns::id,
                 action::columns::name,
@@ -188,6 +188,6 @@ impl ExecutableActionEvent {
                 platform_credentials::columns::password,
             ))
             .order_by(action_event::columns::datetime)
-            .get_results::<ExecutableActionEvent>(conn)
+            .get_results(conn)
     }
 }
