@@ -19,7 +19,10 @@ use crate::{
     types::{AuthenticatedActionProvider, GetById, Platform, UnverifiedId, User},
 };
 
-use crate::types::{PlatformId, UserId};
+use crate::{
+    types::{PlatformId, UserId},
+    VerifyIdForActionProvider,
+};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
@@ -214,8 +217,8 @@ pub struct NewActionRule {
 pub struct ActionEventId(pub i32);
 
 #[cfg(feature = "full")]
-impl UnverifiedId<ActionEventId> {
-    pub fn verify_ap(
+impl VerifyIdForActionProvider<ActionEventId> for UnverifiedId<ActionEventId> {
+    fn verify_ap(
         self,
         auth: &AuthenticatedActionProvider,
         conn: &PgConnection,

@@ -13,7 +13,7 @@ use crate::types::{Movement, MovementId, MovementUnit, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{strength_session, strength_set},
-    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId},
+    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId, VerifyIdForUser},
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -83,8 +83,8 @@ pub struct NewStrengthSession {
 pub struct StrengthSetId(pub i32);
 
 #[cfg(feature = "full")]
-impl UnverifiedId<StrengthSetId> {
-    pub fn verify(
+impl VerifyIdForUser<StrengthSetId> for UnverifiedId<StrengthSetId> {
+    fn verify(
         self,
         auth: &AuthenticatedUser,
         conn: &PgConnection,

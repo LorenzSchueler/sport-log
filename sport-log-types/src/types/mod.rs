@@ -1,5 +1,6 @@
 #[cfg(feature = "full")]
 use diesel::{PgConnection, QueryResult};
+use rocket::http::Status;
 #[cfg(feature = "full")]
 use rocket::{
     data::{self, FromData},
@@ -174,4 +175,24 @@ pub trait Delete {
     type Id;
 
     fn delete(entity: Self::Id, conn: &PgConnection) -> QueryResult<usize>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyIdForUser<Id> {
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Id, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyIdForUserUnchecked<Id> {
+    fn verify_unchecked(self, auth: &AuthenticatedUser) -> Result<Id, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyIdForActionProvider<Id> {
+    fn verify_ap(self, auth: &AuthenticatedActionProvider, conn: &PgConnection) -> Result<Id, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyIdForAdmin<Id> {
+    fn verify_adm(self, auth: &AuthenticatedAdmin) -> Result<Id, Status>;
 }

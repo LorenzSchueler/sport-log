@@ -4,7 +4,8 @@ use sport_log_types::{
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
     ActionRuleId, AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser, Create, Db,
     Delete, ExecutableActionEvent, GetAll, GetById, GetByUser, NewAction, NewActionEvent,
-    NewActionProvider, NewActionRule, Unverified, UnverifiedId, Update,
+    NewActionProvider, NewActionRule, Unverified, UnverifiedId, Update, VerifyIdForActionProvider,
+    VerifyIdForAdmin, VerifyIdForUser, VerifyIdForUserUnchecked,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};

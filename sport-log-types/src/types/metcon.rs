@@ -1,5 +1,7 @@
 use chrono::NaiveDateTime;
 #[cfg(feature = "full")]
+use diesel::PgConnection;
+#[cfg(feature = "full")]
 use diesel_derive_enum::DbEnum;
 #[cfg(feature = "full")]
 use rocket::http::Status;
@@ -15,7 +17,7 @@ use crate::types::{Movement, MovementId, MovementUnit, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
-    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId, User},
+    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId, User, VerifyIdForUser},
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -35,8 +37,8 @@ pub enum MetconType {
 pub struct MetconId(pub i32);
 
 #[cfg(feature = "full")]
-impl UnverifiedId<MetconId> {
-    pub fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<MetconId, Status> {
+impl VerifyIdForUser<MetconId> for UnverifiedId<MetconId> {
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<MetconId, Status> {
         let metcon =
             Metcon::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if metcon.user_id == Some(**auth) {
@@ -45,7 +47,10 @@ impl UnverifiedId<MetconId> {
             Err(rocket::http::Status::Forbidden)
         }
     }
+}
 
+#[cfg(feature = "full")]
+impl UnverifiedId<MetconId> {
     pub fn verify_if_owned(
         self,
         auth: &AuthenticatedUser,
@@ -153,8 +158,8 @@ impl Unverified<NewMetcon> {
 pub struct MetconMovementId(pub i32);
 
 #[cfg(feature = "full")]
-impl UnverifiedId<MetconMovementId> {
-    pub fn verify(
+impl VerifyIdForUser<MetconMovementId> for UnverifiedId<MetconMovementId> {
+    fn verify(
         self,
         auth: &AuthenticatedUser,
         conn: &PgConnection,
@@ -169,7 +174,10 @@ impl UnverifiedId<MetconMovementId> {
             Err(rocket::http::Status::Forbidden)
         }
     }
+}
 
+#[cfg(feature = "full")]
+impl UnverifiedId<MetconMovementId> {
     pub fn verify_if_owned(
         self,
         auth: &AuthenticatedUser,

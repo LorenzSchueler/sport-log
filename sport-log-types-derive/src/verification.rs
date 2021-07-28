@@ -11,8 +11,8 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
     );
 
     let gen = quote! {
-        impl crate::types::UnverifiedId<#id_typename> {
-            pub fn verify(
+        impl crate::types::VerifyIdForUser<#id_typename> for crate::types::UnverifiedId<#id_typename> {
+            fn verify(
                 self,
                 auth: &crate::types::AuthenticatedUser,
                 conn: &diesel::pg::PgConnection,
@@ -36,8 +36,8 @@ pub fn impl_verify_id_for_user_unchecked(ast: &syn::DeriveInput) -> TokenStream 
     let id_typename = &ast.ident;
 
     let gen = quote! {
-        impl crate::types::UnverifiedId<#id_typename> {
-            pub fn verify_unchecked(
+        impl crate::types::VerifyIdForUserUnchecked<#id_typename> for crate::types::UnverifiedId<#id_typename> {
+            fn verify_unchecked(
                 self,
                 auth: &crate::types::AuthenticatedUser,
             ) -> Result<crate::types::#id_typename, rocket::http::Status> {
@@ -57,8 +57,8 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
     );
 
     let gen = quote! {
-        impl crate::types::UnverifiedId<#id_typename> {
-            pub fn verify_ap(
+        impl crate::types::VerifyIdForActionProvider<#id_typename> for crate::types::UnverifiedId<#id_typename> {
+            fn verify_ap(
                 self,
                 auth: &crate::types::AuthenticatedActionProvider,
                 conn: &diesel::pg::PgConnection,
@@ -82,8 +82,8 @@ pub fn impl_verify_id_for_admin(ast: &syn::DeriveInput) -> TokenStream {
     let id_typename = &ast.ident;
 
     let gen = quote! {
-        impl crate::types::UnverifiedId<#id_typename> {
-            pub fn verify_adm(
+        impl crate::types::VerifyIdForAdmin<#id_typename> for  crate::types::UnverifiedId<#id_typename> {
+            fn verify_adm(
                 self,
                 auth: &crate::types::AuthenticatedAdmin,
             ) -> Result<crate::types::#id_typename, rocket::http::Status> {

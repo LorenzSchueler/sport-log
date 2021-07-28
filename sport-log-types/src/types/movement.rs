@@ -10,12 +10,12 @@ use sport_log_types_derive::{
     VerifyIdForAdmin, VerifyIdForUserUnchecked,
 };
 
-use crate::types::UserId;
 #[cfg(feature = "full")]
 use crate::{
     schema::{eorm, movement},
     types::{AuthenticatedUser, GetById, Unverified, UnverifiedId, User},
 };
+use crate::{types::UserId, VerifyIdForUser};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]
@@ -54,12 +54,8 @@ pub enum MovementUnit {
 pub struct MovementId(pub i32);
 
 #[cfg(feature = "full")]
-impl UnverifiedId<MovementId> {
-    pub fn verify(
-        self,
-        auth: &AuthenticatedUser,
-        conn: &PgConnection,
-    ) -> Result<MovementId, Status> {
+impl VerifyIdForUser<MovementId> for UnverifiedId<MovementId> {
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<MovementId, Status> {
         let movement =
             Movement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if movement.user_id == Some(**auth) {
@@ -68,7 +64,10 @@ impl UnverifiedId<MovementId> {
             Err(rocket::http::Status::Forbidden)
         }
     }
+}
 
+#[cfg(feature = "full")]
+impl UnverifiedId<MovementId> {
     pub fn verify_if_owned(
         self,
         auth: &AuthenticatedUser,
