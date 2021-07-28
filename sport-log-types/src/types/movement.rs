@@ -10,12 +10,12 @@ use sport_log_types_derive::{
     VerifyIdForAdmin, VerifyIdForUserUnchecked,
 };
 
+use crate::types::UserId;
 #[cfg(feature = "full")]
 use crate::{
     schema::{eorm, movement},
-    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId, User},
+    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId, User, VerifyIdForUser},
 };
-use crate::{types::UserId, VerifyIdForUser};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]

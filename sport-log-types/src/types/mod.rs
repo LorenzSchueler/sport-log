@@ -1,5 +1,6 @@
 #[cfg(feature = "full")]
 use diesel::{PgConnection, QueryResult};
+#[cfg(feature = "full")]
 use rocket::http::Status;
 #[cfg(feature = "full")]
 use rocket::{
