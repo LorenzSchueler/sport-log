@@ -1,6 +1,12 @@
 
 import 'package:equatable/equatable.dart';
-import 'package:sport_log/models/keys.dart';
+
+abstract class Keys {
+  static const usernameKey = 'username';
+  static const passwordKey = 'password';
+  static const emailKey = 'email';
+  static const idKey = 'id';
+}
 
 class User extends Equatable {
   const User({
@@ -55,5 +61,34 @@ class User extends Equatable {
   @override
   String toString() {
     return '''User(${Keys.idKey}: $id, ${Keys.usernameKey}: $username, ${Keys.passwordKey}: $password, ${Keys.emailKey}: $email)''';
+  }
+}
+
+class NewUser extends Equatable {
+  const NewUser({
+    required this.username,
+    required this.password,
+    required this.email,
+  }) : super();
+
+  final String username;
+  final String password;
+  final String email;
+
+  @override
+  List<Object?> get props => [username, password, email];
+
+  static const List<String> allKeys
+  = [Keys.usernameKey, Keys.passwordKey, Keys.emailKey];
+
+  Map<String, dynamic> toJson() => {
+    Keys.usernameKey: username,
+    Keys.passwordKey: password,
+    Keys.emailKey: email,
+  };
+
+  @override
+  String toString() {
+    return '''NewUser(${Keys.usernameKey}: $username, ${Keys.passwordKey}: $password, ${Keys.emailKey}: $email)''';
   }
 }
