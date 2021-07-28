@@ -37,7 +37,7 @@ class WorkoutPageState extends State<WorkoutPage> {
       drawer: const MainDrawer(selectedRoute: Routes.workout),
       floatingActionButton: _showFab ? FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: _onFabTapped,
+        onPressed: () => _onFabTapped(context),
       ) : null,
     );
   }
@@ -92,9 +92,10 @@ class WorkoutPageState extends State<WorkoutPage> {
     });
   }
 
-  void _onFabTapped() {
+  void _onFabTapped(BuildContext context) {
     switch (_currentPage) {
       case BottomNavPage.workout:
+        Navigator.of(context).pushNamed(Routes.newMetcon);
         break;
       default:
     }

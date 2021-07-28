@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/pages/logs/logs_page.dart';
 import 'package:sport_log/pages/syncing/syncing_page.dart';
+import 'package:sport_log/pages/workout/metcon/new_metcon_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
 import 'package:sport_log/helpers/material_color_generator.dart';
 import 'package:sport_log/pages/workout/workout_page.dart';
@@ -31,6 +32,7 @@ class AppState extends State<App> {
         Routes.login: (_) => const LoginPage(),
         Routes.registration: (_) => const RegistrationPage(),
         Routes.workout: (_) => ProtectedRoute(builder: (_) => const WorkoutPage()),
+        Routes.newMetcon: (_) => ProtectedRoute(builder: (_) => const NewMetconPage()),
         Routes.syncing: (_) => ProtectedRoute(builder: (_) => const SyncingPage()),
         Routes.logs: (_) => ProtectedRoute(builder: (_) => const LogsPage()),
       },
