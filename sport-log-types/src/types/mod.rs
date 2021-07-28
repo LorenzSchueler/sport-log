@@ -189,10 +189,48 @@ pub trait VerifyIdForUserUnchecked<Id> {
 
 #[cfg(feature = "full")]
 pub trait VerifyIdForActionProvider<Id> {
-    fn verify_ap(self, auth: &AuthenticatedActionProvider, conn: &PgConnection) -> Result<Id, Status>;
+    fn verify_ap(
+        self,
+        auth: &AuthenticatedActionProvider,
+        conn: &PgConnection,
+    ) -> Result<Id, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyIdForAdmin<Id> {
     fn verify_adm(self, auth: &AuthenticatedAdmin) -> Result<Id, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyForUserWithDb<Entity> {
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Entity, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyForUserWithoutDb<Entity> {
+    fn verify(self, auth: &AuthenticatedUser) -> Result<Entity, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyForActionProviderWithDb<Entity> {
+    fn verify_ap(
+        self,
+        auth: &AuthenticatedActionProvider,
+        conn: &PgConnection,
+    ) -> Result<Entity, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyForActionProviderWithoutDb<Entity> {
+    fn verify_ap(self, auth: &AuthenticatedActionProvider) -> Result<Entity, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyForActionProviderUnchecked<Entity> {
+    fn verify_unchecked_ap(self, auth: &AuthenticatedActionProvider) -> Result<Entity, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyForAdminWithoutDb<Entity> {
+    fn verify_adm(self, auth: &AuthenticatedAdmin) -> Result<Entity, Status>;
 }

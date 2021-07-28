@@ -3,7 +3,8 @@ use rocket::{http::Status, serde::json::Json};
 use sport_log_types::{
     AuthenticatedUser, Create, Db, Delete, GetById, GetByUser, Metcon, MetconId, MetconMovement,
     MetconMovementId, MetconSession, MetconSessionDescription, MetconSessionId, NewMetcon,
-    NewMetconMovement, NewMetconSession, Unverified, UnverifiedId, Update, VerifyIdForUser,
+    NewMetconMovement, NewMetconSession, Unverified, UnverifiedId, Update, VerifyForUserWithDb,
+    VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};

@@ -56,12 +56,10 @@ impl Activity {
 
         activities.sort_by(|a, b| b.0.cmp(&a.0));
 
-        let activities = activities
+        activities
             .into_iter()
             .map(|(_, activity)| activity)
-            .collect();
-
-        activities
+            .collect()
     }
 
     pub fn get_ordered_by_user_and_timespan(

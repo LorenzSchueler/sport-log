@@ -2,7 +2,9 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
     AuthenticatedActionProvider, AuthenticatedUser, Create, Db, Delete, Diary, DiaryId, GetById,
-    GetByUser, NewDiary, NewWod, Unverified, UnverifiedId, Update, VerifyIdForUser, Wod, WodId,
+    GetByUser, NewDiary, NewWod, Unverified, UnverifiedId, Update,
+    VerifyForActionProviderUnchecked, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
+    Wod, WodId,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
