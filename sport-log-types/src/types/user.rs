@@ -8,7 +8,7 @@ use sport_log_types_derive::{Delete, FromI32, FromSql, GetAll, GetById, ToSql};
 #[cfg(feature = "full")]
 use crate::{
     schema::user,
-    types::{AuthenticatedUser, GetById, Unverified},
+    types::{AuthenticatedUser, GetById, Unverified, VerifyForUserWithDb},
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -41,8 +41,8 @@ pub struct User {
 }
 
 #[cfg(feature = "full")]
-impl Unverified<User> {
-    pub fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<User, Status> {
+impl VerifyForUserWithDb<User> for Unverified<User> {
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<User, Status> {
         let entity = self.0.into_inner();
         if entity.id == **auth
             && User::get_by_id(entity.id, conn)
@@ -68,7 +68,7 @@ pub struct NewUser {
 
 #[cfg(feature = "full")]
 impl Unverified<NewUser> {
-    pub fn verify(self) -> Result<NewUser, Status> {
+    pub fn verify_unchecked(self) -> Result<NewUser, Status> {
         Ok(self.0.into_inner())
     }
 }

@@ -14,7 +14,10 @@ use crate::types::UserId;
 #[cfg(feature = "full")]
 use crate::{
     schema::{eorm, movement},
-    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId, User, VerifyIdForUser},
+    types::{
+        AuthenticatedUser, GetById, Unverified, UnverifiedId, User, VerifyForUserWithDb,
+        VerifyForUserWithoutDb, VerifyIdForUser,
+    },
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -117,8 +120,8 @@ pub struct Movement {
 }
 
 #[cfg(feature = "full")]
-impl Unverified<Movement> {
-    pub fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Movement, Status> {
+impl VerifyForUserWithDb<Movement> for Unverified<Movement> {
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Movement, Status> {
         let movement = self.0.into_inner();
         if movement.user_id == Some(**auth)
             && Movement::get_by_id(movement.id, conn)
@@ -145,8 +148,8 @@ pub struct NewMovement {
 }
 
 #[cfg(feature = "full")]
-impl Unverified<NewMovement> {
-    pub fn verify(self, auth: &AuthenticatedUser) -> Result<NewMovement, Status> {
+impl VerifyForUserWithoutDb<NewMovement> for Unverified<NewMovement> {
+    fn verify(self, auth: &AuthenticatedUser) -> Result<NewMovement, Status> {
         let movement = self.0.into_inner();
         if movement.user_id == Some(**auth) {
             Ok(movement)

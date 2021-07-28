@@ -17,7 +17,10 @@ use crate::types::{Movement, MovementId, MovementUnit, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
-    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId, User, VerifyIdForUser},
+    types::{
+        AuthenticatedUser, GetById, Unverified, UnverifiedId, User, VerifyForUserWithDb,
+        VerifyForUserWithoutDb, VerifyIdForUser,
+    },
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -108,8 +111,8 @@ pub struct Metcon {
 }
 
 #[cfg(feature = "full")]
-impl Unverified<Metcon> {
-    pub fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Metcon, Status> {
+impl VerifyForUserWithDb<Metcon> for Unverified<Metcon> {
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Metcon, Status> {
         let metcon = self.0.into_inner();
         if metcon.user_id == Some(**auth)
             && Metcon::get_by_id(metcon.id, conn)
@@ -138,8 +141,8 @@ pub struct NewMetcon {
 }
 
 #[cfg(feature = "full")]
-impl Unverified<NewMetcon> {
-    pub fn verify(self, auth: &AuthenticatedUser) -> Result<NewMetcon, Status> {
+impl VerifyForUserWithoutDb<NewMetcon> for Unverified<NewMetcon> {
+    fn verify(self, auth: &AuthenticatedUser) -> Result<NewMetcon, Status> {
         let metcon = self.0.into_inner();
         if metcon.user_id == Some(**auth) {
             Ok(metcon)
@@ -224,8 +227,8 @@ pub struct MetconMovement {
 }
 
 #[cfg(feature = "full")]
-impl Unverified<MetconMovement> {
-    pub fn verify(
+impl VerifyForUserWithDb<MetconMovement> for Unverified<MetconMovement> {
+    fn verify(
         self,
         auth: &AuthenticatedUser,
         conn: &PgConnection,
@@ -253,8 +256,8 @@ pub struct NewMetconMovement {
 }
 
 #[cfg(feature = "full")]
-impl Unverified<NewMetconMovement> {
-    pub fn verify(
+impl VerifyForUserWithDb<NewMetconMovement> for Unverified<NewMetconMovement> {
+    fn verify(
         self,
         auth: &AuthenticatedUser,
         conn: &PgConnection,

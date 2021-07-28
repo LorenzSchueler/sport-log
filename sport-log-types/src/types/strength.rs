@@ -13,7 +13,9 @@ use crate::types::{Movement, MovementId, MovementUnit, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{strength_session, strength_set},
-    types::{AuthenticatedUser, GetById, Unverified, UnverifiedId, VerifyIdForUser},
+    types::{
+        AuthenticatedUser, GetById, Unverified, UnverifiedId, VerifyForUserWithDb, VerifyIdForUser,
+    },
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -129,12 +131,8 @@ pub struct StrengthSet {
 }
 
 #[cfg(feature = "full")]
-impl Unverified<StrengthSet> {
-    pub fn verify(
-        self,
-        auth: &AuthenticatedUser,
-        conn: &PgConnection,
-    ) -> Result<StrengthSet, Status> {
+impl VerifyForUserWithDb<StrengthSet> for Unverified<StrengthSet> {
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<StrengthSet, Status> {
         let strength_set = self.0.into_inner();
         if StrengthSession::get_by_id(strength_set.strength_session_id, conn)
             .map_err(|_| Status::InternalServerError)?
@@ -158,8 +156,8 @@ pub struct NewStrengthSet {
 }
 
 #[cfg(feature = "full")]
-impl Unverified<NewStrengthSet> {
-    pub fn verify(
+impl VerifyForUserWithDb<NewStrengthSet> for Unverified<NewStrengthSet> {
+    fn verify(
         self,
         auth: &AuthenticatedUser,
         conn: &PgConnection,
