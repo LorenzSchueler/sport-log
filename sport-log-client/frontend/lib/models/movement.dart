@@ -31,4 +31,7 @@ class Movement {
   String name;
   String description;
   MovementCategory category;
+
+  Movement.fromNewMovement(NewMovement nm, this.id)
+    : name = nm.name, description = nm.description, category = nm.category;
 }
