@@ -42,6 +42,10 @@ class Api {
     _credentials = null;
   }
 
+  Credentials? getCredentials() { // needed so that dart analyze is successful
+    return _credentials;
+  }
+
   void _handleUnknownStatusCode(http.Response response) {
     log("${response.statusCode}\n${response.body}", name: "unknown api error");
   }
@@ -54,12 +58,14 @@ class Api {
     };
   }
 
+  /*
   Map<String, String> get _authorizedHeader {
     assert(_credentials != null);
     final username = _credentials!.username;
     final password = _credentials!.password;
     return _makeAuthorizedHeader(username, password);
   }
+  */
 
   static const _jsonContentTypeHeader = {
     'Content-Type': 'application/json; charset=UTF-8',

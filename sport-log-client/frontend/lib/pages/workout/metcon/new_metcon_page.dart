@@ -13,8 +13,12 @@ class _NewMetconPageState extends State<NewMetconPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("New Metcon")),
-      body: const Center(
-        child: Text("New Metcon")
+      body: Form(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(
+          children: const [
+          ],
+        ),
       ),
     );
   }
