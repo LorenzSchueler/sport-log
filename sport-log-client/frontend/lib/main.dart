@@ -4,7 +4,7 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/repositories/authentication_repository.dart';
 import 'package:sport_log/app.dart';
-import 'package:sport_log/authentication/authentication_bloc.dart';
+import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
 import 'package:sport_log/models/user.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

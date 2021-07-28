@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:sport_log/authentication/authentication_bloc.dart';
+import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
 import 'package:sport_log/helpers/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
