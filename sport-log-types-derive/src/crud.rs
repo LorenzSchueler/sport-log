@@ -82,6 +82,14 @@ pub fn impl_get_by_id(ast: &syn::DeriveInput) -> TokenStream {
                 #tablename::table.find(#idparamname).get_result(conn)
             }
         }
+
+        impl crate::types::GetByIds for #typename {
+            type Id = #idtypename;
+
+            fn get_by_ids(ids: &Vec<Self::Id>, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+                #tablename::table.filter(#tablename::columns::id.eq_any(ids)).get_results(conn)
+            }
+        }
     };
     gen.into()
 }

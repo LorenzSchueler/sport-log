@@ -138,6 +138,22 @@ pub trait GetById {
         Self: Sized;
 }
 
+/// A type for which entries can be retrieved by id from the database.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(GetByIds)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::GetByIds].
+#[cfg(feature = "full")]
+pub trait GetByIds {
+    type Id;
+
+    fn get_by_ids(ids: &Vec<Self::Id>, conn: &PgConnection) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized;
+}
+
 /// A type for which entries can be retrieved by user from the database.
 ///
 /// ### Deriving
@@ -216,6 +232,17 @@ pub trait VerifyIdForUser {
 }
 
 #[cfg(feature = "full")]
+pub trait VerifyMultipleIdForUser {
+    type Id;
+
+    fn verify_multiple(
+        self,
+        auth: &AuthenticatedUser,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status>;
+}
+
+#[cfg(feature = "full")]
 pub trait VerifyIdForUserUnchecked {
     type Id;
 
@@ -248,10 +275,28 @@ pub trait VerifyForUserWithDb {
 }
 
 #[cfg(feature = "full")]
+pub trait VerifyMultipleForUserWithDb {
+    type Entity;
+
+    fn verify_multiple(
+        self,
+        auth: &AuthenticatedUser,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status>;
+}
+
+#[cfg(feature = "full")]
 pub trait VerifyForUserWithoutDb {
     type Entity;
 
     fn verify(self, auth: &AuthenticatedUser) -> Result<Self::Entity, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyMultipleForUserWithoutDb {
+    type Entity;
+
+    fn verify_multiple(self, auth: &AuthenticatedUser) -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]
