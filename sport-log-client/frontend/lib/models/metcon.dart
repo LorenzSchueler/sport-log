@@ -5,6 +5,19 @@ enum MetconType {
   amrap, emom, forTime
 }
 
+extension ToDisplayName on MetconType {
+  String toDisplayName() {
+    switch (this) {
+      case MetconType.amrap:
+        return "AMRAP";
+      case MetconType.emom:
+        return "EMOM";
+      case MetconType.forTime:
+        return "FOR TIME";
+    }
+  }
+}
+
 class MetconMovement {
   MetconMovement({
     required this.id,
