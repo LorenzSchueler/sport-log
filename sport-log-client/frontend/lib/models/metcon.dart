@@ -11,14 +11,14 @@ class MetconMovement {
     required this.movementId,
     required this.count,
     required this.unit,
-    required this.weight,
+    this.weight,
   });
 
   int id;
   int movementId;
   int count;
   MovementUnit unit;
-  double weight;
+  double? weight;
 
   MetconMovement.fromNewMetconMovement(NewMetconMovement nmm, this.id)
     : movementId = nmm.movementId,
@@ -32,16 +32,18 @@ class Metcon {
     required this.id,
     required this.name,
     required this.type,
-    required this.rounds,
-    required this.timecap,
+    this.rounds,
+    this.timecap,
+    this.description,
     required this.moves,
   });
 
   int id;
   String name;
   MetconType type;
-  int rounds;
-  Duration timecap;
+  int? rounds;
+  Duration? timecap;
+  String? description;
 
   List<MetconMovement> moves;
 
@@ -52,7 +54,8 @@ class Metcon {
   ) : name = nm.name,
       type = nm.type,
       rounds = nm.rounds,
-      timecap = nm.timecap;
+      timecap = nm.timecap,
+      description = nm.description;
 }
 
 class NewMetconMovement {
@@ -60,28 +63,30 @@ class NewMetconMovement {
     required this.movementId,
     required this.count,
     required this.unit,
-    required this.weight,
+    this.weight,
   });
 
   int movementId;
   int count;
   MovementUnit unit;
-  double weight;
+  double? weight;
 }
 
 class NewMetcon {
   NewMetcon({
     required this.name,
     required this.type,
-    required this.rounds,
-    required this.timecap,
+    this.rounds,
+    this.timecap,
+    this.description,
     required this.moves,
   });
 
   String name;
   MetconType type;
-  int rounds;
-  Duration timecap;
+  int? rounds;
+  Duration? timecap;
+  String? description;
 
   List<NewMetconMovement> moves;
 }
