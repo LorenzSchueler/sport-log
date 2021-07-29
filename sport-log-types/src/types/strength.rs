@@ -133,8 +133,10 @@ pub struct StrengthSet {
 }
 
 #[cfg(feature = "full")]
-impl VerifyForUserWithDb<StrengthSet> for Unverified<StrengthSet> {
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<StrengthSet, Status> {
+impl VerifyForUserWithDb for Unverified<StrengthSet> {
+    type Entity = StrengthSet;
+
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
         let strength_set = self.0.into_inner();
         if StrengthSession::get_by_id(strength_set.strength_session_id, conn)
             .map_err(|_| Status::InternalServerError)?
@@ -158,12 +160,10 @@ pub struct NewStrengthSet {
 }
 
 #[cfg(feature = "full")]
-impl VerifyForUserWithDb<NewStrengthSet> for Unverified<NewStrengthSet> {
-    fn verify(
-        self,
-        auth: &AuthenticatedUser,
-        conn: &PgConnection,
-    ) -> Result<NewStrengthSet, Status> {
+impl VerifyForUserWithDb for Unverified<NewStrengthSet> {
+    type Entity = NewStrengthSet;
+
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
         let strength_set = self.0.into_inner();
         if StrengthSession::get_by_id(strength_set.strength_session_id, conn)
             .map_err(|_| Status::InternalServerError)?

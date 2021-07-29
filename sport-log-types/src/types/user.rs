@@ -42,8 +42,10 @@ pub struct User {
 }
 
 #[cfg(feature = "full")]
-impl VerifyForUserWithDb<User> for Unverified<User> {
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<User, Status> {
+impl VerifyForUserWithDb for Unverified<User> {
+    type Entity = User;
+
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
         let entity = self.0.into_inner();
         if entity.id == **auth
             && User::get_by_id(entity.id, conn)

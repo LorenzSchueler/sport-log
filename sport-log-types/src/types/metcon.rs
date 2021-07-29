@@ -115,8 +115,10 @@ pub struct Metcon {
 }
 
 #[cfg(feature = "full")]
-impl VerifyForUserWithDb<Metcon> for Unverified<Metcon> {
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Metcon, Status> {
+impl VerifyForUserWithDb for Unverified<Metcon> {
+    type Entity = Metcon;
+
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
         let metcon = self.0.into_inner();
         if metcon.user_id == Some(**auth)
             && Metcon::get_by_id(metcon.id, conn)
@@ -145,8 +147,10 @@ pub struct NewMetcon {
 }
 
 #[cfg(feature = "full")]
-impl VerifyForUserWithoutDb<NewMetcon> for Unverified<NewMetcon> {
-    fn verify(self, auth: &AuthenticatedUser) -> Result<NewMetcon, Status> {
+impl VerifyForUserWithoutDb for Unverified<NewMetcon> {
+    type Entity = NewMetcon;
+
+    fn verify(self, auth: &AuthenticatedUser) -> Result<Self::Entity, Status> {
         let metcon = self.0.into_inner();
         if metcon.user_id == Some(**auth) {
             Ok(metcon)
@@ -168,11 +172,7 @@ pub struct MetconMovementId(pub i32);
 impl VerifyIdForUser for UnverifiedId<MetconMovementId> {
     type Id = MetconMovementId;
 
-    fn verify(
-        self,
-        auth: &AuthenticatedUser,
-        conn: &PgConnection,
-    ) -> Result<Self::Id, Status> {
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Id, Status> {
         let metcon_movement =
             MetconMovement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
@@ -235,12 +235,14 @@ pub struct MetconMovement {
 }
 
 #[cfg(feature = "full")]
-impl VerifyForUserWithDb<MetconMovement> for Unverified<MetconMovement> {
+impl VerifyForUserWithDb for Unverified<MetconMovement> {
+    type Entity = MetconMovement;
+
     fn verify(
         self,
         auth: &AuthenticatedUser,
         conn: &PgConnection,
-    ) -> Result<MetconMovement, Status> {
+    ) -> Result<Self::Entity, Status> {
         let metcon_movement = self.0.into_inner();
         let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?;
@@ -264,12 +266,14 @@ pub struct NewMetconMovement {
 }
 
 #[cfg(feature = "full")]
-impl VerifyForUserWithDb<NewMetconMovement> for Unverified<NewMetconMovement> {
+impl VerifyForUserWithDb for Unverified<NewMetconMovement> {
+    type Entity = NewMetconMovement;
+
     fn verify(
         self,
         auth: &AuthenticatedUser,
         conn: &PgConnection,
-    ) -> Result<NewMetconMovement, Status> {
+    ) -> Result<Self::Entity, Status> {
         let metcon_movement = self.0.into_inner();
         let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?;

@@ -124,8 +124,10 @@ pub struct Movement {
 }
 
 #[cfg(feature = "full")]
-impl VerifyForUserWithDb<Movement> for Unverified<Movement> {
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Movement, Status> {
+impl VerifyForUserWithDb for Unverified<Movement> {
+    type Entity = Movement;
+
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
         let movement = self.0.into_inner();
         if movement.user_id == Some(**auth)
             && Movement::get_by_id(movement.id, conn)
@@ -152,8 +154,10 @@ pub struct NewMovement {
 }
 
 #[cfg(feature = "full")]
-impl VerifyForUserWithoutDb<NewMovement> for Unverified<NewMovement> {
-    fn verify(self, auth: &AuthenticatedUser) -> Result<NewMovement, Status> {
+impl VerifyForUserWithoutDb for Unverified<NewMovement> {
+    type Entity = NewMovement;
+
+    fn verify(self, auth: &AuthenticatedUser) -> Result<Self::Entity, Status> {
         let movement = self.0.into_inner();
         if movement.user_id == Some(**auth) {
             Ok(movement)
