@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, Delete, FromI32, FromSql, GetAll, GetById, ToSql, Update, VerifyForAdminWithoutDb,
+    Create, CreateMultiple, Delete, FromI32, FromSql, GetAll, GetById, ToSql, Update, VerifyForAdminWithoutDb,
     VerifyIdForAdmin, VerifyIdForUserUnchecked,
 };
 
@@ -99,7 +99,7 @@ impl UnverifiedId<MovementId> {
         Identifiable,
         Queryable,
         AsChangeset,
-        Create,
+        Create, CreateMultiple,
         GetById,
         GetAll,
         Update,
@@ -183,7 +183,7 @@ pub struct EormId(pub i32);
         Identifiable,
         Queryable,
         AsChangeset,
-        Create,
+        Create, CreateMultiple,
         GetById,
         GetAll,
         Update,

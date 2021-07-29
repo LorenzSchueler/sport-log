@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
+    Create, CreateMultiple, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
@@ -97,6 +97,7 @@ pub struct RouteId(pub i32);
         Queryable,
         AsChangeset,
         Create,
+        CreateMultiple,
         GetById,
         GetByUser,
         GetAll,
@@ -157,6 +158,7 @@ pub struct CardioSessionId(pub i32);
         Queryable,
         AsChangeset,
         Create,
+        CreateMultiple,
         GetById,
         GetByUser,
         GetAll,

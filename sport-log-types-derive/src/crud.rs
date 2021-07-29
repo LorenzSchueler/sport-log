@@ -48,6 +48,26 @@ pub fn impl_create(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
+pub fn impl_create_multiple(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+    let (newtypename, _, paramname, _, tablename) = get_identifiers(typename);
+
+    let gen = quote! {
+        use diesel::prelude::*;
+
+        impl crate::types::CreateMultiple for #typename {
+            type New = #newtypename;
+
+            fn create(#paramname: Vec<Self::New>, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+                diesel::insert_into(#tablename::table)
+                    .values(&#paramname)
+                    .get_results(conn)
+            }
+        }
+    };
+    gen.into()
+}
+
 pub fn impl_get_by_id(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
     let (_, idtypename, _, idparamname, tablename) = get_identifiers(typename);

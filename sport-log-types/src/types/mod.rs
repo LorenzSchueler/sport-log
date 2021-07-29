@@ -106,6 +106,22 @@ pub trait Create {
         Self: Sized;
 }
 
+/// A type for which new database entries can be created.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(CreateMultiple)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::CreateMultiple].
+#[cfg(feature = "full")]
+pub trait CreateMultiple {
+    type New;
+
+    fn create(enteties: Vec<Self::New>, conn: &PgConnection) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized;
+}
+
 /// A type for which an entry can be retrieved by id from the database.
 ///
 /// ### Deriving
