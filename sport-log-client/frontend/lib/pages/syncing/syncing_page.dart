@@ -7,10 +7,10 @@ class SyncingPage extends StatefulWidget {
   const SyncingPage({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => SyncingPageState();
+  State<StatefulWidget> createState() => _SyncingPageState();
 }
 
-class SyncingPageState extends State<SyncingPage> {
+class _SyncingPageState extends State<SyncingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

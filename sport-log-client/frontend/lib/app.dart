@@ -19,10 +19,10 @@ class App extends StatefulWidget {
   final bool isAuthenticatedAtStart;
 
   @override
-  State<StatefulWidget> createState() => AppState();
+  State<StatefulWidget> createState() => _AppState();
 }
 
-class AppState extends State<App> {
+class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     final primarySwatch = generateMaterialColor(const Color(0xff55d2db));

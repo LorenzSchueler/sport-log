@@ -13,10 +13,10 @@ class WorkoutPage extends StatefulWidget {
   const WorkoutPage({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => WorkoutPageState();
+  State<StatefulWidget> createState() => _WorkoutPageState();
 }
 
-class WorkoutPageState extends State<WorkoutPage> {
+class _WorkoutPageState extends State<WorkoutPage> {
 
   BottomNavPage _currentPage = BottomNavPage.workout;
   bool get _showFab => _currentPage == BottomNavPage.workout;

@@ -11,10 +11,10 @@ class RegistrationForm extends StatefulWidget {
   const RegistrationForm({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => RegistrationFormState();
+  State<StatefulWidget> createState() => _RegistrationFormState();
 }
 
-class RegistrationFormState extends State<RegistrationForm> {
+class _RegistrationFormState extends State<RegistrationForm> {
   final _formKey = GlobalKey<FormState>();
   String _username = "";
   String _email = "";
