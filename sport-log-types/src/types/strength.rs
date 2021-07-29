@@ -87,12 +87,10 @@ pub struct NewStrengthSession {
 pub struct StrengthSetId(pub i32);
 
 #[cfg(feature = "full")]
-impl VerifyIdForUser<StrengthSetId> for UnverifiedId<StrengthSetId> {
-    fn verify(
-        self,
-        auth: &AuthenticatedUser,
-        conn: &PgConnection,
-    ) -> Result<StrengthSetId, Status> {
+impl VerifyIdForUser for UnverifiedId<StrengthSetId> {
+    type Id = StrengthSetId;
+
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Id, Status> {
         let strength_set =
             StrengthSet::get_by_id(self.0, conn).map_err(|_| Status::InternalServerError)?;
         if StrengthSession::get_by_id(strength_set.strength_session_id, conn)

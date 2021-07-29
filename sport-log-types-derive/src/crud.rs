@@ -58,7 +58,7 @@ pub fn impl_create_multiple(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::types::CreateMultiple for #typename {
             type New = #newtypename;
 
-            fn create(#paramname: Vec<Self::New>, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+            fn create_multiple(#paramname: Vec<Self::New>, conn: &PgConnection) -> QueryResult<Vec<Self>> {
                 diesel::insert_into(#tablename::table)
                     .values(&#paramname)
                     .get_results(conn)
@@ -166,7 +166,7 @@ pub fn impl_delete_multiple(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::types::DeleteMultiple for #typename {
             type Id = #idtypename;
 
-            fn delete(#idparamname: Vec<Self::Id>, conn: &PgConnection) -> QueryResult<usize> {
+            fn delete_multiple(#idparamname: Vec<Self::Id>, conn: &PgConnection) -> QueryResult<usize> {
                 diesel::delete(#tablename::table.filter(#tablename::columns::id.eq_any(#idparamname))).execute(conn)
             }
         }

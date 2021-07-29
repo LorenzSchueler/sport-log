@@ -40,8 +40,10 @@ pub enum MetconType {
 pub struct MetconId(pub i32);
 
 #[cfg(feature = "full")]
-impl VerifyIdForUser<MetconId> for UnverifiedId<MetconId> {
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<MetconId, Status> {
+impl VerifyIdForUser for UnverifiedId<MetconId> {
+    type Id = MetconId;
+
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Id, Status> {
         let metcon =
             Metcon::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if metcon.user_id == Some(**auth) {
@@ -163,12 +165,14 @@ impl VerifyForUserWithoutDb<NewMetcon> for Unverified<NewMetcon> {
 pub struct MetconMovementId(pub i32);
 
 #[cfg(feature = "full")]
-impl VerifyIdForUser<MetconMovementId> for UnverifiedId<MetconMovementId> {
+impl VerifyIdForUser for UnverifiedId<MetconMovementId> {
+    type Id = MetconMovementId;
+
     fn verify(
         self,
         auth: &AuthenticatedUser,
         conn: &PgConnection,
-    ) -> Result<MetconMovementId, Status> {
+    ) -> Result<Self::Id, Status> {
         let metcon_movement =
             MetconMovement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)

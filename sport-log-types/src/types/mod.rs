@@ -117,7 +117,7 @@ pub trait Create {
 pub trait CreateMultiple {
     type New;
 
-    fn create(enteties: Vec<Self::New>, conn: &PgConnection) -> QueryResult<Vec<Self>>
+    fn create_multiple(enteties: Vec<Self::New>, conn: &PgConnection) -> QueryResult<Vec<Self>>
     where
         Self: Sized;
 }
@@ -205,31 +205,39 @@ pub trait Delete {
 pub trait DeleteMultiple {
     type Id;
 
-    fn delete(ids: Vec<Self::Id>, conn: &PgConnection) -> QueryResult<usize>;
+    fn delete_multiple(ids: Vec<Self::Id>, conn: &PgConnection) -> QueryResult<usize>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyIdForUser<Id> {
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Id, Status>;
+pub trait VerifyIdForUser {
+    type Id;
+
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyIdForUserUnchecked<Id> {
-    fn verify_unchecked(self, auth: &AuthenticatedUser) -> Result<Id, Status>;
+pub trait VerifyIdForUserUnchecked {
+    type Id;
+
+    fn verify_unchecked(self, auth: &AuthenticatedUser) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyIdForActionProvider<Id> {
+pub trait VerifyIdForActionProvider {
+    type Id;
+
     fn verify_ap(
         self,
         auth: &AuthenticatedActionProvider,
         conn: &PgConnection,
-    ) -> Result<Id, Status>;
+    ) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyIdForAdmin<Id> {
-    fn verify_adm(self, auth: &AuthenticatedAdmin) -> Result<Id, Status>;
+pub trait VerifyIdForAdmin {
+    type Id;
+
+    fn verify_adm(self, auth: &AuthenticatedAdmin) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]

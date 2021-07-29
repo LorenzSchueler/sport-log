@@ -57,8 +57,10 @@ pub enum MovementUnit {
 pub struct MovementId(pub i32);
 
 #[cfg(feature = "full")]
-impl VerifyIdForUser<MovementId> for UnverifiedId<MovementId> {
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<MovementId, Status> {
+impl VerifyIdForUser for UnverifiedId<MovementId> {
+    type Id = MovementId;
+
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Id, Status> {
         let movement =
             Movement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if movement.user_id == Some(**auth) {
