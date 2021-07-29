@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, FromI32, FromSql, GetAll, GetById, ToSql, Update, VerifyForAdminWithoutDb,
-    VerifyIdForAdmin, VerifyIdForUserUnchecked,
+    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, ToSql,
+    Update, VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdForUserUnchecked,
 };
 
 use crate::types::UserId;
@@ -99,11 +99,13 @@ impl UnverifiedId<MovementId> {
         Identifiable,
         Queryable,
         AsChangeset,
-        Create, CreateMultiple,
+        Create,
+        CreateMultiple,
         GetById,
         GetAll,
         Update,
         Delete,
+        DeleteMultiple,
         VerifyForAdminWithoutDb
     )
 )]
@@ -183,11 +185,13 @@ pub struct EormId(pub i32);
         Identifiable,
         Queryable,
         AsChangeset,
-        Create, CreateMultiple,
+        Create,
+        CreateMultiple,
         GetById,
         GetAll,
         Update,
         Delete,
+        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "eorm")]

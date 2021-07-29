@@ -2,7 +2,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
+    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByUser,
+    ToSql, Update,
 };
 
 use crate::types::{CardioSessionId, DiaryId, MetconSessionId, StrengthSessionId, UserId};
@@ -37,6 +38,7 @@ pub struct GroupId(pub i32);
         GetAll,
         Update,
         Delete,
+        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "group")]
@@ -75,6 +77,7 @@ pub struct GroupUserId(pub i32);
         GetAll,
         Update,
         Delete,
+        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "group_user")]
@@ -116,6 +119,7 @@ pub struct SharedMetconSessionId(pub i32);
         GetAll,
         Update,
         Delete,
+        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "shared_metcon_session")]
@@ -157,6 +161,7 @@ pub struct SharedStrengthSessionId(pub i32);
         GetAll,
         Update,
         Delete,
+        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "shared_strength_session")]
@@ -198,6 +203,7 @@ pub struct SharedCardioSessionId(pub i32);
         GetAll,
         Update,
         Delete,
+        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "shared_cardio_session")]
@@ -239,6 +245,7 @@ pub struct SharedDiaryId(pub i32);
         GetAll,
         Update,
         Delete,
+        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "shared_diary")]

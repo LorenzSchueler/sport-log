@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
-    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
+    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByUser,
+    ToSql, Update, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
 use crate::types::{Movement, MovementId, MovementUnit, UserId};
@@ -49,6 +49,7 @@ pub struct StrengthSessionId(pub i32);
         GetAll,
         Update,
         Delete,
+        DeleteMultiple,
         VerifyForUserWithDb
     )
 )]
@@ -120,6 +121,7 @@ impl VerifyIdForUser<StrengthSetId> for UnverifiedId<StrengthSetId> {
         GetAll,
         Update,
         Delete,
+        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "strength_set")]

@@ -191,7 +191,21 @@ pub trait Update {
 pub trait Delete {
     type Id;
 
-    fn delete(entity: Self::Id, conn: &PgConnection) -> QueryResult<usize>;
+    fn delete(id: Self::Id, conn: &PgConnection) -> QueryResult<usize>;
+}
+
+/// A type for which entries can be deleted by id from the database.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(DeleteMultiple)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::DeleteMultiple].
+#[cfg(feature = "full")]
+pub trait DeleteMultiple {
+    type Id;
+
+    fn delete(ids: Vec<Self::Id>, conn: &PgConnection) -> QueryResult<usize>;
 }
 
 #[cfg(feature = "full")]

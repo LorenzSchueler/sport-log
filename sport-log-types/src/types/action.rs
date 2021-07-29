@@ -7,10 +7,10 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
-    VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
-    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin,
-    VerifyIdForUser, VerifyIdForUserUnchecked,
+    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByUser,
+    ToSql, Update, VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb,
+    VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
+    VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser, VerifyIdForUserUnchecked,
 };
 
 #[cfg(feature = "full")]
@@ -51,6 +51,7 @@ pub struct ActionProviderId(pub i32);
         AsChangeset,
         GetAll,
         Delete,
+        DeleteMultiple,
         VerifyForAdminWithoutDb,
     )
 )]
@@ -101,6 +102,7 @@ pub struct ActionId(pub i32);
         GetById,
         GetAll,
         Delete,
+        DeleteMultiple,
         VerifyForActionProviderWithDb,
     )
 )]
@@ -176,6 +178,7 @@ pub struct ActionRuleId(pub i32);
         GetByUser,
         Update,
         Delete,
+        DeleteMultiple,
         VerifyForUserWithDb,
     )
 )]
@@ -251,6 +254,7 @@ impl VerifyIdForActionProvider<ActionEventId> for UnverifiedId<ActionEventId> {
         GetByUser,
         Update,
         Delete,
+        DeleteMultiple,
         VerifyForUserWithDb,
     )
 )]
