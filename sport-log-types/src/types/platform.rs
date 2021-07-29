@@ -2,9 +2,9 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
-    VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForAdmin,
-    VerifyIdForUser, VerifyIdForUserUnchecked,
+    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByUser,
+    ToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
+    VerifyIdForAdmin, VerifyIdForUser, VerifyIdForUserUnchecked,
 };
 
 use crate::types::UserId;
@@ -43,7 +43,8 @@ pub struct PlatformId(pub i32);
         CreateMultiple,
         GetAll,
         Update,
-        Delete, DeleteMultiple,
+        Delete,
+        DeleteMultiple,
         VerifyForAdminWithoutDb,
     )
 )]
@@ -89,7 +90,8 @@ pub struct PlatformCredentialsId(pub i32);
         GetById,
         GetByUser,
         Update,
-        Delete, DeleteMultiple,
+        Delete,
+        DeleteMultiple,
         VerifyForUserWithDb,
     )
 )]

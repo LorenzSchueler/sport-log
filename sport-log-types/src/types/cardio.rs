@@ -16,8 +16,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
-    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
+    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByUser,
+    ToSql, Update, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
 use crate::types::{Movement, MovementId, UserId};
@@ -102,7 +102,8 @@ pub struct RouteId(pub i32);
         GetByUser,
         GetAll,
         Update,
-        Delete, DeleteMultiple,
+        Delete,
+        DeleteMultiple,
         VerifyForUserWithDb
     )
 )]
@@ -163,7 +164,8 @@ pub struct CardioSessionId(pub i32);
         GetByUser,
         GetAll,
         Update,
-        Delete, DeleteMultiple,
+        Delete,
+        DeleteMultiple,
         VerifyForUserWithDb
     )
 )]
