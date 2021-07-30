@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/metcon.dart';
+import 'package:sport_log/widgets/int_picker.dart';
 
 class NewMetconPage extends StatefulWidget {
   const NewMetconPage({Key? key}) : super(key: key);
@@ -13,7 +14,7 @@ class NewMetconPage extends StatefulWidget {
 class _NewMetconPageState extends State<NewMetconPage> {
   String _name = "";
   MetconType _type = MetconType.amrap;
-  int? _rounds = 3;
+  int _rounds = 1;
   Duration? _timecap;
   String? _description;
   List<NewMetconMovement> _moves = [];
@@ -126,8 +127,18 @@ class _NewMetconPageState extends State<NewMetconPage> {
   }
 
   Widget _roundsInput(BuildContext context) {
-    return const Placeholder(
-      fallbackHeight: 50,
+    return Row(
+      children: [
+        const Text("Rounds:"),
+        IntPicker(
+          initialValue: _rounds,
+          setValue: (int value) {
+            setState(() {
+              _rounds = value;
+            });
+          },
+        ),
+      ]
     );
   }
 
