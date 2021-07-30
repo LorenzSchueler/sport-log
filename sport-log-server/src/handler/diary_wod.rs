@@ -1,10 +1,11 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthenticatedActionProvider, AuthenticatedUser, Create, Db, Delete, Diary, DiaryId, GetById,
-    GetByUser, NewDiary, NewWod, Unverified, UnverifiedId, Update,
-    VerifyForActionProviderUnchecked, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
-    Wod, WodId,
+    AuthenticatedActionProvider, AuthenticatedUser, Create, CreateMultiple, Db, Delete,
+    DeleteMultiple, Diary, DiaryId, GetById, GetByUser, NewDiary, NewWod, Unverified, UnverifiedId,
+    UnverifiedIds, Update, VerifyForActionProviderUnchecked, VerifyForUserWithDb,
+    VerifyForUserWithoutDb, VerifyIdForUser, VerifyMultipleForUserWithoutDb,
+    VerifyMultipleIdForUser, Wod, WodId,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
@@ -27,6 +28,18 @@ pub async fn create_wod(
 ) -> Result<Json<Wod>, Status> {
     let wod = wod.verify(&auth)?;
     conn.run(|c| Wod::create(wod, c)).await.into_json()
+}
+
+#[post("/wods", format = "application/json", data = "<wods>")]
+pub async fn create_wods(
+    wods: Unverified<Vec<NewWod>>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<Wod>>, Status> {
+    let wods = wods.verify(&auth)?;
+    conn.run(|c| Wod::create_multiple(wods, c))
+        .await
+        .into_json()
 }
 
 #[get("/wod/timespan/<start_datetime>/<end_datetime>")]
@@ -74,6 +87,20 @@ pub async fn delete_wod(
     .await
 }
 
+#[delete("/wods", format = "application/json", data = "<wod_ids>")]
+pub async fn delete_wods(
+    wod_ids: UnverifiedIds<WodId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        Wod::delete_multiple(wod_ids.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
 #[post("/diary", format = "application/json", data = "<diary>")]
 pub async fn create_diary(
     diary: Unverified<NewDiary>,
@@ -82,6 +109,18 @@ pub async fn create_diary(
 ) -> Result<Json<Diary>, Status> {
     let diary = diary.verify(&auth)?;
     conn.run(|c| Diary::create(diary, c)).await.into_json()
+}
+
+#[post("/diaries", format = "application/json", data = "<diaries>")]
+pub async fn create_diaries(
+    diaries: Unverified<Vec<NewDiary>>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<Diary>>, Status> {
+    let diaries = diaries.verify(&auth)?;
+    conn.run(|c| Diary::create_multiple(diaries, c))
+        .await
+        .into_json()
 }
 
 #[get("/diary/<diary_id>")]
@@ -135,6 +174,20 @@ pub async fn delete_diary(
 ) -> Result<Status, Status> {
     conn.run(move |c| {
         Diary::delete(diary_id.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
+#[delete("/diaries", format = "application/json", data = "<diary_ids>")]
+pub async fn delete_diaries(
+    diary_ids: UnverifiedIds<DiaryId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        Diary::delete_multiple(diary_ids.verify(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
