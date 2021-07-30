@@ -12,12 +12,12 @@ class NewMetconPage extends StatefulWidget {
 }
 
 class _NewMetconPageState extends State<NewMetconPage> {
-  String _name = "";
-  MetconType _type = MetconType.amrap;
-  int _rounds = 1;
-  Duration? _timecap;
-  String? _description;
-  List<NewMetconMovement> _moves = [];
+  final _metcon = NewMetcon(
+      name: "",
+      type: MetconType.amrap,
+      moves: [],
+  );
+
   bool _advancedOptionsExpanded = false;
 
   @override
@@ -46,7 +46,7 @@ class _NewMetconPageState extends State<NewMetconPage> {
     return TextFormField(
       onChanged: (name) {
         setState(() {
-          _name = name;
+          _metcon.name = name;
         });
       },
       style: Theme.of(context).textTheme.headline6,
@@ -65,13 +65,15 @@ class _NewMetconPageState extends State<NewMetconPage> {
         return TextButton(
           onPressed: () {
             setState(() {
-              _type = type;
+              _metcon.type = type;
             });
           },
           child: Text(
             type.toDisplayName(),
             style: style.copyWith(
-              color: (type == _type) ? null : Theme.of(context).disabledColor,
+              color: (type == _metcon.type)
+                  ? null
+                  : Theme.of(context).disabledColor,
             ),
           ),
         );
@@ -91,9 +93,39 @@ class _NewMetconPageState extends State<NewMetconPage> {
           body: Column(
             children: [
               const Padding(padding: EdgeInsets.only(top: 3)),
-              _descriptionInput(context),
-              _roundsInput(context),
-              _timecapInput(context),
+              if (_metcon.description == null)
+                ListTile(
+                  title: const Text("Add description ..."),
+                  onTap: () {
+                    setState(() {
+                      _metcon.description = "";
+                    });
+                  },
+                ),
+              if (_metcon.description != null)
+                _descriptionInput(context),
+              if (_metcon.rounds == null)
+                ListTile(
+                  title: const Text("Add number of rounds ..."),
+                  onTap: () {
+                    setState(() {
+                      _metcon.rounds = 1;
+                    });
+                  },
+                ),
+              if (_metcon.rounds != null)
+                _roundsInput(context),
+              if (_metcon.timecap == null)
+                ListTile(
+                  title: const Text("Add timecap ..."),
+                  onTap: () {
+                    setState(() {
+                      _metcon.timecap = const Duration(minutes: 21);
+                    });
+                  },
+                ),
+              if (_metcon.timecap != null)
+                _timecapInput(context),
             ],
           ),
           canTapOnHeader: true,
@@ -116,12 +148,20 @@ class _NewMetconPageState extends State<NewMetconPage> {
       maxLines: null,
       onChanged: (description) {
         setState(() {
-          _description = description;
+          _metcon.description = description;
         });
       },
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(),
         labelText: "Description",
+        suffixIcon: IconButton(
+          icon: const Icon(Icons.cancel),
+          onPressed: () {
+            setState(() {
+              _metcon.description = null;
+            });
+          },
+        ),
       ),
     );
   }
@@ -131,10 +171,10 @@ class _NewMetconPageState extends State<NewMetconPage> {
       children: [
         const Text("Rounds:"),
         IntPicker(
-          initialValue: _rounds,
+          initialValue: _metcon.rounds ?? 1,
           setValue: (int value) {
             setState(() {
-              _rounds = value;
+              _metcon.rounds = value;
             });
           },
         ),
@@ -143,10 +183,10 @@ class _NewMetconPageState extends State<NewMetconPage> {
   }
 
   Widget _timecapInput(BuildContext context) {
-    return const Placeholder(
-      fallbackHeight: 50,
+    return Row(
+      children: [
+        const Text("Timecap:"),
+      ],
     );
   }
-
-
 }
