@@ -102,21 +102,29 @@ class _NewMetconPageState extends State<NewMetconPage> {
   Widget _advancedFieldsInput(BuildContext context) {
     switch (_metcon.type) {
       case MetconType.amrap:
-        return _timecapInput(context);
+        return Row(
+          children: [
+            const Text("Timecap:"),
+            _timecapInput(context),
+            const Text("mins"),
+          ],
+        );
       case MetconType.emom:
-        return Column(
-          mainAxisSize: MainAxisSize.min,
+        return Row(
           children: [
             _roundsInput(context),
+            const Text("rounds in"),
             _timecapInput(context),
+            const Text("mins"),
           ],
         );
       case MetconType.forTime:
-        return Column(
-          mainAxisSize: MainAxisSize.min,
+        return Row(
           children: [
             _roundsInput(context),
+            const Text("rounds in"),
             _maybeTimecapInput(context),
+            const Text("mins"),
           ],
         );
     }
@@ -169,32 +177,51 @@ class _NewMetconPageState extends State<NewMetconPage> {
   }
 
   Widget _roundsInput(BuildContext context) {
-    return Row(
-      children: [
-        const Text("Rounds:"),
-        IntPicker(
-          initialValue: _metcon.rounds ?? 1,
-          setValue: (int value) {
-            setState(() {
-              _metcon.rounds = value;
-            });
-          },
-        ),
-      ]
+    return IntPicker(
+      initialValue: _metcon.rounds ?? 1,
+      setValue: (int value) {
+        setState(() {
+          _metcon.rounds = value;
+        });
+      },
     );
   }
 
   Widget _timecapInput(BuildContext context, { bool isDismissible = false }) {
     return Row(
       children: [
-        const Text("Timecap:"),
+        IntPicker(
+          initialValue: _metcon.timecap?.inMinutes ?? _timecapDefaultValue.inMinutes,
+          setValue: (int value) {
+            setState(() {
+              _metcon.timecap = Duration(minutes: value);
+            });
+          },
+        ),
+        if (isDismissible)
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  _metcon.timecap = null;
+                });
+              },
+              icon: const Icon(Icons.cancel)
+          ),
       ],
     );
   }
 
   Widget _maybeTimecapInput(BuildContext context) {
     if (_metcon.timecap == null) {
-      return Text("Add timecap");
+      return OutlinedButton.icon(
+        icon: const Icon(Icons.add),
+        onPressed: () {
+          setState(() {
+            _metcon.timecap = _timecapDefaultValue;
+          });
+        },
+        label: const Text("Add timecap..."),
+      );
     } else {
       return _timecapInput(context, isDismissible: true);
     }
