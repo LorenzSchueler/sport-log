@@ -9,13 +9,16 @@ use sport_log_types_derive::{
     ToSql, Update, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
-use crate::types::{Movement, MovementId, MovementUnit, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{strength_session, strength_set},
     types::{
         AuthenticatedUser, GetById, Unverified, UnverifiedId, VerifyForUserWithDb, VerifyIdForUser,
     },
+};
+use crate::{
+    types::{Movement, MovementId, MovementUnit, UserId},
+    GetByIds, UnverifiedIds, VerifyMultipleForUserWithDb, VerifyMultipleIdForUser,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -105,6 +108,33 @@ impl VerifyIdForUser for UnverifiedId<StrengthSetId> {
     }
 }
 
+#[cfg(feature = "full")]
+impl VerifyMultipleIdForUser for UnverifiedIds<StrengthSetId> {
+    type Id = StrengthSetId;
+
+    fn verify(
+        self,
+        auth: &AuthenticatedUser,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status> {
+        let strength_sets =
+            StrengthSet::get_by_ids(&self.0, conn).map_err(|_| Status::InternalServerError)?;
+        let strength_session_ids = strength_sets
+            .iter()
+            .map(|strength_set| strength_set.strength_session_id)
+            .collect();
+        if StrengthSession::get_by_ids(&strength_session_ids, conn)
+            .map_err(|_| Status::InternalServerError)?
+            .iter()
+            .all(|strength_session| strength_session.user_id == **auth)
+        {
+            Ok(self.0)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
@@ -171,6 +201,32 @@ impl VerifyForUserWithDb for Unverified<NewStrengthSet> {
             == **auth
         {
             Ok(strength_set)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "full")]
+impl VerifyMultipleForUserWithDb for Unverified<Vec<NewStrengthSet>> {
+    type Entity = NewStrengthSet;
+
+    fn verify(
+        self,
+        auth: &AuthenticatedUser,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status> {
+        let strength_sets = self.0.into_inner();
+        let strength_session_ids = strength_sets
+            .iter()
+            .map(|strength_set| strength_set.strength_session_id)
+            .collect();
+        if StrengthSession::get_by_ids(&strength_session_ids, conn)
+            .map_err(|_| Status::InternalServerError)?
+            .iter()
+            .all(|strength_session| strength_session.user_id == **auth)
+        {
+            Ok(strength_sets)
         } else {
             Err(Status::Forbidden)
         }
