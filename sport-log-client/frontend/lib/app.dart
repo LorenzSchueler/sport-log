@@ -40,6 +40,8 @@ class _AppState extends State<App> {
       debugShowCheckedModeBanner: false,
       darkTheme: ThemeData(
         brightness: Brightness.dark,
+        primarySwatch: primarySwatch,
+        primaryColor: primarySwatch[500],
         colorScheme: ColorScheme.fromSwatch(
           primarySwatch: primarySwatch,
           brightness: Brightness.dark,

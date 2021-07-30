@@ -18,7 +18,10 @@ class _NewMetconPageState extends State<NewMetconPage> {
       moves: [],
   );
 
-  bool _advancedOptionsExpanded = false;
+  static const _timecapDefaultValue = Duration(minutes: 20);
+  static const _roundsDefaultValue = 1;
+
+  final _descriptionFocusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +35,7 @@ class _NewMetconPageState extends State<NewMetconPage> {
             child: ListView(
               children: [
                 _nameInput(context),
+                _maybeDescriptionInput(context),
                 _typeInput(context),
                 _advancedFieldsInput(context),
               ],
@@ -66,13 +70,27 @@ class _NewMetconPageState extends State<NewMetconPage> {
           onPressed: () {
             setState(() {
               _metcon.type = type;
+              switch (type) {
+                case MetconType.amrap:
+                  _metcon.rounds = null;
+                  _metcon.timecap ??= _timecapDefaultValue;
+                  break;
+                case MetconType.emom:
+                  _metcon.rounds ??= _roundsDefaultValue;
+                  _metcon.timecap ??= _timecapDefaultValue;
+                  break;
+                case MetconType.forTime:
+                  _metcon.rounds ??= _roundsDefaultValue;
+                  // timecap can be either null or non null
+                  break;
+              }
             });
           },
           child: Text(
             type.toDisplayName(),
             style: style.copyWith(
               color: (type == _metcon.type)
-                  ? null
+                  ? Theme.of(context).primaryColor
                   : Theme.of(context).disabledColor,
             ),
           ),
@@ -81,89 +99,73 @@ class _NewMetconPageState extends State<NewMetconPage> {
     );
   }
 
-  _advancedFieldsInput(BuildContext context) {
-    return ExpansionPanelList(
-      expandedHeaderPadding: EdgeInsets.zero,
-      children: [
-        ExpansionPanel(
-          isExpanded: _advancedOptionsExpanded,
-          headerBuilder: (context, isOpen) => const ListTile(
-            title: Text("Advanced"),
-          ),
-          body: Column(
-            children: [
-              const Padding(padding: EdgeInsets.only(top: 3)),
-              if (_metcon.description == null)
-                ListTile(
-                  title: const Text("Add description ..."),
-                  onTap: () {
-                    setState(() {
-                      _metcon.description = "";
-                    });
-                  },
-                ),
-              if (_metcon.description != null)
-                _descriptionInput(context),
-              if (_metcon.rounds == null)
-                ListTile(
-                  title: const Text("Add number of rounds ..."),
-                  onTap: () {
-                    setState(() {
-                      _metcon.rounds = 1;
-                    });
-                  },
-                ),
-              if (_metcon.rounds != null)
-                _roundsInput(context),
-              if (_metcon.timecap == null)
-                ListTile(
-                  title: const Text("Add timecap ..."),
-                  onTap: () {
-                    setState(() {
-                      _metcon.timecap = const Duration(minutes: 21);
-                    });
-                  },
-                ),
-              if (_metcon.timecap != null)
-                _timecapInput(context),
-            ],
-          ),
-          canTapOnHeader: true,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        ),
-      ],
-      expansionCallback: (_, isExpanded) {
-        setState(() {
-          _advancedOptionsExpanded = !isExpanded;
-        });
-      },
-      elevation: 0,
-    );
+  Widget _advancedFieldsInput(BuildContext context) {
+    switch (_metcon.type) {
+      case MetconType.amrap:
+        return _timecapInput(context);
+      case MetconType.emom:
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _roundsInput(context),
+            _timecapInput(context),
+          ],
+        );
+      case MetconType.forTime:
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _roundsInput(context),
+            _maybeTimecapInput(context),
+          ],
+        );
+    }
   }
 
   Widget _descriptionInput(BuildContext context) {
-    return TextField(
-      keyboardType: TextInputType.multiline,
-      minLines: 1,
-      maxLines: null,
-      onChanged: (description) {
-        setState(() {
-          _metcon.description = description;
-        });
-      },
-      decoration: InputDecoration(
-        border: const OutlineInputBorder(),
-        labelText: "Description",
-        suffixIcon: IconButton(
-          icon: const Icon(Icons.cancel),
-          onPressed: () {
-            setState(() {
-              _metcon.description = null;
-            });
-          },
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: TextField(
+        focusNode: _descriptionFocusNode,
+        keyboardType: TextInputType.multiline,
+        minLines: 1,
+        maxLines: null,
+        onChanged: (description) {
+          setState(() {
+            _metcon.description = description;
+          });
+        },
+        decoration: InputDecoration(
+          border: const OutlineInputBorder(),
+          labelText: "Description",
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.cancel),
+            onPressed: () {
+              setState(() {
+                _metcon.description = null;
+              });
+            },
+          ),
         ),
       ),
     );
+  }
+
+  Widget _maybeDescriptionInput(BuildContext context) {
+    if (_metcon.description == null) {
+      return OutlinedButton.icon(
+          onPressed: () {
+            setState(() {
+              _metcon.description ??= "";
+            });
+            _descriptionFocusNode.requestFocus();
+          },
+          icon: const Icon(Icons.add),
+          label: const Text("Add description..."),
+      );
+    } else {
+      return _descriptionInput(context);
+    }
   }
 
   Widget _roundsInput(BuildContext context) {
@@ -182,11 +184,19 @@ class _NewMetconPageState extends State<NewMetconPage> {
     );
   }
 
-  Widget _timecapInput(BuildContext context) {
+  Widget _timecapInput(BuildContext context, { bool isDismissible = false }) {
     return Row(
       children: [
         const Text("Timecap:"),
       ],
     );
+  }
+
+  Widget _maybeTimecapInput(BuildContext context) {
+    if (_metcon.timecap == null) {
+      return Text("Add timecap");
+    } else {
+      return _timecapInput(context, isDismissible: true);
+    }
   }
 }

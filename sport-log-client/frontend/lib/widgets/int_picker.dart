@@ -41,6 +41,7 @@ class _IntPickerState extends State<IntPicker> {
         GestureDetector(
           child: IconButton(
             icon: const Icon(Icons.indeterminate_check_box_rounded),
+            color: Theme.of(context).primaryColor,
             onPressed: (_isValidNumber(_value - 1)) ? () {
               setState(() {
                 _value -= 1;
@@ -106,6 +107,7 @@ class _IntPickerState extends State<IntPicker> {
         GestureDetector(
           child: IconButton(
             icon: const Icon(Icons.add_box_rounded),
+            color: Theme.of(context).primaryColor,
             onPressed: (_isValidNumber(_value + 1)) ? () {
               setState(() {
                 _value += 1;
