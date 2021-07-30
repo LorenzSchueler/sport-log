@@ -103,48 +103,60 @@ class _NewMetconPageState extends State<NewMetconPage> {
   Widget _additionalFieldsInput(BuildContext context) {
     switch (_metcon.type) {
       case MetconType.amrap:
-        return Row(
+        return _amrapInputs(context);
+      case MetconType.emom:
+        return _emomInputs(context);
+      case MetconType.forTime:
+        return _forTimeInputs(context);
+    }
+  }
+
+  Widget _amrapInputs(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _timecapInput(context),
+        Text(plural("min", "mins", _metcon.timecap?.inMinutes ?? 0)
+            + " in total"),
+      ],
+    );
+  }
+
+  Widget _emomInputs(BuildContext context) {
+    return Column(
+      children: [
+        Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            _roundsInput(context),
+            Text(plural("round", "rounds", _metcon.rounds ?? 0)),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("in"),
             _timecapInput(context),
-            Text(pluralize("min", "mins", _metcon.timecap?.inMinutes ?? 0)
-                + " in total"),
+            Text(plural("min", "mins", _metcon.timecap?.inMinutes ?? 0)),
           ],
-        );
-      case MetconType.emom:
-        return Column(
+        )
+      ],
+    );
+  }
+
+  Widget _forTimeInputs(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _roundsInput(context),
-                Text(pluralize("round", "rounds", _metcon.rounds ?? 0)),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("in"),
-                _timecapInput(context),
-                Text(pluralize("min", "mins", _metcon.timecap?.inMinutes ?? 0)),
-              ],
-            )
+            _roundsInput(context),
+            Text(plural("round", "rounds", _metcon.rounds ?? 0)),
           ],
-        );
-      case MetconType.forTime:
-        return Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _roundsInput(context),
-                Text(pluralize("round", "rounds", _metcon.rounds ?? 0)),
-              ],
-            ),
-            _maybeTimecapInput(context),
-          ],
-        );
-    }
+        ),
+        _maybeTimecapInput(context),
+      ],
+    );
   }
 
   Widget _descriptionInput(BuildContext context) {
@@ -226,7 +238,7 @@ class _NewMetconPageState extends State<NewMetconPage> {
         icon: const Icon(Icons.add),
         label: const Text("Add timecap..."),
       );
-    } else {
+    } else { // _metcon.timecap != null
       return Stack(
         alignment: Alignment.centerRight,
         children: [
@@ -235,7 +247,7 @@ class _NewMetconPageState extends State<NewMetconPage> {
             children: [
               const Text("in"),
               _timecapInput(context),
-              Text(pluralize("min", "mins", _metcon.timecap?.inMinutes ?? 0)),
+              Text(plural("min", "mins", _metcon.timecap?.inMinutes ?? 0)),
             ],
           ),
           IconButton(

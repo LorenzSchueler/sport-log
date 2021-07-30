@@ -1,4 +1,4 @@
 
-String pluralize(String singular, String plural, int count) {
+String plural(String singular, String plural, int count) {
   return (count == 1) ? singular : plural;
 }
