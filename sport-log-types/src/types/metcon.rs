@@ -9,8 +9,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByUser,
-    ToSql, Update, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
+    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
+    GetByUser, ToSql, Update, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
 #[cfg(feature = "full")]
@@ -109,6 +109,7 @@ impl UnverifiedId<MetconId> {
         Create,
         CreateMultiple,
         GetById,
+        GetByIds,
         GetAll,
         Update,
         Delete,
@@ -272,6 +273,7 @@ impl UnverifiedId<MetconMovementId> {
         Create,
         CreateMultiple,
         GetById,
+        GetByIds,
         GetAll,
         Update,
         Delete,
@@ -387,6 +389,7 @@ pub struct MetconSessionId(pub i32);
         Create,
         CreateMultiple,
         GetById,
+        GetByIds,
         GetByUser,
         GetAll,
         Update,

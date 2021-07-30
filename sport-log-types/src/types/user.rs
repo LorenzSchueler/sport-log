@@ -3,7 +3,9 @@ use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
-use sport_log_types_derive::{Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, ToSql};
+use sport_log_types_derive::{
+    Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds, ToSql,
+};
 
 #[cfg(feature = "full")]
 use crate::{schema::user, AuthenticatedUser, GetById, Unverified, VerifyForUserWithDb};
@@ -25,6 +27,7 @@ pub struct UserId(pub i32);
         Queryable,
         AsChangeset,
         GetById,
+        GetByIds,
         GetAll,
         Delete,
         DeleteMultiple,

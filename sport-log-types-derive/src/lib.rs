@@ -44,6 +44,17 @@ pub fn get_by_id_derive(input: TokenStream) -> TokenStream {
     impl_get_by_id(&ast)
 }
 
+/// Derives `sport_log_types::GetByIds`.
+///
+/// This macro only works if the following conditions are satisfied:
+/// - the corresponding table has the same name like this type but in snake_case
+/// - there is a type called `[ThisTypeName]Id` which is the primary key of the table.
+#[proc_macro_derive(GetByIds)]
+pub fn get_by_ids_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_get_by_ids(&ast)
+}
+
 /// Derives `sport_log_types::GetByUser`.
 ///
 /// This macro only works if the following conditions are satisfied:

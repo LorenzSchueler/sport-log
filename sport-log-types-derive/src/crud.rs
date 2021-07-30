@@ -82,6 +82,16 @@ pub fn impl_get_by_id(ast: &syn::DeriveInput) -> TokenStream {
                 #tablename::table.find(#idparamname).get_result(conn)
             }
         }
+    };
+    gen.into()
+}
+
+pub fn impl_get_by_ids(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+    let (_, idtypename, _, _, tablename) = get_identifiers(typename);
+
+    let gen = quote! {
+        use diesel::prelude::*;
 
         impl crate::GetByIds for #typename {
             type Id = #idtypename;
