@@ -171,7 +171,7 @@ pub trait GetById {
 pub trait GetByIds {
     type Id;
 
-    fn get_by_ids(ids: &Vec<Self::Id>, conn: &PgConnection) -> QueryResult<Vec<Self>>
+    fn get_by_ids(ids: &[Self::Id], conn: &PgConnection) -> QueryResult<Vec<Self>>
     where
         Self: Sized;
 }

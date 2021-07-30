@@ -228,12 +228,12 @@ impl VerifyMultipleIdForUser for UnverifiedIds<MetconMovementId> {
     ) -> Result<Vec<Self::Id>, Status> {
         let metcon_movements = MetconMovement::get_by_ids(&self.0, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?;
-        let metcon_ids = metcon_movements
+        let metcon_ids: Vec<_> = metcon_movements
             .iter()
             .map(|metcon_movement| metcon_movement.metcon_id)
             .collect();
-        let metcons =
-            Metcon::get_by_ids(&metcon_ids, conn).map_err(|_| rocket::http::Status::Forbidden)?;
+        let metcons = Metcon::get_by_ids(metcon_ids.as_slice(), conn)
+            .map_err(|_| rocket::http::Status::Forbidden)?;
         if metcons.iter().all(|metcon| metcon.user_id == Some(**auth)) {
             Ok(self.0)
         } else {
@@ -344,12 +344,12 @@ impl VerifyMultipleForUserWithDb for Unverified<Vec<NewMetconMovement>> {
         conn: &PgConnection,
     ) -> Result<Vec<Self::Entity>, Status> {
         let metcon_movements = self.0.into_inner();
-        let metcon_ids = metcon_movements
+        let metcon_ids: Vec<_> = metcon_movements
             .iter()
             .map(|metcon_movement| metcon_movement.metcon_id)
             .collect();
-        let metcons =
-            Metcon::get_by_ids(&metcon_ids, conn).map_err(|_| rocket::http::Status::Forbidden)?;
+        let metcons = Metcon::get_by_ids(metcon_ids.as_slice(), conn)
+            .map_err(|_| rocket::http::Status::Forbidden)?;
         if metcons.iter().all(|metcon| metcon.user_id == Some(**auth)) {
             Ok(metcon_movements)
         } else {

@@ -115,11 +115,11 @@ impl VerifyMultipleIdForUser for UnverifiedIds<StrengthSetId> {
     ) -> Result<Vec<Self::Id>, Status> {
         let strength_sets =
             StrengthSet::get_by_ids(&self.0, conn).map_err(|_| Status::InternalServerError)?;
-        let strength_session_ids = strength_sets
+        let strength_session_ids: Vec<_> = strength_sets
             .iter()
             .map(|strength_set| strength_set.strength_session_id)
             .collect();
-        if StrengthSession::get_by_ids(&strength_session_ids, conn)
+        if StrengthSession::get_by_ids(strength_session_ids.as_slice(), conn)
             .map_err(|_| Status::InternalServerError)?
             .iter()
             .all(|strength_session| strength_session.user_id == **auth)
@@ -213,11 +213,11 @@ impl VerifyMultipleForUserWithDb for Unverified<Vec<NewStrengthSet>> {
         conn: &PgConnection,
     ) -> Result<Vec<Self::Entity>, Status> {
         let strength_sets = self.0.into_inner();
-        let strength_session_ids = strength_sets
+        let strength_session_ids: Vec<_> = strength_sets
             .iter()
             .map(|strength_set| strength_set.strength_session_id)
             .collect();
-        if StrengthSession::get_by_ids(&strength_session_ids, conn)
+        if StrengthSession::get_by_ids(strength_session_ids.as_slice(), conn)
             .map_err(|_| Status::InternalServerError)?
             .iter()
             .all(|strength_session| strength_session.user_id == **auth)
