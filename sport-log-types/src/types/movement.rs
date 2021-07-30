@@ -10,14 +10,16 @@ use sport_log_types_derive::{
     Update, VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdForUserUnchecked,
 };
 
-use crate::types::UserId;
 #[cfg(feature = "full")]
 use crate::{
     schema::{eorm, movement},
     types::{
-        AuthenticatedUser, GetById, Unverified, UnverifiedId, User, VerifyForUserWithDb,
+        AuthenticatedUser, GetById, GetByIds, Unverified, UnverifiedId, User, VerifyForUserWithDb,
         VerifyForUserWithoutDb, VerifyIdForUser,
     },
+};
+use crate::{
+    types::UserId, UnverifiedIds, VerifyMultipleForUserWithoutDb, VerifyMultipleIdForUser,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -64,6 +66,28 @@ impl VerifyIdForUser for UnverifiedId<MovementId> {
         let movement =
             Movement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if movement.user_id == Some(**auth) {
+            Ok(self.0)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "full")]
+impl VerifyMultipleIdForUser for UnverifiedIds<MovementId> {
+    type Id = MovementId;
+
+    fn verify(
+        self,
+        auth: &AuthenticatedUser,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status> {
+        let movements =
+            Movement::get_by_ids(&self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
+        if movements
+            .iter()
+            .all(|movement| movement.user_id == Some(**auth))
+        {
             Ok(self.0)
         } else {
             Err(rocket::http::Status::Forbidden)
@@ -161,6 +185,23 @@ impl VerifyForUserWithoutDb for Unverified<NewMovement> {
         let movement = self.0.into_inner();
         if movement.user_id == Some(**auth) {
             Ok(movement)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "full")]
+impl VerifyMultipleForUserWithoutDb for Unverified<Vec<NewMovement>> {
+    type Entity = NewMovement;
+
+    fn verify(self, auth: &AuthenticatedUser) -> Result<Vec<Self::Entity>, Status> {
+        let movements = self.0.into_inner();
+        if movements
+            .iter()
+            .all(|movement| movement.user_id == Some(**auth))
+        {
+            Ok(movements)
         } else {
             Err(Status::Forbidden)
         }
