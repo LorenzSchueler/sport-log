@@ -1,9 +1,11 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthenticatedUser, CardioSession, CardioSessionDescription, CardioSessionId, Create, Db,
-    Delete, GetById, GetByUser, NewCardioSession, NewRoute, Route, RouteId, Unverified,
-    UnverifiedId, Update, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
+    AuthenticatedUser, CardioSession, CardioSessionDescription, CardioSessionId, Create,
+    CreateMultiple, Db, Delete, DeleteMultiple, GetById, GetByUser, NewCardioSession, NewRoute,
+    Route, RouteId, Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForUserWithDb,
+    VerifyForUserWithoutDb, VerifyIdForUser, VerifyMultipleForUserWithoutDb,
+    VerifyMultipleIdForUser,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
@@ -16,6 +18,18 @@ pub async fn create_route(
 ) -> Result<Json<Route>, Status> {
     let route = route.verify(&auth)?;
     conn.run(|c| Route::create(route, c)).await.into_json()
+}
+
+#[post("/routes", format = "application/json", data = "<routes>")]
+pub async fn create_routes(
+    routes: Unverified<Vec<NewRoute>>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<Route>>, Status> {
+    let routes = routes.verify(&auth)?;
+    conn.run(|c| Route::create_multiple(routes, c))
+        .await
+        .into_json()
 }
 
 #[get("/route/<route_id>")]
@@ -61,6 +75,20 @@ pub async fn delete_route(
     .await
 }
 
+#[delete("/routes", format = "application/json", data = "<route_ids>")]
+pub async fn delete_routes(
+    route_ids: UnverifiedIds<RouteId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        Route::delete_multiple(route_ids.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
 #[post(
     "/cardio_session",
     format = "application/json",
@@ -73,6 +101,22 @@ pub async fn create_cardio_session(
 ) -> Result<Json<CardioSession>, Status> {
     let cardio_session = cardio_session.verify(&auth)?;
     conn.run(|c| CardioSession::create(cardio_session, c))
+        .await
+        .into_json()
+}
+
+#[post(
+    "/cardio_sessions",
+    format = "application/json",
+    data = "<cardio_sessions>"
+)]
+pub async fn create_cardio_sessions(
+    cardio_sessions: Unverified<Vec<NewCardioSession>>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<CardioSession>>, Status> {
+    let cardio_sessions = cardio_sessions.verify(&auth)?;
+    conn.run(|c| CardioSession::create_multiple(cardio_sessions, c))
         .await
         .into_json()
 }
@@ -125,6 +169,24 @@ pub async fn delete_cardio_session(
 ) -> Result<Status, Status> {
     conn.run(move |c| {
         CardioSession::delete(cardio_session_id.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
+#[delete(
+    "/cardio_sessions",
+    format = "application/json",
+    data = "<cardio_session_ids>"
+)]
+pub async fn delete_cardio_sessions(
+    cardio_session_ids: UnverifiedIds<CardioSessionId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        CardioSession::delete_multiple(cardio_session_ids.verify(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
