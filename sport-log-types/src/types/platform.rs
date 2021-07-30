@@ -10,7 +10,7 @@ use sport_log_types_derive::{
 use crate::types::UserId;
 #[cfg(feature = "full")]
 use crate::{
-    schema::{platform, platform_credentials},
+    schema::{platform, platform_credential},
     types::User,
 };
 
@@ -75,7 +75,7 @@ pub struct NewPlatform {
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct PlatformCredentialsId(pub i32);
+pub struct PlatformCredentialId(pub i32);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
@@ -95,11 +95,11 @@ pub struct PlatformCredentialsId(pub i32);
         VerifyForUserWithDb,
     )
 )]
-#[cfg_attr(feature = "full", table_name = "platform_credentials")]
+#[cfg_attr(feature = "full", table_name = "platform_credential")]
 #[cfg_attr(feature = "full", belongs_to(User))]
 #[cfg_attr(feature = "full", belongs_to(Platform))]
-pub struct PlatformCredentials {
-    pub id: PlatformCredentialsId,
+pub struct PlatformCredential {
+    pub id: PlatformCredentialId,
     pub user_id: UserId,
     pub platform_id: PlatformId,
     pub username: String,
@@ -108,8 +108,8 @@ pub struct PlatformCredentials {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
-#[cfg_attr(feature = "full", table_name = "platform_credentials")]
-pub struct NewPlatformCredentials {
+#[cfg_attr(feature = "full", table_name = "platform_credential")]
+pub struct NewPlatformCredential {
     pub user_id: UserId,
     pub platform_id: PlatformId,
     pub username: String,

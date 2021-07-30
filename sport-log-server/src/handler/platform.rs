@@ -2,8 +2,8 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
     AuthenticatedAdmin, AuthenticatedUser, Create, CreateMultiple, Db, Delete, DeleteMultiple,
-    GetAll, GetByUser, NewPlatform, NewPlatformCredentials, Platform, PlatformCredentials,
-    PlatformCredentialsId, PlatformId, Unverified, UnverifiedId, UnverifiedIds, Update,
+    GetAll, GetByUser, NewPlatform, NewPlatformCredential, Platform, PlatformCredential,
+    PlatformCredentialId, PlatformId, Unverified, UnverifiedId, UnverifiedIds, Update,
     VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForAdmin,
     VerifyIdForUser, VerifyIdForUserUnchecked, VerifyMultipleForUserWithoutDb,
     VerifyMultipleIdForUser,
@@ -67,86 +67,86 @@ pub async fn adm_delete_platform(
 }
 
 #[post(
-    "/platform_credentials",
+    "/platform_credential",
     format = "application/json",
-    data = "<platform_credentials>"
+    data = "<platform_credential>"
 )]
-pub async fn create_platform_credentials(
-    platform_credentials: Unverified<NewPlatformCredentials>,
+pub async fn create_platform_credential(
+    platform_credential: Unverified<NewPlatformCredential>,
     auth: AuthenticatedUser,
     conn: Db,
-) -> Result<Json<PlatformCredentials>, Status> {
-    let platform_credentials = platform_credentials.verify(&auth)?;
-    conn.run(|c| PlatformCredentials::create(platform_credentials, c))
+) -> Result<Json<PlatformCredential>, Status> {
+    let platform_credential = platform_credential.verify(&auth)?;
+    conn.run(|c| PlatformCredential::create(platform_credential, c))
         .await
         .into_json()
 }
 
 #[post(
-    "/platform_credentialss",
+    "/platform_credentials",
     format = "application/json",
-    data = "<platform_credentialss>"
+    data = "<platform_credentials>"
 )]
-pub async fn create_platform_credentialss(
+pub async fn create_platform_credentials(
     // TODO change name to credential
-    platform_credentialss: Unverified<Vec<NewPlatformCredentials>>,
+    platform_credentials: Unverified<Vec<NewPlatformCredential>>,
     auth: AuthenticatedUser,
     conn: Db,
-) -> Result<Json<Vec<PlatformCredentials>>, Status> {
-    let platform_credentialss = platform_credentialss.verify(&auth)?;
-    conn.run(|c| PlatformCredentials::create_multiple(platform_credentialss, c))
+) -> Result<Json<Vec<PlatformCredential>>, Status> {
+    let platform_credentials = platform_credentials.verify(&auth)?;
+    conn.run(|c| PlatformCredential::create_multiple(platform_credentials, c))
         .await
         .into_json()
 }
 
-#[get("/platform_credentials")]
-pub async fn get_platform_credentials(
+#[get("/platform_credential")]
+pub async fn get_platform_credential(
     auth: AuthenticatedUser,
     conn: Db,
-) -> Result<Json<Vec<PlatformCredentials>>, Status> {
-    conn.run(move |c| PlatformCredentials::get_by_user(*auth, c))
+) -> Result<Json<Vec<PlatformCredential>>, Status> {
+    conn.run(move |c| PlatformCredential::get_by_user(*auth, c))
         .await
         .into_json()
 }
 
-#[get("/platform_credentials/platform/<platform_id>")]
-pub async fn get_platform_credentials_by_platform(
+#[get("/platform_credential/platform/<platform_id>")]
+pub async fn get_platform_credential_by_platform(
     platform_id: UnverifiedId<PlatformId>,
     auth: AuthenticatedUser,
     conn: Db,
-) -> Result<Json<PlatformCredentials>, Status> {
+) -> Result<Json<PlatformCredential>, Status> {
     let platform_id = platform_id.verify_unchecked(&auth)?;
-    conn.run(move |c| PlatformCredentials::get_by_user_and_platform(*auth, platform_id, c))
+    conn.run(move |c| PlatformCredential::get_by_user_and_platform(*auth, platform_id, c))
         .await
         .into_json()
 }
 
 #[put(
-    "/platform_credentials",
+    "/platform_credential",
     format = "application/json",
-    data = "<platform_credentials>"
+    data = "<platform_credential>"
 )]
-pub async fn update_platform_credentials(
-    platform_credentials: Unverified<PlatformCredentials>,
+pub async fn update_platform_credential(
+    platform_credential: Unverified<PlatformCredential>,
     auth: AuthenticatedUser,
     conn: Db,
-) -> Result<Json<PlatformCredentials>, Status> {
-    let platform_credentials = conn
-        .run(move |c| platform_credentials.verify(&auth, c))
+) -> Result<Json<PlatformCredential>, Status> {
+    let platform_credential = conn
+        .run(move |c| platform_credential.verify(&auth, c))
         .await?;
-    conn.run(|c| PlatformCredentials::update(platform_credentials, c))
+    conn.run(|c| PlatformCredential::update(platform_credential, c))
         .await
         .into_json()
 }
 
-#[delete("/platform_credentials/<platform_credentials_id>")]
-pub async fn delete_platform_credentials(
-    platform_credentials_id: UnverifiedId<PlatformCredentialsId>,
+#[delete("/platform_credential/<platform_credential_id>")]
+pub async fn delete_platform_credential(
+    platform_credential_id: UnverifiedId<PlatformCredentialId>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
-        PlatformCredentials::delete(platform_credentials_id.verify(&auth, c)?, c)
+        PlatformCredential::delete(platform_credential_id.verify(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
@@ -154,17 +154,17 @@ pub async fn delete_platform_credentials(
 }
 
 #[delete(
-    "/platform_credentialss",
+    "/platform_credentials",
     format = "application/json",
-    data = "<platform_credentials_ids>"
+    data = "<platform_credential_ids>"
 )]
-pub async fn delete_platform_credentialss(
-    platform_credentials_ids: UnverifiedIds<PlatformCredentialsId>,
+pub async fn delete_platform_credentials(
+    platform_credential_ids: UnverifiedIds<PlatformCredentialId>,
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
-        PlatformCredentials::delete_multiple(platform_credentials_ids.verify(&auth, c)?, c)
+        PlatformCredential::delete_multiple(platform_credential_ids.verify(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })

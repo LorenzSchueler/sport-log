@@ -192,7 +192,7 @@ table! {
     use diesel::sql_types::*;
     use crate::types::*;
 
-    platform_credentials (id) {
+    platform_credential (id) {
         id -> Int4,
         user_id -> Int4,
         platform_id -> Int4,
@@ -329,8 +329,8 @@ joinable!(metcon_movement -> movement (movement_id));
 joinable!(metcon_session -> metcon (metcon_id));
 joinable!(metcon_session -> user (user_id));
 joinable!(movement -> user (user_id));
-joinable!(platform_credentials -> platform (platform_id));
-joinable!(platform_credentials -> user (user_id));
+joinable!(platform_credential -> platform (platform_id));
+joinable!(platform_credential -> user (user_id));
 joinable!(route -> user (user_id));
 joinable!(shared_cardio_session -> cardio_session (cardio_session_id));
 joinable!(shared_cardio_session -> group (group_id));
@@ -360,7 +360,7 @@ allow_tables_to_appear_in_same_query!(
     metcon_session,
     movement,
     platform,
-    platform_credentials,
+    platform_credential,
     route,
     shared_cardio_session,
     shared_diary,

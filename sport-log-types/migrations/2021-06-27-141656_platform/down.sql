@@ -1,2 +1,2 @@
-drop table platform_credentials;
+drop table platform_credential;
 drop table platform;
