@@ -5,10 +5,7 @@ use argon2::{
 use diesel::{prelude::*, result::Error};
 use rand_core::OsRng;
 
-use crate::{
-    schema::user,
-    types::{Create, NewUser, Update, User, UserId},
-};
+use crate::{schema::user, Create, NewUser, Update, User, UserId};
 
 impl Create for User {
     type New = NewUser;

@@ -3,7 +3,7 @@ use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
     schema::{diary, wod},
-    types::{Diary, UserId, Wod},
+    Diary, UserId, Wod,
 };
 
 impl Diary {

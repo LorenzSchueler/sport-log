@@ -1,6 +1,6 @@
 use diesel::{PgConnection, QueryResult};
 
-use crate::types::{
+use crate::{
     AccountData, CardioSession, Diary, GetById, GetByUser, Metcon, MetconMovement, MetconSession,
     Movement, Route, StrengthSession, StrengthSet, User, UserId, Wod,
 };

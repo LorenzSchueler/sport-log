@@ -4,7 +4,7 @@ use argon2::{
 };
 use diesel::{result::Error, PgConnection, QueryResult};
 
-use crate::types::{Admin, CONFIG};
+use crate::{Admin, CONFIG};
 
 impl Admin {
     pub fn authenticate(username: &str, password: &str, _conn: &PgConnection) -> QueryResult<()> {

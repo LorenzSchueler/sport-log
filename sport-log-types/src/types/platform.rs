@@ -7,11 +7,11 @@ use sport_log_types_derive::{
     VerifyIdForAdmin, VerifyIdForUser, VerifyIdForUserUnchecked,
 };
 
-use crate::types::UserId;
+use crate::UserId;
 #[cfg(feature = "full")]
 use crate::{
     schema::{platform, platform_credential},
-    types::User,
+    User,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]

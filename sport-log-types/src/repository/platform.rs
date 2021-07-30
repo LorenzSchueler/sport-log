@@ -1,9 +1,6 @@
 use diesel::prelude::*;
 
-use crate::{
-    schema::platform_credential,
-    types::{PlatformCredential, PlatformId, UserId},
-};
+use crate::{schema::platform_credential, PlatformCredential, PlatformId, UserId};
 
 impl PlatformCredential {
     pub fn get_by_user_and_platform(

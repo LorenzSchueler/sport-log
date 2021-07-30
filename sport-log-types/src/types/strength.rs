@@ -12,14 +12,10 @@ use sport_log_types_derive::{
 #[cfg(feature = "full")]
 use crate::{
     schema::{strength_session, strength_set},
-    types::{
-        AuthenticatedUser, GetById, Unverified, UnverifiedId, VerifyForUserWithDb, VerifyIdForUser,
-    },
+    AuthenticatedUser, GetById, GetByIds, Unverified, UnverifiedId, UnverifiedIds,
+    VerifyForUserWithDb, VerifyIdForUser, VerifyMultipleForUserWithDb, VerifyMultipleIdForUser,
 };
-use crate::{
-    types::{Movement, MovementId, MovementUnit, UserId},
-    GetByIds, UnverifiedIds, VerifyMultipleForUserWithDb, VerifyMultipleIdForUser,
-};
+use crate::{Movement, MovementId, MovementUnit, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(

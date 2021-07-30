@@ -16,13 +16,10 @@ use sport_log_types_derive::{
 #[cfg(feature = "full")]
 use crate::{
     schema::{action, action_event, action_provider, action_rule},
-    types::{
-        AuthenticatedActionProvider, GetById, Platform, UnverifiedId, User,
-        VerifyIdForActionProvider,
-    },
+    AuthenticatedActionProvider, GetById, Platform, UnverifiedId, User, VerifyIdForActionProvider,
 };
 
-use crate::types::{PlatformId, UserId};
+use crate::{PlatformId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(

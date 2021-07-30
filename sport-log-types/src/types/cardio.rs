@@ -20,12 +20,12 @@ use sport_log_types_derive::{
     ToSql, Update, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
-use crate::types::{Movement, MovementId, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{cardio_session, route},
-    types::User,
+    User,
 };
+use crate::{Movement, MovementId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]

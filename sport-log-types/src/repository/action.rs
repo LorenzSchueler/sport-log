@@ -5,10 +5,8 @@ use rand_core::OsRng;
 
 use crate::{
     schema::{action, action_event, action_provider, action_rule, platform_credential},
-    types::{
-        Action, ActionEvent, ActionId, ActionProvider, ActionProviderId, ActionRule, Create,
-        ExecutableActionEvent, NewActionProvider, UserId,
-    },
+    Action, ActionEvent, ActionId, ActionProvider, ActionProviderId, ActionRule, Create,
+    ExecutableActionEvent, NewActionProvider, UserId,
 };
 
 impl Create for ActionProvider {

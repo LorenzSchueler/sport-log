@@ -16,16 +16,11 @@ use sport_log_types_derive::{
 #[cfg(feature = "full")]
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
-    types::{
-        AuthenticatedUser, GetById, GetByIds, Unverified, UnverifiedId, User, VerifyForUserWithDb,
-        VerifyForUserWithoutDb, VerifyIdForUser,
-    },
+    AuthenticatedUser, GetById, GetByIds, Unverified, UnverifiedId, UnverifiedIds, User,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser, VerifyMultipleForUserWithDb,
+    VerifyMultipleForUserWithoutDb, VerifyMultipleIdForUser,
 };
-use crate::{
-    types::{Movement, MovementId, MovementUnit, UserId},
-    UnverifiedIds, VerifyMultipleForUserWithDb, VerifyMultipleForUserWithoutDb,
-    VerifyMultipleIdForUser,
-};
+use crate::{Movement, MovementId, MovementUnit, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]

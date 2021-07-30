@@ -6,10 +6,7 @@ use serde::{Deserialize, Serialize};
 use sport_log_types_derive::{Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, ToSql};
 
 #[cfg(feature = "full")]
-use crate::{
-    schema::user,
-    types::{AuthenticatedUser, GetById, Unverified, VerifyForUserWithDb},
-};
+use crate::{schema::user, AuthenticatedUser, GetById, Unverified, VerifyForUserWithDb};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(

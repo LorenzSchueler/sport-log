@@ -3,10 +3,8 @@ use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
-    types::{
-        GetById, GetByUser, Metcon, MetconId, MetconMovement, MetconSession,
-        MetconSessionDescription, MetconSessionId, Movement, UserId,
-    },
+    GetById, GetByUser, Metcon, MetconId, MetconMovement, MetconSession, MetconSessionDescription,
+    MetconSessionId, Movement, UserId,
 };
 
 impl GetByUser for Metcon {

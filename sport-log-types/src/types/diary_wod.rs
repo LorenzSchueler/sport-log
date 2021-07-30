@@ -8,11 +8,11 @@ use sport_log_types_derive::{
     VerifyIdForUser,
 };
 
-use crate::types::UserId;
+use crate::UserId;
 #[cfg(feature = "full")]
 use crate::{
     schema::{diary, wod},
-    types::User,
+    User,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]

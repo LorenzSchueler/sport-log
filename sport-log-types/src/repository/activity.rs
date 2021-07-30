@@ -1,7 +1,7 @@
 use chrono::NaiveDateTime;
 use diesel::{PgConnection, QueryResult};
 
-use crate::types::{
+use crate::{
     Activity, CardioSessionDescription, Diary, GetByUser, MetconSessionDescription,
     StrengthSessionDescription, UserId, Wod,
 };

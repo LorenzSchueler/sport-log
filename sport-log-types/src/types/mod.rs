@@ -107,7 +107,7 @@ impl<'r, I: FromI32 + Deserialize<'r>> FromData<'r> for UnverifiedIds<I> {
             .await
             .unwrap()
             .into_inner();
-        let ids = ids.into_iter().map(|id| I::from_i32(id)).collect();
+        let ids = ids.into_iter().map(I::from_i32).collect();
         Outcome::Success(Self(ids))
     }
 }

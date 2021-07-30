@@ -3,10 +3,8 @@ use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
     schema::{strength_session, strength_set},
-    types::{
-        GetById, GetByUser, Movement, StrengthSession, StrengthSessionDescription,
-        StrengthSessionId, StrengthSet, UserId,
-    },
+    GetById, GetByUser, Movement, StrengthSession, StrengthSessionDescription, StrengthSessionId,
+    StrengthSet, UserId,
 };
 
 impl StrengthSession {

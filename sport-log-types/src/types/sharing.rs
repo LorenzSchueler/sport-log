@@ -6,15 +6,15 @@ use sport_log_types_derive::{
     ToSql, Update,
 };
 
-use crate::types::{CardioSessionId, DiaryId, MetconSessionId, StrengthSessionId, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{
         group, group_user, shared_cardio_session, shared_diary, shared_metcon_session,
         shared_strength_session,
     },
-    types::{CardioSession, Diary, MetconSession, StrengthSession, User},
+    CardioSession, Diary, MetconSession, StrengthSession, User,
 };
+use crate::{CardioSessionId, DiaryId, MetconSessionId, StrengthSessionId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
