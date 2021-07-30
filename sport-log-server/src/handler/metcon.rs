@@ -1,10 +1,11 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthenticatedUser, Create, Db, Delete, GetById, GetByUser, Metcon, MetconId, MetconMovement,
-    MetconMovementId, MetconSession, MetconSessionDescription, MetconSessionId, NewMetcon,
-    NewMetconMovement, NewMetconSession, Unverified, UnverifiedId, Update, VerifyForUserWithDb,
-    VerifyForUserWithoutDb, VerifyIdForUser,
+    AuthenticatedUser, Create, CreateMultiple, Db, Delete, DeleteMultiple, GetById, GetByUser,
+    Metcon, MetconId, MetconMovement, MetconMovementId, MetconSession, MetconSessionDescription,
+    MetconSessionId, NewMetcon, NewMetconMovement, NewMetconSession, Unverified, UnverifiedId,
+    UnverifiedIds, Update, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
+    VerifyMultipleForUserWithDb, VerifyMultipleForUserWithoutDb, VerifyMultipleIdForUser,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
@@ -21,6 +22,22 @@ pub async fn create_metcon_session(
 ) -> Result<Json<MetconSession>, Status> {
     let metcon_session = metcon_session.verify(&auth)?;
     conn.run(|c| MetconSession::create(metcon_session, c))
+        .await
+        .into_json()
+}
+
+#[post(
+    "/metcon_sessions",
+    format = "application/json",
+    data = "<metcon_sessions>"
+)]
+pub async fn create_metcon_sessions(
+    metcon_sessions: Unverified<Vec<NewMetconSession>>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<MetconSession>>, Status> {
+    let metcon_sessions = metcon_sessions.verify(&auth)?;
+    conn.run(|c| MetconSession::create_multiple(metcon_sessions, c))
         .await
         .into_json()
 }
@@ -79,6 +96,24 @@ pub async fn delete_metcon_session(
     .await
 }
 
+#[delete(
+    "/metcon_sessions",
+    format = "application/json",
+    data = "<metcon_session_ids>"
+)]
+pub async fn delete_metcon_sessions(
+    metcon_session_ids: UnverifiedIds<MetconSessionId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        MetconSession::delete_multiple(metcon_session_ids.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
 #[post("/metcon", format = "application/json", data = "<metcon>")]
 pub async fn create_metcon(
     metcon: Unverified<NewMetcon>,
@@ -87,6 +122,18 @@ pub async fn create_metcon(
 ) -> Result<Json<Metcon>, Status> {
     let metcon = metcon.verify(&auth)?;
     conn.run(|c| Metcon::create(metcon, c)).await.into_json()
+}
+
+#[post("/metcons", format = "application/json", data = "<metcons>")]
+pub async fn create_metcons(
+    metcons: Unverified<Vec<NewMetcon>>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<Metcon>>, Status> {
+    let metcons = metcons.verify(&auth)?;
+    conn.run(|c| Metcon::create_multiple(metcons, c))
+        .await
+        .into_json()
 }
 
 #[get("/metcon/<metcon_id>")]
@@ -132,6 +179,20 @@ pub async fn delete_metcon(
     .await
 }
 
+#[delete("/metcons", format = "application/json", data = "<metcon_ids>")]
+pub async fn delete_metcons(
+    metcon_ids: UnverifiedIds<MetconId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        Metcon::delete_multiple(metcon_ids.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
 #[post(
     "/metcon_movement",
     format = "application/json",
@@ -144,6 +205,22 @@ pub async fn create_metcon_movement(
 ) -> Result<Json<MetconMovement>, Status> {
     let metcon_movement = conn.run(move |c| metcon_movement.verify(&auth, c)).await?;
     conn.run(|c| MetconMovement::create(metcon_movement, c))
+        .await
+        .into_json()
+}
+
+#[post(
+    "/metcon_movements",
+    format = "application/json",
+    data = "<metcon_movements>"
+)]
+pub async fn create_metcon_movements(
+    metcon_movements: Unverified<Vec<NewMetconMovement>>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<MetconMovement>>, Status> {
+    let metcon_movements = conn.run(move |c| metcon_movements.verify(&auth, c)).await?;
+    conn.run(|c| MetconMovement::create_multiple(metcon_movements, c))
         .await
         .into_json()
 }
@@ -198,6 +275,24 @@ pub async fn delete_metcon_movement(
 ) -> Result<Status, Status> {
     conn.run(move |c| {
         MetconMovement::delete(metcon_movement_id.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
+#[delete(
+    "/metcon_movements",
+    format = "application/json",
+    data = "<metcon_movement_ids>"
+)]
+pub async fn delete_metcon_movements(
+    metcon_movement_ids: UnverifiedIds<MetconMovementId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        MetconMovement::delete_multiple(metcon_movement_ids.verify(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })

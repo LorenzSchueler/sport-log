@@ -13,14 +13,18 @@ use sport_log_types_derive::{
     ToSql, Update, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
-use crate::types::{Movement, MovementId, MovementUnit, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
     types::{
-        AuthenticatedUser, GetById, Unverified, UnverifiedId, User, VerifyForUserWithDb,
+        AuthenticatedUser, GetById, GetByIds, Unverified, UnverifiedId, User, VerifyForUserWithDb,
         VerifyForUserWithoutDb, VerifyIdForUser,
     },
+};
+use crate::{
+    types::{Movement, MovementId, MovementUnit, UserId},
+    UnverifiedIds, VerifyMultipleForUserWithDb, VerifyMultipleForUserWithoutDb,
+    VerifyMultipleIdForUser,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -47,6 +51,25 @@ impl VerifyIdForUser for UnverifiedId<MetconId> {
         let metcon =
             Metcon::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if metcon.user_id == Some(**auth) {
+            Ok(self.0)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "full")]
+impl VerifyMultipleIdForUser for UnverifiedIds<MetconId> {
+    type Id = MetconId;
+
+    fn verify(
+        self,
+        auth: &AuthenticatedUser,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status> {
+        let metcons =
+            Metcon::get_by_ids(&self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
+        if metcons.iter().all(|metcon| metcon.user_id == Some(**auth)) {
             Ok(self.0)
         } else {
             Err(rocket::http::Status::Forbidden)
@@ -160,6 +183,20 @@ impl VerifyForUserWithoutDb for Unverified<NewMetcon> {
     }
 }
 
+#[cfg(feature = "full")]
+impl VerifyMultipleForUserWithoutDb for Unverified<Vec<NewMetcon>> {
+    type Entity = NewMetcon;
+
+    fn verify(self, auth: &AuthenticatedUser) -> Result<Vec<Self::Entity>, Status> {
+        let metcons = self.0.into_inner();
+        if metcons.iter().all(|metcon| metcon.user_id == Some(**auth)) {
+            Ok(metcons)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
@@ -178,6 +215,31 @@ impl VerifyIdForUser for UnverifiedId<MetconMovementId> {
         let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?;
         if metcon.user_id == Some(**auth) {
+            Ok(self.0)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "full")]
+impl VerifyMultipleIdForUser for UnverifiedIds<MetconMovementId> {
+    type Id = MetconMovementId;
+
+    fn verify(
+        self,
+        auth: &AuthenticatedUser,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status> {
+        let metcon_movements = MetconMovement::get_by_ids(&self.0, conn)
+            .map_err(|_| rocket::http::Status::Forbidden)?;
+        let metcon_ids = metcon_movements
+            .iter()
+            .map(|metcon_movement| metcon_movement.metcon_id)
+            .collect();
+        let metcons =
+            Metcon::get_by_ids(&metcon_ids, conn).map_err(|_| rocket::http::Status::Forbidden)?;
+        if metcons.iter().all(|metcon| metcon.user_id == Some(**auth)) {
             Ok(self.0)
         } else {
             Err(rocket::http::Status::Forbidden)
@@ -271,6 +333,30 @@ impl VerifyForUserWithDb for Unverified<NewMetconMovement> {
             .map_err(|_| rocket::http::Status::Forbidden)?;
         if metcon.user_id == Some(**auth) {
             Ok(metcon_movement)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "full")]
+impl VerifyMultipleForUserWithDb for Unverified<Vec<NewMetconMovement>> {
+    type Entity = NewMetconMovement;
+
+    fn verify(
+        self,
+        auth: &AuthenticatedUser,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status> {
+        let metcon_movements = self.0.into_inner();
+        let metcon_ids = metcon_movements
+            .iter()
+            .map(|metcon_movement| metcon_movement.metcon_id)
+            .collect();
+        let metcons =
+            Metcon::get_by_ids(&metcon_ids, conn).map_err(|_| rocket::http::Status::Forbidden)?;
+        if metcons.iter().all(|metcon| metcon.user_id == Some(**auth)) {
+            Ok(metcon_movements)
         } else {
             Err(rocket::http::Status::Forbidden)
         }
