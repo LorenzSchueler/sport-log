@@ -2,12 +2,13 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
-    ActionRuleId, AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser, Create, Db,
-    Delete, ExecutableActionEvent, GetAll, GetById, GetByUser, NewAction, NewActionEvent,
-    NewActionProvider, NewActionRule, Unverified, UnverifiedId, Update,
-    VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
-    VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
-    VerifyIdForUserUnchecked,
+    ActionRuleId, AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser, Create,
+    CreateMultiple, Db, Delete, DeleteMultiple, ExecutableActionEvent, GetAll, GetById, GetByUser,
+    NewAction, NewActionEvent, NewActionProvider, NewActionRule, Unverified, UnverifiedId,
+    UnverifiedIds, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin,
+    VerifyIdForUser, VerifyIdForUserUnchecked, VerifyMultipleForUserWithoutDb,
+    VerifyMultipleIdForUser,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
@@ -114,6 +115,18 @@ pub async fn create_action_rule(
         .into_json()
 }
 
+#[post("/action_rules", format = "application/json", data = "<action_rules>")]
+pub async fn create_action_rules(
+    action_rules: Unverified<Vec<NewActionRule>>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<ActionRule>>, Status> {
+    let action_rules = action_rules.verify(&auth)?;
+    conn.run(|c| ActionRule::create_multiple(action_rules, c))
+        .await
+        .into_json()
+}
+
 #[get("/action_rule/<action_rule_id>")]
 pub async fn get_action_rule(
     action_rule_id: UnverifiedId<ActionRuleId>,
@@ -174,6 +187,24 @@ pub async fn delete_action_rule(
     .await
 }
 
+#[delete(
+    "/action_rules",
+    format = "application/json",
+    data = "<action_rule_ids>"
+)]
+pub async fn delete_action_rules(
+    action_rule_ids: UnverifiedIds<ActionRuleId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        ActionRule::delete_multiple(action_rule_ids.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
 #[post("/action_event", format = "application/json", data = "<action_event>")]
 pub async fn create_action_event(
     action_event: Unverified<NewActionEvent>,
@@ -182,6 +213,22 @@ pub async fn create_action_event(
 ) -> Result<Json<ActionEvent>, Status> {
     let action_event = action_event.verify(&auth)?;
     conn.run(|c| ActionEvent::create(action_event, c))
+        .await
+        .into_json()
+}
+
+#[post(
+    "/action_events",
+    format = "application/json",
+    data = "<action_events>"
+)]
+pub async fn create_action_events(
+    action_events: Unverified<Vec<NewActionEvent>>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<ActionEvent>>, Status> {
+    let action_events = action_events.verify(&auth)?;
+    conn.run(|c| ActionEvent::create_multiple(action_events, c))
         .await
         .into_json()
 }
@@ -250,6 +297,24 @@ pub async fn delete_action_event(
 ) -> Result<Status, Status> {
     conn.run(move |c| {
         ActionEvent::delete(action_event_id.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
+#[delete(
+    "/action_events",
+    format = "application/json",
+    data = "<action_event_ids>"
+)]
+pub async fn delete_action_events(
+    action_event_ids: UnverifiedIds<ActionEventId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        ActionEvent::delete_multiple(action_event_ids.verify(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
