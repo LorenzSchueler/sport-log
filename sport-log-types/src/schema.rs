@@ -140,8 +140,9 @@ table! {
 
     metcon_movement (id) {
         id -> Int4,
-        movement_id -> Int4,
         metcon_id -> Int4,
+        movement_id -> Int4,
+        movement_number -> Int4,
         count -> Int4,
         movement_unit -> MovementUnitMapping,
         weight -> Nullable<Float4>,
@@ -282,6 +283,7 @@ table! {
     strength_set (id) {
         id -> Int4,
         strength_session_id -> Int4,
+        set_number -> Int4,
         count -> Int4,
         weight -> Nullable<Float4>,
     }

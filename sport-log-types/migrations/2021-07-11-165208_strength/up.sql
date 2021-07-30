@@ -16,17 +16,19 @@ insert into strength_session (user_id, datetime, movement_id, movement_unit, int
 create table strength_set (
     id serial primary key,
     strength_session_id integer not null references strength_session on delete cascade,
+    set_number integer not null,
     count integer not null, -- number of completed movement_unit
-    weight real
+    weight real,
+    unique (strength_session_id, set_number)
 );
 
-insert into strength_set (strength_session_id, count, weight) values
-    (1, 5, 110),
-    (1, 5, 115),
-    (1, 5, 120),
-    (1, 5, 122.5),
-    (1, 5, 125),
-    (2, 3, 125),
-    (2, 3, 130),
-    (2, 3, 135),
-    (2, 3, 130);
+insert into strength_set (strength_session_id, set_number, count, weight) values
+    (1, 1, 5, 110),
+    (1, 2, 5, 115),
+    (1, 3, 5, 120),
+    (1, 4, 5, 122.5),
+    (1, 5, 5, 125),
+    (2, 1, 3, 125),
+    (2, 2, 3, 130),
+    (2, 3, 3, 135),
+    (2, 4, 3, 130);

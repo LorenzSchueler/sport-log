@@ -283,8 +283,9 @@ impl UnverifiedId<MetconMovementId> {
 #[cfg_attr(feature = "full", belongs_to(Metcon))]
 pub struct MetconMovement {
     pub id: MetconMovementId,
-    pub movement_id: MovementId,
     pub metcon_id: MetconId,
+    pub movement_id: MovementId,
+    pub movement_number: i32,
     pub count: i32,
     pub movement_unit: MovementUnit,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
@@ -311,8 +312,9 @@ impl VerifyForUserWithDb for Unverified<MetconMovement> {
 #[cfg_attr(feature = "full", derive(Insertable))]
 #[cfg_attr(feature = "full", table_name = "metcon_movement")]
 pub struct NewMetconMovement {
-    pub movement_id: MovementId,
     pub metcon_id: MetconId,
+    pub movement_id: MovementId,
+    pub movement_number: i32,
     pub count: i32,
     pub movement_unit: MovementUnit,
     pub weight: Option<f32>,

@@ -153,6 +153,7 @@ impl VerifyMultipleIdForUser for UnverifiedIds<StrengthSetId> {
 pub struct StrengthSet {
     pub id: StrengthSetId,
     pub strength_session_id: StrengthSessionId,
+    pub set_number: i32,
     pub count: i32,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub weight: Option<f32>,
@@ -181,6 +182,7 @@ impl VerifyForUserWithDb for Unverified<StrengthSet> {
 #[cfg_attr(feature = "full", table_name = "strength_set")]
 pub struct NewStrengthSet {
     pub strength_session_id: StrengthSessionId,
+    pub set_number: i32,
     pub count: i32,
     pub weight: Option<f32>,
 }

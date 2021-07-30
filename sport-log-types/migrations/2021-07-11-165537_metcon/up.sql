@@ -18,23 +18,25 @@ insert into metcon (user_id, name, metcon_type, rounds, timecap, description) va
 
 create table metcon_movement (
     id serial primary key,
-    movement_id integer not null references movement on delete no action,
     metcon_id integer not null references metcon on delete cascade,
+    movement_id integer not null references movement on delete no action,
+    movement_number integer not null,
     count integer not null,
     movement_unit movement_unit not null,
-    weight real
+    weight real,
+    unique (metcon_id, movement_number)
 );
 
-insert into metcon_movement (movement_id, metcon_id, count, movement_unit, weight) values
-    (9, 1, 5, 'reps', null),
-    (10, 1, 10, 'reps', null),
-    (11, 1, 15, 'reps', null),
-    (5, 1, 1, 'mile', 9),
-    (9, 1, 100, 'reps', 9),
-    (10, 1, 200, 'reps', 9),
-    (11, 1, 300, 'reps', 9),
-    (5, 1, 1, 'mile', 9),
-    (8, 3, 5, 'km', null);
+insert into metcon_movement (metcon_id, movement_id, movement_number, count, movement_unit, weight) values
+    (1, 9, 1, 5, 'reps', null),
+    (1, 10, 2, 10, 'reps', null),
+    (1, 11, 3, 15, 'reps', null),
+    (2, 5, 1, 1, 'mile', 9),
+    (2, 9, 2, 100, 'reps', 9),
+    (2, 10, 3, 200, 'reps', 9),
+    (2, 11, 4, 300, 'reps', 9),
+    (2, 5, 5, 1, 'mile', 9),
+    (3, 8, 5, 1, 'km', null);
 
 create table metcon_session (
     id serial primary key,
