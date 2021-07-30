@@ -60,6 +60,7 @@ class _IntPickerState extends State<IntPicker> {
                       _value -= 1;
                     });
                     _controller.text = "$_value";
+                    widget.setValue(_value);
                   }
               });
             });
@@ -126,6 +127,7 @@ class _IntPickerState extends State<IntPicker> {
                         _value += 1;
                       });
                       _controller.text = "$_value";
+                      widget.setValue(_value);
                     }
                   });
             });

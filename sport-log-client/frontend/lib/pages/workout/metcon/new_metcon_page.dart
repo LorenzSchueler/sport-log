@@ -1,6 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_log/helpers/pluralize.dart';
 import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/widgets/int_picker.dart';
 
@@ -37,7 +38,7 @@ class _NewMetconPageState extends State<NewMetconPage> {
                 _nameInput(context),
                 _maybeDescriptionInput(context),
                 _typeInput(context),
-                _advancedFieldsInput(context),
+                _additionalFieldsInput(context),
               ],
             ),
           ),
@@ -99,32 +100,48 @@ class _NewMetconPageState extends State<NewMetconPage> {
     );
   }
 
-  Widget _advancedFieldsInput(BuildContext context) {
+  Widget _additionalFieldsInput(BuildContext context) {
     switch (_metcon.type) {
       case MetconType.amrap:
         return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("Timecap:"),
             _timecapInput(context),
-            const Text("mins"),
+            Text(pluralize("min", "mins", _metcon.timecap?.inMinutes ?? 0)
+                + " in total"),
           ],
         );
       case MetconType.emom:
-        return Row(
+        return Column(
           children: [
-            _roundsInput(context),
-            const Text("rounds in"),
-            _timecapInput(context),
-            const Text("mins"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _roundsInput(context),
+                Text(pluralize("round", "rounds", _metcon.rounds ?? 0)),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("in"),
+                _timecapInput(context),
+                Text(pluralize("min", "mins", _metcon.timecap?.inMinutes ?? 0)),
+              ],
+            )
           ],
         );
       case MetconType.forTime:
-        return Row(
+        return Column(
           children: [
-            _roundsInput(context),
-            const Text("rounds in"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _roundsInput(context),
+                Text(pluralize("round", "rounds", _metcon.rounds ?? 0)),
+              ],
+            ),
             _maybeTimecapInput(context),
-            const Text("mins"),
           ],
         );
     }
@@ -187,43 +204,50 @@ class _NewMetconPageState extends State<NewMetconPage> {
     );
   }
 
-  Widget _timecapInput(BuildContext context, { bool isDismissible = false }) {
-    return Row(
-      children: [
-        IntPicker(
-          initialValue: _metcon.timecap?.inMinutes ?? _timecapDefaultValue.inMinutes,
-          setValue: (int value) {
-            setState(() {
-              _metcon.timecap = Duration(minutes: value);
-            });
-          },
-        ),
-        if (isDismissible)
-          IconButton(
-              onPressed: () {
-                setState(() {
-                  _metcon.timecap = null;
-                });
-              },
-              icon: const Icon(Icons.cancel)
-          ),
-      ],
+  Widget _timecapInput(BuildContext context) {
+    return IntPicker(
+      initialValue: _metcon.timecap?.inMinutes ?? _timecapDefaultValue.inMinutes,
+      setValue: (int value) {
+        setState(() {
+          _metcon.timecap = Duration(minutes: value);
+        });
+      },
     );
   }
 
   Widget _maybeTimecapInput(BuildContext context) {
     if (_metcon.timecap == null) {
       return OutlinedButton.icon(
-        icon: const Icon(Icons.add),
         onPressed: () {
           setState(() {
             _metcon.timecap = _timecapDefaultValue;
           });
         },
+        icon: const Icon(Icons.add),
         label: const Text("Add timecap..."),
       );
     } else {
-      return _timecapInput(context, isDismissible: true);
+      return Stack(
+        alignment: Alignment.centerRight,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text("in"),
+              _timecapInput(context),
+              Text(pluralize("min", "mins", _metcon.timecap?.inMinutes ?? 0)),
+            ],
+          ),
+          IconButton(
+            icon: const Icon(Icons.cancel),
+            onPressed: () {
+              setState(() {
+                _metcon.timecap = null;
+              });
+            },
+          ),
+        ]
+      );
     }
   }
 }
