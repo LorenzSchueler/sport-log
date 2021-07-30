@@ -73,7 +73,7 @@ class _IntPickerState extends State<IntPicker> {
           },
         ),
         SizedBox(
-          width: 30,
+          width: 40,
           child: TextField(
             keyboardType: TextInputType.number,
             controller: _controller,
@@ -87,6 +87,9 @@ class _IntPickerState extends State<IntPicker> {
             },
             inputFormatters: [
               TextInputFormatter.withFunction((oldValue, newValue) {
+                if (newValue.text.contains(' ')) {
+                  return oldValue;
+                }
                 int? v = int.tryParse(newValue.text);
                 if (v == null || v < 0 || v > 999) {
                   return oldValue;
@@ -94,6 +97,10 @@ class _IntPickerState extends State<IntPicker> {
                 return newValue;
               }),
             ],
+            decoration: const InputDecoration(
+              isDense: true,
+            ),
+            style: Theme.of(context).textTheme.headline6,
           ),
         ),
         GestureDetector(
