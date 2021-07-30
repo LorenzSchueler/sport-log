@@ -5,8 +5,8 @@ create table metcon (
     user_id integer references "user" on delete cascade,
     name varchar(80) unique,
     metcon_type metcon_type not null,
-    rounds integer,
-    timecap integer, -- seconds
+    rounds integer check (rounds >= 1),
+    timecap integer check (timecap > 0), -- seconds
     description text
 );
 --create index on metcon (user_id, name);
@@ -20,10 +20,10 @@ create table metcon_movement (
     id serial primary key,
     metcon_id integer not null references metcon on delete cascade,
     movement_id integer not null references movement on delete no action,
-    movement_number integer not null,
-    count integer not null,
+    movement_number integer not null check (movement_number >= 1),
+    count integer not null check (count >= 1),
     movement_unit movement_unit not null,
-    weight real,
+    weight real check (weight > 0),
     unique (metcon_id, movement_number)
 );
 
@@ -43,9 +43,9 @@ create table metcon_session (
     user_id integer not null references "user" on delete cascade,
     metcon_id integer not null references metcon on delete no action,
     datetime timestamp not null default now(),
-    time integer, -- seconds
-    rounds integer,
-    reps integer,
+    time integer check (time > 0), -- seconds
+    rounds integer check (rounds >= 0),
+    reps integer check (reps >= 0),
     rx boolean not null default true,
     comments text
 );

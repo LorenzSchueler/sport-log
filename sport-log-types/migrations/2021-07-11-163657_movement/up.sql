@@ -25,8 +25,8 @@ insert into movement (user_id, name, description, category) values
 
 create table eorm (
     id serial primary key,
-    reps integer not null unique,
-    percentage real not null
+    reps integer not null unique check (reps >= 1),
+    percentage real not null check (percentage > 0)
 );
 insert into eorm (reps, percentage) values
     (1, 1.0),

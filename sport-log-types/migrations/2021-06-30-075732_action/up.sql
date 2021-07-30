@@ -2,7 +2,7 @@ create type weekday as enum('monday', 'tuesday', 'wednesday', 'thursday', 'frida
 
 create table action_provider (
     id serial primary key,
-    name varchar(80) not null unique,
+    name varchar(80) not null unique check (length(name) >= 2),
     password char(96) not null,
     platform_id integer not null references platform on delete cascade
 );
@@ -13,7 +13,7 @@ insert into action_provider (name, password, platform_id) values
 
 create table action (
     id serial primary key,
-    name varchar(80) not null,
+    name varchar(80) not null check (length(name) >= 2),
     action_provider_id integer not null references action_provider on delete cascade,
     unique (action_provider_id, name)
 );

@@ -2,7 +2,7 @@ create table diary (
     id serial primary key,
     user_id integer not null references "user" on delete cascade,
     date date not null default now()::date,
-    bodyweight real,
+    bodyweight real check (bodyweight > 0),
     comments text,
     unique (user_id, date)
 );
