@@ -31,10 +31,10 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
             }
         }
 
-        impl crate::types::VerifyMultipleIdForUser for crate::types::UnverifiedId<Vec<#id_typename>> {
+        impl crate::types::VerifyMultipleIdForUser for crate::types::UnverifiedIds<#id_typename> {
             type Id = #id_typename;
 
-            fn verify_multiple(
+            fn verify(
                 self,
                 auth: &crate::types::AuthenticatedUser,
                 conn: &diesel::pg::PgConnection,
@@ -153,7 +153,7 @@ pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::VerifyMultipleForUserWithDb for crate::types::Unverified<Vec<#typename>> {
             type Entity = #typename;
 
-            fn verify_multiple(
+            fn verify(
                 self,
                 auth: &crate::types::AuthenticatedUser,
                 conn: &diesel::pg::PgConnection,
@@ -207,7 +207,7 @@ pub fn impl_verify_for_user_without_db(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::VerifyMultipleForUserWithoutDb for crate::types::Unverified<Vec<#typename>> {
             type Entity = #typename;
 
-            fn verify_multiple(
+            fn verify(
                 self,
                 auth: &crate::types::AuthenticatedUser,
             ) -> Result<Vec<Self::Entity>, rocket::http::Status> {

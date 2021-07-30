@@ -90,6 +90,28 @@ impl<'v, I: FromI32> rocket::request::FromParam<'v> for UnverifiedId<I> {
     }
 }
 
+/// Wrapper around Id types for which the access permissions for the [AuthenticatedUser], [AuthenticatedActionProvider] or [AuthenticatedAdmin] have not been checked.
+///
+/// The Id type can be retrieved by using the appropriate verification function.
+#[cfg(feature = "full")]
+#[derive(Debug, Clone)]
+pub struct UnverifiedIds<I>(Vec<I>);
+
+#[cfg(feature = "full")]
+#[rocket::async_trait]
+impl<'r, I: FromI32 + Deserialize<'r>> FromData<'r> for UnverifiedIds<I> {
+    type Error = ();
+
+    async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> data::Outcome<'r, Self> {
+        let ids = <rocket::serde::json::Json<Vec<i32>> as FromData>::from_data(req, data)
+            .await
+            .unwrap()
+            .into_inner();
+        let ids = ids.into_iter().map(|id| I::from_i32(id)).collect();
+        Outcome::Success(Self(ids))
+    }
+}
+
 /// A type for which a new database entry can be created.
 ///
 /// ### Deriving
@@ -235,11 +257,8 @@ pub trait VerifyIdForUser {
 pub trait VerifyMultipleIdForUser {
     type Id;
 
-    fn verify_multiple(
-        self,
-        auth: &AuthenticatedUser,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Id>, Status>;
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection)
+        -> Result<Vec<Self::Id>, Status>;
 }
 
 #[cfg(feature = "full")]
@@ -278,7 +297,7 @@ pub trait VerifyForUserWithDb {
 pub trait VerifyMultipleForUserWithDb {
     type Entity;
 
-    fn verify_multiple(
+    fn verify(
         self,
         auth: &AuthenticatedUser,
         conn: &PgConnection,
@@ -296,7 +315,7 @@ pub trait VerifyForUserWithoutDb {
 pub trait VerifyMultipleForUserWithoutDb {
     type Entity;
 
-    fn verify_multiple(self, auth: &AuthenticatedUser) -> Result<Vec<Self::Entity>, Status>;
+    fn verify(self, auth: &AuthenticatedUser) -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]
