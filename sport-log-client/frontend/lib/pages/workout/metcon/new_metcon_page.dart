@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/pluralize.dart';
 import 'package:sport_log/models/metcon.dart';
+import 'package:sport_log/models/movement.dart';
 import 'package:sport_log/widgets/int_picker.dart';
 
 class NewMetconPage extends StatefulWidget {
@@ -21,6 +22,8 @@ class _NewMetconPageState extends State<NewMetconPage> {
 
   static const _timecapDefaultValue = Duration(minutes: 20);
   static const _roundsDefaultValue = 1;
+  static const _countDefaultValue = 5;
+  static const _unitDefaultValue = MovementUnit.reps;
 
   final _descriptionFocusNode = FocusNode();
 
@@ -39,6 +42,9 @@ class _NewMetconPageState extends State<NewMetconPage> {
                 _maybeDescriptionInput(context),
                 _typeInput(context),
                 _additionalFieldsInput(context),
+                const Divider(thickness: 2),
+                ..._metconMovementsList(context),
+                _addMetconMovementButton(context),
               ],
             ),
           ),
@@ -261,5 +267,50 @@ class _NewMetconPageState extends State<NewMetconPage> {
         ]
       );
     }
+  }
+
+  List<Widget> _metconMovementsList(BuildContext context) {
+    return _metcon.moves.map((move) {
+      return Card(
+        child: Column(
+          children: [
+            if (move.movementId < 0)
+              ElevatedButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: _movementSectionDialog
+                  );
+                },
+                child: const Text("Choose movement..."),
+              ),
+            if (move.movementId >= 0)
+              Text("Movement"),
+          ],
+        ),
+      );
+    }).toList();
+  }
+
+  Widget _movementSectionDialog(BuildContext context) {
+    return Dialog(
+      child: Text("hi"),
+    );
+  }
+
+  Widget _addMetconMovementButton(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: () {
+        setState(() {
+          _metcon.moves.add(NewMetconMovement(
+            movementId: -1,
+            count: _countDefaultValue,
+            unit: _unitDefaultValue
+          ));
+        });
+      },
+      icon: const Icon(Icons.add),
+      label: const Text("Add movement..."),
+    );
   }
 }
