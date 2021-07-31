@@ -1,8 +1,79 @@
 use reqwest::Client;
+use serde::{Deserialize, Serialize};
 use serde_json::{self, Value};
 
 use sport_log_action_provider_sportstracker_config::Config;
 use sport_log_types::ExecutableActionEvent;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct User {
+    sessionkey: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Workouts {
+    payload: Vec<Workout>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[allow(non_snake_case)]
+pub struct Workout {
+    description: Option<String>,
+    startTime: u64,
+    stopTime: u64,
+    totalTime: f32,
+    totalDistance: f32,
+    totalAscent: f32,
+    totalDescent: f32,
+    startPosition: Position,
+    stopPosition: Position,
+    centerPosition: Position,
+    stepCount: u32,
+    minAltitude: Option<f32>,
+    maxAltitude: Option<f32>,
+    workoutKey: String,
+    //hrdata:
+    cadence: Cadence,
+    energyConsumption: u16,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Position {
+    x: f64,
+    y: f64,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Cadence {
+    max: f32,
+    avg: f32,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct WorkoutData {
+    payload: InnerWorkoutData,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct InnerWorkoutData {
+    description: Option<String>,
+    starttime: u64,
+    totaldistance: u32,
+    totaltime: u32,
+    locations: Vec<Location>,
+    // heartrate: Vec<>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Location {
+    t: u32,  // seconds since start in 1/100 s
+    la: f32, // lat
+    ln: f32, // lon
+    s: u32,  // meter since start
+    h: u16,  // height
+    v: u32,  // ??? TODO
+    d: u64,  // timestamp in 1 / 1000 s
+}
 
 #[tokio::main]
 async fn main() {
