@@ -1,13 +1,11 @@
 #[cfg(feature = "full")]
 use diesel::{PgConnection, QueryResult};
 #[cfg(feature = "full")]
-use rocket::http::Status;
-use rocket::serde::json;
-#[cfg(feature = "full")]
 use rocket::{
     data::{self, FromData},
+    http::Status,
     outcome::Outcome,
-    serde::json::Json,
+    serde::json::{self, Json},
     Data, Request,
 };
 #[cfg(feature = "full")]
