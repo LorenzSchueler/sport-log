@@ -2,6 +2,7 @@
 use diesel::{PgConnection, QueryResult};
 #[cfg(feature = "full")]
 use rocket::http::Status;
+use rocket::serde::json;
 #[cfg(feature = "full")]
 use rocket::{
     data::{self, FromData},
@@ -62,10 +63,12 @@ pub struct Unverified<T>(Json<T>);
 #[cfg(feature = "full")]
 #[rocket::async_trait]
 impl<'r, T: Deserialize<'r>> FromData<'r> for Unverified<T> {
-    type Error = ();
+    type Error = json::Error<'r>;
 
     async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> data::Outcome<'r, Self> {
-        Outcome::Success(Self(Json::<T>::from_data(req, data).await.unwrap()))
+        Json::<T>::from_data(req, data)
+            .await
+            .and_then(|data| Outcome::Success(Self(data)))
     }
 }
 
@@ -100,15 +103,16 @@ pub struct UnverifiedIds<I>(Vec<I>);
 #[cfg(feature = "full")]
 #[rocket::async_trait]
 impl<'r, I: FromI32 + Deserialize<'r>> FromData<'r> for UnverifiedIds<I> {
-    type Error = ();
+    type Error = json::Error<'r>;
 
     async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> data::Outcome<'r, Self> {
-        let ids = <rocket::serde::json::Json<Vec<i32>> as FromData>::from_data(req, data)
+        <rocket::serde::json::Json<Vec<i32>> as FromData>::from_data(req, data)
             .await
-            .unwrap()
-            .into_inner();
-        let ids = ids.into_iter().map(I::from_i32).collect();
-        Outcome::Success(Self(ids))
+            .and_then(|ids_json| {
+                Outcome::Success(Self(
+                    ids_json.into_inner().into_iter().map(I::from_i32).collect(),
+                ))
+            })
     }
 }
 

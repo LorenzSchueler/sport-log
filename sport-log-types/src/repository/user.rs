@@ -13,7 +13,7 @@ impl Create for User {
     fn create(mut user: Self::New, conn: &PgConnection) -> QueryResult<Self> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
-            .hash_password_simple(user.password.as_bytes(), salt.as_ref())
+            .hash_password_simple(user.password.as_bytes(), &salt)
             .unwrap()
             .to_string();
 
@@ -27,7 +27,7 @@ impl Update for User {
     fn update(mut user: Self, conn: &PgConnection) -> QueryResult<Self> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
-            .hash_password_simple(user.password.as_bytes(), salt.as_ref())
+            .hash_password_simple(user.password.as_bytes(), &salt)
             .unwrap()
             .to_string();
 
@@ -48,7 +48,8 @@ impl User {
             .select((user::columns::id, user::columns::password))
             .get_result(conn)?;
 
-        let password_hash = PasswordHash::new(password_hash.as_str()).unwrap();
+        let password_hash = PasswordHash::new(password_hash.as_str())
+            .expect("invalid password hash stored in database");
         if Argon2::default()
             .verify_password(password.as_bytes(), &password_hash)
             .is_ok()

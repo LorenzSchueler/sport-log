@@ -71,11 +71,9 @@ impl<'r> FromRequest<'r> for AuthenticatedUser {
     type Error = ();
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
-        match authenticate::<UserId>(request, User::authenticate).await {
-            Outcome::Success(user_id) => Outcome::Success(Self(user_id)),
-            Outcome::Failure(f) => Outcome::Failure(f),
-            Outcome::Forward(f) => Outcome::Forward(f),
-        }
+        authenticate::<UserId>(request, User::authenticate)
+            .await
+            .and_then(|user_id| Outcome::Success(Self(user_id)))
     }
 }
 
@@ -84,11 +82,9 @@ impl<'r> FromRequest<'r> for AuthenticatedActionProvider {
     type Error = ();
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
-        match authenticate::<ActionProviderId>(request, ActionProvider::authenticate).await {
-            Outcome::Success(action_provider_id) => Outcome::Success(Self(action_provider_id)),
-            Outcome::Failure(f) => Outcome::Failure(f),
-            Outcome::Forward(f) => Outcome::Forward(f),
-        }
+        authenticate::<ActionProviderId>(request, ActionProvider::authenticate)
+            .await
+            .and_then(|action_provider_id| Outcome::Success(Self(action_provider_id)))
     }
 }
 
@@ -97,10 +93,8 @@ impl<'r> FromRequest<'r> for AuthenticatedAdmin {
     type Error = ();
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
-        match authenticate::<()>(request, Admin::authenticate).await {
-            Outcome::Success(()) => Outcome::Success(Self),
-            Outcome::Failure(f) => Outcome::Failure(f),
-            Outcome::Forward(f) => Outcome::Forward(f),
-        }
+        authenticate::<()>(request, Admin::authenticate)
+            .await
+            .and_then(|()| Outcome::Success(Self))
     }
 }
