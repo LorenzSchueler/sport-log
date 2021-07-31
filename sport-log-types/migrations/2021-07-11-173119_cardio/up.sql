@@ -4,7 +4,8 @@ create type "position" as (
     longitude double precision, --numeric(8, 5)
     latitude double precision, --numeric(9, 6)
     elevation real, -- numeric(5, 1) or round to int
-    time integer -- check (time > 0) -- seconds since start; TODO add check
+    distance integer, -- meter since start
+    time integer -- seconds since start
 );
 
 create table route (
