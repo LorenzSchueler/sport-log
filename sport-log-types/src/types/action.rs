@@ -287,6 +287,7 @@ pub struct ExecutableActionEvent {
     pub action_event_id: ActionEventId,
     pub action_name: String,
     pub datetime: NaiveDateTime,
+    pub user_id: UserId,
     pub username: String,
     pub password: String,
 }
