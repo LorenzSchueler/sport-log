@@ -152,6 +152,7 @@ impl ExecutableActionEvent {
                 action_event::columns::id,
                 action::columns::name,
                 action_event::columns::datetime,
+                platform_credential::columns::user_id,
                 platform_credential::columns::username,
                 platform_credential::columns::password,
             ))
@@ -178,6 +179,7 @@ impl ExecutableActionEvent {
                 action_event::columns::id,
                 action::columns::name,
                 action_event::columns::datetime,
+                platform_credential::columns::user_id,
                 platform_credential::columns::username,
                 platform_credential::columns::password,
             ))
