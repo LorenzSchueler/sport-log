@@ -7,8 +7,10 @@ class MovementRepository {
   
   int get _nextId => _movements.length;
 
-  void createMovement(NewMovement movement) {
-    _movements[_nextId] = Movement.fromNewMovement(movement, _nextId);
+  int createMovement(NewMovement movement) {
+    final id = _nextId;
+    _movements[id] = Movement.fromNewMovement(movement, id);
+    return id;
   }
 
   void deleteMovement(int id) {
@@ -24,5 +26,9 @@ class MovementRepository {
 
   List<Movement> getAllMovements() {
     return _movements.values.toList();
+  }
+
+  List<Movement> searchByName(String search) {
+    return _movements.values.where((m) => m.name.contains(search)).toList();
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/pluralize.dart';
 import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/models/movement.dart';
+import 'package:sport_log/pages/workout/metcon/movement_picker_dialog.dart';
 import 'package:sport_log/widgets/int_picker.dart';
 
 class NewMetconPage extends StatefulWidget {
@@ -279,7 +280,7 @@ class _NewMetconPageState extends State<NewMetconPage> {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: _movementSectionDialog
+                    builder: _movementPickerDialog
                   );
                 },
                 child: const Text("Choose movement..."),
@@ -292,10 +293,8 @@ class _NewMetconPageState extends State<NewMetconPage> {
     }).toList();
   }
 
-  Widget _movementSectionDialog(BuildContext context) {
-    return Dialog(
-      child: Text("hi"),
-    );
+  Widget _movementPickerDialog(BuildContext context) {
+    return MovementPickerDialog();
   }
 
   Widget _addMetconMovementButton(BuildContext context) {
