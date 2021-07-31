@@ -1,10 +1,13 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sport_log/helpers/iterable_extension.dart';
 import 'package:sport_log/helpers/pluralize.dart';
 import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/models/movement.dart';
 import 'package:sport_log/pages/workout/metcon/movement_picker_dialog.dart';
+import 'package:sport_log/repositories/movement_repository.dart';
 import 'package:sport_log/widgets/int_picker.dart';
 
 class NewMetconPage extends StatefulWidget {
@@ -271,30 +274,40 @@ class _NewMetconPageState extends State<NewMetconPage> {
   }
 
   List<Widget> _metconMovementsList(BuildContext context) {
-    return _metcon.moves.map((move) {
+    return _metcon.moves.mapIndexed((index, move) {
       return Card(
         child: Column(
           children: [
             if (move.movementId < 0)
               ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: _movementPickerDialog
-                  );
-                },
+                onPressed: () => _showMovementPickerDialog(context, index),
                 child: const Text("Choose movement..."),
               ),
             if (move.movementId >= 0)
-              Text("Movement"),
+              ListTile(
+                title: Text(
+                  context.read<MovementRepository>()
+                      .getMovement(move.movementId)!.name
+                ),
+                onTap: () => _showMovementPickerDialog(context, index),
+              ),
           ],
         ),
       );
     }).toList();
   }
 
-  Widget _movementPickerDialog(BuildContext context) {
-    return MovementPickerDialog();
+  void _showMovementPickerDialog(BuildContext context, int index) {
+    showDialog(
+        context: context,
+        builder: (_) => const MovementPickerDialog(),
+    ).then((movementId) {
+      if (movementId is int) {
+        setState(() {
+          _metcon.moves[index].movementId = movementId;
+        });
+      }
+    });
   }
 
   Widget _addMetconMovementButton(BuildContext context) {

@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:provider/src/provider.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/models/movement.dart';
 import 'package:sport_log/repositories/movement_repository.dart';
 
@@ -29,15 +29,13 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(
         vertical: 20,
-        horizontal: 5
+        horizontal: 10
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListView(
           children: [
             _searchTextField(),
-            if (_movements.isEmpty && _searchTerm.isNotEmpty)
-              _createMovementButton(),
             ..._results(context),
           ],
         ),
@@ -60,27 +58,13 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
     );
   }
 
-  Widget _createMovementButton() {
-    return ElevatedButton.icon(
-      icon: const Icon(Icons.add),
-      label: Text("create movement '" + _searchTerm + "'"),
-      onPressed: () {
-        final int id = context.read<MovementRepository>()
-          .createMovement(NewMovement(
-            name: _searchTerm,
-            category: MovementCategory.strength,
-        ));
-        Navigator.of(context).pop(id);
-      },
-    );
-  }
-
   List<Widget> _results(BuildContext context) {
     return _movements.map((movement) => ListTile(
       title: Text(movement.name),
       subtitle: (movement.description != null)
           ? Text(movement.description!) : null,
       key: ValueKey(movement.id),
+      onTap: () => Navigator.of(context).pop(movement.id),
     )).toList();
   }
 }
