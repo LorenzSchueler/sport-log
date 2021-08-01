@@ -52,7 +52,7 @@ pub struct Position {
 #[cfg(feature = "full")]
 impl ToSql<Position, Pg> for Position {
     fn to_sql<W: Write>(&self, out: &mut Output<W, Pg>) -> serialize::Result {
-        WriteTuple::<(Double, Double, Float, Integer,Integer)>::write_tuple(
+        WriteTuple::<(Double, Double, Float, Integer, Integer)>::write_tuple(
             &(
                 self.longitude,
                 self.latitude,

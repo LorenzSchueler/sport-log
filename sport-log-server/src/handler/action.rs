@@ -75,7 +75,7 @@ pub async fn ap_get_action(
 }
 
 #[get("/ap/action")]
-pub async fn ap_get_actions_by_action_provider(
+pub async fn ap_get_actions(
     auth: AuthenticatedActionProvider,
     conn: Db,
 ) -> Result<Json<Vec<Action>>, Status> {
@@ -140,7 +140,7 @@ pub async fn get_action_rule(
 }
 
 #[get("/action_rule")]
-pub async fn get_action_rules_by_user(
+pub async fn get_action_rules(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<ActionRule>>, Status> {
@@ -150,7 +150,7 @@ pub async fn get_action_rules_by_user(
 }
 
 #[get("/action_rule/action_provider/<action_provider_id>")]
-pub async fn get_action_rules_by_user_and_action_provider(
+pub async fn get_action_rules_by_action_provider(
     action_provider_id: UnverifiedId<ActionProviderId>,
     auth: AuthenticatedUser,
     conn: Db,
@@ -315,20 +315,6 @@ pub async fn delete_action_events(
 ) -> Result<Status, Status> {
     conn.run(move |c| {
         ActionEvent::delete_multiple(action_event_ids.verify(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete("/ap/action_event/<action_event_id>")]
-pub async fn ap_delete_action_event(
-    action_event_id: UnverifiedId<ActionEventId>,
-    auth: AuthenticatedActionProvider,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionEvent::delete(action_event_id.verify_ap(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })

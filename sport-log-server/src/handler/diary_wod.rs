@@ -1,24 +1,13 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthenticatedActionProvider, AuthenticatedUser, Create, CreateMultiple, Db, Delete,
-    DeleteMultiple, Diary, DiaryId, GetById, GetByUser, NewDiary, NewWod, Unverified, UnverifiedId,
-    UnverifiedIds, Update, VerifyForActionProviderUnchecked, VerifyForUserWithDb,
-    VerifyForUserWithoutDb, VerifyIdForUser, VerifyMultipleForUserWithoutDb,
+    AuthenticatedUser, Create, CreateMultiple, Db, Delete, DeleteMultiple, Diary, DiaryId, GetById,
+    GetByUser, NewDiary, NewWod, Unverified, UnverifiedId, UnverifiedIds, Update,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser, VerifyMultipleForUserWithoutDb,
     VerifyMultipleIdForUser, Wod, WodId,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
-
-#[post("/ap/wod", format = "application/json", data = "<wod>")]
-pub async fn ap_create_wod(
-    wod: Unverified<NewWod>,
-    auth: AuthenticatedActionProvider,
-    conn: Db,
-) -> Result<Json<Wod>, Status> {
-    let wod = wod.verify_unchecked_ap(&auth)?;
-    conn.run(|c| Wod::create(wod, c)).await.into_json()
-}
 
 #[post("/wod", format = "application/json", data = "<wod>")]
 pub async fn create_wod(
