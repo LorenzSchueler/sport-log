@@ -48,7 +48,7 @@ class _NewMetconPageState extends State<NewMetconPage> {
                 _typeInput(context),
                 _additionalFieldsInput(context),
                 const Divider(thickness: 2),
-                ..._metconMovementsList(context),
+                _metconMovementsList(context),
                 _addMetconMovementButton(context),
               ],
             ),
@@ -274,72 +274,97 @@ class _NewMetconPageState extends State<NewMetconPage> {
     }
   }
 
-  List<Widget> _metconMovementsList(BuildContext context) {
-    return _metcon.moves.mapIndexed((index, move) {
-      return Card(
-        child: Column(
-          children: [
-            ListTile(
-              title: Text(
-                context.read<MovementRepository>()
-                    .getMovement(move.movementId)!.name
-              ),
-              onTap: () => _showMovementPickerDialog(context, (id) {
-                setState(() {
-                  _metcon.moves[index].movementId = id;
-                });
-              }),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () {
+  Widget _metconMovementsList(BuildContext context) {
+    return ReorderableListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemBuilder: (context, index) {
+        final move = _metcon.moves[index];
+        return Card(
+          key: ObjectKey(move),
+          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
+          child: Column(
+            children: [
+              ListTile(
+                title: Text(
+                    context.read<MovementRepository>()
+                        .getMovement(move.movementId)!.name
+                ),
+                onTap: () => _showMovementPickerDialog(context, (id) {
                   setState(() {
-                    _metcon.moves.removeAt(index);
+                    _metcon.moves[index].movementId = id;
                   });
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                if (move.weight == null)
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        _metcon.moves[index].weight = _weightDefaultValue;
-                      });
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text("Add value..."),
-                  ),
-                if (move.weight != null)
-                  IntPicker(initialValue: move.weight!.toInt(), setValue: (value) {
+                }),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
                     setState(() {
-                      _metcon.moves[index].weight = value.toDouble();
+                      _metcon.moves.removeAt(index);
+                    });
+                  },
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IntPicker(initialValue: move.count, setValue: (count) {
+                    setState(() {
+                      _metcon.moves[index].count = count;
                     });
                   }),
-                DropdownButton(
-                  value: move.unit,
-                  onChanged: (MovementUnit? u) {
-                    if (u != null) {
-                      setState(() {
-                        _metcon.moves[index].unit = u;
-                      });
-                    }
-                  },
-                  items: MovementUnit.values.map((u) =>
-                    DropdownMenuItem(
-                      child: Text(move.unit.toDisplayName()),
-                      key: ValueKey(u.toString()),
-                      value: u,
-                    )
-                  ).toList(),
-                ),
-              ],
-            )
-          ],
-        ),
-      );
-    }).toList();
+                  const Padding(padding: EdgeInsets.all(8)),
+                  DropdownButton(
+                    value: move.unit,
+                    onChanged: (MovementUnit? u) {
+                      if (u != null) {
+                        setState(() {
+                          _metcon.moves[index].unit = u;
+                        });
+                      }
+                    },
+                    items: MovementUnit.values.map((u) =>
+                        DropdownMenuItem(
+                          child: Text(u.toDisplayName()),
+                          key: ValueKey(u.toString()),
+                          value: u,
+                        )
+                    ).toList(),
+                  ),
+                  const Padding(padding: EdgeInsets.all(8)),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (move.weight == null)
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _metcon.moves[index].weight = _weightDefaultValue;
+                        });
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text("Add weight..."),
+                    ),
+                  if (move.weight != null)
+                    const Text("Float picker to come"),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+      itemCount: _metcon.moves.length,
+      onReorder: (oldIndex, newIndex) {
+        if (oldIndex < newIndex) {
+          newIndex -= 1;
+        }
+        setState(() {
+          final oldMove = _metcon.moves.removeAt(oldIndex);
+          _metcon.moves.insert(newIndex, oldMove);
+        });
+      }
+    );
   }
 
   void _showMovementPickerDialog(BuildContext context, Function(int) onPicked) {
