@@ -278,18 +278,16 @@ class _NewMetconPageState extends State<NewMetconPage> {
       return Card(
         child: Column(
           children: [
-            if (move.movementId < 0)
-              ElevatedButton(
-                onPressed: () => _showMovementPickerDialog(context, index),
-                child: const Text("Choose movement..."),
-              ),
-            if (move.movementId >= 0)
               ListTile(
                 title: Text(
                   context.read<MovementRepository>()
                       .getMovement(move.movementId)!.name
                 ),
-                onTap: () => _showMovementPickerDialog(context, index),
+                onTap: () => _showMovementPickerDialog(context, (id) {
+                  setState(() {
+                    _metcon.moves[index].movementId = id;
+                  });
+                }),
               ),
           ],
         ),
@@ -297,30 +295,28 @@ class _NewMetconPageState extends State<NewMetconPage> {
     }).toList();
   }
 
-  void _showMovementPickerDialog(BuildContext context, int index) {
+  void _showMovementPickerDialog(BuildContext context, Function(int) onPicked) {
     showDialog(
         context: context,
         builder: (_) => const MovementPickerDialog(),
     ).then((movementId) {
       if (movementId is int) {
-        setState(() {
-          _metcon.moves[index].movementId = movementId;
-        });
+        onPicked(movementId);
       }
     });
   }
 
   Widget _addMetconMovementButton(BuildContext context) {
     return OutlinedButton.icon(
-      onPressed: () {
+      onPressed: () => _showMovementPickerDialog(context, (id) {
         setState(() {
           _metcon.moves.add(NewMetconMovement(
-            movementId: -1,
+            movementId: id,
             count: _countDefaultValue,
-            unit: _unitDefaultValue
+            unit: _unitDefaultValue,
           ));
         });
-      },
+      }),
       icon: const Icon(Icons.add),
       label: const Text("Add movement..."),
     );

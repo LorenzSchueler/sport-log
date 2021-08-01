@@ -11,7 +11,7 @@
 
 ### New Metcon Screen
 * [ ] create metcon movement test data
-* [ ] show movement picker dialog directly when tapping "Add movement..."
+* [x] show movement picker dialog directly when tapping "Add movement..."
 * [ ] validation
 * [ ] nice widget for metcon movements
 * [ ] possibility to remove metcon movements
