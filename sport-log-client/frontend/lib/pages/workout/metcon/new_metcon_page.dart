@@ -9,6 +9,8 @@ import 'package:sport_log/pages/workout/metcon/movement_picker_dialog.dart';
 import 'package:sport_log/repositories/movement_repository.dart';
 import 'package:sport_log/widgets/int_picker.dart';
 
+import 'metcon_movement_card.dart';
+
 class NewMetconPage extends StatefulWidget {
   const NewMetconPage({Key? key}) : super(key: key);
 
@@ -27,7 +29,6 @@ class _NewMetconPageState extends State<NewMetconPage> {
   static const _roundsDefaultValue = 1;
   static const _countDefaultValue = 5;
   static const _unitDefaultValue = MovementUnit.reps;
-  static const _weightDefaultValue = 10.0;
 
   final _descriptionFocusNode = FocusNode();
 
@@ -295,78 +296,19 @@ class _NewMetconPageState extends State<NewMetconPage> {
       shrinkWrap: true,
       itemBuilder: (context, index) {
         final move = _metcon.moves[index];
-        return Card(
+        return MetconMovementCard(
           key: ObjectKey(move),
-          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
-          child: Column(
-            children: [
-              ListTile(
-                title: Text(
-                    context.read<MovementRepository>()
-                        .getMovement(move.movementId)!.name
-                ),
-                onTap: () => _showMovementPickerDialog(context, (id) {
-                  setState(() {
-                    _metcon.moves[index].movementId = id;
-                  });
-                }),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () {
-                    setState(() {
-                      _metcon.moves.removeAt(index);
-                    });
-                  },
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IntPicker(initialValue: move.count, setValue: (count) {
-                    setState(() {
-                      move.count = count;
-                    });
-                  }),
-                  const Padding(padding: EdgeInsets.all(8)),
-                  DropdownButton(
-                    value: move.unit,
-                    onChanged: (MovementUnit? u) {
-                      if (u != null) {
-                        setState(() {
-                          move.unit = u;
-                        });
-                      }
-                    },
-                    items: MovementUnit.values.map((u) =>
-                        DropdownMenuItem(
-                          child: Text(u.toDisplayName()),
-                          key: ValueKey(u.toString()),
-                          value: u,
-                        )
-                    ).toList(),
-                  ),
-                  const Padding(padding: EdgeInsets.all(8)),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (move.weight == null)
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          move.weight = _weightDefaultValue;
-                        });
-                      },
-                      icon: const Icon(Icons.add),
-                      label: const Text("Add weight..."),
-                    ),
-                  if (move.weight != null)
-                    const Text("Float picker to come"),
-                ],
-              ),
-            ],
-          ),
+          deleteMetconMovement: () {
+            setState(() {
+              _metcon.moves.removeAt(index);
+            });
+          },
+          editMetconMovement: (newMetconMovement) {
+            setState(() {
+              _metcon.moves[index] = newMetconMovement;
+            });
+          },
+          move: move,
         );
       },
       itemCount: _metcon.moves.length,
@@ -382,20 +324,10 @@ class _NewMetconPageState extends State<NewMetconPage> {
     );
   }
 
-  void _showMovementPickerDialog(BuildContext context, Function(int) onPicked) {
-    showDialog(
-        context: context,
-        builder: (_) => const MovementPickerDialog(),
-    ).then((movementId) {
-      if (movementId is int) {
-        onPicked(movementId);
-      }
-    });
-  }
-
   Widget _addMetconMovementButton(BuildContext context) {
     return OutlinedButton.icon(
-      onPressed: () => _showMovementPickerDialog(context, (id) {
+      onPressed: () => MetconMovementCard
+          .showMovementPickerDialog(context, (id) {
         setState(() {
           _metcon.moves.add(NewMetconMovement(
             movementId: id,
