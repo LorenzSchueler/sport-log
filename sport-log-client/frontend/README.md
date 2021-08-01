@@ -16,7 +16,7 @@
 * [ ] nice widget for metcon movements
 * [ ] possibility to remove metcon movements
 * [ ] save button
-* [ ] movement picker with sliver
-* [ ] movement picker with possibility to create new movements
+* [x] movement picker with sliver
+* [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)
 * [ ] reordering metcon movements
 * [ ] edit existing metcon

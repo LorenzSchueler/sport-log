@@ -67,7 +67,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
   Widget _movementToWidget(Movement m) {
     return ListTile(
       title: Text(m.name),
-      subtitle: (m.description != null)
+      subtitle: (m.description != null && m.description!.isNotEmpty)
           ? Text(
         m.description!,
         overflow: TextOverflow.ellipsis,

@@ -62,4 +62,6 @@ void addTestDataToMovementRepo(MovementRepository movementRepo) {
   movementRepo.createMovement(NewMovement(name: "Lunge", category: MovementCategory.strength));
   movementRepo.createMovement(NewMovement(name: "Calf Raises", category: MovementCategory.strength, description: "Calf raises are a method of exercising the gastrocnemius, tibialis posterior, peroneals and soleus muscles of the lower leg. The movement performed is plantar flexion, a.k.a. ankle extension."));
   movementRepo.createMovement(NewMovement(name: "Biceps Curl", category: MovementCategory.strength, description: "The term 'biceps curl' refers to any of a number of weight training exercises that primarily targets the biceps brachii muscle. It may be performed using a barbell, dumbbell, resistance band, or other equipment."));
+  movementRepo.createMovement(NewMovement(name: "Veeeeeeeeeeeeeery Loooooooong Naaaaaaame", category: MovementCategory.cardio, description: ""));
+  movementRepo.createMovement(NewMovement(name: "V e e e e e e e e r y  L o o o o o o n g  N a a a a a m e", category: MovementCategory.cardio, description: ""));
 }
