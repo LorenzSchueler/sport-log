@@ -13,7 +13,6 @@ class MovementPickerDialog extends StatefulWidget {
 
 class _MovementPickerDialogState extends State<MovementPickerDialog> {
 
-  String _searchTerm = "";
   List<Movement> _movements = [];
 
   @override
@@ -31,14 +30,22 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
         vertical: 20,
         horizontal: 10
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ListView(
-          children: [
-            _searchTextField(),
-            ..._results(context),
-          ],
-        ),
+      child: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            title: _searchTextField(),
+            floating: true,
+            snap: true,
+            pinned: false,
+            automaticallyImplyLeading: false,
+          ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => _movementToWidget(_movements[index]),
+              childCount: _movements.length
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -47,24 +54,25 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
     return TextField(
       onChanged: (text) {
         setState(() {
-          _searchTerm = text;
           _movements = context.read<MovementRepository>().searchByName(text);
         });
       },
       decoration: const InputDecoration(
-        labelText: "search",
-        border: OutlineInputBorder(),
+        labelText: "Search",
+        icon: Icon(Icons.search)
       ),
     );
   }
 
-  List<Widget> _results(BuildContext context) {
-    return _movements.map((movement) => ListTile(
-      title: Text(movement.name),
-      subtitle: (movement.description != null)
-          ? Text(movement.description!) : null,
-      key: ValueKey(movement.id),
-      onTap: () => Navigator.of(context).pop(movement.id),
-    )).toList();
+  Widget _movementToWidget(Movement m) {
+    return ListTile(
+      title: Text(m.name),
+      subtitle: (m.description != null)
+          ? Text(
+        m.description!,
+        overflow: TextOverflow.ellipsis,
+      ) : null,
+      onTap: () => Navigator.of(context).pop(m.id),
+    );
   }
 }

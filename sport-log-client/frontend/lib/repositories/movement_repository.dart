@@ -29,6 +29,11 @@ class MovementRepository {
   }
 
   List<Movement> searchByName(String search) {
-    return _movements.values.where((m) => m.name.contains(search)).toList();
+    if (search.isEmpty) {
+      return getAllMovements();
+    }
+    final s = search.toLowerCase();
+    return _movements.values.where((m) =>
+        m.name.toLowerCase().contains(s)).toList();
   }
 }
