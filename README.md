@@ -1,7 +1,7 @@
 # Sport Log
 
 Sport Log is a sports tracking app written in Flutter together with a server backend written in Rust.
-Additionally, there are action providers which are intended to do scheduled repetitive actions like fetching and inserting data from other sources.
+Additionally, there are action providers which are intended to do scheduled repetitive actions like fetching and inserting data from other sources, exporting data or providing automated reservations for other platforms.
 The client and action providers communicate with the server via a REST API.
 In later releases it is planned to equip the client with its own database that synchronizes with the server when connectivity is available in order to allow offline use of the app while still allowing synchronization between multiple devices.
 

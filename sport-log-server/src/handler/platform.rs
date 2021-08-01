@@ -100,7 +100,7 @@ pub async fn create_platform_credentials(
 }
 
 #[get("/platform_credential")]
-pub async fn get_platform_credential(
+pub async fn get_platform_credentials(
     auth: AuthenticatedUser,
     conn: Db,
 ) -> Result<Json<Vec<PlatformCredential>>, Status> {
@@ -110,7 +110,7 @@ pub async fn get_platform_credential(
 }
 
 #[get("/platform_credential/platform/<platform_id>")]
-pub async fn get_platform_credential_by_platform(
+pub async fn get_platform_credentials_by_platform(
     platform_id: UnverifiedId<PlatformId>,
     auth: AuthenticatedUser,
     conn: Db,
