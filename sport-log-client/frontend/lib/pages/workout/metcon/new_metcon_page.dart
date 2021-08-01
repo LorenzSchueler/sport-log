@@ -2,7 +2,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sport_log/helpers/iterable_extension.dart';
 import 'package:sport_log/helpers/pluralize.dart';
 import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/models/movement.dart';
@@ -37,7 +36,23 @@ class _NewMetconPageState extends State<NewMetconPage> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
-        appBar: AppBar(title: const Text("New Metcon")),
+        appBar: AppBar(
+          title: const Text("New Metcon"),
+          leading: IconButton(
+            onPressed: _inputIsValid() ? () {
+              Navigator.of(context).pop(_metcon);
+            } : null,
+            icon: const Icon(Icons.save),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.delete),
+            )
+          ],
+        ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Form(
@@ -309,7 +324,7 @@ class _NewMetconPageState extends State<NewMetconPage> {
                 children: [
                   IntPicker(initialValue: move.count, setValue: (count) {
                     setState(() {
-                      _metcon.moves[index].count = count;
+                      move.count = count;
                     });
                   }),
                   const Padding(padding: EdgeInsets.all(8)),
@@ -318,7 +333,7 @@ class _NewMetconPageState extends State<NewMetconPage> {
                     onChanged: (MovementUnit? u) {
                       if (u != null) {
                         setState(() {
-                          _metcon.moves[index].unit = u;
+                          move.unit = u;
                         });
                       }
                     },
@@ -340,7 +355,7 @@ class _NewMetconPageState extends State<NewMetconPage> {
                     OutlinedButton.icon(
                       onPressed: () {
                         setState(() {
-                          _metcon.moves[index].weight = _weightDefaultValue;
+                          move.weight = _weightDefaultValue;
                         });
                       },
                       icon: const Icon(Icons.add),
@@ -392,5 +407,9 @@ class _NewMetconPageState extends State<NewMetconPage> {
       icon: const Icon(Icons.add),
       label: const Text("Add movement..."),
     );
+  }
+
+  bool _inputIsValid() {
+    return _metcon.name != "" && _metcon.moves.isNotEmpty;
   }
 }

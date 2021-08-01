@@ -1,6 +1,9 @@
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_page.dart';
+import 'package:sport_log/repositories/metcon_repository.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -45,7 +48,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
   Widget get _mainPage {
     switch (_currentPage) {
       case BottomNavPage.workout:
-        return const MetconsPage();
+        // FIXME: this needs to be handled in MetconsPage
+        final metcons = context.read<MetconRepository>().getAllMetcons();
+        return MetconsPage(metcons: metcons);
       case BottomNavPage.strength:
         return const Center(
           child: Text("Strength"),
@@ -92,10 +97,15 @@ class _WorkoutPageState extends State<WorkoutPage> {
     });
   }
 
-  void _onFabTapped(BuildContext context) {
+  void _onFabTapped(BuildContext context) async {
     switch (_currentPage) {
       case BottomNavPage.workout:
-        Navigator.of(context).pushNamed(Routes.newMetcon);
+        final result = await Navigator.of(context).pushNamed(Routes.newMetcon);
+        if (result is NewMetcon) {
+          setState(() {
+            context.read<MetconRepository>().createMetcon(result);
+          });
+        }
         break;
       default:
     }
