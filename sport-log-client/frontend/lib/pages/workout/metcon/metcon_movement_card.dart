@@ -13,10 +13,12 @@ class MetconMovementCard extends StatelessWidget {
     required this.deleteMetconMovement,
     required this.editMetconMovement,
     required this.move,
+    required this.index,
     Key? key,
   }) : super(key: key);
 
   final NewMetconMovement move;
+  final int index;
   final Function(NewMetconMovement) editMetconMovement;
   final Function() deleteMetconMovement;
 
@@ -37,11 +39,20 @@ class MetconMovementCard extends StatelessWidget {
               move.movementId = id;
               editMetconMovement(move);
             }),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                deleteMetconMovement();
-              },
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    deleteMetconMovement();
+                  },
+                ),
+                ReorderableDragStartListener(
+                  child: const Icon(Icons.drag_handle),
+                  index: index
+                ),
+              ],
             ),
           ),
           Row(

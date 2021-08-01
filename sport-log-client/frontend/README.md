@@ -15,4 +15,3 @@
 * [ ] edit existing metcon
 * [ ] double picker widget for metcon movement weight
 * [ ] int picker: same baseline as other form inputs
-* [ ] make long press on int picker inside reorderable list view possible

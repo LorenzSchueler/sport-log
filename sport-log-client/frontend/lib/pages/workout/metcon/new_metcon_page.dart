@@ -292,12 +292,14 @@ class _NewMetconPageState extends State<NewMetconPage> {
 
   Widget _metconMovementsList(BuildContext context) {
     return ReorderableListView.builder(
+      buildDefaultDragHandles: false,
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemBuilder: (context, index) {
         final move = _metcon.moves[index];
         return MetconMovementCard(
           key: ObjectKey(move),
+          index: index,
           deleteMetconMovement: () {
             setState(() {
               _metcon.moves.removeAt(index);
