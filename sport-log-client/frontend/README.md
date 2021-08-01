@@ -13,10 +13,11 @@
 * [x] create metcon movement test data
 * [x] show movement picker dialog directly when tapping "Add movement..."
 * [ ] validation
-* [ ] nice widget for metcon movements
+* [x] nice widget for metcon movements
 * [ ] possibility to remove metcon movements
 * [ ] save button
 * [x] movement picker with sliver
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)
 * [ ] reordering metcon movements
 * [ ] edit existing metcon
+* [ ] double picker widget for metcon movement weight

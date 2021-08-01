@@ -289,6 +289,14 @@ class _NewMetconPageState extends State<NewMetconPage> {
                   _metcon.moves[index].movementId = id;
                 });
               }),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () {
+                  setState(() {
+                    _metcon.moves.removeAt(index);
+                  });
+                },
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
