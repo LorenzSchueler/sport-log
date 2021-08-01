@@ -1,7 +1,8 @@
+use chrono::NaiveDateTime;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
-use sport_log_types::ExecutableActionEvent;
+use sport_log_types::{CardioType, ExecutableActionEvent, MovementId, NewCardioSession, Position};
 
 use sport_log_action_provider_sportstracker_config::Config;
 
@@ -25,9 +26,9 @@ pub struct Workout {
     totalDistance: f32,
     totalAscent: f32,
     totalDescent: f32,
-    startPosition: Position,
-    stopPosition: Position,
-    centerPosition: Position,
+    startPosition: StPosition,
+    stopPosition: StPosition,
+    centerPosition: StPosition,
     stepCount: u32,
     minAltitude: Option<f32>,
     maxAltitude: Option<f32>,
@@ -38,7 +39,7 @@ pub struct Workout {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Position {
+pub struct StPosition {
     x: f64,
     y: f64,
 }
@@ -56,10 +57,10 @@ struct WorkoutData {
 
 #[derive(Serialize, Deserialize, Debug)]
 struct InnerWorkoutData {
-    description: Option<String>,
-    starttime: u64,
-    totaldistance: u32,
-    totaltime: u32,
+    //description: Option<String>,
+    //starttime: u64,
+    //totaldistance: u32,
+    //totaltime: u32,
     locations: Vec<Location>,
     // heartrate: Vec<>,
 }
@@ -67,10 +68,10 @@ struct InnerWorkoutData {
 #[derive(Serialize, Deserialize, Debug)]
 struct Location {
     t: u32,  // seconds since start in 1/100 s
-    la: f32, // lat
-    ln: f32, // lon
+    la: f64, // lat
+    ln: f64, // lon
     s: u32,  // meter since start
-    h: u16,  // height
+    h: f32,  // height
     v: u32,  // ??? TODO
     d: u64,  // timestamp in 1 / 1000 s
 }
@@ -98,7 +99,38 @@ async fn main() {
         // TODO oldest entry
         if let Some(data) = get_data(&exec_action_event.username, &exec_action_event.password).await
         {
-            for (_workout, _workout_data) in data {
+            for (workout, inner_workout_data) in data {
+                let cardio_session = NewCardioSession {
+                    user_id: exec_action_event.user_id,
+                    movement_id: MovementId(0), // TODO get movement name from sportstracker and translate into own MovementId
+                    cardio_type: CardioType::Training,
+                    datetime: NaiveDateTime::from_timestamp(workout.startTime as i64 / 1000, 0),
+                    distance: Some(workout.totalDistance as i32),
+                    ascent: Some(workout.totalAscent as i32),
+                    descent: Some(workout.totalDescent as i32),
+                    time: Some(workout.totalTime as i32),
+                    calories: Some(workout.energyConsumption as i32),
+                    track: Some(
+                        inner_workout_data
+                            .locations
+                            .into_iter()
+                            .map(|location| Position {
+                                latitude: location.la,
+                                longitude: location.ln,
+                                elevation: location.h,
+                                distance: location.s as i32,
+                                time: location.t as i32,
+                            })
+                            .collect(),
+                    ),
+                    avg_cycles: Some(workout.cadence.avg as i32),
+                    cycles: None,
+                    avg_heart_rate: None, // TODO
+                    heart_rate: None,
+                    route_id: None,
+
+                    comments: workout.description,
+                };
                 // insert data into db
             }
             //client
@@ -116,7 +148,7 @@ async fn main() {
     }
 }
 
-async fn get_data(username: &str, password: &str) -> Option<Vec<(Workout, WorkoutData)>> {
+async fn get_data(username: &str, password: &str) -> Option<Vec<(Workout, InnerWorkoutData)>> {
     let client = Client::new();
 
     let credentials = [("l", username), ("p", password)];
@@ -157,9 +189,10 @@ async fn get_data(username: &str, password: &str) -> Option<Vec<(Workout, Workou
                 .send()
                 .await
                 .ok()?
-                .json()
+                .json::<WorkoutData>()
                 .await
-                .ok()?,
+                .ok()?
+                .payload,
         );
     }
 
