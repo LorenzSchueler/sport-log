@@ -26,14 +26,49 @@ impl Create for ActionProvider {
 }
 
 impl ActionProvider {
-    pub fn authenticate(
+    pub fn auth(name: &str, password: &str, conn: &PgConnection) -> QueryResult<ActionProviderId> {
+        let (action_provider_id, password_hash): (ActionProviderId, String) =
+            action_provider::table
+                .filter(action_provider::columns::name.eq(name))
+                .select((
+                    action_provider::columns::id,
+                    action_provider::columns::password,
+                ))
+                .get_result(conn)?;
+
+        let password_hash = PasswordHash::new(password_hash.as_str()).unwrap();
+        if Argon2::default()
+            .verify_password(password.as_bytes(), &password_hash)
+            .is_ok()
+        {
+            Ok(action_provider_id)
+        } else {
+            Err(Error::NotFound)
+        }
+    }
+
+    pub fn auth_as_user(
         name: &str,
         password: &str,
+        user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<ActionProviderId> {
         let (action_provider_id, password_hash): (ActionProviderId, String) =
             action_provider::table
                 .filter(action_provider::columns::name.eq(name))
+                .filter(
+                    action_provider::columns::id.eq_any(
+                        action::table
+                            .filter(
+                                action::columns::id.eq_any(
+                                    action_event::table
+                                        .filter(action_event::columns::user_id.eq(user_id))
+                                        .select(action_event::columns::action_id),
+                                ),
+                            )
+                            .select(action::columns::action_provider_id),
+                    ),
+                )
                 .select((
                     action_provider::columns::id,
                     action_provider::columns::password,

@@ -38,11 +38,7 @@ impl Update for User {
 }
 
 impl User {
-    pub fn authenticate(
-        username: &str,
-        password: &str,
-        conn: &PgConnection,
-    ) -> QueryResult<UserId> {
+    pub fn auth(username: &str, password: &str, conn: &PgConnection) -> QueryResult<UserId> {
         let (user_id, password_hash): (UserId, String) = user::table
             .filter(user::columns::username.eq(username))
             .select((user::columns::id, user::columns::password))

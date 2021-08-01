@@ -1,13 +1,12 @@
 use std::ops::Deref;
 
-use diesel::{PgConnection, QueryResult};
 use rocket::{
     http::Status,
     outcome::Outcome,
     request::{FromRequest, Request},
 };
 
-use crate::{ActionProvider, ActionProviderId, Admin, Db, FromI32, User, UserId};
+use crate::{ActionProvider, ActionProviderId, Admin, Db, User, UserId};
 
 pub struct AuthenticatedUser(UserId);
 
@@ -45,78 +44,38 @@ fn parse_username_password(request: &'_ Request<'_>) -> Option<(String, String)>
     }
 }
 
-type AuthMethod<R> = fn(&str, &str, &PgConnection) -> QueryResult<R>;
-
-async fn auth_with_fallback<R: FromI32 + Send + 'static>(
-    request: &'_ Request<'_>,
-    auth_method: AuthMethod<R>,
-    fallback_auth_methods: Vec<AuthMethod<()>>,
-) -> Outcome<R, (Status, ()), ()> {
-    let (username, password) = match parse_username_password(request) {
-        Some((username, password)) => (username, password),
-        None => return Outcome::Failure((Status::Unauthorized, ())),
-    };
-
-    let conn = match Db::from_request(request).await {
-        Outcome::Success(conn) => conn,
-        Outcome::Failure(f) => return Outcome::Failure(f),
-        Outcome::Forward(f) => return Outcome::Forward(f),
-    };
-    conn.run(move |c| match auth_method(&username, &password, c) {
-        Ok(id) => Outcome::Success(id),
-        Err(_) => {
-            if let Some((name, Ok(id))) = username
-                .split_once("$id$")
-                .map(|(name, id)| (name, id.parse()))
-            {
-                for auth_method in fallback_auth_methods {
-                    if auth_method(&name, &password, c).is_ok() {
-                        return Outcome::Success(R::from_i32(id));
-                    }
-                }
-            };
-            Outcome::Failure((Status::Unauthorized, ()))
-        }
-    })
-    .await
-}
-
-async fn auth<R: Send + 'static>(
-    request: &'_ Request<'_>,
-    auth_method: fn(&str, &str, &PgConnection) -> QueryResult<R>,
-) -> Outcome<R, (Status, ()), ()> {
-    let (username, password) = match parse_username_password(request) {
-        Some((username, password)) => (username, password),
-        None => return Outcome::Failure((Status::Unauthorized, ())),
-    };
-
-    let conn = match Db::from_request(request).await {
-        Outcome::Success(conn) => conn,
-        Outcome::Failure(f) => return Outcome::Failure(f),
-        Outcome::Forward(f) => return Outcome::Forward(f),
-    };
-    conn.run(move |c| match auth_method(&username, &password, c) {
-        Ok(id) => Outcome::Success(id),
-        Err(_) => Outcome::Failure((Status::Unauthorized, ())),
-    })
-    .await
-}
-
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for AuthenticatedUser {
     type Error = ();
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
-        let ap_authenticate = |name: &str, password: &str, conn: &PgConnection| {
-            ActionProvider::authenticate(name, password, conn).map(|_| ())
+        let (username, password) = match parse_username_password(request) {
+            Some((username, password)) => (username, password),
+            None => return Outcome::Failure((Status::Unauthorized, ())),
         };
-        auth_with_fallback::<UserId>(
-            request,
-            User::authenticate,
-            vec![ap_authenticate, Admin::authenticate],
-        )
+
+        let conn = match Db::from_request(request).await {
+            Outcome::Success(conn) => conn,
+            Outcome::Failure(f) => return Outcome::Failure(f),
+            Outcome::Forward(f) => return Outcome::Forward(f),
+        };
+        conn.run(move |c| match User::auth(&username, &password, c) {
+            Ok(id) => Outcome::Success(AuthenticatedUser(id)),
+            Err(_) => {
+                if let Some((name, Ok(user_id))) = username
+                    .split_once("$id$")
+                    .map(|(name, id)| (name, id.parse().map(UserId)))
+                {
+                    if ActionProvider::auth_as_user(&name, &password, user_id, c).is_ok() {
+                        return Outcome::Success(AuthenticatedUser(user_id));
+                    } else if Admin::auth(&name, &password, c).is_ok() {
+                        return Outcome::Success(AuthenticatedUser(user_id));
+                    }
+                };
+                Outcome::Failure((Status::Unauthorized, ()))
+            }
+        })
         .await
-        .map(Self)
     }
 }
 
@@ -125,13 +84,35 @@ impl<'r> FromRequest<'r> for AuthenticatedActionProvider {
     type Error = ();
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
-        auth_with_fallback::<ActionProviderId>(
-            request,
-            ActionProvider::authenticate,
-            vec![Admin::authenticate],
+        let (username, password) = match parse_username_password(request) {
+            Some((username, password)) => (username, password),
+            None => return Outcome::Failure((Status::Unauthorized, ())),
+        };
+
+        let conn = match Db::from_request(request).await {
+            Outcome::Success(conn) => conn,
+            Outcome::Failure(f) => return Outcome::Failure(f),
+            Outcome::Forward(f) => return Outcome::Forward(f),
+        };
+        conn.run(
+            move |c| match ActionProvider::auth(&username, &password, c) {
+                Ok(id) => Outcome::Success(AuthenticatedActionProvider(id)),
+                Err(_) => {
+                    if let Some((name, Ok(id))) = username
+                        .split_once("$id$")
+                        .map(|(name, id)| (name, id.parse()))
+                    {
+                        if Admin::auth(&name, &password, c).is_ok() {
+                            return Outcome::Success(AuthenticatedActionProvider(
+                                ActionProviderId(id),
+                            ));
+                        }
+                    };
+                    Outcome::Failure((Status::Unauthorized, ()))
+                }
+            },
         )
         .await
-        .map(Self)
     }
 }
 
@@ -140,8 +121,20 @@ impl<'r> FromRequest<'r> for AuthenticatedAdmin {
     type Error = ();
 
     async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
-        auth::<()>(request, Admin::authenticate)
-            .await
-            .map(|()| Self)
+        let (username, password) = match parse_username_password(request) {
+            Some((username, password)) => (username, password),
+            None => return Outcome::Failure((Status::Unauthorized, ())),
+        };
+
+        let conn = match Db::from_request(request).await {
+            Outcome::Success(conn) => conn,
+            Outcome::Failure(f) => return Outcome::Failure(f),
+            Outcome::Forward(f) => return Outcome::Forward(f),
+        };
+        conn.run(move |c| match Admin::auth(&username, &password, c) {
+            Ok(_) => Outcome::Success(AuthenticatedAdmin),
+            Err(_) => Outcome::Failure((Status::Unauthorized, ())),
+        })
+        .await
     }
 }
