@@ -1,8 +1,8 @@
 use chrono::NaiveDateTime;
-use reqwest::Client;
+use reqwest::{header::CONTENT_TYPE, Client};
 use serde::{Deserialize, Serialize};
 
-use sport_log_types::{CardioType, ExecutableActionEvent, MovementId, NewCardioSession, Position};
+use sport_log_types::{CardioType, ExecutableActionEvent, Movement, NewCardioSession, Position};
 
 use sport_log_action_provider_sportstracker_config::Config;
 
@@ -20,6 +20,7 @@ pub struct Workouts {
 #[allow(non_snake_case)]
 pub struct Workout {
     description: Option<String>,
+    activityId: u32,
     startTime: u64,
     stopTime: u64,
     totalTime: f32,
@@ -99,10 +100,42 @@ async fn main() {
         // TODO oldest entry
         if let Some(data) = get_data(&exec_action_event.username, &exec_action_event.password).await
         {
+            let username = format!("{}$id${}", config.username, exec_action_event.user_id.0);
+            let movements: Vec<Movement> = client
+                .get(format!("{}/v1/movement", config.base_url))
+                .basic_auth(&username, Some(&config.password))
+                .send()
+                .await
+                .unwrap()
+                .json()
+                .await
+                .unwrap();
+            println!("{:#?}\n", movements);
+            let movements: Vec<_> = movements
+                .into_iter()
+                .map(|mut movement| {
+                    movement.name.make_ascii_lowercase();
+                    movement.name.retain(|c| !c.is_whitespace() && c != '-');
+                    movement
+                })
+                .collect();
+            println!("{:#?}\n", movements);
+
             for (workout, inner_workout_data) in data {
+                // TODO find more mappings or api endpoint
+                let activity = match workout.activityId {
+                    1 => "running",
+                    22 => "trailrunning",
+                    _ => continue,
+                };
+                let movement_id = match movements.iter().find(|movement| movement.name == activity)
+                {
+                    Some(movement) => movement.id,
+                    None => continue,
+                };
                 let cardio_session = NewCardioSession {
                     user_id: exec_action_event.user_id,
-                    movement_id: MovementId(0), // TODO get movement name from sportstracker and translate into own MovementId
+                    movement_id,
                     cardio_type: CardioType::Training,
                     datetime: NaiveDateTime::from_timestamp(workout.startTime as i64 / 1000, 0),
                     distance: Some(workout.totalDistance as i32),
@@ -123,15 +156,27 @@ async fn main() {
                             })
                             .collect(),
                     ),
-                    avg_cycles: Some(workout.cadence.avg as i32),
+                    avg_cycles: if workout.cadence.avg > 0. {
+                        Some(workout.cadence.avg as i32)
+                    } else {
+                        None
+                    },
                     cycles: None,
                     avg_heart_rate: None, // TODO
                     heart_rate: None,
                     route_id: None,
-
                     comments: workout.description,
                 };
-                // insert data into db
+                println!("{:?}", cardio_session);
+                client
+                    .post(format!("{}/v1/cardio_session", config.base_url))
+                    .basic_auth(&username, Some(&config.password))
+                    .body(serde_json::to_string(&cardio_session).unwrap())
+                    .header(CONTENT_TYPE, "application/json")
+                    .send()
+                    .await
+                    .unwrap();
+                break; // TODO remove and use oldes existing cardio session as stopping criteria
             }
             //client
             //.delete(format!(
@@ -163,6 +208,7 @@ async fn get_data(username: &str, password: &str) -> Option<Vec<(Workout, InnerW
         .unwrap();
 
     let sessionkey = user.sessionkey?;
+    println!("{:?}", sessionkey);
     let token = ("token", sessionkey.as_str());
     let workouts: Workouts = client
         .get("https://api.sports-tracker.com/apiserver/v1/workouts")
@@ -201,5 +247,6 @@ async fn get_data(username: &str, password: &str) -> Option<Vec<(Workout, InnerW
     Some(data)
 }
 
-// get workout stats: https://api.sports-tracker.com/apiserver/v1/workouts/<workout_id>?token=sessionkey
-// get gpx: https://api.sports-tracker.com/apiserver/v1/workout/exportGpx/<workout_id>?token=sessionkey
+// workout stats:   https://api.sports-tracker.com/apiserver/v1/workouts/<workout_id>?token=sessionkey
+// gpx:             https://api.sports-tracker.com/apiserver/v1/workout/exportGpx/<workout_id>?token=sessionkey
+// similar routes:  https://api.sports-tracker.com/apiserver/v1/workouts/similarRoutes/<workout_id>?token=sessionkey
