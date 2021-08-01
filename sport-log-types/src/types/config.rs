@@ -10,7 +10,6 @@ use serde::{Deserialize, Serialize};
 /// `self_registration` determines if users can register themself or if only the admin can create new users.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Config {
-    pub admin_username: String,
     pub admin_password: String,
     pub self_registration: bool,
 }

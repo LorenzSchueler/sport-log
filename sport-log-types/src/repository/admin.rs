@@ -9,7 +9,7 @@ use crate::{Admin, CONFIG};
 impl Admin {
     pub fn auth(username: &str, password: &str, _conn: &PgConnection) -> QueryResult<()> {
         let password_hash = PasswordHash::new(CONFIG.admin_password.as_str()).unwrap();
-        if username == CONFIG.admin_username
+        if username == "admin"
             && Argon2::default()
                 .verify_password(password.as_bytes(), &password_hash)
                 .is_ok()
