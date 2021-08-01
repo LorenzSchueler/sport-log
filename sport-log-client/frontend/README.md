@@ -10,7 +10,7 @@
 * [ ] i18n
 
 ### New Metcon Screen
-* [ ] create metcon movement test data
+* [x] create metcon movement test data
 * [x] show movement picker dialog directly when tapping "Add movement..."
 * [ ] validation
 * [ ] nice widget for metcon movements

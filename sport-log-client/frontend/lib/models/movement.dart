@@ -10,13 +10,13 @@ enum MovementCategory {
 class NewMovement {
   NewMovement({
     required this.name,
-    this.description,
     required this.category,
+    this.description,
   });
 
   String name;
-  String? description;
   MovementCategory category;
+  String? description;
 }
 
 class Movement {
@@ -24,15 +24,15 @@ class Movement {
     required this.id,
     required this.userId,
     required this.name,
-    this.description,
     required this.category,
+    this.description,
   });
 
   int id;
   int? userId;
   String name;
-  String? description;
   MovementCategory category;
+  String? description;
 
   Movement.fromNewMovement(NewMovement nm, this.id)
     : name = nm.name, userId = 1,
