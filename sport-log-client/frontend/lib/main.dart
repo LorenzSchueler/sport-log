@@ -17,10 +17,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   User? user;
   AuthenticationRepository? authRepo;
-  if (!Config.isWeb) {
-    authRepo = await AuthenticationRepository.getInstance();
-    user = await authRepo.getUser();
-  }
+  authRepo = await AuthenticationRepository.getInstance();
+  user = await authRepo.getUser();
   final api = Api(urlBase: await Config.apiUrlBase);
   final authBloc = AuthenticationBloc(
       authenticationRepository: authRepo,
