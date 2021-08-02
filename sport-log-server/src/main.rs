@@ -45,6 +45,16 @@ fn default_catcher<'r>(status: Status, _request: &'r Request) -> JsonError {
     JsonError { status }
 }
 
+// TODO only send preflight if route exists
+#[catch(404)]
+fn catcher_404<'r>(status: Status, request: &'r Request) -> Result<Status, JsonError> {
+    if request.method() == Method::Options {
+        Ok(Status::NoContent)
+    } else {
+        Err(JsonError { status })
+    }
+}
+
 pub struct CORS;
 
 #[rocket::async_trait]
@@ -68,11 +78,6 @@ impl Fairing for CORS {
     }
 }
 
-//#[options("/my_route")]
-//fn preflight_my_route() -> NoContent {
-//NoContent
-//}
-
 #[launch]
 fn rocket() -> _ {
     dotenv::dotenv().ok();
@@ -83,7 +88,7 @@ fn rocket() -> _ {
     rocket::build()
         .attach(Db::fairing())
         .attach(CORS)
-        .register("/", catchers![default_catcher])
+        .register("/", catchers![default_catcher, catcher_404])
         .mount(
             BASE,
             routes![
