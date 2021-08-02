@@ -2,11 +2,8 @@ use chrono::NaiveDateTime;
 use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
-    schema::cardio_session,
-    types::{
-        CardioSession, CardioSessionDescription, CardioSessionId, GetById, GetByUser, Movement,
-        Route, UserId,
-    },
+    schema::cardio_session, CardioSession, CardioSessionDescription, CardioSessionId, GetById,
+    GetByUser, Movement, Route, UserId,
 };
 
 impl CardioSession {

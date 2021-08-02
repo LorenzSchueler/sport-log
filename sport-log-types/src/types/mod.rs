@@ -1,12 +1,11 @@
 #[cfg(feature = "full")]
 use diesel::{PgConnection, QueryResult};
 #[cfg(feature = "full")]
-use rocket::http::Status;
-#[cfg(feature = "full")]
 use rocket::{
     data::{self, FromData},
+    http::Status,
     outcome::Outcome,
-    serde::json::Json,
+    serde::json::{self, Json},
     Data, Request,
 };
 #[cfg(feature = "full")]
@@ -62,10 +61,12 @@ pub struct Unverified<T>(Json<T>);
 #[cfg(feature = "full")]
 #[rocket::async_trait]
 impl<'r, T: Deserialize<'r>> FromData<'r> for Unverified<T> {
-    type Error = ();
+    type Error = json::Error<'r>;
 
     async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> data::Outcome<'r, Self> {
-        Outcome::Success(Self(Json::<T>::from_data(req, data).await.unwrap()))
+        Json::<T>::from_data(req, data)
+            .await
+            .and_then(|data| Outcome::Success(Self(data)))
     }
 }
 
@@ -90,6 +91,29 @@ impl<'v, I: FromI32> rocket::request::FromParam<'v> for UnverifiedId<I> {
     }
 }
 
+/// Wrapper around Id types for which the access permissions for the [AuthenticatedUser], [AuthenticatedActionProvider] or [AuthenticatedAdmin] have not been checked.
+///
+/// The Id type can be retrieved by using the appropriate verification function.
+#[cfg(feature = "full")]
+#[derive(Debug, Clone)]
+pub struct UnverifiedIds<I>(Vec<I>);
+
+#[cfg(feature = "full")]
+#[rocket::async_trait]
+impl<'r, I: FromI32 + Deserialize<'r>> FromData<'r> for UnverifiedIds<I> {
+    type Error = json::Error<'r>;
+
+    async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> data::Outcome<'r, Self> {
+        <rocket::serde::json::Json<Vec<i32>> as FromData>::from_data(req, data)
+            .await
+            .and_then(|ids_json| {
+                Outcome::Success(Self(
+                    ids_json.into_inner().into_iter().map(I::from_i32).collect(),
+                ))
+            })
+    }
+}
+
 /// A type for which a new database entry can be created.
 ///
 /// ### Deriving
@@ -106,6 +130,22 @@ pub trait Create {
         Self: Sized;
 }
 
+/// A type for which new database entries can be created.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(CreateMultiple)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::CreateMultiple].
+#[cfg(feature = "full")]
+pub trait CreateMultiple {
+    type New;
+
+    fn create_multiple(enteties: Vec<Self::New>, conn: &PgConnection) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized;
+}
+
 /// A type for which an entry can be retrieved by id from the database.
 ///
 /// ### Deriving
@@ -118,6 +158,22 @@ pub trait GetById {
     type Id;
 
     fn get_by_id(id: Self::Id, conn: &PgConnection) -> QueryResult<Self>
+    where
+        Self: Sized;
+}
+
+/// A type for which entries can be retrieved by id from the database.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(GetByIds)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::GetByIds].
+#[cfg(feature = "full")]
+pub trait GetByIds {
+    type Id;
+
+    fn get_by_ids(ids: &[Self::Id], conn: &PgConnection) -> QueryResult<Vec<Self>>
     where
         Self: Sized;
 }
@@ -175,63 +231,126 @@ pub trait Update {
 pub trait Delete {
     type Id;
 
-    fn delete(entity: Self::Id, conn: &PgConnection) -> QueryResult<usize>;
+    fn delete(id: Self::Id, conn: &PgConnection) -> QueryResult<usize>;
+}
+
+/// A type for which entries can be deleted by id from the database.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(DeleteMultiple)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::DeleteMultiple].
+#[cfg(feature = "full")]
+pub trait DeleteMultiple {
+    type Id;
+
+    fn delete_multiple(ids: Vec<Self::Id>, conn: &PgConnection) -> QueryResult<usize>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyIdForUser<Id> {
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Id, Status>;
+pub trait VerifyIdForUser {
+    type Id;
+
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyIdForUserUnchecked<Id> {
-    fn verify_unchecked(self, auth: &AuthenticatedUser) -> Result<Id, Status>;
+pub trait VerifyMultipleIdForUser {
+    type Id;
+
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection)
+        -> Result<Vec<Self::Id>, Status>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyIdForActionProvider<Id> {
+pub trait VerifyIdForUserUnchecked {
+    type Id;
+
+    fn verify_unchecked(self, auth: &AuthenticatedUser) -> Result<Self::Id, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyIdForActionProvider {
+    type Id;
+
     fn verify_ap(
         self,
         auth: &AuthenticatedActionProvider,
         conn: &PgConnection,
-    ) -> Result<Id, Status>;
+    ) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyIdForAdmin<Id> {
-    fn verify_adm(self, auth: &AuthenticatedAdmin) -> Result<Id, Status>;
+pub trait VerifyIdForAdmin {
+    type Id;
+
+    fn verify_adm(self, auth: &AuthenticatedAdmin) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyForUserWithDb<Entity> {
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Entity, Status>;
+pub trait VerifyForUserWithDb {
+    type Entity;
+
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyForUserWithoutDb<Entity> {
-    fn verify(self, auth: &AuthenticatedUser) -> Result<Entity, Status>;
+pub trait VerifyMultipleForUserWithDb {
+    type Entity;
+
+    fn verify(
+        self,
+        auth: &AuthenticatedUser,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyForActionProviderWithDb<Entity> {
+pub trait VerifyForUserWithoutDb {
+    type Entity;
+
+    fn verify(self, auth: &AuthenticatedUser) -> Result<Self::Entity, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyMultipleForUserWithoutDb {
+    type Entity;
+
+    fn verify(self, auth: &AuthenticatedUser) -> Result<Vec<Self::Entity>, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyForActionProviderWithDb {
+    type Entity;
+
     fn verify_ap(
         self,
         auth: &AuthenticatedActionProvider,
         conn: &PgConnection,
-    ) -> Result<Entity, Status>;
+    ) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyForActionProviderWithoutDb<Entity> {
-    fn verify_ap(self, auth: &AuthenticatedActionProvider) -> Result<Entity, Status>;
+pub trait VerifyForActionProviderWithoutDb {
+    type Entity;
+
+    fn verify_ap(self, auth: &AuthenticatedActionProvider) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyForActionProviderUnchecked<Entity> {
-    fn verify_unchecked_ap(self, auth: &AuthenticatedActionProvider) -> Result<Entity, Status>;
+pub trait VerifyForActionProviderUnchecked {
+    type Entity;
+
+    fn verify_unchecked_ap(
+        self,
+        auth: &AuthenticatedActionProvider,
+    ) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyForAdminWithoutDb<Entity> {
-    fn verify_adm(self, auth: &AuthenticatedAdmin) -> Result<Entity, Status>;
+pub trait VerifyForAdminWithoutDb {
+    type Entity;
+
+    fn verify_adm(self, auth: &AuthenticatedAdmin) -> Result<Self::Entity, Status>;
 }

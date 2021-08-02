@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::types::{
+use crate::{
     CardioSessionDescription, Diary, MetconSessionDescription, StrengthSessionDescription, Wod,
 };
 

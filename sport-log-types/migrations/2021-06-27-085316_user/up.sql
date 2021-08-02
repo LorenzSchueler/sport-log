@@ -1,6 +1,6 @@
 create table "user" (
     id serial primary key,
-    username varchar(80) not null unique,
+    username varchar(80) not null unique check (length(username) >= 2),
     password char(96) not null,
     email varchar(80) not null
 );

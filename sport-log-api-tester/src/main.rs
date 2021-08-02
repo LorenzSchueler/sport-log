@@ -29,10 +29,10 @@
 //! }'
 //! ```
 //!
-//! Create new [PlatformCredentials](../sport_log_types/types/struct.PlatformCredentials.html)
+//! Create new [PlatformCredential](../sport_log_types/types/struct.PlatformCredential.html)
 //!
 //! ```sh
-//! sport-log-api-tester POST /v1/platform_credentials MyUsername MyPassword '
+//! sport-log-api-tester POST /v1/platform_credential MyUsername MyPassword '
 //! {
 //!     "user_id": 4,
 //!     "platform_id": 1,

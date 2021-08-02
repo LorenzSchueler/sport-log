@@ -1,8 +1,10 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthenticatedUser, Create, Db, Delete, Eorm, GetAll, GetById, GetByUser, Movement, MovementId,
-    NewMovement, Unverified, UnverifiedId, Update, VerifyIdForUser,
+    AuthenticatedUser, Create, CreateMultiple, Db, Delete, DeleteMultiple, Eorm, GetAll, GetById,
+    GetByUser, Movement, MovementId, NewMovement, Unverified, UnverifiedId, UnverifiedIds, Update,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser, VerifyMultipleForUserWithoutDb,
+    VerifyMultipleIdForUser,
 };
 
 use crate::handler::IntoJson;
@@ -15,6 +17,18 @@ pub async fn create_movement(
 ) -> Result<Json<Movement>, Status> {
     let movement = movement.verify(&auth)?;
     conn.run(|c| Movement::create(movement, c))
+        .await
+        .into_json()
+}
+
+#[post("/movements", format = "application/json", data = "<movements>")]
+pub async fn create_movements(
+    movements: Unverified<Vec<NewMovement>>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<Movement>>, Status> {
+    let movements = movements.verify(&auth)?;
+    conn.run(|c| Movement::create_multiple(movements, c))
         .await
         .into_json()
 }
@@ -63,6 +77,20 @@ pub async fn delete_movement(
 ) -> Result<Status, Status> {
     conn.run(move |c| {
         Movement::delete(movement_id.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
+#[delete("/movements", format = "application/json", data = "<movement_ids>")]
+pub async fn delete_movements(
+    movement_ids: UnverifiedIds<MovementId>,
+    auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        Movement::delete_multiple(movement_ids.verify(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })

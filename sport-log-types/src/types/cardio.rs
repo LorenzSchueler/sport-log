@@ -16,16 +16,16 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
-    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
+    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
+    GetByUser, ToSql, Update, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
-use crate::types::{Movement, MovementId, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{cardio_session, route},
-    types::User,
+    User,
 };
+use crate::{Movement, MovementId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]
@@ -45,14 +45,21 @@ pub struct Position {
     pub longitude: f64,
     pub latitude: f64,
     pub elevation: f32,
+    pub distance: i32,
     pub time: i32,
 }
 
 #[cfg(feature = "full")]
 impl ToSql<Position, Pg> for Position {
     fn to_sql<W: Write>(&self, out: &mut Output<W, Pg>) -> serialize::Result {
-        WriteTuple::<(Double, Double, Float, Integer)>::write_tuple(
-            &(self.longitude, self.latitude, self.elevation, self.time),
+        WriteTuple::<(Double, Double, Float, Integer, Integer)>::write_tuple(
+            &(
+                self.longitude,
+                self.latitude,
+                self.elevation,
+                self.distance,
+                self.time,
+            ),
             out,
         )
     }
@@ -61,12 +68,13 @@ impl ToSql<Position, Pg> for Position {
 #[cfg(feature = "full")]
 impl FromSql<Position, Pg> for Position {
     fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
-        let (longitude, latitude, elevation, time) =
-            FromSql::<Record<(Double, Double, Float, Integer)>, Pg>::from_sql(bytes)?;
+        let (longitude, latitude, elevation, distance, time) =
+            FromSql::<Record<(Double, Double, Float, Integer, Integer)>, Pg>::from_sql(bytes)?;
         Ok(Position {
             longitude,
             latitude,
             elevation,
+            distance,
             time,
         })
     }
@@ -97,11 +105,14 @@ pub struct RouteId(pub i32);
         Queryable,
         AsChangeset,
         Create,
+        CreateMultiple,
         GetById,
+        GetByIds,
         GetByUser,
         GetAll,
         Update,
         Delete,
+        DeleteMultiple,
         VerifyForUserWithDb
     )
 )]
@@ -157,11 +168,14 @@ pub struct CardioSessionId(pub i32);
         Queryable,
         AsChangeset,
         Create,
+        CreateMultiple,
         GetById,
+        GetByIds,
         GetByUser,
         GetAll,
         Update,
         Delete,
+        DeleteMultiple,
         VerifyForUserWithDb
     )
 )]

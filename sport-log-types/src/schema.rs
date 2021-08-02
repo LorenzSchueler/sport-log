@@ -1,7 +1,7 @@
 #![allow(unused_imports)]
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     action (id) {
         id -> Int4,
@@ -12,7 +12,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     action_event (id) {
         id -> Int4,
@@ -25,7 +25,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     action_provider (id) {
         id -> Int4,
@@ -37,7 +37,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     action_rule (id) {
         id -> Int4,
@@ -51,7 +51,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     cardio_session (id) {
         id -> Int4,
@@ -76,7 +76,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     diary (id) {
         id -> Int4,
@@ -89,7 +89,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     eorm (id) {
         id -> Int4,
@@ -100,7 +100,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     group (id) {
         id -> Int4,
@@ -110,7 +110,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     group_user (id) {
         id -> Int4,
@@ -121,7 +121,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     metcon (id) {
         id -> Int4,
@@ -136,12 +136,13 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     metcon_movement (id) {
         id -> Int4,
-        movement_id -> Int4,
         metcon_id -> Int4,
+        movement_id -> Int4,
+        movement_number -> Int4,
         count -> Int4,
         movement_unit -> MovementUnitMapping,
         weight -> Nullable<Float4>,
@@ -150,7 +151,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     metcon_session (id) {
         id -> Int4,
@@ -167,7 +168,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     movement (id) {
         id -> Int4,
@@ -180,7 +181,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     platform (id) {
         id -> Int4,
@@ -190,9 +191,9 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
-    platform_credentials (id) {
+    platform_credential (id) {
         id -> Int4,
         user_id -> Int4,
         platform_id -> Int4,
@@ -203,7 +204,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     route (id) {
         id -> Int4,
@@ -218,7 +219,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     shared_cardio_session (id) {
         id -> Int4,
@@ -229,7 +230,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     shared_diary (id) {
         id -> Int4,
@@ -240,7 +241,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     shared_metcon_session (id) {
         id -> Int4,
@@ -251,7 +252,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     shared_strength_session (id) {
         id -> Int4,
@@ -262,7 +263,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     strength_session (id) {
         id -> Int4,
@@ -277,11 +278,12 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     strength_set (id) {
         id -> Int4,
         strength_session_id -> Int4,
+        set_number -> Int4,
         count -> Int4,
         weight -> Nullable<Float4>,
     }
@@ -289,7 +291,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     user (id) {
         id -> Int4,
@@ -301,7 +303,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::types::*;
+    use crate::*;
 
     wod (id) {
         id -> Int4,
@@ -329,8 +331,8 @@ joinable!(metcon_movement -> movement (movement_id));
 joinable!(metcon_session -> metcon (metcon_id));
 joinable!(metcon_session -> user (user_id));
 joinable!(movement -> user (user_id));
-joinable!(platform_credentials -> platform (platform_id));
-joinable!(platform_credentials -> user (user_id));
+joinable!(platform_credential -> platform (platform_id));
+joinable!(platform_credential -> user (user_id));
 joinable!(route -> user (user_id));
 joinable!(shared_cardio_session -> cardio_session (cardio_session_id));
 joinable!(shared_cardio_session -> group (group_id));
@@ -360,7 +362,7 @@ allow_tables_to_appear_in_same_query!(
     metcon_session,
     movement,
     platform,
-    platform_credentials,
+    platform_credential,
     route,
     shared_cardio_session,
     shared_diary,

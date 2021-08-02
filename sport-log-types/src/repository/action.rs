@@ -4,11 +4,9 @@ use diesel::{prelude::*, result::Error};
 use rand_core::OsRng;
 
 use crate::{
-    schema::{action, action_event, action_provider, action_rule, platform_credentials},
-    types::{
-        Action, ActionEvent, ActionId, ActionProvider, ActionProviderId, ActionRule, Create,
-        ExecutableActionEvent, NewActionProvider, UserId,
-    },
+    schema::{action, action_event, action_provider, action_rule, platform_credential},
+    Action, ActionEvent, ActionId, ActionProvider, ActionProviderId, ActionRule, Create,
+    ExecutableActionEvent, NewActionProvider, UserId,
 };
 
 impl Create for ActionProvider {
@@ -28,14 +26,49 @@ impl Create for ActionProvider {
 }
 
 impl ActionProvider {
-    pub fn authenticate(
+    pub fn auth(name: &str, password: &str, conn: &PgConnection) -> QueryResult<ActionProviderId> {
+        let (action_provider_id, password_hash): (ActionProviderId, String) =
+            action_provider::table
+                .filter(action_provider::columns::name.eq(name))
+                .select((
+                    action_provider::columns::id,
+                    action_provider::columns::password,
+                ))
+                .get_result(conn)?;
+
+        let password_hash = PasswordHash::new(password_hash.as_str()).unwrap();
+        if Argon2::default()
+            .verify_password(password.as_bytes(), &password_hash)
+            .is_ok()
+        {
+            Ok(action_provider_id)
+        } else {
+            Err(Error::NotFound)
+        }
+    }
+
+    pub fn auth_as_user(
         name: &str,
         password: &str,
+        user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<ActionProviderId> {
         let (action_provider_id, password_hash): (ActionProviderId, String) =
             action_provider::table
                 .filter(action_provider::columns::name.eq(name))
+                .filter(
+                    action_provider::columns::id.eq_any(
+                        action::table
+                            .filter(
+                                action::columns::id.eq_any(
+                                    action_event::table
+                                        .filter(action_event::columns::user_id.eq(user_id))
+                                        .select(action_event::columns::action_id),
+                                ),
+                            )
+                            .select(action::columns::action_provider_id),
+                    ),
+                )
                 .select((
                     action_provider::columns::id,
                     action_provider::columns::password,
@@ -144,11 +177,9 @@ impl ExecutableActionEvent {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
             .inner_join(
-                platform_credentials::table.on(platform_credentials::columns::platform_id
+                platform_credential::table.on(platform_credential::columns::platform_id
                     .eq(action_provider::columns::platform_id)
-                    .and(
-                        platform_credentials::columns::user_id.eq(action_event::columns::user_id),
-                    )),
+                    .and(platform_credential::columns::user_id.eq(action_event::columns::user_id))),
             )
             .filter(action_provider::columns::id.eq(action_provider_id))
             .filter(action_event::columns::enabled.eq(true))
@@ -156,8 +187,9 @@ impl ExecutableActionEvent {
                 action_event::columns::id,
                 action::columns::name,
                 action_event::columns::datetime,
-                platform_credentials::columns::username,
-                platform_credentials::columns::password,
+                platform_credential::columns::user_id,
+                platform_credential::columns::username,
+                platform_credential::columns::password,
             ))
             .get_results::<ExecutableActionEvent>(conn)
     }
@@ -171,11 +203,9 @@ impl ExecutableActionEvent {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
             .inner_join(
-                platform_credentials::table.on(platform_credentials::columns::platform_id
+                platform_credential::table.on(platform_credential::columns::platform_id
                     .eq(action_provider::columns::platform_id)
-                    .and(
-                        platform_credentials::columns::user_id.eq(action_event::columns::user_id),
-                    )),
+                    .and(platform_credential::columns::user_id.eq(action_event::columns::user_id))),
             )
             .filter(action_provider::columns::id.eq(action_provider_id))
             .filter(action_event::columns::enabled.eq(true))
@@ -184,8 +214,9 @@ impl ExecutableActionEvent {
                 action_event::columns::id,
                 action::columns::name,
                 action_event::columns::datetime,
-                platform_credentials::columns::username,
-                platform_credentials::columns::password,
+                platform_credential::columns::user_id,
+                platform_credential::columns::username,
+                platform_credential::columns::password,
             ))
             .order_by(action_event::columns::datetime)
             .get_results(conn)

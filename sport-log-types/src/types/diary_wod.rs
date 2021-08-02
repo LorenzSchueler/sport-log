@@ -3,15 +3,16 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
-    VerifyForActionProviderUnchecked, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
+    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
+    GetByUser, ToSql, Update, VerifyForActionProviderUnchecked, VerifyForUserWithDb,
+    VerifyForUserWithoutDb, VerifyIdForUser,
 };
 
-use crate::types::UserId;
+use crate::UserId;
 #[cfg(feature = "full")]
 use crate::{
     schema::{diary, wod},
-    types::User,
+    User,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -39,11 +40,14 @@ pub struct DiaryId(pub i32);
         Queryable,
         AsChangeset,
         Create,
+        CreateMultiple,
         GetById,
+        GetByIds,
         GetByUser,
         GetAll,
         Update,
         Delete,
+        DeleteMultiple,
         VerifyForUserWithDb
     )
 )]
@@ -94,11 +98,14 @@ pub struct WodId(pub i32);
         Queryable,
         AsChangeset,
         Create,
+        CreateMultiple,
         GetById,
+        GetByIds,
         GetByUser,
         GetAll,
         Update,
         Delete,
+        DeleteMultiple,
         VerifyForUserWithDb,
     )
 )]

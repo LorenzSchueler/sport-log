@@ -7,22 +7,19 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, Delete, FromI32, FromSql, GetAll, GetById, GetByUser, ToSql, Update,
-    VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
-    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin,
-    VerifyIdForUser, VerifyIdForUserUnchecked,
+    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
+    GetByUser, ToSql, Update, VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb,
+    VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
+    VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser, VerifyIdForUserUnchecked,
 };
 
 #[cfg(feature = "full")]
 use crate::{
     schema::{action, action_event, action_provider, action_rule},
-    types::{
-        AuthenticatedActionProvider, GetById, Platform, UnverifiedId, User,
-        VerifyIdForActionProvider,
-    },
+    AuthenticatedActionProvider, GetById, Platform, UnverifiedId, User, VerifyIdForActionProvider,
 };
 
-use crate::types::{PlatformId, UserId};
+use crate::{PlatformId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
@@ -51,6 +48,7 @@ pub struct ActionProviderId(pub i32);
         AsChangeset,
         GetAll,
         Delete,
+        DeleteMultiple,
         VerifyForAdminWithoutDb,
     )
 )]
@@ -97,9 +95,12 @@ pub struct ActionId(pub i32);
         Queryable,
         AsChangeset,
         Create,
+        CreateMultiple,
         GetById,
+        GetByIds,
         GetAll,
         Delete,
+        DeleteMultiple,
         VerifyForActionProviderWithDb,
     )
 )]
@@ -170,10 +171,13 @@ pub struct ActionRuleId(pub i32);
         Queryable,
         AsChangeset,
         Create,
+        CreateMultiple,
         GetById,
+        GetByIds,
         GetByUser,
         Update,
         Delete,
+        DeleteMultiple,
         VerifyForUserWithDb,
     )
 )]
@@ -217,12 +221,14 @@ pub struct NewActionRule {
 pub struct ActionEventId(pub i32);
 
 #[cfg(feature = "full")]
-impl VerifyIdForActionProvider<ActionEventId> for UnverifiedId<ActionEventId> {
+impl VerifyIdForActionProvider for UnverifiedId<ActionEventId> {
+    type Id = ActionEventId;
+
     fn verify_ap(
         self,
         auth: &AuthenticatedActionProvider,
         conn: &PgConnection,
-    ) -> Result<ActionEventId, Status> {
+    ) -> Result<Self::Id, Status> {
         let action_event = ActionEvent::get_by_id(ActionEventId(self.0 .0), conn)
             .map_err(|_| Status::InternalServerError)?;
         let entity = Action::get_by_id(action_event.action_id, conn)
@@ -244,10 +250,13 @@ impl VerifyIdForActionProvider<ActionEventId> for UnverifiedId<ActionEventId> {
         Queryable,
         AsChangeset,
         Create,
+        CreateMultiple,
         GetById,
+        GetByIds,
         GetByUser,
         Update,
         Delete,
+        DeleteMultiple,
         VerifyForUserWithDb,
     )
 )]
@@ -278,6 +287,7 @@ pub struct ExecutableActionEvent {
     pub action_event_id: ActionEventId,
     pub action_name: String,
     pub datetime: NaiveDateTime,
+    pub user_id: UserId,
     pub username: String,
     pub password: String,
 }

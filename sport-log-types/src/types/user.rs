@@ -3,13 +3,12 @@ use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
-use sport_log_types_derive::{Delete, FromI32, FromSql, GetAll, GetById, ToSql};
+use sport_log_types_derive::{
+    Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds, ToSql,
+};
 
 #[cfg(feature = "full")]
-use crate::{
-    schema::user,
-    types::{AuthenticatedUser, GetById, Unverified},
-};
+use crate::{schema::user, AuthenticatedUser, GetById, Unverified, VerifyForUserWithDb};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
@@ -28,8 +27,10 @@ pub struct UserId(pub i32);
         Queryable,
         AsChangeset,
         GetById,
+        GetByIds,
         GetAll,
         Delete,
+        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "user")]
@@ -41,8 +42,10 @@ pub struct User {
 }
 
 #[cfg(feature = "full")]
-impl Unverified<User> {
-    pub fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<User, Status> {
+impl VerifyForUserWithDb for Unverified<User> {
+    type Entity = User;
+
+    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
         let entity = self.0.into_inner();
         if entity.id == **auth
             && User::get_by_id(entity.id, conn)
@@ -68,7 +71,7 @@ pub struct NewUser {
 
 #[cfg(feature = "full")]
 impl Unverified<NewUser> {
-    pub fn verify(self) -> Result<NewUser, Status> {
+    pub fn verify_unchecked(self) -> Result<NewUser, Status> {
         Ok(self.0.into_inner())
     }
 }
