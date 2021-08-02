@@ -10,8 +10,11 @@
 * [ ] i18n
 
 ### New Metcon Screen
-* [ ] build bloc for metcons
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)
 * [ ] edit existing metcon
 * [ ] double picker widget for metcon movement weight
 * [ ] int picker: same baseline as other form inputs
+
+# Metcons Overview
+* [ ] build bloc for metcons
+* [ ] edit existing metcons, delete metcons
