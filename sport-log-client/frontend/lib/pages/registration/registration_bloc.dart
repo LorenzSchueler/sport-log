@@ -2,6 +2,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
+import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/models/user.dart';
 import 'package:sport_log/blocs/authentication/authentication_bloc.dart' as auth;
 
@@ -77,18 +78,6 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   }
 
   void _handleApiError(ApiError error) {
-    switch (error) {
-      case ApiError.usernameTaken:
-        _showErrorSnackBar("Username already taken. Use login instead.");
-        break;
-      case ApiError.unknown:
-        _showErrorSnackBar("An unknown api error occurred.");
-        break;
-      case ApiError.noInternetConnection:
-        _showErrorSnackBar("No internet connection.");
-        break;
-      default:
-        _showErrorSnackBar("An unhandled error occurred.");
-    }
+    _showErrorSnackBar(error.toErrorMessage());
   }
 }

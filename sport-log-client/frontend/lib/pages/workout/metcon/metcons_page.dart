@@ -1,10 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sport_log/api/api.dart';
+import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_cubit.dart';
-import 'package:sport_log/repositories/metcon_repository.dart';
 
 import 'metcon_request_bloc.dart';
 
@@ -21,12 +20,8 @@ class MetconsPage extends StatelessWidget {
         ..add(const MetconRequestGetAll()),
       listener: (context, state) {
         if (state is MetconRequestFailed) {
-          String errorString = "Unhandled error occurred.";
-          if (state.reason == ApiError.noInternetConnection) {
-            errorString = "Could not fetch metcons. Check your Internet connection.";
-          }
           ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(errorString))
+              SnackBar(content: Text(state.reason.toErrorMessage()))
           );
         }
       },

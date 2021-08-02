@@ -2,6 +2,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
+import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/blocs/authentication/authentication_bloc.dart' as auth;
 
 enum LoginState {
@@ -68,18 +69,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   void _handleApiError(ApiError error) {
-    switch (error) {
-      case ApiError.loginFailed:
-        _showErrorSnackBar("Wrong credentials.");
-        break;
-      case ApiError.unknown:
-        _showErrorSnackBar("An unknown api error occurred.");
-        break;
-      case ApiError.noInternetConnection:
-        _showErrorSnackBar("No internet connection.");
-        break;
-      default:
-        _showErrorSnackBar("An unhandled error occurred.");
-    }
+    _showErrorSnackBar(error.toErrorMessage());
   }
 }

@@ -5,13 +5,10 @@ import 'dart:io';
 
 import 'package:sport_log/api/backend_routes.dart';
 import 'package:sport_log/models/user.dart';
+import 'package:sport_log/api/api_error.dart';
 import 'package:http/http.dart' as http;
 
 part 'user_api.dart';
-
-enum ApiError {
-  usernameTaken, unknown, noInternetConnection, loginFailed, notFound
-}
 
 class Credentials {
   Credentials({

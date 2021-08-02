@@ -1,9 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_page.dart';
-import 'package:sport_log/repositories/metcon_repository.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';

@@ -2,14 +2,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
-import 'package:sport_log/api/api.dart';
+import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/helpers/pluralize.dart';
 import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/models/movement.dart';
 import 'package:sport_log/pages/workout/metcon/metcon_request_bloc.dart';
-import 'package:sport_log/pages/workout/metcon/movement_picker_dialog.dart';
-import 'package:sport_log/repositories/movement_repository.dart';
 import 'package:sport_log/widgets/int_picker.dart';
 
 import 'metcon_movement_card.dart';
@@ -42,12 +39,8 @@ class _NewMetconPageState extends State<NewMetconPage> {
       bloc: requestBloc,
       listener: (context, state) {
         if (state is MetconRequestFailed) {
-          String errorMessage = "An unhandled error occurred.";
-          if (state.reason == ApiError.noInternetConnection) {
-            errorMessage = "No Internet connection.";
-          }
           ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(errorMessage),)
+              SnackBar(content: Text(state.reason.toErrorMessage()),)
           );
         } else if (state is MetconRequestSucceeded) {
           Navigator.of(context).pop();

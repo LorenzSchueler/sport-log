@@ -2,7 +2,6 @@
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
-import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/models/movement.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_cubit.dart';
 import 'package:sport_log/repositories/authentication_repository.dart';
