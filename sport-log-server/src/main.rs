@@ -4,7 +4,8 @@ use std::io::Cursor;
 extern crate rocket;
 
 use rocket::{
-    http::{ContentType, Status},
+    fairing::{Fairing, Info, Kind},
+    http::{ContentType, Header, Method, Status},
     response::Responder,
     Request, Response,
 };
@@ -30,7 +31,7 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for JsonError {
         let json = serde_json::to_string(&ErrorMessage {
             status: self.status.code,
         })
-        .unwrap();
+        .map_err(|_| Status::InternalServerError)?;
         Ok(Response::build()
             .status(self.status)
             .header(ContentType::JSON)
@@ -44,6 +45,34 @@ fn default_catcher<'r>(status: Status, _request: &'r Request) -> JsonError {
     JsonError { status }
 }
 
+pub struct CORS;
+
+#[rocket::async_trait]
+impl Fairing for CORS {
+    fn info(&self) -> Info {
+        Info {
+            name: "CORS headers",
+            kind: Kind::Response,
+        }
+    }
+
+    async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
+        response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
+        response.set_header(Header::new(
+            "Access-Control-Allow-Methods",
+            "POST, GET, PUT, DELETE, OPTIONS",
+        ));
+        response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
+        response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
+        response.set_header(Header::new("Access-Control-Max-Age", "864000"));
+    }
+}
+
+//#[options("/my_route")]
+//fn preflight_my_route() -> NoContent {
+//NoContent
+//}
+
 #[launch]
 fn rocket() -> _ {
     dotenv::dotenv().ok();
@@ -52,8 +81,9 @@ fn rocket() -> _ {
 
     use handler::*;
     rocket::build()
-        .register("/", catchers![default_catcher])
         .attach(Db::fairing())
+        .attach(CORS)
+        .register("/", catchers![default_catcher])
         .mount(
             BASE,
             routes![
