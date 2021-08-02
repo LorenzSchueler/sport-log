@@ -6,7 +6,6 @@
 ### General
 * [ ] drawer tabs don't restart scaffold
 * [ ] improve landing screen
-* [ ] save user credentials in web
 * [ ] i18n
 
 ### New Metcon Screen
@@ -14,3 +13,8 @@
 * [ ] edit existing metcon
 * [ ] double picker widget for metcon movement weight
 * [ ] int picker: same baseline as other form inputs
+
+### Movements
+* [ ] add movements overview screen
+* [ ] display existing movements
+* [ ] create new movements screen
