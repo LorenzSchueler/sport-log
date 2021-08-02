@@ -1,4 +1,5 @@
 
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
@@ -70,6 +71,11 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
   }) : _metconRepository = metconRepository,
        _metconsCubit = metconsCubit,
        super(const MetconRequestIdle());
+
+  MetconRequestBloc.fromContext(BuildContext context)
+    : _metconRepository = context.read<MetconRepository>(),
+      _metconsCubit = context.read<MetconsCubit>(),
+      super(const MetconRequestIdle());
 
   final MetconRepository _metconRepository;
   final MetconsCubit _metconsCubit;

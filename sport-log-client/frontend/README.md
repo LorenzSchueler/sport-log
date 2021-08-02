@@ -8,6 +8,8 @@
 * [ ] improve landing screen
 * [ ] save user credentials in web
 * [ ] i18n
+* [ ] central error handling (ApiError -> SnackBar)
+* [ ] use overlay with circular progress indicator on pending request
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)

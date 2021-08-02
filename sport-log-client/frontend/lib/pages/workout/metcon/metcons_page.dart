@@ -17,10 +17,8 @@ class MetconsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<MetconRequestBloc, MetconRequestState>(
-      bloc: MetconRequestBloc(
-        metconRepository: context.read<MetconRepository>(),
-        metconsCubit: context.read<MetconsCubit>(),
-      )..add(const MetconRequestGetAll()),
+      bloc: MetconRequestBloc.fromContext(context)
+        ..add(const MetconRequestGetAll()),
       listener: (context, state) {
         if (state is MetconRequestFailed) {
           String errorString = "Unhandled error occurred.";

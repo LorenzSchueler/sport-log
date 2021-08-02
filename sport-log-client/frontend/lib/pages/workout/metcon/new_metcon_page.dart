@@ -1,10 +1,13 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:sport_log/api/api.dart';
 import 'package:sport_log/helpers/pluralize.dart';
 import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/models/movement.dart';
+import 'package:sport_log/pages/workout/metcon/metcon_request_bloc.dart';
 import 'package:sport_log/pages/workout/metcon/movement_picker_dialog.dart';
 import 'package:sport_log/repositories/movement_repository.dart';
 import 'package:sport_log/widgets/int_picker.dart';
@@ -34,6 +37,33 @@ class _NewMetconPageState extends State<NewMetconPage> {
 
   @override
   Widget build(BuildContext context) {
+    final requestBloc = MetconRequestBloc.fromContext(context);
+    return BlocConsumer<MetconRequestBloc, MetconRequestState>(
+      bloc: requestBloc,
+      listener: (context, state) {
+        if (state is MetconRequestFailed) {
+          String errorMessage = "An unhandled error occurred.";
+          if (state.reason == ApiError.noInternetConnection) {
+            errorMessage = "No Internet connection.";
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(errorMessage),)
+          );
+        } else if (state is MetconRequestSucceeded) {
+          Navigator.of(context).pop();
+        }
+      },
+      builder: (context, state) {
+        if (state is MetconRequestPending) {
+          return const CircularProgressIndicator();
+        } else {
+          return _buildForm(context, requestBloc);
+        }
+      },
+    );
+  }
+
+  Widget _buildForm(BuildContext context, MetconRequestBloc requestBloc) {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
@@ -41,7 +71,7 @@ class _NewMetconPageState extends State<NewMetconPage> {
           title: const Text("New Metcon"),
           leading: IconButton(
             onPressed: _inputIsValid() ? () {
-              Navigator.of(context).pop(_metcon);
+              requestBloc.add(MetconRequestCreate(_metcon));
             } : null,
             icon: const Icon(Icons.save),
           ),

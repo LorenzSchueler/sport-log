@@ -95,15 +95,10 @@ class _WorkoutPageState extends State<WorkoutPage> {
     });
   }
 
-  void _onFabTapped(BuildContext context) async {
+  void _onFabTapped(BuildContext context) {
     switch (_currentPage) {
       case BottomNavPage.workout:
-        final result = await Navigator.of(context).pushNamed(Routes.newMetcon);
-        if (result is NewMetcon) {
-          setState(() {
-            context.read<MetconRepository>().createMetcon(result);
-          });
-        }
+        Navigator.of(context).pushNamed(Routes.newMetcon);
         break;
       default:
     }
