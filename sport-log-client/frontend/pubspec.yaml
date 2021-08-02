@@ -41,6 +41,7 @@ dependencies:
   email_validator: ^2.0.1
   http: ^0.13.3
   device_info_plus: ^2.1.0
+  implicitly_animated_reorderable_list: ^0.4.0
 
 dev_dependencies:
   flutter_test:

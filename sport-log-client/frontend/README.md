@@ -17,5 +17,6 @@
 * [ ] int picker: same baseline as other form inputs
 
 # Metcons Overview
-* [ ] build bloc for metcons
-* [ ] edit existing metcons, delete metcons
+* [ ] edit existing metcons
+* [ ] remove strange circular progress
+* [ ] don't reload metcons if they are already loaded
