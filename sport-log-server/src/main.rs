@@ -8,6 +8,7 @@ use rocket::{
     response::Responder,
     Request, Response,
 };
+use serde::{Deserialize, Serialize};
 
 use sport_log_types::{Db, CONFIG};
 
@@ -19,9 +20,17 @@ struct JsonError {
     status: Status,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+struct ErrorMessage {
+    pub status: u16,
+}
+
 impl<'r, 'o: 'r> Responder<'r, 'o> for JsonError {
     fn respond_to(self, _request: &'r Request<'_>) -> Result<Response<'o>, Status> {
-        let json = format!("{{\"status\":{}}}", self.status.code);
+        let json = serde_json::to_string(&ErrorMessage {
+            status: self.status.code,
+        })
+        .unwrap();
         Ok(Response::build()
             .status(self.status)
             .header(ContentType::JSON)
