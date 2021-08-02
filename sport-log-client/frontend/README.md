@@ -14,6 +14,3 @@
 * [ ] edit existing metcon
 * [ ] double picker widget for metcon movement weight
 * [ ] int picker: same baseline as other form inputs
-
-# Metcons Overview
-* [ ] edit existing metcons

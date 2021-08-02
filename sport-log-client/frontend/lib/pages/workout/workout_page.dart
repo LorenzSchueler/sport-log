@@ -4,6 +4,7 @@ import 'package:sport_log/pages/workout/metcon/metcons_page.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 enum BottomNavPage {
   workout, strength, cardio, other
@@ -27,7 +28,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
       appBar: AppBar(
         title: const Text("Home"),
       ),
-      body: _mainPage,
+      body: WideScreenFrame(child: _mainPage),
       bottomNavigationBar: BottomNavigationBar(
         items: BottomNavPage.values.map(_toBottomNavItem).toList(),
         currentIndex: _currentPage.index,

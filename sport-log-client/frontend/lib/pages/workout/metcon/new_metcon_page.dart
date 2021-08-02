@@ -9,6 +9,7 @@ import 'package:sport_log/models/movement.dart';
 import 'package:sport_log/pages/workout/metcon/metcon_request_bloc.dart';
 import 'package:sport_log/widgets/int_picker.dart';
 import 'package:sport_log/widgets/loading_dialog.dart';
+import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 import 'metcon_movement_card.dart';
 
@@ -44,8 +45,9 @@ class _NewMetconPageState extends State<NewMetconPage> {
               SnackBar(content: Text(state.reason.toErrorMessage()),)
           );
         } else if (state is MetconRequestSucceeded) {
-          Navigator.of(context).pop();
-          Navigator.of(context).pop();
+          // FIXME: this feels kinda unsafe
+          Navigator.of(context).pop(); // remove loading indicator
+          Navigator.of(context).pop(); // go back to metcons page
         } else if (state is MetconRequestPending) {
           showDialog(
             context: context,
@@ -78,19 +80,21 @@ class _NewMetconPageState extends State<NewMetconPage> {
             )
           ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Form(
-            child: ListView(
-              children: [
-                _nameInput(context),
-                _maybeDescriptionInput(context),
-                _typeInput(context),
-                _additionalFieldsInput(context),
-                const Divider(thickness: 2),
-                _metconMovementsList(context),
-                _addMetconMovementButton(context),
-              ],
+        body: WideScreenFrame(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Form(
+              child: ListView(
+                children: [
+                  _nameInput(context),
+                  _maybeDescriptionInput(context),
+                  _typeInput(context),
+                  _additionalFieldsInput(context),
+                  const Divider(thickness: 2),
+                  _metconMovementsList(context),
+                  _addMetconMovementButton(context),
+                ],
+              ),
             ),
           ),
         ),

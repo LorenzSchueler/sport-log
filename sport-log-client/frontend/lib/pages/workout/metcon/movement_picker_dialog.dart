@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/models/movement.dart';
 import 'package:sport_log/repositories/movement_repository.dart';
+import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 class MovementPickerDialog extends StatefulWidget {
   const MovementPickerDialog({Key? key}) : super(key: key);
@@ -25,27 +26,29 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(
-        vertical: 20,
-        horizontal: 10
-      ),
-      child: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            title: _searchTextField(),
-            floating: true,
-            snap: true,
-            pinned: false,
-            automaticallyImplyLeading: false,
-          ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) => _movementToWidget(_movements[index]),
-              childCount: _movements.length
+    return WideScreenFrame(
+      child: Dialog(
+        insetPadding: const EdgeInsets.symmetric(
+          vertical: 20,
+          horizontal: 10
+        ),
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              title: _searchTextField(),
+              floating: true,
+              snap: true,
+              pinned: false,
+              automaticallyImplyLeading: false,
             ),
-          ),
-        ],
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => _movementToWidget(_movements[index]),
+                childCount: _movements.length
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
