@@ -48,9 +48,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
   Widget get _mainPage {
     switch (_currentPage) {
       case BottomNavPage.workout:
-        // FIXME: this needs to be handled in MetconsPage
-        final metcons = context.read<MetconRepository>().getAllMetcons();
-        return MetconsPage(metcons: metcons);
+        return const MetconsPage();
       case BottomNavPage.strength:
         return const Center(
           child: Text("Strength"),

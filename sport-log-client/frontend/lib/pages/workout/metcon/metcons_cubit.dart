@@ -19,7 +19,8 @@ class MetconsLoaded extends MetconsState {
 
   final Map<int, Metcon> _metcons;
 
-  Map<int, Metcon> get metcons => _metcons;
+  Map<int, Metcon> get metconsMap => _metcons;
+  List<Metcon> get metconsList => _metcons.values.toList();
 
   Metcon? getMetcon(int id) => _metcons[id];
 }
@@ -33,7 +34,7 @@ class MetconsCubit extends Cubit<MetconsState> {
 
   void addMetcon(Metcon metcon) {
     if (state is MetconsLoaded) {
-      final metcons = (state as MetconsLoaded).metcons;
+      final metcons = (state as MetconsLoaded).metconsMap;
       if (!metcons.containsKey(metcon.id)) {
         metcons[metcon.id] = metcon;
         emit(MetconsLoaded(metcons));
@@ -47,7 +48,7 @@ class MetconsCubit extends Cubit<MetconsState> {
 
   void addMetconIfNotExists(Metcon metcon) {
     if (state is MetconsLoaded) {
-      final metcons = (state as MetconsLoaded).metcons;
+      final metcons = (state as MetconsLoaded).metconsMap;
       if (!metcons.containsKey(metcon.id)) {
         metcons[metcon.id] = metcon;
         emit(MetconsLoaded(metcons));
@@ -59,7 +60,7 @@ class MetconsCubit extends Cubit<MetconsState> {
 
   void deleteMetcon(int id) {
     if (state is MetconsLoaded) {
-      final metcons = (state as MetconsLoaded).metcons;
+      final metcons = (state as MetconsLoaded).metconsMap;
       if (metcons.containsKey(id)) {
         metcons.remove(id);
         emit(MetconsLoaded(metcons));
@@ -73,7 +74,7 @@ class MetconsCubit extends Cubit<MetconsState> {
 
   void editMetcon(Metcon metcon) {
     if (state is MetconsLoaded) {
-      final metcons = (state as MetconsLoaded).metcons;
+      final metcons = (state as MetconsLoaded).metconsMap;
       if (metcons.containsKey(metcon.id)) {
         metcons[metcon.id] = metcon;
         emit(MetconsLoaded(metcons));

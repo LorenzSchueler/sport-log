@@ -24,4 +24,6 @@ abstract class Config {
     }
     return false;
   }
+
+  static int debugApiDelay = 500; // ms
 }

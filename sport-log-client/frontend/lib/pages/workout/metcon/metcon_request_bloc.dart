@@ -1,6 +1,7 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
+import 'package:sport_log/config.dart';
 import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_cubit.dart';
 import 'package:sport_log/repositories/metcon_repository.dart';
@@ -57,6 +58,10 @@ class MetconRequestUpdate extends MetconRequestEvent {
   final Metcon metcon;
 }
 
+class MetconRequestGetAll extends MetconRequestEvent {
+  const MetconRequestGetAll() : super();
+}
+
 /// Actual Bloc
 class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
   MetconRequestBloc({
@@ -79,12 +84,15 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
       yield* _deleteMetcon(event);
     } else if (event is MetconRequestUpdate) {
       yield* _updateMetcon(event);
+    } else if (event is MetconRequestGetAll) {
+      yield* _getAllMetcons(event);
     }
   }
 
   Stream<MetconRequestState> _getMetcon(MetconRequestGet event) async* {
     yield const MetconRequestPending();
     final metcon = _metconRepository.getMetcon(event.id);
+    await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
     // TODO: use real api
     if (metcon == null) {
       yield const MetconRequestFailed(ApiError.notFound);
@@ -97,6 +105,7 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
   Stream<MetconRequestState> _createMetcon(MetconRequestCreate event) async* {
     yield const MetconRequestPending();
     final metcon = _metconRepository.createMetcon(event.newMetcon);
+    await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
     // TODO: use real api
     _metconsCubit.addMetcon(metcon);
     yield const MetconRequestSucceeded();
@@ -105,6 +114,7 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
   Stream<MetconRequestState> _deleteMetcon(MetconRequestDelete event) async* {
     yield const MetconRequestPending();
     _metconRepository.deleteMetcon(event.id);
+    await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
     // TODO: use real api
     _metconsCubit.deleteMetcon(event.id);
     yield const MetconRequestSucceeded();
@@ -113,8 +123,18 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
   Stream<MetconRequestState> _updateMetcon(MetconRequestUpdate event) async* {
     yield const MetconRequestPending();
     _metconRepository.updateMetcon(event.metcon);
+    await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
     // TODO: use real api
     _metconsCubit.editMetcon(event.metcon);
+    yield const MetconRequestSucceeded();
+  }
+
+  Stream<MetconRequestState> _getAllMetcons(MetconRequestGetAll event) async* {
+    yield const MetconRequestPending();
+    await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
+    // TODO: use real api
+    final allMetcons = _metconRepository.getAllMetcons();
+    _metconsCubit.loadMetcons(allMetcons);
     yield const MetconRequestSucceeded();
   }
 }
