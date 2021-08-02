@@ -10,7 +10,7 @@ import 'package:http/http.dart' as http;
 part 'user_api.dart';
 
 enum ApiError {
-  usernameTaken, unknown, noInternetConnection, loginFailed
+  usernameTaken, unknown, noInternetConnection, loginFailed, notFound
 }
 
 class Credentials {

@@ -45,6 +45,18 @@ class MetconsCubit extends Cubit<MetconsState> {
     }
   }
 
+  void addMetconIfNotExists(Metcon metcon) {
+    if (state is MetconsLoaded) {
+      final metcons = (state as MetconsLoaded).metcons;
+      if (!metcons.containsKey(metcon.id)) {
+        metcons[metcon.id] = metcon;
+        emit(MetconsLoaded(metcons));
+      }
+    } else {
+      addError(Exception("Adding metcon when metcons are not yet loaded."));
+    }
+  }
+
   void deleteMetcon(int id) {
     if (state is MetconsLoaded) {
       final metcons = (state as MetconsLoaded).metcons;
