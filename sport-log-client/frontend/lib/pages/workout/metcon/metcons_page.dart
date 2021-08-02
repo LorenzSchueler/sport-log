@@ -16,18 +16,20 @@ class MetconsPage extends StatefulWidget {
   State<StatefulWidget> createState() => _MetconsPageState();
 }
 
+// FIXME: don't use StatefulWidget if not necessary
 class _MetconsPageState extends State<MetconsPage> {
-  final GlobalKey<AnimatedListState> _listKey = GlobalKey();
 
   static const _deleteChoice = 1;
   static const _editChoice = 2;
 
   @override
   Widget build(BuildContext context) {
-    // TODO: don't fetch if metcons are already loaded
+    final requestBloc = MetconRequestBloc.fromContext(context);
+    if (context.read<MetconsCubit>().state is MetconsInitial) {
+      requestBloc.add(const MetconRequestGetAll());
+    }
     return BlocConsumer<MetconRequestBloc, MetconRequestState>(
-      bloc: MetconRequestBloc.fromContext(context)
-        ..add(const MetconRequestGetAll()),
+      bloc: requestBloc,
       listener: (context, state) {
         if (state is MetconRequestFailed) {
           ScaffoldMessenger.of(context).showSnackBar(

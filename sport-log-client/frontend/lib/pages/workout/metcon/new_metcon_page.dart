@@ -8,6 +8,7 @@ import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/models/movement.dart';
 import 'package:sport_log/pages/workout/metcon/metcon_request_bloc.dart';
 import 'package:sport_log/widgets/int_picker.dart';
+import 'package:sport_log/widgets/loading_dialog.dart';
 
 import 'metcon_movement_card.dart';
 
@@ -44,15 +45,15 @@ class _NewMetconPageState extends State<NewMetconPage> {
           );
         } else if (state is MetconRequestSucceeded) {
           Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        } else if (state is MetconRequestPending) {
+          showDialog(
+            context: context,
+            builder: (context) => const LoadingDialog(),
+          );
         }
       },
-      builder: (context, state) {
-        if (state is MetconRequestPending) {
-          return const CircularProgressIndicator();
-        } else {
-          return _buildForm(context, requestBloc);
-        }
-      },
+      builder: (context, state) => _buildForm(context, requestBloc),
     );
   }
 

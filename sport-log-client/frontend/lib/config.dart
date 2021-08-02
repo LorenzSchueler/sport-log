@@ -25,5 +25,5 @@ abstract class Config {
     return false;
   }
 
-  static int debugApiDelay = 500; // ms
+  static int debugApiDelay = 5000; // ms
 }
