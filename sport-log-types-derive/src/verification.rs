@@ -108,13 +108,24 @@ pub fn impl_verify_id_for_admin(ast: &syn::DeriveInput) -> TokenStream {
     let id_typename = &ast.ident;
 
     let gen = quote! {
-        impl crate::VerifyIdForAdmin for  crate::UnverifiedId<#id_typename> {
+        impl crate::VerifyIdForAdmin for crate::UnverifiedId<#id_typename> {
             type Id = #id_typename;
 
             fn verify_adm(
                 self,
                 auth: &crate::AuthenticatedAdmin,
             ) -> Result<crate::#id_typename, rocket::http::Status> {
+                Ok(self.0)
+            }
+        }
+
+        impl crate::VerifyMultipleIdForAdmin for crate::UnverifiedIds<#id_typename> {
+            type Id = #id_typename;
+
+            fn verify_adm(
+                self,
+                auth: &crate::AuthenticatedAdmin,
+            ) -> Result<Vec<crate::#id_typename>, rocket::http::Status> {
                 Ok(self.0)
             }
         }
@@ -306,6 +317,17 @@ pub fn impl_verify_for_admin_without_db(ast: &syn::DeriveInput) -> TokenStream {
                 self,
                 auth: &crate::AuthenticatedAdmin,
             ) -> Result<Self::Entity, rocket::http::Status> {
+                Ok(self.0.into_inner())
+            }
+        }
+
+        impl crate::VerifyMultipleForAdminWithoutDb for crate::Unverified<Vec<#typename>> {
+            type Entity = #typename;
+
+            fn verify_adm(
+                self,
+                auth: &crate::AuthenticatedAdmin,
+            ) -> Result<Vec<Self::Entity>, rocket::http::Status> {
                 Ok(self.0.into_inner())
             }
         }

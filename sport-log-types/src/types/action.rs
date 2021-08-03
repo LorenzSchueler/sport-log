@@ -222,7 +222,8 @@ pub struct NewActionRule {
         FromI32,
         ToSql,
         FromSql,
-        VerifyIdForUser
+        VerifyIdForUser,
+        VerifyIdForAdmin
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
@@ -280,7 +281,10 @@ pub struct ActionEvent {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
+#[cfg_attr(
+    feature = "full",
+    derive(Insertable, VerifyForUserWithoutDb, VerifyForAdminWithoutDb)
+)]
 #[cfg_attr(feature = "full", table_name = "action_event")]
 pub struct NewActionEvent {
     pub user_id: UserId,

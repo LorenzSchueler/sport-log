@@ -8,7 +8,8 @@ use sport_log_types::{
     NewActionProvider, NewActionRule, Unverified, UnverifiedId, UnverifiedIds, Update,
     VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
     VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
-    VerifyIdForUserUnchecked, VerifyMultipleForUserWithoutDb, VerifyMultipleIdForUser,
+    VerifyIdForUserUnchecked, VerifyMultipleForAdminWithoutDb, VerifyMultipleForUserWithoutDb,
+    VerifyMultipleIdForAdmin, VerifyMultipleIdForUser,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
@@ -226,6 +227,22 @@ pub async fn create_action_event(
 }
 
 #[post(
+    "/adm/action_events",
+    format = "application/json",
+    data = "<action_events>"
+)]
+pub async fn adm_create_action_events(
+    action_events: Unverified<Vec<NewActionEvent>>,
+    auth: AuthenticatedAdmin,
+    conn: Db,
+) -> Result<Json<Vec<ActionEvent>>, Status> {
+    let action_events = action_events.verify_adm(&auth)?;
+    conn.run(|c| ActionEvent::create_multiple(action_events, c))
+        .await
+        .into_json()
+}
+
+#[post(
     "/action_events",
     format = "application/json",
     data = "<action_events>"
@@ -302,6 +319,24 @@ pub async fn delete_action_event(
 }
 
 #[delete(
+    "/adm/action_events",
+    format = "application/json",
+    data = "<action_event_ids>"
+)]
+pub async fn adm_delete_action_events(
+    action_event_ids: UnverifiedIds<ActionEventId>,
+    auth: AuthenticatedAdmin,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        ActionEvent::delete_multiple(action_event_ids.verify_adm(&auth)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
+#[delete(
     "/action_events",
     format = "application/json",
     data = "<action_event_ids>"
@@ -319,7 +354,7 @@ pub async fn delete_action_events(
     .await
 }
 
-#[get("/adm/creatable_action_rules")]
+#[get("/adm/creatable_action_rule")]
 pub async fn adm_get_creatable_action_rules(
     _auth: AuthenticatedAdmin,
     conn: Db,

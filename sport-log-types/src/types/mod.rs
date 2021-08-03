@@ -289,6 +289,13 @@ pub trait VerifyIdForAdmin {
 }
 
 #[cfg(feature = "full")]
+pub trait VerifyMultipleIdForAdmin {
+    type Id;
+
+    fn verify_adm(self, auth: &AuthenticatedAdmin) -> Result<Vec<Self::Id>, Status>;
+}
+
+#[cfg(feature = "full")]
 pub trait VerifyForUserWithDb {
     type Entity;
 
@@ -353,4 +360,11 @@ pub trait VerifyForAdminWithoutDb {
     type Entity;
 
     fn verify_adm(self, auth: &AuthenticatedAdmin) -> Result<Self::Entity, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyMultipleForAdminWithoutDb {
+    type Entity;
+
+    fn verify_adm(self, auth: &AuthenticatedAdmin) -> Result<Vec<Self::Entity>, Status>;
 }
