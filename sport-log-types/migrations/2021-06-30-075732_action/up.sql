@@ -57,7 +57,7 @@ create table action_event (
     action_id integer not null references action on delete cascade,
     datetime timestamp not null,
     enabled boolean not null,
-    unique (user_id, action_id, datetime, enabled)
+    unique (user_id, action_id, datetime)
 );
 insert into action_event (user_id, action_id, datetime, enabled) values 
     (1, 1, '2021-07-01 09:00:00', true), 
