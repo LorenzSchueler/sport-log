@@ -41,13 +41,13 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for JsonError {
 }
 
 #[catch(default)]
-fn default_catcher<'r>(status: Status, _request: &'r Request) -> JsonError {
+fn default_catcher(status: Status, _request: &Request) -> JsonError {
     JsonError { status }
 }
 
 // TODO only send preflight if route exists
 #[catch(404)]
-fn catcher_404<'r>(status: Status, request: &'r Request) -> Result<Status, JsonError> {
+fn catcher_404(status: Status, request: &Request) -> Result<Status, JsonError> {
     if request.method() == Method::Options {
         Ok(Status::NoContent)
     } else {
@@ -100,6 +100,8 @@ fn rocket() -> _ {
                 action::adm_create_action_provider,
                 action::adm_get_action_providers,
                 action::adm_delete_action_provider,
+                action::adm_get_creatable_action_rules,
+                action::adm_get_deletable_action_events,
                 action::ap_create_action,
                 action::ap_get_action,
                 action::ap_get_actions,

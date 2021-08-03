@@ -2,13 +2,13 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
-    ActionRuleId, AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser, Create,
-    CreateMultiple, Db, Delete, DeleteMultiple, ExecutableActionEvent, GetAll, GetById, GetByUser,
-    NewAction, NewActionEvent, NewActionProvider, NewActionRule, Unverified, UnverifiedId,
-    UnverifiedIds, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
-    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin,
-    VerifyIdForUser, VerifyIdForUserUnchecked, VerifyMultipleForUserWithoutDb,
-    VerifyMultipleIdForUser,
+    ActionRuleId, AuthenticatedActionProvider, AuthenticatedAdmin, AuthenticatedUser,
+    CreatableActionRule, Create, CreateMultiple, Db, DeletableActionEvent, Delete, DeleteMultiple,
+    ExecutableActionEvent, GetAll, GetById, GetByUser, NewAction, NewActionEvent,
+    NewActionProvider, NewActionRule, Unverified, UnverifiedId, UnverifiedIds, Update,
+    VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
+    VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
+    VerifyIdForUserUnchecked, VerifyMultipleForUserWithoutDb, VerifyMultipleIdForUser,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
@@ -319,6 +319,16 @@ pub async fn delete_action_events(
     .await
 }
 
+#[get("/adm/creatable_action_rules")]
+pub async fn adm_get_creatable_action_rules(
+    _auth: AuthenticatedAdmin,
+    conn: Db,
+) -> Result<Json<Vec<CreatableActionRule>>, Status> {
+    conn.run(move |c| CreatableActionRule::get_all(c))
+        .await
+        .into_json()
+}
+
 #[get("/ap/executable_action_event")]
 pub async fn ap_get_executable_action_events(
     auth: AuthenticatedActionProvider,
@@ -346,4 +356,14 @@ pub async fn ap_get_ordered_executable_action_events_by_timespan(
     })
     .await
     .into_json()
+}
+
+#[get("/adm/deletable_action_event")]
+pub async fn adm_get_deletable_action_events(
+    _auth: AuthenticatedAdmin,
+    conn: Db,
+) -> Result<Json<Vec<DeletableActionEvent>>, Status> {
+    conn.run(move |c| DeletableActionEvent::get_all(c))
+        .await
+        .into_json()
 }
