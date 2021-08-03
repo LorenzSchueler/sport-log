@@ -7,6 +7,7 @@
 * [ ] drawer tabs don't restart scaffold
 * [ ] improve landing screen
 * [ ] i18n
+* [ ] local units (metric vs imperial system)
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)
