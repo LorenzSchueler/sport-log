@@ -13,14 +13,14 @@ import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 import 'metcon_movement_card.dart';
 
-class NewMetconPage extends StatefulWidget {
-  const NewMetconPage({Key? key}) : super(key: key);
+class EditMetconPage extends StatefulWidget {
+  const EditMetconPage({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _NewMetconPageState();
+  State<StatefulWidget> createState() => _EditMetconPageState();
 }
 
-class _NewMetconPageState extends State<NewMetconPage> {
+class _EditMetconPageState extends State<EditMetconPage> {
   final _metcon = NewMetcon(
       name: "",
       type: MetconType.amrap,
