@@ -37,6 +37,14 @@ pub async fn adm_get_action_providers(
     conn.run(|c| ActionProvider::get_all(c)).await.into_json()
 }
 
+#[get("/action_provider")]
+pub async fn get_action_providers(
+    _auth: AuthenticatedUser,
+    conn: Db,
+) -> Result<Json<Vec<ActionProvider>>, Status> {
+    conn.run(|c| ActionProvider::get_all(c)).await.into_json()
+}
+
 #[delete("/adm/action_provider/<action_provider_id>")]
 pub async fn adm_delete_action_provider(
     action_provider_id: UnverifiedId<ActionProviderId>,

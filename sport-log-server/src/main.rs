@@ -118,6 +118,7 @@ fn rocket() -> _ {
                 platform::update_platform_credential,
                 platform::delete_platform_credential,
                 platform::delete_platform_credentials,
+                action::get_action_providers,
                 action::get_actions,
                 action::create_action_rule,
                 action::create_action_rules,
