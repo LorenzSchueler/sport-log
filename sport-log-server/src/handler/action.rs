@@ -237,7 +237,7 @@ pub async fn adm_create_action_events(
     conn: Db,
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
     let action_events = action_events.verify_adm(&auth)?;
-    conn.run(|c| ActionEvent::create_multiple(action_events, c))
+    conn.run(|c| ActionEvent::create_multiple_ignore_conflict(action_events, c))
         .await
         .into_json()
 }

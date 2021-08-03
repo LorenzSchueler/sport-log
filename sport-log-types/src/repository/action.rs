@@ -7,7 +7,7 @@ use crate::{
     schema::{action, action_event, action_provider, action_rule, platform_credential},
     Action, ActionEvent, ActionId, ActionProvider, ActionProviderId, ActionRule,
     CreatableActionRule, Create, DeletableActionEvent, ExecutableActionEvent, GetAll,
-    NewActionProvider, UserId,
+    NewActionEvent, NewActionProvider, UserId,
 };
 
 impl Create for ActionProvider {
@@ -136,6 +136,16 @@ impl ActionRule {
 }
 
 impl ActionEvent {
+    pub fn create_multiple_ignore_conflict(
+        action_events: Vec<NewActionEvent>,
+        conn: &PgConnection,
+    ) -> QueryResult<Vec<ActionEvent>> {
+        diesel::insert_into(action_event::table)
+            .values(action_events)
+            .on_conflict_do_nothing()
+            .get_results(conn)
+    }
+
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
         conn: &PgConnection,
