@@ -291,6 +291,17 @@ pub struct NewActionEvent {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(Queryable))]
+pub struct CreatableActionRule {
+    pub action_rule_id: ActionRuleId,
+    pub user_id: UserId,
+    pub action_id: ActionId,
+    pub weekday: Weekday,
+    pub time: NaiveTime,
+    pub create_before: i32,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Queryable))]
 pub struct ExecutableActionEvent {
     pub action_event_id: ActionEventId,
     pub action_name: String,
@@ -298,4 +309,12 @@ pub struct ExecutableActionEvent {
     pub user_id: UserId,
     pub username: String,
     pub password: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Queryable))]
+pub struct DeletableActionEvent {
+    pub action_event_id: ActionEventId,
+    pub datetime: NaiveDateTime,
+    pub delete_after: i32,
 }
