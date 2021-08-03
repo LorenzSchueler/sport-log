@@ -59,6 +59,7 @@ pub struct ActionProvider {
     pub name: String,
     pub password: String,
     pub platform_id: PlatformId,
+    pub description: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -68,6 +69,7 @@ pub struct NewActionProvider {
     pub name: String,
     pub password: String,
     pub platform_id: PlatformId,
+    pub description: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -110,6 +112,9 @@ pub struct Action {
     pub id: ActionId,
     pub name: String,
     pub action_provider_id: ActionProviderId,
+    pub description: Option<String>,
+    pub create_before: i32,
+    pub delete_after: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -118,6 +123,9 @@ pub struct Action {
 pub struct NewAction {
     pub name: String,
     pub action_provider_id: ActionProviderId,
+    pub description: Option<String>,
+    pub create_before: i32,
+    pub delete_after: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -214,7 +222,8 @@ pub struct NewActionRule {
         FromI32,
         ToSql,
         FromSql,
-        VerifyIdForUser
+        VerifyIdForUser,
+        VerifyIdForAdmin
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
@@ -272,13 +281,27 @@ pub struct ActionEvent {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
+#[cfg_attr(
+    feature = "full",
+    derive(Insertable, VerifyForUserWithoutDb, VerifyForAdminWithoutDb)
+)]
 #[cfg_attr(feature = "full", table_name = "action_event")]
 pub struct NewActionEvent {
     pub user_id: UserId,
     pub action_id: ActionId,
     pub datetime: NaiveDateTime,
     pub enabled: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Queryable))]
+pub struct CreatableActionRule {
+    pub action_rule_id: ActionRuleId,
+    pub user_id: UserId,
+    pub action_id: ActionId,
+    pub weekday: Weekday,
+    pub time: NaiveTime,
+    pub create_before: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -290,4 +313,12 @@ pub struct ExecutableActionEvent {
     pub user_id: UserId,
     pub username: String,
     pub password: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Queryable))]
+pub struct DeletableActionEvent {
+    pub action_event_id: ActionEventId,
+    pub datetime: NaiveDateTime,
+    pub delete_after: i32,
 }

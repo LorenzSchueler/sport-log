@@ -1455,6 +1455,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "sport-log-scheduler"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "reqwest",
+ "serde",
+ "sport-log-types",
+ "toml",
+]
+
+[[package]]
 name = "sport-log-server"
 version = "0.1.0"
 dependencies = [
@@ -1465,6 +1476,7 @@ dependencies = [
  "rocket",
  "rocket_sync_db_pools",
  "serde",
+ "serde_json",
  "sport-log-types",
 ]
 

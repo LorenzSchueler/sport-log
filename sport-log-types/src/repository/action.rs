@@ -5,8 +5,9 @@ use rand_core::OsRng;
 
 use crate::{
     schema::{action, action_event, action_provider, action_rule, platform_credential},
-    Action, ActionEvent, ActionId, ActionProvider, ActionProviderId, ActionRule, Create,
-    ExecutableActionEvent, NewActionProvider, UserId,
+    Action, ActionEvent, ActionId, ActionProvider, ActionProviderId, ActionRule,
+    CreatableActionRule, Create, DeletableActionEvent, ExecutableActionEvent, GetAll,
+    NewActionEvent, NewActionProvider, UserId,
 };
 
 impl Create for ActionProvider {
@@ -135,6 +136,16 @@ impl ActionRule {
 }
 
 impl ActionEvent {
+    pub fn create_multiple_ignore_conflict(
+        action_events: Vec<NewActionEvent>,
+        conn: &PgConnection,
+    ) -> QueryResult<Vec<ActionEvent>> {
+        diesel::insert_into(action_event::table)
+            .values(action_events)
+            .on_conflict_do_nothing()
+            .get_results(conn)
+    }
+
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
         conn: &PgConnection,
@@ -165,6 +176,23 @@ impl ActionEvent {
                         .select(action::columns::id),
                 ),
             )
+            .get_results(conn)
+    }
+}
+
+impl GetAll for CreatableActionRule {
+    fn get_all(conn: &PgConnection) -> QueryResult<Vec<Self>> {
+        action_rule::table
+            .inner_join(action::table)
+            .filter(action_rule::columns::enabled.eq(true))
+            .select((
+                action_rule::columns::id,
+                action_rule::columns::user_id,
+                action_rule::columns::action_id,
+                action_rule::columns::weekday,
+                action_rule::columns::time,
+                action::columns::create_before,
+            ))
             .get_results(conn)
     }
 }
@@ -219,6 +247,19 @@ impl ExecutableActionEvent {
                 platform_credential::columns::password,
             ))
             .order_by(action_event::columns::datetime)
+            .get_results(conn)
+    }
+}
+
+impl GetAll for DeletableActionEvent {
+    fn get_all(conn: &PgConnection) -> QueryResult<Vec<Self>> {
+        action_event::table
+            .inner_join(action::table)
+            .select((
+                action_event::columns::id,
+                action_event::columns::datetime,
+                action::columns::delete_after,
+            ))
             .get_results(conn)
     }
 }

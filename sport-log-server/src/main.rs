@@ -4,10 +4,12 @@ use std::io::Cursor;
 extern crate rocket;
 
 use rocket::{
-    http::{ContentType, Status},
+    fairing::{Fairing, Info, Kind},
+    http::{ContentType, Header, Method, Status},
     response::Responder,
     Request, Response,
 };
+use serde::{Deserialize, Serialize};
 
 use sport_log_types::{Db, CONFIG};
 
@@ -19,9 +21,17 @@ struct JsonError {
     status: Status,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+struct ErrorMessage {
+    pub status: u16,
+}
+
 impl<'r, 'o: 'r> Responder<'r, 'o> for JsonError {
     fn respond_to(self, _request: &'r Request<'_>) -> Result<Response<'o>, Status> {
-        let json = format!("{{\"status\":{}}}", self.status.code);
+        let json = serde_json::to_string(&ErrorMessage {
+            status: self.status.code,
+        })
+        .map_err(|_| Status::InternalServerError)?;
         Ok(Response::build()
             .status(self.status)
             .header(ContentType::JSON)
@@ -31,8 +41,41 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for JsonError {
 }
 
 #[catch(default)]
-fn default_catcher<'r>(status: Status, _request: &'r Request) -> JsonError {
+fn default_catcher(status: Status, _request: &Request) -> JsonError {
     JsonError { status }
+}
+
+// TODO only send preflight if route exists
+#[catch(404)]
+fn catcher_404(status: Status, request: &Request) -> Result<Status, JsonError> {
+    if request.method() == Method::Options {
+        Ok(Status::NoContent)
+    } else {
+        Err(JsonError { status })
+    }
+}
+
+pub struct CORS;
+
+#[rocket::async_trait]
+impl Fairing for CORS {
+    fn info(&self) -> Info {
+        Info {
+            name: "CORS headers",
+            kind: Kind::Response,
+        }
+    }
+
+    async fn on_response<'r>(&self, _request: &'r Request<'_>, response: &mut Response<'r>) {
+        response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
+        response.set_header(Header::new(
+            "Access-Control-Allow-Methods",
+            "POST, GET, PUT, DELETE, OPTIONS",
+        ));
+        response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
+        response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
+        response.set_header(Header::new("Access-Control-Max-Age", "864000"));
+    }
 }
 
 #[launch]
@@ -43,21 +86,35 @@ fn rocket() -> _ {
 
     use handler::*;
     rocket::build()
-        .register("/", catchers![default_catcher])
         .attach(Db::fairing())
+        .attach(CORS)
+        .register("/", catchers![default_catcher, catcher_404])
         .mount(
             BASE,
             routes![
                 user::adm_create_user,
+                platform::adm_create_platform,
+                platform::adm_get_platforms,
+                platform::adm_update_platform,
+                platform::adm_delete_platform,
+                action::adm_create_action_provider,
+                action::adm_get_action_providers,
+                action::adm_delete_action_provider,
+                action::adm_get_creatable_action_rules,
+                action::adm_get_deletable_action_events,
+                action::adm_create_action_events,
+                action::adm_delete_action_events,
+                action::ap_create_action,
+                action::ap_get_action,
+                action::ap_get_actions,
+                action::ap_delete_action,
+                action::ap_get_executable_action_events,
+                action::ap_get_ordered_executable_action_events_by_timespan,
                 user::create_user,
                 user::get_user,
                 user::update_user,
                 user::delete_user,
-                platform::adm_create_platform,
-                platform::adm_get_platforms,
                 platform::get_platforms,
-                platform::adm_update_platform,
-                platform::adm_delete_platform,
                 platform::create_platform_credential,
                 platform::create_platform_credentials,
                 platform::get_platform_credentials,
@@ -65,14 +122,8 @@ fn rocket() -> _ {
                 platform::update_platform_credential,
                 platform::delete_platform_credential,
                 platform::delete_platform_credentials,
-                action::adm_create_action_provider,
-                action::adm_get_action_providers,
-                action::adm_delete_action_provider,
-                action::ap_create_action,
-                action::ap_get_action,
-                action::ap_get_actions,
+                action::get_action_providers,
                 action::get_actions,
-                action::ap_delete_action,
                 action::create_action_rule,
                 action::create_action_rules,
                 action::get_action_rule,
@@ -85,13 +136,10 @@ fn rocket() -> _ {
                 action::create_action_events,
                 action::get_action_event,
                 action::get_action_events,
-                action::ap_get_action_events,
                 action::get_action_events_by_action_provider,
                 action::update_action_event,
                 action::delete_action_event,
                 action::delete_action_events,
-                action::ap_get_executable_action_events,
-                action::ap_get_ordered_executable_action_events_by_timespan,
                 diary_wod::create_wod,
                 diary_wod::create_wods,
                 diary_wod::get_wods,
