@@ -4,7 +4,9 @@ use serde::{Deserialize, Serialize};
 
 use sport_log_types::{CardioType, ExecutableActionEvent, Movement, NewCardioSession, Position};
 
-use sport_log_action_provider_sportstracker_config::Config;
+mod config;
+
+use config::Config;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct User {

@@ -17,7 +17,3 @@ toml = "0.5.8"
 [[bin]]
 name = "sport-log-action-provider-sportstracker"
 path = "src/main.rs"
-
-[lib]
-name = "sport_log_action_provider_sportstracker_config"
-path = "src/config.rs"
