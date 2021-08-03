@@ -7,6 +7,9 @@ table! {
         id -> Int4,
         name -> Varchar,
         action_provider_id -> Int4,
+        description -> Nullable<Text>,
+        create_before -> Int4,
+        delete_after -> Int4,
     }
 }
 
@@ -32,6 +35,7 @@ table! {
         name -> Varchar,
         password -> Bpchar,
         platform_id -> Int4,
+        description -> Nullable<Text>,
     }
 }
 

@@ -59,6 +59,7 @@ pub struct ActionProvider {
     pub name: String,
     pub password: String,
     pub platform_id: PlatformId,
+    pub description: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -68,6 +69,7 @@ pub struct NewActionProvider {
     pub name: String,
     pub password: String,
     pub platform_id: PlatformId,
+    pub description: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -110,6 +112,9 @@ pub struct Action {
     pub id: ActionId,
     pub name: String,
     pub action_provider_id: ActionProviderId,
+    pub description: Option<String>,
+    pub create_before: i32,
+    pub delete_after: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -118,6 +123,9 @@ pub struct Action {
 pub struct NewAction {
     pub name: String,
     pub action_provider_id: ActionProviderId,
+    pub description: Option<String>,
+    pub create_before: i32,
+    pub delete_after: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
