@@ -255,16 +255,6 @@ pub async fn get_action_events(
         .into_json()
 }
 
-#[get("/ap/action_event")]
-pub async fn ap_get_action_events(
-    auth: AuthenticatedActionProvider,
-    conn: Db,
-) -> Result<Json<Vec<ActionEvent>>, Status> {
-    conn.run(move |c| ActionEvent::get_by_action_provider(*auth, c))
-        .await
-        .into_json()
-}
-
 #[get("/action_event/action_provider/<action_provider_id>")]
 pub async fn get_action_events_by_action_provider(
     action_provider_id: UnverifiedId<ActionProviderId>,
