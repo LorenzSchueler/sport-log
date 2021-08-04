@@ -1,26 +1,37 @@
-use chrono::NaiveDateTime;
+use std::fs;
+
+use chrono::{Duration, Local, NaiveDateTime};
 use reqwest::{header::CONTENT_TYPE, Client};
 use serde::{Deserialize, Serialize};
 
 use sport_log_types::{CardioType, ExecutableActionEvent, Movement, NewCardioSession, Position};
 
-mod config;
+#[derive(Deserialize)]
+struct Config {
+    username: String,
+    password: String,
+    base_url: String,
+}
 
-use config::Config;
+impl Config {
+    fn get() -> Self {
+        toml::from_str(&fs::read_to_string("config.toml").unwrap()).unwrap()
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct User {
+struct User {
     sessionkey: Option<String>, // None if login fails
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Workouts {
+struct Workouts {
     payload: Vec<Workout>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[allow(non_snake_case)]
-pub struct Workout {
+struct Workout {
     description: Option<String>,
     activityId: u32,
     startTime: u64,
@@ -42,7 +53,7 @@ pub struct Workout {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct StPosition {
+struct StPosition {
     x: f64,
     y: f64,
 }
@@ -54,12 +65,12 @@ struct Cadence {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct WorkoutData {
-    payload: InnerWorkoutData,
+struct WorkoutDataWrapper {
+    payload: WorkoutData,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct InnerWorkoutData {
+struct WorkoutData {
     //description: Option<String>,
     //starttime: u64,
     //totaldistance: u32,
@@ -85,9 +96,17 @@ async fn main() {
 
     let client = Client::new();
 
-    // TODO use timespan
+    let now = Local::now().naive_local();
+    let datetime_start = (now + Duration::hours(1)).format("%Y-%m-%dT%H:%M:%S");
+    let datetime_end =
+        (now + Duration::hours(24) + Duration::minutes(1)).format("%Y-%m-%dT%H:%M:%S");
+
     let exec_action_events: Vec<ExecutableActionEvent> = client
-        .get(format!("{}/v1/ap/executable_action_event", config.base_url))
+        .get(format!(
+            "{}/v1/ap/executable_action_event/timespan/{}/{}",
+            config.base_url, datetime_start, datetime_end
+        ))
+        //.get(format!("{}/v1/ap/executable_action_event", config.base_url,))
         .basic_auth(&config.username, Some(&config.password))
         .send()
         .await
@@ -99,86 +118,105 @@ async fn main() {
 
     for exec_action_event in exec_action_events {
         println!("{:#?}", exec_action_event);
-        // TODO oldest entry
-        if let Some(data) = get_data(&exec_action_event.username, &exec_action_event.password).await
-        {
-            let username = format!("{}$id${}", config.username, exec_action_event.user_id.0);
-            let movements: Vec<Movement> = client
-                .get(format!("{}/v1/movement", config.base_url))
-                .basic_auth(&username, Some(&config.password))
-                .send()
-                .await
-                .unwrap()
-                .json()
-                .await
-                .unwrap();
-            println!("{:#?}\n", movements);
-            let movements: Vec<_> = movements
-                .into_iter()
-                .map(|mut movement| {
-                    movement.name.make_ascii_lowercase();
-                    movement.name.retain(|c| !c.is_whitespace() && c != '-');
-                    movement
-                })
-                .collect();
-            println!("{:#?}\n", movements);
 
-            for (workout, inner_workout_data) in data {
-                // TODO find more mappings or api endpoint
-                let activity = match workout.activityId {
-                    1 => "running",
-                    22 => "trailrunning",
-                    _ => continue,
-                };
-                let movement_id = match movements.iter().find(|movement| movement.name == activity)
-                {
-                    Some(movement) => movement.id,
-                    None => continue,
-                };
-                let cardio_session = NewCardioSession {
-                    user_id: exec_action_event.user_id,
-                    movement_id,
-                    cardio_type: CardioType::Training,
-                    datetime: NaiveDateTime::from_timestamp(workout.startTime as i64 / 1000, 0),
-                    distance: Some(workout.totalDistance as i32),
-                    ascent: Some(workout.totalAscent as i32),
-                    descent: Some(workout.totalDescent as i32),
-                    time: Some(workout.totalTime as i32),
-                    calories: Some(workout.energyConsumption as i32),
-                    track: Some(
-                        inner_workout_data
-                            .locations
-                            .into_iter()
-                            .map(|location| Position {
-                                latitude: location.la,
-                                longitude: location.ln,
-                                elevation: location.h,
-                                distance: location.s as i32,
-                                time: location.t as i32,
-                            })
-                            .collect(),
-                    ),
-                    avg_cycles: if workout.cadence.avg > 0. {
-                        Some(workout.cadence.avg as i32)
-                    } else {
-                        None
-                    },
-                    cycles: None,
-                    avg_heart_rate: None, // TODO
-                    heart_rate: None,
-                    route_id: None,
-                    comments: workout.description,
-                };
-                println!("{:?}", cardio_session);
-                client
-                    .post(format!("{}/v1/cardio_session", config.base_url))
+        if let Some(token) = get_token(
+            &client,
+            &exec_action_event.username,
+            &exec_action_event.password,
+        )
+        .await
+        {
+            let token = (token.0, token.1.as_str());
+            println!("{:?}", token);
+
+            if let Some(workouts) = get_workouts(&client, &token).await {
+                let username = format!("{}$id${}", config.username, exec_action_event.user_id.0);
+                let movements: Vec<Movement> = client
+                    .get(format!("{}/v1/movement", config.base_url))
                     .basic_auth(&username, Some(&config.password))
-                    .body(serde_json::to_string(&cardio_session).unwrap())
-                    .header(CONTENT_TYPE, "application/json")
                     .send()
                     .await
+                    .unwrap()
+                    .json()
+                    .await
                     .unwrap();
-                break; // TODO remove and use oldes existing cardio session as stopping criteria
+                println!("{:#?}\n", movements);
+                let movements: Vec<_> = movements
+                    .into_iter()
+                    .map(|mut movement| {
+                        movement.name.make_ascii_lowercase();
+                        movement.name.retain(|c| !c.is_whitespace() && c != '-');
+                        movement
+                    })
+                    .collect();
+                println!("{:#?}\n", movements);
+
+                for workout in workouts {
+                    if let Some(workout_data) =
+                        get_workout_data(&client, &token, &workout.workoutKey).await
+                    {
+                        // TODO find more mappings or api endpoint
+                        let activity = match workout.activityId {
+                            1 => "running",
+                            22 => "trailrunning",
+                            _ => continue,
+                        };
+                        let movement_id =
+                            match movements.iter().find(|movement| movement.name == activity) {
+                                Some(movement) => movement.id,
+                                None => continue,
+                            };
+                        let cardio_session = NewCardioSession {
+                            user_id: exec_action_event.user_id,
+                            movement_id,
+                            cardio_type: CardioType::Training,
+                            datetime: NaiveDateTime::from_timestamp(
+                                workout.startTime as i64 / 1000,
+                                0,
+                            ),
+                            distance: Some(workout.totalDistance as i32),
+                            ascent: Some(workout.totalAscent as i32),
+                            descent: Some(workout.totalDescent as i32),
+                            time: Some(workout.totalTime as i32),
+                            calories: Some(workout.energyConsumption as i32),
+                            track: Some(
+                                workout_data
+                                    .locations
+                                    .into_iter()
+                                    .map(|location| Position {
+                                        latitude: location.la,
+                                        longitude: location.ln,
+                                        elevation: location.h,
+                                        distance: location.s as i32,
+                                        time: location.t as i32,
+                                    })
+                                    .collect(),
+                            ),
+                            avg_cycles: if workout.cadence.avg > 0. {
+                                Some(workout.cadence.avg as i32)
+                            } else {
+                                None
+                            },
+                            cycles: None,
+                            avg_heart_rate: None, // TODO
+                            heart_rate: None,
+                            route_id: None,
+                            comments: workout.description,
+                        };
+                        println!("{:?}", cardio_session);
+                        let response = client
+                            .post(format!("{}/v1/cardio_session", config.base_url))
+                            .basic_auth(&username, Some(&config.password))
+                            .body(serde_json::to_string(&cardio_session).unwrap())
+                            .header(CONTENT_TYPE, "application/json")
+                            .send()
+                            .await
+                            .unwrap();
+                        if !response.status().is_success() {
+                            break;
+                        }
+                    }
+                }
             }
             //client
             //.delete(format!(
@@ -195,9 +233,11 @@ async fn main() {
     }
 }
 
-async fn get_data(username: &str, password: &str) -> Option<Vec<(Workout, InnerWorkoutData)>> {
-    let client = Client::new();
-
+async fn get_token(
+    client: &Client,
+    username: &str,
+    password: &str,
+) -> Option<(&'static str, String)> {
     let credentials = [("l", username), ("p", password)];
     let user: User = client
         .post("https://api.sports-tracker.com/apiserver/v1/login")
@@ -209,9 +249,10 @@ async fn get_data(username: &str, password: &str) -> Option<Vec<(Workout, InnerW
         .await
         .unwrap();
 
-    let sessionkey = user.sessionkey?;
-    println!("{:?}", sessionkey);
-    let token = ("token", sessionkey.as_str());
+    Some(("token", user.sessionkey?))
+}
+
+async fn get_workouts(client: &Client, token: &(&str, &str)) -> Option<Vec<Workout>> {
     let workouts: Workouts = client
         .get("https://api.sports-tracker.com/apiserver/v1/workouts")
         .query(&[token])
@@ -221,32 +262,32 @@ async fn get_data(username: &str, password: &str) -> Option<Vec<(Workout, InnerW
         .json()
         .await
         .ok()?;
-    println!("{:#?}", workouts.payload[0]);
 
-    let samples = ("samples", "100000");
+    Some(workouts.payload)
+}
 
-    let mut workout_datas = vec![];
-    for workout in &workouts.payload {
-        workout_datas.push(
-            client
-                .get(format!(
-                    "https://api.sports-tracker.com/apiserver/v1/workouts/{}/data",
-                    workout.workoutKey
-                ))
-                .query(&[token, samples])
-                .send()
-                .await
-                .ok()?
-                .json::<WorkoutData>()
-                .await
-                .ok()?
-                .payload,
-        );
-    }
+async fn get_workout_data(
+    client: &Client,
+    token: &(&str, &str),
+    workout_key: &str,
+) -> Option<WorkoutData> {
+    let samples = &("samples", "100000");
 
-    let data = workouts.payload.into_iter().zip(workout_datas).collect();
-
-    Some(data)
+    Some(
+        client
+            .get(format!(
+                "https://api.sports-tracker.com/apiserver/v1/workouts/{}/data",
+                workout_key
+            ))
+            .query(&[token, samples])
+            .send()
+            .await
+            .ok()?
+            .json::<WorkoutDataWrapper>()
+            .await
+            .ok()?
+            .payload,
+    )
 }
 
 // workout stats:   https://api.sports-tracker.com/apiserver/v1/workouts/<workout_id>?token=sessionkey
