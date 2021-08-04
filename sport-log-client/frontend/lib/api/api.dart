@@ -14,9 +14,11 @@ class Credentials {
   Credentials({
     required this.username,
     required this.password,
+    required this.userId,
   });
 
   String username, password;
+  int userId;
 }
 
 class Api {
@@ -28,10 +30,11 @@ class Api {
   final _client = http.Client();
   Credentials? _credentials;
 
-  void setCredentials(String username, String password) {
+  void setCredentials(String username, String password, int userId) {
     _credentials = Credentials(
-        username: username,
-        password: password,
+      username: username,
+      password: password,
+      userId: userId
     );
   }
 
@@ -39,7 +42,7 @@ class Api {
     _credentials = null;
   }
 
-  Credentials? getCredentials() { // needed so that dart analyze is successful
+  Credentials? getCredentials() {
     return _credentials;
   }
 
