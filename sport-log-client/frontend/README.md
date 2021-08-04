@@ -11,10 +11,8 @@
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)
-* [ ] edit existing metcon
 * [ ] double picker widget for metcon movement weight
 * [ ] int picker: same baseline as other form inputs
-* [ ] use UiMetcon and UiMetconMovement in Blocs/Cubits
 
 ### Movements
 * [ ] add movements overview screen

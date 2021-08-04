@@ -68,8 +68,8 @@ class UiMetcon {
     this.rounds,
     this.timecap,
     this.description,
-    this.moves = const [],
-  });
+    List<UiMetconMovement>? moves,
+  }) : moves = moves ?? [];
 
   int? id;
   int? userId;

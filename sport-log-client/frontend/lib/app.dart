@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/pages/logs/logs_page.dart';
 import 'package:sport_log/pages/syncing/syncing_page.dart';
 import 'package:sport_log/pages/workout/metcon/edit_metcon_page.dart';
@@ -32,7 +33,14 @@ class _AppState extends State<App> {
         Routes.login: (_) => const LoginPage(),
         Routes.registration: (_) => const RegistrationPage(),
         Routes.workout: (_) => ProtectedRoute(builder: (_) => const WorkoutPage()),
-        Routes.newMetcon: (_) => ProtectedRoute(builder: (_) => const EditMetconPage()),
+        Routes.editMetcon: (_) => ProtectedRoute(builder: (context) {
+          final argument = ModalRoute.of(context)?.settings.arguments;
+          if (argument != null && argument is UiMetcon) {
+            return EditMetconPage(initialMetcon: argument);
+          } else {
+            return EditMetconPage(initialMetcon: null);
+          }
+        }),
         Routes.syncing: (_) => ProtectedRoute(builder: (_) => const SyncingPage()),
         Routes.logs: (_) => ProtectedRoute(builder: (_) => const LogsPage()),
       },

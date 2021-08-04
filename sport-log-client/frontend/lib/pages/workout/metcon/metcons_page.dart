@@ -6,6 +6,7 @@ import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_cubit.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
+import 'package:sport_log/routes.dart';
 
 import 'metcon_request_bloc.dart';
 
@@ -50,7 +51,7 @@ class _MetconsPageState extends State<MetconsPage> {
                 } else {
                   assert(state is MetconsLoaded);
                   final metcons = (state as MetconsLoaded).metconsList;
-                  assert(metcons.any((m) => m.id != null));
+                  assert(metcons.every((m) => m.id != null));
                   if (metcons.isEmpty) {
                     return const Center(child: Text("No metcons there."));
                   }
@@ -111,7 +112,10 @@ class _MetconsPageState extends State<MetconsPage> {
                       requestBloc.add(MetconRequestDelete(metcon.id!));
                       break;
                     case _editChoice:
-                      // TODO
+                      Navigator.of(context).pushNamed(
+                        Routes.editMetcon,
+                        arguments: metcon
+                      );
                       break;
                   }
                 },

@@ -18,17 +18,18 @@ class EditMetconPage extends StatefulWidget {
   EditMetconPage({
     Key? key,
     UiMetcon? initialMetcon,
-  }) : _initialMetcon = initialMetcon ?? UiMetcon(
-      name: "",
-      type: _EditMetconPageState._typeDefaultValue,
-      timecap: _EditMetconPageState._timecapDefaultValue,
-    ),
-    super(key: key);
+  }) : _initialMetcon = initialMetcon, super(key: key) {
+    if (initialMetcon != null) {
+      assert(_initialMetcon!.id != null);
+    }
+  }
   
-  final UiMetcon _initialMetcon;
+  final UiMetcon? _initialMetcon;
 
   @override
   State<StatefulWidget> createState() => _EditMetconPageState(_initialMetcon);
+
+  bool get _isEditing => _initialMetcon != null;
 }
 
 class _EditMetconPageState extends State<EditMetconPage> {
@@ -39,10 +40,12 @@ class _EditMetconPageState extends State<EditMetconPage> {
   static const _unitDefaultValue = MovementUnit.reps;
   static const _typeDefaultValue = MetconType.amrap;
 
-  _EditMetconPageState(this._metcon);
+  _EditMetconPageState(UiMetcon? metcon)
+    : _metcon = metcon ?? UiMetcon(
+    type: _typeDefaultValue
+  );
   
-  final UiMetcon _metcon;
-
+  UiMetcon _metcon;
 
   final _descriptionFocusNode = FocusNode();
   
@@ -51,6 +54,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
   }
   
   _setType(MetconType type) {
+    FocusManager.instance.primaryFocus?.unfocus();
     setState(() {
       _metcon.type = type;
       switch (type) {
@@ -72,11 +76,13 @@ class _EditMetconPageState extends State<EditMetconPage> {
 
   _setRounds(int? rounds) {
     // TODO: assert consistent state
+    FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _metcon.rounds = rounds);
   }
 
   _setTimecap(Duration? timecap) {
     // TODO: assert consistent state
+    FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _metcon.timecap = timecap);
   }
   
@@ -85,14 +91,17 @@ class _EditMetconPageState extends State<EditMetconPage> {
   }
 
   _removeMetconMovement(int index) {
+    FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _metcon.moves.removeAt(index));
   }
 
   _setMetconMovement(int index, UiMetconMovement mm) {
+    FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _metcon.moves[index] = mm);
   }
 
   _reorderMetconMovements(int oldIndex, int newIndex) {
+    FocusManager.instance.primaryFocus?.unfocus();
     if (oldIndex < newIndex) {
       newIndex -= 1;
     }
@@ -103,6 +112,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
   }
 
   _addMetconMovementWithMovementId(int movementId) {
+    FocusManager.instance.primaryFocus?.unfocus();
     setState(() {
       _metcon.moves.add(UiMetconMovement(
         movementId: movementId,
@@ -110,6 +120,35 @@ class _EditMetconPageState extends State<EditMetconPage> {
         unit: _unitDefaultValue,
       ));
     });
+  }
+
+  bool _inputIsValid() {
+    return _metcon.name != null
+        && _metcon.name != ""
+        && _metcon.moves.isNotEmpty;
+  }
+
+  _submit(MetconRequestBloc requestBloc) {
+    if (!_inputIsValid()) {
+      return;
+    }
+    if (_metcon.description == "") {
+      setState(() => _metcon.description = null);
+    }
+    if (widget._isEditing) {
+      requestBloc.add(MetconRequestUpdate(_metcon));
+    } else {
+      requestBloc.add(MetconRequestCreate(_metcon));
+    }
+  }
+
+  _delete(MetconRequestBloc requestBloc) {
+    if (widget._isEditing) {
+      assert(_metcon.id != null);
+      requestBloc.add(MetconRequestDelete(_metcon.id!));
+    } else {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -142,18 +181,14 @@ class _EditMetconPageState extends State<EditMetconPage> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("New Metcon"),
+          title: Text(widget._isEditing ? "Edit Metcon" : "New Metcon"),
           leading: IconButton(
-            onPressed: _inputIsValid() ? () {
-              requestBloc.add(MetconRequestCreate(_metcon));
-            } : null,
+            onPressed: _inputIsValid() ? () => _submit(requestBloc) : null,
             icon: const Icon(Icons.save),
           ),
           actions: [
             IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => _delete(requestBloc),
               icon: const Icon(Icons.delete),
             )
           ],
@@ -182,8 +217,10 @@ class _EditMetconPageState extends State<EditMetconPage> {
 
   Widget _nameInput(BuildContext context) {
     return TextFormField(
+      initialValue: _metcon.name ?? "",
       onChanged: _setName,
       style: Theme.of(context).textTheme.headline6,
+      textInputAction: TextInputAction.next,
       decoration: const InputDecoration(
         labelText: "Name",
         border: OutlineInputBorder(),
@@ -273,7 +310,8 @@ class _EditMetconPageState extends State<EditMetconPage> {
   Widget _descriptionInput(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
-      child: TextField(
+      child: TextFormField(
+        initialValue: _metcon.description ?? "",
         focusNode: _descriptionFocusNode,
         keyboardType: TextInputType.multiline,
         minLines: 1,
@@ -294,7 +332,10 @@ class _EditMetconPageState extends State<EditMetconPage> {
   Widget _maybeDescriptionInput(BuildContext context) {
     if (_metcon.description == null) {
       return OutlinedButton.icon(
-          onPressed: _setDescription(""),
+          onPressed: () {
+            _setDescription("");
+            _descriptionFocusNode.requestFocus();
+          },
           icon: const Icon(Icons.add),
           label: const Text("Add description..."),
       );
@@ -305,14 +346,15 @@ class _EditMetconPageState extends State<EditMetconPage> {
 
   Widget _roundsInput(BuildContext context) {
     return IntPicker(
-      initialValue: _metcon.rounds ?? 1,
+      initialValue: _metcon.rounds ?? _roundsDefaultValue,
       setValue: _setRounds,
     );
   }
 
   Widget _timecapInput(BuildContext context) {
     return IntPicker(
-      initialValue: _metcon.timecap?.inMinutes ?? _timecapDefaultValue.inMinutes,
+      initialValue: _metcon.timecap?.inMinutes
+          ?? _timecapDefaultValue.inMinutes,
       setValue: (int value) => _setTimecap(Duration(minutes: value)),
     );
   }
@@ -372,9 +414,5 @@ class _EditMetconPageState extends State<EditMetconPage> {
       icon: const Icon(Icons.add),
       label: const Text("Add movement..."),
     );
-  }
-
-  bool _inputIsValid() {
-    return _metcon.name != "" && _metcon.moves.isNotEmpty;
   }
 }
