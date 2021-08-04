@@ -4,7 +4,9 @@ use chrono::{Duration, Local, NaiveDateTime};
 use reqwest::{header::CONTENT_TYPE, Client};
 use serde::{Deserialize, Serialize};
 
-use sport_log_types::{CardioType, ExecutableActionEvent, Movement, NewCardioSession, Position};
+use sport_log_types::{
+    ActionEventId, CardioType, ExecutableActionEvent, Movement, NewCardioSession, Position,
+};
 
 #[derive(Deserialize)]
 struct Config {
@@ -90,30 +92,14 @@ struct Location {
     d: u64,  // timestamp in 1 / 1000 s
 }
 
+// TODO ignore errors
 #[tokio::main]
 async fn main() {
     let config = Config::get();
 
     let client = Client::new();
 
-    let now = Local::now().naive_local();
-    let datetime_start = (now + Duration::hours(1)).format("%Y-%m-%dT%H:%M:%S");
-    let datetime_end =
-        (now + Duration::hours(24) + Duration::minutes(1)).format("%Y-%m-%dT%H:%M:%S");
-
-    let exec_action_events: Vec<ExecutableActionEvent> = client
-        .get(format!(
-            "{}/v1/ap/executable_action_event/timespan/{}/{}",
-            config.base_url, datetime_start, datetime_end
-        ))
-        //.get(format!("{}/v1/ap/executable_action_event", config.base_url,))
-        .basic_auth(&config.username, Some(&config.password))
-        .send()
-        .await
-        .unwrap()
-        .json()
-        .await
-        .unwrap();
+    let exec_action_events = get_events(&client, &config).await;
     println!("executable action events: {}\n", exec_action_events.len());
 
     for exec_action_event in exec_action_events {
@@ -137,11 +123,9 @@ async fn main() {
                     .send()
                     .await
                     .unwrap()
-                    .json()
+                    .json::<Vec<Movement>>()
                     .await
-                    .unwrap();
-                println!("{:#?}\n", movements);
-                let movements: Vec<_> = movements
+                    .unwrap()
                     .into_iter()
                     .map(|mut movement| {
                         movement.name.make_ascii_lowercase();
@@ -218,19 +202,45 @@ async fn main() {
                     }
                 }
             }
-            //client
-            //.delete(format!(
-            //"{}/v1/ap/action_event/{}",
-            //config.base_url, action_event.action_event_id.0
-            //))
-            //.basic_auth(&config.username, Some(&config.password))
-            //.send()
-            //.await
-            //.unwrap();
+            //delete_event(&client, &config, &exec_action_event.action_event_id).await;
         } else {
             println!("login failed!\n");
         }
     }
+}
+
+async fn get_events(client: &Client, config: &Config) -> Vec<ExecutableActionEvent> {
+    let now = Local::now().naive_local();
+    let datetime_start = (now + Duration::hours(1)).format("%Y-%m-%dT%H:%M:%S");
+    let datetime_end =
+        (now + Duration::hours(24) + Duration::minutes(1)).format("%Y-%m-%dT%H:%M:%S");
+
+    let exec_action_events: Vec<ExecutableActionEvent> = client
+        .get(format!(
+            "{}/v1/ap/executable_action_event/timespan/{}/{}",
+            config.base_url, datetime_start, datetime_end
+        ))
+        //.get(format!("{}/v1/ap/executable_action_event", config.base_url,))
+        .basic_auth(&config.username, Some(&config.password))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    exec_action_events
+}
+
+async fn delete_event(client: &Client, config: &Config, action_event_id: &ActionEventId) {
+    client
+        .delete(format!(
+            "{}/v1/ap/action_event/{}",
+            config.base_url, action_event_id.0
+        ))
+        .basic_auth(&config.username, Some(&config.password))
+        .send()
+        .await
+        .unwrap();
 }
 
 async fn get_token(
