@@ -5,7 +5,8 @@ create table strength_session (
     movement_id integer not null references movement on delete no action,
     movement_unit movement_unit not null,
     interval integer check (interval > 0),
-    comments text
+    comments text,
+    unique (user_id, datetime, movement_id)
 );
 --create index on strength_session (user_id, datetime desc);
 

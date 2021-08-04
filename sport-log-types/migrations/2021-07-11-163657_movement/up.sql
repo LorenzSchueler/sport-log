@@ -4,7 +4,7 @@ create type movement_unit as enum('reps', 'cal', 'meter', 'km', 'yard', 'foot', 
 create table movement (
     id serial primary key,
     user_id integer references "user" on delete cascade,
-    name varchar(80) not null unique,
+    name varchar(80) not null,
     description text,
     category movement_category not null,
     unique (user_id, name)
@@ -25,8 +25,9 @@ insert into movement (user_id, name, description, category) values
 
 create table eorm (
     id serial primary key,
-    reps integer not null unique check (reps >= 1),
-    percentage real not null check (percentage > 0)
+    reps integer not null check (reps >= 1),
+    percentage real not null check (percentage > 0),
+    unique (reps)
 );
 insert into eorm (reps, percentage) values
     (1, 1.0),
