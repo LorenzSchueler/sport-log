@@ -221,6 +221,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
       onChanged: _setName,
       style: Theme.of(context).textTheme.headline6,
       textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.text,
       decoration: const InputDecoration(
         labelText: "Name",
         border: OutlineInputBorder(),

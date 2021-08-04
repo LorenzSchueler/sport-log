@@ -6,6 +6,7 @@ import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_cubit.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
+import 'package:sport_log/repositories/movement_repository.dart';
 import 'package:sport_log/routes.dart';
 
 import 'metcon_request_bloc.dart';
@@ -92,6 +93,7 @@ class _MetconsPageState extends State<MetconsPage> {
           return Card(
             child: ListTile(
               title: Text(metcon.name ?? "Unnamed"),
+              subtitle: _subtitle(metcon),
               trailing: PopupMenuButton(
                 enabled: state is! MetconRequestPending,
                 itemBuilder: (BuildContext context) {
@@ -124,6 +126,18 @@ class _MetconsPageState extends State<MetconsPage> {
           );
         },
       ),
+    );
+  }
+
+  Widget _subtitle(UiMetcon metcon) {
+    final movementRepo = context.read<MovementRepository>();
+    final subtitleText = metcon.moves
+      .map((m) => movementRepo.getMovement(m.movementId)?.name)
+      .where((name) => name != null)
+      .join(" · ");
+    return Text(
+      subtitleText,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

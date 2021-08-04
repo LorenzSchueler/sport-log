@@ -13,6 +13,7 @@
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)
 * [ ] double picker widget for metcon movement weight
 * [ ] int picker: same baseline as other form inputs
+* [ ] OutlinedButtons bigger
 
 ### Movements
 * [ ] add movements overview screen
