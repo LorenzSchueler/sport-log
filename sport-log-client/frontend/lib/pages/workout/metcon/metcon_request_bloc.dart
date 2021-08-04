@@ -64,8 +64,10 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
   MetconRequestBloc({
     required MetconRepository metconRepository,
     required MetconsCubit metconsCubit,
+    required Api api,
   }) : _metconRepository = metconRepository,
        _metconsCubit = metconsCubit,
+       _api = api,
        super(const MetconRequestIdle());
 
   MetconRequestBloc.fromContext(BuildContext context)
@@ -142,7 +144,7 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
         .map((movement) => UiMetconMovement.fromMetconMovement(movement))
         .toList();
       return UiMetcon.fromMetcon(metcon, movements);
-    });
+    }).toList();
     _metconsCubit.loadMetcons(uiMetcons);
     yield const MetconRequestSucceeded();
   }

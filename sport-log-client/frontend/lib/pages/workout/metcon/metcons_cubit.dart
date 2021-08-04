@@ -11,33 +11,44 @@ class MetconsInitial extends MetconsState {
 }
 
 class MetconsLoaded extends MetconsState {
-  MetconsLoaded(Map<int, Metcon> metcons)
+  MetconsLoaded(Map<int, UiMetcon> metcons)
     : _metcons = metcons, super();
 
-  MetconsLoaded.fromList(List<Metcon> metcons)
-    : _metcons = { for (var m in metcons) m.id : m }, super();
+  MetconsLoaded.fromList(List<UiMetcon> metcons)
+    : _metcons = {}, super() {
+    for (final metcon in metcons) {
+      assert(metcon.id != null);
+      if (metcon.id != null) {
+        _metcons[metcon.id!] = metcon;
+      }
+    }
+  }
 
-  final Map<int, Metcon> _metcons;
+  final Map<int, UiMetcon> _metcons;
 
-  Map<int, Metcon> get metconsMap => _metcons;
-  List<Metcon> get metconsList => _metcons.values.toList();
+  Map<int, UiMetcon> get metconsMap => _metcons;
+  List<UiMetcon> get metconsList => _metcons.values.toList();
 
-  Metcon? getMetcon(int id) => _metcons[id];
+  UiMetcon? getMetcon(int id) => _metcons[id];
 }
 
 class MetconsCubit extends Cubit<MetconsState> {
   MetconsCubit() : super(const MetconsInitial());
 
-  void loadMetcons(List<Metcon> metcons) {
+  void loadMetcons(List<UiMetcon> metcons) {
     emit(MetconsLoaded.fromList(metcons));
   }
 
-  void addMetcon(Metcon metcon) {
+  void addMetcon(UiMetcon metcon) {
     if (state is MetconsLoaded) {
       final metcons = (state as MetconsLoaded).metconsMap;
       if (!metcons.containsKey(metcon.id)) {
-        metcons[metcon.id] = metcon;
-        emit(MetconsLoaded(metcons));
+        if (metcon.id != null) {
+          metcons[metcon.id!] = metcon;
+          emit(MetconsLoaded(metcons));
+        } else {
+          addError(Exception("Adding metcon that does not have an id"));
+        }
       } else {
         addError(Exception("Adding metcon that already exists."));
       }
@@ -46,12 +57,16 @@ class MetconsCubit extends Cubit<MetconsState> {
     }
   }
 
-  void addMetconIfNotExists(Metcon metcon) {
+  void addMetconIfNotExists(UiMetcon metcon) {
     if (state is MetconsLoaded) {
       final metcons = (state as MetconsLoaded).metconsMap;
       if (!metcons.containsKey(metcon.id)) {
-        metcons[metcon.id] = metcon;
-        emit(MetconsLoaded(metcons));
+        if (metcon.id != null) {
+          metcons[metcon.id!] = metcon;
+          emit(MetconsLoaded(metcons));
+        } else {
+          addError(Exception("Adding metcon that does not have an id."));
+        }
       }
     } else {
       addError(Exception("Adding metcon when metcons are not yet loaded."));
@@ -72,12 +87,16 @@ class MetconsCubit extends Cubit<MetconsState> {
     }
   }
 
-  void editMetcon(Metcon metcon) {
+  void updateMetcon(UiMetcon metcon) {
     if (state is MetconsLoaded) {
       final metcons = (state as MetconsLoaded).metconsMap;
       if (metcons.containsKey(metcon.id)) {
-        metcons[metcon.id] = metcon;
-        emit(MetconsLoaded(metcons));
+        if (metcon.id != null) {
+          metcons[metcon.id!] = metcon;
+          emit(MetconsLoaded(metcons));
+        } else {
+          addError(Exception("Editing metcon that does not have an id."));
+        }
       } else {
         addError(Exception("Editing metcon that does not exist."));
       }
