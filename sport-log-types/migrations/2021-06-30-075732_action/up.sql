@@ -2,10 +2,11 @@ create type weekday as enum('monday', 'tuesday', 'wednesday', 'thursday', 'frida
 
 create table action_provider (
     id serial primary key,
-    name varchar(80) not null unique check (length(name) >= 2),
+    name varchar(80) not null check (length(name) >= 2),
     password char(96) not null,
     platform_id integer not null references platform on delete cascade,
-    description text
+    description text,
+    unique (name)
 );
 insert into action_provider (name, password, platform_id, description) values
     ('wodify-login', '$argon2id$v=19$m=4096,t=3,p=1$NZeOJg1K37UlxV5wB7yFhg$C7HNfVK9yLZTJyvJNSOhvYRfUK+nGo1rz0lIck1aO6c', 1, 
@@ -38,7 +39,7 @@ create table action_rule (
     weekday weekday not null, 
     time time not null,
     enabled boolean not null,
-    unique (user_id, action_id, weekday, time, enabled)
+    unique (user_id, action_id, weekday, time)
 );
 insert into action_rule (user_id, action_id, weekday, time, enabled) values 
     (1, 1, 'monday', '09:00:00', true), 
