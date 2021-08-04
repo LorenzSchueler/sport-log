@@ -17,9 +17,9 @@ class MetconMovementCard extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
-  final NewMetconMovement move;
+  final UiMetconMovement move;
   final int index;
-  final Function(NewMetconMovement) editMetconMovement;
+  final Function(UiMetconMovement) editMetconMovement;
   final Function() deleteMetconMovement;
 
   static const _weightDefaultValue = 10.0;

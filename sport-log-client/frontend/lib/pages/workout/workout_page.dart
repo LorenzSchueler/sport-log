@@ -96,7 +96,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
   void _onFabTapped(BuildContext context) {
     switch (_currentPage) {
       case BottomNavPage.workout:
-        Navigator.of(context).pushNamed(Routes.newMetcon);
+        Navigator.of(context).pushNamed(Routes.editMetcon);
         break;
       default:
     }

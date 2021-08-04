@@ -50,13 +50,15 @@ class _MetconsPageState extends State<MetconsPage> {
                 } else {
                   assert(state is MetconsLoaded);
                   final metcons = (state as MetconsLoaded).metconsList;
+                  assert(metcons.any((m) => m.id != null));
                   if (metcons.isEmpty) {
                     return const Center(child: Text("No metcons there."));
                   }
                   return ImplicitlyAnimatedList(
                     items: metcons,
                     itemBuilder: _metconToWidget,
-                    areItemsTheSame: (Metcon m1, Metcon m2) => m1.id == m2.id,
+                    areItemsTheSame: (UiMetcon m1, UiMetcon m2) =>
+                      m1.id == m2.id,
                   );
                 }
               }
@@ -69,7 +71,7 @@ class _MetconsPageState extends State<MetconsPage> {
   Widget _metconToWidget(
     BuildContext context,
     animation,
-    Metcon metcon,
+    UiMetcon metcon,
     int index
   ) {
     final requestBloc = MetconRequestBloc.fromContext(context);
@@ -88,7 +90,7 @@ class _MetconsPageState extends State<MetconsPage> {
         builder: (context, state) {
           return Card(
             child: ListTile(
-              title: Text(metcon.name),
+              title: Text(metcon.name ?? "Unnamed"),
               trailing: PopupMenuButton(
                 enabled: state is! MetconRequestPending,
                 itemBuilder: (BuildContext context) {
@@ -106,7 +108,7 @@ class _MetconsPageState extends State<MetconsPage> {
                 onSelected: (choice) {
                   switch (choice) {
                     case _deleteChoice:
-                      requestBloc.add(MetconRequestDelete(metcon.id));
+                      requestBloc.add(MetconRequestDelete(metcon.id!));
                       break;
                     case _editChoice:
                       // TODO
