@@ -247,7 +247,7 @@ async fn get_events(client: &Client, config: &Config) -> Vec<ExecutableActionEve
     exec_action_events
 }
 
-async fn delete_events(client: &Client, config: &Config, action_event_ids: &Vec<ActionEventId>) {
+async fn delete_events(client: &Client, config: &Config, action_event_ids: &[ActionEventId]) {
     client
         .delete(format!("{}/v1/ap/action_events", config.base_url,))
         .basic_auth(&config.username, Some(&config.password))

@@ -46,14 +46,14 @@ impl VerifyForUserWithDb for Unverified<User> {
     type Entity = User;
 
     fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
-        let entity = self.0.into_inner();
-        if entity.id == **auth
-            && User::get_by_id(entity.id, conn)
+        let user = self.0.into_inner();
+        if user.id == **auth
+            && User::get_by_id(user.id, conn)
                 .map_err(|_| Status::InternalServerError)?
                 .id
                 == **auth
         {
-            Ok(entity)
+            Ok(user)
         } else {
             Err(Status::Forbidden)
         }

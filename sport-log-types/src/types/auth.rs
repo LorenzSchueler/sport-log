@@ -67,8 +67,8 @@ impl<'r> FromRequest<'r> for AuthenticatedUser {
                     .split_once("$id$")
                     .map(|(name, id)| (name, id.parse().map(UserId)))
                 {
-                    if ActionProvider::auth_as_user(&name, &password, user_id, c).is_ok()
-                        || Admin::auth(&name, &password, c).is_ok()
+                    if ActionProvider::auth_as_user(name, &password, user_id, c).is_ok()
+                        || Admin::auth(name, &password, c).is_ok()
                     {
                         return Outcome::Success(AuthenticatedUser(user_id));
                     }
@@ -120,7 +120,7 @@ impl<'r> FromRequest<'r> for AuthenticatedActionProvider {
                         .split_once("$id$")
                         .map(|(name, id)| (name, id.parse()))
                     {
-                        if Admin::auth(&name, &password, c).is_ok() {
+                        if Admin::auth(name, &password, c).is_ok() {
                             return Outcome::Success(AuthenticatedActionProvider(
                                 ActionProviderId(id),
                             ));
