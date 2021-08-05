@@ -46,6 +46,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
   }
 
   _setCategory(MovementCategory category) {
+    FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _movement.category = category);
   }
 
@@ -58,6 +59,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
   }
 
   _submit(MovementRequestBloc requestBloc) {
+    FocusManager.instance.primaryFocus?.unfocus();
     if (!_inputIsValid()) {
       return;
     }

@@ -1,7 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/metcon.dart';
+import 'package:sport_log/models/movement.dart';
 import 'package:sport_log/pages/logs/logs_page.dart';
+import 'package:sport_log/pages/movements/edit_movement_page.dart';
 import 'package:sport_log/pages/movements/movements_page.dart';
 import 'package:sport_log/pages/syncing/syncing_page.dart';
 import 'package:sport_log/pages/workout/metcon/edit_metcon_page.dart';
@@ -35,16 +37,20 @@ class _AppState extends State<App> {
         Routes.registration: (_) => const RegistrationPage(),
         Routes.workout: (_) => ProtectedRoute(builder: (_) => const WorkoutPage()),
         Routes.editMetcon: (_) => ProtectedRoute(builder: (context) {
-          final argument = ModalRoute.of(context)?.settings.arguments;
-          if (argument != null && argument is UiMetcon) {
-            return EditMetconPage(initialMetcon: argument);
-          } else {
-            return EditMetconPage(initialMetcon: null);
-          }
+          final arg = ModalRoute.of(context)?.settings.arguments;
+          return EditMetconPage(
+            initialMetcon: (arg != null && arg is UiMetcon) ? arg : null,
+          );
         }),
         Routes.syncing: (_) => ProtectedRoute(builder: (_) => const SyncingPage()),
         Routes.logs: (_) => ProtectedRoute(builder: (_) => const LogsPage()),
         Routes.movements: (_) => ProtectedRoute(builder: (_) => const MovementsPage()),
+        Routes.editMovement: (_) => ProtectedRoute(builder: (context) {
+          final arg = ModalRoute.of(context)?.settings.arguments;
+          return EditMovementPage(
+           initialMovement: (arg != null && arg is UiMovement) ? arg : null,
+          );
+        })
       },
       initialRoute: widget.isAuthenticatedAtStart ? Routes.workout : Routes.landing,
       debugShowCheckedModeBanner: false,

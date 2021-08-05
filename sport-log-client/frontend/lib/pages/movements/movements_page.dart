@@ -18,12 +18,34 @@ class MovementsPage extends StatelessWidget {
   static const _deleteChoice = 1;
   static const _editChoice = 2;
 
+  int _compareFunction(Movement m1, Movement m2) {
+    if (m1.userId != null) {
+      if (m2.userId != null) {
+        return m1.name.compareTo(m2.name);
+      } else {
+        return -1;
+      }
+    } else {
+      if (m2.userId != null) {
+        return 1;
+      } else {
+        return m1.name.compareTo(m2.name);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Movements"),),
       drawer: const MainDrawer(selectedRoute: Routes.movements),
       body: _body(context),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.of(context).pushNamed(Routes.editMovement);
+        }
+      ),
     );
   }
 
@@ -54,6 +76,7 @@ class MovementsPage extends StatelessWidget {
               } else {
                 assert(state is MovementsLoaded);
                 final movements = (state as MovementsLoaded).movementsList;
+                movements.sort(_compareFunction);
                 if (movements.isEmpty) {
                   return const Center(child: Text("No movements there."));
                 }
@@ -115,6 +138,10 @@ class MovementsPage extends StatelessWidget {
                       requestBloc.add(MovementRequestDelete(movement.id));
                       break;
                     case _editChoice:
+                      Navigator.of(context).pushNamed(
+                        Routes.editMovement,
+                        arguments: movement.toUiMovement()
+                      );
                       break;
                   }
                 },

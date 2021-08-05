@@ -8,4 +8,5 @@ abstract class Routes {
   static const syncing = '/syncing';
   static const logs = '/logs';
   static const movements = '/movements';
+  static const editMovement = '/edit-movement';
 }

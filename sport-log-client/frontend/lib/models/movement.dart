@@ -69,4 +69,14 @@ class Movement {
   String name;
   MovementCategory category;
   String? description;
+
+  UiMovement toUiMovement() {
+    return UiMovement(
+      id: id,
+      userId: userId,
+      name: name,
+      category: category,
+      description: description,
+    );
+  }
 }

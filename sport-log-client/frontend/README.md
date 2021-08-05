@@ -9,6 +9,8 @@
 * [ ] i18n
 * [ ] local units (metric vs imperial system)
 * [ ] maybe put initial resource loading into resource bloc
+* [ ] return resource from edit... pages
+* [ ] keep fabs from covering/blocking content
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)
