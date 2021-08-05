@@ -17,7 +17,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
     Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
-    GetByUser, ToSql, Update, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser,
+    GetByUser, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
 };
 
 #[cfg(feature = "full")]
@@ -90,7 +90,7 @@ impl FromSql<Position, Pg> for Position {
         FromI32,
         ToSql,
         FromSql,
-        VerifyIdForUser
+        VerifyIdForUserOrAP
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
@@ -113,7 +113,7 @@ pub struct RouteId(pub i32);
         Update,
         Delete,
         DeleteMultiple,
-        VerifyForUserWithDb
+        VerifyForUserOrAPWithDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "route")]
@@ -132,7 +132,7 @@ pub struct Route {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserOrAPWithoutDb))]
 #[cfg_attr(feature = "full", table_name = "route")]
 pub struct NewRoute {
     pub user_id: UserId,
@@ -153,7 +153,7 @@ pub struct NewRoute {
         FromI32,
         ToSql,
         FromSql,
-        VerifyIdForUser
+        VerifyIdForUserOrAP
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
@@ -176,7 +176,7 @@ pub struct CardioSessionId(pub i32);
         Update,
         Delete,
         DeleteMultiple,
-        VerifyForUserWithDb
+        VerifyForUserOrAPWithDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "cardio_session")]
@@ -215,7 +215,7 @@ pub struct CardioSession {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserOrAPWithoutDb))]
 #[cfg_attr(feature = "full", table_name = "cardio_session")]
 pub struct NewCardioSession {
     pub user_id: UserId,

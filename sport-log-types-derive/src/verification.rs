@@ -31,12 +31,64 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
             }
         }
 
-        impl crate::VerifyMultipleIdForUser for crate::UnverifiedIds<#id_typename> {
+        impl crate::VerifyIdsForUser for crate::UnverifiedIds<#id_typename> {
             type Id = #id_typename;
 
             fn verify(
                 self,
                 auth: &crate::AuthUser,
+                conn: &diesel::pg::PgConnection,
+            ) -> Result<Vec<Self::Id>, rocket::http::Status> {
+                use crate::GetByIds;
+
+                let entities = crate::#typename::get_by_ids(&self.0, conn)
+                    .map_err(|_| rocket::http::Status::Forbidden)?;
+                if entities.iter().all(|entity| entity.user_id == **auth ){
+                    Ok(self.0)
+                } else {
+                    Err(rocket::http::Status::Forbidden)
+                }
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_verify_id_for_user_or_ap(ast: &syn::DeriveInput) -> TokenStream {
+    let id_typename = &ast.ident;
+    let id_typename_str = id_typename.to_string();
+    let typename = Ident::new(
+        &id_typename_str[..id_typename_str.len() - 2],
+        Span::call_site(),
+    );
+
+    let gen = quote! {
+        impl crate::VerifyIdForUserOrAP for crate::UnverifiedId<#id_typename> {
+            type Id = #id_typename;
+
+            fn verify(
+                self,
+                auth: &crate::AuthUserOrAP,
+                conn: &diesel::pg::PgConnection,
+            ) -> Result<Self::Id, rocket::http::Status> {
+                use crate::GetById;
+
+                let entity = crate::#typename::get_by_id(self.0, conn)
+                    .map_err(|_| rocket::http::Status::Forbidden)?;
+                if entity.user_id == **auth {
+                    Ok(self.0)
+                } else {
+                    Err(rocket::http::Status::Forbidden)
+                }
+            }
+        }
+
+        impl crate::VerifyIdsForUserOrAP for crate::UnverifiedIds<#id_typename> {
+            type Id = #id_typename;
+
+            fn verify(
+                self,
+                auth: &crate::AuthUserOrAP,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Vec<Self::Id>, rocket::http::Status> {
                 use crate::GetByIds;
@@ -64,6 +116,24 @@ pub fn impl_verify_id_for_user_unchecked(ast: &syn::DeriveInput) -> TokenStream 
             fn verify_unchecked(
                 self,
                 auth: &crate::AuthUser,
+            ) -> Result<crate::#id_typename, rocket::http::Status> {
+                Ok(self.0)
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_verify_id_for_user_or_ap_unchecked(ast: &syn::DeriveInput) -> TokenStream {
+    let id_typename = &ast.ident;
+
+    let gen = quote! {
+        impl crate::VerifyIdForUserOrAPUnchecked for crate::UnverifiedId<#id_typename> {
+            type Id = #id_typename;
+
+            fn verify_unchecked(
+                self,
+                auth: &crate::AuthUserOrAP,
             ) -> Result<crate::#id_typename, rocket::http::Status> {
                 Ok(self.0)
             }
@@ -215,6 +285,68 @@ pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
+pub fn impl_verify_for_user_or_ap_with_db(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+
+    let gen = quote! {
+        impl crate::VerifyForUserOrAPWithDb for crate::Unverified<#typename> {
+            type Entity = #typename;
+
+            fn verify(
+                self,
+                auth: &crate::AuthUserOrAP,
+                conn: &diesel::pg::PgConnection,
+            ) -> Result<Self::Entity, rocket::http::Status> {
+                use crate::GetById;
+
+                let entity = self.0.into_inner();
+                if entity.user_id == **auth
+                    && #typename::get_by_id(entity.id, conn)
+                    .map_err(|_| rocket::http::Status::InternalServerError)?
+                    .user_id
+                    == **auth
+                {
+                    Ok(entity)
+                } else {
+                    Err(rocket::http::Status::Forbidden)
+                }
+            }
+        }
+
+        impl crate::VerifyMultipleForUserOrAPWithDb for crate::Unverified<Vec<#typename>> {
+            type Entity = #typename;
+
+            fn verify(
+                self,
+                auth: &crate::AuthUserOrAP,
+                conn: &diesel::pg::PgConnection,
+            ) -> Result<Vec<Self::Entity>, rocket::http::Status> {
+                use crate::GetById;
+
+                let entities = self.0.into_inner();
+
+                let mut valid = true;
+                for entity in &entities {
+                    if entity.user_id == **auth
+                        && #typename::get_by_id(entity.id, conn)
+                        .map_err(|_| rocket::http::Status::InternalServerError)?
+                        .user_id
+                        == **auth {
+                        valid = false;
+                    }
+                }
+                if valid
+                {
+                    Ok(entities)
+                } else {
+                    Err(rocket::http::Status::Forbidden)
+                }
+            }
+        }
+    };
+    gen.into()
+}
+
 pub fn impl_verify_for_user_without_db(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
 
@@ -241,6 +373,45 @@ pub fn impl_verify_for_user_without_db(ast: &syn::DeriveInput) -> TokenStream {
             fn verify(
                 self,
                 auth: &crate::AuthUser,
+            ) -> Result<Vec<Self::Entity>, rocket::http::Status> {
+                let entities = self.0.into_inner();
+                if entities.iter().all(|entity| entity.user_id == **auth) {
+                    Ok(entities)
+                } else {
+                    Err(rocket::http::Status::Forbidden)
+                }
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_verify_for_user_or_ap_without_db(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+
+    let gen = quote! {
+        impl crate::VerifyForUserOrAPWithoutDb for crate::Unverified<#typename> {
+            type Entity = #typename;
+
+            fn verify(
+                self,
+                auth: &crate::AuthUserOrAP,
+            ) -> Result<Self::Entity, rocket::http::Status> {
+                let entity = self.0.into_inner();
+                if entity.user_id == **auth {
+                    Ok(entity)
+                } else {
+                    Err(rocket::http::Status::Forbidden)
+                }
+            }
+        }
+
+        impl crate::VerifyMultipleForUserOrAPWithoutDb for crate::Unverified<Vec<#typename>> {
+            type Entity = #typename;
+
+            fn verify(
+                self,
+                auth: &crate::AuthUserOrAP,
             ) -> Result<Vec<Self::Entity>, rocket::http::Status> {
                 let entities = self.0.into_inner();
                 if entities.iter().all(|entity| entity.user_id == **auth) {

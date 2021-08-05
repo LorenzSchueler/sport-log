@@ -7,16 +7,16 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
     Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
-    ToSql, Update, VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdForUserUnchecked,
+    ToSql, Update, VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdForUserOrAPUnchecked,
 };
 
 use crate::UserId;
 #[cfg(feature = "full")]
 use crate::{
     schema::{eorm, movement},
-    AuthUser, GetById, GetByIds, Unverified, UnverifiedId, UnverifiedIds, User,
-    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser, VerifyMultipleForUserWithoutDb,
-    VerifyMultipleIdForUser,
+    AuthUserOrAP, GetById, GetByIds, Unverified, UnverifiedId, UnverifiedIds, User,
+    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
+    VerifyMultipleForUserOrAPWithoutDb,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -49,17 +49,17 @@ pub enum MovementUnit {
         ToSql,
         FromSql,
         VerifyIdForAdmin,
-        VerifyIdForUserUnchecked
+        VerifyIdForUserOrAPUnchecked
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
 pub struct MovementId(pub i32);
 
 #[cfg(feature = "full")]
-impl VerifyIdForUser for UnverifiedId<MovementId> {
+impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
     type Id = MovementId;
 
-    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Id, Status> {
+    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
         let movement =
             Movement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if movement.user_id == Some(**auth) {
@@ -71,10 +71,10 @@ impl VerifyIdForUser for UnverifiedId<MovementId> {
 }
 
 #[cfg(feature = "full")]
-impl VerifyMultipleIdForUser for UnverifiedIds<MovementId> {
+impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
     type Id = MovementId;
 
-    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
+    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
         let movements =
             Movement::get_by_ids(&self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if movements
@@ -92,7 +92,7 @@ impl VerifyMultipleIdForUser for UnverifiedIds<MovementId> {
 impl UnverifiedId<MovementId> {
     pub fn verify_if_owned(
         self,
-        auth: &AuthUser,
+        auth: &AuthUserOrAP,
         conn: &PgConnection,
     ) -> Result<MovementId, Status> {
         let movement =
@@ -142,10 +142,10 @@ pub struct Movement {
 }
 
 #[cfg(feature = "full")]
-impl VerifyForUserWithDb for Unverified<Movement> {
+impl VerifyForUserOrAPWithDb for Unverified<Movement> {
     type Entity = Movement;
 
-    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
+    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Entity, Status> {
         let movement = self.0.into_inner();
         if movement.user_id == Some(**auth)
             && Movement::get_by_id(movement.id, conn)
@@ -172,10 +172,10 @@ pub struct NewMovement {
 }
 
 #[cfg(feature = "full")]
-impl VerifyForUserWithoutDb for Unverified<NewMovement> {
+impl VerifyForUserOrAPWithoutDb for Unverified<NewMovement> {
     type Entity = NewMovement;
 
-    fn verify(self, auth: &AuthUser) -> Result<Self::Entity, Status> {
+    fn verify(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status> {
         let movement = self.0.into_inner();
         if movement.user_id == Some(**auth) {
             Ok(movement)
@@ -186,10 +186,10 @@ impl VerifyForUserWithoutDb for Unverified<NewMovement> {
 }
 
 #[cfg(feature = "full")]
-impl VerifyMultipleForUserWithoutDb for Unverified<Vec<NewMovement>> {
+impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<NewMovement>> {
     type Entity = NewMovement;
 
-    fn verify(self, auth: &AuthUser) -> Result<Vec<Self::Entity>, Status> {
+    fn verify(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status> {
         let movements = self.0.into_inner();
         if movements
             .iter()

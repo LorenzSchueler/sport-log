@@ -51,7 +51,7 @@ pub use sharing::*;
 pub use strength::*;
 pub use user::*;
 
-/// Wrapper around incoming json data for which the access permissions for the [AuthUser], [AuthAP] or [AuthAdmin] have not been checked.
+/// Wrapper around incoming json data for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///
 /// The data can be retrieved by using the appropriate verification function.
 #[cfg(feature = "full")]
@@ -75,7 +75,7 @@ pub trait FromI32 {
     fn from_i32(value: i32) -> Self;
 }
 
-/// Wrapper around Id types for which the access permissions for the [AuthUser], [AuthAP] or [AuthAdmin] have not been checked.
+/// Wrapper around Id types for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///
 /// The Id type can be retrieved by using the appropriate verification function.
 #[cfg(feature = "full")]
@@ -91,7 +91,7 @@ impl<'v, I: FromI32> rocket::request::FromParam<'v> for UnverifiedId<I> {
     }
 }
 
-/// Wrapper around Id types for which the access permissions for the [AuthUser], [AuthAP] or [AuthAdmin] have not been checked.
+/// Wrapper around Id types for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///
 /// The Id type can be retrieved by using the appropriate verification function.
 #[cfg(feature = "full")]
@@ -256,7 +256,7 @@ pub trait VerifyIdForUser {
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyMultipleIdForUser {
+pub trait VerifyIdsForUser {
     type Id;
 
     fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Vec<Self::Id>, Status>;
@@ -267,6 +267,27 @@ pub trait VerifyIdForUserUnchecked {
     type Id;
 
     fn verify_unchecked(self, auth: &AuthUser) -> Result<Self::Id, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyIdForUserOrAP {
+    type Id;
+
+    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyIdsForUserOrAP {
+    type Id;
+
+    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyIdForUserOrAPUnchecked {
+    type Id;
+
+    fn verify_unchecked(self, auth: &AuthUserOrAP) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]
@@ -323,6 +344,34 @@ pub trait VerifyMultipleForUserWithoutDb {
     type Entity;
 
     fn verify(self, auth: &AuthUser) -> Result<Vec<Self::Entity>, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyForUserOrAPWithDb {
+    type Entity;
+
+    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Entity, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyMultipleForUserOrAPWithDb {
+    type Entity;
+
+    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Entity>, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyForUserOrAPWithoutDb {
+    type Entity;
+
+    fn verify(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyMultipleForUserOrAPWithoutDb {
+    type Entity;
+
+    fn verify(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]

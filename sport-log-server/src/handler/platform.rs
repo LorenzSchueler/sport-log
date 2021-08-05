@@ -5,7 +5,7 @@ use sport_log_types::{
     NewPlatform, NewPlatformCredential, Platform, PlatformCredential, PlatformCredentialId,
     PlatformId, Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForAdminWithoutDb,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForAdmin, VerifyIdForUser,
-    VerifyIdForUserUnchecked, VerifyMultipleForUserWithoutDb, VerifyMultipleIdForUser,
+    VerifyIdForUserUnchecked, VerifyIdsForUser, VerifyMultipleForUserWithoutDb,
 };
 
 use crate::handler::IntoJson;
@@ -81,7 +81,6 @@ pub async fn create_platform_credential(
     data = "<platform_credentials>"
 )]
 pub async fn create_platform_credentials(
-    // TODO change name to credential
     platform_credentials: Unverified<Vec<NewPlatformCredential>>,
     auth: AuthUser,
     conn: Db,

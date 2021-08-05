@@ -1,11 +1,11 @@
 use rocket::{http::Status, serde::json::Json};
 
-use sport_log_types::{Activity, AuthUser, Db, GetByUser};
+use sport_log_types::{Activity, AuthUserOrAP, Db, GetByUser};
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
 
 #[get("/activity")]
-pub async fn get_activities(auth: AuthUser, conn: Db) -> Result<Json<Vec<Activity>>, Status> {
+pub async fn get_activities(auth: AuthUserOrAP, conn: Db) -> Result<Json<Vec<Activity>>, Status> {
     conn.run(move |c| Activity::get_by_user(*auth, c))
         .await
         .into_json()
@@ -15,7 +15,7 @@ pub async fn get_activities(auth: AuthUser, conn: Db) -> Result<Json<Vec<Activit
 pub async fn get_ordered_activities_by_timespan(
     start_datetime: NaiveDateTimeWrapper,
     end_datetime: NaiveDateTimeWrapper,
-    auth: AuthUser,
+    auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Vec<Activity>>, Status> {
     conn.run(move |c| {

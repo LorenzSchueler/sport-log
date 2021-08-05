@@ -7,9 +7,8 @@ use sport_log_types::{
     GetByUser, NewAction, NewActionEvent, NewActionProvider, NewActionRule, Unverified,
     UnverifiedId, UnverifiedIds, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin,
-    VerifyIdForUser, VerifyIdForUserUnchecked, VerifyMultipleForAdminWithoutDb,
+    VerifyIdForUser, VerifyIdForUserUnchecked, VerifyIdsForUser, VerifyMultipleForAdminWithoutDb,
     VerifyMultipleForUserWithoutDb, VerifyMultipleIdForActionProvider, VerifyMultipleIdForAdmin,
-    VerifyMultipleIdForUser,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
@@ -310,6 +309,24 @@ pub async fn ap_delete_action_event(
 }
 
 #[delete(
+    "/action_events",
+    format = "application/json",
+    data = "<action_event_ids>"
+)]
+pub async fn delete_action_events(
+    action_event_ids: UnverifiedIds<ActionEventId>,
+    auth: AuthUser,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        ActionEvent::delete_multiple(action_event_ids.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
+#[delete(
     "/ap/action_events",
     format = "application/json",
     data = "<action_event_ids>"
@@ -339,24 +356,6 @@ pub async fn adm_delete_action_events(
 ) -> Result<Status, Status> {
     conn.run(move |c| {
         ActionEvent::delete_multiple(action_event_ids.verify_adm(&auth)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete(
-    "/action_events",
-    format = "application/json",
-    data = "<action_event_ids>"
-)]
-pub async fn delete_action_events(
-    action_event_ids: UnverifiedIds<ActionEventId>,
-    auth: AuthUser,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionEvent::delete_multiple(action_event_ids.verify(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })

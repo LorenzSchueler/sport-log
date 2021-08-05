@@ -121,6 +121,18 @@ pub fn verify_it_for_user_unchecked_derive(input: TokenStream) -> TokenStream {
     impl_verify_id_for_user_unchecked(&ast)
 }
 
+#[proc_macro_derive(VerifyIdForUserOrAP)]
+pub fn verify_id_for_user_or_ap_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_verify_id_for_user_or_ap(&ast)
+}
+
+#[proc_macro_derive(VerifyIdForUserOrAPUnchecked)]
+pub fn verify_it_for_user_or_ap_unchecked_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_verify_id_for_user_or_ap_unchecked(&ast)
+}
+
 #[proc_macro_derive(VerifyIdForActionProvider)]
 pub fn verify_id_for_action_provider_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
@@ -143,6 +155,18 @@ pub fn verify_for_user_with_db_derive(input: TokenStream) -> TokenStream {
 pub fn verify_for_user_without_db_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_verify_for_user_without_db(&ast)
+}
+
+#[proc_macro_derive(VerifyForUserOrAPWithDb)]
+pub fn verify_for_user_or_ap_with_db_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_verify_for_user_or_ap_with_db(&ast)
+}
+
+#[proc_macro_derive(VerifyForUserOrAPWithoutDb)]
+pub fn verify_for_user_or_ap_without_db_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_verify_for_user_or_ap_without_db(&ast)
 }
 
 #[proc_macro_derive(VerifyForActionProviderWithDb)]
