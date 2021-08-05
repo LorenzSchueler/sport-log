@@ -51,6 +51,9 @@ class MetconRepository {
     _metcons[m.id] = m;
   }
 
-  int get nextMetconId => _metcons.length;
-  int get nextMetconMovementId => _metconMovements.length;
+  static int _nextMetconId = 0;
+  int get nextMetconId => _nextMetconId++;
+
+  static int _nextMetconMovementId = 0;
+  int get nextMetconMovementId => _nextMetconMovementId++;
 }

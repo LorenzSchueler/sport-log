@@ -12,6 +12,7 @@
 * [ ] return resource from edit... pages
 * [ ] keep fabs from covering/blocking content
 * [ ] refresh on pull down
+* [ ] what happens in error case (stop loading indicator?)
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)
