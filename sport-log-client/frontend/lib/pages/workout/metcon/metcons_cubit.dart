@@ -28,8 +28,6 @@ class MetconsLoaded extends MetconsState {
 
   Map<int, UiMetcon> get metconsMap => _metcons;
   List<UiMetcon> get metconsList => _metcons.values.toList();
-
-  UiMetcon? getMetcon(int id) => _metcons[id];
 }
 
 class MetconsCubit extends Cubit<MetconsState> {
@@ -51,22 +49,6 @@ class MetconsCubit extends Cubit<MetconsState> {
         }
       } else {
         addError(Exception("Adding metcon that already exists."));
-      }
-    } else {
-      addError(Exception("Adding metcon when metcons are not yet loaded."));
-    }
-  }
-
-  void addMetconIfNotExists(UiMetcon metcon) {
-    if (state is MetconsLoaded) {
-      final metcons = (state as MetconsLoaded).metconsMap;
-      if (!metcons.containsKey(metcon.id)) {
-        if (metcon.id != null) {
-          metcons[metcon.id!] = metcon;
-          emit(MetconsLoaded(metcons));
-        } else {
-          addError(Exception("Adding metcon that does not have an id."));
-        }
       }
     } else {
       addError(Exception("Adding metcon when metcons are not yet loaded."));
