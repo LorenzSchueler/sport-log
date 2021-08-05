@@ -2,7 +2,7 @@ use std::{env, fs};
 
 use chrono::{Duration, Local, NaiveDateTime};
 use reqwest::{header::CONTENT_TYPE, Client, StatusCode};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 use sport_log_types::{
     ActionEventId, ActionProvider, CardioType, ExecutableActionEvent, Movement, NewAction,
@@ -22,57 +22,72 @@ impl Config {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 struct User {
-    sessionkey: Option<String>, // None if login fails
+    #[serde(rename(serialize = "sessionkey", deserialize = "sessionkey"))]
+    session_key: Option<String>, // None if login fails
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 struct Workouts {
     payload: Vec<Workout>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-#[allow(non_snake_case)]
+#[derive(Deserialize, Debug)]
 struct Workout {
     description: Option<String>,
-    activityId: u32,
-    startTime: u64,
-    stopTime: u64,
-    totalTime: f32,
-    totalDistance: f32,
-    totalAscent: f32,
-    totalDescent: f32,
-    startPosition: StPosition,
-    stopPosition: StPosition,
-    centerPosition: StPosition,
-    stepCount: u32,
-    minAltitude: Option<f32>,
-    maxAltitude: Option<f32>,
-    workoutKey: String,
+    #[serde(rename(deserialize = "activityId"))]
+    activity_id: u32,
+    #[serde(rename(deserialize = "startTime"))]
+    start_time: u64,
+    #[serde(rename(deserialize = "stopTime"))]
+    stop_time: u64,
+    #[serde(rename(deserialize = "totalTime"))]
+    total_time: f32,
+    #[serde(rename(deserialize = "totalDistance"))]
+    total_distance: f32,
+    #[serde(rename(deserialize = "totalAscent"))]
+    total_ascent: f32,
+    #[serde(rename(deserialize = "totalDescent"))]
+    total_descent: f32,
+    #[serde(rename(deserialize = "startPosition"))]
+    start_position: StPosition,
+    #[serde(rename(deserialize = "stopPosition"))]
+    stop_position: StPosition,
+    #[serde(rename(deserialize = "centerPosition"))]
+    center_position: StPosition,
+    #[serde(rename(deserialize = "stepCount"))]
+    step_count: u32,
+    #[serde(rename(deserialize = "minAltitude"))]
+    min_altitude: Option<f32>,
+    #[serde(rename(deserialize = "sessionkey"))]
+    max_altitude: Option<f32>,
+    #[serde(rename(deserialize = "workoutKey"))]
+    workout_key: String,
     //hrdata:
     cadence: Cadence,
-    energyConsumption: u16,
+    #[serde(rename(deserialize = "energyConsumption"))]
+    energy_consumption: u16,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 struct StPosition {
     x: f64,
     y: f64,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 struct Cadence {
     max: f32,
     avg: f32,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 struct WorkoutDataWrapper {
     payload: WorkoutData,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 struct WorkoutData {
     //description: Option<String>,
     //starttime: u64,
@@ -82,7 +97,7 @@ struct WorkoutData {
     // heartrate: Vec<>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 struct Location {
     t: u32,  // seconds since start in 1/100 s
     la: f64, // lat
@@ -203,10 +218,10 @@ async fn fetch() {
 
                 for workout in workouts {
                     if let Some(workout_data) =
-                        get_workout_data(&client, &token, &workout.workoutKey).await
+                        get_workout_data(&client, &token, &workout.workout_key).await
                     {
                         // TODO find more mappings or api endpoint
-                        let activity = match workout.activityId {
+                        let activity = match workout.activity_id {
                             1 => "running",
                             22 => "trailrunning",
                             _ => continue,
@@ -221,14 +236,14 @@ async fn fetch() {
                             movement_id,
                             cardio_type: CardioType::Training,
                             datetime: NaiveDateTime::from_timestamp(
-                                workout.startTime as i64 / 1000,
+                                workout.start_time as i64 / 1000,
                                 0,
                             ),
-                            distance: Some(workout.totalDistance as i32),
-                            ascent: Some(workout.totalAscent as i32),
-                            descent: Some(workout.totalDescent as i32),
-                            time: Some(workout.totalTime as i32),
-                            calories: Some(workout.energyConsumption as i32),
+                            distance: Some(workout.total_distance as i32),
+                            ascent: Some(workout.total_ascent as i32),
+                            descent: Some(workout.total_descent as i32),
+                            time: Some(workout.total_time as i32),
+                            calories: Some(workout.energy_consumption as i32),
                             track: Some(
                                 workout_data
                                     .locations
@@ -287,7 +302,9 @@ async fn fetch() {
             println!("login failed!\n");
         }
     }
-    delete_events(&client, &config, &delete_action_events).await;
+    if !delete_action_events.is_empty() {
+        delete_events(&client, &config, &delete_action_events).await;
+    }
 }
 
 async fn get_events(client: &Client, config: &Config) -> Vec<ExecutableActionEvent> {
@@ -338,7 +355,7 @@ async fn get_token(
         .await
         .unwrap();
 
-    Some(("token", user.sessionkey?))
+    Some(("token", user.session_key?))
 }
 
 async fn get_workouts(client: &Client, token: &(&str, &str)) -> Option<Vec<Workout>> {

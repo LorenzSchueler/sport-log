@@ -43,10 +43,15 @@ pub enum CardioType {
 #[cfg_attr(feature = "full", derive(SqlType,))]
 #[cfg_attr(feature = "full", postgres(type_name = "position"))]
 pub struct Position {
+    #[serde(rename(serialize = "lo", deserialize = "lo"))]
     pub longitude: f64,
+    #[serde(rename(serialize = "la", deserialize = "la"))]
     pub latitude: f64,
+    #[serde(rename(serialize = "e", deserialize = "e"))]
     pub elevation: f32,
+    #[serde(rename(serialize = "d", deserialize = "d"))]
     pub distance: i32,
+    #[serde(rename(serialize = "t", deserialize = "t"))]
     pub time: i32,
 }
 
