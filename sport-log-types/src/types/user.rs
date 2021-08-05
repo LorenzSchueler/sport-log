@@ -8,7 +8,7 @@ use sport_log_types_derive::{
 };
 
 #[cfg(feature = "full")]
-use crate::{schema::user, AuthenticatedUser, GetById, Unverified, VerifyForUserWithDb};
+use crate::{schema::user, AuthUser, GetById, Unverified, VerifyForUserWithDb};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
@@ -45,7 +45,7 @@ pub struct User {
 impl VerifyForUserWithDb for Unverified<User> {
     type Entity = User;
 
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
         let user = self.0.into_inner();
         if user.id == **auth
             && User::get_by_id(user.id, conn)

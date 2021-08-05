@@ -14,7 +14,7 @@ use crate::UserId;
 #[cfg(feature = "full")]
 use crate::{
     schema::{eorm, movement},
-    AuthenticatedUser, GetById, GetByIds, Unverified, UnverifiedId, UnverifiedIds, User,
+    AuthUser, GetById, GetByIds, Unverified, UnverifiedId, UnverifiedIds, User,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser, VerifyMultipleForUserWithoutDb,
     VerifyMultipleIdForUser,
 };
@@ -59,7 +59,7 @@ pub struct MovementId(pub i32);
 impl VerifyIdForUser for UnverifiedId<MovementId> {
     type Id = MovementId;
 
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Id, Status> {
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Id, Status> {
         let movement =
             Movement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if movement.user_id == Some(**auth) {
@@ -74,11 +74,7 @@ impl VerifyIdForUser for UnverifiedId<MovementId> {
 impl VerifyMultipleIdForUser for UnverifiedIds<MovementId> {
     type Id = MovementId;
 
-    fn verify(
-        self,
-        auth: &AuthenticatedUser,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Id>, Status> {
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
         let movements =
             Movement::get_by_ids(&self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if movements
@@ -96,7 +92,7 @@ impl VerifyMultipleIdForUser for UnverifiedIds<MovementId> {
 impl UnverifiedId<MovementId> {
     pub fn verify_if_owned(
         self,
-        auth: &AuthenticatedUser,
+        auth: &AuthUser,
         conn: &PgConnection,
     ) -> Result<MovementId, Status> {
         let movement =
@@ -149,7 +145,7 @@ pub struct Movement {
 impl VerifyForUserWithDb for Unverified<Movement> {
     type Entity = Movement;
 
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
         let movement = self.0.into_inner();
         if movement.user_id == Some(**auth)
             && Movement::get_by_id(movement.id, conn)
@@ -179,7 +175,7 @@ pub struct NewMovement {
 impl VerifyForUserWithoutDb for Unverified<NewMovement> {
     type Entity = NewMovement;
 
-    fn verify(self, auth: &AuthenticatedUser) -> Result<Self::Entity, Status> {
+    fn verify(self, auth: &AuthUser) -> Result<Self::Entity, Status> {
         let movement = self.0.into_inner();
         if movement.user_id == Some(**auth) {
             Ok(movement)
@@ -193,7 +189,7 @@ impl VerifyForUserWithoutDb for Unverified<NewMovement> {
 impl VerifyMultipleForUserWithoutDb for Unverified<Vec<NewMovement>> {
     type Entity = NewMovement;
 
-    fn verify(self, auth: &AuthenticatedUser) -> Result<Vec<Self::Entity>, Status> {
+    fn verify(self, auth: &AuthUser) -> Result<Vec<Self::Entity>, Status> {
         let movements = self.0.into_inner();
         if movements
             .iter()

@@ -1,8 +1,8 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthenticatedAdmin, AuthenticatedUser, Create, Db, Delete, GetById, NewUser, Unverified,
-    Update, User, VerifyForUserWithDb, CONFIG,
+    AuthAdmin, AuthUser, Create, Db, Delete, GetById, NewUser, Unverified, Update, User,
+    VerifyForUserWithDb, CONFIG,
 };
 
 use crate::handler::IntoJson;
@@ -10,7 +10,7 @@ use crate::handler::IntoJson;
 #[post("/adm/user", format = "application/json", data = "<user>")]
 pub async fn adm_create_user(
     user: Unverified<NewUser>,
-    _auth: AuthenticatedAdmin,
+    _auth: AuthAdmin,
     conn: Db,
 ) -> Result<Json<User>, Status> {
     let user = user.verify_unchecked()?;
@@ -27,7 +27,7 @@ pub async fn create_user(user: Unverified<NewUser>, conn: Db) -> Result<Json<Use
 }
 
 #[get("/user")]
-pub async fn get_user(auth: AuthenticatedUser, conn: Db) -> Result<Json<User>, Status> {
+pub async fn get_user(auth: AuthUser, conn: Db) -> Result<Json<User>, Status> {
     conn.run(move |c| User::get_by_id(*auth, c))
         .await
         .into_json()
@@ -36,7 +36,7 @@ pub async fn get_user(auth: AuthenticatedUser, conn: Db) -> Result<Json<User>, S
 #[put("/user", format = "application/json", data = "<user>")]
 pub async fn update_user(
     user: Unverified<User>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<User>, Status> {
     let user = conn.run(move |c| user.verify(&auth, c)).await?;
@@ -44,7 +44,7 @@ pub async fn update_user(
 }
 
 #[delete("/user")]
-pub async fn delete_user(auth: AuthenticatedUser, conn: Db) -> Result<Status, Status> {
+pub async fn delete_user(auth: AuthUser, conn: Db) -> Result<Status, Status> {
     conn.run(move |c| {
         User::delete(*auth, c)
             .map(|_| Status::NoContent)

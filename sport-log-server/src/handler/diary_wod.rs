@@ -1,7 +1,7 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthenticatedUser, Create, CreateMultiple, Db, Delete, DeleteMultiple, Diary, DiaryId, GetById,
+    AuthUser, Create, CreateMultiple, Db, Delete, DeleteMultiple, Diary, DiaryId, GetById,
     GetByUser, NewDiary, NewWod, Unverified, UnverifiedId, UnverifiedIds, Update,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser, VerifyMultipleForUserWithoutDb,
     VerifyMultipleIdForUser, Wod, WodId,
@@ -12,7 +12,7 @@ use crate::handler::{IntoJson, NaiveDateTimeWrapper};
 #[post("/wod", format = "application/json", data = "<wod>")]
 pub async fn create_wod(
     wod: Unverified<NewWod>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Wod>, Status> {
     let wod = wod.verify(&auth)?;
@@ -22,7 +22,7 @@ pub async fn create_wod(
 #[post("/wods", format = "application/json", data = "<wods>")]
 pub async fn create_wods(
     wods: Unverified<Vec<NewWod>>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<Wod>>, Status> {
     let wods = wods.verify(&auth)?;
@@ -35,7 +35,7 @@ pub async fn create_wods(
 pub async fn get_ordered_wods_by_timespan(
     start_datetime: NaiveDateTimeWrapper,
     end_datetime: NaiveDateTimeWrapper,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<Wod>>, Status> {
     conn.run(move |c| {
@@ -46,7 +46,7 @@ pub async fn get_ordered_wods_by_timespan(
 }
 
 #[get("/wod")]
-pub async fn get_wods(auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Wod>>, Status> {
+pub async fn get_wods(auth: AuthUser, conn: Db) -> Result<Json<Vec<Wod>>, Status> {
     conn.run(move |c| Wod::get_by_user(*auth, c))
         .await
         .into_json()
@@ -55,7 +55,7 @@ pub async fn get_wods(auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Wod>
 #[put("/wod", format = "application/json", data = "<wod>")]
 pub async fn update_wod(
     wod: Unverified<Wod>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Wod>, Status> {
     let wod = conn.run(move |c| wod.verify(&auth, c)).await?;
@@ -65,7 +65,7 @@ pub async fn update_wod(
 #[delete("/wod/<wod_id>")]
 pub async fn delete_wod(
     wod_id: UnverifiedId<WodId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
@@ -79,7 +79,7 @@ pub async fn delete_wod(
 #[delete("/wods", format = "application/json", data = "<wod_ids>")]
 pub async fn delete_wods(
     wod_ids: UnverifiedIds<WodId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
@@ -93,7 +93,7 @@ pub async fn delete_wods(
 #[post("/diary", format = "application/json", data = "<diary>")]
 pub async fn create_diary(
     diary: Unverified<NewDiary>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Diary>, Status> {
     let diary = diary.verify(&auth)?;
@@ -103,7 +103,7 @@ pub async fn create_diary(
 #[post("/diaries", format = "application/json", data = "<diaries>")]
 pub async fn create_diaries(
     diaries: Unverified<Vec<NewDiary>>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<Diary>>, Status> {
     let diaries = diaries.verify(&auth)?;
@@ -115,7 +115,7 @@ pub async fn create_diaries(
 #[get("/diary/<diary_id>")]
 pub async fn get_diary(
     diary_id: UnverifiedId<DiaryId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Diary>, Status> {
     let diary_id = conn.run(move |c| diary_id.verify(&auth, c)).await?;
@@ -128,7 +128,7 @@ pub async fn get_diary(
 pub async fn get_ordered_diarys_by_timespan(
     start_datetime: NaiveDateTimeWrapper,
     end_datetime: NaiveDateTimeWrapper,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<Diary>>, Status> {
     conn.run(move |c| {
@@ -139,7 +139,7 @@ pub async fn get_ordered_diarys_by_timespan(
 }
 
 #[get("/diary")]
-pub async fn get_diarys(auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Diary>>, Status> {
+pub async fn get_diarys(auth: AuthUser, conn: Db) -> Result<Json<Vec<Diary>>, Status> {
     conn.run(move |c| Diary::get_by_user(*auth, c))
         .await
         .into_json()
@@ -148,7 +148,7 @@ pub async fn get_diarys(auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Di
 #[put("/diary", format = "application/json", data = "<diary>")]
 pub async fn update_diary(
     diary: Unverified<Diary>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Diary>, Status> {
     let diary = conn.run(move |c| diary.verify(&auth, c)).await?;
@@ -158,7 +158,7 @@ pub async fn update_diary(
 #[delete("/diary/<diary_id>")]
 pub async fn delete_diary(
     diary_id: UnverifiedId<DiaryId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
@@ -172,7 +172,7 @@ pub async fn delete_diary(
 #[delete("/diaries", format = "application/json", data = "<diary_ids>")]
 pub async fn delete_diaries(
     diary_ids: UnverifiedIds<DiaryId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {

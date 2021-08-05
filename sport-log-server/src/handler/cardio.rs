@@ -1,11 +1,10 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthenticatedUser, CardioSession, CardioSessionDescription, CardioSessionId, Create,
-    CreateMultiple, Db, Delete, DeleteMultiple, GetById, GetByUser, NewCardioSession, NewRoute,
-    Route, RouteId, Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForUserWithDb,
-    VerifyForUserWithoutDb, VerifyIdForUser, VerifyMultipleForUserWithoutDb,
-    VerifyMultipleIdForUser,
+    AuthUser, CardioSession, CardioSessionDescription, CardioSessionId, Create, CreateMultiple, Db,
+    Delete, DeleteMultiple, GetById, GetByUser, NewCardioSession, NewRoute, Route, RouteId,
+    Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForUserWithDb, VerifyForUserWithoutDb,
+    VerifyIdForUser, VerifyMultipleForUserWithoutDb, VerifyMultipleIdForUser,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
@@ -13,7 +12,7 @@ use crate::handler::{IntoJson, NaiveDateTimeWrapper};
 #[post("/route", format = "application/json", data = "<route>")]
 pub async fn create_route(
     route: Unverified<NewRoute>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Route>, Status> {
     let route = route.verify(&auth)?;
@@ -23,7 +22,7 @@ pub async fn create_route(
 #[post("/routes", format = "application/json", data = "<routes>")]
 pub async fn create_routes(
     routes: Unverified<Vec<NewRoute>>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<Route>>, Status> {
     let routes = routes.verify(&auth)?;
@@ -35,7 +34,7 @@ pub async fn create_routes(
 #[get("/route/<route_id>")]
 pub async fn get_route(
     route_id: UnverifiedId<RouteId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Route>, Status> {
     let route_id = conn.run(move |c| route_id.verify(&auth, c)).await?;
@@ -45,7 +44,7 @@ pub async fn get_route(
 }
 
 #[get("/route")]
-pub async fn get_routes(auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Route>>, Status> {
+pub async fn get_routes(auth: AuthUser, conn: Db) -> Result<Json<Vec<Route>>, Status> {
     conn.run(move |c| Route::get_by_user(*auth, c))
         .await
         .into_json()
@@ -54,7 +53,7 @@ pub async fn get_routes(auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Ro
 #[put("/route", format = "application/json", data = "<route>")]
 pub async fn update_route(
     route: Unverified<Route>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Route>, Status> {
     let route = conn.run(move |c| route.verify(&auth, c)).await?;
@@ -64,7 +63,7 @@ pub async fn update_route(
 #[delete("/route/<route_id>")]
 pub async fn delete_route(
     route_id: UnverifiedId<RouteId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
@@ -78,7 +77,7 @@ pub async fn delete_route(
 #[delete("/routes", format = "application/json", data = "<route_ids>")]
 pub async fn delete_routes(
     route_ids: UnverifiedIds<RouteId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
@@ -96,7 +95,7 @@ pub async fn delete_routes(
 )]
 pub async fn create_cardio_session(
     cardio_session: Unverified<NewCardioSession>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<CardioSession>, Status> {
     let cardio_session = cardio_session.verify(&auth)?;
@@ -112,7 +111,7 @@ pub async fn create_cardio_session(
 )]
 pub async fn create_cardio_sessions(
     cardio_sessions: Unverified<Vec<NewCardioSession>>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<CardioSession>>, Status> {
     let cardio_sessions = cardio_sessions.verify(&auth)?;
@@ -124,7 +123,7 @@ pub async fn create_cardio_sessions(
 #[get("/cardio_session/<cardio_session_id>")]
 pub async fn get_cardio_session(
     cardio_session_id: UnverifiedId<CardioSessionId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<CardioSession>, Status> {
     let cardio_session_id = conn
@@ -137,7 +136,7 @@ pub async fn get_cardio_session(
 
 #[get("/cardio_session")]
 pub async fn get_cardio_sessions(
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<CardioSession>>, Status> {
     conn.run(move |c| CardioSession::get_by_user(*auth, c))
@@ -152,7 +151,7 @@ pub async fn get_cardio_sessions(
 )]
 pub async fn update_cardio_session(
     cardio_session: Unverified<CardioSession>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<CardioSession>, Status> {
     let cardio_session = conn.run(move |c| cardio_session.verify(&auth, c)).await?;
@@ -164,7 +163,7 @@ pub async fn update_cardio_session(
 #[delete("/cardio_session/<cardio_session_id>")]
 pub async fn delete_cardio_session(
     cardio_session_id: UnverifiedId<CardioSessionId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
@@ -182,7 +181,7 @@ pub async fn delete_cardio_session(
 )]
 pub async fn delete_cardio_sessions(
     cardio_session_ids: UnverifiedIds<CardioSessionId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
@@ -196,7 +195,7 @@ pub async fn delete_cardio_sessions(
 #[get("/cardio_session_description/<cardio_session_id>")]
 pub async fn get_cardio_session_description(
     cardio_session_id: UnverifiedId<CardioSessionId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<CardioSessionDescription>, Status> {
     let cardio_session_id = conn
@@ -209,7 +208,7 @@ pub async fn get_cardio_session_description(
 
 #[get("/cardio_session_description")]
 pub async fn get_cardio_session_descriptions(
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<CardioSessionDescription>>, Status> {
     conn.run(move |c| CardioSessionDescription::get_by_user(*auth, c))
@@ -221,7 +220,7 @@ pub async fn get_cardio_session_descriptions(
 pub async fn get_ordered_cardio_session_descriptions_by_timespan(
     start_datetime: NaiveDateTimeWrapper,
     end_datetime: NaiveDateTimeWrapper,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<CardioSessionDescription>>, Status> {
     conn.run(move |c| {

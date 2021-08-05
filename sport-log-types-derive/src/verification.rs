@@ -16,7 +16,7 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
 
             fn verify(
                 self,
-                auth: &crate::AuthenticatedUser,
+                auth: &crate::AuthUser,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Self::Id, rocket::http::Status> {
                 use crate::GetById;
@@ -36,7 +36,7 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
 
             fn verify(
                 self,
-                auth: &crate::AuthenticatedUser,
+                auth: &crate::AuthUser,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Vec<Self::Id>, rocket::http::Status> {
                 use crate::GetByIds;
@@ -63,7 +63,7 @@ pub fn impl_verify_id_for_user_unchecked(ast: &syn::DeriveInput) -> TokenStream 
 
             fn verify_unchecked(
                 self,
-                auth: &crate::AuthenticatedUser,
+                auth: &crate::AuthUser,
             ) -> Result<crate::#id_typename, rocket::http::Status> {
                 Ok(self.0)
             }
@@ -86,7 +86,7 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
 
             fn verify_ap(
                 self,
-                auth: &crate::AuthenticatedActionProvider,
+                auth: &crate::AuthAP,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<crate::#id_typename, rocket::http::Status> {
                 use crate::GetById;
@@ -106,7 +106,7 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
 
             fn verify_ap(
                 self,
-                auth: &crate::AuthenticatedActionProvider,
+                auth: &crate::AuthAP,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Vec<crate::#id_typename>, rocket::http::Status> {
                 use crate::GetByIds;
@@ -133,7 +133,7 @@ pub fn impl_verify_id_for_admin(ast: &syn::DeriveInput) -> TokenStream {
 
             fn verify_adm(
                 self,
-                auth: &crate::AuthenticatedAdmin,
+                auth: &crate::AuthAdmin,
             ) -> Result<crate::#id_typename, rocket::http::Status> {
                 Ok(self.0)
             }
@@ -144,7 +144,7 @@ pub fn impl_verify_id_for_admin(ast: &syn::DeriveInput) -> TokenStream {
 
             fn verify_adm(
                 self,
-                auth: &crate::AuthenticatedAdmin,
+                auth: &crate::AuthAdmin,
             ) -> Result<Vec<crate::#id_typename>, rocket::http::Status> {
                 Ok(self.0)
             }
@@ -162,7 +162,7 @@ pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
 
             fn verify(
                 self,
-                auth: &crate::AuthenticatedUser,
+                auth: &crate::AuthUser,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Self::Entity, rocket::http::Status> {
                 use crate::GetById;
@@ -186,7 +186,7 @@ pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
 
             fn verify(
                 self,
-                auth: &crate::AuthenticatedUser,
+                auth: &crate::AuthUser,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Vec<Self::Entity>, rocket::http::Status> {
                 use crate::GetById;
@@ -224,7 +224,7 @@ pub fn impl_verify_for_user_without_db(ast: &syn::DeriveInput) -> TokenStream {
 
             fn verify(
                 self,
-                auth: &crate::AuthenticatedUser,
+                auth: &crate::AuthUser,
             ) -> Result<Self::Entity, rocket::http::Status> {
                 let entity = self.0.into_inner();
                 if entity.user_id == **auth {
@@ -240,7 +240,7 @@ pub fn impl_verify_for_user_without_db(ast: &syn::DeriveInput) -> TokenStream {
 
             fn verify(
                 self,
-                auth: &crate::AuthenticatedUser,
+                auth: &crate::AuthUser,
             ) -> Result<Vec<Self::Entity>, rocket::http::Status> {
                 let entities = self.0.into_inner();
                 if entities.iter().all(|entity| entity.user_id == **auth) {
@@ -263,7 +263,7 @@ pub fn impl_verify_for_action_provider_with_db(ast: &syn::DeriveInput) -> TokenS
 
             fn verify_ap(
                 self,
-                auth: &crate::AuthenticatedActionProvider,
+                auth: &crate::AuthAP,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Self::Entity, rocket::http::Status> {
                 use crate::GetById;
@@ -294,7 +294,7 @@ pub fn impl_verify_for_action_provider_without_db(ast: &syn::DeriveInput) -> Tok
 
             fn verify_ap(
                 self,
-                auth: &crate::AuthenticatedActionProvider,
+                auth: &crate::AuthAP,
             ) -> Result<Self::Entity, rocket::http::Status> {
                 let entity = self.0.into_inner();
                 if entity.action_provider_id == **auth {
@@ -317,7 +317,7 @@ pub fn impl_verify_for_action_provider_unchecked(ast: &syn::DeriveInput) -> Toke
 
             fn verify_unchecked_ap(
                 self,
-                auth: &crate::AuthenticatedActionProvider,
+                auth: &crate::AuthAP,
             ) -> Result<Self::Entity, rocket::http::Status> {
                 Ok(self.0.into_inner())
             }
@@ -335,7 +335,7 @@ pub fn impl_verify_for_admin_without_db(ast: &syn::DeriveInput) -> TokenStream {
 
             fn verify_adm(
                 self,
-                auth: &crate::AuthenticatedAdmin,
+                auth: &crate::AuthAdmin,
             ) -> Result<Self::Entity, rocket::http::Status> {
                 Ok(self.0.into_inner())
             }
@@ -346,7 +346,7 @@ pub fn impl_verify_for_admin_without_db(ast: &syn::DeriveInput) -> TokenStream {
 
             fn verify_adm(
                 self,
-                auth: &crate::AuthenticatedAdmin,
+                auth: &crate::AuthAdmin,
             ) -> Result<Vec<Self::Entity>, rocket::http::Status> {
                 Ok(self.0.into_inner())
             }

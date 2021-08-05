@@ -16,7 +16,7 @@ use sport_log_types_derive::{
 #[cfg(feature = "full")]
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
-    AuthenticatedUser, GetById, GetByIds, Unverified, UnverifiedId, UnverifiedIds, User,
+    AuthUser, GetById, GetByIds, Unverified, UnverifiedId, UnverifiedIds, User,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser, VerifyMultipleForUserWithDb,
     VerifyMultipleForUserWithoutDb, VerifyMultipleIdForUser,
 };
@@ -42,7 +42,7 @@ pub struct MetconId(pub i32);
 impl VerifyIdForUser for UnverifiedId<MetconId> {
     type Id = MetconId;
 
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Id, Status> {
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Id, Status> {
         let metcon =
             Metcon::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if metcon.user_id == Some(**auth) {
@@ -57,11 +57,7 @@ impl VerifyIdForUser for UnverifiedId<MetconId> {
 impl VerifyMultipleIdForUser for UnverifiedIds<MetconId> {
     type Id = MetconId;
 
-    fn verify(
-        self,
-        auth: &AuthenticatedUser,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Id>, Status> {
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
         let metcons =
             Metcon::get_by_ids(&self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if metcons.iter().all(|metcon| metcon.user_id == Some(**auth)) {
@@ -74,11 +70,7 @@ impl VerifyMultipleIdForUser for UnverifiedIds<MetconId> {
 
 #[cfg(feature = "full")]
 impl UnverifiedId<MetconId> {
-    pub fn verify_if_owned(
-        self,
-        auth: &AuthenticatedUser,
-        conn: &PgConnection,
-    ) -> Result<MetconId, Status> {
+    pub fn verify_if_owned(self, auth: &AuthUser, conn: &PgConnection) -> Result<MetconId, Status> {
         let metcon =
             Metcon::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if metcon.user_id.is_none() || metcon.user_id == Some(**auth) {
@@ -137,7 +129,7 @@ pub struct Metcon {
 impl VerifyForUserWithDb for Unverified<Metcon> {
     type Entity = Metcon;
 
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
         let metcon = self.0.into_inner();
         if metcon.user_id == Some(**auth)
             && Metcon::get_by_id(metcon.id, conn)
@@ -169,7 +161,7 @@ pub struct NewMetcon {
 impl VerifyForUserWithoutDb for Unverified<NewMetcon> {
     type Entity = NewMetcon;
 
-    fn verify(self, auth: &AuthenticatedUser) -> Result<Self::Entity, Status> {
+    fn verify(self, auth: &AuthUser) -> Result<Self::Entity, Status> {
         let metcon = self.0.into_inner();
         if metcon.user_id == Some(**auth) {
             Ok(metcon)
@@ -183,7 +175,7 @@ impl VerifyForUserWithoutDb for Unverified<NewMetcon> {
 impl VerifyMultipleForUserWithoutDb for Unverified<Vec<NewMetcon>> {
     type Entity = NewMetcon;
 
-    fn verify(self, auth: &AuthenticatedUser) -> Result<Vec<Self::Entity>, Status> {
+    fn verify(self, auth: &AuthUser) -> Result<Vec<Self::Entity>, Status> {
         let metcons = self.0.into_inner();
         if metcons.iter().all(|metcon| metcon.user_id == Some(**auth)) {
             Ok(metcons)
@@ -205,7 +197,7 @@ pub struct MetconMovementId(pub i32);
 impl VerifyIdForUser for UnverifiedId<MetconMovementId> {
     type Id = MetconMovementId;
 
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Id, Status> {
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Id, Status> {
         let metcon_movement =
             MetconMovement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
@@ -222,11 +214,7 @@ impl VerifyIdForUser for UnverifiedId<MetconMovementId> {
 impl VerifyMultipleIdForUser for UnverifiedIds<MetconMovementId> {
     type Id = MetconMovementId;
 
-    fn verify(
-        self,
-        auth: &AuthenticatedUser,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Id>, Status> {
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
         let metcon_movements = MetconMovement::get_by_ids(&self.0, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?;
         let metcon_ids: Vec<_> = metcon_movements
@@ -247,7 +235,7 @@ impl VerifyMultipleIdForUser for UnverifiedIds<MetconMovementId> {
 impl UnverifiedId<MetconMovementId> {
     pub fn verify_if_owned(
         self,
-        auth: &AuthenticatedUser,
+        auth: &AuthUser,
         conn: &PgConnection,
     ) -> Result<MetconMovementId, Status> {
         let metcon_movement =
@@ -298,7 +286,7 @@ pub struct MetconMovement {
 impl VerifyForUserWithDb for Unverified<MetconMovement> {
     type Entity = MetconMovement;
 
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
         let metcon_movement = self.0.into_inner();
         let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?;
@@ -326,7 +314,7 @@ pub struct NewMetconMovement {
 impl VerifyForUserWithDb for Unverified<NewMetconMovement> {
     type Entity = NewMetconMovement;
 
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
         let metcon_movement = self.0.into_inner();
         let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?;
@@ -342,11 +330,7 @@ impl VerifyForUserWithDb for Unverified<NewMetconMovement> {
 impl VerifyMultipleForUserWithDb for Unverified<Vec<NewMetconMovement>> {
     type Entity = NewMetconMovement;
 
-    fn verify(
-        self,
-        auth: &AuthenticatedUser,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Entity>, Status> {
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Vec<Self::Entity>, Status> {
         let metcon_movements = self.0.into_inner();
         let metcon_ids: Vec<_> = metcon_movements
             .iter()

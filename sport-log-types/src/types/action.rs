@@ -16,7 +16,7 @@ use sport_log_types_derive::{
 #[cfg(feature = "full")]
 use crate::{
     schema::{action, action_event, action_provider, action_rule},
-    AuthenticatedActionProvider, GetById, GetByIds, Platform, UnverifiedId, UnverifiedIds, User,
+    AuthAP, GetById, GetByIds, Platform, UnverifiedId, UnverifiedIds, User,
     VerifyIdForActionProvider, VerifyMultipleIdForActionProvider,
 };
 
@@ -234,11 +234,7 @@ pub struct ActionEventId(pub i32);
 impl VerifyIdForActionProvider for UnverifiedId<ActionEventId> {
     type Id = ActionEventId;
 
-    fn verify_ap(
-        self,
-        auth: &AuthenticatedActionProvider,
-        conn: &PgConnection,
-    ) -> Result<Self::Id, Status> {
+    fn verify_ap(self, auth: &AuthAP, conn: &PgConnection) -> Result<Self::Id, Status> {
         let action_event =
             ActionEvent::get_by_id(self.0, conn).map_err(|_| Status::InternalServerError)?;
         let action = Action::get_by_id(action_event.action_id, conn)
@@ -255,11 +251,7 @@ impl VerifyIdForActionProvider for UnverifiedId<ActionEventId> {
 impl VerifyMultipleIdForActionProvider for UnverifiedIds<ActionEventId> {
     type Id = ActionEventId;
 
-    fn verify_ap(
-        self,
-        auth: &AuthenticatedActionProvider,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Id>, Status> {
+    fn verify_ap(self, auth: &AuthAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
         let action_events =
             ActionEvent::get_by_ids(&self.0, conn).map_err(|_| Status::InternalServerError)?;
         let action_event_ids: Vec<_> = action_events

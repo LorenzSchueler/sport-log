@@ -1,12 +1,11 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthenticatedAdmin, AuthenticatedUser, Create, CreateMultiple, Db, Delete, DeleteMultiple,
-    GetAll, GetByUser, NewPlatform, NewPlatformCredential, Platform, PlatformCredential,
-    PlatformCredentialId, PlatformId, Unverified, UnverifiedId, UnverifiedIds, Update,
-    VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForAdmin,
-    VerifyIdForUser, VerifyIdForUserUnchecked, VerifyMultipleForUserWithoutDb,
-    VerifyMultipleIdForUser,
+    AuthAdmin, AuthUser, Create, CreateMultiple, Db, Delete, DeleteMultiple, GetAll, GetByUser,
+    NewPlatform, NewPlatformCredential, Platform, PlatformCredential, PlatformCredentialId,
+    PlatformId, Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForAdminWithoutDb,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForAdmin, VerifyIdForUser,
+    VerifyIdForUserUnchecked, VerifyMultipleForUserWithoutDb, VerifyMultipleIdForUser,
 };
 
 use crate::handler::IntoJson;
@@ -14,7 +13,7 @@ use crate::handler::IntoJson;
 #[post("/adm/platform", format = "application/json", data = "<platform>")]
 pub async fn adm_create_platform(
     platform: Unverified<NewPlatform>,
-    auth: AuthenticatedAdmin,
+    auth: AuthAdmin,
     conn: Db,
 ) -> Result<Json<Platform>, Status> {
     let platform = platform.verify_adm(&auth)?;
@@ -24,25 +23,19 @@ pub async fn adm_create_platform(
 }
 
 #[get("/adm/platform")]
-pub async fn adm_get_platforms(
-    _auth: AuthenticatedAdmin,
-    conn: Db,
-) -> Result<Json<Vec<Platform>>, Status> {
+pub async fn adm_get_platforms(_auth: AuthAdmin, conn: Db) -> Result<Json<Vec<Platform>>, Status> {
     conn.run(|c| Platform::get_all(c)).await.into_json()
 }
 
 #[get("/platform")]
-pub async fn get_platforms(
-    _auth: AuthenticatedUser,
-    conn: Db,
-) -> Result<Json<Vec<Platform>>, Status> {
+pub async fn get_platforms(_auth: AuthUser, conn: Db) -> Result<Json<Vec<Platform>>, Status> {
     conn.run(|c| Platform::get_all(c)).await.into_json()
 }
 
 #[put("/adm/platform", format = "application/json", data = "<platform>")]
 pub async fn adm_update_platform(
     platform: Unverified<Platform>,
-    auth: AuthenticatedAdmin,
+    auth: AuthAdmin,
     conn: Db,
 ) -> Result<Json<Platform>, Status> {
     let platform = platform.verify_adm(&auth)?;
@@ -54,7 +47,7 @@ pub async fn adm_update_platform(
 #[delete("/adm/platform/<platform_id>")]
 pub async fn adm_delete_platform(
     platform_id: UnverifiedId<PlatformId>,
-    auth: AuthenticatedAdmin,
+    auth: AuthAdmin,
     conn: Db,
 ) -> Result<Status, Status> {
     let platform_id = platform_id.verify_adm(&auth)?;
@@ -73,7 +66,7 @@ pub async fn adm_delete_platform(
 )]
 pub async fn create_platform_credential(
     platform_credential: Unverified<NewPlatformCredential>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<PlatformCredential>, Status> {
     let platform_credential = platform_credential.verify(&auth)?;
@@ -90,7 +83,7 @@ pub async fn create_platform_credential(
 pub async fn create_platform_credentials(
     // TODO change name to credential
     platform_credentials: Unverified<Vec<NewPlatformCredential>>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<PlatformCredential>>, Status> {
     let platform_credentials = platform_credentials.verify(&auth)?;
@@ -101,7 +94,7 @@ pub async fn create_platform_credentials(
 
 #[get("/platform_credential")]
 pub async fn get_platform_credentials(
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<PlatformCredential>>, Status> {
     conn.run(move |c| PlatformCredential::get_by_user(*auth, c))
@@ -112,7 +105,7 @@ pub async fn get_platform_credentials(
 #[get("/platform_credential/platform/<platform_id>")]
 pub async fn get_platform_credentials_by_platform(
     platform_id: UnverifiedId<PlatformId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<PlatformCredential>, Status> {
     let platform_id = platform_id.verify_unchecked(&auth)?;
@@ -128,7 +121,7 @@ pub async fn get_platform_credentials_by_platform(
 )]
 pub async fn update_platform_credential(
     platform_credential: Unverified<PlatformCredential>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Json<PlatformCredential>, Status> {
     let platform_credential = conn
@@ -142,7 +135,7 @@ pub async fn update_platform_credential(
 #[delete("/platform_credential/<platform_credential_id>")]
 pub async fn delete_platform_credential(
     platform_credential_id: UnverifiedId<PlatformCredentialId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
@@ -160,7 +153,7 @@ pub async fn delete_platform_credential(
 )]
 pub async fn delete_platform_credentials(
     platform_credential_ids: UnverifiedIds<PlatformCredentialId>,
-    auth: AuthenticatedUser,
+    auth: AuthUser,
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
