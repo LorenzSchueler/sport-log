@@ -1,11 +1,12 @@
-use std::fs;
+use std::{env, fs};
 
 use chrono::{Duration, Local, NaiveDateTime};
 use reqwest::{header::CONTENT_TYPE, Client, StatusCode};
 use serde::{Deserialize, Serialize};
 
 use sport_log_types::{
-    ActionEventId, CardioType, ExecutableActionEvent, Movement, NewCardioSession, Position,
+    ActionEventId, ActionProvider, CardioType, ExecutableActionEvent, Movement, NewAction,
+    NewCardioSession, Position,
 };
 
 #[derive(Deserialize)]
@@ -92,9 +93,73 @@ struct Location {
     d: u64,  // timestamp in 1 / 1000 s
 }
 
-// TODO ignore errors
 #[tokio::main]
 async fn main() {
+    match &env::args().collect::<Vec<_>>()[1..] {
+        [] => fetch().await,
+        [option] if option == "--setup" => setup().await,
+        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
+        _ => wrong_use(),
+    }
+}
+
+fn help() {
+    println!(
+        "Sportstracker Action Provider\n\n\
+
+        USAGE:\n\
+        sport-log-action-provider-sportstracker [OPTIONS]\n\n\
+
+        OPTIONS:\n\
+        -h, --help\tprint this help page\n\
+        --setup\t\tcreate own actions"
+    );
+}
+
+fn wrong_use() {
+    println!("no such options");
+}
+
+async fn setup() {
+    let config = Config::get();
+
+    let client = Client::new();
+
+    let action_provider: ActionProvider = client
+        .get(format!("{}/v1/ap/action_provider", config.base_url))
+        .basic_auth(&config.username, Some(&config.password))
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+
+    let action = NewAction {
+        name: "fetch".to_owned(),
+        action_provider_id: action_provider.id,
+        description: Some("Fetch and save new workouts.".to_owned()),
+        create_before: 168,
+        delete_after: 0,
+    };
+
+    match client
+        .post(format!("{}/v1/ap/action", config.base_url))
+        .basic_auth(&config.username, Some(&config.password))
+        .json(&action)
+        .send()
+        .await
+        .unwrap()
+        .status()
+    {
+        StatusCode::OK => println!("setup successful"),
+        StatusCode::CONFLICT => println!("action already exists"),
+        status => println!("an error occured (status {})", status),
+    }
+}
+
+// TODO handle connection errors and ignore everything else errors
+async fn fetch() {
     let config = Config::get();
 
     let client = Client::new();
