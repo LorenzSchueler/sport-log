@@ -9,7 +9,7 @@ use sport_log_types::{
     VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
     VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
     VerifyIdForUserUnchecked, VerifyMultipleForAdminWithoutDb, VerifyMultipleForUserWithoutDb,
-    VerifyMultipleIdForAdmin, VerifyMultipleIdForUser,
+    VerifyMultipleIdForActionProvider, VerifyMultipleIdForAdmin, VerifyMultipleIdForUser,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
@@ -96,20 +96,6 @@ pub async fn ap_get_actions(
 #[get("/action")]
 pub async fn get_actions(_auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Action>>, Status> {
     conn.run(|c| Action::get_all(c)).await.into_json()
-}
-
-#[delete("/ap/action/<action_id>")]
-pub async fn ap_delete_action(
-    action_id: UnverifiedId<ActionId>,
-    auth: AuthenticatedActionProvider,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Action::delete(action_id.verify_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
 }
 
 #[post("/action_rule", format = "application/json", data = "<action_rule>")]
@@ -312,6 +298,38 @@ pub async fn delete_action_event(
 ) -> Result<Status, Status> {
     conn.run(move |c| {
         ActionEvent::delete(action_event_id.verify(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
+#[delete("/ap/action_event/<action_event_id>")]
+pub async fn ap_delete_action_event(
+    action_event_id: UnverifiedId<ActionEventId>,
+    auth: AuthenticatedActionProvider,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        ActionEvent::delete(action_event_id.verify_ap(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
+#[delete(
+    "/ap/action_events",
+    format = "application/json",
+    data = "<action_event_ids>"
+)]
+pub async fn ap_delete_action_events(
+    action_event_ids: UnverifiedIds<ActionEventId>,
+    auth: AuthenticatedActionProvider,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        ActionEvent::delete_multiple(action_event_ids.verify_ap(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
