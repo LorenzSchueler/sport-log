@@ -3,7 +3,7 @@ enum MovementUnit {
   reps, cal, meter, km, yard, foot, mile
 }
 
-extension ToDisplayName on MovementUnit {
+extension MovementUniToDisplayName on MovementUnit {
   String toDisplayName() {
     switch (this) {
       case MovementUnit.reps:
@@ -26,6 +26,17 @@ extension ToDisplayName on MovementUnit {
 
 enum MovementCategory {
   strength, cardio
+}
+
+extension MovementCategoryToDisplayName on MovementCategory {
+  String toDisplayName() {
+    switch (this) {
+      case MovementCategory.strength:
+        return "strength";
+      case MovementCategory.cardio:
+        return "cardio";
+    }
+  }
 }
 
 class UiMovement {
