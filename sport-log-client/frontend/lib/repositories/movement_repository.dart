@@ -5,16 +5,21 @@ class MovementRepository {
 
   final Map<int, Movement> _movements = {};
   
-  int get _nextId => _movements.length;
+  int get nextMovementId => _movements.length;
 
-  int createMovement(NewMovement movement, int userId) {
-    final id = _nextId;
-    _movements[id] = Movement.fromNewMovement(movement, id, userId);
-    return id;
+  void addMovement(Movement movement) {
+    assert(!_movements.containsKey(movement.id));
+    _movements[movement.id] = movement;
   }
 
   void deleteMovement(int id) {
+    assert(_movements.containsKey(id));
     _movements.remove(id);
+  }
+
+  void updateMovement(Movement movement) {
+    assert(_movements.containsKey(movement.id));
+    _movements[movement.id] = movement;
   }
 
   Movement? getMovement(int id) {

@@ -5,11 +5,6 @@ class MetconRepository {
   final Map<int, Metcon> _metcons = {};
   final Map<int, MetconMovement> _metconMovements = {};
 
-  MetconMovement? getMetconMovement(int id) {
-    assert(_metconMovements.containsKey(id));
-    return _metconMovements[id];
-  }
-
   List<MetconMovement> getMetconMovementsOfMetcon(Metcon metcon) {
     return _metconMovements.values.where((mm) => mm.metconId == metcon.id)
       .toList();
@@ -27,16 +22,6 @@ class MetconRepository {
   }
 
   void updateOrAddMetconMovement(MetconMovement mm) {
-    _metconMovements[mm.id] = mm;
-  }
-
-  void deleteMetconMovement(int id) {
-    assert(_metconMovements.containsKey(id));
-    _metconMovements.remove(id);
-  }
-
-  void updateMetconMovement(MetconMovement mm) {
-    assert(_metconMovements.containsKey(mm.id));
     _metconMovements[mm.id] = mm;
   }
 
@@ -66,9 +51,6 @@ class MetconRepository {
     _metcons[m.id] = m;
   }
 
-  static int _nextMetconId = 0;
-  int get nextMetconId => _nextMetconId++;
-
-  static int _nextMetconMovementId = 0;
-  int get nextMetconMovementId => _nextMetconMovementId++;
+  int get nextMetconId => _metcons.length;
+  int get nextMetconMovementId => _metconMovements.length;
 }

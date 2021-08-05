@@ -61,23 +61,14 @@ class MetconRequestGetAll extends MetconRequestEvent {
 
 /// Actual Bloc
 class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
-  MetconRequestBloc({
-    required MetconRepository metconRepository,
-    required MetconsCubit metconsCubit,
-    required Api api,
-  }) : _metconRepository = metconRepository,
-       _metconsCubit = metconsCubit,
-       _api = api,
-       super(const MetconRequestIdle());
-
   MetconRequestBloc.fromContext(BuildContext context)
-    : _metconRepository = context.read<MetconRepository>(),
-      _metconsCubit = context.read<MetconsCubit>(),
+    : _repo = context.read<MetconRepository>(),
+      _cubit = context.read<MetconsCubit>(),
       _api = context.read<Api>(),
       super(const MetconRequestIdle());
 
-  final MetconRepository _metconRepository;
-  final MetconsCubit _metconsCubit;
+  final MetconRepository _repo;
+  final MetconsCubit _cubit;
   final Api _api;
 
   @override
@@ -98,25 +89,25 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
     assert(event.newMetcon.id == null);
     int userId = _api.getCredentials()!.userId;
     event.newMetcon.userId = userId;
-    event.newMetcon.id = _metconRepository.nextMetconId;
+    event.newMetcon.id = _repo.nextMetconId;
     final metcon = event.newMetcon.toMetcon();
     final metconMovements = event.newMetcon.moves.mapIndexed((index, mm) {
       assert(mm.id == null);
-      mm.id = _metconRepository.nextMetconMovementId;
+      mm.id = _repo.nextMetconMovementId;
       return mm.toMetconMovement(metcon, index);
     }).toList();
     await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
-    _metconRepository.addMetcon(metcon);
-    _metconRepository.addMetconMovements(metconMovements);
-    _metconsCubit.addMetcon(event.newMetcon);
+    _repo.addMetcon(metcon);
+    _repo.addMetconMovements(metconMovements);
+    _cubit.addMetcon(event.newMetcon);
     yield const MetconRequestSucceeded();
   }
 
   Stream<MetconRequestState> _deleteMetcon(MetconRequestDelete event) async* {
     yield const MetconRequestPending();
-    _metconRepository.deleteMetcon(event.id);
+    _repo.deleteMetcon(event.id);
     await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
-    _metconsCubit.deleteMetcon(event.id);
+    _cubit.deleteMetcon(event.id);
     yield const MetconRequestSucceeded();
   }
 
@@ -126,26 +117,26 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
     assert(event.metcon.id != null);
     final metcon = event.metcon.toMetcon();
     final metconMovements = event.metcon.moves.mapIndexed((index, mm) {
-      mm.id ??= _metconRepository.nextMetconMovementId;
+      mm.id ??= _repo.nextMetconMovementId;
       return mm.toMetconMovement(metcon, index);
     }).toList();
     await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
-    _metconRepository.updateMetcon(metcon);
-    _metconRepository.updateOrAddMetconMovements(metconMovements);
-    _metconsCubit.updateMetcon(event.metcon);
+    _repo.updateMetcon(metcon);
+    _repo.updateOrAddMetconMovements(metconMovements);
+    _cubit.updateMetcon(event.metcon);
     yield const MetconRequestSucceeded();
   }
 
   Stream<MetconRequestState> _getAllMetcons(MetconRequestGetAll event) async* {
     yield const MetconRequestPending();
     await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
-    final uiMetcons = _metconRepository.getMetcons().map((metcon) {
-      final movements = _metconRepository.getMetconMovementsOfMetcon(metcon)
+    final uiMetcons = _repo.getMetcons().map((metcon) {
+      final movements = _repo.getMetconMovementsOfMetcon(metcon)
         .map((movement) => UiMetconMovement.fromMetconMovement(movement))
         .toList();
       return UiMetcon.fromMetcon(metcon, movements);
     }).toList();
-    _metconsCubit.loadMetcons(uiMetcons);
+    _cubit.loadMetcons(uiMetcons);
     yield const MetconRequestSucceeded();
   }
 }

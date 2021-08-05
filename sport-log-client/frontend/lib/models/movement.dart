@@ -28,13 +28,17 @@ enum MovementCategory {
   strength, cardio
 }
 
-class NewMovement {
-  NewMovement({
+class UiMovement {
+  UiMovement({
+    required this.id,
+    required this.userId,
     required this.name,
     required this.category,
-    this.description,
+    required this.description,
   });
 
+  int? id;
+  int? userId;
   String name;
   MovementCategory category;
   String? description;
@@ -46,7 +50,7 @@ class Movement {
     required this.userId,
     required this.name,
     required this.category,
-    this.description,
+    required this.description,
   });
 
   int id;
@@ -54,7 +58,4 @@ class Movement {
   String name;
   MovementCategory category;
   String? description;
-
-  Movement.fromNewMovement(NewMovement nm, this.id, this.userId)
-    : name = nm.name, description = nm.description, category = nm.category;
 }
