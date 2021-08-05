@@ -16,7 +16,8 @@ use sport_log_types_derive::{
 #[cfg(feature = "full")]
 use crate::{
     schema::{action, action_event, action_provider, action_rule},
-    AuthenticatedActionProvider, GetById, Platform, UnverifiedId, User, VerifyIdForActionProvider,
+    AuthenticatedActionProvider, GetById, GetByIds, Platform, UnverifiedId, UnverifiedIds, User,
+    VerifyIdForActionProvider, VerifyMultipleIdForActionProvider,
 };
 
 use crate::{PlatformId, UserId};
@@ -238,11 +239,39 @@ impl VerifyIdForActionProvider for UnverifiedId<ActionEventId> {
         auth: &AuthenticatedActionProvider,
         conn: &PgConnection,
     ) -> Result<Self::Id, Status> {
-        let action_event = ActionEvent::get_by_id(ActionEventId(self.0 .0), conn)
+        let action_event =
+            ActionEvent::get_by_id(self.0, conn).map_err(|_| Status::InternalServerError)?;
+        let action = Action::get_by_id(action_event.action_id, conn)
             .map_err(|_| Status::InternalServerError)?;
-        let entity = Action::get_by_id(action_event.action_id, conn)
-            .map_err(|_| Status::InternalServerError)?;
-        if entity.action_provider_id == **auth {
+        if action.action_provider_id == **auth {
+            Ok(self.0)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "full")]
+impl VerifyMultipleIdForActionProvider for UnverifiedIds<ActionEventId> {
+    type Id = ActionEventId;
+
+    fn verify_ap(
+        self,
+        auth: &AuthenticatedActionProvider,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status> {
+        let action_events =
+            ActionEvent::get_by_ids(&self.0, conn).map_err(|_| Status::InternalServerError)?;
+        let action_event_ids: Vec<_> = action_events
+            .iter()
+            .map(|action_event| action_event.action_id)
+            .collect();
+        let actions =
+            Action::get_by_ids(&action_event_ids, conn).map_err(|_| Status::InternalServerError)?;
+        if actions
+            .iter()
+            .all(|action| action.action_provider_id == **auth)
+        {
             Ok(self.0)
         } else {
             Err(Status::Forbidden)
