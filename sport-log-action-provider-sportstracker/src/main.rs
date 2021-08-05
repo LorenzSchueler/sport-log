@@ -1,7 +1,7 @@
 use std::fs;
 
 use chrono::{Duration, Local, NaiveDateTime};
-use reqwest::{header::CONTENT_TYPE, Client};
+use reqwest::{header::CONTENT_TYPE, Client, StatusCode};
 use serde::{Deserialize, Serialize};
 
 use sport_log_types::{
@@ -102,6 +102,7 @@ async fn main() {
     let exec_action_events = get_events(&client, &config).await;
     println!("executable action events: {}\n", exec_action_events.len());
 
+    let mut delete_action_events = vec![];
     for exec_action_event in exec_action_events {
         println!("{:#?}", exec_action_event);
 
@@ -133,7 +134,7 @@ async fn main() {
                         movement
                     })
                     .collect();
-                println!("{:#?}\n", movements);
+                //println!("{:#?}\n", movements);
 
                 for workout in workouts {
                     if let Some(workout_data) =
@@ -187,33 +188,48 @@ async fn main() {
                             route_id: None,
                             comments: workout.description,
                         };
-                        println!("{:?}", cardio_session);
-                        let response = client
+                        //println!("{:?}", cardio_session);
+                        match client
                             .post(format!("{}/v1/cardio_session", config.base_url))
                             .basic_auth(&username, Some(&config.password))
                             .body(serde_json::to_string(&cardio_session).unwrap())
                             .header(CONTENT_TYPE, "application/json")
                             .send()
                             .await
-                            .unwrap();
-                        if !response.status().is_success() {
-                            break;
+                            .unwrap()
+                            .status()
+                        {
+                            status if status.is_success() => {
+                                println!("cardio session saved");
+                            }
+                            StatusCode::CONFLICT => {
+                                println!(
+                                    "everything up to date for user {}",
+                                    exec_action_event.user_id.0
+                                );
+                                break;
+                            }
+                            status => {
+                                println!("error (status {:?})", status);
+                                break;
+                            }
                         }
                     }
                 }
             }
-            //delete_event(&client, &config, &exec_action_event.action_event_id).await;
+            delete_action_events.push(exec_action_event.action_event_id);
         } else {
             println!("login failed!\n");
         }
     }
+    delete_events(&client, &config, &delete_action_events).await;
 }
 
 async fn get_events(client: &Client, config: &Config) -> Vec<ExecutableActionEvent> {
     let now = Local::now().naive_local();
-    let datetime_start = (now + Duration::hours(1)).format("%Y-%m-%dT%H:%M:%S");
+    let datetime_start = now.format("%Y-%m-%dT%H:%M:%S");
     let datetime_end =
-        (now + Duration::hours(24) + Duration::minutes(1)).format("%Y-%m-%dT%H:%M:%S");
+        (now + Duration::hours(1) + Duration::minutes(1)).format("%Y-%m-%dT%H:%M:%S");
 
     let exec_action_events: Vec<ExecutableActionEvent> = client
         .get(format!(
@@ -231,13 +247,11 @@ async fn get_events(client: &Client, config: &Config) -> Vec<ExecutableActionEve
     exec_action_events
 }
 
-async fn delete_event(client: &Client, config: &Config, action_event_id: &ActionEventId) {
+async fn delete_events(client: &Client, config: &Config, action_event_ids: &Vec<ActionEventId>) {
     client
-        .delete(format!(
-            "{}/v1/ap/action_event/{}",
-            config.base_url, action_event_id.0
-        ))
+        .delete(format!("{}/v1/ap/action_events", config.base_url,))
         .basic_auth(&config.username, Some(&config.password))
+        .json(action_event_ids)
         .send()
         .await
         .unwrap();
