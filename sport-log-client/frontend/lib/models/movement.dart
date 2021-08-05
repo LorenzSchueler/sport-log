@@ -1,6 +1,4 @@
 
-import 'package:sport_log/helpers/pluralize.dart';
-
 enum MovementUnit {
   reps, cal, meter, km, yard, foot, mile
 }
@@ -57,7 +55,6 @@ class Movement {
   MovementCategory category;
   String? description;
 
-  Movement.fromNewMovement(NewMovement nm, this.id)
-    : name = nm.name, userId = 1,
-      description = nm.description, category = nm.category;
+  Movement.fromNewMovement(NewMovement nm, this.id, this.userId)
+    : name = nm.name, description = nm.description, category = nm.category;
 }

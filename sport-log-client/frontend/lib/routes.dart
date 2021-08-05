@@ -7,4 +7,5 @@ abstract class Routes {
   static const editMetcon = workout + '/edit-metcon';
   static const syncing = '/syncing';
   static const logs = '/logs';
+  static const movements = '/movements';
 }

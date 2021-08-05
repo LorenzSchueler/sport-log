@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/metcon.dart';
 import 'package:sport_log/pages/logs/logs_page.dart';
+import 'package:sport_log/pages/movements/movements_page.dart';
 import 'package:sport_log/pages/syncing/syncing_page.dart';
 import 'package:sport_log/pages/workout/metcon/edit_metcon_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
@@ -43,6 +44,7 @@ class _AppState extends State<App> {
         }),
         Routes.syncing: (_) => ProtectedRoute(builder: (_) => const SyncingPage()),
         Routes.logs: (_) => ProtectedRoute(builder: (_) => const LogsPage()),
+        Routes.movements: (_) => ProtectedRoute(builder: (_) => const MovementsPage()),
       },
       initialRoute: widget.isAuthenticatedAtStart ? Routes.workout : Routes.landing,
       debugShowCheckedModeBanner: false,

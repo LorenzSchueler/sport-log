@@ -23,6 +23,14 @@ class MainDrawer extends StatelessWidget {
             child: null,
           ),
           ListTile(
+            title: const Text("Movements"),
+            leading: const Icon(Icons.apps),
+            onTap: () {
+              Nav.changeNamed(context, Routes.movements);
+            },
+            selected: selectedRoute == Routes.movements,
+          ),
+          ListTile(
             title: const Text("Workout"),
             leading: const Icon(CustomIcons.dumbbell_rotated),
             onTap: () {

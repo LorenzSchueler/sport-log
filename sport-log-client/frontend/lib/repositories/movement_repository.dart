@@ -7,9 +7,9 @@ class MovementRepository {
   
   int get _nextId => _movements.length;
 
-  int createMovement(NewMovement movement) {
+  int createMovement(NewMovement movement, int userId) {
     final id = _nextId;
-    _movements[id] = Movement.fromNewMovement(movement, id);
+    _movements[id] = Movement.fromNewMovement(movement, id, userId);
     return id;
   }
 
