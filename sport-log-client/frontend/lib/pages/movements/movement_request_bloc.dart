@@ -22,7 +22,11 @@ class MovementRequestFailed extends MovementRequestState {
   final ApiError reason;
 }
 
-class MovementRequestSucceeded extends MovementRequestState {}
+class MovementRequestSucceeded extends MovementRequestState {
+  MovementRequestSucceeded({this.payload});
+
+  dynamic payload;
+}
 
 /// Bloc Event
 abstract class MovementRequestEvent {}
@@ -87,7 +91,7 @@ class MovementRequestBloc
     await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
     _repo.addMovement(movement);
     _cubit.addMovement(movement);
-    yield MovementRequestSucceeded();
+    yield MovementRequestSucceeded(payload: movement.id);
   }
 
   Stream<MovementRequestState> _deleteMovement(MovementRequestDelete event) async* {
@@ -95,7 +99,7 @@ class MovementRequestBloc
     await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
     _repo.deleteMovement(event.id);
     _cubit.deleteMovement(event.id);
-    yield MovementRequestSucceeded();
+    yield MovementRequestSucceeded(payload: event.id);
   }
 
   Stream<MovementRequestState> _updateMovement(MovementRequestUpdate event) async* {
@@ -113,7 +117,7 @@ class MovementRequestBloc
     );
     _repo.updateMovement(movement);
     _cubit.updateMovement(movement);
-    yield MovementRequestSucceeded();
+    yield MovementRequestSucceeded(payload: movement.id);
   }
 
   Stream<MovementRequestState> _getAllMovements(MovementRequestGetAll event) async* {

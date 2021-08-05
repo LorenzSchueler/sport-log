@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/models/movement.dart';
 import 'package:sport_log/repositories/movement_repository.dart';
+import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 class MovementPickerDialog extends StatefulWidget {
@@ -15,6 +16,11 @@ class MovementPickerDialog extends StatefulWidget {
 class _MovementPickerDialogState extends State<MovementPickerDialog> {
 
   List<Movement> _movements = [];
+  String _searchTerm = "";
+  bool _anyFullMatches = false;
+
+  bool get _canCreateNewMovement =>
+      _searchTerm.isNotEmpty && _anyFullMatches == false;
 
   @override
   void initState() {
@@ -43,8 +49,17 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
             ),
             SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, index) => _movementToWidget(_movements[index]),
-                childCount: _movements.length
+                (context, index) {
+                  if (_canCreateNewMovement) {
+                    return index == 0
+                        ? _newMovementButton(context)
+                        : _movementToWidget(_movements[index - 1]);
+                  } else {
+                    return _movementToWidget(_movements[index]);
+                  }
+                },
+                childCount: _canCreateNewMovement
+                    ? _movements.length + 1 : _movements.length,
               ),
             ),
           ],
@@ -54,16 +69,37 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
   }
 
   Widget _searchTextField() {
-    return TextField(
+    return TextFormField(
+      initialValue: _searchTerm,
       onChanged: (text) {
         setState(() {
           _movements = context.read<MovementRepository>().searchByName(text);
+          _searchTerm = text;
+          final search = _searchTerm.toLowerCase();
+          _anyFullMatches = _movements.any((movement) =>
+            movement.name.toLowerCase() == search);
         });
       },
       decoration: const InputDecoration(
         labelText: "Search",
         icon: Icon(Icons.search)
       ),
+    );
+  }
+
+  _newMovementButton(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.add),
+      title: Text("Create new movement '$_searchTerm'"),
+      onTap: () async {
+        dynamic payload = await Navigator.of(context).pushNamed(
+          Routes.editMovement,
+          arguments: _searchTerm,
+        );
+        if (payload is int) {
+          Navigator.of(context).pop(payload);
+        }
+      },
     );
   }
 

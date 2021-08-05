@@ -11,32 +11,46 @@ class EditMovementPage extends StatefulWidget {
   EditMovementPage({
     Key? key,
     UiMovement? initialMovement,
-  }) : _initialMovement = initialMovement, super(key: key) {
+    String? initialName,
+  }) : assert(initialMovement == null || initialName == null),
+       _initialMovement = initialMovement,
+       _initialName = initialName,
+       super(key: key) {
     if (initialMovement != null) {
       assert(_initialMovement!.id != null);
     }
   }
 
   final UiMovement? _initialMovement;
+  final String? _initialName;
 
   @override
-  State<StatefulWidget> createState() => _EditMovementPageState(_initialMovement);
+  State<StatefulWidget> createState() => _EditMovementPageState();
 
   bool get _isEditing => _initialMovement != null;
 }
 
 class _EditMovementPageState extends State<EditMovementPage> {
 
-  _EditMovementPageState(UiMovement? movement)
-    : _movement = movement ?? UiMovement(
-      id: null,
-      userId: null,
-      name: "",
-      category: _categoryDefaultValue,
-      description: null,
-  );
+  _EditMovementPageState();
 
-  UiMovement _movement;
+  @override
+  void initState() {
+    super.initState();
+    if (widget._initialMovement != null) {
+      _movement = widget._initialMovement!;
+    } else {
+      _movement = UiMovement(
+        id: null,
+        userId: null,
+        name: widget._initialName ?? "",
+        category: _categoryDefaultValue,
+        description: null
+      );
+    }
+  }
+
+  late UiMovement _movement;
 
   final _descriptionFocusNode = FocusNode();
   static const _categoryDefaultValue = MovementCategory.strength;
@@ -95,7 +109,11 @@ class _EditMovementPageState extends State<EditMovementPage> {
         } else if (state is MovementRequestSucceeded) {
           final navigator = Navigator.of(context);
           navigator.pop();
-          navigator.pop();
+          if (state.payload is int) {
+            navigator.pop(state.payload);
+          } else {
+            navigator.pop();
+          }
         } else if (state is MovementRequestPending) {
           showDialog(
             context: context,

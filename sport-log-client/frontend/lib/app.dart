@@ -47,6 +47,11 @@ class _AppState extends State<App> {
         Routes.movements: (_) => ProtectedRoute(builder: (_) => const MovementsPage()),
         Routes.editMovement: (_) => ProtectedRoute(builder: (context) {
           final arg = ModalRoute.of(context)?.settings.arguments;
+          if (arg is UiMovement) {
+            return EditMovementPage(initialMovement: arg);
+          } else if (arg is String) {
+            return EditMovementPage(initialName: arg);
+          }
           return EditMovementPage(
            initialMovement: (arg != null && arg is UiMovement) ? arg : null,
           );
