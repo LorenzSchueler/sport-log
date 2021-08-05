@@ -282,6 +282,17 @@ pub trait VerifyIdForActionProvider {
 }
 
 #[cfg(feature = "full")]
+pub trait VerifyMultipleIdForActionProvider {
+    type Id;
+
+    fn verify_ap(
+        self,
+        auth: &AuthenticatedActionProvider,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status>;
+}
+
+#[cfg(feature = "full")]
 pub trait VerifyIdForAdmin {
     type Id;
 

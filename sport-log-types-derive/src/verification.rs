@@ -100,6 +100,26 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
                 }
             }
         }
+
+        impl crate::VerifyMultipleIdForActionProvider for crate::UnverifiedIds<#id_typename> {
+            type Id = #id_typename;
+
+            fn verify_ap(
+                self,
+                auth: &crate::AuthenticatedActionProvider,
+                conn: &diesel::pg::PgConnection,
+            ) -> Result<Vec<crate::#id_typename>, rocket::http::Status> {
+                use crate::GetByIds;
+
+                let entities = crate::#typename::get_by_ids(&self.0, conn)
+                    .map_err(|_| rocket::http::Status::Forbidden)?;
+                if entities.iter().all(|entity| entity.action_provider_id == **auth) {
+                    Ok(self.0)
+                } else {
+                    Err(rocket::http::Status::Forbidden)
+                }
+            }
+        }
     };
     gen.into()
 }
