@@ -117,6 +117,10 @@ class MovementRequestBloc
   }
 
   Stream<MovementRequestState> _getAllMovements(MovementRequestGetAll event) async* {
-
+    yield MovementRequestPending();
+    await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
+    final movements = _repo.getAllMovements();
+    _cubit.loadMovements(movements);
+    yield MovementRequestSucceeded();
   }
 }

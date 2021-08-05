@@ -8,6 +8,7 @@
 * [ ] improve landing screen
 * [ ] i18n
 * [ ] local units (metric vs imperial system)
+* [ ] maybe put initial resource loading into resource bloc
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)
@@ -16,6 +17,4 @@
 * [ ] OutlinedButtons bigger
 
 ### Movements
-* [ ] add movements overview screen
-* [ ] display existing movements
 * [ ] create new movements screen

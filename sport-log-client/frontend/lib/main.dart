@@ -3,6 +3,7 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/models/movement.dart';
+import 'package:sport_log/pages/movements/movements_cubit.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_cubit.dart';
 import 'package:sport_log/repositories/authentication_repository.dart';
 import 'package:sport_log/repositories/movement_repository.dart';
@@ -31,7 +32,8 @@ void main() async {
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider.value(value: authBloc),
-      BlocProvider.value(value: MetconsCubit())
+      BlocProvider.value(value: MetconsCubit()),
+      BlocProvider.value(value: MovementsCubit()),
     ],
     child: MultiRepositoryProvider(
       providers: [
