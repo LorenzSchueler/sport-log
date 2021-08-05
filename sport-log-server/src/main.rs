@@ -104,6 +104,7 @@ fn rocket() -> _ {
                 action::adm_get_deletable_action_events,
                 action::adm_create_action_events,
                 action::adm_delete_action_events,
+                action::ap_get_action_provider,
                 action::ap_create_action,
                 action::ap_get_action,
                 action::ap_get_actions,

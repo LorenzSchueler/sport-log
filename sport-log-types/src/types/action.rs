@@ -47,6 +47,7 @@ pub struct ActionProviderId(pub i32);
         Identifiable,
         Queryable,
         AsChangeset,
+        GetById,
         GetAll,
         Delete,
         DeleteMultiple,

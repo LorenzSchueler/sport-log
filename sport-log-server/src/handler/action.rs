@@ -37,6 +37,16 @@ pub async fn adm_get_action_providers(
     conn.run(|c| ActionProvider::get_all(c)).await.into_json()
 }
 
+#[get("/ap/action_provider")]
+pub async fn ap_get_action_provider(
+    auth: AuthAP,
+    conn: Db,
+) -> Result<Json<ActionProvider>, Status> {
+    conn.run(move |c| ActionProvider::get_by_id(*auth, c))
+        .await
+        .into_json()
+}
+
 #[get("/action_provider")]
 pub async fn get_action_providers(
     _auth: AuthUser,
