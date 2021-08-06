@@ -1,11 +1,40 @@
+//! The Sport Log Scheduler creates [ActionEvents](sport_log_types::ActionEvent) from [ActionRules](sport_log_types::ActionRule) and deletes old [ActionEvents](sport_log_types::ActionEvent).
+//!
+//! [ActionEvents](sport_log_types::ActionEvent) are only created from enabled [ActionRules](sport_log_types::ActionRule).
+//!
+//! The timespan they are created before their `datetime` is determined by the `create_before` field of the corresponding [Action](sport_log_types::Action).
+//!
+//! Similarly the timespan they are deleted after their `datetime` is determined by the `delete_after` field of the corresponding [Action](sport_log_types::Action).
+//!
+//! However most [ActionProvider](sport_log_types::ActionProvider) will delete an [ActionEvent](sport_log_types::ActionEvent) after it has been executed.
+//!
+//! # Usage
+//!
+//! The Sport Log Scheduler has do be executed periodically, perferably as a cron job every hour.
+//!
+//! # Config
+//!
+//! The config file must be called `sport-log-scheduler.toml` and must be deserializable to a [Config].
+
+use std::fs;
+
 use chrono::{Datelike, Duration, Local, NaiveDateTime};
 use reqwest::blocking::Client;
+use serde::Deserialize;
 
 use sport_log_types::{CreatableActionRule, DeletableActionEvent, NewActionEvent};
 
-mod config;
+#[derive(Deserialize)]
+pub struct Config {
+    pub admin_password: String,
+    pub base_url: String,
+}
 
-use config::Config;
+impl Config {
+    pub fn get() -> Self {
+        toml::from_str(&fs::read_to_string("sport-log-scheduler.toml").unwrap()).unwrap()
+    }
+}
 
 fn main() {
     let config = Config::get();
