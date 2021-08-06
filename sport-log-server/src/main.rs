@@ -99,12 +99,13 @@ fn rocket() -> _ {
                 platform::adm_delete_platform,
                 action::adm_create_action_provider,
                 action::adm_get_action_providers,
-                action::adm_delete_action_provider,
-                action::adm_get_creatable_action_rules,
-                action::adm_get_deletable_action_events,
-                action::adm_create_action_events,
-                action::adm_delete_action_events,
+                action::adm_get_creatable_action_rules, // for scheduler
+                action::adm_get_deletable_action_events, // for scheduler
+                action::adm_create_action_events,       // for scheduler
+                action::adm_delete_action_events,       // for scheduler
+                action::ap_create_action_provider,
                 action::ap_get_action_provider,
+                action::ap_delete_action_provider,
                 action::ap_create_action,
                 action::ap_get_action,
                 action::ap_get_actions,

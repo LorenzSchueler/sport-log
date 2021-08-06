@@ -347,6 +347,13 @@ pub trait VerifyMultipleForUserWithoutDb {
 }
 
 #[cfg(feature = "full")]
+pub trait VerifyForUserUnchecked {
+    type Entity;
+
+    fn verify_unchecked(self) -> Result<Self::Entity, Status>;
+}
+
+#[cfg(feature = "full")]
 pub trait VerifyForUserOrAPWithDb {
     type Entity;
 
@@ -392,7 +399,7 @@ pub trait VerifyForActionProviderWithoutDb {
 pub trait VerifyForActionProviderUnchecked {
     type Entity;
 
-    fn verify_unchecked_ap(self, auth: &AuthAP) -> Result<Self::Entity, Status>;
+    fn verify_ap_unchecked(self) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]

@@ -2,7 +2,7 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
     AuthAdmin, AuthUser, Create, Db, Delete, GetById, NewUser, Unverified, Update, User,
-    VerifyForUserWithDb, CONFIG,
+    VerifyForUserUnchecked, VerifyForUserWithDb, CONFIG,
 };
 
 use crate::handler::IntoJson;
@@ -19,8 +19,8 @@ pub async fn adm_create_user(
 
 #[post("/user", format = "application/json", data = "<user>")]
 pub async fn create_user(user: Unverified<NewUser>, conn: Db) -> Result<Json<User>, Status> {
-    if !CONFIG.self_registration {
-        return Err(Status::Unauthorized);
+    if !CONFIG.user_self_registration {
+        return Err(Status::Forbidden);
     }
     let user = user.verify_unchecked()?;
     conn.run(|c| User::create(user, c)).await.into_json()

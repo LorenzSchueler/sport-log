@@ -8,9 +8,10 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
     Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
-    GetByUser, ToSql, Update, VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb,
-    VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
-    VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser, VerifyIdForUserUnchecked,
+    GetByUser, ToSql, Update, VerifyForActionProviderUnchecked, VerifyForActionProviderWithDb,
+    VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
+    VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
+    VerifyIdForUserUnchecked,
 };
 
 #[cfg(feature = "full")]
@@ -65,7 +66,10 @@ pub struct ActionProvider {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForAdminWithoutDb))]
+#[cfg_attr(
+    feature = "full",
+    derive(Insertable, VerifyForAdminWithoutDb, VerifyForActionProviderUnchecked)
+)]
 #[cfg_attr(feature = "full", table_name = "action_provider")]
 pub struct NewActionProvider {
     pub name: String,

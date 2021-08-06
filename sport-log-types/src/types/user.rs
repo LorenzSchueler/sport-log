@@ -7,6 +7,7 @@ use sport_log_types_derive::{
     Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds, ToSql,
 };
 
+use crate::VerifyForUserUnchecked;
 #[cfg(feature = "full")]
 use crate::{schema::user, AuthUser, GetById, Unverified, VerifyForUserWithDb};
 
@@ -70,8 +71,10 @@ pub struct NewUser {
 }
 
 #[cfg(feature = "full")]
-impl Unverified<NewUser> {
-    pub fn verify_unchecked(self) -> Result<NewUser, Status> {
+impl VerifyForUserUnchecked for Unverified<NewUser> {
+    type Entity = NewUser;
+
+    fn verify_unchecked(self) -> Result<Self::Entity, Status> {
         Ok(self.0.into_inner())
     }
 }

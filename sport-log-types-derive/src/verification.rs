@@ -486,9 +486,8 @@ pub fn impl_verify_for_action_provider_unchecked(ast: &syn::DeriveInput) -> Toke
         impl crate::VerifyForActionProviderUnchecked for crate::Unverified<#typename> {
             type Entity = #typename;
 
-            fn verify_unchecked_ap(
+            fn verify_ap_unchecked(
                 self,
-                auth: &crate::AuthAP,
             ) -> Result<Self::Entity, rocket::http::Status> {
                 Ok(self.0.into_inner())
             }

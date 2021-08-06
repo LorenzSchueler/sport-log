@@ -5,10 +5,11 @@ use sport_log_types::{
     ActionRuleId, AuthAP, AuthAdmin, AuthUser, CreatableActionRule, Create, CreateMultiple, Db,
     DeletableActionEvent, Delete, DeleteMultiple, ExecutableActionEvent, GetAll, GetById,
     GetByUser, NewAction, NewActionEvent, NewActionProvider, NewActionRule, Unverified,
-    UnverifiedId, UnverifiedIds, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
-    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin,
-    VerifyIdForUser, VerifyIdForUserUnchecked, VerifyIdsForUser, VerifyMultipleForAdminWithoutDb,
-    VerifyMultipleForUserWithoutDb, VerifyMultipleIdForActionProvider, VerifyMultipleIdForAdmin,
+    UnverifiedId, UnverifiedIds, Update, VerifyForActionProviderUnchecked,
+    VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
+    VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForUser, VerifyIdForUserUnchecked,
+    VerifyIdsForUser, VerifyMultipleForAdminWithoutDb, VerifyMultipleForUserWithoutDb,
+    VerifyMultipleIdForActionProvider, VerifyMultipleIdForAdmin, CONFIG,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
@@ -24,6 +25,24 @@ pub async fn adm_create_action_provider(
     conn: Db,
 ) -> Result<Json<ActionProvider>, Status> {
     let action_provider = action_provider.verify_adm(&auth)?;
+    conn.run(|c| ActionProvider::create(action_provider, c))
+        .await
+        .into_json()
+}
+
+#[post(
+    "/ap/action_provider",
+    format = "application/json",
+    data = "<action_provider>"
+)]
+pub async fn ap_create_action_provider(
+    action_provider: Unverified<NewActionProvider>,
+    conn: Db,
+) -> Result<Json<ActionProvider>, Status> {
+    if !CONFIG.ap_self_registration {
+        return Err(Status::Forbidden);
+    }
+    let action_provider = action_provider.verify_ap_unchecked()?;
     conn.run(|c| ActionProvider::create(action_provider, c))
         .await
         .into_json()
@@ -55,15 +74,10 @@ pub async fn get_action_providers(
     conn.run(|c| ActionProvider::get_all(c)).await.into_json()
 }
 
-#[delete("/adm/action_provider/<action_provider_id>")]
-pub async fn adm_delete_action_provider(
-    action_provider_id: UnverifiedId<ActionProviderId>,
-    auth: AuthAdmin,
-    conn: Db,
-) -> Result<Status, Status> {
-    let action_provider_id = action_provider_id.verify_adm(&auth)?;
+#[delete("/ap/action_provider")]
+pub async fn ap_delete_action_provider(auth: AuthAP, conn: Db) -> Result<Status, Status> {
     conn.run(move |c| {
-        ActionProvider::delete(action_provider_id, c)
+        ActionProvider::delete(*auth, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
