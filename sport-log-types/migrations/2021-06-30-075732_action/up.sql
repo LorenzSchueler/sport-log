@@ -2,27 +2,35 @@ create type weekday as enum('monday', 'tuesday', 'wednesday', 'thursday', 'frida
 
 create table action_provider (
     id serial primary key,
-    name varchar(80) not null unique check (length(name) >= 2),
+    name varchar(80) not null check (length(name) >= 2),
     password char(96) not null,
-    platform_id integer not null references platform on delete cascade
+    platform_id integer not null references platform on delete cascade,
+    description text,
+    unique (name)
 );
-insert into action_provider (name, password, platform_id) values
-    ('wodify-login', '$argon2id$v=19$m=4096,t=3,p=1$NZeOJg1K37UlxV5wB7yFhg$C7HNfVK9yLZTJyvJNSOhvYRfUK+nGo1rz0lIck1aO6c', 1), -- "wodify-login-passwd"
-    ('wodify-wod', '$argon2id$v=19$m=4096,t=3,p=1$FscunZHcMdL3To4Zxc5z5w$InsqwdstEFdkszaokG1rk0HS0oazMm4zTynD6pjQEgw', 1), -- "wodify-wod-passwd"
-    ('sportstracker-fetch', '$argon2id$v=19$m=4096,t=3,p=1$mmRowryKPKBhRSvrRZRFmg$VPInpHpMq47ZEymwSojrst+CWVOoHopBlvSIwybchAg', 2); -- "sportstracker-fetch-passwd"
+insert into action_provider (name, password, platform_id, description) values
+    ('wodify-login', '$argon2id$v=19$m=4096,t=3,p=1$NZeOJg1K37UlxV5wB7yFhg$C7HNfVK9yLZTJyvJNSOhvYRfUK+nGo1rz0lIck1aO6c', 1, 
+        'Wodify Login can reserve spots in classes. The action names correspond to the class types.'), -- "wodify-login-passwd"
+    ('wodify-wod', '$argon2id$v=19$m=4096,t=3,p=1$FscunZHcMdL3To4Zxc5z5w$InsqwdstEFdkszaokG1rk0HS0oazMm4zTynD6pjQEgw', 1,  
+        'Wodify Wod can fetch the Workout of the Day and save it in your wods.'), -- "wodify-wod-passwd"
+    ('sportstracker-fetch', '$argon2id$v=19$m=4096,t=3,p=1$mmRowryKPKBhRSvrRZRFmg$VPInpHpMq47ZEymwSojrst+CWVOoHopBlvSIwybchAg', 2,  
+        'Sportstracker Fetch can fetch the latests workouts recorded with sportstracker and save them in your cardio sessions.'); -- "sportstracker-fetch-passwd"
 
 create table action (
     id serial primary key,
     name varchar(80) not null check (length(name) >= 2),
     action_provider_id integer not null references action_provider on delete cascade,
+    description text,
+    create_before integer not null check (create_before >= 0), -- hours
+    delete_after integer not null check (delete_after >= 0), --hours
     unique (action_provider_id, name)
 );
-insert into action (name, action_provider_id) values 
-    ('Crossfit', 1), 
-    ('Weightlifting', 1), 
-    ('Open Fridge', 1),
-    ('fetch', 2),
-    ('fetch', 3);
+insert into action (name, action_provider_id, description, create_before, delete_after) values 
+    ('Crossfit', 1, 'Reserve a spot in a CrossFit class.', 168, 0), 
+    ('Weightlifting', 1, 'Reserve a spot in a Weightlifting class.', 168, 0), 
+    ('Open Fridge', 1, 'Reserve a spot in a Open Fridge class.', 168, 0),
+    ('fetch', 2, 'Fetch and save the wod for the current day.', 168, 24),
+    ('fetch', 3, 'Fetch and save new workouts.', 168, 0);
 
 create table action_rule (
     id serial primary key,
@@ -31,7 +39,7 @@ create table action_rule (
     weekday weekday not null, 
     time time not null,
     enabled boolean not null,
-    unique (user_id, action_id, weekday, time, enabled)
+    unique (user_id, action_id, weekday, time)
 );
 insert into action_rule (user_id, action_id, weekday, time, enabled) values 
     (1, 1, 'monday', '09:00:00', true), 
@@ -50,7 +58,7 @@ create table action_event (
     action_id integer not null references action on delete cascade,
     datetime timestamp not null,
     enabled boolean not null,
-    unique (user_id, action_id, datetime, enabled)
+    unique (user_id, action_id, datetime)
 );
 insert into action_event (user_id, action_id, datetime, enabled) values 
     (1, 1, '2021-07-01 09:00:00', true), 

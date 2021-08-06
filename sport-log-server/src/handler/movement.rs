@@ -1,10 +1,10 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthenticatedUser, Create, CreateMultiple, Db, Delete, DeleteMultiple, Eorm, GetAll, GetById,
+    AuthUserOrAP, Create, CreateMultiple, Db, Delete, DeleteMultiple, Eorm, GetAll, GetById,
     GetByUser, Movement, MovementId, NewMovement, Unverified, UnverifiedId, UnverifiedIds, Update,
-    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForUser, VerifyMultipleForUserWithoutDb,
-    VerifyMultipleIdForUser,
+    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
+    VerifyMultipleForUserOrAPWithoutDb,
 };
 
 use crate::handler::IntoJson;
@@ -12,7 +12,7 @@ use crate::handler::IntoJson;
 #[post("/movement", format = "application/json", data = "<movement>")]
 pub async fn create_movement(
     movement: Unverified<NewMovement>,
-    auth: AuthenticatedUser,
+    auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Movement>, Status> {
     let movement = movement.verify(&auth)?;
@@ -24,7 +24,7 @@ pub async fn create_movement(
 #[post("/movements", format = "application/json", data = "<movements>")]
 pub async fn create_movements(
     movements: Unverified<Vec<NewMovement>>,
-    auth: AuthenticatedUser,
+    auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Vec<Movement>>, Status> {
     let movements = movements.verify(&auth)?;
@@ -36,7 +36,7 @@ pub async fn create_movements(
 #[get("/movement/<movement_id>")]
 pub async fn get_movement(
     movement_id: UnverifiedId<MovementId>,
-    auth: AuthenticatedUser,
+    auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Movement>, Status> {
     let movement_id = conn
@@ -48,10 +48,7 @@ pub async fn get_movement(
 }
 
 #[get("/movement")]
-pub async fn get_movements(
-    auth: AuthenticatedUser,
-    conn: Db,
-) -> Result<Json<Vec<Movement>>, Status> {
+pub async fn get_movements(auth: AuthUserOrAP, conn: Db) -> Result<Json<Vec<Movement>>, Status> {
     conn.run(move |c| Movement::get_by_user(*auth, c))
         .await
         .into_json()
@@ -60,7 +57,7 @@ pub async fn get_movements(
 #[put("/movement", format = "application/json", data = "<movement>")]
 pub async fn update_movement(
     movement: Unverified<Movement>,
-    auth: AuthenticatedUser,
+    auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Movement>, Status> {
     let movement = conn.run(move |c| movement.verify(&auth, c)).await?;
@@ -72,7 +69,7 @@ pub async fn update_movement(
 #[delete("/movement/<movement_id>")]
 pub async fn delete_movement(
     movement_id: UnverifiedId<MovementId>,
-    auth: AuthenticatedUser,
+    auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
@@ -86,7 +83,7 @@ pub async fn delete_movement(
 #[delete("/movements", format = "application/json", data = "<movement_ids>")]
 pub async fn delete_movements(
     movement_ids: UnverifiedIds<MovementId>,
-    auth: AuthenticatedUser,
+    auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
@@ -98,6 +95,6 @@ pub async fn delete_movements(
 }
 
 #[get("/eorm")]
-pub async fn get_eorms(_auth: AuthenticatedUser, conn: Db) -> Result<Json<Vec<Eorm>>, Status> {
+pub async fn get_eorms(_auth: AuthUserOrAP, conn: Db) -> Result<Json<Vec<Eorm>>, Status> {
     conn.run(move |c| Eorm::get_all(c)).await.into_json()
 }

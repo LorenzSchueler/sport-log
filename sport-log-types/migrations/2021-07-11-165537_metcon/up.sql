@@ -3,11 +3,12 @@ create type metcon_type as enum('amrap', 'emom', 'for_time');
 create table metcon (
     id serial primary key,
     user_id integer references "user" on delete cascade,
-    name varchar(80) unique,
+    name varchar(80),
     metcon_type metcon_type not null,
     rounds integer check (rounds >= 1),
     timecap integer check (timecap > 0), -- seconds
-    description text
+    description text,
+    unique (user_id, name)
 );
 --create index on metcon (user_id, name);
 
@@ -47,7 +48,8 @@ create table metcon_session (
     rounds integer check (rounds >= 0),
     reps integer check (reps >= 0),
     rx boolean not null default true,
-    comments text
+    comments text,
+    unique (user_id, metcon_id, datetime)
 );
 --create index on metcon_session (user_id, datetime desc);
 

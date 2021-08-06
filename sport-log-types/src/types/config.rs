@@ -5,13 +5,16 @@ use serde::{Deserialize, Serialize};
 
 /// Server configuration.
 ///
-/// `admin_username` and `admin_password` are the credentials for the admin endpoints.
+/// `admin_password` is the password for the admin endpoints.
 ///
-/// `self_registration` determines if users can register themself or if only the admin can create new users.
+/// `user_self_registration` determines if users can register themself or if only the admin can create new users.
+///
+/// `ap_self_registration` determines if action providers can register themself or if only the admin can create new action provider.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Config {
     pub admin_password: String,
-    pub self_registration: bool,
+    pub user_self_registration: bool,
+    pub ap_self_registration: bool,
 }
 
 impl Config {

@@ -2,7 +2,6 @@
 name = "sport-log-action-provider-sportstracker"
 version = "0.1.0"
 edition = "2018"
-default-run = "sport-log-action-provider-sportstracker"
 
 [dependencies]
 
@@ -18,11 +17,3 @@ toml = "0.5.8"
 [[bin]]
 name = "sport-log-action-provider-sportstracker"
 path = "src/main.rs"
-
-[[bin]]
-name = "sport-log-action-provider-sportstracker-schedule"
-path = "src/schedule.rs"
-
-[lib]
-name = "sport_log_action_provider_sportstracker_config"
-path = "src/config.rs"

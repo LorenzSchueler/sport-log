@@ -1,2 +1,10 @@
 [workspace]
-members = ["sport-log-server", "sport-log-types-derive", "sport-log-types", "sport-log-api-tester", "sport-log-action-provider-sportstracker", "sport-log-password-hasher"]
+members = [
+    "sport-log-server",
+    "sport-log-types-derive",
+    "sport-log-types",
+    "sport-log-scheduler",
+    "sport-log-api-tester",
+    "sport-log-action-provider-sportstracker",
+    "sport-log-password-hasher"
+]

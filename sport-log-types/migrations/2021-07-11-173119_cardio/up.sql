@@ -11,11 +11,12 @@ create type "position" as (
 create table route (
     id serial primary key,
     user_id integer not null references "user" on delete cascade,
-    name varchar(80) not null unique check (length(name) >= 2),
+    name varchar(80) not null check (length(name) >= 2),
     distance integer not null check (distance > 0),
     ascent integer check (ascent >= 0),
     descent integer check (descent >= 0),
-    track "position"[]
+    track "position"[],
+    unique (user_id, name)
 );
 --create index on route (user_id, name);
 
@@ -39,7 +40,8 @@ create table cardio_session (
     avg_heart_rate integer check (avg_heart_rate > 0),
     heart_rate real[], -- = secs since start
     route_id integer references route on delete set null,
-    comments text
+    comments text,
+    unique (user_id, movement_id, datetime)
 );
 --create index on cardio_session (user_id, datetime desc);
 

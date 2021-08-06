@@ -10,13 +10,15 @@ use sport_log_types_derive::{
     Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
     GetByUser, ToSql, Update, VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb,
     VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
-    VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser, VerifyIdForUserUnchecked,
+    VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked,
+    VerifyUnchecked,
 };
 
 #[cfg(feature = "full")]
 use crate::{
     schema::{action, action_event, action_provider, action_rule},
-    AuthenticatedActionProvider, GetById, Platform, UnverifiedId, User, VerifyIdForActionProvider,
+    AuthAP, GetById, GetByIds, Platform, UnverifiedId, UnverifiedIds, User,
+    VerifyIdForActionProvider, VerifyIdsForActionProvider,
 };
 
 use crate::{PlatformId, UserId};
@@ -32,7 +34,7 @@ use crate::{PlatformId, UserId};
         ToSql,
         FromSql,
         VerifyIdForAdmin,
-        VerifyIdForUserUnchecked
+        VerifyIdUnchecked
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
@@ -46,6 +48,7 @@ pub struct ActionProviderId(pub i32);
         Identifiable,
         Queryable,
         AsChangeset,
+        GetById,
         GetAll,
         Delete,
         DeleteMultiple,
@@ -59,15 +62,20 @@ pub struct ActionProvider {
     pub name: String,
     pub password: String,
     pub platform_id: PlatformId,
+    pub description: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForAdminWithoutDb))]
+#[cfg_attr(
+    feature = "full",
+    derive(Insertable, VerifyForAdminWithoutDb, VerifyUnchecked)
+)]
 #[cfg_attr(feature = "full", table_name = "action_provider")]
 pub struct NewActionProvider {
     pub name: String,
     pub password: String,
     pub platform_id: PlatformId,
+    pub description: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -110,6 +118,9 @@ pub struct Action {
     pub id: ActionId,
     pub name: String,
     pub action_provider_id: ActionProviderId,
+    pub description: Option<String>,
+    pub create_before: i32,
+    pub delete_after: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -118,6 +129,9 @@ pub struct Action {
 pub struct NewAction {
     pub name: String,
     pub action_provider_id: ActionProviderId,
+    pub description: Option<String>,
+    pub create_before: i32,
+    pub delete_after: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -214,7 +228,8 @@ pub struct NewActionRule {
         FromI32,
         ToSql,
         FromSql,
-        VerifyIdForUser
+        VerifyIdForUser,
+        VerifyIdForAdmin
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
@@ -224,16 +239,36 @@ pub struct ActionEventId(pub i32);
 impl VerifyIdForActionProvider for UnverifiedId<ActionEventId> {
     type Id = ActionEventId;
 
-    fn verify_ap(
-        self,
-        auth: &AuthenticatedActionProvider,
-        conn: &PgConnection,
-    ) -> Result<Self::Id, Status> {
-        let action_event = ActionEvent::get_by_id(ActionEventId(self.0 .0), conn)
+    fn verify_ap(self, auth: &AuthAP, conn: &PgConnection) -> Result<Self::Id, Status> {
+        let action_event =
+            ActionEvent::get_by_id(self.0, conn).map_err(|_| Status::InternalServerError)?;
+        let action = Action::get_by_id(action_event.action_id, conn)
             .map_err(|_| Status::InternalServerError)?;
-        let entity = Action::get_by_id(action_event.action_id, conn)
-            .map_err(|_| Status::InternalServerError)?;
-        if entity.action_provider_id == **auth {
+        if action.action_provider_id == **auth {
+            Ok(self.0)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "full")]
+impl VerifyIdsForActionProvider for UnverifiedIds<ActionEventId> {
+    type Id = ActionEventId;
+
+    fn verify_ap(self, auth: &AuthAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
+        let action_events =
+            ActionEvent::get_by_ids(&self.0, conn).map_err(|_| Status::InternalServerError)?;
+        let action_event_ids: Vec<_> = action_events
+            .iter()
+            .map(|action_event| action_event.action_id)
+            .collect();
+        let actions =
+            Action::get_by_ids(&action_event_ids, conn).map_err(|_| Status::InternalServerError)?;
+        if actions
+            .iter()
+            .all(|action| action.action_provider_id == **auth)
+        {
             Ok(self.0)
         } else {
             Err(Status::Forbidden)
@@ -272,13 +307,27 @@ pub struct ActionEvent {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
+#[cfg_attr(
+    feature = "full",
+    derive(Insertable, VerifyForUserWithoutDb, VerifyForAdminWithoutDb)
+)]
 #[cfg_attr(feature = "full", table_name = "action_event")]
 pub struct NewActionEvent {
     pub user_id: UserId,
     pub action_id: ActionId,
     pub datetime: NaiveDateTime,
     pub enabled: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Queryable))]
+pub struct CreatableActionRule {
+    pub action_rule_id: ActionRuleId,
+    pub user_id: UserId,
+    pub action_id: ActionId,
+    pub weekday: Weekday,
+    pub time: NaiveTime,
+    pub create_before: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -290,4 +339,12 @@ pub struct ExecutableActionEvent {
     pub user_id: UserId,
     pub username: String,
     pub password: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(feature = "full", derive(Queryable))]
+pub struct DeletableActionEvent {
+    pub action_event_id: ActionEventId,
+    pub datetime: NaiveDateTime,
+    pub delete_after: i32,
 }

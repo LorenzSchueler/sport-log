@@ -41,13 +41,13 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for JsonError {
 }
 
 #[catch(default)]
-fn default_catcher<'r>(status: Status, _request: &'r Request) -> JsonError {
+fn default_catcher(status: Status, _request: &Request) -> JsonError {
     JsonError { status }
 }
 
 // TODO only send preflight if route exists
 #[catch(404)]
-fn catcher_404<'r>(status: Status, request: &'r Request) -> Result<Status, JsonError> {
+fn catcher_404(status: Status, request: &Request) -> Result<Status, JsonError> {
     if request.method() == Method::Options {
         Ok(Status::NoContent)
     } else {
@@ -93,15 +93,33 @@ fn rocket() -> _ {
             BASE,
             routes![
                 user::adm_create_user,
+                platform::adm_create_platform,
+                platform::adm_get_platforms,
+                platform::adm_update_platform,
+                platform::adm_delete_platform,
+                action::adm_create_action_provider,
+                action::adm_get_action_providers,
+                action::adm_get_creatable_action_rules, // for scheduler
+                action::adm_get_deletable_action_events, // for scheduler
+                action::adm_create_action_events,       // for scheduler
+                action::adm_delete_action_events,       // for scheduler
+                platform::ap_create_platform,
+                platform::ap_get_platforms,
+                action::ap_create_action_provider,
+                action::ap_get_action_provider,
+                action::ap_delete_action_provider,
+                action::ap_create_action,
+                action::ap_get_action,
+                action::ap_get_actions,
+                action::ap_get_executable_action_events,
+                action::ap_get_ordered_executable_action_events_by_timespan,
+                action::ap_delete_action_event,
+                action::ap_delete_action_events,
                 user::create_user,
                 user::get_user,
                 user::update_user,
                 user::delete_user,
-                platform::adm_create_platform,
-                platform::adm_get_platforms,
                 platform::get_platforms,
-                platform::adm_update_platform,
-                platform::adm_delete_platform,
                 platform::create_platform_credential,
                 platform::create_platform_credentials,
                 platform::get_platform_credentials,
@@ -109,14 +127,8 @@ fn rocket() -> _ {
                 platform::update_platform_credential,
                 platform::delete_platform_credential,
                 platform::delete_platform_credentials,
-                action::adm_create_action_provider,
-                action::adm_get_action_providers,
-                action::adm_delete_action_provider,
-                action::ap_create_action,
-                action::ap_get_action,
-                action::ap_get_actions,
+                action::get_action_providers,
                 action::get_actions,
-                action::ap_delete_action,
                 action::create_action_rule,
                 action::create_action_rules,
                 action::get_action_rule,
@@ -129,13 +141,10 @@ fn rocket() -> _ {
                 action::create_action_events,
                 action::get_action_event,
                 action::get_action_events,
-                action::ap_get_action_events,
                 action::get_action_events_by_action_provider,
                 action::update_action_event,
                 action::delete_action_event,
                 action::delete_action_events,
-                action::ap_get_executable_action_events,
-                action::ap_get_ordered_executable_action_events_by_timespan,
                 diary_wod::create_wod,
                 diary_wod::create_wods,
                 diary_wod::get_wods,

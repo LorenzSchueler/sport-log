@@ -4,11 +4,11 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds, ToSql,
+    Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds, ToSql, VerifyUnchecked,
 };
 
 #[cfg(feature = "full")]
-use crate::{schema::user, AuthenticatedUser, GetById, Unverified, VerifyForUserWithDb};
+use crate::{schema::user, AuthUser, GetById, Unverified, VerifyForUserWithDb};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
@@ -45,15 +45,15 @@ pub struct User {
 impl VerifyForUserWithDb for Unverified<User> {
     type Entity = User;
 
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
-        let entity = self.0.into_inner();
-        if entity.id == **auth
-            && User::get_by_id(entity.id, conn)
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
+        let user = self.0.into_inner();
+        if user.id == **auth
+            && User::get_by_id(user.id, conn)
                 .map_err(|_| Status::InternalServerError)?
                 .id
                 == **auth
         {
-            Ok(entity)
+            Ok(user)
         } else {
             Err(Status::Forbidden)
         }
@@ -61,17 +61,10 @@ impl VerifyForUserWithDb for Unverified<User> {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyUnchecked))]
 #[cfg_attr(feature = "full", table_name = "user")]
 pub struct NewUser {
     pub username: String,
     pub password: String,
     pub email: String,
-}
-
-#[cfg(feature = "full")]
-impl Unverified<NewUser> {
-    pub fn verify_unchecked(self) -> Result<NewUser, Status> {
-        Ok(self.0.into_inner())
-    }
 }

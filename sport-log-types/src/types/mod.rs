@@ -51,7 +51,7 @@ pub use sharing::*;
 pub use strength::*;
 pub use user::*;
 
-/// Wrapper around incoming json data for which the access permissions for the [AuthenticatedUser], [AuthenticatedActionProvider] or [AuthenticatedAdmin] have not been checked.
+/// Wrapper around incoming json data for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///
 /// The data can be retrieved by using the appropriate verification function.
 #[cfg(feature = "full")]
@@ -75,7 +75,7 @@ pub trait FromI32 {
     fn from_i32(value: i32) -> Self;
 }
 
-/// Wrapper around Id types for which the access permissions for the [AuthenticatedUser], [AuthenticatedActionProvider] or [AuthenticatedAdmin] have not been checked.
+/// Wrapper around Id types for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///
 /// The Id type can be retrieved by using the appropriate verification function.
 #[cfg(feature = "full")]
@@ -91,7 +91,7 @@ impl<'v, I: FromI32> rocket::request::FromParam<'v> for UnverifiedId<I> {
     }
 }
 
-/// Wrapper around Id types for which the access permissions for the [AuthenticatedUser], [AuthenticatedActionProvider] or [AuthenticatedAdmin] have not been checked.
+/// Wrapper around Id types for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///
 /// The Id type can be retrieved by using the appropriate verification function.
 #[cfg(feature = "full")]
@@ -252,105 +252,152 @@ pub trait DeleteMultiple {
 pub trait VerifyIdForUser {
     type Id;
 
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Id, Status>;
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyMultipleIdForUser {
+pub trait VerifyIdsForUser {
     type Id;
 
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection)
-        -> Result<Vec<Self::Id>, Status>;
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Vec<Self::Id>, Status>;
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyIdForUserUnchecked {
+pub trait VerifyIdForUserOrAP {
     type Id;
 
-    fn verify_unchecked(self, auth: &AuthenticatedUser) -> Result<Self::Id, Status>;
+    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyIdsForUserOrAP {
+    type Id;
+
+    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyIdForActionProvider {
     type Id;
 
-    fn verify_ap(
-        self,
-        auth: &AuthenticatedActionProvider,
-        conn: &PgConnection,
-    ) -> Result<Self::Id, Status>;
+    fn verify_ap(self, auth: &AuthAP, conn: &PgConnection) -> Result<Self::Id, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyIdsForActionProvider {
+    type Id;
+
+    fn verify_ap(self, auth: &AuthAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyIdForAdmin {
     type Id;
 
-    fn verify_adm(self, auth: &AuthenticatedAdmin) -> Result<Self::Id, Status>;
+    fn verify_adm(self, auth: &AuthAdmin) -> Result<Self::Id, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyIdsForAdmin {
+    type Id;
+
+    fn verify_adm(self, auth: &AuthAdmin) -> Result<Vec<Self::Id>, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyIdUnchecked {
+    type Id;
+
+    fn verify_unchecked(self) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyForUserWithDb {
     type Entity;
 
-    fn verify(self, auth: &AuthenticatedUser, conn: &PgConnection) -> Result<Self::Entity, Status>;
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyMultipleForUserWithDb {
     type Entity;
 
-    fn verify(
-        self,
-        auth: &AuthenticatedUser,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Entity>, Status>;
+    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyForUserWithoutDb {
     type Entity;
 
-    fn verify(self, auth: &AuthenticatedUser) -> Result<Self::Entity, Status>;
+    fn verify(self, auth: &AuthUser) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyMultipleForUserWithoutDb {
     type Entity;
 
-    fn verify(self, auth: &AuthenticatedUser) -> Result<Vec<Self::Entity>, Status>;
+    fn verify(self, auth: &AuthUser) -> Result<Vec<Self::Entity>, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyForUserOrAPWithDb {
+    type Entity;
+
+    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Entity, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyMultipleForUserOrAPWithDb {
+    type Entity;
+
+    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Entity>, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyForUserOrAPWithoutDb {
+    type Entity;
+
+    fn verify(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyMultipleForUserOrAPWithoutDb {
+    type Entity;
+
+    fn verify(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyForActionProviderWithDb {
     type Entity;
 
-    fn verify_ap(
-        self,
-        auth: &AuthenticatedActionProvider,
-        conn: &PgConnection,
-    ) -> Result<Self::Entity, Status>;
+    fn verify_ap(self, auth: &AuthAP, conn: &PgConnection) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyForActionProviderWithoutDb {
     type Entity;
 
-    fn verify_ap(self, auth: &AuthenticatedActionProvider) -> Result<Self::Entity, Status>;
-}
-
-#[cfg(feature = "full")]
-pub trait VerifyForActionProviderUnchecked {
-    type Entity;
-
-    fn verify_unchecked_ap(
-        self,
-        auth: &AuthenticatedActionProvider,
-    ) -> Result<Self::Entity, Status>;
+    fn verify_ap(self, auth: &AuthAP) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyForAdminWithoutDb {
     type Entity;
 
-    fn verify_adm(self, auth: &AuthenticatedAdmin) -> Result<Self::Entity, Status>;
+    fn verify_adm(self, auth: &AuthAdmin) -> Result<Self::Entity, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyMultipleForAdminWithoutDb {
+    type Entity;
+
+    fn verify_adm(self, auth: &AuthAdmin) -> Result<Vec<Self::Entity>, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyUnchecked {
+    type Entity;
+
+    fn verify_unchecked(self) -> Result<Self::Entity, Status>;
 }
