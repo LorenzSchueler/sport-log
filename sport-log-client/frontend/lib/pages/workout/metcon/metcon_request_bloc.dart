@@ -64,7 +64,7 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
   MetconRequestBloc.fromContext(BuildContext context)
     : _repo = context.read<MetconRepository>(),
       _cubit = context.read<MetconsCubit>(),
-      _api = context.read<Api>(),
+      _api = Api.instance,
       super(const MetconRequestIdle());
 
   final MetconRepository _repo;

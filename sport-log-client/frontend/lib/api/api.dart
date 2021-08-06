@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:sport_log/api/backend_routes.dart';
+import 'package:sport_log/config.dart';
 import 'package:sport_log/models/user.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:http/http.dart' as http;
@@ -22,11 +23,11 @@ class Credentials {
 }
 
 class Api {
-  Api({
-    required this.urlBase
-  });
 
-  final String urlBase;
+  static final Api instance = Api._();
+  Api._();
+
+  late final String urlBase;
   final _client = http.Client();
   Credentials? _credentials;
 

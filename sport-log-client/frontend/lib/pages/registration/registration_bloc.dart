@@ -41,11 +41,10 @@ class RestartRegistration extends RegistrationEvent {}
 class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   RegistrationBloc({
     required auth.AuthenticationBloc authenticationBloc,
-    required Api api,
     required showErrorSnackBar,
   })
       : _authenticationBloc = authenticationBloc,
-        _api = api,
+        _api = Api.instance,
         _showErrorSnackBar = showErrorSnackBar,
         super(RegistrationState.idle);
 

@@ -58,7 +58,7 @@ class MovementRequestBloc
   MovementRequestBloc.fromContext(BuildContext context)
       : _repo = context.read<MovementRepository>(),
         _cubit = context.read<MovementsCubit>(),
-        _api = context.read<Api>(),
+        _api = Api.instance,
         super(MovementRequestIdle());
   
   final MovementRepository _repo;

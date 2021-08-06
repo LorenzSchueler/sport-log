@@ -20,7 +20,8 @@ void main() async {
   AuthenticationRepository? authRepo;
   authRepo = await AuthenticationRepository.getInstance();
   user = await authRepo.getUser();
-  final api = Api(urlBase: await Config.apiUrlBase);
+  final api = Api.instance;
+  api.urlBase = await Config.apiUrlBase;
   final authBloc = AuthenticationBloc(
       authenticationRepository: authRepo,
       api: api,
@@ -44,7 +45,6 @@ void main() async {
     child: MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: authRepo),
-        RepositoryProvider.value(value: api),
         RepositoryProvider.value(value: movementRepo),
         RepositoryProvider.value(value: MetconRepository()),
       ],

@@ -32,11 +32,10 @@ class RestartLogin extends LoginEvent {}
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc({
     required auth.AuthenticationBloc authenticationBloc,
-    required Api api,
     required Function(String) showErrorSnackBar,
   })
       : _authenticationBloc = authenticationBloc,
-        _api = api,
+        _api = Api.instance,
         _showErrorSnackBar = showErrorSnackBar,
         super(LoginState.idle);
 
