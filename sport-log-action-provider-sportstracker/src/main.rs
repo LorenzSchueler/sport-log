@@ -6,12 +6,15 @@ use serde::Deserialize;
 
 use sport_log_types::{
     ActionEventId, ActionProvider, CardioType, ExecutableActionEvent, Movement, NewAction,
-    NewCardioSession, Position,
+    NewActionProvider, NewCardioSession, NewPlatform, Platform, Position,
 };
+
+const NAME: &str = "sportstracker-fetch";
+const DESCRIPTION: &str = "Sportstracker Fetch can fetch the latests workouts recorded with sportstracker and save them in your cardio sessions.";
+const PLATFORM_NAME: &str = "sportstracker";
 
 #[derive(Deserialize)]
 struct Config {
-    username: String,
     password: String,
     base_url: String,
 }
@@ -140,15 +143,90 @@ async fn setup() {
 
     let client = Client::new();
 
-    let action_provider: ActionProvider = client
-        .get(format!("{}/v1/ap/action_provider", config.base_url))
-        .basic_auth(&config.username, Some(&config.password))
+    let platform = NewPlatform {
+        name: PLATFORM_NAME.to_owned(),
+    };
+
+    let response = client
+        .post(format!("{}/v1/ap/platform", config.base_url))
+        .basic_auth(NAME, Some(&config.password))
+        .json(&platform)
         .send()
         .await
-        .unwrap()
-        .json()
+        .unwrap();
+
+    let platform = match response.status() {
+        StatusCode::OK => {
+            println!("platform created");
+            response.json().await.unwrap()
+        }
+        StatusCode::CONFLICT => {
+            println!("platform already exists");
+            let platforms: Vec<Platform> = client
+                .get(format!("{}/v1/ap/platform", config.base_url))
+                .send()
+                .await
+                .unwrap()
+                .json()
+                .await
+                .unwrap();
+            platforms
+                .into_iter()
+                .find(|platform| platform.name == NAME)
+                .unwrap()
+        }
+        StatusCode::FORBIDDEN => {
+            println!("action provider self registration disabled");
+            return;
+        }
+        status => {
+            println!("an error occured (status {})", status);
+            return;
+        }
+    };
+
+    let action_provider = NewActionProvider {
+        name: NAME.to_owned(),
+        password: config.password.clone(),
+        platform_id: platform.id,
+        description: Some(DESCRIPTION.to_owned()),
+    };
+
+    let response = client
+        .post(format!("{}/v1/ap/action_provider", config.base_url))
+        .basic_auth(NAME, Some(&config.password))
+        .json(&action_provider)
+        .send()
         .await
         .unwrap();
+
+    let action_provider: ActionProvider = match response.status() {
+        StatusCode::OK => {
+            println!("action provider created");
+            response.json().await.unwrap()
+        }
+        StatusCode::CONFLICT => {
+            println!("action provider already exists");
+            let action_provider: ActionProvider = client
+                .get(format!("{}/v1/ap/action_provider", config.base_url))
+                .basic_auth(NAME, Some(&config.password))
+                .send()
+                .await
+                .unwrap()
+                .json()
+                .await
+                .unwrap();
+            action_provider
+        }
+        StatusCode::FORBIDDEN => {
+            println!("action provider self registration disabled");
+            return;
+        }
+        status => {
+            println!("an error occured (status {})", status);
+            return;
+        }
+    };
 
     let action = NewAction {
         name: "fetch".to_owned(),
@@ -160,15 +238,15 @@ async fn setup() {
 
     match client
         .post(format!("{}/v1/ap/action", config.base_url))
-        .basic_auth(&config.username, Some(&config.password))
+        .basic_auth(NAME, Some(&config.password))
         .json(&action)
         .send()
         .await
         .unwrap()
         .status()
     {
-        StatusCode::OK => println!("setup successful"),
-        StatusCode::CONFLICT => println!("action already exists"),
+        StatusCode::OK => println!("action created.\nsetup successful"),
+        StatusCode::CONFLICT => println!("action already exists\nsetup successful"),
         status => println!("an error occured (status {})", status),
     }
 }
@@ -197,7 +275,7 @@ async fn fetch() {
             println!("{:?}", token);
 
             if let Some(workouts) = get_workouts(&client, &token).await {
-                let username = format!("{}$id${}", config.username, exec_action_event.user_id.0);
+                let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
                 let movements: Vec<Movement> = client
                     .get(format!("{}/v1/movement", config.base_url))
                     .basic_auth(&username, Some(&config.password))
@@ -319,7 +397,7 @@ async fn get_events(client: &Client, config: &Config) -> Vec<ExecutableActionEve
             config.base_url, datetime_start, datetime_end
         ))
         //.get(format!("{}/v1/ap/executable_action_event", config.base_url,))
-        .basic_auth(&config.username, Some(&config.password))
+        .basic_auth(NAME, Some(&config.password))
         .send()
         .await
         .unwrap()
@@ -332,7 +410,7 @@ async fn get_events(client: &Client, config: &Config) -> Vec<ExecutableActionEve
 async fn delete_events(client: &Client, config: &Config, action_event_ids: &[ActionEventId]) {
     client
         .delete(format!("{}/v1/ap/action_events", config.base_url,))
-        .basic_auth(&config.username, Some(&config.password))
+        .basic_auth(NAME, Some(&config.password))
         .json(action_event_ids)
         .send()
         .await

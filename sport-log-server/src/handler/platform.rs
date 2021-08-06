@@ -5,8 +5,7 @@ use sport_log_types::{
     NewPlatform, NewPlatformCredential, Platform, PlatformCredential, PlatformCredentialId,
     PlatformId, Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForAdminWithoutDb,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForAdmin, VerifyIdForUser,
-    VerifyIdUnchecked, VerifyIdsForUser, VerifyMultipleForUserWithoutDb, CONFIG,
-    VerifyUnchecked
+    VerifyIdUnchecked, VerifyIdsForUser, VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
 };
 
 use crate::handler::IntoJson;
