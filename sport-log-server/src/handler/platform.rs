@@ -5,7 +5,8 @@ use sport_log_types::{
     NewPlatform, NewPlatformCredential, Platform, PlatformCredential, PlatformCredentialId,
     PlatformId, Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForAdminWithoutDb,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForAdmin, VerifyIdForUser,
-    VerifyIdUnchecked, VerifyIdsForUser, VerifyMultipleForUserWithoutDb,
+    VerifyIdUnchecked, VerifyIdsForUser, VerifyMultipleForUserWithoutDb, CONFIG,
+    VerifyUnchecked
 };
 
 use crate::handler::IntoJson;
@@ -22,8 +23,30 @@ pub async fn adm_create_platform(
         .into_json()
 }
 
+#[post("/ap/platform", format = "application/json", data = "<platform>")]
+pub async fn ap_create_platform(
+    platform: Unverified<NewPlatform>,
+    conn: Db,
+) -> Result<Json<Platform>, Status> {
+    if !CONFIG.ap_self_registration {
+        return Err(Status::Forbidden);
+    }
+    let platform = platform.verify_unchecked()?;
+    conn.run(|c| Platform::create(platform, c))
+        .await
+        .into_json()
+}
+
 #[get("/adm/platform")]
 pub async fn adm_get_platforms(_auth: AuthAdmin, conn: Db) -> Result<Json<Vec<Platform>>, Status> {
+    conn.run(|c| Platform::get_all(c)).await.into_json()
+}
+
+#[get("/ap/platform")]
+pub async fn ap_get_platforms(conn: Db) -> Result<Json<Vec<Platform>>, Status> {
+    if !CONFIG.ap_self_registration {
+        return Err(Status::Forbidden);
+    }
     conn.run(|c| Platform::get_all(c)).await.into_json()
 }
 

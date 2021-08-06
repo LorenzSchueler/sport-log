@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use sport_log_types_derive::{
     Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
     GetByUser, ToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
-    VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked,
+    VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked, VerifyUnchecked,
 };
 
 use crate::UserId;
@@ -55,7 +55,10 @@ pub struct Platform {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForAdminWithoutDb))]
+#[cfg_attr(
+    feature = "full",
+    derive(Insertable, VerifyForAdminWithoutDb, VerifyUnchecked)
+)]
 #[cfg_attr(feature = "full", table_name = "platform")]
 pub struct NewPlatform {
     pub name: String,

@@ -103,6 +103,8 @@ fn rocket() -> _ {
                 action::adm_get_deletable_action_events, // for scheduler
                 action::adm_create_action_events,       // for scheduler
                 action::adm_delete_action_events,       // for scheduler
+                platform::ap_create_platform,
+                platform::ap_get_platforms,
                 action::ap_create_action_provider,
                 action::ap_get_action_provider,
                 action::ap_delete_action_provider,
