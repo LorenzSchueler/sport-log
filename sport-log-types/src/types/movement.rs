@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
     Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
-    ToSql, Update, VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdForUserOrAPUnchecked,
+    ToSql, Update, VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
 };
 
 use crate::UserId;
@@ -49,7 +49,7 @@ pub enum MovementUnit {
         ToSql,
         FromSql,
         VerifyIdForAdmin,
-        VerifyIdForUserOrAPUnchecked
+        VerifyIdUnchecked
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]

@@ -5,11 +5,10 @@ use sport_log_types::{
     ActionRuleId, AuthAP, AuthAdmin, AuthUser, CreatableActionRule, Create, CreateMultiple, Db,
     DeletableActionEvent, Delete, DeleteMultiple, ExecutableActionEvent, GetAll, GetById,
     GetByUser, NewAction, NewActionEvent, NewActionProvider, NewActionRule, Unverified,
-    UnverifiedId, UnverifiedIds, Update, VerifyForActionProviderUnchecked,
-    VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
-    VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForUser, VerifyIdForUserUnchecked,
-    VerifyIdsForUser, VerifyMultipleForAdminWithoutDb, VerifyMultipleForUserWithoutDb,
-    VerifyMultipleIdForActionProvider, VerifyMultipleIdForAdmin, CONFIG,
+    UnverifiedId, UnverifiedIds, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForUser,
+    VerifyIdUnchecked, VerifyIdsForActionProvider, VerifyIdsForAdmin, VerifyIdsForUser,
+    VerifyMultipleForAdminWithoutDb, VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
@@ -42,7 +41,7 @@ pub async fn ap_create_action_provider(
     if !CONFIG.ap_self_registration {
         return Err(Status::Forbidden);
     }
-    let action_provider = action_provider.verify_ap_unchecked()?;
+    let action_provider = action_provider.verify_unchecked()?;
     conn.run(|c| ActionProvider::create(action_provider, c))
         .await
         .into_json()
@@ -167,7 +166,7 @@ pub async fn get_action_rules_by_action_provider(
     auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<ActionRule>>, Status> {
-    let action_provider_id = action_provider_id.verify_unchecked(&auth)?;
+    let action_provider_id = action_provider_id.verify_unchecked()?;
     conn.run(move |c| ActionRule::get_by_user_and_action_provider(*auth, action_provider_id, c))
         .await
         .into_json()
@@ -286,7 +285,7 @@ pub async fn get_action_events_by_action_provider(
     auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
-    let action_provider_id = action_provider_id.verify_unchecked(&auth)?;
+    let action_provider_id = action_provider_id.verify_unchecked()?;
     conn.run(move |c| ActionEvent::get_by_user_and_action_provider(*auth, action_provider_id, c))
         .await
         .into_json()

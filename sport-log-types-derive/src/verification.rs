@@ -106,42 +106,6 @@ pub fn impl_verify_id_for_user_or_ap(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
-pub fn impl_verify_id_for_user_unchecked(ast: &syn::DeriveInput) -> TokenStream {
-    let id_typename = &ast.ident;
-
-    let gen = quote! {
-        impl crate::VerifyIdForUserUnchecked for crate::UnverifiedId<#id_typename> {
-            type Id = #id_typename;
-
-            fn verify_unchecked(
-                self,
-                auth: &crate::AuthUser,
-            ) -> Result<crate::#id_typename, rocket::http::Status> {
-                Ok(self.0)
-            }
-        }
-    };
-    gen.into()
-}
-
-pub fn impl_verify_id_for_user_or_ap_unchecked(ast: &syn::DeriveInput) -> TokenStream {
-    let id_typename = &ast.ident;
-
-    let gen = quote! {
-        impl crate::VerifyIdForUserOrAPUnchecked for crate::UnverifiedId<#id_typename> {
-            type Id = #id_typename;
-
-            fn verify_unchecked(
-                self,
-                auth: &crate::AuthUserOrAP,
-            ) -> Result<crate::#id_typename, rocket::http::Status> {
-                Ok(self.0)
-            }
-        }
-    };
-    gen.into()
-}
-
 pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream {
     let id_typename = &ast.ident;
     let id_typename_str = id_typename.to_string();
@@ -171,7 +135,7 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
             }
         }
 
-        impl crate::VerifyMultipleIdForActionProvider for crate::UnverifiedIds<#id_typename> {
+        impl crate::VerifyIdsForActionProvider for crate::UnverifiedIds<#id_typename> {
             type Id = #id_typename;
 
             fn verify_ap(
@@ -209,13 +173,30 @@ pub fn impl_verify_id_for_admin(ast: &syn::DeriveInput) -> TokenStream {
             }
         }
 
-        impl crate::VerifyMultipleIdForAdmin for crate::UnverifiedIds<#id_typename> {
+        impl crate::VerifyIdsForAdmin for crate::UnverifiedIds<#id_typename> {
             type Id = #id_typename;
 
             fn verify_adm(
                 self,
                 auth: &crate::AuthAdmin,
             ) -> Result<Vec<crate::#id_typename>, rocket::http::Status> {
+                Ok(self.0)
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_verify_id_unchecked(ast: &syn::DeriveInput) -> TokenStream {
+    let id_typename = &ast.ident;
+
+    let gen = quote! {
+        impl crate::VerifyIdUnchecked for crate::UnverifiedId<#id_typename> {
+            type Id = #id_typename;
+
+            fn verify_unchecked(
+                self,
+            ) -> Result<crate::#id_typename, rocket::http::Status> {
                 Ok(self.0)
             }
         }
@@ -479,23 +460,6 @@ pub fn impl_verify_for_action_provider_without_db(ast: &syn::DeriveInput) -> Tok
     gen.into()
 }
 
-pub fn impl_verify_for_action_provider_unchecked(ast: &syn::DeriveInput) -> TokenStream {
-    let typename = &ast.ident;
-
-    let gen = quote! {
-        impl crate::VerifyForActionProviderUnchecked for crate::Unverified<#typename> {
-            type Entity = #typename;
-
-            fn verify_ap_unchecked(
-                self,
-            ) -> Result<Self::Entity, rocket::http::Status> {
-                Ok(self.0.into_inner())
-            }
-        }
-    };
-    gen.into()
-}
-
 pub fn impl_verify_for_admin_without_db(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
 
@@ -532,6 +496,23 @@ pub fn impl_from_i32(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::FromI32 for #id_typename {
             fn from_i32(value: i32) -> Self {
                 Self(value)
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_verify_unchecked(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+
+    let gen = quote! {
+        impl crate::VerifyUnchecked for crate::Unverified<#typename> {
+            type Entity = #typename;
+
+            fn verify_unchecked(
+                self,
+            ) -> Result<Self::Entity, rocket::http::Status> {
+                Ok(self.0.into_inner())
             }
         }
     };

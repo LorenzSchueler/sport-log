@@ -5,7 +5,7 @@ use sport_log_types::{
     NewPlatform, NewPlatformCredential, Platform, PlatformCredential, PlatformCredentialId,
     PlatformId, Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForAdminWithoutDb,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForAdmin, VerifyIdForUser,
-    VerifyIdForUserUnchecked, VerifyIdsForUser, VerifyMultipleForUserWithoutDb,
+    VerifyIdUnchecked, VerifyIdsForUser, VerifyMultipleForUserWithoutDb,
 };
 
 use crate::handler::IntoJson;
@@ -107,7 +107,7 @@ pub async fn get_platform_credentials_by_platform(
     auth: AuthUser,
     conn: Db,
 ) -> Result<Json<PlatformCredential>, Status> {
-    let platform_id = platform_id.verify_unchecked(&auth)?;
+    let platform_id = platform_id.verify_unchecked()?;
     conn.run(move |c| PlatformCredential::get_by_user_and_platform(*auth, platform_id, c))
         .await
         .into_json()

@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
     Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
-    GetByUser, ToSql, Update, VerifyForActionProviderUnchecked, VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    GetByUser, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
+    VerifyIdForUserOrAP, VerifyUnchecked,
 };
 
 use crate::UserId;
@@ -122,11 +122,7 @@ pub struct Wod {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Insertable,
-        VerifyForUserOrAPWithoutDb,
-        VerifyForActionProviderUnchecked,
-    )
+    derive(Insertable, VerifyForUserOrAPWithoutDb, VerifyUnchecked,)
 )]
 #[cfg_attr(feature = "full", table_name = "wod")]
 pub struct NewWod {

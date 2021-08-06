@@ -2,7 +2,7 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
     AuthAdmin, AuthUser, Create, Db, Delete, GetById, NewUser, Unverified, Update, User,
-    VerifyForUserUnchecked, VerifyForUserWithDb, CONFIG,
+    VerifyForUserWithDb, VerifyUnchecked, CONFIG,
 };
 
 use crate::handler::IntoJson;

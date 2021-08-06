@@ -263,13 +263,6 @@ pub trait VerifyIdsForUser {
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyIdForUserUnchecked {
-    type Id;
-
-    fn verify_unchecked(self, auth: &AuthUser) -> Result<Self::Id, Status>;
-}
-
-#[cfg(feature = "full")]
 pub trait VerifyIdForUserOrAP {
     type Id;
 
@@ -284,13 +277,6 @@ pub trait VerifyIdsForUserOrAP {
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyIdForUserOrAPUnchecked {
-    type Id;
-
-    fn verify_unchecked(self, auth: &AuthUserOrAP) -> Result<Self::Id, Status>;
-}
-
-#[cfg(feature = "full")]
 pub trait VerifyIdForActionProvider {
     type Id;
 
@@ -298,7 +284,7 @@ pub trait VerifyIdForActionProvider {
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyMultipleIdForActionProvider {
+pub trait VerifyIdsForActionProvider {
     type Id;
 
     fn verify_ap(self, auth: &AuthAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status>;
@@ -312,10 +298,17 @@ pub trait VerifyIdForAdmin {
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyMultipleIdForAdmin {
+pub trait VerifyIdsForAdmin {
     type Id;
 
     fn verify_adm(self, auth: &AuthAdmin) -> Result<Vec<Self::Id>, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyIdUnchecked {
+    type Id;
+
+    fn verify_unchecked(self) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]
@@ -344,13 +337,6 @@ pub trait VerifyMultipleForUserWithoutDb {
     type Entity;
 
     fn verify(self, auth: &AuthUser) -> Result<Vec<Self::Entity>, Status>;
-}
-
-#[cfg(feature = "full")]
-pub trait VerifyForUserUnchecked {
-    type Entity;
-
-    fn verify_unchecked(self) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
@@ -396,13 +382,6 @@ pub trait VerifyForActionProviderWithoutDb {
 }
 
 #[cfg(feature = "full")]
-pub trait VerifyForActionProviderUnchecked {
-    type Entity;
-
-    fn verify_ap_unchecked(self) -> Result<Self::Entity, Status>;
-}
-
-#[cfg(feature = "full")]
 pub trait VerifyForAdminWithoutDb {
     type Entity;
 
@@ -414,4 +393,11 @@ pub trait VerifyMultipleForAdminWithoutDb {
     type Entity;
 
     fn verify_adm(self, auth: &AuthAdmin) -> Result<Vec<Self::Entity>, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyUnchecked {
+    type Entity;
+
+    fn verify_unchecked(self) -> Result<Self::Entity, Status>;
 }

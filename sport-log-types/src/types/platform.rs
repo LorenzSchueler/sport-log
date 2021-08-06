@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use sport_log_types_derive::{
     Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
     GetByUser, ToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
-    VerifyIdForAdmin, VerifyIdForUser, VerifyIdForUserUnchecked,
+    VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked,
 };
 
 use crate::UserId;
@@ -25,7 +25,7 @@ use crate::{
         ToSql,
         FromSql,
         VerifyIdForAdmin,
-        VerifyIdForUserUnchecked
+        VerifyIdUnchecked
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]

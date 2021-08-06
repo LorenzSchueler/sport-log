@@ -4,10 +4,9 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds, ToSql,
+    Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds, ToSql, VerifyUnchecked,
 };
 
-use crate::VerifyForUserUnchecked;
 #[cfg(feature = "full")]
 use crate::{schema::user, AuthUser, GetById, Unverified, VerifyForUserWithDb};
 
@@ -62,19 +61,10 @@ impl VerifyForUserWithDb for Unverified<User> {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
+#[cfg_attr(feature = "full", derive(Insertable, VerifyUnchecked))]
 #[cfg_attr(feature = "full", table_name = "user")]
 pub struct NewUser {
     pub username: String,
     pub password: String,
     pub email: String,
-}
-
-#[cfg(feature = "full")]
-impl VerifyForUserUnchecked for Unverified<NewUser> {
-    type Entity = NewUser;
-
-    fn verify_unchecked(self) -> Result<Self::Entity, Status> {
-        Ok(self.0.into_inner())
-    }
 }

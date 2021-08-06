@@ -8,17 +8,17 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
     Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
-    GetByUser, ToSql, Update, VerifyForActionProviderUnchecked, VerifyForActionProviderWithDb,
-    VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
-    VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
-    VerifyIdForUserUnchecked,
+    GetByUser, ToSql, Update, VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb,
+    VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
+    VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked,
+    VerifyUnchecked,
 };
 
 #[cfg(feature = "full")]
 use crate::{
     schema::{action, action_event, action_provider, action_rule},
     AuthAP, GetById, GetByIds, Platform, UnverifiedId, UnverifiedIds, User,
-    VerifyIdForActionProvider, VerifyMultipleIdForActionProvider,
+    VerifyIdForActionProvider, VerifyIdsForActionProvider,
 };
 
 use crate::{PlatformId, UserId};
@@ -34,7 +34,7 @@ use crate::{PlatformId, UserId};
         ToSql,
         FromSql,
         VerifyIdForAdmin,
-        VerifyIdForUserUnchecked
+        VerifyIdUnchecked
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
@@ -68,7 +68,7 @@ pub struct ActionProvider {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(Insertable, VerifyForAdminWithoutDb, VerifyForActionProviderUnchecked)
+    derive(Insertable, VerifyForAdminWithoutDb, VerifyUnchecked)
 )]
 #[cfg_attr(feature = "full", table_name = "action_provider")]
 pub struct NewActionProvider {
@@ -253,7 +253,7 @@ impl VerifyIdForActionProvider for UnverifiedId<ActionEventId> {
 }
 
 #[cfg(feature = "full")]
-impl VerifyMultipleIdForActionProvider for UnverifiedIds<ActionEventId> {
+impl VerifyIdsForActionProvider for UnverifiedIds<ActionEventId> {
     type Id = ActionEventId;
 
     fn verify_ap(self, auth: &AuthAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
