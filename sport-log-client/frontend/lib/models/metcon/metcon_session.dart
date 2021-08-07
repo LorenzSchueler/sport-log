@@ -26,6 +26,9 @@ class MetconSession {
   int? reps;
   bool rx;
   String? comments;
+
+  factory MetconSession.fromJson(Map<String, dynamic> json) => _$MetconSessionFromJson(json);
+  Map<String, dynamic> toJson() => _$MetconSessionToJson(this);
 }
 
 @JsonSerializable()
@@ -49,4 +52,7 @@ class NewMetconSession {
   int? reps;
   bool rx;
   String? comments;
+
+  factory NewMetconSession.fromJson(Map<String, dynamic> json) => _$NewMetconSessionFromJson(json);
+  Map<String, dynamic> toJson() => _$NewMetconSessionToJson(this);
 }

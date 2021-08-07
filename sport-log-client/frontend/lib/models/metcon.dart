@@ -22,7 +22,7 @@ extension ToDisplayName on MetconType {
 class Metcon {
   Metcon({
     required this.id,
-    this.userId,
+    required this.userId,
     this.name,
     required this.type,
     this.rounds,
