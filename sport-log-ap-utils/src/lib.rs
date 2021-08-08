@@ -10,9 +10,10 @@ pub async fn setup(
     base_url: &str,
     name: &str,
     password: &str,
+    platform_name: &str,
     platform: NewPlatform,
     mut action_provider: NewActionProvider,
-    mut action: NewAction,
+    mut actions: Vec<NewAction>,
 ) {
     let client = Client::new();
 
@@ -41,7 +42,7 @@ pub async fn setup(
                 .unwrap();
             platforms
                 .into_iter()
-                .find(|platform| platform.name == name)
+                .find(|platform| platform.name == platform_name)
                 .unwrap()
         }
         StatusCode::FORBIDDEN => {
@@ -94,12 +95,14 @@ pub async fn setup(
     };
 
     // TODO remove if random id implemented
-    action.action_provider_id = action_provider.id;
+    for mut action in &mut actions {
+        action.action_provider_id = action_provider.id;
+    }
 
     match client
-        .post(format!("{}/v1/ap/action", base_url))
+        .post(format!("{}/v1/ap/actions", base_url))
         .basic_auth(name, Some(&password))
-        .json(&action)
+        .json(&actions)
         .send()
         .await
         .unwrap()

@@ -1,6 +1,7 @@
 use std::{env, fs};
 
 use chrono::{Duration, NaiveDateTime};
+use rand::Rng;
 use reqwest::{Client, StatusCode};
 use serde::Deserialize;
 
@@ -119,6 +120,8 @@ async fn main() {
         [option] if option == "--setup" => {
             let config = Config::get();
 
+            let mut rng = rand::thread_rng();
+
             let platform = NewPlatform {
                 name: PLATFORM_NAME.to_owned(),
             };
@@ -126,25 +129,26 @@ async fn main() {
             let action_provider = NewActionProvider {
                 name: NAME.to_owned(),
                 password: config.password.clone(),
-                platform_id: PlatformId(0), // TODO generate randomly
+                platform_id: PlatformId(rng.gen()), // TODO use generated id from platfrom
                 description: Some(DESCRIPTION.to_owned()),
             };
 
-            let action = NewAction {
+            let actions = vec![NewAction {
                 name: "fetch".to_owned(),
-                action_provider_id: ActionProviderId(0), // TODO generate randomly
+                action_provider_id: ActionProviderId(rng.gen()), // TODO use generated id from action provider
                 description: Some("Fetch and save new workouts.".to_owned()),
                 create_before: 168,
                 delete_after: 0,
-            };
+            }];
 
             setup(
                 &config.base_url,
                 NAME,
                 &config.password,
+                PLATFORM_NAME,
                 platform,
                 action_provider,
-                action,
+                actions,
             )
             .await;
         }
