@@ -1,5 +1,7 @@
 
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/models/action/naive_time.dart';
 import 'package:sport_log/models/action/weekday.dart';
 
 part 'action_rule.g.dart';
@@ -20,7 +22,7 @@ class ActionRule {
   int userId;
   int actionId;
   Weekday weekday;
-  DateTime time;
+  @NaiveTimeSerde() NaiveTime time;
   bool enabled;
   bool deleted;
 
