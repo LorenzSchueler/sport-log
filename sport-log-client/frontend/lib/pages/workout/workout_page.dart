@@ -71,7 +71,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
         );
       case BottomNavPage.strength:
         return const BottomNavigationBarItem(
-          icon: Icon(CustomIcons.dumbbell_not_rotated),
+          icon: Icon(CustomIcons.dumbbellNotRotated),
           label: "Strength",
         );
       case BottomNavPage.cardio:

@@ -47,7 +47,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
     deleted: false,
   );
   
-  UiMetcon _metcon;
+  final UiMetcon _metcon;
 
   final _descriptionFocusNode = FocusNode();
   

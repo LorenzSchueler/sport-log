@@ -54,11 +54,11 @@ K _$enumDecode<K, V>(
 }
 
 const _$WeekdayEnumMap = {
-  Weekday.monday: 'monday',
-  Weekday.tuesday: 'tuesday',
-  Weekday.wednesday: 'wednesday',
-  Weekday.thursday: 'thursday',
-  Weekday.friday: 'friday',
-  Weekday.saturday: 'saturday',
-  Weekday.sunday: 'sunday',
+  Weekday.monday: 'Monday',
+  Weekday.tuesday: 'Tuesday',
+  Weekday.wednesday: 'Wednesday',
+  Weekday.thursday: 'Thursday',
+  Weekday.friday: 'Friday',
+  Weekday.saturday: 'Saturday',
+  Weekday.sunday: 'Sunday',
 };
