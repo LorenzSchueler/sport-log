@@ -8,7 +8,8 @@ use sport_log_types::{
     UnverifiedId, UnverifiedIds, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForUser,
     VerifyIdUnchecked, VerifyIdsForActionProvider, VerifyIdsForAdmin, VerifyIdsForUser,
-    VerifyMultipleForAdminWithoutDb, VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
+    VerifyMultipleForActionProviderWithoutDb, VerifyMultipleForAdminWithoutDb,
+    VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};
@@ -91,6 +92,18 @@ pub async fn ap_create_action(
 ) -> Result<Json<Action>, Status> {
     let action = action.verify_ap(&auth)?;
     conn.run(|c| Action::create(action, c)).await.into_json()
+}
+
+#[post("/ap/actions", format = "application/json", data = "<actions>")]
+pub async fn ap_create_actions(
+    actions: Unverified<Vec<NewAction>>,
+    auth: AuthAP,
+    conn: Db,
+) -> Result<Json<Vec<Action>>, Status> {
+    let s = actions.verify_ap(&auth)?;
+    conn.run(|c| Action::create_multiple(s, c))
+        .await
+        .into_json()
 }
 
 #[get("/ap/action/<action_id>")]
