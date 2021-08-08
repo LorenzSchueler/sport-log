@@ -10,14 +10,11 @@ pub async fn setup(
     base_url: &str,
     name: &str,
     password: &str,
-    description: &str,
-    platform_name: &str,
+    platform: NewPlatform,
+    mut action_provider: NewActionProvider,
+    mut action: NewAction,
 ) {
     let client = Client::new();
-
-    let platform = NewPlatform {
-        name: platform_name.to_owned(),
-    };
 
     let response = client
         .post(format!("{}/v1/ap/platform", base_url))
@@ -57,12 +54,8 @@ pub async fn setup(
         }
     };
 
-    let action_provider = NewActionProvider {
-        name: name.to_owned(),
-        password: password.to_owned(),
-        platform_id: platform.id,
-        description: Some(description.to_owned()),
-    };
+    // TODO remove if random id implemented
+    action_provider.platform_id = platform.id;
 
     let response = client
         .post(format!("{}/v1/ap/action_provider", base_url))
@@ -100,13 +93,8 @@ pub async fn setup(
         }
     };
 
-    let action = NewAction {
-        name: "fetch".to_owned(),
-        action_provider_id: action_provider.id,
-        description: Some("Fetch and save new workouts.".to_owned()),
-        create_before: 168,
-        delete_after: 0,
-    };
+    // TODO remove if random id implemented
+    action.action_provider_id = action_provider.id;
 
     match client
         .post(format!("{}/v1/ap/action", base_url))
