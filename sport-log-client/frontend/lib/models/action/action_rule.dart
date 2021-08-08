@@ -1,5 +1,4 @@
 
-import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/models/action/naive_time.dart';
 import 'package:sport_log/models/action/weekday.dart';
