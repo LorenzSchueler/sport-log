@@ -382,6 +382,13 @@ pub trait VerifyForActionProviderWithoutDb {
 }
 
 #[cfg(feature = "full")]
+pub trait VerifyMultipleForActionProviderWithoutDb {
+    type Entity;
+
+    fn verify_ap(self, auth: &AuthAP) -> Result<Vec<Self::Entity>, Status>;
+}
+
+#[cfg(feature = "full")]
 pub trait VerifyForAdminWithoutDb {
     type Entity;
 

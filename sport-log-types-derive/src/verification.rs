@@ -456,6 +456,22 @@ pub fn impl_verify_for_action_provider_without_db(ast: &syn::DeriveInput) -> Tok
                 }
             }
         }
+
+        impl crate::VerifyMultipleForActionProviderWithoutDb for crate::Unverified<Vec<#typename>> {
+            type Entity = #typename;
+
+            fn verify_ap(
+                self,
+                auth: &crate::AuthAP,
+            ) -> Result<Vec<Self::Entity>, rocket::http::Status> {
+                let entities = self.0.into_inner();
+                if entities.iter().all(|entity| entity.action_provider_id == **auth) {
+                    Ok(entities)
+                } else {
+                    Err(rocket::http::Status::Forbidden)
+                }
+            }
+        }
     };
     gen.into()
 }
