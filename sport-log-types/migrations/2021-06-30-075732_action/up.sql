@@ -26,7 +26,7 @@ create table action (
     unique (action_provider_id, name)
 );
 insert into action (name, action_provider_id, description, create_before, delete_after) values 
-    ('Crossfit', 1, 'Reserve a spot in a CrossFit class.', 168, 0), 
+    ('CrossFit', 1, 'Reserve a spot in a CrossFit class.', 168, 0), 
     ('Weightlifting', 1, 'Reserve a spot in a Weightlifting class.', 168, 0), 
     ('Open Fridge', 1, 'Reserve a spot in a Open Fridge class.', 168, 0),
     ('fetch', 2, 'Fetch and save the wod for the current day.', 168, 24),
