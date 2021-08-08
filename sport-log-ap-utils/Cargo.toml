@@ -1,0 +1,10 @@
+[package]
+name = "sport-log-ap-utils"
+version = "0.1.0"
+edition = "2018"
+
+
+[dependencies]
+sport-log-types = { path = "../sport-log-types" }
+reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls"] }
+chrono = { version = "0.4.19", features = ["serde"] }
