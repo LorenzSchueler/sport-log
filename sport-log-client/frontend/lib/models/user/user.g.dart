@@ -19,15 +19,3 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'password': instance.password,
       'email': instance.email,
     };
-
-NewUser _$NewUserFromJson(Map<String, dynamic> json) => NewUser(
-      username: json['username'] as String,
-      password: json['password'] as String,
-      email: json['email'] as String,
-    );
-
-Map<String, dynamic> _$NewUserToJson(NewUser instance) => <String, dynamic>{
-      'username': instance.username,
-      'password': instance.password,
-      'email': instance.email,
-    };

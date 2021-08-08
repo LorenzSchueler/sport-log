@@ -24,23 +24,3 @@ class Action {
   factory Action.fromJson(Map<String, dynamic> json) => _$ActionFromJson(json);
   Map<String, dynamic> toJson() => _$ActionToJson(this);
 }
-
-@JsonSerializable()
-class NewAction {
-  NewAction({
-    required this.name,
-    required this.actionProviderId,
-    required this.description,
-    required this.createBefore,
-    required this.deleteAfter,
-  });
-
-  String name;
-  int actionProviderId;
-  String? description;
-  int createBefore;
-  int deleteAfter;
-
-  factory NewAction.fromJson(Map<String, dynamic> json) => _$NewActionFromJson(json);
-  Map<String, dynamic> toJson() => _$NewActionToJson(this);
-}

@@ -37,21 +37,3 @@ class Movement {
   factory Movement.fromJson(Map<String, dynamic> json) => _$MovementFromJson(json);
   Map<String, dynamic> toJson() => _$MovementToJson(this);
 }
-
-@JsonSerializable()
-class NewMovement {
-  NewMovement({
-    required this.userId,
-    required this.name,
-    required this.description,
-    required this.category,
-  });
-
-  int? userId;
-  String name;
-  String? description;
-  MovementCategory category;
-
-  factory NewMovement.fromJson(Map<String, dynamic> json) => _$NewMovementFromJson(json);
-  Map<String, dynamic> toJson() => _$NewMovementToJson(this);
-}

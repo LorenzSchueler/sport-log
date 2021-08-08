@@ -32,25 +32,3 @@ class Metcon {
   factory Metcon.fromJson(Map<String, dynamic> json) => _$MetconFromJson(json);
   Map<String, dynamic> toJson() => _$MetconToJson(this);
 }
-
-@JsonSerializable()
-class NewMetcon {
-  NewMetcon({
-    required this.userId,
-    required this.name,
-    required this.metconType,
-    required this.rounds,
-    required this.timecap,
-    required this.description,
-  });
-
-  int? userId;
-  String? name;
-  MetconType metconType;
-  int? rounds;
-  int? timecap;
-  String? description;
-
-  factory NewMetcon.fromJson(Map<String, dynamic> json) => _$NewMetconFromJson(json);
-  Map<String, dynamic> toJson() => _$NewMetconToJson(this);
-}

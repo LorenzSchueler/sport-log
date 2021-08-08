@@ -20,19 +20,3 @@ class Wod {
   factory Wod.fromMap(Map<String, dynamic> json) => _$WodFromJson(json);
   Map<String, dynamic> toJson() => _$WodToJson(this);
 }
-
-@JsonSerializable()
-class NewWod {
-  NewWod({
-    required this.userId,
-    required this.date,
-    required this.description,
-  });
-
-  int userId;
-  DateTime date;
-  String? description;
-
-  factory NewWod.fromMap(Map<String, dynamic> json) => _$NewWodFromJson(json);
-  Map<String, dynamic> toJson() => _$NewWodToJson(this);
-}

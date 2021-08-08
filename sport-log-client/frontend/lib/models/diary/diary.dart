@@ -22,21 +22,3 @@ class Diary {
   factory Diary.fromJson(Map<String, dynamic> json) => _$DiaryFromJson(json);
   Map<String, dynamic> toJson() => _$DiaryToJson(this);
 }
-
-@JsonSerializable()
-class NewDiary {
-  NewDiary({
-    required this.userId,
-    required this.date,
-    required this.bodyweight,
-    required this.comments,
-  });
-
-  int userId;
-  DateTime date;
-  double? bodyweight;
-  String? comments;
-
-  factory NewDiary.fromJson(Map<String, dynamic> json) => _$NewDiaryFromJson(json);
-  Map<String, dynamic> toJson() => _$NewDiaryToJson(this);
-}

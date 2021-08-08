@@ -31,27 +31,3 @@ Map<String, dynamic> _$MetconSessionToJson(MetconSession instance) =>
       'rx': instance.rx,
       'comments': instance.comments,
     };
-
-NewMetconSession _$NewMetconSessionFromJson(Map<String, dynamic> json) =>
-    NewMetconSession(
-      userId: json['user_id'] as int,
-      metconId: json['metcon_id'] as int,
-      dateTime: DateTime.parse(json['date_time'] as String),
-      time: json['time'] as int?,
-      rounds: json['rounds'] as int?,
-      reps: json['reps'] as int?,
-      rx: json['rx'] as bool,
-      comments: json['comments'] as String?,
-    );
-
-Map<String, dynamic> _$NewMetconSessionToJson(NewMetconSession instance) =>
-    <String, dynamic>{
-      'user_id': instance.userId,
-      'metcon_id': instance.metconId,
-      'date_time': instance.dateTime.toIso8601String(),
-      'time': instance.time,
-      'rounds': instance.rounds,
-      'reps': instance.reps,
-      'rx': instance.rx,
-      'comments': instance.comments,
-    };

@@ -27,25 +27,3 @@ class StrengthSession {
   factory StrengthSession.fromJson(Map<String, dynamic> json) => _$StrengthSessionFromJson(json);
   Map<String, dynamic> toJson() => _$StrengthSessionToJson(this);
 }
-
-@JsonSerializable()
-class NewStrengthSession {
-  NewStrengthSession({
-    required this.userId,
-    required this.datetime,
-    required this.movementId,
-    required this.movementUnit,
-    required this.interval,
-    required this.comments,
-  });
-
-  int userId;
-  DateTime datetime;
-  int movementId;
-  MovementUnit movementUnit;
-  int? interval;
-  String? comments;
-
-  factory NewStrengthSession.fromJson(Map<String, dynamic> json) => _$NewStrengthSessionFromJson(json);
-  Map<String, dynamic> toJson() => _$NewStrengthSessionToJson(this);
-}

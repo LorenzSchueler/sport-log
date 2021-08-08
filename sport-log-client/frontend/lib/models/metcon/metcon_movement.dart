@@ -27,25 +27,3 @@ class MetconMovement {
   factory MetconMovement.fromJson(Map<String, dynamic> json) => _$MetconMovementFromJson(json);
   Map<String, dynamic> toJson() => _$MetconMovementToJson(this);
 }
-
-@JsonSerializable()
-class NewMetconMovement {
-  NewMetconMovement({
-    required this.metconId,
-    required this.movementId,
-    required this.movementNumber,
-    required this.count,
-    required this.unit,
-    required this.weight,
-  });
-
-  int metconId;
-  int movementId;
-  int movementNumber;
-  int count;
-  MovementUnit unit;
-  double? weight;
-
-  factory NewMetconMovement.fromJson(Map<String, dynamic> json) => _$NewMetconMovementFromJson(json);
-  Map<String, dynamic> toJson() => _$NewMetconMovementToJson(this);
-}

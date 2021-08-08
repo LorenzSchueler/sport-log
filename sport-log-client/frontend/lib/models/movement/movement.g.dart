@@ -52,18 +52,3 @@ const _$MovementCategoryEnumMap = {
   MovementCategory.cardio: 'Cardio',
   MovementCategory.strength: 'Strength',
 };
-
-NewMovement _$NewMovementFromJson(Map<String, dynamic> json) => NewMovement(
-      userId: json['user_id'] as int?,
-      name: json['name'] as String,
-      description: json['description'] as String?,
-      category: _$enumDecode(_$MovementCategoryEnumMap, json['category']),
-    );
-
-Map<String, dynamic> _$NewMovementToJson(NewMovement instance) =>
-    <String, dynamic>{
-      'user_id': instance.userId,
-      'name': instance.name,
-      'description': instance.description,
-      'category': _$MovementCategoryEnumMap[instance.category],
-    };

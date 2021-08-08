@@ -63,23 +63,3 @@ const _$MovementUnitEnumMap = {
   MovementUnit.foot: 'Foot',
   MovementUnit.mile: 'Mile',
 };
-
-NewMetconMovement _$NewMetconMovementFromJson(Map<String, dynamic> json) =>
-    NewMetconMovement(
-      metconId: json['metcon_id'] as int,
-      movementId: json['movement_id'] as int,
-      movementNumber: json['movement_number'] as int,
-      count: json['count'] as int,
-      unit: _$enumDecode(_$MovementUnitEnumMap, json['unit']),
-      weight: (json['weight'] as num?)?.toDouble(),
-    );
-
-Map<String, dynamic> _$NewMetconMovementToJson(NewMetconMovement instance) =>
-    <String, dynamic>{
-      'metcon_id': instance.metconId,
-      'movement_id': instance.movementId,
-      'movement_number': instance.movementNumber,
-      'count': instance.count,
-      'unit': _$MovementUnitEnumMap[instance.unit],
-      'weight': instance.weight,
-    };

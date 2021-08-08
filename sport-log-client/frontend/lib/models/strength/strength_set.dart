@@ -22,21 +22,3 @@ class StrengthSet {
   factory StrengthSet.fromJson(Map<String, dynamic> json) => _$StrengthSetFromJson(json);
   Map<String, dynamic> toJson() => _$StrengthSetToJson(this);
 }
-
-@JsonSerializable()
-class NewStrengthSet {
-  NewStrengthSet({
-    required this.strengthSessionId,
-    required this.setNumber,
-    required this.count,
-    required this.weight,
-  });
-
-  int strengthSessionId;
-  int setNumber;
-  int count;
-  double? weight;
-
-  factory NewStrengthSet.fromJson(Map<String, dynamic> json) => _$NewStrengthSetFromJson(json);
-  Map<String, dynamic> toJson() => _$NewStrengthSetToJson(this);
-}

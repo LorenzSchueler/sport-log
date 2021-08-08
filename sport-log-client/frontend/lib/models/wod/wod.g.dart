@@ -19,15 +19,3 @@ Map<String, dynamic> _$WodToJson(Wod instance) => <String, dynamic>{
       'date': instance.date.toIso8601String(),
       'description': instance.description,
     };
-
-NewWod _$NewWodFromJson(Map<String, dynamic> json) => NewWod(
-      userId: json['user_id'] as int,
-      date: DateTime.parse(json['date'] as String),
-      description: json['description'] as String?,
-    );
-
-Map<String, dynamic> _$NewWodToJson(NewWod instance) => <String, dynamic>{
-      'user_id': instance.userId,
-      'date': instance.date.toIso8601String(),
-      'description': instance.description,
-    };

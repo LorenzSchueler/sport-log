@@ -21,17 +21,3 @@ Map<String, dynamic> _$DiaryToJson(Diary instance) => <String, dynamic>{
       'bodyweight': instance.bodyweight,
       'comments': instance.comments,
     };
-
-NewDiary _$NewDiaryFromJson(Map<String, dynamic> json) => NewDiary(
-      userId: json['user_id'] as int,
-      date: DateTime.parse(json['date'] as String),
-      bodyweight: (json['bodyweight'] as num?)?.toDouble(),
-      comments: json['comments'] as String?,
-    );
-
-Map<String, dynamic> _$NewDiaryToJson(NewDiary instance) => <String, dynamic>{
-      'user_id': instance.userId,
-      'date': instance.date.toIso8601String(),
-      'bodyweight': instance.bodyweight,
-      'comments': instance.comments,
-    };

@@ -57,21 +57,3 @@ const _$MetconTypeEnumMap = {
   MetconType.emom: 'Emom',
   MetconType.forTime: 'ForTime',
 };
-
-NewMetcon _$NewMetconFromJson(Map<String, dynamic> json) => NewMetcon(
-      userId: json['user_id'] as int?,
-      name: json['name'] as String?,
-      metconType: _$enumDecode(_$MetconTypeEnumMap, json['metcon_type']),
-      rounds: json['rounds'] as int?,
-      timecap: json['timecap'] as int?,
-      description: json['description'] as String?,
-    );
-
-Map<String, dynamic> _$NewMetconToJson(NewMetcon instance) => <String, dynamic>{
-      'user_id': instance.userId,
-      'name': instance.name,
-      'metcon_type': _$MetconTypeEnumMap[instance.metconType],
-      'rounds': instance.rounds,
-      'timecap': instance.timecap,
-      'description': instance.description,
-    };
