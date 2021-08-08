@@ -12,6 +12,7 @@ StrengthSet _$StrengthSetFromJson(Map<String, dynamic> json) => StrengthSet(
       setNumber: json['set_number'] as int,
       count: json['count'] as int,
       weight: (json['weight'] as num?)?.toDouble(),
+      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$StrengthSetToJson(StrengthSet instance) =>
@@ -21,4 +22,5 @@ Map<String, dynamic> _$StrengthSetToJson(StrengthSet instance) =>
       'set_number': instance.setNumber,
       'count': instance.count,
       'weight': instance.weight,
+      'deleted': instance.deleted,
     };

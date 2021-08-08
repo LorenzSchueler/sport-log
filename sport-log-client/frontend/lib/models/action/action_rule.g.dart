@@ -13,6 +13,7 @@ ActionRule _$ActionRuleFromJson(Map<String, dynamic> json) => ActionRule(
       weekday: _$enumDecode(_$WeekdayEnumMap, json['weekday']),
       time: DateTime.parse(json['time'] as String),
       enabled: json['enabled'] as bool,
+      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$ActionRuleToJson(ActionRule instance) =>
@@ -23,6 +24,7 @@ Map<String, dynamic> _$ActionRuleToJson(ActionRule instance) =>
       'weekday': _$WeekdayEnumMap[instance.weekday],
       'time': instance.time.toIso8601String(),
       'enabled': instance.enabled,
+      'deleted': instance.deleted,
     };
 
 K _$enumDecode<K, V>(

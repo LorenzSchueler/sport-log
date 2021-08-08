@@ -31,6 +31,7 @@ CardioSession _$CardioSessionFromJson(Map<String, dynamic> json) =>
           .toList(),
       routeId: json['route_id'] as int?,
       comments: json['comments'] as String?,
+      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$CardioSessionToJson(CardioSession instance) =>
@@ -52,6 +53,7 @@ Map<String, dynamic> _$CardioSessionToJson(CardioSession instance) =>
       'heart_rate': instance.heartRate,
       'route_id': instance.routeId,
       'comments': instance.comments,
+      'deleted': instance.deleted,
     };
 
 K _$enumDecode<K, V>(

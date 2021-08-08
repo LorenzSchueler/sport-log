@@ -13,6 +13,7 @@ PlatformCredential _$PlatformCredentialFromJson(Map<String, dynamic> json) =>
       platformId: json['platform_id'] as int,
       username: json['username'] as String,
       password: json['password'] as String,
+      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$PlatformCredentialToJson(PlatformCredential instance) =>
@@ -22,4 +23,5 @@ Map<String, dynamic> _$PlatformCredentialToJson(PlatformCredential instance) =>
       'platform_id': instance.platformId,
       'username': instance.username,
       'password': instance.password,
+      'deleted': instance.deleted,
     };

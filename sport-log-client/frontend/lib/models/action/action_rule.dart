@@ -13,6 +13,7 @@ class ActionRule {
     required this.weekday,
     required this.time,
     required this.enabled,
+    required this.deleted,
   });
 
   int id;
@@ -21,6 +22,7 @@ class ActionRule {
   Weekday weekday;
   DateTime time;
   bool enabled;
+  bool deleted;
 
   factory ActionRule.fromJson(Map<String, dynamic> json) => _$ActionRuleFromJson(json);
   Map<String, dynamic> toJson() => _$ActionRuleToJson(this);

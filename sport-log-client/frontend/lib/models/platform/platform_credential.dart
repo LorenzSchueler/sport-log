@@ -11,6 +11,7 @@ class PlatformCredential {
     required this.platformId,
     required this.username,
     required this.password,
+    required this.deleted,
   });
 
   int id;
@@ -18,6 +19,7 @@ class PlatformCredential {
   int platformId;
   String username;
   String password;
+  bool deleted;
 
   factory PlatformCredential.fromJson(Map<String, dynamic> json) => _$PlatformCredentialFromJson(json);
   Map<String, dynamic> toJson() => _$PlatformCredentialToJson(this);

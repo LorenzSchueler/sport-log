@@ -19,6 +19,7 @@ class Metcon {
     required this.rounds,
     required this.timecap,
     required this.description,
+    required this.deleted,
   });
 
   int id;
@@ -28,6 +29,7 @@ class Metcon {
   int? rounds;
   int? timecap;
   String? description;
+  bool deleted;
 
   factory Metcon.fromJson(Map<String, dynamic> json) => _$MetconFromJson(json);
   Map<String, dynamic> toJson() => _$MetconToJson(this);

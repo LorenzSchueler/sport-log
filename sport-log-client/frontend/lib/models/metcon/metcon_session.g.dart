@@ -17,6 +17,7 @@ MetconSession _$MetconSessionFromJson(Map<String, dynamic> json) =>
       reps: json['reps'] as int?,
       rx: json['rx'] as bool,
       comments: json['comments'] as String?,
+      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$MetconSessionToJson(MetconSession instance) =>
@@ -30,4 +31,5 @@ Map<String, dynamic> _$MetconSessionToJson(MetconSession instance) =>
       'reps': instance.reps,
       'rx': instance.rx,
       'comments': instance.comments,
+      'deleted': instance.deleted,
     };

@@ -12,6 +12,7 @@ Diary _$DiaryFromJson(Map<String, dynamic> json) => Diary(
       date: DateTime.parse(json['date'] as String),
       bodyweight: (json['bodyweight'] as num?)?.toDouble(),
       comments: json['comments'] as String?,
+      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$DiaryToJson(Diary instance) => <String, dynamic>{
@@ -20,4 +21,5 @@ Map<String, dynamic> _$DiaryToJson(Diary instance) => <String, dynamic>{
       'date': instance.date.toIso8601String(),
       'bodyweight': instance.bodyweight,
       'comments': instance.comments,
+      'deleted': instance.deleted,
     };

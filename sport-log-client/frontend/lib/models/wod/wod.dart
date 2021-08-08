@@ -10,12 +10,14 @@ class Wod {
     required this.userId,
     required this.date,
     required this.description,
+    required this.deleted,
   });
 
   int id;
   int userId;
   DateTime date;
   String? description;
+  bool deleted;
 
   factory Wod.fromMap(Map<String, dynamic> json) => _$WodFromJson(json);
   Map<String, dynamic> toJson() => _$WodToJson(this);

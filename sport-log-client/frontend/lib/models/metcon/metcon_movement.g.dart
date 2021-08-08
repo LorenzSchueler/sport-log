@@ -15,6 +15,7 @@ MetconMovement _$MetconMovementFromJson(Map<String, dynamic> json) =>
       count: json['count'] as int,
       unit: _$enumDecode(_$MovementUnitEnumMap, json['unit']),
       weight: (json['weight'] as num?)?.toDouble(),
+      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$MetconMovementToJson(MetconMovement instance) =>
@@ -26,6 +27,7 @@ Map<String, dynamic> _$MetconMovementToJson(MetconMovement instance) =>
       'count': instance.count,
       'unit': _$MovementUnitEnumMap[instance.unit],
       'weight': instance.weight,
+      'deleted': instance.deleted,
     };
 
 K _$enumDecode<K, V>(

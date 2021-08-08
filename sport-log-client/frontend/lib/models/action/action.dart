@@ -12,6 +12,7 @@ class Action {
     required this.description,
     required this.createBefore,
     required this.deleteAfter,
+    required this.deleted,
   });
 
   int id;
@@ -20,6 +21,7 @@ class Action {
   String? description;
   int createBefore;
   int deleteAfter;
+  bool deleted;
 
   factory Action.fromJson(Map<String, dynamic> json) => _$ActionFromJson(json);
   Map<String, dynamic> toJson() => _$ActionToJson(this);

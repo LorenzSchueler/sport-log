@@ -14,6 +14,7 @@ class StrengthSession {
     required this.movementUnit,
     required this.interval,
     required this.comments,
+    required this.deleted,
   });
 
   int id;
@@ -23,6 +24,7 @@ class StrengthSession {
   MovementUnit movementUnit;
   int? interval;
   String? comments;
+  bool deleted;
 
   factory StrengthSession.fromJson(Map<String, dynamic> json) => _$StrengthSessionFromJson(json);
   Map<String, dynamic> toJson() => _$StrengthSessionToJson(this);

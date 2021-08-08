@@ -14,6 +14,7 @@ class Route {
     required this.ascent,
     required this.descent,
     required this.track,
+    required this.deleted,
   });
 
   int id;
@@ -23,6 +24,7 @@ class Route {
   int? ascent;
   int? descent;
   List<Position>? track;
+  bool deleted;
 
   factory Route.fromJson(Map<String, dynamic> json) => _$RouteFromJson(json);
   Map<String, dynamic> toJson() => _$RouteToJson(this);

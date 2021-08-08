@@ -13,6 +13,7 @@ ActionProvider _$ActionProviderFromJson(Map<String, dynamic> json) =>
       password: json['password'] as String,
       platformId: json['platform_id'] as int,
       description: json['description'] as String?,
+      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$ActionProviderToJson(ActionProvider instance) =>
@@ -22,4 +23,5 @@ Map<String, dynamic> _$ActionProviderToJson(ActionProvider instance) =>
       'password': instance.password,
       'platform_id': instance.platformId,
       'description': instance.description,
+      'deleted': instance.deleted,
     };

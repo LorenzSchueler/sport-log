@@ -11,6 +11,7 @@ class StrengthSet {
     required this.setNumber,
     required this.count,
     required this.weight,
+    required this.deleted,
   });
 
   int id;
@@ -18,6 +19,7 @@ class StrengthSet {
   int setNumber;
   int count;
   double? weight;
+  bool deleted;
 
   factory StrengthSet.fromJson(Map<String, dynamic> json) => _$StrengthSetFromJson(json);
   Map<String, dynamic> toJson() => _$StrengthSetToJson(this);

@@ -14,6 +14,7 @@ class MetconMovement {
     required this.count,
     required this.unit,
     required this.weight,
+    required this.deleted,
   });
 
   int id;
@@ -23,6 +24,7 @@ class MetconMovement {
   int count;
   MovementUnit unit;
   double? weight;
+  bool deleted;
 
   factory MetconMovement.fromJson(Map<String, dynamic> json) => _$MetconMovementFromJson(json);
   Map<String, dynamic> toJson() => _$MetconMovementToJson(this);

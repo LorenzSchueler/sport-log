@@ -11,6 +11,7 @@ class ActionProvider {
     required this.password,
     required this.platformId,
     required this.description,
+    required this.deleted,
   });
 
   int id;
@@ -18,6 +19,7 @@ class ActionProvider {
   String password;
   int platformId;
   String? description;
+  bool deleted;
 
   factory ActionProvider.fromMap(Map<String, dynamic> json) => _$ActionProviderFromJson(json);
   Map<String, dynamic> toJson() => _$ActionProviderToJson(this);

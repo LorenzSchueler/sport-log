@@ -13,6 +13,7 @@ Action _$ActionFromJson(Map<String, dynamic> json) => Action(
       description: json['description'] as String?,
       createBefore: json['create_before'] as int,
       deleteAfter: json['delete_after'] as int,
+      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$ActionToJson(Action instance) => <String, dynamic>{
@@ -22,4 +23,5 @@ Map<String, dynamic> _$ActionToJson(Action instance) => <String, dynamic>{
       'description': instance.description,
       'create_before': instance.createBefore,
       'delete_after': instance.deleteAfter,
+      'deleted': instance.deleted,
     };

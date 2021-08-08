@@ -12,6 +12,7 @@ Movement _$MovementFromJson(Map<String, dynamic> json) => Movement(
       name: json['name'] as String,
       description: json['description'] as String?,
       category: _$enumDecode(_$MovementCategoryEnumMap, json['category']),
+      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$MovementToJson(Movement instance) => <String, dynamic>{
@@ -20,6 +21,7 @@ Map<String, dynamic> _$MovementToJson(Movement instance) => <String, dynamic>{
       'name': instance.name,
       'description': instance.description,
       'category': _$MovementCategoryEnumMap[instance.category],
+      'deleted': instance.deleted,
     };
 
 K _$enumDecode<K, V>(

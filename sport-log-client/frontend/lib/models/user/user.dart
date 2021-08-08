@@ -10,12 +10,14 @@ class User {
     required this.username,
     required this.password,
     required this.email,
+    required this.deleted,
   });
 
   int id;
   String username;
   String password;
   String email;
+  bool deleted;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
   Map<String, dynamic> toJson() => _$UserToJson(this);

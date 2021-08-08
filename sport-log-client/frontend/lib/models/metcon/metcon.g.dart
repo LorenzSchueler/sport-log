@@ -14,6 +14,7 @@ Metcon _$MetconFromJson(Map<String, dynamic> json) => Metcon(
       rounds: json['rounds'] as int?,
       timecap: json['timecap'] as int?,
       description: json['description'] as String?,
+      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$MetconToJson(Metcon instance) => <String, dynamic>{
@@ -24,6 +25,7 @@ Map<String, dynamic> _$MetconToJson(Metcon instance) => <String, dynamic>{
       'rounds': instance.rounds,
       'timecap': instance.timecap,
       'description': instance.description,
+      'deleted': instance.deleted,
     };
 
 K _$enumDecode<K, V>(

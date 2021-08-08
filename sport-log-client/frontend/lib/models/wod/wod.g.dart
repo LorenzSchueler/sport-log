@@ -11,6 +11,7 @@ Wod _$WodFromJson(Map<String, dynamic> json) => Wod(
       userId: json['user_id'] as int,
       date: DateTime.parse(json['date'] as String),
       description: json['description'] as String?,
+      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$WodToJson(Wod instance) => <String, dynamic>{
@@ -18,4 +19,5 @@ Map<String, dynamic> _$WodToJson(Wod instance) => <String, dynamic>{
       'user_id': instance.userId,
       'date': instance.date.toIso8601String(),
       'description': instance.description,
+      'deleted': instance.deleted,
     };

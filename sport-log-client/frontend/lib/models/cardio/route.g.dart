@@ -16,6 +16,7 @@ Route _$RouteFromJson(Map<String, dynamic> json) => Route(
       track: (json['track'] as List<dynamic>?)
           ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
           .toList(),
+      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$RouteToJson(Route instance) => <String, dynamic>{
@@ -26,4 +27,5 @@ Map<String, dynamic> _$RouteToJson(Route instance) => <String, dynamic>{
       'ascent': instance.ascent,
       'descent': instance.descent,
       'track': instance.track,
+      'deleted': instance.deleted,
     };

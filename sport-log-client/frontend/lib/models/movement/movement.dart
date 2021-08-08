@@ -26,6 +26,7 @@ class Movement {
     required this.name,
     required this.description,
     required this.category,
+    required this.deleted,
   });
 
   int id;
@@ -33,6 +34,7 @@ class Movement {
   String name;
   String? description;
   MovementCategory category;
+  bool deleted;
 
   factory Movement.fromJson(Map<String, dynamic> json) => _$MovementFromJson(json);
   Map<String, dynamic> toJson() => _$MovementToJson(this);

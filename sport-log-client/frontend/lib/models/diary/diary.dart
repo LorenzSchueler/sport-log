@@ -11,6 +11,7 @@ class Diary {
     required this.date,
     required this.bodyweight,
     required this.comments,
+    required this.deleted,
   });
 
   int id;
@@ -18,6 +19,7 @@ class Diary {
   DateTime date;
   double? bodyweight;
   String? comments;
+  bool deleted;
 
   factory Diary.fromJson(Map<String, dynamic> json) => _$DiaryFromJson(json);
   Map<String, dynamic> toJson() => _$DiaryToJson(this);

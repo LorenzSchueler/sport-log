@@ -30,6 +30,7 @@ class CardioSession {
     required this.heartRate,
     required this.routeId,
     required this.comments,
+    required this.deleted,
   });
 
   int id;
@@ -49,6 +50,7 @@ class CardioSession {
   List<double>? heartRate;
   int? routeId;
   String? comments;
+  bool deleted;
 
   factory CardioSession.fromJson(Map<String, dynamic> json) => _$CardioSessionFromJson(json);
   Map<String, dynamic> toJson() => _$CardioSessionToJson(this);

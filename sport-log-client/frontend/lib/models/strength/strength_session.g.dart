@@ -15,6 +15,7 @@ StrengthSession _$StrengthSessionFromJson(Map<String, dynamic> json) =>
       movementUnit: _$enumDecode(_$MovementUnitEnumMap, json['movement_unit']),
       interval: json['interval'] as int?,
       comments: json['comments'] as String?,
+      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$StrengthSessionToJson(StrengthSession instance) =>
@@ -26,6 +27,7 @@ Map<String, dynamic> _$StrengthSessionToJson(StrengthSession instance) =>
       'movement_unit': _$MovementUnitEnumMap[instance.movementUnit],
       'interval': instance.interval,
       'comments': instance.comments,
+      'deleted': instance.deleted,
     };
 
 K _$enumDecode<K, V>(

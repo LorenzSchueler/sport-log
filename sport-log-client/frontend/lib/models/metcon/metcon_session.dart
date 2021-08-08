@@ -15,6 +15,7 @@ class MetconSession {
     required this.reps,
     required this.rx,
     required this.comments,
+    required this.deleted,
   });
 
   int id;
@@ -26,6 +27,7 @@ class MetconSession {
   int? reps;
   bool rx;
   String? comments;
+  bool deleted;
 
   factory MetconSession.fromJson(Map<String, dynamic> json) => _$MetconSessionFromJson(json);
   Map<String, dynamic> toJson() => _$MetconSessionToJson(this);
