@@ -1,5 +1,5 @@
 
-import 'package:sport_log/models/movement.dart';
+import 'package:sport_log/models/movement/movement.dart';
 
 class MovementRepository {
 

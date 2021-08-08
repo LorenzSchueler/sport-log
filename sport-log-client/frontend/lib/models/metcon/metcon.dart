@@ -9,6 +9,19 @@ enum MetconType {
   @JsonValue("ForTime") forTime
 }
 
+extension ToDisplayName on MetconType {
+  String toDisplayName() {
+    switch (this) {
+      case MetconType.amrap:
+        return "AMRAP";
+      case MetconType.emom:
+        return "EMOM";
+      case MetconType.forTime:
+        return "FOR TIME";
+    }
+  }
+}
+
 @JsonSerializable()
 class Metcon {
   Metcon({

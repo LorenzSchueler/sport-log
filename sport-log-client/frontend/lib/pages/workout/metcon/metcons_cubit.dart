@@ -1,6 +1,6 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sport_log/models/metcon.dart';
+import 'package:sport_log/models/metcon/ui_metcon.dart';
 
 abstract class MetconsState {
   const MetconsState();

@@ -2,7 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api_error.dart';
-import 'package:sport_log/models/movement.dart';
+import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/models/movement/ui_movement.dart';
 import 'package:sport_log/pages/movements/movement_request_bloc.dart';
 import 'package:sport_log/widgets/loading_dialog.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';

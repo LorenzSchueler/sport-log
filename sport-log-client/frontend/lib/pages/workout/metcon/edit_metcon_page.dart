@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/helpers/pluralize.dart';
-import 'package:sport_log/models/metcon.dart';
-import 'package:sport_log/models/movement.dart';
+import 'package:sport_log/models/metcon/metcon.dart';
+import 'package:sport_log/models/metcon/ui_metcon.dart';
+import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/metcon/metcon_request_bloc.dart';
 import 'package:sport_log/widgets/int_picker.dart';
 import 'package:sport_log/widgets/loading_dialog.dart';
@@ -42,7 +43,8 @@ class _EditMetconPageState extends State<EditMetconPage> {
 
   _EditMetconPageState(UiMetcon? metcon)
     : _metcon = metcon ?? UiMetcon(
-    type: _typeDefaultValue
+    type: _typeDefaultValue,
+    deleted: false,
   );
   
   UiMetcon _metcon;
@@ -118,6 +120,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
         movementId: movementId,
         count: _countDefaultValue,
         unit: _unitDefaultValue,
+        deleted: false,
       ));
     });
   }

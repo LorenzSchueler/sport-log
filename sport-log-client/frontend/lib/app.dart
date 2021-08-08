@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
-import 'package:sport_log/models/metcon.dart';
-import 'package:sport_log/models/movement.dart';
+import 'package:sport_log/models/metcon/ui_metcon.dart';
+import 'package:sport_log/models/movement/ui_movement.dart';
 import 'package:sport_log/pages/logs/logs_page.dart';
 import 'package:sport_log/pages/movements/edit_movement_page.dart';
 import 'package:sport_log/pages/movements/movements_page.dart';
@@ -39,7 +39,7 @@ class _AppState extends State<App> {
         Routes.editMetcon: (_) => ProtectedRoute(builder: (context) {
           final arg = ModalRoute.of(context)?.settings.arguments;
           return EditMetconPage(
-            initialMetcon: (arg != null && arg is UiMetcon) ? arg : null,
+            initialMetcon: (arg is UiMetcon) ? arg : null,
           );
         }),
         Routes.syncing: (_) => ProtectedRoute(builder: (_) => const SyncingPage()),
@@ -53,7 +53,7 @@ class _AppState extends State<App> {
             return EditMovementPage(initialName: arg);
           }
           return EditMovementPage(
-           initialMovement: (arg != null && arg is UiMovement) ? arg : null,
+           initialMovement: (arg is UiMovement) ? arg : null,
           );
         })
       },

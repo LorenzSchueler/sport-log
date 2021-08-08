@@ -1,6 +1,6 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sport_log/models/movement.dart';
+import 'package:sport_log/models/movement/movement.dart';
 
 abstract class MovementsState {}
 

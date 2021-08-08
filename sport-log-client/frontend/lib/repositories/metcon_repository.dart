@@ -1,5 +1,6 @@
 
-import 'package:sport_log/models/metcon.dart';
+import 'package:sport_log/models/metcon/metcon.dart';
+import 'package:sport_log/models/metcon/metcon_movement.dart';
 
 class MetconRepository {
   final Map<int, Metcon> _metcons = {};

@@ -4,7 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/config.dart';
-import 'package:sport_log/models/movement.dart';
+import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/models/movement/ui_movement.dart';
 import 'package:sport_log/pages/movements/movements_cubit.dart';
 import 'package:sport_log/repositories/movement_repository.dart';
 
@@ -87,6 +88,7 @@ class MovementRequestBloc
       name: event.newMovement.name,
       category: event.newMovement.category,
       description: event.newMovement.description,
+      deleted: false,
     );
     await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
     _repo.addMovement(movement);
@@ -114,6 +116,7 @@ class MovementRequestBloc
       name: event.movement.name,
       category: event.movement.category,
       description: event.movement.description,
+      deleted: false,
     );
     _repo.updateMovement(movement);
     _cubit.updateMovement(movement);

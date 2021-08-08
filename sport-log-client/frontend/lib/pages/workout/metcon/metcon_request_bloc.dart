@@ -4,10 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/config.dart';
-import 'package:sport_log/models/metcon.dart';
+import 'package:sport_log/helpers/iterable_extension.dart';
+import 'package:sport_log/models/metcon/ui_metcon.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_cubit.dart';
 import 'package:sport_log/repositories/metcon_repository.dart';
-import 'package:sport_log/helpers/iterable_extension.dart';
 
 /// Bloc State
 abstract class MetconRequestState {

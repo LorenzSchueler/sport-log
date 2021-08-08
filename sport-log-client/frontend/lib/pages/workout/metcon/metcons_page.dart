@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:sport_log/api/api_error.dart';
-import 'package:sport_log/models/metcon.dart';
+import 'package:sport_log/models/metcon/ui_metcon.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_cubit.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:sport_log/repositories/movement_repository.dart';

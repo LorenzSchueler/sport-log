@@ -8,6 +8,17 @@ enum MovementCategory {
   @JsonValue("Strength") strength,
 }
 
+extension MovementCategoryToDisplayName on MovementCategory {
+  String toDisplayName() {
+    switch (this) {
+      case MovementCategory.strength:
+        return "strength";
+      case MovementCategory.cardio:
+        return "cardio";
+    }
+  }
+}
+
 enum MovementUnit {
   @JsonValue("Reps") reps,
   @JsonValue("Cal") cal,
@@ -16,6 +27,27 @@ enum MovementUnit {
   @JsonValue("Yard") yard,
   @JsonValue("Foot") foot,
   @JsonValue("Mile") mile,
+}
+
+extension MovementUniToDisplayName on MovementUnit {
+  String toDisplayName() {
+    switch (this) {
+      case MovementUnit.reps:
+        return "Reps";
+      case MovementUnit.cal:
+        return "Cals";
+      case MovementUnit.meter:
+        return "m";
+      case MovementUnit.km:
+        return "km";
+      case MovementUnit.yard:
+        return "yd";
+      case MovementUnit.foot:
+        return "ft";
+      case MovementUnit.mile:
+        return "mi";
+    }
+  }
 }
 
 @JsonSerializable()
