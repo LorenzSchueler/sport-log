@@ -2,7 +2,7 @@
 import 'dart:developer';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sport_log/models/user.dart';
+import 'package:sport_log/models/user/user.dart';
 
 class AuthenticationRepository {
   AuthenticationRepository._(this._storage);

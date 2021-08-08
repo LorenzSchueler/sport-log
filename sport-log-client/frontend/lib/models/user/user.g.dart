@@ -11,7 +11,6 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       username: json['username'] as String,
       password: json['password'] as String,
       email: json['email'] as String,
-      deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
@@ -19,5 +18,4 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'username': instance.username,
       'password': instance.password,
       'email': instance.email,
-      'deleted': instance.deleted,
     };

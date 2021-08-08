@@ -3,7 +3,7 @@ part of 'api.dart';
 
 extension UserRoutes on Api {
 
-  Future<User> createUser(NewUser newUser) async {
+  Future<void> createUser(User newUser) async {
     try {
       final response = await _client.post(
         Uri.parse(urlBase + BackendRoutes.user),
@@ -12,9 +12,7 @@ extension UserRoutes on Api {
       );
       if (response.statusCode == 409) {
         throw ApiError.usernameTaken;
-      } else if (response.statusCode == 200) {
-        return User.fromJson(jsonDecode(response.body));
-      } else {
+      } else if (response.statusCode != 200) {
         _handleUnknownStatusCode(response);
         throw ApiError.unknown;
       }

@@ -4,9 +4,9 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:sport_log/api/backend_routes.dart';
-import 'package:sport_log/models/user.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:http/http.dart' as http;
+import 'package:sport_log/models/user/user.dart';
 
 part 'user_api.dart';
 

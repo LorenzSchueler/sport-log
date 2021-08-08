@@ -3,6 +3,7 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/pages/movements/movements_cubit.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_cubit.dart';
 import 'package:sport_log/repositories/authentication_repository.dart';
@@ -10,16 +11,14 @@ import 'package:sport_log/repositories/movement_repository.dart';
 import 'package:sport_log/repositories/metcon_repository.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
-import 'package:sport_log/models/user.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  User? user;
   AuthenticationRepository? authRepo;
   authRepo = await AuthenticationRepository.getInstance();
-  user = await authRepo.getUser();
+  User? user = await authRepo.getUser();
   final api = Api.instance;
   api.urlBase = await Config.apiUrlBase;
   final authBloc = AuthenticationBloc(
