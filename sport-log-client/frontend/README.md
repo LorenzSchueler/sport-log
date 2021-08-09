@@ -13,7 +13,6 @@
 * [ ] refresh on pull down
 * [ ] remove naive time
 * [ ] user instead of credentials for api
-* [ ] random id generator
 * [ ] runtime id state accessible for whole app
 
 ### New Metcon Screen
