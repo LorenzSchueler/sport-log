@@ -32,7 +32,7 @@ create table cardio_session (
     user_id integer not null references "user" on delete cascade,
     movement_id integer not null references movement on delete no action,
     cardio_type cardio_type not null,
-    datetime timestamp not null default now(),
+    datetime timestamptz not null default now(),
     distance integer check (distance > 0),
     ascent integer check (ascent >= 0),
     descent integer check (descent >= 0),

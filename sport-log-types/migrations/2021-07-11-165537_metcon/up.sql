@@ -52,7 +52,7 @@ create table metcon_session (
     id bigint primary key,
     user_id integer not null references "user" on delete cascade,
     metcon_id integer not null references metcon on delete no action,
-    datetime timestamp not null default now(),
+    datetime timestamptz not null default now(),
     time integer check (time > 0), -- seconds
     rounds integer check (rounds >= 0),
     reps integer check (reps >= 0),
