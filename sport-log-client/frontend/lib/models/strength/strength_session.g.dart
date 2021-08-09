@@ -8,10 +8,10 @@ part of 'strength_session.dart';
 
 StrengthSession _$StrengthSessionFromJson(Map<String, dynamic> json) =>
     StrengthSession(
-      id: json['id'] as int,
-      userId: json['user_id'] as int,
+      id: const IdConverter().fromJson(json['id'] as String),
+      userId: const IdConverter().fromJson(json['user_id'] as String),
       datetime: DateTime.parse(json['datetime'] as String),
-      movementId: json['movement_id'] as int,
+      movementId: const IdConverter().fromJson(json['movement_id'] as String),
       movementUnit: _$enumDecode(_$MovementUnitEnumMap, json['movement_unit']),
       interval: json['interval'] as int?,
       comments: json['comments'] as String?,
@@ -20,10 +20,10 @@ StrengthSession _$StrengthSessionFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$StrengthSessionToJson(StrengthSession instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'user_id': instance.userId,
+      'id': const IdConverter().toJson(instance.id),
+      'user_id': const IdConverter().toJson(instance.userId),
       'datetime': instance.datetime.toIso8601String(),
-      'movement_id': instance.movementId,
+      'movement_id': const IdConverter().toJson(instance.movementId),
       'movement_unit': _$MovementUnitEnumMap[instance.movementUnit],
       'interval': instance.interval,
       'comments': instance.comments,

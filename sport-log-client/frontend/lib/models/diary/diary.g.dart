@@ -7,8 +7,8 @@ part of 'diary.dart';
 // **************************************************************************
 
 Diary _$DiaryFromJson(Map<String, dynamic> json) => Diary(
-      id: json['id'] as int,
-      userId: json['user_id'] as int,
+      id: const IdConverter().fromJson(json['id'] as String),
+      userId: const IdConverter().fromJson(json['user_id'] as String),
       date: DateTime.parse(json['date'] as String),
       bodyweight: (json['bodyweight'] as num?)?.toDouble(),
       comments: json['comments'] as String?,
@@ -16,8 +16,8 @@ Diary _$DiaryFromJson(Map<String, dynamic> json) => Diary(
     );
 
 Map<String, dynamic> _$DiaryToJson(Diary instance) => <String, dynamic>{
-      'id': instance.id,
-      'user_id': instance.userId,
+      'id': const IdConverter().toJson(instance.id),
+      'user_id': const IdConverter().toJson(instance.userId),
       'date': instance.date.toIso8601String(),
       'bodyweight': instance.bodyweight,
       'comments': instance.comments,

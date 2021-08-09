@@ -1,5 +1,7 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/helpers/id_serialization.dart';
 
 part 'strength_set.g.dart';
 
@@ -14,8 +16,8 @@ class StrengthSet {
     required this.deleted,
   });
 
-  int id;
-  int strengthSessionId;
+  @IdConverter() Int64 id;
+  @IdConverter() Int64 strengthSessionId;
   int setNumber;
   int count;
   double? weight;

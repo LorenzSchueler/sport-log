@@ -7,8 +7,9 @@ part of 'strength_set.dart';
 // **************************************************************************
 
 StrengthSet _$StrengthSetFromJson(Map<String, dynamic> json) => StrengthSet(
-      id: json['id'] as int,
-      strengthSessionId: json['strength_session_id'] as int,
+      id: const IdConverter().fromJson(json['id'] as String),
+      strengthSessionId:
+          const IdConverter().fromJson(json['strength_session_id'] as String),
       setNumber: json['set_number'] as int,
       count: json['count'] as int,
       weight: (json['weight'] as num?)?.toDouble(),
@@ -17,8 +18,9 @@ StrengthSet _$StrengthSetFromJson(Map<String, dynamic> json) => StrengthSet(
 
 Map<String, dynamic> _$StrengthSetToJson(StrengthSet instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'strength_session_id': instance.strengthSessionId,
+      'id': const IdConverter().toJson(instance.id),
+      'strength_session_id':
+          const IdConverter().toJson(instance.strengthSessionId),
       'set_number': instance.setNumber,
       'count': instance.count,
       'weight': instance.weight,

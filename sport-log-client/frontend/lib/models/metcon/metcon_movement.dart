@@ -1,5 +1,7 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/helpers/id_serialization.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
 part 'metcon_movement.g.dart';
@@ -17,9 +19,9 @@ class MetconMovement {
     required this.deleted,
   });
 
-  int id;
-  int metconId;
-  int movementId;
+  @IdConverter() Int64 id;
+  @IdConverter() Int64 metconId;
+  @IdConverter() Int64 movementId;
   int movementNumber;
   int count;
   MovementUnit unit;

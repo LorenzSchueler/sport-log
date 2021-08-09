@@ -7,8 +7,8 @@ part of 'movement.dart';
 // **************************************************************************
 
 Movement _$MovementFromJson(Map<String, dynamic> json) => Movement(
-      id: json['id'] as int,
-      userId: json['user_id'] as int?,
+      id: const IdConverter().fromJson(json['id'] as String),
+      userId: const OptionalIdConverter().fromJson(json['user_id'] as String?),
       name: json['name'] as String,
       description: json['description'] as String?,
       category: _$enumDecode(_$MovementCategoryEnumMap, json['category']),
@@ -16,8 +16,8 @@ Movement _$MovementFromJson(Map<String, dynamic> json) => Movement(
     );
 
 Map<String, dynamic> _$MovementToJson(Movement instance) => <String, dynamic>{
-      'id': instance.id,
-      'user_id': instance.userId,
+      'id': const IdConverter().toJson(instance.id),
+      'user_id': const OptionalIdConverter().toJson(instance.userId),
       'name': instance.name,
       'description': instance.description,
       'category': _$MovementCategoryEnumMap[instance.category],

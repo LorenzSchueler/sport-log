@@ -1,5 +1,7 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/helpers/id_serialization.dart';
 import 'package:sport_log/models/cardio/position.dart';
 
 part 'cardio_session.g.dart';
@@ -33,9 +35,9 @@ class CardioSession {
     required this.deleted,
   });
 
-  int id;
-  int userId;
-  int movementId;
+  @IdConverter() Int64 id;
+  @IdConverter() Int64 userId;
+  @IdConverter() Int64 movementId;
   CardioType cardioType;
   DateTime datetime;
   int? distance;
@@ -48,7 +50,7 @@ class CardioSession {
   List<double>? cycles;
   int? avgHeartRate;
   List<double>? heartRate;
-  int? routeId;
+  @OptionalIdConverter() Int64? routeId;
   String? comments;
   bool deleted;
 

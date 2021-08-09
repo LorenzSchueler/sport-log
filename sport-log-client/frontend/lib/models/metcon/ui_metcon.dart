@@ -1,4 +1,5 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
 import 'metcon.dart';
@@ -17,8 +18,8 @@ class UiMetcon {
     required this.deleted,
   }) : moves = moves ?? [];
 
-  int? id;
-  int? userId;
+  Int64? id;
+  Int64? userId;
   String? name;
   MetconType type;
   int? rounds;
@@ -64,9 +65,9 @@ class UiMetconMovement {
     required this.deleted,
   });
 
-  int? id;
-  int? metconId;
-  int movementId;
+  Int64? id;
+  Int64? metconId;
+  Int64 movementId;
   int count;
   MovementUnit unit;
   double? weight;

@@ -1,4 +1,6 @@
 
+import 'package:fixnum/fixnum.dart';
+
 import 'movement.dart';
 
 class UiMovement {
@@ -10,8 +12,8 @@ class UiMovement {
     required this.description,
   });
 
-  int? id;
-  int? userId;
+  Int64? id;
+  Int64? userId;
   String name;
   MovementCategory category;
   String? description;

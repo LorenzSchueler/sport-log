@@ -1,5 +1,7 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/helpers/id_serialization.dart';
 
 part 'metcon_session.g.dart';
 
@@ -18,9 +20,9 @@ class MetconSession {
     required this.deleted,
   });
 
-  int id;
-  int userId;
-  int metconId;
+  @IdConverter() Int64 id;
+  @IdConverter() Int64 userId;
+  @IdConverter() Int64 metconId;
   DateTime datetime;
   int? time;
   int? rounds;

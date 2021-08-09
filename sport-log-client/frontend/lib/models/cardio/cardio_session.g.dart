@@ -8,9 +8,9 @@ part of 'cardio_session.dart';
 
 CardioSession _$CardioSessionFromJson(Map<String, dynamic> json) =>
     CardioSession(
-      id: json['id'] as int,
-      userId: json['user_id'] as int,
-      movementId: json['movement_id'] as int,
+      id: const IdConverter().fromJson(json['id'] as String),
+      userId: const IdConverter().fromJson(json['user_id'] as String),
+      movementId: const IdConverter().fromJson(json['movement_id'] as String),
       cardioType: _$enumDecode(_$CardioTypeEnumMap, json['cardio_type']),
       datetime: DateTime.parse(json['datetime'] as String),
       distance: json['distance'] as int?,
@@ -29,16 +29,17 @@ CardioSession _$CardioSessionFromJson(Map<String, dynamic> json) =>
       heartRate: (json['heart_rate'] as List<dynamic>?)
           ?.map((e) => (e as num).toDouble())
           .toList(),
-      routeId: json['route_id'] as int?,
+      routeId:
+          const OptionalIdConverter().fromJson(json['route_id'] as String?),
       comments: json['comments'] as String?,
       deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$CardioSessionToJson(CardioSession instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'user_id': instance.userId,
-      'movement_id': instance.movementId,
+      'id': const IdConverter().toJson(instance.id),
+      'user_id': const IdConverter().toJson(instance.userId),
+      'movement_id': const IdConverter().toJson(instance.movementId),
       'cardio_type': _$CardioTypeEnumMap[instance.cardioType],
       'datetime': instance.datetime.toIso8601String(),
       'distance': instance.distance,
@@ -51,7 +52,7 @@ Map<String, dynamic> _$CardioSessionToJson(CardioSession instance) =>
       'cycles': instance.cycles,
       'avg_heart_rate': instance.avgHeartRate,
       'heart_rate': instance.heartRate,
-      'route_id': instance.routeId,
+      'route_id': const OptionalIdConverter().toJson(instance.routeId),
       'comments': instance.comments,
       'deleted': instance.deleted,
     };

@@ -1,5 +1,7 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/helpers/id_serialization.dart';
 
 part 'diary.g.dart';
 
@@ -14,8 +16,8 @@ class Diary {
     required this.deleted,
   });
 
-  int id;
-  int userId;
+  @IdConverter() Int64 id;
+  @IdConverter() Int64 userId;
   DateTime date;
   double? bodyweight;
   String? comments;

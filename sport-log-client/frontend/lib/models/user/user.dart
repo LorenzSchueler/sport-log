@@ -1,5 +1,9 @@
 
+import 'dart:developer';
+
+import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/helpers/id_serialization.dart';
 
 part 'user.g.dart';
 
@@ -12,7 +16,7 @@ class User {
     required this.email,
   });
 
-  int id;
+  @IdConverter() Int64 id;
   String username;
   String password;
   String email;
@@ -44,16 +48,21 @@ class User {
   static User? fromMap(Map<String, String> map) {
     if (map.containsKey(idKey) && map.containsKey(usernameKey)
         && map.containsKey(passwordKey) && map.containsKey(emailKey)) {
-      final id = int.tryParse(map[idKey]!);
-      if (id == null) {
+      try {
+        final id = Int64.parseInt(map[idKey]!);
+        if (id == null) {
+          return null;
+        }
+        return User(
+            id: id,
+            username: map[usernameKey]!,
+            password: map[passwordKey]!,
+            email: map[emailKey]!
+        );
+      } on FormatException catch (e) {
+        log("Id parsing error.", error: e);
         return null;
       }
-      return User(
-          id: id,
-          username: map[usernameKey]!,
-          password: map[passwordKey]!,
-          email: map[emailKey]!
-      );
     }
     return null;
   }

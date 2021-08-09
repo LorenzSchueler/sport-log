@@ -1,5 +1,7 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/helpers/id_serialization.dart';
 
 part 'metcon.g.dart';
 
@@ -35,8 +37,8 @@ class Metcon {
     required this.deleted,
   });
 
-  int id;
-  int? userId;
+  @IdConverter() Int64 id;
+  @OptionalIdConverter() Int64? userId;
   String? name;
   MetconType metconType;
   int? rounds;

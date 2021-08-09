@@ -7,8 +7,8 @@ part of 'route.dart';
 // **************************************************************************
 
 Route _$RouteFromJson(Map<String, dynamic> json) => Route(
-      id: json['id'] as int,
-      userId: json['user_id'] as int,
+      id: const IdConverter().fromJson(json['id'] as String),
+      userId: const IdConverter().fromJson(json['user_id'] as String),
       name: json['name'] as String,
       distance: json['distance'] as int,
       ascent: json['ascent'] as int?,
@@ -20,8 +20,8 @@ Route _$RouteFromJson(Map<String, dynamic> json) => Route(
     );
 
 Map<String, dynamic> _$RouteToJson(Route instance) => <String, dynamic>{
-      'id': instance.id,
-      'user_id': instance.userId,
+      'id': const IdConverter().toJson(instance.id),
+      'user_id': const IdConverter().toJson(instance.userId),
       'name': instance.name,
       'distance': instance.distance,
       'ascent': instance.ascent,

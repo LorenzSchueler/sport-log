@@ -7,8 +7,8 @@ part of 'metcon.dart';
 // **************************************************************************
 
 Metcon _$MetconFromJson(Map<String, dynamic> json) => Metcon(
-      id: json['id'] as int,
-      userId: json['user_id'] as int?,
+      id: const IdConverter().fromJson(json['id'] as String),
+      userId: const OptionalIdConverter().fromJson(json['user_id'] as String?),
       name: json['name'] as String?,
       metconType: _$enumDecode(_$MetconTypeEnumMap, json['metcon_type']),
       rounds: json['rounds'] as int?,
@@ -18,8 +18,8 @@ Metcon _$MetconFromJson(Map<String, dynamic> json) => Metcon(
     );
 
 Map<String, dynamic> _$MetconToJson(Metcon instance) => <String, dynamic>{
-      'id': instance.id,
-      'user_id': instance.userId,
+      'id': const IdConverter().toJson(instance.id),
+      'user_id': const OptionalIdConverter().toJson(instance.userId),
       'name': instance.name,
       'metcon_type': _$MetconTypeEnumMap[instance.metconType],
       'rounds': instance.rounds,

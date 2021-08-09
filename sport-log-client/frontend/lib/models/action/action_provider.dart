@@ -1,5 +1,7 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/helpers/id_serialization.dart';
 
 part 'action_provider.g.dart';
 
@@ -14,10 +16,10 @@ class ActionProvider {
     required this.deleted,
   });
 
-  int id;
+  @IdConverter() Int64 id;
   String name;
   String password;
-  int platformId;
+  @IdConverter() Int64 platformId;
   String? description;
   bool deleted;
 

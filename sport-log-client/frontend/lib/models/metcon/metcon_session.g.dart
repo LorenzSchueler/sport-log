@@ -8,9 +8,9 @@ part of 'metcon_session.dart';
 
 MetconSession _$MetconSessionFromJson(Map<String, dynamic> json) =>
     MetconSession(
-      id: json['id'] as int,
-      userId: json['user_id'] as int,
-      metconId: json['metcon_id'] as int,
+      id: const IdConverter().fromJson(json['id'] as String),
+      userId: const IdConverter().fromJson(json['user_id'] as String),
+      metconId: const IdConverter().fromJson(json['metcon_id'] as String),
       datetime: DateTime.parse(json['datetime'] as String),
       time: json['time'] as int?,
       rounds: json['rounds'] as int?,
@@ -22,9 +22,9 @@ MetconSession _$MetconSessionFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$MetconSessionToJson(MetconSession instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'user_id': instance.userId,
-      'metcon_id': instance.metconId,
+      'id': const IdConverter().toJson(instance.id),
+      'user_id': const IdConverter().toJson(instance.userId),
+      'metcon_id': const IdConverter().toJson(instance.metconId),
       'datetime': instance.datetime.toIso8601String(),
       'time': instance.time,
       'rounds': instance.rounds,

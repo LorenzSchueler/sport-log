@@ -8,9 +8,9 @@ part of 'metcon_movement.dart';
 
 MetconMovement _$MetconMovementFromJson(Map<String, dynamic> json) =>
     MetconMovement(
-      id: json['id'] as int,
-      metconId: json['metcon_id'] as int,
-      movementId: json['movement_id'] as int,
+      id: const IdConverter().fromJson(json['id'] as String),
+      metconId: const IdConverter().fromJson(json['metcon_id'] as String),
+      movementId: const IdConverter().fromJson(json['movement_id'] as String),
       movementNumber: json['movement_number'] as int,
       count: json['count'] as int,
       unit: _$enumDecode(_$MovementUnitEnumMap, json['unit']),
@@ -20,9 +20,9 @@ MetconMovement _$MetconMovementFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$MetconMovementToJson(MetconMovement instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'metcon_id': instance.metconId,
-      'movement_id': instance.movementId,
+      'id': const IdConverter().toJson(instance.id),
+      'metcon_id': const IdConverter().toJson(instance.metconId),
+      'movement_id': const IdConverter().toJson(instance.movementId),
       'movement_number': instance.movementNumber,
       'count': instance.count,
       'unit': _$MovementUnitEnumMap[instance.unit],

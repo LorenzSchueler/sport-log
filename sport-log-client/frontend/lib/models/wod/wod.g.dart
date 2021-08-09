@@ -7,16 +7,16 @@ part of 'wod.dart';
 // **************************************************************************
 
 Wod _$WodFromJson(Map<String, dynamic> json) => Wod(
-      id: json['id'] as int,
-      userId: json['user_id'] as int,
+      id: const IdConverter().fromJson(json['id'] as String),
+      userId: const IdConverter().fromJson(json['user_id'] as String),
       date: DateTime.parse(json['date'] as String),
       description: json['description'] as String?,
       deleted: json['deleted'] as bool,
     );
 
 Map<String, dynamic> _$WodToJson(Wod instance) => <String, dynamic>{
-      'id': instance.id,
-      'user_id': instance.userId,
+      'id': const IdConverter().toJson(instance.id),
+      'user_id': const IdConverter().toJson(instance.userId),
       'date': instance.date.toIso8601String(),
       'description': instance.description,
       'deleted': instance.deleted,

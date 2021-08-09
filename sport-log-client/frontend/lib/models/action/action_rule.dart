@@ -1,5 +1,7 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/helpers/id_serialization.dart';
 import 'package:sport_log/models/action/naive_time.dart';
 import 'package:sport_log/models/action/weekday.dart';
 
@@ -17,9 +19,9 @@ class ActionRule {
     required this.deleted,
   });
 
-  int id;
-  int userId;
-  int actionId;
+  @IdConverter() Int64 id;
+  @IdConverter() Int64 userId;
+  @IdConverter() Int64 actionId;
   Weekday weekday;
   @NaiveTimeSerde() NaiveTime time;
   bool enabled;

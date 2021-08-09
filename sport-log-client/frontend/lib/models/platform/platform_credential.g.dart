@@ -8,9 +8,9 @@ part of 'platform_credential.dart';
 
 PlatformCredential _$PlatformCredentialFromJson(Map<String, dynamic> json) =>
     PlatformCredential(
-      id: json['id'] as int,
-      userId: json['user_id'] as int,
-      platformId: json['platform_id'] as int,
+      id: const IdConverter().fromJson(json['id'] as String),
+      userId: const IdConverter().fromJson(json['user_id'] as String),
+      platformId: const IdConverter().fromJson(json['platform_id'] as String),
       username: json['username'] as String,
       password: json['password'] as String,
       deleted: json['deleted'] as bool,
@@ -18,9 +18,9 @@ PlatformCredential _$PlatformCredentialFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$PlatformCredentialToJson(PlatformCredential instance) =>
     <String, dynamic>{
-      'id': instance.id,
-      'user_id': instance.userId,
-      'platform_id': instance.platformId,
+      'id': const IdConverter().toJson(instance.id),
+      'user_id': const IdConverter().toJson(instance.userId),
+      'platform_id': const IdConverter().toJson(instance.platformId),
       'username': instance.username,
       'password': instance.password,
       'deleted': instance.deleted,

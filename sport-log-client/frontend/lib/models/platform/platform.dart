@@ -1,5 +1,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:fixnum/fixnum.dart';
+import 'package:sport_log/helpers/id_serialization.dart';
 
 part 'platform.g.dart';
 
@@ -11,7 +13,7 @@ class Platform {
     required this.deleted,
   });
 
-  int id;
+  @IdConverter() Int64 id;
   String name;
   bool deleted;
 

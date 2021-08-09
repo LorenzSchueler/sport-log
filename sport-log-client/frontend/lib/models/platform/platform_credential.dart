@@ -1,5 +1,7 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/helpers/id_serialization.dart';
 
 part 'platform_credential.g.dart';
 
@@ -14,9 +16,9 @@ class PlatformCredential {
     required this.deleted,
   });
 
-  int id;
-  int userId;
-  int platformId;
+  @IdConverter() Int64 id;
+  @IdConverter() Int64 userId;
+  @IdConverter() Int64 platformId;
   String username;
   String password;
   bool deleted;
