@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 #[cfg(feature = "full")]
 use rocket::http::Status;
 use serde::{Deserialize, Serialize};
@@ -39,6 +40,9 @@ pub struct User {
     pub username: String,
     pub password: String,
     pub email: String,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
 }
 
 #[cfg(feature = "full")]
@@ -64,6 +68,7 @@ impl VerifyForUserWithDb for Unverified<User> {
 #[cfg_attr(feature = "full", derive(Insertable, VerifyUnchecked))]
 #[cfg_attr(feature = "full", table_name = "user")]
 pub struct NewUser {
+    pub id: UserId,
     pub username: String,
     pub password: String,
     pub email: String,

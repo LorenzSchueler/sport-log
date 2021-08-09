@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
@@ -52,6 +53,10 @@ pub struct PlatformId(pub i64);
 pub struct Platform {
     pub id: PlatformId,
     pub name: String,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -108,6 +113,10 @@ pub struct PlatformCredential {
     pub platform_id: PlatformId,
     pub username: String,
     pub password: String,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
@@ -46,6 +47,10 @@ pub struct GroupId(pub i64);
 pub struct Group {
     pub id: GroupId,
     pub name: String,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -89,6 +94,10 @@ pub struct GroupUser {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub user_id: UserId,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -132,6 +141,10 @@ pub struct SharedMetconSession {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub metcon_session_id: MetconSessionId,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -175,6 +188,10 @@ pub struct SharedStrengthSession {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub strength_session_id: StrengthSessionId,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -218,6 +235,10 @@ pub struct SharedCardioSession {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub cardio_session_id: CardioSessionId,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -261,6 +282,10 @@ pub struct SharedDiary {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub diary_id: DiaryId,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

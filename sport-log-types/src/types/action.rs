@@ -1,4 +1,4 @@
-use chrono::{NaiveDateTime, NaiveTime};
+use chrono::{DateTime, NaiveDateTime, Utc};
 #[cfg(feature = "full")]
 use diesel_derive_enum::DbEnum;
 #[cfg(feature = "full")]
@@ -63,6 +63,10 @@ pub struct ActionProvider {
     pub password: String,
     pub platform_id: PlatformId,
     pub description: Option<String>,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -121,6 +125,10 @@ pub struct Action {
     pub description: Option<String>,
     pub create_before: i32,
     pub delete_after: i32,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -203,8 +211,12 @@ pub struct ActionRule {
     pub user_id: UserId,
     pub action_id: ActionId,
     pub weekday: Weekday,
-    pub time: NaiveTime,
+    pub time: NaiveDateTime,
     pub enabled: bool,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -214,7 +226,7 @@ pub struct NewActionRule {
     pub user_id: UserId,
     pub action_id: ActionId,
     pub weekday: Weekday,
-    pub time: NaiveTime,
+    pub time: NaiveDateTime,
     pub enabled: bool,
 }
 
@@ -304,6 +316,10 @@ pub struct ActionEvent {
     pub action_id: ActionId,
     pub datetime: NaiveDateTime,
     pub enabled: bool,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -326,7 +342,7 @@ pub struct CreatableActionRule {
     pub user_id: UserId,
     pub action_id: ActionId,
     pub weekday: Weekday,
-    pub time: NaiveTime,
+    pub time: NaiveDateTime,
     pub create_before: i32,
 }
 

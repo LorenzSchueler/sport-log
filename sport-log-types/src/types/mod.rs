@@ -87,7 +87,7 @@ impl<'v, I: FromI64> rocket::request::FromParam<'v> for UnverifiedId<I> {
     type Error = &'v str;
 
     fn from_param(param: &'v str) -> Result<Self, Self::Error> {
-        Ok(Self(I::from_i64(i32::from_param(param)?)))
+        Ok(Self(I::from_i64(i64::from_param(param)?)))
     }
 }
 
@@ -104,7 +104,7 @@ impl<'r, I: FromI64 + Deserialize<'r>> FromData<'r> for UnverifiedIds<I> {
     type Error = json::Error<'r>;
 
     async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> data::Outcome<'r, Self> {
-        <rocket::serde::json::Json<Vec<i32>> as FromData>::from_data(req, data)
+        <rocket::serde::json::Json<Vec<i64>> as FromData>::from_data(req, data)
             .await
             .and_then(|ids_json| {
                 Outcome::Success(Self(

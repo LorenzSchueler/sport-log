@@ -1,7 +1,7 @@
 #[cfg(feature = "full")]
 use std::io::Write;
 
-use chrono::NaiveDateTime;
+use chrono::{DateTime, NaiveDateTime, Utc};
 #[cfg(feature = "full")]
 use diesel::{
     deserialize,
@@ -135,6 +135,10 @@ pub struct Route {
     pub descent: Option<i32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub track: Option<Vec<Position>>,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -218,6 +222,10 @@ pub struct CardioSession {
     pub route_id: Option<RouteId>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
