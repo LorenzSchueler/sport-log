@@ -99,6 +99,7 @@ impl UnverifiedId<MetconId> {
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -153,22 +154,9 @@ impl VerifyForUserOrAPWithDb for Unverified<Metcon> {
     }
 }
 
-/// Please refer to [Metcon].
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "metcon")]
-pub struct NewMetcon {
-    pub user_id: Option<UserId>,
-    pub name: Option<String>,
-    pub metcon_type: MetconType,
-    pub rounds: Option<i32>,
-    pub timecap: Option<i32>,
-    pub description: Option<String>,
-}
-
 #[cfg(feature = "full")]
-impl VerifyForUserOrAPWithoutDb for Unverified<NewMetcon> {
-    type Entity = NewMetcon;
+impl VerifyForUserOrAPWithoutDb for Unverified<Metcon> {
+    type Entity = Metcon;
 
     fn verify(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status> {
         let metcon = self.0.into_inner();
@@ -181,8 +169,8 @@ impl VerifyForUserOrAPWithoutDb for Unverified<NewMetcon> {
 }
 
 #[cfg(feature = "full")]
-impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<NewMetcon>> {
-    type Entity = NewMetcon;
+impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Metcon>> {
+    type Entity = Metcon;
 
     fn verify(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status> {
         let metcons = self.0.into_inner();
@@ -263,6 +251,7 @@ impl UnverifiedId<MetconMovementId> {
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -311,37 +300,9 @@ impl VerifyForUserOrAPWithDb for Unverified<MetconMovement> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "metcon_movement")]
-pub struct NewMetconMovement {
-    pub metcon_id: MetconId,
-    pub movement_id: MovementId,
-    pub movement_number: i32,
-    pub count: i32,
-    pub movement_unit: MovementUnit,
-    pub weight: Option<f32>,
-}
-
 #[cfg(feature = "full")]
-impl VerifyForUserOrAPWithDb for Unverified<NewMetconMovement> {
-    type Entity = NewMetconMovement;
-
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Entity, Status> {
-        let metcon_movement = self.0.into_inner();
-        let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
-            .map_err(|_| rocket::http::Status::Forbidden)?;
-        if metcon.user_id == Some(**auth) {
-            Ok(metcon_movement)
-        } else {
-            Err(rocket::http::Status::Forbidden)
-        }
-    }
-}
-
-#[cfg(feature = "full")]
-impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<NewMetconMovement>> {
-    type Entity = NewMetconMovement;
+impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
+    type Entity = MetconMovement;
 
     fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Entity>, Status> {
         let metcon_movements = self.0.into_inner();
@@ -379,6 +340,7 @@ pub struct MetconSessionId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -392,7 +354,8 @@ pub struct MetconSessionId(pub i64);
         Update,
         Delete,
         DeleteMultiple,
-        VerifyForUserOrAPWithDb
+        VerifyForUserOrAPWithDb,
+        VerifyForUserOrAPWithoutDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "metcon_session")]
@@ -416,20 +379,6 @@ pub struct MetconSession {
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
     pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserOrAPWithoutDb))]
-#[cfg_attr(feature = "full", table_name = "metcon_session")]
-pub struct NewMetconSession {
-    pub user_id: UserId,
-    pub metcon_id: MetconId,
-    pub datetime: NaiveDateTime,
-    pub time: Option<i32>,
-    pub rounds: Option<i32>,
-    pub reps: Option<i32>,
-    pub rx: bool,
-    pub comments: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

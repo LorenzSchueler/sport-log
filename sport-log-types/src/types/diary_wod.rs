@@ -4,8 +4,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
     Create, CreateMultiple, Delete, DeleteMultiple, FromI64, FromSql, GetAll, GetById, GetByIds,
-    GetByUser, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
-    VerifyIdForUserOrAP, VerifyUnchecked,
+    GetByUser, ToSql, Update, VerifyForUserOrAPWithDb, VerifyIdForUserOrAP, VerifyUnchecked,
 };
 
 use crate::UserId;
@@ -35,6 +34,7 @@ pub struct DiaryId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -48,7 +48,8 @@ pub struct DiaryId(pub i64);
         Update,
         Delete,
         DeleteMultiple,
-        VerifyForUserOrAPWithDb
+        VerifyForUserOrAPWithDb,
+        VerifyUnchecked
     )
 )]
 #[cfg_attr(feature = "full", table_name = "diary")]
@@ -65,16 +66,6 @@ pub struct Diary {
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
     pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserOrAPWithoutDb))]
-#[cfg_attr(feature = "full", table_name = "diary")]
-pub struct NewDiary {
-    pub user_id: UserId,
-    pub date: NaiveDate,
-    pub bodyweight: Option<f32>,
-    pub comments: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -97,6 +88,7 @@ pub struct WodId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -111,6 +103,7 @@ pub struct WodId(pub i64);
         Delete,
         DeleteMultiple,
         VerifyForUserOrAPWithDb,
+        VerifyUnchecked
     )
 )]
 #[cfg_attr(feature = "full", table_name = "wod")]
@@ -125,16 +118,4 @@ pub struct Wod {
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
     pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(
-    feature = "full",
-    derive(Insertable, VerifyForUserOrAPWithoutDb, VerifyUnchecked,)
-)]
-#[cfg_attr(feature = "full", table_name = "wod")]
-pub struct NewWod {
-    pub user_id: UserId,
-    pub date: NaiveDate,
-    pub description: Option<String>,
 }

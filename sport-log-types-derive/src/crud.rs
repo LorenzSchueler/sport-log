@@ -5,11 +5,7 @@ use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use quote::quote;
 
-pub fn get_identifiers(typename: &Ident) -> (Ident, Ident, Ident, Ident, Ident) {
-    let newtypename = Ident::new(
-        ("New".to_owned() + typename.to_string().as_ref()).as_ref(),
-        Span::call_site(),
-    );
+pub fn get_identifiers(typename: &Ident) -> (Ident, Ident, Ident, Ident) {
     let idtypename = Ident::new((typename.to_string() + "Id").as_ref(), Span::call_site());
     let idparamname = Ident::new(
         idtypename.to_string().to_snake_case().as_ref(),
@@ -19,26 +15,18 @@ pub fn get_identifiers(typename: &Ident) -> (Ident, Ident, Ident, Ident, Ident) 
         typename.to_string().to_snake_case().as_ref(),
         Span::call_site(),
     );
-    (
-        newtypename,
-        idtypename,
-        paramname.clone(),
-        idparamname,
-        paramname,
-    )
+    (idtypename, paramname.clone(), idparamname, paramname)
 }
 
 pub fn impl_create(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
-    let (newtypename, _, paramname, _, tablename) = get_identifiers(typename);
+    let (_, paramname, _, tablename) = get_identifiers(typename);
 
     let gen = quote! {
         use diesel::prelude::*;
 
         impl crate::Create for #typename {
-            type New = #newtypename;
-
-            fn create(#paramname: Self::New, conn: &PgConnection) -> QueryResult<Self> {
+            fn create(#paramname: Self, conn: &PgConnection) -> QueryResult<Self> {
                 diesel::insert_into(#tablename::table)
                     .values(#paramname)
                     .get_result(conn)
@@ -50,15 +38,13 @@ pub fn impl_create(ast: &syn::DeriveInput) -> TokenStream {
 
 pub fn impl_create_multiple(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
-    let (newtypename, _, paramname, _, tablename) = get_identifiers(typename);
+    let (_, paramname, _, tablename) = get_identifiers(typename);
 
     let gen = quote! {
         use diesel::prelude::*;
 
         impl crate::CreateMultiple for #typename {
-            type New = #newtypename;
-
-            fn create_multiple(#paramname: Vec<Self::New>, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+            fn create_multiple(#paramname: Vec<Self>, conn: &PgConnection) -> QueryResult<Vec<Self>> {
                 diesel::insert_into(#tablename::table)
                     .values(&#paramname)
                     .get_results(conn)
@@ -70,7 +56,7 @@ pub fn impl_create_multiple(ast: &syn::DeriveInput) -> TokenStream {
 
 pub fn impl_get_by_id(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
-    let (_, idtypename, _, idparamname, tablename) = get_identifiers(typename);
+    let (idtypename, _, idparamname, tablename) = get_identifiers(typename);
 
     let gen = quote! {
         use diesel::prelude::*;
@@ -88,7 +74,7 @@ pub fn impl_get_by_id(ast: &syn::DeriveInput) -> TokenStream {
 
 pub fn impl_get_by_ids(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
-    let (_, idtypename, _, _, tablename) = get_identifiers(typename);
+    let (idtypename, _, _, tablename) = get_identifiers(typename);
 
     let gen = quote! {
         use diesel::prelude::*;
@@ -106,7 +92,7 @@ pub fn impl_get_by_ids(ast: &syn::DeriveInput) -> TokenStream {
 
 pub fn impl_get_by_user(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
-    let (_, _, _, _, tablename) = get_identifiers(typename);
+    let (_, _, _, tablename) = get_identifiers(typename);
 
     let gen = quote! {
         use diesel::prelude::*;
@@ -124,7 +110,7 @@ pub fn impl_get_by_user(ast: &syn::DeriveInput) -> TokenStream {
 
 pub fn impl_get_all(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
-    let (_, _, _, _, tablename) = get_identifiers(typename);
+    let (_, _, _, tablename) = get_identifiers(typename);
 
     let gen = quote! {
         use diesel::prelude::*;
@@ -140,7 +126,7 @@ pub fn impl_get_all(ast: &syn::DeriveInput) -> TokenStream {
 
 pub fn impl_update(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
-    let (_, _, paramname, _, tablename) = get_identifiers(typename);
+    let (_, paramname, _, tablename) = get_identifiers(typename);
 
     let gen = quote! {
         use diesel::prelude::*;
@@ -158,7 +144,7 @@ pub fn impl_update(ast: &syn::DeriveInput) -> TokenStream {
 
 pub fn impl_delete(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
-    let (_, idtypename, _, idparamname, tablename) = get_identifiers(typename);
+    let (idtypename, _, idparamname, tablename) = get_identifiers(typename);
 
     let gen = quote! {
         use diesel::prelude::*;
@@ -176,7 +162,7 @@ pub fn impl_delete(ast: &syn::DeriveInput) -> TokenStream {
 
 pub fn impl_delete_multiple(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
-    let (_, idtypename, _, idparamname, tablename) = get_identifiers(typename);
+    let (idtypename, _, idparamname, tablename) = get_identifiers(typename);
 
     let gen = quote! {
         use diesel::prelude::*;

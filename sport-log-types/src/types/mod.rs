@@ -123,9 +123,7 @@ impl<'r, I: FromI64 + Deserialize<'r>> FromData<'r> for UnverifiedIds<I> {
 /// For restrictions on the types for derive to work please see [sport_log_types_derive::Create].
 #[cfg(feature = "full")]
 pub trait Create {
-    type New;
-
-    fn create(entity: Self::New, conn: &PgConnection) -> QueryResult<Self>
+    fn create(entity: Self, conn: &PgConnection) -> QueryResult<Self>
     where
         Self: Sized;
 }
@@ -139,9 +137,7 @@ pub trait Create {
 /// For restrictions on the types for derive to work please see [sport_log_types_derive::CreateMultiple].
 #[cfg(feature = "full")]
 pub trait CreateMultiple {
-    type New;
-
-    fn create_multiple(enteties: Vec<Self::New>, conn: &PgConnection) -> QueryResult<Vec<Self>>
+    fn create_multiple(enteties: Vec<Self>, conn: &PgConnection) -> QueryResult<Vec<Self>>
     where
         Self: Sized;
 }

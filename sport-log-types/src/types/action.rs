@@ -44,6 +44,7 @@ pub struct ActionProviderId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -53,6 +54,7 @@ pub struct ActionProviderId(pub i64);
         Delete,
         DeleteMultiple,
         VerifyForAdminWithoutDb,
+        VerifyUnchecked
     )
 )]
 #[cfg_attr(feature = "full", table_name = "action_provider")]
@@ -67,19 +69,6 @@ pub struct ActionProvider {
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
     pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(
-    feature = "full",
-    derive(Insertable, VerifyForAdminWithoutDb, VerifyUnchecked)
-)]
-#[cfg_attr(feature = "full", table_name = "action_provider")]
-pub struct NewActionProvider {
-    pub name: String,
-    pub password: String,
-    pub platform_id: PlatformId,
-    pub description: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -102,6 +91,7 @@ pub struct ActionId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -114,6 +104,7 @@ pub struct ActionId(pub i64);
         Delete,
         DeleteMultiple,
         VerifyForActionProviderWithDb,
+        VerifyForActionProviderWithoutDb,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "action")]
@@ -129,17 +120,6 @@ pub struct Action {
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
     pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForActionProviderWithoutDb))]
-#[cfg_attr(feature = "full", table_name = "action")]
-pub struct NewAction {
-    pub name: String,
-    pub action_provider_id: ActionProviderId,
-    pub description: Option<String>,
-    pub create_before: i32,
-    pub delete_after: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -188,6 +168,7 @@ pub struct ActionRuleId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -201,6 +182,7 @@ pub struct ActionRuleId(pub i64);
         Delete,
         DeleteMultiple,
         VerifyForUserWithDb,
+        VerifyForUserWithoutDb,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "action_rule")]
@@ -217,17 +199,6 @@ pub struct ActionRule {
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
     pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
-#[cfg_attr(feature = "full", table_name = "action_rule")]
-pub struct NewActionRule {
-    pub user_id: UserId,
-    pub action_id: ActionId,
-    pub weekday: Weekday,
-    pub time: NaiveDateTime,
-    pub enabled: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -292,6 +263,7 @@ impl VerifyIdsForActionProvider for UnverifiedIds<ActionEventId> {
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -305,6 +277,8 @@ impl VerifyIdsForActionProvider for UnverifiedIds<ActionEventId> {
         Delete,
         DeleteMultiple,
         VerifyForUserWithDb,
+        VerifyForUserWithoutDb,
+        VerifyForAdminWithoutDb,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "action_event")]
@@ -320,19 +294,6 @@ pub struct ActionEvent {
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
     pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(
-    feature = "full",
-    derive(Insertable, VerifyForUserWithoutDb, VerifyForAdminWithoutDb)
-)]
-#[cfg_attr(feature = "full", table_name = "action_event")]
-pub struct NewActionEvent {
-    pub user_id: UserId,
-    pub action_id: ActionId,
-    pub datetime: NaiveDateTime,
-    pub enabled: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

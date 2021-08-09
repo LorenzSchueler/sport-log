@@ -106,6 +106,7 @@ pub struct RouteId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -119,7 +120,8 @@ pub struct RouteId(pub i64);
         Update,
         Delete,
         DeleteMultiple,
-        VerifyForUserOrAPWithDb
+        VerifyForUserOrAPWithDb,
+        VerifyForUserOrAPWithoutDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "route")]
@@ -139,18 +141,6 @@ pub struct Route {
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
     pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserOrAPWithoutDb))]
-#[cfg_attr(feature = "full", table_name = "route")]
-pub struct NewRoute {
-    pub user_id: UserId,
-    pub name: String,
-    pub distance: i32,
-    pub ascent: Option<i32>,
-    pub descent: Option<i32>,
-    pub track: Option<Vec<Position>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -173,6 +163,7 @@ pub struct CardioSessionId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -186,7 +177,8 @@ pub struct CardioSessionId(pub i64);
         Update,
         Delete,
         DeleteMultiple,
-        VerifyForUserOrAPWithDb
+        VerifyForUserOrAPWithDb,
+        VerifyForUserOrAPWithoutDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "cardio_session")]
@@ -226,28 +218,6 @@ pub struct CardioSession {
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
     pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserOrAPWithoutDb))]
-#[cfg_attr(feature = "full", table_name = "cardio_session")]
-pub struct NewCardioSession {
-    pub user_id: UserId,
-    pub movement_id: MovementId,
-    pub cardio_type: CardioType,
-    pub datetime: NaiveDateTime,
-    pub distance: Option<i32>,
-    pub ascent: Option<i32>,
-    pub descent: Option<i32>,
-    pub time: Option<i32>,
-    pub calories: Option<i32>,
-    pub track: Option<Vec<Position>>,
-    pub avg_cycles: Option<i32>,
-    pub cycles: Option<Vec<f32>>,
-    pub avg_heart_rate: Option<i32>,
-    pub heart_rate: Option<Vec<f32>>,
-    pub route_id: Option<RouteId>,
-    pub comments: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

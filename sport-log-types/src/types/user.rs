@@ -23,6 +23,7 @@ pub struct UserId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -32,6 +33,7 @@ pub struct UserId(pub i64);
         GetAll,
         Delete,
         DeleteMultiple,
+        VerifyUnchecked,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "user")]
@@ -62,14 +64,4 @@ impl VerifyForUserWithDb for Unverified<User> {
             Err(Status::Forbidden)
         }
     }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyUnchecked))]
-#[cfg_attr(feature = "full", table_name = "user")]
-pub struct NewUser {
-    pub id: UserId,
-    pub username: String,
-    pub password: String,
-    pub email: String,
 }

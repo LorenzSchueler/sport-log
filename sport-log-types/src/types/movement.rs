@@ -115,6 +115,7 @@ impl UnverifiedId<MovementId> {
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -165,20 +166,9 @@ impl VerifyForUserOrAPWithDb for Unverified<Movement> {
     }
 }
 
-/// Please refer to [Movement].
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "movement")]
-pub struct NewMovement {
-    pub user_id: Option<UserId>,
-    pub name: String,
-    pub description: Option<String>,
-    pub category: MovementCategory,
-}
-
 #[cfg(feature = "full")]
-impl VerifyForUserOrAPWithoutDb for Unverified<NewMovement> {
-    type Entity = NewMovement;
+impl VerifyForUserOrAPWithoutDb for Unverified<Movement> {
+    type Entity = Movement;
 
     fn verify(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status> {
         let movement = self.0.into_inner();
@@ -191,8 +181,8 @@ impl VerifyForUserOrAPWithoutDb for Unverified<NewMovement> {
 }
 
 #[cfg(feature = "full")]
-impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<NewMovement>> {
-    type Entity = NewMovement;
+impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
+    type Entity = Movement;
 
     fn verify(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status> {
         let movements = self.0.into_inner();
@@ -226,20 +216,7 @@ pub struct EormId(pub i64);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Associations,
-        Identifiable,
-        Queryable,
-        AsChangeset,
-        Create,
-        CreateMultiple,
-        GetById,
-        GetByIds,
-        GetAll,
-        Update,
-        Delete,
-        DeleteMultiple,
-    )
+    derive(Associations, Identifiable, Queryable, GetById, GetByIds, GetAll,)
 )]
 #[cfg_attr(feature = "full", table_name = "eorm")]
 pub struct Eorm {

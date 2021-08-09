@@ -6,14 +6,11 @@ use rand_core::OsRng;
 use crate::{
     schema::{action, action_event, action_provider, action_rule, platform_credential},
     Action, ActionEvent, ActionId, ActionProvider, ActionProviderId, ActionRule,
-    CreatableActionRule, Create, DeletableActionEvent, ExecutableActionEvent, GetAll,
-    NewActionEvent, NewActionProvider, UserId,
+    CreatableActionRule, Create, DeletableActionEvent, ExecutableActionEvent, GetAll, UserId,
 };
 
 impl Create for ActionProvider {
-    type New = NewActionProvider;
-
-    fn create(mut action_provider: Self::New, conn: &PgConnection) -> QueryResult<Self> {
+    fn create(mut action_provider: Self, conn: &PgConnection) -> QueryResult<Self> {
         let salt = SaltString::generate(&mut OsRng);
         action_provider.password = Argon2::default()
             .hash_password_simple(action_provider.password.as_bytes(), salt.as_ref())
@@ -137,7 +134,7 @@ impl ActionRule {
 
 impl ActionEvent {
     pub fn create_multiple_ignore_conflict(
-        action_events: Vec<NewActionEvent>,
+        action_events: Vec<ActionEvent>,
         conn: &PgConnection,
     ) -> QueryResult<Vec<ActionEvent>> {
         diesel::insert_into(action_event::table)

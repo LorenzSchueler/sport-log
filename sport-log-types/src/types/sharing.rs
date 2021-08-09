@@ -29,6 +29,7 @@ pub struct GroupId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -53,13 +54,6 @@ pub struct Group {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "group")]
-pub struct NewGroup {
-    pub name: String,
-}
-
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
@@ -72,6 +66,7 @@ pub struct GroupUserId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -100,14 +95,6 @@ pub struct GroupUser {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "group_user")]
-pub struct NewGroupUser {
-    pub group_id: GroupId,
-    pub user_id: UserId,
-}
-
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
@@ -120,6 +107,7 @@ pub struct SharedMetconSessionId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -147,14 +135,6 @@ pub struct SharedMetconSession {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "shared_metcon_session")]
-pub struct NewSharedMetconSession {
-    pub group_id: GroupId,
-    pub metcon_session_id: MetconSessionId,
-}
-
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
@@ -167,6 +147,7 @@ pub struct SharedStrengthSessionId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -194,14 +175,6 @@ pub struct SharedStrengthSession {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "shared_strength_session")]
-pub struct NewSharedStrengthSession {
-    pub group_id: GroupId,
-    pub strength_session_id: StrengthSessionId,
-}
-
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
@@ -214,6 +187,7 @@ pub struct SharedCardioSessionId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -241,14 +215,6 @@ pub struct SharedCardioSession {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "shared_cardio_session")]
-pub struct NewSharedCardioSession {
-    pub group_id: GroupId,
-    pub cardio_session_id: CardioSessionId,
-}
-
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
@@ -261,6 +227,7 @@ pub struct SharedDiaryId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -286,12 +253,4 @@ pub struct SharedDiary {
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
     pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "shared_diary")]
-pub struct NewSharedDiary {
-    pub group_id: GroupId,
-    pub diary_id: DiaryId,
 }

@@ -5,12 +5,10 @@ use argon2::{
 use diesel::{prelude::*, result::Error};
 use rand_core::OsRng;
 
-use crate::{schema::user, Create, NewUser, Update, User, UserId};
+use crate::{schema::user, Create, Update, User, UserId};
 
 impl Create for User {
-    type New = NewUser;
-
-    fn create(mut user: Self::New, conn: &PgConnection) -> QueryResult<Self> {
+    fn create(mut user: Self, conn: &PgConnection) -> QueryResult<Self> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
             .hash_password_simple(user.password.as_bytes(), &salt)

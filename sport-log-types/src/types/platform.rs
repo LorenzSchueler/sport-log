@@ -36,6 +36,7 @@ pub struct PlatformId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -47,6 +48,7 @@ pub struct PlatformId(pub i64);
         Delete,
         DeleteMultiple,
         VerifyForAdminWithoutDb,
+        VerifyUnchecked
     )
 )]
 #[cfg_attr(feature = "full", table_name = "platform")]
@@ -57,16 +59,6 @@ pub struct Platform {
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
     pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(
-    feature = "full",
-    derive(Insertable, VerifyForAdminWithoutDb, VerifyUnchecked)
-)]
-#[cfg_attr(feature = "full", table_name = "platform")]
-pub struct NewPlatform {
-    pub name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -89,6 +81,7 @@ pub struct PlatformCredentialId(pub i64);
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -102,6 +95,7 @@ pub struct PlatformCredentialId(pub i64);
         Delete,
         DeleteMultiple,
         VerifyForUserWithDb,
+        VerifyForUserWithoutDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "platform_credential")]
@@ -117,14 +111,4 @@ pub struct PlatformCredential {
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
     pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
-#[cfg_attr(feature = "full", table_name = "platform_credential")]
-pub struct NewPlatformCredential {
-    pub user_id: UserId,
-    pub platform_id: PlatformId,
-    pub username: String,
-    pub password: String,
 }
