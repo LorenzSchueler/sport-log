@@ -69,8 +69,8 @@ impl Activity {
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         Ok(Self::join_and_order(
-            Diary::get_ordered_by_user_and_timespan(user_id, start, end, conn)?,
-            Wod::get_ordered_by_user_and_timespan(user_id, start, end, conn)?,
+            Diary::get_ordered_by_user_and_timespan(user_id, start.date(), end.date(), conn)?,
+            Wod::get_ordered_by_user_and_timespan(user_id, start.date(), end.date(), conn)?,
             StrengthSessionDescription::get_ordered_by_user_and_timespan(
                 user_id, start, end, conn,
             )?,
