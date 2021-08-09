@@ -66,21 +66,6 @@ pub async fn adm_update_platform(
         .into_json()
 }
 
-#[delete("/adm/platform/<platform_id>")]
-pub async fn adm_delete_platform(
-    platform_id: UnverifiedId<PlatformId>,
-    auth: AuthAdmin,
-    conn: Db,
-) -> Result<Status, Status> {
-    let platform_id = platform_id.verify_adm(&auth)?;
-    conn.run(move |c| {
-        Platform::delete(platform_id, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
 #[post(
     "/platform_credential",
     format = "application/json",
@@ -151,36 +136,4 @@ pub async fn update_platform_credential(
     conn.run(|c| PlatformCredential::update(platform_credential, c))
         .await
         .into_json()
-}
-
-#[delete("/platform_credential/<platform_credential_id>")]
-pub async fn delete_platform_credential(
-    platform_credential_id: UnverifiedId<PlatformCredentialId>,
-    auth: AuthUser,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        PlatformCredential::delete(platform_credential_id.verify_user(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete(
-    "/platform_credentials",
-    format = "application/json",
-    data = "<platform_credential_ids>"
-)]
-pub async fn delete_platform_credentials(
-    platform_credential_ids: UnverifiedIds<PlatformCredentialId>,
-    auth: AuthUser,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        PlatformCredential::delete_multiple(platform_credential_ids.verify_user(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
 }

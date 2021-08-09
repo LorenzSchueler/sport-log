@@ -62,34 +62,6 @@ pub async fn update_wod(
     conn.run(|c| Wod::update(wod, c)).await.into_json()
 }
 
-#[delete("/wod/<wod_id>")]
-pub async fn delete_wod(
-    wod_id: UnverifiedId<WodId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Wod::delete(wod_id.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete("/wods", format = "application/json", data = "<wod_ids>")]
-pub async fn delete_wods(
-    wod_ids: UnverifiedIds<WodId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Wod::delete_multiple(wod_ids.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
 #[post("/diary", format = "application/json", data = "<diary>")]
 pub async fn create_diary(
     diary: Unverified<Diary>,
@@ -153,32 +125,4 @@ pub async fn update_diary(
 ) -> Result<Json<Diary>, Status> {
     let diary = conn.run(move |c| diary.verify_user_ap(&auth, c)).await?;
     conn.run(|c| Diary::update(diary, c)).await.into_json()
-}
-
-#[delete("/diary/<diary_id>")]
-pub async fn delete_diary(
-    diary_id: UnverifiedId<DiaryId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Diary::delete(diary_id.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete("/diaries", format = "application/json", data = "<diary_ids>")]
-pub async fn delete_diaries(
-    diary_ids: UnverifiedIds<DiaryId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Diary::delete_multiple(diary_ids.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
 }

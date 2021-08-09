@@ -73,16 +73,6 @@ pub async fn get_action_providers(
     conn.run(|c| ActionProvider::get_all(c)).await.into_json()
 }
 
-#[delete("/ap/action_provider")]
-pub async fn ap_delete_action_provider(auth: AuthAP, conn: Db) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionProvider::delete(*auth, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
 #[post("/ap/action", format = "application/json", data = "<action>")]
 pub async fn ap_create_action(
     action: Unverified<Action>,
@@ -184,38 +174,6 @@ pub async fn update_action_rule(
     conn.run(|c| ActionRule::update(action_rule, c))
         .await
         .into_json()
-}
-
-#[delete("/action_rule/<action_rule_id>")]
-pub async fn delete_action_rule(
-    action_rule_id: UnverifiedId<ActionRuleId>,
-    auth: AuthUser,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionRule::delete(action_rule_id.verify_user(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete(
-    "/action_rules",
-    format = "application/json",
-    data = "<action_rule_ids>"
-)]
-pub async fn delete_action_rules(
-    action_rule_ids: UnverifiedIds<ActionRuleId>,
-    auth: AuthUser,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionRule::delete_multiple(action_rule_ids.verify_user(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
 }
 
 #[post("/action_event", format = "application/json", data = "<action_event>")]

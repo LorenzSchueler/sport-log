@@ -60,34 +60,6 @@ pub async fn update_route(
     conn.run(|c| Route::update(route, c)).await.into_json()
 }
 
-#[delete("/route/<route_id>")]
-pub async fn delete_route(
-    route_id: UnverifiedId<RouteId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Route::delete(route_id.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete("/routes", format = "application/json", data = "<route_ids>")]
-pub async fn delete_routes(
-    route_ids: UnverifiedIds<RouteId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Route::delete_multiple(route_ids.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
 #[post(
     "/cardio_session",
     format = "application/json",
@@ -160,38 +132,6 @@ pub async fn update_cardio_session(
     conn.run(|c| CardioSession::update(cardio_session, c))
         .await
         .into_json()
-}
-
-#[delete("/cardio_session/<cardio_session_id>")]
-pub async fn delete_cardio_session(
-    cardio_session_id: UnverifiedId<CardioSessionId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        CardioSession::delete(cardio_session_id.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete(
-    "/cardio_sessions",
-    format = "application/json",
-    data = "<cardio_session_ids>"
-)]
-pub async fn delete_cardio_sessions(
-    cardio_session_ids: UnverifiedIds<CardioSessionId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        CardioSession::delete_multiple(cardio_session_ids.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
 }
 
 #[get("/cardio_session_description/<cardio_session_id>")]

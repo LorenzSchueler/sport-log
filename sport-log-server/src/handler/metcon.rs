@@ -84,38 +84,6 @@ pub async fn update_metcon_session(
         .into_json()
 }
 
-#[delete("/metcon_session/<metcon_session_id>")]
-pub async fn delete_metcon_session(
-    metcon_session_id: UnverifiedId<MetconSessionId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        MetconSession::delete(metcon_session_id.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete(
-    "/metcon_sessions",
-    format = "application/json",
-    data = "<metcon_session_ids>"
-)]
-pub async fn delete_metcon_sessions(
-    metcon_session_ids: UnverifiedIds<MetconSessionId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        MetconSession::delete_multiple(metcon_session_ids.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
 #[post("/metcon", format = "application/json", data = "<metcon>")]
 pub async fn create_metcon(
     metcon: Unverified<Metcon>,
@@ -167,34 +135,6 @@ pub async fn update_metcon(
 ) -> Result<Json<Metcon>, Status> {
     let metcon = conn.run(move |c| metcon.verify_user_ap(&auth, c)).await?;
     conn.run(|c| Metcon::update(metcon, c)).await.into_json()
-}
-
-#[delete("/metcon/<metcon_id>")]
-pub async fn delete_metcon(
-    metcon_id: UnverifiedId<MetconId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Metcon::delete(metcon_id.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete("/metcons", format = "application/json", data = "<metcon_ids>")]
-pub async fn delete_metcons(
-    metcon_ids: UnverifiedIds<MetconId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Metcon::delete_multiple(metcon_ids.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
 }
 
 #[post(
@@ -277,38 +217,6 @@ pub async fn update_metcon_movement(
     conn.run(|c| MetconMovement::update(metcon_movement, c))
         .await
         .into_json()
-}
-
-#[delete("/metcon_movement/<metcon_movement_id>")]
-pub async fn delete_metcon_movement(
-    metcon_movement_id: UnverifiedId<MetconMovementId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        MetconMovement::delete(metcon_movement_id.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete(
-    "/metcon_movements",
-    format = "application/json",
-    data = "<metcon_movement_ids>"
-)]
-pub async fn delete_metcon_movements(
-    metcon_movement_ids: UnverifiedIds<MetconMovementId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        MetconMovement::delete_multiple(metcon_movement_ids.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
 }
 
 #[get("/metcon_session_description/<metcon_session_id>")]

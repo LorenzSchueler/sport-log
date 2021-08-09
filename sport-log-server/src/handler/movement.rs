@@ -66,34 +66,6 @@ pub async fn update_movement(
         .into_json()
 }
 
-#[delete("/movement/<movement_id>")]
-pub async fn delete_movement(
-    movement_id: UnverifiedId<MovementId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Movement::delete(movement_id.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete("/movements", format = "application/json", data = "<movement_ids>")]
-pub async fn delete_movements(
-    movement_ids: UnverifiedIds<MovementId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Movement::delete_multiple(movement_ids.verify_user_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
 #[get("/eorm")]
 pub async fn get_eorms(_auth: AuthUserOrAP, conn: Db) -> Result<Json<Vec<Eorm>>, Status> {
     conn.run(move |c| Eorm::get_all(c)).await.into_json()
