@@ -53,7 +53,7 @@ pub enum MovementUnit {
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct MovementId(pub i32);
+pub struct MovementId(pub i64);
 
 #[cfg(feature = "full")]
 impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
@@ -216,7 +216,7 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<NewMovement>> {
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct EormId(pub i32);
+pub struct EormId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(

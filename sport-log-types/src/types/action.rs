@@ -38,7 +38,7 @@ use crate::{PlatformId, UserId};
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct ActionProviderId(pub i32);
+pub struct ActionProviderId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
@@ -92,7 +92,7 @@ pub struct NewActionProvider {
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct ActionId(pub i32);
+pub struct ActionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
@@ -174,7 +174,7 @@ impl Weekday {
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct ActionRuleId(pub i32);
+pub struct ActionRuleId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
@@ -233,7 +233,7 @@ pub struct NewActionRule {
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct ActionEventId(pub i32);
+pub struct ActionEventId(pub i64);
 
 #[cfg(feature = "full")]
 impl VerifyIdForActionProvider for UnverifiedId<ActionEventId> {

@@ -16,7 +16,7 @@ use crate::{schema::user, AuthUser, GetById, Unverified, VerifyForUserWithDb};
     derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct UserId(pub i32);
+pub struct UserId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(

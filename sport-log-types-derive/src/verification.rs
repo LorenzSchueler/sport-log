@@ -489,12 +489,12 @@ pub fn impl_verify_for_admin_without_db(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
-pub fn impl_from_i32(ast: &syn::DeriveInput) -> TokenStream {
+pub fn impl_from_i64(ast: &syn::DeriveInput) -> TokenStream {
     let id_typename = &ast.ident;
 
     let gen = quote! {
-        impl crate::FromI32 for #id_typename {
-            fn from_i32(value: i32) -> Self {
+        impl crate::FromI64 for #id_typename {
+            fn from_i64(value: i64) -> Self {
                 Self(value)
             }
         }

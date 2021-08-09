@@ -100,7 +100,7 @@ impl FromSql<Position, Pg> for Position {
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct RouteId(pub i32);
+pub struct RouteId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
@@ -163,7 +163,7 @@ pub struct NewRoute {
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct CardioSessionId(pub i32);
+pub struct CardioSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(

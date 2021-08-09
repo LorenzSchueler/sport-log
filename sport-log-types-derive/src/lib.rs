@@ -193,7 +193,7 @@ pub fn verify_unchecked_derive(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(FromI32)]
 pub fn form_i32_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_from_i32(&ast)
+    impl_from_i64(&ast)
 }
 
 /// Derives `diesel::types::ToSql<diesel::sql_types::Integer, diesel::pg::Pg>`.

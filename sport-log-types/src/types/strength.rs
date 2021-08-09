@@ -33,7 +33,7 @@ use crate::{Movement, MovementId, MovementUnit, UserId};
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct StrengthSessionId(pub i32);
+pub struct StrengthSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
@@ -86,7 +86,7 @@ pub struct NewStrengthSession {
     derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct StrengthSetId(pub i32);
+pub struct StrengthSetId(pub i64);
 
 #[cfg(feature = "full")]
 impl VerifyIdForUserOrAP for UnverifiedId<StrengthSetId> {

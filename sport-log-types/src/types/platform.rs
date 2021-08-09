@@ -29,7 +29,7 @@ use crate::{
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct PlatformId(pub i32);
+pub struct PlatformId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
@@ -78,7 +78,7 @@ pub struct NewPlatform {
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct PlatformCredentialId(pub i32);
+pub struct PlatformCredentialId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(

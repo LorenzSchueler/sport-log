@@ -71,8 +71,8 @@ impl<'r, T: Deserialize<'r>> FromData<'r> for Unverified<T> {
 }
 
 /// Indicated that the type can be build from an [i32].
-pub trait FromI32 {
-    fn from_i32(value: i32) -> Self;
+pub trait FromI64 {
+    fn from_i64(value: i64) -> Self;
 }
 
 /// Wrapper around Id types for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
@@ -83,11 +83,11 @@ pub trait FromI32 {
 pub struct UnverifiedId<I>(I);
 
 #[cfg(feature = "full")]
-impl<'v, I: FromI32> rocket::request::FromParam<'v> for UnverifiedId<I> {
+impl<'v, I: FromI64> rocket::request::FromParam<'v> for UnverifiedId<I> {
     type Error = &'v str;
 
     fn from_param(param: &'v str) -> Result<Self, Self::Error> {
-        Ok(Self(I::from_i32(i32::from_param(param)?)))
+        Ok(Self(I::from_i64(i32::from_param(param)?)))
     }
 }
 
@@ -100,7 +100,7 @@ pub struct UnverifiedIds<I>(Vec<I>);
 
 #[cfg(feature = "full")]
 #[rocket::async_trait]
-impl<'r, I: FromI32 + Deserialize<'r>> FromData<'r> for UnverifiedIds<I> {
+impl<'r, I: FromI64 + Deserialize<'r>> FromData<'r> for UnverifiedIds<I> {
     type Error = json::Error<'r>;
 
     async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> data::Outcome<'r, Self> {
@@ -108,7 +108,7 @@ impl<'r, I: FromI32 + Deserialize<'r>> FromData<'r> for UnverifiedIds<I> {
             .await
             .and_then(|ids_json| {
                 Outcome::Success(Self(
-                    ids_json.into_inner().into_iter().map(I::from_i32).collect(),
+                    ids_json.into_inner().into_iter().map(I::from_i64).collect(),
                 ))
             })
     }

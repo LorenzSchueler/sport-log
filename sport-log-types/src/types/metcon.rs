@@ -37,7 +37,7 @@ pub enum MetconType {
     derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct MetconId(pub i32);
+pub struct MetconId(pub i64);
 
 #[cfg(feature = "full")]
 impl VerifyIdForUserOrAP for UnverifiedId<MetconId> {
@@ -196,7 +196,7 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<NewMetcon>> {
     derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct MetconMovementId(pub i32);
+pub struct MetconMovementId(pub i64);
 
 #[cfg(feature = "full")]
 impl VerifyIdForUserOrAP for UnverifiedId<MetconMovementId> {
@@ -365,7 +365,7 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<NewMetconMovement>> {
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct MetconSessionId(pub i32);
+pub struct MetconSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
