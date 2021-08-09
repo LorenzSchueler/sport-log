@@ -2,33 +2,39 @@ create type movement_category as enum('strength', 'cardio');
 create type movement_unit as enum('reps', 'cal', 'meter', 'km', 'yard', 'foot', 'mile');
 
 create table movement (
-    id serial primary key,
+    id bigint primary key,
     user_id integer references "user" on delete cascade,
     name varchar(80) not null,
     description text,
     category movement_category not null,
-    unique (user_id, name)
+    last_change timestamptz not null default now(),
+    deleted boolean not null default false,
+    unique (user_id, name, category, deleted)
 );
---create index on movement (user_id, name);
-insert into movement (user_id, name, description, category) values
-    (null, 'Back Squat', null, 'strength'),
-    (null, 'Front Squat', null, 'strength'),
-    (null, 'Over Head Squat', null, 'strength'),
-    (1, 'Yoke Carry', null, 'strength'),
-    (null, 'Running', 'road running without significant altitude change', 'cardio'),
-    (null, 'Trailrunning', null, 'cardio'),
-    (null, 'Swimming Freestyle', 'indoor freestyle swimming', 'cardio'),
-    (1, 'Rowing', null, 'cardio'),
-    (null, 'Pull-Up', null, 'strength'),
-    (null, 'Push-Up', null, 'strength'),
-    (null, 'Air Squat', null, 'strength');
+
+create trigger set_timestamp before update on movement
+    for each row execute procedure trigger_set_timestamp();
+
+insert into movement (id, user_id, name, description, category) values
+    (1, null, 'Back Squat', null, 'strength'),
+    (2, null, 'Front Squat', null, 'strength'),
+    (3, null, 'Over Head Squat', null, 'strength'),
+    (4, 1, 'Yoke Carry', null, 'strength'),
+    (5, null, 'Running', 'road running without significant altitude change', 'cardio'),
+    (6, null, 'Trailrunning', null, 'cardio'),
+    (7, null, 'Swimming Freestyle', 'indoor freestyle swimming', 'cardio'),
+    (8, 1, 'Rowing', null, 'cardio'),
+    (9, null, 'Pull-Up', null, 'strength'),
+    (10, null, 'Push-Up', null, 'strength'),
+    (11, null, 'Air Squat', null, 'strength');
 
 create table eorm (
-    id serial primary key,
+    id bigserial primary key,
     reps integer not null check (reps >= 1),
     percentage real not null check (percentage > 0),
     unique (reps)
 );
+
 insert into eorm (reps, percentage) values
     (1, 1.0),
     (2, 0.97),

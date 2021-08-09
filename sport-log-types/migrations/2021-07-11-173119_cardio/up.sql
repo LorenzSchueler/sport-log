@@ -9,22 +9,26 @@ create type "position" as (
 );
 
 create table route (
-    id serial primary key,
+    id bigint primary key,
     user_id integer not null references "user" on delete cascade,
     name varchar(80) not null check (length(name) >= 2),
     distance integer not null check (distance > 0),
     ascent integer check (ascent >= 0),
     descent integer check (descent >= 0),
     track "position"[],
-    unique (user_id, name)
+    last_change timestamptz not null default now(),
+    deleted boolean not null default false,
+    unique (user_id, name, deleted)
 );
---create index on route (user_id, name);
 
-insert into route (user_id, name, distance, ascent, descent, track) values
-    (1, 'around the lake', 26500, 43, 43, null);
+create trigger set_timestamp before update on route
+    for each row execute procedure trigger_set_timestamp();
+
+insert into route (id, user_id, name, distance, ascent, descent, track) values
+    (1, 1, 'around the lake', 26500, 43, 43, null);
 
 create table cardio_session (
-    id serial primary key,
+    id bigint primary key,
     user_id integer not null references "user" on delete cascade,
     movement_id integer not null references movement on delete no action,
     cardio_type cardio_type not null,
@@ -41,13 +45,17 @@ create table cardio_session (
     heart_rate real[], -- = secs since start
     route_id integer references route on delete set null,
     comments text,
-    unique (user_id, movement_id, datetime)
+    last_change timestamptz not null default now(),
+    deleted boolean not null default false,
+    unique (user_id, movement_id, datetime, deleted)
 );
---create index on cardio_session (user_id, datetime desc);
 
-insert into cardio_session (user_id, movement_id, cardio_type, datetime, 
+create trigger set_timestamp before update on cardio_session
+    for each row execute procedure trigger_set_timestamp();
+
+insert into cardio_session (id, user_id, movement_id, cardio_type, datetime, 
         distance, ascent, descent, time, calories, track, avg_cycles, 
         cycles, avg_heart_rate, heart_rate, route_id, comments) values
-    (1, 5, 'training', '2021-08-22 10:25:34', 
+    (1, 1, 5, 'training', '2021-08-22 10:25:34', 
         26742, 35, 43, 9134, null, null, 167, 
         null, 156, null, 1, null);
