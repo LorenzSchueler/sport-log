@@ -6,7 +6,7 @@ table! {
     action (id) {
         id -> Int8,
         name -> Varchar,
-        action_provider_id -> Int4,
+        action_provider_id -> Int8,
         description -> Nullable<Text>,
         create_before -> Int4,
         delete_after -> Int4,
@@ -21,8 +21,8 @@ table! {
 
     action_event (id) {
         id -> Int8,
-        user_id -> Int4,
-        action_id -> Int4,
+        user_id -> Int8,
+        action_id -> Int8,
         datetime -> Timestamptz,
         enabled -> Bool,
         last_change -> Timestamptz,
@@ -38,7 +38,7 @@ table! {
         id -> Int8,
         name -> Varchar,
         password -> Bpchar,
-        platform_id -> Int4,
+        platform_id -> Int8,
         description -> Nullable<Text>,
         last_change -> Timestamptz,
         deleted -> Bool,
@@ -51,8 +51,8 @@ table! {
 
     action_rule (id) {
         id -> Int8,
-        user_id -> Int4,
-        action_id -> Int4,
+        user_id -> Int8,
+        action_id -> Int8,
         weekday -> WeekdayMapping,
         time -> Timetz,
         enabled -> Bool,
@@ -67,8 +67,8 @@ table! {
 
     cardio_session (id) {
         id -> Int8,
-        user_id -> Int4,
-        movement_id -> Int4,
+        user_id -> Int8,
+        movement_id -> Int8,
         cardio_type -> CardioTypeMapping,
         datetime -> Timestamptz,
         distance -> Nullable<Int4>,
@@ -81,7 +81,7 @@ table! {
         cycles -> Nullable<Array<Float4>>,
         avg_heart_rate -> Nullable<Int4>,
         heart_rate -> Nullable<Array<Float4>>,
-        route_id -> Nullable<Int4>,
+        route_id -> Nullable<Int8>,
         comments -> Nullable<Text>,
         last_change -> Timestamptz,
         deleted -> Bool,
@@ -94,7 +94,7 @@ table! {
 
     diary (id) {
         id -> Int8,
-        user_id -> Int4,
+        user_id -> Int8,
         date -> Date,
         bodyweight -> Nullable<Float4>,
         comments -> Nullable<Text>,
@@ -132,8 +132,8 @@ table! {
 
     group_user (id) {
         id -> Int8,
-        group_id -> Int4,
-        user_id -> Int4,
+        group_id -> Int8,
+        user_id -> Int8,
         last_change -> Timestamptz,
         deleted -> Bool,
     }
@@ -145,7 +145,7 @@ table! {
 
     metcon (id) {
         id -> Int8,
-        user_id -> Nullable<Int4>,
+        user_id -> Nullable<Int8>,
         name -> Nullable<Varchar>,
         metcon_type -> MetconTypeMapping,
         rounds -> Nullable<Int4>,
@@ -162,8 +162,8 @@ table! {
 
     metcon_movement (id) {
         id -> Int8,
-        metcon_id -> Int4,
-        movement_id -> Int4,
+        metcon_id -> Int8,
+        movement_id -> Int8,
         movement_number -> Int4,
         count -> Int4,
         movement_unit -> MovementUnitMapping,
@@ -179,8 +179,8 @@ table! {
 
     metcon_session (id) {
         id -> Int8,
-        user_id -> Int4,
-        metcon_id -> Int4,
+        user_id -> Int8,
+        metcon_id -> Int8,
         datetime -> Timestamptz,
         time -> Nullable<Int4>,
         rounds -> Nullable<Int4>,
@@ -198,7 +198,7 @@ table! {
 
     movement (id) {
         id -> Int8,
-        user_id -> Nullable<Int4>,
+        user_id -> Nullable<Int8>,
         name -> Varchar,
         description -> Nullable<Text>,
         category -> MovementCategoryMapping,
@@ -225,8 +225,8 @@ table! {
 
     platform_credential (id) {
         id -> Int8,
-        user_id -> Int4,
-        platform_id -> Int4,
+        user_id -> Int8,
+        platform_id -> Int8,
         username -> Varchar,
         password -> Varchar,
         last_change -> Timestamptz,
@@ -240,7 +240,7 @@ table! {
 
     route (id) {
         id -> Int8,
-        user_id -> Int4,
+        user_id -> Int8,
         name -> Varchar,
         distance -> Int4,
         ascent -> Nullable<Int4>,
@@ -257,8 +257,8 @@ table! {
 
     shared_cardio_session (id) {
         id -> Int8,
-        group_id -> Int4,
-        cardio_session_id -> Int4,
+        group_id -> Int8,
+        cardio_session_id -> Int8,
         last_change -> Timestamptz,
         deleted -> Bool,
     }
@@ -270,8 +270,8 @@ table! {
 
     shared_diary (id) {
         id -> Int8,
-        group_id -> Int4,
-        diary_id -> Int4,
+        group_id -> Int8,
+        diary_id -> Int8,
         last_change -> Timestamptz,
         deleted -> Bool,
     }
@@ -283,8 +283,8 @@ table! {
 
     shared_metcon_session (id) {
         id -> Int8,
-        group_id -> Int4,
-        metcon_session_id -> Int4,
+        group_id -> Int8,
+        metcon_session_id -> Int8,
         last_change -> Timestamptz,
         deleted -> Bool,
     }
@@ -296,8 +296,8 @@ table! {
 
     shared_strength_session (id) {
         id -> Int8,
-        group_id -> Int4,
-        strength_session_id -> Int4,
+        group_id -> Int8,
+        strength_session_id -> Int8,
         last_change -> Timestamptz,
         deleted -> Bool,
     }
@@ -309,9 +309,9 @@ table! {
 
     strength_session (id) {
         id -> Int8,
-        user_id -> Int4,
+        user_id -> Int8,
         datetime -> Timestamptz,
-        movement_id -> Int4,
+        movement_id -> Int8,
         movement_unit -> MovementUnitMapping,
         interval -> Nullable<Int4>,
         comments -> Nullable<Text>,
@@ -326,7 +326,7 @@ table! {
 
     strength_set (id) {
         id -> Int8,
-        strength_session_id -> Int4,
+        strength_session_id -> Int8,
         set_number -> Int4,
         count -> Int4,
         weight -> Nullable<Float4>,
@@ -354,7 +354,7 @@ table! {
 
     wod (id) {
         id -> Int8,
-        user_id -> Int4,
+        user_id -> Int8,
         date -> Date,
         description -> Nullable<Text>,
         last_change -> Timestamptz,

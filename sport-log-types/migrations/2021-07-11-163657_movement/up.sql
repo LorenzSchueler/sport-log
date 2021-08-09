@@ -3,7 +3,7 @@ create type movement_unit as enum('reps', 'cal', 'meter', 'km', 'yard', 'foot', 
 
 create table movement (
     id bigint primary key,
-    user_id integer references "user" on delete cascade,
+    user_id bigint references "user" on delete cascade,
     name varchar(80) not null,
     description text,
     category movement_category not null,

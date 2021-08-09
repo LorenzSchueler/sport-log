@@ -4,7 +4,7 @@ create table action_provider (
     id bigint primary key,
     name varchar(80) not null check (length(name) >= 2),
     password char(96) not null,
-    platform_id integer not null references platform on delete cascade,
+    platform_id bigint not null references platform on delete cascade,
     description text,
     last_change timestamptz not null default now(),
     deleted boolean not null default false,
@@ -24,7 +24,7 @@ insert into action_provider (id, name, password, platform_id, description) value
 create table action (
     id bigint primary key,
     name varchar(80) not null check (length(name) >= 2),
-    action_provider_id integer not null references action_provider on delete cascade,
+    action_provider_id bigint not null references action_provider on delete cascade,
     description text,
     create_before integer not null check (create_before >= 0), -- hours
     delete_after integer not null check (delete_after >= 0), --hours
@@ -46,8 +46,8 @@ insert into action (id, name, action_provider_id, description, create_before, de
 
 create table action_rule (
     id bigint primary key,
-    user_id integer not null references "user" on delete cascade,
-    action_id integer not null references action on delete cascade,
+    user_id bigint not null references "user" on delete cascade,
+    action_id bigint not null references action on delete cascade,
     weekday weekday not null, 
     time timetz not null,
     enabled boolean not null,
@@ -71,8 +71,8 @@ insert into action_rule (id, user_id, action_id, weekday, time, enabled) values
 
 create table action_event (
     id bigint primary key,
-    user_id integer not null references "user" on delete cascade,
-    action_id integer not null references action on delete cascade,
+    user_id bigint not null references "user" on delete cascade,
+    action_id bigint not null references action on delete cascade,
     datetime timestamptz not null,
     enabled boolean not null,
     last_change timestamptz not null default now(),

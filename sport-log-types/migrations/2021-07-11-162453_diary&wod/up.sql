@@ -1,6 +1,6 @@
 create table diary (
     id bigint primary key,
-    user_id integer not null references "user" on delete cascade,
+    user_id bigint not null references "user" on delete cascade,
     date date not null default now()::date,
     bodyweight real check (bodyweight > 0),
     comments text,
@@ -21,7 +21,7 @@ insert into diary (id, user_id, date, bodyweight, comments) values
 
 create table wod (
     id bigint primary key,
-    user_id integer not null references "user" on delete cascade,
+    user_id bigint not null references "user" on delete cascade,
     date date not null default now()::date,
     description text,
     last_change timestamptz not null default now(),

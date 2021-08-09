@@ -10,7 +10,7 @@ create type "position" as (
 
 create table route (
     id bigint primary key,
-    user_id integer not null references "user" on delete cascade,
+    user_id bigint not null references "user" on delete cascade,
     name varchar(80) not null check (length(name) >= 2),
     distance integer not null check (distance > 0),
     ascent integer check (ascent >= 0),
@@ -29,8 +29,8 @@ insert into route (id, user_id, name, distance, ascent, descent, track) values
 
 create table cardio_session (
     id bigint primary key,
-    user_id integer not null references "user" on delete cascade,
-    movement_id integer not null references movement on delete no action,
+    user_id bigint not null references "user" on delete cascade,
+    movement_id bigint not null references movement on delete no action,
     cardio_type cardio_type not null,
     datetime timestamptz not null default now(),
     distance integer check (distance > 0),
@@ -43,7 +43,7 @@ create table cardio_session (
     cycles real[], -- = secs since start
     avg_heart_rate integer check (avg_heart_rate > 0),
     heart_rate real[], -- = secs since start
-    route_id integer references route on delete set null,
+    route_id bigint references route on delete set null,
     comments text,
     last_change timestamptz not null default now(),
     deleted boolean not null default false,

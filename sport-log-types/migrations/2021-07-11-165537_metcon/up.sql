@@ -2,7 +2,7 @@ create type metcon_type as enum('amrap', 'emom', 'for_time');
 
 create table metcon (
     id bigint primary key,
-    user_id integer references "user" on delete cascade,
+    user_id bigint references "user" on delete cascade,
     name varchar(80),
     metcon_type metcon_type not null,
     rounds integer check (rounds >= 1),
@@ -23,8 +23,8 @@ insert into metcon (id, user_id, name, metcon_type, rounds, timecap, description
 
 create table metcon_movement (
     id bigint primary key,
-    metcon_id integer not null references metcon on delete cascade,
-    movement_id integer not null references movement on delete no action,
+    metcon_id bigint not null references metcon on delete cascade,
+    movement_id bigint not null references movement on delete no action,
     movement_number integer not null check (movement_number >= 1),
     count integer not null check (count >= 1),
     movement_unit movement_unit not null,
@@ -50,8 +50,8 @@ insert into metcon_movement (id, metcon_id, movement_id, movement_number, count,
 
 create table metcon_session (
     id bigint primary key,
-    user_id integer not null references "user" on delete cascade,
-    metcon_id integer not null references metcon on delete no action,
+    user_id bigint not null references "user" on delete cascade,
+    metcon_id bigint not null references metcon on delete no action,
     datetime timestamptz not null default now(),
     time integer check (time > 0), -- seconds
     rounds integer check (rounds >= 0),

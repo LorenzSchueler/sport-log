@@ -15,8 +15,8 @@ insert into platform (id, name) values
 
 create table platform_credential (
     id bigint primary key,
-    user_id integer not null references "user" on delete cascade,
-    platform_id integer not null references platform on delete cascade,
+    user_id bigint not null references "user" on delete cascade,
+    platform_id bigint not null references platform on delete cascade,
     username varchar(80) not null,
     password varchar(80) not null,
     last_change timestamptz not null default now(),
