@@ -1,4 +1,5 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/models/metcon/ui_metcon.dart';
@@ -105,13 +106,13 @@ class MetconMovementCard extends StatelessWidget {
 
   static void showMovementPickerDialog(
       BuildContext context,
-      Function(int) onPicked
+      Function(Int64) onPicked
   ) {
     showDialog(
       context: context,
       builder: (_) => const MovementPickerDialog(),
     ).then((movementId) {
-      if (movementId is int) {
+      if (movementId is Int64) {
         onPicked(movementId);
       }
     });

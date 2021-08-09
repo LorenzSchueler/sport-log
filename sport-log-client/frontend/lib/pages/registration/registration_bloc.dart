@@ -1,5 +1,6 @@
 
 import 'package:equatable/equatable.dart';
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/api/api_error.dart';
@@ -59,7 +60,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     yield RegistrationState.pending;
     try {
       final user = User(
-        id: 1, // TODO: random number
+        id: Int64(1), // TODO: random number
         email: event.email,
         username: event.username,
         password: event.password,

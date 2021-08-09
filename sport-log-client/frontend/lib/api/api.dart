@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/api/backend_routes.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:http/http.dart' as http;
@@ -18,7 +19,7 @@ class Credentials {
   });
 
   String username, password;
-  int userId;
+  Int64 userId;
 }
 
 class Api {
@@ -30,7 +31,7 @@ class Api {
   final _client = http.Client();
   Credentials? _credentials;
 
-  void setCredentials(String username, String password, int userId) {
+  void setCredentials(String username, String password, Int64 userId) {
     _credentials = Credentials(
       username: username,
       password: password,

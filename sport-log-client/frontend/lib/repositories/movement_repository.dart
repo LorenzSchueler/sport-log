@@ -1,12 +1,13 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
 class MovementRepository {
 
-  final Map<int, Movement> _movements = {};
+  final Map<Int64, Movement> _movements = {};
 
-  static int _nextMovementId = 0;
-  int get nextMovementId => _nextMovementId++;
+  static Int64 _nextMovementId = Int64(0);
+  Int64 get nextMovementId => _nextMovementId++;
 
   void addMovement(Movement movement) {
     assert(!_movements.containsKey(movement.id));
@@ -19,7 +20,7 @@ class MovementRepository {
     }
   }
 
-  void deleteMovement(int id) {
+  void deleteMovement(Int64 id) {
     assert(_movements.containsKey(id));
     _movements.remove(id);
   }
@@ -29,7 +30,7 @@ class MovementRepository {
     _movements[movement.id] = movement;
   }
 
-  Movement? getMovement(int id) {
+  Movement? getMovement(Int64 id) {
     if (!_movements.containsKey(id)) {
       return null;
     }

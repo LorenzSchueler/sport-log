@@ -1,4 +1,5 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
@@ -41,7 +42,7 @@ class MovementRequestCreate extends MovementRequestEvent {
 class MovementRequestDelete extends MovementRequestEvent {
   MovementRequestDelete(this.id) : super();
 
-  final int id;
+  final Int64 id;
 }
 
 class MovementRequestUpdate extends MovementRequestEvent {

@@ -1,4 +1,5 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -113,7 +114,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
     });
   }
 
-  _addMetconMovementWithMovementId(int movementId) {
+  _addMetconMovementWithMovementId(Int64 movementId) {
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() {
       _metcon.moves.add(UiMetconMovement(

@@ -1,4 +1,5 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
@@ -46,7 +47,7 @@ class MetconRequestCreate extends MetconRequestEvent {
 class MetconRequestDelete extends MetconRequestEvent {
   const MetconRequestDelete(this.id) : super();
 
-  final int id;
+  final Int64 id;
 }
 
 class MetconRequestUpdate extends MetconRequestEvent {
@@ -87,7 +88,7 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
   Stream<MetconRequestState> _createMetcon(MetconRequestCreate event) async* {
     yield const MetconRequestPending();
     assert(event.newMetcon.id == null);
-    int userId = _api.getCredentials()!.userId;
+    Int64 userId = _api.getCredentials()!.userId;
     event.newMetcon.userId = userId;
     event.newMetcon.id = _repo.nextMetconId;
     final metcon = event.newMetcon.toMetcon();

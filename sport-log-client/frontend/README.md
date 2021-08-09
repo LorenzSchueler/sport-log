@@ -11,7 +11,10 @@
 * [ ] ! maybe put initial resource loading into resource bloc
 * [ ] keep fabs from covering/blocking content
 * [ ] refresh on pull down
-* [ ] test naive time
+* [ ] remove naive time
+* [ ] user instead of credentials for api
+* [ ] random id generator
+* [ ] runtime id state accessible for whole app
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)

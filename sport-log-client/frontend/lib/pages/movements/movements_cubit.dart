@@ -1,4 +1,5 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
@@ -7,7 +8,7 @@ abstract class MovementsState {}
 class MovementsInitial extends MovementsState {}
 
 class MovementsLoaded extends MovementsState {
-  MovementsLoaded(Map<int, Movement> movements)
+  MovementsLoaded(Map<Int64, Movement> movements)
     : _movements = movements, super();
 
   MovementsLoaded.fromList(List<Movement> movements)
@@ -17,9 +18,9 @@ class MovementsLoaded extends MovementsState {
     }
   }
 
-  final Map<int, Movement> _movements;
+  final Map<Int64, Movement> _movements;
 
-  Map<int, Movement> get movementsMap => _movements;
+  Map<Int64, Movement> get movementsMap => _movements;
   List<Movement> get movementsList => _movements.values.toList();
 }
 
@@ -45,7 +46,7 @@ class MovementsCubit extends Cubit<MovementsState> {
     }
   }
 
-  void deleteMovement(int id) {
+  void deleteMovement(Int64 id) {
     if (state is MovementsLoaded) {
       final movements = (state as MovementsLoaded).movementsMap;
       if (movements.containsKey(id)) {

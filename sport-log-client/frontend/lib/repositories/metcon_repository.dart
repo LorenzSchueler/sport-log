@@ -1,10 +1,11 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/models/metcon/metcon_movement.dart';
 
 class MetconRepository {
-  final Map<int, Metcon> _metcons = {};
-  final Map<int, MetconMovement> _metconMovements = {};
+  final Map<Int64, Metcon> _metcons = {};
+  final Map<Int64, MetconMovement> _metconMovements = {};
 
   List<MetconMovement> getMetconMovementsOfMetcon(Metcon metcon) {
     return _metconMovements.values.where((mm) => mm.metconId == metcon.id)
@@ -41,7 +42,7 @@ class MetconRepository {
     _metcons[m.id] = m;
   }
 
-  void deleteMetcon(int id) {
+  void deleteMetcon(Int64 id) {
     assert(_metcons.containsKey(id));
     _metcons.remove(id);
     _metconMovements.removeWhere((id, mm) => mm.metconId == id);
@@ -52,9 +53,9 @@ class MetconRepository {
     _metcons[m.id] = m;
   }
 
-  static int _nextMetconId = 0;
-  int get nextMetconId => _nextMetconId++;
+  static Int64 _nextMetconId = Int64(0);
+  Int64 get nextMetconId => _nextMetconId++;
 
-  static int _nextMetconMovementId = 0;
-  int get nextMetconMovementId => _nextMetconMovementId++;
+  static Int64 _nextMetconMovementId = Int64(0);
+  Int64 get nextMetconMovementId => _nextMetconMovementId++;
 }

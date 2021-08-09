@@ -1,4 +1,5 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/models/metcon/ui_metcon.dart';
 
@@ -11,7 +12,7 @@ class MetconsInitial extends MetconsState {
 }
 
 class MetconsLoaded extends MetconsState {
-  MetconsLoaded(Map<int, UiMetcon> metcons)
+  MetconsLoaded(Map<Int64, UiMetcon> metcons)
     : _metcons = metcons, super();
 
   MetconsLoaded.fromList(List<UiMetcon> metcons)
@@ -24,9 +25,9 @@ class MetconsLoaded extends MetconsState {
     }
   }
 
-  final Map<int, UiMetcon> _metcons;
+  final Map<Int64, UiMetcon> _metcons;
 
-  Map<int, UiMetcon> get metconsMap => _metcons;
+  Map<Int64, UiMetcon> get metconsMap => _metcons;
   List<UiMetcon> get metconsList => _metcons.values.toList();
 }
 
@@ -55,7 +56,7 @@ class MetconsCubit extends Cubit<MetconsState> {
     }
   }
 
-  void deleteMetcon(int id) {
+  void deleteMetcon(Int64 id) {
     if (state is MetconsLoaded) {
       final metcons = (state as MetconsLoaded).metconsMap;
       if (metcons.containsKey(id)) {
