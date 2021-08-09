@@ -1,0 +1,16 @@
+[package]
+name = "sport-log-action-provider-wodify-wod"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+sport-log-types = { path = "../sport-log-types" }
+sport-log-ap-utils = { path = "../sport-log-ap-utils" }
+
+tokio = { version = "1.9", features = ["full"] }
+thirtyfour = "0.27.0"
+reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls"] }
+chrono = { version = "0.4.19", features = ["serde"] }
+serde = { version = "1.0.117", features = ["derive"] }
+toml = "0.5.8"
+rand = "0.8.4"

@@ -1615,6 +1615,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "sport-log-action-provider-wodify-wod"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "rand",
+ "reqwest",
+ "serde",
+ "sport-log-ap-utils",
+ "sport-log-types",
+ "thirtyfour",
+ "tokio",
+ "toml",
+]
+
+[[package]]
 name = "sport-log-ap-utils"
 version = "0.1.0"
 dependencies = [
