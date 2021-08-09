@@ -1,9 +1,9 @@
-use chrono::NaiveDate;
+use chrono::{DateTime, Local, NaiveDate};
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
+    Create, CreateMultiple, Delete, DeleteMultiple, FromI64, FromSql, GetAll, GetById, GetByIds,
     GetByUser, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
     VerifyIdForUserOrAP, VerifyUnchecked,
 };
@@ -22,13 +22,13 @@ use crate::{
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct DiaryId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -80,13 +80,13 @@ pub struct NewDiary {
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct WodId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

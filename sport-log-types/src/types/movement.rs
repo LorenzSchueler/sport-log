@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
+    Create, CreateMultiple, Delete, DeleteMultiple, FromI64, FromSql, GetAll, GetById, GetByIds,
     ToSql, Update, VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
 };
 
@@ -45,14 +45,14 @@ pub enum MovementUnit {
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForAdmin,
         VerifyIdUnchecked
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct MovementId(pub i64);
 
 #[cfg(feature = "full")]
@@ -209,13 +209,13 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<NewMovement>> {
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForAdmin
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct EormId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

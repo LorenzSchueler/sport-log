@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
+    Create, CreateMultiple, Delete, DeleteMultiple, FromI64, FromSql, GetAll, GetById, GetByIds,
     GetByUser, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
     VerifyIdForUserOrAP,
 };
@@ -26,13 +26,13 @@ use crate::{Movement, MovementId, MovementUnit, UserId};
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct StrengthSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -83,9 +83,9 @@ pub struct NewStrengthSession {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI64, ToSql, FromSql)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct StrengthSetId(pub i64);
 
 #[cfg(feature = "full")]

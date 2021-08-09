@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
+    Create, CreateMultiple, Delete, DeleteMultiple, FromI64, FromSql, GetAll, GetById, GetByIds,
     GetByUser, ToSql, Update, VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb,
     VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
     VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked,
@@ -30,14 +30,14 @@ use crate::{PlatformId, UserId};
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForAdmin,
         VerifyIdUnchecked
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct ActionProviderId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -85,13 +85,13 @@ pub struct NewActionProvider {
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForActionProvider
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct ActionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -167,13 +167,13 @@ impl Weekday {
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForUser
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct ActionRuleId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -225,14 +225,14 @@ pub struct NewActionRule {
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForUser,
         VerifyIdForAdmin
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct ActionEventId(pub i64);
 
 #[cfg(feature = "full")]
