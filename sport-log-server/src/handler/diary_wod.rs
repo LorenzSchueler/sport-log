@@ -2,8 +2,8 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
     AuthUserOrAP, Create, CreateMultiple, Db, Delete, DeleteMultiple, Diary, DiaryId, GetById,
-    GetByUser, NewDiary, NewWod, Unverified, UnverifiedId, UnverifiedIds, Update,
-    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
+    GetByUser, Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForUserOrAPWithDb,
+    VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
     VerifyMultipleForUserOrAPWithoutDb, Wod, WodId,
 };
 
@@ -11,21 +11,21 @@ use crate::handler::{IntoJson, NaiveDateTimeWrapper};
 
 #[post("/wod", format = "application/json", data = "<wod>")]
 pub async fn create_wod(
-    wod: Unverified<NewWod>,
+    wod: Unverified<Wod>,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Wod>, Status> {
-    let wod = wod.verify(&auth)?;
+    let wod = wod.verify_user_ap_without_db(&auth)?;
     conn.run(|c| Wod::create(wod, c)).await.into_json()
 }
 
 #[post("/wods", format = "application/json", data = "<wods>")]
 pub async fn create_wods(
-    wods: Unverified<Vec<NewWod>>,
+    wods: Unverified<Vec<Wod>>,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Vec<Wod>>, Status> {
-    let wods = wods.verify(&auth)?;
+    let wods = wods.verify_user_ap_without_db(&auth)?;
     conn.run(|c| Wod::create_multiple(wods, c))
         .await
         .into_json()
@@ -58,7 +58,7 @@ pub async fn update_wod(
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Wod>, Status> {
-    let wod = conn.run(move |c| wod.verify(&auth, c)).await?;
+    let wod = conn.run(move |c| wod.verify_user_ap(&auth, c)).await?;
     conn.run(|c| Wod::update(wod, c)).await.into_json()
 }
 
@@ -69,7 +69,7 @@ pub async fn delete_wod(
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
-        Wod::delete(wod_id.verify(&auth, c)?, c)
+        Wod::delete(wod_id.verify_user_ap(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
@@ -83,7 +83,7 @@ pub async fn delete_wods(
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
-        Wod::delete_multiple(wod_ids.verify(&auth, c)?, c)
+        Wod::delete_multiple(wod_ids.verify_user_ap(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
@@ -92,21 +92,21 @@ pub async fn delete_wods(
 
 #[post("/diary", format = "application/json", data = "<diary>")]
 pub async fn create_diary(
-    diary: Unverified<NewDiary>,
+    diary: Unverified<Diary>,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Diary>, Status> {
-    let diary = diary.verify(&auth)?;
+    let diary = diary.verify_user_ap_without_db(&auth)?;
     conn.run(|c| Diary::create(diary, c)).await.into_json()
 }
 
 #[post("/diaries", format = "application/json", data = "<diaries>")]
 pub async fn create_diaries(
-    diaries: Unverified<Vec<NewDiary>>,
+    diaries: Unverified<Vec<Diary>>,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Vec<Diary>>, Status> {
-    let diaries = diaries.verify(&auth)?;
+    let diaries = diaries.verify_user_ap_without_db(&auth)?;
     conn.run(|c| Diary::create_multiple(diaries, c))
         .await
         .into_json()
@@ -118,7 +118,7 @@ pub async fn get_diary(
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Diary>, Status> {
-    let diary_id = conn.run(move |c| diary_id.verify(&auth, c)).await?;
+    let diary_id = conn.run(move |c| diary_id.verify_user_ap(&auth, c)).await?;
     conn.run(move |c| Diary::get_by_id(diary_id, c))
         .await
         .into_json()
@@ -151,7 +151,7 @@ pub async fn update_diary(
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Diary>, Status> {
-    let diary = conn.run(move |c| diary.verify(&auth, c)).await?;
+    let diary = conn.run(move |c| diary.verify_user_ap(&auth, c)).await?;
     conn.run(|c| Diary::update(diary, c)).await.into_json()
 }
 
@@ -162,7 +162,7 @@ pub async fn delete_diary(
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
-        Diary::delete(diary_id.verify(&auth, c)?, c)
+        Diary::delete(diary_id.verify_user_ap(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
@@ -176,7 +176,7 @@ pub async fn delete_diaries(
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
-        Diary::delete_multiple(diary_ids.verify(&auth, c)?, c)
+        Diary::delete_multiple(diary_ids.verify_user_ap(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })

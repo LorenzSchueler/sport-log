@@ -2,17 +2,17 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
     AuthAdmin, AuthUser, Create, CreateMultiple, Db, Delete, DeleteMultiple, GetAll, GetByUser,
-    NewPlatform, NewPlatformCredential, Platform, PlatformCredential, PlatformCredentialId,
-    PlatformId, Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForAdminWithoutDb,
-    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForAdmin, VerifyIdForUser,
-    VerifyIdUnchecked, VerifyIdsForUser, VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
+    Platform, PlatformCredential, PlatformCredentialId, PlatformId, Unverified, UnverifiedId,
+    UnverifiedIds, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
+    VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked, VerifyIdsForUser,
+    VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
 };
 
 use crate::handler::IntoJson;
 
 #[post("/adm/platform", format = "application/json", data = "<platform>")]
 pub async fn adm_create_platform(
-    platform: Unverified<NewPlatform>,
+    platform: Unverified<Platform>,
     auth: AuthAdmin,
     conn: Db,
 ) -> Result<Json<Platform>, Status> {
@@ -24,7 +24,7 @@ pub async fn adm_create_platform(
 
 #[post("/ap/platform", format = "application/json", data = "<platform>")]
 pub async fn ap_create_platform(
-    platform: Unverified<NewPlatform>,
+    platform: Unverified<Platform>,
     conn: Db,
 ) -> Result<Json<Platform>, Status> {
     if !CONFIG.ap_self_registration {
@@ -87,11 +87,11 @@ pub async fn adm_delete_platform(
     data = "<platform_credential>"
 )]
 pub async fn create_platform_credential(
-    platform_credential: Unverified<NewPlatformCredential>,
+    platform_credential: Unverified<PlatformCredential>,
     auth: AuthUser,
     conn: Db,
 ) -> Result<Json<PlatformCredential>, Status> {
-    let platform_credential = platform_credential.verify(&auth)?;
+    let platform_credential = platform_credential.verify_user_without_db(&auth)?;
     conn.run(|c| PlatformCredential::create(platform_credential, c))
         .await
         .into_json()
@@ -103,11 +103,11 @@ pub async fn create_platform_credential(
     data = "<platform_credentials>"
 )]
 pub async fn create_platform_credentials(
-    platform_credentials: Unverified<Vec<NewPlatformCredential>>,
+    platform_credentials: Unverified<Vec<PlatformCredential>>,
     auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<PlatformCredential>>, Status> {
-    let platform_credentials = platform_credentials.verify(&auth)?;
+    let platform_credentials = platform_credentials.verify_user_without_db(&auth)?;
     conn.run(|c| PlatformCredential::create_multiple(platform_credentials, c))
         .await
         .into_json()
@@ -146,7 +146,7 @@ pub async fn update_platform_credential(
     conn: Db,
 ) -> Result<Json<PlatformCredential>, Status> {
     let platform_credential = conn
-        .run(move |c| platform_credential.verify(&auth, c))
+        .run(move |c| platform_credential.verify_user(&auth, c))
         .await?;
     conn.run(|c| PlatformCredential::update(platform_credential, c))
         .await
@@ -160,7 +160,7 @@ pub async fn delete_platform_credential(
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
-        PlatformCredential::delete(platform_credential_id.verify(&auth, c)?, c)
+        PlatformCredential::delete(platform_credential_id.verify_user(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
@@ -178,7 +178,7 @@ pub async fn delete_platform_credentials(
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
-        PlatformCredential::delete_multiple(platform_credential_ids.verify(&auth, c)?, c)
+        PlatformCredential::delete_multiple(platform_credential_ids.verify_user(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })

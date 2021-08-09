@@ -86,7 +86,7 @@ pub struct StrengthSetId(pub i64);
 impl VerifyIdForUserOrAP for UnverifiedId<StrengthSetId> {
     type Id = StrengthSetId;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
+    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
         let strength_set =
             StrengthSet::get_by_id(self.0, conn).map_err(|_| Status::InternalServerError)?;
         if StrengthSession::get_by_id(strength_set.strength_session_id, conn)
@@ -105,7 +105,11 @@ impl VerifyIdForUserOrAP for UnverifiedId<StrengthSetId> {
 impl VerifyIdsForUserOrAP for UnverifiedIds<StrengthSetId> {
     type Id = StrengthSetId;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status> {
         let strength_sets =
             StrengthSet::get_by_ids(&self.0, conn).map_err(|_| Status::InternalServerError)?;
         let strength_session_ids: Vec<_> = strength_sets
@@ -162,7 +166,11 @@ pub struct StrengthSet {
 impl VerifyForUserOrAPWithDb for Unverified<StrengthSet> {
     type Entity = StrengthSet;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Entity, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Self::Entity, Status> {
         let strength_set = self.0.into_inner();
         if StrengthSession::get_by_id(strength_set.strength_session_id, conn)
             .map_err(|_| Status::InternalServerError)?
@@ -180,7 +188,11 @@ impl VerifyForUserOrAPWithDb for Unverified<StrengthSet> {
 impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthSet>> {
     type Entity = StrengthSet;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Entity>, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status> {
         let strength_sets = self.0.into_inner();
         let strength_session_ids: Vec<_> = strength_sets
             .iter()

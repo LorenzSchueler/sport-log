@@ -60,7 +60,7 @@ pub struct MovementId(pub i64);
 impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
     type Id = MovementId;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
+    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
         let movement =
             Movement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if movement.user_id == Some(**auth) {
@@ -75,7 +75,11 @@ impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
 impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
     type Id = MovementId;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status> {
         let movements =
             Movement::get_by_ids(&self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if movements
@@ -151,7 +155,11 @@ pub struct Movement {
 impl VerifyForUserOrAPWithDb for Unverified<Movement> {
     type Entity = Movement;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Entity, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Self::Entity, Status> {
         let movement = self.0.into_inner();
         if movement.user_id == Some(**auth)
             && Movement::get_by_id(movement.id, conn)
@@ -170,7 +178,7 @@ impl VerifyForUserOrAPWithDb for Unverified<Movement> {
 impl VerifyForUserOrAPWithoutDb for Unverified<Movement> {
     type Entity = Movement;
 
-    fn verify(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status> {
+    fn verify_user_ap_without_db(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status> {
         let movement = self.0.into_inner();
         if movement.user_id == Some(**auth) {
             Ok(movement)
@@ -184,7 +192,7 @@ impl VerifyForUserOrAPWithoutDb for Unverified<Movement> {
 impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
     type Entity = Movement;
 
-    fn verify(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status> {
+    fn verify_user_ap_without_db(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status> {
         let movements = self.0.into_inner();
         if movements
             .iter()

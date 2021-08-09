@@ -248,28 +248,32 @@ pub trait DeleteMultiple {
 pub trait VerifyIdForUser {
     type Id;
 
-    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Id, Status>;
+    fn verify_user(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyIdsForUser {
     type Id;
 
-    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Vec<Self::Id>, Status>;
+    fn verify_user(self, auth: &AuthUser, conn: &PgConnection) -> Result<Vec<Self::Id>, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyIdForUserOrAP {
     type Id;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status>;
+    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyIdsForUserOrAP {
     type Id;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status>;
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status>;
 }
 
 #[cfg(feature = "full")]
@@ -311,56 +315,65 @@ pub trait VerifyIdUnchecked {
 pub trait VerifyForUserWithDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status>;
+    fn verify_user(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyMultipleForUserWithDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Vec<Self::Entity>, Status>;
+    fn verify_user(self, auth: &AuthUser, conn: &PgConnection)
+        -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyForUserWithoutDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUser) -> Result<Self::Entity, Status>;
+    fn verify_user_without_db(self, auth: &AuthUser) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyMultipleForUserWithoutDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUser) -> Result<Vec<Self::Entity>, Status>;
+    fn verify_user_without_db(self, auth: &AuthUser) -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyForUserOrAPWithDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Entity, Status>;
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyMultipleForUserOrAPWithDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Entity>, Status>;
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyForUserOrAPWithoutDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status>;
+    fn verify_user_ap_without_db(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyMultipleForUserOrAPWithoutDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status>;
+    fn verify_user_ap_without_db(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]
@@ -374,7 +387,7 @@ pub trait VerifyForActionProviderWithDb {
 pub trait VerifyForActionProviderWithoutDb {
     type Entity;
 
-    fn verify_ap(self, auth: &AuthAP) -> Result<Self::Entity, Status>;
+    fn verify_ap_without_db(self, auth: &AuthAP) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]

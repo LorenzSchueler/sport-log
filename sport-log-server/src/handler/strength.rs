@@ -2,9 +2,9 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
     AuthUserOrAP, Create, CreateMultiple, Db, Delete, DeleteMultiple, GetById, GetByUser,
-    NewStrengthSession, NewStrengthSet, StrengthSession, StrengthSessionDescription,
-    StrengthSessionId, StrengthSet, StrengthSetId, Unverified, UnverifiedId, UnverifiedIds, Update,
-    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
+    StrengthSession, StrengthSessionDescription, StrengthSessionId, StrengthSet, StrengthSetId,
+    Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForUserOrAPWithDb,
+    VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
     VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
 };
 
@@ -16,11 +16,11 @@ use crate::handler::{IntoJson, NaiveDateTimeWrapper};
     data = "<strength_session>"
 )]
 pub async fn create_strength_session(
-    strength_session: Unverified<NewStrengthSession>,
+    strength_session: Unverified<StrengthSession>,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<StrengthSession>, Status> {
-    let strength_session = strength_session.verify(&auth)?;
+    let strength_session = strength_session.verify_user_ap_without_db(&auth)?;
     conn.run(|c| StrengthSession::create(strength_session, c))
         .await
         .into_json()
@@ -32,11 +32,11 @@ pub async fn create_strength_session(
     data = "<strength_sessions>"
 )]
 pub async fn create_strength_sessions(
-    strength_sessions: Unverified<Vec<NewStrengthSession>>,
+    strength_sessions: Unverified<Vec<StrengthSession>>,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Vec<StrengthSession>>, Status> {
-    let strength_session = strength_sessions.verify(&auth)?;
+    let strength_session = strength_sessions.verify_user_ap_without_db(&auth)?;
     conn.run(|c| StrengthSession::create_multiple(strength_session, c))
         .await
         .into_json()
@@ -49,7 +49,7 @@ pub async fn get_strength_session(
     conn: Db,
 ) -> Result<Json<StrengthSession>, Status> {
     let strength_session_id = conn
-        .run(move |c| strength_session_id.verify(&auth, c))
+        .run(move |c| strength_session_id.verify_user_ap(&auth, c))
         .await?;
     conn.run(move |c| StrengthSession::get_by_id(strength_session_id, c))
         .await
@@ -76,7 +76,9 @@ pub async fn update_strength_session(
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<StrengthSession>, Status> {
-    let strength_session = conn.run(move |c| strength_session.verify(&auth, c)).await?;
+    let strength_session = conn
+        .run(move |c| strength_session.verify_user_ap(&auth, c))
+        .await?;
     conn.run(|c| StrengthSession::update(strength_session, c))
         .await
         .into_json()
@@ -89,7 +91,7 @@ pub async fn delete_strength_session(
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
-        StrengthSession::delete(strength_session_id.verify(&auth, c)?, c)
+        StrengthSession::delete(strength_session_id.verify_user_ap(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
@@ -107,7 +109,7 @@ pub async fn delete_strength_sessions(
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
-        StrengthSession::delete_multiple(strength_session_ids.verify(&auth, c)?, c)
+        StrengthSession::delete_multiple(strength_session_ids.verify_user_ap(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
@@ -116,11 +118,13 @@ pub async fn delete_strength_sessions(
 
 #[post("/strength_set", format = "application/json", data = "<strength_set>")]
 pub async fn create_strength_set(
-    strength_set: Unverified<NewStrengthSet>,
+    strength_set: Unverified<StrengthSet>,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<StrengthSet>, Status> {
-    let strength_set = conn.run(move |c| strength_set.verify(&auth, c)).await?;
+    let strength_set = conn
+        .run(move |c| strength_set.verify_user_ap(&auth, c))
+        .await?;
     conn.run(|c| StrengthSet::create(strength_set, c))
         .await
         .into_json()
@@ -132,11 +136,13 @@ pub async fn create_strength_set(
     data = "<strength_sets>"
 )]
 pub async fn create_strength_sets(
-    strength_sets: Unverified<Vec<NewStrengthSet>>,
+    strength_sets: Unverified<Vec<StrengthSet>>,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Vec<StrengthSet>>, Status> {
-    let strength_set = conn.run(move |c| strength_sets.verify(&auth, c)).await?;
+    let strength_set = conn
+        .run(move |c| strength_sets.verify_user_ap(&auth, c))
+        .await?;
     conn.run(|c| StrengthSet::create_multiple(strength_set, c))
         .await
         .into_json()
@@ -148,7 +154,9 @@ pub async fn get_strength_set(
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<StrengthSet>, Status> {
-    let strength_set_id = conn.run(move |c| strength_set_id.verify(&auth, c)).await?;
+    let strength_set_id = conn
+        .run(move |c| strength_set_id.verify_user_ap(&auth, c))
+        .await?;
     conn.run(move |c| StrengthSet::get_by_id(strength_set_id, c))
         .await
         .into_json()
@@ -161,7 +169,7 @@ pub async fn get_strength_sets_by_strength_session(
     conn: Db,
 ) -> Result<Json<Vec<StrengthSet>>, Status> {
     let strength_session_id = conn
-        .run(move |c| strength_session_id.verify(&auth, c))
+        .run(move |c| strength_session_id.verify_user_ap(&auth, c))
         .await?;
     conn.run(move |c| StrengthSet::get_by_strength_session(strength_session_id, c))
         .await
@@ -174,7 +182,9 @@ pub async fn update_strength_set(
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<StrengthSet>, Status> {
-    let strength_set = conn.run(move |c| strength_set.verify(&auth, c)).await?;
+    let strength_set = conn
+        .run(move |c| strength_set.verify_user_ap(&auth, c))
+        .await?;
     conn.run(|c| StrengthSet::update(strength_set, c))
         .await
         .into_json()
@@ -191,7 +201,7 @@ pub async fn delete_strength_sets(
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
-        StrengthSet::delete_multiple(strength_set_ids.verify(&auth, c)?, c)
+        StrengthSet::delete_multiple(strength_set_ids.verify_user_ap(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
@@ -205,7 +215,7 @@ pub async fn delete_strength_set(
     conn: Db,
 ) -> Result<Status, Status> {
     conn.run(move |c| {
-        StrengthSet::delete(strength_set_id.verify(&auth, c)?, c)
+        StrengthSet::delete(strength_set_id.verify_user_ap(&auth, c)?, c)
             .map(|_| Status::NoContent)
             .map_err(|_| Status::InternalServerError)
     })
@@ -219,7 +229,7 @@ pub async fn get_strength_session_description(
     conn: Db,
 ) -> Result<Json<StrengthSessionDescription>, Status> {
     let strength_session_id = conn
-        .run(move |c| strength_session_id.verify(&auth, c))
+        .run(move |c| strength_session_id.verify_user_ap(&auth, c))
         .await?;
     conn.run(move |c| StrengthSessionDescription::get_by_id(strength_session_id, c))
         .await
