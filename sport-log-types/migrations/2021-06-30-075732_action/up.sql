@@ -49,7 +49,7 @@ create table action_rule (
     user_id bigint not null references "user" on delete cascade,
     action_id bigint not null references action on delete cascade,
     weekday weekday not null, 
-    time timetz not null,
+    time timestamptz not null,
     enabled boolean not null,
     last_change timestamptz not null default now(),
     deleted boolean not null default false,
@@ -59,15 +59,15 @@ create trigger set_timestamp before update on action_rule
     for each row execute procedure trigger_set_timestamp();
 
 insert into action_rule (id, user_id, action_id, weekday, time, enabled) values 
-    (1, 1, 1, 'monday', '09:00:00', true), 
-    (2, 1, 3, 'tuesday', '19:00:00', true),
-    (3, 1, 4, 'monday', '00:00:00', true),
-    (4, 1, 4, 'tuesday', '00:00:00', true),
-    (5, 1, 4, 'wednesday', '00:00:00', true),
-    (6, 1, 4, 'thursday', '00:00:00', true),
-    (8, 1, 4, 'friday', '00:00:00', true),
-    (9, 1, 4, 'saturday', '00:00:00', true),
-    (10, 1, 4, 'sunday', '00:00:00', true);
+    (1, 1, 1, 'monday', '1970-01-01 09:00:00', true), 
+    (2, 1, 3, 'tuesday', '1970-01-01 19:00:00', true),
+    (3, 1, 4, 'monday', '1970-01-01 00:00:00', true),
+    (4, 1, 4, 'tuesday', '1970-01-01 00:00:00', true),
+    (5, 1, 4, 'wednesday', '1970-01-01 00:00:00', true),
+    (6, 1, 4, 'thursday', '1970-01-01 00:00:00', true),
+    (8, 1, 4, 'friday', '1970-01-01 00:00:00', true),
+    (9, 1, 4, 'saturday', '1970-01-01 00:00:00', true),
+    (10, 1, 4, 'sunday', '1970-01-01 00:00:00', true);
 
 create table action_event (
     id bigint primary key,

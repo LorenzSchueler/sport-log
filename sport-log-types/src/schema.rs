@@ -54,7 +54,7 @@ table! {
         user_id -> Int8,
         action_id -> Int8,
         weekday -> WeekdayMapping,
-        time -> Timetz,
+        time -> Timestamptz,
         enabled -> Bool,
         last_change -> Timestamptz,
         deleted -> Bool,
