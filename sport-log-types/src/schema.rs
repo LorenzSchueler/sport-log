@@ -119,8 +119,10 @@ table! {
     use crate::*;
 
     group (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Varchar,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -129,9 +131,11 @@ table! {
     use crate::*;
 
     group_user (id) {
-        id -> Int4,
+        id -> Int8,
         group_id -> Int4,
         user_id -> Int4,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -252,9 +256,11 @@ table! {
     use crate::*;
 
     shared_cardio_session (id) {
-        id -> Int4,
+        id -> Int8,
         group_id -> Int4,
         cardio_session_id -> Int4,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -263,9 +269,11 @@ table! {
     use crate::*;
 
     shared_diary (id) {
-        id -> Int4,
+        id -> Int8,
         group_id -> Int4,
         diary_id -> Int4,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -274,9 +282,11 @@ table! {
     use crate::*;
 
     shared_metcon_session (id) {
-        id -> Int4,
+        id -> Int8,
         group_id -> Int4,
         metcon_session_id -> Int4,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -285,9 +295,11 @@ table! {
     use crate::*;
 
     shared_strength_session (id) {
-        id -> Int4,
+        id -> Int8,
         group_id -> Int4,
         strength_session_id -> Int4,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
