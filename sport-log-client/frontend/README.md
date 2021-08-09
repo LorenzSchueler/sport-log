@@ -14,6 +14,8 @@
 * [ ] remove naive time
 * [ ] user instead of credentials for api
 * [ ] runtime id state accessible for whole app
+* [ ] how to handle changed database on app update?
+* [ ] use hive instead of shared preferences
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)

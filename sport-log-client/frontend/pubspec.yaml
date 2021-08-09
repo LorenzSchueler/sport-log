@@ -42,8 +42,12 @@ dependencies:
   http: ^0.13.3
   device_info_plus: ^2.1.0
   implicitly_animated_reorderable_list: ^0.4.0
-  json_serializable: ^5.0.0
+  json_serializable: any
   fixnum: ^1.0.0
+  moor: ^4.4.1
+  sqlite3_flutter_libs: ^0.5.0
+  path_provider: ^2.0.2
+  path: ^1.8.0
 
 dev_dependencies:
   flutter_test:
@@ -56,6 +60,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
   build_runner: ^2.1.0
+  moor_generator: ^4.4.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
