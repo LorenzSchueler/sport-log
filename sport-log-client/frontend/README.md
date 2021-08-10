@@ -34,6 +34,7 @@
 * [ ] add all (unique) constraints like in server
 * [ ] set last modified on update/delete
 * [ ] add references to foreign keys
+* [ ] shouldn't be possible to delete e. g. movement when it is referenced by other resource
 
 # Sync
 * new flag, wenn vom server zurück auf false; nur in DB
