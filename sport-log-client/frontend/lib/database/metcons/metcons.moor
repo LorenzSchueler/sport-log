@@ -5,4 +5,7 @@ metconHasMetconSession: SELECT 1 FROM metcon_sessions
     WHERE metcon_id == :id AND deleted == false;
 
 _metconExists: SELECT 1 FROM metcons
-    WHERE id == :id and deleted == false;
+    WHERE id == :id AND deleted == false;
+
+_idsOfMetconMovementsOfMetcon: SELECT id from metcon_movements
+    WHERE metcon_id == :id AND deleted == false;

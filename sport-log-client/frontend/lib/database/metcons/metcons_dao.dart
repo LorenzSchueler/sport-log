@@ -41,7 +41,7 @@ class MetconsDao extends DatabaseAccessor<Database> with _$MetconsDaoMixin {
     if (!await metconExists(metconSession.metconId)) {
       return Failure(DbException.metconDoesNotExist);
     }
-    into(metconSessions).insert(metconSession);
+    await into(metconSessions).insert(metconSession);
     return Success(null);
   }
 
@@ -58,30 +58,102 @@ class MetconsDao extends DatabaseAccessor<Database> with _$MetconsDaoMixin {
       return Failure(DbException.metconHasMetconSession);
     }
     return transaction(() async {
-      await deleteMetconMovementsOfMetcon(id);
+      await _deleteMetconMovementsOfMetcon(id);
       await _unsafeDeleteMetcon(id);
       return Success(null);
     });
   }
 
-  Future<void> deleteMetconMovementsOfMetcon(Int64 id) async {
-    (update(metconMovements)
+  Future<void> _deleteMetconMovementsOfMetcon(Int64 id) async {
+    await (update(metconMovements)
       ..where((mm) => mm.metconId.equals(id.toInt()) & mm.deleted.equals(false))
     ).write(const MetconMovementsCompanion(deleted: Value(true)));
   }
 
   Future<void> _unsafeDeleteMetcon(Int64 id) async {
-    (update(metcons)
+    await (update(metcons)
       ..where((m) => m.id.equals(id.toInt()) & m.deleted.equals(false))
     ).write(const MetconsCompanion(deleted: Value(true)));
   }
 
   Future<void> deleteMetconSession(Int64 id) async {
-    (update(metconSessions)
+    await (update(metconSessions)
       ..where((ms) => ms.id.equals(id.toInt()) & ms.deleted.equals(false))
     ).write(const MetconSessionsCompanion(deleted: Value(true)));
   }
 
 
   // update methods
+
+  Future<Result<void, DbException>> updateMetconSession(MetconSession metconSession) async {
+    if (!metconSession.validateOnUpdate()) {
+      return Failure(DbException.validationFailed);
+    }
+    if (!await metconExists(metconSession.metconId)) {
+      return Failure(DbException.metconDoesNotExist);
+    }
+    await (update(metconSessions)
+      ..where((ms) => ms.id.equals(metconSession.id.toInt())
+        & ms.deleted.equals(false))
+    ).write(metconSession);
+    return Success(null);
+  }
+
+  Future<Result<void, DbException>> updateMetcon(MetconDescription metconDescription) async {
+    if (!metconDescription.validateOnUpdate()) {
+      return Failure(DbException.validationFailed);
+    }
+    // starting a transaction for consistency
+    return transaction(() async {
+      // updating the metcon record
+      await (update(metcons)
+        ..where((m) => m.id.equals(metconDescription.metcon.id.toInt())
+          & m.deleted.equals(false))
+      ).write(metconDescription.metcon);
+
+      // find all metcon movement ids of the former metcon
+      final oldMetconMovementsIds = (await _idsOfMetconMovementsOfMetcon(
+          metconDescription.metcon.id.toInt()).get())
+          .map((id) => id.toInt())
+          .toSet();
+      List<MetconMovement> toCreate =  [];
+      List<MetconMovement> toUpdate = [];
+      // find out which metcon movements need to be updated or created
+      for (final mm in metconDescription.moves) {
+        if (!oldMetconMovementsIds.contains(mm.id.toInt())) {
+          toCreate.add(mm);
+        } else {
+          toUpdate.add(mm);
+        }
+      }
+      // all metcons that didn't get reused will be deleted
+      Set<int> toDelete = oldMetconMovementsIds.difference(
+          toUpdate.map((mm) => mm.id.toInt()).toSet());
+
+      // starting a batch for faster execution
+      await batch((batch) async {
+        // deleting all metcon movements in toDelete
+        for (int id in toDelete) {
+          (update(metconMovements)
+            ..where((mm) => mm.id.equals(id)
+              & mm.deleted.equals(false))
+          ).write(const MetconMovementsCompanion(deleted: Value(true)));
+        }
+
+        // updating all metcon movements in toUpdate
+        for (final metconMovement in toUpdate) {
+          (update(metconMovements)
+            ..where((mm) => mm.id.equals(metconMovement.id.toInt())
+              & mm.deleted.equals(false)
+            )
+          ).write(metconMovement);
+        }
+
+        // inserting all metcon movements in toCreate
+        batch.insertAll(metconMovements, toCreate);
+      });
+
+      return Success(null);
+    });
+  }
 }

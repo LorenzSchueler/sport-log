@@ -23,12 +23,24 @@ mixin _$MetconsDaoMixin on DatabaseAccessor<Database> {
 
   Selectable<int> _metconExists(int id) {
     return customSelect(
-        'SELECT 1 FROM metcons\n    WHERE id == :id and deleted == false',
+        'SELECT 1 FROM metcons\n    WHERE id == :id AND deleted == false',
         variables: [
           Variable<int>(id)
         ],
         readsFrom: {
           metcons,
         }).map((QueryRow row) => row.read<int>('1'));
+  }
+
+  Selectable<Int64> _idsOfMetconMovementsOfMetcon(int id) {
+    return customSelect(
+        'SELECT id from metcon_movements\n    WHERE metcon_id == :id AND deleted == false',
+        variables: [
+          Variable<int>(id)
+        ],
+        readsFrom: {
+          metconMovements,
+        }).map((QueryRow row) =>
+        $MetconMovementsTable.$converter0.mapToDart(row.read<int>('id'))!);
   }
 }
