@@ -3,7 +3,7 @@ use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
     schema::cardio_session, CardioSession, CardioSessionDescription, CardioSessionId, GetById,
-    GetByUser, Movement, Route, UserId,
+    GetByUser, GetByUserSync, Movement, Route, UserId,
 };
 
 impl CardioSession {

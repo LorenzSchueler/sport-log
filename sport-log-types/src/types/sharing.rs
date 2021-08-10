@@ -3,7 +3,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, GetByUser, ToSql, Update,
+    Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, GetByUser, GetByUserSync,
+    ToSql, Update,
 };
 
 #[cfg(feature = "full")]
@@ -73,6 +74,7 @@ pub struct GroupUserId(pub i64);
         GetById,
         GetByIds,
         GetByUser,
+        GetByUserSync,
         GetAll,
         Update,
     )

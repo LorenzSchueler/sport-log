@@ -2,6 +2,7 @@ use argon2::{
     password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
 };
+use chrono::{DateTime, Utc};
 use diesel::{prelude::*, result::Error};
 use rand_core::OsRng;
 
@@ -52,6 +53,18 @@ impl User {
         } else {
             Err(Error::NotFound)
         }
+    }
+
+    pub fn get_by_id_and_last_sync(
+        user_id: UserId,
+        last_sync: DateTime<Utc>,
+        conn: &PgConnection,
+    ) -> QueryResult<Option<User>> {
+        user::table
+            .filter(user::columns::id.eq(user_id))
+            .filter(user::columns::last_change.ge(last_sync))
+            .get_result(conn)
+            .optional()
     }
 
     pub fn delete(user_id: UserId, conn: &PgConnection) -> QueryResult<usize> {

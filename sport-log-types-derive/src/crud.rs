@@ -116,7 +116,7 @@ pub fn impl_get_by_user_and_last_sync(ast: &syn::DeriveInput) -> TokenStream {
         use diesel::prelude::*;
 
         impl crate::GetByUserSync for #typename {
-            fn get_by_user(
+            fn get_by_user_and_last_sync(
                 user_id: crate::UserId,
                 last_sync: DateTime<Utc>,
                 conn: &PgConnection

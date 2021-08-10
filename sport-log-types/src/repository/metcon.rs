@@ -3,8 +3,8 @@ use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
-    GetById, GetByUser, Metcon, MetconId, MetconMovement, MetconSession, MetconSessionDescription,
-    MetconSessionId, Movement, UserId,
+    GetById, GetByUser, GetByUserSync, Metcon, MetconId, MetconMovement, MetconSession,
+    MetconSessionDescription, MetconSessionId, Movement, UserId,
 };
 
 impl GetByUser for Metcon {
@@ -15,6 +15,26 @@ impl GetByUser for Metcon {
                     .eq(user_id)
                     .or(metcon::columns::user_id.is_null()),
             )
+            .get_results(conn)
+    }
+}
+
+impl GetByUserSync for Metcon {
+    fn get_by_user_and_last_sync(
+        user_id: UserId,
+        last_sync: DateTime<Utc>,
+        conn: &PgConnection,
+    ) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized,
+    {
+        metcon::table
+            .filter(
+                metcon::columns::user_id
+                    .eq(user_id)
+                    .or(metcon::columns::user_id.is_null()),
+            )
+            .filter(metcon::columns::last_change.ge(last_sync))
             .get_results(conn)
     }
 }
@@ -45,6 +65,29 @@ impl GetByUser for MetconMovement {
                         .get_results::<MetconId>(conn)?,
                 ),
             )
+            .get_results(conn)
+    }
+}
+
+impl GetByUserSync for MetconMovement {
+    fn get_by_user_and_last_sync(
+        user_id: UserId,
+        last_sync: DateTime<Utc>,
+        conn: &PgConnection,
+    ) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized,
+    {
+        metcon_movement::table
+            .filter(
+                metcon_movement::columns::metcon_id.eq_any(
+                    metcon::table
+                        .filter(metcon::columns::user_id.eq(user_id))
+                        .select(metcon::columns::id)
+                        .get_results::<MetconId>(conn)?,
+                ),
+            )
+            .filter(metcon_movement::columns::last_change.ge(last_sync))
             .get_results(conn)
     }
 }

@@ -8,7 +8,7 @@ use crate::{
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AccountData {
-    pub user: User,
+    pub user: Option<User>,
     pub diaries: Vec<Diary>,
     pub wods: Vec<Wod>,
     pub movements: Vec<Movement>,

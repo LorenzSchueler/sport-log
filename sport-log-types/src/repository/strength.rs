@@ -3,8 +3,8 @@ use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
     schema::{strength_session, strength_set},
-    GetById, GetByUser, Movement, StrengthSession, StrengthSessionDescription, StrengthSessionId,
-    StrengthSet, UserId,
+    GetById, GetByUser, GetByUserSync, Movement, StrengthSession, StrengthSessionDescription,
+    StrengthSessionId, StrengthSet, UserId,
 };
 
 impl StrengthSession {
@@ -33,6 +33,29 @@ impl GetByUser for StrengthSet {
                         .get_results::<StrengthSessionId>(conn)?,
                 ),
             )
+            .get_results(conn)
+    }
+}
+
+impl GetByUserSync for StrengthSet {
+    fn get_by_user_and_last_sync(
+        user_id: UserId,
+        last_sync: DateTime<Utc>,
+        conn: &PgConnection,
+    ) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized,
+    {
+        strength_set::table
+            .filter(
+                strength_set::columns::strength_session_id.eq_any(
+                    strength_session::table
+                        .filter(strength_session::columns::user_id.eq(user_id))
+                        .select(strength_session::columns::id)
+                        .get_results::<StrengthSessionId>(conn)?,
+                ),
+            )
+            .filter(strength_set::columns::last_change.ge(last_sync))
             .get_results(conn)
     }
 }
