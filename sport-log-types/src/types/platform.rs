@@ -1,10 +1,11 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
-    GetByUser, ToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
-    VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked, VerifyUnchecked,
+    Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, GetBySync, GetByUser,
+    GetByUserSync, ToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb,
+    VerifyForUserWithoutDb, VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked, VerifyUnchecked,
 };
 
 use crate::UserId;
@@ -21,20 +22,21 @@ use crate::{
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForAdmin,
         VerifyIdUnchecked
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct PlatformId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct PlatformId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -42,26 +44,20 @@ pub struct PlatformId(pub i32);
         Create,
         CreateMultiple,
         GetAll,
+        GetBySync,
         Update,
-        Delete,
-        DeleteMultiple,
         VerifyForAdminWithoutDb,
+        VerifyUnchecked
     )
 )]
 #[cfg_attr(feature = "full", table_name = "platform")]
 pub struct Platform {
     pub id: PlatformId,
     pub name: String,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(
-    feature = "full",
-    derive(Insertable, VerifyForAdminWithoutDb, VerifyUnchecked)
-)]
-#[cfg_attr(feature = "full", table_name = "platform")]
-pub struct NewPlatform {
-    pub name: String,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -71,19 +67,20 @@ pub struct NewPlatform {
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForUser
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct PlatformCredentialId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct PlatformCredentialId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -93,10 +90,10 @@ pub struct PlatformCredentialId(pub i32);
         GetById,
         GetByIds,
         GetByUser,
+        GetByUserSync,
         Update,
-        Delete,
-        DeleteMultiple,
         VerifyForUserWithDb,
+        VerifyForUserWithoutDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "platform_credential")]
@@ -108,14 +105,8 @@ pub struct PlatformCredential {
     pub platform_id: PlatformId,
     pub username: String,
     pub password: String,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserWithoutDb))]
-#[cfg_attr(feature = "full", table_name = "platform_credential")]
-pub struct NewPlatformCredential {
-    pub user_id: UserId,
-    pub platform_id: PlatformId,
-    pub username: String,
-    pub password: String,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }

@@ -14,7 +14,7 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::VerifyIdForUser for crate::UnverifiedId<#id_typename> {
             type Id = #id_typename;
 
-            fn verify(
+            fn verify_user(
                 self,
                 auth: &crate::AuthUser,
                 conn: &diesel::pg::PgConnection,
@@ -34,7 +34,7 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::VerifyIdsForUser for crate::UnverifiedIds<#id_typename> {
             type Id = #id_typename;
 
-            fn verify(
+            fn verify_user(
                 self,
                 auth: &crate::AuthUser,
                 conn: &diesel::pg::PgConnection,
@@ -66,7 +66,7 @@ pub fn impl_verify_id_for_user_or_ap(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::VerifyIdForUserOrAP for crate::UnverifiedId<#id_typename> {
             type Id = #id_typename;
 
-            fn verify(
+            fn verify_user_ap(
                 self,
                 auth: &crate::AuthUserOrAP,
                 conn: &diesel::pg::PgConnection,
@@ -86,7 +86,7 @@ pub fn impl_verify_id_for_user_or_ap(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::VerifyIdsForUserOrAP for crate::UnverifiedIds<#id_typename> {
             type Id = #id_typename;
 
-            fn verify(
+            fn verify_user_ap(
                 self,
                 auth: &crate::AuthUserOrAP,
                 conn: &diesel::pg::PgConnection,
@@ -211,7 +211,7 @@ pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::VerifyForUserWithDb for crate::Unverified<#typename> {
             type Entity = #typename;
 
-            fn verify(
+            fn verify_user(
                 self,
                 auth: &crate::AuthUser,
                 conn: &diesel::pg::PgConnection,
@@ -235,7 +235,7 @@ pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::VerifyMultipleForUserWithDb for crate::Unverified<Vec<#typename>> {
             type Entity = #typename;
 
-            fn verify(
+            fn verify_user(
                 self,
                 auth: &crate::AuthUser,
                 conn: &diesel::pg::PgConnection,
@@ -273,7 +273,7 @@ pub fn impl_verify_for_user_or_ap_with_db(ast: &syn::DeriveInput) -> TokenStream
         impl crate::VerifyForUserOrAPWithDb for crate::Unverified<#typename> {
             type Entity = #typename;
 
-            fn verify(
+            fn verify_user_ap(
                 self,
                 auth: &crate::AuthUserOrAP,
                 conn: &diesel::pg::PgConnection,
@@ -297,7 +297,7 @@ pub fn impl_verify_for_user_or_ap_with_db(ast: &syn::DeriveInput) -> TokenStream
         impl crate::VerifyMultipleForUserOrAPWithDb for crate::Unverified<Vec<#typename>> {
             type Entity = #typename;
 
-            fn verify(
+            fn verify_user_ap(
                 self,
                 auth: &crate::AuthUserOrAP,
                 conn: &diesel::pg::PgConnection,
@@ -335,7 +335,7 @@ pub fn impl_verify_for_user_without_db(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::VerifyForUserWithoutDb for crate::Unverified<#typename> {
             type Entity = #typename;
 
-            fn verify(
+            fn verify_user_without_db(
                 self,
                 auth: &crate::AuthUser,
             ) -> Result<Self::Entity, rocket::http::Status> {
@@ -351,7 +351,7 @@ pub fn impl_verify_for_user_without_db(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::VerifyMultipleForUserWithoutDb for crate::Unverified<Vec<#typename>> {
             type Entity = #typename;
 
-            fn verify(
+            fn verify_user_without_db(
                 self,
                 auth: &crate::AuthUser,
             ) -> Result<Vec<Self::Entity>, rocket::http::Status> {
@@ -374,7 +374,7 @@ pub fn impl_verify_for_user_or_ap_without_db(ast: &syn::DeriveInput) -> TokenStr
         impl crate::VerifyForUserOrAPWithoutDb for crate::Unverified<#typename> {
             type Entity = #typename;
 
-            fn verify(
+            fn verify_user_ap_without_db(
                 self,
                 auth: &crate::AuthUserOrAP,
             ) -> Result<Self::Entity, rocket::http::Status> {
@@ -390,7 +390,7 @@ pub fn impl_verify_for_user_or_ap_without_db(ast: &syn::DeriveInput) -> TokenStr
         impl crate::VerifyMultipleForUserOrAPWithoutDb for crate::Unverified<Vec<#typename>> {
             type Entity = #typename;
 
-            fn verify(
+            fn verify_user_ap_without_db(
                 self,
                 auth: &crate::AuthUserOrAP,
             ) -> Result<Vec<Self::Entity>, rocket::http::Status> {
@@ -444,7 +444,7 @@ pub fn impl_verify_for_action_provider_without_db(ast: &syn::DeriveInput) -> Tok
         impl crate::VerifyForActionProviderWithoutDb for crate::Unverified<#typename> {
             type Entity = #typename;
 
-            fn verify_ap(
+            fn verify_ap_without_db(
                 self,
                 auth: &crate::AuthAP,
             ) -> Result<Self::Entity, rocket::http::Status> {
@@ -460,7 +460,7 @@ pub fn impl_verify_for_action_provider_without_db(ast: &syn::DeriveInput) -> Tok
         impl crate::VerifyMultipleForActionProviderWithoutDb for crate::Unverified<Vec<#typename>> {
             type Entity = #typename;
 
-            fn verify_ap(
+            fn verify_ap_without_db(
                 self,
                 auth: &crate::AuthAP,
             ) -> Result<Vec<Self::Entity>, rocket::http::Status> {
@@ -505,12 +505,12 @@ pub fn impl_verify_for_admin_without_db(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
-pub fn impl_from_i32(ast: &syn::DeriveInput) -> TokenStream {
+pub fn impl_from_i64(ast: &syn::DeriveInput) -> TokenStream {
     let id_typename = &ast.ident;
 
     let gen = quote! {
-        impl crate::FromI32 for #id_typename {
-            fn from_i32(value: i32) -> Self {
+        impl crate::FromI64 for #id_typename {
+            fn from_i64(value: i64) -> Self {
                 Self(value)
             }
         }

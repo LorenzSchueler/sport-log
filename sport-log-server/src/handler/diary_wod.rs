@@ -1,46 +1,47 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthUserOrAP, Create, CreateMultiple, Db, Delete, DeleteMultiple, Diary, DiaryId, GetById,
-    GetByUser, NewDiary, NewWod, Unverified, UnverifiedId, UnverifiedIds, Update,
-    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
-    VerifyMultipleForUserOrAPWithoutDb, Wod, WodId,
+    AuthUserOrAP, Create, CreateMultiple, Db, Diary, DiaryId, GetById, GetByUser, Unverified,
+    UnverifiedId, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    VerifyMultipleForUserOrAPWithoutDb, Wod,
 };
 
-use crate::handler::{IntoJson, NaiveDateWrapper};
+use crate::handler::{DateTimeWrapper, IntoJson};
 
 #[post("/wod", format = "application/json", data = "<wod>")]
 pub async fn create_wod(
-    wod: Unverified<NewWod>,
+    wod: Unverified<Wod>,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Wod>, Status> {
-    let wod = wod.verify(&auth)?;
+    let wod = wod.verify_user_ap_without_db(&auth)?;
     conn.run(|c| Wod::create(wod, c)).await.into_json()
 }
 
 #[post("/wods", format = "application/json", data = "<wods>")]
 pub async fn create_wods(
-    wods: Unverified<Vec<NewWod>>,
+    wods: Unverified<Vec<Wod>>,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Vec<Wod>>, Status> {
-    let wods = wods.verify(&auth)?;
+    let wods = wods.verify_user_ap_without_db(&auth)?;
     conn.run(|c| Wod::create_multiple(wods, c))
         .await
         .into_json()
 }
 
-#[get("/wod/timespan/<start_date>/<end_date>")]
+#[get("/wod/timespan/<start_datetime>/<end_datetime>")]
 pub async fn get_ordered_wods_by_timespan(
-    start_date: NaiveDateWrapper,
-    end_date: NaiveDateWrapper,
+    start_datetime: DateTimeWrapper,
+    end_datetime: DateTimeWrapper,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Vec<Wod>>, Status> {
-    conn.run(move |c| Wod::get_ordered_by_user_and_timespan(*auth, *start_date, *end_date, c))
-        .await
-        .into_json()
+    conn.run(move |c| {
+        Wod::get_ordered_by_user_and_timespan(*auth, *start_datetime, *end_datetime, c)
+    })
+    .await
+    .into_json()
 }
 
 #[get("/wod")]
@@ -56,55 +57,27 @@ pub async fn update_wod(
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Wod>, Status> {
-    let wod = conn.run(move |c| wod.verify(&auth, c)).await?;
+    let wod = conn.run(move |c| wod.verify_user_ap(&auth, c)).await?;
     conn.run(|c| Wod::update(wod, c)).await.into_json()
-}
-
-#[delete("/wod/<wod_id>")]
-pub async fn delete_wod(
-    wod_id: UnverifiedId<WodId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Wod::delete(wod_id.verify(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete("/wods", format = "application/json", data = "<wod_ids>")]
-pub async fn delete_wods(
-    wod_ids: UnverifiedIds<WodId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Wod::delete_multiple(wod_ids.verify(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
 }
 
 #[post("/diary", format = "application/json", data = "<diary>")]
 pub async fn create_diary(
-    diary: Unverified<NewDiary>,
+    diary: Unverified<Diary>,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Diary>, Status> {
-    let diary = diary.verify(&auth)?;
+    let diary = diary.verify_user_ap_without_db(&auth)?;
     conn.run(|c| Diary::create(diary, c)).await.into_json()
 }
 
 #[post("/diaries", format = "application/json", data = "<diaries>")]
 pub async fn create_diaries(
-    diaries: Unverified<Vec<NewDiary>>,
+    diaries: Unverified<Vec<Diary>>,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Vec<Diary>>, Status> {
-    let diaries = diaries.verify(&auth)?;
+    let diaries = diaries.verify_user_ap_without_db(&auth)?;
     conn.run(|c| Diary::create_multiple(diaries, c))
         .await
         .into_json()
@@ -116,22 +89,24 @@ pub async fn get_diary(
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Diary>, Status> {
-    let diary_id = conn.run(move |c| diary_id.verify(&auth, c)).await?;
+    let diary_id = conn.run(move |c| diary_id.verify_user_ap(&auth, c)).await?;
     conn.run(move |c| Diary::get_by_id(diary_id, c))
         .await
         .into_json()
 }
 
-#[get("/diary/timespan/<start_date>/<end_date>")]
+#[get("/diary/timespan/<start_datetime>/<end_datetime>")]
 pub async fn get_ordered_diarys_by_timespan(
-    start_date: NaiveDateWrapper,
-    end_date: NaiveDateWrapper,
+    start_datetime: DateTimeWrapper,
+    end_datetime: DateTimeWrapper,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Vec<Diary>>, Status> {
-    conn.run(move |c| Diary::get_ordered_by_user_and_timespan(*auth, *start_date, *end_date, c))
-        .await
-        .into_json()
+    conn.run(move |c| {
+        Diary::get_ordered_by_user_and_timespan(*auth, *start_datetime, *end_datetime, c)
+    })
+    .await
+    .into_json()
 }
 
 #[get("/diary")]
@@ -147,34 +122,6 @@ pub async fn update_diary(
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Diary>, Status> {
-    let diary = conn.run(move |c| diary.verify(&auth, c)).await?;
+    let diary = conn.run(move |c| diary.verify_user_ap(&auth, c)).await?;
     conn.run(|c| Diary::update(diary, c)).await.into_json()
-}
-
-#[delete("/diary/<diary_id>")]
-pub async fn delete_diary(
-    diary_id: UnverifiedId<DiaryId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Diary::delete(diary_id.verify(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete("/diaries", format = "application/json", data = "<diary_ids>")]
-pub async fn delete_diaries(
-    diary_ids: UnverifiedIds<DiaryId>,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        Diary::delete_multiple(diary_ids.verify(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
 }

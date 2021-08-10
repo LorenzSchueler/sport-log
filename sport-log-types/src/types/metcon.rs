@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 #[cfg(feature = "full")]
 use diesel::PgConnection;
 #[cfg(feature = "full")]
@@ -9,9 +9,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
-    GetByUser, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
-    VerifyIdForUserOrAP,
+    Create, CreateMultiple, FromI64, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, ToSql,
+    Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
 };
 
 #[cfg(feature = "full")]
@@ -34,16 +33,16 @@ pub enum MetconType {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI64, ToSql, FromSql)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct MetconId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct MetconId(pub i64);
 
 #[cfg(feature = "full")]
 impl VerifyIdForUserOrAP for UnverifiedId<MetconId> {
     type Id = MetconId;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
+    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
         let metcon =
             Metcon::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if metcon.user_id == Some(**auth) {
@@ -58,7 +57,11 @@ impl VerifyIdForUserOrAP for UnverifiedId<MetconId> {
 impl VerifyIdsForUserOrAP for UnverifiedIds<MetconId> {
     type Id = MetconId;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status> {
         let metcons =
             Metcon::get_by_ids(&self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if metcons.iter().all(|metcon| metcon.user_id == Some(**auth)) {
@@ -99,6 +102,7 @@ impl UnverifiedId<MetconId> {
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -107,10 +111,7 @@ impl UnverifiedId<MetconId> {
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
-        Delete,
-        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "metcon")]
@@ -128,13 +129,21 @@ pub struct Metcon {
     pub timecap: Option<i32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[cfg(feature = "full")]
 impl VerifyForUserOrAPWithDb for Unverified<Metcon> {
     type Entity = Metcon;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Entity, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Self::Entity, Status> {
         let metcon = self.0.into_inner();
         if metcon.user_id == Some(**auth)
             && Metcon::get_by_id(metcon.id, conn)
@@ -149,24 +158,11 @@ impl VerifyForUserOrAPWithDb for Unverified<Metcon> {
     }
 }
 
-/// Please refer to [Metcon].
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "metcon")]
-pub struct NewMetcon {
-    pub user_id: Option<UserId>,
-    pub name: Option<String>,
-    pub metcon_type: MetconType,
-    pub rounds: Option<i32>,
-    pub timecap: Option<i32>,
-    pub description: Option<String>,
-}
-
 #[cfg(feature = "full")]
-impl VerifyForUserOrAPWithoutDb for Unverified<NewMetcon> {
-    type Entity = NewMetcon;
+impl VerifyForUserOrAPWithoutDb for Unverified<Metcon> {
+    type Entity = Metcon;
 
-    fn verify(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status> {
+    fn verify_user_ap_without_db(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status> {
         let metcon = self.0.into_inner();
         if metcon.user_id == Some(**auth) {
             Ok(metcon)
@@ -177,10 +173,10 @@ impl VerifyForUserOrAPWithoutDb for Unverified<NewMetcon> {
 }
 
 #[cfg(feature = "full")]
-impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<NewMetcon>> {
-    type Entity = NewMetcon;
+impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Metcon>> {
+    type Entity = Metcon;
 
-    fn verify(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status> {
+    fn verify_user_ap_without_db(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status> {
         let metcons = self.0.into_inner();
         if metcons.iter().all(|metcon| metcon.user_id == Some(**auth)) {
             Ok(metcons)
@@ -193,16 +189,16 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<NewMetcon>> {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI64, ToSql, FromSql)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct MetconMovementId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct MetconMovementId(pub i64);
 
 #[cfg(feature = "full")]
 impl VerifyIdForUserOrAP for UnverifiedId<MetconMovementId> {
     type Id = MetconMovementId;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
+    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
         let metcon_movement =
             MetconMovement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
@@ -219,7 +215,11 @@ impl VerifyIdForUserOrAP for UnverifiedId<MetconMovementId> {
 impl VerifyIdsForUserOrAP for UnverifiedIds<MetconMovementId> {
     type Id = MetconMovementId;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status> {
         let metcon_movements = MetconMovement::get_by_ids(&self.0, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?;
         let metcon_ids: Vec<_> = metcon_movements
@@ -259,6 +259,7 @@ impl UnverifiedId<MetconMovementId> {
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -267,10 +268,7 @@ impl UnverifiedId<MetconMovementId> {
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
-        Delete,
-        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "metcon_movement")]
@@ -285,41 +283,21 @@ pub struct MetconMovement {
     pub movement_unit: MovementUnit,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub weight: Option<f32>,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[cfg(feature = "full")]
 impl VerifyForUserOrAPWithDb for Unverified<MetconMovement> {
     type Entity = MetconMovement;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Entity, Status> {
-        let metcon_movement = self.0.into_inner();
-        let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
-            .map_err(|_| rocket::http::Status::Forbidden)?;
-        if metcon.user_id == Some(**auth) {
-            Ok(metcon_movement)
-        } else {
-            Err(rocket::http::Status::Forbidden)
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "metcon_movement")]
-pub struct NewMetconMovement {
-    pub metcon_id: MetconId,
-    pub movement_id: MovementId,
-    pub movement_number: i32,
-    pub count: i32,
-    pub movement_unit: MovementUnit,
-    pub weight: Option<f32>,
-}
-
-#[cfg(feature = "full")]
-impl VerifyForUserOrAPWithDb for Unverified<NewMetconMovement> {
-    type Entity = NewMetconMovement;
-
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Entity, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Self::Entity, Status> {
         let metcon_movement = self.0.into_inner();
         let metcon = Metcon::get_by_id(metcon_movement.metcon_id, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?;
@@ -332,10 +310,14 @@ impl VerifyForUserOrAPWithDb for Unverified<NewMetconMovement> {
 }
 
 #[cfg(feature = "full")]
-impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<NewMetconMovement>> {
-    type Entity = NewMetconMovement;
+impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
+    type Entity = MetconMovement;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Entity>, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status> {
         let metcon_movements = self.0.into_inner();
         let metcon_ids: Vec<_> = metcon_movements
             .iter()
@@ -358,19 +340,20 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<NewMetconMovement>> {
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct MetconSessionId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct MetconSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -380,11 +363,10 @@ pub struct MetconSessionId(pub i32);
         GetById,
         GetByIds,
         GetByUser,
-        GetAll,
+        GetByUserSync,
         Update,
-        Delete,
-        DeleteMultiple,
-        VerifyForUserOrAPWithDb
+        VerifyForUserOrAPWithDb,
+        VerifyForUserOrAPWithoutDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "metcon_session")]
@@ -394,7 +376,7 @@ pub struct MetconSession {
     pub id: MetconSessionId,
     pub user_id: UserId,
     pub metcon_id: MetconId,
-    pub datetime: NaiveDateTime,
+    pub datetime: DateTime<Utc>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub time: Option<i32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
@@ -404,20 +386,10 @@ pub struct MetconSession {
     pub rx: bool,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserOrAPWithoutDb))]
-#[cfg_attr(feature = "full", table_name = "metcon_session")]
-pub struct NewMetconSession {
-    pub user_id: UserId,
-    pub metcon_id: MetconId,
-    pub datetime: NaiveDateTime,
-    pub time: Option<i32>,
-    pub rounds: Option<i32>,
-    pub reps: Option<i32>,
-    pub rx: bool,
-    pub comments: Option<String>,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

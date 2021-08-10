@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 #[cfg(feature = "full")]
 use diesel_derive_enum::DbEnum;
 #[cfg(feature = "full")]
@@ -6,8 +7,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
-    ToSql, Update, VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
+    Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, ToSql, Update,
+    VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
 };
 
 use crate::UserId;
@@ -45,21 +46,21 @@ pub enum MovementUnit {
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForAdmin,
         VerifyIdUnchecked
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct MovementId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct MovementId(pub i64);
 
 #[cfg(feature = "full")]
 impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
     type Id = MovementId;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
+    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
         let movement =
             Movement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if movement.user_id == Some(**auth) {
@@ -74,7 +75,11 @@ impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
 impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
     type Id = MovementId;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status> {
         let movements =
             Movement::get_by_ids(&self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
         if movements
@@ -114,6 +119,7 @@ impl UnverifiedId<MovementId> {
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -122,10 +128,7 @@ impl UnverifiedId<MovementId> {
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
-        Delete,
-        DeleteMultiple,
         VerifyForAdminWithoutDb
     )
 )]
@@ -139,13 +142,21 @@ pub struct Movement {
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
     pub category: MovementCategory,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[cfg(feature = "full")]
 impl VerifyForUserOrAPWithDb for Unverified<Movement> {
     type Entity = Movement;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Entity, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Self::Entity, Status> {
         let movement = self.0.into_inner();
         if movement.user_id == Some(**auth)
             && Movement::get_by_id(movement.id, conn)
@@ -160,22 +171,11 @@ impl VerifyForUserOrAPWithDb for Unverified<Movement> {
     }
 }
 
-/// Please refer to [Movement].
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "movement")]
-pub struct NewMovement {
-    pub user_id: Option<UserId>,
-    pub name: String,
-    pub description: Option<String>,
-    pub category: MovementCategory,
-}
-
 #[cfg(feature = "full")]
-impl VerifyForUserOrAPWithoutDb for Unverified<NewMovement> {
-    type Entity = NewMovement;
+impl VerifyForUserOrAPWithoutDb for Unverified<Movement> {
+    type Entity = Movement;
 
-    fn verify(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status> {
+    fn verify_user_ap_without_db(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status> {
         let movement = self.0.into_inner();
         if movement.user_id == Some(**auth) {
             Ok(movement)
@@ -186,10 +186,10 @@ impl VerifyForUserOrAPWithoutDb for Unverified<NewMovement> {
 }
 
 #[cfg(feature = "full")]
-impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<NewMovement>> {
-    type Entity = NewMovement;
+impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
+    type Entity = Movement;
 
-    fn verify(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status> {
+    fn verify_user_ap_without_db(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status> {
         let movements = self.0.into_inner();
         if movements
             .iter()
@@ -209,32 +209,19 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<NewMovement>> {
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForAdmin
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct EormId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct EormId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Associations,
-        Identifiable,
-        Queryable,
-        AsChangeset,
-        Create,
-        CreateMultiple,
-        GetById,
-        GetByIds,
-        GetAll,
-        Update,
-        Delete,
-        DeleteMultiple,
-    )
+    derive(Associations, Identifiable, Queryable, GetById, GetByIds, GetAll)
 )]
 #[cfg_attr(feature = "full", table_name = "eorm")]
 pub struct Eorm {

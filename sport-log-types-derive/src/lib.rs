@@ -66,6 +66,29 @@ pub fn get_by_user_derive(input: TokenStream) -> TokenStream {
     impl_get_by_user(&ast)
 }
 
+/// Derives `sport_log_types::GetByUserSync`.
+///
+/// This macro only works if the following conditions are satisfied:
+/// - the corresponding table has the same name like this type but in snake_case
+/// - the table has a column `user_id` which references the table `user`.
+/// - the table has a column `last_sync` with type `timestamptz`.
+#[proc_macro_derive(GetByUserSync)]
+pub fn get_by_user_and_last_sync_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_get_by_user_and_last_sync(&ast)
+}
+
+/// Derives `sport_log_types::GetBySync`.
+///
+/// This macro only works if the following conditions are satisfied:
+/// - the corresponding table has the same name like this type but in snake_case
+/// - the table has a column `last_sync` with type `timestamptz`.
+#[proc_macro_derive(GetBySync)]
+pub fn get_by_last_sync_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_get_by_last_sync(&ast)
+}
+
 /// Derives `sport_log_types::GetAll`.
 ///
 /// This macro only works if the following condition is satisfied:
@@ -85,28 +108,6 @@ pub fn get_all_derive(input: TokenStream) -> TokenStream {
 pub fn update_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_update(&ast)
-}
-
-/// Derives `sport_log_types::Delete`.
-///
-/// This macro only works if the following conditions are satisfied:
-/// - the corresponding table has the same name like this type but in snake_case
-/// - there is a type called `[ThisTypeName]Id` which is the primary key of the table.
-#[proc_macro_derive(Delete)]
-pub fn delete_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_delete(&ast)
-}
-
-/// Derives `sport_log_types::DeleteMultiple`.
-///
-/// This macro only works if the following conditions are satisfied:
-/// - the corresponding table has the same name like this type but in snake_case
-/// - there is a type called `[ThisTypeName]Id` which is the primary key of the table and a field `id` with this type.
-#[proc_macro_derive(DeleteMultiple)]
-pub fn delete_multiple_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_delete_multiple(&ast)
 }
 
 #[proc_macro_derive(VerifyIdForUser)]
@@ -187,27 +188,27 @@ pub fn verify_unchecked_derive(input: TokenStream) -> TokenStream {
     impl_verify_unchecked(&ast)
 }
 
-/// Derives `sport_log_types::FromI32`.
+/// Derives `sport_log_types::FromI64`.
 ///
 /// This macro only works if the type is a one tuple struct of i32.
-#[proc_macro_derive(FromI32)]
+#[proc_macro_derive(FromI64)]
 pub fn form_i32_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_from_i32(&ast)
+    impl_from_i64(&ast)
 }
 
-/// Derives `diesel::types::ToSql<diesel::sql_types::Integer, diesel::pg::Pg>`.
+/// Derives `diesel::types::ToSql<diesel::sql_types::BigInt, diesel::pg::Pg>`.
 ///
-/// This macro only works if the type implements `sport_log_types::FromI32` which can also be derived using [FromI32].
+/// This macro only works if the type implements `sport_log_types::FromI64` which can also be derived using [FromI64].
 #[proc_macro_derive(ToSql)]
 pub fn unverified_inner_int_to_sql(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_to_sql(&ast)
 }
 
-/// Derives `diesel::types::FromSql<diesel::sql_types::Integer, diesel::pg::Pg>`.
+/// Derives `diesel::types::FromSql<diesel::sql_types::BigInt, diesel::pg::Pg>`.
 ///
-/// This macro only works if the type implements `sport_log_types::FromI32` which can also be derived using [FromI32].
+/// This macro only works if the type implements `sport_log_types::FromI64` which can also be derived using [FromI64].
 #[proc_macro_derive(FromSql)]
 pub fn unverified_inner_int_drom_sql(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();

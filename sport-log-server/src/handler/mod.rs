@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use chrono::{DateTime, NaiveTime, Utc};
 use diesel::{
     result::{DatabaseErrorKind as DbError, Error as DieselError},
     QueryResult,
@@ -36,17 +36,8 @@ impl<T> IntoJson<T> for QueryResult<T> {
     }
 }
 
-pub struct NaiveDateWrapper(NaiveDate);
 pub struct NaiveTimeWrapper(NaiveTime);
-pub struct NaiveDateTimeWrapper(NaiveDateTime);
-
-impl<'v> FromParam<'v> for NaiveDateWrapper {
-    type Error = &'v str;
-
-    fn from_param(param: &'v str) -> Result<Self, Self::Error> {
-        Ok(Self(param.parse().map_err(|_| param)?))
-    }
-}
+pub struct DateTimeWrapper(DateTime<Utc>);
 
 impl<'v> FromParam<'v> for NaiveTimeWrapper {
     type Error = &'v str;
@@ -56,19 +47,11 @@ impl<'v> FromParam<'v> for NaiveTimeWrapper {
     }
 }
 
-impl<'v> FromParam<'v> for NaiveDateTimeWrapper {
+impl<'v> FromParam<'v> for DateTimeWrapper {
     type Error = &'v str;
 
-    fn from_param(param: &'v str) -> Result<Self, Self::Error> {
-        Ok(Self(param.parse().map_err(|_| param)?))
-    }
-}
-
-impl Deref for NaiveDateWrapper {
-    type Target = NaiveDate;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
+    fn from_param(param: &'v str) -> Result<DateTimeWrapper, Self::Error> {
+        Ok(DateTimeWrapper(param.parse().map_err(|_| param)?))
     }
 }
 
@@ -80,8 +63,8 @@ impl Deref for NaiveTimeWrapper {
     }
 }
 
-impl Deref for NaiveDateTimeWrapper {
-    type Target = NaiveDateTime;
+impl Deref for DateTimeWrapper {
+    type Target = DateTime<Utc>;
 
     fn deref(&self) -> &Self::Target {
         &self.0

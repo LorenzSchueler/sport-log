@@ -1,15 +1,15 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthAdmin, AuthUser, Create, Db, Delete, GetById, NewUser, Unverified, Update, User,
-    VerifyForUserWithDb, VerifyUnchecked, CONFIG,
+    AuthAdmin, AuthUser, Create, Db, GetById, Unverified, Update, User, VerifyForUserWithDb,
+    VerifyUnchecked, CONFIG,
 };
 
 use crate::handler::IntoJson;
 
 #[post("/adm/user", format = "application/json", data = "<user>")]
 pub async fn adm_create_user(
-    user: Unverified<NewUser>,
+    user: Unverified<User>,
     _auth: AuthAdmin,
     conn: Db,
 ) -> Result<Json<User>, Status> {
@@ -18,7 +18,7 @@ pub async fn adm_create_user(
 }
 
 #[post("/user", format = "application/json", data = "<user>")]
-pub async fn create_user(user: Unverified<NewUser>, conn: Db) -> Result<Json<User>, Status> {
+pub async fn create_user(user: Unverified<User>, conn: Db) -> Result<Json<User>, Status> {
     if !CONFIG.user_self_registration {
         return Err(Status::Forbidden);
     }
@@ -39,7 +39,7 @@ pub async fn update_user(
     auth: AuthUser,
     conn: Db,
 ) -> Result<Json<User>, Status> {
-    let user = conn.run(move |c| user.verify(&auth, c)).await?;
+    let user = conn.run(move |c| user.verify_user(&auth, c)).await?;
     conn.run(|c| User::update(user, c)).await.into_json()
 }
 

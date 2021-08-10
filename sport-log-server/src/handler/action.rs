@@ -3,16 +3,14 @@ use rocket::{http::Status, serde::json::Json};
 use sport_log_types::{
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
     ActionRuleId, AuthAP, AuthAdmin, AuthUser, CreatableActionRule, Create, CreateMultiple, Db,
-    DeletableActionEvent, Delete, DeleteMultiple, ExecutableActionEvent, GetAll, GetById,
-    GetByUser, NewAction, NewActionEvent, NewActionProvider, NewActionRule, Unverified,
-    UnverifiedId, UnverifiedIds, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
+    DeletableActionEvent, ExecutableActionEvent, GetAll, GetById, GetByUser, Unverified,
+    UnverifiedId, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForUser,
-    VerifyIdUnchecked, VerifyIdsForActionProvider, VerifyIdsForAdmin, VerifyIdsForUser,
-    VerifyMultipleForActionProviderWithoutDb, VerifyMultipleForAdminWithoutDb,
+    VerifyIdUnchecked, VerifyMultipleForActionProviderWithoutDb, VerifyMultipleForAdminWithoutDb,
     VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
 };
 
-use crate::handler::{IntoJson, NaiveDateTimeWrapper};
+use crate::handler::{DateTimeWrapper, IntoJson};
 
 #[post(
     "/adm/action_provider",
@@ -20,7 +18,7 @@ use crate::handler::{IntoJson, NaiveDateTimeWrapper};
     data = "<action_provider>"
 )]
 pub async fn adm_create_action_provider(
-    action_provider: Unverified<NewActionProvider>,
+    action_provider: Unverified<ActionProvider>,
     auth: AuthAdmin,
     conn: Db,
 ) -> Result<Json<ActionProvider>, Status> {
@@ -36,7 +34,7 @@ pub async fn adm_create_action_provider(
     data = "<action_provider>"
 )]
 pub async fn ap_create_action_provider(
-    action_provider: Unverified<NewActionProvider>,
+    action_provider: Unverified<ActionProvider>,
     conn: Db,
 ) -> Result<Json<ActionProvider>, Status> {
     if !CONFIG.ap_self_registration {
@@ -74,34 +72,24 @@ pub async fn get_action_providers(
     conn.run(|c| ActionProvider::get_all(c)).await.into_json()
 }
 
-#[delete("/ap/action_provider")]
-pub async fn ap_delete_action_provider(auth: AuthAP, conn: Db) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionProvider::delete(*auth, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
 #[post("/ap/action", format = "application/json", data = "<action>")]
 pub async fn ap_create_action(
-    action: Unverified<NewAction>,
+    action: Unverified<Action>,
     auth: AuthAP,
     conn: Db,
 ) -> Result<Json<Action>, Status> {
-    let action = action.verify_ap(&auth)?;
+    let action = action.verify_ap_without_db(&auth)?;
     conn.run(|c| Action::create(action, c)).await.into_json()
 }
 
 #[post("/ap/actions", format = "application/json", data = "<actions>")]
 pub async fn ap_create_actions(
-    actions: Unverified<Vec<NewAction>>,
+    actions: Unverified<Vec<Action>>,
     auth: AuthAP,
     conn: Db,
 ) -> Result<Json<Vec<Action>>, Status> {
-    let s = actions.verify_ap(&auth)?;
-    conn.run(|c| Action::create_multiple(s, c))
+    let actions = actions.verify_ap_without_db(&auth)?;
+    conn.run(|c| Action::create_multiple(actions, c))
         .await
         .into_json()
 }
@@ -132,11 +120,11 @@ pub async fn get_actions(_auth: AuthUser, conn: Db) -> Result<Json<Vec<Action>>,
 
 #[post("/action_rule", format = "application/json", data = "<action_rule>")]
 pub async fn create_action_rule(
-    action_rule: Unverified<NewActionRule>,
+    action_rule: Unverified<ActionRule>,
     auth: AuthUser,
     conn: Db,
 ) -> Result<Json<ActionRule>, Status> {
-    let action_rule = action_rule.verify(&auth)?;
+    let action_rule = action_rule.verify_user_without_db(&auth)?;
     conn.run(|c| ActionRule::create(action_rule, c))
         .await
         .into_json()
@@ -144,11 +132,11 @@ pub async fn create_action_rule(
 
 #[post("/action_rules", format = "application/json", data = "<action_rules>")]
 pub async fn create_action_rules(
-    action_rules: Unverified<Vec<NewActionRule>>,
+    action_rules: Unverified<Vec<ActionRule>>,
     auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<ActionRule>>, Status> {
-    let action_rules = action_rules.verify(&auth)?;
+    let action_rules = action_rules.verify_user_without_db(&auth)?;
     conn.run(|c| ActionRule::create_multiple(action_rules, c))
         .await
         .into_json()
@@ -160,7 +148,9 @@ pub async fn get_action_rule(
     auth: AuthUser,
     conn: Db,
 ) -> Result<Json<ActionRule>, Status> {
-    let action_rule_id = conn.run(move |c| action_rule_id.verify(&auth, c)).await?;
+    let action_rule_id = conn
+        .run(move |c| action_rule_id.verify_user(&auth, c))
+        .await?;
     conn.run(move |c| ActionRule::get_by_id(action_rule_id, c))
         .await
         .into_json()
@@ -191,51 +181,19 @@ pub async fn update_action_rule(
     auth: AuthUser,
     conn: Db,
 ) -> Result<Json<ActionRule>, Status> {
-    let action_rule = conn.run(move |c| action_rule.verify(&auth, c)).await?;
+    let action_rule = conn.run(move |c| action_rule.verify_user(&auth, c)).await?;
     conn.run(|c| ActionRule::update(action_rule, c))
         .await
         .into_json()
 }
 
-#[delete("/action_rule/<action_rule_id>")]
-pub async fn delete_action_rule(
-    action_rule_id: UnverifiedId<ActionRuleId>,
-    auth: AuthUser,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionRule::delete(action_rule_id.verify(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete(
-    "/action_rules",
-    format = "application/json",
-    data = "<action_rule_ids>"
-)]
-pub async fn delete_action_rules(
-    action_rule_ids: UnverifiedIds<ActionRuleId>,
-    auth: AuthUser,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionRule::delete_multiple(action_rule_ids.verify(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
 #[post("/action_event", format = "application/json", data = "<action_event>")]
 pub async fn create_action_event(
-    action_event: Unverified<NewActionEvent>,
+    action_event: Unverified<ActionEvent>,
     auth: AuthUser,
     conn: Db,
 ) -> Result<Json<ActionEvent>, Status> {
-    let action_event = action_event.verify(&auth)?;
+    let action_event = action_event.verify_user_without_db(&auth)?;
     conn.run(|c| ActionEvent::create(action_event, c))
         .await
         .into_json()
@@ -247,7 +205,7 @@ pub async fn create_action_event(
     data = "<action_events>"
 )]
 pub async fn adm_create_action_events(
-    action_events: Unverified<Vec<NewActionEvent>>,
+    action_events: Unverified<Vec<ActionEvent>>,
     auth: AuthAdmin,
     conn: Db,
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
@@ -263,11 +221,11 @@ pub async fn adm_create_action_events(
     data = "<action_events>"
 )]
 pub async fn create_action_events(
-    action_events: Unverified<Vec<NewActionEvent>>,
+    action_events: Unverified<Vec<ActionEvent>>,
     auth: AuthUser,
     conn: Db,
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
-    let action_events = action_events.verify(&auth)?;
+    let action_events = action_events.verify_user_without_db(&auth)?;
     conn.run(|c| ActionEvent::create_multiple(action_events, c))
         .await
         .into_json()
@@ -279,7 +237,9 @@ pub async fn get_action_event(
     auth: AuthUser,
     conn: Db,
 ) -> Result<Json<ActionEvent>, Status> {
-    let action_event_id = conn.run(move |c| action_event_id.verify(&auth, c)).await?;
+    let action_event_id = conn
+        .run(move |c| action_event_id.verify_user(&auth, c))
+        .await?;
     conn.run(move |c| ActionEvent::get_by_id(action_event_id, c))
         .await
         .into_json()
@@ -310,92 +270,28 @@ pub async fn update_action_event(
     auth: AuthUser,
     conn: Db,
 ) -> Result<Json<ActionEvent>, Status> {
-    let action_event = conn.run(move |c| action_event.verify(&auth, c)).await?;
+    let action_event = conn
+        .run(move |c| action_event.verify_user(&auth, c))
+        .await?;
     conn.run(|c| ActionEvent::update(action_event, c))
         .await
         .into_json()
 }
 
-#[delete("/action_event/<action_event_id>")]
-pub async fn delete_action_event(
-    action_event_id: UnverifiedId<ActionEventId>,
-    auth: AuthUser,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionEvent::delete(action_event_id.verify(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete("/ap/action_event/<action_event_id>")]
-pub async fn ap_delete_action_event(
-    action_event_id: UnverifiedId<ActionEventId>,
-    auth: AuthAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionEvent::delete(action_event_id.verify_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete(
-    "/action_events",
+#[put(
+    "/adm/action_event",
     format = "application/json",
-    data = "<action_event_ids>"
+    data = "<action_event>"
 )]
-pub async fn delete_action_events(
-    action_event_ids: UnverifiedIds<ActionEventId>,
-    auth: AuthUser,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionEvent::delete_multiple(action_event_ids.verify(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete(
-    "/ap/action_events",
-    format = "application/json",
-    data = "<action_event_ids>"
-)]
-pub async fn ap_delete_action_events(
-    action_event_ids: UnverifiedIds<ActionEventId>,
-    auth: AuthAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionEvent::delete_multiple(action_event_ids.verify_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete(
-    "/adm/action_events",
-    format = "application/json",
-    data = "<action_event_ids>"
-)]
-pub async fn adm_delete_action_events(
-    action_event_ids: UnverifiedIds<ActionEventId>,
+pub async fn adm_update_action_event(
+    action_event: Unverified<ActionEvent>,
     auth: AuthAdmin,
     conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionEvent::delete_multiple(action_event_ids.verify_adm(&auth)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
+) -> Result<Json<ActionEvent>, Status> {
+    let action_event = conn.run(move |_| action_event.verify_adm(&auth)).await?;
+    conn.run(|c| ActionEvent::update(action_event, c))
+        .await
+        .into_json()
 }
 
 #[get("/adm/creatable_action_rule")]
@@ -420,8 +316,8 @@ pub async fn ap_get_executable_action_events(
 
 #[get("/ap/executable_action_event/timespan/<start_datetime>/<end_datetime>")]
 pub async fn ap_get_ordered_executable_action_events_by_timespan(
-    start_datetime: NaiveDateTimeWrapper,
-    end_datetime: NaiveDateTimeWrapper,
+    start_datetime: DateTimeWrapper,
+    end_datetime: DateTimeWrapper,
     auth: AuthAP,
     conn: Db,
 ) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {
