@@ -1,15 +1,10 @@
 
 import 'package:fixnum/fixnum.dart';
-import 'package:flutter/services.dart';
 import 'package:moor/moor.dart';
 import 'package:sport_log/database/database.dart';
 import 'metcon_tables.dart';
 
 part 'metcons_deletion_dao.g.dart';
-
-enum DbException {
-  metconHasMetconSession,
-}
 
 @UseDao(
   tables: [Metcons, MetconSessions, MetconMovements],
@@ -25,7 +20,7 @@ class MetconsDeletionDao extends DatabaseAccessor<Database> with _$MetconsDeleti
     }
     return transaction(() async {
       await deleteMetconMovementsOfMetcon(id);
-      await unsafeDeleteMetcon(id);
+      await _unsafeDeleteMetcon(id);
     });
   }
 
@@ -35,7 +30,7 @@ class MetconsDeletionDao extends DatabaseAccessor<Database> with _$MetconsDeleti
     ).write(const MetconMovementsCompanion(deleted: Value(true)));
   }
 
-  Future<void> unsafeDeleteMetcon(Int64 id) async {
+  Future<void> _unsafeDeleteMetcon(Int64 id) async {
     (update(metcons)
       ..where((m) => m.id.equals(id.toInt()) & m.deleted.equals(false))
     ).write(const MetconsCompanion(deleted: Value(true)));

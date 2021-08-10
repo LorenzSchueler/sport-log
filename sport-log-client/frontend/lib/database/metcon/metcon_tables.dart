@@ -26,8 +26,8 @@ class Metcons extends Table {
 @UseRowClass(MetconMovement)
 class MetconMovements extends Table {
   IntColumn get id => integer().map(const DbIdConverter())();
-  IntColumn get metconId => integer().map(const DbIdConverter())();
-  IntColumn get movementId => integer().map(const DbIdConverter())();
+  IntColumn get metconId => integer().map(const DbIdConverter()).customConstraint("NOT NULL REFERENCES metcons(id)")();
+  IntColumn get movementId => integer().map(const DbIdConverter())(); // TODO: foreign key
   IntColumn get movementNumber => integer()();
   IntColumn get count => integer()();
   IntColumn get unit => intEnum<MovementUnit>()();
@@ -45,7 +45,7 @@ class MetconMovements extends Table {
 class MetconSessions extends Table {
   IntColumn get id => integer().map(const DbIdConverter())();
   IntColumn get userId => integer().map(const DbIdConverter())();
-  IntColumn get metconId => integer().map(const DbIdConverter())();
+  IntColumn get metconId => integer().map(const DbIdConverter()).customConstraint("NOT NULL REFERENCES metcons(id)")();
   DateTimeColumn get datetime => dateTime()();
   IntColumn get time => integer().nullable()();
   IntColumn get rounds => integer().nullable()();

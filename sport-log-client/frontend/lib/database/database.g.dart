@@ -464,7 +464,9 @@ class $MetconMovementsTable extends MetconMovements
   final VerificationMeta _metconIdMeta = const VerificationMeta('metconId');
   late final GeneratedColumnWithTypeConverter<Int64, int?> metconId =
       GeneratedColumn<int?>('metcon_id', aliasedName, false,
-              typeName: 'INTEGER', requiredDuringInsert: true)
+              typeName: 'INTEGER',
+              requiredDuringInsert: true,
+              $customConstraints: 'NOT NULL REFERENCES metcons(id)')
           .withConverter<Int64>($MetconMovementsTable.$converter1);
   final VerificationMeta _movementIdMeta = const VerificationMeta('movementId');
   late final GeneratedColumnWithTypeConverter<Int64, int?> movementId =
@@ -794,7 +796,9 @@ class $MetconSessionsTable extends MetconSessions
   final VerificationMeta _metconIdMeta = const VerificationMeta('metconId');
   late final GeneratedColumnWithTypeConverter<Int64, int?> metconId =
       GeneratedColumn<int?>('metcon_id', aliasedName, false,
-              typeName: 'INTEGER', requiredDuringInsert: true)
+              typeName: 'INTEGER',
+              requiredDuringInsert: true,
+              $customConstraints: 'NOT NULL REFERENCES metcons(id)')
           .withConverter<Int64>($MetconSessionsTable.$converter2);
   final VerificationMeta _datetimeMeta = const VerificationMeta('datetime');
   late final GeneratedColumn<DateTime?> datetime = GeneratedColumn<DateTime?>(
@@ -961,6 +965,8 @@ abstract class _$Database extends GeneratedDatabase {
   late final $MetconSessionsTable metconSessions = $MetconSessionsTable(this);
   late final MetconsDeletionDao metconsDeletionDao =
       MetconsDeletionDao(this as Database);
+  late final MetconsCreationDao metconsCreationDao =
+      MetconsCreationDao(this as Database);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override

@@ -1,9 +1,10 @@
 
-import 'package:moor_inspector/moor_inspector.dart';
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
+import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/pages/movements/movements_cubit.dart';
@@ -16,8 +17,14 @@ import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+void debugMain() async {
+  final db = Database.instance!;
+  db.metconsCreationDao.createMetconSession(MetconSession(id: Int64(23434), userId: Int64(23), metconId: Int64(2323434), datetime: DateTime.now(), time: 34, rounds: null, reps: null, rx: true, comments: null, deleted: false));
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  debugMain();
   AuthenticationRepository? authRepo;
   authRepo = await AuthenticationRepository.getInstance();
   User? user = await authRepo.getUser();
