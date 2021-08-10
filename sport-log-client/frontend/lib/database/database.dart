@@ -6,6 +6,7 @@ import 'package:moor/moor.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sport_log/config.dart';
+import 'package:sport_log/database/metcon/metcon_sessions.dart';
 import 'package:sport_log/database/metcon/metcons.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/metcon/metcon_movements.dart';
@@ -21,8 +22,8 @@ LazyDatabase _openConnection() {
 }
 
 @UseMoor(
-  tables: [Metcons, MetconMovements],
-  daos: [MetconsDao, MetconMovementsDao]
+  tables: [Metcons, MetconMovements, MetconSessions],
+  daos: [MetconsDao, MetconMovementsDao, MetconSessionsDao]
 )
 class Database extends _$Database {
 

@@ -34,13 +34,12 @@ class MetconMovements extends Table {
 class MetconMovementsDao extends DatabaseAccessor<Database> with _$MetconMovementsDaoMixin {
   MetconMovementsDao(Database attachedDatabase) : super(attachedDatabase);
 
-
   Future<void> insertMetconMovement(MetconMovement metconMovement) async {
     assert(metconMovement.deleted == false);
     into(metconMovements).insert(metconMovement);
   }
 
-  Future<List<MetconMovement>> getAllMetcons() async {
+  Future<List<MetconMovement>> getAllMetconMovements() async {
     return (select(metconMovements)
       ..where((mm) => mm.deleted.equals(false))
     ).get();

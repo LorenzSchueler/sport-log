@@ -1,12 +1,14 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:moor/moor.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/id_serialization.dart';
 
 part 'metcon_session.g.dart';
 
 @JsonSerializable()
-class MetconSession {
+class MetconSession extends Insertable<MetconSession>{
   MetconSession({
     required this.id,
     required this.userId,
@@ -33,4 +35,20 @@ class MetconSession {
 
   factory MetconSession.fromJson(Map<String, dynamic> json) => _$MetconSessionFromJson(json);
   Map<String, dynamic> toJson() => _$MetconSessionToJson(this);
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    return MetconSessionsCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      metconId: Value(metconId),
+      datetime: Value(datetime),
+      time: Value(time),
+      rounds: Value(rounds),
+      reps: Value(reps),
+      rx: Value(rx),
+      comments: Value(comments),
+      deleted: Value(deleted),
+    ).toColumns(false);
+  }
 }
