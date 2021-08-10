@@ -1,5 +1,6 @@
 
 import 'package:fixnum/fixnum.dart';
+import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/database/database.dart';
@@ -19,7 +20,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 void debugMain() async {
   final db = Database.instance!;
-  db.metconsCreationDao.createMetconSession(MetconSession(id: Int64(23434), userId: Int64(23), metconId: Int64(2323434), datetime: DateTime.now(), time: 34, rounds: null, reps: null, rx: true, comments: null, deleted: false));
+  db.metconsCreationDao.createMetcon(MetconDescription(
+    metcon: Metcon(id: Int64(23), userId: Int64(23), name: "asdf", metconType: MetconType.amrap, rounds: 3, timecap: null, description: "hallo", deleted: false),
+    moves: []
+  ));
+  final Result result = await db.metconsCreationDao.createMetconSession(MetconSession(id: Int64(23434), userId: Int64(23), metconId: Int64(23), datetime: DateTime.now(), time: 34, rounds: null, reps: null, rx: true, comments: null, deleted: false));
+  print(result.success.runtimeType);
 }
 
 void main() async {

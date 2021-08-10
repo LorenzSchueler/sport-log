@@ -20,6 +20,8 @@
 * [ ] add to string methods for debugging
 * [ ] length restrictions for string inputs
 * [ ] restrict int numbers coming from user input
+* [ ] verify interfaces on types
+* [ ] deleted field not required
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)

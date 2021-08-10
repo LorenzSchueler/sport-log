@@ -1,6 +1,7 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:moor/moor.dart';
+import 'package:result_type/result_type.dart';
 import 'package:sport_log/database/database.dart';
 import 'metcon_tables.dart';
 
@@ -13,14 +14,15 @@ part 'metcons_deletion_dao.g.dart';
 class MetconsDeletionDao extends DatabaseAccessor<Database> with _$MetconsDeletionDaoMixin {
   MetconsDeletionDao(Database attachedDatabase) : super(attachedDatabase);
 
-  Future<void> deleteMetcon(Int64 id) async {
+  Future<Result<void, DbException>> deleteMetcon(Int64 id) async {
     if (await metconHasMetconSession(id.toInt()).getSingleOrNull() != null) {
       // there is still a metcon session left
-      throw DbException.metconHasMetconSession;
+      return Failure(DbException.metconHasMetconSession);
     }
     return transaction(() async {
       await deleteMetconMovementsOfMetcon(id);
       await _unsafeDeleteMetcon(id);
+      return Success(null);
     });
   }
 
