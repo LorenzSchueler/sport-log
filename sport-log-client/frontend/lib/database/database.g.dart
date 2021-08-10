@@ -957,19 +957,269 @@ class $MetconSessionsTable extends MetconSessions
   static TypeConverter<Int64, int> $converter2 = const DbIdConverter();
 }
 
+class MovementsCompanion extends UpdateCompanion<Movement> {
+  final Value<Int64> id;
+  final Value<Int64?> userId;
+  final Value<String> name;
+  final Value<String?> description;
+  final Value<MovementCategory> category;
+  final Value<bool> deleted;
+  final Value<DateTime> lastModified;
+  final Value<bool> isNew;
+  const MovementsCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.description = const Value.absent(),
+    this.category = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.lastModified = const Value.absent(),
+    this.isNew = const Value.absent(),
+  });
+  MovementsCompanion.insert({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    required String name,
+    this.description = const Value.absent(),
+    required MovementCategory category,
+    this.deleted = const Value.absent(),
+    this.lastModified = const Value.absent(),
+    this.isNew = const Value.absent(),
+  })  : name = Value(name),
+        category = Value(category);
+  static Insertable<Movement> custom({
+    Expression<Int64>? id,
+    Expression<Int64?>? userId,
+    Expression<String>? name,
+    Expression<String?>? description,
+    Expression<MovementCategory>? category,
+    Expression<bool>? deleted,
+    Expression<DateTime>? lastModified,
+    Expression<bool>? isNew,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (name != null) 'name': name,
+      if (description != null) 'description': description,
+      if (category != null) 'category': category,
+      if (deleted != null) 'deleted': deleted,
+      if (lastModified != null) 'last_modified': lastModified,
+      if (isNew != null) 'is_new': isNew,
+    });
+  }
+
+  MovementsCompanion copyWith(
+      {Value<Int64>? id,
+      Value<Int64?>? userId,
+      Value<String>? name,
+      Value<String?>? description,
+      Value<MovementCategory>? category,
+      Value<bool>? deleted,
+      Value<DateTime>? lastModified,
+      Value<bool>? isNew}) {
+    return MovementsCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      category: category ?? this.category,
+      deleted: deleted ?? this.deleted,
+      lastModified: lastModified ?? this.lastModified,
+      isNew: isNew ?? this.isNew,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      final converter = $MovementsTable.$converter0;
+      map['id'] = Variable<int>(converter.mapToSql(id.value)!);
+    }
+    if (userId.present) {
+      final converter = $MovementsTable.$converter1;
+      map['user_id'] = Variable<int?>(converter.mapToSql(userId.value));
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String?>(description.value);
+    }
+    if (category.present) {
+      final converter = $MovementsTable.$converter2;
+      map['category'] = Variable<int>(converter.mapToSql(category.value)!);
+    }
+    if (deleted.present) {
+      map['deleted'] = Variable<bool>(deleted.value);
+    }
+    if (lastModified.present) {
+      map['last_modified'] = Variable<DateTime>(lastModified.value);
+    }
+    if (isNew.present) {
+      map['is_new'] = Variable<bool>(isNew.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MovementsCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('category: $category, ')
+          ..write('deleted: $deleted, ')
+          ..write('lastModified: $lastModified, ')
+          ..write('isNew: $isNew')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MovementsTable extends Movements
+    with TableInfo<$MovementsTable, Movement> {
+  final GeneratedDatabase _db;
+  final String? _alias;
+  $MovementsTable(this._db, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumnWithTypeConverter<Int64, int?> id =
+      GeneratedColumn<int?>('id', aliasedName, false,
+              typeName: 'INTEGER', requiredDuringInsert: false)
+          .withConverter<Int64>($MovementsTable.$converter0);
+  final VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  late final GeneratedColumnWithTypeConverter<Int64, int?> userId =
+      GeneratedColumn<int?>('user_id', aliasedName, true,
+              typeName: 'INTEGER', requiredDuringInsert: false)
+          .withConverter<Int64>($MovementsTable.$converter1);
+  final VerificationMeta _nameMeta = const VerificationMeta('name');
+  late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
+      'name', aliasedName, false,
+      typeName: 'TEXT', requiredDuringInsert: true);
+  final VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  late final GeneratedColumn<String?> description = GeneratedColumn<String?>(
+      'description', aliasedName, true,
+      typeName: 'TEXT', requiredDuringInsert: false);
+  final VerificationMeta _categoryMeta = const VerificationMeta('category');
+  late final GeneratedColumnWithTypeConverter<MovementCategory, int?> category =
+      GeneratedColumn<int?>('category', aliasedName, false,
+              typeName: 'INTEGER', requiredDuringInsert: true)
+          .withConverter<MovementCategory>($MovementsTable.$converter2);
+  final VerificationMeta _deletedMeta = const VerificationMeta('deleted');
+  late final GeneratedColumn<bool?> deleted = GeneratedColumn<bool?>(
+      'deleted', aliasedName, false,
+      typeName: 'INTEGER',
+      requiredDuringInsert: false,
+      defaultConstraints: 'CHECK (deleted IN (0, 1))',
+      defaultValue: const Constant(true));
+  final VerificationMeta _lastModifiedMeta =
+      const VerificationMeta('lastModified');
+  late final GeneratedColumn<DateTime?> lastModified =
+      GeneratedColumn<DateTime?>('last_modified', aliasedName, false,
+          typeName: 'INTEGER',
+          requiredDuringInsert: false,
+          clientDefault: () => DateTime.now());
+  final VerificationMeta _isNewMeta = const VerificationMeta('isNew');
+  late final GeneratedColumn<bool?> isNew = GeneratedColumn<bool?>(
+      'is_new', aliasedName, false,
+      typeName: 'INTEGER',
+      requiredDuringInsert: false,
+      defaultConstraints: 'CHECK (is_new IN (0, 1))',
+      defaultValue: const Constant(true));
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, userId, name, description, category, deleted, lastModified, isNew];
+  @override
+  String get aliasedName => _alias ?? 'movements';
+  @override
+  String get actualTableName => 'movements';
+  @override
+  VerificationContext validateIntegrity(Insertable<Movement> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    context.handle(_idMeta, const VerificationResult.success());
+    context.handle(_userIdMeta, const VerificationResult.success());
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    }
+    context.handle(_categoryMeta, const VerificationResult.success());
+    if (data.containsKey('deleted')) {
+      context.handle(_deletedMeta,
+          deleted.isAcceptableOrUnknown(data['deleted']!, _deletedMeta));
+    }
+    if (data.containsKey('last_modified')) {
+      context.handle(
+          _lastModifiedMeta,
+          lastModified.isAcceptableOrUnknown(
+              data['last_modified']!, _lastModifiedMeta));
+    }
+    if (data.containsKey('is_new')) {
+      context.handle(
+          _isNewMeta, isNew.isAcceptableOrUnknown(data['is_new']!, _isNewMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Movement map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Movement(
+      id: $MovementsTable.$converter0.mapToDart(const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id']))!,
+      userId: $MovementsTable.$converter1.mapToDart(const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}user_id'])),
+      name: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
+      description: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}description']),
+      category: $MovementsTable.$converter2.mapToDart(const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}category']))!,
+      deleted: const BoolType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}deleted'])!,
+    );
+  }
+
+  @override
+  $MovementsTable createAlias(String alias) {
+    return $MovementsTable(_db, alias);
+  }
+
+  static TypeConverter<Int64, int> $converter0 = const DbIdConverter();
+  static TypeConverter<Int64, int> $converter1 = const DbIdConverter();
+  static TypeConverter<MovementCategory, int> $converter2 =
+      const EnumIndexConverter<MovementCategory>(MovementCategory.values);
+}
+
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   late final $MetconsTable metcons = $MetconsTable(this);
   late final $MetconMovementsTable metconMovements =
       $MetconMovementsTable(this);
   late final $MetconSessionsTable metconSessions = $MetconSessionsTable(this);
+  late final $MovementsTable movements = $MovementsTable(this);
   late final MetconsDeletionDao metconsDeletionDao =
       MetconsDeletionDao(this as Database);
   late final MetconsCreationDao metconsCreationDao =
       MetconsCreationDao(this as Database);
+  late final MovementsDao movementsDao = MovementsDao(this as Database);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [metcons, metconMovements, metconSessions];
+      [metcons, metconMovements, metconSessions, movements];
 }
