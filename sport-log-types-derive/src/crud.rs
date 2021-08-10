@@ -141,39 +141,3 @@ pub fn impl_update(ast: &syn::DeriveInput) -> TokenStream {
     };
     gen.into()
 }
-
-pub fn impl_delete(ast: &syn::DeriveInput) -> TokenStream {
-    let typename = &ast.ident;
-    let (idtypename, _, idparamname, tablename) = get_identifiers(typename);
-
-    let gen = quote! {
-        use diesel::prelude::*;
-
-        impl crate::Delete for #typename {
-            type Id = #idtypename;
-
-            fn delete(#idparamname: Self::Id, conn: &PgConnection) -> QueryResult<usize> {
-                diesel::delete(#tablename::table.find(#idparamname)).execute(conn)
-            }
-        }
-    };
-    gen.into()
-}
-
-pub fn impl_delete_multiple(ast: &syn::DeriveInput) -> TokenStream {
-    let typename = &ast.ident;
-    let (idtypename, _, idparamname, tablename) = get_identifiers(typename);
-
-    let gen = quote! {
-        use diesel::prelude::*;
-
-        impl crate::DeleteMultiple for #typename {
-            type Id = #idtypename;
-
-            fn delete_multiple(#idparamname: Vec<Self::Id>, conn: &PgConnection) -> QueryResult<usize> {
-                diesel::delete(#tablename::table.filter(#tablename::columns::id.eq_any(#idparamname))).execute(conn)
-            }
-        }
-    };
-    gen.into()
-}

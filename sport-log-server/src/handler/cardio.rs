@@ -2,7 +2,7 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
     AuthUserOrAP, CardioSession, CardioSessionDescription, CardioSessionId, Create, CreateMultiple,
-    Db, Delete, DeleteMultiple, GetById, GetByUser, Route, RouteId, Unverified, UnverifiedId,
+    Db,   GetById, GetByUser, Route, RouteId, Unverified, UnverifiedId,
     UnverifiedIds, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
     VerifyIdForUserOrAP, VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithoutDb,
 };

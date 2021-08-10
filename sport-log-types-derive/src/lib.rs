@@ -87,28 +87,6 @@ pub fn update_derive(input: TokenStream) -> TokenStream {
     impl_update(&ast)
 }
 
-/// Derives `sport_log_types::Delete`.
-///
-/// This macro only works if the following conditions are satisfied:
-/// - the corresponding table has the same name like this type but in snake_case
-/// - there is a type called `[ThisTypeName]Id` which is the primary key of the table.
-#[proc_macro_derive(Delete)]
-pub fn delete_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_delete(&ast)
-}
-
-/// Derives `sport_log_types::DeleteMultiple`.
-///
-/// This macro only works if the following conditions are satisfied:
-/// - the corresponding table has the same name like this type but in snake_case
-/// - there is a type called `[ThisTypeName]Id` which is the primary key of the table and a field `id` with this type.
-#[proc_macro_derive(DeleteMultiple)]
-pub fn delete_multiple_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_delete_multiple(&ast)
-}
-
 #[proc_macro_derive(VerifyIdForUser)]
 pub fn verify_id_for_user_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();

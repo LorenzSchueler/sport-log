@@ -1,7 +1,7 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthUserOrAP, Create, CreateMultiple, Db, Delete, DeleteMultiple, Diary, DiaryId, GetById,
+    AuthUserOrAP, Create, CreateMultiple, Db,   Diary, DiaryId, GetById,
     GetByUser, Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForUserOrAPWithDb,
     VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
     VerifyMultipleForUserOrAPWithoutDb, Wod, WodId,

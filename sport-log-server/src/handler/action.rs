@@ -3,12 +3,11 @@ use rocket::{http::Status, serde::json::Json};
 use sport_log_types::{
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
     ActionRuleId, AuthAP, AuthAdmin, AuthUser, CreatableActionRule, Create, CreateMultiple, Db,
-    DeletableActionEvent, Delete, DeleteMultiple, ExecutableActionEvent, GetAll, GetById,
-    GetByUser, Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForActionProviderWithoutDb,
-    VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
-    VerifyIdForActionProvider, VerifyIdForUser, VerifyIdUnchecked, VerifyIdsForActionProvider,
-    VerifyIdsForAdmin, VerifyIdsForUser, VerifyMultipleForAdminWithoutDb,
-    VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
+    DeletableActionEvent, ExecutableActionEvent, GetAll, GetById, GetByUser, Unverified,
+    UnverifiedId, UnverifiedIds, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForUser,
+    VerifyIdUnchecked, VerifyIdsForActionProvider, VerifyIdsForAdmin, VerifyIdsForUser,
+    VerifyMultipleForAdminWithoutDb, VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
 };
 
 use crate::handler::{IntoJson, NaiveDateTimeWrapper};

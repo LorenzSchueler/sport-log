@@ -5,9 +5,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI64, FromSql, GetAll, GetById, GetByIds,
-    GetByUser, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
-    VerifyIdForUserOrAP,
+    Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, GetByUser, ToSql, Update,
+    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
 };
 
 #[cfg(feature = "full")]
@@ -51,8 +50,6 @@ pub struct StrengthSessionId(pub i64);
         GetByUser,
         GetAll,
         Update,
-        Delete,
-        DeleteMultiple,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb
     )
@@ -143,8 +140,6 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<StrengthSetId> {
         GetByIds,
         GetAll,
         Update,
-        Delete,
-        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "strength_set")]

@@ -53,4 +53,8 @@ impl User {
             Err(Error::NotFound)
         }
     }
+
+    pub fn delete(user_id: UserId, conn: &PgConnection) -> QueryResult<usize> {
+        diesel::delete(user::table.find(user_id)).execute(conn)
+    }
 }
