@@ -3,9 +3,8 @@ use rocket::{http::Status, serde::json::Json};
 use sport_log_types::{
     AuthUserOrAP, Create, CreateMultiple, Db, GetById, GetByUser, StrengthSession,
     StrengthSessionDescription, StrengthSessionId, StrengthSet, StrengthSetId, Unverified,
-    UnverifiedId, UnverifiedIds, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
-    VerifyIdForUserOrAP, VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithDb,
-    VerifyMultipleForUserOrAPWithoutDb,
+    UnverifiedId, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
 };
 
 use crate::handler::{DateTimeWrapper, IntoJson};

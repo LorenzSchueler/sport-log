@@ -1,8 +1,8 @@
-use chrono::{DateTime, TimeZone, Utc};
+use chrono::{DateTime, Utc};
 use diesel::{PgConnection, QueryResult};
 
 use crate::{
-    Activity, CardioSessionDescription, Diary, GetByUser, GetByUserSync, MetconSessionDescription,
+    Activity, CardioSessionDescription, Diary, GetByUser, MetconSessionDescription,
     StrengthSessionDescription, UserId, Wod,
 };
 

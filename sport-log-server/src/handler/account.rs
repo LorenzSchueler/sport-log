@@ -1,4 +1,3 @@
-use chrono::{DateTime, Utc};
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{AccountData, AuthUser, Db};

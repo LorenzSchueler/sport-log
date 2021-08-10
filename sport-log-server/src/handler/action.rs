@@ -4,10 +4,10 @@ use sport_log_types::{
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
     ActionRuleId, AuthAP, AuthAdmin, AuthUser, CreatableActionRule, Create, CreateMultiple, Db,
     DeletableActionEvent, ExecutableActionEvent, GetAll, GetById, GetByUser, Unverified,
-    UnverifiedId, UnverifiedIds, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
+    UnverifiedId, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForUser,
-    VerifyIdUnchecked, VerifyIdsForActionProvider, VerifyIdsForAdmin, VerifyIdsForUser,
-    VerifyMultipleForAdminWithoutDb, VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
+    VerifyIdUnchecked, VerifyMultipleForAdminWithoutDb, VerifyMultipleForUserWithoutDb,
+    VerifyUnchecked, CONFIG,
 };
 
 use crate::handler::{DateTimeWrapper, IntoJson};
@@ -276,7 +276,7 @@ pub async fn adm_update_action_event(
     auth: AuthAdmin,
     conn: Db,
 ) -> Result<Json<ActionEvent>, Status> {
-    let action_event = conn.run(move |c| action_event.verify_adm(&auth)).await?;
+    let action_event = conn.run(move |_| action_event.verify_adm(&auth)).await?;
     conn.run(|c| ActionEvent::update(action_event, c))
         .await
         .into_json()

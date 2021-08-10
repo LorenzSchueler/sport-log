@@ -2,8 +2,8 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
     AuthUserOrAP, Create, CreateMultiple, Db, Diary, DiaryId, GetById, GetByUser, Unverified,
-    UnverifiedId, UnverifiedIds, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
-    VerifyIdForUserOrAP, VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithoutDb, Wod, WodId,
+    UnverifiedId, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    VerifyMultipleForUserOrAPWithoutDb, Wod,
 };
 
 use crate::handler::{DateTimeWrapper, IntoJson};

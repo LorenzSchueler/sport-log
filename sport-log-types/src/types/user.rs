@@ -4,7 +4,7 @@ use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
-use sport_log_types_derive::{FromI64, FromSql, GetAll, GetById, GetByIds, ToSql, VerifyUnchecked};
+use sport_log_types_derive::{FromI64, FromSql, GetById, GetByIds, ToSql, VerifyUnchecked};
 
 #[cfg(feature = "full")]
 use crate::{schema::user, AuthUser, GetById, Unverified, VerifyForUserWithDb};
@@ -28,7 +28,6 @@ pub struct UserId(pub i64);
         AsChangeset,
         GetById,
         GetByIds,
-        GetAll,
         VerifyUnchecked,
     )
 )]

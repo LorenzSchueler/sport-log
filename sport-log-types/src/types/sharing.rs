@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, GetByUser, GetByUserSync,
-    ToSql, Update,
+    Create, CreateMultiple, FromI64, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, ToSql,
+    Update,
 };
 
 #[cfg(feature = "full")]
@@ -38,7 +38,6 @@ pub struct GroupId(pub i64);
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
     )
 )]
@@ -75,7 +74,6 @@ pub struct GroupUserId(pub i64);
         GetByIds,
         GetByUser,
         GetByUserSync,
-        GetAll,
         Update,
     )
 )]
@@ -113,7 +111,6 @@ pub struct SharedMetconSessionId(pub i64);
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
     )
 )]
@@ -151,7 +148,6 @@ pub struct SharedStrengthSessionId(pub i64);
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
     )
 )]
@@ -189,7 +185,6 @@ pub struct SharedCardioSessionId(pub i64);
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
     )
 )]
@@ -227,7 +222,6 @@ pub struct SharedDiaryId(pub i64);
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
     )
 )]

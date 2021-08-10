@@ -128,7 +128,6 @@ impl UnverifiedId<MovementId> {
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
         VerifyForAdminWithoutDb
     )
@@ -222,7 +221,7 @@ pub struct EormId(pub i64);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(Associations, Identifiable, Queryable, GetById, GetByIds, GetAll,)
+    derive(Associations, Identifiable, Queryable, GetById, GetByIds, GetAll)
 )]
 #[cfg_attr(feature = "full", table_name = "eorm")]
 pub struct Eorm {
