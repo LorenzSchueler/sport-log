@@ -18,6 +18,7 @@
 * [ ] use hive instead of shared preferences
 * [ ] handle time zone in all time fields
 * [ ] add to string methods for debugging
+* [ ] length restrictions for string inputs
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)
