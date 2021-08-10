@@ -15,17 +15,24 @@ part 'metcons_creation_dao.g.dart';
 class MetconsCreationDao extends DatabaseAccessor<Database> with _$MetconsCreationDaoMixin {
   MetconsCreationDao(Database attachedDatabase) : super(attachedDatabase);
 
-  Future<void> createMetcon(MetconDescription metconDescription) async {
+  Future<Result<void, DbException>> createMetcon(MetconDescription metconDescription) async {
     // TODO: consistency check: verify metcon, check if movements exist
+    if (!metconDescription.validateOnUpdate()) {
+      return Failure(DbException.validationFailed);
+    }
     return transaction(() async {
       await into(metcons).insert(metconDescription.metcon);
       await batch((batch) {
         batch.insertAll(metconMovements, metconDescription.moves);
       });
+      return Success(null);
     });
   }
 
   Future<Result<void, DbException>> createMetconSession(MetconSession metconSession) async {
+    if (!metconSession.validateOnUpdate()) {
+      return Failure(DbException.validationFailed);
+    }
     if (!await metconExists(metconSession.metconId)) {
       return Failure(DbException.metconDoesNotExist);
     }

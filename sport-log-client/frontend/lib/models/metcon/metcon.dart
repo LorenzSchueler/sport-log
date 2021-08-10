@@ -4,6 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:moor/moor.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/id_serialization.dart';
+import 'package:sport_log/models/update_validatable.dart';
 
 part 'metcon.g.dart';
 
@@ -27,7 +28,7 @@ extension ToDisplayName on MetconType {
 }
 
 @JsonSerializable()
-class Metcon extends Insertable<Metcon> {
+class Metcon extends Insertable<Metcon> implements UpdateValidatable {
   Metcon({
     required this.id,
     required this.userId,
@@ -63,5 +64,26 @@ class Metcon extends Insertable<Metcon> {
       description: Value(description),
       deleted: Value(deleted),
     ).toColumns(false);
+  }
+
+  bool validateMetconType() {
+    switch (metconType) {
+      case MetconType.amrap:
+        return rounds == null && timecap != null;
+      case MetconType.emom:
+        return rounds != null && timecap != null;
+      case MetconType.forTime:
+        return rounds != null;
+    }
+  }
+
+  @override
+  bool validateOnUpdate() {
+    return userId != null
+        && name != null
+        && deleted != true
+        && (rounds == null || rounds! >= 1)
+        && (timecap == null || timecap! >= 1)
+        && validateMetconType();
   }
 }

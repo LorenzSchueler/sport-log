@@ -21,6 +21,7 @@ part 'database.g.dart';
 enum DbException {
   metconHasMetconSession,
   metconDoesNotExist,
+  validationFailed,
 }
 
 LazyDatabase _openConnection() {

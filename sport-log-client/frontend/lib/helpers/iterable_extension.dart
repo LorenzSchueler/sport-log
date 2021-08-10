@@ -7,4 +7,12 @@ extension IterableExtension<T> on Iterable<T> {
       yield convert(index++, element);
     }
   }
+
+  bool everyIndexed(bool test(T element, int index)) {
+    int index = 0;
+    for (T element in this) {
+      if (!test(element, index++)) return false;
+    }
+    return true;
+  }
 }

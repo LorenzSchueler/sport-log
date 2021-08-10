@@ -4,12 +4,13 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:moor/moor.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/id_serialization.dart';
+import 'package:sport_log/models/update_validatable.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
 part 'metcon_movement.g.dart';
 
 @JsonSerializable()
-class MetconMovement extends Insertable<MetconMovement> {
+class MetconMovement extends Insertable<MetconMovement> implements UpdateValidatable {
   MetconMovement({
     required this.id,
     required this.metconId,
@@ -45,5 +46,13 @@ class MetconMovement extends Insertable<MetconMovement> {
       weight: Value(weight),
       deleted: Value(deleted),
     ).toColumns(false);
+  }
+
+  @override
+  bool validateOnUpdate() {
+    return deleted != true
+        && movementNumber > 0
+        && count > 0
+        && (weight == null || weight! > 0);
   }
 }
