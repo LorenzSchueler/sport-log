@@ -16,10 +16,10 @@ class MetconsCreationDao extends DatabaseAccessor<Database> with _$MetconsCreati
   MetconsCreationDao(Database attachedDatabase) : super(attachedDatabase);
 
   Future<Result<void, DbException>> createMetcon(MetconDescription metconDescription) async {
-    // TODO: consistency check: verify metcon, check if movements exist
     if (!metconDescription.validateOnUpdate()) {
       return Failure(DbException.validationFailed);
     }
+    // TODO: check if all movement ids of metcon movements are valid
     return transaction(() async {
       await into(metcons).insert(metconDescription.metcon);
       await batch((batch) {

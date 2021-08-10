@@ -29,7 +29,7 @@ enum DbException {
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(join(dbFolder.path, 'db.sqlite'));
+    final file = File(join(dbFolder.path, Config.databaseName));
     if (file.existsSync()) {
       log("Deleting existing database...", name: "db");
       file.deleteSync();

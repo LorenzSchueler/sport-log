@@ -26,4 +26,6 @@ abstract class Config {
   }
 
   static int debugApiDelay = 500; // ms
+
+  static String databaseName = 'database.sqlite';
 }
