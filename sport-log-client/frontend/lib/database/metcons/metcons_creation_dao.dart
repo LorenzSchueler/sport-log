@@ -1,7 +1,7 @@
 
 import 'package:moor/moor.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/database/metcon/metcon_tables.dart';
+import 'package:sport_log/database/metcons/metcon_tables.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:result_type/result_type.dart';
