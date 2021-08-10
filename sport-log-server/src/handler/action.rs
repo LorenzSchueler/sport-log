@@ -267,86 +267,20 @@ pub async fn update_action_event(
         .into_json()
 }
 
-#[delete("/action_event/<action_event_id>")]
-pub async fn delete_action_event(
-    action_event_id: UnverifiedId<ActionEventId>,
-    auth: AuthUser,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionEvent::delete(action_event_id.verify_user(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete("/ap/action_event/<action_event_id>")]
-pub async fn ap_delete_action_event(
-    action_event_id: UnverifiedId<ActionEventId>,
-    auth: AuthAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionEvent::delete(action_event_id.verify_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete(
-    "/action_events",
+#[put(
+    "/adm/action_event",
     format = "application/json",
-    data = "<action_event_ids>"
+    data = "<action_event>"
 )]
-pub async fn delete_action_events(
-    action_event_ids: UnverifiedIds<ActionEventId>,
-    auth: AuthUser,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionEvent::delete_multiple(action_event_ids.verify_user(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete(
-    "/ap/action_events",
-    format = "application/json",
-    data = "<action_event_ids>"
-)]
-pub async fn ap_delete_action_events(
-    action_event_ids: UnverifiedIds<ActionEventId>,
-    auth: AuthAP,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionEvent::delete_multiple(action_event_ids.verify_ap(&auth, c)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
-}
-
-#[delete(
-    "/adm/action_events",
-    format = "application/json",
-    data = "<action_event_ids>"
-)]
-pub async fn adm_delete_action_events(
-    action_event_ids: UnverifiedIds<ActionEventId>,
+pub async fn adm_update_action_event(
+    action_event: Unverified<ActionEvent>,
     auth: AuthAdmin,
     conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionEvent::delete_multiple(action_event_ids.verify_adm(&auth)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
+) -> Result<Json<ActionEvent>, Status> {
+    let action_event = conn.run(move |c| action_event.verify_adm(&auth)).await?;
+    conn.run(|c| ActionEvent::update(action_event, c))
+        .await
+        .into_json()
 }
 
 #[get("/adm/creatable_action_rule")]

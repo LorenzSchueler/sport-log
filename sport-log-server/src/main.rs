@@ -101,7 +101,7 @@ fn rocket() -> _ {
                 action::adm_get_creatable_action_rules, // for scheduler
                 action::adm_get_deletable_action_events, // for scheduler
                 action::adm_create_action_events,       // for scheduler
-                action::adm_delete_action_events,       // for scheduler
+                action::adm_update_action_event,        // for scheduler
                 platform::ap_create_platform,
                 platform::ap_get_platforms,
                 action::ap_create_action_provider,
@@ -111,8 +111,6 @@ fn rocket() -> _ {
                 action::ap_get_actions,
                 action::ap_get_executable_action_events,
                 action::ap_get_ordered_executable_action_events_by_timespan,
-                action::ap_delete_action_event,
-                action::ap_delete_action_events,
                 user::create_user,
                 user::get_user,
                 user::update_user,
