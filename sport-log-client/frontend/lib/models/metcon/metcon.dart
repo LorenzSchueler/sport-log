@@ -1,6 +1,8 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:moor/moor.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/id_serialization.dart';
 
 part 'metcon.g.dart';
@@ -25,7 +27,7 @@ extension ToDisplayName on MetconType {
 }
 
 @JsonSerializable()
-class Metcon {
+class Metcon extends Insertable<Metcon> {
   Metcon({
     required this.id,
     required this.userId,
@@ -48,4 +50,18 @@ class Metcon {
 
   factory Metcon.fromJson(Map<String, dynamic> json) => _$MetconFromJson(json);
   Map<String, dynamic> toJson() => _$MetconToJson(this);
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    return MetconsCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      name: Value(name),
+      metconType: Value(metconType),
+      rounds: Value(rounds),
+      timecap: Value(timecap),
+      description: Value(description),
+      deleted: Value(deleted),
+    ).toColumns(false);
+  }
 }

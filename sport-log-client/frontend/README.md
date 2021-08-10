@@ -8,7 +8,7 @@
 * [ ] improve landing screen
 * [ ] i18n
 * [ ] local units (metric vs imperial system)
-* [ ] ! maybe put initial resource loading into resource bloc
+* [ ] maybe put initial resource loading into resource bloc
 * [ ] keep fabs from covering/blocking content
 * [ ] refresh on pull down
 * [ ] remove naive time
@@ -16,6 +16,8 @@
 * [ ] runtime id state accessible for whole app
 * [ ] how to handle changed database on app update?
 * [ ] use hive instead of shared preferences
+* [ ] handle time zone in all time fields
+* [ ] add to string methods for debugging
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)

@@ -1,6 +1,9 @@
 
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
+import 'package:sport_log/database/database.dart';
+import 'package:sport_log/database/metcon/metcon.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/user/user.dart';

@@ -6,17 +6,18 @@ part of 'strength_session.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-StrengthSession _$StrengthSessionFromJson(Map<String, dynamic> json) =>
-    StrengthSession(
-      id: const IdConverter().fromJson(json['id'] as String),
-      userId: const IdConverter().fromJson(json['user_id'] as String),
-      datetime: DateTime.parse(json['datetime'] as String),
-      movementId: const IdConverter().fromJson(json['movement_id'] as String),
-      movementUnit: _$enumDecode(_$MovementUnitEnumMap, json['movement_unit']),
-      interval: json['interval'] as int?,
-      comments: json['comments'] as String?,
-      deleted: json['deleted'] as bool,
-    );
+StrengthSession _$StrengthSessionFromJson(Map<String, dynamic> json) {
+  return StrengthSession(
+    id: const IdConverter().fromJson(json['id'] as String),
+    userId: const IdConverter().fromJson(json['user_id'] as String),
+    datetime: DateTime.parse(json['datetime'] as String),
+    movementId: const IdConverter().fromJson(json['movement_id'] as String),
+    movementUnit: _$enumDecode(_$MovementUnitEnumMap, json['movement_unit']),
+    interval: json['interval'] as int?,
+    comments: json['comments'] as String?,
+    deleted: json['deleted'] as bool,
+  );
+}
 
 Map<String, dynamic> _$StrengthSessionToJson(StrengthSession instance) =>
     <String, dynamic>{

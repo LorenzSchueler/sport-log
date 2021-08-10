@@ -6,13 +6,15 @@ part of 'position.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Position _$PositionFromJson(Map<String, dynamic> json) => Position(
-      longitude: (json['lo'] as num).toDouble(),
-      latitude: (json['la'] as num).toDouble(),
-      elevation: (json['e'] as num).toDouble(),
-      distance: json['d'] as int,
-      time: json['t'] as int,
-    );
+Position _$PositionFromJson(Map<String, dynamic> json) {
+  return Position(
+    longitude: (json['lo'] as num).toDouble(),
+    latitude: (json['la'] as num).toDouble(),
+    elevation: (json['e'] as num).toDouble(),
+    distance: json['d'] as int,
+    time: json['t'] as int,
+  );
+}
 
 Map<String, dynamic> _$PositionToJson(Position instance) => <String, dynamic>{
       'lo': instance.longitude,

@@ -6,15 +6,16 @@ part of 'action_provider.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-ActionProvider _$ActionProviderFromJson(Map<String, dynamic> json) =>
-    ActionProvider(
-      id: const IdConverter().fromJson(json['id'] as String),
-      name: json['name'] as String,
-      password: json['password'] as String,
-      platformId: const IdConverter().fromJson(json['platform_id'] as String),
-      description: json['description'] as String?,
-      deleted: json['deleted'] as bool,
-    );
+ActionProvider _$ActionProviderFromJson(Map<String, dynamic> json) {
+  return ActionProvider(
+    id: const IdConverter().fromJson(json['id'] as String),
+    name: json['name'] as String,
+    password: json['password'] as String,
+    platformId: const IdConverter().fromJson(json['platform_id'] as String),
+    description: json['description'] as String?,
+    deleted: json['deleted'] as bool,
+  );
+}
 
 Map<String, dynamic> _$ActionProviderToJson(ActionProvider instance) =>
     <String, dynamic>{

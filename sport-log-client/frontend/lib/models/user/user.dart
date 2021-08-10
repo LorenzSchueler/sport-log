@@ -50,9 +50,6 @@ class User {
         && map.containsKey(passwordKey) && map.containsKey(emailKey)) {
       try {
         final id = Int64.parseInt(map[idKey]!);
-        if (id == null) {
-          return null;
-        }
         return User(
             id: id,
             username: map[usernameKey]!,
