@@ -1,13 +1,15 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:moor/moor.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/id_serialization.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
 part 'metcon_movement.g.dart';
 
 @JsonSerializable()
-class MetconMovement {
+class MetconMovement extends Insertable<MetconMovement> {
   MetconMovement({
     required this.id,
     required this.metconId,
@@ -30,4 +32,18 @@ class MetconMovement {
 
   factory MetconMovement.fromJson(Map<String, dynamic> json) => _$MetconMovementFromJson(json);
   Map<String, dynamic> toJson() => _$MetconMovementToJson(this);
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    return MetconMovementsCompanion(
+      id: Value(id),
+      metconId: Value(metconId),
+      movementId: Value(movementId),
+      movementNumber: Value(movementNumber),
+      count: Value(count),
+      unit: Value(unit),
+      weight: Value(weight),
+      deleted: Value(deleted),
+    ).toColumns(false);
+  }
 }

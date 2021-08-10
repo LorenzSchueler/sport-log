@@ -19,6 +19,7 @@
 * [ ] handle time zone in all time fields
 * [ ] add to string methods for debugging
 * [ ] length restrictions for string inputs
+* [ ] restrict int numbers coming from user input
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)
@@ -29,6 +30,10 @@
 ### Movements
 * [ ] show description and category in list
 
+### Database
+* [ ] add all (unique) constraints like in server
+* [ ] set last modified on update/delete
+* [ ] add references to foreign keys
 
 # Sync
 * new flag, wenn vom server zurück auf false; nur in DB

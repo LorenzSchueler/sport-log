@@ -2,25 +2,12 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:moor/moor.dart';
 import 'package:sport_log/database/database.dart';
+import 'package:sport_log/helpers/id_serialization.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 
 export 'package:sport_log/models/metcon/metcon.dart';
 
-part 'metcon.g.dart';
-
-class DbIdConverter extends TypeConverter<Int64, int> {
-  const DbIdConverter() : super();
-
-  @override
-  Int64? mapToDart(int? fromDb) {
-    return fromDb == null ? null : Int64(fromDb);
-  }
-
-  @override
-  int? mapToSql(Int64? value) {
-    return value?.toInt();
-  }
-}
+part 'metcons.g.dart';
 
 @UseRowClass(Metcon)
 class Metcons extends Table {
@@ -31,7 +18,8 @@ class Metcons extends Table {
   IntColumn get rounds => integer().nullable()();
   IntColumn get timecap => integer().nullable()();
   TextColumn get description => text().nullable()();
-  BoolColumn get deleted => boolean()();
+
+  BoolColumn get deleted => boolean().withDefault(const Constant(true))();
   DateTimeColumn get lastModified => dateTime().clientDefault(() => DateTime.now())();
   BoolColumn get isNew => boolean().withDefault(const Constant(true))();
 
