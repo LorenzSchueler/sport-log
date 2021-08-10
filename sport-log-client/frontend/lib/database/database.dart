@@ -7,15 +7,15 @@ import 'package:moor/moor.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sport_log/config.dart';
-import 'package:sport_log/database/metcons/metcons_creation_dao.dart';
 import 'package:sport_log/database/metcons/metcon_tables.dart';
-import 'package:sport_log/database/metcons/metcons_deletion_dao.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/movements/movement_table.dart';
 import 'package:sport_log/database/movements/movements_dao.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/helpers/id_serialization.dart';
 import 'package:sport_log/models/movement/all.dart';
+
+import 'metcons/metcons_dao.dart';
 // TODO: fix imports
 
 part 'database.g.dart';
@@ -40,7 +40,7 @@ LazyDatabase _openConnection() {
 
 @UseMoor(
   tables: [Metcons, MetconMovements, MetconSessions, Movements],
-  daos: [MetconsDeletionDao, MetconsCreationDao, MovementsDao]
+  daos: [MetconsDao, MovementsDao]
 )
 class Database extends _$Database {
 

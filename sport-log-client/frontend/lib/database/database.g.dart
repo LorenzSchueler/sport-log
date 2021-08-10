@@ -1212,10 +1212,7 @@ abstract class _$Database extends GeneratedDatabase {
       $MetconMovementsTable(this);
   late final $MetconSessionsTable metconSessions = $MetconSessionsTable(this);
   late final $MovementsTable movements = $MovementsTable(this);
-  late final MetconsDeletionDao metconsDeletionDao =
-      MetconsDeletionDao(this as Database);
-  late final MetconsCreationDao metconsCreationDao =
-      MetconsCreationDao(this as Database);
+  late final MetconsDao metconsDao = MetconsDao(this as Database);
   late final MovementsDao movementsDao = MovementsDao(this as Database);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();

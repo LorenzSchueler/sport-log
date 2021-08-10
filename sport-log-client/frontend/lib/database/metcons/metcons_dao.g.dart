@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'metcons_deletion_dao.dart';
+part of 'metcons_dao.dart';
 
 // **************************************************************************
 // DaoGenerator
 // **************************************************************************
 
-mixin _$MetconsDeletionDaoMixin on DatabaseAccessor<Database> {
+mixin _$MetconsDaoMixin on DatabaseAccessor<Database> {
   $MetconsTable get metcons => attachedDatabase.metcons;
   $MetconMovementsTable get metconMovements => attachedDatabase.metconMovements;
   $MetconSessionsTable get metconSessions => attachedDatabase.metconSessions;

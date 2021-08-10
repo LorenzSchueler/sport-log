@@ -20,11 +20,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 void debugMain() async {
   final db = Database.instance!;
-  db.metconsCreationDao.createMetcon(MetconDescription(
+  db.metconsDao.createMetcon(MetconDescription(
     metcon: Metcon(id: Int64(23), userId: Int64(23), name: "asdf", metconType: MetconType.amrap, rounds: 3, timecap: null, description: "hallo", deleted: false),
     moves: []
   ));
-  final Result result = await db.metconsCreationDao.createMetconSession(MetconSession(id: Int64(23434), userId: Int64(23), metconId: Int64(23), datetime: DateTime.now(), time: 34, rounds: null, reps: null, rx: true, comments: null, deleted: false));
+  final Result result = await db.metconsDao.createMetconSession(MetconSession(id: Int64(23434), userId: Int64(23), metconId: Int64(23), datetime: DateTime.now(), time: 34, rounds: null, reps: null, rx: true, comments: null, deleted: false));
   print(result.success.runtimeType);
 }
 
