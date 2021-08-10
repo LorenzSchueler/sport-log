@@ -4,12 +4,14 @@ table! {
     use crate::*;
 
     action (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Varchar,
-        action_provider_id -> Int4,
+        action_provider_id -> Int8,
         description -> Nullable<Text>,
         create_before -> Int4,
         delete_after -> Int4,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -18,11 +20,13 @@ table! {
     use crate::*;
 
     action_event (id) {
-        id -> Int4,
-        user_id -> Int4,
-        action_id -> Int4,
-        datetime -> Timestamp,
+        id -> Int8,
+        user_id -> Int8,
+        action_id -> Int8,
+        datetime -> Timestamptz,
         enabled -> Bool,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -31,11 +35,13 @@ table! {
     use crate::*;
 
     action_provider (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Varchar,
         password -> Bpchar,
-        platform_id -> Int4,
+        platform_id -> Int8,
         description -> Nullable<Text>,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -44,12 +50,14 @@ table! {
     use crate::*;
 
     action_rule (id) {
-        id -> Int4,
-        user_id -> Int4,
-        action_id -> Int4,
+        id -> Int8,
+        user_id -> Int8,
+        action_id -> Int8,
         weekday -> WeekdayMapping,
-        time -> Time,
+        time -> Timestamptz,
         enabled -> Bool,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -58,11 +66,11 @@ table! {
     use crate::*;
 
     cardio_session (id) {
-        id -> Int4,
-        user_id -> Int4,
-        movement_id -> Int4,
+        id -> Int8,
+        user_id -> Int8,
+        movement_id -> Int8,
         cardio_type -> CardioTypeMapping,
-        datetime -> Timestamp,
+        datetime -> Timestamptz,
         distance -> Nullable<Int4>,
         ascent -> Nullable<Int4>,
         descent -> Nullable<Int4>,
@@ -73,8 +81,10 @@ table! {
         cycles -> Nullable<Array<Float4>>,
         avg_heart_rate -> Nullable<Int4>,
         heart_rate -> Nullable<Array<Float4>>,
-        route_id -> Nullable<Int4>,
+        route_id -> Nullable<Int8>,
         comments -> Nullable<Text>,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -83,11 +93,13 @@ table! {
     use crate::*;
 
     diary (id) {
-        id -> Int4,
-        user_id -> Int4,
+        id -> Int8,
+        user_id -> Int8,
         date -> Date,
         bodyweight -> Nullable<Float4>,
         comments -> Nullable<Text>,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -96,7 +108,7 @@ table! {
     use crate::*;
 
     eorm (id) {
-        id -> Int4,
+        id -> Int8,
         reps -> Int4,
         percentage -> Float4,
     }
@@ -107,8 +119,10 @@ table! {
     use crate::*;
 
     group (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Varchar,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -117,9 +131,11 @@ table! {
     use crate::*;
 
     group_user (id) {
-        id -> Int4,
-        group_id -> Int4,
-        user_id -> Int4,
+        id -> Int8,
+        group_id -> Int8,
+        user_id -> Int8,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -128,13 +144,15 @@ table! {
     use crate::*;
 
     metcon (id) {
-        id -> Int4,
-        user_id -> Nullable<Int4>,
+        id -> Int8,
+        user_id -> Nullable<Int8>,
         name -> Nullable<Varchar>,
         metcon_type -> MetconTypeMapping,
         rounds -> Nullable<Int4>,
         timecap -> Nullable<Int4>,
         description -> Nullable<Text>,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -143,13 +161,15 @@ table! {
     use crate::*;
 
     metcon_movement (id) {
-        id -> Int4,
-        metcon_id -> Int4,
-        movement_id -> Int4,
+        id -> Int8,
+        metcon_id -> Int8,
+        movement_id -> Int8,
         movement_number -> Int4,
         count -> Int4,
         movement_unit -> MovementUnitMapping,
         weight -> Nullable<Float4>,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -158,15 +178,17 @@ table! {
     use crate::*;
 
     metcon_session (id) {
-        id -> Int4,
-        user_id -> Int4,
-        metcon_id -> Int4,
-        datetime -> Timestamp,
+        id -> Int8,
+        user_id -> Int8,
+        metcon_id -> Int8,
+        datetime -> Timestamptz,
         time -> Nullable<Int4>,
         rounds -> Nullable<Int4>,
         reps -> Nullable<Int4>,
         rx -> Bool,
         comments -> Nullable<Text>,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -175,11 +197,13 @@ table! {
     use crate::*;
 
     movement (id) {
-        id -> Int4,
-        user_id -> Nullable<Int4>,
+        id -> Int8,
+        user_id -> Nullable<Int8>,
         name -> Varchar,
         description -> Nullable<Text>,
         category -> MovementCategoryMapping,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -188,8 +212,10 @@ table! {
     use crate::*;
 
     platform (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Varchar,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -198,11 +224,13 @@ table! {
     use crate::*;
 
     platform_credential (id) {
-        id -> Int4,
-        user_id -> Int4,
-        platform_id -> Int4,
+        id -> Int8,
+        user_id -> Int8,
+        platform_id -> Int8,
         username -> Varchar,
         password -> Varchar,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -211,13 +239,15 @@ table! {
     use crate::*;
 
     route (id) {
-        id -> Int4,
-        user_id -> Int4,
+        id -> Int8,
+        user_id -> Int8,
         name -> Varchar,
         distance -> Int4,
         ascent -> Nullable<Int4>,
         descent -> Nullable<Int4>,
         track -> Nullable<Array<Position>>,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -226,9 +256,11 @@ table! {
     use crate::*;
 
     shared_cardio_session (id) {
-        id -> Int4,
-        group_id -> Int4,
-        cardio_session_id -> Int4,
+        id -> Int8,
+        group_id -> Int8,
+        cardio_session_id -> Int8,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -237,9 +269,11 @@ table! {
     use crate::*;
 
     shared_diary (id) {
-        id -> Int4,
-        group_id -> Int4,
-        diary_id -> Int4,
+        id -> Int8,
+        group_id -> Int8,
+        diary_id -> Int8,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -248,9 +282,11 @@ table! {
     use crate::*;
 
     shared_metcon_session (id) {
-        id -> Int4,
-        group_id -> Int4,
-        metcon_session_id -> Int4,
+        id -> Int8,
+        group_id -> Int8,
+        metcon_session_id -> Int8,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -259,9 +295,11 @@ table! {
     use crate::*;
 
     shared_strength_session (id) {
-        id -> Int4,
-        group_id -> Int4,
-        strength_session_id -> Int4,
+        id -> Int8,
+        group_id -> Int8,
+        strength_session_id -> Int8,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -270,13 +308,15 @@ table! {
     use crate::*;
 
     strength_session (id) {
-        id -> Int4,
-        user_id -> Int4,
-        datetime -> Timestamp,
-        movement_id -> Int4,
+        id -> Int8,
+        user_id -> Int8,
+        datetime -> Timestamptz,
+        movement_id -> Int8,
         movement_unit -> MovementUnitMapping,
         interval -> Nullable<Int4>,
         comments -> Nullable<Text>,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -285,11 +325,13 @@ table! {
     use crate::*;
 
     strength_set (id) {
-        id -> Int4,
-        strength_session_id -> Int4,
+        id -> Int8,
+        strength_session_id -> Int8,
         set_number -> Int4,
         count -> Int4,
         weight -> Nullable<Float4>,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 
@@ -298,10 +340,11 @@ table! {
     use crate::*;
 
     user (id) {
-        id -> Int4,
+        id -> Int8,
         username -> Varchar,
         password -> Bpchar,
         email -> Varchar,
+        last_change -> Timestamptz,
     }
 }
 
@@ -310,10 +353,12 @@ table! {
     use crate::*;
 
     wod (id) {
-        id -> Int4,
-        user_id -> Int4,
+        id -> Int8,
+        user_id -> Int8,
         date -> Date,
         description -> Nullable<Text>,
+        last_change -> Timestamptz,
+        deleted -> Bool,
     }
 }
 

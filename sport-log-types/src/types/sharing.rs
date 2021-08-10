@@ -1,9 +1,10 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
-    GetByUser, ToSql, Update,
+    Create, CreateMultiple, FromI64, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, ToSql,
+    Update,
 };
 
 #[cfg(feature = "full")]
@@ -19,15 +20,16 @@ use crate::{CardioSessionId, DiaryId, MetconSessionId, StrengthSessionId, UserId
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI64, ToSql, FromSql)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct GroupId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct GroupId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -36,37 +38,32 @@ pub struct GroupId(pub i32);
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
-        Delete,
-        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "group")]
 pub struct Group {
     pub id: GroupId,
     pub name: String,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "group")]
-pub struct NewGroup {
-    pub name: String,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI64, ToSql, FromSql)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct GroupUserId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct GroupUserId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -76,10 +73,8 @@ pub struct GroupUserId(pub i32);
         GetById,
         GetByIds,
         GetByUser,
-        GetAll,
+        GetByUserSync,
         Update,
-        Delete,
-        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "group_user")]
@@ -89,28 +84,25 @@ pub struct GroupUser {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub user_id: UserId,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "group_user")]
-pub struct NewGroupUser {
-    pub group_id: GroupId,
-    pub user_id: UserId,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI64, ToSql, FromSql)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct SharedMetconSessionId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct SharedMetconSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -119,10 +111,7 @@ pub struct SharedMetconSessionId(pub i32);
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
-        Delete,
-        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "shared_metcon_session")]
@@ -132,28 +121,25 @@ pub struct SharedMetconSession {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub metcon_session_id: MetconSessionId,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "shared_metcon_session")]
-pub struct NewSharedMetconSession {
-    pub group_id: GroupId,
-    pub metcon_session_id: MetconSessionId,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI64, ToSql, FromSql)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct SharedStrengthSessionId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct SharedStrengthSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -162,10 +148,7 @@ pub struct SharedStrengthSessionId(pub i32);
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
-        Delete,
-        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "shared_strength_session")]
@@ -175,28 +158,25 @@ pub struct SharedStrengthSession {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub strength_session_id: StrengthSessionId,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "shared_strength_session")]
-pub struct NewSharedStrengthSession {
-    pub group_id: GroupId,
-    pub strength_session_id: StrengthSessionId,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI64, ToSql, FromSql)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct SharedCardioSessionId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct SharedCardioSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -205,10 +185,7 @@ pub struct SharedCardioSessionId(pub i32);
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
-        Delete,
-        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "shared_cardio_session")]
@@ -218,28 +195,25 @@ pub struct SharedCardioSession {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub cardio_session_id: CardioSessionId,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "shared_cardio_session")]
-pub struct NewSharedCardioSession {
-    pub group_id: GroupId,
-    pub cardio_session_id: CardioSessionId,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI64, ToSql, FromSql)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct SharedDiaryId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct SharedDiaryId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -248,10 +222,7 @@ pub struct SharedDiaryId(pub i32);
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
-        Delete,
-        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "shared_diary")]
@@ -261,12 +232,8 @@ pub struct SharedDiary {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub diary_id: DiaryId,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "shared_diary")]
-pub struct NewSharedDiary {
-    pub group_id: GroupId,
-    pub diary_id: DiaryId,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }

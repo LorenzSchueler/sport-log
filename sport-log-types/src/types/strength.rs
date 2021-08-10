@@ -1,13 +1,12 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 #[cfg(feature = "full")]
 use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
-    GetByUser, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
-    VerifyIdForUserOrAP,
+    Create, CreateMultiple, FromI64, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, ToSql,
+    Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
 };
 
 #[cfg(feature = "full")]
@@ -26,19 +25,20 @@ use crate::{Movement, MovementId, MovementUnit, UserId};
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct StrengthSessionId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct StrengthSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -48,51 +48,42 @@ pub struct StrengthSessionId(pub i32);
         GetById,
         GetByIds,
         GetByUser,
-        GetAll,
+        GetByUserSync,
         Update,
-        Delete,
-        DeleteMultiple,
-        VerifyForUserOrAPWithDb
+        VerifyForUserOrAPWithDb,
+        VerifyForUserOrAPWithoutDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "strength_session")]
 pub struct StrengthSession {
     pub id: StrengthSessionId,
     pub user_id: UserId,
-    pub datetime: NaiveDateTime,
+    pub datetime: DateTime<Utc>,
     pub movement_id: MovementId,
     pub movement_unit: MovementUnit,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub interval: Option<i32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserOrAPWithoutDb))]
-#[cfg_attr(feature = "full", table_name = "strength_session")]
-pub struct NewStrengthSession {
-    pub user_id: UserId,
-    pub datetime: NaiveDateTime,
-    pub movement_id: MovementId,
-    pub movement_unit: MovementUnit,
-    pub interval: Option<i32>,
-    pub comments: Option<String>,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI64, ToSql, FromSql)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct StrengthSetId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct StrengthSetId(pub i64);
 
 #[cfg(feature = "full")]
 impl VerifyIdForUserOrAP for UnverifiedId<StrengthSetId> {
     type Id = StrengthSetId;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
+    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
         let strength_set =
             StrengthSet::get_by_id(self.0, conn).map_err(|_| Status::InternalServerError)?;
         if StrengthSession::get_by_id(strength_set.strength_session_id, conn)
@@ -111,7 +102,11 @@ impl VerifyIdForUserOrAP for UnverifiedId<StrengthSetId> {
 impl VerifyIdsForUserOrAP for UnverifiedIds<StrengthSetId> {
     type Id = StrengthSetId;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status> {
         let strength_sets =
             StrengthSet::get_by_ids(&self.0, conn).map_err(|_| Status::InternalServerError)?;
         let strength_session_ids: Vec<_> = strength_sets
@@ -134,6 +129,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<StrengthSetId> {
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -142,10 +138,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<StrengthSetId> {
         CreateMultiple,
         GetById,
         GetByIds,
-        GetAll,
         Update,
-        Delete,
-        DeleteMultiple,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "strength_set")]
@@ -157,41 +150,21 @@ pub struct StrengthSet {
     pub count: i32,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub weight: Option<f32>,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[cfg(feature = "full")]
 impl VerifyForUserOrAPWithDb for Unverified<StrengthSet> {
     type Entity = StrengthSet;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Entity, Status> {
-        let strength_set = self.0.into_inner();
-        if StrengthSession::get_by_id(strength_set.strength_session_id, conn)
-            .map_err(|_| Status::InternalServerError)?
-            .user_id
-            == **auth
-        {
-            Ok(strength_set)
-        } else {
-            Err(Status::Forbidden)
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "strength_set")]
-pub struct NewStrengthSet {
-    pub strength_session_id: StrengthSessionId,
-    pub set_number: i32,
-    pub count: i32,
-    pub weight: Option<f32>,
-}
-
-#[cfg(feature = "full")]
-impl VerifyForUserOrAPWithDb for Unverified<NewStrengthSet> {
-    type Entity = NewStrengthSet;
-
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Entity, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Self::Entity, Status> {
         let strength_set = self.0.into_inner();
         if StrengthSession::get_by_id(strength_set.strength_session_id, conn)
             .map_err(|_| Status::InternalServerError)?
@@ -206,10 +179,14 @@ impl VerifyForUserOrAPWithDb for Unverified<NewStrengthSet> {
 }
 
 #[cfg(feature = "full")]
-impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<NewStrengthSet>> {
-    type Entity = NewStrengthSet;
+impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthSet>> {
+    type Entity = StrengthSet;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Entity>, Status> {
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status> {
         let strength_sets = self.0.into_inner();
         let strength_session_ids: Vec<_> = strength_sets
             .iter()

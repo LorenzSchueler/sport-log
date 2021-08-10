@@ -18,11 +18,12 @@
 
 use std::fs;
 
-use chrono::{Datelike, Duration, Local, NaiveDateTime};
+use chrono::{Datelike, Duration, Utc};
+use rand::Rng;
 use reqwest::blocking::Client;
 use serde::Deserialize;
 
-use sport_log_types::{CreatableActionRule, DeletableActionEvent, NewActionEvent};
+use sport_log_types::{ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent};
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -52,30 +53,32 @@ fn main() {
 
     println!("{:#?}", creatable_action_rules);
 
+    let mut rng = rand::thread_rng();
+
     let mut action_events = vec![];
     for creatable_action_rule in creatable_action_rules {
-        let datetime = NaiveDateTime::new(
-            Local::today()
-                .naive_local()
-                .checked_add_signed(Duration::days(
-                    (creatable_action_rule.weekday.to_u32() as i64
-                        - Local::today().weekday().num_days_from_monday() as i64)
-                        .rem_euclid(7),
-                ))
-                .unwrap(),
-            creatable_action_rule.time,
-        );
+        let datetime = Utc::today()
+            .checked_add_signed(Duration::days(
+                (creatable_action_rule.weekday.to_u32() as i64
+                    - Utc::today().weekday().num_days_from_monday() as i64)
+                    .rem_euclid(7),
+            ))
+            .unwrap()
+            .and_time(creatable_action_rule.time.time())
+            .unwrap();
 
         for weeks in 0.. {
             let datetime = datetime + Duration::weeks(weeks);
-            if Local::now().naive_local()
-                >= datetime - Duration::hours(creatable_action_rule.create_before as i64)
+            if Utc::now() >= datetime - Duration::hours(creatable_action_rule.create_before as i64)
             {
-                action_events.push(NewActionEvent {
+                action_events.push(ActionEvent {
+                    id: ActionEventId(rng.gen()),
                     user_id: creatable_action_rule.user_id,
                     action_id: creatable_action_rule.action_id,
                     datetime,
                     enabled: true,
+                    last_change: Utc::now(),
+                    deleted: false,
                 });
             } else {
                 break;
@@ -104,7 +107,7 @@ fn main() {
 
     let mut action_event_ids = vec![];
     for deletable_action_event in deletable_action_events {
-        if Local::now().naive_local()
+        if Utc::now()
             >= deletable_action_event.datetime
                 + Duration::hours(deletable_action_event.delete_after as i64)
         {

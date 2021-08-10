@@ -1,4 +1,6 @@
 #[cfg(feature = "full")]
+use chrono::{DateTime, Utc};
+#[cfg(feature = "full")]
 use diesel::{PgConnection, QueryResult};
 #[cfg(feature = "full")]
 use rocket::{
@@ -71,8 +73,8 @@ impl<'r, T: Deserialize<'r>> FromData<'r> for Unverified<T> {
 }
 
 /// Indicated that the type can be build from an [i32].
-pub trait FromI32 {
-    fn from_i32(value: i32) -> Self;
+pub trait FromI64 {
+    fn from_i64(value: i64) -> Self;
 }
 
 /// Wrapper around Id types for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
@@ -83,11 +85,11 @@ pub trait FromI32 {
 pub struct UnverifiedId<I>(I);
 
 #[cfg(feature = "full")]
-impl<'v, I: FromI32> rocket::request::FromParam<'v> for UnverifiedId<I> {
+impl<'v, I: FromI64> rocket::request::FromParam<'v> for UnverifiedId<I> {
     type Error = &'v str;
 
     fn from_param(param: &'v str) -> Result<Self, Self::Error> {
-        Ok(Self(I::from_i32(i32::from_param(param)?)))
+        Ok(Self(I::from_i64(i64::from_param(param)?)))
     }
 }
 
@@ -100,15 +102,15 @@ pub struct UnverifiedIds<I>(Vec<I>);
 
 #[cfg(feature = "full")]
 #[rocket::async_trait]
-impl<'r, I: FromI32 + Deserialize<'r>> FromData<'r> for UnverifiedIds<I> {
+impl<'r, I: FromI64 + Deserialize<'r>> FromData<'r> for UnverifiedIds<I> {
     type Error = json::Error<'r>;
 
     async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> data::Outcome<'r, Self> {
-        <rocket::serde::json::Json<Vec<i32>> as FromData>::from_data(req, data)
+        <rocket::serde::json::Json<Vec<i64>> as FromData>::from_data(req, data)
             .await
             .and_then(|ids_json| {
                 Outcome::Success(Self(
-                    ids_json.into_inner().into_iter().map(I::from_i32).collect(),
+                    ids_json.into_inner().into_iter().map(I::from_i64).collect(),
                 ))
             })
     }
@@ -123,9 +125,7 @@ impl<'r, I: FromI32 + Deserialize<'r>> FromData<'r> for UnverifiedIds<I> {
 /// For restrictions on the types for derive to work please see [sport_log_types_derive::Create].
 #[cfg(feature = "full")]
 pub trait Create {
-    type New;
-
-    fn create(entity: Self::New, conn: &PgConnection) -> QueryResult<Self>
+    fn create(entity: Self, conn: &PgConnection) -> QueryResult<Self>
     where
         Self: Sized;
 }
@@ -139,9 +139,7 @@ pub trait Create {
 /// For restrictions on the types for derive to work please see [sport_log_types_derive::CreateMultiple].
 #[cfg(feature = "full")]
 pub trait CreateMultiple {
-    type New;
-
-    fn create_multiple(enteties: Vec<Self::New>, conn: &PgConnection) -> QueryResult<Vec<Self>>
+    fn create_multiple(enteties: Vec<Self>, conn: &PgConnection) -> QueryResult<Vec<Self>>
     where
         Self: Sized;
 }
@@ -192,6 +190,38 @@ pub trait GetByUser {
         Self: Sized;
 }
 
+/// A type for which entries can be retrieved by user and the timestamp of the last synchonization from the database.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(GetByUserSync)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::GetByUserSync].
+#[cfg(feature = "full")]
+pub trait GetByUserSync {
+    fn get_by_user_and_last_sync(
+        user_id: UserId,
+        last_sync: DateTime<Utc>,
+        conn: &PgConnection,
+    ) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized;
+}
+
+/// A type for which entries can be retrieved by the timestamp of the last synchonization from the database.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(GetBySync)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::GetBySync].
+#[cfg(feature = "full")]
+pub trait GetBySync {
+    fn get_by_last_sync(last_sync: DateTime<Utc>, conn: &PgConnection) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized;
+}
+
 /// A type for which all entries can be retrieved from the database.
 ///
 /// ### Deriving
@@ -220,60 +250,36 @@ pub trait Update {
         Self: Sized;
 }
 
-/// A type for which an entry can be deleted by id from the database.
-///
-/// ### Deriving
-///
-/// This trait can be automatically derived by adding `#[derive(Delete)]` to your struct.
-///
-/// For restrictions on the types for derive to work please see [sport_log_types_derive::Delete].
-#[cfg(feature = "full")]
-pub trait Delete {
-    type Id;
-
-    fn delete(id: Self::Id, conn: &PgConnection) -> QueryResult<usize>;
-}
-
-/// A type for which entries can be deleted by id from the database.
-///
-/// ### Deriving
-///
-/// This trait can be automatically derived by adding `#[derive(DeleteMultiple)]` to your struct.
-///
-/// For restrictions on the types for derive to work please see [sport_log_types_derive::DeleteMultiple].
-#[cfg(feature = "full")]
-pub trait DeleteMultiple {
-    type Id;
-
-    fn delete_multiple(ids: Vec<Self::Id>, conn: &PgConnection) -> QueryResult<usize>;
-}
-
 #[cfg(feature = "full")]
 pub trait VerifyIdForUser {
     type Id;
 
-    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Id, Status>;
+    fn verify_user(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyIdsForUser {
     type Id;
 
-    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Vec<Self::Id>, Status>;
+    fn verify_user(self, auth: &AuthUser, conn: &PgConnection) -> Result<Vec<Self::Id>, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyIdForUserOrAP {
     type Id;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status>;
+    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyIdsForUserOrAP {
     type Id;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status>;
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status>;
 }
 
 #[cfg(feature = "full")]
@@ -315,56 +321,65 @@ pub trait VerifyIdUnchecked {
 pub trait VerifyForUserWithDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status>;
+    fn verify_user(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyMultipleForUserWithDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Vec<Self::Entity>, Status>;
+    fn verify_user(self, auth: &AuthUser, conn: &PgConnection)
+        -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyForUserWithoutDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUser) -> Result<Self::Entity, Status>;
+    fn verify_user_without_db(self, auth: &AuthUser) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyMultipleForUserWithoutDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUser) -> Result<Vec<Self::Entity>, Status>;
+    fn verify_user_without_db(self, auth: &AuthUser) -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyForUserOrAPWithDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Entity, Status>;
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyMultipleForUserOrAPWithDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Vec<Self::Entity>, Status>;
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyForUserOrAPWithoutDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status>;
+    fn verify_user_ap_without_db(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status>;
 }
 
 #[cfg(feature = "full")]
 pub trait VerifyMultipleForUserOrAPWithoutDb {
     type Entity;
 
-    fn verify(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status>;
+    fn verify_user_ap_without_db(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]
@@ -378,7 +393,14 @@ pub trait VerifyForActionProviderWithDb {
 pub trait VerifyForActionProviderWithoutDb {
     type Entity;
 
-    fn verify_ap(self, auth: &AuthAP) -> Result<Self::Entity, Status>;
+    fn verify_ap_without_db(self, auth: &AuthAP) -> Result<Self::Entity, Status>;
+}
+
+#[cfg(feature = "full")]
+pub trait VerifyMultipleForActionProviderWithoutDb {
+    type Entity;
+
+    fn verify_ap_without_db(self, auth: &AuthAP) -> Result<Vec<Self::Entity>, Status>;
 }
 
 #[cfg(feature = "full")]

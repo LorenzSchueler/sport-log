@@ -1,11 +1,11 @@
-use chrono::NaiveDate;
+use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
-    GetByUser, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
-    VerifyIdForUserOrAP, VerifyUnchecked,
+    Create, CreateMultiple, FromI64, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, ToSql,
+    Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    VerifyUnchecked,
 };
 
 use crate::UserId;
@@ -22,19 +22,20 @@ use crate::{
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct DiaryId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct DiaryId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -44,11 +45,11 @@ pub struct DiaryId(pub i32);
         GetById,
         GetByIds,
         GetByUser,
-        GetAll,
+        GetByUserSync,
         Update,
-        Delete,
-        DeleteMultiple,
-        VerifyForUserOrAPWithDb
+        VerifyForUserOrAPWithDb,
+        VerifyForUserOrAPWithoutDb,
+        VerifyUnchecked
     )
 )]
 #[cfg_attr(feature = "full", table_name = "diary")]
@@ -61,16 +62,10 @@ pub struct Diary {
     pub bodyweight: Option<f32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserOrAPWithoutDb))]
-#[cfg_attr(feature = "full", table_name = "diary")]
-pub struct NewDiary {
-    pub user_id: UserId,
-    pub date: NaiveDate,
-    pub bodyweight: Option<f32>,
-    pub comments: Option<String>,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -80,19 +75,20 @@ pub struct NewDiary {
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct WodId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct WodId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -102,11 +98,11 @@ pub struct WodId(pub i32);
         GetById,
         GetByIds,
         GetByUser,
-        GetAll,
+        GetByUserSync,
         Update,
-        Delete,
-        DeleteMultiple,
         VerifyForUserOrAPWithDb,
+        VerifyForUserOrAPWithoutDb,
+        VerifyUnchecked
     )
 )]
 #[cfg_attr(feature = "full", table_name = "wod")]
@@ -117,16 +113,8 @@ pub struct Wod {
     pub date: NaiveDate,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(
-    feature = "full",
-    derive(Insertable, VerifyForUserOrAPWithoutDb, VerifyUnchecked,)
-)]
-#[cfg_attr(feature = "full", table_name = "wod")]
-pub struct NewWod {
-    pub user_id: UserId,
-    pub date: NaiveDate,
-    pub description: Option<String>,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }

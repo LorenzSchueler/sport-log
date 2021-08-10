@@ -5,6 +5,9 @@ members = [
     "sport-log-types",
     "sport-log-scheduler",
     "sport-log-api-tester",
+    "sport-log-password-hasher",
+    "sport-log-ap-utils",
     "sport-log-action-provider-sportstracker",
-    "sport-log-password-hasher"
+    "sport-log-action-provider-wodify-login",
+    "sport-log-action-provider-wodify-wod",
 ]

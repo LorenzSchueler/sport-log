@@ -1,11 +1,10 @@
+use chrono::{DateTime, Utc};
 #[cfg(feature = "full")]
 use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
-use sport_log_types_derive::{
-    Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds, ToSql, VerifyUnchecked,
-};
+use sport_log_types_derive::{FromI64, FromSql, GetById, GetByIds, ToSql, VerifyUnchecked};
 
 #[cfg(feature = "full")]
 use crate::{schema::user, AuthUser, GetById, Unverified, VerifyForUserWithDb};
@@ -13,24 +12,23 @@ use crate::{schema::user, AuthUser, GetById, Unverified, VerifyForUserWithDb};
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI32, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, FromI64, ToSql, FromSql)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct UserId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct UserId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
         AsChangeset,
         GetById,
         GetByIds,
-        GetAll,
-        Delete,
-        DeleteMultiple,
+        VerifyUnchecked,
     )
 )]
 #[cfg_attr(feature = "full", table_name = "user")]
@@ -39,13 +37,16 @@ pub struct User {
     pub username: String,
     pub password: String,
     pub email: String,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
 }
 
 #[cfg(feature = "full")]
 impl VerifyForUserWithDb for Unverified<User> {
     type Entity = User;
 
-    fn verify(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
+    fn verify_user(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
         let user = self.0.into_inner();
         if user.id == **auth
             && User::get_by_id(user.id, conn)
@@ -58,13 +59,4 @@ impl VerifyForUserWithDb for Unverified<User> {
             Err(Status::Forbidden)
         }
     }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyUnchecked))]
-#[cfg_attr(feature = "full", table_name = "user")]
-pub struct NewUser {
-    pub username: String,
-    pub password: String,
-    pub email: String,
 }

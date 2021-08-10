@@ -1,7 +1,7 @@
 #[cfg(feature = "full")]
 use std::io::Write;
 
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 #[cfg(feature = "full")]
 use diesel::{
     deserialize,
@@ -16,9 +16,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, Delete, DeleteMultiple, FromI32, FromSql, GetAll, GetById, GetByIds,
-    GetByUser, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
-    VerifyIdForUserOrAP,
+    Create, CreateMultiple, FromI64, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, ToSql,
+    Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
 };
 
 #[cfg(feature = "full")]
@@ -93,19 +92,20 @@ impl FromSql<Position, Pg> for Position {
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct RouteId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct RouteId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -115,11 +115,10 @@ pub struct RouteId(pub i32);
         GetById,
         GetByIds,
         GetByUser,
-        GetAll,
+        GetByUserSync,
         Update,
-        Delete,
-        DeleteMultiple,
-        VerifyForUserOrAPWithDb
+        VerifyForUserOrAPWithDb,
+        VerifyForUserOrAPWithoutDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "route")]
@@ -135,18 +134,10 @@ pub struct Route {
     pub descent: Option<i32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub track: Option<Vec<Position>>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserOrAPWithoutDb))]
-#[cfg_attr(feature = "full", table_name = "route")]
-pub struct NewRoute {
-    pub user_id: UserId,
-    pub name: String,
-    pub distance: i32,
-    pub ascent: Option<i32>,
-    pub descent: Option<i32>,
-    pub track: Option<Vec<Position>>,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -156,19 +147,20 @@ pub struct NewRoute {
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI32,
+        FromI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::Integer")]
-pub struct CardioSessionId(pub i32);
+#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+pub struct CardioSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
     derive(
+        Insertable,
         Associations,
         Identifiable,
         Queryable,
@@ -178,11 +170,10 @@ pub struct CardioSessionId(pub i32);
         GetById,
         GetByIds,
         GetByUser,
-        GetAll,
+        GetByUserSync,
         Update,
-        Delete,
-        DeleteMultiple,
-        VerifyForUserOrAPWithDb
+        VerifyForUserOrAPWithDb,
+        VerifyForUserOrAPWithoutDb
     )
 )]
 #[cfg_attr(feature = "full", table_name = "cardio_session")]
@@ -193,7 +184,7 @@ pub struct CardioSession {
     pub user_id: UserId,
     pub movement_id: MovementId,
     pub cardio_type: CardioType,
-    pub datetime: NaiveDateTime,
+    pub datetime: DateTime<Utc>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub distance: Option<i32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
@@ -218,28 +209,10 @@ pub struct CardioSession {
     pub route_id: Option<RouteId>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable, VerifyForUserOrAPWithoutDb))]
-#[cfg_attr(feature = "full", table_name = "cardio_session")]
-pub struct NewCardioSession {
-    pub user_id: UserId,
-    pub movement_id: MovementId,
-    pub cardio_type: CardioType,
-    pub datetime: NaiveDateTime,
-    pub distance: Option<i32>,
-    pub ascent: Option<i32>,
-    pub descent: Option<i32>,
-    pub time: Option<i32>,
-    pub calories: Option<i32>,
-    pub track: Option<Vec<Position>>,
-    pub avg_cycles: Option<i32>,
-    pub cycles: Option<Vec<f32>>,
-    pub avg_heart_rate: Option<i32>,
-    pub heart_rate: Option<Vec<f32>>,
-    pub route_id: Option<RouteId>,
-    pub comments: Option<String>,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
