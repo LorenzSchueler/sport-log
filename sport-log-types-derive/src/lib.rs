@@ -66,6 +66,29 @@ pub fn get_by_user_derive(input: TokenStream) -> TokenStream {
     impl_get_by_user(&ast)
 }
 
+/// Derives `sport_log_types::GetByUserSync`.
+///
+/// This macro only works if the following conditions are satisfied:
+/// - the corresponding table has the same name like this type but in snake_case
+/// - the table has a column `user_id` which references the table `user`.
+/// - the table has a column `last_sync` with type `timestamptz`.
+#[proc_macro_derive(GetByUserSync)]
+pub fn get_by_user_and_last_sync_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_get_by_user_and_last_sync(&ast)
+}
+
+/// Derives `sport_log_types::GetBySync`.
+///
+/// This macro only works if the following conditions are satisfied:
+/// - the corresponding table has the same name like this type but in snake_case
+/// - the table has a column `last_sync` with type `timestamptz`.
+#[proc_macro_derive(GetBySync)]
+pub fn get_by_last_sync_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_get_by_last_sync(&ast)
+}
+
 /// Derives `sport_log_types::GetAll`.
 ///
 /// This macro only works if the following condition is satisfied:

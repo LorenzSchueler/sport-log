@@ -108,6 +108,47 @@ pub fn impl_get_by_user(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
+pub fn impl_get_by_user_and_last_sync(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+    let (_, _, _, tablename) = get_identifiers(typename);
+
+    let gen = quote! {
+        use diesel::prelude::*;
+
+        impl crate::GetByUserSync for #typename {
+            fn get_by_user(
+                user_id: crate::UserId,
+                last_sync: DateTime<Utc>,
+                conn: &PgConnection
+            ) -> QueryResult<Vec<Self>> {
+                #tablename::table
+                    .filter(#tablename::columns::user_id.eq(user_id))
+                    .filter(#tablename::columns::last_change.ge(last_sync))
+                    .get_results(conn)
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_get_by_last_sync(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+    let (_, _, _, tablename) = get_identifiers(typename);
+
+    let gen = quote! {
+        use diesel::prelude::*;
+
+        impl crate::GetBySync for #typename {
+            fn get_by_last_sync(last_sync: DateTime<Utc>, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+                #tablename::table
+                    .filter(#tablename::columns::last_change.ge(last_sync))
+                    .get_results(conn)
+            }
+        }
+    };
+    gen.into()
+}
+
 pub fn impl_get_all(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
     let (_, _, _, tablename) = get_identifiers(typename);

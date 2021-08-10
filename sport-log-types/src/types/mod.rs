@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 #[cfg(feature = "full")]
 use diesel::{PgConnection, QueryResult};
 #[cfg(feature = "full")]
@@ -184,6 +185,38 @@ pub trait GetByIds {
 #[cfg(feature = "full")]
 pub trait GetByUser {
     fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized;
+}
+
+/// A type for which entries can be retrieved by user and the timestamp of the last synchonization from the database.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(GetByUserSync)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::GetByUserSync].
+#[cfg(feature = "full")]
+pub trait GetByUserSync {
+    fn get_by_user_and_last_sync(
+        user_id: UserId,
+        last_sync: DateTime<Utc>,
+        conn: &PgConnection,
+    ) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized;
+}
+
+/// A type for which entries can be retrieved by the timestamp of the last synchonization from the database.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(GetBySync)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::GetBySync].
+#[cfg(feature = "full")]
+pub trait GetBySync {
+    fn get_by_last_sync(last_sync: DateTime<Utc>, conn: &PgConnection) -> QueryResult<Vec<Self>>
     where
         Self: Sized;
 }
