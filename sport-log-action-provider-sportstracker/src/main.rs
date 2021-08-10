@@ -1,14 +1,14 @@
 use std::{env, fs};
 
-use chrono::{Duration, NaiveDateTime};
+use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use rand::Rng;
 use reqwest::{Client, StatusCode};
 use serde::Deserialize;
 
 use sport_log_ap_utils::{delete_events, get_events, setup};
 use sport_log_types::{
-    ActionProviderId, CardioType, Movement, NewAction, NewActionProvider, NewCardioSession,
-    NewPlatform, PlatformId, Position,
+    Action, ActionId, ActionProvider, ActionProviderId, CardioSession, CardioSessionId, CardioType,
+    Movement, Platform, PlatformId, Position,
 };
 
 const NAME: &str = "sportstracker-fetch";
@@ -122,23 +122,32 @@ async fn main() {
 
             let mut rng = rand::thread_rng();
 
-            let platform = NewPlatform {
+            let platform = Platform {
+                id: PlatformId(rng.gen()),
                 name: PLATFORM_NAME.to_owned(),
+                last_change: Utc::now(),
+                deleted: false,
             };
 
-            let action_provider = NewActionProvider {
+            let action_provider = ActionProvider {
+                id: ActionProviderId(rng.gen()),
                 name: NAME.to_owned(),
                 password: config.password.clone(),
-                platform_id: PlatformId(rng.gen()), // TODO use generated id from platfrom
+                platform_id: platform.id,
                 description: Some(DESCRIPTION.to_owned()),
+                last_change: Utc::now(),
+                deleted: false,
             };
 
-            let actions = vec![NewAction {
+            let actions = vec![Action {
+                id: ActionId(rng.gen()),
                 name: "fetch".to_owned(),
-                action_provider_id: ActionProviderId(rng.gen()), // TODO use generated id from action provider
+                action_provider_id: action_provider.id,
                 description: Some("Fetch and save new workouts.".to_owned()),
                 create_before: 168,
                 delete_after: 0,
+                last_change: Utc::now(),
+                deleted: false,
             }];
 
             setup(
@@ -191,6 +200,8 @@ async fn fetch() {
     .await;
     println!("executable action events: {}\n", exec_action_events.len());
 
+    let mut rng = rand::thread_rng();
+
     let mut delete_action_event_ids = vec![];
     for exec_action_event in exec_action_events {
         println!("{:#?}", exec_action_event);
@@ -240,13 +251,14 @@ async fn fetch() {
                                 Some(movement) => movement.id,
                                 None => continue,
                             };
-                        let cardio_session = NewCardioSession {
+                        let cardio_session = CardioSession {
+                            id: CardioSessionId(rng.gen()),
                             user_id: exec_action_event.user_id,
                             movement_id,
                             cardio_type: CardioType::Training,
-                            datetime: NaiveDateTime::from_timestamp(
-                                workout.start_time as i64 / 1000,
-                                0,
+                            datetime: DateTime::from_utc(
+                                NaiveDateTime::from_timestamp(workout.start_time as i64 / 1000, 0),
+                                Utc,
                             ),
                             distance: Some(workout.total_distance as i32),
                             ascent: Some(workout.total_ascent as i32),
@@ -276,6 +288,8 @@ async fn fetch() {
                             heart_rate: None,
                             route_id: None,
                             comments: workout.description,
+                            last_change: Utc::now(),
+                            deleted: false,
                         };
                         //println!("{:?}", cardio_session);
                         match client

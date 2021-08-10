@@ -1,19 +1,16 @@
-use chrono::{Duration, Local};
+use chrono::{Duration, Utc};
 use reqwest::{Client, StatusCode};
 
-use sport_log_types::{
-    ActionEventId, ActionProvider, ExecutableActionEvent, NewAction, NewActionProvider,
-    NewPlatform, Platform,
-};
+use sport_log_types::{Action, ActionEventId, ActionProvider, ExecutableActionEvent, Platform};
 
 pub async fn setup(
     base_url: &str,
     name: &str,
     password: &str,
     platform_name: &str,
-    platform: NewPlatform,
-    mut action_provider: NewActionProvider,
-    mut actions: Vec<NewAction>,
+    platform: Platform,
+    mut action_provider: ActionProvider,
+    mut actions: Vec<Action>,
 ) {
     let client = Client::new();
 
@@ -25,10 +22,9 @@ pub async fn setup(
         .await
         .unwrap();
 
-    let platform = match response.status() {
+    match response.status() {
         StatusCode::OK => {
             println!("platform created");
-            response.json().await.unwrap()
         }
         StatusCode::CONFLICT => {
             println!("platform already exists");
@@ -40,10 +36,11 @@ pub async fn setup(
                 .json()
                 .await
                 .unwrap();
-            platforms
+            let platform = platforms
                 .into_iter()
                 .find(|platform| platform.name == platform_name)
-                .unwrap()
+                .unwrap();
+            action_provider.platform_id = platform.id;
         }
         StatusCode::FORBIDDEN => {
             println!("action provider self registration disabled");
@@ -55,9 +52,6 @@ pub async fn setup(
         }
     };
 
-    // TODO remove if random id implemented
-    action_provider.platform_id = platform.id;
-
     let response = client
         .post(format!("{}/v1/ap/action_provider", base_url))
         .basic_auth(name, Some(&password))
@@ -66,10 +60,9 @@ pub async fn setup(
         .await
         .unwrap();
 
-    let action_provider: ActionProvider = match response.status() {
+    match response.status() {
         StatusCode::OK => {
             println!("action provider created");
-            response.json().await.unwrap()
         }
         StatusCode::CONFLICT => {
             println!("action provider already exists");
@@ -82,7 +75,9 @@ pub async fn setup(
                 .json()
                 .await
                 .unwrap();
-            action_provider
+            for mut action in &mut actions {
+                action.action_provider_id = action_provider.id;
+            }
         }
         StatusCode::FORBIDDEN => {
             println!("action provider self registration disabled");
@@ -93,11 +88,6 @@ pub async fn setup(
             return;
         }
     };
-
-    // TODO remove if random id implemented
-    for mut action in &mut actions {
-        action.action_provider_id = action_provider.id;
-    }
 
     match client
         .post(format!("{}/v1/ap/actions", base_url))
@@ -122,9 +112,11 @@ pub async fn get_events(
     start_offset: Duration,
     end_offset: Duration,
 ) -> Vec<ExecutableActionEvent> {
-    let now = Local::now().naive_local();
-    let datetime_start = (now + start_offset).format("%Y-%m-%dT%H:%M:%S");
-    let datetime_end = (now + end_offset).format("%Y-%m-%dT%H:%M:%S");
+    let now = Utc::now();
+    let datetime_start = (now + start_offset).to_rfc3339();
+    let datetime_end = (now + end_offset).to_rfc3339();
+    println!("{:?}", datetime_start);
+    println!("{:?}", datetime_end);
 
     let exec_action_events: Vec<ExecutableActionEvent> = client
         .get(format!(
