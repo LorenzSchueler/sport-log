@@ -1,13 +1,14 @@
 use std::{env, fs, process::Command, thread, time::Duration as StdDuration};
 
-use chrono::{Duration, Local};
+use chrono::{Duration, Local, Utc};
+use rand::Rng;
 use reqwest::Client;
 use serde::Deserialize;
 use thirtyfour::prelude::*;
 use tokio;
 
 use sport_log_ap_utils::{delete_events, get_events, setup};
-use sport_log_types::{ActionProviderId, NewAction, NewActionProvider, NewPlatform, PlatformId};
+use sport_log_types::{Action, ActionId, ActionProvider, ActionProviderId, Platform, PlatformId};
 
 const NAME: &str = "wodify-login";
 const DESCRIPTION: &str =
@@ -33,38 +34,55 @@ async fn main() {
         [option] if option == "--setup" => {
             let config = Config::get();
 
-            let platform = NewPlatform {
+            let mut rng = rand::thread_rng();
+
+            let platform = Platform {
+                id: PlatformId(rng.gen()),
                 name: PLATFORM_NAME.to_owned(),
+                last_change: Utc::now(),
+                deleted: false,
             };
 
-            let action_provider = NewActionProvider {
+            let action_provider = ActionProvider {
+                id: ActionProviderId(rng.gen()),
                 name: NAME.to_owned(),
                 password: config.password.clone(),
-                platform_id: PlatformId(0), // TODO use generated id from platform
+                platform_id: platform.id,
                 description: Some(DESCRIPTION.to_owned()),
+                last_change: Utc::now(),
+                deleted: false,
             };
 
             let actions = vec![
-                NewAction {
+                Action {
+                    id: ActionId(rng.gen()),
                     name: "CrossFit".to_owned(),
-                    action_provider_id: ActionProviderId(0), // TODO use generated id from action provider
+                    action_provider_id: action_provider.id,
                     description: Some("Reserve a spot in a CrossFit class.".to_owned()),
                     create_before: 168,
                     delete_after: 0,
+                    last_change: Utc::now(),
+                    deleted: false,
                 },
-                NewAction {
+                Action {
+                    id: ActionId(rng.gen()),
                     name: "Weightlifting".to_owned(),
-                    action_provider_id: ActionProviderId(0), // TODO use generated id from action provider
+                    action_provider_id: action_provider.id,
                     description: Some("Reserve a spot in a Weightlifting class.".to_owned()),
                     create_before: 168,
                     delete_after: 0,
+                    last_change: Utc::now(),
+                    deleted: false,
                 },
-                NewAction {
+                Action {
+                    id: ActionId(rng.gen()),
                     name: "Open Fridge".to_owned(),
-                    action_provider_id: ActionProviderId(0), // TODO use generated id from action provider
+                    action_provider_id: action_provider.id,
                     description: Some("Reserve a spot in a Open Fridge class.".to_owned()),
                     create_before: 168,
                     delete_after: 0,
+                    last_change: Utc::now(),
+                    deleted: false,
                 },
             ];
 
@@ -136,7 +154,11 @@ async fn login() -> WebDriverResult<()> {
     for exec_action_event in exec_action_events {
         println!("{:#?}", exec_action_event);
 
-        let time = exec_action_event.datetime.format("%-H:%M").to_string();
+        let time = exec_action_event
+            .datetime
+            .with_timezone(&Local)
+            .format("%-H:%M")
+            .to_string();
         let date = exec_action_event.datetime.format("%m/%d/%Y").to_string();
         println!("time: {:?}", time);
         println!("date: {:?}", date);
@@ -175,12 +197,12 @@ async fn login() -> WebDriverResult<()> {
         }
         println!("login successful");
 
-        while Local::now().naive_local() < exec_action_event.datetime - Duration::days(1) {
+        while Utc::now() < exec_action_event.datetime - Duration::days(1) {
             thread::sleep(StdDuration::from_millis(100));
         }
         println!("ready");
 
-        'event_loop: while Local::now().naive_local() < exec_action_event.datetime
+        'event_loop: while Utc::now() < exec_action_event.datetime
         // - Duration::days(1) + Duration::minutes(1) // TODO
         {
             driver.refresh().await?; // TODO can this be removed?

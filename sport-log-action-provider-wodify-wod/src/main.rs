@@ -1,6 +1,7 @@
 use std::{env, fs, process::Command, thread, time::Duration as StdDuration};
 
-use chrono::{Duration, Local};
+use chrono::{Duration, Local, Utc};
+use rand::Rng;
 use reqwest::{Client, StatusCode};
 use serde::Deserialize;
 use thirtyfour::prelude::*;
@@ -8,7 +9,7 @@ use tokio;
 
 use sport_log_ap_utils::{delete_events, get_events, setup};
 use sport_log_types::{
-    ActionProviderId, NewAction, NewActionProvider, NewPlatform, NewWod, PlatformId, Wod,
+    Action, ActionId, ActionProvider, ActionProviderId, Platform, PlatformId, Wod, WodId,
 };
 
 const NAME: &str = "wodify-wod";
@@ -35,44 +36,61 @@ async fn main() {
         [option] if option == "--setup" => {
             let config = Config::get();
 
-            let platform = NewPlatform {
+            let mut rng = rand::thread_rng();
+
+            let platform = Platform {
+                id: PlatformId(rng.gen()),
                 name: PLATFORM_NAME.to_owned(),
+                last_change: Utc::now(),
+                deleted: false,
             };
 
-            let action_provider = NewActionProvider {
+            let action_provider = ActionProvider {
+                id: ActionProviderId(rng.gen()),
                 name: NAME.to_owned(),
                 password: config.password.clone(),
-                platform_id: PlatformId(0), // TODO use generated id from platform
+                platform_id: platform.id,
                 description: Some(DESCRIPTION.to_owned()),
+                last_change: Utc::now(),
+                deleted: false,
             };
 
             let actions = vec![
-                NewAction {
+                Action {
+                    id: ActionId(rng.gen()),
                     name: "CrossFit".to_owned(),
-                    action_provider_id: ActionProviderId(0), // TODO use generated id from action provider
+                    action_provider_id: action_provider.id,
                     description: Some(
                         "Fetch and save the CrossFit wod for the current day.".to_owned(),
                     ),
                     create_before: 168,
                     delete_after: 0,
+                    last_change: Utc::now(),
+                    deleted: false,
                 },
-                NewAction {
+                Action {
+                    id: ActionId(rng.gen()),
                     name: "Weightlifting".to_owned(),
-                    action_provider_id: ActionProviderId(0), // TODO use generated id from action provider
+                    action_provider_id: action_provider.id,
                     description: Some(
                         "Fetch and save the Weightlifting wod for the current day.".to_owned(),
                     ),
                     create_before: 168,
                     delete_after: 0,
+                    last_change: Utc::now(),
+                    deleted: false,
                 },
-                NewAction {
+                Action {
+                    id: ActionId(rng.gen()),
                     name: "Open Fridge".to_owned(),
-                    action_provider_id: ActionProviderId(0), // TODO use generated id from action provider
+                    action_provider_id: action_provider.id,
                     description: Some(
                         "Fetch and save the Open Fridge wod for the current day.".to_owned(),
                     ),
                     create_before: 168,
                     delete_after: 0,
+                    last_change: Utc::now(),
+                    deleted: false,
                 },
             ];
 
@@ -128,6 +146,8 @@ async fn login() -> WebDriverResult<()> {
     if exec_action_events.is_empty() {
         return Ok(());
     }
+
+    let mut rng = rand::thread_rng();
 
     let mut webdriver = Command::new("../geckodriver").spawn().unwrap();
 
@@ -224,11 +244,13 @@ async fn login() -> WebDriverResult<()> {
                 description += "\n";
         }
         println!("{}", description);
-        // insert into db
-        let wod = NewWod {
+        let wod = Wod {
+            id: WodId(rng.gen()),
             user_id: exec_action_event.user_id,
             date: Local::today().naive_local(),
-            description: Some(description.clone())
+            description: Some(description.clone()),
+            last_change: Utc::now(),
+            deleted: false,
         };
         // TODO append
         if client
@@ -237,34 +259,34 @@ async fn login() -> WebDriverResult<()> {
             .json(&wod )
             .send()
             .await
-            .unwrap().status() == StatusCode::CONFLICT {
-
-                let today = Local::today().naive_local().format("%Y-%m-%d");
-                let wods: Vec<Wod> = client
-            .get(format!("{}/v1/wod/timespan/{}/{}", config.base_url,today, today))
-            .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&config.password))
-            .send()
-            .await
-            .unwrap()
-            .json().await.unwrap();
+            .unwrap().status() == StatusCode::CONFLICT 
+        {
+            let today = Local::today().naive_local().format("%Y-%m-%d");
+            let wods: Vec<Wod> = client
+                .get(format!("{}/v1/wod/timespan/{}/{}", config.base_url,today, today))
+                .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&config.password))
+                .send()
+                .await
+                .unwrap()
+                .json().await.unwrap();
             let mut wod = wods.into_iter().next().unwrap();
             if let Some(old_description) = wod.description {
-
-            wod.description = Some(old_description + &description) ;
+                wod.description = Some(old_description + &description) ;
             } else {
                 wod.description = Some(description);
             }
-                client
-            .put(format!("{}/v1/wod", config.base_url,))
-            .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&config.password))
-            .json(&wod )
-            .send()
-            .await
-            .unwrap();}
+            client
+                .put(format!("{}/v1/wod", config.base_url,))
+                .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&config.password))
+                .json(&wod )
+                .send()
+                .await
+                .unwrap();
+            }
         } else {
             println!("not wod found");
         }
-        //delete_action_event_ids.push(exec_action_event.action_event_id);
+        delete_action_event_ids.push(exec_action_event.action_event_id); 
     }
 
     println!("delete event ids: {:?}", delete_action_event_ids);
