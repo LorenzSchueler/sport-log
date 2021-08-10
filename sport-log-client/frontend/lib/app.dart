@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:moor_db_viewer/moor_db_viewer.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/models/metcon/ui_metcon.dart';
 import 'package:sport_log/models/movement/ui_movement.dart';
 import 'package:sport_log/pages/logs/logs_page.dart';
@@ -55,7 +57,9 @@ class _AppState extends State<App> {
           return EditMovementPage(
            initialMovement: (arg is UiMovement) ? arg : null,
           );
-        })
+        }),
+        if (Database.instance != null)
+          Routes.debugViewDatabase: (_) => MoorDbViewer(Database.instance!),
       },
       initialRoute: widget.isAuthenticatedAtStart ? Routes.workout : Routes.landing,
       debugShowCheckedModeBanner: false,

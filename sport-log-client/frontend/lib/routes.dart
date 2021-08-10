@@ -9,4 +9,5 @@ abstract class Routes {
   static const logs = '/logs';
   static const movements = '/movements';
   static const editMovement = '/edit-movement';
+  static const debugViewDatabase = '/debug-view-database';
 }

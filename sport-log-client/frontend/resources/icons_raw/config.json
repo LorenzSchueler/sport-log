@@ -61,6 +61,12 @@
       "search": [
         "plan"
       ]
+    },
+    {
+      "uid": "347c38a8b96a509270fdcabc951e7571",
+      "css": "database",
+      "code": 61888,
+      "src": "fontawesome"
     }
   ]
 }
