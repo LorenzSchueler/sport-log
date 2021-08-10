@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
@@ -22,8 +22,8 @@ impl GetByUser for Metcon {
 impl MetconSession {
     pub fn get_ordered_by_user_and_timespan(
         user_id: UserId,
-        start_datetime: NaiveDateTime,
-        end_datetime: NaiveDateTime,
+        start_datetime: DateTime<Utc>,
+        end_datetime: DateTime<Utc>,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         metcon_session::table
@@ -134,8 +134,8 @@ impl MetconSessionDescription {
 
     pub fn get_ordered_by_user_and_timespan(
         user_id: UserId,
-        start_datetime: NaiveDateTime,
-        end_datetime: NaiveDateTime,
+        start_datetime: DateTime<Utc>,
+        end_datetime: DateTime<Utc>,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         let metcon_sessions = MetconSession::get_ordered_by_user_and_timespan(

@@ -10,7 +10,7 @@ use sport_log_types::{
     VerifyMultipleForAdminWithoutDb, VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
 };
 
-use crate::handler::{IntoJson, NaiveDateTimeWrapper};
+use crate::handler::{DateTimeWrapper, IntoJson};
 
 #[post(
     "/adm/action_provider",
@@ -304,8 +304,8 @@ pub async fn ap_get_executable_action_events(
 
 #[get("/ap/executable_action_event/timespan/<start_datetime>/<end_datetime>")]
 pub async fn ap_get_ordered_executable_action_events_by_timespan(
-    start_datetime: NaiveDateTimeWrapper,
-    end_datetime: NaiveDateTimeWrapper,
+    start_datetime: DateTimeWrapper,
+    end_datetime: DateTimeWrapper,
     auth: AuthAP,
     conn: Db,
 ) -> Result<Json<Vec<ExecutableActionEvent>>, Status> {

@@ -1,4 +1,4 @@
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, Utc};
 #[cfg(feature = "full")]
 use diesel::PgConnection;
 #[cfg(feature = "full")]
@@ -378,7 +378,7 @@ pub struct MetconSession {
     pub id: MetconSessionId,
     pub user_id: UserId,
     pub metcon_id: MetconId,
-    pub datetime: NaiveDateTime,
+    pub datetime: DateTime<Utc>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub time: Option<i32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]

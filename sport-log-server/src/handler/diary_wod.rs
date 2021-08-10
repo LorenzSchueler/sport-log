@@ -1,13 +1,12 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthUserOrAP, Create, CreateMultiple, Db,   Diary, DiaryId, GetById,
-    GetByUser, Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
-    VerifyMultipleForUserOrAPWithoutDb, Wod, WodId,
+    AuthUserOrAP, Create, CreateMultiple, Db, Diary, DiaryId, GetById, GetByUser, Unverified,
+    UnverifiedId, UnverifiedIds, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
+    VerifyIdForUserOrAP, VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithoutDb, Wod, WodId,
 };
 
-use crate::handler::{IntoJson, NaiveDateTimeWrapper};
+use crate::handler::{DateTimeWrapper, IntoJson};
 
 #[post("/wod", format = "application/json", data = "<wod>")]
 pub async fn create_wod(
@@ -33,8 +32,8 @@ pub async fn create_wods(
 
 #[get("/wod/timespan/<start_datetime>/<end_datetime>")]
 pub async fn get_ordered_wods_by_timespan(
-    start_datetime: NaiveDateTimeWrapper,
-    end_datetime: NaiveDateTimeWrapper,
+    start_datetime: DateTimeWrapper,
+    end_datetime: DateTimeWrapper,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Vec<Wod>>, Status> {
@@ -98,8 +97,8 @@ pub async fn get_diary(
 
 #[get("/diary/timespan/<start_datetime>/<end_datetime>")]
 pub async fn get_ordered_diarys_by_timespan(
-    start_datetime: NaiveDateTimeWrapper,
-    end_datetime: NaiveDateTimeWrapper,
+    start_datetime: DateTimeWrapper,
+    end_datetime: DateTimeWrapper,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Vec<Diary>>, Status> {

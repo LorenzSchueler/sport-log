@@ -1,4 +1,4 @@
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, Utc};
 #[cfg(feature = "full")]
 use rocket::http::Status;
 use serde::{Deserialize, Serialize};
@@ -58,7 +58,7 @@ pub struct StrengthSessionId(pub i64);
 pub struct StrengthSession {
     pub id: StrengthSessionId,
     pub user_id: UserId,
-    pub datetime: NaiveDateTime,
+    pub datetime: DateTime<Utc>,
     pub movement_id: MovementId,
     pub movement_unit: MovementUnit,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]

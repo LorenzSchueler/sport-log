@@ -1,4 +1,4 @@
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, Utc};
 #[cfg(feature = "full")]
 use diesel_derive_enum::DbEnum;
 #[cfg(feature = "full")]
@@ -186,7 +186,7 @@ pub struct ActionRule {
     pub user_id: UserId,
     pub action_id: ActionId,
     pub weekday: Weekday,
-    pub time: NaiveDateTime,
+    pub time: DateTime<Utc>,
     pub enabled: bool,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -279,7 +279,7 @@ pub struct ActionEvent {
     pub id: ActionEventId,
     pub user_id: UserId,
     pub action_id: ActionId,
-    pub datetime: NaiveDateTime,
+    pub datetime: DateTime<Utc>,
     pub enabled: bool,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -294,7 +294,7 @@ pub struct CreatableActionRule {
     pub user_id: UserId,
     pub action_id: ActionId,
     pub weekday: Weekday,
-    pub time: NaiveDateTime,
+    pub time: DateTime<Utc>,
     pub create_before: i32,
 }
 
@@ -303,7 +303,7 @@ pub struct CreatableActionRule {
 pub struct ExecutableActionEvent {
     pub action_event_id: ActionEventId,
     pub action_name: String,
-    pub datetime: NaiveDateTime,
+    pub datetime: DateTime<Utc>,
     pub user_id: UserId,
     pub username: String,
     pub password: String,
@@ -313,6 +313,6 @@ pub struct ExecutableActionEvent {
 #[cfg_attr(feature = "full", derive(Queryable))]
 pub struct DeletableActionEvent {
     pub action_event_id: ActionEventId,
-    pub datetime: NaiveDateTime,
+    pub datetime: DateTime<Utc>,
     pub delete_after: i32,
 }

@@ -1,5 +1,5 @@
 use argon2::{password_hash::SaltString, Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::{prelude::*, result::Error};
 use rand_core::OsRng;
 
@@ -221,8 +221,8 @@ impl ExecutableActionEvent {
 
     pub fn get_ordered_by_action_provider_and_timespan(
         action_provider_id: ActionProviderId,
-        start_datetime: NaiveDateTime,
-        end_datetime: NaiveDateTime,
+        start_datetime: DateTime<Utc>,
+        end_datetime: DateTime<Utc>,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action_event::table

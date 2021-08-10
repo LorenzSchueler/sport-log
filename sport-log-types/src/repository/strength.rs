@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
@@ -10,8 +10,8 @@ use crate::{
 impl StrengthSession {
     pub fn get_ordered_by_user_and_timespan(
         user_id: UserId,
-        start_datetime: NaiveDateTime,
-        end_datetime: NaiveDateTime,
+        start_datetime: DateTime<Utc>,
+        end_datetime: DateTime<Utc>,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         strength_session::table
@@ -102,8 +102,8 @@ impl StrengthSessionDescription {
 
     pub fn get_ordered_by_user_and_timespan(
         user_id: UserId,
-        start_datetime: NaiveDateTime,
-        end_datetime: NaiveDateTime,
+        start_datetime: DateTime<Utc>,
+        end_datetime: DateTime<Utc>,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         let strength_sessions = StrengthSession::get_ordered_by_user_and_timespan(

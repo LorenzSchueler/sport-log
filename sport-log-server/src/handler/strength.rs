@@ -1,14 +1,14 @@
 use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
-    AuthUserOrAP, Create, CreateMultiple, Db,   GetById, GetByUser,
-    StrengthSession, StrengthSessionDescription, StrengthSessionId, StrengthSet, StrengthSetId,
-    Unverified, UnverifiedId, UnverifiedIds, Update, VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
-    VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
+    AuthUserOrAP, Create, CreateMultiple, Db, GetById, GetByUser, StrengthSession,
+    StrengthSessionDescription, StrengthSessionId, StrengthSet, StrengthSetId, Unverified,
+    UnverifiedId, UnverifiedIds, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
+    VerifyIdForUserOrAP, VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithDb,
+    VerifyMultipleForUserOrAPWithoutDb,
 };
 
-use crate::handler::{IntoJson, NaiveDateTimeWrapper};
+use crate::handler::{DateTimeWrapper, IntoJson};
 
 #[post(
     "/strength_session",
@@ -184,8 +184,8 @@ pub async fn get_strength_session_descriptions(
 
 #[get("/strength_session_description/timespan/<start_datetime>/<end_datetime>")]
 pub async fn get_ordered_strength_session_descriptions_by_timespan(
-    start_datetime: NaiveDateTimeWrapper,
-    end_datetime: NaiveDateTimeWrapper,
+    start_datetime: DateTimeWrapper,
+    end_datetime: DateTimeWrapper,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Vec<StrengthSessionDescription>>, Status> {

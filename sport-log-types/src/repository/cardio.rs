@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
@@ -9,8 +9,8 @@ use crate::{
 impl CardioSession {
     pub fn get_ordered_by_user_and_timespan(
         user_id: UserId,
-        start_datetime: NaiveDateTime,
-        end_datetime: NaiveDateTime,
+        start_datetime: DateTime<Utc>,
+        end_datetime: DateTime<Utc>,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         cardio_session::table
@@ -82,8 +82,8 @@ impl CardioSessionDescription {
 
     pub fn get_ordered_by_user_and_timespan(
         user_id: UserId,
-        start_datetime: NaiveDateTime,
-        end_datetime: NaiveDateTime,
+        start_datetime: DateTime<Utc>,
+        end_datetime: DateTime<Utc>,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         let cardio_sessions = CardioSession::get_ordered_by_user_and_timespan(

@@ -1,7 +1,7 @@
 #[cfg(feature = "full")]
 use std::io::Write;
 
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, Utc};
 #[cfg(feature = "full")]
 use diesel::{
     deserialize,
@@ -184,7 +184,7 @@ pub struct CardioSession {
     pub user_id: UserId,
     pub movement_id: MovementId,
     pub cardio_type: CardioType,
-    pub datetime: NaiveDateTime,
+    pub datetime: DateTime<Utc>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub distance: Option<i32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]

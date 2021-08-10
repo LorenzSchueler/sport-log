@@ -2,12 +2,12 @@ use rocket::{http::Status, serde::json::Json};
 
 use sport_log_types::{
     AuthUserOrAP, CardioSession, CardioSessionDescription, CardioSessionId, Create, CreateMultiple,
-    Db,   GetById, GetByUser, Route, RouteId, Unverified, UnverifiedId,
-    UnverifiedIds, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
-    VerifyIdForUserOrAP, VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithoutDb,
+    Db, GetById, GetByUser, Route, RouteId, Unverified, UnverifiedId, UnverifiedIds, Update,
+    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
+    VerifyMultipleForUserOrAPWithoutDb,
 };
 
-use crate::handler::{IntoJson, NaiveDateTimeWrapper};
+use crate::handler::{DateTimeWrapper, IntoJson};
 
 #[post("/route", format = "application/json", data = "<route>")]
 pub async fn create_route(
@@ -160,8 +160,8 @@ pub async fn get_cardio_session_descriptions(
 
 #[get("/cardio_session_description/timespan/<start_datetime>/<end_datetime>")]
 pub async fn get_ordered_cardio_session_descriptions_by_timespan(
-    start_datetime: NaiveDateTimeWrapper,
-    end_datetime: NaiveDateTimeWrapper,
+    start_datetime: DateTimeWrapper,
+    end_datetime: DateTimeWrapper,
     auth: AuthUserOrAP,
     conn: Db,
 ) -> Result<Json<Vec<CardioSessionDescription>>, Status> {

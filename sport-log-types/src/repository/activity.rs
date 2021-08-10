@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, TimeZone, Utc};
 use diesel::{PgConnection, QueryResult};
 
 use crate::{
@@ -16,16 +16,19 @@ impl Activity {
     ) -> Vec<Self> {
         let mut activities = vec![];
 
-        activities.extend(
-            diarys
-                .into_iter()
-                .map(|diary| (diary.date.and_hms(0, 0, 0), Activity::Diary(diary))),
-        );
+        activities.extend(diarys.into_iter().map(|diary| {
+            (
+                DateTime::from_utc(diary.date.and_hms(0, 0, 0), Utc),
+                Activity::Diary(diary),
+            )
+        }));
 
-        activities.extend(
-            wods.into_iter()
-                .map(|wod| (wod.date.and_hms(0, 0, 0), Activity::Wod(wod))),
-        );
+        activities.extend(wods.into_iter().map(|wod| {
+            (
+                DateTime::from_utc(wod.date.and_hms(0, 0, 0), Utc),
+                Activity::Wod(wod),
+            )
+        }));
 
         activities.extend(strength_session_descriptions.into_iter().map(
             |strength_session_description| {
@@ -64,8 +67,8 @@ impl Activity {
 
     pub fn get_ordered_by_user_and_timespan(
         user_id: UserId,
-        start: NaiveDateTime,
-        end: NaiveDateTime,
+        start: DateTime<Utc>,
+        end: DateTime<Utc>,
         conn: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         Ok(Self::join_and_order(
