@@ -1,3 +1,4 @@
+#[cfg(feature = "full")]
 use chrono::{DateTime, Utc};
 #[cfg(feature = "full")]
 use diesel::{PgConnection, QueryResult};

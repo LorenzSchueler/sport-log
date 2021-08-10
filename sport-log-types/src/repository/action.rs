@@ -5,7 +5,7 @@ use rand_core::OsRng;
 
 use crate::{
     schema::{action, action_event, action_provider, action_rule, platform_credential},
-    Action, ActionEvent, ActionId, ActionProvider, ActionProviderId, ActionRule,
+    Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
     CreatableActionRule, Create, DeletableActionEvent, ExecutableActionEvent, GetAll, UserId,
 };
 
@@ -174,6 +174,17 @@ impl ActionEvent {
                 ),
             )
             .get_results(conn)
+    }
+
+    pub fn delete_multiple(
+        action_event_ids: Vec<ActionEventId>,
+        conn: &PgConnection,
+    ) -> QueryResult<usize> {
+        diesel::update(
+            action_event::table.filter(action_event::columns::id.eq_any(action_event_ids)),
+        )
+        .set(action_event::columns::deleted.eq(true))
+        .execute(conn)
     }
 }
 

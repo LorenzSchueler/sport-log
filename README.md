@@ -22,8 +22,9 @@ see [#1](https://github.com/LorenzSchueler/sport-log/issues/1)
 The sport-log consists of multiple crates:
 
 - **sport-log-types** rust types for use in all rust crates (also includes SQL files and methods for database access)
-- **sport-log-server** central server backend
 - **sport-log-types-derive** macros for types
+- **sport-log-server** central server backend
+- **sport-log-scheduler** responsible for creating action events from action rules and deleting old action events
 - **sport-log-api-tester** command line HTTP client for API testing and manual communication with the server
 - **sport-log-password-hasher** hash passwords and verify hashes and passwords that can be stored in the server backend
 - **sport-log-action-provider-\<name\>** various action providers

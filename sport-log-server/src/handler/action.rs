@@ -4,9 +4,10 @@ use sport_log_types::{
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
     ActionRuleId, AuthAP, AuthAdmin, AuthUser, CreatableActionRule, Create, CreateMultiple, Db,
     DeletableActionEvent, ExecutableActionEvent, GetAll, GetById, GetByUser, Unverified,
-    UnverifiedId, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
+    UnverifiedId, UnverifiedIds, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForUser,
-    VerifyIdUnchecked, VerifyMultipleForActionProviderWithoutDb, VerifyMultipleForAdminWithoutDb,
+    VerifyIdUnchecked, VerifyIdsForActionProvider, VerifyIdsForAdmin,
+    VerifyMultipleForActionProviderWithoutDb, VerifyMultipleForAdminWithoutDb,
     VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
 };
 
@@ -292,6 +293,42 @@ pub async fn adm_update_action_event(
     conn.run(|c| ActionEvent::update(action_event, c))
         .await
         .into_json()
+}
+
+#[delete(
+    "/ap/action_events",
+    format = "application/json",
+    data = "<action_event_ids>"
+)]
+pub async fn ap_delete_action_events(
+    action_event_ids: UnverifiedIds<ActionEventId>,
+    auth: AuthAP,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        ActionEvent::delete_multiple(action_event_ids.verify_ap(&auth, c)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
+}
+
+#[delete(
+    "/adm/action_events",
+    format = "application/json",
+    data = "<action_event_ids>"
+)]
+pub async fn adm_delete_action_events(
+    action_event_ids: UnverifiedIds<ActionEventId>,
+    auth: AuthAdmin,
+    conn: Db,
+) -> Result<Status, Status> {
+    conn.run(move |c| {
+        ActionEvent::delete_multiple(action_event_ids.verify_adm(&auth)?, c)
+            .map(|_| Status::NoContent)
+            .map_err(|_| Status::InternalServerError)
+    })
+    .await
 }
 
 #[get("/adm/creatable_action_rule")]
