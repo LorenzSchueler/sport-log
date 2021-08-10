@@ -199,6 +199,7 @@ fn rocket() -> _ {
                 activity::get_ordered_activities_by_timespan,
                 activity::get_activities,
                 account::get_account_data,
+                account::sync,
             ],
         )
 }

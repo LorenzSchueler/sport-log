@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    CardioSession, Diary, Metcon, MetconMovement, MetconSession, Movement, Route, StrengthSession,
-    StrengthSet, User, Wod,
+    Action, ActionEvent, ActionProvider, ActionRule, CardioSession, Diary, Metcon, MetconMovement,
+    MetconSession, Movement, Platform, PlatformCredential, Route, StrengthSession, StrengthSet,
+    User, Wod,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -18,4 +19,10 @@ pub struct AccountData {
     pub metcon_movements: Vec<MetconMovement>,
     pub cardio_sessions: Vec<CardioSession>,
     pub routes: Vec<Route>,
+    pub platforms: Vec<Platform>,
+    pub platform_credentials: Vec<PlatformCredential>,
+    pub action_providers: Vec<ActionProvider>,
+    pub actions: Vec<Action>,
+    pub action_rules: Vec<ActionRule>,
+    pub action_event: Vec<ActionEvent>,
 }

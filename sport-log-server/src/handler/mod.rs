@@ -16,7 +16,6 @@ pub mod metcon;
 pub mod movement;
 pub mod platform;
 pub mod strength;
-pub mod sync;
 pub mod user;
 
 trait IntoJson<T> {
