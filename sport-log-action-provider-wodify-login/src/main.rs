@@ -5,7 +5,6 @@ use rand::Rng;
 use reqwest::Client;
 use serde::Deserialize;
 use thirtyfour::prelude::*;
-use tokio;
 
 use sport_log_ap_utils::{delete_events, get_events, setup};
 use sport_log_types::{Action, ActionId, ActionProvider, ActionProviderId, Platform, PlatformId};
@@ -188,9 +187,10 @@ async fn login() -> WebDriverResult<()> {
             .await?;
         thread::sleep(StdDuration::from_secs(2));
 
-        if let Err(_) = driver
+        if driver
             .find_element(By::Id("AthleteTheme_wt6_block_wt9_wtLogoutLink"))
             .await
+            .is_err()
         {
             println!("login failed");
             continue;

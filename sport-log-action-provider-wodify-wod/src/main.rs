@@ -5,7 +5,6 @@ use rand::Rng;
 use reqwest::{Client, StatusCode};
 use serde::Deserialize;
 use thirtyfour::prelude::*;
-use tokio;
 
 use sport_log_ap_utils::{delete_events, get_events, setup};
 use sport_log_types::{
@@ -194,9 +193,10 @@ async fn login() -> WebDriverResult<()> {
             .await?;
         thread::sleep(StdDuration::from_secs(2));
 
-        if let Err(_) = driver
+        if driver
             .find_element(By::Id("AthleteTheme_wtLayoutNormal_block_wt9_wtLogoutLink"))
             .await
+            .is_err()
         {
             println!("login failed");
             continue;
@@ -259,7 +259,7 @@ async fn login() -> WebDriverResult<()> {
             .json(&wod )
             .send()
             .await
-            .unwrap().status() == StatusCode::CONFLICT 
+            .unwrap().status() == StatusCode::CONFLICT
         {
             let today = Local::today().naive_local().format("%Y-%m-%d");
             let wods: Vec<Wod> = client
@@ -286,7 +286,7 @@ async fn login() -> WebDriverResult<()> {
         } else {
             println!("not wod found");
         }
-        delete_action_event_ids.push(exec_action_event.action_event_id); 
+        delete_action_event_ids.push(exec_action_event.action_event_id);
     }
 
     println!("delete event ids: {:?}", delete_action_event_ids);
