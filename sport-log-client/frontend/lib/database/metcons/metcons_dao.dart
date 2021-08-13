@@ -17,10 +17,29 @@ class MetconsDao extends DatabaseAccessor<Database> with _$MetconsDaoMixin {
 
   // select methods
 
+  Future<List<MetconDescription>> getAllMetcons() async {
+    final List<Metcon> metconsList = await (select(metcons)
+      ..where((m) => m.deleted.equals(false))
+    ).get();
+    return Future.wait(metconsList.map((m) async {
+      return MetconDescription(
+          metcon: m,
+          moves: await getMetconMovementsOfMetcon(m.id),
+      );
+    }));
+  }
+
+  Future<List<MetconMovement>> getMetconMovementsOfMetcon(
+      Int64 id) async {
+    return await (select(metconMovements)
+      ..where((mm) => mm.metconId.equals(id.toInt()) & mm.deleted.equals(false))
+    ).get();
+  }
 
   // creation methods
 
-  Future<Result<void, DbException>> createMetcon(MetconDescription metconDescription) async {
+  Future<Result<void, DbException>> createMetcon(
+      MetconDescription metconDescription) async {
     if (!metconDescription.validateOnUpdate()) {
       return Failure(DbException.validationFailed);
     }
@@ -34,7 +53,8 @@ class MetconsDao extends DatabaseAccessor<Database> with _$MetconsDaoMixin {
     });
   }
 
-  Future<Result<void, DbException>> createMetconSession(MetconSession metconSession) async {
+  Future<Result<void, DbException>> createMetconSession(
+      MetconSession metconSession) async {
     if (!metconSession.validateOnUpdate()) {
       return Failure(DbException.validationFailed);
     }
@@ -111,6 +131,7 @@ class MetconsDao extends DatabaseAccessor<Database> with _$MetconsDaoMixin {
           & m.deleted.equals(false))
       ).write(metconDescription.metcon);
 
+      // TODO: move out of transaction
       // find all metcon movement ids of the former metcon
       final oldMetconMovementsIds = (await _idsOfMetconMovementsOfMetcon(
           metconDescription.metcon.id.toInt()).get())
