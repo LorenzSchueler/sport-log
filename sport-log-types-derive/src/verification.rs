@@ -21,7 +21,9 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
             ) -> Result<Self::Id, rocket::http::Status> {
                 use crate::CheckUserId;
 
-                if #typename::check_user_id(self.0, **auth, conn).map_err(|_| rocket::http::Status::InternalServerError)? {
+                if #typename::check_user_id(self.0, **auth, conn)
+                    .map_err(|_| rocket::http::Status::InternalServerError)?
+                {
                     Ok(self.0)
                 } else {
                     Err(rocket::http::Status::Forbidden)
@@ -39,7 +41,9 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
             ) -> Result<Vec<Self::Id>, rocket::http::Status> {
                 use crate::CheckUserId;
 
-                if #typename::check_user_ids(&self.0, **auth, conn).map_err(|_| rocket::http::Status::InternalServerError)? {
+                if #typename::check_user_ids(&self.0, **auth, conn)
+                    .map_err(|_| rocket::http::Status::InternalServerError)?
+                {
                     Ok(self.0)
                 } else {
                     Err(rocket::http::Status::Forbidden)
@@ -69,7 +73,9 @@ pub fn impl_verify_id_for_user_or_ap(ast: &syn::DeriveInput) -> TokenStream {
             ) -> Result<Self::Id, rocket::http::Status> {
                 use crate::CheckUserId;
 
-                if #typename::check_user_id(self.0, **auth, conn).map_err(|_| rocket::http::Status::InternalServerError)? {
+                if #typename::check_user_id(self.0, **auth, conn)
+                    .map_err(|_| rocket::http::Status::InternalServerError)?
+                {
                     Ok(self.0)
                 } else {
                     Err(rocket::http::Status::Forbidden)
@@ -87,7 +93,9 @@ pub fn impl_verify_id_for_user_or_ap(ast: &syn::DeriveInput) -> TokenStream {
             ) -> Result<Vec<Self::Id>, rocket::http::Status> {
                 use crate::CheckUserId;
 
-                if #typename::check_user_ids(&self.0, **auth, conn).map_err(|_| rocket::http::Status::InternalServerError)? {
+                if #typename::check_user_ids(&self.0, **auth, conn)
+                    .map_err(|_| rocket::http::Status::InternalServerError)?
+                {
                     Ok(self.0)
                 } else {
                     Err(rocket::http::Status::Forbidden)
@@ -117,7 +125,9 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
             ) -> Result<crate::#id_typename, rocket::http::Status> {
                 use crate::CheckAPId;
 
-                if #typename::check_ap_id(self.0, **auth, conn).map_err(|_| rocket::http::Status::InternalServerError)? {
+                if #typename::check_ap_id(self.0, **auth, conn)
+                    .map_err(|_| rocket::http::Status::InternalServerError)?
+                {
                     Ok(self.0)
                 } else {
                     Err(rocket::http::Status::Forbidden)
@@ -135,7 +145,9 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
             ) -> Result<Vec<crate::#id_typename>, rocket::http::Status> {
                 use crate::CheckAPId;
 
-                if #typename::check_ap_ids(&self.0, **auth, conn).map_err(|_| rocket::http::Status::InternalServerError)? {
+                if #typename::check_ap_ids(&self.0, **auth, conn)
+                    .map_err(|_| rocket::http::Status::InternalServerError)?
+                {
                     Ok(self.0)
                 } else {
                     Err(rocket::http::Status::Forbidden)
@@ -204,14 +216,12 @@ pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
                 auth: &crate::AuthUser,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Self::Entity, rocket::http::Status> {
-                use crate::GetById;
+                use crate::CheckUserId;
 
                 let entity = self.0.into_inner();
                 if entity.user_id == **auth
-                    && #typename::get_by_id(entity.id, conn)
+                    && #typename::check_user_id(entity.id, **auth, conn)
                     .map_err(|_| rocket::http::Status::InternalServerError)?
-                    .user_id
-                    == **auth
                 {
                     Ok(entity)
                 } else {
@@ -228,21 +238,13 @@ pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
                 auth: &crate::AuthUser,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Vec<Self::Entity>, rocket::http::Status> {
-                use crate::GetById;
+                use crate::CheckUserId;
 
                 let entities = self.0.into_inner();
-
-                let mut valid = true;
-                for entity in &entities {
-                    if entity.user_id == **auth
-                        && #typename::get_by_id(entity.id, conn)
-                        .map_err(|_| rocket::http::Status::InternalServerError)?
-                        .user_id
-                        == **auth {
-                        valid = false;
-                    }
-                }
-                if valid
+                let ids: Vec<_> = entities.iter().map(|entity| entity.id).collect();
+                if entities.iter().all(|entity| entity.user_id == **auth)
+                    && #typename::check_user_ids(&ids, **auth, conn)
+                    .map_err(|_| rocket::http::Status::InternalServerError)?
                 {
                     Ok(entities)
                 } else {
@@ -266,14 +268,12 @@ pub fn impl_verify_for_user_or_ap_with_db(ast: &syn::DeriveInput) -> TokenStream
                 auth: &crate::AuthUserOrAP,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Self::Entity, rocket::http::Status> {
-                use crate::GetById;
+                use crate::CheckUserId;
 
                 let entity = self.0.into_inner();
                 if entity.user_id == **auth
-                    && #typename::get_by_id(entity.id, conn)
+                    && #typename::check_user_id(entity.id, **auth, conn)
                     .map_err(|_| rocket::http::Status::InternalServerError)?
-                    .user_id
-                    == **auth
                 {
                     Ok(entity)
                 } else {
@@ -290,21 +290,13 @@ pub fn impl_verify_for_user_or_ap_with_db(ast: &syn::DeriveInput) -> TokenStream
                 auth: &crate::AuthUserOrAP,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Vec<Self::Entity>, rocket::http::Status> {
-                use crate::GetById;
+                use crate::CheckUserId;
 
                 let entities = self.0.into_inner();
-
-                let mut valid = true;
-                for entity in &entities {
-                    if entity.user_id == **auth
-                        && #typename::get_by_id(entity.id, conn)
-                        .map_err(|_| rocket::http::Status::InternalServerError)?
-                        .user_id
-                        == **auth {
-                        valid = false;
-                    }
-                }
-                if valid
+                let ids: Vec<_> = entities.iter().map(|entity| entity.id).collect();
+                if entities.iter().all(|entity| entity.user_id == **auth)
+                    && #typename::check_user_ids(&ids, **auth, conn)
+                    .map_err(|_| rocket::http::Status::InternalServerError)?
                 {
                     Ok(entities)
                 } else {
@@ -406,14 +398,12 @@ pub fn impl_verify_for_action_provider_with_db(ast: &syn::DeriveInput) -> TokenS
                 auth: &crate::AuthAP,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Self::Entity, rocket::http::Status> {
-                use crate::GetById;
+                use crate::CheckAPId;
 
                 let entity = self.0.into_inner();
                 if entity.action_provider_id == **auth
-                    && #typename::get_by_id(entity.id, conn)
+                    && #typename::check_ap_id(entity.id, **auth, conn)
                     .map_err(|_| rocket::http::Status::InternalServerError)?
-                    .action_provider_id
-                    == **auth
                 {
                     Ok(entity)
                 } else {
@@ -493,19 +483,6 @@ pub fn impl_verify_for_admin_without_db(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
-pub fn impl_from_i64(ast: &syn::DeriveInput) -> TokenStream {
-    let id_typename = &ast.ident;
-
-    let gen = quote! {
-        impl crate::FromI64 for #id_typename {
-            fn from_i64(value: i64) -> Self {
-                Self(value)
-            }
-        }
-    };
-    gen.into()
-}
-
 pub fn impl_verify_unchecked(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
 
@@ -517,6 +494,19 @@ pub fn impl_verify_unchecked(ast: &syn::DeriveInput) -> TokenStream {
                 self,
             ) -> Result<Self::Entity, rocket::http::Status> {
                 Ok(self.0.into_inner())
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_from_i64(ast: &syn::DeriveInput) -> TokenStream {
+    let id_typename = &ast.ident;
+
+    let gen = quote! {
+        impl crate::FromI64 for #id_typename {
+            fn from_i64(value: i64) -> Self {
+                Self(value)
             }
         }
     };
