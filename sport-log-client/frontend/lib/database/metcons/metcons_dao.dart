@@ -36,6 +36,11 @@ class MetconsDao extends DatabaseAccessor<Database> with _$MetconsDaoMixin {
     ).get();
   }
 
+  Future<bool> metconMovementWithMovementExists(Int64 id) async {
+    return await _metconMovementWithMovementExists(id.toInt())
+        .getSingleOrNull() != null;
+  }
+
   // creation methods
 
   Future<Result<void, DbException>> createMetcon(

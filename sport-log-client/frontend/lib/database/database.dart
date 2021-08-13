@@ -24,6 +24,7 @@ enum DbException {
   metconHasMetconSession,
   metconDoesNotExist,
   validationFailed,
+  movementHasDependency,
 }
 
 LazyDatabase _openConnection() {

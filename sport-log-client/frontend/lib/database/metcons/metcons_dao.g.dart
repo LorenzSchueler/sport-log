@@ -43,4 +43,15 @@ mixin _$MetconsDaoMixin on DatabaseAccessor<Database> {
         }).map((QueryRow row) =>
         $MetconMovementsTable.$converter0.mapToDart(row.read<int>('id'))!);
   }
+
+  Selectable<int> _metconMovementWithMovementExists(int id) {
+    return customSelect(
+        'SELECT 1 FROM metcon_movements\n    WHERE movement_id == :id AND deleted == false',
+        variables: [
+          Variable<int>(id)
+        ],
+        readsFrom: {
+          metconMovements,
+        }).map((QueryRow row) => row.read<int>('1'));
+  }
 }
