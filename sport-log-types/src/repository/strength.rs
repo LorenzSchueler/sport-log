@@ -29,8 +29,7 @@ impl GetByUser for StrengthSet {
                 strength_set::columns::strength_session_id.eq_any(
                     strength_session::table
                         .filter(strength_session::columns::user_id.eq(user_id))
-                        .select(strength_session::columns::id)
-                        .get_results::<StrengthSessionId>(conn)?,
+                        .select(strength_session::columns::id),
                 ),
             )
             .get_results(conn)
@@ -51,8 +50,7 @@ impl GetByUserSync for StrengthSet {
                 strength_set::columns::strength_session_id.eq_any(
                     strength_session::table
                         .filter(strength_session::columns::user_id.eq(user_id))
-                        .select(strength_session::columns::id)
-                        .get_results::<StrengthSessionId>(conn)?,
+                        .select(strength_session::columns::id),
                 ),
             )
             .filter(strength_set::columns::last_change.ge(last_sync))

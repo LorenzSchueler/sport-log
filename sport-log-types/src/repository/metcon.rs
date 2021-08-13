@@ -61,8 +61,7 @@ impl GetByUser for MetconMovement {
                 metcon_movement::columns::metcon_id.eq_any(
                     metcon::table
                         .filter(metcon::columns::user_id.eq(user_id))
-                        .select(metcon::columns::id)
-                        .get_results::<MetconId>(conn)?,
+                        .select(metcon::columns::id),
                 ),
             )
             .get_results(conn)
@@ -83,8 +82,7 @@ impl GetByUserSync for MetconMovement {
                 metcon_movement::columns::metcon_id.eq_any(
                     metcon::table
                         .filter(metcon::columns::user_id.eq(user_id))
-                        .select(metcon::columns::id)
-                        .get_results::<MetconId>(conn)?,
+                        .select(metcon::columns::id),
                 ),
             )
             .filter(metcon_movement::columns::last_change.ge(last_sync))

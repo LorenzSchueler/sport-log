@@ -5,7 +5,7 @@ use rand_core::OsRng;
 
 use crate::{
     schema::{action, action_event, action_provider, action_rule, platform_credential},
-    Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
+    Action, ActionEvent, ActionEventId, ActionProvider, ActionProviderId, ActionRule,
     CreatableActionRule, Create, DeletableActionEvent, ExecutableActionEvent, GetAll, UserId,
 };
 
@@ -106,8 +106,7 @@ impl ActionRule {
                 action_rule::columns::action_id.eq_any(
                     action::table
                         .select(action::columns::id)
-                        .filter(action::columns::action_provider_id.eq(action_provider_id))
-                        .get_results::<ActionId>(conn)?,
+                        .filter(action::columns::action_provider_id.eq(action_provider_id)),
                 ),
             )
             .get_results(conn)
@@ -124,8 +123,7 @@ impl ActionRule {
                 action_rule::columns::action_id.eq_any(
                     action::table
                         .select(action::columns::id)
-                        .filter(action::columns::action_provider_id.eq(action_provider_id))
-                        .get_results::<ActionId>(conn)?,
+                        .filter(action::columns::action_provider_id.eq(action_provider_id)),
                 ),
             )
             .get_results(conn)
@@ -152,8 +150,7 @@ impl ActionEvent {
                 action_event::columns::action_id.eq_any(
                     action::table
                         .select(action::columns::id)
-                        .filter(action::columns::action_provider_id.eq(action_provider_id))
-                        .get_results::<ActionId>(conn)?,
+                        .filter(action::columns::action_provider_id.eq(action_provider_id)),
                 ),
             )
             .get_results(conn)
@@ -227,7 +224,7 @@ impl ExecutableActionEvent {
                 platform_credential::columns::username,
                 platform_credential::columns::password,
             ))
-            .get_results::<ExecutableActionEvent>(conn)
+            .get_results(conn)
     }
 
     pub fn get_ordered_by_action_provider_and_timespan(
