@@ -7,8 +7,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, GetBySync,
-    GetByUser, GetByUserSync, ToSql, Update, VerifyForActionProviderWithDb,
+    CheckAPId, CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds,
+    GetBySync, GetByUser, GetByUserSync, ToSql, Update, VerifyForActionProviderWithDb,
     VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
     VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
     VerifyIdUnchecked, VerifyUnchecked,
@@ -102,6 +102,7 @@ pub struct ActionId(pub i64);
         GetByIds,
         GetAll,
         GetBySync,
+        CheckAPId,
         VerifyForActionProviderWithDb,
         VerifyForActionProviderWithoutDb,
     )

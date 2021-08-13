@@ -115,11 +115,9 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
                 auth: &crate::AuthAP,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<crate::#id_typename, rocket::http::Status> {
-                use crate::GetById;
+                use crate::CheckAPId;
 
-                let entity = crate::#typename::get_by_id(self.0, conn)
-                    .map_err(|_| rocket::http::Status::Forbidden)?;
-                if entity.action_provider_id == **auth {
+                if #typename::check_ap_id(self.0, **auth, conn).map_err(|_| rocket::http::Status::InternalServerError)? {
                     Ok(self.0)
                 } else {
                     Err(rocket::http::Status::Forbidden)
@@ -135,11 +133,9 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
                 auth: &crate::AuthAP,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Vec<crate::#id_typename>, rocket::http::Status> {
-                use crate::GetByIds;
+                use crate::CheckAPId;
 
-                let entities = crate::#typename::get_by_ids(&self.0, conn)
-                    .map_err(|_| rocket::http::Status::Forbidden)?;
-                if entities.iter().all(|entity| entity.action_provider_id == **auth) {
+                if #typename::check_ap_ids(&self.0, **auth, conn).map_err(|_| rocket::http::Status::InternalServerError)? {
                     Ok(self.0)
                 } else {
                     Err(rocket::http::Status::Forbidden)

@@ -264,6 +264,20 @@ pub trait CheckUserId {
 }
 
 #[cfg(feature = "full")]
+pub trait CheckAPId {
+    type Id;
+
+    fn check_ap_id(id: Self::Id, ap_id: ActionProviderId, conn: &PgConnection)
+        -> QueryResult<bool>;
+
+    fn check_ap_ids(
+        ids: &Vec<Self::Id>,
+        ap_id: ActionProviderId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool>;
+}
+
+#[cfg(feature = "full")]
 pub trait VerifyIdForUser {
     type Id;
 
