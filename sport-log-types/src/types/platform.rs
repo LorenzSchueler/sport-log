@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, GetBySync, GetByUser,
-    GetByUserSync, ToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb,
+    CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, GetBySync,
+    GetByUser, GetByUserSync, ToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb,
     VerifyForUserWithoutDb, VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked, VerifyUnchecked,
 };
 
@@ -92,6 +92,7 @@ pub struct PlatformCredentialId(pub i64);
         GetByUser,
         GetByUserSync,
         Update,
+        CheckUserId,
         VerifyForUserWithDb,
         VerifyForUserWithoutDb
     )

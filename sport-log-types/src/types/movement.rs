@@ -221,19 +221,19 @@ pub struct EormId(pub i64);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(Associations, Identifiable, Queryable, GetById, GetByIds, GetAll)
+    derive(
+        Insertable,
+        Associations,
+        Identifiable,
+        Queryable,
+        GetById,
+        GetByIds,
+        GetAll
+    )
 )]
 #[cfg_attr(feature = "full", table_name = "eorm")]
 pub struct Eorm {
     pub id: EormId,
-    pub reps: i32,
-    pub percentage: f32,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "eorm")]
-pub struct NewEorm {
     pub reps: i32,
     pub percentage: f32,
 }

@@ -19,11 +19,9 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
                 auth: &crate::AuthUser,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Self::Id, rocket::http::Status> {
-                use crate::GetById;
+                use crate::CheckUserId;
 
-                let entity = crate::#typename::get_by_id(self.0, conn)
-                    .map_err(|_| rocket::http::Status::Forbidden)?;
-                if entity.user_id == **auth {
+                if #typename::check_user_id(self.0, **auth, conn).map_err(|_| rocket::http::Status::InternalServerError)? {
                     Ok(self.0)
                 } else {
                     Err(rocket::http::Status::Forbidden)
@@ -39,11 +37,9 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
                 auth: &crate::AuthUser,
                 conn: &diesel::pg::PgConnection,
             ) -> Result<Vec<Self::Id>, rocket::http::Status> {
-                use crate::GetByIds;
+                use crate::CheckUserId;
 
-                let entities = crate::#typename::get_by_ids(&self.0, conn)
-                    .map_err(|_| rocket::http::Status::Forbidden)?;
-                if entities.iter().all(|entity| entity.user_id == **auth ){
+                if #typename::check_user_ids(&self.0, **auth, conn).map_err(|_| rocket::http::Status::InternalServerError)? {
                     Ok(self.0)
                 } else {
                     Err(rocket::http::Status::Forbidden)

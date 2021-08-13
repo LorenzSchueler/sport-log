@@ -182,3 +182,39 @@ pub fn impl_update(ast: &syn::DeriveInput) -> TokenStream {
     };
     gen.into()
 }
+
+pub fn impl_check_user_id(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+    let (idtypename, _, _, tablename) = get_identifiers(typename);
+
+    let gen = quote! {
+        use diesel::prelude::*;
+
+        impl crate::CheckUserId for #typename {
+            type Id = #idtypename;
+
+            fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+                #tablename::table
+                    .filter(#tablename::columns::id.eq(id))
+                    .filter(#tablename::columns::user_id.eq(user_id))
+                    .count()
+                    .get_result(conn)
+                    .map(|count: i64| count == 1)
+            }
+
+            fn check_user_ids(
+                ids: &Vec<Self::Id>,
+                user_id: UserId,
+                conn: &PgConnection,
+            ) -> QueryResult<bool> {
+                #tablename::table
+                    .filter(#tablename::columns::id.eq_any(ids))
+                    .filter(#tablename::columns::user_id.eq(user_id))
+                    .count()
+                    .get_result(conn)
+                    .map(|count: i64| count == ids.len() as i64)
+            }
+        }
+    };
+    gen.into()
+}

@@ -110,6 +110,12 @@ pub fn update_derive(input: TokenStream) -> TokenStream {
     impl_update(&ast)
 }
 
+#[proc_macro_derive(CheckUserId)]
+pub fn check_user_id_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_check_user_id(&ast)
+}
+
 #[proc_macro_derive(VerifyIdForUser)]
 pub fn verify_id_for_user_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();

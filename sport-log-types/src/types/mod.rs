@@ -251,6 +251,19 @@ pub trait Update {
 }
 
 #[cfg(feature = "full")]
+pub trait CheckUserId {
+    type Id;
+
+    fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool>;
+
+    fn check_user_ids(
+        ids: &Vec<Self::Id>,
+        user_id: UserId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool>;
+}
+
+#[cfg(feature = "full")]
 pub trait VerifyIdForUser {
     type Id;
 
