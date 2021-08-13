@@ -46,4 +46,22 @@ class MovementsDao extends DatabaseAccessor<Database> with _$MovementsDaoMixin {
     ).write(const MovementsCompanion(deleted: Value(true)));
     return Success(null);
   }
+
+  Future<Result<void, DbException>> updateMovement(Movement movement) async {
+    if (!movement.validateOnUpdate()) {
+      return Failure(DbException.validationFailed);
+    }
+    (update(movements)
+      ..where((m) => m.id.equals(movement.id.toInt()) & m.deleted.equals(false))
+    ).write(movement);
+    return Success(null);
+  }
+
+  Future<Result<void, DbException>> createMovement(Movement movement) async {
+    if (!movement.validateOnUpdate()) {
+      return Failure(DbException.validationFailed);
+    }
+    await (into(movements).insert(movement));
+    return Success(null);
+  }
 }

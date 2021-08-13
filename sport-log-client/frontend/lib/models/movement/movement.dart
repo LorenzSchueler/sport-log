@@ -1,7 +1,10 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:moor/moor.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/id_serialization.dart';
+import 'package:sport_log/models/update_validatable.dart';
 
 part 'movement.g.dart';
 
@@ -53,7 +56,7 @@ extension MovementUniToDisplayName on MovementUnit {
 }
 
 @JsonSerializable()
-class Movement {
+class Movement extends Insertable<Movement> implements UpdateValidatable {
   Movement({
     required this.id,
     required this.userId,
@@ -72,4 +75,23 @@ class Movement {
 
   factory Movement.fromJson(Map<String, dynamic> json) => _$MovementFromJson(json);
   Map<String, dynamic> toJson() => _$MovementToJson(this);
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    return MovementsCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      name: Value(name),
+      description: Value(description),
+      category: Value(category),
+      deleted: Value(deleted),
+    ).toColumns(false);
+  }
+
+  @override
+  bool validateOnUpdate() {
+    return userId != null
+        && name.isNotEmpty
+        && deleted == false;
+  }
 }
