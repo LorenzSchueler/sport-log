@@ -7,17 +7,16 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, ToSql, Update,
-    VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
+    CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, ToSql,
+    Update, VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdForUserOrAP, VerifyIdUnchecked,
 };
 
 use crate::UserId;
 #[cfg(feature = "full")]
 use crate::{
     schema::{eorm, movement},
-    AuthUserOrAP, GetById, GetByIds, Unverified, UnverifiedId, UnverifiedIds, User,
-    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
-    VerifyMultipleForUserOrAPWithoutDb,
+    AuthUserOrAP, GetById, Unverified, UnverifiedId, User, VerifyForUserOrAPWithDb,
+    VerifyForUserOrAPWithoutDb, VerifyMultipleForUserOrAPWithoutDb,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -49,49 +48,13 @@ pub enum MovementUnit {
         FromI64,
         ToSql,
         FromSql,
+        VerifyIdForUserOrAP,
         VerifyIdForAdmin,
         VerifyIdUnchecked
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct MovementId(pub i64);
-
-#[cfg(feature = "full")]
-impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
-    type Id = MovementId;
-
-    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
-        let movement =
-            Movement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
-        if movement.user_id == Some(**auth) {
-            Ok(self.0)
-        } else {
-            Err(rocket::http::Status::Forbidden)
-        }
-    }
-}
-
-#[cfg(feature = "full")]
-impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
-    type Id = MovementId;
-
-    fn verify_user_ap(
-        self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Id>, Status> {
-        let movements =
-            Movement::get_by_ids(&self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
-        if movements
-            .iter()
-            .all(|movement| movement.user_id == Some(**auth))
-        {
-            Ok(self.0)
-        } else {
-            Err(rocket::http::Status::Forbidden)
-        }
-    }
-}
 
 #[cfg(feature = "full")]
 impl UnverifiedId<MovementId> {
@@ -129,6 +92,7 @@ impl UnverifiedId<MovementId> {
         GetById,
         GetByIds,
         Update,
+        CheckUserId,
         VerifyForAdminWithoutDb
     )
 )]

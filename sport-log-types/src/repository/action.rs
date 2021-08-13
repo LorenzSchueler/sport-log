@@ -5,7 +5,7 @@ use rand_core::OsRng;
 
 use crate::{
     schema::{action, action_event, action_provider, action_rule, platform_credential},
-    Action, ActionEvent, ActionEventId, ActionProvider, ActionProviderId, ActionRule,
+    Action, ActionEvent, ActionEventId, ActionProvider, ActionProviderId, ActionRule, CheckAPId,
     CreatableActionRule, Create, DeletableActionEvent, ExecutableActionEvent, GetAll, UserId,
 };
 
@@ -127,6 +127,48 @@ impl ActionRule {
                 ),
             )
             .get_results(conn)
+    }
+}
+
+impl CheckAPId for ActionEvent {
+    type Id = ActionEventId;
+
+    fn check_ap_id(
+        id: Self::Id,
+        ap_id: ActionProviderId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool> {
+        action::table
+            .filter(
+                action::columns::id.eq_any(
+                    action_event::table
+                        .find(id)
+                        .select(action_event::columns::action_id),
+                ),
+            )
+            .filter(action::columns::action_provider_id.eq(ap_id))
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == 1)
+    }
+
+    fn check_ap_ids(
+        ids: &Vec<Self::Id>,
+        ap_id: ActionProviderId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool> {
+        action::table
+            .filter(
+                action::columns::id.eq_any(
+                    action_event::table
+                        .filter(action_event::columns::id.eq_any(ids))
+                        .select(action_event::columns::action_id),
+                ),
+            )
+            .filter(action::columns::action_provider_id.eq(ap_id))
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == 1)
     }
 }
 

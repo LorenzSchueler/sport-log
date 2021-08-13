@@ -13,11 +13,10 @@ use sport_log_types_derive::{
 #[cfg(feature = "full")]
 use crate::{
     schema::{strength_session, strength_set},
-    AuthUserOrAP, GetById, GetByIds, Unverified, UnverifiedId, UnverifiedIds,
-    VerifyForUserOrAPWithDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
+    AuthUserOrAP, CheckUserId, Unverified, VerifyForUserOrAPWithDb,
     VerifyMultipleForUserOrAPWithDb,
 };
-use crate::{Movement, MovementId, MovementUnit, UserId};
+use crate::{GetById, GetByIds, Movement, MovementId, MovementUnit, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
@@ -76,56 +75,18 @@ pub struct StrengthSession {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI64, ToSql, FromSql)
+    derive(
+        Hash,
+        FromSqlRow,
+        AsExpression,
+        FromI64,
+        ToSql,
+        FromSql,
+        VerifyIdForUserOrAP
+    )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct StrengthSetId(pub i64);
-
-#[cfg(feature = "full")]
-impl VerifyIdForUserOrAP for UnverifiedId<StrengthSetId> {
-    type Id = StrengthSetId;
-
-    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
-        let strength_set =
-            StrengthSet::get_by_id(self.0, conn).map_err(|_| Status::InternalServerError)?;
-        if StrengthSession::get_by_id(strength_set.strength_session_id, conn)
-            .map_err(|_| Status::InternalServerError)?
-            .user_id
-            == **auth
-        {
-            Ok(self.0)
-        } else {
-            Err(Status::Forbidden)
-        }
-    }
-}
-
-#[cfg(feature = "full")]
-impl VerifyIdsForUserOrAP for UnverifiedIds<StrengthSetId> {
-    type Id = StrengthSetId;
-
-    fn verify_user_ap(
-        self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Id>, Status> {
-        let strength_sets =
-            StrengthSet::get_by_ids(&self.0, conn).map_err(|_| Status::InternalServerError)?;
-        let strength_session_ids: Vec<_> = strength_sets
-            .iter()
-            .map(|strength_set| strength_set.strength_session_id)
-            .collect();
-        if StrengthSession::get_by_ids(strength_session_ids.as_slice(), conn)
-            .map_err(|_| Status::InternalServerError)?
-            .iter()
-            .all(|strength_session| strength_session.user_id == **auth)
-        {
-            Ok(self.0)
-        } else {
-            Err(Status::Forbidden)
-        }
-    }
-}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
@@ -168,10 +129,12 @@ impl VerifyForUserOrAPWithDb for Unverified<StrengthSet> {
         conn: &PgConnection,
     ) -> Result<Self::Entity, Status> {
         let strength_set = self.0.into_inner();
-        if StrengthSession::get_by_id(strength_set.strength_session_id, conn)
+        let strength_set_db = StrengthSet::get_by_id(strength_set.id, conn)
+            .map_err(|_| Status::InternalServerError)?;
+        if StrengthSession::check_user_id(strength_set.strength_session_id, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
-            .user_id
-            == **auth
+            && StrengthSession::check_user_id(strength_set_db.strength_session_id, **auth, conn)
+                .map_err(|_| Status::InternalServerError)?
         {
             Ok(strength_set)
         } else {
@@ -190,14 +153,23 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthSet>> {
         conn: &PgConnection,
     ) -> Result<Vec<Self::Entity>, Status> {
         let strength_sets = self.0.into_inner();
+        let strength_set_ids: Vec<_> = strength_sets
+            .iter()
+            .map(|strength_set| strength_set.id)
+            .collect();
         let strength_session_ids: Vec<_> = strength_sets
             .iter()
             .map(|strength_set| strength_set.strength_session_id)
             .collect();
-        if StrengthSession::get_by_ids(strength_session_ids.as_slice(), conn)
+        let strength_session_ids_db = StrengthSet::get_by_ids(&strength_set_ids, conn)
             .map_err(|_| Status::InternalServerError)?
-            .iter()
-            .all(|strength_session| strength_session.user_id == **auth)
+            .into_iter()
+            .map(|strength_set| strength_set.strength_session_id)
+            .collect();
+        if StrengthSession::check_user_ids(&strength_session_ids, **auth, conn)
+            .map_err(|_| Status::InternalServerError)?
+            && StrengthSession::check_user_ids(&strength_session_ids_db, **auth, conn)
+                .map_err(|_| Status::InternalServerError)?
         {
             Ok(strength_sets)
         } else {

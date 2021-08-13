@@ -3,8 +3,8 @@ use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
     schema::{strength_session, strength_set},
-    GetById, GetByUser, GetByUserSync, Movement, StrengthSession, StrengthSessionDescription,
-    StrengthSessionId, StrengthSet, UserId,
+    CheckUserId, GetById, GetByUser, GetByUserSync, Movement, StrengthSession,
+    StrengthSessionDescription, StrengthSessionId, StrengthSet, StrengthSetId, UserId,
 };
 
 impl StrengthSession {
@@ -55,6 +55,44 @@ impl GetByUserSync for StrengthSet {
             )
             .filter(strength_set::columns::last_change.ge(last_sync))
             .get_results(conn)
+    }
+}
+
+impl CheckUserId for StrengthSet {
+    type Id = StrengthSetId;
+
+    fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+        strength_session::table
+            .filter(
+                strength_session::columns::id.eq_any(
+                    strength_set::table
+                        .filter(strength_set::columns::id.eq(id))
+                        .select(strength_set::columns::strength_session_id),
+                ),
+            )
+            .filter(strength_session::columns::user_id.eq(user_id))
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == 1)
+    }
+
+    fn check_user_ids(
+        ids: &Vec<Self::Id>,
+        user_id: UserId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool> {
+        strength_session::table
+            .filter(
+                strength_session::columns::id.eq_any(
+                    strength_set::table
+                        .filter(strength_set::columns::id.eq_any(ids))
+                        .select(strength_set::columns::strength_session_id),
+                ),
+            )
+            .filter(strength_session::columns::user_id.eq(user_id))
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == 1)
     }
 }
 
