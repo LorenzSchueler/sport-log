@@ -1205,6 +1205,565 @@ class $MovementsTable extends Movements
       const EnumIndexConverter<MovementCategory>(MovementCategory.values);
 }
 
+class StrengthSessionsCompanion extends UpdateCompanion<StrengthSession> {
+  final Value<Int64> id;
+  final Value<Int64> userId;
+  final Value<DateTime> datetime;
+  final Value<Int64> movementId;
+  final Value<MovementUnit> movementUnit;
+  final Value<int?> interval;
+  final Value<String?> comments;
+  final Value<bool> deleted;
+  final Value<DateTime> lastModified;
+  final Value<bool> isNew;
+  const StrengthSessionsCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.datetime = const Value.absent(),
+    this.movementId = const Value.absent(),
+    this.movementUnit = const Value.absent(),
+    this.interval = const Value.absent(),
+    this.comments = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.lastModified = const Value.absent(),
+    this.isNew = const Value.absent(),
+  });
+  StrengthSessionsCompanion.insert({
+    this.id = const Value.absent(),
+    required Int64 userId,
+    required DateTime datetime,
+    required Int64 movementId,
+    required MovementUnit movementUnit,
+    this.interval = const Value.absent(),
+    this.comments = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.lastModified = const Value.absent(),
+    this.isNew = const Value.absent(),
+  })  : userId = Value(userId),
+        datetime = Value(datetime),
+        movementId = Value(movementId),
+        movementUnit = Value(movementUnit);
+  static Insertable<StrengthSession> custom({
+    Expression<Int64>? id,
+    Expression<Int64>? userId,
+    Expression<DateTime>? datetime,
+    Expression<Int64>? movementId,
+    Expression<MovementUnit>? movementUnit,
+    Expression<int?>? interval,
+    Expression<String?>? comments,
+    Expression<bool>? deleted,
+    Expression<DateTime>? lastModified,
+    Expression<bool>? isNew,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (datetime != null) 'datetime': datetime,
+      if (movementId != null) 'movement_id': movementId,
+      if (movementUnit != null) 'movement_unit': movementUnit,
+      if (interval != null) 'interval': interval,
+      if (comments != null) 'comments': comments,
+      if (deleted != null) 'deleted': deleted,
+      if (lastModified != null) 'last_modified': lastModified,
+      if (isNew != null) 'is_new': isNew,
+    });
+  }
+
+  StrengthSessionsCompanion copyWith(
+      {Value<Int64>? id,
+      Value<Int64>? userId,
+      Value<DateTime>? datetime,
+      Value<Int64>? movementId,
+      Value<MovementUnit>? movementUnit,
+      Value<int?>? interval,
+      Value<String?>? comments,
+      Value<bool>? deleted,
+      Value<DateTime>? lastModified,
+      Value<bool>? isNew}) {
+    return StrengthSessionsCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      datetime: datetime ?? this.datetime,
+      movementId: movementId ?? this.movementId,
+      movementUnit: movementUnit ?? this.movementUnit,
+      interval: interval ?? this.interval,
+      comments: comments ?? this.comments,
+      deleted: deleted ?? this.deleted,
+      lastModified: lastModified ?? this.lastModified,
+      isNew: isNew ?? this.isNew,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      final converter = $StrengthSessionsTable.$converter0;
+      map['id'] = Variable<int>(converter.mapToSql(id.value)!);
+    }
+    if (userId.present) {
+      final converter = $StrengthSessionsTable.$converter1;
+      map['user_id'] = Variable<int>(converter.mapToSql(userId.value)!);
+    }
+    if (datetime.present) {
+      map['datetime'] = Variable<DateTime>(datetime.value);
+    }
+    if (movementId.present) {
+      final converter = $StrengthSessionsTable.$converter2;
+      map['movement_id'] = Variable<int>(converter.mapToSql(movementId.value)!);
+    }
+    if (movementUnit.present) {
+      final converter = $StrengthSessionsTable.$converter3;
+      map['movement_unit'] =
+          Variable<int>(converter.mapToSql(movementUnit.value)!);
+    }
+    if (interval.present) {
+      map['interval'] = Variable<int?>(interval.value);
+    }
+    if (comments.present) {
+      map['comments'] = Variable<String?>(comments.value);
+    }
+    if (deleted.present) {
+      map['deleted'] = Variable<bool>(deleted.value);
+    }
+    if (lastModified.present) {
+      map['last_modified'] = Variable<DateTime>(lastModified.value);
+    }
+    if (isNew.present) {
+      map['is_new'] = Variable<bool>(isNew.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StrengthSessionsCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('datetime: $datetime, ')
+          ..write('movementId: $movementId, ')
+          ..write('movementUnit: $movementUnit, ')
+          ..write('interval: $interval, ')
+          ..write('comments: $comments, ')
+          ..write('deleted: $deleted, ')
+          ..write('lastModified: $lastModified, ')
+          ..write('isNew: $isNew')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $StrengthSessionsTable extends StrengthSessions
+    with TableInfo<$StrengthSessionsTable, StrengthSession> {
+  final GeneratedDatabase _db;
+  final String? _alias;
+  $StrengthSessionsTable(this._db, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumnWithTypeConverter<Int64, int?> id =
+      GeneratedColumn<int?>('id', aliasedName, false,
+              typeName: 'INTEGER', requiredDuringInsert: false)
+          .withConverter<Int64>($StrengthSessionsTable.$converter0);
+  final VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  late final GeneratedColumnWithTypeConverter<Int64, int?> userId =
+      GeneratedColumn<int?>('user_id', aliasedName, false,
+              typeName: 'INTEGER', requiredDuringInsert: true)
+          .withConverter<Int64>($StrengthSessionsTable.$converter1);
+  final VerificationMeta _datetimeMeta = const VerificationMeta('datetime');
+  late final GeneratedColumn<DateTime?> datetime = GeneratedColumn<DateTime?>(
+      'datetime', aliasedName, false,
+      typeName: 'INTEGER', requiredDuringInsert: true);
+  final VerificationMeta _movementIdMeta = const VerificationMeta('movementId');
+  late final GeneratedColumnWithTypeConverter<Int64, int?> movementId =
+      GeneratedColumn<int?>('movement_id', aliasedName, false,
+              typeName: 'INTEGER', requiredDuringInsert: true)
+          .withConverter<Int64>($StrengthSessionsTable.$converter2);
+  final VerificationMeta _movementUnitMeta =
+      const VerificationMeta('movementUnit');
+  late final GeneratedColumnWithTypeConverter<MovementUnit, int?> movementUnit =
+      GeneratedColumn<int?>('movement_unit', aliasedName, false,
+              typeName: 'INTEGER', requiredDuringInsert: true)
+          .withConverter<MovementUnit>($StrengthSessionsTable.$converter3);
+  final VerificationMeta _intervalMeta = const VerificationMeta('interval');
+  late final GeneratedColumn<int?> interval = GeneratedColumn<int?>(
+      'interval', aliasedName, true,
+      typeName: 'INTEGER', requiredDuringInsert: false);
+  final VerificationMeta _commentsMeta = const VerificationMeta('comments');
+  late final GeneratedColumn<String?> comments = GeneratedColumn<String?>(
+      'comments', aliasedName, true,
+      typeName: 'TEXT', requiredDuringInsert: false);
+  final VerificationMeta _deletedMeta = const VerificationMeta('deleted');
+  late final GeneratedColumn<bool?> deleted = GeneratedColumn<bool?>(
+      'deleted', aliasedName, false,
+      typeName: 'INTEGER',
+      requiredDuringInsert: false,
+      defaultConstraints: 'CHECK (deleted IN (0, 1))',
+      defaultValue: const Constant(true));
+  final VerificationMeta _lastModifiedMeta =
+      const VerificationMeta('lastModified');
+  late final GeneratedColumn<DateTime?> lastModified =
+      GeneratedColumn<DateTime?>('last_modified', aliasedName, false,
+          typeName: 'INTEGER',
+          requiredDuringInsert: false,
+          clientDefault: () => DateTime.now());
+  final VerificationMeta _isNewMeta = const VerificationMeta('isNew');
+  late final GeneratedColumn<bool?> isNew = GeneratedColumn<bool?>(
+      'is_new', aliasedName, false,
+      typeName: 'INTEGER',
+      requiredDuringInsert: false,
+      defaultConstraints: 'CHECK (is_new IN (0, 1))',
+      defaultValue: const Constant(true));
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        userId,
+        datetime,
+        movementId,
+        movementUnit,
+        interval,
+        comments,
+        deleted,
+        lastModified,
+        isNew
+      ];
+  @override
+  String get aliasedName => _alias ?? 'strength_sessions';
+  @override
+  String get actualTableName => 'strength_sessions';
+  @override
+  VerificationContext validateIntegrity(Insertable<StrengthSession> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    context.handle(_idMeta, const VerificationResult.success());
+    context.handle(_userIdMeta, const VerificationResult.success());
+    if (data.containsKey('datetime')) {
+      context.handle(_datetimeMeta,
+          datetime.isAcceptableOrUnknown(data['datetime']!, _datetimeMeta));
+    } else if (isInserting) {
+      context.missing(_datetimeMeta);
+    }
+    context.handle(_movementIdMeta, const VerificationResult.success());
+    context.handle(_movementUnitMeta, const VerificationResult.success());
+    if (data.containsKey('interval')) {
+      context.handle(_intervalMeta,
+          interval.isAcceptableOrUnknown(data['interval']!, _intervalMeta));
+    }
+    if (data.containsKey('comments')) {
+      context.handle(_commentsMeta,
+          comments.isAcceptableOrUnknown(data['comments']!, _commentsMeta));
+    }
+    if (data.containsKey('deleted')) {
+      context.handle(_deletedMeta,
+          deleted.isAcceptableOrUnknown(data['deleted']!, _deletedMeta));
+    }
+    if (data.containsKey('last_modified')) {
+      context.handle(
+          _lastModifiedMeta,
+          lastModified.isAcceptableOrUnknown(
+              data['last_modified']!, _lastModifiedMeta));
+    }
+    if (data.containsKey('is_new')) {
+      context.handle(
+          _isNewMeta, isNew.isAcceptableOrUnknown(data['is_new']!, _isNewMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  StrengthSession map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StrengthSession(
+      id: $StrengthSessionsTable.$converter0.mapToDart(const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id']))!,
+      userId: $StrengthSessionsTable.$converter1.mapToDart(const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}user_id']))!,
+      datetime: const DateTimeType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}datetime'])!,
+      movementId: $StrengthSessionsTable.$converter2.mapToDart(const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}movement_id']))!,
+      movementUnit: $StrengthSessionsTable.$converter3.mapToDart(const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}movement_unit']))!,
+      interval: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}interval']),
+      comments: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}comments']),
+      deleted: const BoolType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}deleted'])!,
+    );
+  }
+
+  @override
+  $StrengthSessionsTable createAlias(String alias) {
+    return $StrengthSessionsTable(_db, alias);
+  }
+
+  static TypeConverter<Int64, int> $converter0 = const DbIdConverter();
+  static TypeConverter<Int64, int> $converter1 = const DbIdConverter();
+  static TypeConverter<Int64, int> $converter2 = const DbIdConverter();
+  static TypeConverter<MovementUnit, int> $converter3 =
+      const EnumIndexConverter<MovementUnit>(MovementUnit.values);
+}
+
+class StrengthSetsCompanion extends UpdateCompanion<StrengthSet> {
+  final Value<Int64> id;
+  final Value<Int64> strengthSessionId;
+  final Value<int> setNumber;
+  final Value<int> count;
+  final Value<double?> weight;
+  final Value<bool> deleted;
+  final Value<DateTime> lastModified;
+  final Value<bool> isNew;
+  const StrengthSetsCompanion({
+    this.id = const Value.absent(),
+    this.strengthSessionId = const Value.absent(),
+    this.setNumber = const Value.absent(),
+    this.count = const Value.absent(),
+    this.weight = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.lastModified = const Value.absent(),
+    this.isNew = const Value.absent(),
+  });
+  StrengthSetsCompanion.insert({
+    this.id = const Value.absent(),
+    required Int64 strengthSessionId,
+    required int setNumber,
+    required int count,
+    this.weight = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.lastModified = const Value.absent(),
+    this.isNew = const Value.absent(),
+  })  : strengthSessionId = Value(strengthSessionId),
+        setNumber = Value(setNumber),
+        count = Value(count);
+  static Insertable<StrengthSet> custom({
+    Expression<Int64>? id,
+    Expression<Int64>? strengthSessionId,
+    Expression<int>? setNumber,
+    Expression<int>? count,
+    Expression<double?>? weight,
+    Expression<bool>? deleted,
+    Expression<DateTime>? lastModified,
+    Expression<bool>? isNew,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (strengthSessionId != null) 'strength_session_id': strengthSessionId,
+      if (setNumber != null) 'set_number': setNumber,
+      if (count != null) 'count': count,
+      if (weight != null) 'weight': weight,
+      if (deleted != null) 'deleted': deleted,
+      if (lastModified != null) 'last_modified': lastModified,
+      if (isNew != null) 'is_new': isNew,
+    });
+  }
+
+  StrengthSetsCompanion copyWith(
+      {Value<Int64>? id,
+      Value<Int64>? strengthSessionId,
+      Value<int>? setNumber,
+      Value<int>? count,
+      Value<double?>? weight,
+      Value<bool>? deleted,
+      Value<DateTime>? lastModified,
+      Value<bool>? isNew}) {
+    return StrengthSetsCompanion(
+      id: id ?? this.id,
+      strengthSessionId: strengthSessionId ?? this.strengthSessionId,
+      setNumber: setNumber ?? this.setNumber,
+      count: count ?? this.count,
+      weight: weight ?? this.weight,
+      deleted: deleted ?? this.deleted,
+      lastModified: lastModified ?? this.lastModified,
+      isNew: isNew ?? this.isNew,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      final converter = $StrengthSetsTable.$converter0;
+      map['id'] = Variable<int>(converter.mapToSql(id.value)!);
+    }
+    if (strengthSessionId.present) {
+      final converter = $StrengthSetsTable.$converter1;
+      map['strength_session_id'] =
+          Variable<int>(converter.mapToSql(strengthSessionId.value)!);
+    }
+    if (setNumber.present) {
+      map['set_number'] = Variable<int>(setNumber.value);
+    }
+    if (count.present) {
+      map['count'] = Variable<int>(count.value);
+    }
+    if (weight.present) {
+      map['weight'] = Variable<double?>(weight.value);
+    }
+    if (deleted.present) {
+      map['deleted'] = Variable<bool>(deleted.value);
+    }
+    if (lastModified.present) {
+      map['last_modified'] = Variable<DateTime>(lastModified.value);
+    }
+    if (isNew.present) {
+      map['is_new'] = Variable<bool>(isNew.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StrengthSetsCompanion(')
+          ..write('id: $id, ')
+          ..write('strengthSessionId: $strengthSessionId, ')
+          ..write('setNumber: $setNumber, ')
+          ..write('count: $count, ')
+          ..write('weight: $weight, ')
+          ..write('deleted: $deleted, ')
+          ..write('lastModified: $lastModified, ')
+          ..write('isNew: $isNew')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $StrengthSetsTable extends StrengthSets
+    with TableInfo<$StrengthSetsTable, StrengthSet> {
+  final GeneratedDatabase _db;
+  final String? _alias;
+  $StrengthSetsTable(this._db, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumnWithTypeConverter<Int64, int?> id =
+      GeneratedColumn<int?>('id', aliasedName, false,
+              typeName: 'INTEGER', requiredDuringInsert: false)
+          .withConverter<Int64>($StrengthSetsTable.$converter0);
+  final VerificationMeta _strengthSessionIdMeta =
+      const VerificationMeta('strengthSessionId');
+  late final GeneratedColumnWithTypeConverter<Int64, int?> strengthSessionId =
+      GeneratedColumn<int?>('strength_session_id', aliasedName, false,
+              typeName: 'INTEGER', requiredDuringInsert: true)
+          .withConverter<Int64>($StrengthSetsTable.$converter1);
+  final VerificationMeta _setNumberMeta = const VerificationMeta('setNumber');
+  late final GeneratedColumn<int?> setNumber = GeneratedColumn<int?>(
+      'set_number', aliasedName, false,
+      typeName: 'INTEGER', requiredDuringInsert: true);
+  final VerificationMeta _countMeta = const VerificationMeta('count');
+  late final GeneratedColumn<int?> count = GeneratedColumn<int?>(
+      'count', aliasedName, false,
+      typeName: 'INTEGER', requiredDuringInsert: true);
+  final VerificationMeta _weightMeta = const VerificationMeta('weight');
+  late final GeneratedColumn<double?> weight = GeneratedColumn<double?>(
+      'weight', aliasedName, true,
+      typeName: 'REAL', requiredDuringInsert: false);
+  final VerificationMeta _deletedMeta = const VerificationMeta('deleted');
+  late final GeneratedColumn<bool?> deleted = GeneratedColumn<bool?>(
+      'deleted', aliasedName, false,
+      typeName: 'INTEGER',
+      requiredDuringInsert: false,
+      defaultConstraints: 'CHECK (deleted IN (0, 1))',
+      defaultValue: const Constant(true));
+  final VerificationMeta _lastModifiedMeta =
+      const VerificationMeta('lastModified');
+  late final GeneratedColumn<DateTime?> lastModified =
+      GeneratedColumn<DateTime?>('last_modified', aliasedName, false,
+          typeName: 'INTEGER',
+          requiredDuringInsert: false,
+          clientDefault: () => DateTime.now());
+  final VerificationMeta _isNewMeta = const VerificationMeta('isNew');
+  late final GeneratedColumn<bool?> isNew = GeneratedColumn<bool?>(
+      'is_new', aliasedName, false,
+      typeName: 'INTEGER',
+      requiredDuringInsert: false,
+      defaultConstraints: 'CHECK (is_new IN (0, 1))',
+      defaultValue: const Constant(true));
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        strengthSessionId,
+        setNumber,
+        count,
+        weight,
+        deleted,
+        lastModified,
+        isNew
+      ];
+  @override
+  String get aliasedName => _alias ?? 'strength_sets';
+  @override
+  String get actualTableName => 'strength_sets';
+  @override
+  VerificationContext validateIntegrity(Insertable<StrengthSet> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    context.handle(_idMeta, const VerificationResult.success());
+    context.handle(_strengthSessionIdMeta, const VerificationResult.success());
+    if (data.containsKey('set_number')) {
+      context.handle(_setNumberMeta,
+          setNumber.isAcceptableOrUnknown(data['set_number']!, _setNumberMeta));
+    } else if (isInserting) {
+      context.missing(_setNumberMeta);
+    }
+    if (data.containsKey('count')) {
+      context.handle(
+          _countMeta, count.isAcceptableOrUnknown(data['count']!, _countMeta));
+    } else if (isInserting) {
+      context.missing(_countMeta);
+    }
+    if (data.containsKey('weight')) {
+      context.handle(_weightMeta,
+          weight.isAcceptableOrUnknown(data['weight']!, _weightMeta));
+    }
+    if (data.containsKey('deleted')) {
+      context.handle(_deletedMeta,
+          deleted.isAcceptableOrUnknown(data['deleted']!, _deletedMeta));
+    }
+    if (data.containsKey('last_modified')) {
+      context.handle(
+          _lastModifiedMeta,
+          lastModified.isAcceptableOrUnknown(
+              data['last_modified']!, _lastModifiedMeta));
+    }
+    if (data.containsKey('is_new')) {
+      context.handle(
+          _isNewMeta, isNew.isAcceptableOrUnknown(data['is_new']!, _isNewMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  StrengthSet map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StrengthSet(
+      id: $StrengthSetsTable.$converter0.mapToDart(const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id']))!,
+      strengthSessionId: $StrengthSetsTable.$converter1.mapToDart(
+          const IntType().mapFromDatabaseResponse(
+              data['${effectivePrefix}strength_session_id']))!,
+      setNumber: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}set_number'])!,
+      count: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}count'])!,
+      weight: const RealType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}weight']),
+      deleted: const BoolType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}deleted'])!,
+    );
+  }
+
+  @override
+  $StrengthSetsTable createAlias(String alias) {
+    return $StrengthSetsTable(_db, alias);
+  }
+
+  static TypeConverter<Int64, int> $converter0 = const DbIdConverter();
+  static TypeConverter<Int64, int> $converter1 = const DbIdConverter();
+}
+
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   late final $MetconsTable metcons = $MetconsTable(this);
@@ -1212,11 +1771,21 @@ abstract class _$Database extends GeneratedDatabase {
       $MetconMovementsTable(this);
   late final $MetconSessionsTable metconSessions = $MetconSessionsTable(this);
   late final $MovementsTable movements = $MovementsTable(this);
+  late final $StrengthSessionsTable strengthSessions =
+      $StrengthSessionsTable(this);
+  late final $StrengthSetsTable strengthSets = $StrengthSetsTable(this);
   late final MetconsDao metconsDao = MetconsDao(this as Database);
   late final MovementsDao movementsDao = MovementsDao(this as Database);
+  late final StrengthDao strengthDao = StrengthDao(this as Database);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [metcons, metconMovements, metconSessions, movements];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        metcons,
+        metconMovements,
+        metconSessions,
+        movements,
+        strengthSessions,
+        strengthSets
+      ];
 }

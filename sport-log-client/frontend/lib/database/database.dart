@@ -11,6 +11,8 @@ import 'package:sport_log/database/metcons/metcon_tables.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/movements/movement_table.dart';
 import 'package:sport_log/database/movements/movements_dao.dart';
+import 'package:sport_log/database/strength/strength_dao.dart';
+import 'package:sport_log/database/strength/strength_tables.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/helpers/id_serialization.dart';
 import 'package:sport_log/models/movement/all.dart';
@@ -40,8 +42,19 @@ LazyDatabase _openConnection() {
 }
 
 @UseMoor(
-  tables: [Metcons, MetconMovements, MetconSessions, Movements],
-  daos: [MetconsDao, MovementsDao]
+  tables: [
+    Metcons,
+    MetconMovements,
+    MetconSessions,
+    Movements,
+    StrengthSessions,
+    StrengthSets,
+  ],
+  daos: [
+    MetconsDao,
+    MovementsDao,
+    StrengthDao,
+  ],
 )
 class Database extends _$Database {
 

@@ -24,12 +24,12 @@ class MetconsDao extends DatabaseAccessor<Database> with _$MetconsDaoMixin {
     return Future.wait(metconsList.map((m) async {
       return MetconDescription(
           metcon: m,
-          moves: await getMetconMovementsOfMetcon(m.id),
+          moves: await _getMetconMovementsOfMetcon(m.id),
       );
     }));
   }
 
-  Future<List<MetconMovement>> getMetconMovementsOfMetcon(
+  Future<List<MetconMovement>> _getMetconMovementsOfMetcon(
       Int64 id) async {
     return await (select(metconMovements)
       ..where((mm) => mm.metconId.equals(id.toInt()) & mm.deleted.equals(false))
@@ -48,7 +48,6 @@ class MetconsDao extends DatabaseAccessor<Database> with _$MetconsDaoMixin {
     if (!metconDescription.validateOnUpdate()) {
       return Failure(DbException.validationFailed);
     }
-    // TODO: check if all movement ids of metcon movements are valid
     return transaction(() async {
       await into(metcons).insert(metconDescription.metcon);
       await batch((batch) {
@@ -77,15 +76,10 @@ class MetconsDao extends DatabaseAccessor<Database> with _$MetconsDaoMixin {
 
   // deletion methods
 
-  Future<Result<void, DbException>> deleteMetcon(Int64 id) async {
-    if (await metconHasMetconSession(id.toInt()).getSingleOrNull() != null) {
-      // there is still a metcon session left
-      return Failure(DbException.metconHasMetconSession);
-    }
+  Future<void> deleteMetcon(Int64 id) async {
     return transaction(() async {
       await _deleteMetconMovementsOfMetcon(id);
       await _unsafeDeleteMetcon(id);
-      return Success(null);
     });
   }
 
@@ -136,7 +130,6 @@ class MetconsDao extends DatabaseAccessor<Database> with _$MetconsDaoMixin {
           & m.deleted.equals(false))
       ).write(metconDescription.metcon);
 
-      // TODO: move out of transaction
       // find all metcon movement ids of the former metcon
       final oldMetconMovementsIds = (await _idsOfMetconMovementsOfMetcon(
           metconDescription.metcon.id.toInt()).get())
@@ -160,19 +153,22 @@ class MetconsDao extends DatabaseAccessor<Database> with _$MetconsDaoMixin {
       await batch((batch) async {
         // deleting all metcon movements in toDelete
         for (int id in toDelete) {
-          (update(metconMovements)
-            ..where((mm) => mm.id.equals(id)
-              & mm.deleted.equals(false))
-          ).write(const MetconMovementsCompanion(deleted: Value(true)));
+          batch.update(
+            metconMovements,
+            const MetconMovementsCompanion(deleted: Value(true)),
+            where: ($MetconMovementsTable mm) =>
+                mm.id.equals(id) & mm.deleted.not()
+          );
         }
 
         // updating all metcon movements in toUpdate
         for (final metconMovement in toUpdate) {
-          (update(metconMovements)
-            ..where((mm) => mm.id.equals(metconMovement.id.toInt())
-              & mm.deleted.equals(false)
-            )
-          ).write(metconMovement);
+          batch.update(
+            metconMovements,
+            metconMovement,
+            where: ($MetconMovementsTable mm) =>
+                mm.id.equals(metconMovement.id.toInt()) & mm.deleted.not()
+          );
         }
 
         // inserting all metcon movements in toCreate

@@ -1,9 +1,6 @@
 
 import 'metcon_tables.dart';
 
-metconHasMetconSession: SELECT 1 FROM metcon_sessions
-    WHERE metcon_id == :id AND deleted == false;
-
 _metconExists: SELECT 1 FROM metcons
     WHERE id == :id AND deleted == false;
 

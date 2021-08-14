@@ -15,8 +15,10 @@ class MetconDescription implements UpdateValidatable {
 
   @override
   bool validateOnUpdate() {
-    return moves.every((mm) => mm.metconId == metcon.id)
+    return metcon.validateOnUpdate()
         && moves.isNotEmpty
-        && moves.everyIndexed((mm, index) => mm.movementNumber == index + 1);
+        && moves.every((mm) => mm.metconId == metcon.id)
+        && moves.everyIndexed((mm, index) => mm.movementNumber == index + 1)
+        && moves.every((mm) => mm.validateOnUpdate());
   }
 }

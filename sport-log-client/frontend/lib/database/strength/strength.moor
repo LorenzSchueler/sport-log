@@ -1,0 +1,5 @@
+
+import 'strength_tables.dart';
+
+_strengthSetIdsOfSession: SELECT id FROM strength_sets
+    WHERE strength_session_id == :id AND deleted == false;
