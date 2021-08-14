@@ -179,7 +179,7 @@ pub async fn get_metcon_movement(
     conn: Db,
 ) -> Result<Json<MetconMovement>, Status> {
     let metcon_movement_id = conn
-        .run(move |c| metcon_movement_id.verify_if_owned(&auth, c))
+        .run(move |c| metcon_movement_id.verify_user_ap(&auth, c))
         .await?;
     conn.run(move |c| MetconMovement::get_by_id(metcon_movement_id, c))
         .await

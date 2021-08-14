@@ -3,8 +3,8 @@ use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
-    GetById, GetByUser, GetByUserSync, Metcon, MetconId, MetconMovement, MetconSession,
-    MetconSessionDescription, MetconSessionId, Movement, UserId,
+    CheckUserId, GetById, GetByUser, GetByUserSync, Metcon, MetconId, MetconMovement,
+    MetconMovementId, MetconSession, MetconSessionDescription, MetconSessionId, Movement, UserId,
 };
 
 impl GetByUser for Metcon {
@@ -36,6 +36,42 @@ impl GetByUserSync for Metcon {
             )
             .filter(metcon::columns::last_change.ge(last_sync))
             .get_results(conn)
+    }
+}
+
+impl Metcon {
+    pub fn check_user_id_null(
+        id: MetconId,
+        user_id: UserId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool> {
+        metcon::table
+            .filter(metcon::columns::id.eq(id))
+            .filter(
+                metcon::columns::user_id
+                    .eq(user_id)
+                    .or(metcon::columns::user_id.is_null()),
+            )
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == 1)
+    }
+
+    pub fn check_user_ids_null(
+        ids: &Vec<MetconId>,
+        user_id: UserId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool> {
+        metcon::table
+            .filter(metcon::columns::id.eq_any(ids))
+            .filter(
+                metcon::columns::user_id
+                    .eq(user_id)
+                    .or(metcon::columns::user_id.is_null()),
+            )
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == ids.len() as i64)
     }
 }
 
@@ -87,6 +123,72 @@ impl GetByUserSync for MetconMovement {
             )
             .filter(metcon_movement::columns::last_change.ge(last_sync))
             .get_results(conn)
+    }
+}
+
+impl CheckUserId for MetconMovement {
+    type Id = MetconMovementId;
+
+    fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+        metcon_movement::table
+            .inner_join(metcon::table)
+            .filter(metcon_movement::columns::id.eq(id))
+            .filter(metcon::columns::user_id.eq(user_id))
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == 1)
+    }
+
+    fn check_user_ids(
+        ids: &Vec<Self::Id>,
+        user_id: UserId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool> {
+        metcon_movement::table
+            .inner_join(metcon::table)
+            .filter(metcon_movement::columns::id.eq_any(ids))
+            .filter(metcon::columns::user_id.eq(user_id))
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == ids.len() as i64)
+    }
+}
+
+impl MetconMovement {
+    pub fn check_user_id_null(
+        id: MetconMovementId,
+        user_id: UserId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool> {
+        metcon_movement::table
+            .inner_join(metcon::table)
+            .filter(metcon_movement::columns::id.eq(id))
+            .filter(
+                metcon::columns::user_id
+                    .eq(user_id)
+                    .or(metcon::columns::user_id.is_null()),
+            )
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == 1)
+    }
+
+    pub fn check_user_ids_null(
+        ids: &Vec<MetconMovementId>,
+        user_id: UserId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool> {
+        metcon_movement::table
+            .inner_join(metcon::table)
+            .filter(metcon_movement::columns::id.eq_any(ids))
+            .filter(
+                metcon::columns::user_id
+                    .eq(user_id)
+                    .or(metcon::columns::user_id.is_null()),
+            )
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == ids.len() as i64)
     }
 }
 

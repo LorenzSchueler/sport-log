@@ -16,7 +16,7 @@ use crate::{
     AuthUserOrAP, CheckUserId, Unverified, VerifyForUserOrAPWithDb,
     VerifyMultipleForUserOrAPWithDb,
 };
-use crate::{GetById, GetByIds, Movement, MovementId, MovementUnit, UserId};
+use crate::{Movement, MovementId, MovementUnit, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
@@ -129,11 +129,9 @@ impl VerifyForUserOrAPWithDb for Unverified<StrengthSet> {
         conn: &PgConnection,
     ) -> Result<Self::Entity, Status> {
         let strength_set = self.0.into_inner();
-        let strength_set_db = StrengthSet::get_by_id(strength_set.id, conn)
-            .map_err(|_| Status::InternalServerError)?;
         if StrengthSession::check_user_id(strength_set.strength_session_id, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
-            && StrengthSession::check_user_id(strength_set_db.strength_session_id, **auth, conn)
+            && StrengthSet::check_user_id(strength_set.id, **auth, conn)
                 .map_err(|_| Status::InternalServerError)?
         {
             Ok(strength_set)
@@ -161,14 +159,9 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthSet>> {
             .iter()
             .map(|strength_set| strength_set.strength_session_id)
             .collect();
-        let strength_session_ids_db = StrengthSet::get_by_ids(&strength_set_ids, conn)
-            .map_err(|_| Status::InternalServerError)?
-            .into_iter()
-            .map(|strength_set| strength_set.strength_session_id)
-            .collect();
         if StrengthSession::check_user_ids(&strength_session_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
-            && StrengthSession::check_user_ids(&strength_session_ids_db, **auth, conn)
+            && StrengthSet::check_user_ids(&strength_set_ids, **auth, conn)
                 .map_err(|_| Status::InternalServerError)?
         {
             Ok(strength_sets)

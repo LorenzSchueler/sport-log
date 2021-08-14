@@ -138,14 +138,9 @@ impl CheckAPId for ActionEvent {
         ap_id: ActionProviderId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {
-        action::table
-            .filter(
-                action::columns::id.eq_any(
-                    action_event::table
-                        .find(id)
-                        .select(action_event::columns::action_id),
-                ),
-            )
+        action_event::table
+            .inner_join(action::table)
+            .filter(action_event::columns::id.eq(id))
             .filter(action::columns::action_provider_id.eq(ap_id))
             .count()
             .get_result(conn)
@@ -157,18 +152,13 @@ impl CheckAPId for ActionEvent {
         ap_id: ActionProviderId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {
-        action::table
-            .filter(
-                action::columns::id.eq_any(
-                    action_event::table
-                        .filter(action_event::columns::id.eq_any(ids))
-                        .select(action_event::columns::action_id),
-                ),
-            )
+        action_event::table
+            .inner_join(action::table)
+            .filter(action_event::columns::id.eq_any(ids))
             .filter(action::columns::action_provider_id.eq(ap_id))
             .count()
             .get_result(conn)
-            .map(|count: i64| count == 1)
+            .map(|count: i64| count == ids.len() as i64)
     }
 }
 

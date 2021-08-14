@@ -3,7 +3,7 @@ use rocket::{http::Status, serde::json::Json};
 use sport_log_types::{
     AuthUserOrAP, Create, CreateMultiple, Db, Eorm, GetAll, GetById, GetByUser, Movement,
     MovementId, Unverified, UnverifiedId, Update, VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb, VerifyMultipleForUserOrAPWithoutDb,
+    VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyMultipleForUserOrAPWithoutDb,
 };
 
 use crate::handler::IntoJson;
@@ -39,7 +39,7 @@ pub async fn get_movement(
     conn: Db,
 ) -> Result<Json<Movement>, Status> {
     let movement_id = conn
-        .run(move |c| movement_id.verify_if_owned(&auth, c))
+        .run(move |c| movement_id.verify_user_ap(&auth, c))
         .await?;
     conn.run(move |c| Movement::get_by_id(movement_id, c))
         .await

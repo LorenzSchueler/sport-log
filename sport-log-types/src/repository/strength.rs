@@ -62,14 +62,9 @@ impl CheckUserId for StrengthSet {
     type Id = StrengthSetId;
 
     fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
-        strength_session::table
-            .filter(
-                strength_session::columns::id.eq_any(
-                    strength_set::table
-                        .filter(strength_set::columns::id.eq(id))
-                        .select(strength_set::columns::strength_session_id),
-                ),
-            )
+        strength_set::table
+            .inner_join(strength_session::table)
+            .filter(strength_set::columns::id.eq(id))
             .filter(strength_session::columns::user_id.eq(user_id))
             .count()
             .get_result(conn)
@@ -81,18 +76,13 @@ impl CheckUserId for StrengthSet {
         user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {
-        strength_session::table
-            .filter(
-                strength_session::columns::id.eq_any(
-                    strength_set::table
-                        .filter(strength_set::columns::id.eq_any(ids))
-                        .select(strength_set::columns::strength_session_id),
-                ),
-            )
+        strength_set::table
+            .inner_join(strength_session::table)
+            .filter(strength_set::columns::id.eq_any(ids))
             .filter(strength_session::columns::user_id.eq(user_id))
             .count()
             .get_result(conn)
-            .map(|count: i64| count == 1)
+            .map(|count: i64| count == ids.len() as i64)
     }
 }
 
