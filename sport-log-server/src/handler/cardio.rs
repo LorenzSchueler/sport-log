@@ -4,7 +4,7 @@ use sport_log_types::{
     AuthUserOrAP, CardioSession, CardioSessionDescription, CardioSessionId, Create, CreateMultiple,
     Db, GetById, GetByUser, Route, RouteId, Unverified, UnverifiedId, Update,
     VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
-    VerifyMultipleForUserOrAPWithoutDb,
+    VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
 };
 
 use crate::handler::{DateTimeWrapper, IntoJson};
@@ -19,7 +19,7 @@ pub async fn create_route(
     conn.run(|c| Route::create(route, c)).await.into_json()
 }
 
-#[post("/routes", format = "application/json", data = "<routes>")]
+#[post("/route", format = "application/json", data = "<routes>", rank = 2)]
 pub async fn create_routes(
     routes: Unverified<Vec<Route>>,
     auth: AuthUserOrAP,
@@ -60,6 +60,18 @@ pub async fn update_route(
     conn.run(|c| Route::update(route, c)).await.into_json()
 }
 
+#[put("/route", format = "application/json", data = "<routes>", rank = 2)]
+pub async fn update_routes(
+    routes: Unverified<Vec<Route>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> Result<Json<Vec<Route>>, Status> {
+    let routes = conn.run(move |c| routes.verify_user_ap(&auth, c)).await?;
+    conn.run(|c| Route::update_multiple(routes, c))
+        .await
+        .into_json()
+}
+
 #[post(
     "/cardio_session",
     format = "application/json",
@@ -77,9 +89,10 @@ pub async fn create_cardio_session(
 }
 
 #[post(
-    "/cardio_sessions",
+    "/cardio_session",
     format = "application/json",
-    data = "<cardio_sessions>"
+    data = "<cardio_sessions>",
+    rank = 2
 )]
 pub async fn create_cardio_sessions(
     cardio_sessions: Unverified<Vec<CardioSession>>,
@@ -130,6 +143,25 @@ pub async fn update_cardio_session(
         .run(move |c| cardio_session.verify_user_ap(&auth, c))
         .await?;
     conn.run(|c| CardioSession::update(cardio_session, c))
+        .await
+        .into_json()
+}
+
+#[put(
+    "/cardio_session",
+    format = "application/json",
+    data = "<cardio_sessions>",
+    rank = 2
+)]
+pub async fn update_cardio_sessions(
+    cardio_sessions: Unverified<Vec<CardioSession>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> Result<Json<Vec<CardioSession>>, Status> {
+    let cardio_sessions = conn
+        .run(move |c| cardio_sessions.verify_user_ap(&auth, c))
+        .await?;
+    conn.run(|c| CardioSession::update_multiple(cardio_sessions, c))
         .await
         .into_json()
 }

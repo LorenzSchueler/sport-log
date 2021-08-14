@@ -11,7 +11,7 @@ pub async fn get_account_data(auth: AuthUser, conn: Db) -> Result<Json<AccountDa
         .into_json()
 }
 
-#[get("/account_data/sync/<last_sync>")]
+#[get("/account_data/<last_sync>")]
 pub async fn sync(
     last_sync: DateTimeWrapper,
     auth: AuthUser,

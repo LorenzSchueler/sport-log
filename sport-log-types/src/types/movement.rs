@@ -17,7 +17,9 @@ use crate::{
     AuthUserOrAP, GetById, Unverified, UnverifiedId, User, VerifyForUserOrAPWithDb,
     VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyMultipleForUserOrAPWithoutDb,
 };
-use crate::{UnverifiedIds, UserId, VerifyIdsForUserOrAP};
+use crate::{
+    CheckUserId, UnverifiedIds, UserId, VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithDb,
+};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]
@@ -144,6 +146,30 @@ impl VerifyForUserOrAPWithDb for Unverified<Movement> {
                 == Some(**auth)
         {
             Ok(movement)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "full")]
+impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Movement>> {
+    type Entity = Movement;
+
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status> {
+        let movements = self.0.into_inner();
+        let movement_ids: Vec<_> = movements.iter().map(|movement| movement.id).collect();
+        if movements
+            .iter()
+            .all(|movement| movement.user_id == Some(**auth))
+            && Movement::check_user_ids(&movement_ids, **auth, conn)
+                .map_err(|_| Status::InternalServerError)?
+        {
+            Ok(movements)
         } else {
             Err(Status::Forbidden)
         }

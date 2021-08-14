@@ -3,7 +3,7 @@ use rocket::{http::Status, serde::json::Json};
 use sport_log_types::{
     AuthUserOrAP, Create, CreateMultiple, Db, Diary, DiaryId, GetById, GetByUser, Unverified,
     UnverifiedId, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
-    VerifyMultipleForUserOrAPWithoutDb, Wod,
+    VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb, Wod,
 };
 
 use crate::handler::{DateTimeWrapper, IntoJson};
@@ -18,7 +18,7 @@ pub async fn create_wod(
     conn.run(|c| Wod::create(wod, c)).await.into_json()
 }
 
-#[post("/wods", format = "application/json", data = "<wods>")]
+#[post("/wod", format = "application/json", data = "<wods>", rank = 2)]
 pub async fn create_wods(
     wods: Unverified<Vec<Wod>>,
     auth: AuthUserOrAP,
@@ -61,6 +61,18 @@ pub async fn update_wod(
     conn.run(|c| Wod::update(wod, c)).await.into_json()
 }
 
+#[put("/wod", format = "application/json", data = "<wods>", rank = 2)]
+pub async fn update_wods(
+    wods: Unverified<Vec<Wod>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> Result<Json<Vec<Wod>>, Status> {
+    let wods = conn.run(move |c| wods.verify_user_ap(&auth, c)).await?;
+    conn.run(|c| Wod::update_multiple(wods, c))
+        .await
+        .into_json()
+}
+
 #[post("/diary", format = "application/json", data = "<diary>")]
 pub async fn create_diary(
     diary: Unverified<Diary>,
@@ -71,7 +83,7 @@ pub async fn create_diary(
     conn.run(|c| Diary::create(diary, c)).await.into_json()
 }
 
-#[post("/diaries", format = "application/json", data = "<diaries>")]
+#[post("/diary", format = "application/json", data = "<diaries>", rank = 2)]
 pub async fn create_diaries(
     diaries: Unverified<Vec<Diary>>,
     auth: AuthUserOrAP,
@@ -124,4 +136,16 @@ pub async fn update_diary(
 ) -> Result<Json<Diary>, Status> {
     let diary = conn.run(move |c| diary.verify_user_ap(&auth, c)).await?;
     conn.run(|c| Diary::update(diary, c)).await.into_json()
+}
+
+#[put("/diary", format = "application/json", data = "<diaries>", rank = 2)]
+pub async fn update_diaries(
+    diaries: Unverified<Vec<Diary>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> Result<Json<Vec<Diary>>, Status> {
+    let diaries = conn.run(move |c| diaries.verify_user_ap(&auth, c)).await?;
+    conn.run(|c| Diary::update_multiple(diaries, c))
+        .await
+        .into_json()
 }

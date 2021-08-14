@@ -26,9 +26,10 @@ pub async fn create_strength_session(
 }
 
 #[post(
-    "/strength_sessions",
+    "/strength_session",
     format = "application/json",
-    data = "<strength_sessions>"
+    data = "<strength_sessions>",
+    rank = 2
 )]
 pub async fn create_strength_sessions(
     strength_sessions: Unverified<Vec<StrengthSession>>,
@@ -83,6 +84,25 @@ pub async fn update_strength_session(
         .into_json()
 }
 
+#[put(
+    "/strength_session",
+    format = "application/json",
+    data = "<strength_sessions>",
+    rank = 2
+)]
+pub async fn update_strength_sessions(
+    strength_sessions: Unverified<Vec<StrengthSession>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> Result<Json<Vec<StrengthSession>>, Status> {
+    let strength_sessions = conn
+        .run(move |c| strength_sessions.verify_user_ap(&auth, c))
+        .await?;
+    conn.run(|c| StrengthSession::update_multiple(strength_sessions, c))
+        .await
+        .into_json()
+}
+
 #[post("/strength_set", format = "application/json", data = "<strength_set>")]
 pub async fn create_strength_set(
     strength_set: Unverified<StrengthSet>,
@@ -98,9 +118,10 @@ pub async fn create_strength_set(
 }
 
 #[post(
-    "/strength_sets",
+    "/strength_set",
     format = "application/json",
-    data = "<strength_sets>"
+    data = "<strength_sets>",
+    rank = 2
 )]
 pub async fn create_strength_sets(
     strength_sets: Unverified<Vec<StrengthSet>>,
@@ -153,6 +174,25 @@ pub async fn update_strength_set(
         .run(move |c| strength_set.verify_user_ap(&auth, c))
         .await?;
     conn.run(|c| StrengthSet::update(strength_set, c))
+        .await
+        .into_json()
+}
+
+#[put(
+    "/strength_set",
+    format = "application/json",
+    data = "<strength_sets>",
+    rank = 2
+)]
+pub async fn update_strength_sets(
+    strength_sets: Unverified<Vec<StrengthSet>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> Result<Json<Vec<StrengthSet>>, Status> {
+    let strength_sets = conn
+        .run(move |c| strength_sets.verify_user_ap(&auth, c))
+        .await?;
+    conn.run(|c| StrengthSet::update_multiple(strength_sets, c))
         .await
         .into_json()
 }

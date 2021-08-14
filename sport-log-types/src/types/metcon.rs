@@ -141,6 +141,28 @@ impl VerifyForUserOrAPWithDb for Unverified<Metcon> {
 }
 
 #[cfg(feature = "full")]
+impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Metcon>> {
+    type Entity = Metcon;
+
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status> {
+        let metcons = self.0.into_inner();
+        let metcon_ids: Vec<_> = metcons.iter().map(|metcon| metcon.id).collect();
+        if metcons.iter().all(|metcon| metcon.user_id == Some(**auth))
+            && Metcon::check_user_ids(&metcon_ids, **auth, conn)
+                .map_err(|_| Status::InternalServerError)?
+        {
+            Ok(metcons)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "full")]
 impl VerifyForUserOrAPWithoutDb for Unverified<Metcon> {
     type Entity = Metcon;
 
