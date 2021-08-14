@@ -1,6 +1,6 @@
 use diesel::prelude::*;
 
-use crate::{GetByUser, GetByUserSync, Movement, MovementId, UserId, schema::movement};
+use crate::{schema::movement, GetByUser, GetByUserSync, Movement, MovementId, UserId};
 
 impl GetByUser for Movement {
     fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>> {

@@ -1,12 +1,13 @@
-use std::{env, fs, process::Command, thread, time::Duration as StdDuration};
+use std::{env, fs, process::Command, time::Duration as StdDuration};
 
 use chrono::{Duration, Local, Utc};
 use rand::Rng;
 use reqwest::{Client, StatusCode};
 use serde::Deserialize;
 use thirtyfour::prelude::*;
+use tokio::time;
 
-use sport_log_ap_utils::{delete_events, get_events, setup};
+use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{
     Action, ActionId, ActionProvider, ActionProviderId, Platform, PlatformId, Wod, WodId,
 };
@@ -32,81 +33,79 @@ impl Config {
 async fn main() {
     match &env::args().collect::<Vec<_>>()[1..] {
         [] => login().await.unwrap(),
-        [option] if option == "--setup" => {
-            let config = Config::get();
-
-            let mut rng = rand::thread_rng();
-
-            let platform = Platform {
-                id: PlatformId(rng.gen()),
-                name: PLATFORM_NAME.to_owned(),
-                last_change: Utc::now(),
-                deleted: false,
-            };
-
-            let action_provider = ActionProvider {
-                id: ActionProviderId(rng.gen()),
-                name: NAME.to_owned(),
-                password: config.password.clone(),
-                platform_id: platform.id,
-                description: Some(DESCRIPTION.to_owned()),
-                last_change: Utc::now(),
-                deleted: false,
-            };
-
-            let actions = vec![
-                Action {
-                    id: ActionId(rng.gen()),
-                    name: "CrossFit".to_owned(),
-                    action_provider_id: action_provider.id,
-                    description: Some(
-                        "Fetch and save the CrossFit wod for the current day.".to_owned(),
-                    ),
-                    create_before: 168,
-                    delete_after: 0,
-                    last_change: Utc::now(),
-                    deleted: false,
-                },
-                Action {
-                    id: ActionId(rng.gen()),
-                    name: "Weightlifting".to_owned(),
-                    action_provider_id: action_provider.id,
-                    description: Some(
-                        "Fetch and save the Weightlifting wod for the current day.".to_owned(),
-                    ),
-                    create_before: 168,
-                    delete_after: 0,
-                    last_change: Utc::now(),
-                    deleted: false,
-                },
-                Action {
-                    id: ActionId(rng.gen()),
-                    name: "Open Fridge".to_owned(),
-                    action_provider_id: action_provider.id,
-                    description: Some(
-                        "Fetch and save the Open Fridge wod for the current day.".to_owned(),
-                    ),
-                    create_before: 168,
-                    delete_after: 0,
-                    last_change: Utc::now(),
-                    deleted: false,
-                },
-            ];
-
-            setup(
-                &config.base_url,
-                NAME,
-                &config.password,
-                PLATFORM_NAME,
-                platform,
-                action_provider,
-                actions,
-            )
-            .await;
-        }
+        [option] if option == "--setup" => setup().await,
         [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
         _ => wrong_use(),
     }
+}
+
+async fn setup() {
+    let config = Config::get();
+
+    let mut rng = rand::thread_rng();
+
+    let platform = Platform {
+        id: PlatformId(rng.gen()),
+        name: PLATFORM_NAME.to_owned(),
+        last_change: Utc::now(),
+        deleted: false,
+    };
+
+    let action_provider = ActionProvider {
+        id: ActionProviderId(rng.gen()),
+        name: NAME.to_owned(),
+        password: config.password.clone(),
+        platform_id: platform.id,
+        description: Some(DESCRIPTION.to_owned()),
+        last_change: Utc::now(),
+        deleted: false,
+    };
+
+    let actions = vec![
+        Action {
+            id: ActionId(rng.gen()),
+            name: "CrossFit".to_owned(),
+            action_provider_id: action_provider.id,
+            description: Some("Fetch and save the CrossFit wod for the current day.".to_owned()),
+            create_before: 168,
+            delete_after: 0,
+            last_change: Utc::now(),
+            deleted: false,
+        },
+        Action {
+            id: ActionId(rng.gen()),
+            name: "Weightlifting".to_owned(),
+            action_provider_id: action_provider.id,
+            description: Some(
+                "Fetch and save the Weightlifting wod for the current day.".to_owned(),
+            ),
+            create_before: 168,
+            delete_after: 0,
+            last_change: Utc::now(),
+            deleted: false,
+        },
+        Action {
+            id: ActionId(rng.gen()),
+            name: "Open Fridge".to_owned(),
+            action_provider_id: action_provider.id,
+            description: Some("Fetch and save the Open Fridge wod for the current day.".to_owned()),
+            create_before: 168,
+            delete_after: 0,
+            last_change: Utc::now(),
+            deleted: false,
+        },
+    ];
+
+    setup_db(
+        &config.base_url,
+        NAME,
+        &config.password,
+        PLATFORM_NAME,
+        platform,
+        action_provider,
+        actions,
+    )
+    .await;
 }
 
 fn help() {
@@ -174,7 +173,7 @@ async fn login() -> WebDriverResult<()> {
             .get("https://app.wodify.com/WOD/WODEntry.aspx")
             .await?;
 
-        thread::sleep(StdDuration::from_secs(3));
+        time::sleep(StdDuration::from_secs(3)).await;
 
         driver
             .find_element(By::Id("Input_UserName"))
@@ -191,7 +190,7 @@ async fn login() -> WebDriverResult<()> {
             .await?
             .click()
             .await?;
-        thread::sleep(StdDuration::from_secs(2));
+        time::sleep(StdDuration::from_secs(2)).await;
 
         if driver
             .find_element(By::Id("AthleteTheme_wtLayoutNormal_block_wt9_wtLogoutLink"))
@@ -211,7 +210,7 @@ async fn login() -> WebDriverResult<()> {
         //.await?;
         //type_picker.click().await?;
         //type_picker.send_keys(exec_action_event.action_name).await?; // TODO does not work
-        //thread::sleep(StdDuration::from_secs(3));
+        //time::sleep(StdDuration::from_secs(2)).await;
 
         if let Ok(wod) = driver.find_element(By::Id(
             "AthleteTheme_wtLayoutNormal_block_wtMainContent_WOD_UI_wt9_block_wtWODComponentsList",
@@ -221,7 +220,7 @@ async fn login() -> WebDriverResult<()> {
             .find_elements(By::ClassName("component_show_wrapper"))
             .await?;
 
-            let mut description = "".to_owned();
+        let mut description = "".to_owned();
         for element in elements {
             let name = element
                 .find_element(By::ClassName("component_name"))
@@ -252,7 +251,7 @@ async fn login() -> WebDriverResult<()> {
             last_change: Utc::now(),
             deleted: false,
         };
-        // TODO append
+
         if client
             .post(format!("{}/v1/wod", config.base_url,))
             .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&config.password))
@@ -263,7 +262,7 @@ async fn login() -> WebDriverResult<()> {
         {
             let today = Local::today().naive_local().format("%Y-%m-%d");
             let wods: Vec<Wod> = client
-                .get(format!("{}/v1/wod/timespan/{}/{}", config.base_url,today, today))
+                .get(format!("{}/v1/wod/timespan/{}/{}", config.base_url, today, today))
                 .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&config.password))
                 .send()
                 .await
