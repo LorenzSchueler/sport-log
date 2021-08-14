@@ -148,7 +148,7 @@ impl CheckAPId for ActionEvent {
     }
 
     fn check_ap_ids(
-        ids: &Vec<Self::Id>,
+        ids: &[Self::Id],
         ap_id: ActionProviderId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {

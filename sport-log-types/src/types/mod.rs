@@ -256,11 +256,7 @@ pub trait CheckUserId {
 
     fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool>;
 
-    fn check_user_ids(
-        ids: &Vec<Self::Id>,
-        user_id: UserId,
-        conn: &PgConnection,
-    ) -> QueryResult<bool>;
+    fn check_user_ids(ids: &[Self::Id], user_id: UserId, conn: &PgConnection) -> QueryResult<bool>;
 }
 
 #[cfg(feature = "full")]
@@ -271,7 +267,7 @@ pub trait CheckAPId {
         -> QueryResult<bool>;
 
     fn check_ap_ids(
-        ids: &Vec<Self::Id>,
+        ids: &[Self::Id],
         ap_id: ActionProviderId,
         conn: &PgConnection,
     ) -> QueryResult<bool>;

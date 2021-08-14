@@ -58,7 +58,7 @@ impl Metcon {
     }
 
     pub fn check_user_ids_null(
-        ids: &Vec<MetconId>,
+        ids: &[MetconId],
         user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {
@@ -139,11 +139,7 @@ impl CheckUserId for MetconMovement {
             .map(|count: i64| count == 1)
     }
 
-    fn check_user_ids(
-        ids: &Vec<Self::Id>,
-        user_id: UserId,
-        conn: &PgConnection,
-    ) -> QueryResult<bool> {
+    fn check_user_ids(ids: &[Self::Id], user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
             .filter(metcon_movement::columns::id.eq_any(ids))
@@ -174,7 +170,7 @@ impl MetconMovement {
     }
 
     pub fn check_user_ids_null(
-        ids: &Vec<MetconMovementId>,
+        ids: &[MetconMovementId],
         user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {

@@ -49,7 +49,7 @@ impl CheckUserId for User {
     }
 
     fn check_user_ids(
-        _ids: &Vec<Self::Id>,
+        _ids: &[Self::Id],
         _user_id: UserId,
         _conn: &PgConnection,
     ) -> QueryResult<bool> {

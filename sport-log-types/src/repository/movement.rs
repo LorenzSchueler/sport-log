@@ -53,7 +53,7 @@ impl Movement {
     }
 
     pub fn check_user_ids_null(
-        ids: &Vec<MovementId>,
+        ids: &[MovementId],
         user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {

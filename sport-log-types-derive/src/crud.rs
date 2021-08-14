@@ -203,7 +203,7 @@ pub fn impl_check_user_id(ast: &syn::DeriveInput) -> TokenStream {
             }
 
             fn check_user_ids(
-                ids: &Vec<Self::Id>,
+                ids: &[Self::Id],
                 user_id: UserId,
                 conn: &PgConnection,
             ) -> QueryResult<bool> {
@@ -239,7 +239,7 @@ pub fn impl_check_ap_id(ast: &syn::DeriveInput) -> TokenStream {
             }
 
             fn check_ap_ids(
-                ids: &Vec<Self::Id>,
+                ids: &[Self::Id],
                 ap_id: ActionProviderId,
                 conn: &PgConnection,
             ) -> QueryResult<bool> {

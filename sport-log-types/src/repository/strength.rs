@@ -71,11 +71,7 @@ impl CheckUserId for StrengthSet {
             .map(|count: i64| count == 1)
     }
 
-    fn check_user_ids(
-        ids: &Vec<Self::Id>,
-        user_id: UserId,
-        conn: &PgConnection,
-    ) -> QueryResult<bool> {
+    fn check_user_ids(ids: &[Self::Id], user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
         strength_set::table
             .inner_join(strength_session::table)
             .filter(strength_set::columns::id.eq_any(ids))
