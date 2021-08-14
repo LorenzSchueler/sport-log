@@ -34,6 +34,25 @@ impl Update for User {
             .set(user)
             .get_result(conn)
     }
+
+    fn update_multiple(users: Vec<Self>, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+        conn.transaction(|| {
+            users
+                .into_iter()
+                .map(|mut user| {
+                    let salt = SaltString::generate(&mut OsRng);
+                    user.password = Argon2::default()
+                        .hash_password_simple(user.password.as_bytes(), &salt)
+                        .unwrap()
+                        .to_string();
+
+                    diesel::update(user::table.find(user.id))
+                        .set(user)
+                        .get_result(conn)
+                })
+                .collect()
+        })
+    }
 }
 
 impl CheckUserId for User {

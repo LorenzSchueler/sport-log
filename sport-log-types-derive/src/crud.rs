@@ -178,6 +178,18 @@ pub fn impl_update(ast: &syn::DeriveInput) -> TokenStream {
                     .set(#paramname)
                     .get_result(conn)
             }
+
+            fn update_multiple(#paramname: Vec<#typename>, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+                conn.transaction(|| {
+                    #paramname.into_iter()
+                        .map(|entity|
+                            diesel::update(#tablename::table.find(entity.id))
+                                .set(entity)
+                                .get_result(conn)
+                        )
+                        .collect()
+                })
+            }
         }
     };
     gen.into()

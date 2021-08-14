@@ -248,6 +248,10 @@ pub trait Update {
     fn update(entity: Self, conn: &PgConnection) -> QueryResult<Self>
     where
         Self: Sized;
+
+    fn update_multiple(entities: Vec<Self>, conn: &PgConnection) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized;
 }
 
 #[cfg(feature = "full")]
