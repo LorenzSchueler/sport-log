@@ -9,6 +9,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/database/cardio/cardio_dao.dart';
 import 'package:sport_log/database/cardio/cardio_tables.dart';
+import 'package:sport_log/database/diary/diary_dao.dart';
+import 'package:sport_log/database/diary/diary_table.dart';
 import 'package:sport_log/database/metcons/metcon_tables.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/movements/movement_table.dart';
@@ -54,6 +56,7 @@ LazyDatabase _openConnection() {
     CardioSessions,
     Routes,
     Wods,
+    Diaries,
   ],
   daos: [
     MetconsDao,
@@ -61,6 +64,7 @@ LazyDatabase _openConnection() {
     StrengthDao,
     CardioDao,
     WodDao,
+    DiaryDao,
   ],
 )
 class Database extends _$Database {

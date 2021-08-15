@@ -2814,6 +2814,251 @@ class $WodsTable extends Wods with TableInfo<$WodsTable, Wod> {
   static TypeConverter<Int64, int> $converter1 = const DbIdConverter();
 }
 
+class DiariesCompanion extends UpdateCompanion<Diary> {
+  final Value<Int64> id;
+  final Value<Int64> userId;
+  final Value<DateTime> date;
+  final Value<double?> bodyweight;
+  final Value<String?> comments;
+  final Value<bool> deleted;
+  final Value<DateTime> lastModified;
+  final Value<bool> isNew;
+  const DiariesCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.date = const Value.absent(),
+    this.bodyweight = const Value.absent(),
+    this.comments = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.lastModified = const Value.absent(),
+    this.isNew = const Value.absent(),
+  });
+  DiariesCompanion.insert({
+    this.id = const Value.absent(),
+    required Int64 userId,
+    required DateTime date,
+    this.bodyweight = const Value.absent(),
+    this.comments = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.lastModified = const Value.absent(),
+    this.isNew = const Value.absent(),
+  })  : userId = Value(userId),
+        date = Value(date);
+  static Insertable<Diary> custom({
+    Expression<Int64>? id,
+    Expression<Int64>? userId,
+    Expression<DateTime>? date,
+    Expression<double?>? bodyweight,
+    Expression<String?>? comments,
+    Expression<bool>? deleted,
+    Expression<DateTime>? lastModified,
+    Expression<bool>? isNew,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (date != null) 'date': date,
+      if (bodyweight != null) 'bodyweight': bodyweight,
+      if (comments != null) 'comments': comments,
+      if (deleted != null) 'deleted': deleted,
+      if (lastModified != null) 'last_modified': lastModified,
+      if (isNew != null) 'is_new': isNew,
+    });
+  }
+
+  DiariesCompanion copyWith(
+      {Value<Int64>? id,
+      Value<Int64>? userId,
+      Value<DateTime>? date,
+      Value<double?>? bodyweight,
+      Value<String?>? comments,
+      Value<bool>? deleted,
+      Value<DateTime>? lastModified,
+      Value<bool>? isNew}) {
+    return DiariesCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      date: date ?? this.date,
+      bodyweight: bodyweight ?? this.bodyweight,
+      comments: comments ?? this.comments,
+      deleted: deleted ?? this.deleted,
+      lastModified: lastModified ?? this.lastModified,
+      isNew: isNew ?? this.isNew,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      final converter = $DiariesTable.$converter0;
+      map['id'] = Variable<int>(converter.mapToSql(id.value)!);
+    }
+    if (userId.present) {
+      final converter = $DiariesTable.$converter1;
+      map['user_id'] = Variable<int>(converter.mapToSql(userId.value)!);
+    }
+    if (date.present) {
+      map['date'] = Variable<DateTime>(date.value);
+    }
+    if (bodyweight.present) {
+      map['bodyweight'] = Variable<double?>(bodyweight.value);
+    }
+    if (comments.present) {
+      map['comments'] = Variable<String?>(comments.value);
+    }
+    if (deleted.present) {
+      map['deleted'] = Variable<bool>(deleted.value);
+    }
+    if (lastModified.present) {
+      map['last_modified'] = Variable<DateTime>(lastModified.value);
+    }
+    if (isNew.present) {
+      map['is_new'] = Variable<bool>(isNew.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DiariesCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('date: $date, ')
+          ..write('bodyweight: $bodyweight, ')
+          ..write('comments: $comments, ')
+          ..write('deleted: $deleted, ')
+          ..write('lastModified: $lastModified, ')
+          ..write('isNew: $isNew')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DiariesTable extends Diaries with TableInfo<$DiariesTable, Diary> {
+  final GeneratedDatabase _db;
+  final String? _alias;
+  $DiariesTable(this._db, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumnWithTypeConverter<Int64, int?> id =
+      GeneratedColumn<int?>('id', aliasedName, false,
+              typeName: 'INTEGER', requiredDuringInsert: false)
+          .withConverter<Int64>($DiariesTable.$converter0);
+  final VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  late final GeneratedColumnWithTypeConverter<Int64, int?> userId =
+      GeneratedColumn<int?>('user_id', aliasedName, false,
+              typeName: 'INTEGER', requiredDuringInsert: true)
+          .withConverter<Int64>($DiariesTable.$converter1);
+  final VerificationMeta _dateMeta = const VerificationMeta('date');
+  late final GeneratedColumn<DateTime?> date = GeneratedColumn<DateTime?>(
+      'date', aliasedName, false,
+      typeName: 'INTEGER', requiredDuringInsert: true);
+  final VerificationMeta _bodyweightMeta = const VerificationMeta('bodyweight');
+  late final GeneratedColumn<double?> bodyweight = GeneratedColumn<double?>(
+      'bodyweight', aliasedName, true,
+      typeName: 'REAL', requiredDuringInsert: false);
+  final VerificationMeta _commentsMeta = const VerificationMeta('comments');
+  late final GeneratedColumn<String?> comments = GeneratedColumn<String?>(
+      'comments', aliasedName, true,
+      typeName: 'TEXT', requiredDuringInsert: false);
+  final VerificationMeta _deletedMeta = const VerificationMeta('deleted');
+  late final GeneratedColumn<bool?> deleted = GeneratedColumn<bool?>(
+      'deleted', aliasedName, false,
+      typeName: 'INTEGER',
+      requiredDuringInsert: false,
+      defaultConstraints: 'CHECK (deleted IN (0, 1))',
+      defaultValue: const Constant(true));
+  final VerificationMeta _lastModifiedMeta =
+      const VerificationMeta('lastModified');
+  late final GeneratedColumn<DateTime?> lastModified =
+      GeneratedColumn<DateTime?>('last_modified', aliasedName, false,
+          typeName: 'INTEGER',
+          requiredDuringInsert: false,
+          clientDefault: () => DateTime.now());
+  final VerificationMeta _isNewMeta = const VerificationMeta('isNew');
+  late final GeneratedColumn<bool?> isNew = GeneratedColumn<bool?>(
+      'is_new', aliasedName, false,
+      typeName: 'INTEGER',
+      requiredDuringInsert: false,
+      defaultConstraints: 'CHECK (is_new IN (0, 1))',
+      defaultValue: const Constant(true));
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, userId, date, bodyweight, comments, deleted, lastModified, isNew];
+  @override
+  String get aliasedName => _alias ?? 'diaries';
+  @override
+  String get actualTableName => 'diaries';
+  @override
+  VerificationContext validateIntegrity(Insertable<Diary> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    context.handle(_idMeta, const VerificationResult.success());
+    context.handle(_userIdMeta, const VerificationResult.success());
+    if (data.containsKey('date')) {
+      context.handle(
+          _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('bodyweight')) {
+      context.handle(
+          _bodyweightMeta,
+          bodyweight.isAcceptableOrUnknown(
+              data['bodyweight']!, _bodyweightMeta));
+    }
+    if (data.containsKey('comments')) {
+      context.handle(_commentsMeta,
+          comments.isAcceptableOrUnknown(data['comments']!, _commentsMeta));
+    }
+    if (data.containsKey('deleted')) {
+      context.handle(_deletedMeta,
+          deleted.isAcceptableOrUnknown(data['deleted']!, _deletedMeta));
+    }
+    if (data.containsKey('last_modified')) {
+      context.handle(
+          _lastModifiedMeta,
+          lastModified.isAcceptableOrUnknown(
+              data['last_modified']!, _lastModifiedMeta));
+    }
+    if (data.containsKey('is_new')) {
+      context.handle(
+          _isNewMeta, isNew.isAcceptableOrUnknown(data['is_new']!, _isNewMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Diary map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Diary(
+      id: $DiariesTable.$converter0.mapToDart(const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id']))!,
+      userId: $DiariesTable.$converter1.mapToDart(const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}user_id']))!,
+      date: const DateTimeType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}date'])!,
+      bodyweight: const RealType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}bodyweight']),
+      comments: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}comments']),
+      deleted: const BoolType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}deleted'])!,
+    );
+  }
+
+  @override
+  $DiariesTable createAlias(String alias) {
+    return $DiariesTable(_db, alias);
+  }
+
+  static TypeConverter<Int64, int> $converter0 = const DbIdConverter();
+  static TypeConverter<Int64, int> $converter1 = const DbIdConverter();
+}
+
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   late final $MetconsTable metcons = $MetconsTable(this);
@@ -2827,11 +3072,13 @@ abstract class _$Database extends GeneratedDatabase {
   late final $CardioSessionsTable cardioSessions = $CardioSessionsTable(this);
   late final $RoutesTable routes = $RoutesTable(this);
   late final $WodsTable wods = $WodsTable(this);
+  late final $DiariesTable diaries = $DiariesTable(this);
   late final MetconsDao metconsDao = MetconsDao(this as Database);
   late final MovementsDao movementsDao = MovementsDao(this as Database);
   late final StrengthDao strengthDao = StrengthDao(this as Database);
   late final CardioDao cardioDao = CardioDao(this as Database);
   late final WodDao wodDao = WodDao(this as Database);
+  late final DiaryDao diaryDao = DiaryDao(this as Database);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
@@ -2844,6 +3091,7 @@ abstract class _$Database extends GeneratedDatabase {
         strengthSets,
         cardioSessions,
         routes,
-        wods
+        wods,
+        diaries
       ];
 }
