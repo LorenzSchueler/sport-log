@@ -8,7 +8,7 @@ use sport_log_types::{
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForUser,
     VerifyIdUnchecked, VerifyIdsForActionProvider, VerifyIdsForAdmin,
     VerifyMultipleForActionProviderWithoutDb, VerifyMultipleForAdminWithoutDb,
-    VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
+    VerifyMultipleForUserWithDb, VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
 };
 
 use crate::handler::{DateTimeWrapper, IntoJson};
@@ -83,7 +83,12 @@ pub async fn ap_create_action(
     conn.run(|c| Action::create(action, c)).await.into_json()
 }
 
-#[post("/ap/actions", format = "application/json", data = "<actions>")]
+#[post(
+    "/ap/action",
+    format = "application/json",
+    data = "<actions>",
+    rank = 2
+)]
 pub async fn ap_create_actions(
     actions: Unverified<Vec<Action>>,
     auth: AuthAP,
@@ -131,7 +136,12 @@ pub async fn create_action_rule(
         .into_json()
 }
 
-#[post("/action_rules", format = "application/json", data = "<action_rules>")]
+#[post(
+    "/action_rule",
+    format = "application/json",
+    data = "<action_rules>",
+    rank = 2
+)]
 pub async fn create_action_rules(
     action_rules: Unverified<Vec<ActionRule>>,
     auth: AuthUser,
@@ -188,6 +198,25 @@ pub async fn update_action_rule(
         .into_json()
 }
 
+#[put(
+    "/action_rule",
+    format = "application/json",
+    data = "<action_rules>",
+    rank = 2
+)]
+pub async fn update_action_rules(
+    action_rules: Unverified<Vec<ActionRule>>,
+    auth: AuthUser,
+    conn: Db,
+) -> Result<Json<Vec<ActionRule>>, Status> {
+    let action_rules = conn
+        .run(move |c| action_rules.verify_user(&auth, c))
+        .await?;
+    conn.run(|c| ActionRule::update_multiple(action_rules, c))
+        .await
+        .into_json()
+}
+
 #[post("/action_event", format = "application/json", data = "<action_event>")]
 pub async fn create_action_event(
     action_event: Unverified<ActionEvent>,
@@ -201,7 +230,24 @@ pub async fn create_action_event(
 }
 
 #[post(
-    "/adm/action_events",
+    "/action_event",
+    format = "application/json",
+    data = "<action_events>",
+    rank = 2
+)]
+pub async fn create_action_events(
+    action_events: Unverified<Vec<ActionEvent>>,
+    auth: AuthUser,
+    conn: Db,
+) -> Result<Json<Vec<ActionEvent>>, Status> {
+    let action_events = action_events.verify_user_without_db(&auth)?;
+    conn.run(|c| ActionEvent::create_multiple(action_events, c))
+        .await
+        .into_json()
+}
+
+#[post(
+    "/adm/action_event",
     format = "application/json",
     data = "<action_events>"
 )]
@@ -212,22 +258,6 @@ pub async fn adm_create_action_events(
 ) -> Result<Json<Vec<ActionEvent>>, Status> {
     let action_events = action_events.verify_adm(&auth)?;
     conn.run(|c| ActionEvent::create_multiple_ignore_conflict(action_events, c))
-        .await
-        .into_json()
-}
-
-#[post(
-    "/action_events",
-    format = "application/json",
-    data = "<action_events>"
-)]
-pub async fn create_action_events(
-    action_events: Unverified<Vec<ActionEvent>>,
-    auth: AuthUser,
-    conn: Db,
-) -> Result<Json<Vec<ActionEvent>>, Status> {
-    let action_events = action_events.verify_user_without_db(&auth)?;
-    conn.run(|c| ActionEvent::create_multiple(action_events, c))
         .await
         .into_json()
 }
@@ -280,6 +310,25 @@ pub async fn update_action_event(
 }
 
 #[put(
+    "/action_event",
+    format = "application/json",
+    data = "<action_events>",
+    rank = 2
+)]
+pub async fn update_action_events(
+    action_events: Unverified<Vec<ActionEvent>>,
+    auth: AuthUser,
+    conn: Db,
+) -> Result<Json<Vec<ActionEvent>>, Status> {
+    let action_events = conn
+        .run(move |c| action_events.verify_user(&auth, c))
+        .await?;
+    conn.run(|c| ActionEvent::update_multiple(action_events, c))
+        .await
+        .into_json()
+}
+
+#[put(
     "/adm/action_event",
     format = "application/json",
     data = "<action_event>"
@@ -296,7 +345,7 @@ pub async fn adm_update_action_event(
 }
 
 #[delete(
-    "/ap/action_events",
+    "/ap/action_event",
     format = "application/json",
     data = "<action_event_ids>"
 )]
@@ -314,7 +363,7 @@ pub async fn ap_delete_action_events(
 }
 
 #[delete(
-    "/adm/action_events",
+    "/adm/action_event",
     format = "application/json",
     data = "<action_event_ids>"
 )]

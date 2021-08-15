@@ -3,7 +3,8 @@ use rocket::{http::Status, serde::json::Json};
 use sport_log_types::{
     AuthUserOrAP, Create, CreateMultiple, Db, Eorm, GetAll, GetById, GetByUser, Movement,
     MovementId, Unverified, UnverifiedId, Update, VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb, VerifyMultipleForUserOrAPWithoutDb,
+    VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyMultipleForUserOrAPWithDb,
+    VerifyMultipleForUserOrAPWithoutDb,
 };
 
 use crate::handler::IntoJson;
@@ -20,7 +21,12 @@ pub async fn create_movement(
         .into_json()
 }
 
-#[post("/movements", format = "application/json", data = "<movements>")]
+#[post(
+    "/movement",
+    format = "application/json",
+    data = "<movements>",
+    rank = 2
+)]
 pub async fn create_movements(
     movements: Unverified<Vec<Movement>>,
     auth: AuthUserOrAP,
@@ -39,7 +45,7 @@ pub async fn get_movement(
     conn: Db,
 ) -> Result<Json<Movement>, Status> {
     let movement_id = conn
-        .run(move |c| movement_id.verify_if_owned(&auth, c))
+        .run(move |c| movement_id.verify_user_ap(&auth, c))
         .await?;
     conn.run(move |c| Movement::get_by_id(movement_id, c))
         .await
@@ -61,6 +67,25 @@ pub async fn update_movement(
 ) -> Result<Json<Movement>, Status> {
     let movement = conn.run(move |c| movement.verify_user_ap(&auth, c)).await?;
     conn.run(|c| Movement::update(movement, c))
+        .await
+        .into_json()
+}
+
+#[put(
+    "/movement",
+    format = "application/json",
+    data = "<movements>",
+    rank = 2
+)]
+pub async fn update_movements(
+    movements: Unverified<Vec<Movement>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> Result<Json<Vec<Movement>>, Status> {
+    let movements = conn
+        .run(move |c| movements.verify_user_ap(&auth, c))
+        .await?;
+    conn.run(|c| Movement::update_multiple(movements, c))
         .await
         .into_json()
 }

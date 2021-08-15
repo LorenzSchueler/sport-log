@@ -248,6 +248,33 @@ pub trait Update {
     fn update(entity: Self, conn: &PgConnection) -> QueryResult<Self>
     where
         Self: Sized;
+
+    fn update_multiple(entities: Vec<Self>, conn: &PgConnection) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized;
+}
+
+#[cfg(feature = "full")]
+pub trait CheckUserId {
+    type Id;
+
+    fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool>;
+
+    fn check_user_ids(ids: &[Self::Id], user_id: UserId, conn: &PgConnection) -> QueryResult<bool>;
+}
+
+#[cfg(feature = "full")]
+pub trait CheckAPId {
+    type Id;
+
+    fn check_ap_id(id: Self::Id, ap_id: ActionProviderId, conn: &PgConnection)
+        -> QueryResult<bool>;
+
+    fn check_ap_ids(
+        ids: &[Self::Id],
+        ap_id: ActionProviderId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool>;
 }
 
 #[cfg(feature = "full")]

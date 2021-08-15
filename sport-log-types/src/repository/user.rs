@@ -6,7 +6,7 @@ use chrono::{DateTime, Utc};
 use diesel::{prelude::*, result::Error};
 use rand_core::OsRng;
 
-use crate::{schema::user, Create, Update, User, UserId};
+use crate::{schema::user, CheckUserId, Create, Update, User, UserId};
 
 impl Create for User {
     fn create(mut user: Self, conn: &PgConnection) -> QueryResult<Self> {
@@ -33,6 +33,46 @@ impl Update for User {
         diesel::update(user::table.find(user.id))
             .set(user)
             .get_result(conn)
+    }
+
+    fn update_multiple(users: Vec<Self>, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+        conn.transaction(|| {
+            users
+                .into_iter()
+                .map(|mut user| {
+                    let salt = SaltString::generate(&mut OsRng);
+                    user.password = Argon2::default()
+                        .hash_password_simple(user.password.as_bytes(), &salt)
+                        .unwrap()
+                        .to_string();
+
+                    diesel::update(user::table.find(user.id))
+                        .set(user)
+                        .get_result(conn)
+                })
+                .collect()
+        })
+    }
+}
+
+impl CheckUserId for User {
+    type Id = UserId;
+
+    fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+        user::table
+            .filter(user::columns::id.eq(id))
+            .filter(user::columns::id.eq(user_id))
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == 1)
+    }
+
+    fn check_user_ids(
+        _ids: &[Self::Id],
+        _user_id: UserId,
+        _conn: &PgConnection,
+    ) -> QueryResult<bool> {
+        Ok(false) // it is not allowed to request data for multiple users
     }
 }
 

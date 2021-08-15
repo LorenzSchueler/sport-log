@@ -26,9 +26,10 @@ pub async fn create_metcon_session(
 }
 
 #[post(
-    "/metcon_sessions",
+    "/metcon_session",
     format = "application/json",
-    data = "<metcon_sessions>"
+    data = "<metcon_sessions>",
+    rank = 2
 )]
 pub async fn create_metcon_sessions(
     metcon_sessions: Unverified<Vec<MetconSession>>,
@@ -83,6 +84,25 @@ pub async fn update_metcon_session(
         .into_json()
 }
 
+#[put(
+    "/metcon_session",
+    format = "application/json",
+    data = "<metcon_sessions>",
+    rank = 2
+)]
+pub async fn update_metcon_sessions(
+    metcon_sessions: Unverified<Vec<MetconSession>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> Result<Json<Vec<MetconSession>>, Status> {
+    let metcon_sessions = conn
+        .run(move |c| metcon_sessions.verify_user_ap(&auth, c))
+        .await?;
+    conn.run(|c| MetconSession::update_multiple(metcon_sessions, c))
+        .await
+        .into_json()
+}
+
 #[post("/metcon", format = "application/json", data = "<metcon>")]
 pub async fn create_metcon(
     metcon: Unverified<Metcon>,
@@ -93,7 +113,7 @@ pub async fn create_metcon(
     conn.run(|c| Metcon::create(metcon, c)).await.into_json()
 }
 
-#[post("/metcons", format = "application/json", data = "<metcons>")]
+#[post("/metcon", format = "application/json", data = "<metcons>", rank = 2)]
 pub async fn create_metcons(
     metcons: Unverified<Vec<Metcon>>,
     auth: AuthUserOrAP,
@@ -136,6 +156,18 @@ pub async fn update_metcon(
     conn.run(|c| Metcon::update(metcon, c)).await.into_json()
 }
 
+#[put("/metcon", format = "application/json", data = "<metcons>", rank = 2)]
+pub async fn update_metcons(
+    metcons: Unverified<Vec<Metcon>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> Result<Json<Vec<Metcon>>, Status> {
+    let metcons = conn.run(move |c| metcons.verify_user_ap(&auth, c)).await?;
+    conn.run(|c| Metcon::update_multiple(metcons, c))
+        .await
+        .into_json()
+}
+
 #[post(
     "/metcon_movement",
     format = "application/json",
@@ -155,9 +187,10 @@ pub async fn create_metcon_movement(
 }
 
 #[post(
-    "/metcon_movements",
+    "/metcon_movement",
     format = "application/json",
-    data = "<metcon_movements>"
+    data = "<metcon_movements>",
+    rank = 2
 )]
 pub async fn create_metcon_movements(
     metcon_movements: Unverified<Vec<MetconMovement>>,
@@ -179,7 +212,7 @@ pub async fn get_metcon_movement(
     conn: Db,
 ) -> Result<Json<MetconMovement>, Status> {
     let metcon_movement_id = conn
-        .run(move |c| metcon_movement_id.verify_if_owned(&auth, c))
+        .run(move |c| metcon_movement_id.verify_user_ap(&auth, c))
         .await?;
     conn.run(move |c| MetconMovement::get_by_id(metcon_movement_id, c))
         .await
@@ -214,6 +247,25 @@ pub async fn update_metcon_movement(
         .run(move |c| metcon_movement.verify_user_ap(&auth, c))
         .await?;
     conn.run(|c| MetconMovement::update(metcon_movement, c))
+        .await
+        .into_json()
+}
+
+#[put(
+    "/metcon_movement",
+    format = "application/json",
+    data = "<metcon_movements>",
+    rank = 2
+)]
+pub async fn update_metcon_movements(
+    metcon_movements: Unverified<Vec<MetconMovement>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> Result<Json<Vec<MetconMovement>>, Status> {
+    let metcon_movements = conn
+        .run(move |c| metcon_movements.verify_user_ap(&auth, c))
+        .await?;
+    conn.run(|c| MetconMovement::update_multiple(metcon_movements, c))
         .await
         .into_json()
 }

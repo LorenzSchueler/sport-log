@@ -3,8 +3,8 @@ use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
     schema::{strength_session, strength_set},
-    GetById, GetByUser, GetByUserSync, Movement, StrengthSession, StrengthSessionDescription,
-    StrengthSessionId, StrengthSet, UserId,
+    CheckUserId, GetById, GetByUser, GetByUserSync, Movement, StrengthSession,
+    StrengthSessionDescription, StrengthSessionId, StrengthSet, StrengthSetId, UserId,
 };
 
 impl StrengthSession {
@@ -29,8 +29,7 @@ impl GetByUser for StrengthSet {
                 strength_set::columns::strength_session_id.eq_any(
                     strength_session::table
                         .filter(strength_session::columns::user_id.eq(user_id))
-                        .select(strength_session::columns::id)
-                        .get_results::<StrengthSessionId>(conn)?,
+                        .select(strength_session::columns::id),
                 ),
             )
             .get_results(conn)
@@ -51,12 +50,35 @@ impl GetByUserSync for StrengthSet {
                 strength_set::columns::strength_session_id.eq_any(
                     strength_session::table
                         .filter(strength_session::columns::user_id.eq(user_id))
-                        .select(strength_session::columns::id)
-                        .get_results::<StrengthSessionId>(conn)?,
+                        .select(strength_session::columns::id),
                 ),
             )
             .filter(strength_set::columns::last_change.ge(last_sync))
             .get_results(conn)
+    }
+}
+
+impl CheckUserId for StrengthSet {
+    type Id = StrengthSetId;
+
+    fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+        strength_set::table
+            .inner_join(strength_session::table)
+            .filter(strength_set::columns::id.eq(id))
+            .filter(strength_session::columns::user_id.eq(user_id))
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == 1)
+    }
+
+    fn check_user_ids(ids: &[Self::Id], user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+        strength_set::table
+            .inner_join(strength_session::table)
+            .filter(strength_set::columns::id.eq_any(ids))
+            .filter(strength_session::columns::user_id.eq(user_id))
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == ids.len() as i64)
     }
 }
 

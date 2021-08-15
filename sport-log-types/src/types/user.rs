@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use sport_log_types_derive::{FromI64, FromSql, GetById, GetByIds, ToSql, VerifyUnchecked};
 
 #[cfg(feature = "full")]
-use crate::{schema::user, AuthUser, GetById, Unverified, VerifyForUserWithDb};
+use crate::{schema::user, AuthUser, CheckUserId, Unverified, VerifyForUserWithDb};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
@@ -49,10 +49,8 @@ impl VerifyForUserWithDb for Unverified<User> {
     fn verify_user(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
         let user = self.0.into_inner();
         if user.id == **auth
-            && User::get_by_id(user.id, conn)
+            && User::check_user_id(user.id, **auth, conn)
                 .map_err(|_| Status::InternalServerError)?
-                .id
-                == **auth
         {
             Ok(user)
         } else {

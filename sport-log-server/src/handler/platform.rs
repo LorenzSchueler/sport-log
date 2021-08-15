@@ -3,8 +3,8 @@ use rocket::{http::Status, serde::json::Json};
 use sport_log_types::{
     AuthAdmin, AuthUser, Create, CreateMultiple, Db, GetAll, GetByUser, Platform,
     PlatformCredential, PlatformId, Unverified, UnverifiedId, Update, VerifyForAdminWithoutDb,
-    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdUnchecked, VerifyMultipleForUserWithoutDb,
-    VerifyUnchecked, CONFIG,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdUnchecked, VerifyMultipleForUserWithDb,
+    VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
 };
 
 use crate::handler::IntoJson;
@@ -82,9 +82,10 @@ pub async fn create_platform_credential(
 }
 
 #[post(
-    "/platform_credentials",
+    "/platform_credential",
     format = "application/json",
-    data = "<platform_credentials>"
+    data = "<platform_credentials>",
+    rank = 2
 )]
 pub async fn create_platform_credentials(
     platform_credentials: Unverified<Vec<PlatformCredential>>,
@@ -133,6 +134,25 @@ pub async fn update_platform_credential(
         .run(move |c| platform_credential.verify_user(&auth, c))
         .await?;
     conn.run(|c| PlatformCredential::update(platform_credential, c))
+        .await
+        .into_json()
+}
+
+#[put(
+    "/platform_credential",
+    format = "application/json",
+    data = "<platform_credentials>",
+    rank = 2
+)]
+pub async fn update_platform_credentials(
+    platform_credentials: Unverified<Vec<PlatformCredential>>,
+    auth: AuthUser,
+    conn: Db,
+) -> Result<Json<Vec<PlatformCredential>>, Status> {
+    let platform_credentials = conn
+        .run(move |c| platform_credentials.verify_user(&auth, c))
+        .await?;
+    conn.run(|c| PlatformCredential::update_multiple(platform_credentials, c))
         .await
         .into_json()
 }

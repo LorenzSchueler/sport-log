@@ -5,7 +5,7 @@ use rand::Rng;
 use reqwest::{Client, StatusCode};
 use serde::Deserialize;
 
-use sport_log_ap_utils::{delete_events, get_events, setup};
+use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{
     Action, ActionId, ActionProvider, ActionProviderId, CardioSession, CardioSessionId, CardioType,
     Movement, Platform, PlatformId, Position,
@@ -94,12 +94,7 @@ struct WorkoutDataWrapper {
 
 #[derive(Deserialize, Debug)]
 struct WorkoutData {
-    //description: Option<String>,
-    //starttime: u64,
-    //totaldistance: u32,
-    //totaltime: u32,
     locations: Vec<Location>,
-    // heartrate: Vec<>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -117,53 +112,55 @@ struct Location {
 async fn main() {
     match &env::args().collect::<Vec<_>>()[1..] {
         [] => fetch().await,
-        [option] if option == "--setup" => {
-            let config = Config::get();
-
-            let mut rng = rand::thread_rng();
-
-            let platform = Platform {
-                id: PlatformId(rng.gen()),
-                name: PLATFORM_NAME.to_owned(),
-                last_change: Utc::now(),
-                deleted: false,
-            };
-
-            let action_provider = ActionProvider {
-                id: ActionProviderId(rng.gen()),
-                name: NAME.to_owned(),
-                password: config.password.clone(),
-                platform_id: platform.id,
-                description: Some(DESCRIPTION.to_owned()),
-                last_change: Utc::now(),
-                deleted: false,
-            };
-
-            let actions = vec![Action {
-                id: ActionId(rng.gen()),
-                name: "fetch".to_owned(),
-                action_provider_id: action_provider.id,
-                description: Some("Fetch and save new workouts.".to_owned()),
-                create_before: 168,
-                delete_after: 0,
-                last_change: Utc::now(),
-                deleted: false,
-            }];
-
-            setup(
-                &config.base_url,
-                NAME,
-                &config.password,
-                PLATFORM_NAME,
-                platform,
-                action_provider,
-                actions,
-            )
-            .await;
-        }
+        [option] if option == "--setup" => setup().await,
         [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
         _ => wrong_use(),
     }
+}
+
+async fn setup() {
+    let config = Config::get();
+
+    let mut rng = rand::thread_rng();
+
+    let platform = Platform {
+        id: PlatformId(rng.gen()),
+        name: PLATFORM_NAME.to_owned(),
+        last_change: Utc::now(),
+        deleted: false,
+    };
+
+    let action_provider = ActionProvider {
+        id: ActionProviderId(rng.gen()),
+        name: NAME.to_owned(),
+        password: config.password.clone(),
+        platform_id: platform.id,
+        description: Some(DESCRIPTION.to_owned()),
+        last_change: Utc::now(),
+        deleted: false,
+    };
+
+    let actions = vec![Action {
+        id: ActionId(rng.gen()),
+        name: "fetch".to_owned(),
+        action_provider_id: action_provider.id,
+        description: Some("Fetch and save new workouts.".to_owned()),
+        create_before: 168,
+        delete_after: 0,
+        last_change: Utc::now(),
+        deleted: false,
+    }];
+
+    setup_db(
+        &config.base_url,
+        NAME,
+        &config.password,
+        PLATFORM_NAME,
+        platform,
+        action_provider,
+        actions,
+    )
+    .await;
 }
 
 fn help() {
@@ -284,7 +281,7 @@ async fn fetch() {
                                 None
                             },
                             cycles: None,
-                            avg_heart_rate: None, // TODO
+                            avg_heart_rate: None,
                             heart_rate: None,
                             route_id: None,
                             comments: workout.description,

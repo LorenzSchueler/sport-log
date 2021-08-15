@@ -2,23 +2,21 @@ use chrono::{DateTime, Utc};
 #[cfg(feature = "full")]
 use diesel_derive_enum::DbEnum;
 #[cfg(feature = "full")]
-use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, GetBySync, GetByUser,
-    GetByUserSync, ToSql, Update, VerifyForActionProviderWithDb, VerifyForActionProviderWithoutDb,
-    VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb,
-    VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked,
-    VerifyUnchecked,
+    CheckAPId, CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds,
+    GetBySync, GetByUser, GetByUserSync, ToSql, Update, VerifyForActionProviderWithDb,
+    VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
+    VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
+    VerifyIdUnchecked, VerifyUnchecked,
 };
 
 #[cfg(feature = "full")]
 use crate::{
     schema::{action, action_event, action_provider, action_rule},
-    AuthAP, GetById, GetByIds, Platform, UnverifiedId, UnverifiedIds, User,
-    VerifyIdForActionProvider, VerifyIdsForActionProvider,
+    Platform, User,
 };
 
 use crate::{PlatformId, UserId};
@@ -50,6 +48,7 @@ pub struct ActionProviderId(pub i64);
         Queryable,
         AsChangeset,
         GetById,
+        GetByIds,
         GetAll,
         GetBySync,
         VerifyForAdminWithoutDb,
@@ -101,6 +100,7 @@ pub struct ActionId(pub i64);
         GetByIds,
         GetAll,
         GetBySync,
+        CheckAPId,
         VerifyForActionProviderWithDb,
         VerifyForActionProviderWithoutDb,
     )
@@ -178,6 +178,7 @@ pub struct ActionRuleId(pub i64);
         GetByUser,
         GetByUserSync,
         Update,
+        CheckUserId,
         VerifyForUserWithDb,
         VerifyForUserWithoutDb,
     )
@@ -209,52 +210,12 @@ pub struct ActionRule {
         ToSql,
         FromSql,
         VerifyIdForUser,
+        VerifyIdForActionProvider,
         VerifyIdForAdmin
     )
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct ActionEventId(pub i64);
-
-#[cfg(feature = "full")]
-impl VerifyIdForActionProvider for UnverifiedId<ActionEventId> {
-    type Id = ActionEventId;
-
-    fn verify_ap(self, auth: &AuthAP, conn: &PgConnection) -> Result<Self::Id, Status> {
-        let action_event =
-            ActionEvent::get_by_id(self.0, conn).map_err(|_| Status::InternalServerError)?;
-        let action = Action::get_by_id(action_event.action_id, conn)
-            .map_err(|_| Status::InternalServerError)?;
-        if action.action_provider_id == **auth {
-            Ok(self.0)
-        } else {
-            Err(Status::Forbidden)
-        }
-    }
-}
-
-#[cfg(feature = "full")]
-impl VerifyIdsForActionProvider for UnverifiedIds<ActionEventId> {
-    type Id = ActionEventId;
-
-    fn verify_ap(self, auth: &AuthAP, conn: &PgConnection) -> Result<Vec<Self::Id>, Status> {
-        let action_events =
-            ActionEvent::get_by_ids(&self.0, conn).map_err(|_| Status::InternalServerError)?;
-        let action_event_ids: Vec<_> = action_events
-            .iter()
-            .map(|action_event| action_event.action_id)
-            .collect();
-        let actions =
-            Action::get_by_ids(&action_event_ids, conn).map_err(|_| Status::InternalServerError)?;
-        if actions
-            .iter()
-            .all(|action| action.action_provider_id == **auth)
-        {
-            Ok(self.0)
-        } else {
-            Err(Status::Forbidden)
-        }
-    }
-}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
@@ -272,6 +233,7 @@ impl VerifyIdsForActionProvider for UnverifiedIds<ActionEventId> {
         GetByUser,
         GetByUserSync,
         Update,
+        CheckUserId,
         VerifyForUserWithDb,
         VerifyForUserWithoutDb,
         VerifyForAdminWithoutDb,

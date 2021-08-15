@@ -7,17 +7,18 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, ToSql, Update,
-    VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
+    CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, ToSql,
+    Update, VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
 };
 
-use crate::UserId;
 #[cfg(feature = "full")]
 use crate::{
     schema::{eorm, movement},
-    AuthUserOrAP, GetById, GetByIds, Unverified, UnverifiedId, UnverifiedIds, User,
-    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
-    VerifyMultipleForUserOrAPWithoutDb,
+    AuthUserOrAP, GetById, Unverified, UnverifiedId, User, VerifyForUserOrAPWithDb,
+    VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyMultipleForUserOrAPWithoutDb,
+};
+use crate::{
+    CheckUserId, UnverifiedIds, UserId, VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithDb,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -56,14 +57,13 @@ pub enum MovementUnit {
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct MovementId(pub i64);
 
-#[cfg(feature = "full")]
 impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
     type Id = MovementId;
 
     fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
-        let movement =
-            Movement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
-        if movement.user_id == Some(**auth) {
+        if Movement::check_user_id_null(self.0, **auth, conn)
+            .map_err(|_| rocket::http::Status::Forbidden)?
+        {
             Ok(self.0)
         } else {
             Err(rocket::http::Status::Forbidden)
@@ -80,29 +80,9 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
         auth: &AuthUserOrAP,
         conn: &PgConnection,
     ) -> Result<Vec<Self::Id>, Status> {
-        let movements =
-            Movement::get_by_ids(&self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
-        if movements
-            .iter()
-            .all(|movement| movement.user_id == Some(**auth))
+        if Movement::check_user_ids_null(&self.0, **auth, conn)
+            .map_err(|_| rocket::http::Status::Forbidden)?
         {
-            Ok(self.0)
-        } else {
-            Err(rocket::http::Status::Forbidden)
-        }
-    }
-}
-
-#[cfg(feature = "full")]
-impl UnverifiedId<MovementId> {
-    pub fn verify_if_owned(
-        self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<MovementId, Status> {
-        let movement =
-            Movement::get_by_id(self.0, conn).map_err(|_| rocket::http::Status::Forbidden)?;
-        if movement.user_id.is_none() || movement.user_id == Some(**auth) {
             Ok(self.0)
         } else {
             Err(rocket::http::Status::Forbidden)
@@ -129,6 +109,7 @@ impl UnverifiedId<MovementId> {
         GetById,
         GetByIds,
         Update,
+        CheckUserId,
         VerifyForAdminWithoutDb
     )
 )]
@@ -165,6 +146,30 @@ impl VerifyForUserOrAPWithDb for Unverified<Movement> {
                 == Some(**auth)
         {
             Ok(movement)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "full")]
+impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Movement>> {
+    type Entity = Movement;
+
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status> {
+        let movements = self.0.into_inner();
+        let movement_ids: Vec<_> = movements.iter().map(|movement| movement.id).collect();
+        if movements
+            .iter()
+            .all(|movement| movement.user_id == Some(**auth))
+            && Movement::check_user_ids(&movement_ids, **auth, conn)
+                .map_err(|_| Status::InternalServerError)?
+        {
+            Ok(movements)
         } else {
             Err(Status::Forbidden)
         }
@@ -221,19 +226,19 @@ pub struct EormId(pub i64);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "full",
-    derive(Associations, Identifiable, Queryable, GetById, GetByIds, GetAll)
+    derive(
+        Insertable,
+        Associations,
+        Identifiable,
+        Queryable,
+        GetById,
+        GetByIds,
+        GetAll
+    )
 )]
 #[cfg_attr(feature = "full", table_name = "eorm")]
 pub struct Eorm {
     pub id: EormId,
-    pub reps: i32,
-    pub percentage: f32,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Insertable))]
-#[cfg_attr(feature = "full", table_name = "eorm")]
-pub struct NewEorm {
     pub reps: i32,
     pub percentage: f32,
 }

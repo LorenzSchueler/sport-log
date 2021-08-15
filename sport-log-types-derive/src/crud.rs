@@ -178,6 +178,90 @@ pub fn impl_update(ast: &syn::DeriveInput) -> TokenStream {
                     .set(#paramname)
                     .get_result(conn)
             }
+
+            fn update_multiple(#paramname: Vec<#typename>, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+                conn.transaction(|| {
+                    #paramname.into_iter()
+                        .map(|entity|
+                            diesel::update(#tablename::table.find(entity.id))
+                                .set(entity)
+                                .get_result(conn)
+                        )
+                        .collect()
+                })
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_check_user_id(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+    let (idtypename, _, _, tablename) = get_identifiers(typename);
+
+    let gen = quote! {
+        use diesel::prelude::*;
+
+        impl crate::CheckUserId for #typename {
+            type Id = #idtypename;
+
+            fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+                #tablename::table
+                    .filter(#tablename::columns::id.eq(id))
+                    .filter(#tablename::columns::user_id.eq(user_id))
+                    .count()
+                    .get_result(conn)
+                    .map(|count: i64| count == 1)
+            }
+
+            fn check_user_ids(
+                ids: &[Self::Id],
+                user_id: UserId,
+                conn: &PgConnection,
+            ) -> QueryResult<bool> {
+                #tablename::table
+                    .filter(#tablename::columns::id.eq_any(ids))
+                    .filter(#tablename::columns::user_id.eq(user_id))
+                    .count()
+                    .get_result(conn)
+                    .map(|count: i64| count == ids.len() as i64)
+            }
+        }
+    };
+    gen.into()
+}
+
+pub fn impl_check_ap_id(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+    let (idtypename, _, _, tablename) = get_identifiers(typename);
+
+    let gen = quote! {
+        use diesel::prelude::*;
+
+        impl crate::CheckAPId for #typename {
+            type Id = #idtypename;
+
+            fn check_ap_id(id: Self::Id, ap_id: ActionProviderId, conn: &PgConnection) -> QueryResult<bool> {
+                #tablename::table
+                    .filter(#tablename::columns::id.eq(id))
+                    .filter(#tablename::columns::action_provider_id.eq(ap_id))
+                    .count()
+                    .get_result(conn)
+                    .map(|count: i64| count == 1)
+            }
+
+            fn check_ap_ids(
+                ids: &[Self::Id],
+                ap_id: ActionProviderId,
+                conn: &PgConnection,
+            ) -> QueryResult<bool> {
+                #tablename::table
+                    .filter(#tablename::columns::id.eq_any(ids))
+                    .filter(#tablename::columns::action_provider_id.eq(ap_id))
+                    .count()
+                    .get_result(conn)
+                    .map(|count: i64| count == ids.len() as i64)
+            }
         }
     };
     gen.into()
