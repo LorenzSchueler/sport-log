@@ -1,6 +1,6 @@
 
 import 'package:moor/moor.dart';
-import 'package:sport_log/helpers/id_serialization.dart';
+import 'package:sport_log/helpers/db_serialization.dart';
 import 'package:sport_log/models/movement/all.dart';
 
 @UseRowClass(Movement)

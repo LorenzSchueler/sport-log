@@ -30,17 +30,3 @@ class OptionalIdConverter extends JsonConverter<Int64?, String?> {
     return (object == null) ? null : object.toString();
   }
 }
-
-class DbIdConverter extends TypeConverter<Int64, int> {
-  const DbIdConverter() : super();
-
-  @override
-  Int64? mapToDart(int? fromDb) {
-    return fromDb == null ? null : Int64(fromDb);
-  }
-
-  @override
-  int? mapToSql(Int64? value) {
-    return value?.toInt();
-  }
-}

@@ -1,7 +1,7 @@
 
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/all.dart';
-import 'package:sport_log/helpers/id_serialization.dart';
+import 'package:sport_log/helpers/db_serialization.dart';
 
 import 'package:moor/moor.dart';
 

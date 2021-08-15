@@ -1,8 +1,10 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:moor/moor.dart';
 import 'package:sport_log/helpers/id_serialization.dart';
 import 'package:sport_log/models/cardio/position.dart';
+import 'package:sport_log/models/update_validatable.dart';
 
 part 'cardio_session.g.dart';
 
@@ -13,7 +15,7 @@ enum CardioType {
 }
 
 @JsonSerializable()
-class CardioSession {
+class CardioSession extends Insertable implements UpdateValidatable {
   CardioSession({
     required this.id,
     required this.userId,
@@ -56,4 +58,19 @@ class CardioSession {
 
   factory CardioSession.fromJson(Map<String, dynamic> json) => _$CardioSessionFromJson(json);
   Map<String, dynamic> toJson() => _$CardioSessionToJson(this);
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    // TODO: implement toColumns
+    throw UnimplementedError();
+  }
+
+  @override
+  bool validateOnUpdate() {
+    return !deleted
+        && [ascent, descent]
+          .every((val) => val == null || val >= 0)
+        && [distance, time, calories, avgCycles, avgHeartRate]
+          .every((val) => val == null || val > 0);
+  }
 }
