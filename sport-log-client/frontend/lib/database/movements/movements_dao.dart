@@ -39,7 +39,7 @@ class MovementsDao extends DatabaseAccessor<Database> with _$MovementsDaoMixin {
 
   Future<Result<void, DbException>> deleteMovement(Int64 id) async {
     if (await movementHasDependency(id)) {
-      return Failure(DbException.movementHasDependency);
+      return Failure(DbException.hasDependency);
     }
     await (update(movements)
       ..where((m) => m.id.equals(id.toInt()) & m.deleted.equals(false))

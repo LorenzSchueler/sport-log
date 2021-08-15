@@ -63,7 +63,7 @@ class MetconsDao extends DatabaseAccessor<Database> with _$MetconsDaoMixin {
       return Failure(DbException.validationFailed);
     }
     if (!await metconExists(metconSession.metconId)) {
-      return Failure(DbException.metconDoesNotExist);
+      return Failure(DbException.doesNotExist);
     }
     await into(metconSessions).insert(metconSession);
     return Success(null);
@@ -109,7 +109,7 @@ class MetconsDao extends DatabaseAccessor<Database> with _$MetconsDaoMixin {
       return Failure(DbException.validationFailed);
     }
     if (!await metconExists(metconSession.metconId)) {
-      return Failure(DbException.metconDoesNotExist);
+      return Failure(DbException.doesNotExist);
     }
     await (update(metconSessions)
       ..where((ms) => ms.id.equals(metconSession.id.toInt())

@@ -2,6 +2,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:moor/moor.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/json_serialization.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/update_validatable.dart';
@@ -61,8 +62,26 @@ class CardioSession extends Insertable implements UpdateValidatable {
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
-    // TODO: implement toColumns
-    throw UnimplementedError();
+    return CardioSessionsCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      movementId: Value(movementId),
+      cardioType: Value(cardioType),
+      datetime: Value(datetime),
+      distance: Value(distance),
+      ascent: Value(ascent),
+      descent: Value(descent),
+      time: Value(time),
+      calories: Value(calories),
+      track: Value(track),
+      avgCycles: Value(avgCycles),
+      cycles: Value(cycles),
+      avgHeartRate: Value(avgHeartRate),
+      heartRate: Value(heartRate),
+      routeId: Value(routeId),
+      comments: Value(comments),
+      deleted: Value(deleted),
+    ).toColumns(false);
   }
 
   @override
@@ -71,6 +90,9 @@ class CardioSession extends Insertable implements UpdateValidatable {
         && [ascent, descent]
           .every((val) => val == null || val >= 0)
         && [distance, time, calories, avgCycles, avgHeartRate]
-          .every((val) => val == null || val > 0);
+          .every((val) => val == null || val > 0)
+        && (track == null || distance != null)
+        && (cycles == null || avgCycles != null)
+        && (heartRate == null || avgHeartRate != null);
   }
 }

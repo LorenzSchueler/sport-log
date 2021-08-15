@@ -7,6 +7,7 @@ import 'package:moor/moor.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sport_log/config.dart';
+import 'package:sport_log/database/cardio/cardio_tables.dart';
 import 'package:sport_log/database/metcons/metcon_tables.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/movements/movement_table.dart';
@@ -22,10 +23,9 @@ import 'metcons/metcons_dao.dart';
 part 'database.g.dart';
 
 enum DbException {
-  metconHasMetconSession,
-  metconDoesNotExist,
+  doesNotExist,
   validationFailed,
-  movementHasDependency,
+  hasDependency,
 }
 
 LazyDatabase _openConnection() {
@@ -48,6 +48,8 @@ LazyDatabase _openConnection() {
     Movements,
     StrengthSessions,
     StrengthSets,
+    CardioSessions,
+    Routes,
   ],
   daos: [
     MetconsDao,

@@ -2,6 +2,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:moor/moor.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/json_serialization.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/update_validatable.dart';
@@ -35,8 +36,16 @@ class Route extends Insertable implements UpdateValidatable {
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
-    // TODO: implement toColumns
-    throw UnimplementedError();
+    return RoutesCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      name: Value(name),
+      distance: Value(distance),
+      ascent: Value(ascent),
+      descent: Value(descent),
+      track: Value(track),
+      deleted: Value(deleted),
+    ).toColumns(false);
   }
 
   @override
