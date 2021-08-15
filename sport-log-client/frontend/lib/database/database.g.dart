@@ -2589,6 +2589,231 @@ class $RoutesTable extends Routes with TableInfo<$RoutesTable, Route> {
       const DbPositionListConverter();
 }
 
+class WodsCompanion extends UpdateCompanion<Wod> {
+  final Value<Int64> id;
+  final Value<Int64> userId;
+  final Value<DateTime> date;
+  final Value<String?> description;
+  final Value<bool> deleted;
+  final Value<DateTime> lastModified;
+  final Value<bool> isNew;
+  const WodsCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.date = const Value.absent(),
+    this.description = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.lastModified = const Value.absent(),
+    this.isNew = const Value.absent(),
+  });
+  WodsCompanion.insert({
+    this.id = const Value.absent(),
+    required Int64 userId,
+    required DateTime date,
+    this.description = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.lastModified = const Value.absent(),
+    this.isNew = const Value.absent(),
+  })  : userId = Value(userId),
+        date = Value(date);
+  static Insertable<Wod> custom({
+    Expression<Int64>? id,
+    Expression<Int64>? userId,
+    Expression<DateTime>? date,
+    Expression<String?>? description,
+    Expression<bool>? deleted,
+    Expression<DateTime>? lastModified,
+    Expression<bool>? isNew,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (date != null) 'date': date,
+      if (description != null) 'description': description,
+      if (deleted != null) 'deleted': deleted,
+      if (lastModified != null) 'last_modified': lastModified,
+      if (isNew != null) 'is_new': isNew,
+    });
+  }
+
+  WodsCompanion copyWith(
+      {Value<Int64>? id,
+      Value<Int64>? userId,
+      Value<DateTime>? date,
+      Value<String?>? description,
+      Value<bool>? deleted,
+      Value<DateTime>? lastModified,
+      Value<bool>? isNew}) {
+    return WodsCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      date: date ?? this.date,
+      description: description ?? this.description,
+      deleted: deleted ?? this.deleted,
+      lastModified: lastModified ?? this.lastModified,
+      isNew: isNew ?? this.isNew,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      final converter = $WodsTable.$converter0;
+      map['id'] = Variable<int>(converter.mapToSql(id.value)!);
+    }
+    if (userId.present) {
+      final converter = $WodsTable.$converter1;
+      map['user_id'] = Variable<int>(converter.mapToSql(userId.value)!);
+    }
+    if (date.present) {
+      map['date'] = Variable<DateTime>(date.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String?>(description.value);
+    }
+    if (deleted.present) {
+      map['deleted'] = Variable<bool>(deleted.value);
+    }
+    if (lastModified.present) {
+      map['last_modified'] = Variable<DateTime>(lastModified.value);
+    }
+    if (isNew.present) {
+      map['is_new'] = Variable<bool>(isNew.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WodsCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('date: $date, ')
+          ..write('description: $description, ')
+          ..write('deleted: $deleted, ')
+          ..write('lastModified: $lastModified, ')
+          ..write('isNew: $isNew')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $WodsTable extends Wods with TableInfo<$WodsTable, Wod> {
+  final GeneratedDatabase _db;
+  final String? _alias;
+  $WodsTable(this._db, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  late final GeneratedColumnWithTypeConverter<Int64, int?> id =
+      GeneratedColumn<int?>('id', aliasedName, false,
+              typeName: 'INTEGER', requiredDuringInsert: false)
+          .withConverter<Int64>($WodsTable.$converter0);
+  final VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  late final GeneratedColumnWithTypeConverter<Int64, int?> userId =
+      GeneratedColumn<int?>('user_id', aliasedName, false,
+              typeName: 'INTEGER', requiredDuringInsert: true)
+          .withConverter<Int64>($WodsTable.$converter1);
+  final VerificationMeta _dateMeta = const VerificationMeta('date');
+  late final GeneratedColumn<DateTime?> date = GeneratedColumn<DateTime?>(
+      'date', aliasedName, false,
+      typeName: 'INTEGER', requiredDuringInsert: true);
+  final VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  late final GeneratedColumn<String?> description = GeneratedColumn<String?>(
+      'description', aliasedName, true,
+      typeName: 'TEXT', requiredDuringInsert: false);
+  final VerificationMeta _deletedMeta = const VerificationMeta('deleted');
+  late final GeneratedColumn<bool?> deleted = GeneratedColumn<bool?>(
+      'deleted', aliasedName, false,
+      typeName: 'INTEGER',
+      requiredDuringInsert: false,
+      defaultConstraints: 'CHECK (deleted IN (0, 1))',
+      defaultValue: const Constant(true));
+  final VerificationMeta _lastModifiedMeta =
+      const VerificationMeta('lastModified');
+  late final GeneratedColumn<DateTime?> lastModified =
+      GeneratedColumn<DateTime?>('last_modified', aliasedName, false,
+          typeName: 'INTEGER',
+          requiredDuringInsert: false,
+          clientDefault: () => DateTime.now());
+  final VerificationMeta _isNewMeta = const VerificationMeta('isNew');
+  late final GeneratedColumn<bool?> isNew = GeneratedColumn<bool?>(
+      'is_new', aliasedName, false,
+      typeName: 'INTEGER',
+      requiredDuringInsert: false,
+      defaultConstraints: 'CHECK (is_new IN (0, 1))',
+      defaultValue: const Constant(true));
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, userId, date, description, deleted, lastModified, isNew];
+  @override
+  String get aliasedName => _alias ?? 'wods';
+  @override
+  String get actualTableName => 'wods';
+  @override
+  VerificationContext validateIntegrity(Insertable<Wod> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    context.handle(_idMeta, const VerificationResult.success());
+    context.handle(_userIdMeta, const VerificationResult.success());
+    if (data.containsKey('date')) {
+      context.handle(
+          _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    }
+    if (data.containsKey('deleted')) {
+      context.handle(_deletedMeta,
+          deleted.isAcceptableOrUnknown(data['deleted']!, _deletedMeta));
+    }
+    if (data.containsKey('last_modified')) {
+      context.handle(
+          _lastModifiedMeta,
+          lastModified.isAcceptableOrUnknown(
+              data['last_modified']!, _lastModifiedMeta));
+    }
+    if (data.containsKey('is_new')) {
+      context.handle(
+          _isNewMeta, isNew.isAcceptableOrUnknown(data['is_new']!, _isNewMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Wod map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Wod(
+      id: $WodsTable.$converter0.mapToDart(const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id']))!,
+      userId: $WodsTable.$converter1.mapToDart(const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}user_id']))!,
+      date: const DateTimeType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}date'])!,
+      description: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}description']),
+      deleted: const BoolType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}deleted'])!,
+    );
+  }
+
+  @override
+  $WodsTable createAlias(String alias) {
+    return $WodsTable(_db, alias);
+  }
+
+  static TypeConverter<Int64, int> $converter0 = const DbIdConverter();
+  static TypeConverter<Int64, int> $converter1 = const DbIdConverter();
+}
+
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   late final $MetconsTable metcons = $MetconsTable(this);
@@ -2601,9 +2826,12 @@ abstract class _$Database extends GeneratedDatabase {
   late final $StrengthSetsTable strengthSets = $StrengthSetsTable(this);
   late final $CardioSessionsTable cardioSessions = $CardioSessionsTable(this);
   late final $RoutesTable routes = $RoutesTable(this);
+  late final $WodsTable wods = $WodsTable(this);
   late final MetconsDao metconsDao = MetconsDao(this as Database);
   late final MovementsDao movementsDao = MovementsDao(this as Database);
   late final StrengthDao strengthDao = StrengthDao(this as Database);
+  late final CardioDao cardioDao = CardioDao(this as Database);
+  late final WodDao wodDao = WodDao(this as Database);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
@@ -2615,6 +2843,7 @@ abstract class _$Database extends GeneratedDatabase {
         strengthSessions,
         strengthSets,
         cardioSessions,
-        routes
+        routes,
+        wods
       ];
 }
