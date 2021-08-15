@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/helpers/id_serialization.dart';
+import 'package:sport_log/helpers/json_serialization.dart';
 
 part 'user.g.dart';
 

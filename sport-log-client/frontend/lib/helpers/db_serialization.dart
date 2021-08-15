@@ -21,6 +21,8 @@ class DbIdConverter extends TypeConverter<Int64, int> {
 }
 
 class DbDoubleListConverter extends TypeConverter<List<double>, Uint8List> {
+  const DbDoubleListConverter() : super();
+
   @override
   List<double>? mapToDart(Uint8List? fromDb) {
     assert(fromDb == null || fromDb.length % 8 == 0);
@@ -36,6 +38,8 @@ class DbDoubleListConverter extends TypeConverter<List<double>, Uint8List> {
 }
 
 class DbPositionListConverter extends TypeConverter<List<Position>, Uint8List> {
+  const DbPositionListConverter() : super();
+
   @override
   List<Position>? mapToDart(Uint8List? fromDb) {
     if (fromDb == null) {

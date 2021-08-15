@@ -3,7 +3,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:moor/moor.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/helpers/id_serialization.dart';
+import 'package:sport_log/helpers/json_serialization.dart';
 import 'package:sport_log/models/update_validatable.dart';
 import 'package:sport_log/models/movement/movement.dart';
 

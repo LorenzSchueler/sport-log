@@ -1,7 +1,6 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:moor/moor.dart';
 
 class IdConverter extends JsonConverter<Int64, String> {
   const IdConverter() : super();

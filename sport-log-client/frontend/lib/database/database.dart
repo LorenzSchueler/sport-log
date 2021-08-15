@@ -14,7 +14,6 @@ import 'package:sport_log/database/movements/movements_dao.dart';
 import 'package:sport_log/database/strength/strength_dao.dart';
 import 'package:sport_log/database/strength/strength_tables.dart';
 import 'package:sport_log/models/metcon/all.dart';
-import 'package:sport_log/helpers/id_serialization.dart';
 import 'package:sport_log/models/movement/all.dart';
 
 import 'metcons/metcons_dao.dart';
