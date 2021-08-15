@@ -1,7 +1,7 @@
 
 import 'package:sport_log/models/cardio/cardio_session.dart';
 import 'package:sport_log/models/cardio/route.dart';
-import 'package:sport_log/models/update_validatable.dart';
+import 'package:sport_log/helpers/update_validatable.dart';
 
 class CardioSessionDescription implements UpdateValidatable {
   CardioSessionDescription({

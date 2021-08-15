@@ -1,6 +1,11 @@
 
 enum ApiError {
-  usernameTaken, unknown, noInternetConnection, loginFailed, notFound
+  usernameTaken,
+  noInternetConnection,
+  loginFailed,
+  notFound,
+  unknown, // unknown status code from server
+  unhandled, // unknown request error
 }
 
 extension ToErrorMessage on ApiError {
@@ -16,6 +21,8 @@ extension ToErrorMessage on ApiError {
         return "Wrong credentials.";
       case ApiError.notFound:
         return "Resource not found.";
+      case ApiError.unhandled:
+        return "Unhandled error occurred.";
     }
   }
 }

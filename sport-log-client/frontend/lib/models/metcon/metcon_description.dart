@@ -1,5 +1,5 @@
 
-import 'package:sport_log/models/update_validatable.dart';
+import 'package:sport_log/helpers/update_validatable.dart';
 import 'package:sport_log/helpers/iterable_extension.dart';
 
 import 'all.dart';

@@ -8,7 +8,7 @@ extension UserRoutes on Api {
       final response = await _client.post(
         Uri.parse(urlBase + BackendRoutes.user),
         body: jsonEncode(newUser.toJson()),
-        headers: Api._jsonContentTypeHeader,
+        headers: _jsonContentTypeHeader,
       );
       if (response.statusCode == 409) {
         throw ApiError.usernameTaken;
