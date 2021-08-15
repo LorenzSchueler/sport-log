@@ -22,6 +22,7 @@
 * [ ] restrict int numbers coming from user input
 * [ ] verify interfaces on types
 * [ ] deleted field not required
+* [ ] fetch full account data on login
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)
