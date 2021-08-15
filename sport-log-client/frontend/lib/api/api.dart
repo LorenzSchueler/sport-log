@@ -15,6 +15,7 @@ part 'movement_api.dart';
 part 'metcon_api.dart';
 part 'cardio_api.dart';
 part 'diary_api.dart';
+part 'wod_api.dart';
 
 typedef ApiResult<T> = Future<Result<T, ApiError>>;
 

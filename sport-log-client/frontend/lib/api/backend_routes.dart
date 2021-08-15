@@ -11,6 +11,7 @@ abstract class BackendRoutes {
   static const route = _version + '/route';
   static const cardioSession = _version + '/cardio_session';
   static const diary = _version + '/diary';
+  static const wod = _version + '/wod';
 
   static String metconMovementByMetcon(Int64 id) =>
       _version + metconMovement + '/metcon/${id.toString()}';
