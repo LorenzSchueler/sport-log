@@ -54,15 +54,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Stream<LoginState> _submitLogin(SubmitLogin event) async* {
     yield LoginState.pending;
-    try {
-      final user = await _api.getUser(event.username, event.password);
+    final result = await _api.getUser(event.username, event.password);
+    if (result.isSuccess) {
       yield LoginState.successful;
-      _authenticationBloc.add(auth.LoginEvent(user: user));
-    } on ApiError catch (e) {
-      _handleApiError(e);
-      yield LoginState.failed;
-    } catch (e) {
-      addError(e);
+      _authenticationBloc.add(auth.LoginEvent(user: result.success));
+    } else {
+      _handleApiError(result.failure);
       yield LoginState.failed;
     }
   }

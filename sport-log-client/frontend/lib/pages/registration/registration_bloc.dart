@@ -58,21 +58,18 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
 
   Stream<RegistrationState> _submitRegistration(SubmitRegistration event) async* {
     yield RegistrationState.pending;
-    try {
-      final user = User(
-        id: randomId(),
-        email: event.email,
-        username: event.username,
-        password: event.password,
-      );
-      await _api.createUser(user);
+    final user = User(
+      id: randomId(),
+      email: event.email,
+      username: event.username,
+      password: event.password,
+    );
+    final result = await _api.createUser(user);
+    if (result.isSuccess) {
       yield RegistrationState.successful;
       _authenticationBloc.add(auth.RegisterEvent(user: user));
-    } on ApiError catch (e) {
-      _handleApiError(e);
-      yield RegistrationState.failed;
-    } catch (e) {
-      addError(e);
+    } else {
+      _handleApiError(result.failure);
       yield RegistrationState.failed;
     }
   }

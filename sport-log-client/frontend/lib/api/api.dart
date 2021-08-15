@@ -10,13 +10,13 @@ import 'package:sport_log/api/api_error.dart';
 import 'package:http/http.dart' as http;
 import 'package:sport_log/models/all.dart';
 
-part 'user_api.dart';
 part 'movement_api.dart';
 part 'metcon_api.dart';
 part 'cardio_api.dart';
 part 'diary_api.dart';
 part 'wod_api.dart';
 part 'strength_api.dart';
+part 'user_api.dart';
 
 typedef ApiResult<T> = Future<Result<T, ApiError>>;
 
@@ -104,13 +104,14 @@ class Api {
 
   Future<Result<T, ApiError>> _get<T>(String route, {
     ApiError? Function(int)? mapBadStatusToApiError,
+    Map<String, String>? headers,
   }) async {
     return _request<T>((client) async {
       final response = await client.get(
         _uri(route),
-        headers: _defaultHeaders,
+        headers: headers ?? _authorizedHeader,
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode <= 200 && response.statusCode < 300) {
         final T result = jsonDecode(response.body);
         return Success(result);
       }
@@ -127,14 +128,15 @@ class Api {
 
   Future<Result<void, ApiError>> _post(String route, Object body, {
     ApiError? Function(int)? mapBadStatusToApiError,
+    Map<String, String>? headers,
   }) async {
     return _request((client) async {
       final response = await client.post(
         _uri(route),
-        headers: _defaultHeaders,
+        headers: headers ?? _defaultHeaders,
         body: jsonEncode(body),
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         return Success(null);
       }
       if (mapBadStatusToApiError != null) {
@@ -142,6 +144,9 @@ class Api {
         if (e != null) {
           return Failure(e);
         }
+      }
+      if (response.statusCode == 409) {
+        return Failure(ApiError.conflict);
       }
       _handleUnknownStatusCode(response);
       return Failure(ApiError.unknown);
@@ -157,7 +162,7 @@ class Api {
         headers: _defaultHeaders,
         body: jsonEncode(body),
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode <= 200 && response.statusCode < 300) {
         return Success(null);
       }
       if (mapBadStatusToApiError != null) {

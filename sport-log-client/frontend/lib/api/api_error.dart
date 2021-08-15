@@ -6,6 +6,7 @@ enum ApiError {
   notFound,
   unknown, // unknown status code from server
   unhandled, // unknown request error
+  conflict,
 }
 
 extension ToErrorMessage on ApiError {
@@ -23,6 +24,8 @@ extension ToErrorMessage on ApiError {
         return "Resource not found.";
       case ApiError.unhandled:
         return "Unhandled error occurred.";
+      case ApiError.conflict:
+        return "Conflict creating resource";
     }
   }
 }

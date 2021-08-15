@@ -2,41 +2,44 @@
 part of 'api.dart';
 
 extension UserRoutes on Api {
-
-  Future<void> createUser(User newUser) async {
-    try {
-      final response = await _client.post(
-        Uri.parse(urlBase + BackendRoutes.user),
-        body: jsonEncode(newUser.toJson()),
+  ApiResult<void> createUser(User user) async {
+    return _post(
+        BackendRoutes.user,
+        user,
         headers: _jsonContentTypeHeader,
-      );
-      if (response.statusCode == 409) {
-        throw ApiError.usernameTaken;
-      } else if (response.statusCode != 200) {
-        _handleUnknownStatusCode(response);
-        throw ApiError.unknown;
-      }
-    } on SocketException {
-      throw ApiError.noInternetConnection;
-    }
+        mapBadStatusToApiError: (statusCode) {
+          if (statusCode == 409) {
+            return ApiError.usernameTaken;
+          }
+        });
   }
 
-  Future<User> getUser(String username, String password) async {
-    try {
-      final response = await _client.get(
-          Uri.parse(urlBase + BackendRoutes.user),
-          headers: _makeAuthorizedHeader(username, password)
+  ApiResult<User> getUser(String username, String password) async {
+    return _get(
+      BackendRoutes.user,
+      headers: _makeAuthorizedHeader(username, password),
+      mapBadStatusToApiError: (statusCode) {
+        if (statusCode == 401) {
+          return ApiError.loginFailed;
+        }
+      });
+  }
+
+  ApiResult<void> updateUser(User user) async {
+    return _put(BackendRoutes.user, user);
+  }
+
+  ApiResult<void> deleteUser() async {
+    return _request((client) async {
+      final response = await client.delete(
+        _uri(BackendRoutes.user),
+        headers: _authorizedHeader
       );
-      if (response.statusCode == 401) {
-        throw ApiError.loginFailed;
-      } else if (response.statusCode == 200) {
-        return User.fromJson(jsonDecode(response.body));
-      } else {
-        _handleUnknownStatusCode(response);
-        throw ApiError.unknown;
+      if (response.statusCode <= 200 && response.statusCode < 300) {
+        return Success(null);
       }
-    } on SocketException {
-      throw ApiError.noInternetConnection;
-    }
+      _handleUnknownStatusCode(response);
+      return Failure(ApiError.unknown);
+    });
   }
 }
