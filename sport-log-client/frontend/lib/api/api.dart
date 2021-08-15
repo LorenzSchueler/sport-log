@@ -118,18 +118,49 @@ class Api {
     });
   }
 
-  // Future<Result<T, ApiError>> _post<T>(String route, Object body, {
-  //   ApiError? Function(int)? mapBadStatusToApiError,
-  // }) async {
-  //   return _request<T>((client) async {
-  //     final response = await client.post(
-  //       _uri(route),
-  //       headers: _defaultHeaders,
-  //       body: jsonEncode(body),
-  //     );
-  //     if (response.statusCode == 200) {
-  //       return Success(null);
-  //     }
-  //   });
-  // }
+  Future<Result<void, ApiError>> _post(String route, Object body, {
+    ApiError? Function(int)? mapBadStatusToApiError,
+  }) async {
+    return _request((client) async {
+      final response = await client.post(
+        _uri(route),
+        headers: _defaultHeaders,
+        body: jsonEncode(body),
+      );
+      if (response.statusCode == 200) {
+        return Success(null);
+      }
+      if (mapBadStatusToApiError != null) {
+        final ApiError? e = mapBadStatusToApiError(response.statusCode);
+        if (e != null) {
+          return Failure(e);
+        }
+      }
+      _handleUnknownStatusCode(response);
+      return Failure(ApiError.unknown);
+    });
+  }
+
+  Future<Result<void, ApiError>> _put(String route, Object body, {
+    ApiError? Function(int)? mapBadStatusToApiError,
+  }) async {
+    return _request((client) async {
+      final response = await client.put(
+        _uri(route),
+        headers: _defaultHeaders,
+        body: jsonEncode(body),
+      );
+      if (response.statusCode == 200) {
+        return Success(null);
+      }
+      if (mapBadStatusToApiError != null) {
+        final ApiError? e = mapBadStatusToApiError(response.statusCode);
+        if (e != null) {
+          return Failure(e);
+        }
+      }
+      _handleUnknownStatusCode(response);
+      return Failure(ApiError.unknown);
+    });
+  }
 }
