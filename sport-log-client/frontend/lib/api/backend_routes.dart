@@ -12,7 +12,12 @@ abstract class BackendRoutes {
   static const cardioSession = _version + '/cardio_session';
   static const diary = _version + '/diary';
   static const wod = _version + '/wod';
+  static const strengthSet = _version + '/strength_set';
+  static const strengthSession = _version + '/strength_session';
 
   static String metconMovementByMetcon(Int64 id) =>
-      _version + metconMovement + '/metcon/${id.toString()}';
+      _version + '/metcon_movement/metcon/${id.toString()}';
+
+  static String strengthSetsByStrengthSession(Int64 id) =>
+      _version + '/strength_set/strength_session/${id.toString()}';
 }
