@@ -36,8 +36,7 @@ class WodDao extends DatabaseAccessor<Database> with _$WodDaoMixin {
     return Success(null);
   }
 
-  // FIXME: type?
-  Future<List> getAllWods() async {
+  Future<List<Wod>> getAllWods() async {
     return (select(wods)
         ..where((wod) => wod.deleted.not())).get();
   }

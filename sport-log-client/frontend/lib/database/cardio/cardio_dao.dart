@@ -72,7 +72,7 @@ class CardioDao extends DatabaseAccessor<Database> with _$CardioDaoMixin {
     return Future.wait(sessions.map((s) async =>
       CardioSessionDescription(
           cardioSession: s,
-          route: s.routeId == null ? null : await _getRoute(s.routeId)
+          route: s.routeId == null ? null : await _getRoute(s.routeId!)
       )
     ));
   }
@@ -83,8 +83,7 @@ class CardioDao extends DatabaseAccessor<Database> with _$CardioDaoMixin {
     ).getSingle();
   }
 
-  // FIXME: type?
-  Future<List> getAllRoutes() async {
+  Future<List<Route>> getAllRoutes() async {
     return (select(routes)
       ..where((r) => r.deleted.not())
     ).get();

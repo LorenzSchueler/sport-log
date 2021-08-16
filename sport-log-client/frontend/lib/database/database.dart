@@ -4,26 +4,13 @@ import 'dart:io';
 
 import 'package:moor/ffi.dart';
 import 'package:moor/moor.dart';
+import 'package:fixnum/fixnum.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sport_log/config.dart';
-import 'package:sport_log/database/cardio/cardio_dao.dart';
-import 'package:sport_log/database/cardio/cardio_tables.dart';
-import 'package:sport_log/database/diary/diary_dao.dart';
-import 'package:sport_log/database/diary/diary_table.dart';
-import 'package:sport_log/database/metcons/metcon_tables.dart';
-import 'package:fixnum/fixnum.dart';
-import 'package:sport_log/database/movements/movement_table.dart';
-import 'package:sport_log/database/movements/movements_dao.dart';
-import 'package:sport_log/database/strength/strength_dao.dart';
-import 'package:sport_log/database/strength/strength_tables.dart';
-import 'package:sport_log/database/wod/wod_dao.dart';
-import 'package:sport_log/database/wod/wod_table.dart';
-import 'package:sport_log/models/metcon/all.dart';
-import 'package:sport_log/models/movement/all.dart';
-
-import 'metcons/metcons_dao.dart';
-// TODO: fix imports
+import 'package:sport_log/helpers/db_serialization.dart';
+import 'all_subfolders.dart';
+import 'package:sport_log/models/all.dart';
 
 part 'database.g.dart';
 

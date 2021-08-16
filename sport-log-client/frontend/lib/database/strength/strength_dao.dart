@@ -49,7 +49,7 @@ class StrengthDao extends DatabaseAccessor<Database> with _$StrengthDaoMixin {
     await (update(strengthSets)
       ..where((ss) => ss.strengthSessionId.equals(id.toInt())
       & ss.deleted.equals(false)))
-        .write(const StrengthSessionsCompanion(deleted: Value(true)));
+        .write(const StrengthSetsCompanion(deleted: Value(true)));
   }
 
   Future<List<StrengthSessionDescription>> getAllStrengthSessions() async {
@@ -65,8 +65,7 @@ class StrengthDao extends DatabaseAccessor<Database> with _$StrengthDaoMixin {
     }));
   }
 
-  // FIXME: type?
-  Future _getStrengthSetsOfSession(Int64 id) async {
+  Future<List<StrengthSet>> _getStrengthSetsOfSession(Int64 id) async {
     return (select(strengthSets)
       ..where((ss) => ss.strengthSessionId.equals(id.toInt())
       & ss.deleted.equals(false))

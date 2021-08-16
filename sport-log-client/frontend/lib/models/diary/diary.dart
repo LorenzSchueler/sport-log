@@ -9,7 +9,7 @@ import 'package:sport_log/helpers/update_validatable.dart';
 part 'diary.g.dart';
 
 @JsonSerializable()
-class Diary extends Insertable implements UpdateValidatable {
+class Diary extends Insertable<Diary> implements UpdateValidatable {
   Diary({
     required this.id,
     required this.userId,

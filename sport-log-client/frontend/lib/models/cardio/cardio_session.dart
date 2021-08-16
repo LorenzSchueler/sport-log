@@ -16,7 +16,8 @@ enum CardioType {
 }
 
 @JsonSerializable()
-class CardioSession extends Insertable implements UpdateValidatable {
+class CardioSession extends Insertable<CardioSession>
+    implements UpdateValidatable {
   CardioSession({
     required this.id,
     required this.userId,

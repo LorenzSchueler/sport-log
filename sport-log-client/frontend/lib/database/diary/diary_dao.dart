@@ -37,8 +37,7 @@ class DiaryDao extends DatabaseAccessor<Database> with _$DiaryDaoMixin {
     return Success(null);
   }
 
-  // FIXME: type?
-  Future<List> getAllDiaries() async {
+  Future<List<Diary>> getAllDiaries() async {
     return (select(diaries)
         ..where((d) => d.deleted.not())).get();
   }

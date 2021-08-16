@@ -9,7 +9,8 @@ import 'package:sport_log/helpers/update_validatable.dart';
 part 'strength_set.g.dart';
 
 @JsonSerializable()
-class StrengthSet extends Insertable implements UpdateValidatable {
+class StrengthSet extends Insertable<StrengthSet>
+    implements UpdateValidatable {
   StrengthSet({
     required this.id,
     required this.strengthSessionId,

@@ -10,7 +10,7 @@ import 'package:sport_log/helpers/update_validatable.dart';
 part 'route.g.dart';
 
 @JsonSerializable()
-class Route extends Insertable implements UpdateValidatable {
+class Route extends Insertable<Route> implements UpdateValidatable {
   Route({
     required this.id,
     required this.userId,

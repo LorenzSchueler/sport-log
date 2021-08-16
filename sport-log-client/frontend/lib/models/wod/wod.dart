@@ -2,6 +2,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:moor/moor.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/json_serialization.dart';
 import 'package:sport_log/helpers/update_validatable.dart';
 
@@ -28,8 +29,13 @@ class Wod extends Insertable<Wod> implements UpdateValidatable {
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
-    // TODO: implement toColumns
-    throw UnimplementedError();
+    return WodsCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      date: Value(date),
+      description: Value(description),
+      deleted: Value(deleted),
+    ).toColumns(false);
   }
 
   @override
