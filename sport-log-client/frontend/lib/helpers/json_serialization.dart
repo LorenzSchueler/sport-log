@@ -43,5 +43,18 @@ class DateConverter extends JsonConverter<DateTime, String> {
   String toJson(DateTime object) {
     return DateFormat('yyyy-MM-dd').format(object);
   }
+}
 
+class DateTimeConverter extends JsonConverter<DateTime, String> {
+  const DateTimeConverter() : super();
+
+  @override
+  DateTime fromJson(String json) {
+    return DateTime.parse(json);
+  }
+
+  @override
+  String toJson(DateTime object) {
+    return object.toIso8601String() + '+00:00';
+  }
 }

@@ -47,21 +47,42 @@ void testAction(Api api) async {
 }
 
 void testDiary(Api api) async {
-  final diary = Diary(
+  test('test diary', () async {
+    final diary = Diary(
       id: randomId(),
       userId: sampleUser.id,
       date: DateTime.now(),
       bodyweight: null,
       comments: "hallo",
       deleted: false,
-  );
-  test('test diary', () async {
-    print(diary.toJson());
+    );
+
     api.setCurrentUser(sampleUser);
     expect(await api.createDiary(diary), isA<Success>());
     expect(await api.getDiaries(), isA<Success>());
     expect(await api.updateDiary(diary..date = DateTime.now()), isA<Success>());
     expect(await api.updateDiary(diary..deleted = true), isA<Success>());
+  });
+}
+
+void testStrengthSession(Api api) async {
+  test('test strength session', () async {
+    final strengthSession = StrengthSession(
+      id: randomId(),
+      userId: sampleUser.id,
+      datetime: DateTime.now(),
+      movementId: Int64(1),
+      movementUnit: MovementUnit.reps,
+      interval: 10,
+      comments: null,
+      deleted: false,
+    );
+
+    api.setCurrentUser(sampleUser);
+    expect(await api.createStrengthSession(strengthSession), isA<Success>());
+    expect(await api.getStrengthSessions(), isA<Success>());
+    expect(await api.updateStrengthSession(strengthSession..movementUnit=MovementUnit.cal), isA<Success>());
+    expect(await api.updateStrengthSession(strengthSession..deleted=true), isA<Success>());
   });
 }
 
@@ -72,4 +93,5 @@ void main() async {
   testUser(api);
   testAction(api);
   testDiary(api);
+  testStrengthSession(api);
 }

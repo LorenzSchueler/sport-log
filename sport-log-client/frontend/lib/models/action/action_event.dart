@@ -19,7 +19,7 @@ class ActionEvent {
   @IdConverter() Int64 id;
   @IdConverter() Int64 userId;
   @IdConverter() Int64 actionId;
-  DateTime datetime;
+  @DateTimeConverter() DateTime datetime;
   bool enabled;
   bool deleted;
 

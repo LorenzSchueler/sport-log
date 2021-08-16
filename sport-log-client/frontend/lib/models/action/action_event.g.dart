@@ -11,7 +11,7 @@ ActionEvent _$ActionEventFromJson(Map<String, dynamic> json) {
     id: const IdConverter().fromJson(json['id'] as String),
     userId: const IdConverter().fromJson(json['user_id'] as String),
     actionId: const IdConverter().fromJson(json['action_id'] as String),
-    datetime: DateTime.parse(json['datetime'] as String),
+    datetime: const DateTimeConverter().fromJson(json['datetime'] as String),
     enabled: json['enabled'] as bool,
     deleted: json['deleted'] as bool,
   );
@@ -22,7 +22,7 @@ Map<String, dynamic> _$ActionEventToJson(ActionEvent instance) =>
       'id': const IdConverter().toJson(instance.id),
       'user_id': const IdConverter().toJson(instance.userId),
       'action_id': const IdConverter().toJson(instance.actionId),
-      'datetime': instance.datetime.toIso8601String(),
+      'datetime': const DateTimeConverter().toJson(instance.datetime),
       'enabled': instance.enabled,
       'deleted': instance.deleted,
     };

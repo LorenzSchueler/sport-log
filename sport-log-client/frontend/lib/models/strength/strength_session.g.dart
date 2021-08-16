@@ -10,7 +10,7 @@ StrengthSession _$StrengthSessionFromJson(Map<String, dynamic> json) {
   return StrengthSession(
     id: const IdConverter().fromJson(json['id'] as String),
     userId: const IdConverter().fromJson(json['user_id'] as String),
-    datetime: DateTime.parse(json['datetime'] as String),
+    datetime: const DateTimeConverter().fromJson(json['datetime'] as String),
     movementId: const IdConverter().fromJson(json['movement_id'] as String),
     movementUnit: _$enumDecode(_$MovementUnitEnumMap, json['movement_unit']),
     interval: json['interval'] as int?,
@@ -23,7 +23,7 @@ Map<String, dynamic> _$StrengthSessionToJson(StrengthSession instance) =>
     <String, dynamic>{
       'id': const IdConverter().toJson(instance.id),
       'user_id': const IdConverter().toJson(instance.userId),
-      'datetime': instance.datetime.toIso8601String(),
+      'datetime': const DateTimeConverter().toJson(instance.datetime),
       'movement_id': const IdConverter().toJson(instance.movementId),
       'movement_unit': _$MovementUnitEnumMap[instance.movementUnit],
       'interval': instance.interval,

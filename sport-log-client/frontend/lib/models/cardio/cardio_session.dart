@@ -43,7 +43,7 @@ class CardioSession extends Insertable<CardioSession>
   @IdConverter() Int64 userId;
   @IdConverter() Int64 movementId;
   CardioType cardioType;
-  DateTime datetime;
+  @DateTimeConverter() DateTime datetime;
   int? distance;
   int? ascent;
   int? descent;

@@ -26,7 +26,7 @@ class MetconSession extends Insertable<MetconSession> implements UpdateValidatab
   @IdConverter() Int64 id;
   @IdConverter() Int64 userId;
   @IdConverter() Int64 metconId;
-  DateTime datetime;
+  @DateTimeConverter() DateTime datetime;
   int? time;
   int? rounds;
   int? reps;

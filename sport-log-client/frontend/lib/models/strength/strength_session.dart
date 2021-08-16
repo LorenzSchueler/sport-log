@@ -25,7 +25,7 @@ class StrengthSession extends Insertable<StrengthSession>
 
   @IdConverter() Int64 id;
   @IdConverter() Int64 userId;
-  DateTime datetime;
+  @DateTimeConverter() DateTime datetime;
   @IdConverter() Int64 movementId;
   MovementUnit movementUnit;
   int? interval;
