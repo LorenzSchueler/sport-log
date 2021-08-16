@@ -60,8 +60,10 @@ class DbPositionListConverter extends TypeConverter<List<Position>, Uint8List> {
       return null;
     }
     final bytes = Uint8List(value.length * Position.byteSize);
+    int p = 0;
     for (final position in value) {
-      bytes.addAll(position.asBytesList());
+      bytes.setAll(p, position.asBytesList());
+      p += Position.byteSize;
     }
     return bytes;
   }

@@ -49,4 +49,16 @@ class Position {
       time: bytes.getInt64(32),
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! Position) {
+      return false;
+    }
+    return longitude == other.longitude
+        && latitude == other.latitude
+        && elevation == other.elevation
+        && distance == other.distance
+        && time == other.time;
+  }
 }
