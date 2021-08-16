@@ -108,7 +108,11 @@ pub struct PlatformCredential {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: PlatformCredentialId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub platform_id: PlatformId,
     pub username: String,
     pub password: String,

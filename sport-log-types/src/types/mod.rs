@@ -102,6 +102,29 @@ where
     serializer.serialize_str(&id.to_i64().to_string())
 }
 
+pub fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
+where
+    T: FromI64,
+    D: Deserializer<'de>,
+{
+    let s = Option::<String>::deserialize(deserializer)?;
+    Ok(match s {
+        Some(string) => Some(T::from_i64(string.parse().map_err(de::Error::custom)?)),
+        None => None,
+    })
+}
+
+pub fn to_str_optional<'de, T, S>(id: &Option<T>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    T: ToI64,
+    S: Serializer,
+{
+    match id {
+        Some(t) => serializer.serialize_str(&t.to_i64().to_string()),
+        None => serializer.serialize_none(),
+    }
+}
+
 /// Wrapper around Id types for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///
 /// The Id type can be retrieved by using the appropriate verification function.

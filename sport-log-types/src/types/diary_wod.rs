@@ -60,6 +60,8 @@ pub struct Diary {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: DiaryId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
     pub date: NaiveDate,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
@@ -117,6 +119,8 @@ pub struct Wod {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: WodId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
     pub date: NaiveDate,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
