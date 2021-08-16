@@ -3,7 +3,7 @@ part of 'api.dart';
 
 extension UserRoutes on Api {
   ApiResult<void> createUser(User user) async {
-    return _post(
+    final result = await _post(
         BackendRoutes.user,
         user,
         headers: _jsonContentTypeHeader,
@@ -12,10 +12,14 @@ extension UserRoutes on Api {
             return ApiError.usernameTaken;
           }
         });
+    if (result.isSuccess) {
+      _currentUser = user;
+    }
+    return result;
   }
 
   ApiResult<User> getUser(String username, String password) async {
-    return _get(
+    final result = await _get<User>(
       BackendRoutes.user,
       headers: _makeAuthorizedHeader(username, password),
       mapBadStatusToApiError: (statusCode) {
@@ -23,10 +27,18 @@ extension UserRoutes on Api {
           return ApiError.loginFailed;
         }
       });
+    if (result.isSuccess) {
+      _currentUser = result.success;
+    }
+    return result;
   }
 
   ApiResult<void> updateUser(User user) async {
-    return _put(BackendRoutes.user, user);
+    final result = await _put(BackendRoutes.user, user);
+    if (result.isSuccess) {
+      _currentUser = user;
+    }
+    return result;
   }
 
   ApiResult<void> deleteUser() async {
@@ -36,6 +48,7 @@ extension UserRoutes on Api {
         headers: _authorizedHeader
       );
       if (response.statusCode <= 200 && response.statusCode < 300) {
+        _currentUser = null;
         return Success(null);
       }
       _handleUnknownStatusCode(response);

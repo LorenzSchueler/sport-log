@@ -21,7 +21,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
           ? Unauthenticated()
           : Authenticated(user: user)) {
     if (user != null) {
-      _api.setCredentials(user.username, user.password, user.id);
+      _api.setCurrentUser(user);
     }
   }
 
@@ -45,21 +45,17 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
 
   Stream<AuthenticationState> _logoutStream(LogoutEvent event) async* {
     _authenticationRepository?.deleteUser();
-    _api.removeCredentials();
+    _api.removeCurrentUser();
     yield Unauthenticated();
   }
 
   Stream<AuthenticationState> _loginStream(LoginEvent event) async* {
     _authenticationRepository?.createUser(event.user);
-    _api.setCredentials(
-        event.user.username, event.user.password, event.user.id);
     yield Authenticated(user: event.user);
   }
 
   Stream<AuthenticationState> _registrationStream(RegisterEvent event) async* {
     _authenticationRepository?.createUser(event.user);
-    _api.setCredentials(
-        event.user.username, event.user.password, event.user.id);
     yield Authenticated(user: event.user);
   }
 }

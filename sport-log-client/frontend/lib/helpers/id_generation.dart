@@ -10,7 +10,9 @@ extension on Random {
   Int64 nextId() {
     final i1 = _random.nextInt(randomMax);
     final i2 = _random.nextInt(randomMax);
-    return Int64.fromInts(i1, i2);
+    final result = Int64.fromInts(i1, i2);
+    assert(result.bitLength <= 64);
+    return result;
   }
 }
 

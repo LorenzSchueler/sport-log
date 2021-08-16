@@ -88,7 +88,7 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
   Stream<MetconRequestState> _createMetcon(MetconRequestCreate event) async* {
     yield const MetconRequestPending();
     assert(event.newMetcon.id == null);
-    Int64 userId = _api.getCredentials()!.userId;
+    Int64 userId = _api.currentUser!.id;
     event.newMetcon.userId = userId;
     event.newMetcon.id = _repo.nextMetconId;
     final metcon = event.newMetcon.toMetcon();

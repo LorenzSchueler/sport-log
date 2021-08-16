@@ -85,7 +85,7 @@ class MovementRequestBloc
     assert(event.newMovement.id == null);
     final Movement movement = Movement(
       id: _repo.nextMovementId,
-      userId: _api.getCredentials()!.userId,
+      userId: _api.currentUser!.id,
       name: event.newMovement.name,
       category: event.newMovement.category,
       description: event.newMovement.description,
@@ -109,7 +109,7 @@ class MovementRequestBloc
     yield MovementRequestPending();
     assert(event.movement.id != null);
     assert(event.movement.userId != null);
-    assert(event.movement.userId == _api.getCredentials()!.userId);
+    assert(event.movement.userId == _api.currentUser!.id);
     await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
     final movement = Movement(
       id: event.movement.id!,

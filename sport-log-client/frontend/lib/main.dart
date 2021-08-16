@@ -35,8 +35,7 @@ void main() async {
   AuthenticationRepository? authRepo;
   authRepo = await AuthenticationRepository.getInstance();
   User? user = await authRepo.getUser();
-  final api = Api.instance;
-  api.urlBase = await Config.apiUrlBase;
+  final api = Api.instance..init();
   final authBloc = AuthenticationBloc(
       authenticationRepository: authRepo,
       api: api,

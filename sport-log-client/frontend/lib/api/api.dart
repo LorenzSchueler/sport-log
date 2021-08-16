@@ -8,6 +8,7 @@ import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/backend_routes.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:http/http.dart' as http;
+import 'package:sport_log/config.dart';
 import 'package:sport_log/models/all.dart';
 
 part 'movement_api.dart';
@@ -22,46 +23,38 @@ part 'action.dart';
 
 typedef ApiResult<T> = Future<Result<T, ApiError>>;
 
-class Credentials {
-  Credentials({
-    required this.username,
-    required this.password,
-    required this.userId,
-  });
-
-  String username, password;
-  Int64 userId;
-}
-
 class Api {
 
   static final Api instance = Api._();
   Api._();
 
-  late final String urlBase;
-  final _client = http.Client();
-  Credentials? _credentials;
+  String? _urlBaseOptional;
+  String get _urlBase {
+    assert(_urlBaseOptional != null, 'forget to call Api().init()');
+    return _urlBaseOptional!;
+  }
 
-  Uri _uri(String route) => Uri.parse(urlBase + route);
+  final _client = http.Client();
+  User? _currentUser;
+
+  Future<void> init() async {
+    _urlBaseOptional = await Config.apiUrlBase;
+  }
+
+  void setCurrentUser(User user) {
+    _currentUser = user;
+  }
+
+  void removeCurrentUser() {
+    _currentUser = null;
+  }
+
+  User? get currentUser => _currentUser;
+
+  Uri _uri(String route) => Uri.parse(_urlBase + route);
 
   void _logError(String message) {
     log(message, name: "API");
-  }
-
-  void setCredentials(String username, String password, Int64 userId) {
-    _credentials = Credentials(
-      username: username,
-      password: password,
-      userId: userId
-    );
-  }
-
-  void removeCredentials() {
-    _credentials = null;
-  }
-
-  Credentials? getCredentials() {
-    return _credentials;
   }
 
   void _handleUnknownStatusCode(http.Response response) {
@@ -77,9 +70,9 @@ class Api {
   }
 
   Map<String, String> get _authorizedHeader {
-    assert(_credentials != null);
-    final username = _credentials!.username;
-    final password = _credentials!.password;
+    assert(_currentUser != null);
+    final username = _currentUser!.username;
+    final password = _currentUser!.password;
     return _makeAuthorizedHeader(username, password);
   }
 
