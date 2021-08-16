@@ -7,19 +7,18 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
     CheckAPId, CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds,
-    GetBySync, GetByUser, GetByUserSync, ToSql, Update, VerifyForActionProviderWithDb,
+    GetBySync, GetByUser, GetByUserSync, ToI64, ToSql, Update, VerifyForActionProviderWithDb,
     VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
     VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
     VerifyIdUnchecked, VerifyUnchecked,
 };
 
+use crate::{from_str, to_str, PlatformId, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{action, action_event, action_provider, action_rule},
     Platform, User,
 };
-
-use crate::{PlatformId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
@@ -29,6 +28,7 @@ use crate::{PlatformId, UserId};
         FromSqlRow,
         AsExpression,
         FromI64,
+        ToI64,
         ToSql,
         FromSql,
         VerifyIdForAdmin,
@@ -58,6 +58,8 @@ pub struct ActionProviderId(pub i64);
 #[cfg_attr(feature = "full", table_name = "action_provider")]
 #[cfg_attr(feature = "full", belongs_to(Platform))]
 pub struct ActionProvider {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub id: ActionProviderId,
     pub name: String,
     pub password: String,
@@ -77,6 +79,7 @@ pub struct ActionProvider {
         FromSqlRow,
         AsExpression,
         FromI64,
+        ToI64,
         ToSql,
         FromSql,
         VerifyIdForActionProvider
@@ -108,6 +111,8 @@ pub struct ActionId(pub i64);
 #[cfg_attr(feature = "full", table_name = "action")]
 #[cfg_attr(feature = "full", belongs_to(ActionProvider))]
 pub struct Action {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub id: ActionId,
     pub name: String,
     pub action_provider_id: ActionProviderId,
@@ -154,6 +159,7 @@ impl Weekday {
         FromSqlRow,
         AsExpression,
         FromI64,
+        ToI64,
         ToSql,
         FromSql,
         VerifyIdForUser
@@ -187,6 +193,8 @@ pub struct ActionRuleId(pub i64);
 #[cfg_attr(feature = "full", belongs_to(User))]
 #[cfg_attr(feature = "full", belongs_to(Action))]
 pub struct ActionRule {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub id: ActionRuleId,
     pub user_id: UserId,
     pub action_id: ActionId,
@@ -207,6 +215,7 @@ pub struct ActionRule {
         FromSqlRow,
         AsExpression,
         FromI64,
+        ToI64,
         ToSql,
         FromSql,
         VerifyIdForUser,
@@ -243,6 +252,8 @@ pub struct ActionEventId(pub i64);
 #[cfg_attr(feature = "full", belongs_to(User))]
 #[cfg_attr(feature = "full", belongs_to(Action))]
 pub struct ActionEvent {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub id: ActionEventId,
     pub user_id: UserId,
     pub action_id: ActionId,

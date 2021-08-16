@@ -49,6 +49,7 @@ pub use diary_wod::*;
 pub use metcon::*;
 pub use movement::*;
 pub use platform::*;
+use serde::{de, Deserializer, Serializer};
 pub use sharing::*;
 pub use strength::*;
 pub use user::*;
@@ -72,9 +73,33 @@ impl<'r, T: Deserialize<'r>> FromData<'r> for Unverified<T> {
     }
 }
 
-/// Indicated that the type can be build from an [i32].
+/// Indicated that the type can be build from an [i64].
 pub trait FromI64 {
     fn from_i64(value: i64) -> Self;
+}
+
+/// Indicated that the type can be converted into an [i64].
+pub trait ToI64 {
+    fn to_i64(&self) -> i64;
+}
+
+pub fn from_str<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+where
+    T: FromI64,
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?
+        .parse()
+        .map_err(de::Error::custom)?;
+    Ok(T::from_i64(s))
+}
+
+pub fn to_str<'de, T, S>(id: &T, serializer: S) -> Result<S::Ok, S::Error>
+where
+    T: ToI64,
+    S: Serializer,
+{
+    serializer.serialize_str(&id.to_i64().to_string())
 }
 
 /// Wrapper around Id types for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.

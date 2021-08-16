@@ -512,3 +512,16 @@ pub fn impl_from_i64(ast: &syn::DeriveInput) -> TokenStream {
     };
     gen.into()
 }
+
+pub fn impl_to_i64(ast: &syn::DeriveInput) -> TokenStream {
+    let id_typename = &ast.ident;
+
+    let gen = quote! {
+        impl crate::ToI64 for #id_typename {
+            fn to_i64(&self) -> i64 {
+                self.0
+            }
+        }
+    };
+    gen.into()
+}

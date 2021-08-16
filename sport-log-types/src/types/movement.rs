@@ -7,18 +7,19 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, ToSql,
+    CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, ToI64, ToSql,
     Update, VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
 };
 
+use crate::{
+    from_str, to_str, CheckUserId, UnverifiedIds, UserId, VerifyIdsForUserOrAP,
+    VerifyMultipleForUserOrAPWithDb,
+};
 #[cfg(feature = "full")]
 use crate::{
     schema::{eorm, movement},
     AuthUserOrAP, GetById, Unverified, UnverifiedId, User, VerifyForUserOrAPWithDb,
     VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyMultipleForUserOrAPWithoutDb,
-};
-use crate::{
-    CheckUserId, UnverifiedIds, UserId, VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithDb,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -48,6 +49,7 @@ pub enum MovementUnit {
         FromSqlRow,
         AsExpression,
         FromI64,
+        ToI64,
         ToSql,
         FromSql,
         VerifyIdForAdmin,
@@ -116,6 +118,8 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
 #[cfg_attr(feature = "full", table_name = "movement")]
 #[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Movement {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub id: MovementId,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub user_id: Option<UserId>,
@@ -215,6 +219,7 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
         FromSqlRow,
         AsExpression,
         FromI64,
+        ToI64,
         ToSql,
         FromSql,
         VerifyIdForAdmin
@@ -238,6 +243,8 @@ pub struct EormId(pub i64);
 )]
 #[cfg_attr(feature = "full", table_name = "eorm")]
 pub struct Eorm {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub id: EormId,
     pub reps: i32,
     pub percentage: f32,

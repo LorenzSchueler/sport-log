@@ -17,16 +17,16 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
     CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetById, GetByIds, GetByUser,
-    GetByUserSync, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
+    GetByUserSync, ToI64, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
     VerifyIdForUserOrAP,
 };
 
+use crate::{from_str, to_str, Movement, MovementId, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{cardio_session, route},
     User,
 };
-use crate::{Movement, MovementId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "full", derive(DbEnum))]
@@ -94,6 +94,7 @@ impl FromSql<Position, Pg> for Position {
         FromSqlRow,
         AsExpression,
         FromI64,
+        ToI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
@@ -126,6 +127,8 @@ pub struct RouteId(pub i64);
 #[cfg_attr(feature = "full", table_name = "route")]
 #[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Route {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub id: RouteId,
     pub user_id: UserId,
     pub name: String,
@@ -150,6 +153,7 @@ pub struct Route {
         FromSqlRow,
         AsExpression,
         FromI64,
+        ToI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
@@ -183,6 +187,8 @@ pub struct CardioSessionId(pub i64);
 #[cfg_attr(feature = "full", belongs_to(User))]
 #[cfg_attr(feature = "full", belongs_to(Movement))]
 pub struct CardioSession {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub id: CardioSessionId,
     pub user_id: UserId,
     pub movement_id: MovementId,

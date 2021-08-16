@@ -202,11 +202,20 @@ pub fn verify_unchecked_derive(input: TokenStream) -> TokenStream {
 
 /// Derives `sport_log_types::FromI64`.
 ///
-/// This macro only works if the type is a one tuple struct of i32.
+/// This macro only works if the type is a one tuple struct of i64.
 #[proc_macro_derive(FromI64)]
-pub fn form_i32_derive(input: TokenStream) -> TokenStream {
+pub fn form_i64_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_from_i64(&ast)
+}
+
+/// Derives `sport_log_types::ToI64`.
+///
+/// This macro only works if the type is a one tuple struct of i64.
+#[proc_macro_derive(ToI64)]
+pub fn to_i64_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_to_i64(&ast)
 }
 
 /// Derives `diesel::types::ToSql<diesel::sql_types::BigInt, diesel::pg::Pg>`.
