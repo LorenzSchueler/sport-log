@@ -19,8 +19,9 @@ extension UserRoutes on Api {
   }
 
   ApiResult<User> getUser(String username, String password) async {
-    final result = await _get<User>(
+    final result = await _getSingle<User>(
       BackendRoutes.user,
+      fromJson: (json) => User.fromJson(json),
       headers: _makeAuthorizedHeader(username, password),
       mapBadStatusToApiError: (statusCode) {
         if (statusCode == 401) {

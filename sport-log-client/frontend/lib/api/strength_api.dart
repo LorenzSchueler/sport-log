@@ -14,7 +14,8 @@ extension StrengthRoutes on Api {
   }
 
   ApiResult<List<StrengthSession>> getStrengthSessions() async {
-    return _get(BackendRoutes.strengthSession);
+    return _getMultiple(BackendRoutes.strengthSession,
+        fromJson: (json) => StrengthSession.fromJson(json));
   }
 
   ApiResult<void> updateStrengthSession(StrengthSession ss) async {
@@ -36,12 +37,14 @@ extension StrengthRoutes on Api {
   }
 
   ApiResult<List<StrengthSet>> getStrengthSets() async {
-    return _get(BackendRoutes.strengthSet);
+    return _getMultiple(BackendRoutes.strengthSet,
+        fromJson: (json) => StrengthSet.fromJson(json));
   }
 
   ApiResult<List<StrengthSet>> getStrengthSetsByStrengthSession(
       Int64 id) async {
-    return _get(BackendRoutes.strengthSetsByStrengthSession(id));
+    return _getMultiple(BackendRoutes.strengthSetsByStrengthSession(id),
+        fromJson: (json) => StrengthSet.fromJson(json));
   }
 
   ApiResult<void> updateStrengthSet(StrengthSet set) async {

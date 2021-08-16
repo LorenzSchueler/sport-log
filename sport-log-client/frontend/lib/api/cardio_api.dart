@@ -14,7 +14,8 @@ extension CardioRoutes on Api {
   }
 
   ApiResult<List<Route>> getRoutes() async {
-    return _get(BackendRoutes.route);
+    return _getMultiple(BackendRoutes.route,
+        fromJson: (json) => Route.fromJson(json));
   }
 
   ApiResult<void> updateRoute(Route route) async {
@@ -36,7 +37,8 @@ extension CardioRoutes on Api {
   }
 
   ApiResult<List<CardioSession>> getCardioSessions() async {
-    return _get(BackendRoutes.cardioSession);
+    return _getMultiple(BackendRoutes.cardioSession,
+        fromJson: (json) => CardioSession.fromJson(json));
   }
 
   ApiResult<void> updateCardioSession(CardioSession cs) async {

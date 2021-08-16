@@ -12,7 +12,8 @@ extension MovementRoutes on Api {
   }
 
   ApiResult<List<Movement>> getMovements() async {
-    return _get<List<Movement>>(BackendRoutes.movement);
+    return _getMultiple(BackendRoutes.movement,
+        fromJson: (json) => Movement.fromJson(json));
   }
 
   ApiResult<void> updateMovement(Movement movement) async {

@@ -6,13 +6,15 @@ extension ActionRoutes on Api {
   // Action Providers
 
   ApiResult<List<ActionProvider>> getActionProviders() async {
-    return _get(BackendRoutes.actionProvider);
+    return _getMultiple(BackendRoutes.actionProvider,
+        fromJson: (json) => ActionProvider.fromJson(json));
   }
 
   // Actions
 
   ApiResult<List<Action>> getActions() async {
-    return _get(BackendRoutes.action);
+    return _getMultiple(BackendRoutes.action,
+        fromJson: (json) => Action.fromJson(json));
   }
 
   // Action Rules
@@ -26,11 +28,13 @@ extension ActionRoutes on Api {
   }
 
   ApiResult<List<ActionRule>> getActionRules() async {
-    return _get(BackendRoutes.actionRule);
+    return _getMultiple(BackendRoutes.actionRule,
+        fromJson: (json) => ActionRule.fromJson(json));
   }
 
   ApiResult<List<ActionRule>> getActionRulesByActionProvider(Int64 id) async {
-    return _get(BackendRoutes.actionRuleByActionProvider(id));
+    return _getMultiple(BackendRoutes.actionRuleByActionProvider(id),
+        fromJson: (json) => ActionRule.fromJson(json));
   }
 
   ApiResult<void> updateActionRule(ActionRule ar) async {
@@ -52,11 +56,13 @@ extension ActionRoutes on Api {
   }
 
   ApiResult<List<ActionEvent>> getActionEvents() async {
-    return _get(BackendRoutes.actionEvent);
+    return _getMultiple(BackendRoutes.actionEvent,
+        fromJson: (json) => ActionEvent.fromJson(json));
   }
 
   ApiResult<List<ActionEvent>> getActionEventsByActionProvider(Int64 id) async {
-    return _get(BackendRoutes.actionEventByActionProvider(id));
+    return _getMultiple(BackendRoutes.actionEventByActionProvider(id),
+        fromJson: (json) => ActionEvent.fromJson(json));
   }
 
   ApiResult<void> updateActionEvent(ActionEvent ae) async {

@@ -1,6 +1,8 @@
 
 part of 'api.dart';
 
+typedef FromJson<T> = T Function(Map<String, dynamic>);
+
 extension Helpers on Api {
 
   String get _urlBase {
@@ -55,7 +57,40 @@ extension Helpers on Api {
     }
   }
 
-  Future<Result<T, ApiError>> _get<T>(String route, {
+  Future<Result<List<T>, ApiError>> _getMultiple<T>(String route, {
+    required FromJson<T> fromJson,
+    ApiError? Function(int)? mapBadStatusToApiError,
+    Map<String, String>? headers,
+  }) async {
+    return _request<List<T>>((client) async {
+      final response = await client.get(
+        _uri(route),
+        headers: headers ?? _authorizedHeader,
+      );
+      if (response.statusCode <= 200 && response.statusCode < 300) {
+        final json = jsonDecode(response.body);
+        if (!json is List<T>) {
+          return Failure(ApiError.badJson);
+        } else {
+          final List<T> result = (json as List).map((j) =>
+              fromJson(j as Map<String, dynamic>)
+          ).toList();
+          return Success(result);
+        }
+      }
+      if (mapBadStatusToApiError != null) {
+        final ApiError? e = mapBadStatusToApiError(response.statusCode);
+        if (e != null) {
+          return Failure(e);
+        }
+      }
+      _handleUnknownStatusCode(response);
+      return Failure(ApiError.unknown);
+    });
+  }
+
+  Future<Result<T, ApiError>> _getSingle<T>(String route, {
+    required FromJson<T> fromJson,
     ApiError? Function(int)? mapBadStatusToApiError,
     Map<String, String>? headers,
   }) async {
@@ -65,8 +100,7 @@ extension Helpers on Api {
         headers: headers ?? _authorizedHeader,
       );
       if (response.statusCode <= 200 && response.statusCode < 300) {
-        final T result = jsonDecode(response.body);
-        return Success(result);
+        return Success(fromJson(jsonDecode(response.body)));
       }
       if (mapBadStatusToApiError != null) {
         final ApiError? e = mapBadStatusToApiError(response.statusCode);

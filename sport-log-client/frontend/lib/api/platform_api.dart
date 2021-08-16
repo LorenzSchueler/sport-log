@@ -3,7 +3,8 @@ part of 'api.dart';
 
 extension PlatformRoutes on Api {
   ApiResult<List<Platform>> getPlatforms() async {
-    return _get(BackendRoutes.platform);
+    return _getMultiple(BackendRoutes.platform,
+        fromJson: (json) => Platform.fromJson(json));
   }
 
   ApiResult<void> createPlatformCredential(PlatformCredential pc) async {
@@ -16,7 +17,8 @@ extension PlatformRoutes on Api {
   }
 
   ApiResult<List<PlatformCredential>> getPlatformCredentials() async {
-    return _get(BackendRoutes.platformCredential);
+    return _getMultiple(BackendRoutes.platformCredential,
+        fromJson: (json) => PlatformCredential.fromJson(json));
   }
 
   ApiResult<void> updatePlatformCredential(PlatformCredential pc) async {

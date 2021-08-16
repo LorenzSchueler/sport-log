@@ -55,15 +55,15 @@ void main() async {
   final Api api = Api.instance;
   await api.init();
 
-  testUser(api);
+  // testUser(api);
 
-  // final result = await api.getUser('user2', 'user2-passwd');
-  // if (result.isFailure) {
-  //   stderr.writeln(result.failure);
-  // }
-  // assert(result.isSuccess);
-  //
-  // // testAction(api);
-  //
-  // assert((await api.deleteUser()).isSuccess);
+  final result = await api.getUser('user2', 'user2-passwd');
+  if (result.isFailure) {
+    stderr.writeln(result.failure);
+  }
+  assert(result.isSuccess);
+
+  // testAction(api);
+
+  assert((await api.deleteUser()).isSuccess);
 }

@@ -11,7 +11,8 @@ extension WodRoutes on Api {
   }
 
   ApiResult<List<Wod>> getWods() async {
-    return _get(BackendRoutes.wod);
+    return _getMultiple(BackendRoutes.wod,
+        fromJson: (json) => Wod.fromJson(json));
   }
 
   ApiResult<void> updateWod(Wod wod) async {

@@ -23,6 +23,6 @@ class ActionProvider {
   String? description;
   bool deleted;
 
-  factory ActionProvider.fromMap(Map<String, dynamic> json) => _$ActionProviderFromJson(json);
+  factory ActionProvider.fromJson(Map<String, dynamic> json) => _$ActionProviderFromJson(json);
   Map<String, dynamic> toJson() => _$ActionProviderToJson(this);
 }

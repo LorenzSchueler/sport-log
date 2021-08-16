@@ -24,7 +24,7 @@ class Wod extends Insertable<Wod> implements UpdateValidatable {
   String? description;
   bool deleted;
 
-  factory Wod.fromMap(Map<String, dynamic> json) => _$WodFromJson(json);
+  factory Wod.fromJson(Map<String, dynamic> json) => _$WodFromJson(json);
   Map<String, dynamic> toJson() => _$WodToJson(this);
 
   @override

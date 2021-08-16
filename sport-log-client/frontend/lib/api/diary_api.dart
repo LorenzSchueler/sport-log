@@ -11,7 +11,8 @@ extension DiaryRoutes on Api {
   }
 
   ApiResult<List<Diary>> getDiaries() async {
-    return _get(BackendRoutes.diary);
+    return _getMultiple(BackendRoutes.diary,
+        fromJson: (json) => Diary.fromJson(json));
   }
 
   ApiResult<void> updateDiary(Diary diary) async {

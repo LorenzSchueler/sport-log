@@ -7,6 +7,7 @@ enum ApiError {
   unknown, // unknown status code from server
   unhandled, // unknown request error
   conflict,
+  badJson,
 }
 
 extension ToErrorMessage on ApiError {
@@ -26,6 +27,8 @@ extension ToErrorMessage on ApiError {
         return "Unhandled error occurred.";
       case ApiError.conflict:
         return "Conflict creating resource";
+      case ApiError.badJson:
+        return "Got bad json from server.";
     }
   }
 }
