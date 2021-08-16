@@ -38,6 +38,12 @@ pub enum CardioType {
 
 /// A GPS position.
 ///
+/// `latitude` and `longitude` are meassured in decimal degrees.
+///
+/// `elevation` is the elevation above sea level in in meter.
+///
+/// `distance` is the distance in meter since the start of the recording.
+///
 /// `time` is the time in seconds since the start of the recording.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(SqlType,))]
