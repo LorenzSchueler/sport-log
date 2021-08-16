@@ -68,12 +68,12 @@ extension Helpers on Api {
         headers: headers ?? _authorizedHeader,
       );
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        final json = jsonDecode(response.body);
+        final dynamic json = jsonDecode(response.body);
         if (json is! List) {
           _logError(response.body);
           return Failure(ApiError.badJson);
         } else {
-          final List<T> result = json.map((j) =>
+          final List<T> result = json.map((dynamic j) =>
               fromJson(j as Map<String, dynamic>)
           ).toList();
           return Success(result);
@@ -101,7 +101,13 @@ extension Helpers on Api {
         headers: headers ?? _authorizedHeader,
       );
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        return Success(fromJson(jsonDecode(response.body)));
+        final dynamic result = jsonDecode(response.body);
+        if (result !is Map<String, dynamic>) {
+          _logError(response.body);
+          return Failure(ApiError.badJson);
+        }
+        return Success(fromJson(
+            jsonDecode(response.body) as Map<String, dynamic>));
       }
       if (mapBadStatusToApiError != null) {
         final ApiError? e = mapBadStatusToApiError(response.statusCode);

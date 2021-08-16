@@ -87,7 +87,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
     );
   }
 
-  _newMovementButton(BuildContext context) {
+  Widget _newMovementButton(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.add),
       title: Text("Create new movement '$_searchTerm'"),

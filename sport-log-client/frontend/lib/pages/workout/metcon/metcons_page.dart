@@ -72,7 +72,7 @@ class _MetconsPageState extends State<MetconsPage> {
 
   Widget _metconToWidget(
     BuildContext context,
-    animation,
+    Animation<double> animation,
     UiMetcon metcon,
     int index
   ) {

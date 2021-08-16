@@ -52,11 +52,11 @@ class _EditMetconPageState extends State<EditMetconPage> {
 
   final _descriptionFocusNode = FocusNode();
   
-  _setName(String name) {
+  void _setName(String name) {
     setState(() => _metcon.name = name);
   }
   
-  _setType(MetconType type) {
+  void _setType(MetconType type) {
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() {
       _metcon.type = type;
@@ -77,33 +77,33 @@ class _EditMetconPageState extends State<EditMetconPage> {
     });
   }
 
-  _setRounds(int? rounds) {
+  void _setRounds(int? rounds) {
     // TODO: assert consistent state
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _metcon.rounds = rounds);
   }
 
-  _setTimecap(Duration? timecap) {
+  void _setTimecap(Duration? timecap) {
     // TODO: assert consistent state
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _metcon.timecap = timecap);
   }
   
-  _setDescription(String? description) {
+  void _setDescription(String? description) {
     setState(() => _metcon.description = description);
   }
 
-  _removeMetconMovement(int index) {
+  void _removeMetconMovement(int index) {
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _metcon.moves.removeAt(index));
   }
 
-  _setMetconMovement(int index, UiMetconMovement mm) {
+  void _setMetconMovement(int index, UiMetconMovement mm) {
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _metcon.moves[index] = mm);
   }
 
-  _reorderMetconMovements(int oldIndex, int newIndex) {
+  void _reorderMetconMovements(int oldIndex, int newIndex) {
     FocusManager.instance.primaryFocus?.unfocus();
     if (oldIndex < newIndex) {
       newIndex -= 1;
@@ -114,7 +114,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
     });
   }
 
-  _addMetconMovementWithMovementId(Int64 movementId) {
+  void _addMetconMovementWithMovementId(Int64 movementId) {
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() {
       _metcon.moves.add(UiMetconMovement(
@@ -132,7 +132,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
         && _metcon.moves.isNotEmpty;
   }
 
-  _submit(MetconRequestBloc requestBloc) {
+  void _submit(MetconRequestBloc requestBloc) {
     if (!_inputIsValid()) {
       return;
     }
@@ -146,7 +146,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
     }
   }
 
-  _delete(MetconRequestBloc requestBloc) {
+  void _delete(MetconRequestBloc requestBloc) {
     if (widget._isEditing) {
       assert(_metcon.id != null);
       requestBloc.add(MetconRequestDelete(_metcon.id!));
@@ -170,7 +170,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
           Navigator.of(context).pop(); // remove loading indicator
           Navigator.of(context).pop(); // go back to metcons page
         } else if (state is MetconRequestPending) {
-          showDialog(
+          showDialog<void>(
             context: context,
             builder: (context) => const LoadingDialog(),
           );

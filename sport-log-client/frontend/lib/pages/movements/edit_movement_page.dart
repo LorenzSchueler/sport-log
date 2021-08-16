@@ -56,16 +56,16 @@ class _EditMovementPageState extends State<EditMovementPage> {
   final _descriptionFocusNode = FocusNode();
   static const _categoryDefaultValue = MovementCategory.strength;
 
-  _setName(String name) {
+  void _setName(String name) {
     setState(() => _movement.name = name);
   }
 
-  _setCategory(MovementCategory category) {
+  void _setCategory(MovementCategory category) {
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _movement.category = category);
   }
 
-  _setDescription(String? description) {
+  void _setDescription(String? description) {
     setState(() => _movement.description = description);
   }
 
@@ -73,7 +73,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
     return _movement.name != "";
   }
 
-  _submit(MovementRequestBloc requestBloc) {
+  void _submit(MovementRequestBloc requestBloc) {
     FocusManager.instance.primaryFocus?.unfocus();
     if (!_inputIsValid()) {
       return;
@@ -87,7 +87,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
     }
   }
 
-  _delete(MovementRequestBloc requestBloc) {
+  void _delete(MovementRequestBloc requestBloc) {
     if (widget._isEditing) {
       assert(_movement.id != null);
       assert(_movement.userId != null);
@@ -116,7 +116,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
             navigator.pop();
           }
         } else if (state is MovementRequestPending) {
-          showDialog(
+          showDialog<void>(
             context: context,
             builder: (_) => const LoadingDialog(),
           );

@@ -36,7 +36,7 @@ class RestartRegistration extends RegistrationEvent {}
 class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   RegistrationBloc({
     required auth.AuthenticationBloc authenticationBloc,
-    required showErrorSnackBar,
+    required void Function(String) showErrorSnackBar,
   })
       : _authenticationBloc = authenticationBloc,
         _api = Api.instance,
@@ -45,7 +45,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
 
   final auth.AuthenticationBloc _authenticationBloc;
   final Api _api;
-  final Function(String) _showErrorSnackBar;
+  final void Function(String) _showErrorSnackBar;
 
   @override
   Stream<RegistrationState> mapEventToState(RegistrationEvent event) async* {

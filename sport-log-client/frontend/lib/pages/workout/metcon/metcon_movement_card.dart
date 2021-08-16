@@ -108,7 +108,7 @@ class MetconMovementCard extends StatelessWidget {
       BuildContext context,
       Function(Int64) onPicked
   ) {
-    showDialog(
+    showDialog<Int64>(
       context: context,
       builder: (_) => const MovementPickerDialog(),
     ).then((movementId) {

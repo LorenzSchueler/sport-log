@@ -28,5 +28,9 @@ linter:
 analyzer:
   exclude:
     - "**/*.g.dart"
+
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

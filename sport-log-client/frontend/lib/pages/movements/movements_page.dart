@@ -96,7 +96,10 @@ class MovementsPage extends StatelessWidget {
   }
 
   Widget _movementToWidget(
-      BuildContext context, animation, Movement movement, int index
+      BuildContext context,
+      Animation<double> animation,
+      Movement movement,
+      int index,
   ) {
     final requestBloc = MovementRequestBloc.fromContext(context);
     return SizeFadeTransition(

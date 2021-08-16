@@ -91,7 +91,7 @@ class MovementRequestBloc
       description: event.newMovement.description,
       deleted: false,
     );
-    await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
+    await Future<void>.delayed(Duration(milliseconds: Config.debugApiDelay));
     _repo.addMovement(movement);
     _cubit.addMovement(movement);
     yield MovementRequestSucceeded(payload: movement.id);
@@ -99,7 +99,7 @@ class MovementRequestBloc
 
   Stream<MovementRequestState> _deleteMovement(MovementRequestDelete event) async* {
     yield MovementRequestPending();
-    await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
+    await Future<void>.delayed(Duration(milliseconds: Config.debugApiDelay));
     _repo.deleteMovement(event.id);
     _cubit.deleteMovement(event.id);
     yield MovementRequestSucceeded(payload: event.id);
@@ -110,7 +110,7 @@ class MovementRequestBloc
     assert(event.movement.id != null);
     assert(event.movement.userId != null);
     assert(event.movement.userId == _api.currentUser!.id);
-    await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
+    await Future<void>.delayed(Duration(milliseconds: Config.debugApiDelay));
     final movement = Movement(
       id: event.movement.id!,
       userId: event.movement.userId,
@@ -126,7 +126,7 @@ class MovementRequestBloc
 
   Stream<MovementRequestState> _getAllMovements(MovementRequestGetAll event) async* {
     yield MovementRequestPending();
-    await Future.delayed(Duration(milliseconds: Config.debugApiDelay));
+    await Future<void>.delayed(Duration(milliseconds: Config.debugApiDelay));
     final movements = _repo.getAllMovements();
     _cubit.loadMovements(movements);
     yield MovementRequestSucceeded();
