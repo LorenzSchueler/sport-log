@@ -4,11 +4,11 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
     CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, GetBySync,
-    GetByUser, GetByUserSync, ToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb,
+    GetByUser, GetByUserSync, ToI64, ToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb,
     VerifyForUserWithoutDb, VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked, VerifyUnchecked,
 };
 
-use crate::UserId;
+use crate::{from_str, to_str, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{platform, platform_credential},
@@ -23,6 +23,7 @@ use crate::{
         FromSqlRow,
         AsExpression,
         FromI64,
+        ToI64,
         ToSql,
         FromSql,
         VerifyIdForAdmin,
@@ -52,6 +53,8 @@ pub struct PlatformId(pub i64);
 )]
 #[cfg_attr(feature = "full", table_name = "platform")]
 pub struct Platform {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub id: PlatformId,
     pub name: String,
     #[serde(skip)]
@@ -68,6 +71,7 @@ pub struct Platform {
         FromSqlRow,
         AsExpression,
         FromI64,
+        ToI64,
         ToSql,
         FromSql,
         VerifyIdForUser
@@ -101,6 +105,8 @@ pub struct PlatformCredentialId(pub i64);
 #[cfg_attr(feature = "full", belongs_to(User))]
 #[cfg_attr(feature = "full", belongs_to(Platform))]
 pub struct PlatformCredential {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub id: PlatformCredentialId,
     pub user_id: UserId,
     pub platform_id: PlatformId,

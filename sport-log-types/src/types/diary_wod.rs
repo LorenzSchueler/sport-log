@@ -4,11 +4,11 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
     CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetById, GetByIds, GetByUser,
-    GetByUserSync, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
+    GetByUserSync, ToI64, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
     VerifyIdForUserOrAP, VerifyUnchecked,
 };
 
-use crate::UserId;
+use crate::{from_str, to_str, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{diary, wod},
@@ -23,6 +23,7 @@ use crate::{
         FromSqlRow,
         AsExpression,
         FromI64,
+        ToI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
@@ -56,6 +57,8 @@ pub struct DiaryId(pub i64);
 #[cfg_attr(feature = "full", table_name = "diary")]
 #[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Diary {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub id: DiaryId,
     pub user_id: UserId,
     pub date: NaiveDate,
@@ -77,6 +80,7 @@ pub struct Diary {
         FromSqlRow,
         AsExpression,
         FromI64,
+        ToI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
@@ -110,6 +114,8 @@ pub struct WodId(pub i64);
 #[cfg_attr(feature = "full", table_name = "wod")]
 #[cfg_attr(feature = "full", belongs_to(User))]
 pub struct Wod {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub id: WodId,
     pub user_id: UserId,
     pub date: NaiveDate,

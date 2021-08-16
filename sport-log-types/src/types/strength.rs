@@ -6,17 +6,17 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
     CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetById, GetByIds, GetByUser,
-    GetByUserSync, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
+    GetByUserSync, ToI64, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
     VerifyIdForUserOrAP,
 };
 
+use crate::{from_str, to_str, Movement, MovementId, MovementUnit, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{strength_session, strength_set},
     AuthUserOrAP, CheckUserId, Unverified, VerifyForUserOrAPWithDb,
     VerifyMultipleForUserOrAPWithDb,
 };
-use crate::{Movement, MovementId, MovementUnit, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(
@@ -26,6 +26,7 @@ use crate::{Movement, MovementId, MovementUnit, UserId};
         FromSqlRow,
         AsExpression,
         FromI64,
+        ToI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
@@ -57,6 +58,8 @@ pub struct StrengthSessionId(pub i64);
 )]
 #[cfg_attr(feature = "full", table_name = "strength_session")]
 pub struct StrengthSession {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub id: StrengthSessionId,
     pub user_id: UserId,
     pub datetime: DateTime<Utc>,
@@ -80,6 +83,7 @@ pub struct StrengthSession {
         FromSqlRow,
         AsExpression,
         FromI64,
+        ToI64,
         ToSql,
         FromSql,
         VerifyIdForUserOrAP
@@ -107,6 +111,8 @@ pub struct StrengthSetId(pub i64);
 #[cfg_attr(feature = "full", table_name = "strength_set")]
 #[cfg_attr(feature = "full", belongs_to(StrengthSession))]
 pub struct StrengthSet {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub id: StrengthSetId,
     pub strength_session_id: StrengthSessionId,
     pub set_number: i32,
