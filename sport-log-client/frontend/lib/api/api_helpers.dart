@@ -67,7 +67,7 @@ extension Helpers on Api {
         _uri(route),
         headers: headers ?? _authorizedHeader,
       );
-      if (response.statusCode <= 200 && response.statusCode < 300) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         final json = jsonDecode(response.body);
         if (!json is List<T>) {
           return Failure(ApiError.badJson);
@@ -99,7 +99,7 @@ extension Helpers on Api {
         _uri(route),
         headers: headers ?? _authorizedHeader,
       );
-      if (response.statusCode <= 200 && response.statusCode < 300) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         return Success(fromJson(jsonDecode(response.body)));
       }
       if (mapBadStatusToApiError != null) {
@@ -149,7 +149,7 @@ extension Helpers on Api {
         headers: _defaultHeaders,
         body: jsonEncode(body),
       );
-      if (response.statusCode <= 200 && response.statusCode < 300) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         return Success(null);
       }
       if (mapBadStatusToApiError != null) {

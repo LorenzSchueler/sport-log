@@ -8,6 +8,7 @@ enum ApiError {
   unhandled, // unknown request error
   conflict,
   badJson,
+  unauthorized,
 }
 
 extension ToErrorMessage on ApiError {
@@ -29,6 +30,8 @@ extension ToErrorMessage on ApiError {
         return "Conflict creating resource";
       case ApiError.badJson:
         return "Got bad json from server.";
+      case ApiError.unauthorized:
+        return "Unauthorized.";
     }
   }
 }

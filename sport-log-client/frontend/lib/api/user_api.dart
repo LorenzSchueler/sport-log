@@ -30,6 +30,7 @@ extension UserRoutes on Api {
       });
     if (result.isSuccess) {
       _currentUser = result.success;
+      _currentUser!.password = password;
     }
     return result;
   }
@@ -48,7 +49,7 @@ extension UserRoutes on Api {
         _uri(BackendRoutes.user),
         headers: _authorizedHeader
       );
-      if (response.statusCode <= 200 && response.statusCode < 300) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         _currentUser = null;
         return Success(null);
       }
