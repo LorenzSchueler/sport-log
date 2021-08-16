@@ -1,11 +1,11 @@
-use std::{env, fs, process::Command, time::Duration as StdDuration};
+use std::{env, fs, time::Duration as StdDuration};
 
 use chrono::{Duration, Local, Utc};
 use rand::Rng;
 use reqwest::{Client, StatusCode};
 use serde::Deserialize;
 use thirtyfour::prelude::*;
-use tokio::time;
+use tokio::{process::Command, time};
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{

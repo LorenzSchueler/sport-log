@@ -10,8 +10,7 @@ use rocket::{
     serde::json::{self, Json},
     Data, Request,
 };
-#[cfg(feature = "full")]
-use serde::Deserialize;
+use serde::{de, Deserialize, Deserializer, Serializer};
 
 mod account;
 mod action;
@@ -49,7 +48,6 @@ pub use diary_wod::*;
 pub use metcon::*;
 pub use movement::*;
 pub use platform::*;
-use serde::{de, Deserializer, Serializer};
 pub use sharing::*;
 pub use strength::*;
 pub use user::*;

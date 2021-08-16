@@ -3,10 +3,11 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, GetBySync,
-    GetByUser, GetByUserSync, ToI64, ToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb,
+    CheckUserId, Create, CreateMultiple, FromSql, GetAll, GetById, GetByIds, GetBySync, GetByUser,
+    GetByUserSync, ToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb,
     VerifyForUserWithoutDb, VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked, VerifyUnchecked,
 };
+use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{from_str, to_str, UserId};
 #[cfg(feature = "full")]
@@ -15,15 +16,13 @@ use crate::{
     User,
 };
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
     derive(
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI64,
-        ToI64,
         ToSql,
         FromSql,
         VerifyIdForAdmin,
@@ -63,19 +62,10 @@ pub struct Platform {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Hash,
-        FromSqlRow,
-        AsExpression,
-        FromI64,
-        ToI64,
-        ToSql,
-        FromSql,
-        VerifyIdForUser
-    )
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUser)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct PlatformCredentialId(pub i64);
