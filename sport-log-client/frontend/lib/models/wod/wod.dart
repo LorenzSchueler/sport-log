@@ -20,7 +20,7 @@ class Wod extends Insertable<Wod> implements UpdateValidatable {
 
   @IdConverter() Int64 id;
   @IdConverter() Int64 userId;
-  DateTime date;
+  @DateConverter() DateTime date;
   String? description;
   bool deleted;
 

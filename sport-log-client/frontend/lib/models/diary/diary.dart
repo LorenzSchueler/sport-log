@@ -21,7 +21,7 @@ class Diary extends Insertable<Diary> implements UpdateValidatable {
 
   @IdConverter() Int64 id;
   @IdConverter() Int64 userId;
-  DateTime date;
+  @DateConverter() DateTime date;
   double? bodyweight;
   String? comments;
   bool deleted;

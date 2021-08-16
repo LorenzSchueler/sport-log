@@ -40,9 +40,28 @@ void testUser(Api api) {
 }
 
 void testAction(Api api) async {
-  api.setCurrentUser(sampleUser);
   test('get action providers', () async {
-    expect((await api.getActionProviders()), isA<Success>());
+    api.setCurrentUser(sampleUser);
+    expect(await api.getActionProviders(), isA<Success>());
+  });
+}
+
+void testDiary(Api api) async {
+  final diary = Diary(
+      id: randomId(),
+      userId: sampleUser.id,
+      date: DateTime.now(),
+      bodyweight: null,
+      comments: "hallo",
+      deleted: false,
+  );
+  test('test diary', () async {
+    print(diary.toJson());
+    api.setCurrentUser(sampleUser);
+    expect(await api.createDiary(diary), isA<Success>());
+    expect(await api.getDiaries(), isA<Success>());
+    expect(await api.updateDiary(diary..date = DateTime.now()), isA<Success>());
+    expect(await api.updateDiary(diary..deleted = true), isA<Success>());
   });
 }
 
@@ -52,4 +71,5 @@ void main() async {
 
   testUser(api);
   testAction(api);
+  testDiary(api);
 }

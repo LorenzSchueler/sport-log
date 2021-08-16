@@ -69,10 +69,11 @@ extension Helpers on Api {
       );
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final json = jsonDecode(response.body);
-        if (!json is List<T>) {
+        if (json is! List) {
+          _logError(response.body);
           return Failure(ApiError.badJson);
         } else {
-          final List<T> result = (json as List).map((j) =>
+          final List<T> result = json.map((j) =>
               fromJson(j as Map<String, dynamic>)
           ).toList();
           return Success(result);
