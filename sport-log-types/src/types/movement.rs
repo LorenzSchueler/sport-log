@@ -12,8 +12,8 @@ use sport_log_types_derive::{
 };
 
 use crate::{
-    from_str, to_str, CheckUserId, UnverifiedIds, UserId, VerifyIdsForUserOrAP,
-    VerifyMultipleForUserOrAPWithDb,
+    from_str, from_str_optional, to_str, to_str_optional, CheckUserId, UnverifiedIds, UserId,
+    VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithDb,
 };
 #[cfg(feature = "full")]
 use crate::{
@@ -122,6 +122,8 @@ pub struct Movement {
     #[serde(deserialize_with = "from_str")]
     pub id: MovementId,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[serde(serialize_with = "to_str_optional")]
+    #[serde(deserialize_with = "from_str_optional")]
     pub user_id: Option<UserId>,
     pub name: String,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]

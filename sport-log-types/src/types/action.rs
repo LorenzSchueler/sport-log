@@ -63,6 +63,8 @@ pub struct ActionProvider {
     pub id: ActionProviderId,
     pub name: String,
     pub password: String,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub platform_id: PlatformId,
     pub description: Option<String>,
     #[serde(skip)]
@@ -115,6 +117,8 @@ pub struct Action {
     #[serde(deserialize_with = "from_str")]
     pub id: ActionId,
     pub name: String,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub action_provider_id: ActionProviderId,
     pub description: Option<String>,
     pub create_before: i32,
@@ -196,7 +200,11 @@ pub struct ActionRule {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: ActionRuleId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub action_id: ActionId,
     pub weekday: Weekday,
     pub time: DateTime<Utc>,
@@ -255,7 +263,11 @@ pub struct ActionEvent {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: ActionEventId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub action_id: ActionId,
     pub datetime: DateTime<Utc>,
     pub enabled: bool,
@@ -268,8 +280,14 @@ pub struct ActionEvent {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(Queryable))]
 pub struct CreatableActionRule {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub action_rule_id: ActionRuleId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub action_id: ActionId,
     pub weekday: Weekday,
     pub time: DateTime<Utc>,
@@ -279,9 +297,13 @@ pub struct CreatableActionRule {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(Queryable))]
 pub struct ExecutableActionEvent {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub action_event_id: ActionEventId,
     pub action_name: String,
     pub datetime: DateTime<Utc>,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
     pub username: String,
     pub password: String,
@@ -290,6 +312,8 @@ pub struct ExecutableActionEvent {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(feature = "full", derive(Queryable))]
 pub struct DeletableActionEvent {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub action_event_id: ActionEventId,
     pub datetime: DateTime<Utc>,
     pub delete_after: i32,

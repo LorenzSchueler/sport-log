@@ -14,7 +14,10 @@ use sport_log_types_derive::{
     VerifyIdForUserOrAP,
 };
 
-use crate::{from_str, to_str, Movement, MovementId, MovementUnit, UserId};
+use crate::{
+    from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, MovementUnit,
+    UserId,
+};
 #[cfg(feature = "full")]
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
@@ -105,6 +108,8 @@ pub struct Metcon {
     #[serde(deserialize_with = "from_str")]
     pub id: MetconId,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[serde(serialize_with = "to_str_optional")]
+    #[serde(deserialize_with = "from_str_optional")]
     pub user_id: Option<UserId>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub name: Option<String>,
@@ -257,7 +262,11 @@ pub struct MetconMovement {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: MetconMovementId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub metcon_id: MetconId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub movement_id: MovementId,
     pub movement_number: i32,
     pub count: i32,
@@ -367,7 +376,11 @@ pub struct MetconSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: MetconSessionId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub metcon_id: MetconId,
     pub datetime: DateTime<Utc>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]

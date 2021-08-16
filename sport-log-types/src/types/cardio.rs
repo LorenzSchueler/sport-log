@@ -21,7 +21,7 @@ use sport_log_types_derive::{
     VerifyIdForUserOrAP,
 };
 
-use crate::{from_str, to_str, Movement, MovementId, UserId};
+use crate::{from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{cardio_session, route},
@@ -130,6 +130,8 @@ pub struct Route {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: RouteId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
     pub name: String,
     pub distance: i32,
@@ -190,7 +192,11 @@ pub struct CardioSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: CardioSessionId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub movement_id: MovementId,
     pub cardio_type: CardioType,
     pub datetime: DateTime<Utc>,
@@ -215,6 +221,8 @@ pub struct CardioSession {
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub heart_rate: Option<Vec<f32>>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[serde(serialize_with = "to_str_optional")]
+    #[serde(deserialize_with = "from_str_optional")]
     pub route_id: Option<RouteId>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,

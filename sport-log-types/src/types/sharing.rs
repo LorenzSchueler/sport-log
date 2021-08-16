@@ -88,7 +88,11 @@ pub struct GroupUser {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: GroupUserId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub group_id: GroupId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -127,7 +131,11 @@ pub struct SharedMetconSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: GroupUserId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub group_id: GroupId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub metcon_session_id: MetconSessionId,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -166,7 +174,11 @@ pub struct SharedStrengthSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: GroupUserId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub group_id: GroupId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub strength_session_id: StrengthSessionId,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -205,7 +217,11 @@ pub struct SharedCardioSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: GroupUserId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub group_id: GroupId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub cardio_session_id: CardioSessionId,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -244,7 +260,11 @@ pub struct SharedDiary {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: GroupUserId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub group_id: GroupId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub diary_id: DiaryId,
     #[serde(skip)]
     #[serde(default = "Utc::now")]

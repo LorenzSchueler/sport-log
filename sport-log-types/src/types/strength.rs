@@ -61,8 +61,12 @@ pub struct StrengthSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: StrengthSessionId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
     pub datetime: DateTime<Utc>,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub movement_id: MovementId,
     pub movement_unit: MovementUnit,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
@@ -114,6 +118,8 @@ pub struct StrengthSet {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: StrengthSetId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
     pub strength_session_id: StrengthSessionId,
     pub set_number: i32,
     pub count: i32,
