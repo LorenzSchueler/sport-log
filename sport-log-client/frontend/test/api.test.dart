@@ -1,7 +1,11 @@
 
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
+import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:faker/faker.dart';
@@ -53,9 +57,13 @@ void main() async {
 
   testUser(api);
 
-  assert((await api.getUser('user1', 'user1-passwd')).isSuccess);
-
-  testAction(api);
-
-  assert((await api.deleteUser()).isSuccess);
+  // final result = await api.getUser('user2', 'user2-passwd');
+  // if (result.isFailure) {
+  //   stderr.writeln(result.failure);
+  // }
+  // assert(result.isSuccess);
+  //
+  // // testAction(api);
+  //
+  // assert((await api.deleteUser()).isSuccess);
 }
