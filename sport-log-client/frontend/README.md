@@ -23,6 +23,7 @@
 * [ ] verify interfaces on types
 * [ ] deleted field not required
 * [ ] fetch full account data on login
+* [ ] page showing recent activity
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)

@@ -16,10 +16,20 @@ abstract class BackendRoutes {
   static const strengthSession = _version + '/strength_session';
   static const platform = _version + '/platform';
   static const platformCredential = _version + '/platform_credential';
+  static const actionProvider = _version + '/action_provider';
+  static const action = _version + '/action';
+  static const actionRule = _version + '/action_rule';
+  static const actionEvent = _version + '/action_event';
 
   static String metconMovementByMetcon(Int64 id) =>
       _version + '/metcon_movement/metcon/${id.toString()}';
 
   static String strengthSetsByStrengthSession(Int64 id) =>
       _version + '/strength_set/strength_session/${id.toString()}';
+
+  static String actionRuleByActionProvider(Int64 id) =>
+      _version + '/action_rule/action_provider/${id.toString()}';
+
+  static String actionEventByActionProvider(Int64 id) =>
+      _version + '/action_event/action_provider/${id.toString()}';
 }
