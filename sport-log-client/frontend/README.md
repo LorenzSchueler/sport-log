@@ -12,19 +12,14 @@
 * [ ] keep fabs from covering/blocking content
 * [ ] refresh on pull down
 * [ ] remove naive time
-* [ ] user instead of credentials for api
 * [ ] runtime id state accessible for whole app
-* [ ] how to handle changed database on app update?
 * [ ] use hive instead of shared preferences
 * [ ] handle time zone in all time fields
 * [ ] add to string methods for debugging
 * [ ] length restrictions for string inputs
 * [ ] restrict int numbers coming from user input
-* [ ] verify interfaces on types
-* [ ] deleted field not required
 * [ ] fetch full account data on login
 * [ ] page showing recent activity
-* [ ] delete database on logout/user deletion
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)
@@ -36,10 +31,9 @@
 * [ ] show description and category in list
 
 ### Database
-* [ ] add all (unique) constraints like in server
-* [ ] set last modified on update/delete
-* [ ] add references to foreign keys
 * [ ] shouldn't be possible to delete e. g. movement when it is referenced by other resource
+* [ ] check unique constraints
+* [ ] delete database on logout/user deletion
 
 # Sync
 * new flag, wenn vom server zurück auf false; nur in DB
