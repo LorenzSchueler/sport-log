@@ -3,7 +3,7 @@ import 'package:sport_log/models/cardio/cardio_session.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/helpers/update_validatable.dart';
 
-class CardioSessionDescription implements UpdateValidatable {
+class CardioSessionDescription implements Validatable {
   CardioSessionDescription({
     required this.cardioSession,
     required this.route,
@@ -13,9 +13,9 @@ class CardioSessionDescription implements UpdateValidatable {
   Route? route;
 
   @override
-  bool validateOnUpdate() {
-    return cardioSession.validateOnUpdate()
-        && (route == null || route!.validateOnUpdate())
+  bool isValid() {
+    return cardioSession.isValid()
+        && (route == null || route!.isValid())
         && (route == null || cardioSession.routeId != null)
         && (route == null || cardioSession.routeId! == route!.id);
   }

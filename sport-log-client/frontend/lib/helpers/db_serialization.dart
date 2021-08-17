@@ -3,33 +3,28 @@
 import 'dart:typed_data';
 
 import 'package:fixnum/fixnum.dart';
-import 'package:moor/moor.dart';
 import 'package:sport_log/models/cardio/all.dart';
 
-class DbIdConverter extends TypeConverter<Int64, int> {
+class DbIdConverter {
   const DbIdConverter() : super();
 
-  @override
   Int64? mapToDart(int? fromDb) {
     return fromDb == null ? null : Int64(fromDb);
   }
 
-  @override
   int? mapToSql(Int64? value) {
     return value?.toInt();
   }
 }
 
-class DbDoubleListConverter extends TypeConverter<List<double>, Uint8List> {
+class DbDoubleListConverter {
   const DbDoubleListConverter() : super();
 
-  @override
   List<double>? mapToDart(Uint8List? fromDb) {
     assert(fromDb == null || fromDb.length % 8 == 0);
     return fromDb?.buffer.asFloat64List().toList();
   }
 
-  @override
   Uint8List? mapToSql(List<double>? value) {
     return value == null
         ? null
@@ -37,10 +32,9 @@ class DbDoubleListConverter extends TypeConverter<List<double>, Uint8List> {
   }
 }
 
-class DbPositionListConverter extends TypeConverter<List<Position>, Uint8List> {
+class DbPositionListConverter {
   const DbPositionListConverter() : super();
 
-  @override
   List<Position>? mapToDart(Uint8List? fromDb) {
     if (fromDb == null) {
       return null;
@@ -54,7 +48,6 @@ class DbPositionListConverter extends TypeConverter<List<Position>, Uint8List> {
     return positions;
   }
 
-  @override
   Uint8List? mapToSql(List<Position>? value) {
     if (value == null) {
       return null;

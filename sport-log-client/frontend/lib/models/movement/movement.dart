@@ -1,10 +1,8 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:moor/moor.dart';
-import 'package:sport_log/database/database.dart';
+import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/json_serialization.dart';
-import 'package:sport_log/helpers/update_validatable.dart';
 
 part 'movement.g.dart';
 
@@ -56,7 +54,7 @@ extension MovementUniToDisplayName on MovementUnit {
 }
 
 @JsonSerializable()
-class Movement extends Insertable<Movement> implements UpdateValidatable {
+class Movement implements DbObject {
   Movement({
     required this.id,
     required this.userId,
@@ -66,30 +64,20 @@ class Movement extends Insertable<Movement> implements UpdateValidatable {
     required this.deleted,
   });
 
+  @override
   @IdConverter() Int64 id;
   @OptionalIdConverter() Int64? userId;
   String name;
   String? description;
   MovementCategory category;
+  @override
   bool deleted;
 
   factory Movement.fromJson(Map<String, dynamic> json) => _$MovementFromJson(json);
   Map<String, dynamic> toJson() => _$MovementToJson(this);
 
   @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    return MovementsCompanion(
-      id: Value(id),
-      userId: Value(userId),
-      name: Value(name),
-      description: Value(description),
-      category: Value(category),
-      deleted: Value(deleted),
-    ).toColumns(false);
-  }
-
-  @override
-  bool validateOnUpdate() {
+  bool isValid() {
     return userId != null
         && name.isNotEmpty
         && deleted == false;

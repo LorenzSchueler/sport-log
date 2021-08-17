@@ -4,7 +4,7 @@ import 'package:sport_log/helpers/iterable_extension.dart';
 
 import 'all.dart';
 
-class MetconDescription implements UpdateValidatable {
+class MetconDescription implements Validatable {
   MetconDescription({
     required this.metcon,
     required this.moves,
@@ -14,11 +14,11 @@ class MetconDescription implements UpdateValidatable {
   List<MetconMovement> moves;
 
   @override
-  bool validateOnUpdate() {
-    return metcon.validateOnUpdate()
+  bool isValid() {
+    return metcon.isValid()
         && moves.isNotEmpty
         && moves.every((mm) => mm.metconId == metcon.id)
         && moves.everyIndexed((mm, index) => mm.movementNumber == index + 1)
-        && moves.every((mm) => mm.validateOnUpdate());
+        && moves.every((mm) => mm.isValid());
   }
 }

@@ -1,16 +1,14 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:moor/moor.dart';
-import 'package:sport_log/database/database.dart';
+import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/json_serialization.dart';
-import 'package:sport_log/helpers/update_validatable.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
 part 'metcon_movement.g.dart';
 
 @JsonSerializable()
-class MetconMovement extends Insertable<MetconMovement> implements UpdateValidatable {
+class MetconMovement implements DbObject {
   MetconMovement({
     required this.id,
     required this.metconId,
@@ -22,6 +20,7 @@ class MetconMovement extends Insertable<MetconMovement> implements UpdateValidat
     required this.deleted,
   });
 
+  @override
   @IdConverter() Int64 id;
   @IdConverter() Int64 metconId;
   @IdConverter() Int64 movementId;
@@ -29,27 +28,14 @@ class MetconMovement extends Insertable<MetconMovement> implements UpdateValidat
   int count;
   MovementUnit unit;
   double? weight;
+  @override
   bool deleted;
 
   factory MetconMovement.fromJson(Map<String, dynamic> json) => _$MetconMovementFromJson(json);
   Map<String, dynamic> toJson() => _$MetconMovementToJson(this);
 
   @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    return MetconMovementsCompanion(
-      id: Value(id),
-      metconId: Value(metconId),
-      movementId: Value(movementId),
-      movementNumber: Value(movementNumber),
-      count: Value(count),
-      unit: Value(unit),
-      weight: Value(weight),
-      deleted: Value(deleted),
-    ).toColumns(false);
-  }
-
-  @override
-  bool validateOnUpdate() {
+  bool isValid() {
     return deleted != true
         && movementNumber > 0
         && count > 0

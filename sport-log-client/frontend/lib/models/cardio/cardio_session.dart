@@ -1,11 +1,9 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:moor/moor.dart';
-import 'package:sport_log/database/database.dart';
+import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/json_serialization.dart';
 import 'package:sport_log/models/cardio/position.dart';
-import 'package:sport_log/helpers/update_validatable.dart';
 
 part 'cardio_session.g.dart';
 
@@ -16,8 +14,7 @@ enum CardioType {
 }
 
 @JsonSerializable()
-class CardioSession extends Insertable<CardioSession>
-    implements UpdateValidatable {
+class CardioSession implements DbObject {
   CardioSession({
     required this.id,
     required this.userId,
@@ -39,6 +36,7 @@ class CardioSession extends Insertable<CardioSession>
     required this.deleted,
   });
 
+  @override
   @IdConverter() Int64 id;
   @IdConverter() Int64 userId;
   @IdConverter() Int64 movementId;
@@ -56,37 +54,14 @@ class CardioSession extends Insertable<CardioSession>
   List<double>? heartRate;
   @OptionalIdConverter() Int64? routeId;
   String? comments;
+  @override
   bool deleted;
 
   factory CardioSession.fromJson(Map<String, dynamic> json) => _$CardioSessionFromJson(json);
   Map<String, dynamic> toJson() => _$CardioSessionToJson(this);
 
   @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    return CardioSessionsCompanion(
-      id: Value(id),
-      userId: Value(userId),
-      movementId: Value(movementId),
-      cardioType: Value(cardioType),
-      datetime: Value(datetime),
-      distance: Value(distance),
-      ascent: Value(ascent),
-      descent: Value(descent),
-      time: Value(time),
-      calories: Value(calories),
-      track: Value(track),
-      avgCycles: Value(avgCycles),
-      cycles: Value(cycles),
-      avgHeartRate: Value(avgHeartRate),
-      heartRate: Value(heartRate),
-      routeId: Value(routeId),
-      comments: Value(comments),
-      deleted: Value(deleted),
-    ).toColumns(false);
-  }
-
-  @override
-  bool validateOnUpdate() {
+  bool isValid() {
     return !deleted
         && [ascent, descent]
           .every((val) => val == null || val >= 0)

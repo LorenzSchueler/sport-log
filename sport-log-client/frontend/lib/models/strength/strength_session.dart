@@ -1,17 +1,14 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:moor/moor.dart';
-import 'package:sport_log/database/database.dart';
+import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/json_serialization.dart';
 import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/helpers/update_validatable.dart';
 
 part 'strength_session.g.dart';
 
 @JsonSerializable()
-class StrengthSession extends Insertable<StrengthSession>
-    implements UpdateValidatable {
+class StrengthSession implements DbObject {
   StrengthSession({
     required this.id,
     required this.userId,
@@ -23,35 +20,26 @@ class StrengthSession extends Insertable<StrengthSession>
     required this.deleted,
   });
 
-  @IdConverter() Int64 id;
+  @override
+  @IdConverter()
+  Int64 id;
   @IdConverter() Int64 userId;
   @DateTimeConverter() DateTime datetime;
   @IdConverter() Int64 movementId;
   MovementUnit movementUnit;
   int? interval;
   String? comments;
+  @override
   bool deleted;
 
-  factory StrengthSession.fromJson(Map<String, dynamic> json) => _$StrengthSessionFromJson(json);
+  factory StrengthSession.fromJson(Map<String, dynamic> json) =>
+      _$StrengthSessionFromJson(json);
+
   Map<String, dynamic> toJson() => _$StrengthSessionToJson(this);
 
   @override
-  bool validateOnUpdate() {
+  bool isValid() {
     return !deleted
         && (interval == null || interval! > 0);
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    return StrengthSessionsCompanion(
-      id: Value(id),
-      userId: Value(userId),
-      datetime: Value(datetime),
-      movementId: Value(movementId),
-      movementUnit: Value(movementUnit),
-      interval: Value(interval),
-      comments: Value(comments),
-      deleted: Value(deleted),
-    ).toColumns(false);
   }
 }

@@ -1,14 +1,17 @@
 
 import 'dart:developer';
 
+import 'package:email_validator/email_validator.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/json_serialization.dart';
+import 'package:sport_log/helpers/update_validatable.dart';
 
 part 'user.g.dart';
 
 @JsonSerializable()
-class User {
+class User implements Validatable {
   User({
     required this.id,
     required this.username,
@@ -62,5 +65,12 @@ class User {
       }
     }
     return null;
+  }
+
+  @override
+  bool isValid() {
+    return username.isNotEmpty
+        && password.isNotEmpty
+        && EmailValidator.validate(email);
   }
 }

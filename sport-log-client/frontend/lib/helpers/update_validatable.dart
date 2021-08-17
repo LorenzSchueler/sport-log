@@ -1,4 +1,4 @@
 
-abstract class UpdateValidatable {
-  bool validateOnUpdate();
+abstract class Validatable {
+  bool isValid();
 }

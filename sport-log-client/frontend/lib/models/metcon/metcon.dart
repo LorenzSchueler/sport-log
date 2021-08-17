@@ -1,10 +1,8 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:moor/moor.dart';
-import 'package:sport_log/database/database.dart';
+import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/json_serialization.dart';
-import 'package:sport_log/helpers/update_validatable.dart';
 
 part 'metcon.g.dart';
 
@@ -28,7 +26,7 @@ extension ToDisplayName on MetconType {
 }
 
 @JsonSerializable()
-class Metcon extends Insertable<Metcon> implements UpdateValidatable {
+class Metcon implements DbObject {
   Metcon({
     required this.id,
     required this.userId,
@@ -40,6 +38,7 @@ class Metcon extends Insertable<Metcon> implements UpdateValidatable {
     required this.deleted,
   });
 
+  @override
   @IdConverter() Int64 id;
   @OptionalIdConverter() Int64? userId;
   String? name;
@@ -47,24 +46,11 @@ class Metcon extends Insertable<Metcon> implements UpdateValidatable {
   int? rounds;
   int? timecap;
   String? description;
+  @override
   bool deleted;
 
   factory Metcon.fromJson(Map<String, dynamic> json) => _$MetconFromJson(json);
   Map<String, dynamic> toJson() => _$MetconToJson(this);
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    return MetconsCompanion(
-      id: Value(id),
-      userId: Value(userId),
-      name: Value(name),
-      metconType: Value(metconType),
-      rounds: Value(rounds),
-      timecap: Value(timecap),
-      description: Value(description),
-      deleted: Value(deleted),
-    ).toColumns(false);
-  }
 
   bool validateMetconType() {
     switch (metconType) {
@@ -78,7 +64,7 @@ class Metcon extends Insertable<Metcon> implements UpdateValidatable {
   }
 
   @override
-  bool validateOnUpdate() {
+  bool isValid() {
     return userId != null
         && name != null
         && deleted != true

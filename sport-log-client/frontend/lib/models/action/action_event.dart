@@ -1,12 +1,13 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/json_serialization.dart';
 
 part 'action_event.g.dart';
 
 @JsonSerializable()
-class ActionEvent {
+class ActionEvent implements DbObject {
   ActionEvent({
     required this.id,
     required this.userId,
@@ -16,13 +17,20 @@ class ActionEvent {
     required this.deleted,
   });
 
+  @override
   @IdConverter() Int64 id;
   @IdConverter() Int64 userId;
   @IdConverter() Int64 actionId;
   @DateTimeConverter() DateTime datetime;
   bool enabled;
+  @override
   bool deleted;
 
   factory ActionEvent.fromJson(Map<String, dynamic> json) => _$ActionEventFromJson(json);
   Map<String, dynamic> toJson() => _$ActionEventToJson(this);
+
+  @override
+  bool isValid() {
+    return !deleted;
+  }
 }
