@@ -5,6 +5,7 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/database/metcon/metcon.dart';
 import 'package:sport_log/database/metcon/metcon_movement.dart';
 import 'package:sport_log/database/metcon/metcon_session.dart';
+import 'package:sport_log/database/movement/movement.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -38,11 +39,13 @@ class AppDatabase {
     );
   }
 
+  final movements = MovementTable();
   final metcons = MetconTable();
   final metconMovements = MetconMovementTable();
   final metconSessions = MetconSessionTable();
 
   List<Table> get allTables => [
+    movements,
     metcons,
     metconMovements,
     metconSessions,

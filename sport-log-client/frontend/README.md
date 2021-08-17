@@ -24,6 +24,7 @@
 * [ ] deleted field not required
 * [ ] fetch full account data on login
 * [ ] page showing recent activity
+* [ ] delete database on logout/user deletion
 
 ### New Metcon Screen
 * [ ] movement picker with possibility to create new movements (we'll need movement creation screen first)
