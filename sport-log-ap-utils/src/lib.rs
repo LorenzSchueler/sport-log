@@ -43,7 +43,7 @@ pub async fn setup(
             action_provider.platform_id = platform.id;
         }
         StatusCode::FORBIDDEN => {
-            println!("action provider self registration disabled");
+            println!("action provider self registration is disabled");
             return;
         }
         status => {
@@ -98,7 +98,7 @@ pub async fn setup(
         .unwrap()
         .status()
     {
-        StatusCode::OK => println!("action created.\nsetup successful"),
+        StatusCode::OK => println!("action created\nsetup successful"),
         StatusCode::CONFLICT => println!("action already exists\nsetup successful"),
         status => println!("an error occured (status {})", status),
     }

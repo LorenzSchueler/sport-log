@@ -1633,6 +1633,7 @@ name = "sport-log-action-provider-map-matching"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "geo-types",
  "gpx",
  "rand",
  "reqwest",

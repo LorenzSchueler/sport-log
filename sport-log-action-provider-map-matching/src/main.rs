@@ -1,19 +1,27 @@
-use std::{env, fs};
+use std::{
+    env,
+    fs::{self, File},
+    io::Cursor,
+};
 
-use chrono::{DateTime, Duration, NaiveDateTime, Utc};
+use chrono::{DateTime, Duration, Utc};
+use geo_types::Point;
+use gpx::{self, Gpx, GpxVersion, Track, TrackSegment, Waypoint};
 use rand::Rng;
 use reqwest::{Client, StatusCode};
 use serde::Deserialize;
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{
-    Action, ActionId, ActionProvider, ActionProviderId, CardioSession, CardioSessionId, CardioType,
-    Movement, Platform, PlatformId, Position, Route, RouteId,
+    Action, ActionId, ActionProvider, ActionProviderId, CardioSession, Platform, PlatformId,
+    Position, Route, RouteId,
 };
+use tokio::process::Command;
 
-const NAME: &str = "sportstracker-fetch";
-const DESCRIPTION: &str = "Sportstracker Fetch can fetch the latests workouts recorded with sportstracker and save them in your cardio sessions.";
-const PLATFORM_NAME: &str = "sportstracker";
+const NAME: &str = "map-matcher";
+const DESCRIPTION: &str =
+    "Map Matcher will try to match gpx tracks to the closest path that exists in OSM.";
+const PLATFORM_NAME: &str = "sport-log";
 
 #[derive(Deserialize)]
 struct Config {
@@ -25,15 +33,6 @@ impl Config {
     fn get() -> Self {
         toml::from_str(&fs::read_to_string("config.toml").unwrap()).unwrap()
     }
-}
-
-#[derive(Deserialize, Debug)]
-struct Workout {
-    description: Option<String>,
-    #[serde(rename(deserialize = "activityId"))]
-    activity_id: u32,
-    #[serde(rename(deserialize = "startTime"))]
-    start_time: u64,
 }
 
 #[tokio::main]
@@ -70,9 +69,9 @@ async fn setup() {
 
     let actions = vec![Action {
         id: ActionId(rng.gen()),
-        name: "fetch".to_owned(),
+        name: "match".to_owned(),
         action_provider_id: action_provider.id,
-        description: Some("Fetch and save new workouts.".to_owned()),
+        description: Some("Match a gpx track to as OSM path.".to_owned()),
         create_before: 168,
         delete_after: 0,
         last_change: Utc::now(),
@@ -93,10 +92,10 @@ async fn setup() {
 
 fn help() {
     println!(
-        "Sportstracker Action Provider\n\n\
+        "Map Matcher\n\n\
 
         USAGE:\n\
-        sport-log-action-provider-sportstracker [OPTIONS]\n\n\
+        sport-log-action-provider-map-matcher [OPTIONS]\n\n\
 
         OPTIONS:\n\
         -h, --help\tprint this help page\n\
@@ -125,16 +124,13 @@ async fn fetch() {
     .await;
     println!("executable action events: {}\n", exec_action_events.len());
 
-    let mut rng = rand::thread_rng();
-
     let mut delete_action_event_ids = vec![];
     for exec_action_event in exec_action_events {
         println!("{:#?}", exec_action_event);
 
         let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
 
-        // get cardio session
-        let cardio_session: CardioSession = client
+        let mut cardio_session: CardioSession = client
             .get(format!("{}/v1/cardio_session", config.base_url))
             .basic_auth(&username, Some(&config.password))
             .send()
@@ -144,16 +140,32 @@ async fn fetch() {
             .await
             .unwrap();
 
-        let route = match_to_map(&client, cardio_session).await;
+        let route = match_to_map(&cardio_session).await.unwrap();
 
-        // as route id to cardio session
+        cardio_session.route_id = Some(route.id);
 
-        // send route to server
+        match client
+            .post(format!("{}/v1/route", config.base_url))
+            .basic_auth(&username, Some(&config.password))
+            .json(&route)
+            .send()
+            .await
+            .unwrap()
+            .status()
+        {
+            status if status.is_success() => {
+                println!("route saved");
+            }
+            status => {
+                println!("error (status {:?})", status);
+                break;
+            }
+        }
 
         match client
             .post(format!("{}/v1/cardio_session", config.base_url))
             .basic_auth(&username, Some(&config.password))
-            .json(&route)
+            .json(&cardio_session)
             .send()
             .await
             .unwrap()
@@ -188,32 +200,76 @@ async fn fetch() {
     }
 }
 
-async fn match_to_map(client: &Client, cardio_session: CardioSession) -> Option<Route> {
-    let xml = to_xml(cardio_session);
+async fn match_to_map(cardio_session: &CardioSession) -> Result<Route, ()> {
+    let gpx = to_gpx(cardio_session)?;
+    gpx::write(&gpx, File::create("tracks/trackX.gpx").unwrap()).unwrap();
 
-    let args = [("profile", "foot"), ("type", "gpx")];
-    Some(
-        client
-            .post("localhost:8989/match")
-            .query(&args)
-            .body(xml)
-            .send()
-            .await
-            .ok()?
-            .json::<Route>()
-            .await
-            .ok()?,
-    )
+    let output = Command::new("java")
+        .args(&[
+            "-jar",
+            "matching-web/target/graphhopper-map-matching-web-3.0-SNAPSHOT.jar",
+            "match",
+            "--vehicle",
+            "foot",
+            "tracks/trackX.gpx",
+        ])
+        .output()
+        .await
+        .unwrap();
+
+    if output.status.code() != Some(0) || output.status.code() == None {
+        return Err(());
+    }
+
+    //let gpx = gpx::read(Cursor::new(output.stdout)).unwrap();
+    let gpx = gpx::read(File::open("tracks/trackX.gpx.res.gpx").unwrap()).unwrap();
+
+    Ok(to_route(gpx, cardio_session))
 }
 
-fn to_xml(cardio_session: CardioSession) -> String {
-    "".to_owned()
+fn to_gpx(cardio_session: &CardioSession) -> Result<Gpx, ()> {
+    if let Some(positions) = &cardio_session.track {
+        let mut track = Track::new();
+        let mut track_segment = TrackSegment::new();
+        let waypoints: Vec<_> = positions
+            .iter()
+            .map(|position| Waypoint::new(Point::new(position.longitude, position.latitude)))
+            .collect();
+        track_segment.points.extend(waypoints);
+        track.segments.push(track_segment);
+        let gpx = Gpx {
+            version: GpxVersion::Gpx10,
+            creator: None,
+            metadata: None,
+            waypoints: vec![],
+            tracks: vec![track],
+            routes: vec![],
+        };
+        Ok(gpx)
+    } else {
+        Err(())
+    }
 }
 
-fn to_route(xml: String, cardio_session: CardioSession) -> Route {
+fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
+    let track = &gpx.tracks[0];
+    let track_segment = &track.segments[0];
+    let points = &track_segment.points;
+    let positions = points
+        .into_iter()
+        .map(|point| {
+            let point = point.point();
+            Position {
+                longitude: point.lng(),
+                latitude: point.lat(),
+                elevation: 0., // TODO
+                distance: 0,   // TODO
+                time: 0,       // TODO
+            }
+        })
+        .collect();
+
     let mut rng = rand::thread_rng();
-    let track = vec![];
-
     Route {
         id: RouteId(rng.gen()),
         user_id: cardio_session.user_id,
@@ -221,7 +277,7 @@ fn to_route(xml: String, cardio_session: CardioSession) -> Route {
         distance: cardio_session.distance.unwrap(), // calc new
         ascent: cardio_session.ascent,              // calc new
         descent: cardio_session.descent,            // calc new
-        track: Some(track),
+        track: Some(positions),
         last_change: Utc::now(),
         deleted: false,
     }
