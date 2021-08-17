@@ -24,6 +24,8 @@ void debugMain() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   debugMain();
+  final database = AppDatabase.instance!;
+  await database.init();
   AuthenticationRepository? authRepo;
   authRepo = await AuthenticationRepository.getInstance();
   User? user = await authRepo.getUser();

@@ -1,6 +1,11 @@
 
+import 'dart:io';
+
 import 'package:sport_log/config.dart';
-import 'package:sport_log/database/metcon/metcon_table.dart';
+import 'package:sport_log/database/metcon/metcon.dart';
+import 'package:sport_log/database/metcon/metcon_movement.dart';
+import 'package:sport_log/database/metcon/metcon_session.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sqflite/sqflite.dart';
 
 class AppDatabase {
@@ -15,10 +20,31 @@ class AppDatabase {
   late Database _db;
 
   Future<void> init() async {
-    final _db = await openDatabase('database.sqlite');
-
-    metcons = MetconTable(_db);
+    const fileName = 'database.sqlite';
+    final File databaseFile = File(await getDatabasesPath() + '/' + fileName);
+    // TODO: remove this
+    if (await databaseFile.exists()) {
+      await databaseFile.delete();
+    }
+    _db = await openDatabase(
+      fileName,
+      version: 1,
+      onConfigure: (db) => db.execute("PRAGMA foreign_keys = ON;"),
+      onCreate: (db, version) {
+        for (final table in allTables) {
+          table.init(db);
+        }
+      }
+    );
   }
 
-  late MetconTable metcons;
+  final metcons = MetconTable();
+  final metconMovements = MetconMovementTable();
+  final metconSessions = MetconSessionTable();
+
+  List<Table> get allTables => [
+    metcons,
+    metconMovements,
+    metconSessions,
+  ];
 }

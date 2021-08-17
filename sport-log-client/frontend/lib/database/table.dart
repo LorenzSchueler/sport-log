@@ -7,13 +7,22 @@ import 'package:sqflite/sqflite.dart';
 import 'defs.dart';
 
 abstract class Table<T extends DbObject> {
-  String get createTable;
+  String get setupSql;
   String get tableName;
   DbSerializer<T> get serde;
 
-  late final Database _db;
+  late Database _db;
 
-  Table(Database database) : _db = database;
+  Future<void> init(Database db) async {
+    _db = db;
+    await _db.execute(setupSql);
+    await _db.execute('''
+create trigger ${tableName}_last_change after update on $tableName
+begin
+  update $tableName set last_change = datetime('now') where id = new.id;
+end;
+    ''');
+  }
 
   void _logError(Object error) {
     stderr.writeln(error);
