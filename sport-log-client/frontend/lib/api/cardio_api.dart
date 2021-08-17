@@ -18,6 +18,11 @@ extension CardioRoutes on Api {
         fromJson: (json) => Route.fromJson(json));
   }
 
+  ApiResult<Route> getRoute(Int64 id) async {
+    return _getSingle(BackendRoutes.route + '/$id',
+        fromJson: (json) => Route.fromJson(json));
+  }
+
   ApiResult<void> updateRoute(Route route) async {
     return _put(BackendRoutes.route, route);
   }
@@ -38,6 +43,11 @@ extension CardioRoutes on Api {
 
   ApiResult<List<CardioSession>> getCardioSessions() async {
     return _getMultiple(BackendRoutes.cardioSession,
+        fromJson: (json) => CardioSession.fromJson(json));
+  }
+
+  ApiResult<CardioSession> getCardioSession(Int64 id) async {
+    return _getSingle(BackendRoutes.cardioSession + '/$id',
         fromJson: (json) => CardioSession.fromJson(json));
   }
 

@@ -51,7 +51,7 @@ void testDiary(Api api) async {
     final diary = Diary(
       id: randomId(),
       userId: sampleUser.id,
-      date: DateTime.now(),
+      date: faker.date.dateTime(),
       bodyweight: null,
       comments: "hallo",
       deleted: false,
@@ -60,7 +60,13 @@ void testDiary(Api api) async {
     api.setCurrentUser(sampleUser);
     expect(await api.createDiary(diary), isA<Success>());
     expect(await api.getDiaries(), isA<Success>());
-    expect(await api.updateDiary(diary..date = DateTime.now()), isA<Success>());
+    diary.date = faker.date.dateTime();
+    print(diary.date);
+    expect(await api.updateDiary(diary..date = faker.date.dateTime()), isA<Success>());
+    final result = await api.getDiary(diary.id);
+    expect(result, isA<Success>());
+    print(result.success.date);
+    expect(result.success.date, diary.date);
     expect(await api.updateDiary(diary..deleted = true), isA<Success>());
   });
 }
@@ -86,6 +92,37 @@ void testStrengthSession(Api api) async {
   });
 }
 
+void testActionRule(Api api) async {
+  test('test action rule', () async {
+    final actionRule = ActionRule(
+        id: randomId(),
+        userId: sampleUser.id,
+        actionId: Int64(1),
+        weekday: Weekday.values[faker.randomGenerator.integer(7)],
+        time: DateTime(2021, 8, 17,
+          faker.randomGenerator.integer(24),
+          faker.randomGenerator.integer(60),
+          faker.randomGenerator.integer(60),
+        ),
+        enabled: true,
+        deleted: false,
+    );
+    api.setCurrentUser(sampleUser);
+    expect(await api.createActionRule(actionRule), isA<Success>());
+    expect(await api.getActionRules(), isA<Success>());
+    actionRule.time = DateTime(2021, 8, 17,
+      faker.randomGenerator.integer(24),
+      faker.randomGenerator.integer(60),
+      faker.randomGenerator.integer(60),
+    );
+    expect(await api.updateActionRule(actionRule), isA<Success>());
+    final result = await api.getActionRule(actionRule.id);
+    expect(result, isA<Success>());
+    expect(result.success.time, actionRule.time);
+    expect(await api.updateActionRule(actionRule..deleted=true), isA<Success>());
+  });
+}
+
 void main() async {
   final Api api = Api.instance;
   await api.init();
@@ -94,4 +131,5 @@ void main() async {
   testAction(api);
   testDiary(api);
   testStrengthSession(api);
+  testActionRule(api);
 }

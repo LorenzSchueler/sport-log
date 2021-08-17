@@ -101,11 +101,6 @@ extension Helpers on Api {
         headers: headers ?? _authorizedHeader,
       );
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        final dynamic result = jsonDecode(response.body);
-        if (result !is Map<String, dynamic>) {
-          _logError(response.body);
-          return Failure(ApiError.badJson);
-        }
         return Success(fromJson(
             jsonDecode(response.body) as Map<String, dynamic>));
       }

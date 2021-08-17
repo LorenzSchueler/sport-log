@@ -15,6 +15,11 @@ extension WodRoutes on Api {
         fromJson: (json) => Wod.fromJson(json));
   }
 
+  ApiResult<Wod> getWod(Int64 id) async {
+    return _getSingle(BackendRoutes.wod + '/$id',
+        fromJson: (json) => Wod.fromJson(json));
+  }
+
   ApiResult<void> updateWod(Wod wod) async {
     return _put(BackendRoutes.wod, wod);
   }

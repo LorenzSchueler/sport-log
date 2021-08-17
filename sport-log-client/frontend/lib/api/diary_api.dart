@@ -15,6 +15,11 @@ extension DiaryRoutes on Api {
         fromJson: (json) => Diary.fromJson(json));
   }
 
+  ApiResult<Diary> getDiary(Int64 id) async {
+    return _getSingle(BackendRoutes.diary + '/$id',
+        fromJson: (json) => Diary.fromJson(json));
+  }
+
   ApiResult<void> updateDiary(Diary diary) async {
     return _put(BackendRoutes.diary, diary);
   }

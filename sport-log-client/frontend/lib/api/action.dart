@@ -10,10 +10,20 @@ extension ActionRoutes on Api {
         fromJson: (json) => ActionProvider.fromJson(json));
   }
 
+  ApiResult<ActionProvider> getActionProvider(Int64 id) async {
+    return _getSingle(BackendRoutes.actionProvider + '/$id',
+        fromJson: (json) => ActionProvider.fromJson(json));
+  }
+
   // Actions
 
   ApiResult<List<Action>> getActions() async {
     return _getMultiple(BackendRoutes.action,
+        fromJson: (json) => Action.fromJson(json));
+  }
+
+  ApiResult<Action> getAction(Int64 id) async {
+    return _getSingle(BackendRoutes.action + '/$id',
         fromJson: (json) => Action.fromJson(json));
   }
 
@@ -29,6 +39,11 @@ extension ActionRoutes on Api {
 
   ApiResult<List<ActionRule>> getActionRules() async {
     return _getMultiple(BackendRoutes.actionRule,
+        fromJson: (json) => ActionRule.fromJson(json));
+  }
+
+  ApiResult<ActionRule> getActionRule(Int64 id) async {
+    return _getSingle(BackendRoutes.actionRule + '/$id',
         fromJson: (json) => ActionRule.fromJson(json));
   }
 
@@ -57,6 +72,11 @@ extension ActionRoutes on Api {
 
   ApiResult<List<ActionEvent>> getActionEvents() async {
     return _getMultiple(BackendRoutes.actionEvent,
+        fromJson: (json) => ActionEvent.fromJson(json));
+  }
+
+  ApiResult<ActionEvent> getActionEvent(Int64 id) async {
+    return _getSingle(BackendRoutes.actionEvent + '/$id',
         fromJson: (json) => ActionEvent.fromJson(json));
   }
 

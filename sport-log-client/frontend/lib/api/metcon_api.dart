@@ -19,6 +19,11 @@ extension MetconRoutes on Api {
       fromJson: (json) => MetconSession.fromJson(json));
   }
 
+  ApiResult<MetconSession> getMetconSession(Int64 id) async {
+    return _getSingle(BackendRoutes.metconSession + '/$id',
+      fromJson: (json) => MetconSession.fromJson(json));
+  }
+
   ApiResult<void> updateMetconSession(MetconSession ms) async {
     return _put(BackendRoutes.metconSession, ms);
   }
@@ -43,6 +48,11 @@ extension MetconRoutes on Api {
         fromJson: (json) => Metcon.fromJson(json));
   }
 
+  ApiResult<Metcon> getMetcon(Int64 id) async {
+    return _getSingle(BackendRoutes.metcon + '/$id',
+        fromJson: (json) => Metcon.fromJson(json));
+  }
+
   ApiResult<void> updateMetcon(Metcon metcon) async {
     return _put(BackendRoutes.metcon, metcon);
   }
@@ -63,6 +73,11 @@ extension MetconRoutes on Api {
 
   ApiResult<List<MetconMovement>> getMetconMovements() async {
     return _getMultiple(BackendRoutes.metconMovement,
+        fromJson: (json) => MetconMovement.fromJson(json));
+  }
+
+  ApiResult<MetconMovement> getMetconMovement(Int64 id) async {
+    return _getSingle(BackendRoutes.metconMovement + '/$id',
         fromJson: (json) => MetconMovement.fromJson(json));
   }
 

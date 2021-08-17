@@ -7,6 +7,11 @@ extension PlatformRoutes on Api {
         fromJson: (json) => Platform.fromJson(json));
   }
 
+  ApiResult<Platform> getPlatform(Int64 id) async {
+    return _getSingle(BackendRoutes.platform + '/$id',
+        fromJson: (json) => Platform.fromJson(json));
+  }
+
   ApiResult<void> createPlatformCredential(PlatformCredential pc) async {
     return _post(BackendRoutes.platformCredential, pc);
   }
@@ -18,6 +23,11 @@ extension PlatformRoutes on Api {
 
   ApiResult<List<PlatformCredential>> getPlatformCredentials() async {
     return _getMultiple(BackendRoutes.platformCredential,
+        fromJson: (json) => PlatformCredential.fromJson(json));
+  }
+
+  ApiResult<PlatformCredential> getPlatformCredential(Int64 id) async {
+    return _getSingle(BackendRoutes.platformCredential + '/$id',
         fromJson: (json) => PlatformCredential.fromJson(json));
   }
 

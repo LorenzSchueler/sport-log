@@ -12,7 +12,7 @@ ActionRule _$ActionRuleFromJson(Map<String, dynamic> json) {
     userId: const IdConverter().fromJson(json['user_id'] as String),
     actionId: const IdConverter().fromJson(json['action_id'] as String),
     weekday: _$enumDecode(_$WeekdayEnumMap, json['weekday']),
-    time: const NaiveTimeSerde().fromJson(json['time'] as String),
+    time: const DateTimeConverter().fromJson(json['time'] as String),
     enabled: json['enabled'] as bool,
     deleted: json['deleted'] as bool,
   );
@@ -24,7 +24,7 @@ Map<String, dynamic> _$ActionRuleToJson(ActionRule instance) =>
       'user_id': const IdConverter().toJson(instance.userId),
       'action_id': const IdConverter().toJson(instance.actionId),
       'weekday': _$WeekdayEnumMap[instance.weekday],
-      'time': const NaiveTimeSerde().toJson(instance.time),
+      'time': const DateTimeConverter().toJson(instance.time),
       'enabled': instance.enabled,
       'deleted': instance.deleted,
     };

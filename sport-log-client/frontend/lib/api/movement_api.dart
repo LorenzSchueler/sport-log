@@ -16,6 +16,11 @@ extension MovementRoutes on Api {
         fromJson: (json) => Movement.fromJson(json));
   }
 
+  ApiResult<Movement> getMovement(Int64 id) async {
+    return _getSingle(BackendRoutes.movement + '/$id',
+        fromJson: (json) => Movement.fromJson(json));
+  }
+
   ApiResult<void> updateMovement(Movement movement) async {
     return _put(BackendRoutes.movement, movement);
   }

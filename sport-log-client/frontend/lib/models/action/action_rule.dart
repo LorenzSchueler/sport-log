@@ -25,7 +25,7 @@ class ActionRule implements DbObject {
   @IdConverter() Int64 userId;
   @IdConverter() Int64 actionId;
   Weekday weekday;
-  @NaiveTimeSerde() NaiveTime time;
+  @DateTimeConverter() DateTime time;
   bool enabled;
   @override
   bool deleted;
@@ -47,7 +47,7 @@ class DbActionRuleSerializer implements DbSerializer<ActionRule> {
       userId: Int64(r[Keys.userId]! as int),
       actionId: Int64(r[Keys.actionId]! as int),
       weekday: Weekday.values[r[Keys.weekday]! as int],
-      time: const NaiveTimeSerde().fromJson(r[Keys.time]! as String),
+      time: DateTime.parse(r[Keys.time]! as String),
       enabled: r[Keys.enabled]! as int == 1,
       deleted: r[Keys.deleted]! as int == 1,
     );
@@ -60,7 +60,7 @@ class DbActionRuleSerializer implements DbSerializer<ActionRule> {
       Keys.userId: o.userId.toInt(),
       Keys.actionId: o.actionId.toInt(),
       Keys.weekday: Weekday.values.indexOf(o.weekday),
-      Keys.time: const NaiveTimeSerde().toJson(o.time),
+      Keys.time: o.time.toString(),
       Keys.enabled: o.enabled ? 1 : 0,
       Keys.deleted: o.deleted ? 1 : 0,
     };
