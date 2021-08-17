@@ -7,7 +7,7 @@ members = [
     "sport-log-api-tester",
     "sport-log-password-hasher",
     "sport-log-ap-utils",
-    "sport-log-action-provider-map-matching",
+    "sport-log-action-provider-map-matcher",
     "sport-log-action-provider-sportstracker",
     "sport-log-action-provider-wodify-login",
     "sport-log-action-provider-wodify-wod",
