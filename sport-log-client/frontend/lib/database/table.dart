@@ -95,19 +95,25 @@ end;
     });
   }
 
-  DbResult<void> unsafeCreateSingle(T object) async {
+  DbResult<void> unsafeCreateSingle(T object, bool isNew) async {
     assert(object.isValid());
     return _voidRequest((db) async {
-      await _db.insert(tableName, serde.toDbRecord(object));
+      await _db.insert(tableName, {
+        ...serde.toDbRecord(object),
+        Keys.isNew: isNew ? 1 : 0,
+      });
     });
   }
 
-  DbResult<void> unsafeCreateMultiple(List<T> objects) async {
+  DbResult<void> unsafeCreateMultiple(List<T> objects, bool isNew) async {
     return _voidRequest((db) async {
       final batch = _db.batch();
       for (final object in objects) {
         assert(object.isValid());
-        batch.insert(tableName, serde.toDbRecord(object));
+        batch.insert(tableName, {
+          ...serde.toDbRecord(object),
+          Keys.isNew: isNew ? 1 : 0,
+        });
       }
       await batch.commit(noResult: true, continueOnError: true);
     });
