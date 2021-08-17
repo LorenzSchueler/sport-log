@@ -119,7 +119,7 @@ async fn fetch() {
         NAME,
         &config.password,
         Duration::hours(0),
-        Duration::hours(1) + Duration::minutes(1),
+        Duration::hours(1),
     )
     .await;
     println!("executable action events: {}\n", exec_action_events.len());
@@ -130,7 +130,7 @@ async fn fetch() {
 
         let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
 
-        let mut cardio_session: CardioSession = client
+        let mut cardio_sessions: Vec<CardioSession> = client
             .get(format!("{}/v1/cardio_session", config.base_url))
             .basic_auth(&username, Some(&config.password))
             .send()
@@ -140,50 +140,47 @@ async fn fetch() {
             .await
             .unwrap();
 
-        let route = match_to_map(&cardio_session).await.unwrap();
+        println!("cardio sessions:\t{}", cardio_sessions.len());
 
-        cardio_session.route_id = Some(route.id);
+        for cardio_session in &mut cardio_sessions[1..2] {
+            let route = match_to_map(cardio_session).await.unwrap();
 
-        match client
-            .post(format!("{}/v1/route", config.base_url))
-            .basic_auth(&username, Some(&config.password))
-            .json(&route)
-            .send()
-            .await
-            .unwrap()
-            .status()
-        {
-            status if status.is_success() => {
-                println!("route saved");
-            }
-            status => {
-                println!("error (status {:?})", status);
-                break;
-            }
-        }
+            cardio_session.route_id = Some(route.id);
 
-        match client
-            .post(format!("{}/v1/cardio_session", config.base_url))
-            .basic_auth(&username, Some(&config.password))
-            .json(&cardio_session)
-            .send()
-            .await
-            .unwrap()
-            .status()
-        {
-            status if status.is_success() => {
-                println!("cardio session saved");
+            match client
+                .post(format!("{}/v1/route", config.base_url))
+                .basic_auth(&username, Some(&config.password))
+                .json(&route)
+                .send()
+                .await
+                .unwrap()
+                .status()
+            {
+                status if status.is_success() => {
+                    println!("route saved");
+                }
+                status => {
+                    println!("error (status {:?})", status);
+                    break;
+                }
             }
-            StatusCode::CONFLICT => {
-                println!(
-                    "everything up to date for user {}",
-                    exec_action_event.user_id.0
-                );
-                break;
-            }
-            status => {
-                println!("error (status {:?})", status);
-                break;
+
+            match client
+                .put(format!("{}/v1/cardio_session", config.base_url))
+                .basic_auth(&username, Some(&config.password))
+                .json(cardio_session)
+                .send()
+                .await
+                .unwrap()
+                .status()
+            {
+                status if status.is_success() => {
+                    println!("cardio session saved");
+                }
+                status => {
+                    println!("error (status {:?})", status);
+                    break;
+                }
             }
         }
         delete_action_event_ids.push(exec_action_event.action_event_id);
@@ -211,13 +208,15 @@ async fn match_to_map(cardio_session: &CardioSession) -> Result<Route, ()> {
             "match",
             "--vehicle",
             "foot",
-            "tracks/trackX.gpx",
+            "../tracks/trackX.gpx",
         ])
+        .current_dir("map-matching")
         .output()
         .await
         .unwrap();
 
-    if output.status.code() != Some(0) || output.status.code() == None {
+    println!("{:?}", output);
+    if !output.status.success() {
         return Err(());
     }
 
