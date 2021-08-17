@@ -34,3 +34,32 @@ class Action implements DbObject {
     return name.isNotEmpty && !deleted;
   }
 }
+
+class DbActionSerializer implements DbSerializer<Action> {
+
+  @override
+  Action fromDbRecord(DbRecord r) {
+    return Action(
+      id: Int64(r[Keys.id]! as int),
+      name: r[Keys.name]! as String,
+      actionProviderId: Int64(r[Keys.actionProviderId]! as int),
+      description: r[Keys.description] as String?,
+      createBefore: r[Keys.createBefore]! as int,
+      deleteAfter: r[Keys.deleteAfter]! as int,
+      deleted: r[Keys.deleted]! as int == 1,
+    );
+  }
+
+  @override
+  DbRecord toDbRecord(Action o) {
+    return {
+      Keys.id: o.id.toInt(),
+      Keys.name: o.name,
+      Keys.actionProviderId: o.actionProviderId,
+      Keys.description: o.description,
+      Keys.createBefore: o.createBefore,
+      Keys.deleteAfter: o.deleteAfter,
+      Keys.deleted: o.deleted ? 1 : 0,
+    };
+  }
+}

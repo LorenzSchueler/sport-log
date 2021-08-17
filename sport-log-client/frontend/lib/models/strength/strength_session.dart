@@ -43,3 +43,33 @@ class StrengthSession implements DbObject {
         && (interval == null || interval! > 0);
   }
 }
+
+class DbStrengthSessionSerializer implements DbSerializer<StrengthSession> {
+  @override
+  StrengthSession fromDbRecord(DbRecord r) {
+    return StrengthSession(
+      id: Int64(r[Keys.id]! as int),
+      userId: Int64(r[Keys.userId]! as int),
+      datetime: DateTime.parse(r[Keys.datetime]! as String),
+      movementId: Int64(r[Keys.movementId]! as int),
+      movementUnit: MovementUnit.values[r[Keys.movementUnit]! as int],
+      interval: r[Keys.interval] as int?,
+      comments: r[Keys.comments] as String?,
+      deleted: r[Keys.deleted]! as int == 1,
+    );
+  }
+
+  @override
+  DbRecord toDbRecord(StrengthSession o) {
+    return {
+      Keys.id: o.id.toInt(),
+      Keys.userId: o.userId.toInt(),
+      Keys.datetime: o.datetime.toString(),
+      Keys.movementId: o.movementId.toInt(),
+      Keys.movementUnit: MovementUnit.values.indexOf(o.movementUnit),
+      Keys.interval: o.interval,
+      Keys.comments: o.comments,
+      Keys.deleted: o.deleted ? 1 : 0,
+    };
+  }
+}

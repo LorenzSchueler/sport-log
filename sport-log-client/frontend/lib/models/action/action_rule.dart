@@ -38,3 +38,31 @@ class ActionRule implements DbObject {
     return !deleted;
   }
 }
+
+class DbActionRuleSerializer implements DbSerializer<ActionRule> {
+  @override
+  ActionRule fromDbRecord(DbRecord r) {
+    return ActionRule(
+      id: Int64(r[Keys.id]! as int),
+      userId: Int64(r[Keys.userId]! as int),
+      actionId: Int64(r[Keys.actionId]! as int),
+      weekday: Weekday.values[r[Keys.weekday]! as int],
+      time: const NaiveTimeSerde().fromJson(r[Keys.time]! as String),
+      enabled: r[Keys.enabled]! as int == 1,
+      deleted: r[Keys.deleted]! as int == 1,
+    );
+  }
+
+  @override
+  DbRecord toDbRecord(ActionRule o) {
+    return {
+      Keys.id: o.id.toInt(),
+      Keys.userId: o.userId.toInt(),
+      Keys.actionId: o.actionId.toInt(),
+      Keys.weekday: Weekday.values.indexOf(o.weekday),
+      Keys.time: const NaiveTimeSerde().toJson(o.time),
+      Keys.enabled: o.enabled ? 1 : 0,
+      Keys.deleted: o.deleted ? 1 : 0,
+    };
+  }
+}

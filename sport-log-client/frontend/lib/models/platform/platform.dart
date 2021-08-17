@@ -28,3 +28,23 @@ class Platform implements DbObject {
     return name.isNotEmpty && !deleted;
   }
 }
+
+class DbPlatformSerializer implements DbSerializer<Platform> {
+  @override
+  Platform fromDbRecord(DbRecord r) {
+    return Platform(
+      id: Int64(r[Keys.id]! as int),
+      name: r[Keys.name]! as String,
+      deleted: r[Keys.deleted]! as int == 1
+    );
+  }
+
+  @override
+  DbRecord toDbRecord(Platform o) {
+    return {
+      Keys.id: o.id.toInt(),
+      Keys.name: o.name,
+      Keys.deleted: o.deleted ? 1 : 0,
+    };
+  }
+}

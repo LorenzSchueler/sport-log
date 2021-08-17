@@ -73,3 +73,33 @@ class Metcon implements DbObject {
         && validateMetconType();
   }
 }
+
+class DbMetconSerializer implements DbSerializer<Metcon> {
+  @override
+  Metcon fromDbRecord(DbRecord r) {
+    return Metcon(
+      id: Int64(r[Keys.id]! as int),
+      userId: r[Keys.userId] == null ? null : Int64(r[Keys.userId]! as int),
+      name: r[Keys.name] as String?,
+      metconType: MetconType.values[r[Keys.metconType]! as int],
+      rounds: r[Keys.rounds] as int?,
+      timecap: r[Keys.timecap] as int?,
+      description: r[Keys.description] as String?,
+      deleted: r[Keys.deleted]! as int == 1,
+    );
+  }
+
+  @override
+  DbRecord toDbRecord(Metcon o) {
+    return {
+      Keys.id: o.id.toInt(),
+      Keys.userId: o.userId?.toInt(),
+      Keys.name: o.name,
+      Keys.metconType: MetconType.values.indexOf(o.metconType),
+      Keys.rounds: o.rounds,
+      Keys.timecap: o.timecap,
+      Keys.description: o.description,
+      Keys.deleted: o.deleted ? 1 : 0,
+    };
+  }
+}

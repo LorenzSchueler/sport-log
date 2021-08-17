@@ -34,3 +34,29 @@ class ActionEvent implements DbObject {
     return !deleted;
   }
 }
+
+class DbActionEventSerializer implements DbSerializer<ActionEvent> {
+  @override
+  ActionEvent fromDbRecord(DbRecord r) {
+    return ActionEvent(
+      id: Int64(r[Keys.id]! as int),
+      userId: Int64(r[Keys.userId]! as int),
+      actionId: Int64(r[Keys.actionId]! as int),
+      datetime: DateTime.parse(r[Keys.datetime]! as String),
+      enabled: r[Keys.enabled]! as int == 1,
+      deleted: r[Keys.deleted]! as int == 1,
+    );
+  }
+
+  @override
+  DbRecord toDbRecord(ActionEvent o) {
+    return {
+      Keys.id: o.id.toInt(),
+      Keys.userId: o.userId.toInt(),
+      Keys.actionId: o.actionId.toInt(),
+      Keys.datetime: o.datetime.toString(),
+      Keys.enabled: o.enabled ? 1 : 0,
+      Keys.deleted: o.deleted ? 1 : 0,
+    };
+  }
+}

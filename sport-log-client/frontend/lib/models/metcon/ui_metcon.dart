@@ -78,7 +78,7 @@ class UiMetconMovement {
         metconId = mm.metconId,
         movementId = mm.movementId,
         count = mm.count,
-        unit = mm.unit,
+        unit = mm.movementUnit,
         weight = mm.weight,
         deleted = mm.deleted;
 
@@ -90,7 +90,7 @@ class UiMetconMovement {
       movementId: movementId,
       movementNumber: movementNumber,
       count: count,
-      unit: unit,
+      movementUnit: unit,
       weight: weight,
       deleted: deleted,
     );

@@ -40,3 +40,29 @@ class StrengthSet implements DbObject {
         && (weight == null || weight! > 0);
   }
 }
+
+class DbStrengthSetSerializer implements DbSerializer<StrengthSet> {
+  @override
+  StrengthSet fromDbRecord(DbRecord r) {
+    return StrengthSet(
+      id: Int64(r[Keys.id]! as int),
+      strengthSessionId: Int64(r[Keys.strengthSessionId]! as int),
+      setNumber: r[Keys.setNumber]! as int,
+      count: r[Keys.count]! as int,
+      weight: r[Keys.weight] as double?,
+      deleted: r[Keys.deleted]! as int == 1,
+    );
+  }
+
+  @override
+  DbRecord toDbRecord(StrengthSet o) {
+    return {
+      Keys.id: o.id.toInt(),
+      Keys.strengthSessionId: o.strengthSessionId.toInt(),
+      Keys.setNumber: o.setNumber,
+      Keys.count: o.count,
+      Keys.weight: o.weight,
+      Keys.deleted: o.deleted ? 1 : 0,
+    };
+  }
+}

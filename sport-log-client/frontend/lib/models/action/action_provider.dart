@@ -34,3 +34,29 @@ class ActionProvider implements DbObject {
     return name.isNotEmpty && password.isNotEmpty && !deleted;
   }
 }
+
+class DbActionProviderSerializer implements DbSerializer<ActionProvider> {
+  @override
+  ActionProvider fromDbRecord(DbRecord r) {
+    return ActionProvider(
+      id: Int64(r[Keys.id]! as int),
+      name: r[Keys.name]! as String,
+      password: r[Keys.password]! as String,
+      platformId: Int64(r[Keys.platformId]! as int),
+      description: r[Keys.description] as String?,
+      deleted: r[Keys.deleted]! as int == 1,
+    );
+  }
+
+  @override
+  DbRecord toDbRecord(ActionProvider o) {
+    return {
+      Keys.id: o.id.toInt(),
+      Keys.name: o.name,
+      Keys.password: o.password,
+      Keys.platformId: o.platformId.toInt(),
+      Keys.description: o.description,
+      Keys.deleted: o.deleted ? 1 : 0,
+    };
+  }
+}

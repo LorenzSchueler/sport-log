@@ -35,3 +35,29 @@ class Diary implements DbObject {
         && !deleted;
   }
 }
+
+class DbDiarySerializer implements DbSerializer<Diary> {
+  @override
+  Diary fromDbRecord(DbRecord r) {
+    return Diary(
+      id: Int64(r[Keys.id]! as int),
+      userId: Int64(r[Keys.userId]! as int),
+      date: const DateConverter().fromJson(r[Keys.date]! as String),
+      bodyweight: r[Keys.bodyweight] as double?,
+      comments: r[Keys.comments] as String?,
+      deleted: r[Keys.deleted]! as int == 1,
+    );
+  }
+
+  @override
+  DbRecord toDbRecord(Diary o) {
+    return {
+      Keys.id: o.id.toInt(),
+      Keys.userId: o.userId.toInt(),
+      Keys.date: const DateConverter().toJson(o.date),
+      Keys.bodyweight: o.bodyweight,
+      Keys.comments: o.comments,
+      Keys.deleted: o.deleted ? 1 : 0,
+    };
+  }
+}

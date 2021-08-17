@@ -32,3 +32,27 @@ class Wod implements DbObject {
     return !deleted;
   }
 }
+
+class DbWodSerializer implements DbSerializer<Wod> {
+  @override
+  Wod fromDbRecord(DbRecord r) {
+    return Wod(
+      id: Int64(r[Keys.id]! as int),
+      userId: Int64(r[Keys.userId]! as int),
+      date: DateTime.parse(r[Keys.date]! as String),
+      description: r[Keys.description] as String?,
+      deleted: r[Keys.deleted]! as int == 1,
+    );
+  }
+
+  @override
+  DbRecord toDbRecord(Wod o) {
+    return {
+      Keys.id: o.id.toInt(),
+      Keys.userId: o.userId.toInt(),
+      Keys.date: o.date.toString(),
+      Keys.description: o.description,
+      Keys.deleted: o.deleted ? 1 : 0,
+    };
+  }
+}

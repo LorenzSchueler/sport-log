@@ -83,3 +83,29 @@ class Movement implements DbObject {
         && deleted == false;
   }
 }
+
+class DbMovementSerializer implements DbSerializer<Movement> {
+  @override
+  Movement fromDbRecord(DbRecord r) {
+    return Movement(
+      id: Int64(r[Keys.id]! as int),
+      userId: r[Keys.userId] == null ? null : Int64(r[Keys.userId]! as int),
+      name: r[Keys.name]! as String,
+      description: r[Keys.description] as String?,
+      category: MovementCategory.values[r[Keys.category]! as int],
+      deleted: r[Keys.deleted]! as int == 1,
+    );
+  }
+
+  @override
+  DbRecord toDbRecord(Movement o) {
+    return {
+      Keys.id: o.id.toInt(),
+      Keys.userId: o.userId?.toInt(),
+      Keys.name: o.name,
+      Keys.description: o.description,
+      Keys.category: MovementCategory.values.indexOf(o.category),
+      Keys.deleted: o.deleted ? 1 : 0,
+    };
+  }
+}

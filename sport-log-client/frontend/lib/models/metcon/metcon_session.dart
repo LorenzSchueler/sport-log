@@ -45,3 +45,37 @@ class MetconSession implements DbObject {
         && (reps == null || reps! > 0);
   }
 }
+
+class DbMetconSessionSerializer implements DbSerializer<MetconSession> {
+  @override
+  MetconSession fromDbRecord(DbRecord r) {
+    return MetconSession(
+      id: Int64(r[Keys.id]! as int),
+      userId: Int64(r[Keys.userId]! as int),
+      metconId: Int64(r[Keys.metconId]! as int),
+      datetime: DateTime.parse(r[Keys.datetime]! as String),
+      time: r[Keys.time] as int?,
+      rounds: r[Keys.rounds] as int?,
+      reps: r[Keys.reps] as int?,
+      rx: r[Keys.rx]! as int == 1,
+      comments: r[Keys.comments] as String?,
+      deleted: r[Keys.deleted]! as int == 1,
+    );
+  }
+
+  @override
+  DbRecord toDbRecord(MetconSession o) {
+    return {
+      Keys.id: o.id.toInt(),
+      Keys.userId: o.userId.toInt(),
+      Keys.metconId: o.metconId.toInt(),
+      Keys.datetime: o.datetime.toString(),
+      Keys.time: o.time,
+      Keys.rounds: o.rounds,
+      Keys.reps: o.reps,
+      Keys.rx: o.rx ? 1 : 0,
+      Keys.comments: o.comments,
+      Keys.deleted: o.deleted ? 1 : 0,
+    };
+  }
+}
