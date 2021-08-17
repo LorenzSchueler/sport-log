@@ -15,6 +15,7 @@ create table strength_session (
     comments text,
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
+    is_new integer not null check (is_new in (0, 1)),
     unique (user_id, datetime, movement_id, deleted)
 );
   ''';
@@ -32,6 +33,7 @@ create table strength_set (
     weight real check (weight > 0),
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
+    is_new integer not null check (is_new in (0, 1)),
     unique (strength_session_id, set_number, deleted)
 );
   ''';

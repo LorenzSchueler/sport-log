@@ -45,7 +45,7 @@ end;
     });
   }
 
-  DbResult<void> _deleteSingle(T object) {
+  DbResult<void> unsafeDeleteSingle(T object) {
     assert(object.deleted == false);
     return _voidRequest((db) async {
       await _db.update(
@@ -57,7 +57,7 @@ end;
     });
   }
 
-  DbResult<void> _deleteMultiple(List<T> objects) {
+  DbResult<void> unsafeDeleteMultiple(List<T> objects) {
     assert(objects.every((element) => element.deleted == false));
     return _voidRequest((db) async {
       await _db.update(
@@ -69,7 +69,8 @@ end;
     });
   }
 
-  DbResult<void> _updateSingle(T object) async {
+  DbResult<void> unsafeUpdateSingle(T object) async {
+    assert(object.isValid());
     return _voidRequest((db) async {
       await _db.update(
         tableName, serde.toDbRecord(object),
@@ -79,10 +80,11 @@ end;
     });
   }
 
-  DbResult<void> _updateMultiple(List<T> objects) async {
+  DbResult<void> unsafeUpdateMultiple(List<T> objects) async {
     return _voidRequest((db) async {
       final batch = db.batch();
       for (final object in objects) {
+        assert(object.isValid());
         batch.update(
           tableName, serde.toDbRecord(object),
           where: "deleted = 0 AND id = ?",
@@ -93,16 +95,18 @@ end;
     });
   }
 
-  DbResult<void> _createSingle(T object) async {
+  DbResult<void> unsafeCreateSingle(T object) async {
+    assert(object.isValid());
     return _voidRequest((db) async {
       await _db.insert(tableName, serde.toDbRecord(object));
     });
   }
 
-  DbResult<void> _createMultiple(List<T> objects) async {
+  DbResult<void> unsafeCreateMultiple(List<T> objects) async {
     return _voidRequest((db) async {
       final batch = _db.batch();
       for (final object in objects) {
+        assert(object.isValid());
         batch.insert(tableName, serde.toDbRecord(object));
       }
       await batch.commit(noResult: true, continueOnError: true);

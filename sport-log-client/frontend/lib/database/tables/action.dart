@@ -14,6 +14,7 @@ create table action (
     delete_after integer not null check (delete_after >= 0), --hours
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
+    is_new integer not null check (is_new in (0, 1)),
     unique (action_provider_id, name, deleted)
 );
   ''';
@@ -31,6 +32,7 @@ create table action_event (
     enabled integer not null check(enabled in (0, 1)),
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
+    is_new integer not null check (is_new in (0, 1)),
     unique (user_id, action_id, datetime, deleted)
 );
   ''';
@@ -49,6 +51,7 @@ create table action_rule (
     enabled integer not null check(enabled in (0, 1)),
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
+    is_new integer not null check (is_new in (0, 1)),
     unique (user_id, action_id, weekday, time, deleted)
 );
   ''';
@@ -60,12 +63,13 @@ class ActionProviderTable extends Table<ActionProvider> {
   @override String get setupSql => '''
 create table action_provider (
     id integer primary key,
-    name text not null check(length(name) >= 2),
-    password text not null check(length(password) <= 96),
+    name text not null check(length(name) between 2 and 80),
+    password text not null check(length(password) between 1 and 96),
     platform_id integer not null references platform(id) on delete cascade,
     description text,
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
+    is_new integer not null check (is_new in (0, 1)),
     unique (name, deleted)
 );
   ''';

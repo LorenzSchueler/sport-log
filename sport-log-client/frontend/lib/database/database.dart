@@ -28,9 +28,9 @@ class AppDatabase {
       fileName,
       version: 1,
       onConfigure: (db) => db.execute("PRAGMA foreign_keys = ON;"),
-      onCreate: (db, version) {
+      onCreate: (db, version) async {
         for (final table in allTables) {
-          table.init(db);
+          await table.init(db);
         }
       }
     );

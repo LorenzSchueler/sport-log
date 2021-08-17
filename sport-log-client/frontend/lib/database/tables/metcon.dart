@@ -14,6 +14,7 @@ create table metcon (
     description text,
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
+    is_new integer not null check (is_new in (0, 1)),
     unique (user_id, name, deleted)
 );
   ''';
@@ -34,6 +35,7 @@ create table metcon_movement (
     weight real check (weight > 0),
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
+    is_new integer not null check (is_new in (0, 1)),
     unique (metcon_id, movement_number, deleted)
 );
   ''';
@@ -56,6 +58,7 @@ create table metcon_session (
     comments text,
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
+    is_new integer not null check (is_new in (0, 1)),
     unique (user_id, metcon_id, datetime, deleted)
 );
   ''';

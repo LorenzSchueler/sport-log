@@ -10,6 +10,7 @@ create table platform (
     name text not null check (length(name) between 3 and 80),
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
+    is_new integer not null check (is_new in (0, 1)),
     unique (name, deleted)
 );
   ''';
@@ -27,6 +28,7 @@ create table platform_credential (
     password text null check (length(password) between 1 and 80),
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
+    is_new integer not null check (is_new in (0, 1)),
     unique (user_id, platform_id, deleted)
 );
   ''';
