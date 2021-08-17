@@ -36,7 +36,10 @@ impl<T> IntoJson<T> for QueryResult<T> {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct NaiveTimeWrapper(NaiveTime);
+
+#[derive(Debug, Clone)]
 pub struct DateTimeWrapper(DateTime<Utc>);
 
 impl<'v> FromParam<'v> for NaiveTimeWrapper {

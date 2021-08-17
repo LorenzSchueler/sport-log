@@ -29,6 +29,7 @@ fn parse_username_password(request: &'_ Request<'_>) -> Option<(String, String)>
 /// [Admin] can also use endpoints with an [AuthUser] as request guard.
 ///
 /// In order to do so, the username has to be set to `admin$id$<user_id>` and the password is the password of the [Admin] as configured in [Config](crate::Config).
+#[derive(Debug, Clone)]
 pub struct AuthUser(UserId);
 
 impl Deref for AuthUser {
@@ -85,6 +86,7 @@ impl<'r> FromRequest<'r> for AuthUser {
 /// [Admin] can also use endpoints with an [AuthUserOrAP] as request guard.
 ///
 /// In order to do so, the username has to be set to `admin$id$<user_id>` and the password is the password of the [Admin] as configured in [Config](crate::Config).
+#[derive(Debug, Clone)]
 pub struct AuthUserOrAP(UserId);
 
 impl Deref for AuthUserOrAP {
@@ -137,6 +139,7 @@ impl<'r> FromRequest<'r> for AuthUserOrAP {
 /// [Admin] can also use endpoints with an [AuthAP] as request guard.
 ///
 /// In order to do so, the username has to be set to `admin$id$<action_provider_id>` and the password is the password of the [Admin] as configured in [Config](crate::Config).
+#[derive(Debug, Clone)]
 pub struct AuthAP(ActionProviderId);
 
 impl Deref for AuthAP {
