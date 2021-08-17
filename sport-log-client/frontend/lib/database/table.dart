@@ -3,8 +3,9 @@ import 'dart:io';
 
 import 'package:result_type/result_type.dart';
 import 'package:sqflite/sqflite.dart';
-
 import 'defs.dart';
+
+export 'defs.dart';
 
 abstract class Table<T extends DbObject> {
   String get setupSql;

@@ -2,10 +2,7 @@
 import 'dart:io';
 
 import 'package:sport_log/config.dart';
-import 'package:sport_log/database/metcon/metcon.dart';
-import 'package:sport_log/database/metcon/metcon_movement.dart';
-import 'package:sport_log/database/metcon/metcon_session.dart';
-import 'package:sport_log/database/movement/movement.dart';
+import 'tables/all.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -43,11 +40,36 @@ class AppDatabase {
   final metcons = MetconTable();
   final metconMovements = MetconMovementTable();
   final metconSessions = MetconSessionTable();
+  final routes = RouteTable();
+  final cardioSessions = CardioSessionTable();
+  final strengthSets = StrengthSetTable();
+  final strengthSessions = StrengthSessionTable();
+  final platforms = PlatformTable();
+  final platformCredentials = PlatformCredentialTable();
+  final actionProviders = ActionProviderTable();
+  final actions = ActionTable();
+  final actionRules = ActionRuleTable();
+  final actionEvents = ActionEventTable();
+  final diaries = DiaryTable();
+  final wods = WodTable();
+
 
   List<Table> get allTables => [
     movements,
     metcons,
     metconMovements,
     metconSessions,
+    routes,
+    cardioSessions,
+    strengthSets,
+    strengthSessions,
+    platforms,
+    platformCredentials,
+    actionProviders,
+    actions,
+    actionRules,
+    actionEvents,
+    diaries,
+    wods,
   ];
 }
