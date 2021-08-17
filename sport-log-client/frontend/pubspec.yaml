@@ -44,13 +44,9 @@ dependencies:
   implicitly_animated_reorderable_list: ^0.4.0
   json_serializable: any
   fixnum: ^1.0.0
-  moor: ^4.4.1
-  sqlite3_flutter_libs: ^0.5.0
-  path_provider: ^2.0.2
-  path: ^1.8.0
-  moor_db_viewer: ^4.3.0
   result_type: ^0.1.0
-  intl: ^0.17.0
+  intl: ^0.17.0  # used for date formatting
+  sqflite: ^2.0.0+3
 
 dev_dependencies:
   flutter_test:

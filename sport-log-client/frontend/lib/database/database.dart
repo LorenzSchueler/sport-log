@@ -1,72 +1,24 @@
 
-import 'dart:developer';
-import 'dart:io';
-
-import 'package:moor/ffi.dart';
-import 'package:moor/moor.dart';
-import 'package:fixnum/fixnum.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sport_log/config.dart';
-import 'package:sport_log/helpers/db_serialization.dart';
-import 'all_subfolders.dart';
-import 'package:sport_log/models/all.dart';
+import 'package:sport_log/database/metcon/metcon_table.dart';
+import 'package:sqflite/sqflite.dart';
 
-part 'database.g.dart';
+class AppDatabase {
 
-enum DbException {
-  doesNotExist,
-  validationFailed,
-  hasDependency,
-}
+  static final AppDatabase? _instance = Config.isAndroid || Config.isIOS
+      ? AppDatabase._() : null;
 
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(join(dbFolder.path, Config.databaseName));
-    if (file.existsSync()) {
-      log("Deleting existing database...", name: "db");
-      file.deleteSync();
-    }
-    return VmDatabase(file);
-  });
-}
+  static AppDatabase? get instance => _instance;
 
-@UseMoor(
-  tables: [
-    Metcons,
-    MetconMovements,
-    MetconSessions,
-    Movements,
-    StrengthSessions,
-    StrengthSets,
-    CardioSessions,
-    Routes,
-    Wods,
-    Diaries,
-  ],
-  daos: [
-    MetconsDao,
-    MovementsDao,
-    StrengthDao,
-    CardioDao,
-    WodDao,
-    DiaryDao,
-  ],
-)
-class Database extends _$Database {
+  AppDatabase._();
 
-  static Database? instance = Config.isWeb ? null : Database._();
+  late Database _db;
 
-  Database._() : super(_openConnection());
+  Future<void> init() async {
+    final _db = await openDatabase('database.sqlite');
 
-  @override
-  int get schemaVersion => 1;
+    metcons = MetconTable(_db);
+  }
 
-  @override
-  MigrationStrategy get migration => MigrationStrategy(
-    beforeOpen: (details) async {
-      await customStatement('PRAGMA foreign_keys = ON;');
-    },
-  );
+  late MetconTable metcons;
 }

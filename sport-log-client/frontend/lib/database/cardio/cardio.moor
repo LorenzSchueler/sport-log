@@ -1,5 +1,0 @@
-
-import 'cardio_tables.dart';
-
-_cardioSessionWithRouteExists: SELECT 1 FROM cardio_sessions
-    WHERE deleted == FALSE AND route_id == :id;

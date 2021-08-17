@@ -1,6 +1,0 @@
-
-import 'movement_table.dart';
-
-_movementExists:
-SELECT 1 FROM movements
-    WHERE id == :id AND deleted == false;
