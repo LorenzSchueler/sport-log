@@ -1,6 +1,7 @@
 
 import 'dart:io';
 
+import 'package:fixnum/fixnum.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sqflite/sqflite.dart';
 import 'defs.dart';
@@ -12,12 +13,12 @@ abstract class Table<T extends DbObject> {
   String get tableName;
   DbSerializer<T> get serde;
 
-  late Database _db;
+  late Database database;
 
   Future<void> init(Database db) async {
-    _db = db;
-    await _db.execute(setupSql);
-    await _db.execute('''
+    database = db;
+    await database.execute(setupSql);
+    await database.execute('''
 create trigger ${tableName}_last_change after update on $tableName
 begin
   update $tableName set last_change = datetime('now') where id = new.id;
@@ -25,54 +26,52 @@ end;
     ''');
   }
 
-  void _logError(Object error) {
+  void logError(Object error) {
     stderr.writeln(error);
   }
 
-  DbResult<R> _request<R>(DbResult<R> Function(Database db) req) async {
+  DbResult<R> request<R>(DbResult<R> Function(Database db) req) async {
     try {
-      return await req(_db);
+      return await req(database);
     } catch (e) {
-      _logError(e);
+      logError(e);
       return Failure(DbError.unknown);
     }
   }
 
-  DbResult<void> _voidRequest(Future<void> Function(Database db) req) async {
-    return _request((db) async {
+  DbResult<void> voidRequest(Future<void> Function(Database db) req) async {
+    return request((db) async {
       await req(db);
       return Success(null);
     });
   }
 
-  DbResult<void> unsafeDeleteSingle(T object) {
-    assert(object.deleted == false);
-    return _voidRequest((db) async {
-      await _db.update(
+  DbResult<void> unsafeDeleteSingle(Int64 id) {
+    return voidRequest((db) async {
+      await database.update(
           tableName,
           {"deleted": 1},
           where: "deleted = 0 AND id = ?",
-          whereArgs: [object.id.toInt()]
+          whereArgs: [id.toInt()]
       );
     });
   }
 
-  DbResult<void> unsafeDeleteMultiple(List<T> objects) {
-    assert(objects.every((element) => element.deleted == false));
-    return _voidRequest((db) async {
-      await _db.update(
+  DbResult<void> unsafeDeleteMultiple(List<Int64> ids) {
+    return voidRequest((db) async {
+      await database.update(
         tableName,
         {"deleted": 1},
         where: "deleted = 0 AND id = ?",
-        whereArgs: objects.map((e) => e.id.toInt()).toList(),
+        whereArgs: ids.map((id) => id.toInt()).toList(),
       );
     });
   }
 
   DbResult<void> unsafeUpdateSingle(T object) async {
     assert(object.isValid());
-    return _voidRequest((db) async {
-      await _db.update(
+    return voidRequest((db) async {
+      await database.update(
         tableName, serde.toDbRecord(object),
         where: "deleted = 0 AND id = ?",
         whereArgs: [object.id.toInt()],
@@ -81,7 +80,7 @@ end;
   }
 
   DbResult<void> unsafeUpdateMultiple(List<T> objects) async {
-    return _voidRequest((db) async {
+    return voidRequest((db) async {
       final batch = db.batch();
       for (final object in objects) {
         assert(object.isValid());
@@ -97,8 +96,8 @@ end;
 
   DbResult<void> unsafeCreateSingle(T object, bool isNew) async {
     assert(object.isValid());
-    return _voidRequest((db) async {
-      await _db.insert(tableName, {
+    return voidRequest((db) async {
+      await database.insert(tableName, {
         ...serde.toDbRecord(object),
         Keys.isNew: isNew ? 1 : 0,
       });
@@ -106,8 +105,8 @@ end;
   }
 
   DbResult<void> unsafeCreateMultiple(List<T> objects, bool isNew) async {
-    return _voidRequest((db) async {
-      final batch = _db.batch();
+    return voidRequest((db) async {
+      final batch = database.batch();
       for (final object in objects) {
         assert(object.isValid());
         batch.insert(tableName, {
@@ -123,7 +122,7 @@ end;
     bool onlyIsNew = false,
     bool includeDeleted = false,
   }) async {
-    return _request((db) async {
+    return request((db) async {
       final filter = onlyIsNew
           ? (includeDeleted ? "is_new = 1" : "is_new = 1 and deleted = 0")
           : (includeDeleted ? null : "deleted = 0");
@@ -133,7 +132,7 @@ end;
   }
 
   DbResult<void> setAllIsNewFalse() async {
-    return _voidRequest((db) async {
+    return voidRequest((db) async {
       await db.update(tableName, {"is_new": 0}, where: "is_new = 1");
     });
   }

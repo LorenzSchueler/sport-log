@@ -1,4 +1,6 @@
 
+import 'package:fixnum/fixnum.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/models/metcon/all.dart';
 
@@ -20,6 +22,27 @@ create table metcon (
   ''';
   @override DbSerializer<Metcon> get serde => DbMetconSerializer();
   @override String get tableName => 'metcon';
+
+  final metconMovements = AppDatabase.instance!.metconMovements;
+
+  DbResult<void> deleteWithMetconMovements(Int64 id) async {
+    return voidRequest((db) async {
+      await db.transaction((txn) async {
+        txn.update(
+          metconMovements.tableName,
+          {Keys.deleted: 1},
+          where: '${Keys.metconId} = ?',
+          whereArgs: [id.toInt()]
+        );
+        txn.update(
+          tableName,
+          {Keys.deleted: 1},
+          where: '${Keys.id} = ?',
+          whereArgs: [id.toInt()]
+        );
+      });
+    });
+  }
 }
 
 class MetconMovementTable extends Table<MetconMovement> {
