@@ -8,9 +8,7 @@ use thirtyfour::prelude::*;
 use tokio::{process::Command, time};
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
-use sport_log_types::{
-    Action, ActionId, ActionProvider, ActionProviderId, Platform, PlatformId, Wod, WodId,
-};
+use sport_log_types::{Wod, WodId};
 
 const NAME: &str = "wodify-wod";
 const DESCRIPTION: &str =
@@ -42,68 +40,28 @@ async fn main() {
 async fn setup() {
     let config = Config::get();
 
-    let mut rng = rand::thread_rng();
-
-    let platform = Platform {
-        id: PlatformId(rng.gen()),
-        name: PLATFORM_NAME.to_owned(),
-        last_change: Utc::now(),
-        deleted: false,
-    };
-
-    let action_provider = ActionProvider {
-        id: ActionProviderId(rng.gen()),
-        name: NAME.to_owned(),
-        password: config.password.clone(),
-        platform_id: platform.id,
-        description: Some(DESCRIPTION.to_owned()),
-        last_change: Utc::now(),
-        deleted: false,
-    };
-
-    let actions = vec![
-        Action {
-            id: ActionId(rng.gen()),
-            name: "CrossFit".to_owned(),
-            action_provider_id: action_provider.id,
-            description: Some("Fetch and save the CrossFit wod for the current day.".to_owned()),
-            create_before: 168,
-            delete_after: 0,
-            last_change: Utc::now(),
-            deleted: false,
-        },
-        Action {
-            id: ActionId(rng.gen()),
-            name: "Weightlifting".to_owned(),
-            action_provider_id: action_provider.id,
-            description: Some(
-                "Fetch and save the Weightlifting wod for the current day.".to_owned(),
-            ),
-            create_before: 168,
-            delete_after: 0,
-            last_change: Utc::now(),
-            deleted: false,
-        },
-        Action {
-            id: ActionId(rng.gen()),
-            name: "Open Fridge".to_owned(),
-            action_provider_id: action_provider.id,
-            description: Some("Fetch and save the Open Fridge wod for the current day.".to_owned()),
-            create_before: 168,
-            delete_after: 0,
-            last_change: Utc::now(),
-            deleted: false,
-        },
-    ];
-
     setup_db(
         &config.base_url,
         NAME,
         &config.password,
+        DESCRIPTION,
         PLATFORM_NAME,
-        platform,
-        action_provider,
-        actions,
+        &[
+            (
+                "CrossFit",
+                "Fetch and save the CrossFit wod for the current day.",
+            ),
+            (
+                "Weightlifting",
+                "Fetch and save the Weightlifting wod for the current day.",
+            ),
+            (
+                "Open Fridge",
+                "Fetch and save the Open Fridge wod for the current day.",
+            ),
+        ],
+        168,
+        0,
     )
     .await;
 }

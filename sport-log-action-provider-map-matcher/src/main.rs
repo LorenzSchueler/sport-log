@@ -12,15 +12,12 @@ use reqwest::{Client, StatusCode};
 use serde::Deserialize;
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
-use sport_log_types::{
-    Action, ActionId, ActionProvider, ActionProviderId, CardioSession, Platform, PlatformId,
-    Position, Route, RouteId,
-};
+use sport_log_types::{CardioSession, Position, Route, RouteId};
 use tokio::process::Command;
 
 const NAME: &str = "map-matcher";
 const DESCRIPTION: &str =
-    "Map Matcher will try to match gpx tracks to the closest path that exists in OSM.";
+    "Map Matcher will try to match GPX tracks to the closest path that exists in OSM.";
 const PLATFORM_NAME: &str = "sport-log";
 
 #[derive(Deserialize)]
@@ -38,7 +35,7 @@ impl Config {
 #[tokio::main]
 async fn main() {
     match &env::args().collect::<Vec<_>>()[1..] {
-        [] => fetch().await,
+        [] => map_match().await,
         [option] if option == "--setup" => setup().await,
         [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
         _ => wrong_use(),
@@ -48,44 +45,15 @@ async fn main() {
 async fn setup() {
     let config = Config::get();
 
-    let mut rng = rand::thread_rng();
-
-    let platform = Platform {
-        id: PlatformId(rng.gen()),
-        name: PLATFORM_NAME.to_owned(),
-        last_change: Utc::now(),
-        deleted: false,
-    };
-
-    let action_provider = ActionProvider {
-        id: ActionProviderId(rng.gen()),
-        name: NAME.to_owned(),
-        password: config.password.clone(),
-        platform_id: platform.id,
-        description: Some(DESCRIPTION.to_owned()),
-        last_change: Utc::now(),
-        deleted: false,
-    };
-
-    let actions = vec![Action {
-        id: ActionId(rng.gen()),
-        name: "match".to_owned(),
-        action_provider_id: action_provider.id,
-        description: Some("Match a gpx track to as OSM path.".to_owned()),
-        create_before: 168,
-        delete_after: 0,
-        last_change: Utc::now(),
-        deleted: false,
-    }];
-
     setup_db(
         &config.base_url,
         NAME,
         &config.password,
+        DESCRIPTION,
         PLATFORM_NAME,
-        platform,
-        action_provider,
-        actions,
+        &[("match", "Match a gpx track to as OSM path.")],
+        168,
+        0,
     )
     .await;
 }
@@ -107,8 +75,7 @@ fn wrong_use() {
     println!("no such options");
 }
 
-// TODO handle connection errors and ignore everything else errors
-async fn fetch() {
+async fn map_match() {
     let config = Config::get();
 
     let client = Client::new();
@@ -215,8 +182,8 @@ async fn match_to_map(cardio_session: &CardioSession) -> Result<Route, ()> {
         .await
         .unwrap();
 
-    println!("{:?}", output);
     if !output.status.success() {
+        println!("{:?}", output);
         return Err(());
     }
 
