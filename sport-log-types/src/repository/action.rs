@@ -222,6 +222,7 @@ impl GetAll for CreatableActionRule {
         action_rule::table
             .inner_join(action::table)
             .filter(action_rule::columns::enabled.eq(true))
+            .filter(action_rule::columns::deleted.eq(false))
             .select((
                 action_rule::columns::id,
                 action_rule::columns::user_id,
@@ -248,6 +249,7 @@ impl ExecutableActionEvent {
             )
             .filter(action_provider::columns::id.eq(action_provider_id))
             .filter(action_event::columns::enabled.eq(true))
+            .filter(action_event::columns::deleted.eq(false))
             .select((
                 action_event::columns::id,
                 action::columns::name,
@@ -274,6 +276,7 @@ impl ExecutableActionEvent {
             )
             .filter(action_provider::columns::id.eq(action_provider_id))
             .filter(action_event::columns::enabled.eq(true))
+            .filter(action_event::columns::deleted.eq(false))
             .filter(action_event::columns::datetime.between(start_datetime, end_datetime))
             .select((
                 action_event::columns::id,

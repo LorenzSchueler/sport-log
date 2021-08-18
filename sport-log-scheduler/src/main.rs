@@ -118,7 +118,7 @@ fn main() {
     println!("{:#?}", action_event_ids);
 
     client
-        .delete(format!("{}/v1/adm/action_event", config.base_url,))
+        .delete(format!("{}/v1/adm/action_events", config.base_url,))
         .basic_auth(username, Some(&config.admin_password))
         .json(&action_event_ids)
         .send()
