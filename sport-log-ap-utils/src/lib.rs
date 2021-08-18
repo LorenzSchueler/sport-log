@@ -90,7 +90,7 @@ pub async fn setup(
     };
 
     match client
-        .post(format!("{}/v1/ap/action", base_url))
+        .post(format!("{}/v1/ap/actions", base_url))
         .basic_auth(name, Some(&password))
         .json(&actions)
         .send()
@@ -141,7 +141,7 @@ pub async fn delete_events(
     action_event_ids: &[ActionEventId],
 ) {
     client
-        .delete(format!("{}/v1/ap/action_event", base_url,))
+        .delete(format!("{}/v1/ap/action_events", base_url,))
         .basic_auth(name, Some(&password))
         .json(action_event_ids)
         .send()

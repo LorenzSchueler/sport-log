@@ -255,7 +255,7 @@ async fn login() -> WebDriverResult<()> {
         if client
             .post(format!("{}/v1/wod", config.base_url,))
             .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&config.password))
-            .json(&wod )
+            .json(&wod)
             .send()
             .await
             .unwrap().status() == StatusCode::CONFLICT
@@ -277,7 +277,7 @@ async fn login() -> WebDriverResult<()> {
             client
                 .put(format!("{}/v1/wod", config.base_url,))
                 .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&config.password))
-                .json(&wod )
+                .json(&wod)
                 .send()
                 .await
                 .unwrap();

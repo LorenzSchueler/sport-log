@@ -89,7 +89,7 @@ fn main() {
     println!("{:#?}", action_events);
 
     client
-        .post(format!("{}/v1/adm/action_event", config.base_url))
+        .post(format!("{}/v1/adm/action_events", config.base_url))
         .basic_auth(username, Some(&config.admin_password))
         .json(&action_events)
         .send()
