@@ -26,10 +26,9 @@ pub async fn create_metcon_session(
 }
 
 #[post(
-    "/metcon_session",
+    "/metcon_sessions",
     format = "application/json",
-    data = "<metcon_sessions>",
-    rank = 2
+    data = "<metcon_sessions>"
 )]
 pub async fn create_metcon_sessions(
     metcon_sessions: Unverified<Vec<MetconSession>>,
@@ -85,10 +84,9 @@ pub async fn update_metcon_session(
 }
 
 #[put(
-    "/metcon_session",
+    "/metcon_sessions",
     format = "application/json",
-    data = "<metcon_sessions>",
-    rank = 2
+    data = "<metcon_sessions>"
 )]
 pub async fn update_metcon_sessions(
     metcon_sessions: Unverified<Vec<MetconSession>>,
@@ -113,7 +111,7 @@ pub async fn create_metcon(
     conn.run(|c| Metcon::create(metcon, c)).await.into_json()
 }
 
-#[post("/metcon", format = "application/json", data = "<metcons>", rank = 2)]
+#[post("/metcons", format = "application/json", data = "<metcons>")]
 pub async fn create_metcons(
     metcons: Unverified<Vec<Metcon>>,
     auth: AuthUserOrAP,
@@ -156,7 +154,7 @@ pub async fn update_metcon(
     conn.run(|c| Metcon::update(metcon, c)).await.into_json()
 }
 
-#[put("/metcon", format = "application/json", data = "<metcons>", rank = 2)]
+#[put("/metcons", format = "application/json", data = "<metcons>")]
 pub async fn update_metcons(
     metcons: Unverified<Vec<Metcon>>,
     auth: AuthUserOrAP,
@@ -187,10 +185,9 @@ pub async fn create_metcon_movement(
 }
 
 #[post(
-    "/metcon_movement",
+    "/metcon_movements",
     format = "application/json",
-    data = "<metcon_movements>",
-    rank = 2
+    data = "<metcon_movements>"
 )]
 pub async fn create_metcon_movements(
     metcon_movements: Unverified<Vec<MetconMovement>>,
@@ -252,10 +249,9 @@ pub async fn update_metcon_movement(
 }
 
 #[put(
-    "/metcon_movement",
+    "/metcon_movements",
     format = "application/json",
-    data = "<metcon_movements>",
-    rank = 2
+    data = "<metcon_movements>"
 )]
 pub async fn update_metcon_movements(
     metcon_movements: Unverified<Vec<MetconMovement>>,

@@ -26,10 +26,9 @@ pub async fn create_strength_session(
 }
 
 #[post(
-    "/strength_session",
+    "/strength_sessions",
     format = "application/json",
-    data = "<strength_sessions>",
-    rank = 2
+    data = "<strength_sessions>"
 )]
 pub async fn create_strength_sessions(
     strength_sessions: Unverified<Vec<StrengthSession>>,
@@ -85,10 +84,9 @@ pub async fn update_strength_session(
 }
 
 #[put(
-    "/strength_session",
+    "/strength_sessions",
     format = "application/json",
-    data = "<strength_sessions>",
-    rank = 2
+    data = "<strength_sessions>"
 )]
 pub async fn update_strength_sessions(
     strength_sessions: Unverified<Vec<StrengthSession>>,
@@ -118,10 +116,9 @@ pub async fn create_strength_set(
 }
 
 #[post(
-    "/strength_set",
+    "/strength_sets",
     format = "application/json",
-    data = "<strength_sets>",
-    rank = 2
+    data = "<strength_sets>"
 )]
 pub async fn create_strength_sets(
     strength_sets: Unverified<Vec<StrengthSet>>,
@@ -179,10 +176,9 @@ pub async fn update_strength_set(
 }
 
 #[put(
-    "/strength_set",
+    "/strength_sets",
     format = "application/json",
-    data = "<strength_sets>",
-    rank = 2
+    data = "<strength_sets>"
 )]
 pub async fn update_strength_sets(
     strength_sets: Unverified<Vec<StrengthSet>>,
