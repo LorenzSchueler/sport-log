@@ -3,7 +3,6 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/json_serialization.dart';
-import 'package:sport_log/models/action/naive_time.dart';
 import 'package:sport_log/models/action/weekday.dart';
 
 part 'action_rule.g.dart';
