@@ -8,10 +8,12 @@ class MetconDescription implements Validatable {
   MetconDescription({
     required this.metcon,
     required this.moves,
+    required this.isDeletable,
   });
 
   Metcon metcon;
   List<MetconMovement> moves;
+  bool isDeletable;
 
   @override
   bool isValid() {
