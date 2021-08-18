@@ -118,4 +118,23 @@ end;
       await batch.commit(noResult: true, continueOnError: true);
     });
   }
+
+  DbResult<List<T>> getAll({
+    bool onlyIsNew = false,
+    bool includeDeleted = false,
+  }) async {
+    return _request((db) async {
+      final filter = onlyIsNew
+          ? (includeDeleted ? "is_new = 1" : "is_new = 1 and deleted = 0")
+          : (includeDeleted ? null : "deleted = 0");
+      final List<DbRecord> result = await db.query(tableName, where: filter);
+      return Success(result.map(serde.fromDbRecord).toList());
+    });
+  }
+
+  DbResult<void> setAllIsNewFalse() async {
+    return _voidRequest((db) async {
+      await db.update(tableName, {"is_new": 0}, where: "is_new = 1");
+    });
+  }
 }
