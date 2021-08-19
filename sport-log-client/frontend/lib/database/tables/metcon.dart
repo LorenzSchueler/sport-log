@@ -1,8 +1,10 @@
 
 import 'package:fixnum/fixnum.dart';
+import 'package:result_type/result_type.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/models/metcon/all.dart';
+import 'package:sqflite/sqflite.dart';
 
 class MetconTable extends Table<Metcon> {
   @override String get setupSql => '''
@@ -25,21 +27,66 @@ create table metcon (
 
   final metconMovements = AppDatabase.instance!.metconMovements;
 
-  DbResult<void> deleteWithMetconMovements(Int64 id) async {
-    return voidRequest((db) async {
-      await db.transaction((txn) async {
-        txn.update(
-          metconMovements.tableName,
-          {Keys.deleted: 1},
-          where: '${Keys.metconId} = ?',
-          whereArgs: [id.toInt()]
+  @override
+  DbResult<void> deleteSingle(Int64 id, [Transaction? txn]) async {
+    assert(txn == null);
+    return voidRequest(() async {
+      await database.transaction((transaction) async {
+        metconMovements.deleteByMetcon(id, transaction);
+        super.deleteSingle(id, transaction);
+      });
+    });
+  }
+
+  @override
+  DbResult<void> deleteMultiple(List<Int64> ids, [Transaction? txn]) async {
+    assert(txn == null);
+    for (final id in ids) {
+      final result = await deleteSingle(id);
+      if (result.isFailure) {
+        return result;
+      }
+    }
+    return Success(null);
+  }
+
+  DbResult<void> updateFull(MetconDescription metconDescription) async {
+    if (!metconDescription.isValid()) {
+      return Failure(DbError.validationFailed);
+    }
+    return voidRequest(() async {
+      await database.transaction((txn) async {
+        updateSingle(metconDescription.metcon, txn);
+        final result = await metconMovements.get(
+          where: "${Keys.metconId} = ?",
+          whereArgs: [metconDescription.metcon.id],
+          transaction: txn,
         );
-        txn.update(
-          tableName,
-          {Keys.deleted: 1},
-          where: '${Keys.id} = ?',
-          whereArgs: [id.toInt()]
-        );
+        if (result.isFailure) {
+          throw result.failure;
+        }
+        final Set<Int64> oldIds = result.success.map((mm) => mm.id).toSet();
+        List<MetconMovement> toCreate = [], toUpdate = [];
+
+        for (final mm in metconDescription.moves) {
+          oldIds.contains(mm.id) ? toUpdate.add(mm) : toCreate.add(mm);
+        }
+
+        List<Int64> toDelete = oldIds.difference(
+            toUpdate.map((mm) => mm.id).toSet()).toList();
+
+        metconMovements.deleteMultiple(toDelete, txn);
+        metconMovements.updateMultiple(toUpdate, txn);
+        metconMovements.createMultiple(toCreate, true, txn);
+      });
+    });
+  }
+
+  DbResult<void> createFull(MetconDescription metconDescription, bool isNew) async {
+    return voidRequest(() async {
+      await database.transaction((txn) async {
+        createSingle(metconDescription.metcon, isNew, txn);
+        metconMovements.createMultiple(metconDescription.moves, isNew, txn);
       });
     });
   }
@@ -63,6 +110,17 @@ create table metcon_movement (
 );
   ''';
   @override String get tableName => 'metcon_movement';
+
+  DbResult<void> deleteByMetcon(Int64 id, [Transaction? txn]) async {
+    return voidRequest(() async {
+      (txn ?? database).update(
+        tableName,
+        {Keys.deleted: 1},
+        where: '${Keys.metconId} = ?',
+        whereArgs: [id.toInt()]
+      );
+    });
+  }
 }
 
 class MetconSessionTable extends Table<MetconSession> {
