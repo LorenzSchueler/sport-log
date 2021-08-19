@@ -13,7 +13,7 @@
 * [ ] keep fabs from covering/blocking content
 * [ ] refresh on pull down
 * [ ] remove naive time
-* [ ] runtime id state accessible for whole app
+* [ ] runtime id state accessible for whole app (inherited model?)
 * [ ] use hive instead of shared preferences
 * [ ] handle time zone in all time fields
 * [ ] add to string methods for debugging

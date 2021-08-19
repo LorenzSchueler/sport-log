@@ -21,7 +21,6 @@ class WorkoutPage extends StatefulWidget {
 class _WorkoutPageState extends State<WorkoutPage> {
 
   BottomNavPage _currentPage = BottomNavPage.workout;
-  bool get _showFab => _currentPage == BottomNavPage.workout;
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +36,10 @@ class _WorkoutPageState extends State<WorkoutPage> {
         type: BottomNavigationBarType.fixed,
       ),
       drawer: const MainDrawer(selectedRoute: Routes.workout),
-      floatingActionButton: _showFab ? FloatingActionButton(
+      floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () => _onFabTapped(context),
-      ) : null,
+      ),
     );
   }
 
@@ -96,6 +95,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
     switch (_currentPage) {
       case BottomNavPage.workout:
         Navigator.of(context).pushNamed(Routes.editMetcon);
+        break;
+      case BottomNavPage.strength:
+        Navigator.of(context).pushNamed(Routes.editStrengthSession);
         break;
       default:
     }

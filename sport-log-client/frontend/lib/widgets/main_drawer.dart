@@ -54,14 +54,6 @@ class MainDrawer extends StatelessWidget {
             },
             selected: selectedRoute == Routes.syncing
           ),
-          ListTile(
-            title: const Text("Database"),
-            leading: const Icon(CustomIcons.database),
-            onTap: () {
-              Navigator.pushNamed(context, Routes.debugViewDatabase);
-            },
-            selected: selectedRoute == Routes.debugViewDatabase,
-          ),
           const Spacer(),
           ListTile(
             title: const Text("Logout"),

@@ -7,12 +7,14 @@ import 'package:sport_log/pages/movements/edit_movement_page.dart';
 import 'package:sport_log/pages/movements/movements_page.dart';
 import 'package:sport_log/pages/syncing/syncing_page.dart';
 import 'package:sport_log/pages/workout/metcon/edit_metcon_page.dart';
+import 'package:sport_log/pages/workout/strength/edit_strength_session_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
 import 'package:sport_log/helpers/material_color_generator.dart';
 import 'package:sport_log/pages/workout/workout_page.dart';
 import 'package:sport_log/pages/landing/landing_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
+import 'models/strength/strength_session_description.dart';
 import 'routes.dart';
 
 class App extends StatefulWidget {
@@ -55,6 +57,11 @@ class _AppState extends State<App> {
           return EditMovementPage(
            initialMovement: (arg is UiMovement) ? arg : null,
           );
+        }),
+        Routes.editStrengthSession: (context) => ProtectedRoute(builder: (context) {
+          final dynamic arg = ModalRoute.of(context)?.settings.arguments;
+          return EditStrengthSessionPage(
+              description: arg is StrengthSessionDescription ? arg : null);
         }),
       },
       initialRoute: widget.isAuthenticatedAtStart ? Routes.workout : Routes.landing,
