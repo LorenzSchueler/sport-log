@@ -32,6 +32,8 @@ class AppDatabase {
         for (final table in allTables) {
           await table.init(db);
         }
+        // FIXME: this is awkward
+        metcons.metconMovements = metconMovements;
       }
     );
   }

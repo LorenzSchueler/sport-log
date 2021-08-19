@@ -41,9 +41,9 @@ class StrengthSet implements DbObject {
         && (weight == null || weight! > 0);
   }
 
-  String toDisplayName(MovementUnit unit) {
-    if (weight == null) {
-      return '${count}x${weight!}${unit.toDisplayName()}';
+  String toDisplayName() {
+    if (weight != null) {
+      return '${count}x${weight!}kg';
     } else {
       return '${count}x';
     }

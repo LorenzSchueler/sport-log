@@ -25,7 +25,7 @@ create table metcon (
   @override DbSerializer<Metcon> get serde => DbMetconSerializer();
   @override String get tableName => 'metcon';
 
-  final metconMovements = AppDatabase.instance!.metconMovements;
+  late MetconMovementTable metconMovements;
 
   @override
   DbResult<void> deleteSingle(Int64 id, [Transaction? txn]) async {

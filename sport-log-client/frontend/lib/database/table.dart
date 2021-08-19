@@ -2,6 +2,7 @@
 import 'dart:io';
 
 import 'package:fixnum/fixnum.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sqflite/sqflite.dart';
 import 'defs.dart';
@@ -15,6 +16,7 @@ abstract class Table<T extends DbObject> {
 
   late Database database;
 
+  @mustCallSuper
   Future<void> init(Database db) async {
     database = db;
     await database.execute(setupSql);
