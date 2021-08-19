@@ -59,7 +59,7 @@ create table metcon (
         updateSingle(metconDescription.metcon, txn);
         final result = await metconMovements.get(
           where: "${Keys.metconId} = ?",
-          whereArgs: [metconDescription.metcon.id],
+          whereArgs: [metconDescription.metcon.id.toInt()],
           transaction: txn,
         );
         if (result.isFailure) {

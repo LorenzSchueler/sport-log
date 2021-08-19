@@ -3,6 +3,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/json_serialization.dart';
+import 'package:sport_log/models/movement/movement.dart';
 
 part 'strength_set.g.dart';
 
@@ -38,6 +39,14 @@ class StrengthSet implements DbObject {
         && setNumber > 0
         && count > 0
         && (weight == null || weight! > 0);
+  }
+
+  String toDisplayName(MovementUnit unit) {
+    if (weight == null) {
+      return '${count}x${weight!}${unit.toDisplayName()}';
+    } else {
+      return '${count}x';
+    }
   }
 }
 

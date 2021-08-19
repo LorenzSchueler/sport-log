@@ -7,6 +7,7 @@
 * [ ] drawer tabs don't restart scaffold
 * [ ] improve landing screen
 * [ ] i18n
+* [ ] date format localization
 * [ ] local units (metric vs imperial system)
 * [ ] maybe put initial resource loading into resource bloc
 * [ ] keep fabs from covering/blocking content

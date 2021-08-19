@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_page.dart';
+import 'package:sport_log/pages/workout/strength/strength_page.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -48,9 +49,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
       case BottomNavPage.workout:
         return const MetconsPage();
       case BottomNavPage.strength:
-        return const Center(
-          child: Text("Strength"),
-        );
+        return const StrengthPage();
       case BottomNavPage.cardio:
         return const Center(
           child: Text("Cardio"),
