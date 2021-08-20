@@ -189,7 +189,11 @@ async fn map_match() {
 
 async fn match_to_map(cardio_session: &CardioSession) -> Result<Route, ()> {
     let gpx = to_gpx(cardio_session)?;
-    gpx::write(&gpx, File::create("tracks/trackX.gpx").unwrap()).unwrap();
+
+    let mut rng = rand::thread_rng();
+    let filename = format!("/tmp/map-matcher-{}.gpx", rng.gen::<u64>());
+    let filename_result = format!("{}{}", filename, ".res.gpx");
+    gpx::write(&gpx, File::create(&filename).unwrap()).unwrap();
 
     let output = Command::new("java")
         .args(&[
@@ -198,7 +202,7 @@ async fn match_to_map(cardio_session: &CardioSession) -> Result<Route, ()> {
             "match",
             "--vehicle",
             "foot",
-            "../tracks/trackX.gpx",
+            &filename,
         ])
         .current_dir("map-matching")
         .output()
@@ -210,7 +214,10 @@ async fn match_to_map(cardio_session: &CardioSession) -> Result<Route, ()> {
         return Err(());
     }
 
-    let gpx = gpx::read(File::open("tracks/trackX.gpx.res.gpx").unwrap()).unwrap();
+    let gpx = gpx::read(File::open(&filename_result).unwrap()).unwrap();
+
+    fs::remove_file(&filename).unwrap();
+    fs::remove_file(&filename_result).unwrap();
 
     Ok(to_route(gpx, cardio_session).await)
 }
