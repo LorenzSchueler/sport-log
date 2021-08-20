@@ -120,6 +120,15 @@ async fn login() -> WebDriverResult<()> {
     for exec_action_event in exec_action_events {
         println!("{:#?}", exec_action_event);
 
+        let (username, password) = if let (Some(username), Some(password)) =
+            (exec_action_event.username, exec_action_event.password)
+        {
+            (username, password)
+        } else {
+            println!("not credential provided");
+            continue;
+        };
+
         let time = exec_action_event.datetime.format("%-H:%M").to_string();
         let date = exec_action_event.datetime.format("%m/%d/%Y").to_string();
         println!("time: {}", time);
@@ -136,12 +145,12 @@ async fn login() -> WebDriverResult<()> {
         driver
             .find_element(By::Id("Input_UserName"))
             .await?
-            .send_keys(&exec_action_event.username)
+            .send_keys(&username)
             .await?;
         driver
             .find_element(By::Id("Input_Password"))
             .await?
-            .send_keys(&exec_action_event.password)
+            .send_keys(&password)
             .await?;
         driver
             .find_element(By::ClassName("signin-btn"))

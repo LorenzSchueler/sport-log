@@ -171,13 +171,16 @@ async fn fetch() {
     for exec_action_event in exec_action_events {
         println!("{:#?}", exec_action_event);
 
-        if let Some(token) = get_token(
-            &client,
-            &exec_action_event.username,
-            &exec_action_event.password,
-        )
-        .await
+        let (username, password) = if let (Some(username), Some(password)) =
+            (exec_action_event.username, exec_action_event.password)
         {
+            (username, password)
+        } else {
+            println!("not credential provided");
+            continue;
+        };
+
+        if let Some(token) = get_token(&client, &username, &password).await {
             let token = (token.0, token.1.as_str());
             println!("{:?}", token);
 
