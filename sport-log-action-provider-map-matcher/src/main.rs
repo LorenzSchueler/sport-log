@@ -8,7 +8,7 @@ use geo_types::Point;
 use gpx::{self, Gpx, GpxVersion, Track, TrackSegment, Waypoint};
 use rand::Rng;
 use reqwest::Client;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{CardioSession, Position, Route, RouteId};
@@ -29,6 +29,29 @@ impl Config {
     fn get() -> Self {
         toml::from_str(&fs::read_to_string("config.toml").unwrap()).unwrap()
     }
+}
+
+#[derive(Serialize, Debug)]
+struct RequestData {
+    locations: Vec<Location>,
+}
+
+#[derive(Serialize, Debug)]
+struct Location {
+    latitude: f64,
+    longitude: f64,
+}
+
+#[derive(Deserialize, Debug)]
+struct ResponseData {
+    results: Vec<LocationElevation>,
+}
+
+#[derive(Deserialize, Debug)]
+struct LocationElevation {
+    latitude: f64,
+    longitude: f64,
+    elevation: f32,
 }
 
 #[tokio::main]
@@ -109,7 +132,7 @@ async fn map_match() {
 
         println!("cardio sessions:\t{}", cardio_sessions.len());
 
-        for cardio_session in &mut cardio_sessions[1..2] {
+        for cardio_session in &mut cardio_sessions[0..1] {
             let route = match_to_map(cardio_session).await.unwrap();
 
             cardio_session.route_id = Some(route.id);
@@ -187,10 +210,9 @@ async fn match_to_map(cardio_session: &CardioSession) -> Result<Route, ()> {
         return Err(());
     }
 
-    //let gpx = gpx::read(Cursor::new(output.stdout)).unwrap();
     let gpx = gpx::read(File::open("tracks/trackX.gpx.res.gpx").unwrap()).unwrap();
 
-    Ok(to_route(gpx, cardio_session))
+    Ok(to_route(gpx, cardio_session).await)
 }
 
 fn to_gpx(cardio_session: &CardioSession) -> Result<Gpx, ()> {
@@ -217,20 +239,42 @@ fn to_gpx(cardio_session: &CardioSession) -> Result<Gpx, ()> {
     }
 }
 
-fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
-    let track = &gpx.tracks[0];
-    let track_segment = &track.segments[0];
-    let points = &track_segment.points;
-    let positions = points
+async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
+    let points = &gpx.tracks[0].segments[0].points;
+
+    let locations = points
         .iter()
         .map(|point| {
             let point = point.point();
-            Position {
-                longitude: point.lng(),
+            Location {
                 latitude: point.lat(),
-                elevation: 0., // TODO
-                distance: 0,   // TODO
-                time: 0,       // TODO
+                longitude: point.lng(),
+            }
+        })
+        .collect();
+    let request_data = RequestData { locations };
+
+    let client = Client::new();
+    let response_data: ResponseData = client
+        .post("https://api.open-elevation.com/api/v1/lookup")
+        .json(&request_data)
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+
+    let positions = response_data
+        .results
+        .iter()
+        .map(|point| {
+            Position {
+                longitude: point.longitude,
+                latitude: point.latitude,
+                elevation: point.elevation,
+                distance: 0, // TODO
+                time: 0,     // TODO
             }
         })
         .collect();
