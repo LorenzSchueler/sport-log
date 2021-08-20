@@ -1,6 +1,7 @@
 create table platform (
     id bigint primary key,
     name varchar(80) not null check (length(name) > 2),
+    credential boolean not null,
     last_change timestamptz not null default now(),
     deleted boolean not null default false,
     unique (name, deleted)
@@ -9,9 +10,9 @@ create table platform (
 create trigger set_timestamp before update on platform
     for each row execute procedure trigger_set_timestamp();
 
-insert into platform (id, name) values 
-    (1, 'wodify'),
-    (2, 'sportstracker');
+insert into platform (id, name, credential) values 
+    (1, 'wodify', true),
+    (2, 'sportstracker', true);
 
 create table platform_credential (
     id bigint primary key,

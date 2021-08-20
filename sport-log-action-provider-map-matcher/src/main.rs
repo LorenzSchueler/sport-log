@@ -50,6 +50,7 @@ async fn setup() {
         &config.password,
         DESCRIPTION,
         PLATFORM_NAME,
+        false,
         &[("match", "Match a gpx track to as OSM path.")],
         168,
         0,

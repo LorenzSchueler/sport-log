@@ -14,6 +14,7 @@ pub async fn setup(
     password: &str,
     description: &str,
     platform_name: &str,
+    credential: bool,
     actions: &[(&str, &str)],
     create_before: i32,
     delete_after: i32,
@@ -25,6 +26,7 @@ pub async fn setup(
     let platform = Platform {
         id: PlatformId(rng.gen()),
         name: platform_name.to_owned(),
+        credential,
         last_change: Utc::now(),
         deleted: false,
     };

@@ -44,6 +44,7 @@ async fn setup() {
         &config.password,
         DESCRIPTION,
         PLATFORM_NAME,
+        true,
         &[
             ("CrossFit", "Reserve a spot in a CrossFit class."),
             ("Weightlifting", "Reserve a spot in a Weightlifting class."),

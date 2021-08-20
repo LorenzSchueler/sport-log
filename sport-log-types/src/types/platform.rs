@@ -56,6 +56,7 @@ pub struct Platform {
     #[serde(deserialize_with = "from_str")]
     pub id: PlatformId,
     pub name: String,
+    pub credential: bool,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,

@@ -46,6 +46,7 @@ async fn setup() {
         &config.password,
         DESCRIPTION,
         PLATFORM_NAME,
+        true,
         &[
             (
                 "CrossFit",

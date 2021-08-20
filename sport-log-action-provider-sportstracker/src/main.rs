@@ -124,6 +124,7 @@ async fn setup() {
         &config.password,
         DESCRIPTION,
         PLATFORM_NAME,
+        true,
         &[("fetch", "Fetch and save new workouts.")],
         168,
         0,
