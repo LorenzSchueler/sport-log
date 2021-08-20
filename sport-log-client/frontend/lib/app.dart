@@ -16,6 +16,7 @@ import 'package:sport_log/pages/login/login_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
 import 'models/strength/strength_session_description.dart';
 import 'routes.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class App extends StatefulWidget {
   const App({
@@ -76,6 +77,16 @@ class _AppState extends State<App> {
         ),
       ),
       themeMode: ThemeMode.dark,
+      builder: (context, child) {
+        if (child != null) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+            child: child,
+          );
+        } else {
+          return Container();
+        }
+      },
     );
   }
 }
