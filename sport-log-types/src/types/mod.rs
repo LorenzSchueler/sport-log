@@ -123,9 +123,9 @@ where
     }
 }
 
-/// Wrapper around Id types for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
+/// Wrapper around an incomming id for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///
-/// The Id type can be retrieved by using the appropriate verification function.
+/// The id can be retrieved by using the appropriate verification function.
 #[cfg(feature = "full")]
 #[derive(Debug, Clone)]
 pub struct UnverifiedId<I>(I);
@@ -139,9 +139,9 @@ impl<'v, I: FromI64> rocket::request::FromParam<'v> for UnverifiedId<I> {
     }
 }
 
-/// Wrapper around Id types for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
+/// Wrapper around multiple incoming ids for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///
-/// The Id type can be retrieved by using the appropriate verification function.
+/// The ids type can be retrieved by using the appropriate verification function.
 #[cfg(feature = "full")]
 #[derive(Debug, Clone)]
 pub struct UnverifiedIds<I>(Vec<I>);

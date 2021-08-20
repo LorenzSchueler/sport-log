@@ -6,6 +6,9 @@ use crate::{
     User, Wod,
 };
 
+/// A representation of all or recentily updated data belonging to a user account.
+///
+/// This struct is used for the `account_data` endpoints.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AccountData {
     pub user: Option<User>,
