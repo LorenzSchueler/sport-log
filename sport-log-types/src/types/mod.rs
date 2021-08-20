@@ -92,7 +92,7 @@ where
     Ok(T::from_i64(s))
 }
 
-pub fn to_str<'de, T, S>(id: &T, serializer: S) -> Result<S::Ok, S::Error>
+pub fn to_str<T, S>(id: &T, serializer: S) -> Result<S::Ok, S::Error>
 where
     T: ToI64,
     S: Serializer,
@@ -112,7 +112,7 @@ where
     })
 }
 
-pub fn to_str_optional<'de, T, S>(id: &Option<T>, serializer: S) -> Result<S::Ok, S::Error>
+pub fn to_str_optional<T, S>(id: &Option<T>, serializer: S) -> Result<S::Ok, S::Error>
 where
     T: ToI64,
     S: Serializer,

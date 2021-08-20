@@ -1,14 +1,13 @@
 use std::{
     env,
     fs::{self, File},
-    io::Cursor,
 };
 
-use chrono::{DateTime, Duration, Utc};
+use chrono::{Duration, Utc};
 use geo_types::Point;
 use gpx::{self, Gpx, GpxVersion, Track, TrackSegment, Waypoint};
 use rand::Rng;
-use reqwest::{Client, StatusCode};
+use reqwest::Client;
 use serde::Deserialize;
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
@@ -222,7 +221,7 @@ fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
     let track_segment = &track.segments[0];
     let points = &track_segment.points;
     let positions = points
-        .into_iter()
+        .iter()
         .map(|point| {
             let point = point.point();
             Position {

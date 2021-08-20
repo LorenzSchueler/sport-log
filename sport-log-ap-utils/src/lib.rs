@@ -7,6 +7,7 @@ use sport_log_types::{
     Platform, PlatformId,
 };
 
+#[allow(clippy::too_many_arguments)]
 pub async fn setup(
     base_url: &str,
     name: &str,
@@ -70,7 +71,7 @@ pub async fn setup(
         id: ActionProviderId(rng.gen()),
         name: name.to_owned(),
         password: password.to_owned(),
-        platform_id: platform_id,
+        platform_id,
         description: Some(description.to_owned()),
         last_change: Utc::now(),
         deleted: false,
