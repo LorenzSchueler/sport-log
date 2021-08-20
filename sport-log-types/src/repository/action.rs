@@ -242,7 +242,7 @@ impl ExecutableActionEvent {
     ) -> QueryResult<Vec<Self>> {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
-            .inner_join(
+            .left_outer_join(
                 platform_credential::table.on(platform_credential::columns::platform_id
                     .eq(action_provider::columns::platform_id)
                     .and(platform_credential::columns::user_id.eq(action_event::columns::user_id))),
@@ -254,9 +254,9 @@ impl ExecutableActionEvent {
                 action_event::columns::id,
                 action::columns::name,
                 action_event::columns::datetime,
-                platform_credential::columns::user_id,
-                platform_credential::columns::username,
-                platform_credential::columns::password,
+                action_event::columns::user_id,
+                platform_credential::columns::username.nullable(),
+                platform_credential::columns::password.nullable(),
             ))
             .get_results(conn)
     }
@@ -269,7 +269,7 @@ impl ExecutableActionEvent {
     ) -> QueryResult<Vec<Self>> {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
-            .inner_join(
+            .left_outer_join(
                 platform_credential::table.on(platform_credential::columns::platform_id
                     .eq(action_provider::columns::platform_id)
                     .and(platform_credential::columns::user_id.eq(action_event::columns::user_id))),
@@ -282,9 +282,9 @@ impl ExecutableActionEvent {
                 action_event::columns::id,
                 action::columns::name,
                 action_event::columns::datetime,
-                platform_credential::columns::user_id,
-                platform_credential::columns::username,
-                platform_credential::columns::password,
+                action_event::columns::user_id,
+                platform_credential::columns::username.nullable(),
+                platform_credential::columns::password.nullable(),
             ))
             .order_by(action_event::columns::datetime)
             .get_results(conn)

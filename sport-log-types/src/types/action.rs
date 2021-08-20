@@ -290,8 +290,8 @@ pub struct ExecutableActionEvent {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
-    pub username: String,
-    pub password: String,
+    pub username: Option<String>,
+    pub password: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
