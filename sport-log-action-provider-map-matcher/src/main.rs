@@ -331,14 +331,14 @@ fn compare_routes(route: &Route, routes: &[Route]) -> Option<RouteId> {
     const MAX_MISSES: i32 = 10;
     const MAX_CONT_MISSES: i32 = 20;
 
-    for old_route in routes {
+    'route_loop: for old_route in routes {
         if (route.distance - old_route.distance).abs() > route.distance / MAX_MISSES {
-            continue;
+            continue 'route_loop;
         }
         if let (Some(track), Some(old_track)) = (&route.track, &old_route.track) {
             if (track.len() as i32 - old_track.len() as i32).abs() > track.len() as i32 / MAX_MISSES
             {
-                continue;
+                continue 'route_loop;
             }
             let coords: Vec<_> = track
                 .iter()
@@ -353,13 +353,14 @@ fn compare_routes(route: &Route, routes: &[Route]) -> Option<RouteId> {
             let mut cont_misses = 0;
             let mut idx = 0;
             let mut old_idx = 0;
-            loop {
+            'match_loop: loop {
                 if misses > track.len() as i32 / MAX_MISSES
                     || cont_misses > track.len() as i32 / MAX_CONT_MISSES
-                    || idx == coords.len()
-                    || old_idx == coords.len()
                 {
-                    break;
+                    continue 'route_loop;
+                }
+                if idx == coords.len() || old_idx == coords.len() {
+                    break 'match_loop;
                 }
                 if coords[idx] == old_coords[old_idx] {
                     hits += 1;
@@ -383,9 +384,11 @@ fn compare_routes(route: &Route, routes: &[Route]) -> Option<RouteId> {
                             if coord == old_coord {
                                 idx = i;
                                 old_idx = old_i;
+                                continue 'match_loop;
                             }
                         }
                     }
+                    break 'match_loop;
                 }
             }
             println!("misses: {}", misses);
@@ -394,7 +397,7 @@ fn compare_routes(route: &Route, routes: &[Route]) -> Option<RouteId> {
             if misses > track.len() as i32 / MAX_MISSES
                 || cont_misses > track.len() as i32 / MAX_CONT_MISSES
             {
-                return None;
+                continue 'route_loop;
             } else {
                 return Some(old_route.id);
             }
