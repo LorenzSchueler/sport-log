@@ -135,6 +135,18 @@ async fn map_match() {
         for cardio_session in &mut cardio_sessions[0..1] {
             let route = match_to_map(cardio_session).await.unwrap();
 
+            let routes: Vec<Route> = client
+                .get(format!("{}/v1/route", config.base_url))
+                .basic_auth(&username, Some(&config.password))
+                .send()
+                .await
+                .unwrap()
+                .json()
+                .await
+                .unwrap();
+
+            let route_id = compare_routes(&route, &routes);
+
             cardio_session.route_id = Some(route.id);
 
             match client
@@ -272,7 +284,7 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
         .await
         .unwrap();
 
-    let positions = response_data
+    let positions: Vec<_> = response_data
         .results
         .iter()
         .map(|point| {
@@ -286,16 +298,33 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
         })
         .collect();
 
+    let (ascent, descent, _) = positions.iter().fold(
+        (0., 0., &positions[0]),
+        |(mut ascent, mut descent, prev), next| {
+            let diff = prev.elevation - next.elevation;
+            if diff > 0. {
+                descent += diff;
+            } else {
+                ascent += diff;
+            }
+            (ascent, descent, next)
+        },
+    );
+
     let mut rng = rand::thread_rng();
     Route {
         id: RouteId(rng.gen()),
         user_id: cardio_session.user_id,
         name: format!("{} workout route", cardio_session.datetime),
         distance: cardio_session.distance.unwrap(), // calc new
-        ascent: cardio_session.ascent,              // calc new
-        descent: cardio_session.descent,            // calc new
+        ascent: Some(ascent as i32),
+        descent: Some(descent as i32),
         track: Some(positions),
         last_change: Utc::now(),
         deleted: false,
     }
+}
+
+fn compare_routes(route: &Route, routes: &[Route]) -> Option<RouteId> {
+    None
 }
