@@ -16,7 +16,6 @@ import 'package:sport_log/pages/login/login_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
 import 'models/strength/strength_session_description.dart';
 import 'routes.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 class App extends StatefulWidget {
   const App({
