@@ -9,9 +9,10 @@ create table metcon (
     timecap integer check (timecap > 0), -- seconds
     description text,
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (user_id, name, deleted)
+    deleted boolean not null default false
 );
+
+create unique index metcon_idx on metcon (user_id, name) where deleted = false;
 
 create trigger set_timestamp before update on metcon
     for each row execute procedure trigger_set_timestamp();
@@ -30,9 +31,11 @@ create table metcon_movement (
     movement_unit movement_unit not null,
     weight real check (weight > 0),
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (metcon_id, movement_number, deleted)
+    deleted boolean not null default false
 );
+
+create unique index metcon_movement_idx on metcon_movement (metcon_id, movement_number)     
+    where deleted = false;
 
 create trigger set_timestamp before update on metcon_movement
     for each row execute procedure trigger_set_timestamp();
@@ -59,9 +62,11 @@ create table metcon_session (
     rx boolean not null default true,
     comments text,
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (user_id, metcon_id, datetime, deleted)
+    deleted boolean not null default false
 );
+
+create unique index metcon_session_idx on metcon_session (user_id, metcon_id, datetime)     
+    where deleted = false;
 
 create trigger set_timestamp before update on metcon_session
     for each row execute procedure trigger_set_timestamp();

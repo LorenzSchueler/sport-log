@@ -7,9 +7,11 @@ create table action_provider (
     platform_id bigint not null references platform on delete cascade,
     description text,
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (name, deleted)
+    deleted boolean not null default false
 );
+
+create unique index action_provider_idx on action_provider (name) where deleted = false;
+
 create trigger set_timestamp before update on action_provider
     for each row execute procedure trigger_set_timestamp();
 
@@ -29,9 +31,11 @@ create table action (
     create_before integer not null check (create_before >= 0), -- hours
     delete_after integer not null check (delete_after >= 0), --hours
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (action_provider_id, name, deleted)
+    deleted boolean not null default false
 );
+
+create unique index action_idx on action (action_provider_id, name) where deleted = false;
+
 create trigger set_timestamp before update on action
     for each row execute procedure trigger_set_timestamp();
 
@@ -53,9 +57,12 @@ create table action_rule (
     arguments text,
     enabled boolean not null,
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (user_id, action_id, weekday, time, deleted)
+    deleted boolean not null default false
 );
+
+create unique index action_rule_idx on action_rule (user_id, action_id, weekday, time) 
+    where deleted = false;
+
 create trigger set_timestamp before update on action_rule
     for each row execute procedure trigger_set_timestamp();
 
@@ -78,9 +85,12 @@ create table action_event (
     arguments text,
     enabled boolean not null,
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (user_id, action_id, datetime, deleted)
+    deleted boolean not null default false
 );
+
+create unique index action_event_idx on action_event (user_id, action_id, datetime)
+    where deleted = false;
+
 create trigger set_timestamp before update on action_event
     for each row execute procedure trigger_set_timestamp();
 

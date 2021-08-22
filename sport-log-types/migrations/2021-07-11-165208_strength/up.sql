@@ -7,9 +7,11 @@ create table strength_session (
     interval integer check (interval > 0),
     comments text,
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (user_id, datetime, movement_id, deleted)
+    deleted boolean not null default false
 );
+
+create unique index strength_session_idx on strength_session (user_id, datetime, movement_id) 
+    where deleted = false;
 
 create trigger set_timestamp before update on strength_session
     for each row execute procedure trigger_set_timestamp();
@@ -25,9 +27,11 @@ create table strength_set (
     count integer not null check (count >= 1), -- number of completed movement_unit
     weight real check (weight > 0),
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (strength_session_id, set_number, deleted)
+    deleted boolean not null default false
 );
+
+create unique index strength_set_idx on strength_set (strength_session_id, set_number) 
+    where deleted = false;
 
 create trigger set_timestamp before update on strength_set
     for each row execute procedure trigger_set_timestamp();

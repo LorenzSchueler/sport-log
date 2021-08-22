@@ -1,6 +1,12 @@
+drop index shared_diary_idx;
 drop table shared_diary;
+drop index shared_cardio_session_idx;
 drop table shared_cardio_session;
+drop index shared_strength_session_idx;
 drop table shared_strength_session;
+drop index shared_metcon_session_idx;
 drop table shared_metcon_session;
+drop index group_user_idx;
 drop table group_user;
+drop index group_idx;
 drop table "group";

@@ -209,9 +209,9 @@ pub async fn create_action_event(
     conn: Db,
 ) -> Result<Json<ActionEvent>, Status> {
     let action_event = action_event.verify_user_without_db(&auth)?;
-    conn.run(|c| ActionEvent::create(action_event, c))
-        .await
-        .into_json()
+    let x = conn.run(|c| ActionEvent::create(action_event, c)).await;
+    println!("{:?}", x);
+    x.into_json()
 }
 
 #[post(

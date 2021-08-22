@@ -17,9 +17,10 @@ create table route (
     descent integer check (descent >= 0),
     track "position"[] not null,
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (user_id, name, deleted)
+    deleted boolean not null default false
 );
+
+create unique index route_idx on route (user_id, name) where deleted = false;
 
 create trigger set_timestamp before update on route
     for each row execute procedure trigger_set_timestamp();
@@ -43,9 +44,11 @@ create table cardio_session (
     route_id bigint references route on delete set null,
     comments text,
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (user_id, movement_id, datetime, deleted)
+    deleted boolean not null default false
 );
+
+create unique index cardio_session_idx on cardio_session (user_id, movement_id, datetime) 
+    where deleted = false;
 
 create trigger set_timestamp before update on cardio_session
     for each row execute procedure trigger_set_timestamp();
