@@ -56,7 +56,8 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
     movementInitialized = widget.initial != null;
     datetimeIsNow = widget.initial == null ? true : false;
   }
-  
+
+  /*
   void _submit() {
     if (!_formIsValid()) {
       return;
@@ -67,6 +68,7 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
       });
     }
   }
+   */
 
   bool _formIsValid() {
     return ssd.isValid() && movementInitialized;

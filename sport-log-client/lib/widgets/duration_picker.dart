@@ -105,6 +105,7 @@ class _DurationPickerState extends State<DurationPicker> {
     );
   }
 
+/*
   void _setValue(Duration d) {
     setState(() {
       value = d;
@@ -125,4 +126,5 @@ class _DurationPickerState extends State<DurationPicker> {
       _setValue(Duration(minutes: value.inMinutes, seconds: s));
     }
   }
+   */
 }
