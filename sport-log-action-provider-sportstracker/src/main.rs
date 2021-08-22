@@ -241,7 +241,7 @@ async fn fetch() {
                                     .map(|location| Position {
                                         latitude: location.la,
                                         longitude: location.ln,
-                                        elevation: location.h,
+                                        elevation: location.h as i32,
                                         distance: location.s as i32,
                                         time: location.t as i32,
                                     })

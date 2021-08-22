@@ -51,7 +51,7 @@ struct ResponseData {
 struct LocationElevation {
     latitude: f64,
     longitude: f64,
-    elevation: f32,
+    elevation: i32,
 }
 
 #[tokio::main]
@@ -299,10 +299,10 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
         .collect();
 
     let (ascent, descent, _) = positions.iter().fold(
-        (0., 0., &positions[0]),
+        (0, 0, &positions[0]),
         |(mut ascent, mut descent, prev), next| {
             let diff = prev.elevation - next.elevation;
-            if diff > 0. {
+            if diff > 0 {
                 descent += diff;
             } else {
                 ascent += diff;

@@ -7,7 +7,7 @@ use diesel::{
     deserialize,
     pg::Pg,
     serialize::{self, Output, WriteTuple},
-    sql_types::{Double, Float, Integer},
+    sql_types::{Double, Integer},
     types::{FromSql, Record, ToSql},
 };
 #[cfg(feature = "full")]
@@ -54,7 +54,7 @@ pub struct Position {
     #[serde(rename(serialize = "la", deserialize = "la"))]
     pub latitude: f64,
     #[serde(rename(serialize = "e", deserialize = "e"))]
-    pub elevation: f32,
+    pub elevation: i32,
     #[serde(rename(serialize = "d", deserialize = "d"))]
     pub distance: i32,
     #[serde(rename(serialize = "t", deserialize = "t"))]
@@ -64,7 +64,7 @@ pub struct Position {
 #[cfg(feature = "full")]
 impl ToSql<Position, Pg> for Position {
     fn to_sql<W: Write>(&self, out: &mut Output<W, Pg>) -> serialize::Result {
-        WriteTuple::<(Double, Double, Float, Integer, Integer)>::write_tuple(
+        WriteTuple::<(Double, Double, Integer, Integer, Integer)>::write_tuple(
             &(
                 self.longitude,
                 self.latitude,
@@ -81,7 +81,7 @@ impl ToSql<Position, Pg> for Position {
 impl FromSql<Position, Pg> for Position {
     fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
         let (longitude, latitude, elevation, distance, time) =
-            FromSql::<Record<(Double, Double, Float, Integer, Integer)>, Pg>::from_sql(bytes)?;
+            FromSql::<Record<(Double, Double, Integer, Integer, Integer)>, Pg>::from_sql(bytes)?;
         Ok(Position {
             longitude,
             latitude,
