@@ -28,7 +28,7 @@ class StrengthSetTable extends Table<StrengthSet> {
 create table strength_set (
     id integer primary key,
     strength_session_id integer not null references strength_session on delete cascade,
-    set_number integer not null check (set_number >= 1),
+    set_number integer not null check (set_number >= 0),
     count integer not null check (count >= 1), -- number of completed movement_unit
     weight real check (weight > 0),
     last_change text not null default (datetime('now')),

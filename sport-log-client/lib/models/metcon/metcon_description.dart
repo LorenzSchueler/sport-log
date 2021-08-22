@@ -20,7 +20,7 @@ class MetconDescription implements Validatable {
     return metcon.isValid()
         && moves.isNotEmpty
         && moves.every((mm) => mm.metconId == metcon.id)
-        && moves.everyIndexed((mm, index) => mm.movementNumber == index + 1)
+        && moves.everyIndexed((mm, index) => mm.movementNumber == index)
         && moves.every((mm) => mm.isValid());
   }
 }

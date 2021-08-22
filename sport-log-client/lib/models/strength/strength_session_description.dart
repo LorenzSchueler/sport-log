@@ -21,7 +21,7 @@ class StrengthSessionDescription implements Validatable {
     return strengthSession.isValid()
         && strengthSets.isNotEmpty
         && strengthSets.every((ss) => ss.strengthSessionId == strengthSession.id)
-        && strengthSets.everyIndexed((ss, index) => ss.setNumber == index + 1)
+        && strengthSets.everyIndexed((ss, index) => ss.setNumber == index)
         && strengthSets.every((ss) => ss.isValid())
         && strengthSession.movementId == movement.id;
   }
