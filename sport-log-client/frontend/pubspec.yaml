@@ -61,7 +61,6 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
   build_runner: ^2.1.0
-  moor_generator: ^4.4.1
   faker: ^2.0.0
 
 # For information on the generic Dart part of this file, see the
