@@ -65,14 +65,19 @@ class CardioSession implements DbObject {
 
   @override
   bool isValid() {
-    return !deleted
-        && [ascent, descent]
-          .every((val) => val == null || val >= 0)
-        && [distance, time, calories, avgCadence, avgHeartRate]
-          .every((val) => val == null || val > 0)
-        && (track == null || distance != null)
-        && (cadence == null || avgCadence != null)
-        && (heartRate == null || avgHeartRate != null);
+    return validate(!deleted, 'CardioSession: deleted is true')
+        && validate([ascent, descent]
+          .every((val) => val == null || val >= 0),
+            'CardioSession: ascent or descent < 0')
+        && validate([distance, time, calories, avgCadence, avgHeartRate]
+          .every((val) => val == null || val > 0),
+            'CardioSession: distance, time, calories, avgCadence or avgHeartRate <= 0')
+        && validate((track == null || distance != null),
+            'CardioSession: distance == null when track is set')
+        && validate((cadence == null || avgCadence != null),
+            'CardioSession: avgCadence == null when cadence is set')
+        && validate((heartRate == null || avgHeartRate != null),
+            'CardioSession: avgHeartRate == null when heartRate is set');
   }
 }
 

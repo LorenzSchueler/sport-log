@@ -36,7 +36,7 @@ class ActionRule implements DbObject {
 
   @override
   bool isValid() {
-    return !deleted;
+    return validate(!deleted, 'ActionRule: deleted is true');
   }
 }
 

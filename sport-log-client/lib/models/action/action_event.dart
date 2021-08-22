@@ -33,7 +33,7 @@ class ActionEvent implements DbObject {
 
   @override
   bool isValid() {
-    return !deleted;
+    return validate(!deleted, 'ActionEvent: deleted is true');
   }
 }
 

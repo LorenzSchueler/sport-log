@@ -31,7 +31,9 @@ class ActionProvider implements DbObject {
 
   @override
   bool isValid() {
-    return name.isNotEmpty && password.isNotEmpty && !deleted;
+    return validate(name.isNotEmpty, 'ActionProvider: name is empty')
+        && validate(password.isNotEmpty, 'ActionProvider: password is empty')
+        && validate(!deleted, 'ActionProvider: deleted is true');
   }
 }
 

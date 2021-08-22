@@ -31,7 +31,8 @@ class Action implements DbObject {
 
   @override
   bool isValid() {
-    return name.isNotEmpty && !deleted;
+    return validate(name.isNotEmpty, 'Action: name is empty')
+        && validate(!deleted, 'Action: deleted is true');
   }
 }
 

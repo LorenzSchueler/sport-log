@@ -61,4 +61,10 @@ class Position {
         && distance == other.distance
         && time == other.time;
   }
+
+  @override
+  int get hashCode {
+    return Object.hashAll([longitude, latitude, elevation, distance, time]);
+  }
+
 }
