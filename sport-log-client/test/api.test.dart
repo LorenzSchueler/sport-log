@@ -103,6 +103,7 @@ void testActionRule(Api api) async {
           faker.randomGenerator.integer(60),
           faker.randomGenerator.integer(60),
         ),
+        arguments: 'args',
         enabled: true,
         deleted: false,
     );

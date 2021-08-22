@@ -15,6 +15,7 @@ class ActionRule implements DbObject {
     required this.actionId,
     required this.weekday,
     required this.time,
+    required this.arguments,
     required this.enabled,
     required this.deleted,
   });
@@ -25,6 +26,7 @@ class ActionRule implements DbObject {
   @IdConverter() Int64 actionId;
   Weekday weekday;
   @DateTimeConverter() DateTime time;
+  String? arguments;
   bool enabled;
   @override
   bool deleted;
@@ -47,6 +49,7 @@ class DbActionRuleSerializer implements DbSerializer<ActionRule> {
       actionId: Int64(r[Keys.actionId]! as int),
       weekday: Weekday.values[r[Keys.weekday]! as int],
       time: DateTime.parse(r[Keys.time]! as String),
+      arguments: r[Keys.arguments] as String?,
       enabled: r[Keys.enabled]! as int == 1,
       deleted: r[Keys.deleted]! as int == 1,
     );
@@ -60,6 +63,7 @@ class DbActionRuleSerializer implements DbSerializer<ActionRule> {
       Keys.actionId: o.actionId.toInt(),
       Keys.weekday: Weekday.values.indexOf(o.weekday),
       Keys.time: o.time.toString(),
+      Keys.arguments: o.arguments,
       Keys.enabled: o.enabled ? 1 : 0,
       Keys.deleted: o.deleted ? 1 : 0,
     };
