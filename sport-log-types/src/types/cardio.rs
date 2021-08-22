@@ -201,9 +201,9 @@ pub struct CardioSession {
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub track: Option<Vec<Position>>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
-    pub avg_cycles: Option<i32>,
+    pub avg_cadence: Option<i32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
-    pub cycles: Option<Vec<f32>>,
+    pub cadence: Option<Vec<f32>>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub avg_heart_rate: Option<i32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]

@@ -39,8 +39,8 @@ create table cardio_session (
     time integer check (time > 0), -- seconds
     calories integer check (calories >= 0),
     track "position"[],
-    avg_cycles integer check (avg_cycles > 0), 
-    cycles real[], -- = secs since start
+    avg_cadence integer check (avg_cadence > 0), 
+    cadence real[], -- = secs since start
     avg_heart_rate integer check (avg_heart_rate > 0),
     heart_rate real[], -- = secs since start
     route_id bigint references route on delete set null,
@@ -54,8 +54,8 @@ create trigger set_timestamp before update on cardio_session
     for each row execute procedure trigger_set_timestamp();
 
 insert into cardio_session (id, user_id, movement_id, cardio_type, datetime, 
-        distance, ascent, descent, time, calories, track, avg_cycles, 
-        cycles, avg_heart_rate, heart_rate, route_id, comments) values
+        distance, ascent, descent, time, calories, track, avg_cadence, 
+        cadence, avg_heart_rate, heart_rate, route_id, comments) values
     (1, 1, 5, 'training', '2021-08-22 10:25:34', 
         26742, 35, 43, 9134, null, null, 167, 
         null, 156, null, 1, null);

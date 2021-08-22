@@ -247,12 +247,12 @@ async fn fetch() {
                                     })
                                     .collect(),
                             ),
-                            avg_cycles: if workout.cadence.avg > 0. {
+                            avg_cadence: if workout.cadence.avg > 0. {
                                 Some(workout.cadence.avg as i32)
                             } else {
                                 None
                             },
-                            cycles: None,
+                            cadence: None,
                             avg_heart_rate: None,
                             heart_rate: None,
                             route_id: None,
