@@ -3,17 +3,18 @@ use chrono::{DateTime, Utc};
 use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
+use sport_log_types_derive::{FromI64, ToI64};
 #[cfg(feature = "full")]
-use sport_log_types_derive::{FromI64, FromSql, GetById, GetByIds, ToI64, ToSql, VerifyUnchecked};
+use sport_log_types_derive::{FromSql, GetById, GetByIds, ToSql, VerifyUnchecked};
 
 use crate::{from_str, to_str};
 #[cfg(feature = "full")]
 use crate::{schema::user, AuthUser, CheckUserId, Unverified, VerifyForUserWithDb};
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI64, ToI64, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct UserId(pub i64);

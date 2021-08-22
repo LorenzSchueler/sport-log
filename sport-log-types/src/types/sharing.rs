@@ -3,9 +3,9 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, FromI64, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, ToI64,
-    ToSql, Update,
+    Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, ToSql, Update,
 };
+use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{
     from_str, to_str, CardioSessionId, DiaryId, MetconSessionId, StrengthSessionId, UserId,
@@ -19,10 +19,10 @@ use crate::{
     CardioSession, Diary, MetconSession, StrengthSession, User,
 };
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI64, ToI64, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct GroupId(pub i64);
@@ -55,10 +55,10 @@ pub struct Group {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI64, ToI64, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct GroupUserId(pub i64);
@@ -100,10 +100,10 @@ pub struct GroupUser {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI64, ToI64, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct SharedMetconSessionId(pub i64);
@@ -143,10 +143,10 @@ pub struct SharedMetconSession {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI64, ToI64, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct SharedStrengthSessionId(pub i64);
@@ -186,10 +186,10 @@ pub struct SharedStrengthSession {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI64, ToI64, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct SharedCardioSessionId(pub i64);
@@ -229,10 +229,10 @@ pub struct SharedCardioSession {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI64, ToI64, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct SharedDiaryId(pub i64);

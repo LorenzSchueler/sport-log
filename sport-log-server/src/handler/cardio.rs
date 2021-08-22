@@ -19,7 +19,7 @@ pub async fn create_route(
     conn.run(|c| Route::create(route, c)).await.into_json()
 }
 
-#[post("/route", format = "application/json", data = "<routes>", rank = 2)]
+#[post("/routes", format = "application/json", data = "<routes>")]
 pub async fn create_routes(
     routes: Unverified<Vec<Route>>,
     auth: AuthUserOrAP,
@@ -60,7 +60,7 @@ pub async fn update_route(
     conn.run(|c| Route::update(route, c)).await.into_json()
 }
 
-#[put("/route", format = "application/json", data = "<routes>", rank = 2)]
+#[put("/routes", format = "application/json", data = "<routes>")]
 pub async fn update_routes(
     routes: Unverified<Vec<Route>>,
     auth: AuthUserOrAP,
@@ -89,10 +89,9 @@ pub async fn create_cardio_session(
 }
 
 #[post(
-    "/cardio_session",
+    "/cardio_sessions",
     format = "application/json",
-    data = "<cardio_sessions>",
-    rank = 2
+    data = "<cardio_sessions>"
 )]
 pub async fn create_cardio_sessions(
     cardio_sessions: Unverified<Vec<CardioSession>>,
@@ -148,10 +147,9 @@ pub async fn update_cardio_session(
 }
 
 #[put(
-    "/cardio_session",
+    "/cardio_sessions",
     format = "application/json",
-    data = "<cardio_sessions>",
-    rank = 2
+    data = "<cardio_sessions>"
 )]
 pub async fn update_cardio_sessions(
     cardio_sessions: Unverified<Vec<CardioSession>>,

@@ -6,10 +6,7 @@ use reqwest::{Client, StatusCode};
 use serde::Deserialize;
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
-use sport_log_types::{
-    Action, ActionId, ActionProvider, ActionProviderId, CardioSession, CardioSessionId, CardioType,
-    Movement, Platform, PlatformId, Position,
-};
+use sport_log_types::{CardioSession, CardioSessionId, CardioType, Movement, Position};
 
 const NAME: &str = "sportstracker-fetch";
 const DESCRIPTION: &str = "Sportstracker Fetch can fetch the latests workouts recorded with sportstracker and save them in your cardio sessions.";
@@ -121,44 +118,16 @@ async fn main() {
 async fn setup() {
     let config = Config::get();
 
-    let mut rng = rand::thread_rng();
-
-    let platform = Platform {
-        id: PlatformId(rng.gen()),
-        name: PLATFORM_NAME.to_owned(),
-        last_change: Utc::now(),
-        deleted: false,
-    };
-
-    let action_provider = ActionProvider {
-        id: ActionProviderId(rng.gen()),
-        name: NAME.to_owned(),
-        password: config.password.clone(),
-        platform_id: platform.id,
-        description: Some(DESCRIPTION.to_owned()),
-        last_change: Utc::now(),
-        deleted: false,
-    };
-
-    let actions = vec![Action {
-        id: ActionId(rng.gen()),
-        name: "fetch".to_owned(),
-        action_provider_id: action_provider.id,
-        description: Some("Fetch and save new workouts.".to_owned()),
-        create_before: 168,
-        delete_after: 0,
-        last_change: Utc::now(),
-        deleted: false,
-    }];
-
     setup_db(
         &config.base_url,
         NAME,
         &config.password,
+        DESCRIPTION,
         PLATFORM_NAME,
-        platform,
-        action_provider,
-        actions,
+        true,
+        &[("fetch", "Fetch and save new workouts.")],
+        168,
+        0,
     )
     .await;
 }
@@ -203,13 +172,16 @@ async fn fetch() {
     for exec_action_event in exec_action_events {
         println!("{:#?}", exec_action_event);
 
-        if let Some(token) = get_token(
-            &client,
-            &exec_action_event.username,
-            &exec_action_event.password,
-        )
-        .await
+        let (username, password) = if let (Some(username), Some(password)) =
+            (exec_action_event.username, exec_action_event.password)
         {
+            (username, password)
+        } else {
+            println!("not credential provided");
+            continue;
+        };
+
+        if let Some(token) = get_token(&client, &username, &password).await {
             let token = (token.0, token.1.as_str());
             println!("{:?}", token);
 

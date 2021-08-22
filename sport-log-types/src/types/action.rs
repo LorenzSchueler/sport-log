@@ -1,17 +1,17 @@
 use chrono::{DateTime, Utc};
 #[cfg(feature = "full")]
 use diesel_derive_enum::DbEnum;
-#[cfg(feature = "full")]
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    CheckAPId, CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds,
-    GetBySync, GetByUser, GetByUserSync, ToI64, ToSql, Update, VerifyForActionProviderWithDb,
+    CheckAPId, CheckUserId, Create, CreateMultiple, FromSql, GetAll, GetById, GetByIds, GetBySync,
+    GetByUser, GetByUserSync, ToSql, Update, VerifyForActionProviderWithDb,
     VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
     VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
     VerifyIdUnchecked, VerifyUnchecked,
 };
+use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{from_str, to_str, PlatformId, UserId};
 #[cfg(feature = "full")]
@@ -20,15 +20,13 @@ use crate::{
     Platform, User,
 };
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
     derive(
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI64,
-        ToI64,
         ToSql,
         FromSql,
         VerifyIdForAdmin,
@@ -73,15 +71,13 @@ pub struct ActionProvider {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
     derive(
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI64,
-        ToI64,
         ToSql,
         FromSql,
         VerifyIdForActionProvider
@@ -155,19 +151,10 @@ impl Weekday {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Hash,
-        FromSqlRow,
-        AsExpression,
-        FromI64,
-        ToI64,
-        ToSql,
-        FromSql,
-        VerifyIdForUser
-    )
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUser)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct ActionRuleId(pub i64);
@@ -215,15 +202,13 @@ pub struct ActionRule {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
     derive(
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI64,
-        ToI64,
         ToSql,
         FromSql,
         VerifyIdForUser,
@@ -305,8 +290,8 @@ pub struct ExecutableActionEvent {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
-    pub username: String,
-    pub password: String,
+    pub username: Option<String>,
+    pub password: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

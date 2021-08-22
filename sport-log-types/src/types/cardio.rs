@@ -16,10 +16,10 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetById, GetByIds, GetByUser,
-    GetByUserSync, ToI64, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
-    VerifyIdForUserOrAP,
+    CheckUserId, Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync,
+    ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
 };
+use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, UserId};
 #[cfg(feature = "full")]
@@ -37,6 +37,12 @@ pub enum CardioType {
 }
 
 /// A GPS position.
+///
+/// `latitude` and `longitude` are meassured in decimal degrees.
+///
+/// `elevation` is the elevation above sea level in in meter.
+///
+/// `distance` is the distance in meter since the start of the recording.
 ///
 /// `time` is the time in seconds since the start of the recording.
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -86,19 +92,10 @@ impl FromSql<Position, Pg> for Position {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Hash,
-        FromSqlRow,
-        AsExpression,
-        FromI64,
-        ToI64,
-        ToSql,
-        FromSql,
-        VerifyIdForUserOrAP
-    )
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct RouteId(pub i64);
@@ -147,19 +144,10 @@ pub struct Route {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Hash,
-        FromSqlRow,
-        AsExpression,
-        FromI64,
-        ToI64,
-        ToSql,
-        FromSql,
-        VerifyIdForUserOrAP
-    )
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct CardioSessionId(pub i64);

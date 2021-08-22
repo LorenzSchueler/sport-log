@@ -9,10 +9,10 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetById, GetByIds, GetByUser,
-    GetByUserSync, ToI64, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
-    VerifyIdForUserOrAP,
+    CheckUserId, Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync,
+    ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
 };
+use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{
     from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, MovementUnit,
@@ -34,14 +34,15 @@ pub enum MetconType {
     ForTime,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI64, ToI64, ToSql, FromSql,)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql,)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct MetconId(pub i64);
 
+#[cfg(feature = "full")]
 impl VerifyIdForUserOrAP for UnverifiedId<MetconId> {
     type Id = MetconId;
 
@@ -197,10 +198,10 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Metcon>> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(Hash, FromSqlRow, AsExpression, FromI64, ToI64, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct MetconMovementId(pub i64);
@@ -331,19 +332,10 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Hash,
-        FromSqlRow,
-        AsExpression,
-        FromI64,
-        ToI64,
-        ToSql,
-        FromSql,
-        VerifyIdForUserOrAP
-    )
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct MetconSessionId(pub i64);

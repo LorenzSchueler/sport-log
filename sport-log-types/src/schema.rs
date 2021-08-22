@@ -214,6 +214,7 @@ table! {
     platform (id) {
         id -> Int8,
         name -> Varchar,
+        credential -> Bool,
         last_change -> Timestamptz,
         deleted -> Bool,
     }

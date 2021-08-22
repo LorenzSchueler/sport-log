@@ -83,12 +83,7 @@ pub async fn ap_create_action(
     conn.run(|c| Action::create(action, c)).await.into_json()
 }
 
-#[post(
-    "/ap/action",
-    format = "application/json",
-    data = "<actions>",
-    rank = 2
-)]
+#[post("/ap/actions", format = "application/json", data = "<actions>")]
 pub async fn ap_create_actions(
     actions: Unverified<Vec<Action>>,
     auth: AuthAP,
@@ -136,12 +131,7 @@ pub async fn create_action_rule(
         .into_json()
 }
 
-#[post(
-    "/action_rule",
-    format = "application/json",
-    data = "<action_rules>",
-    rank = 2
-)]
+#[post("/action_rules", format = "application/json", data = "<action_rules>")]
 pub async fn create_action_rules(
     action_rules: Unverified<Vec<ActionRule>>,
     auth: AuthUser,
@@ -198,12 +188,7 @@ pub async fn update_action_rule(
         .into_json()
 }
 
-#[put(
-    "/action_rule",
-    format = "application/json",
-    data = "<action_rules>",
-    rank = 2
-)]
+#[put("/action_rules", format = "application/json", data = "<action_rules>")]
 pub async fn update_action_rules(
     action_rules: Unverified<Vec<ActionRule>>,
     auth: AuthUser,
@@ -230,10 +215,9 @@ pub async fn create_action_event(
 }
 
 #[post(
-    "/action_event",
+    "/action_events",
     format = "application/json",
-    data = "<action_events>",
-    rank = 2
+    data = "<action_events>"
 )]
 pub async fn create_action_events(
     action_events: Unverified<Vec<ActionEvent>>,
@@ -247,7 +231,7 @@ pub async fn create_action_events(
 }
 
 #[post(
-    "/adm/action_event",
+    "/adm/action_events",
     format = "application/json",
     data = "<action_events>"
 )]
@@ -310,10 +294,9 @@ pub async fn update_action_event(
 }
 
 #[put(
-    "/action_event",
+    "/action_events",
     format = "application/json",
-    data = "<action_events>",
-    rank = 2
+    data = "<action_events>"
 )]
 pub async fn update_action_events(
     action_events: Unverified<Vec<ActionEvent>>,
@@ -345,7 +328,7 @@ pub async fn adm_update_action_event(
 }
 
 #[delete(
-    "/ap/action_event",
+    "/ap/action_events",
     format = "application/json",
     data = "<action_event_ids>"
 )]
@@ -363,7 +346,7 @@ pub async fn ap_delete_action_events(
 }
 
 #[delete(
-    "/adm/action_event",
+    "/adm/action_events",
     format = "application/json",
     data = "<action_event_ids>"
 )]

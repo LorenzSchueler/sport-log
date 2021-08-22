@@ -18,7 +18,7 @@ pub async fn create_wod(
     conn.run(|c| Wod::create(wod, c)).await.into_json()
 }
 
-#[post("/wod", format = "application/json", data = "<wods>", rank = 2)]
+#[post("/wods", format = "application/json", data = "<wods>")]
 pub async fn create_wods(
     wods: Unverified<Vec<Wod>>,
     auth: AuthUserOrAP,
@@ -61,7 +61,7 @@ pub async fn update_wod(
     conn.run(|c| Wod::update(wod, c)).await.into_json()
 }
 
-#[put("/wod", format = "application/json", data = "<wods>", rank = 2)]
+#[put("/wods", format = "application/json", data = "<wods>")]
 pub async fn update_wods(
     wods: Unverified<Vec<Wod>>,
     auth: AuthUserOrAP,
@@ -83,7 +83,7 @@ pub async fn create_diary(
     conn.run(|c| Diary::create(diary, c)).await.into_json()
 }
 
-#[post("/diary", format = "application/json", data = "<diaries>", rank = 2)]
+#[post("/diaries", format = "application/json", data = "<diaries>")]
 pub async fn create_diaries(
     diaries: Unverified<Vec<Diary>>,
     auth: AuthUserOrAP,
@@ -138,7 +138,7 @@ pub async fn update_diary(
     conn.run(|c| Diary::update(diary, c)).await.into_json()
 }
 
-#[put("/diary", format = "application/json", data = "<diaries>", rank = 2)]
+#[put("/diaries", format = "application/json", data = "<diaries>")]
 pub async fn update_diaries(
     diaries: Unverified<Vec<Diary>>,
     auth: AuthUserOrAP,

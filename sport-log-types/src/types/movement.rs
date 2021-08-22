@@ -7,19 +7,18 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "full")]
 use sport_log_types_derive::{
-    CheckUserId, Create, CreateMultiple, FromI64, FromSql, GetAll, GetById, GetByIds, ToI64, ToSql,
-    Update, VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
+    CheckUserId, Create, CreateMultiple, FromSql, GetAll, GetById, GetByIds, ToSql, Update,
+    VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
 };
+use sport_log_types_derive::{FromI64, ToI64};
 
-use crate::{
-    from_str, from_str_optional, to_str, to_str_optional, CheckUserId, UnverifiedIds, UserId,
-    VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithDb,
-};
+use crate::{from_str, from_str_optional, to_str, to_str_optional, UserId};
 #[cfg(feature = "full")]
 use crate::{
     schema::{eorm, movement},
-    AuthUserOrAP, GetById, Unverified, UnverifiedId, User, VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyMultipleForUserOrAPWithoutDb,
+    AuthUserOrAP, CheckUserId, GetById, Unverified, UnverifiedId, UnverifiedIds, User,
+    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
+    VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -41,15 +40,13 @@ pub enum MovementUnit {
     Mile,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
     derive(
         Hash,
         FromSqlRow,
         AsExpression,
-        FromI64,
-        ToI64,
         ToSql,
         FromSql,
         VerifyIdForAdmin,
@@ -59,6 +56,7 @@ pub enum MovementUnit {
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct MovementId(pub i64);
 
+#[cfg(feature = "full")]
 impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
     type Id = MovementId;
 
@@ -213,19 +211,10 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "full",
-    derive(
-        Hash,
-        FromSqlRow,
-        AsExpression,
-        FromI64,
-        ToI64,
-        ToSql,
-        FromSql,
-        VerifyIdForAdmin
-    )
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForAdmin)
 )]
 #[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
 pub struct EormId(pub i64);

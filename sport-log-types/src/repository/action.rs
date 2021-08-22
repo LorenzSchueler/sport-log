@@ -222,6 +222,7 @@ impl GetAll for CreatableActionRule {
         action_rule::table
             .inner_join(action::table)
             .filter(action_rule::columns::enabled.eq(true))
+            .filter(action_rule::columns::deleted.eq(false))
             .select((
                 action_rule::columns::id,
                 action_rule::columns::user_id,
@@ -241,20 +242,21 @@ impl ExecutableActionEvent {
     ) -> QueryResult<Vec<Self>> {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
-            .inner_join(
+            .left_outer_join(
                 platform_credential::table.on(platform_credential::columns::platform_id
                     .eq(action_provider::columns::platform_id)
                     .and(platform_credential::columns::user_id.eq(action_event::columns::user_id))),
             )
             .filter(action_provider::columns::id.eq(action_provider_id))
             .filter(action_event::columns::enabled.eq(true))
+            .filter(action_event::columns::deleted.eq(false))
             .select((
                 action_event::columns::id,
                 action::columns::name,
                 action_event::columns::datetime,
-                platform_credential::columns::user_id,
-                platform_credential::columns::username,
-                platform_credential::columns::password,
+                action_event::columns::user_id,
+                platform_credential::columns::username.nullable(),
+                platform_credential::columns::password.nullable(),
             ))
             .get_results(conn)
     }
@@ -267,21 +269,22 @@ impl ExecutableActionEvent {
     ) -> QueryResult<Vec<Self>> {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
-            .inner_join(
+            .left_outer_join(
                 platform_credential::table.on(platform_credential::columns::platform_id
                     .eq(action_provider::columns::platform_id)
                     .and(platform_credential::columns::user_id.eq(action_event::columns::user_id))),
             )
             .filter(action_provider::columns::id.eq(action_provider_id))
             .filter(action_event::columns::enabled.eq(true))
+            .filter(action_event::columns::deleted.eq(false))
             .filter(action_event::columns::datetime.between(start_datetime, end_datetime))
             .select((
                 action_event::columns::id,
                 action::columns::name,
                 action_event::columns::datetime,
-                platform_credential::columns::user_id,
-                platform_credential::columns::username,
-                platform_credential::columns::password,
+                action_event::columns::user_id,
+                platform_credential::columns::username.nullable(),
+                platform_credential::columns::password.nullable(),
             ))
             .order_by(action_event::columns::datetime)
             .get_results(conn)

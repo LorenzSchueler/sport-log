@@ -1,4 +1,5 @@
 /target
 /.idea
+/sport-log-action-provider-map-matching/map-matching
 .env
 private_data.sh

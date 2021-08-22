@@ -82,10 +82,9 @@ pub async fn create_platform_credential(
 }
 
 #[post(
-    "/platform_credential",
+    "/platform_credentials",
     format = "application/json",
-    data = "<platform_credentials>",
-    rank = 2
+    data = "<platform_credentials>"
 )]
 pub async fn create_platform_credentials(
     platform_credentials: Unverified<Vec<PlatformCredential>>,
@@ -139,10 +138,9 @@ pub async fn update_platform_credential(
 }
 
 #[put(
-    "/platform_credential",
+    "/platform_credentials",
     format = "application/json",
-    data = "<platform_credentials>",
-    rank = 2
+    data = "<platform_credentials>"
 )]
 pub async fn update_platform_credentials(
     platform_credentials: Unverified<Vec<PlatformCredential>>,

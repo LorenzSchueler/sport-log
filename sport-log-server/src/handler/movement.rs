@@ -21,12 +21,7 @@ pub async fn create_movement(
         .into_json()
 }
 
-#[post(
-    "/movement",
-    format = "application/json",
-    data = "<movements>",
-    rank = 2
-)]
+#[post("/movements", format = "application/json", data = "<movements>")]
 pub async fn create_movements(
     movements: Unverified<Vec<Movement>>,
     auth: AuthUserOrAP,
@@ -71,12 +66,7 @@ pub async fn update_movement(
         .into_json()
 }
 
-#[put(
-    "/movement",
-    format = "application/json",
-    data = "<movements>",
-    rank = 2
-)]
+#[put("/movements", format = "application/json", data = "<movements>")]
 pub async fn update_movements(
     movements: Unverified<Vec<Movement>>,
     auth: AuthUserOrAP,

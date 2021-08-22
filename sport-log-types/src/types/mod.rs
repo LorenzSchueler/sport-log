@@ -10,8 +10,7 @@ use rocket::{
     serde::json::{self, Json},
     Data, Request,
 };
-#[cfg(feature = "full")]
-use serde::Deserialize;
+use serde::{de, Deserialize, Deserializer, Serializer};
 
 mod account;
 mod action;
@@ -49,7 +48,6 @@ pub use diary_wod::*;
 pub use metcon::*;
 pub use movement::*;
 pub use platform::*;
-use serde::{de, Deserializer, Serializer};
 pub use sharing::*;
 pub use strength::*;
 pub use user::*;
@@ -94,7 +92,7 @@ where
     Ok(T::from_i64(s))
 }
 
-pub fn to_str<'de, T, S>(id: &T, serializer: S) -> Result<S::Ok, S::Error>
+pub fn to_str<T, S>(id: &T, serializer: S) -> Result<S::Ok, S::Error>
 where
     T: ToI64,
     S: Serializer,
@@ -114,7 +112,7 @@ where
     })
 }
 
-pub fn to_str_optional<'de, T, S>(id: &Option<T>, serializer: S) -> Result<S::Ok, S::Error>
+pub fn to_str_optional<T, S>(id: &Option<T>, serializer: S) -> Result<S::Ok, S::Error>
 where
     T: ToI64,
     S: Serializer,
@@ -125,9 +123,9 @@ where
     }
 }
 
-/// Wrapper around Id types for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
+/// Wrapper around an incomming id for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///
-/// The Id type can be retrieved by using the appropriate verification function.
+/// The id can be retrieved by using the appropriate verification function.
 #[cfg(feature = "full")]
 #[derive(Debug, Clone)]
 pub struct UnverifiedId<I>(I);
@@ -141,9 +139,9 @@ impl<'v, I: FromI64> rocket::request::FromParam<'v> for UnverifiedId<I> {
     }
 }
 
-/// Wrapper around Id types for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
+/// Wrapper around multiple incoming ids for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///
-/// The Id type can be retrieved by using the appropriate verification function.
+/// The ids type can be retrieved by using the appropriate verification function.
 #[cfg(feature = "full")]
 #[derive(Debug, Clone)]
 pub struct UnverifiedIds<I>(Vec<I>);
