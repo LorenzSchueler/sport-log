@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/duration_picker.dart';
 
 class EditStrengthSessionPage extends StatefulWidget {
   const EditStrengthSessionPage({
@@ -254,7 +255,10 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
   }
 
   Widget _intervalInput(BuildContext context) {
-    return Text(formatDuration(Duration(seconds: ssd.strengthSession.interval ?? 0)));
+    return DurationPicker(
+      setValue: _setInterval,
+      initialValue: Duration(seconds: ssd.strengthSession.interval ?? 0),
+    );
   }
 
   Widget _maybeIntervalInput(BuildContext context) {
