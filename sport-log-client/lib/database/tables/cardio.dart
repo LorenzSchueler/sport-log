@@ -42,7 +42,7 @@ create table route (
     distance integer not null check (distance > 0),
     ascent integer check (ascent >= 0),
     descent integer check (descent >= 0),
-    track blob,
+    track blob not null,
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
     is_new integer not null check (is_new in (0, 1)),

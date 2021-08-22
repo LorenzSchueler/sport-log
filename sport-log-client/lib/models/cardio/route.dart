@@ -30,7 +30,7 @@ class Route implements DbObject {
   int distance;
   int? ascent;
   int? descent;
-  List<Position>? track;
+  List<Position> track;
   @override
   bool deleted;
 
@@ -43,7 +43,7 @@ class Route implements DbObject {
         && distance > 0
         && (ascent == null || ascent! >= 0)
         && (descent == null || descent! >= 0)
-        && (track == null || track!.isNotEmpty)
+        && track.isNotEmpty
         && !deleted;
 
   }
@@ -59,7 +59,7 @@ class DbRouteSerializer implements DbSerializer<Route> {
       distance: r[Keys.distance]! as int,
       ascent: r[Keys.ascent] as int?,
       descent: r[Keys.descent] as int?,
-      track: const DbPositionListConverter().mapToDart(r[Keys.track] as Uint8List?),
+      track: const DbPositionListConverter().mapToDart(r[Keys.track]! as Uint8List)!,
       deleted: r[Keys.deleted] == 1,
     );
   }
@@ -73,7 +73,7 @@ class DbRouteSerializer implements DbSerializer<Route> {
       Keys.distance: o.distance,
       Keys.ascent: o.ascent,
       Keys.descent: o.descent,
-      Keys.track: const DbPositionListConverter().mapToSql(o.track),
+      Keys.track: const DbPositionListConverter().mapToSql(o.track)!,
       Keys.deleted: o.deleted ? 1 : 0,
     };
   }

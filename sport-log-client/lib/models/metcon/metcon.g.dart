@@ -6,18 +6,16 @@ part of 'metcon.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Metcon _$MetconFromJson(Map<String, dynamic> json) {
-  return Metcon(
-    id: const IdConverter().fromJson(json['id'] as String),
-    userId: const OptionalIdConverter().fromJson(json['user_id'] as String?),
-    name: json['name'] as String?,
-    metconType: _$enumDecode(_$MetconTypeEnumMap, json['metcon_type']),
-    rounds: json['rounds'] as int?,
-    timecap: json['timecap'] as int?,
-    description: json['description'] as String?,
-    deleted: json['deleted'] as bool,
-  );
-}
+Metcon _$MetconFromJson(Map<String, dynamic> json) => Metcon(
+      id: const IdConverter().fromJson(json['id'] as String),
+      userId: const OptionalIdConverter().fromJson(json['user_id'] as String?),
+      name: json['name'] as String?,
+      metconType: _$enumDecode(_$MetconTypeEnumMap, json['metcon_type']),
+      rounds: json['rounds'] as int?,
+      timecap: json['timecap'] as int?,
+      description: json['description'] as String?,
+      deleted: json['deleted'] as bool,
+    );
 
 Map<String, dynamic> _$MetconToJson(Metcon instance) => <String, dynamic>{
       'id': const IdConverter().toJson(instance.id),

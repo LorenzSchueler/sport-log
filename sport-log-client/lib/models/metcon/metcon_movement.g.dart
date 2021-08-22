@@ -6,18 +6,17 @@ part of 'metcon_movement.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-MetconMovement _$MetconMovementFromJson(Map<String, dynamic> json) {
-  return MetconMovement(
-    id: const IdConverter().fromJson(json['id'] as String),
-    metconId: const IdConverter().fromJson(json['metcon_id'] as String),
-    movementId: const IdConverter().fromJson(json['movement_id'] as String),
-    movementNumber: json['movement_number'] as int,
-    count: json['count'] as int,
-    movementUnit: _$enumDecode(_$MovementUnitEnumMap, json['movement_unit']),
-    weight: (json['weight'] as num?)?.toDouble(),
-    deleted: json['deleted'] as bool,
-  );
-}
+MetconMovement _$MetconMovementFromJson(Map<String, dynamic> json) =>
+    MetconMovement(
+      id: const IdConverter().fromJson(json['id'] as String),
+      metconId: const IdConverter().fromJson(json['metcon_id'] as String),
+      movementId: const IdConverter().fromJson(json['movement_id'] as String),
+      movementNumber: json['movement_number'] as int,
+      count: json['count'] as int,
+      movementUnit: _$enumDecode(_$MovementUnitEnumMap, json['movement_unit']),
+      weight: (json['weight'] as num?)?.toDouble(),
+      deleted: json['deleted'] as bool,
+    );
 
 Map<String, dynamic> _$MetconMovementToJson(MetconMovement instance) =>
     <String, dynamic>{

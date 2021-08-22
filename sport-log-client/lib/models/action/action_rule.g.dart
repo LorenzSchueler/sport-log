@@ -6,17 +6,15 @@ part of 'action_rule.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-ActionRule _$ActionRuleFromJson(Map<String, dynamic> json) {
-  return ActionRule(
-    id: const IdConverter().fromJson(json['id'] as String),
-    userId: const IdConverter().fromJson(json['user_id'] as String),
-    actionId: const IdConverter().fromJson(json['action_id'] as String),
-    weekday: _$enumDecode(_$WeekdayEnumMap, json['weekday']),
-    time: const DateTimeConverter().fromJson(json['time'] as String),
-    enabled: json['enabled'] as bool,
-    deleted: json['deleted'] as bool,
-  );
-}
+ActionRule _$ActionRuleFromJson(Map<String, dynamic> json) => ActionRule(
+      id: const IdConverter().fromJson(json['id'] as String),
+      userId: const IdConverter().fromJson(json['user_id'] as String),
+      actionId: const IdConverter().fromJson(json['action_id'] as String),
+      weekday: _$enumDecode(_$WeekdayEnumMap, json['weekday']),
+      time: const DateTimeConverter().fromJson(json['time'] as String),
+      enabled: json['enabled'] as bool,
+      deleted: json['deleted'] as bool,
+    );
 
 Map<String, dynamic> _$ActionRuleToJson(ActionRule instance) =>
     <String, dynamic>{
