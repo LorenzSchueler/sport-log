@@ -15,6 +15,7 @@ class AppDatabase {
 
   AppDatabase._();
 
+  // TODO: local variable
   late Database _db;
 
   Future<void> init() async {
