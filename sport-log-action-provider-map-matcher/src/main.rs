@@ -12,7 +12,7 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
-use sport_log_types::{CardioSession, Position, Route, RouteId};
+use sport_log_types::{CardioSession, CardioSessionId, Position, Route, RouteId};
 use tokio::process::Command;
 
 const NAME: &str = "map-matcher";
@@ -120,9 +120,24 @@ async fn map_match() {
         println!("{:#?}", exec_action_event);
 
         let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
+        let cardio_session_id: CardioSessionId = match exec_action_event
+            .arguments
+            .map(|arg| arg.parse().ok())
+            .flatten()
+        {
+            Some(arg) => CardioSessionId(arg),
+            None => {
+                println!("action event has no cardion session id as argument");
+                delete_action_event_ids.push(exec_action_event.action_event_id);
+                continue;
+            }
+        };
 
-        let mut cardio_sessions: Vec<CardioSession> = client
-            .get(format!("{}/v1/cardio_session", config.base_url))
+        let mut cardio_session: CardioSession = client
+            .get(format!(
+                "{}/v1/cardio_session/{}",
+                config.base_url, cardio_session_id.0
+            ))
             .basic_auth(&username, Some(&config.password))
             .send()
             .await
@@ -131,59 +146,55 @@ async fn map_match() {
             .await
             .unwrap();
 
-        println!("cardio sessions:\t{}", cardio_sessions.len());
+        let route = match_to_map(&cardio_session).await.unwrap();
 
-        for cardio_session in &mut cardio_sessions[0..1] {
-            let route = match_to_map(cardio_session).await.unwrap();
+        let routes: Vec<Route> = client
+            .get(format!("{}/v1/route", config.base_url))
+            .basic_auth(&username, Some(&config.password))
+            .send()
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap();
 
-            let routes: Vec<Route> = client
-                .get(format!("{}/v1/route", config.base_url))
-                .basic_auth(&username, Some(&config.password))
-                .send()
-                .await
-                .unwrap()
-                .json()
-                .await
-                .unwrap();
-
-            if let Some(route_id) = compare_routes(&route, &routes) {
-                cardio_session.route_id = Some(route_id);
-            } else {
-                match client
-                    .post(format!("{}/v1/route", config.base_url))
-                    .basic_auth(&username, Some(&config.password))
-                    .json(&route)
-                    .send()
-                    .await
-                    .unwrap()
-                    .status()
-                {
-                    status if status.is_success() => {
-                        println!("route saved");
-                    }
-                    status => {
-                        println!("error (status {:?})", status);
-                        break;
-                    }
-                }
-            }
-
+        if let Some(route_id) = compare_routes(&route, &routes) {
+            cardio_session.route_id = Some(route_id);
+        } else {
             match client
-                .put(format!("{}/v1/cardio_session", config.base_url))
+                .post(format!("{}/v1/route", config.base_url))
                 .basic_auth(&username, Some(&config.password))
-                .json(cardio_session)
+                .json(&route)
                 .send()
                 .await
                 .unwrap()
                 .status()
             {
                 status if status.is_success() => {
-                    println!("cardio session saved");
+                    println!("route saved");
                 }
                 status => {
                     println!("error (status {:?})", status);
                     break;
                 }
+            }
+        }
+
+        match client
+            .put(format!("{}/v1/cardio_session", config.base_url))
+            .basic_auth(&username, Some(&config.password))
+            .json(&cardio_session)
+            .send()
+            .await
+            .unwrap()
+            .status()
+        {
+            status if status.is_success() => {
+                println!("cardio session saved");
+            }
+            status => {
+                println!("error (status {:?})", status);
+                break;
             }
         }
         delete_action_event_ids.push(exec_action_event.action_event_id);
