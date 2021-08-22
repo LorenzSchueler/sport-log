@@ -195,6 +195,7 @@ pub struct ActionRule {
     pub action_id: ActionId,
     pub weekday: Weekday,
     pub time: DateTime<Utc>,
+    pub arguments: Option<String>,
     pub enabled: bool,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -255,6 +256,7 @@ pub struct ActionEvent {
     #[serde(deserialize_with = "from_str")]
     pub action_id: ActionId,
     pub datetime: DateTime<Utc>,
+    pub arguments: Option<String>,
     pub enabled: bool,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -276,6 +278,7 @@ pub struct CreatableActionRule {
     pub action_id: ActionId,
     pub weekday: Weekday,
     pub time: DateTime<Utc>,
+    pub arguments: Option<String>,
     pub create_before: i32,
 }
 
@@ -287,6 +290,7 @@ pub struct ExecutableActionEvent {
     pub action_event_id: ActionEventId,
     pub action_name: String,
     pub datetime: DateTime<Utc>,
+    pub arguments: Option<String>,
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
