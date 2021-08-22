@@ -15,7 +15,7 @@ create table route (
     distance integer not null check (distance > 0),
     ascent integer check (ascent >= 0),
     descent integer check (descent >= 0),
-    track "position"[],
+    track "position"[] not null,
     last_change timestamptz not null default now(),
     deleted boolean not null default false,
     unique (user_id, name, deleted)
@@ -23,9 +23,6 @@ create table route (
 
 create trigger set_timestamp before update on route
     for each row execute procedure trigger_set_timestamp();
-
-insert into route (id, user_id, name, distance, ascent, descent, track) values
-    (1, 1, 'around the lake', 26500, 43, 43, null);
 
 create table cardio_session (
     id bigint primary key,
@@ -58,4 +55,4 @@ insert into cardio_session (id, user_id, movement_id, cardio_type, datetime,
         cadence, avg_heart_rate, heart_rate, route_id, comments) values
     (1, 1, 5, 'training', '2021-08-22 10:25:34', 
         26742, 35, 43, 9134, null, null, 167, 
-        null, 156, null, 1, null);
+        null, 156, null, null, null);

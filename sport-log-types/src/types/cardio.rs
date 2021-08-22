@@ -137,7 +137,7 @@ pub struct Route {
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub descent: Option<i32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
-    pub track: Option<Vec<Position>>,
+    pub track: Vec<Position>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,

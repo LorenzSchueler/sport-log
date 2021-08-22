@@ -319,7 +319,7 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
         distance: cardio_session.distance.unwrap(), // calc new
         ascent: Some(ascent as i32),
         descent: Some(descent as i32),
-        track: Some(positions),
+        track: positions,
         last_change: Utc::now(),
         deleted: false,
     }
@@ -335,72 +335,73 @@ fn compare_routes(route: &Route, routes: &[Route]) -> Option<RouteId> {
         if (route.distance - old_route.distance).abs() > route.distance / MAX_MISSES {
             continue 'route_loop;
         }
-        if let (Some(track), Some(old_track)) = (&route.track, &old_route.track) {
-            if (track.len() as i32 - old_track.len() as i32).abs() > track.len() as i32 / MAX_MISSES
+        if (route.track.len() as i32 - old_route.track.len() as i32).abs()
+            > route.track.len() as i32 / MAX_MISSES
+        {
+            continue 'route_loop;
+        }
+        let coords: Vec<_> = route
+            .track
+            .iter()
+            .map(|position| (position.latitude, position.longitude))
+            .collect();
+        let old_coords: Vec<_> = old_route
+            .track
+            .iter()
+            .map(|position| (position.latitude, position.longitude))
+            .collect();
+        let mut hits = 0;
+        let mut misses = 0;
+        let mut cont_misses = 0;
+        let mut idx = 0;
+        let mut old_idx = 0;
+        'match_loop: loop {
+            if misses > route.track.len() as i32 / MAX_MISSES
+                || cont_misses > route.track.len() as i32 / MAX_CONT_MISSES
             {
                 continue 'route_loop;
             }
-            let coords: Vec<_> = track
-                .iter()
-                .map(|position| (position.latitude, position.longitude))
-                .collect();
-            let old_coords: Vec<_> = old_track
-                .iter()
-                .map(|position| (position.latitude, position.longitude))
-                .collect();
-            let mut hits = 0;
-            let mut misses = 0;
-            let mut cont_misses = 0;
-            let mut idx = 0;
-            let mut old_idx = 0;
-            'match_loop: loop {
-                if misses > track.len() as i32 / MAX_MISSES
-                    || cont_misses > track.len() as i32 / MAX_CONT_MISSES
-                {
-                    continue 'route_loop;
-                }
-                if idx == coords.len() || old_idx == coords.len() {
-                    break 'match_loop;
-                }
-                if coords[idx] == old_coords[old_idx] {
-                    hits += 1;
-                    cont_misses = 0;
-                    idx += 1;
-                    old_idx += 1;
-                } else {
-                    // find next match within MAX_CONT_MISSES
-                    misses += 1;
-                    cont_misses += 1;
-                    let end = usize::min(
-                        idx + coords.len() / MAX_CONT_MISSES as usize,
-                        coords.len() - 1,
-                    );
-                    let old_end = usize::min(
-                        old_idx + old_coords.len() / MAX_CONT_MISSES as usize,
-                        old_coords.len() - 1,
-                    );
-                    for (i, coord) in coords[idx..end].iter().enumerate() {
-                        for (old_i, old_coord) in old_coords[old_idx..old_end].iter().enumerate() {
-                            if coord == old_coord {
-                                idx = i;
-                                old_idx = old_i;
-                                continue 'match_loop;
-                            }
+            if idx == coords.len() || old_idx == coords.len() {
+                break 'match_loop;
+            }
+            if coords[idx] == old_coords[old_idx] {
+                hits += 1;
+                cont_misses = 0;
+                idx += 1;
+                old_idx += 1;
+            } else {
+                // find next match within MAX_CONT_MISSES
+                misses += 1;
+                cont_misses += 1;
+                let end = usize::min(
+                    idx + coords.len() / MAX_CONT_MISSES as usize,
+                    coords.len() - 1,
+                );
+                let old_end = usize::min(
+                    old_idx + old_coords.len() / MAX_CONT_MISSES as usize,
+                    old_coords.len() - 1,
+                );
+                for (i, coord) in coords[idx..end].iter().enumerate() {
+                    for (old_i, old_coord) in old_coords[old_idx..old_end].iter().enumerate() {
+                        if coord == old_coord {
+                            idx = i;
+                            old_idx = old_i;
+                            continue 'match_loop;
                         }
                     }
-                    break 'match_loop;
                 }
+                break 'match_loop;
             }
-            println!("misses: {}", misses);
-            println!("cont misses: {}", cont_misses);
-            println!("hits: {}", hits);
-            if misses > track.len() as i32 / MAX_MISSES
-                || cont_misses > track.len() as i32 / MAX_CONT_MISSES
-            {
-                continue 'route_loop;
-            } else {
-                return Some(old_route.id);
-            }
+        }
+        println!("misses: {}", misses);
+        println!("cont misses: {}", cont_misses);
+        println!("hits: {}", hits);
+        if misses > route.track.len() as i32 / MAX_MISSES
+            || cont_misses > route.track.len() as i32 / MAX_CONT_MISSES
+        {
+            continue 'route_loop;
+        } else {
+            return Some(old_route.id);
         }
     }
     None
