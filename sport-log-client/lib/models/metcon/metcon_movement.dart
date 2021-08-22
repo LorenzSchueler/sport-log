@@ -37,7 +37,7 @@ class MetconMovement implements DbObject {
   @override
   bool isValid() {
     return deleted != true
-        && movementNumber > 0
+        && movementNumber >= 0
         && count > 0
         && (weight == null || weight! > 0);
   }

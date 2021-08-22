@@ -18,11 +18,17 @@ class StrengthSessionDescription implements Validatable {
 
   @override
   bool isValid() {
-    return strengthSession.isValid()
-        && strengthSets.isNotEmpty
-        && strengthSets.every((ss) => ss.strengthSessionId == strengthSession.id)
-        && strengthSets.everyIndexed((ss, index) => ss.setNumber == index)
-        && strengthSets.every((ss) => ss.isValid())
-        && strengthSession.movementId == movement.id;
+    return validate(strengthSession.isValid(),
+            'StrengthSessionDescription: strength session not valid')
+        && validate(strengthSets.isNotEmpty,
+            'StrengthSessionDescription: strength sets empty')
+        && validate(strengthSets.every((ss) => ss.strengthSessionId == strengthSession.id),
+            'StrengthSessionDescription: strengthSessionId != strengthSession.id')
+        && validate(strengthSets.everyIndexed((ss, index) => ss.setNumber == index),
+            'StrengthSessionDescription: strengthSets indices wrong')
+        && validate(strengthSets.every((ss) => ss.isValid()),
+            'StrengthSessionDescription: strengthSets not valid')
+        && validate(strengthSession.movementId == movement.id,
+            'StrengthSessionDescription: movement id mismatch');
   }
 }

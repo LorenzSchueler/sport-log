@@ -35,7 +35,7 @@ class StrengthSet implements DbObject {
   @override
   bool isValid() {
     return !deleted
-        && setNumber > 0
+        && setNumber >= 0
         && count > 0
         && (weight == null || weight! > 0);
   }

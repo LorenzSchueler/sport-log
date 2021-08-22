@@ -39,8 +39,9 @@ class StrengthSession implements DbObject {
 
   @override
   bool isValid() {
-    return !deleted
-        && (interval == null || interval! > 0);
+    return validate(!deleted, 'StrengthSession: deleted is true')
+        && validate(interval == null || interval! > 0,
+            'StrengthSession: interval <= 0');
   }
 }
 

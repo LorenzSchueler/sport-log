@@ -34,18 +34,18 @@ class StrengthPage extends StatelessWidget {
         StrengthSessionDescription(
           strengthSession: StrengthSession(id: Int64(1), userId: Int64(1), datetime: DateTime.now(), movementId: Int64(1), movementUnit: MovementUnit.reps, interval: 234, comments: null, deleted: false),
           strengthSets: [
-            StrengthSet(id: Int64(1), strengthSessionId: Int64(1), setNumber: 1, count: 12, weight: 5.6, deleted: false),
-            StrengthSet(id: Int64(2), strengthSessionId: Int64(1), setNumber: 2, count: 11, weight: 5.2, deleted: false),
-            StrengthSet(id: Int64(3), strengthSessionId: Int64(1), setNumber: 3, count: 11, weight: 4.9, deleted: false),
+            StrengthSet(id: Int64(1), strengthSessionId: Int64(1), setNumber: 0, count: 12, weight: 5.6, deleted: false),
+            StrengthSet(id: Int64(2), strengthSessionId: Int64(1), setNumber: 1, count: 11, weight: 5.2, deleted: false),
+            StrengthSet(id: Int64(3), strengthSessionId: Int64(1), setNumber: 2, count: 11, weight: 4.9, deleted: false),
           ],
           movement: Movement(id: Int64(1), userId: Int64(1), name: "Squats", description: "bla", category: MovementCategory.strength, deleted: false),
         ),
         StrengthSessionDescription(
           strengthSession: StrengthSession(id: Int64(1), userId: Int64(1), datetime: DateTime.now(), movementId: Int64(1), movementUnit: MovementUnit.reps, interval: 234, comments: faker.lorem.sentences(8).join(' '), deleted: false),
           strengthSets: [
-            StrengthSet(id: Int64(1), strengthSessionId: Int64(1), setNumber: 1, count: 12, weight: 5.6, deleted: false),
-            StrengthSet(id: Int64(2), strengthSessionId: Int64(1), setNumber: 2, count: 11, weight: 5.2, deleted: false),
-            StrengthSet(id: Int64(3), strengthSessionId: Int64(1), setNumber: 3, count: 11, weight: 4.9, deleted: false),
+            StrengthSet(id: Int64(1), strengthSessionId: Int64(1), setNumber: 0, count: 12, weight: 5.6, deleted: false),
+            StrengthSet(id: Int64(2), strengthSessionId: Int64(1), setNumber: 1, count: 11, weight: 5.2, deleted: false),
+            StrengthSet(id: Int64(3), strengthSessionId: Int64(1), setNumber: 2, count: 11, weight: 4.9, deleted: false),
           ],
           movement: Movement(id: Int64(1), userId: Int64(1), name: "Squats", description: "bla", category: MovementCategory.strength, deleted: false),
         ),
