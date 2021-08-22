@@ -25,7 +25,7 @@ create table metcon_movement (
     id bigint primary key,
     metcon_id bigint not null references metcon on delete cascade,
     movement_id bigint not null references movement on delete no action,
-    movement_number integer not null check (movement_number >= 1),
+    movement_number integer not null check (movement_number >= 0),
     count integer not null check (count >= 1),
     movement_unit movement_unit not null,
     weight real check (weight > 0),

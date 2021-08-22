@@ -21,7 +21,7 @@ insert into strength_session (id, user_id, datetime, movement_id, movement_unit,
 create table strength_set (
     id bigint primary key,
     strength_session_id bigint not null references strength_session on delete cascade,
-    set_number integer not null check (set_number >= 1),
+    set_number integer not null check (set_number >= 0),
     count integer not null check (count >= 1), -- number of completed movement_unit
     weight real check (weight > 0),
     last_change timestamptz not null default now(),
