@@ -1,7 +1,6 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:result_type/result_type.dart';
-import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sqflite/sqflite.dart';

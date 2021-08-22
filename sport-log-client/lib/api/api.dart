@@ -8,7 +8,6 @@ import 'package:sport_log/api/backend_routes.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:http/http.dart' as http;
 import 'package:sport_log/config.dart';
-import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/all.dart';
 
 part 'movement_api.dart';

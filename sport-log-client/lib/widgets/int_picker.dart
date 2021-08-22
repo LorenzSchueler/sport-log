@@ -15,18 +15,21 @@ class IntPicker extends StatefulWidget {
   final Function(int) setValue;
 
   @override
-  State<StatefulWidget> createState() => _IntPickerState(initialValue);
+  State<StatefulWidget> createState() => _IntPickerState();
 }
 
 class _IntPickerState extends State<IntPicker> {
-  _IntPickerState(this._value)
-      : _controller = TextEditingController(text: "$_value"),
-        super();
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.initialValue;
+    _controller.text = '$_value';
+  }
 
   Timer? _decreaseTimer;
   Timer? _increaseTimer;
-  final TextEditingController _controller;
-  int _value;
+  final TextEditingController _controller = TextEditingController();
+  late int _value;
 
   static const _timeBetweenValueChanges = 80; // ms
 

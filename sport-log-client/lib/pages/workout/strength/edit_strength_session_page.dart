@@ -3,7 +3,6 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sport_log/api/api.dart';
-import 'package:sport_log/helpers/human_readable.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';

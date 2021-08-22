@@ -1,4 +1,6 @@
 
+import 'dart:developer';
+
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:result_type/result_type.dart';
@@ -115,11 +117,11 @@ void testActionRule(Api api) async {
       faker.randomGenerator.integer(60),
       faker.randomGenerator.integer(60),
     );
-    print(actionRule.time);
+    log(actionRule.time.toString());
     expect(await api.updateActionRule(actionRule), isA<Success>());
     final result = await api.getActionRule(actionRule.id);
     expect(result, isA<Success>());
-    print(result.success.time);
+    log(result.success.time.toString());
     // expect(result.success.time, actionRule.time);
     expect(await api.updateActionRule(actionRule..deleted=true), isA<Success>());
   });

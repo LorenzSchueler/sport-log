@@ -15,9 +15,6 @@ class AppDatabase {
 
   AppDatabase._();
 
-  // TODO: local variable
-  late Database _db;
-
   Future<void> init() async {
     const fileName = 'database.sqlite';
     final File databaseFile = File(await getDatabasesPath() + '/' + fileName);
@@ -25,7 +22,7 @@ class AppDatabase {
     if (await databaseFile.exists()) {
       await databaseFile.delete();
     }
-    _db = await openDatabase(
+    await openDatabase(
       fileName,
       version: 1,
       onConfigure: (db) => db.execute("PRAGMA foreign_keys = ON;"),

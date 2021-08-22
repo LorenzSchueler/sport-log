@@ -29,7 +29,7 @@ class EditMetconPage extends StatefulWidget {
   final UiMetcon? _initialMetcon;
 
   @override
-  State<StatefulWidget> createState() => _EditMetconPageState(_initialMetcon);
+  State<StatefulWidget> createState() => _EditMetconPageState();
 
   bool get _isEditing => _initialMetcon != null;
 }
@@ -42,13 +42,16 @@ class _EditMetconPageState extends State<EditMetconPage> {
   static const _unitDefaultValue = MovementUnit.reps;
   static const _typeDefaultValue = MetconType.amrap;
 
-  _EditMetconPageState(UiMetcon? metcon)
-    : _metcon = metcon ?? UiMetcon(
-    type: _typeDefaultValue,
-    deleted: false,
-  );
+  @override
+  void initState() {
+    super.initState();
+    _metcon = widget._initialMetcon ?? UiMetcon(
+      type: _typeDefaultValue,
+      deleted: false,
+    );
+  }
   
-  final UiMetcon _metcon;
+  late final UiMetcon _metcon;
 
   final _descriptionFocusNode = FocusNode();
   
