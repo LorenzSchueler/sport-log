@@ -41,7 +41,7 @@
 ## Ideas
 * [ ] use hive instead of shared preferences
 * [ ] page showing recent activity
-* [ ] tidy up helpers directory
+* [x] tidy up helpers directory
 
 ## Database
 * [ ] shouldn't be possible to delete e. g. movement when it is referenced by other resource

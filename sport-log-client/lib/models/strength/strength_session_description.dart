@@ -1,9 +1,9 @@
 
-import 'package:sport_log/helpers/iterable_extension.dart';
+import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
 import 'package:sport_log/models/strength/strength_set.dart';
-import 'package:sport_log/helpers/update_validatable.dart';
+import 'package:sport_log/helpers/validation.dart';
 
 class StrengthSessionDescription implements Validatable {
   StrengthSessionDescription({

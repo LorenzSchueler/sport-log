@@ -8,7 +8,7 @@ extension IterableExtension<T> on Iterable<T> {
     }
   }
 
-  bool everyIndexed(bool test(T element, int index)) {
+  bool everyIndexed(bool Function(T element, int index) test) {
     int index = 0;
     for (T element in this) {
       if (!test(element, index++)) return false;

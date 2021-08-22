@@ -1,7 +1,7 @@
 
 import 'package:fixnum/fixnum.dart';
 import 'package:result_type/result_type.dart';
-import 'package:sport_log/helpers/update_validatable.dart';
+import 'package:sport_log/helpers/validation.dart';
 
 typedef DbRecord = Map<String, Object?>;
 

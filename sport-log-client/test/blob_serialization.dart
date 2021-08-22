@@ -1,6 +1,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sport_log/helpers/db_serialization.dart';
+import 'package:sport_log/helpers/serialization/db_serialization.dart';
 import 'package:sport_log/models/all.dart';
 
 void main() {
