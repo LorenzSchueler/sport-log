@@ -17,8 +17,8 @@ create table cardio_session (
     time integer check (time > 0), -- seconds
     calories integer check (calories >= 0),
     track blob,
-    avg_cycles integer check (avg_cycles > 0), 
-    cycles blob, -- = secs since start
+    avg_cadence integer check (avg_cadence > 0), 
+    cadence blob, -- = secs since start
     avg_heart_rate integer check (avg_heart_rate > 0),
     heart_rate blob, -- = secs since start
     route_id integer references route(id) on delete set null,

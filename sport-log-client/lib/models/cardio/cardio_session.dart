@@ -30,8 +30,8 @@ class CardioSession implements DbObject {
     required this.time,
     required this.calories,
     required this.track,
-    required this.avgCycles,
-    required this.cycles,
+    required this.avgCadence,
+    required this.cadence,
     required this.avgHeartRate,
     required this.heartRate,
     required this.routeId,
@@ -51,8 +51,8 @@ class CardioSession implements DbObject {
   int? time;
   int? calories;
   List<Position>? track;
-  int? avgCycles;
-  List<double>? cycles;
+  int? avgCadence;
+  List<double>? cadence;
   int? avgHeartRate;
   List<double>? heartRate;
   @OptionalIdConverter() Int64? routeId;
@@ -68,10 +68,10 @@ class CardioSession implements DbObject {
     return !deleted
         && [ascent, descent]
           .every((val) => val == null || val >= 0)
-        && [distance, time, calories, avgCycles, avgHeartRate]
+        && [distance, time, calories, avgCadence, avgHeartRate]
           .every((val) => val == null || val > 0)
         && (track == null || distance != null)
-        && (cycles == null || avgCycles != null)
+        && (cadence == null || avgCadence != null)
         && (heartRate == null || avgHeartRate != null);
   }
 }
@@ -91,8 +91,8 @@ class DbCardioSessionSerializer implements DbSerializer<CardioSession> {
       time: r[Keys.time] as int?,
       calories: r[Keys.calories] as int?,
       track: const DbPositionListConverter().mapToDart(r[Keys.track] as Uint8List?),
-      avgCycles: r[Keys.avgCycles] as int?,
-      cycles: const DbDoubleListConverter().mapToDart(r[Keys.cycles] as Uint8List?),
+      avgCadence: r[Keys.avgCadence] as int?,
+      cadence: const DbDoubleListConverter().mapToDart(r[Keys.cadence] as Uint8List?),
       avgHeartRate: r[Keys.avgHeartRate] as int?,
       heartRate: const DbDoubleListConverter().mapToDart(r[Keys.heartRate] as Uint8List?),
       routeId: r[Keys.routeId] == null ? null : Int64(r[Keys.routeId]! as int),
@@ -115,8 +115,8 @@ class DbCardioSessionSerializer implements DbSerializer<CardioSession> {
       Keys.time: o.time,
       Keys.calories: o.calories,
       Keys.track: const DbPositionListConverter().mapToSql(o.track),
-      Keys.avgCycles: o.avgCycles,
-      Keys.cycles: const DbDoubleListConverter().mapToSql(o.cycles),
+      Keys.avgCadence: o.avgCadence,
+      Keys.cadence: const DbDoubleListConverter().mapToSql(o.cadence),
       Keys.avgHeartRate: o.avgHeartRate,
       Keys.heartRate: const DbDoubleListConverter().mapToSql(o.heartRate),
       Keys.routeId: o.routeId?.toInt(),

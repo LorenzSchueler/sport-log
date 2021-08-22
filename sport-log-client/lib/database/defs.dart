@@ -46,8 +46,8 @@ abstract class Keys {
   static const descent = 'descent';
   static const calories = 'calories';
   static const track = 'track';
-  static const avgCycles = 'avg_cycles';
-  static const cycles = 'cycles';
+  static const avgCadence = 'avg_cadence';
+  static const cadence = 'cadence';
   static const avgHeartRate = 'avg_heart_rate';
   static const heartRate = 'heart_rate';
   static const routeId = 'route_id';
