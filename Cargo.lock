@@ -552,6 +552,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "geoutils"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e006f616a407d396ace1d2ebb3f43ed73189db8b098079bd129928d7645dd1e"
+
+[[package]]
 name = "getrandom"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1634,6 +1640,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "geo-types",
+ "geoutils",
  "gpx",
  "rand",
  "reqwest",

@@ -5,6 +5,7 @@ use std::{
 
 use chrono::{Duration, Utc};
 use geo_types::Point;
+use geoutils::Location as GeoLocation;
 use gpx::{self, Gpx, GpxVersion, Track, TrackSegment, Waypoint};
 use rand::Rng;
 use reqwest::Client;
@@ -284,16 +285,25 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
         .await
         .unwrap();
 
+    let mut distance = 0.;
+    let mut prev_point = GeoLocation::new(
+        response_data.results[0].latitude,
+        response_data.results[0].longitude,
+    );
     let positions: Vec<_> = response_data
         .results
         .iter()
         .map(|point| {
+            let next_point = GeoLocation::new(point.latitude, point.longitude);
+            distance += prev_point.haversine_distance_to(&next_point).meters();
+            prev_point = next_point;
+
             Position {
                 longitude: point.longitude,
                 latitude: point.latitude,
                 elevation: point.elevation,
-                distance: 0, // TODO
-                time: 0,     // TODO
+                distance: distance as i32,
+                time: 0,
             }
         })
         .collect();
@@ -305,7 +315,7 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
             if diff > 0 {
                 descent += diff;
             } else {
-                ascent += diff;
+                ascent += -diff;
             }
             (ascent, descent, next)
         },
@@ -316,7 +326,7 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
         id: RouteId(rng.gen()),
         user_id: cardio_session.user_id,
         name: format!("{} workout route", cardio_session.datetime),
-        distance: cardio_session.distance.unwrap(), // calc new
+        distance: positions.last().unwrap().distance,
         ascent: Some(ascent as i32),
         descent: Some(descent as i32),
         track: positions,
