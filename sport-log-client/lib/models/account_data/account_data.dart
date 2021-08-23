@@ -44,4 +44,7 @@ class AccountData {
   List<Action> actions;
   List<ActionRule> actionRules;
   List<ActionEvent> actionEvents;
+
+  factory AccountData.fromJson(Map<String, dynamic> json) => _$AccountDataFromJson(json);
+  Map<String, dynamic> toJson() => _$AccountDataToJson(this);
 }

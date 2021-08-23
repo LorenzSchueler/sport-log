@@ -1,6 +1,7 @@
 
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'position.g.dart';
@@ -63,8 +64,5 @@ class Position {
   }
 
   @override
-  int get hashCode {
-    return Object.hashAll([longitude, latitude, elevation, distance, time]);
-  }
-
+  int get hashCode => hashValues(longitude, latitude, elevation, distance, time);
 }

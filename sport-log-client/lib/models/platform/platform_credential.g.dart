@@ -6,15 +6,16 @@ part of 'platform_credential.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-PlatformCredential _$PlatformCredentialFromJson(Map<String, dynamic> json) =>
-    PlatformCredential(
-      id: const IdConverter().fromJson(json['id'] as String),
-      userId: const IdConverter().fromJson(json['user_id'] as String),
-      platformId: const IdConverter().fromJson(json['platform_id'] as String),
-      username: json['username'] as String,
-      password: json['password'] as String,
-      deleted: json['deleted'] as bool,
-    );
+PlatformCredential _$PlatformCredentialFromJson(Map<String, dynamic> json) {
+  return PlatformCredential(
+    id: const IdConverter().fromJson(json['id'] as String),
+    userId: const IdConverter().fromJson(json['user_id'] as String),
+    platformId: const IdConverter().fromJson(json['platform_id'] as String),
+    username: json['username'] as String,
+    password: json['password'] as String,
+    deleted: json['deleted'] as bool,
+  );
+}
 
 Map<String, dynamic> _$PlatformCredentialToJson(PlatformCredential instance) =>
     <String, dynamic>{
