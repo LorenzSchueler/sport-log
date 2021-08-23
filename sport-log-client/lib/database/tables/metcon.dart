@@ -17,7 +17,6 @@ create table metcon (
     description text,
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
-    is_new integer not null check (is_new in (0, 1)),
 );
   ''';
   @override DbSerializer<Metcon> get serde => DbMetconSerializer();
@@ -75,16 +74,16 @@ create table metcon (
 
         metconMovements.deleteMultiple(toDelete, txn);
         metconMovements.updateMultiple(toUpdate, txn);
-        metconMovements.createMultiple(toCreate, true, txn);
+        metconMovements.createMultiple(toCreate, txn);
       });
     });
   }
 
-  DbResult<void> createFull(MetconDescription metconDescription, bool isNew) async {
+  DbResult<void> createFull(MetconDescription metconDescription) async {
     return voidRequest(() async {
       await database.transaction((txn) async {
-        createSingle(metconDescription.metcon, isNew, txn);
-        metconMovements.createMultiple(metconDescription.moves, isNew, txn);
+        createSingle(metconDescription.metcon, txn);
+        metconMovements.createMultiple(metconDescription.moves, txn);
       });
     });
   }
@@ -103,7 +102,6 @@ create table metcon_movement (
     weight real check (weight > 0),
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
-    is_new integer not null check (is_new in (0, 1)),
 );
   ''';
   @override String get tableName => 'metcon_movement';
@@ -136,7 +134,6 @@ create table metcon_session (
     comments text,
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
-    is_new integer not null check (is_new in (0, 1)),
 );
   ''';
   @override String get tableName => 'metcon_session';

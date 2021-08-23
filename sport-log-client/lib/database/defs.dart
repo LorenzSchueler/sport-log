@@ -70,7 +70,6 @@ abstract class Keys {
   static const interval = 'interval';
   static const strengthSessionId = 'strength_session_id';
   static const setNumber = 'set_number';
-  static const isNew = 'is_new';
   static const arguments = 'arguments';
   static const lastSync = 'last_sync';
 }

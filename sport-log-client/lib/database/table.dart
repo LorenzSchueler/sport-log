@@ -84,33 +84,27 @@ end;
     });
   }
 
-  DbResult<void> createSingle(T object, bool isNew, [Transaction? txn]) async {
-    return createMultiple([object], isNew, txn);
+  DbResult<void> createSingle(T object, [Transaction? txn]) async {
+    return createMultiple([object], txn);
   }
 
-  DbResult<void> createMultiple(List<T> objects, bool isNew, [Transaction? txn]) async {
+  DbResult<void> createMultiple(List<T> objects, [Transaction? txn]) async {
     return voidRequest(() async {
       final batch = (txn ?? database).batch();
       for (final object in objects) {
         assert(object.isValid());
-        batch.insert(tableName, {
-          ...serde.toDbRecord(object),
-          Keys.isNew: isNew ? 1 : 0,
-        });
+        batch.insert(tableName, serde.toDbRecord(object));
       }
       await batch.commit(noResult: true, continueOnError: true);
     });
   }
 
   DbResult<List<T>> getAll({
-    bool onlyIsNew = false,
     bool includeDeleted = false,
     Transaction? txn
   }) async {
     return request(() async {
-      final filter = onlyIsNew
-          ? (includeDeleted ? "is_new = 1" : "is_new = 1 and deleted = 0")
-          : (includeDeleted ? null : "deleted = 0");
+      final filter = includeDeleted ? null : "deleted = 0";
       final List<DbRecord> result = await (txn ?? database)
           .query(tableName, where: filter);
       return Success(result.map(serde.fromDbRecord).toList());
@@ -155,12 +149,6 @@ end;
       final List<DbRecord> result = await (transaction ?? database)
           .rawQuery("SELECT 1 FROM $tableName where $filter;", [id.toInt()]);
       return Success(result.isNotEmpty);
-    });
-  }
-
-  DbResult<void> setAllIsNewFalse() async {
-    return voidRequest(() async {
-      await database.update(tableName, {"is_new": 0}, where: "is_new = 1");
     });
   }
 }

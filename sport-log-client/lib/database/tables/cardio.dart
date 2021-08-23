@@ -25,7 +25,6 @@ create table cardio_session (
     comments text,
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
-    is_new integer not null check (is_new in (0, 1)),
 );
   ''';
   @override String get tableName => 'cardio_session';
@@ -44,7 +43,6 @@ create table route (
     track blob not null,
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
-    is_new integer not null check (is_new in (0, 1)),
 );
   ''';
   @override String get tableName => 'route';

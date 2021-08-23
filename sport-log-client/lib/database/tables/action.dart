@@ -14,7 +14,6 @@ create table action (
     delete_after integer not null check (delete_after >= 0), --hours
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
-    is_new integer not null check (is_new in (0, 1)),
 );
   ''';
   @override String get tableName => 'action';
@@ -32,7 +31,6 @@ create table action_event (
     enabled integer not null check(enabled in (0, 1)),
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
-    is_new integer not null check (is_new in (0, 1)),
 );
   ''';
   @override String get tableName => 'action_event';
@@ -51,7 +49,6 @@ create table action_rule (
     enabled integer not null check(enabled in (0, 1)),
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
-    is_new integer not null check (is_new in (0, 1)),
 );
   ''';
   @override String get tableName => 'action_rule';
@@ -68,7 +65,6 @@ create table action_provider (
     description text,
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
-    is_new integer not null check (is_new in (0, 1)),
 );
   ''';
   @override String get tableName => 'action_provider';
