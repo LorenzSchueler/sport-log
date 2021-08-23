@@ -18,8 +18,9 @@ part 'wod_api.dart';
 part 'strength_api.dart';
 part 'user_api.dart';
 part 'platform_api.dart';
-part 'action.dart';
+part 'action_api.dart';
 part 'api_helpers.dart';
+part 'sync_api.dart';
 
 typedef ApiResult<T> = Future<Result<T, ApiError>>;
 

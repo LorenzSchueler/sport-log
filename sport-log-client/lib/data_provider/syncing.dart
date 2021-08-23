@@ -1,17 +1,13 @@
-
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sport_log/database/defs.dart';
 
-class LastSync {
-  static const String key = 'last_sync';
+Future<void> _syncDone() async {
+  final storage = await SharedPreferences.getInstance();
+  storage.setString(Keys.lastSync, DateTime.now().toString());
+}
 
-  static Future<void> syncDone() async {
-    final storage = await SharedPreferences.getInstance();
-    storage.setString(key, DateTime.now().toString());
-  }
-
-  static Future<DateTime?> lastSync() async {
-    final storage = await SharedPreferences.getInstance();
-    final result = storage.getString(key);
-    return result == null ? null : DateTime.parse(result);
-  }
+Future<DateTime?> _lastSync() async {
+  final storage = await SharedPreferences.getInstance();
+  final result = storage.getString(Keys.lastSync);
+  return result == null ? null : DateTime.parse(result);
 }

@@ -32,4 +32,7 @@ abstract class BackendRoutes {
 
   static String actionEventByActionProvider(Int64 id) =>
       _version + '/action_event/action_provider/${id.toString()}';
+
+  static String sync(DateTime? dateTime) =>
+      dateTime == null ? '/account_data' : '/account_data/$dateTime';
 }

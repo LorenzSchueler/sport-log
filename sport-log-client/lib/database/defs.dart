@@ -72,4 +72,5 @@ abstract class Keys {
   static const setNumber = 'set_number';
   static const isNew = 'is_new';
   static const arguments = 'arguments';
+  static const lastSync = 'last_sync';
 }
