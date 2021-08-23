@@ -18,7 +18,6 @@ create table metcon (
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
     is_new integer not null check (is_new in (0, 1)),
-    unique (user_id, name, deleted)
 );
   ''';
   @override DbSerializer<Metcon> get serde => DbMetconSerializer();
@@ -105,7 +104,6 @@ create table metcon_movement (
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
     is_new integer not null check (is_new in (0, 1)),
-    unique (metcon_id, movement_number, deleted)
 );
   ''';
   @override String get tableName => 'metcon_movement';
@@ -139,7 +137,6 @@ create table metcon_session (
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
     is_new integer not null check (is_new in (0, 1)),
-    unique (user_id, metcon_id, datetime, deleted)
 );
   ''';
   @override String get tableName => 'metcon_session';

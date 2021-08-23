@@ -16,7 +16,6 @@ create table strength_session (
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
     is_new integer not null check (is_new in (0, 1)),
-    unique (user_id, datetime, movement_id, deleted)
 );
   ''';
   @override String get tableName => 'strength_session';
@@ -34,7 +33,6 @@ create table strength_set (
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
     is_new integer not null check (is_new in (0, 1)),
-    unique (strength_session_id, set_number, deleted)
 );
   ''';
   @override String get tableName => 'strength_set';

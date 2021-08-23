@@ -11,7 +11,6 @@ create table platform (
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
     is_new integer not null check (is_new in (0, 1)),
-    unique (name, deleted)
 );
   ''';
   @override String get tableName => 'platform';
@@ -29,7 +28,6 @@ create table platform_credential (
     last_change text not null default (datetime('now')),
     deleted integer not null default 0 check (deleted in (0, 1)),
     is_new integer not null check (is_new in (0, 1)),
-    unique (user_id, platform_id, deleted)
 );
   ''';
   @override String get tableName => 'platform_credential';
