@@ -8,7 +8,6 @@ import 'package:sqflite/sqflite.dart';
 class MetconTable extends Table<Metcon> {
   @override String get setupSql => '''
 create table metcon (
-    id integer primary key,
     user_id integer,
     name text check (length(name) <= 80),
     metcon_type integer not null check (metcon_type between 0 and 2),
@@ -16,7 +15,7 @@ create table metcon (
     timecap integer check (timecap > 0), -- seconds
     description text,
     last_change text not null default (datetime('now')),
-    deleted integer not null default 0 check (deleted in (0, 1)),
+    $idAndDeletedAndStatus
 );
   ''';
   @override DbSerializer<Metcon> get serde => DbMetconSerializer();
@@ -93,7 +92,6 @@ class MetconMovementTable extends Table<MetconMovement> {
   @override DbSerializer<MetconMovement> get serde => DbMetconMovementSerializer();
   @override String get setupSql => '''
 create table metcon_movement (
-    id integer primary key,
     metcon_id integer not null references metcon(id) on delete cascade,
     movement_id integer not null references movement(id) on delete no action,
     movement_number integer not null check (movement_number >= 0),
@@ -101,7 +99,7 @@ create table metcon_movement (
     movement_unit integer not null check (movement_unit between 0 and 6),
     weight real check (weight > 0),
     last_change text not null default (datetime('now')),
-    deleted integer not null default 0 check (deleted in (0, 1)),
+    $idAndDeletedAndStatus
 );
   ''';
   @override String get tableName => 'metcon_movement';
@@ -123,7 +121,6 @@ class MetconSessionTable extends Table<MetconSession> {
   @override
   String get setupSql => '''
 create table metcon_session (
-    id integer primary key,
     user_id integer not null,
     metcon_id integer not null references metcon(id) on delete no action,
     datetime text not null default (datetime('now')),
@@ -133,7 +130,7 @@ create table metcon_session (
     rx integer not null default 1 check (rx in (0, 1)),
     comments text,
     last_change text not null default (datetime('now')),
-    deleted integer not null default 0 check (deleted in (0, 1)),
+    $idAndDeletedAndStatus
 );
   ''';
   @override String get tableName => 'metcon_session';

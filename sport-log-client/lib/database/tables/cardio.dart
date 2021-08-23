@@ -6,7 +6,6 @@ class CardioSessionTable extends Table<CardioSession> {
   @override DbSerializer<CardioSession> get serde => DbCardioSessionSerializer();
   @override String get setupSql => '''
 create table cardio_session (
-    id integer primary key,
     user_id integer not null,
     movement_id integer not null references movement(id) on delete no action,
     cardio_type integer not null check(cardio_type between 0 and 2),
@@ -24,7 +23,7 @@ create table cardio_session (
     route_id integer references route(id) on delete set null,
     comments text,
     last_change text not null default (datetime('now')),
-    deleted integer not null default 0 check (deleted in (0, 1)),
+    $idAndDeletedAndStatus
 );
   ''';
   @override String get tableName => 'cardio_session';
@@ -34,7 +33,6 @@ class RouteTable extends Table<Route> {
   @override DbSerializer<Route> get serde => DbRouteSerializer();
   @override String get setupSql => '''
 create table route (
-    id integer primary key,
     user_id integer not null,
     name text not null check (length(name) >= 2),
     distance integer not null check (distance > 0),
@@ -42,7 +40,7 @@ create table route (
     descent integer check (descent >= 0),
     track blob not null,
     last_change text not null default (datetime('now')),
-    deleted integer not null default 0 check (deleted in (0, 1)),
+    $idAndDeletedAndStatus
 );
   ''';
   @override String get tableName => 'route';

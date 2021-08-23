@@ -16,6 +16,12 @@ abstract class Table<T extends DbObject> {
 
   late Database database;
 
+  String get idAndDeletedAndStatus => '''
+    id integer primary key,
+    deleted integer not null default 0 check (deleted in (0, 1)),
+    sync_status integer not null default 2 check (sync_status in (0, 1, 2)),
+  ''';
+
   @mustCallSuper
   Future<void> init(Database db) async {
     database = db;
