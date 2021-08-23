@@ -14,7 +14,6 @@ create table metcon (
     rounds integer check (rounds >= 1),
     timecap integer check (timecap > 0), -- seconds
     description text,
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';
@@ -98,7 +97,6 @@ create table metcon_movement (
     count integer not null check (count >= 1),
     movement_unit integer not null check (movement_unit between 0 and 6),
     weight real check (weight > 0),
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';
@@ -129,7 +127,6 @@ create table metcon_session (
     reps integer check (reps >= 0),
     rx integer not null default 1 check (rx in (0, 1)),
     comments text,
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';

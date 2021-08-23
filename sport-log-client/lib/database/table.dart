@@ -27,9 +27,9 @@ abstract class Table<T extends DbObject> {
     database = db;
     await database.execute(setupSql);
     await database.execute('''
-create trigger ${tableName}_last_change after update on $tableName
+create trigger ${tableName}_update after update on $tableName
 begin
-  update $tableName set last_change = datetime('now') where id = new.id;
+  update $tableName set sync_status = 1 where id = new.id and sync_status = 0;
 end;
     ''');
   }

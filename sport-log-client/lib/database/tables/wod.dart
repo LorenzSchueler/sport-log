@@ -9,7 +9,6 @@ create table wod (
     user_id integer not null,
     date date not null default (datetime('now')),
     description text,
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';

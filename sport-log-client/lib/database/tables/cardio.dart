@@ -22,7 +22,6 @@ create table cardio_session (
     heart_rate blob, -- = secs since start
     route_id integer references route(id) on delete set null,
     comments text,
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';
@@ -39,7 +38,6 @@ create table route (
     ascent integer check (ascent >= 0),
     descent integer check (descent >= 0),
     track blob not null,
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';

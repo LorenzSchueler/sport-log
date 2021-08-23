@@ -13,7 +13,6 @@ create table movement (
     name text not null,
     description text,
     category integer not null check (category in (0, 1)),
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';

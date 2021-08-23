@@ -10,7 +10,6 @@ create table diary (
     date text not null default (datetime('now')),
     bodyweight real check (bodyweight > 0),
     comments text,
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';

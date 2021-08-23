@@ -11,7 +11,6 @@ create table action (
     description text,
     create_before integer not null check (create_before >= 0), -- hours
     delete_after integer not null check (delete_after >= 0), --hours
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';
@@ -27,7 +26,6 @@ create table action_event (
     datetime text not null,
     arguments text,
     enabled integer not null check(enabled in (0, 1)),
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';
@@ -44,7 +42,6 @@ create table action_rule (
     time text not null,
     arguments text,
     enabled integer not null check(enabled in (0, 1)),
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';
@@ -59,7 +56,6 @@ create table action_provider (
     password text not null check(length(password) between 1 and 96),
     platform_id integer not null references platform(id) on delete cascade,
     description text,
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';

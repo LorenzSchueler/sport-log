@@ -12,7 +12,6 @@ create table strength_session (
     movement_unit integer not null check (movement_unit between 0 and 6),
     interval integer check (interval > 0),
     comments text,
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';
@@ -27,7 +26,6 @@ create table strength_set (
     set_number integer not null check (set_number >= 0),
     count integer not null check (count >= 1), -- number of completed movement_unit
     weight real check (weight > 0),
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';

@@ -7,7 +7,6 @@ class PlatformTable extends Table<Platform> {
   @override String get setupSql => '''
 create table platform (
     name text not null check (length(name) between 3 and 80),
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';
@@ -22,7 +21,6 @@ create table platform_credential (
     platform_id integer not null references platform on delete cascade,
     username text not null check (length(username) between 1 and 80),
     password text null check (length(password) between 1 and 80),
-    last_change text not null default (datetime('now')),
     $idAndDeletedAndStatus
 );
   ''';
