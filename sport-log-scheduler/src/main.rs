@@ -1,4 +1,7 @@
-//! The Sport Log Scheduler creates [ActionEvents](sport_log_types::ActionEvent) from [ActionRules](sport_log_types::ActionRule) and deletes old [ActionEvents](sport_log_types::ActionEvent).
+//! **Sport Log Scheduler** is responsible for scheduling [ActionEvents](ActionEvent).
+//!
+//! **Sport Log Scheduler** creates [ActionEvents](sport_log_types::ActionEvent) from [ActionRules](sport_log_types::ActionRule)
+//! and deletes old [ActionEvents](sport_log_types::ActionEvent).
 //!
 //! [ActionEvents](sport_log_types::ActionEvent) are only created from enabled [ActionRules](sport_log_types::ActionRule).
 //!
@@ -6,11 +9,11 @@
 //!
 //! Similarly the timespan they are deleted after their `datetime` is determined by the `delete_after` field of the corresponding [Action](sport_log_types::Action).
 //!
-//! However most [ActionProvider](sport_log_types::ActionProvider) will delete an [ActionEvent](sport_log_types::ActionEvent) after it has been executed.
+//! However most [ActionProvider](sport_log_types::ActionProvider) will delete a [ActionEvents](sport_log_types::ActionEvent) directly after execution.
 //!
 //! # Usage
 //!
-//! The Sport Log Scheduler has do be executed periodically, perferably as a cron job every hour.
+//! The **Sport Log Scheduler** has do be executed periodically, perferably as a cron job every hour.
 //!
 //! # Config
 //!
@@ -47,8 +50,7 @@ pub struct Config {
 
 impl Config {
     fn get() -> Result<Self> {
-            toml::from_str(&fs::read_to_string("config.toml").map_err(Error::Io)?)
-                .map_err(Error::Toml)
+        toml::from_str(&fs::read_to_string("config.toml").map_err(Error::Io)?).map_err(Error::Toml)
     }
 }
 

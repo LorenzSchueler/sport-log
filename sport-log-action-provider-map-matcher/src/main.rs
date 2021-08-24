@@ -1,3 +1,24 @@
+//! **Map Matcher** is an [ActionProvider](sport_log_types::ActionProvider) which matches GPS tracks to the nearest path in OSM.
+//!
+//! Like all [ActionProvider](sport_log_types::ActionProvider) **Map Matcher** executes [ActionEvents](sport_log_types::ActionEvent).
+//! The `arguments` field has to be a valid [CardioSessionId] for which the GPS track should be matched.
+//!
+//! The resulting path will be converted into a [Route] and compared to all [Routes](Route) of the [User](sport_log_types::User).
+//! If no similar [Route] is found the new [Route] will be saved.
+//! The `route_id` field of the [CardioSession] will be updated to the id of the new [Route] or a similar existing [Route] if one exists.
+//!
+//! # Time of execution
+//!
+//! [ActionEvents](sport_log_types::ActionEvent) will be executed if their `datetime` lies (up to 7 days) in the past.
+//!
+//! # Usage
+//!
+//! The **Map Matcher** has do be executed periodically, perferably as a cron job every hour.
+//!
+//! # Config
+//!
+//! The config file must be called `config.toml` and must be deserializable to a [Config].
+
 use std::{
     env,
     fs::{self, File},
@@ -39,7 +60,7 @@ enum Error {
 type Result<T> = StdResult<T, Error>;
 
 #[derive(Deserialize)]
-struct Config {
+pub struct Config {
     password: String,
     base_url: String,
 }
@@ -101,7 +122,7 @@ async fn setup() -> Result<()> {
         false,
         &[("match", "Match a gpx track to as OSM path.")],
         168,
-        0,
+        168,
     )
     .await
     .map_err(Error::Reqwest)
@@ -134,8 +155,8 @@ async fn map_match() -> Result<()> {
         &config.base_url,
         NAME,
         &config.password,
+        Duration::hours(-168),
         Duration::hours(0),
-        Duration::hours(1),
     )
     .await
     .map_err(Error::Reqwest)?;
