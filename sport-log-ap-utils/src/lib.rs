@@ -1,6 +1,6 @@
 use chrono::{Duration, Utc};
 use rand::Rng;
-use reqwest::{Client, StatusCode};
+use reqwest::{Client, Error, StatusCode};
 
 use sport_log_types::{
     Action, ActionEventId, ActionId, ActionProvider, ActionProviderId, ExecutableActionEvent,
@@ -18,7 +18,7 @@ pub async fn setup(
     actions: &[(&str, &str)],
     create_before: i32,
     delete_after: i32,
-) {
+) -> Result<(), Error> {
     let client = Client::new();
 
     let mut rng = rand::thread_rng();
@@ -35,8 +35,7 @@ pub async fn setup(
         .post(format!("{}/v1/ap/platform", base_url))
         .json(&platform)
         .send()
-        .await
-        .unwrap();
+        .await?;
 
     let platform_id = match response.status() {
         StatusCode::OK => {
@@ -48,24 +47,22 @@ pub async fn setup(
             let platforms: Vec<Platform> = client
                 .get(format!("{}/v1/ap/platform", base_url))
                 .send()
-                .await
-                .unwrap()
+                .await?
                 .json()
-                .await
-                .unwrap();
+                .await?;
             let platform = platforms
                 .into_iter()
                 .find(|platform| platform.name == platform_name)
-                .unwrap();
+                .expect("platform name already exists but server response contains no platform with this name");
             platform.id
         }
         StatusCode::FORBIDDEN => {
             println!("action provider self registration is disabled");
-            return;
+            response.json::<Platform>().await?.id // this will always fail and return the error
         }
         status => {
             println!("an error occured (status {})", status);
-            return;
+            response.json::<Platform>().await?.id // this will always fail and return the error
         }
     };
 
@@ -84,8 +81,7 @@ pub async fn setup(
         .basic_auth(name, Some(&password))
         .json(&action_provider)
         .send()
-        .await
-        .unwrap();
+        .await?;
 
     let action_provider_id = match response.status() {
         StatusCode::OK => {
@@ -98,20 +94,18 @@ pub async fn setup(
                 .get(format!("{}/v1/ap/action_provider", base_url))
                 .basic_auth(name, Some(&password))
                 .send()
-                .await
-                .unwrap()
+                .await?
                 .json()
-                .await
-                .unwrap();
+                .await?;
             action_provider.id
         }
         StatusCode::FORBIDDEN => {
             println!("action provider self registration disabled");
-            return;
+            response.json::<ActionProvider>().await?.id // this will always fail and return the error
         }
         status => {
             println!("an error occured (status {})", status);
-            return;
+            response.json::<ActionProvider>().await?.id // this will always fail and return the error
         }
     };
 
@@ -134,14 +128,14 @@ pub async fn setup(
         .basic_auth(name, Some(&password))
         .json(&actions)
         .send()
-        .await
-        .unwrap()
+        .await?
         .status()
     {
         StatusCode::OK => println!("action created\nsetup successful"),
         StatusCode::CONFLICT => println!("action already exists\nsetup successful"),
         status => println!("an error occured (status {})", status),
     }
+    Ok(())
 }
 
 pub async fn get_events(
@@ -151,7 +145,7 @@ pub async fn get_events(
     password: &str,
     start_offset: Duration,
     end_offset: Duration,
-) -> Vec<ExecutableActionEvent> {
+) -> Result<Vec<ExecutableActionEvent>, Error> {
     let now = Utc::now();
     let datetime_start = (now + start_offset).to_rfc3339();
     let datetime_end = (now + end_offset).to_rfc3339();
@@ -163,12 +157,10 @@ pub async fn get_events(
         ))
         .basic_auth(name, Some(&password))
         .send()
-        .await
-        .unwrap()
+        .await?
         .json()
-        .await
-        .unwrap();
-    exec_action_events
+        .await?;
+    Ok(exec_action_events)
 }
 
 pub async fn delete_events(
@@ -177,12 +169,12 @@ pub async fn delete_events(
     name: &str,
     password: &str,
     action_event_ids: &[ActionEventId],
-) {
+) -> Result<(), Error> {
     client
         .delete(format!("{}/v1/ap/action_events", base_url,))
         .basic_auth(name, Some(&password))
         .json(action_event_ids)
         .send()
-        .await
-        .unwrap();
+        .await?;
+    Ok(())
 }
