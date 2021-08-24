@@ -7,7 +7,7 @@ use diesel::{
     deserialize,
     pg::Pg,
     serialize::{self, Output, WriteTuple},
-    sql_types::{Double, Float, Integer},
+    sql_types::{Double, Integer},
     types::{FromSql, Record, ToSql},
 };
 #[cfg(feature = "full")]
@@ -54,7 +54,7 @@ pub struct Position {
     #[serde(rename(serialize = "la", deserialize = "la"))]
     pub latitude: f64,
     #[serde(rename(serialize = "e", deserialize = "e"))]
-    pub elevation: f32,
+    pub elevation: i32,
     #[serde(rename(serialize = "d", deserialize = "d"))]
     pub distance: i32,
     #[serde(rename(serialize = "t", deserialize = "t"))]
@@ -64,7 +64,7 @@ pub struct Position {
 #[cfg(feature = "full")]
 impl ToSql<Position, Pg> for Position {
     fn to_sql<W: Write>(&self, out: &mut Output<W, Pg>) -> serialize::Result {
-        WriteTuple::<(Double, Double, Float, Integer, Integer)>::write_tuple(
+        WriteTuple::<(Double, Double, Integer, Integer, Integer)>::write_tuple(
             &(
                 self.longitude,
                 self.latitude,
@@ -81,7 +81,7 @@ impl ToSql<Position, Pg> for Position {
 impl FromSql<Position, Pg> for Position {
     fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
         let (longitude, latitude, elevation, distance, time) =
-            FromSql::<Record<(Double, Double, Float, Integer, Integer)>, Pg>::from_sql(bytes)?;
+            FromSql::<Record<(Double, Double, Integer, Integer, Integer)>, Pg>::from_sql(bytes)?;
         Ok(Position {
             longitude,
             latitude,
@@ -137,7 +137,7 @@ pub struct Route {
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub descent: Option<i32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
-    pub track: Option<Vec<Position>>,
+    pub track: Vec<Position>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
@@ -201,9 +201,9 @@ pub struct CardioSession {
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub track: Option<Vec<Position>>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
-    pub avg_cycles: Option<i32>,
+    pub avg_cadence: Option<i32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
-    pub cycles: Option<Vec<f32>>,
+    pub cadence: Option<Vec<f32>>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub avg_heart_rate: Option<i32>,
     #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]

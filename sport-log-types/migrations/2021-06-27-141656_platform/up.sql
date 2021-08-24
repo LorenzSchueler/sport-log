@@ -3,9 +3,10 @@ create table platform (
     name varchar(80) not null check (length(name) > 2),
     credential boolean not null,
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (name, deleted)
+    deleted boolean not null default false
 );
+
+create unique index platform_idx on platform (name) where deleted = false;
 
 create trigger set_timestamp before update on platform
     for each row execute procedure trigger_set_timestamp();
@@ -21,9 +22,10 @@ create table platform_credential (
     username varchar(80) not null,
     password varchar(80) not null,
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (user_id, platform_id, deleted)
+    deleted boolean not null default false
 );
+
+create unique index platform_credential_idx on platform_credential (user_id, platform_id) where deleted = false;
 
 create trigger set_timestamp before update on platform_credential
     for each row execute procedure trigger_set_timestamp();

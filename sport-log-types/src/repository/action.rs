@@ -229,6 +229,7 @@ impl GetAll for CreatableActionRule {
                 action_rule::columns::action_id,
                 action_rule::columns::weekday,
                 action_rule::columns::time,
+                action_rule::columns::arguments,
                 action::columns::create_before,
             ))
             .get_results(conn)
@@ -254,6 +255,7 @@ impl ExecutableActionEvent {
                 action_event::columns::id,
                 action::columns::name,
                 action_event::columns::datetime,
+                action_event::columns::arguments,
                 action_event::columns::user_id,
                 platform_credential::columns::username.nullable(),
                 platform_credential::columns::password.nullable(),
@@ -282,6 +284,7 @@ impl ExecutableActionEvent {
                 action_event::columns::id,
                 action::columns::name,
                 action_event::columns::datetime,
+                action_event::columns::arguments,
                 action_event::columns::user_id,
                 platform_credential::columns::username.nullable(),
                 platform_credential::columns::password.nullable(),

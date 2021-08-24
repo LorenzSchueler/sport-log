@@ -241,18 +241,18 @@ async fn fetch() {
                                     .map(|location| Position {
                                         latitude: location.la,
                                         longitude: location.ln,
-                                        elevation: location.h,
+                                        elevation: location.h as i32,
                                         distance: location.s as i32,
                                         time: location.t as i32,
                                     })
                                     .collect(),
                             ),
-                            avg_cycles: if workout.cadence.avg > 0. {
+                            avg_cadence: if workout.cadence.avg > 0. {
                                 Some(workout.cadence.avg as i32)
                             } else {
                                 None
                             },
-                            cycles: None,
+                            cadence: None,
                             avg_heart_rate: None,
                             heart_rate: None,
                             route_id: None,

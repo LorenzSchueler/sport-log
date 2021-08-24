@@ -1,5 +1,9 @@
+drop index action_event_idx;
 drop table action_event;
+drop index action_rule_idx;
 drop table action_rule;
+drop index action_idx;
 drop table action;
+drop index action_provider_idx;
 drop table action_provider;
 drop type weekday;

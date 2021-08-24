@@ -8,9 +8,10 @@ create table movement (
     description text,
     category movement_category not null,
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (user_id, name, category, deleted)
+    deleted boolean not null default false
 );
+
+create unique index movement_idx on movement (user_id, name, category) where deleted = false;
 
 create trigger set_timestamp before update on movement
     for each row execute procedure trigger_set_timestamp();
