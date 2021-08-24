@@ -14,8 +14,8 @@ impl AccountData {
             diaries: Diary::get_by_user(user_id, conn)?,
             wods: Wod::get_by_user(user_id, conn)?,
             movements: Movement::get_by_user(user_id, conn)?,
-            strenght_sessions: StrengthSession::get_by_user(user_id, conn)?,
-            strenght_set: StrengthSet::get_by_user(user_id, conn)?,
+            strength_sessions: StrengthSession::get_by_user(user_id, conn)?,
+            strength_sets: StrengthSet::get_by_user(user_id, conn)?,
             metcons: Metcon::get_by_user(user_id, conn)?,
             metcon_sessions: MetconSession::get_by_user(user_id, conn)?,
             metcon_movements: MetconMovement::get_by_user(user_id, conn)?,
@@ -26,7 +26,7 @@ impl AccountData {
             action_providers: ActionProvider::get_all(conn)?,
             actions: Action::get_all(conn)?,
             action_rules: ActionRule::get_by_user(user_id, conn)?,
-            action_event: ActionEvent::get_by_user(user_id, conn)?,
+            action_events: ActionEvent::get_by_user(user_id, conn)?,
         })
     }
 
@@ -40,10 +40,10 @@ impl AccountData {
             diaries: Diary::get_by_user_and_last_sync(user_id, last_sync, conn)?,
             wods: Wod::get_by_user_and_last_sync(user_id, last_sync, conn)?,
             movements: Movement::get_by_user_and_last_sync(user_id, last_sync, conn)?,
-            strenght_sessions: StrengthSession::get_by_user_and_last_sync(
+            strength_sessions: StrengthSession::get_by_user_and_last_sync(
                 user_id, last_sync, conn,
             )?,
-            strenght_set: StrengthSet::get_by_user_and_last_sync(user_id, last_sync, conn)?,
+            strength_sets: StrengthSet::get_by_user_and_last_sync(user_id, last_sync, conn)?,
             metcons: Metcon::get_by_user_and_last_sync(user_id, last_sync, conn)?,
             metcon_sessions: MetconSession::get_by_user_and_last_sync(user_id, last_sync, conn)?,
             metcon_movements: MetconMovement::get_by_user_and_last_sync(user_id, last_sync, conn)?,
@@ -56,7 +56,7 @@ impl AccountData {
             action_providers: ActionProvider::get_by_last_sync(last_sync, conn)?,
             actions: Action::get_by_last_sync(last_sync, conn)?,
             action_rules: ActionRule::get_by_user_and_last_sync(user_id, last_sync, conn)?,
-            action_event: ActionEvent::get_by_user_and_last_sync(user_id, last_sync, conn)?,
+            action_events: ActionEvent::get_by_user_and_last_sync(user_id, last_sync, conn)?,
         })
     }
 }

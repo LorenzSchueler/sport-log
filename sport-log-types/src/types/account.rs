@@ -15,8 +15,8 @@ pub struct AccountData {
     pub diaries: Vec<Diary>,
     pub wods: Vec<Wod>,
     pub movements: Vec<Movement>,
-    pub strenght_sessions: Vec<StrengthSession>,
-    pub strenght_set: Vec<StrengthSet>,
+    pub strength_sessions: Vec<StrengthSession>,
+    pub strength_sets: Vec<StrengthSet>,
     pub metcons: Vec<Metcon>,
     pub metcon_sessions: Vec<MetconSession>,
     pub metcon_movements: Vec<MetconMovement>,
@@ -27,5 +27,5 @@ pub struct AccountData {
     pub action_providers: Vec<ActionProvider>,
     pub actions: Vec<Action>,
     pub action_rules: Vec<ActionRule>,
-    pub action_event: Vec<ActionEvent>,
+    pub action_events: Vec<ActionEvent>,
 }
