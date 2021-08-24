@@ -4,8 +4,8 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
 import 'package:sport_log/config.dart';
-import 'package:sport_log/data_provider/authentication_repository.dart';
 import 'package:sport_log/data_provider/syncing.dart';
+import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -20,8 +20,8 @@ void main() async {
   await Config.init();
   final database = AppDatabase.instance!;
   await database.init();
-  AuthenticationRepository? authRepo;
-  authRepo = await AuthenticationRepository.getInstance();
+  UserState? authRepo;
+  authRepo = await UserState.getInstance();
   User? user = await authRepo.getUser();
   final api = Api.instance;
   if (user != null) {

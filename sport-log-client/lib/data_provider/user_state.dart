@@ -4,11 +4,11 @@ import 'package:sport_log/models/user/user.dart';
 
 final _logger = Logger('AUTH DP');
 
-class AuthenticationRepository {
-  AuthenticationRepository._(this._storage);
+class UserState {
+  UserState._(this._storage);
 
-  static Future<AuthenticationRepository> getInstance() async {
-    return AuthenticationRepository._(await SharedPreferences.getInstance());
+  static Future<UserState> getInstance() async {
+    return UserState._(await SharedPreferences.getInstance());
   }
 
   final SharedPreferences _storage;
