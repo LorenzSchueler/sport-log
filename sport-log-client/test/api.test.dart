@@ -134,7 +134,7 @@ void testActionRule(Api api) async {
 }
 
 void main() async {
-  final Api api = await Api.instance;
+  final Api api = Api.instance;
 
   testUser(api);
   testAction(api);

@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/api/backend_routes.dart';
-import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 
@@ -27,11 +26,9 @@ final logger = Logger('API');
 typedef ApiResult<T> = Future<Result<T, ApiError>>;
 
 class Api {
-  static Api? _instance;
-  static Future<Api> get instance async =>
-      _instance ??= Api._(await Config.apiUrlBase);
+  static final Api instance = Api._();
 
-  Api._(this._urlBase);
+  Api._();
 
   void setCurrentUser(User user) {
     _currentUser = user;
@@ -41,9 +38,11 @@ class Api {
     _currentUser = null;
   }
 
+  void setUrlBase(String base) => _urlBase = base;
+
   User? get currentUser => _currentUser;
 
-  final String _urlBase;
+  late final String _urlBase;
   final _client = http.Client();
   User? _currentUser;
 }

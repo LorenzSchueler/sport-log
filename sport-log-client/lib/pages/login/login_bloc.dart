@@ -1,14 +1,12 @@
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/api/api_error.dart';
-import 'package:sport_log/blocs/authentication/authentication_bloc.dart' as auth;
+import 'package:sport_log/blocs/authentication/authentication_bloc.dart'
+    as auth;
 import 'package:sport_log/data_provider/syncing.dart';
 
-enum LoginState {
-  idle, pending, failed, successful
-}
+enum LoginState { idle, pending, failed, successful }
 
 abstract class LoginEvent extends Equatable {
   @override
@@ -34,8 +32,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc({
     required auth.AuthenticationBloc authenticationBloc,
     required Function(String) showErrorSnackBar,
-  })
-      : _authenticationBloc = authenticationBloc,
+  })  : _authenticationBloc = authenticationBloc,
         _showErrorSnackBar = showErrorSnackBar,
         super(LoginState.idle);
 
@@ -53,7 +50,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Stream<LoginState> _submitLogin(SubmitLogin event) async* {
     yield LoginState.pending;
-    final result = await (await Api.instance).getUser(event.username, event.password);
+    final result = await Api.instance.getUser(event.username, event.password);
     if (result.isSuccess) {
       yield LoginState.successful;
       _authenticationBloc.add(auth.LoginEvent(user: result.success));

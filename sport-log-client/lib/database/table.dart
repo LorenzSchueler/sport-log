@@ -175,6 +175,7 @@ end;
       final batch = (txn ?? database).batch();
       for (final object in objects) {
         assert(object.isValid());
+        // TODO: what it sync_status == 1 or sync_status == 2?
         batch.insert(tableName, serde.toDbRecord(object),
             conflictAlgorithm: ConflictAlgorithm.replace);
       }

@@ -1,11 +1,10 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/duration_picker.dart';
 
@@ -13,7 +12,8 @@ class EditStrengthSessionPage extends StatefulWidget {
   const EditStrengthSessionPage({
     Key? key,
     StrengthSessionDescription? description,
-  }) : initial = description, super(key: key);
+  })  : initial = description,
+        super(key: key);
 
   final StrengthSessionDescription? initial;
 
@@ -22,7 +22,6 @@ class EditStrengthSessionPage extends StatefulWidget {
 }
 
 class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
-
   late StrengthSessionDescription ssd;
   late bool movementInitialized;
   final scaffoldState = GlobalKey<ScaffoldState>();
@@ -31,28 +30,27 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
   @override
   void initState() async {
     super.initState();
-    final userId = (await Api.instance).currentUser!.id;
-    ssd = widget.initial ?? StrengthSessionDescription(
-      strengthSession: StrengthSession(
-          id: randomId(),
-          userId: userId,
-          datetime: DateTime.now(),
-          movementId: Int64(0),
-          movementUnit: MovementUnit.reps,
-          interval: null,
-          comments: null,
-          deleted: false
-      ),
-      strengthSets: [],
-      movement: Movement(
-          id: Int64(1),
-          userId: userId,
-          name: '',
-          description: null,
-          category: MovementCategory.strength,
-          deleted: false
-      ),
-    );
+    final userId = Api.instance.currentUser!.id;
+    ssd = widget.initial ??
+        StrengthSessionDescription(
+          strengthSession: StrengthSession(
+              id: randomId(),
+              userId: userId,
+              datetime: DateTime.now(),
+              movementId: Int64(0),
+              movementUnit: MovementUnit.reps,
+              interval: null,
+              comments: null,
+              deleted: false),
+          strengthSets: [],
+          movement: Movement(
+              id: Int64(1),
+              userId: userId,
+              name: '',
+              description: null,
+              category: MovementCategory.strength,
+              deleted: false),
+        );
     movementInitialized = widget.initial != null;
     datetimeIsNow = widget.initial == null ? true : false;
   }
@@ -85,18 +83,19 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
     int hour = ssd.strengthSession.datetime.hour;
     int minute = ssd.strengthSession.datetime.minute;
     setState(() {
-      ssd.strengthSession.datetime = DateTime(
-          date.year, date.month, date.day, hour, minute);
+      ssd.strengthSession.datetime =
+          DateTime(date.year, date.month, date.day, hour, minute);
       datetimeIsNow = false;
     });
   }
-  
+
   void _setTime(TimeOfDay time) {
     int year = ssd.strengthSession.datetime.year;
     int month = ssd.strengthSession.datetime.month;
     int day = ssd.strengthSession.datetime.day;
     setState(() {
-      ssd.strengthSession.datetime = DateTime(year, month, day, time.hour, time.minute);
+      ssd.strengthSession.datetime =
+          DateTime(year, month, day, time.hour, time.minute);
       datetimeIsNow = false;
     });
   }
@@ -122,23 +121,22 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
       _setDate(date);
     }
     final time = await showRoundedTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(ssd.strengthSession.datetime),
-      theme: ThemeData.dark(),
-      leftBtn: 'Set now',
-      onLeftBtn: () {
-        final oldDate = ssd.strengthSession.datetime;
-        final today = DateTime.now();
-        if (oldDate.year == today.year
-            && oldDate.month == today.month
-            && oldDate.day == today.day) {
-          _setDateTimeNow();
-        } else {
-          _setTime(TimeOfDay.now());
-        }
-        Navigator.of(context).pop();
-      }
-    );
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(ssd.strengthSession.datetime),
+        theme: ThemeData.dark(),
+        leftBtn: 'Set now',
+        onLeftBtn: () {
+          final oldDate = ssd.strengthSession.datetime;
+          final today = DateTime.now();
+          if (oldDate.year == today.year &&
+              oldDate.month == today.month &&
+              oldDate.day == today.day) {
+            _setDateTimeNow();
+          } else {
+            _setTime(TimeOfDay.now());
+          }
+          Navigator.of(context).pop();
+        });
     if (time != null) {
       _setTime(time);
     }
@@ -167,57 +165,56 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
     return Scaffold(
       key: scaffoldState,
       appBar: AppBar(
-        title: Text(widget.initial == null ? 'New Strength Session' : 'EditStrengthSession'),
+        title: Text(widget.initial == null
+            ? 'New Strength Session'
+            : 'EditStrengthSession'),
       ),
       body: _buildForm(context),
     );
   }
-  
+
   Widget _buildForm(BuildContext context) {
-    final datetimeStr = DateFormat('dd.MM.yyyy HH:mm')
-        .format(ssd.strengthSession.datetime);
+    final datetimeStr =
+        DateFormat('dd.MM.yyyy HH:mm').format(ssd.strengthSession.datetime);
     return Form(
-      child: ListView(
-        children: [
-          ListTile(
-            leading: const Icon(CustomIcons.dumbbellRotated),
-            title: Text(movementInitialized
-                ? ssd.movement.name
-                : 'Select movement...'
-            ),
-            onTap: () {
-              // TODO
+        child: ListView(
+      children: [
+        ListTile(
+          leading: const Icon(CustomIcons.dumbbellRotated),
+          title: Text(
+              movementInitialized ? ssd.movement.name : 'Select movement...'),
+          onTap: () {
+            // TODO
+          },
+        ),
+        const Divider(),
+        ListTile(
+          leading: const Icon(Icons.calendar_today_outlined),
+          title: Text(datetimeIsNow ? 'now' : datetimeStr),
+          onTap: _pickDateAndTime,
+        ),
+        const Divider(),
+        ListTile(
+          leading: const Icon(Icons.stop), // TODO: Icon for movement unit
+          title: DropdownButtonFormField<MovementUnit>(
+            items: MovementUnit.values
+                .map((unit) => DropdownMenuItem<MovementUnit>(
+                      child: Text(unit.toDisplayName()),
+                      value: unit,
+                    ))
+                .toList(),
+            onChanged: (unit) {
+              if (unit != null) {
+                _setMovementUnit(unit);
+              }
             },
+            value: MovementUnit.reps,
           ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.calendar_today_outlined),
-            title: Text(datetimeIsNow ? 'now' : datetimeStr),
-            onTap: _pickDateAndTime,
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.stop), // TODO: Icon for movement unit
-            title: DropdownButtonFormField<MovementUnit>(
-              items: MovementUnit.values.map((unit) =>
-                DropdownMenuItem<MovementUnit>(
-                  child: Text(unit.toDisplayName()),
-                  value: unit,
-                )
-              ).toList(),
-              onChanged: (unit) {
-                if (unit != null) {
-                  _setMovementUnit(unit);
-                }
-              },
-              value: MovementUnit.reps,
-            ),
-          ),
-          _maybeIntervalInput(context),
-          _maybeCommentsInput(context),
-        ],
-      )
-    );
+        ),
+        _maybeIntervalInput(context),
+        _maybeCommentsInput(context),
+      ],
+    ));
   }
 
   Widget _commentInput(BuildContext context) {

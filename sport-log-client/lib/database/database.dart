@@ -1,17 +1,16 @@
-
 import 'dart:io';
 
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
-import 'package:sport_log/models/account_data/account_data.dart';
-import 'tables/all.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sqflite/sqflite.dart';
 
-class AppDatabase {
+import 'tables/all.dart';
 
-  static final AppDatabase? _instance = Config.isAndroid || Config.isIOS
-      ? AppDatabase._() : null;
+class AppDatabase {
+  static final AppDatabase? _instance =
+      Config.isAndroid || Config.isIOS ? AppDatabase._() : null;
 
   static AppDatabase? get instance => _instance;
 
@@ -25,18 +24,16 @@ class AppDatabase {
     if (await databaseFile.exists()) {
       await databaseFile.delete();
     }
-    await openDatabase(
-      fileName,
-      version: 1,
-      onConfigure: (db) => db.execute("PRAGMA foreign_keys = ON;"),
-      onCreate: (db, version) async {
-        for (final table in allTables) {
-          await table.init(db);
-        }
-        // FIXME: this is awkward
-        metcons.metconMovements = metconMovements;
-      }
-    );
+    await openDatabase(fileName,
+        version: 1,
+        onConfigure: (db) => db.execute("PRAGMA foreign_keys = ON;"),
+        onCreate: (db, version) async {
+          for (final table in allTables) {
+            await table.init(db);
+          }
+          // FIXME: this is awkward
+          metcons.metconMovements = metconMovements;
+        });
   }
 
   DbResult<void> upsertAccountData(AccountData data) async {
@@ -76,23 +73,22 @@ class AppDatabase {
   final diaries = DiaryTable();
   final wods = WodTable();
 
-
   List<Table> get allTables => [
-    movements,
-    metcons,
-    metconMovements,
-    metconSessions,
-    routes,
-    cardioSessions,
-    strengthSets,
-    strengthSessions,
-    platforms,
-    platformCredentials,
-    actionProviders,
-    actions,
-    actionRules,
-    actionEvents,
-    diaries,
-    wods,
-  ];
+        movements,
+        metcons,
+        metconMovements,
+        metconSessions,
+        routes,
+        cardioSessions,
+        strengthSets,
+        strengthSessions,
+        platforms,
+        platformCredentials,
+        actionProviders,
+        actions,
+        actionRules,
+        actionEvents,
+        diaries,
+        wods,
+      ];
 }

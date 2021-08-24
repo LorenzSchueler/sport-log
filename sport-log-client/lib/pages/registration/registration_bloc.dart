@@ -1,15 +1,13 @@
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/api/api_error.dart';
-import 'package:sport_log/blocs/authentication/authentication_bloc.dart' as auth;
+import 'package:sport_log/blocs/authentication/authentication_bloc.dart'
+    as auth;
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/user/user.dart';
 
-enum RegistrationState {
-  idle, pending, failed, successful
-}
+enum RegistrationState { idle, pending, failed, successful }
 
 abstract class RegistrationEvent extends Equatable {
   @override
@@ -22,7 +20,7 @@ class SubmitRegistration extends RegistrationEvent {
     required this.email,
     required this.password,
   }) : super();
-  
+
   final String username;
   final String email;
   final String password;
@@ -37,8 +35,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   RegistrationBloc({
     required auth.AuthenticationBloc authenticationBloc,
     required void Function(String) showErrorSnackBar,
-  })
-      : _authenticationBloc = authenticationBloc,
+  })  : _authenticationBloc = authenticationBloc,
         _showErrorSnackBar = showErrorSnackBar,
         super(RegistrationState.idle);
 
@@ -54,7 +51,8 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     }
   }
 
-  Stream<RegistrationState> _submitRegistration(SubmitRegistration event) async* {
+  Stream<RegistrationState> _submitRegistration(
+      SubmitRegistration event) async* {
     yield RegistrationState.pending;
     final user = User(
       id: randomId(),
@@ -62,7 +60,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       username: event.username,
       password: event.password,
     );
-    final result = await (await Api.instance).createUser(user);
+    final result = await Api.instance.createUser(user);
     if (result.isSuccess) {
       yield RegistrationState.successful;
       _authenticationBloc.add(auth.RegisterEvent(user: user));

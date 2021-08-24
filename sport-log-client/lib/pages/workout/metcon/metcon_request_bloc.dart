@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -63,9 +62,9 @@ class MetconRequestGetAll extends MetconRequestEvent {
 /// Actual Bloc
 class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
   MetconRequestBloc.fromContext(BuildContext context)
-    : _repo = context.read<MetconRepository>(),
-      _cubit = context.read<MetconsCubit>(),
-      super(const MetconRequestIdle());
+      : _repo = context.read<MetconRepository>(),
+        _cubit = context.read<MetconsCubit>(),
+        super(const MetconRequestIdle());
 
   final MetconRepository _repo;
   final MetconsCubit _cubit;
@@ -86,7 +85,7 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
   Stream<MetconRequestState> _createMetcon(MetconRequestCreate event) async* {
     yield const MetconRequestPending();
     assert(event.newMetcon.id == null);
-    Int64 userId = (await Api.instance).currentUser!.id;
+    Int64 userId = Api.instance.currentUser!.id;
     event.newMetcon.userId = userId;
     event.newMetcon.id = _repo.nextMetconId;
     final metcon = event.newMetcon.toMetcon();
@@ -130,9 +129,10 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
     yield const MetconRequestPending();
     await Future<void>.delayed(Duration(milliseconds: Config.debugApiDelay));
     final uiMetcons = _repo.getMetcons().map((metcon) {
-      final movements = _repo.getMetconMovementsOfMetcon(metcon)
-        .map((movement) => UiMetconMovement.fromMetconMovement(movement))
-        .toList();
+      final movements = _repo
+          .getMetconMovementsOfMetcon(metcon)
+          .map((movement) => UiMetconMovement.fromMetconMovement(movement))
+          .toList();
       return UiMetcon.fromMetcon(metcon, movements);
     }).toList();
     _cubit.loadMetcons(uiMetcons);

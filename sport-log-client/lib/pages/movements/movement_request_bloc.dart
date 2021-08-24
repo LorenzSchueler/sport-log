@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,7 +8,6 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/movement/ui_movement.dart';
 import 'package:sport_log/pages/movements/movements_cubit.dart';
 import 'package:sport_log/repositories/movement_repository.dart';
-
 
 /// Bloc State
 abstract class MovementRequestState {}
@@ -56,17 +54,17 @@ class MovementRequestGetAll extends MovementRequestEvent {}
 /// Bloc
 class MovementRequestBloc
     extends Bloc<MovementRequestEvent, MovementRequestState> {
-
   MovementRequestBloc.fromContext(BuildContext context)
       : _repo = context.read<MovementRepository>(),
         _cubit = context.read<MovementsCubit>(),
         super(MovementRequestIdle());
-  
+
   final MovementRepository _repo;
   final MovementsCubit _cubit;
 
   @override
-  Stream<MovementRequestState> mapEventToState(MovementRequestEvent event) async* {
+  Stream<MovementRequestState> mapEventToState(
+      MovementRequestEvent event) async* {
     if (event is MovementRequestCreate) {
       yield* _createMovement(event);
     } else if (event is MovementRequestDelete) {
@@ -78,12 +76,13 @@ class MovementRequestBloc
     }
   }
 
-  Stream<MovementRequestState> _createMovement(MovementRequestCreate event) async* {
+  Stream<MovementRequestState> _createMovement(
+      MovementRequestCreate event) async* {
     yield MovementRequestPending();
     assert(event.newMovement.id == null);
     final Movement movement = Movement(
       id: _repo.nextMovementId,
-      userId: (await Api.instance).currentUser!.id,
+      userId: Api.instance.currentUser!.id,
       name: event.newMovement.name,
       category: event.newMovement.category,
       description: event.newMovement.description,
@@ -95,7 +94,8 @@ class MovementRequestBloc
     yield MovementRequestSucceeded(payload: movement.id);
   }
 
-  Stream<MovementRequestState> _deleteMovement(MovementRequestDelete event) async* {
+  Stream<MovementRequestState> _deleteMovement(
+      MovementRequestDelete event) async* {
     yield MovementRequestPending();
     await Future<void>.delayed(Duration(milliseconds: Config.debugApiDelay));
     _repo.deleteMovement(event.id);
@@ -103,11 +103,12 @@ class MovementRequestBloc
     yield MovementRequestSucceeded(payload: event.id);
   }
 
-  Stream<MovementRequestState> _updateMovement(MovementRequestUpdate event) async* {
+  Stream<MovementRequestState> _updateMovement(
+      MovementRequestUpdate event) async* {
     yield MovementRequestPending();
     assert(event.movement.id != null);
     assert(event.movement.userId != null);
-    assert(event.movement.userId == (await Api.instance).currentUser!.id);
+    assert(event.movement.userId == Api.instance.currentUser!.id);
     await Future<void>.delayed(Duration(milliseconds: Config.debugApiDelay));
     final movement = Movement(
       id: event.movement.id!,
@@ -122,7 +123,8 @@ class MovementRequestBloc
     yield MovementRequestSucceeded(payload: movement.id);
   }
 
-  Stream<MovementRequestState> _getAllMovements(MovementRequestGetAll event) async* {
+  Stream<MovementRequestState> _getAllMovements(
+      MovementRequestGetAll event) async* {
     yield MovementRequestPending();
     await Future<void>.delayed(Duration(milliseconds: Config.debugApiDelay));
     final movements = _repo.getAllMovements();
