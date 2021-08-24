@@ -1,9 +1,12 @@
 
+import 'dart:developer';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/blocs/authentication/authentication_bloc.dart' as auth;
+import 'package:sport_log/data_provider/syncing.dart';
 
 enum LoginState {
   idle, pending, failed, successful
@@ -58,6 +61,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     if (result.isSuccess) {
       yield LoginState.successful;
       _authenticationBloc.add(auth.LoginEvent(user: result.success));
+      (await DownSync.instance).sync();
     } else {
       _handleApiError(result.failure);
       yield LoginState.failed;

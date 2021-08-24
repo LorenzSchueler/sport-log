@@ -22,14 +22,18 @@ extension Helpers on Api {
   }
 
   void _logRequest(String httpMethod, String url, [String? json]) {
-    log('$httpMethod $url\n$json', name: 'API request');
+    if (json != null) {
+      log('$httpMethod $url\n$json', name: 'API request');
+    } else {
+      log('$httpMethod $url', name: 'API request');
+    }
   }
 
   void _logResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      log('${response.statusCode}', name: 'API response');
-    } else {
       log('${response.statusCode}\n${response.body}', name: 'API response');
+    } else {
+      log('${response.statusCode}', name: 'API response');
     }
   }
 

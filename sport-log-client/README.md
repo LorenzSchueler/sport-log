@@ -10,6 +10,7 @@
 
 ## Bugs
 * [ ] create movement on the fly does not work
+* [ ] usernames/passwords with ':' do not work
 
 ## Ui Improvements
 * [ ] main drawer tabs don't restart scaffold
@@ -43,11 +44,12 @@
 * [ ] use one string for last_modified, is_new, deleted in every table
 * [ ] clean unified logging strategy
 * [ ] similar structure (like in database) in api with subobjects for actual routes
+* [x] tidy up helpers directory
 
 ## Ideas
 * [ ] use hive instead of shared preferences
 * [ ] page showing recent activity
-* [x] tidy up helpers directory
+* [ ] syncing in different thread / background service
 
 ## Database
 * [ ] shouldn't be possible to delete e. g. movement when it is referenced by other resource

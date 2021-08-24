@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,7 +20,7 @@ class DownSync {
     final api = Api.instance;
     final lastSync = await _lastSync();
     _storage.setString(Keys.lastSync, DateTime.now().toString());
-    final result = await api.getAccountData(lastSync);
+    final result = await api.getAccountData(null); // TODO: use lastSync datetime
     if (result.isFailure) {
       // TODO: what to do now?
       stderr.writeln('Could not fetch account data');
@@ -30,7 +31,8 @@ class DownSync {
       // TODO: syncing on the web?
       return;
     }
-    db.upsertAccountData(result.success);
+    db.upsertAccountData(result.success)
+      .then((_) => log('done', name: 'DOWN SYNC'));
   }
 
   Future<DateTime?> _lastSync() async {
