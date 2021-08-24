@@ -1,3 +1,5 @@
+//! Collection of functions for use in action providers.
+
 use chrono::{Duration, Utc};
 use rand::Rng;
 use reqwest::{Client, Error, StatusCode};

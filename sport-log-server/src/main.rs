@@ -1,3 +1,18 @@
+//! Central server for **Sport Log**.
+//!
+//! **Sport Log Server** is a multi-user server backend which stores user data and provides synchonization.
+//!
+//! # Usage
+//!
+//! **Sport Log Server** should be started at system startup, perferably as a systemd service.
+//! It listens on port 8000 for HTTP request.
+//! It is highly recommended to use an HTTP server linke apache or nginx and configure it as a reverse proxy.
+//! Make sure only connections via HTTPS are allowed since otherwise you data will be send in clear text.
+//!
+//! # Config
+//!
+//! The config file must be called `config.toml` and must be deserializable to a [Config](sport_log_types::Config).
+
 use std::io::Cursor;
 
 #[macro_use]
