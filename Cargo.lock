@@ -1695,6 +1695,7 @@ name = "sport-log-action-provider-sportstracker"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "err-derive",
  "rand",
  "reqwest",
  "serde",
@@ -1709,6 +1710,7 @@ name = "sport-log-action-provider-wodify-login"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "err-derive",
  "rand",
  "reqwest",
  "serde",
@@ -1724,6 +1726,7 @@ name = "sport-log-action-provider-wodify-wod"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "err-derive",
  "rand",
  "reqwest",
  "serde",
