@@ -12,6 +12,12 @@ enum DbError {
   validationFailed,
 }
 
+enum SyncStatus {
+  synchronized,
+  updated,
+  created,
+}
+
 abstract class DbObject extends Validatable {
   Int64 get id;
   bool get deleted;
@@ -72,4 +78,6 @@ abstract class Keys {
   static const setNumber = 'set_number';
   static const arguments = 'arguments';
   static const lastSync = 'last_sync';
+  static const syncNeeded = 'sync_needed';
+  static const syncStatus = 'sync_status';
 }

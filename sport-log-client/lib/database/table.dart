@@ -105,14 +105,19 @@ end;
     });
   }
 
-  DbResult<List<T>> getAll({
-    bool includeDeleted = false,
-    Transaction? txn
-  }) async {
+  DbResult<List<T>> getNonDeleted([Transaction? txn]) async {
     return request(() async {
-      final filter = includeDeleted ? null : "deleted = 0";
       final List<DbRecord> result = await (txn ?? database)
-          .query(tableName, where: filter);
+          .query(tableName, where: 'deleted = 0');
+      return Success(result.map(serde.fromDbRecord).toList());
+    });
+  }
+
+  DbResult<List<T>> getWithSyncStatus(SyncStatus syncStatus) async {
+    final int status = SyncStatus.values.indexOf(syncStatus);
+    return request(() async {
+      final List<DbRecord> result = await database.query(tableName,
+          where: '${Keys.syncStatus} = $status');
       return Success(result.map(serde.fromDbRecord).toList());
     });
   }
@@ -155,6 +160,25 @@ end;
       final List<DbRecord> result = await (transaction ?? database)
           .rawQuery("SELECT 1 FROM $tableName where $filter;", [id.toInt()]);
       return Success(result.isNotEmpty);
+    });
+  }
+
+  DbResult<void> setSynchronized(Int64 id) async {
+    return voidRequest(() async {
+      database.update(tableName, {'sync_status': 0},
+        where: 'id = ?', whereArgs: [id.toInt()]);
+    });
+  }
+
+  DbResult<void> upsertMultiple(List<T> objects, [Transaction? txn]) async {
+    return voidRequest(() async {
+      final batch = (txn ?? database).batch();
+      for (final object in objects) {
+        assert(object.isValid());
+        batch.insert(tableName, serde.toDbRecord(object),
+            conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+      await batch.commit(noResult: true, continueOnError: true);
     });
   }
 }
