@@ -1,25 +1,23 @@
-
-import 'package:sport_log/api/api.dart';
-import 'package:sport_log/models/user/user.dart';
-import 'package:sport_log/repositories/authentication_repository.dart';
-
 import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:sport_log/api/api.dart';
+import 'package:sport_log/data_provider/authentication_repository.dart';
+import 'package:sport_log/models/user/user.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
 
-class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
+class AuthenticationBloc
+    extends Bloc<AuthenticationEvent, AuthenticationState> {
   AuthenticationBloc({
     required AuthenticationRepository? authenticationRepository,
     required Api api,
     User? user,
-  }) : _authenticationRepository = authenticationRepository,
-       _api = api,
-        super(user == null
-          ? Unauthenticated()
-          : Authenticated(user: user));
+  })  : _authenticationRepository = authenticationRepository,
+        _api = api,
+        super(user == null ? Unauthenticated() : Authenticated(user: user));
 
   final AuthenticationRepository? _authenticationRepository;
   final Api _api;
