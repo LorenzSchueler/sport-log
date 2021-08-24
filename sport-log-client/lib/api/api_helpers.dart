@@ -5,25 +5,26 @@ typedef FromJson<T> = T Function(Map<String, dynamic>);
 
 extension Helpers on Api {
 
-  String get _urlBase {
-    assert(_urlBaseOptional != null, 'forget to call Api().init()');
-    return _urlBaseOptional!;
-  }
-
-
   Uri _uri(String route) => Uri.parse(_urlBase + route);
 
   void _logError(String message) {
     stderr.writeln(message);
   }
 
+  String _prettyJson(dynamic json, {int indent = 2}) {
+    var spaces = ' ' * indent;
+    var encoder = JsonEncoder.withIndent(spaces);
+    return encoder.convert(json);
+  }
+
   void _handleUnknownStatusCode(http.Response response) {
     _logError("status code: ${response.statusCode}; response: ${response.body};");
   }
 
-  void _logRequest(String httpMethod, String url, [String? json]) {
+  void _logRequest(String httpMethod, String url, [dynamic json]) {
     if (json != null) {
-      log('$httpMethod $url\n$json', name: 'API request');
+      final prettyJson = _prettyJson(json);
+      log('$httpMethod $url\n$prettyJson', name: 'API request');
     } else {
       log('$httpMethod $url', name: 'API request');
     }
@@ -31,7 +32,9 @@ extension Helpers on Api {
 
   void _logResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      log('${response.statusCode}\n${response.body}', name: 'API response');
+      dynamic jsonObject = jsonDecode(response.body);
+      log('${response.statusCode}\n${_prettyJson(jsonObject)}',
+          name: 'API response');
     } else {
       log('${response.statusCode}', name: 'API response');
     }
@@ -140,12 +143,11 @@ extension Helpers on Api {
     Map<String, String>? headers,
   }) async {
     return _errorHandling((client) async {
-      final bodyStr = jsonEncode(body);
-      _logRequest('POST', route, bodyStr);
+      _logRequest('POST', route, body);
       final response = await client.post(
         _uri(route),
         headers: headers ?? _defaultHeaders,
-        body: bodyStr,
+        body: jsonEncode(body),
       );
       _logResponse(response);
       if (response.statusCode >= 200 && response.statusCode < 300) {
@@ -169,12 +171,11 @@ extension Helpers on Api {
     ApiError? Function(int)? mapBadStatusToApiError,
   }) async {
     return _errorHandling((client) async {
-      final bodyStr = jsonEncode(body);
-      _logRequest('PUT', route, bodyStr);
+      _logRequest('PUT', route, body);
       final response = await client.put(
         _uri(route),
         headers: _defaultHeaders,
-        body: bodyStr,
+        body: jsonEncode(body),
       );
       _logResponse(response);
       if (response.statusCode >= 200 && response.statusCode < 300) {

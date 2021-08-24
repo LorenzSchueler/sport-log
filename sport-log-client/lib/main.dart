@@ -1,5 +1,6 @@
 
 import 'package:sport_log/api/api.dart';
+import 'package:sport_log/data_provider/syncing.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -14,18 +15,18 @@ import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-void debugMain() async {
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  debugMain();
   final database = AppDatabase.instance!;
   await database.init();
   AuthenticationRepository? authRepo;
   authRepo = await AuthenticationRepository.getInstance();
   User? user = await authRepo.getUser();
-  final api = Api.instance..init();
+  final api = (await Api.instance);
+  if (user != null) {
+    api.setCurrentUser(user);
+    (await DownSync.instance).sync();
+  }
   final authBloc = AuthenticationBloc(
       authenticationRepository: authRepo,
       api: api,

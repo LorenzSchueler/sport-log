@@ -17,7 +17,7 @@ class DownSync {
   final SharedPreferences _storage;
 
   Future<void> sync() async {
-    final api = Api.instance;
+    final api = await Api.instance;
     final lastSync = await _lastSync();
     _storage.setString(Keys.lastSync, DateTime.now().toString());
     final result = await api.getAccountData(null); // TODO: use lastSync datetime
@@ -33,6 +33,7 @@ class DownSync {
     }
     db.upsertAccountData(result.success)
       .then((_) => log('done', name: 'DOWN SYNC'));
+    // TODO: handle user update
   }
 
   Future<DateTime?> _lastSync() async {
@@ -63,18 +64,18 @@ class UpSync {
       return;
     }
     // TODO: check for internet connection
-    _pushToApi();
+    _pushToServer();
     _storage.setBool(Keys.syncNeeded, false);
   }
 
-  Future<void> _pushToApi() async {
+  Future<void> _pushToServer() async {
     final db = AppDatabase.instance;
     if (db == null) {
       return;
     }
     final api = Api.instance;
 
-    // TODO
+    // TODO: push database records and changed user
     throw UnimplementedError();
   }
 }

@@ -39,12 +39,10 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     required void Function(String) showErrorSnackBar,
   })
       : _authenticationBloc = authenticationBloc,
-        _api = Api.instance,
         _showErrorSnackBar = showErrorSnackBar,
         super(RegistrationState.idle);
 
   final auth.AuthenticationBloc _authenticationBloc;
-  final Api _api;
   final void Function(String) _showErrorSnackBar;
 
   @override
@@ -64,7 +62,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       username: event.username,
       password: event.password,
     );
-    final result = await _api.createUser(user);
+    final result = await (await Api.instance).createUser(user);
     if (result.isSuccess) {
       yield RegistrationState.successful;
       _authenticationBloc.add(auth.RegisterEvent(user: user));

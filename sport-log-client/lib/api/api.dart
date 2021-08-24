@@ -27,12 +27,11 @@ typedef ApiResult<T> = Future<Result<T, ApiError>>;
 
 class Api {
 
-  static final Api instance = Api._();
-  Api._();
+  static Api? _instance;
+  static Future<Api> get instance async => _instance
+    ??= Api._(await Config.apiUrlBase);
 
-  Future<void> init() async {
-    _urlBaseOptional = await Config.apiUrlBase;
-  }
+  Api._(this._urlBase);
 
   void setCurrentUser(User user) {
     _currentUser = user;
@@ -44,7 +43,7 @@ class Api {
 
   User? get currentUser => _currentUser;
 
-  String? _urlBaseOptional;
+  final String _urlBase;
   final _client = http.Client();
   User? _currentUser;
 }

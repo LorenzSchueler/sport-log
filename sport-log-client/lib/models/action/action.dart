@@ -56,7 +56,7 @@ class DbActionSerializer implements DbSerializer<Action> {
     return {
       Keys.id: o.id.toInt(),
       Keys.name: o.name,
-      Keys.actionProviderId: o.actionProviderId,
+      Keys.actionProviderId: o.actionProviderId.toInt(),
       Keys.description: o.description,
       Keys.createBefore: o.createBefore,
       Keys.deleteAfter: o.deleteAfter,

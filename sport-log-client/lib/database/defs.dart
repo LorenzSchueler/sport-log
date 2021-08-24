@@ -40,8 +40,8 @@ abstract class Keys {
   static const movementId = 'movement_id';
   static const metconId = 'metcon_id';
   static const actionProviderId = 'action_provider_id';
-  static const createBefore = 'created_before';
-  static const deleteAfter = 'deleted_after';
+  static const createBefore = 'create_before';
+  static const deleteAfter = 'delete_after';
   static const actionId = 'action_id';
   static const datetime = 'datetime';
   static const enabled = 'enabled';

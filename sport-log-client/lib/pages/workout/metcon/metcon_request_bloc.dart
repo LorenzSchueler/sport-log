@@ -65,12 +65,10 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
   MetconRequestBloc.fromContext(BuildContext context)
     : _repo = context.read<MetconRepository>(),
       _cubit = context.read<MetconsCubit>(),
-      _api = Api.instance,
       super(const MetconRequestIdle());
 
   final MetconRepository _repo;
   final MetconsCubit _cubit;
-  final Api _api;
 
   @override
   Stream<MetconRequestState> mapEventToState(MetconRequestEvent event) async* {
@@ -88,7 +86,7 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
   Stream<MetconRequestState> _createMetcon(MetconRequestCreate event) async* {
     yield const MetconRequestPending();
     assert(event.newMetcon.id == null);
-    Int64 userId = _api.currentUser!.id;
+    Int64 userId = (await Api.instance).currentUser!.id;
     event.newMetcon.userId = userId;
     event.newMetcon.id = _repo.nextMetconId;
     final metcon = event.newMetcon.toMetcon();
