@@ -17,13 +17,13 @@ import 'package:sport_log/repositories/movement_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Config.init();
   final database = AppDatabase.instance!;
   await database.init();
   AuthenticationRepository? authRepo;
   authRepo = await AuthenticationRepository.getInstance();
   User? user = await authRepo.getUser();
   final api = Api.instance;
-  api.setUrlBase(await Config.apiUrlBase);
   if (user != null) {
     api.setCurrentUser(user);
     (await DownSync.instance).sync();

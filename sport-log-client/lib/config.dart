@@ -1,13 +1,17 @@
-
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 
 abstract class Config {
-  // this is only for convenience; should be remove later
-  static Future<String> get apiUrlBase async => await isAndroidEmulator
-      ? "http://10.0.2.2:8000" : "http://127.0.0.1:8000";
+  static late String apiUrlBase;
+
+  static Future<void> init() async {
+    // this is only for convenience; should be remove later
+    apiUrlBase = await isAndroidEmulator
+        ? "http://10.0.2.2:8000"
+        : "http://127.0.0.1:8000";
+  }
 
   static bool get isWeb => kIsWeb;
   // Workaround for Platform.XXX not being supported on web

@@ -3,6 +3,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
+import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
@@ -134,6 +135,7 @@ void testActionRule(Api api) async {
 }
 
 void main() async {
+  await Config.init();
   final Api api = Api.instance;
 
   testUser(api);
