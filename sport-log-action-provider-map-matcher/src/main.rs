@@ -27,13 +27,13 @@ const PLATFORM_NAME: &str = "sport-log";
 #[derive(Debug, StdError)]
 enum Error {
     #[error(display = "{}", _0)]
-    ReqwestError(ReqwestError),
+    Reqwest(ReqwestError),
     #[error(display = "{}", _0)]
-    IoError(IoError),
+    Io(IoError),
     #[error(display = "{}", _0)]
-    TomlError(TomlError),
+    Toml(TomlError),
     #[error(display = "{}", _0)]
-    GpxError(GpxError),
+    Gpx(GpxError),
 }
 
 type Result<T> = StdResult<T, Error>;
@@ -46,10 +46,7 @@ struct Config {
 
 impl Config {
     fn get() -> Result<Self> {
-        Ok(
-            toml::from_str(&fs::read_to_string("config.toml").map_err(Error::IoError)?)
-                .map_err(Error::TomlError)?,
-        )
+        toml::from_str(&fs::read_to_string("config.toml").map_err(Error::Io)?).map_err(Error::Toml)
     }
 }
 
@@ -81,8 +78,14 @@ async fn main() -> Result<()> {
     match &env::args().collect::<Vec<_>>()[1..] {
         [] => map_match().await,
         [option] if option == "--setup" => setup().await,
-        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => Ok(help()),
-        _ => Ok(wrong_use()),
+        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => {
+            help();
+            Ok(())
+        }
+        _ => {
+            wrong_use();
+            Ok(())
+        }
     }
 }
 
@@ -101,7 +104,7 @@ async fn setup() -> Result<()> {
         0,
     )
     .await
-    .map_err(Error::ReqwestError)
+    .map_err(Error::Reqwest)
 }
 
 fn help() {
@@ -135,7 +138,7 @@ async fn map_match() -> Result<()> {
         Duration::hours(1),
     )
     .await
-    .map_err(Error::ReqwestError)?;
+    .map_err(Error::Reqwest)?;
     println!("executable action events: {}\n", exec_action_events.len());
 
     let mut delete_action_event_ids = vec![];
@@ -164,10 +167,10 @@ async fn map_match() -> Result<()> {
             .basic_auth(&username, Some(&config.password))
             .send()
             .await
-            .map_err(Error::ReqwestError)?
+            .map_err(Error::Reqwest)?
             .json()
             .await
-            .map_err(Error::ReqwestError)?;
+            .map_err(Error::Reqwest)?;
 
         let route = match_to_map(&cardio_session).await?;
 
@@ -176,10 +179,10 @@ async fn map_match() -> Result<()> {
             .basic_auth(&username, Some(&config.password))
             .send()
             .await
-            .map_err(Error::ReqwestError)?
+            .map_err(Error::Reqwest)?
             .json()
             .await
-            .map_err(Error::ReqwestError)?;
+            .map_err(Error::Reqwest)?;
 
         if let Some(route_id) = compare_routes(&route, &routes) {
             cardio_session.route_id = Some(route_id);
@@ -190,7 +193,7 @@ async fn map_match() -> Result<()> {
                 .json(&route)
                 .send()
                 .await
-                .map_err(Error::ReqwestError)?
+                .map_err(Error::Reqwest)?
                 .status()
             {
                 status if status.is_success() => {
@@ -209,7 +212,7 @@ async fn map_match() -> Result<()> {
             .json(&cardio_session)
             .send()
             .await
-            .map_err(Error::ReqwestError)?
+            .map_err(Error::Reqwest)?
             .status()
         {
             status if status.is_success() => {
@@ -231,18 +234,18 @@ async fn map_match() -> Result<()> {
             &delete_action_event_ids,
         )
         .await
-        .map_err(Error::ReqwestError)?;
+        .map_err(Error::Reqwest)?;
     }
     Ok(())
 }
 
 async fn match_to_map(cardio_session: &CardioSession) -> Result<Route> {
-    let gpx = to_gpx(&cardio_session.track.as_ref().unwrap()); // function only called if track is not None
+    let gpx = to_gpx(cardio_session.track.as_ref().unwrap()); // function only called if track is not None
 
     let mut rng = rand::thread_rng();
     let filename = format!("/tmp/map-matcher-{}.gpx", rng.gen::<u64>());
     let filename_result = format!("{}{}", filename, ".res.gpx");
-    gpx::write(&gpx, File::create(&filename).map_err(Error::IoError)?).map_err(Error::GpxError)?;
+    gpx::write(&gpx, File::create(&filename).map_err(Error::Io)?).map_err(Error::Gpx)?;
 
     let output = Command::new("java")
         .args(&[
@@ -256,22 +259,21 @@ async fn match_to_map(cardio_session: &CardioSession) -> Result<Route> {
         .current_dir("map-matching")
         .output()
         .await
-        .map_err(Error::IoError)?;
+        .map_err(Error::Io)?;
 
     if !output.status.success() {
         println!("{:?}", output);
     }
 
-    let gpx = gpx::read(File::open(&filename_result).map_err(Error::IoError)?)
-        .map_err(Error::GpxError)?;
+    let gpx = gpx::read(File::open(&filename_result).map_err(Error::Io)?).map_err(Error::Gpx)?;
 
-    fs::remove_file(&filename).map_err(Error::IoError)?;
-    fs::remove_file(&filename_result).map_err(Error::IoError)?;
+    fs::remove_file(&filename).map_err(Error::Io)?;
+    fs::remove_file(&filename_result).map_err(Error::Io)?;
 
     to_route(gpx, cardio_session).await
 }
 
-fn to_gpx(positions: &Vec<Position>) -> Gpx {
+fn to_gpx(positions: &[Position]) -> Gpx {
     let mut track = Track::new();
     let mut track_segment = TrackSegment::new();
     let waypoints: Vec<_> = positions
@@ -280,15 +282,15 @@ fn to_gpx(positions: &Vec<Position>) -> Gpx {
         .collect();
     track_segment.points.extend(waypoints);
     track.segments.push(track_segment);
-    let gpx = Gpx {
+
+    Gpx {
         version: GpxVersion::Gpx10,
         creator: None,
         metadata: None,
         waypoints: vec![],
         tracks: vec![track],
         routes: vec![],
-    };
-    gpx
+    }
 }
 
 async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Result<Route> {
@@ -312,10 +314,10 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Result<Route> {
         .json(&request_data)
         .send()
         .await
-        .map_err(Error::ReqwestError)?
+        .map_err(Error::Reqwest)?
         .json()
         .await
-        .map_err(Error::ReqwestError)?;
+        .map_err(Error::Reqwest)?;
 
     let mut distance = 0.;
     let mut prev_point = GeoLocation::new(

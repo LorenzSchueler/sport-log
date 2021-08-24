@@ -20,13 +20,13 @@ const PLATFORM_NAME: &str = "wodify";
 #[derive(Debug, StdError)]
 enum Error {
     #[error(display = "{}", _0)]
-    ReqwestError(ReqwestError),
+    Reqwest(ReqwestError),
     #[error(display = "{}", _0)]
-    IoError(IoError),
+    Io(IoError),
     #[error(display = "{}", _0)]
-    TomlError(TomlError),
+    Toml(TomlError),
     #[error(display = "{}", _0)]
-    WebDriverError(WebDriverError),
+    WebDriver(WebDriverError),
 }
 
 type Result<T> = StdResult<T, Error>;
@@ -39,10 +39,7 @@ struct Config {
 
 impl Config {
     fn get() -> Result<Self> {
-        Ok(
-            toml::from_str(&fs::read_to_string("config.toml").map_err(Error::IoError)?)
-                .map_err(Error::TomlError)?,
-        )
+        toml::from_str(&fs::read_to_string("config.toml").map_err(Error::Io)?).map_err(Error::Toml)
     }
 }
 
@@ -51,8 +48,14 @@ async fn main() -> Result<()> {
     match &env::args().collect::<Vec<_>>()[1..] {
         [] => login().await,
         [option] if option == "--setup" => setup().await,
-        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => Ok(help()),
-        _ => Ok(wrong_use()),
+        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => {
+            help();
+            Ok(())
+        }
+        _ => {
+            wrong_use();
+            Ok(())
+        }
     }
 }
 
@@ -75,7 +78,7 @@ async fn setup() -> Result<()> {
         0,
     )
     .await
-    .map_err(Error::ReqwestError)
+    .map_err(Error::Reqwest)
 }
 
 fn help() {
@@ -109,16 +112,14 @@ async fn login() -> Result<()> {
         Duration::days(1) + Duration::minutes(1),
     )
     .await
-    .map_err(Error::ReqwestError)?;
+    .map_err(Error::Reqwest)?;
     println!("executable action events: {}\n", exec_action_events.len());
 
     if exec_action_events.is_empty() {
         return Ok(());
     }
 
-    let mut webdriver = Command::new("../geckodriver")
-        .spawn()
-        .map_err(Error::IoError)?;
+    let mut webdriver = Command::new("../geckodriver").spawn().map_err(Error::Io)?;
 
     let caps = DesiredCapabilities::firefox();
     let driver = WebDriver::new_with_timeout(
@@ -127,7 +128,7 @@ async fn login() -> Result<()> {
         Some(StdDuration::from_secs(5)),
     )
     .await
-    .map_err(Error::WebDriverError)?;
+    .map_err(Error::WebDriver)?;
 
     let mut delete_action_event_ids = vec![];
     // TODO execute in parallel
@@ -156,35 +157,35 @@ async fn login() -> Result<()> {
         driver
             .delete_all_cookies()
             .await
-            .map_err(Error::WebDriverError)?;
+            .map_err(Error::WebDriver)?;
         driver
             .get("https://app.wodify.com/Schedule/CalendarListView.aspx")
             .await
-            .map_err(Error::WebDriverError)?;
+            .map_err(Error::WebDriver)?;
 
         time::sleep(StdDuration::from_secs(3)).await;
 
         driver
             .find_element(By::Id("Input_UserName"))
             .await
-            .map_err(Error::WebDriverError)?
+            .map_err(Error::WebDriver)?
             .send_keys(&username)
             .await
-            .map_err(Error::WebDriverError)?;
+            .map_err(Error::WebDriver)?;
         driver
             .find_element(By::Id("Input_Password"))
             .await
-            .map_err(Error::WebDriverError)?
+            .map_err(Error::WebDriver)?
             .send_keys(&password)
             .await
-            .map_err(Error::WebDriverError)?;
+            .map_err(Error::WebDriver)?;
         driver
             .find_element(By::ClassName("signin-btn"))
             .await
-            .map_err(Error::WebDriverError)?
+            .map_err(Error::WebDriver)?
             .click()
             .await
-            .map_err(Error::WebDriverError)?;
+            .map_err(Error::WebDriver)?;
         time::sleep(StdDuration::from_secs(2)).await;
 
         if driver
@@ -206,13 +207,13 @@ async fn login() -> Result<()> {
         'event_loop: while Utc::now() < exec_action_event.datetime
         // - Duration::days(1) + Duration::minutes(1) // TODO
         {
-            driver.refresh().await.map_err(Error::WebDriverError)?; // TODO can this be removed?
+            driver.refresh().await.map_err(Error::WebDriver)?; // TODO can this be removed?
             println!("searching");
 
             let rows = driver
                 .find_elements(By::XPath("//table[@class='TableRecords']/tbody/tr"))
                 .await
-                .map_err(Error::WebDriverError)?;
+                .map_err(Error::WebDriver)?;
             println!("rows: {:?}", rows.len());
 
             let mut row_number = rows.len();
@@ -224,7 +225,7 @@ async fn login() -> Result<()> {
                     if day
                         .inner_html()
                         .await
-                        .map_err(Error::WebDriverError)?
+                        .map_err(Error::WebDriver)?
                         .contains(&date)
                     {
                         println!("day found");
@@ -240,7 +241,7 @@ async fn login() -> Result<()> {
                     let title = label
                         .get_attribute("title")
                         .await
-                        .map_err(Error::WebDriverError)?
+                        .map_err(Error::WebDriver)?
                         .unwrap();
                     println!("title: {:?}", title);
                     if title.contains(&exec_action_event.action_name) && title.contains(&time) {
@@ -248,10 +249,10 @@ async fn login() -> Result<()> {
                         //row.find_element(By::XPath("./td[3]/div/a"))
                         row.find_element(By::XPath("./td[3]/div"))
                             .await
-                            .map_err(Error::WebDriverError)?
+                            .map_err(Error::WebDriver)?
                             .click()
                             .await
-                            .map_err(Error::WebDriverError)?;
+                            .map_err(Error::WebDriver)?;
                         println!("reserved");
                         time::sleep(StdDuration::from_secs(2)).await; // TODO remove
 
@@ -272,11 +273,11 @@ async fn login() -> Result<()> {
             &delete_action_event_ids,
         )
         .await
-        .map_err(Error::ReqwestError)?;
+        .map_err(Error::Reqwest)?;
     }
 
     println!("closing browser");
-    driver.quit().await.map_err(Error::WebDriverError)?;
+    driver.quit().await.map_err(Error::WebDriver)?;
 
     println!("terminating webdriver");
     let _ = webdriver.kill();

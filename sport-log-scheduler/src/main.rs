@@ -30,11 +30,11 @@ use sport_log_types::{ActionEvent, ActionEventId, CreatableActionRule, Deletable
 #[derive(Debug, StdError)]
 enum Error {
     #[error(display = "{}", _0)]
-    ReqwestError(ReqwestError),
+    Reqwest(ReqwestError),
     #[error(display = "{}", _0)]
-    IoError(IoError),
+    Io(IoError),
     #[error(display = "{}", _0)]
-    TomlError(TomlError),
+    Toml(TomlError),
 }
 
 type Result<T> = StdResult<T, Error>;
@@ -47,10 +47,8 @@ pub struct Config {
 
 impl Config {
     fn get() -> Result<Self> {
-        Ok(
-            toml::from_str(&fs::read_to_string("config.toml").map_err(Error::IoError)?)
-                .map_err(Error::TomlError)?,
-        )
+            toml::from_str(&fs::read_to_string("config.toml").map_err(Error::Io)?)
+                .map_err(Error::Toml)
     }
 }
 
@@ -64,9 +62,9 @@ fn main() -> Result<()> {
         .get(format!("{}/v1/adm/creatable_action_rule", config.base_url))
         .basic_auth(username, Some(&config.admin_password))
         .send()
-        .map_err(Error::ReqwestError)?
+        .map_err(Error::Reqwest)?
         .json()
-        .map_err(Error::ReqwestError)?;
+        .map_err(Error::Reqwest)?;
 
     println!("{:#?}", creatable_action_rules);
 
@@ -111,15 +109,15 @@ fn main() -> Result<()> {
         .basic_auth(username, Some(&config.admin_password))
         .json(&action_events)
         .send()
-        .map_err(Error::ReqwestError)?;
+        .map_err(Error::Reqwest)?;
 
     let deletable_action_events: Vec<DeletableActionEvent> = client
         .get(format!("{}/v1/adm/deletable_action_event", config.base_url))
         .basic_auth(username, Some(&config.admin_password))
         .send()
-        .map_err(Error::ReqwestError)?
+        .map_err(Error::Reqwest)?
         .json()
-        .map_err(Error::ReqwestError)?;
+        .map_err(Error::Reqwest)?;
 
     println!("{:#?}", deletable_action_events);
 
@@ -140,6 +138,6 @@ fn main() -> Result<()> {
         .basic_auth(username, Some(&config.admin_password))
         .json(&action_event_ids)
         .send()
-        .map_err(Error::ReqwestError)?;
+        .map_err(Error::Reqwest)?;
     Ok(())
 }

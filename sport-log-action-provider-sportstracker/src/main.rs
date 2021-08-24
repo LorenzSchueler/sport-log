@@ -17,11 +17,11 @@ const PLATFORM_NAME: &str = "sportstracker";
 #[derive(Debug, StdError)]
 enum Error {
     #[error(display = "{}", _0)]
-    ReqwestError(ReqwestError),
+    Reqwest(ReqwestError),
     #[error(display = "{}", _0)]
-    IoError(IoError),
+    Io(IoError),
     #[error(display = "{}", _0)]
-    TomlError(TomlError),
+    Toml(TomlError),
 }
 
 type Result<T> = StdResult<T, Error>;
@@ -34,10 +34,7 @@ struct Config {
 
 impl Config {
     fn get() -> Result<Self> {
-        Ok(
-            toml::from_str(&fs::read_to_string("config.toml").map_err(Error::IoError)?)
-                .map_err(Error::TomlError)?,
-        )
+        toml::from_str(&fs::read_to_string("config.toml").map_err(Error::Io)?).map_err(Error::Toml)
     }
 }
 
@@ -127,8 +124,14 @@ async fn main() -> Result<()> {
     match &env::args().collect::<Vec<_>>()[1..] {
         [] => fetch().await,
         [option] if option == "--setup" => setup().await,
-        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => Ok(help()),
-        _ => Ok(wrong_use()),
+        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => {
+            help();
+            Ok(())
+        }
+        _ => {
+            wrong_use();
+            Ok(())
+        }
     }
 }
 
@@ -147,7 +150,7 @@ async fn setup() -> Result<()> {
         0,
     )
     .await
-    .map_err(Error::ReqwestError)
+    .map_err(Error::Reqwest)
 }
 
 fn help() {
@@ -182,7 +185,7 @@ async fn fetch() -> Result<()> {
         Duration::hours(1) + Duration::minutes(1),
     )
     .await
-    .map_err(Error::ReqwestError)?;
+    .map_err(Error::Reqwest)?;
     println!("executable action events: {}\n", exec_action_events.len());
 
     let mut rng = rand::thread_rng();
@@ -211,10 +214,10 @@ async fn fetch() -> Result<()> {
                 .basic_auth(&username, Some(&config.password))
                 .send()
                 .await
-                .map_err(Error::ReqwestError)?
+                .map_err(Error::Reqwest)?
                 .json::<Vec<Movement>>()
                 .await
-                .map_err(Error::ReqwestError)?
+                .map_err(Error::Reqwest)?
                 .into_iter()
                 .map(|mut movement| {
                     movement.name.make_ascii_lowercase();
@@ -283,7 +286,7 @@ async fn fetch() -> Result<()> {
                     .json(&cardio_session)
                     .send()
                     .await
-                    .map_err(Error::ReqwestError)?
+                    .map_err(Error::Reqwest)?
                     .status()
                 {
                     status if status.is_success() => {
@@ -316,7 +319,7 @@ async fn fetch() -> Result<()> {
             &delete_action_event_ids,
         )
         .await
-        .map_err(Error::ReqwestError)?;
+        .map_err(Error::Reqwest)?;
     }
     Ok(())
 }
@@ -332,10 +335,10 @@ async fn get_token(
         .form(&credentials)
         .send()
         .await
-        .map_err(Error::ReqwestError)?
+        .map_err(Error::Reqwest)?
         .json()
         .await
-        .map_err(Error::ReqwestError)?;
+        .map_err(Error::Reqwest)?;
 
     Ok(user.session_key.map(|key| ("token", key)))
 }
@@ -346,10 +349,10 @@ async fn get_workouts(client: &Client, token: &(&str, &str)) -> Result<Vec<Worko
         .query(&[token])
         .send()
         .await
-        .map_err(Error::ReqwestError)?
+        .map_err(Error::Reqwest)?
         .json()
         .await
-        .map_err(Error::ReqwestError)?;
+        .map_err(Error::Reqwest)?;
 
     Ok(workouts.payload)
 }
@@ -369,10 +372,10 @@ async fn get_workout_data(
         .query(&[token, samples])
         .send()
         .await
-        .map_err(Error::ReqwestError)?
+        .map_err(Error::Reqwest)?
         .json::<WorkoutDataWrapper>()
         .await
-        .map_err(Error::ReqwestError)?
+        .map_err(Error::Reqwest)?
         .payload)
 }
 
