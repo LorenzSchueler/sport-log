@@ -16,6 +16,8 @@ class RegistrationForm extends StatefulWidget {
 
 class _RegistrationFormState extends State<RegistrationForm> {
   final _formKey = GlobalKey<FormState>();
+
+  // TODO: use User class
   String _username = "";
   String _email = "";
   String _password1 = "";
@@ -191,6 +193,9 @@ class _RegistrationFormState extends State<RegistrationForm> {
   String? _usernameValidator(String? username) {
     if (username != null && username.isEmpty) {
       return "Username must not be empty.";
+    }
+    if (username != null && username.contains(':')) {
+      return "Username must not contain ':'.";
     }
   }
 

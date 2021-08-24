@@ -10,7 +10,7 @@
 
 ## Bugs
 * [ ] create movement on the fly does not work
-* [ ] usernames/passwords with ':' do not work
+* [x] usernames/passwords with ':' do not work
 
 ## Ui Improvements
 * [ ] main drawer tabs don't restart scaffold
