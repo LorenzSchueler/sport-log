@@ -11,6 +11,7 @@
 ## Bugs
 * [ ] create movement on the fly does not work
 * [x] usernames/passwords with ':' do not work
+* [ ] app start without internet connection
 
 ## Ui Improvements
 * [ ] main drawer tabs don't restart scaffold

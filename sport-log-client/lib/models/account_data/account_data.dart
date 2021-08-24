@@ -30,9 +30,7 @@ class AccountData {
   List<Diary> diaries;
   List<Wod> wods;
   List<Movement> movements;
-  @JsonKey(name: 'strenght_sessions') // FIXME
   List<StrengthSession> strengthSessions;
-  @JsonKey(name: 'strenght_set') // FIXME
   List<StrengthSet> strengthSets;
   List<Metcon> metcons;
   List<MetconSession> metconSessions;
@@ -44,7 +42,6 @@ class AccountData {
   List<ActionProvider> actionProviders;
   List<Action> actions;
   List<ActionRule> actionRules;
-  @JsonKey(name: 'action_event') // FIXME
   List<ActionEvent> actionEvents;
 
   factory AccountData.fromJson(Map<String, dynamic> json) => _$AccountDataFromJson(json);

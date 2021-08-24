@@ -20,10 +20,10 @@ AccountData _$AccountDataFromJson(Map<String, dynamic> json) {
     movements: (json['movements'] as List<dynamic>)
         .map((e) => Movement.fromJson(e as Map<String, dynamic>))
         .toList(),
-    strengthSessions: (json['strenght_sessions'] as List<dynamic>)
+    strengthSessions: (json['strength_sessions'] as List<dynamic>)
         .map((e) => StrengthSession.fromJson(e as Map<String, dynamic>))
         .toList(),
-    strengthSets: (json['strenght_set'] as List<dynamic>)
+    strengthSets: (json['strength_sets'] as List<dynamic>)
         .map((e) => StrengthSet.fromJson(e as Map<String, dynamic>))
         .toList(),
     metcons: (json['metcons'] as List<dynamic>)
@@ -56,7 +56,7 @@ AccountData _$AccountDataFromJson(Map<String, dynamic> json) {
     actionRules: (json['action_rules'] as List<dynamic>)
         .map((e) => ActionRule.fromJson(e as Map<String, dynamic>))
         .toList(),
-    actionEvents: (json['action_event'] as List<dynamic>)
+    actionEvents: (json['action_events'] as List<dynamic>)
         .map((e) => ActionEvent.fromJson(e as Map<String, dynamic>))
         .toList(),
   );
@@ -68,8 +68,8 @@ Map<String, dynamic> _$AccountDataToJson(AccountData instance) =>
       'diaries': instance.diaries,
       'wods': instance.wods,
       'movements': instance.movements,
-      'strenght_sessions': instance.strengthSessions,
-      'strenght_set': instance.strengthSets,
+      'strength_sessions': instance.strengthSessions,
+      'strength_sets': instance.strengthSets,
       'metcons': instance.metcons,
       'metcon_sessions': instance.metconSessions,
       'metcon_movements': instance.metconMovements,
@@ -80,5 +80,5 @@ Map<String, dynamic> _$AccountDataToJson(AccountData instance) =>
       'action_providers': instance.actionProviders,
       'actions': instance.actions,
       'action_rules': instance.actionRules,
-      'action_event': instance.actionEvents,
+      'action_events': instance.actionEvents,
     };
