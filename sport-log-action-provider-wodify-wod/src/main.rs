@@ -1,11 +1,15 @@
-use std::{env, fs, time::Duration as StdDuration};
+use std::{
+    env, fs, io::Error as IoError, result::Result as StdResult, time::Duration as StdDuration,
+};
 
 use chrono::{Duration, Local, Utc};
+use err_derive::Error as StdError;
 use rand::Rng;
-use reqwest::{Client, StatusCode};
+use reqwest::{Client, Error as ReqwestError, StatusCode};
 use serde::Deserialize;
-use thirtyfour::prelude::*;
+use thirtyfour::{error::WebDriverError, prelude::*};
 use tokio::{process::Command, time};
+use toml::de::Error as TomlError;
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{Wod, WodId};
@@ -15,6 +19,20 @@ const DESCRIPTION: &str =
     "Wodify Wod can fetch the Workout of the Day and save it in your wods. The action names correspond to the class type the wod should be fetched for.";
 const PLATFORM_NAME: &str = "wodify";
 
+#[derive(Debug, StdError)]
+enum Error {
+    #[error(display = "{}", _0)]
+    ReqwestError(ReqwestError),
+    #[error(display = "{}", _0)]
+    IoError(IoError),
+    #[error(display = "{}", _0)]
+    TomlError(TomlError),
+    #[error(display = "{}", _0)]
+    WebDriverError(WebDriverError),
+}
+
+type Result<T> = StdResult<T, Error>;
+
 #[derive(Deserialize)]
 struct Config {
     password: String,
@@ -22,23 +40,26 @@ struct Config {
 }
 
 impl Config {
-    fn get() -> Self {
-        toml::from_str(&fs::read_to_string("config.toml").unwrap()).unwrap()
+    fn get() -> Result<Self> {
+        Ok(
+            toml::from_str(&fs::read_to_string("config.toml").map_err(Error::IoError)?)
+                .map_err(Error::TomlError)?,
+        )
     }
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
     match &env::args().collect::<Vec<_>>()[1..] {
-        [] => login().await.unwrap(),
+        [] => login().await,
         [option] if option == "--setup" => setup().await,
-        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
-        _ => wrong_use(),
+        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => Ok(help()),
+        _ => Ok(wrong_use()),
     }
 }
 
-async fn setup() {
-    let config = Config::get();
+async fn setup() -> Result<()> {
+    let config = Config::get()?;
 
     setup_db(
         &config.base_url,
@@ -64,7 +85,8 @@ async fn setup() {
         168,
         0,
     )
-    .await;
+    .await
+    .map_err(Error::ReqwestError)
 }
 
 fn help() {
@@ -84,8 +106,8 @@ fn wrong_use() {
     println!("no such options");
 }
 
-async fn login() -> WebDriverResult<()> {
-    let config = Config::get();
+async fn login() -> Result<()> {
+    let config = Config::get()?;
 
     let client = Client::new();
 
@@ -97,7 +119,8 @@ async fn login() -> WebDriverResult<()> {
         Duration::hours(0),
         Duration::days(1) + Duration::minutes(1),
     )
-    .await;
+    .await
+    .map_err(Error::ReqwestError)?;
     println!("executable action events: {}\n", exec_action_events.len());
 
     if exec_action_events.is_empty() {
@@ -106,7 +129,9 @@ async fn login() -> WebDriverResult<()> {
 
     let mut rng = rand::thread_rng();
 
-    let mut webdriver = Command::new("../geckodriver").spawn().unwrap();
+    let mut webdriver = Command::new("../geckodriver")
+        .spawn()
+        .map_err(Error::IoError)?;
 
     let caps = DesiredCapabilities::firefox();
     let driver = WebDriver::new_with_timeout(
@@ -114,7 +139,8 @@ async fn login() -> WebDriverResult<()> {
         &caps,
         Some(StdDuration::from_secs(5)),
     )
-    .await?;
+    .await
+    .map_err(Error::WebDriverError)?;
 
     let mut delete_action_event_ids = vec![];
     // TODO execute in parallel
@@ -136,28 +162,38 @@ async fn login() -> WebDriverResult<()> {
         println!("date: {}", date);
         println!("name: {}", exec_action_event.action_name);
 
-        driver.delete_all_cookies().await?;
+        driver
+            .delete_all_cookies()
+            .await
+            .map_err(Error::WebDriverError)?;
         driver
             .get("https://app.wodify.com/WOD/WODEntry.aspx")
-            .await?;
+            .await
+            .map_err(Error::WebDriverError)?;
 
         time::sleep(StdDuration::from_secs(3)).await;
 
         driver
             .find_element(By::Id("Input_UserName"))
-            .await?
+            .await
+            .map_err(Error::WebDriverError)?
             .send_keys(&username)
-            .await?;
+            .await
+            .map_err(Error::WebDriverError)?;
         driver
             .find_element(By::Id("Input_Password"))
-            .await?
+            .await
+            .map_err(Error::WebDriverError)?
             .send_keys(&password)
-            .await?;
+            .await
+            .map_err(Error::WebDriverError)?;
         driver
             .find_element(By::ClassName("signin-btn"))
-            .await?
+            .await
+            .map_err(Error::WebDriverError)?
             .click()
-            .await?;
+            .await
+            .map_err(Error::WebDriverError)?;
         time::sleep(StdDuration::from_secs(2)).await;
 
         if driver
@@ -186,15 +222,18 @@ async fn login() -> WebDriverResult<()> {
 
         let elements = wod
             .find_elements(By::ClassName("component_show_wrapper"))
-            .await?;
+            .await
+            .map_err(Error::WebDriverError)?;
 
         let mut description = "".to_owned();
         for element in elements {
             let name = element
                 .find_element(By::ClassName("component_name"))
-                .await?
+                .await
+                .map_err(Error::WebDriverError)?
                 .inner_html()
-                .await?
+                .await
+                .map_err(Error::WebDriverError)?
                 .replace("<br>", "\n")
                 .replace("&nbsp;", " ");
                 description += &name;
@@ -202,9 +241,11 @@ async fn login() -> WebDriverResult<()> {
 
             let content = element
                 .find_element(By::ClassName("component_wrapper"))
-                .await?
+                .await
+                .map_err(Error::WebDriverError)?
                 .inner_html()
-                .await?
+                .await
+                .map_err(Error::WebDriverError)?
                 .replace("<br>", "\n")
                 .replace("&nbsp;", " ");
                 description += &content;
@@ -226,7 +267,8 @@ async fn login() -> WebDriverResult<()> {
             .json(&wod)
             .send()
             .await
-            .unwrap().status() == StatusCode::CONFLICT
+            .map_err(Error::ReqwestError)?
+            .status() == StatusCode::CONFLICT
         {
             let today = Local::today().naive_local().format("%Y-%m-%d");
             let wods: Vec<Wod> = client
@@ -234,9 +276,14 @@ async fn login() -> WebDriverResult<()> {
                 .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&config.password))
                 .send()
                 .await
-                .unwrap()
-                .json().await.unwrap();
-            let mut wod = wods.into_iter().next().unwrap();
+                .map_err(Error::ReqwestError)?
+                .json()
+                .await
+                .map_err(Error::ReqwestError)?;
+            let mut wod = wods
+                .into_iter()
+                .next()
+                .expect("server returned multiple wods for the same date");
             if let Some(old_description) = wod.description {
                 wod.description = Some(old_description + &description) ;
             } else {
@@ -248,7 +295,7 @@ async fn login() -> WebDriverResult<()> {
                 .json(&wod)
                 .send()
                 .await
-                .unwrap();
+                .map_err(Error::ReqwestError)?;
             }
         } else {
             println!("not wod found");
@@ -265,11 +312,12 @@ async fn login() -> WebDriverResult<()> {
             &config.password,
             &delete_action_event_ids,
         )
-        .await;
+        .await
+        .map_err(Error::ReqwestError)?;
     }
 
     println!("closing browser");
-    driver.quit().await?;
+    driver.quit().await.map_err(Error::WebDriverError)?;
 
     println!("terminating webdriver");
     let _ = webdriver.kill();

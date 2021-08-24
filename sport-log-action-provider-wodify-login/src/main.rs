@@ -6,8 +6,7 @@ use chrono::{Duration, Local, Utc};
 use err_derive::Error as StdError;
 use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
-use thirtyfour::error::WebDriverError;
-use thirtyfour::prelude::*;
+use thirtyfour::{error::WebDriverError, prelude::*};
 use toml::de::Error as TomlError;
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
@@ -117,7 +116,9 @@ async fn login() -> Result<()> {
         return Ok(());
     }
 
-    let mut webdriver = Command::new("../geckodriver").spawn().unwrap();
+    let mut webdriver = Command::new("../geckodriver")
+        .spawn()
+        .map_err(Error::IoError)?;
 
     let caps = DesiredCapabilities::firefox();
     let driver = WebDriver::new_with_timeout(
