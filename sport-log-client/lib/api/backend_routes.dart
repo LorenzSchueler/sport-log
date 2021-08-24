@@ -34,5 +34,5 @@ abstract class BackendRoutes {
       _version + '/action_event/action_provider/${id.toString()}';
 
   static String sync(DateTime? dateTime) => _version
-      + (dateTime == null ? '/account_data' : '/account_data/$dateTime');
+      + (dateTime == null ? '/account_data' : '/account_data/${dateTime.toUtc().toIso8601String()}');
 }
