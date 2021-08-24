@@ -1,5 +1,4 @@
-
-part of 'api.dart';
+part of '../api.dart';
 
 extension WodRoutes on Api {
   ApiResult<void> createWod(Wod wod) async {

@@ -1,8 +1,6 @@
-
-part of 'api.dart';
+part of '../api.dart';
 
 extension CardioRoutes on Api {
-
   // Routes
 
   ApiResult<void> createRoute(Route route) async {

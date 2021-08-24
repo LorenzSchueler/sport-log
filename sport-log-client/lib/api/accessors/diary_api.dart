@@ -1,5 +1,4 @@
-
-part of 'api.dart';
+part of '../api.dart';
 
 extension DiaryRoutes on Api {
   ApiResult<void> createDiary(Diary diary) async {

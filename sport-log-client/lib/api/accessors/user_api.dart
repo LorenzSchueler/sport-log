@@ -1,17 +1,13 @@
-
-part of 'api.dart';
+part of '../api.dart';
 
 extension UserRoutes on Api {
   ApiResult<void> createUser(User user) async {
-    final result = await _post(
-        BackendRoutes.user,
-        user,
-        headers: _jsonContentTypeHeader,
-        mapBadStatusToApiError: (statusCode) {
-          if (statusCode == 409) {
-            return ApiError.usernameTaken;
-          }
-        });
+    final result = await _post(BackendRoutes.user, user,
+        headers: _jsonContentTypeHeader, mapBadStatusToApiError: (statusCode) {
+      if (statusCode == 409) {
+        return ApiError.usernameTaken;
+      }
+    });
     if (result.isSuccess) {
       _currentUser = user;
     }
@@ -19,15 +15,14 @@ extension UserRoutes on Api {
   }
 
   ApiResult<User> getUser(String username, String password) async {
-    final result = await _getSingle<User>(
-      BackendRoutes.user,
-      fromJson: (json) => User.fromJson(json),
-      headers: _makeAuthorizedHeader(username, password),
-      mapBadStatusToApiError: (statusCode) {
-        if (statusCode == 401) {
-          return ApiError.loginFailed;
-        }
-      });
+    final result = await _getSingle<User>(BackendRoutes.user,
+        fromJson: (json) => User.fromJson(json),
+        headers: _makeAuthorizedHeader(username, password),
+        mapBadStatusToApiError: (statusCode) {
+          if (statusCode == 401) {
+            return ApiError.loginFailed;
+          }
+        });
     if (result.isSuccess) {
       _currentUser = result.success;
       _currentUser!.password = password;
@@ -47,10 +42,8 @@ extension UserRoutes on Api {
     return _errorHandling((client) async {
       final route = BackendRoutes.user;
       _logRequest('DELETE', route);
-      final response = await client.delete(
-        _uri(route),
-        headers: _authorizedHeader
-      );
+      final response =
+          await client.delete(_uri(route), headers: _authorizedHeader);
       _logResponse(response);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         _currentUser = null;

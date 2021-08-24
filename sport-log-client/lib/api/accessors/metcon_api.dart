@@ -1,35 +1,31 @@
-
-part of 'api.dart';
+part of '../api.dart';
 
 extension MetconRoutes on Api {
-
   // Metcon Session
 
   ApiResult<void> createMetconSession(MetconSession ms) async {
     return _post(BackendRoutes.metconSession, ms);
   }
 
-  ApiResult<void> createMetconSessions(
-      List<MetconSession> mss) async {
+  ApiResult<void> createMetconSessions(List<MetconSession> mss) async {
     return _post(BackendRoutes.metconSession, mss);
   }
 
   ApiResult<List<MetconSession>> getMetconSessions() async {
     return _getMultiple(BackendRoutes.metconSession,
-      fromJson: (json) => MetconSession.fromJson(json));
+        fromJson: (json) => MetconSession.fromJson(json));
   }
 
   ApiResult<MetconSession> getMetconSession(Int64 id) async {
     return _getSingle(BackendRoutes.metconSession + '/$id',
-      fromJson: (json) => MetconSession.fromJson(json));
+        fromJson: (json) => MetconSession.fromJson(json));
   }
 
   ApiResult<void> updateMetconSession(MetconSession ms) async {
     return _put(BackendRoutes.metconSession, ms);
   }
 
-  ApiResult<void> updateMetconSessions(
-      List<MetconSession> mss) async {
+  ApiResult<void> updateMetconSessions(List<MetconSession> mss) async {
     return _put(BackendRoutes.metconSession, mss);
   }
 

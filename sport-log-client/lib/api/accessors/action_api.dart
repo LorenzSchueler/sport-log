@@ -1,8 +1,6 @@
-
-part of 'api.dart';
+part of '../api.dart';
 
 extension ActionRoutes on Api {
-
   // Action Providers
 
   ApiResult<List<ActionProvider>> getActionProviders() async {

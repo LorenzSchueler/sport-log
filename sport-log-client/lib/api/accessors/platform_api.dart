@@ -1,5 +1,4 @@
-
-part of 'api.dart';
+part of '../api.dart';
 
 extension PlatformRoutes on Api {
   ApiResult<List<Platform>> getPlatforms() async {

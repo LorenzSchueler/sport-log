@@ -1,8 +1,6 @@
-
-part of 'api.dart';
+part of '../api.dart';
 
 extension StrengthRoutes on Api {
-
   // Strength Sessions
 
   ApiResult<void> createStrengthSession(StrengthSession ss) async {

@@ -9,17 +9,17 @@ import 'package:sport_log/api/backend_routes.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 
-part 'action_api.dart';
+part 'accessors/action_api.dart';
+part 'accessors/cardio_api.dart';
+part 'accessors/diary_api.dart';
+part 'accessors/metcon_api.dart';
+part 'accessors/movement_api.dart';
+part 'accessors/platform_api.dart';
+part 'accessors/strength_api.dart';
+part 'accessors/sync_api.dart';
+part 'accessors/user_api.dart';
+part 'accessors/wod_api.dart';
 part 'api_helpers.dart';
-part 'cardio_api.dart';
-part 'diary_api.dart';
-part 'metcon_api.dart';
-part 'movement_api.dart';
-part 'platform_api.dart';
-part 'strength_api.dart';
-part 'sync_api.dart';
-part 'user_api.dart';
-part 'wod_api.dart';
 
 final logger = Logger('API');
 

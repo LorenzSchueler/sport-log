@@ -1,5 +1,4 @@
-
-part of 'api.dart';
+part of '../api.dart';
 
 extension SyncRoutes on Api {
   ApiResult<AccountData> getAccountData(DateTime? lastSync) {
