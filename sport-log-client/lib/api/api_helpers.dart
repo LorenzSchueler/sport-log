@@ -7,10 +7,6 @@ extension Helpers on Api {
 
   Uri _uri(String route) => Uri.parse(_urlBase + route);
 
-  void _logError(String message) {
-    stderr.writeln(message);
-  }
-
   String _prettyJson(dynamic json, {int indent = 2}) {
     var spaces = ' ' * indent;
     var encoder = JsonEncoder.withIndent(spaces);
@@ -18,25 +14,24 @@ extension Helpers on Api {
   }
 
   void _handleUnknownStatusCode(http.Response response) {
-    _logError("status code: ${response.statusCode}; response: ${response.body};");
+    logger.e("status code: ${response.statusCode}; response: ${response.body};");
   }
 
   void _logRequest(String httpMethod, String url, [dynamic json]) {
     if (json != null) {
       final prettyJson = _prettyJson(json);
-      log('$httpMethod $url\n$prettyJson', name: 'API request');
+      logger.d('request: $httpMethod $url\n$prettyJson');
     } else {
-      log('$httpMethod $url', name: 'API request');
+      logger.d('request: $httpMethod $url');
     }
   }
 
   void _logResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       dynamic jsonObject = jsonDecode(response.body);
-      log('${response.statusCode}\n${_prettyJson(jsonObject)}',
-          name: 'API response');
+      logger.d('response: ${response.statusCode}\n${_prettyJson(jsonObject)}');
     } else {
-      log('${response.statusCode}', name: 'API response');
+      logger.d('response: ${response.statusCode}');
     }
   }
 
@@ -71,7 +66,7 @@ extension Helpers on Api {
     } on SocketException {
       return Failure(ApiError.noInternetConnection);
     } catch (e) {
-      _logError("Unhandled error: " + e.toString());
+      logger.e("Unhandled error: " + e.toString());
       return Failure(ApiError.unhandled);
     }
   }
@@ -91,7 +86,7 @@ extension Helpers on Api {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final dynamic json = jsonDecode(response.body);
         if (json is! List) {
-          _logError(response.body);
+          logger.e('wrong json type');
           return Failure(ApiError.badJson);
         } else {
           final List<T> result = json.map((dynamic j) =>

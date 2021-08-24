@@ -43,7 +43,7 @@
 * [ ] isValid methods: print reason if false
 * [ ] use Keys for everything (especially in table creation sql)
 * [x] use one string for last_modified, is_new, deleted in every table
-* [ ] clean unified logging strategy
+* [x] clean unified logging strategy
 * [ ] similar structure (like in database) in api with subobjects for actual routes
 * [x] tidy up helpers directory
 

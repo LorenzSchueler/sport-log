@@ -1,16 +1,15 @@
-import 'dart:developer';
-import 'dart:io';
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/helpers/logger.dart';
+
+final logger = Logger('SYNC');
 
 class DownSync {
-
   static DownSync? _instance;
-  static Future<DownSync> get instance async => _instance
-    ??= DownSync._(await SharedPreferences.getInstance());
+  static Future<DownSync> get instance async =>
+      _instance ??= DownSync._(await SharedPreferences.getInstance());
 
   DownSync._(this._storage);
 
@@ -23,7 +22,7 @@ class DownSync {
     final result = await api.getAccountData(lastSync);
     if (result.isFailure) {
       // TODO: what to do now?
-      stderr.writeln('Could not fetch account data');
+      logger.w('Could not fetch account data');
       return;
     }
     final db = AppDatabase.instance;
@@ -31,8 +30,9 @@ class DownSync {
       // TODO: syncing on the web?
       return;
     }
-    db.upsertAccountData(result.success)
-      .then((_) => log('done', name: 'DOWN SYNC'));
+    db
+        .upsertAccountData(result.success)
+        .then((_) => logger.i('down sync done'));
     // TODO: handle user update
   }
 
@@ -43,10 +43,9 @@ class DownSync {
 }
 
 class UpSync {
-
   static UpSync? _instance;
-  static Future<UpSync> get instance async => _instance
-    ??= UpSync._(await SharedPreferences.getInstance());
+  static Future<UpSync> get instance async =>
+      _instance ??= UpSync._(await SharedPreferences.getInstance());
 
   UpSync._(this._storage);
 

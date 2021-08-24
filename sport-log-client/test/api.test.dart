@@ -1,21 +1,16 @@
-
-import 'dart:developer';
-
+import 'package:faker/faker.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/helpers/id_generation.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:faker/faker.dart';
 
+final logger = Logger('TEST');
 
 final User sampleUser = User(
-    id: Int64(1),
-    username: "user1",
-    password: "user1-passwd",
-    email: "email1"
-);
+    id: Int64(1), username: "user1", password: "user1-passwd", email: "email1");
 
 void testUser(Api api) {
   test('user test', () async {
@@ -30,10 +25,10 @@ void testUser(Api api) {
     expect(await api.getUser(user.username, user.password), isA<Success>());
 
     final updatedUser = User(
-        id: user.id,
-        username: faker.internet.userName(),
-        password: faker.internet.password(),
-        email: faker.internet.email(),
+      id: user.id,
+      username: faker.internet.userName(),
+      password: faker.internet.password(),
+      email: faker.internet.email(),
     );
 
     expect(await api.updateUser(updatedUser), isA<Success>());
@@ -88,42 +83,53 @@ void testStrengthSession(Api api) async {
     api.setCurrentUser(sampleUser);
     expect(await api.createStrengthSession(strengthSession), isA<Success>());
     expect(await api.getStrengthSessions(), isA<Success>());
-    expect(await api.updateStrengthSession(strengthSession..movementUnit=MovementUnit.cal), isA<Success>());
-    expect(await api.updateStrengthSession(strengthSession..deleted=true), isA<Success>());
+    expect(
+        await api.updateStrengthSession(
+            strengthSession..movementUnit = MovementUnit.cal),
+        isA<Success>());
+    expect(await api.updateStrengthSession(strengthSession..deleted = true),
+        isA<Success>());
   });
 }
 
 void testActionRule(Api api) async {
   test('test action rule', () async {
     final actionRule = ActionRule(
-        id: randomId(),
-        userId: sampleUser.id,
-        actionId: Int64(1),
-        weekday: Weekday.values[faker.randomGenerator.integer(7)],
-        time: DateTime(2021, 8, 17,
-          faker.randomGenerator.integer(24),
-          faker.randomGenerator.integer(60),
-          faker.randomGenerator.integer(60),
-        ),
-        arguments: 'args',
-        enabled: true,
-        deleted: false,
+      id: randomId(),
+      userId: sampleUser.id,
+      actionId: Int64(1),
+      weekday: Weekday.values[faker.randomGenerator.integer(7)],
+      time: DateTime(
+        2021,
+        8,
+        17,
+        faker.randomGenerator.integer(24),
+        faker.randomGenerator.integer(60),
+        faker.randomGenerator.integer(60),
+      ),
+      arguments: 'args',
+      enabled: true,
+      deleted: false,
     );
     api.setCurrentUser(sampleUser);
     expect(await api.createActionRule(actionRule), isA<Success>());
     expect(await api.getActionRules(), isA<Success>());
-    actionRule.time = DateTime(2021, 8, 17,
+    actionRule.time = DateTime(
+      2021,
+      8,
+      17,
       faker.randomGenerator.integer(24),
       faker.randomGenerator.integer(60),
       faker.randomGenerator.integer(60),
     );
-    log(actionRule.time.toString());
+    logger.i(actionRule.time.toString());
     expect(await api.updateActionRule(actionRule), isA<Success>());
     final result = await api.getActionRule(actionRule.id);
     expect(result, isA<Success>());
-    log(result.success.time.toString());
+    logger.i(result.success.time.toString());
     // expect(result.success.time, actionRule.time);
-    expect(await api.updateActionRule(actionRule..deleted=true), isA<Success>());
+    expect(
+        await api.updateActionRule(actionRule..deleted = true), isA<Success>());
   });
 }
 

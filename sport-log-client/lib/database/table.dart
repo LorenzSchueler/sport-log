@@ -1,13 +1,14 @@
-
-import 'dart:io';
-
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:result_type/result_type.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sqflite/sqflite.dart';
+
 import 'defs.dart';
 
 export 'defs.dart';
+
+final logger = Logger('DB');
 
 abstract class Table<T extends DbObject> {
   String get setupSql;
@@ -34,17 +35,13 @@ end;
     ''');
   }
 
-  void logError(Object error) {
-    stderr.writeln(error);
-  }
-
   DbResult<R> request<R>(DbResult<R> Function() req) async {
     try {
       return await req();
     } on DbError catch (e) {
       return Failure(e);
     } catch (e) {
-      logError(e);
+      logger.e(e.toString());
       return Failure(DbError.unknown);
     }
   }
@@ -81,7 +78,8 @@ end;
       for (final object in objects) {
         assert(object.isValid());
         batch.update(
-          tableName, serde.toDbRecord(object),
+          tableName,
+          serde.toDbRecord(object),
           where: "deleted = 0 AND id = ?",
           whereArgs: [object.id.toInt()],
         );
@@ -107,8 +105,8 @@ end;
 
   DbResult<List<T>> getNonDeleted([Transaction? txn]) async {
     return request(() async {
-      final List<DbRecord> result = await (txn ?? database)
-          .query(tableName, where: 'deleted = 0');
+      final List<DbRecord> result =
+          await (txn ?? database).query(tableName, where: 'deleted = 0');
       return Success(result.map(serde.fromDbRecord).toList());
     });
   }
@@ -134,7 +132,8 @@ end;
     });
   }
 
-  DbResult<T?> getSingle(Int64 id, {
+  DbResult<T?> getSingle(
+    Int64 id, {
     bool includeDeleted = false,
     Transaction? transaction,
   }) async {
@@ -151,7 +150,8 @@ end;
     });
   }
 
-  DbResult<bool> exists(Int64 id, {
+  DbResult<bool> exists(
+    Int64 id, {
     bool includeDeleted = false,
     Transaction? transaction,
   }) async {
@@ -166,7 +166,7 @@ end;
   DbResult<void> setSynchronized(Int64 id) async {
     return voidRequest(() async {
       database.update(tableName, {'sync_status': 0},
-        where: 'id = ?', whereArgs: [id.toInt()]);
+          where: 'id = ?', whereArgs: [id.toInt()]);
     });
   }
 

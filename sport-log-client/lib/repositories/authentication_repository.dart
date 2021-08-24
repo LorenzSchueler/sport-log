@@ -1,7 +1,6 @@
 
-import 'dart:developer';
-
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/user/user.dart';
 
 class AuthenticationRepository {
@@ -12,24 +11,23 @@ class AuthenticationRepository {
   }
 
   final SharedPreferences _storage;
-  static const String _debugName = "auth repo";
 
  Future<void> deleteUser() async {
-  log("deleting user data from storage...", name: _debugName);
+  logger.i("deleting user data from storage...");
   for (final key in User.allKeys) {
    _storage.remove(key);
   }
  }
 
  Future<void> createUser(User user) async {
-  log("saving user data in storage...", name: _debugName);
+  logger.i("saving user data in storage...");
   for (final entry in user.toMap().entries) {
    _storage.setString(entry.key, entry.value);
   }
  }
 
  Future<User?> getUser() async {
-  log("reading user data from storage...", name: _debugName);
+  logger.i("reading user data from storage...");
   final Map<String, String> userMap = {};
   for (final key in User.allKeys) {
     final value = _storage.getString(key);
@@ -39,9 +37,9 @@ class AuthenticationRepository {
   }
   final user = User.fromMap(userMap);
   if (user == null) {
-   log("no user data found", name: _debugName);
+   logger.i("no user data found");
   } else {
-   log("user data found", name: _debugName);
+   logger.i("user data found");
   }
   return user;
  }

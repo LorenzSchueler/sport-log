@@ -41,14 +41,15 @@ dependencies:
   email_validator: ^2.0.1
   http: ^0.13.3
   device_info_plus: ^2.1.0
-  implicitly_animated_reorderable_list: ^0.4.0
+  implicitly_animated_reorderable_list: ^0.4.0 # ui
   json_serializable: ^4.1.0
-  fixnum: ^1.0.0
-  result_type: ^0.1.0
+  fixnum: ^1.0.0 # used for ids (in web ints go only up to 2^53-1)
+  result_type: ^0.1.0 # convenience for returning something that can either be a success or failure
   intl: ^0.17.0  # used for date formatting
-  sqflite: ^2.0.0+3
-  expansion_tile_card: ^2.0.0
-  flutter_rounded_date_picker: ^2.0.2
+  sqflite: ^2.0.0+3 # sqlite database
+  expansion_tile_card: ^2.0.0 # ui
+  flutter_rounded_date_picker: ^2.0.2 # ui (standard time picker has a weird clock division)
+  logger: ^1.0.0
 
 dev_dependencies:
   flutter_test:

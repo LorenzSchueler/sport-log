@@ -1,6 +1,4 @@
 
-import 'dart:developer';
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
