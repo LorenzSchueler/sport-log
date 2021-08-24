@@ -8,7 +8,7 @@ import 'package:sport_log/helpers/validation.dart';
 
 part 'user.g.dart';
 
-final logger = Logger('USER');
+final _logger = Logger('USER');
 
 @JsonSerializable()
 class User implements Validatable {
@@ -67,7 +67,7 @@ class User implements Validatable {
             password: map[passwordKey]!,
             email: map[emailKey]!);
       } on FormatException catch (e) {
-        logger.e("Id parsing error: " + e.toString());
+        _logger.e("Id parsing error: " + e.toString());
         return null;
       }
     }

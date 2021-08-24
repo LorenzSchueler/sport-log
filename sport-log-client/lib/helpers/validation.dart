@@ -1,6 +1,6 @@
 import 'logger.dart';
 
-final logger = Logger('VALIDATION');
+final _logger = Logger('VALIDATION');
 
 abstract class Validatable {
   bool isValid();
@@ -8,7 +8,7 @@ abstract class Validatable {
 
 bool validate(bool val, String message) {
   if (!val) {
-    logger.w(message);
+    _logger.w(message);
     return false;
   }
   return true;

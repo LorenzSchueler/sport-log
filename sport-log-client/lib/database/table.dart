@@ -8,7 +8,7 @@ import 'defs.dart';
 
 export 'defs.dart';
 
-final logger = Logger('DB');
+final _logger = Logger('DB');
 
 abstract class Table<T extends DbObject> {
   String get setupSql;
@@ -41,7 +41,7 @@ end;
     } on DbError catch (e) {
       return Failure(e);
     } catch (e) {
-      logger.e(e.toString());
+      _logger.e(e.toString());
       return Failure(DbError.unknown);
     }
   }

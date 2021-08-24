@@ -8,7 +8,7 @@ import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 
-final logger = Logger('TEST');
+final _logger = Logger('TEST');
 
 final User sampleUser = User(
     id: Int64(1), username: "user1", password: "user1-passwd", email: "email1");
@@ -123,11 +123,11 @@ void testActionRule(Api api) async {
       faker.randomGenerator.integer(60),
       faker.randomGenerator.integer(60),
     );
-    logger.i(actionRule.time.toString());
+    _logger.i(actionRule.time.toString());
     expect(await api.updateActionRule(actionRule), isA<Success>());
     final result = await api.getActionRule(actionRule.id);
     expect(result, isA<Success>());
-    logger.i(result.success.time.toString());
+    _logger.i(result.success.time.toString());
     // expect(result.success.time, actionRule.time);
     expect(
         await api.updateActionRule(actionRule..deleted = true), isA<Success>());

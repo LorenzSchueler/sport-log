@@ -4,7 +4,7 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/logger.dart';
 
-final logger = Logger('SYNC');
+final _logger = Logger('SYNC');
 
 class DownSync {
   static DownSync? _instance;
@@ -22,7 +22,7 @@ class DownSync {
     final result = await api.getAccountData(lastSync);
     if (result.isFailure) {
       // TODO: what to do now?
-      logger.w('Could not fetch account data');
+      _logger.w('Could not fetch account data');
       return;
     }
     final db = AppDatabase.instance;
@@ -32,7 +32,7 @@ class DownSync {
     }
     db
         .upsertAccountData(result.success)
-        .then((_) => logger.i('down sync done'));
+        .then((_) => _logger.i('down sync done'));
     // TODO: handle user update
   }
 

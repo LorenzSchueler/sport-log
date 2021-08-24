@@ -21,7 +21,7 @@ part 'accessors/user_api.dart';
 part 'accessors/wod_api.dart';
 part 'api_helpers.dart';
 
-final logger = Logger('API');
+final _logger = Logger('API');
 
 typedef ApiResult<T> = Future<Result<T, ApiError>>;
 
