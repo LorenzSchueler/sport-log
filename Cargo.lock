@@ -1768,6 +1768,7 @@ name = "sport-log-scheduler"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "err-derive",
  "rand",
  "reqwest",
  "serde",

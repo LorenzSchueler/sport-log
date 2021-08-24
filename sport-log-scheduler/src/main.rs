@@ -16,14 +16,28 @@
 //!
 //! The config file must be called `sport-log-scheduler.toml` and must be deserializable to a [Config].
 
-use std::fs;
+use std::{fs, io::Error as IoError, result::Result as StdResult};
 
 use chrono::{Datelike, Duration, Utc};
+use err_derive::Error as StdError;
 use rand::Rng;
-use reqwest::blocking::Client;
+use reqwest::{blocking::Client, Error as ReqwestError};
 use serde::Deserialize;
+use toml::de::Error as TomlError;
 
 use sport_log_types::{ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent};
+
+#[derive(Debug, StdError)]
+enum Error {
+    #[error(display = "{}", _0)]
+    ReqwestError(ReqwestError),
+    #[error(display = "{}", _0)]
+    IoError(IoError),
+    #[error(display = "{}", _0)]
+    TomlError(TomlError),
+}
+
+type Result<T> = StdResult<T, Error>;
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -32,13 +46,16 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn get() -> Self {
-        toml::from_str(&fs::read_to_string("sport-log-scheduler.toml").unwrap()).unwrap()
+    fn get() -> Result<Self> {
+        Ok(
+            toml::from_str(&fs::read_to_string("config.toml").map_err(Error::IoError)?)
+                .map_err(Error::TomlError)?,
+        )
     }
 }
 
-fn main() {
-    let config = Config::get();
+fn main() -> Result<()> {
+    let config = Config::get()?;
     let username = "admin";
 
     let client = Client::new();
@@ -47,9 +64,9 @@ fn main() {
         .get(format!("{}/v1/adm/creatable_action_rule", config.base_url))
         .basic_auth(username, Some(&config.admin_password))
         .send()
-        .unwrap()
+        .map_err(Error::ReqwestError)?
         .json()
-        .unwrap();
+        .map_err(Error::ReqwestError)?;
 
     println!("{:#?}", creatable_action_rules);
 
@@ -94,15 +111,15 @@ fn main() {
         .basic_auth(username, Some(&config.admin_password))
         .json(&action_events)
         .send()
-        .unwrap();
+        .map_err(Error::ReqwestError)?;
 
     let deletable_action_events: Vec<DeletableActionEvent> = client
         .get(format!("{}/v1/adm/deletable_action_event", config.base_url))
         .basic_auth(username, Some(&config.admin_password))
         .send()
-        .unwrap()
+        .map_err(Error::ReqwestError)?
         .json()
-        .unwrap();
+        .map_err(Error::ReqwestError)?;
 
     println!("{:#?}", deletable_action_events);
 
@@ -123,5 +140,6 @@ fn main() {
         .basic_auth(username, Some(&config.admin_password))
         .json(&action_event_ids)
         .send()
-        .unwrap();
+        .map_err(Error::ReqwestError)?;
+    Ok(())
 }
