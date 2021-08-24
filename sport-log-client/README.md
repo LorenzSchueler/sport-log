@@ -36,7 +36,7 @@
 
 ## Debugging/Testing/Code Quality
 * [ ] add to string methods to types for debugging
-* [ ] log json requests/responses
+* [x] log json requests/responses
 * [ ] write tests for database
 * [ ] isValid methods: print reason if false
 * [ ] use Keys for everything (especially in table creation sql)

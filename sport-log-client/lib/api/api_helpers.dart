@@ -21,6 +21,18 @@ extension Helpers on Api {
     _logError("status code: ${response.statusCode}; response: ${response.body};");
   }
 
+  void _logRequest(String httpMethod, String url, [String? json]) {
+    log('$httpMethod $url\n$json', name: 'API request');
+  }
+
+  void _logResponse(http.Response response) {
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      log('${response.statusCode}', name: 'API response');
+    } else {
+      log('${response.statusCode}\n${response.body}', name: 'API response');
+    }
+  }
+
   Map<String, String> _makeAuthorizedHeader(String username, String password) {
     final basicAuth = 'Basic '
         + base64Encode(utf8.encode('$username:$password'));
@@ -45,7 +57,7 @@ extension Helpers on Api {
     ..._jsonContentTypeHeader,
   };
 
-  Future<Result<T, ApiError>> _request<T>(
+  ApiResult<T> _errorHandling<T>(
       Future<Result<T, ApiError>> Function(http.Client client) req) async {
     try {
       return req(_client);
@@ -57,16 +69,18 @@ extension Helpers on Api {
     }
   }
 
-  Future<Result<List<T>, ApiError>> _getMultiple<T>(String route, {
+  ApiResult<List<T>> _getMultiple<T>(String route, {
     required FromJson<T> fromJson,
     ApiError? Function(int)? mapBadStatusToApiError,
     Map<String, String>? headers,
   }) async {
-    return _request<List<T>>((client) async {
+    return _errorHandling<List<T>>((client) async {
+      _logRequest('GET', route);
       final response = await client.get(
         _uri(route),
         headers: headers ?? _authorizedHeader,
       );
+      _logResponse(response);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final dynamic json = jsonDecode(response.body);
         if (json is! List) {
@@ -90,16 +104,18 @@ extension Helpers on Api {
     });
   }
 
-  Future<Result<T, ApiError>> _getSingle<T>(String route, {
+  ApiResult<T> _getSingle<T>(String route, {
     required FromJson<T> fromJson,
     ApiError? Function(int)? mapBadStatusToApiError,
     Map<String, String>? headers,
   }) async {
-    return _request<T>((client) async {
+    return _errorHandling<T>((client) async {
+      _logRequest('GET', route);
       final response = await client.get(
         _uri(route),
         headers: headers ?? _authorizedHeader,
       );
+      _logResponse(response);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return Success(fromJson(
             jsonDecode(response.body) as Map<String, dynamic>));
@@ -115,16 +131,19 @@ extension Helpers on Api {
     });
   }
 
-  Future<Result<void, ApiError>> _post(String route, Object body, {
+  ApiResult<void> _post(String route, Object body, {
     ApiError? Function(int)? mapBadStatusToApiError,
     Map<String, String>? headers,
   }) async {
-    return _request((client) async {
+    return _errorHandling((client) async {
+      final bodyStr = jsonEncode(body);
+      _logRequest('POST', route, bodyStr);
       final response = await client.post(
         _uri(route),
         headers: headers ?? _defaultHeaders,
-        body: jsonEncode(body),
+        body: bodyStr,
       );
+      _logResponse(response);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return Success(null);
       }
@@ -142,15 +161,18 @@ extension Helpers on Api {
     });
   }
 
-  Future<Result<void, ApiError>> _put(String route, Object body, {
+  ApiResult<void> _put(String route, Object body, {
     ApiError? Function(int)? mapBadStatusToApiError,
   }) async {
-    return _request((client) async {
+    return _errorHandling((client) async {
+      final bodyStr = jsonEncode(body);
+      _logRequest('PUT', route, bodyStr);
       final response = await client.put(
         _uri(route),
         headers: _defaultHeaders,
-        body: jsonEncode(body),
+        body: bodyStr,
       );
+      _logResponse(response);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return Success(null);
       }
