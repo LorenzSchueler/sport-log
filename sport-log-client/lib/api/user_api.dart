@@ -44,11 +44,14 @@ extension UserRoutes on Api {
   }
 
   ApiResult<void> deleteUser() async {
-    return _request((client) async {
+    return _errorHandling((client) async {
+      final route = BackendRoutes.user;
+      _logRequest('DELETE', route);
       final response = await client.delete(
-        _uri(BackendRoutes.user),
+        _uri(route),
         headers: _authorizedHeader
       );
+      _logResponse(response);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         _currentUser = null;
         return Success(null);

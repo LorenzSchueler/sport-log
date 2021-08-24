@@ -29,9 +29,9 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
   late bool datetimeIsNow;
 
   @override
-  void initState() {
+  void initState() async {
     super.initState();
-    final userId = Api.instance.currentUser!.id;
+    final userId = (await Api.instance).currentUser!.id;
     ssd = widget.initial ?? StrengthSessionDescription(
       strengthSession: StrengthSession(
           id: randomId(),
@@ -68,11 +68,11 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
       });
     }
   }
-   */
 
   bool _formIsValid() {
     return ssd.isValid() && movementInitialized;
   }
+   */
 
   void _setDateTimeNow() {
     setState(() {

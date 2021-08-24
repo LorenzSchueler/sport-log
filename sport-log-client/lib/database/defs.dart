@@ -12,6 +12,12 @@ enum DbError {
   validationFailed,
 }
 
+enum SyncStatus {
+  synchronized,
+  updated,
+  created,
+}
+
 abstract class DbObject extends Validatable {
   Int64 get id;
   bool get deleted;
@@ -34,8 +40,8 @@ abstract class Keys {
   static const movementId = 'movement_id';
   static const metconId = 'metcon_id';
   static const actionProviderId = 'action_provider_id';
-  static const createBefore = 'created_before';
-  static const deleteAfter = 'deleted_after';
+  static const createBefore = 'create_before';
+  static const deleteAfter = 'delete_after';
   static const actionId = 'action_id';
   static const datetime = 'datetime';
   static const enabled = 'enabled';
@@ -70,7 +76,8 @@ abstract class Keys {
   static const interval = 'interval';
   static const strengthSessionId = 'strength_session_id';
   static const setNumber = 'set_number';
-  static const isNew = 'is_new';
   static const arguments = 'arguments';
   static const lastSync = 'last_sync';
+  static const syncNeeded = 'sync_needed';
+  static const syncStatus = 'sync_status';
 }

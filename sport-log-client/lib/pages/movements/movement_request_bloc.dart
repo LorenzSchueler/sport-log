@@ -60,12 +60,10 @@ class MovementRequestBloc
   MovementRequestBloc.fromContext(BuildContext context)
       : _repo = context.read<MovementRepository>(),
         _cubit = context.read<MovementsCubit>(),
-        _api = Api.instance,
         super(MovementRequestIdle());
   
   final MovementRepository _repo;
   final MovementsCubit _cubit;
-  final Api _api;
 
   @override
   Stream<MovementRequestState> mapEventToState(MovementRequestEvent event) async* {
@@ -85,7 +83,7 @@ class MovementRequestBloc
     assert(event.newMovement.id == null);
     final Movement movement = Movement(
       id: _repo.nextMovementId,
-      userId: _api.currentUser!.id,
+      userId: (await Api.instance).currentUser!.id,
       name: event.newMovement.name,
       category: event.newMovement.category,
       description: event.newMovement.description,
@@ -109,7 +107,7 @@ class MovementRequestBloc
     yield MovementRequestPending();
     assert(event.movement.id != null);
     assert(event.movement.userId != null);
-    assert(event.movement.userId == _api.currentUser!.id);
+    assert(event.movement.userId == (await Api.instance).currentUser!.id);
     await Future<void>.delayed(Duration(milliseconds: Config.debugApiDelay));
     final movement = Movement(
       id: event.movement.id!,

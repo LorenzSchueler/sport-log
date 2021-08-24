@@ -16,14 +16,20 @@ abstract class Table<T extends DbObject> {
 
   late Database database;
 
+  String get idAndDeletedAndStatus => '''
+    id integer primary key,
+    deleted integer not null default 0 check (deleted in (0, 1)),
+    sync_status integer not null default 2 check (sync_status in (0, 1, 2))
+  ''';
+
   @mustCallSuper
   Future<void> init(Database db) async {
     database = db;
     await database.execute(setupSql);
     await database.execute('''
-create trigger ${tableName}_last_change after update on $tableName
+create trigger ${tableName}_update after update on $tableName
 begin
-  update $tableName set last_change = datetime('now') where id = new.id;
+  update $tableName set sync_status = 1 where id = new.id and sync_status = 0;
 end;
     ''');
   }
@@ -84,35 +90,34 @@ end;
     });
   }
 
-  DbResult<void> createSingle(T object, bool isNew, [Transaction? txn]) async {
-    return createMultiple([object], isNew, txn);
+  DbResult<void> createSingle(T object, [Transaction? txn]) async {
+    return createMultiple([object], txn);
   }
 
-  DbResult<void> createMultiple(List<T> objects, bool isNew, [Transaction? txn]) async {
+  DbResult<void> createMultiple(List<T> objects, [Transaction? txn]) async {
     return voidRequest(() async {
       final batch = (txn ?? database).batch();
       for (final object in objects) {
         assert(object.isValid());
-        batch.insert(tableName, {
-          ...serde.toDbRecord(object),
-          Keys.isNew: isNew ? 1 : 0,
-        });
+        batch.insert(tableName, serde.toDbRecord(object));
       }
       await batch.commit(noResult: true, continueOnError: true);
     });
   }
 
-  DbResult<List<T>> getAll({
-    bool onlyIsNew = false,
-    bool includeDeleted = false,
-    Transaction? txn
-  }) async {
+  DbResult<List<T>> getNonDeleted([Transaction? txn]) async {
     return request(() async {
-      final filter = onlyIsNew
-          ? (includeDeleted ? "is_new = 1" : "is_new = 1 and deleted = 0")
-          : (includeDeleted ? null : "deleted = 0");
       final List<DbRecord> result = await (txn ?? database)
-          .query(tableName, where: filter);
+          .query(tableName, where: 'deleted = 0');
+      return Success(result.map(serde.fromDbRecord).toList());
+    });
+  }
+
+  DbResult<List<T>> getWithSyncStatus(SyncStatus syncStatus) async {
+    final int status = SyncStatus.values.indexOf(syncStatus);
+    return request(() async {
+      final List<DbRecord> result = await database.query(tableName,
+          where: '${Keys.syncStatus} = $status');
       return Success(result.map(serde.fromDbRecord).toList());
     });
   }
@@ -158,9 +163,22 @@ end;
     });
   }
 
-  DbResult<void> setAllIsNewFalse() async {
+  DbResult<void> setSynchronized(Int64 id) async {
     return voidRequest(() async {
-      await database.update(tableName, {"is_new": 0}, where: "is_new = 1");
+      database.update(tableName, {'sync_status': 0},
+        where: 'id = ?', whereArgs: [id.toInt()]);
+    });
+  }
+
+  DbResult<void> upsertMultiple(List<T> objects, [Transaction? txn]) async {
+    return voidRequest(() async {
+      final batch = (txn ?? database).batch();
+      for (final object in objects) {
+        assert(object.isValid());
+        batch.insert(tableName, serde.toDbRecord(object),
+            conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+      await batch.commit(noResult: true, continueOnError: true);
     });
   }
 }

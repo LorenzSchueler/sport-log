@@ -5,20 +5,39 @@ typedef FromJson<T> = T Function(Map<String, dynamic>);
 
 extension Helpers on Api {
 
-  String get _urlBase {
-    assert(_urlBaseOptional != null, 'forget to call Api().init()');
-    return _urlBaseOptional!;
-  }
-
-
   Uri _uri(String route) => Uri.parse(_urlBase + route);
 
   void _logError(String message) {
     stderr.writeln(message);
   }
 
+  String _prettyJson(dynamic json, {int indent = 2}) {
+    var spaces = ' ' * indent;
+    var encoder = JsonEncoder.withIndent(spaces);
+    return encoder.convert(json);
+  }
+
   void _handleUnknownStatusCode(http.Response response) {
     _logError("status code: ${response.statusCode}; response: ${response.body};");
+  }
+
+  void _logRequest(String httpMethod, String url, [dynamic json]) {
+    if (json != null) {
+      final prettyJson = _prettyJson(json);
+      log('$httpMethod $url\n$prettyJson', name: 'API request');
+    } else {
+      log('$httpMethod $url', name: 'API request');
+    }
+  }
+
+  void _logResponse(http.Response response) {
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      dynamic jsonObject = jsonDecode(response.body);
+      log('${response.statusCode}\n${_prettyJson(jsonObject)}',
+          name: 'API response');
+    } else {
+      log('${response.statusCode}', name: 'API response');
+    }
   }
 
   Map<String, String> _makeAuthorizedHeader(String username, String password) {
@@ -45,7 +64,7 @@ extension Helpers on Api {
     ..._jsonContentTypeHeader,
   };
 
-  Future<Result<T, ApiError>> _request<T>(
+  ApiResult<T> _errorHandling<T>(
       Future<Result<T, ApiError>> Function(http.Client client) req) async {
     try {
       return req(_client);
@@ -57,16 +76,18 @@ extension Helpers on Api {
     }
   }
 
-  Future<Result<List<T>, ApiError>> _getMultiple<T>(String route, {
+  ApiResult<List<T>> _getMultiple<T>(String route, {
     required FromJson<T> fromJson,
     ApiError? Function(int)? mapBadStatusToApiError,
     Map<String, String>? headers,
   }) async {
-    return _request<List<T>>((client) async {
+    return _errorHandling<List<T>>((client) async {
+      _logRequest('GET', route);
       final response = await client.get(
         _uri(route),
         headers: headers ?? _authorizedHeader,
       );
+      _logResponse(response);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         final dynamic json = jsonDecode(response.body);
         if (json is! List) {
@@ -90,16 +111,18 @@ extension Helpers on Api {
     });
   }
 
-  Future<Result<T, ApiError>> _getSingle<T>(String route, {
+  ApiResult<T> _getSingle<T>(String route, {
     required FromJson<T> fromJson,
     ApiError? Function(int)? mapBadStatusToApiError,
     Map<String, String>? headers,
   }) async {
-    return _request<T>((client) async {
+    return _errorHandling<T>((client) async {
+      _logRequest('GET', route);
       final response = await client.get(
         _uri(route),
         headers: headers ?? _authorizedHeader,
       );
+      _logResponse(response);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return Success(fromJson(
             jsonDecode(response.body) as Map<String, dynamic>));
@@ -115,16 +138,18 @@ extension Helpers on Api {
     });
   }
 
-  Future<Result<void, ApiError>> _post(String route, Object body, {
+  ApiResult<void> _post(String route, Object body, {
     ApiError? Function(int)? mapBadStatusToApiError,
     Map<String, String>? headers,
   }) async {
-    return _request((client) async {
+    return _errorHandling((client) async {
+      _logRequest('POST', route, body);
       final response = await client.post(
         _uri(route),
         headers: headers ?? _defaultHeaders,
         body: jsonEncode(body),
       );
+      _logResponse(response);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return Success(null);
       }
@@ -142,15 +167,17 @@ extension Helpers on Api {
     });
   }
 
-  Future<Result<void, ApiError>> _put(String route, Object body, {
+  ApiResult<void> _put(String route, Object body, {
     ApiError? Function(int)? mapBadStatusToApiError,
   }) async {
-    return _request((client) async {
+    return _errorHandling((client) async {
+      _logRequest('PUT', route, body);
       final response = await client.put(
         _uri(route),
         headers: _defaultHeaders,
         body: jsonEncode(body),
       );
+      _logResponse(response);
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return Success(null);
       }

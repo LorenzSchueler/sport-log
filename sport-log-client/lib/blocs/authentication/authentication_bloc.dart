@@ -19,11 +19,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
        _api = api,
         super(user == null
           ? Unauthenticated()
-          : Authenticated(user: user)) {
-    if (user != null) {
-      _api.setCurrentUser(user);
-    }
-  }
+          : Authenticated(user: user));
 
   final AuthenticationRepository? _authenticationRepository;
   final Api _api;

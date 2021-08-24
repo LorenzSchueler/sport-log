@@ -139,6 +139,9 @@ class _LoginFormState extends State<LoginForm> {
     if (username != null && username.isEmpty) {
       return "Username must not be empty.";
     }
+    if (username != null && username.contains(':')) {
+      return "Username must not contain ':'.";
+    }
   }
 
   String? _passwordValidator(String? password) {
