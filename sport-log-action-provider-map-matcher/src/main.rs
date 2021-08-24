@@ -1,15 +1,19 @@
 use std::{
     env,
     fs::{self, File},
+    io::Error as IoError,
+    result::Result as StdResult,
 };
 
 use chrono::{Duration, Utc};
+use err_derive::Error as StdError;
 use geo_types::Point;
 use geoutils::Location as GeoLocation;
-use gpx::{self, Gpx, GpxVersion, Track, TrackSegment, Waypoint};
+use gpx::{self, errors::Error as GpxError, Gpx, GpxVersion, Track, TrackSegment, Waypoint};
 use rand::Rng;
-use reqwest::Client;
+use reqwest::{Client, Error as ReqwestError};
 use serde::{Deserialize, Serialize};
+use toml::de::Error as TomlError;
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{CardioSession, CardioSessionId, Position, Route, RouteId};
@@ -20,6 +24,20 @@ const DESCRIPTION: &str =
     "Map Matcher will try to match GPX tracks to the closest path that exists in OSM.";
 const PLATFORM_NAME: &str = "sport-log";
 
+#[derive(Debug, StdError)]
+enum Error {
+    #[error(display = "{}", _0)]
+    ReqwestError(ReqwestError),
+    #[error(display = "{}", _0)]
+    IoError(IoError),
+    #[error(display = "{}", _0)]
+    TomlError(TomlError),
+    #[error(display = "{}", _0)]
+    GpxError(GpxError),
+}
+
+type Result<T> = StdResult<T, Error>;
+
 #[derive(Deserialize)]
 struct Config {
     password: String,
@@ -27,8 +45,11 @@ struct Config {
 }
 
 impl Config {
-    fn get() -> Self {
-        toml::from_str(&fs::read_to_string("config.toml").unwrap()).unwrap()
+    fn get() -> Result<Self> {
+        Ok(
+            toml::from_str(&fs::read_to_string("config.toml").map_err(Error::IoError)?)
+                .map_err(Error::TomlError)?,
+        )
     }
 }
 
@@ -56,17 +77,17 @@ struct LocationElevation {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
     match &env::args().collect::<Vec<_>>()[1..] {
         [] => map_match().await,
         [option] if option == "--setup" => setup().await,
-        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
-        _ => wrong_use(),
+        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => Ok(help()),
+        _ => Ok(wrong_use()),
     }
 }
 
-async fn setup() {
-    let config = Config::get();
+async fn setup() -> Result<()> {
+    let config = Config::get()?;
 
     setup_db(
         &config.base_url,
@@ -79,7 +100,8 @@ async fn setup() {
         168,
         0,
     )
-    .await;
+    .await
+    .map_err(Error::ReqwestError)
 }
 
 fn help() {
@@ -99,8 +121,8 @@ fn wrong_use() {
     println!("no such options");
 }
 
-async fn map_match() {
-    let config = Config::get();
+async fn map_match() -> Result<()> {
+    let config = Config::get()?;
 
     let client = Client::new();
 
@@ -112,7 +134,8 @@ async fn map_match() {
         Duration::hours(0),
         Duration::hours(1),
     )
-    .await;
+    .await
+    .map_err(Error::ReqwestError)?;
     println!("executable action events: {}\n", exec_action_events.len());
 
     let mut delete_action_event_ids = vec![];
@@ -141,22 +164,22 @@ async fn map_match() {
             .basic_auth(&username, Some(&config.password))
             .send()
             .await
-            .unwrap()
+            .map_err(Error::ReqwestError)?
             .json()
             .await
-            .unwrap();
+            .map_err(Error::ReqwestError)?;
 
-        let route = match_to_map(&cardio_session).await.unwrap();
+        let route = match_to_map(&cardio_session).await?;
 
         let routes: Vec<Route> = client
             .get(format!("{}/v1/route", config.base_url))
             .basic_auth(&username, Some(&config.password))
             .send()
             .await
-            .unwrap()
+            .map_err(Error::ReqwestError)?
             .json()
             .await
-            .unwrap();
+            .map_err(Error::ReqwestError)?;
 
         if let Some(route_id) = compare_routes(&route, &routes) {
             cardio_session.route_id = Some(route_id);
@@ -167,7 +190,7 @@ async fn map_match() {
                 .json(&route)
                 .send()
                 .await
-                .unwrap()
+                .map_err(Error::ReqwestError)?
                 .status()
             {
                 status if status.is_success() => {
@@ -186,7 +209,7 @@ async fn map_match() {
             .json(&cardio_session)
             .send()
             .await
-            .unwrap()
+            .map_err(Error::ReqwestError)?
             .status()
         {
             status if status.is_success() => {
@@ -207,17 +230,19 @@ async fn map_match() {
             &config.password,
             &delete_action_event_ids,
         )
-        .await;
+        .await
+        .map_err(Error::ReqwestError)?;
     }
+    Ok(())
 }
 
-async fn match_to_map(cardio_session: &CardioSession) -> Result<Route, ()> {
-    let gpx = to_gpx(cardio_session)?;
+async fn match_to_map(cardio_session: &CardioSession) -> Result<Route> {
+    let gpx = to_gpx(&cardio_session.track.as_ref().unwrap()); // function only called if track is not None
 
     let mut rng = rand::thread_rng();
     let filename = format!("/tmp/map-matcher-{}.gpx", rng.gen::<u64>());
     let filename_result = format!("{}{}", filename, ".res.gpx");
-    gpx::write(&gpx, File::create(&filename).unwrap()).unwrap();
+    gpx::write(&gpx, File::create(&filename).map_err(Error::IoError)?).map_err(Error::GpxError)?;
 
     let output = Command::new("java")
         .args(&[
@@ -231,46 +256,42 @@ async fn match_to_map(cardio_session: &CardioSession) -> Result<Route, ()> {
         .current_dir("map-matching")
         .output()
         .await
-        .unwrap();
+        .map_err(Error::IoError)?;
 
     if !output.status.success() {
         println!("{:?}", output);
-        return Err(());
     }
 
-    let gpx = gpx::read(File::open(&filename_result).unwrap()).unwrap();
+    let gpx = gpx::read(File::open(&filename_result).map_err(Error::IoError)?)
+        .map_err(Error::GpxError)?;
 
-    fs::remove_file(&filename).unwrap();
-    fs::remove_file(&filename_result).unwrap();
+    fs::remove_file(&filename).map_err(Error::IoError)?;
+    fs::remove_file(&filename_result).map_err(Error::IoError)?;
 
-    Ok(to_route(gpx, cardio_session).await)
+    to_route(gpx, cardio_session).await
 }
 
-fn to_gpx(cardio_session: &CardioSession) -> Result<Gpx, ()> {
-    if let Some(positions) = &cardio_session.track {
-        let mut track = Track::new();
-        let mut track_segment = TrackSegment::new();
-        let waypoints: Vec<_> = positions
-            .iter()
-            .map(|position| Waypoint::new(Point::new(position.longitude, position.latitude)))
-            .collect();
-        track_segment.points.extend(waypoints);
-        track.segments.push(track_segment);
-        let gpx = Gpx {
-            version: GpxVersion::Gpx10,
-            creator: None,
-            metadata: None,
-            waypoints: vec![],
-            tracks: vec![track],
-            routes: vec![],
-        };
-        Ok(gpx)
-    } else {
-        Err(())
-    }
+fn to_gpx(positions: &Vec<Position>) -> Gpx {
+    let mut track = Track::new();
+    let mut track_segment = TrackSegment::new();
+    let waypoints: Vec<_> = positions
+        .iter()
+        .map(|position| Waypoint::new(Point::new(position.longitude, position.latitude)))
+        .collect();
+    track_segment.points.extend(waypoints);
+    track.segments.push(track_segment);
+    let gpx = Gpx {
+        version: GpxVersion::Gpx10,
+        creator: None,
+        metadata: None,
+        waypoints: vec![],
+        tracks: vec![track],
+        routes: vec![],
+    };
+    gpx
 }
 
-async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
+async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Result<Route> {
     let points = &gpx.tracks[0].segments[0].points;
 
     let locations = points
@@ -291,10 +312,10 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
         .json(&request_data)
         .send()
         .await
-        .unwrap()
+        .map_err(Error::ReqwestError)?
         .json()
         .await
-        .unwrap();
+        .map_err(Error::ReqwestError)?;
 
     let mut distance = 0.;
     let mut prev_point = GeoLocation::new(
@@ -333,7 +354,7 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
     );
 
     let mut rng = rand::thread_rng();
-    Route {
+    Ok(Route {
         id: RouteId(rng.gen()),
         user_id: cardio_session.user_id,
         name: format!("{} workout route", cardio_session.datetime),
@@ -343,7 +364,7 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
         track: positions,
         last_change: Utc::now(),
         deleted: false,
-    }
+    })
 }
 
 /// This function relies on the fact that routes generated by the map matcher only contain the coordinates of the path in OSM.
