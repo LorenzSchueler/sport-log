@@ -5,13 +5,14 @@ use std::{
 
 use chrono::{Duration, Utc};
 use geo_types::Point;
+use geoutils::Location as GeoLocation;
 use gpx::{self, Gpx, GpxVersion, Track, TrackSegment, Waypoint};
 use rand::Rng;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
-use sport_log_types::{CardioSession, Position, Route, RouteId};
+use sport_log_types::{CardioSession, CardioSessionId, Position, Route, RouteId};
 use tokio::process::Command;
 
 const NAME: &str = "map-matcher";
@@ -51,7 +52,7 @@ struct ResponseData {
 struct LocationElevation {
     latitude: f64,
     longitude: f64,
-    elevation: f32,
+    elevation: i32,
 }
 
 #[tokio::main]
@@ -119,9 +120,24 @@ async fn map_match() {
         println!("{:#?}", exec_action_event);
 
         let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
+        let cardio_session_id: CardioSessionId = match exec_action_event
+            .arguments
+            .map(|arg| arg.parse().ok())
+            .flatten()
+        {
+            Some(arg) => CardioSessionId(arg),
+            None => {
+                println!("action event has no cardion session id as argument");
+                delete_action_event_ids.push(exec_action_event.action_event_id);
+                continue;
+            }
+        };
 
-        let mut cardio_sessions: Vec<CardioSession> = client
-            .get(format!("{}/v1/cardio_session", config.base_url))
+        let mut cardio_session: CardioSession = client
+            .get(format!(
+                "{}/v1/cardio_session/{}",
+                config.base_url, cardio_session_id.0
+            ))
             .basic_auth(&username, Some(&config.password))
             .send()
             .await
@@ -130,59 +146,55 @@ async fn map_match() {
             .await
             .unwrap();
 
-        println!("cardio sessions:\t{}", cardio_sessions.len());
+        let route = match_to_map(&cardio_session).await.unwrap();
 
-        for cardio_session in &mut cardio_sessions[0..1] {
-            let route = match_to_map(cardio_session).await.unwrap();
+        let routes: Vec<Route> = client
+            .get(format!("{}/v1/route", config.base_url))
+            .basic_auth(&username, Some(&config.password))
+            .send()
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap();
 
-            let routes: Vec<Route> = client
-                .get(format!("{}/v1/route", config.base_url))
-                .basic_auth(&username, Some(&config.password))
-                .send()
-                .await
-                .unwrap()
-                .json()
-                .await
-                .unwrap();
-
-            if let Some(route_id) = compare_routes(&route, &routes) {
-                cardio_session.route_id = Some(route_id);
-            } else {
-                match client
-                    .post(format!("{}/v1/route", config.base_url))
-                    .basic_auth(&username, Some(&config.password))
-                    .json(&route)
-                    .send()
-                    .await
-                    .unwrap()
-                    .status()
-                {
-                    status if status.is_success() => {
-                        println!("route saved");
-                    }
-                    status => {
-                        println!("error (status {:?})", status);
-                        break;
-                    }
-                }
-            }
-
+        if let Some(route_id) = compare_routes(&route, &routes) {
+            cardio_session.route_id = Some(route_id);
+        } else {
             match client
-                .put(format!("{}/v1/cardio_session", config.base_url))
+                .post(format!("{}/v1/route", config.base_url))
                 .basic_auth(&username, Some(&config.password))
-                .json(cardio_session)
+                .json(&route)
                 .send()
                 .await
                 .unwrap()
                 .status()
             {
                 status if status.is_success() => {
-                    println!("cardio session saved");
+                    println!("route saved");
                 }
                 status => {
                     println!("error (status {:?})", status);
                     break;
                 }
+            }
+        }
+
+        match client
+            .put(format!("{}/v1/cardio_session", config.base_url))
+            .basic_auth(&username, Some(&config.password))
+            .json(&cardio_session)
+            .send()
+            .await
+            .unwrap()
+            .status()
+        {
+            status if status.is_success() => {
+                println!("cardio session saved");
+            }
+            status => {
+                println!("error (status {:?})", status);
+                break;
             }
         }
         delete_action_event_ids.push(exec_action_event.action_event_id);
@@ -284,28 +296,37 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
         .await
         .unwrap();
 
+    let mut distance = 0.;
+    let mut prev_point = GeoLocation::new(
+        response_data.results[0].latitude,
+        response_data.results[0].longitude,
+    );
     let positions: Vec<_> = response_data
         .results
         .iter()
         .map(|point| {
+            let next_point = GeoLocation::new(point.latitude, point.longitude);
+            distance += prev_point.haversine_distance_to(&next_point).meters();
+            prev_point = next_point;
+
             Position {
                 longitude: point.longitude,
                 latitude: point.latitude,
                 elevation: point.elevation,
-                distance: 0, // TODO
-                time: 0,     // TODO
+                distance: distance as i32,
+                time: 0,
             }
         })
         .collect();
 
     let (ascent, descent, _) = positions.iter().fold(
-        (0., 0., &positions[0]),
+        (0, 0, &positions[0]),
         |(mut ascent, mut descent, prev), next| {
             let diff = prev.elevation - next.elevation;
-            if diff > 0. {
+            if diff > 0 {
                 descent += diff;
             } else {
-                ascent += diff;
+                ascent += -diff;
             }
             (ascent, descent, next)
         },
@@ -316,10 +337,10 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Route {
         id: RouteId(rng.gen()),
         user_id: cardio_session.user_id,
         name: format!("{} workout route", cardio_session.datetime),
-        distance: cardio_session.distance.unwrap(), // calc new
+        distance: positions.last().unwrap().distance,
         ascent: Some(ascent as i32),
         descent: Some(descent as i32),
-        track: Some(positions),
+        track: positions,
         last_change: Utc::now(),
         deleted: false,
     }
@@ -335,72 +356,73 @@ fn compare_routes(route: &Route, routes: &[Route]) -> Option<RouteId> {
         if (route.distance - old_route.distance).abs() > route.distance / MAX_MISSES {
             continue 'route_loop;
         }
-        if let (Some(track), Some(old_track)) = (&route.track, &old_route.track) {
-            if (track.len() as i32 - old_track.len() as i32).abs() > track.len() as i32 / MAX_MISSES
+        if (route.track.len() as i32 - old_route.track.len() as i32).abs()
+            > route.track.len() as i32 / MAX_MISSES
+        {
+            continue 'route_loop;
+        }
+        let coords: Vec<_> = route
+            .track
+            .iter()
+            .map(|position| (position.latitude, position.longitude))
+            .collect();
+        let old_coords: Vec<_> = old_route
+            .track
+            .iter()
+            .map(|position| (position.latitude, position.longitude))
+            .collect();
+        let mut hits = 0;
+        let mut misses = 0;
+        let mut cont_misses = 0;
+        let mut idx = 0;
+        let mut old_idx = 0;
+        'match_loop: loop {
+            if misses > route.track.len() as i32 / MAX_MISSES
+                || cont_misses > route.track.len() as i32 / MAX_CONT_MISSES
             {
                 continue 'route_loop;
             }
-            let coords: Vec<_> = track
-                .iter()
-                .map(|position| (position.latitude, position.longitude))
-                .collect();
-            let old_coords: Vec<_> = old_track
-                .iter()
-                .map(|position| (position.latitude, position.longitude))
-                .collect();
-            let mut hits = 0;
-            let mut misses = 0;
-            let mut cont_misses = 0;
-            let mut idx = 0;
-            let mut old_idx = 0;
-            'match_loop: loop {
-                if misses > track.len() as i32 / MAX_MISSES
-                    || cont_misses > track.len() as i32 / MAX_CONT_MISSES
-                {
-                    continue 'route_loop;
-                }
-                if idx == coords.len() || old_idx == coords.len() {
-                    break 'match_loop;
-                }
-                if coords[idx] == old_coords[old_idx] {
-                    hits += 1;
-                    cont_misses = 0;
-                    idx += 1;
-                    old_idx += 1;
-                } else {
-                    // find next match within MAX_CONT_MISSES
-                    misses += 1;
-                    cont_misses += 1;
-                    let end = usize::min(
-                        idx + coords.len() / MAX_CONT_MISSES as usize,
-                        coords.len() - 1,
-                    );
-                    let old_end = usize::min(
-                        old_idx + old_coords.len() / MAX_CONT_MISSES as usize,
-                        old_coords.len() - 1,
-                    );
-                    for (i, coord) in coords[idx..end].iter().enumerate() {
-                        for (old_i, old_coord) in old_coords[old_idx..old_end].iter().enumerate() {
-                            if coord == old_coord {
-                                idx = i;
-                                old_idx = old_i;
-                                continue 'match_loop;
-                            }
+            if idx == coords.len() || old_idx == coords.len() {
+                break 'match_loop;
+            }
+            if coords[idx] == old_coords[old_idx] {
+                hits += 1;
+                cont_misses = 0;
+                idx += 1;
+                old_idx += 1;
+            } else {
+                // find next match within MAX_CONT_MISSES
+                misses += 1;
+                cont_misses += 1;
+                let end = usize::min(
+                    idx + coords.len() / MAX_CONT_MISSES as usize,
+                    coords.len() - 1,
+                );
+                let old_end = usize::min(
+                    old_idx + old_coords.len() / MAX_CONT_MISSES as usize,
+                    old_coords.len() - 1,
+                );
+                for (i, coord) in coords[idx..end].iter().enumerate() {
+                    for (old_i, old_coord) in old_coords[old_idx..old_end].iter().enumerate() {
+                        if coord == old_coord {
+                            idx = i;
+                            old_idx = old_i;
+                            continue 'match_loop;
                         }
                     }
-                    break 'match_loop;
                 }
+                break 'match_loop;
             }
-            println!("misses: {}", misses);
-            println!("cont misses: {}", cont_misses);
-            println!("hits: {}", hits);
-            if misses > track.len() as i32 / MAX_MISSES
-                || cont_misses > track.len() as i32 / MAX_CONT_MISSES
-            {
-                continue 'route_loop;
-            } else {
-                return Some(old_route.id);
-            }
+        }
+        println!("misses: {}", misses);
+        println!("cont misses: {}", cont_misses);
+        println!("hits: {}", hits);
+        if misses > route.track.len() as i32 / MAX_MISSES
+            || cont_misses > route.track.len() as i32 / MAX_CONT_MISSES
+        {
+            continue 'route_loop;
+        } else {
+            return Some(old_route.id);
         }
     }
     None

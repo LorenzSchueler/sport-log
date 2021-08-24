@@ -5,9 +5,10 @@ create table diary (
     bodyweight real check (bodyweight > 0),
     comments text,
     last_change timestamptz not null default now(),
-    deleted boolean not null default false,
-    unique (user_id, date, deleted)
+    deleted boolean not null default false
 );
+
+create unique index diary_idx on diary (user_id, date) where deleted = false;
 
 create trigger set_timestamp before update on diary
     for each row execute procedure trigger_set_timestamp();
@@ -28,6 +29,8 @@ create table wod (
     deleted boolean not null default false,
     unique (user_id, date, deleted)
 );
+
+create unique index wod_idx on wod (user_id, date) where deleted = false;
 
 create trigger set_timestamp before update on wod
     for each row execute procedure trigger_set_timestamp();

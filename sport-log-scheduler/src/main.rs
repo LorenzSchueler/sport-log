@@ -76,6 +76,7 @@ fn main() {
                     user_id: creatable_action_rule.user_id,
                     action_id: creatable_action_rule.action_id,
                     datetime,
+                    arguments: creatable_action_rule.arguments.clone(),
                     enabled: true,
                     last_change: Utc::now(),
                     deleted: false,

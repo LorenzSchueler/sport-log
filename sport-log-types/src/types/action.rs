@@ -64,6 +64,7 @@ pub struct ActionProvider {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub platform_id: PlatformId,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -116,6 +117,7 @@ pub struct Action {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub action_provider_id: ActionProviderId,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
     pub create_before: i32,
     pub delete_after: i32,
@@ -195,6 +197,8 @@ pub struct ActionRule {
     pub action_id: ActionId,
     pub weekday: Weekday,
     pub time: DateTime<Utc>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    pub arguments: Option<String>,
     pub enabled: bool,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -255,6 +259,8 @@ pub struct ActionEvent {
     #[serde(deserialize_with = "from_str")]
     pub action_id: ActionId,
     pub datetime: DateTime<Utc>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    pub arguments: Option<String>,
     pub enabled: bool,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -276,6 +282,8 @@ pub struct CreatableActionRule {
     pub action_id: ActionId,
     pub weekday: Weekday,
     pub time: DateTime<Utc>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    pub arguments: Option<String>,
     pub create_before: i32,
 }
 
@@ -287,10 +295,14 @@ pub struct ExecutableActionEvent {
     pub action_event_id: ActionEventId,
     pub action_name: String,
     pub datetime: DateTime<Utc>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    pub arguments: Option<String>,
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub username: Option<String>,
+    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
     pub password: Option<String>,
 }
 
