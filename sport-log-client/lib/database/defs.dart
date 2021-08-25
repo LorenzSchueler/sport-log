@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/helpers/validation.dart';
@@ -20,7 +19,9 @@ enum SyncStatus {
 
 abstract class DbObject extends Validatable {
   Int64 get id;
+
   bool get deleted;
+  set deleted(bool deleted);
 }
 
 abstract class DbSerializer<T> {

@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
@@ -7,9 +6,12 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 part 'metcon.g.dart';
 
 enum MetconType {
-  @JsonValue("Amrap") amrap,
-  @JsonValue("Emom") emom,
-  @JsonValue("ForTime") forTime
+  @JsonValue("Amrap")
+  amrap,
+  @JsonValue("Emom")
+  emom,
+  @JsonValue("ForTime")
+  forTime
 }
 
 extension ToDisplayName on MetconType {
@@ -39,8 +41,10 @@ class Metcon implements DbObject {
   });
 
   @override
-  @IdConverter() Int64 id;
-  @OptionalIdConverter() Int64? userId;
+  @IdConverter()
+  Int64 id;
+  @OptionalIdConverter()
+  Int64? userId;
   String? name;
   MetconType metconType;
   int? rounds;
@@ -65,12 +69,12 @@ class Metcon implements DbObject {
 
   @override
   bool isValid() {
-    return userId != null
-        && name != null
-        && deleted != true
-        && (rounds == null || rounds! >= 1)
-        && (timecap == null || timecap! >= 1)
-        && validateMetconType();
+    return userId != null &&
+        name != null &&
+        deleted != true &&
+        (rounds == null || rounds! >= 1) &&
+        (timecap == null || timecap! >= 1) &&
+        validateMetconType();
   }
 }
 
@@ -95,7 +99,7 @@ class DbMetconSerializer implements DbSerializer<Metcon> {
       Keys.id: o.id.toInt(),
       Keys.userId: o.userId?.toInt(),
       Keys.name: o.name,
-      Keys.metconType: MetconType.values.indexOf(o.metconType),
+      Keys.metconType: o.metconType.index,
       Keys.rounds: o.rounds,
       Keys.timecap: o.timecap,
       Keys.description: o.description,

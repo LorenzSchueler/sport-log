@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
@@ -21,9 +20,12 @@ class MetconMovement implements DbObject {
   });
 
   @override
-  @IdConverter() Int64 id;
-  @IdConverter() Int64 metconId;
-  @IdConverter() Int64 movementId;
+  @IdConverter()
+  Int64 id;
+  @IdConverter()
+  Int64 metconId;
+  @IdConverter()
+  Int64 movementId;
   int movementNumber;
   int count;
   MovementUnit movementUnit;
@@ -31,15 +33,16 @@ class MetconMovement implements DbObject {
   @override
   bool deleted;
 
-  factory MetconMovement.fromJson(Map<String, dynamic> json) => _$MetconMovementFromJson(json);
+  factory MetconMovement.fromJson(Map<String, dynamic> json) =>
+      _$MetconMovementFromJson(json);
   Map<String, dynamic> toJson() => _$MetconMovementToJson(this);
 
   @override
   bool isValid() {
-    return deleted != true
-        && movementNumber >= 0
-        && count > 0
-        && (weight == null || weight! > 0);
+    return deleted != true &&
+        movementNumber >= 0 &&
+        count > 0 &&
+        (weight == null || weight! > 0);
   }
 }
 
@@ -66,7 +69,7 @@ class DbMetconMovementSerializer implements DbSerializer<MetconMovement> {
       Keys.movementId: o.movementId.toInt(),
       Keys.movementNumber: o.movementNumber,
       Keys.count: o.count,
-      Keys.movementUnit: MovementUnit.values.indexOf(o.movementUnit),
+      Keys.movementUnit: o.movementUnit.index,
       Keys.weight: o.weight,
       Keys.deleted: o.deleted ? 1 : 0,
     };

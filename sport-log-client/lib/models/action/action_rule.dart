@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
@@ -21,17 +20,22 @@ class ActionRule implements DbObject {
   });
 
   @override
-  @IdConverter() Int64 id;
-  @IdConverter() Int64 userId;
-  @IdConverter() Int64 actionId;
+  @IdConverter()
+  Int64 id;
+  @IdConverter()
+  Int64 userId;
+  @IdConverter()
+  Int64 actionId;
   Weekday weekday;
-  @DateTimeConverter() DateTime time;
+  @DateTimeConverter()
+  DateTime time;
   String? arguments;
   bool enabled;
   @override
   bool deleted;
 
-  factory ActionRule.fromJson(Map<String, dynamic> json) => _$ActionRuleFromJson(json);
+  factory ActionRule.fromJson(Map<String, dynamic> json) =>
+      _$ActionRuleFromJson(json);
   Map<String, dynamic> toJson() => _$ActionRuleToJson(this);
 
   @override
@@ -61,7 +65,7 @@ class DbActionRuleSerializer implements DbSerializer<ActionRule> {
       Keys.id: o.id.toInt(),
       Keys.userId: o.userId.toInt(),
       Keys.actionId: o.actionId.toInt(),
-      Keys.weekday: Weekday.values.indexOf(o.weekday),
+      Keys.weekday: o.weekday.index,
       Keys.time: o.time.toString(),
       Keys.arguments: o.arguments,
       Keys.enabled: o.enabled ? 1 : 0,

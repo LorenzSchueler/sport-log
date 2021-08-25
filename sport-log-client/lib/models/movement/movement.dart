@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
@@ -7,8 +6,10 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 part 'movement.g.dart';
 
 enum MovementCategory {
-  @JsonValue("Cardio") cardio,
-  @JsonValue("Strength") strength,
+  @JsonValue("Cardio")
+  cardio,
+  @JsonValue("Strength")
+  strength,
 }
 
 extension MovementCategoryToDisplayName on MovementCategory {
@@ -23,13 +24,20 @@ extension MovementCategoryToDisplayName on MovementCategory {
 }
 
 enum MovementUnit {
-  @JsonValue("Reps") reps,
-  @JsonValue("Cal") cal,
-  @JsonValue("Meter") meter,
-  @JsonValue("Km") km,
-  @JsonValue("Yard") yard,
-  @JsonValue("Foot") foot,
-  @JsonValue("Mile") mile,
+  @JsonValue("Reps")
+  reps,
+  @JsonValue("Cal")
+  cal,
+  @JsonValue("Meter")
+  meter,
+  @JsonValue("Km")
+  km,
+  @JsonValue("Yard")
+  yard,
+  @JsonValue("Foot")
+  foot,
+  @JsonValue("Mile")
+  mile,
 }
 
 extension MovementUniToDisplayName on MovementUnit {
@@ -65,22 +73,23 @@ class Movement implements DbObject {
   });
 
   @override
-  @IdConverter() Int64 id;
-  @OptionalIdConverter() Int64? userId;
+  @IdConverter()
+  Int64 id;
+  @OptionalIdConverter()
+  Int64? userId;
   String name;
   String? description;
   MovementCategory category;
   @override
   bool deleted;
 
-  factory Movement.fromJson(Map<String, dynamic> json) => _$MovementFromJson(json);
+  factory Movement.fromJson(Map<String, dynamic> json) =>
+      _$MovementFromJson(json);
   Map<String, dynamic> toJson() => _$MovementToJson(this);
 
   @override
   bool isValid() {
-    return userId != null
-        && name.isNotEmpty
-        && deleted == false;
+    return userId != null && name.isNotEmpty && deleted == false;
   }
 }
 
@@ -104,7 +113,7 @@ class DbMovementSerializer implements DbSerializer<Movement> {
       Keys.userId: o.userId?.toInt(),
       Keys.name: o.name,
       Keys.description: o.description,
-      Keys.category: MovementCategory.values.indexOf(o.category),
+      Keys.category: o.category.index,
       Keys.deleted: o.deleted ? 1 : 0,
     };
   }

@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import 'package:fixnum/fixnum.dart';
@@ -11,9 +10,12 @@ import 'package:sport_log/models/cardio/position.dart';
 part 'cardio_session.g.dart';
 
 enum CardioType {
-  @JsonValue("Training") training,
-  @JsonValue("ActiveRecovery") activeRecovery,
-  @JsonValue("Freetime") freetime
+  @JsonValue("Training")
+  training,
+  @JsonValue("ActiveRecovery")
+  activeRecovery,
+  @JsonValue("Freetime")
+  freetime
 }
 
 @JsonSerializable()
@@ -40,11 +42,15 @@ class CardioSession implements DbObject {
   });
 
   @override
-  @IdConverter() Int64 id;
-  @IdConverter() Int64 userId;
-  @IdConverter() Int64 movementId;
+  @IdConverter()
+  Int64 id;
+  @IdConverter()
+  Int64 userId;
+  @IdConverter()
+  Int64 movementId;
   CardioType cardioType;
-  @DateTimeConverter() DateTime datetime;
+  @DateTimeConverter()
+  DateTime datetime;
   int? distance;
   int? ascent;
   int? descent;
@@ -55,28 +61,30 @@ class CardioSession implements DbObject {
   List<double>? cadence;
   int? avgHeartRate;
   List<double>? heartRate;
-  @OptionalIdConverter() Int64? routeId;
+  @OptionalIdConverter()
+  Int64? routeId;
   String? comments;
   @override
   bool deleted;
 
-  factory CardioSession.fromJson(Map<String, dynamic> json) => _$CardioSessionFromJson(json);
+  factory CardioSession.fromJson(Map<String, dynamic> json) =>
+      _$CardioSessionFromJson(json);
   Map<String, dynamic> toJson() => _$CardioSessionToJson(this);
 
   @override
   bool isValid() {
-    return validate(!deleted, 'CardioSession: deleted is true')
-        && validate([ascent, descent]
-          .every((val) => val == null || val >= 0),
-            'CardioSession: ascent or descent < 0')
-        && validate([distance, time, calories, avgCadence, avgHeartRate]
-          .every((val) => val == null || val > 0),
-            'CardioSession: distance, time, calories, avgCadence or avgHeartRate <= 0')
-        && validate((track == null || distance != null),
-            'CardioSession: distance == null when track is set')
-        && validate((cadence == null || avgCadence != null),
-            'CardioSession: avgCadence == null when cadence is set')
-        && validate((heartRate == null || avgHeartRate != null),
+    return validate(!deleted, 'CardioSession: deleted is true') &&
+        validate([ascent, descent].every((val) => val == null || val >= 0),
+            'CardioSession: ascent or descent < 0') &&
+        validate(
+            [distance, time, calories, avgCadence, avgHeartRate]
+                .every((val) => val == null || val > 0),
+            'CardioSession: distance, time, calories, avgCadence or avgHeartRate <= 0') &&
+        validate((track == null || distance != null),
+            'CardioSession: distance == null when track is set') &&
+        validate((cadence == null || avgCadence != null),
+            'CardioSession: avgCadence == null when cadence is set') &&
+        validate((heartRate == null || avgHeartRate != null),
             'CardioSession: avgHeartRate == null when heartRate is set');
   }
 }
@@ -95,11 +103,14 @@ class DbCardioSessionSerializer implements DbSerializer<CardioSession> {
       descent: r[Keys.descent] as int?,
       time: r[Keys.time] as int?,
       calories: r[Keys.calories] as int?,
-      track: const DbPositionListConverter().mapToDart(r[Keys.track] as Uint8List?),
+      track: const DbPositionListConverter()
+          .mapToDart(r[Keys.track] as Uint8List?),
       avgCadence: r[Keys.avgCadence] as int?,
-      cadence: const DbDoubleListConverter().mapToDart(r[Keys.cadence] as Uint8List?),
+      cadence: const DbDoubleListConverter()
+          .mapToDart(r[Keys.cadence] as Uint8List?),
       avgHeartRate: r[Keys.avgHeartRate] as int?,
-      heartRate: const DbDoubleListConverter().mapToDart(r[Keys.heartRate] as Uint8List?),
+      heartRate: const DbDoubleListConverter()
+          .mapToDart(r[Keys.heartRate] as Uint8List?),
       routeId: r[Keys.routeId] == null ? null : Int64(r[Keys.routeId]! as int),
       comments: r[Keys.comments] as String?,
       deleted: r[Keys.deleted]! as int == 1,
@@ -112,7 +123,7 @@ class DbCardioSessionSerializer implements DbSerializer<CardioSession> {
       Keys.id: o.id.toInt(),
       Keys.userId: o.userId.toInt(),
       Keys.movementId: o.movementId.toInt(),
-      Keys.cardioType: CardioType.values.indexOf(o.cardioType),
+      Keys.cardioType: o.cardioType.index,
       Keys.datetime: o.datetime.toString(),
       Keys.distance: o.distance,
       Keys.ascent: o.ascent,

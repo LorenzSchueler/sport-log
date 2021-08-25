@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
@@ -23,9 +22,12 @@ class StrengthSession implements DbObject {
   @override
   @IdConverter()
   Int64 id;
-  @IdConverter() Int64 userId;
-  @DateTimeConverter() DateTime datetime;
-  @IdConverter() Int64 movementId;
+  @IdConverter()
+  Int64 userId;
+  @DateTimeConverter()
+  DateTime datetime;
+  @IdConverter()
+  Int64 movementId;
   MovementUnit movementUnit;
   int? interval;
   String? comments;
@@ -39,8 +41,8 @@ class StrengthSession implements DbObject {
 
   @override
   bool isValid() {
-    return validate(!deleted, 'StrengthSession: deleted is true')
-        && validate(interval == null || interval! > 0,
+    return validate(!deleted, 'StrengthSession: deleted is true') &&
+        validate(interval == null || interval! > 0,
             'StrengthSession: interval <= 0');
   }
 }
@@ -67,7 +69,7 @@ class DbStrengthSessionSerializer implements DbSerializer<StrengthSession> {
       Keys.userId: o.userId.toInt(),
       Keys.datetime: o.datetime.toString(),
       Keys.movementId: o.movementId.toInt(),
-      Keys.movementUnit: MovementUnit.values.indexOf(o.movementUnit),
+      Keys.movementUnit: o.movementUnit.index,
       Keys.interval: o.interval,
       Keys.comments: o.comments,
       Keys.deleted: o.deleted ? 1 : 0,
