@@ -9,7 +9,7 @@ extension UserRoutes on Api {
       }
     });
     if (result.isSuccess) {
-      _currentUser = user;
+      UserState.instance.setUser(user);
     }
     return result;
   }
@@ -24,8 +24,8 @@ extension UserRoutes on Api {
           }
         });
     if (result.isSuccess) {
-      _currentUser = result.success;
-      _currentUser!.password = password;
+      final user = result.success..password = password;
+      UserState.instance.setUser(user);
     }
     return result;
   }
@@ -33,7 +33,7 @@ extension UserRoutes on Api {
   ApiResult<void> updateUser(User user) async {
     final result = await _put(BackendRoutes.user, user);
     if (result.isSuccess) {
-      _currentUser = user;
+      UserState.instance.setUser(user);
     }
     return result;
   }
@@ -46,7 +46,7 @@ extension UserRoutes on Api {
           await client.delete(_uri(route), headers: _authorizedHeader);
       _logResponse(response);
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        _currentUser = null;
+        UserState.instance.deleteUser();
         return Success(null);
       }
       _handleUnknownStatusCode(response);

@@ -9,14 +9,11 @@ import 'package:sqflite/sqflite.dart';
 import 'tables/all.dart';
 
 class AppDatabase {
-  static final AppDatabase? _instance =
+  static final AppDatabase? instance =
       Config.isAndroid || Config.isIOS ? AppDatabase._() : null;
-
-  static AppDatabase? get instance => _instance;
 
   AppDatabase._();
 
-  // TODO: possible without init method
   Future<void> init() async {
     const fileName = 'database.sqlite';
     final File databaseFile = File(await getDatabasesPath() + '/' + fileName);

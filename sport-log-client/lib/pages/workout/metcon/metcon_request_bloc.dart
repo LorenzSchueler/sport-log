@@ -1,9 +1,9 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sport_log/api/api.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/config.dart';
+import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/models/metcon/ui_metcon.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_cubit.dart';
@@ -85,7 +85,7 @@ class MetconRequestBloc extends Bloc<MetconRequestEvent, MetconRequestState> {
   Stream<MetconRequestState> _createMetcon(MetconRequestCreate event) async* {
     yield const MetconRequestPending();
     assert(event.newMetcon.id == null);
-    Int64 userId = Api.instance.currentUser!.id;
+    Int64 userId = UserState.instance.currentUser!.id;
     event.newMetcon.userId = userId;
     event.newMetcon.id = _repo.nextMetconId;
     final metcon = event.newMetcon.toMetcon();

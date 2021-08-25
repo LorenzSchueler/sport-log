@@ -26,8 +26,11 @@ extension Helpers on Api {
   }
 
   void _logResponse(http.Response response) {
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      dynamic jsonObject = jsonDecode(response.body);
+    final body = response.body;
+    if (response.statusCode >= 200 &&
+        response.statusCode < 300 &&
+        body.isNotEmpty) {
+      dynamic jsonObject = jsonDecode(body);
       _logger.d('response: ${response.statusCode}\n${_prettyJson(jsonObject)}');
     } else {
       _logger.d('response: ${response.statusCode}');
@@ -41,9 +44,10 @@ extension Helpers on Api {
   }
 
   Map<String, String> get _authorizedHeader {
-    assert(_currentUser != null);
-    final username = _currentUser!.username;
-    final password = _currentUser!.password;
+    final user = UserState.instance.currentUser;
+    assert(user != null);
+    final username = user!.username;
+    final password = user.password;
     return _makeAuthorizedHeader(username, password);
   }
 
@@ -59,7 +63,7 @@ extension Helpers on Api {
   ApiResult<T> _errorHandling<T>(
       Future<Result<T, ApiError>> Function(http.Client client) req) async {
     try {
-      return req(_client);
+      return await req(_client);
     } on SocketException {
       return Failure(ApiError.noInternetConnection);
     } catch (e) {

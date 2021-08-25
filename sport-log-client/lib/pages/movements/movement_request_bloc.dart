@@ -1,9 +1,9 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sport_log/api/api.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/config.dart';
+import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/movement/ui_movement.dart';
 import 'package:sport_log/pages/movements/movements_cubit.dart';
@@ -82,7 +82,7 @@ class MovementRequestBloc
     assert(event.newMovement.id == null);
     final Movement movement = Movement(
       id: _repo.nextMovementId,
-      userId: Api.instance.currentUser!.id,
+      userId: UserState.instance.currentUser!.id,
       name: event.newMovement.name,
       category: event.newMovement.category,
       description: event.newMovement.description,
@@ -108,7 +108,7 @@ class MovementRequestBloc
     yield MovementRequestPending();
     assert(event.movement.id != null);
     assert(event.movement.userId != null);
-    assert(event.movement.userId == Api.instance.currentUser!.id);
+    assert(event.movement.userId == UserState.instance.currentUser!.id);
     await Future<void>.delayed(Duration(milliseconds: Config.debugApiDelay));
     final movement = Movement(
       id: event.movement.id!,

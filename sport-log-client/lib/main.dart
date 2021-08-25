@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sport_log/api/api.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
 import 'package:sport_log/config.dart';
@@ -9,55 +8,47 @@ import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/pages/movements/movements_cubit.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_cubit.dart';
 import 'package:sport_log/repositories/metcon_repository.dart';
 import 'package:sport_log/repositories/movement_repository.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+Future<void> initialize({bool doDownSync = true}) async {
+  WidgetsFlutterBinding.ensureInitialized(); // TODO: necessary?
   await Config.init();
-  final database = AppDatabase.instance!;
-  await database.init();
-  UserState? authRepo;
-  authRepo = await UserState.getInstance();
-  User? user = await authRepo.getUser();
-  final api = Api.instance;
-  if (user != null) {
-    api.setCurrentUser(user);
-    (await DownSync.instance).sync();
-  }
-  final authBloc = AuthenticationBloc(
-    authenticationRepository: authRepo,
-    api: api,
-    user: user,
-  );
+  await UserState.instance.init();
+  await AppDatabase.instance?.init().then((_) {
+    DownSync.instance.init().then((downSync) {
+      if (doDownSync) downSync.sync();
+    });
+  });
+  await UpSync.instance.init();
   Bloc.observer = SimpleBlocObserver();
+}
 
-  // TODO: this is a bad idea
-  final movementRepo = MovementRepository();
-  final movements = getMovementsTestData(movementRepo);
-  movementRepo.addAllMovements(movements);
-  final movementsCubit = MovementsCubit()..loadMovements(movements);
+void main() async {
+  initialize().then((_) {
+    // TODO: this is a bad idea
+    final movementRepo = MovementRepository();
+    final movements = getMovementsTestData(movementRepo);
+    movementRepo.addAllMovements(movements);
+    final movementsCubit = MovementsCubit()..loadMovements(movements);
 
-  runApp(MultiBlocProvider(
-    providers: [
-      BlocProvider.value(value: authBloc),
-      BlocProvider.value(value: MetconsCubit()),
-      BlocProvider.value(value: movementsCubit),
-    ],
-    child: MultiRepositoryProvider(
+    runApp(MultiBlocProvider(
       providers: [
-        RepositoryProvider.value(value: authRepo),
-        RepositoryProvider.value(value: movementRepo),
-        RepositoryProvider.value(value: MetconRepository()),
+        BlocProvider.value(value: AuthenticationBloc()),
+        BlocProvider.value(value: MetconsCubit()),
+        BlocProvider.value(value: movementsCubit),
       ],
-      child: App(
-        isAuthenticatedAtStart: user != null,
+      child: MultiRepositoryProvider(
+        providers: [
+          RepositoryProvider.value(value: movementRepo),
+          RepositoryProvider.value(value: MetconRepository()),
+        ],
+        child: const App(),
       ),
-    ),
-  ));
+    ));
+  });
 }
 
 List<Movement> getMovementsTestData(MovementRepository repo) {

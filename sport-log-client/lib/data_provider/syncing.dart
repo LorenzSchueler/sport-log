@@ -7,22 +7,25 @@ import 'package:sport_log/helpers/logger.dart';
 final _logger = Logger('SYNC');
 
 class DownSync {
-  static DownSync? _instance;
-  static Future<DownSync> get instance async =>
-      _instance ??= DownSync._(await SharedPreferences.getInstance());
+  static final DownSync instance = DownSync._();
+  DownSync._();
 
-  DownSync._(this._storage);
+  Future<DownSync> init() async {
+    _storage = await SharedPreferences.getInstance();
+    return this;
+  }
 
-  final SharedPreferences _storage;
+  late final SharedPreferences _storage;
 
   Future<void> sync() async {
-    final api = await Api.instance;
+    final api = Api.instance;
     final lastSync = await _lastSync();
     _storage.setString(Keys.lastSync, DateTime.now().toString());
     final result = await api.getAccountData(lastSync);
     if (result.isFailure) {
       // TODO: what to do now?
-      _logger.w('Could not fetch account data');
+      _logger.w(
+          'Could not fetch account data: ${result.failure.toErrorMessage()}');
       return;
     }
     final db = AppDatabase.instance;
@@ -43,13 +46,14 @@ class DownSync {
 }
 
 class UpSync {
-  static UpSync? _instance;
-  static Future<UpSync> get instance async =>
-      _instance ??= UpSync._(await SharedPreferences.getInstance());
+  static UpSync instance = UpSync._();
+  UpSync._();
 
-  UpSync._(this._storage);
+  Future<void> init() async {
+    _storage = await SharedPreferences.getInstance();
+  }
 
-  final SharedPreferences _storage;
+  late final SharedPreferences _storage;
 
   Future<void> syncNeeded() async {
     _storage.setBool(Keys.syncNeeded, true);

@@ -2,25 +2,21 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/models/user/user.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
 
+// TODO: do we really need this class?
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
-  AuthenticationBloc({
-    required UserState? authenticationRepository,
-    required Api api,
-    User? user,
-  })  : _authenticationRepository = authenticationRepository,
-        _api = api,
-        super(user == null ? Unauthenticated() : Authenticated(user: user));
+  AuthenticationBloc()
+      : super(UserState.instance.currentUser == null
+            ? Unauthenticated()
+            : Authenticated(user: UserState.instance.currentUser!));
 
-  final UserState? _authenticationRepository;
-  final Api _api;
+  final UserState _userState = UserState.instance;
 
   @override
   Stream<AuthenticationState> mapEventToState(
@@ -38,18 +34,17 @@ class AuthenticationBloc
   }
 
   Stream<AuthenticationState> _logoutStream(LogoutEvent event) async* {
-    _authenticationRepository?.deleteUser();
-    _api.removeCurrentUser();
+    _userState.deleteUser();
     yield Unauthenticated();
   }
 
   Stream<AuthenticationState> _loginStream(LoginEvent event) async* {
-    _authenticationRepository?.createUser(event.user);
+    _userState.setUser(event.user);
     yield Authenticated(user: event.user);
   }
 
   Stream<AuthenticationState> _registrationStream(RegisterEvent event) async* {
-    _authenticationRepository?.createUser(event.user);
+    _userState.setUser(event.user);
     yield Authenticated(user: event.user);
   }
 }

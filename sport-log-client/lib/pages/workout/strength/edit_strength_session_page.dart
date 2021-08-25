@@ -2,7 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:sport_log/api/api.dart';
+import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
@@ -28,9 +28,9 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
   late bool datetimeIsNow;
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
-    final userId = Api.instance.currentUser!.id;
+    final userId = UserState.instance.currentUser!.id;
     ssd = widget.initial ??
         StrengthSessionDescription(
           strengthSession: StrengthSession(

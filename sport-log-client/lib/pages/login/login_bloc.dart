@@ -54,7 +54,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     if (result.isSuccess) {
       yield LoginState.successful;
       _authenticationBloc.add(auth.LoginEvent(user: result.success));
-      (await DownSync.instance).sync();
+      DownSync.instance.sync();
     } else {
       _handleApiError(result.failure);
       yield LoginState.failed;

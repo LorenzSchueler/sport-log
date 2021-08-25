@@ -6,8 +6,12 @@ import 'package:http/http.dart' as http;
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/api/backend_routes.dart';
+import 'package:sport_log/config.dart';
+import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
+
+export 'api_error.dart';
 
 part 'accessors/action_api.dart';
 part 'accessors/cardio_api.dart';
@@ -30,19 +34,6 @@ class Api {
 
   Api._();
 
-  void setCurrentUser(User user) {
-    _currentUser = user;
-  }
-
-  void removeCurrentUser() {
-    _currentUser = null;
-  }
-
-  void setUrlBase(String base) => _urlBase = base;
-
-  User? get currentUser => _currentUser;
-
-  late final String _urlBase;
+  final String _urlBase = Config.apiUrlBase;
   final _client = http.Client();
-  User? _currentUser;
 }

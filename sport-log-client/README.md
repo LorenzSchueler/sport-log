@@ -11,7 +11,7 @@
 ## Bugs
 * [ ] create movement on the fly does not work
 * [x] usernames/passwords with ':' do not work
-* [ ] app start without internet connection
+* [x] app start without internet connection
 
 ## Ui Improvements
 * [ ] main drawer tabs don't restart scaffold
@@ -31,7 +31,7 @@
 * [ ] handle time zone in all time fields
 
 ## Business Logic/State
-* [ ] runtime id state accessible for whole app (inherited model?)
+* [x] runtime id state accessible for whole app (inherited model?)
 * [ ] length restrictions for string inputs
 * [ ] restrict int numbers coming from user input
 * [ ] push changes in user object to server on up sync
