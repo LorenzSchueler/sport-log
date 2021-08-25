@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_log/api/api.dart';
+import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -18,6 +19,9 @@ class DownSync {
   late final SharedPreferences _storage;
 
   Future<void> sync() async {
+    if (UserState.instance.currentUser == null) {
+      return;
+    }
     final api = Api.instance;
     final lastSync = await _lastSync();
     _storage.setString(Keys.lastSync, DateTime.now().toString());

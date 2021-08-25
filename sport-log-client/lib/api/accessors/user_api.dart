@@ -20,6 +20,7 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       final user =
           User.fromJson(jsonDecode(response.body) as Map<String, dynamic>)
             ..password = password;
+      UserState.instance.setUser(user);
       return Success(user);
     });
   }
