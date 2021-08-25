@@ -1,39 +1,97 @@
-/*
-abstract class ApiAccessor<T> {
+part of 'api.dart';
+
+abstract class ApiAccessor<T> with ApiHeaders, ApiLogging, ApiHelpers {
   // things needed to be overridden
   T fromJson(Map<String, dynamic> json);
   Map<String, dynamic> toJson(T object);
   String get singularRoute; // everything after url base, e. g. '/v1/user'
-  String get pluralRoute;
-
-  // fields
-  final client = Client();
-  final urlBase = Config.apiUrlBase;
+  String get pluralRoute => singularRoute + 's';
 
   // actual methods
-  ApiResult<T> getSingle(Int64? id) async {}
+  ApiResult<T> getSingle(Int64 id) async {
+    return _getRequest(singularRoute + '/$id',
+        (dynamic json) => fromJson(json as Map<String, dynamic>));
+  }
 
-  ApiResult<List<T>> getMultiple() async {}
+  ApiResult<List<T>> getMultiple() async {
+    return _getRequest(
+        pluralRoute,
+        (dynamic json) => (json as List<Map<String, dynamic>>)
+            .map((json) => fromJson(json))
+            .toList());
+  }
 
-  ApiResult<void> postSingle(T object) async {}
+  ApiResult<void> postSingle(T object) async {
+    return _errorHandling((client) async {
+      final body = toJson(object);
+      _logRequest('POST', singularRoute, body);
+      final response = await client.post(
+        _uri(singularRoute),
+        headers: _defaultHeaders,
+        body: jsonEncode(body),
+      );
+      _logResponse(response);
+      if (response.statusCode == 409) {
+        return Failure(ApiError.conflict);
+      }
+      if (response.statusCode < 200 && response.statusCode >= 300) {
+        return Failure(ApiError.unknown);
+      }
+      return Success(null);
+    });
+  }
 
-  ApiResult<void> postMultiple(List<T> objects) async {}
+  ApiResult<void> postMultiple(List<T> objects) async {
+    return _errorHandling((client) async {
+      final body = objects.map(toJson).toList();
+      _logRequest('POST', pluralRoute, body);
+      final response = await client.post(
+        _uri(pluralRoute),
+        headers: _defaultHeaders,
+        body: jsonEncode(body),
+      );
+      _logResponse(response);
+      if (response.statusCode == 409) {
+        return Failure(ApiError.conflict);
+      }
+      if (response.statusCode < 200 && response.statusCode >= 300) {
+        return Failure(ApiError.unknown);
+      }
+      return Success(null);
+    });
+  }
 
-  ApiResult<void> updateSingle(T object) async {}
+  ApiResult<void> updateSingle(T object) async {
+    return _errorHandling((client) async {
+      final body = toJson(object);
+      _logRequest('PUT', singularRoute, body);
+      final response = await client.put(
+        _uri(singularRoute),
+        headers: _defaultHeaders,
+        body: jsonEncode(body),
+      );
+      _logResponse(response);
+      if (response.statusCode < 200 && response.statusCode >= 300) {
+        return Failure(ApiError.unknown);
+      }
+      return Success(null);
+    });
+  }
 
-  ApiResult<void> updateMultiple(List<T> objects) async {}
-
-  // helper methods
-  ApiResult<T> _errorHandling<T>(
-      Future<Result<T, ApiError>> Function(http.Client client) req) async {
-    try {
-      return req(_client);
-    } on SocketException {
-      return Failure(ApiError.noInternetConnection);
-    } catch (e) {
-      _logger.e("Unhandled error: " + e.toString());
-      return Failure(ApiError.unhandled);
-    }
+  ApiResult<void> updateMultiple(List<T> objects) async {
+    return _errorHandling((client) async {
+      final body = objects.map(toJson).toList();
+      _logRequest('PUT', pluralRoute, body);
+      final response = await client.put(
+        _uri(pluralRoute),
+        headers: _defaultHeaders,
+        body: jsonEncode(body),
+      );
+      _logResponse(response);
+      if (response.statusCode < 200 && response.statusCode >= 300) {
+        return Failure(ApiError.unknown);
+      }
+      return Success(null);
+    });
   }
 }
-*/

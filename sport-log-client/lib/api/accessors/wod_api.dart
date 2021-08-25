@@ -1,29 +1,12 @@
 part of '../api.dart';
 
-extension WodRoutes on Api {
-  ApiResult<void> createWod(Wod wod) async {
-    return _post(BackendRoutes.wod, wod);
-  }
+class WodApi extends ApiAccessor<Wod> {
+  @override
+  Wod fromJson(Map<String, dynamic> json) => Wod.fromJson(json);
 
-  ApiResult<void> createWods(List<Wod> wods) async {
-    return _post(BackendRoutes.wod, wods);
-  }
+  @override
+  String get singularRoute => version + '/wod';
 
-  ApiResult<List<Wod>> getWods() async {
-    return _getMultiple(BackendRoutes.wod,
-        fromJson: (json) => Wod.fromJson(json));
-  }
-
-  ApiResult<Wod> getWod(Int64 id) async {
-    return _getSingle(BackendRoutes.wod + '/$id',
-        fromJson: (json) => Wod.fromJson(json));
-  }
-
-  ApiResult<void> updateWod(Wod wod) async {
-    return _put(BackendRoutes.wod, wod);
-  }
-
-  ApiResult<void> updateWods(List<Wod> wods) async {
-    return _put(BackendRoutes.wod, wods);
-  }
+  @override
+  Map<String, dynamic> toJson(Wod object) => object.toJson();
 }

@@ -1,56 +1,86 @@
 part of '../api.dart';
 
-extension UserRoutes on Api {
-  ApiResult<void> createUser(User user) async {
-    final result = await _post(BackendRoutes.user, user,
-        headers: _jsonContentTypeHeader, mapBadStatusToApiError: (statusCode) {
-      if (statusCode == 409) {
-        return ApiError.usernameTaken;
-      }
-    });
-    if (result.isSuccess) {
-      UserState.instance.setUser(user);
-    }
-    return result;
-  }
+class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
+  final String route = version + '/user';
 
-  ApiResult<User> getUser(String username, String password) async {
-    final result = await _getSingle<User>(BackendRoutes.user,
-        fromJson: (json) => User.fromJson(json),
+  ApiResult<User> getSingle(String username, String password) {
+    return _errorHandling<User>((client) async {
+      _logRequest('GET', route);
+      final response = await client.get(
+        _uri(route),
         headers: _makeAuthorizedHeader(username, password),
-        mapBadStatusToApiError: (statusCode) {
-          if (statusCode == 401) {
-            return ApiError.loginFailed;
-          }
-        });
-    if (result.isSuccess) {
-      final user = result.success..password = password;
-      UserState.instance.setUser(user);
-    }
-    return result;
-  }
-
-  ApiResult<void> updateUser(User user) async {
-    final result = await _put(BackendRoutes.user, user);
-    if (result.isSuccess) {
-      UserState.instance.setUser(user);
-    }
-    return result;
-  }
-
-  ApiResult<void> deleteUser() async {
-    return _errorHandling((client) async {
-      final route = BackendRoutes.user;
-      _logRequest('DELETE', route);
-      final response =
-          await client.delete(_uri(route), headers: _authorizedHeader);
+      );
       _logResponse(response);
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        UserState.instance.deleteUser();
-        return Success(null);
+      if (response.statusCode == 401) {
+        return Failure(ApiError.loginFailed);
       }
-      _handleUnknownStatusCode(response);
-      return Failure(ApiError.unknown);
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        return Failure(ApiError.unknown);
+      }
+      final user =
+          User.fromJson(jsonDecode(response.body) as Map<String, dynamic>)
+            ..password = password;
+      return Success(user);
+    });
+  }
+
+  ApiResult<void> postSingle(User user) async {
+    return _errorHandling((client) async {
+      final body = user.toJson();
+      _logRequest('POST', route, body);
+      final response = await client.post(
+        _uri(route),
+        headers: _jsonContentTypeHeader,
+        body: jsonEncode(body),
+      );
+      _logResponse(response);
+      if (response.statusCode == 409) {
+        // TODO: this could also be an id conflict
+        return Failure(ApiError.usernameTaken);
+      }
+      if (response.statusCode < 200 && response.statusCode >= 300) {
+        return Failure(ApiError.unknown);
+      }
+      UserState.instance.setUser(user);
+      return Success(null);
+    });
+  }
+
+  ApiResult<void> updateSingle(User user) async {
+    assert(UserState.instance.currentUser!.id == user.id);
+    return _errorHandling((client) async {
+      final body = user.toJson();
+      _logRequest('PUT', route, body);
+      final response = await client.put(
+        _uri(route),
+        headers: _defaultHeaders,
+        body: jsonEncode(body),
+      );
+      _logResponse(response);
+      if (response.statusCode == 409) {
+        return Failure(ApiError.usernameTaken);
+      }
+      if (response.statusCode < 200 && response.statusCode >= 300) {
+        return Failure(ApiError.unknown);
+      }
+      UserState.instance.setUser(user);
+      return Success(null);
+    });
+  }
+
+  ApiResult<void> deleteSingle() async {
+    return _errorHandling((client) async {
+      _logRequest('DELETE', route);
+      final response = await client.delete(
+        _uri(route),
+        headers: _authorizedHeader,
+      );
+      _logResponse(response);
+      if (response.statusCode < 200 && response.statusCode >= 300) {
+        return Failure(ApiError.unknown);
+      }
+      UserState.instance.deleteUser();
+      return Success(null);
     });
   }
 }

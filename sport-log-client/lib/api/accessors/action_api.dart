@@ -1,93 +1,76 @@
 part of '../api.dart';
 
-extension ActionRoutes on Api {
-  // Action Providers
+class ActionProviderApi extends ApiAccessor<ActionProvider> {
+  @override
+  ActionProvider fromJson(Map<String, dynamic> json) =>
+      ActionProvider.fromJson(json);
 
-  ApiResult<List<ActionProvider>> getActionProviders() async {
-    return _getMultiple(BackendRoutes.actionProvider,
-        fromJson: (json) => ActionProvider.fromJson(json));
-  }
+  @override
+  String get singularRoute => version + '/action_provider';
 
-  ApiResult<ActionProvider> getActionProvider(Int64 id) async {
-    return _getSingle(BackendRoutes.actionProvider + '/$id',
-        fromJson: (json) => ActionProvider.fromJson(json));
-  }
+  @override
+  Map<String, dynamic> toJson(ActionProvider object) => object.toJson();
 
-  // Actions
+  @override
+  ApiResult<void> postSingle(ActionProvider object) =>
+      throw UnimplementedError();
 
-  ApiResult<List<Action>> getActions() async {
-    return _getMultiple(BackendRoutes.action,
-        fromJson: (json) => Action.fromJson(json));
-  }
+  @override
+  ApiResult<void> postMultiple(List<ActionProvider> objects) =>
+      throw UnimplementedError();
 
-  ApiResult<Action> getAction(Int64 id) async {
-    return _getSingle(BackendRoutes.action + '/$id',
-        fromJson: (json) => Action.fromJson(json));
-  }
+  @override
+  ApiResult<void> updateSingle(ActionProvider object) =>
+      throw UnimplementedError();
 
-  // Action Rules
+  @override
+  ApiResult<void> updateMultiple(List<ActionProvider> objects) =>
+      throw UnimplementedError();
+}
 
-  ApiResult<void> createActionRule(ActionRule ar) async {
-    return _post(BackendRoutes.actionRule, ar);
-  }
+class ActionApi extends ApiAccessor<Action> {
+  @override
+  Action fromJson(Map<String, dynamic> json) => Action.fromJson(json);
 
-  ApiResult<void> createActionRules(List<ActionRule> ars) async {
-    return _post(BackendRoutes.actionRule, ars);
-  }
+  @override
+  String get singularRoute => version + '/action';
 
-  ApiResult<List<ActionRule>> getActionRules() async {
-    return _getMultiple(BackendRoutes.actionRule,
-        fromJson: (json) => ActionRule.fromJson(json));
-  }
+  @override
+  Map<String, dynamic> toJson(Action object) => object.toJson();
 
-  ApiResult<ActionRule> getActionRule(Int64 id) async {
-    return _getSingle(BackendRoutes.actionRule + '/$id',
-        fromJson: (json) => ActionRule.fromJson(json));
-  }
+  @override
+  ApiResult<void> postSingle(Action object) => throw UnimplementedError();
 
-  ApiResult<List<ActionRule>> getActionRulesByActionProvider(Int64 id) async {
-    return _getMultiple(BackendRoutes.actionRuleByActionProvider(id),
-        fromJson: (json) => ActionRule.fromJson(json));
-  }
+  @override
+  ApiResult<void> postMultiple(List<Action> objects) =>
+      throw UnimplementedError();
 
-  ApiResult<void> updateActionRule(ActionRule ar) async {
-    return _put(BackendRoutes.actionRule, ar);
-  }
+  @override
+  ApiResult<void> updateSingle(Action object) => throw UnimplementedError();
 
-  ApiResult<void> updateActionRules(List<ActionRule> ars) async {
-    return _put(BackendRoutes.actionRule, ars);
-  }
+  @override
+  ApiResult<void> updateMultiple(List<Action> objects) =>
+      throw UnimplementedError();
+}
 
-  // Action Events
+class ActionRuleApi extends ApiAccessor<ActionRule> {
+  @override
+  ActionRule fromJson(Map<String, dynamic> json) => ActionRule.fromJson(json);
 
-  ApiResult<void> createActionEvent(ActionEvent ae) async {
-    return _post(BackendRoutes.actionEvent, ae);
-  }
+  @override
+  String get singularRoute => version + '/action_rule';
 
-  ApiResult<void> createActionEvents(List<ActionEvent> aes) async {
-    return _post(BackendRoutes.actionEvent, aes);
-  }
+  @override
+  Map<String, dynamic> toJson(ActionRule object) => object.toJson();
+}
 
-  ApiResult<List<ActionEvent>> getActionEvents() async {
-    return _getMultiple(BackendRoutes.actionEvent,
-        fromJson: (json) => ActionEvent.fromJson(json));
-  }
+class ActionEventApi extends ApiAccessor<ActionEvent> {
+  @override
+  ActionEvent fromJson(Map<String, dynamic> json) => ActionEvent.fromJson(json);
 
-  ApiResult<ActionEvent> getActionEvent(Int64 id) async {
-    return _getSingle(BackendRoutes.actionEvent + '/$id',
-        fromJson: (json) => ActionEvent.fromJson(json));
-  }
+  @override
+  String get singularRoute => version + '/action_event';
 
-  ApiResult<List<ActionEvent>> getActionEventsByActionProvider(Int64 id) async {
-    return _getMultiple(BackendRoutes.actionEventByActionProvider(id),
-        fromJson: (json) => ActionEvent.fromJson(json));
-  }
-
-  ApiResult<void> updateActionEvent(ActionEvent ae) async {
-    return _put(BackendRoutes.actionEvent, ae);
-  }
-
-  ApiResult<void> updateActionEvents(List<ActionEvent> aes) async {
-    return _put(BackendRoutes.actionEvent, aes);
-  }
+  @override
+  Map<String, dynamic> toJson(ActionEvent object) => object.toJson();
 }

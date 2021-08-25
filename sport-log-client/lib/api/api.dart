@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:fixnum/fixnum.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/api/backend_routes.dart';
@@ -23,17 +23,12 @@ part 'accessors/strength_api.dart';
 part 'accessors/sync_api.dart';
 part 'accessors/user_api.dart';
 part 'accessors/wod_api.dart';
+part 'api_accessor.dart';
 part 'api_helpers.dart';
 
-final _logger = Logger('API');
-
-typedef ApiResult<T> = Future<Result<T, ApiError>>;
+const String version = '/v1';
 
 class Api {
   static final Api instance = Api._();
-
   Api._();
-
-  final String _urlBase = Config.apiUrlBase;
-  final _client = http.Client();
 }

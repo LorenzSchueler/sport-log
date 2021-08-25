@@ -1,29 +1,15 @@
 part of '../api.dart';
 
-extension DiaryRoutes on Api {
-  ApiResult<void> createDiary(Diary diary) async {
-    return _post(BackendRoutes.diary, diary);
-  }
+class DiaryApi extends ApiAccessor<Diary> {
+  @override
+  Diary fromJson(Map<String, dynamic> json) => Diary.fromJson(json);
 
-  ApiResult<void> createDiaries(List<Diary> diaries) async {
-    return _post(BackendRoutes.diary, diaries);
-  }
+  @override
+  String get singularRoute => version + '/diary';
 
-  ApiResult<List<Diary>> getDiaries() async {
-    return _getMultiple(BackendRoutes.diary,
-        fromJson: (json) => Diary.fromJson(json));
-  }
+  @override
+  String get pluralRoute => version + '/diaries';
 
-  ApiResult<Diary> getDiary(Int64 id) async {
-    return _getSingle(BackendRoutes.diary + '/$id',
-        fromJson: (json) => Diary.fromJson(json));
-  }
-
-  ApiResult<void> updateDiary(Diary diary) async {
-    return _put(BackendRoutes.diary, diary);
-  }
-
-  ApiResult<void> updateDiaries(List<Diary> diaries) async {
-    return _put(BackendRoutes.diary, diaries);
-  }
+  @override
+  Map<String, dynamic> toJson(Diary object) => object.toJson();
 }

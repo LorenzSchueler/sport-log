@@ -1,59 +1,24 @@
 part of '../api.dart';
 
-extension CardioRoutes on Api {
-  // Routes
+class RouteApi extends ApiAccessor<Route> {
+  @override
+  Route fromJson(Map<String, dynamic> json) => Route.fromJson(json);
 
-  ApiResult<void> createRoute(Route route) async {
-    return _post(BackendRoutes.route, route);
-  }
+  @override
+  String get singularRoute => version + '/route';
 
-  ApiResult<void> createRoutes(List<Route> routes) async {
-    return _post(BackendRoutes.route, routes);
-  }
+  @override
+  Map<String, dynamic> toJson(Route object) => object.toJson();
+}
 
-  ApiResult<List<Route>> getRoutes() async {
-    return _getMultiple(BackendRoutes.route,
-        fromJson: (json) => Route.fromJson(json));
-  }
+class CardioSessionApi extends ApiAccessor<CardioSession> {
+  @override
+  CardioSession fromJson(Map<String, dynamic> json) =>
+      CardioSession.fromJson(json);
 
-  ApiResult<Route> getRoute(Int64 id) async {
-    return _getSingle(BackendRoutes.route + '/$id',
-        fromJson: (json) => Route.fromJson(json));
-  }
+  @override
+  String get singularRoute => version + '/cardio_session';
 
-  ApiResult<void> updateRoute(Route route) async {
-    return _put(BackendRoutes.route, route);
-  }
-
-  ApiResult<void> updateRoutes(List<Route> routes) async {
-    return _put(BackendRoutes.route, routes);
-  }
-
-  // Cardio Sessions
-
-  ApiResult<void> createCardioSession(CardioSession cs) async {
-    return _post(BackendRoutes.cardioSession, cs);
-  }
-
-  ApiResult<void> createCardioSessions(List<CardioSession> css) async {
-    return _post(BackendRoutes.cardioSession, css);
-  }
-
-  ApiResult<List<CardioSession>> getCardioSessions() async {
-    return _getMultiple(BackendRoutes.cardioSession,
-        fromJson: (json) => CardioSession.fromJson(json));
-  }
-
-  ApiResult<CardioSession> getCardioSession(Int64 id) async {
-    return _getSingle(BackendRoutes.cardioSession + '/$id',
-        fromJson: (json) => CardioSession.fromJson(json));
-  }
-
-  ApiResult<void> updateCardioSession(CardioSession cs) async {
-    return _put(BackendRoutes.cardioSession, cs);
-  }
-
-  ApiResult<void> updateCardioSessions(List<CardioSession> css) async {
-    return _put(BackendRoutes.cardioSession, css);
-  }
+  @override
+  Map<String, dynamic> toJson(CardioSession object) => object.toJson();
 }

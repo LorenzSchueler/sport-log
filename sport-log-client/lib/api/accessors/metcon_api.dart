@@ -1,92 +1,36 @@
 part of '../api.dart';
 
-extension MetconRoutes on Api {
-  // Metcon Session
+class MetconSessionApi extends ApiAccessor<MetconSession> {
+  @override
+  MetconSession fromJson(Map<String, dynamic> json) =>
+      MetconSession.fromJson(json);
 
-  ApiResult<void> createMetconSession(MetconSession ms) async {
-    return _post(BackendRoutes.metconSession, ms);
-  }
+  @override
+  String get singularRoute => version + '/metcon_session';
 
-  ApiResult<void> createMetconSessions(List<MetconSession> mss) async {
-    return _post(BackendRoutes.metconSession, mss);
-  }
+  @override
+  Map<String, dynamic> toJson(MetconSession object) => object.toJson();
+}
 
-  ApiResult<List<MetconSession>> getMetconSessions() async {
-    return _getMultiple(BackendRoutes.metconSession,
-        fromJson: (json) => MetconSession.fromJson(json));
-  }
+class MetconApi extends ApiAccessor<Metcon> {
+  @override
+  Metcon fromJson(Map<String, dynamic> json) => Metcon.fromJson(json);
 
-  ApiResult<MetconSession> getMetconSession(Int64 id) async {
-    return _getSingle(BackendRoutes.metconSession + '/$id',
-        fromJson: (json) => MetconSession.fromJson(json));
-  }
+  @override
+  String get singularRoute => version + '/metcon';
 
-  ApiResult<void> updateMetconSession(MetconSession ms) async {
-    return _put(BackendRoutes.metconSession, ms);
-  }
+  @override
+  Map<String, dynamic> toJson(Metcon object) => object.toJson();
+}
 
-  ApiResult<void> updateMetconSessions(List<MetconSession> mss) async {
-    return _put(BackendRoutes.metconSession, mss);
-  }
+class MetconMovementApi extends ApiAccessor<MetconMovement> {
+  @override
+  MetconMovement fromJson(Map<String, dynamic> json) =>
+      MetconMovement.fromJson(json);
 
-  // Metcon
+  @override
+  String get singularRoute => version + '/metcon_movement';
 
-  ApiResult<void> createMetcon(Metcon metcon) async {
-    return _post(BackendRoutes.metcon, metcon);
-  }
-
-  ApiResult<void> createMetcons(List<Metcon> metcons) async {
-    return _post(BackendRoutes.metcon, metcons);
-  }
-
-  ApiResult<List<Metcon>> getMetcons() async {
-    return _getMultiple(BackendRoutes.metcon,
-        fromJson: (json) => Metcon.fromJson(json));
-  }
-
-  ApiResult<Metcon> getMetcon(Int64 id) async {
-    return _getSingle(BackendRoutes.metcon + '/$id',
-        fromJson: (json) => Metcon.fromJson(json));
-  }
-
-  ApiResult<void> updateMetcon(Metcon metcon) async {
-    return _put(BackendRoutes.metcon, metcon);
-  }
-
-  ApiResult<void> updateMetcons(List<Metcon> metcons) async {
-    return _put(BackendRoutes.metcon, metcons);
-  }
-
-  // Metcon Movement
-
-  ApiResult<void> createMetconMovement(MetconMovement mm) async {
-    return _post(BackendRoutes.metconMovement, mm);
-  }
-
-  ApiResult<void> createMetconMovements(List<MetconMovement> mms) async {
-    return _post(BackendRoutes.metconMovement, mms);
-  }
-
-  ApiResult<List<MetconMovement>> getMetconMovements() async {
-    return _getMultiple(BackendRoutes.metconMovement,
-        fromJson: (json) => MetconMovement.fromJson(json));
-  }
-
-  ApiResult<MetconMovement> getMetconMovement(Int64 id) async {
-    return _getSingle(BackendRoutes.metconMovement + '/$id',
-        fromJson: (json) => MetconMovement.fromJson(json));
-  }
-
-  ApiResult<List<MetconMovement>> getMetconMovementsByMetcon(Int64 id) async {
-    return _getMultiple(BackendRoutes.metconMovementByMetcon(id),
-        fromJson: (json) => MetconMovement.fromJson(json));
-  }
-
-  ApiResult<void> updateMetconMovement(MetconMovement mm) async {
-    return _put(BackendRoutes.metconMovement, mm);
-  }
-
-  ApiResult<void> updateMetconMovements(List<MetconMovement> mms) async {
-    return _put(BackendRoutes.metconMovement, mms);
-  }
+  @override
+  Map<String, dynamic> toJson(MetconMovement object) => object.toJson();
 }
