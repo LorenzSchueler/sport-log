@@ -21,7 +21,7 @@ class DownSync {
     final api = Api.instance;
     final lastSync = await _lastSync();
     _storage.setString(Keys.lastSync, DateTime.now().toString());
-    final result = await api.getAccountData(lastSync);
+    final result = await api.accountData.get(lastSync);
     if (result.isFailure) {
       // TODO: what to do now?
       _logger.w(

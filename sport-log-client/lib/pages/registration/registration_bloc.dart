@@ -60,7 +60,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
       username: event.username,
       password: event.password,
     );
-    final result = await Api.instance.createUser(user);
+    final result = await Api.instance.user.postSingle(user);
     if (result.isSuccess) {
       yield RegistrationState.successful;
       _authenticationBloc.add(auth.RegisterEvent(user: user));

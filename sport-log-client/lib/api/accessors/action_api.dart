@@ -20,11 +20,11 @@ class ActionProviderApi extends ApiAccessor<ActionProvider> {
       throw UnimplementedError();
 
   @override
-  ApiResult<void> updateSingle(ActionProvider object) =>
+  ApiResult<void> putSingle(ActionProvider object) =>
       throw UnimplementedError();
 
   @override
-  ApiResult<void> updateMultiple(List<ActionProvider> objects) =>
+  ApiResult<void> putMultiple(List<ActionProvider> objects) =>
       throw UnimplementedError();
 }
 
@@ -46,10 +46,10 @@ class ActionApi extends ApiAccessor<Action> {
       throw UnimplementedError();
 
   @override
-  ApiResult<void> updateSingle(Action object) => throw UnimplementedError();
+  ApiResult<void> putSingle(Action object) => throw UnimplementedError();
 
   @override
-  ApiResult<void> updateMultiple(List<Action> objects) =>
+  ApiResult<void> putMultiple(List<Action> objects) =>
       throw UnimplementedError();
 }
 

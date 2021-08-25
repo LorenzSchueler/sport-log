@@ -1,6 +1,6 @@
 part of '../api.dart';
 
-class SyncApi with ApiHeaders, ApiLogging, ApiHelpers {
+class AccountDataApi with ApiHeaders, ApiLogging, ApiHelpers {
   ApiResult<AccountData> get(DateTime? lastSync) async {
     return _getRequest(route(lastSync),
         (dynamic json) => AccountData.fromJson(json as Map<String, dynamic>));

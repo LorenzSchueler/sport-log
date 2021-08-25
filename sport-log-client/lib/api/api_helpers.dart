@@ -46,12 +46,15 @@ mixin ApiLogging {
   }
 
   void _logResponse(Response response) {
-    final body = response.body;
-    if (response.statusCode >= 200 &&
-        response.statusCode < 300 &&
-        body.isNotEmpty) {
-      dynamic jsonObject = jsonDecode(body);
-      logger.d('response: ${response.statusCode}\n${_prettyJson(jsonObject)}');
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      final body = response.body;
+      if (body.isEmpty) {
+        logger.d('response: ${response.statusCode}');
+      } else {
+        dynamic jsonObject = jsonDecode(body);
+        logger
+            .d('response: ${response.statusCode}\n${_prettyJson(jsonObject)}');
+      }
     } else {
       logger.e('response: ${response.statusCode}');
     }

@@ -15,9 +15,9 @@ abstract class ApiAccessor<T> with ApiHeaders, ApiLogging, ApiHelpers {
 
   ApiResult<List<T>> getMultiple() async {
     return _getRequest(
-        pluralRoute,
-        (dynamic json) => (json as List<Map<String, dynamic>>)
-            .map((json) => fromJson(json))
+        singularRoute,
+        (dynamic json) => (json as List<dynamic>)
+            .map((dynamic json) => fromJson(json as Map<String, dynamic>))
             .toList());
   }
 
@@ -61,7 +61,7 @@ abstract class ApiAccessor<T> with ApiHeaders, ApiLogging, ApiHelpers {
     });
   }
 
-  ApiResult<void> updateSingle(T object) async {
+  ApiResult<void> putSingle(T object) async {
     return _errorHandling((client) async {
       final body = toJson(object);
       _logRequest('PUT', singularRoute, body);
@@ -78,7 +78,7 @@ abstract class ApiAccessor<T> with ApiHeaders, ApiLogging, ApiHelpers {
     });
   }
 
-  ApiResult<void> updateMultiple(List<T> objects) async {
+  ApiResult<void> putMultiple(List<T> objects) async {
     return _errorHandling((client) async {
       final body = objects.map(toJson).toList();
       _logRequest('PUT', pluralRoute, body);

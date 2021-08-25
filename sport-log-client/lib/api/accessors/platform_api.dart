@@ -18,10 +18,10 @@ class PlatformApi extends ApiAccessor<Platform> {
       throw UnimplementedError();
 
   @override
-  ApiResult<void> updateSingle(Platform object) => throw UnimplementedError();
+  ApiResult<void> putSingle(Platform object) => throw UnimplementedError();
 
   @override
-  ApiResult<void> updateMultiple(List<Platform> objects) =>
+  ApiResult<void> putMultiple(List<Platform> objects) =>
       throw UnimplementedError();
 }
 

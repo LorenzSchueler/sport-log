@@ -46,7 +46,7 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
     });
   }
 
-  ApiResult<void> updateSingle(User user) async {
+  ApiResult<void> putSingle(User user) async {
     assert(UserState.instance.currentUser!.id == user.id);
     return _errorHandling((client) async {
       final body = user.toJson();
