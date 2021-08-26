@@ -246,7 +246,6 @@ async fn login() -> Result<()> {
                     println!("title: {:?}", title);
                     if title.contains(&exec_action_event.action_name) && title.contains(&time) {
                         println!("entry found");
-                        //row.find_element(By::XPath("./td[3]/div/a"))
                         row.find_element(By::XPath("./td[3]/div"))
                             .await
                             .map_err(Error::WebDriver)?

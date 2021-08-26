@@ -1681,6 +1681,7 @@ dependencies = [
  "geo-types",
  "geoutils",
  "gpx",
+ "lazy_static",
  "rand",
  "reqwest",
  "serde",

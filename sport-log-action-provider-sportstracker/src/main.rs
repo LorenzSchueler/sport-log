@@ -115,7 +115,7 @@ struct Location {
     ln: f64, // lon
     s: u32,  // meter since start
     h: f32,  // height
-    v: u32,  // ??? TODO
+    v: u32,  // ???
     d: u64,  // timestamp in 1 / 1000 s
 }
 
@@ -170,7 +170,6 @@ fn wrong_use() {
     println!("no such options");
 }
 
-// TODO handle connection errors and ignore everything else errors
 async fn fetch() -> Result<()> {
     let config = Config::get()?;
 

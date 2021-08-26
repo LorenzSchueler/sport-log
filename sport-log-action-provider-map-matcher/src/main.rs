@@ -17,12 +17,13 @@
 //!
 //! # Config
 //!
-//! The config file must be called `config.toml` and must be deserializable to a [Config].
+//! The config file must be called `CONFIG.toml` and must be deserializable to a [Config].
 
 use std::{
     env,
     fs::{self, File},
     io::Error as IoError,
+    process,
     result::Result as StdResult,
 };
 
@@ -31,13 +32,14 @@ use err_derive::Error as StdError;
 use geo_types::Point;
 use geoutils::Location as GeoLocation;
 use gpx::{self, errors::Error as GpxError, Gpx, GpxVersion, Track, TrackSegment, Waypoint};
+use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError};
 use serde::{Deserialize, Serialize};
 use toml::de::Error as TomlError;
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
-use sport_log_types::{CardioSession, CardioSessionId, Position, Route, RouteId};
+use sport_log_types::{ActionEventId, CardioSession, CardioSessionId, Position, Route, RouteId};
 use tokio::process::Command;
 
 const NAME: &str = "map-matcher";
@@ -46,15 +48,25 @@ const DESCRIPTION: &str =
 const PLATFORM_NAME: &str = "sport-log";
 
 #[derive(Debug, StdError)]
+enum ConfigError {
+    #[error(display = "{}", _0)]
+    Io(IoError),
+    #[error(display = "{}", _0)]
+    Toml(TomlError),
+}
+
+type ConfigResult<T> = StdResult<T, ConfigError>;
+
+#[derive(Debug, StdError)]
 enum Error {
     #[error(display = "{}", _0)]
     Reqwest(ReqwestError),
     #[error(display = "{}", _0)]
     Io(IoError),
     #[error(display = "{}", _0)]
-    Toml(TomlError),
-    #[error(display = "{}", _0)]
     Gpx(GpxError),
+    #[error(display = "CardioSessionId missing")]
+    CardioSessionIdMissing(ActionEventId),
 }
 
 type Result<T> = StdResult<T, Error>;
@@ -66,9 +78,24 @@ pub struct Config {
 }
 
 impl Config {
-    fn get() -> Result<Self> {
-        toml::from_str(&fs::read_to_string("config.toml").map_err(Error::Io)?).map_err(Error::Toml)
+    fn get() -> ConfigResult<Self> {
+        toml::from_str(&fs::read_to_string("config.toml").map_err(ConfigError::Io)?)
+            .map_err(ConfigError::Toml)
     }
+}
+
+lazy_static! {
+    pub static ref CONFIG: Config = match Config::get() {
+        Ok(config) => config,
+        Err(ConfigError::Io(error)) => {
+            println!("Failed to read config.toml: {}", error);
+            process::exit(1);
+        }
+        Err(ConfigError::Toml(error)) => {
+            println!("Failed to parse config.toml: {}", error);
+            process::exit(1);
+        }
+    };
 }
 
 #[derive(Serialize, Debug)]
@@ -111,12 +138,10 @@ async fn main() -> Result<()> {
 }
 
 async fn setup() -> Result<()> {
-    let config = Config::get()?;
-
     setup_db(
-        &config.base_url,
+        &CONFIG.base_url,
         NAME,
-        &config.password,
+        &CONFIG.password,
         DESCRIPTION,
         PLATFORM_NAME,
         false,
@@ -146,15 +171,13 @@ fn wrong_use() {
 }
 
 async fn map_match() -> Result<()> {
-    let config = Config::get()?;
-
     let client = Client::new();
 
     let exec_action_events = get_events(
         &client,
-        &config.base_url,
+        &CONFIG.base_url,
         NAME,
-        &config.password,
+        &CONFIG.password,
         Duration::hours(-168),
         Duration::hours(0),
     )
@@ -162,96 +185,90 @@ async fn map_match() -> Result<()> {
     .map_err(Error::Reqwest)?;
     println!("executable action events: {}\n", exec_action_events.len());
 
-    let mut delete_action_event_ids = vec![];
+    let mut tasks = vec![];
     for exec_action_event in exec_action_events {
-        println!("{:#?}", exec_action_event);
+        let client = client.clone();
 
-        let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
-        let cardio_session_id: CardioSessionId = match exec_action_event
-            .arguments
-            .map(|arg| arg.parse().ok())
-            .flatten()
-        {
-            Some(arg) => CardioSessionId(arg),
-            None => {
-                println!("action event has no cardion session id as argument");
-                delete_action_event_ids.push(exec_action_event.action_event_id);
-                continue;
-            }
-        };
+        tasks.push(tokio::spawn(async move {
+            println!("{:#?}", exec_action_event);
 
-        let mut cardio_session: CardioSession = client
-            .get(format!(
-                "{}/v1/cardio_session/{}",
-                config.base_url, cardio_session_id.0
-            ))
-            .basic_auth(&username, Some(&config.password))
-            .send()
-            .await
-            .map_err(Error::Reqwest)?
-            .json()
-            .await
-            .map_err(Error::Reqwest)?;
+            let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
 
-        let route = match_to_map(&cardio_session).await?;
+            let cardio_session_id: CardioSessionId = exec_action_event
+                .arguments
+                .map(|arg| arg.parse().ok())
+                .flatten()
+                .map(CardioSessionId)
+                .ok_or(Error::CardioSessionIdMissing(
+                    exec_action_event.action_event_id,
+                ))?;
 
-        let routes: Vec<Route> = client
-            .get(format!("{}/v1/route", config.base_url))
-            .basic_auth(&username, Some(&config.password))
-            .send()
-            .await
-            .map_err(Error::Reqwest)?
-            .json()
-            .await
-            .map_err(Error::Reqwest)?;
-
-        if let Some(route_id) = compare_routes(&route, &routes) {
-            cardio_session.route_id = Some(route_id);
-        } else {
-            match client
-                .post(format!("{}/v1/route", config.base_url))
-                .basic_auth(&username, Some(&config.password))
-                .json(&route)
+            let mut cardio_session: CardioSession = client
+                .get(format!(
+                    "{}/v1/cardio_session/{}",
+                    CONFIG.base_url, cardio_session_id.0
+                ))
+                .basic_auth(&username, Some(&CONFIG.password))
                 .send()
                 .await
                 .map_err(Error::Reqwest)?
-                .status()
-            {
-                status if status.is_success() => {
-                    println!("route saved");
-                }
-                status => {
-                    println!("error (status {:?})", status);
-                    break;
-                }
-            }
-        }
+                .json()
+                .await
+                .map_err(Error::Reqwest)?;
 
-        match client
-            .put(format!("{}/v1/cardio_session", config.base_url))
-            .basic_auth(&username, Some(&config.password))
-            .json(&cardio_session)
-            .send()
-            .await
-            .map_err(Error::Reqwest)?
-            .status()
-        {
-            status if status.is_success() => {
-                println!("cardio session saved");
+            let route = match_to_map(&cardio_session).await?;
+
+            let routes: Vec<Route> = client
+                .get(format!("{}/v1/route", CONFIG.base_url))
+                .basic_auth(&username, Some(&CONFIG.password))
+                .send()
+                .await
+                .map_err(Error::Reqwest)?
+                .json()
+                .await
+                .map_err(Error::Reqwest)?;
+
+            if let Some(route_id) = compare_routes(&route, &routes) {
+                cardio_session.route_id = Some(route_id);
+            } else {
+                client
+                    .post(format!("{}/v1/route", CONFIG.base_url))
+                    .basic_auth(&username, Some(&CONFIG.password))
+                    .json(&route)
+                    .send()
+                    .await
+                    .map_err(Error::Reqwest)?;
             }
-            status => {
-                println!("error (status {:?})", status);
-                break;
-            }
-        }
-        delete_action_event_ids.push(exec_action_event.action_event_id);
+
+            client
+                .put(format!("{}/v1/cardio_session", CONFIG.base_url))
+                .basic_auth(&username, Some(&CONFIG.password))
+                .json(&cardio_session)
+                .send()
+                .await
+                .map_err(Error::Reqwest)?;
+
+            Result::Ok(exec_action_event.action_event_id)
+        }));
     }
+
+    let mut delete_action_event_ids = vec![];
+    for task in tasks {
+        match task.await.unwrap() {
+            Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
+            Err(Error::CardioSessionIdMissing(action_event_id)) => {
+                delete_action_event_ids.push(action_event_id)
+            }
+            Err(error) => println!("{}", error),
+        }
+    }
+
     if !delete_action_event_ids.is_empty() {
         delete_events(
             &client,
-            &config.base_url,
+            &CONFIG.base_url,
             NAME,
-            &config.password,
+            &CONFIG.password,
             &delete_action_event_ids,
         )
         .await
@@ -263,8 +280,7 @@ async fn map_match() -> Result<()> {
 async fn match_to_map(cardio_session: &CardioSession) -> Result<Route> {
     let gpx = to_gpx(cardio_session.track.as_ref().unwrap()); // function only called if track is not None
 
-    let mut rng = rand::thread_rng();
-    let filename = format!("/tmp/map-matcher-{}.gpx", rng.gen::<u64>());
+    let filename = format!("/tmp/map-matcher-{}.gpx", rand::thread_rng().gen::<u64>());
     let filename_result = format!("{}{}", filename, ".res.gpx");
     gpx::write(&gpx, File::create(&filename).map_err(Error::Io)?).map_err(Error::Gpx)?;
 
@@ -376,9 +392,8 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Result<Route> {
         },
     );
 
-    let mut rng = rand::thread_rng();
     Ok(Route {
-        id: RouteId(rng.gen()),
+        id: RouteId(rand::thread_rng().gen()),
         user_id: cardio_session.user_id,
         name: format!("{} workout route", cardio_session.datetime),
         distance: positions.last().unwrap().distance,
