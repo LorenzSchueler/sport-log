@@ -1,7 +1,8 @@
-use std::fs;
+use std::{fs, process};
 
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
+use tracing::error;
 
 /// Server configuration.
 ///
@@ -17,13 +18,20 @@ pub struct Config {
     pub ap_self_registration: bool,
 }
 
-impl Config {
-    pub fn get() -> Self {
-        toml::from_str(&fs::read_to_string("config.toml").expect("config.toml not found"))
-            .expect("config.toml is not valid TOML")
-    }
-}
+const CONFIG_FILE: &str = "config.toml";
 
 lazy_static! {
-    pub static ref CONFIG: Config = Config::get();
+    pub static ref CONFIG: Config = match fs::read_to_string(CONFIG_FILE) {
+        Ok(file) => match toml::from_str(&file) {
+            Ok(config) => config,
+            Err(error) => {
+                error!("Failed to parse config.toml: {}", error);
+                process::exit(1);
+            }
+        },
+        Err(error) => {
+            error!("Failed to read config.toml: {}", error);
+            process::exit(1);
+        }
+    };
 }

@@ -36,26 +36,16 @@ use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError};
 use serde::{Deserialize, Serialize};
-use toml::de::Error as TomlError;
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{ActionEventId, CardioSession, CardioSessionId, Position, Route, RouteId};
 use tokio::process::Command;
 
+const CONFIG_FILE: &str = "config.toml";
 const NAME: &str = "map-matcher";
 const DESCRIPTION: &str =
     "Map Matcher will try to match GPX tracks to the closest path that exists in OSM.";
 const PLATFORM_NAME: &str = "sport-log";
-
-#[derive(Debug, StdError)]
-enum ConfigError {
-    #[error(display = "{}", _0)]
-    Io(IoError),
-    #[error(display = "{}", _0)]
-    Toml(TomlError),
-}
-
-type ConfigResult<T> = StdResult<T, ConfigError>;
 
 #[derive(Debug, StdError)]
 enum Error {
@@ -77,22 +67,17 @@ pub struct Config {
     base_url: String,
 }
 
-impl Config {
-    fn get() -> ConfigResult<Self> {
-        toml::from_str(&fs::read_to_string("config.toml").map_err(ConfigError::Io)?)
-            .map_err(ConfigError::Toml)
-    }
-}
-
 lazy_static! {
-    pub static ref CONFIG: Config = match Config::get() {
-        Ok(config) => config,
-        Err(ConfigError::Io(error)) => {
+    pub static ref CONFIG: Config = match fs::read_to_string(CONFIG_FILE) {
+        Ok(file) => match toml::from_str(&file) {
+            Ok(config) => config,
+            Err(error) => {
+                println!("Failed to parse config.toml: {}", error);
+                process::exit(1);
+            }
+        },
+        Err(error) => {
             println!("Failed to read config.toml: {}", error);
-            process::exit(1);
-        }
-        Err(ConfigError::Toml(error)) => {
-            println!("Failed to parse config.toml: {}", error);
             process::exit(1);
         }
     };
