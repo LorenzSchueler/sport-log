@@ -13,7 +13,7 @@
 //!
 //! The config file must be called `config.toml` and must be deserializable to a [Config](sport_log_types::Config).
 
-use std::io::Cursor;
+use std::{env, io::Cursor};
 
 #[macro_use]
 extern crate rocket;
@@ -95,6 +95,9 @@ impl Fairing for CORS {
 
 #[launch]
 fn rocket() -> _ {
+    env::set_var("RUST_LOG", "warn,sport_log_server=debug");
+    //let _ = tracing_subscriber::fmt::try_init();
+
     dotenv::dotenv().ok();
 
     lazy_static::initialize(&CONFIG);

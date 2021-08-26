@@ -15,3 +15,5 @@ serde_json = "1.0.59"
 dotenv = "0.15.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 lazy_static = "1.4.0"
+tracing = "0.1.26"
+tracing-subscriber = "0.2.20"
