@@ -65,7 +65,7 @@ enum Error {
     Io(IoError),
     #[error(display = "{}", _0)]
     Gpx(GpxError),
-    #[error(display = "CardioSessionId missing")]
+    #[error(display = "ExecutableActionEvent doesn't contain a valid CardioSessionId")]
     CardioSessionIdMissing(ActionEventId),
 }
 
@@ -122,8 +122,8 @@ struct LocationElevation {
 }
 
 #[tokio::main]
-async fn main() -> Result<()> {
-    match &env::args().collect::<Vec<_>>()[1..] {
+async fn main() {
+    let result = match &env::args().collect::<Vec<_>>()[1..] {
         [] => map_match().await,
         [option] if option == "--setup" => setup().await,
         [option] if ["help", "-h", "--help"].contains(&option.as_str()) => {
@@ -134,6 +134,10 @@ async fn main() -> Result<()> {
             wrong_use();
             Ok(())
         }
+    };
+
+    if let Err(error) = result {
+        println!("{}", error);
     }
 }
 
@@ -274,6 +278,7 @@ async fn map_match() -> Result<()> {
         .await
         .map_err(Error::Reqwest)?;
     }
+
     Ok(())
 }
 
@@ -430,7 +435,6 @@ fn compare_routes(route: &Route, routes: &[Route]) -> Option<RouteId> {
             .iter()
             .map(|position| (position.latitude, position.longitude))
             .collect();
-        let mut hits = 0;
         let mut misses = 0;
         let mut cont_misses = 0;
         let mut idx = 0;
@@ -445,7 +449,6 @@ fn compare_routes(route: &Route, routes: &[Route]) -> Option<RouteId> {
                 break 'match_loop;
             }
             if coords[idx] == old_coords[old_idx] {
-                hits += 1;
                 cont_misses = 0;
                 idx += 1;
                 old_idx += 1;
@@ -473,9 +476,6 @@ fn compare_routes(route: &Route, routes: &[Route]) -> Option<RouteId> {
                 break 'match_loop;
             }
         }
-        println!("misses: {}", misses);
-        println!("cont misses: {}", cont_misses);
-        println!("hits: {}", hits);
         if misses > route.track.len() as i32 / MAX_MISSES
             || cont_misses > route.track.len() as i32 / MAX_CONT_MISSES
         {
@@ -484,5 +484,6 @@ fn compare_routes(route: &Route, routes: &[Route]) -> Option<RouteId> {
             return Some(old_route.id);
         }
     }
+
     None
 }
