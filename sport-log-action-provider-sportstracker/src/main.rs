@@ -1,30 +1,20 @@
-use std::{env, fs, io::Error as IoError, result::Result as StdResult};
+use std::{env, fs, process, result::Result as StdResult};
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
-use err_derive::Error as StdError;
+use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError, StatusCode};
 use serde::Deserialize;
-use toml::de::Error as TomlError;
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{CardioSession, CardioSessionId, CardioType, Movement, Position};
 
+const CONFIG_FILE: &str = "config.toml";
 const NAME: &str = "sportstracker-fetch";
 const DESCRIPTION: &str = "Sportstracker Fetch can fetch the latests workouts recorded with sportstracker and save them in your cardio sessions.";
 const PLATFORM_NAME: &str = "sportstracker";
 
-#[derive(Debug, StdError)]
-enum Error {
-    #[error(display = "{}", _0)]
-    Reqwest(ReqwestError),
-    #[error(display = "{}", _0)]
-    Io(IoError),
-    #[error(display = "{}", _0)]
-    Toml(TomlError),
-}
-
-type Result<T> = StdResult<T, Error>;
+type Result<T> = StdResult<T, ReqwestError>;
 
 #[derive(Deserialize)]
 struct Config {
@@ -32,10 +22,20 @@ struct Config {
     base_url: String,
 }
 
-impl Config {
-    fn get() -> Result<Self> {
-        toml::from_str(&fs::read_to_string("config.toml").map_err(Error::Io)?).map_err(Error::Toml)
-    }
+lazy_static! {
+    static ref CONFIG: Config = match fs::read_to_string(CONFIG_FILE) {
+        Ok(file) => match toml::from_str(&file) {
+            Ok(config) => config,
+            Err(error) => {
+                println!("Failed to parse config.toml.: {}", error);
+                process::exit(1);
+            }
+        },
+        Err(error) => {
+            println!("Failed to read config.toml.: {}", error);
+            process::exit(1);
+        }
+    };
 }
 
 #[derive(Deserialize, Debug)]
@@ -136,12 +136,10 @@ async fn main() -> Result<()> {
 }
 
 async fn setup() -> Result<()> {
-    let config = Config::get()?;
-
     setup_db(
-        &config.base_url,
+        &CONFIG.base_url,
         NAME,
-        &config.password,
+        &CONFIG.password,
         DESCRIPTION,
         PLATFORM_NAME,
         true,
@@ -150,7 +148,6 @@ async fn setup() -> Result<()> {
         0,
     )
     .await
-    .map_err(Error::Reqwest)
 }
 
 fn help() {
@@ -171,20 +168,18 @@ fn wrong_use() {
 }
 
 async fn fetch() -> Result<()> {
-    let config = Config::get()?;
-
     let client = Client::new();
 
     let exec_action_events = get_events(
         &client,
-        &config.base_url,
+        &CONFIG.base_url,
         NAME,
-        &config.password,
+        &CONFIG.password,
         Duration::hours(0),
         Duration::hours(1) + Duration::minutes(1),
     )
-    .await
-    .map_err(Error::Reqwest)?;
+    .await?;
+
     println!("executable action events: {}\n", exec_action_events.len());
 
     let mut rng = rand::thread_rng();
@@ -209,14 +204,12 @@ async fn fetch() -> Result<()> {
             let workouts = get_workouts(&client, &token).await?;
             let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
             let movements: Vec<Movement> = client
-                .get(format!("{}/v1/movement", config.base_url))
-                .basic_auth(&username, Some(&config.password))
+                .get(format!("{}/v1/movement", CONFIG.base_url))
+                .basic_auth(&username, Some(&CONFIG.password))
                 .send()
-                .await
-                .map_err(Error::Reqwest)?
+                .await?
                 .json::<Vec<Movement>>()
-                .await
-                .map_err(Error::Reqwest)?
+                .await?
                 .into_iter()
                 .map(|mut movement| {
                     movement.name.make_ascii_lowercase();
@@ -280,12 +273,11 @@ async fn fetch() -> Result<()> {
                 };
                 //println!("{:?}", cardio_session);
                 match client
-                    .post(format!("{}/v1/cardio_session", config.base_url))
-                    .basic_auth(&username, Some(&config.password))
+                    .post(format!("{}/v1/cardio_session", CONFIG.base_url))
+                    .basic_auth(&username, Some(&CONFIG.password))
                     .json(&cardio_session)
                     .send()
-                    .await
-                    .map_err(Error::Reqwest)?
+                    .await?
                     .status()
                 {
                     status if status.is_success() => {
@@ -312,13 +304,12 @@ async fn fetch() -> Result<()> {
     if !delete_action_event_ids.is_empty() {
         delete_events(
             &client,
-            &config.base_url,
+            &CONFIG.base_url,
             NAME,
-            &config.password,
+            &CONFIG.password,
             &delete_action_event_ids,
         )
-        .await
-        .map_err(Error::Reqwest)?;
+        .await?;
     }
     Ok(())
 }
@@ -333,11 +324,9 @@ async fn get_token(
         .post("https://api.sports-tracker.com/apiserver/v1/login")
         .form(&credentials)
         .send()
-        .await
-        .map_err(Error::Reqwest)?
+        .await?
         .json()
-        .await
-        .map_err(Error::Reqwest)?;
+        .await?;
 
     Ok(user.session_key.map(|key| ("token", key)))
 }
@@ -347,11 +336,9 @@ async fn get_workouts(client: &Client, token: &(&str, &str)) -> Result<Vec<Worko
         .get("https://api.sports-tracker.com/apiserver/v1/workouts")
         .query(&[token])
         .send()
-        .await
-        .map_err(Error::Reqwest)?
+        .await?
         .json()
-        .await
-        .map_err(Error::Reqwest)?;
+        .await?;
 
     Ok(workouts.payload)
 }
@@ -370,11 +357,9 @@ async fn get_workout_data(
         ))
         .query(&[token, samples])
         .send()
-        .await
-        .map_err(Error::Reqwest)?
+        .await?
         .json::<WorkoutDataWrapper>()
-        .await
-        .map_err(Error::Reqwest)?
+        .await?
         .payload)
 }
 

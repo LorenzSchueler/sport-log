@@ -14,3 +14,4 @@ serde = { version = "1.0.117", features = ["derive"] }
 toml = "0.5.8"
 rand = "0.8.4"
 err-derive = "0.3.0"
+lazy_static = "1.4.0"

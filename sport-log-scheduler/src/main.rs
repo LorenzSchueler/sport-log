@@ -19,28 +19,19 @@
 //!
 //! The config file must be called `sport-log-scheduler.toml` and must be deserializable to a [Config].
 
-use std::{fs, io::Error as IoError, result::Result as StdResult};
+use std::{fs, process, result::Result as StdResult};
 
 use chrono::{Datelike, Duration, Utc};
-use err_derive::Error as StdError;
+use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{blocking::Client, Error as ReqwestError};
 use serde::Deserialize;
-use toml::de::Error as TomlError;
 
 use sport_log_types::{ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent};
 
-#[derive(Debug, StdError)]
-enum Error {
-    #[error(display = "{}", _0)]
-    Reqwest(ReqwestError),
-    #[error(display = "{}", _0)]
-    Io(IoError),
-    #[error(display = "{}", _0)]
-    Toml(TomlError),
-}
+const CONFIG_FILE: &str = "config.toml";
 
-type Result<T> = StdResult<T, Error>;
+type Result<T> = StdResult<T, ReqwestError>;
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -48,25 +39,32 @@ pub struct Config {
     pub base_url: String,
 }
 
-impl Config {
-    fn get() -> Result<Self> {
-        toml::from_str(&fs::read_to_string("config.toml").map_err(Error::Io)?).map_err(Error::Toml)
-    }
+lazy_static! {
+    static ref CONFIG: Config = match fs::read_to_string(CONFIG_FILE) {
+        Ok(file) => match toml::from_str(&file) {
+            Ok(config) => config,
+            Err(error) => {
+                println!("Failed to parse config.toml...: {}", error);
+                process::exit(1);
+            }
+        },
+        Err(error) => {
+            println!("Failed to read config.toml...: {}", error);
+            process::exit(1);
+        }
+    };
 }
 
 fn main() -> Result<()> {
-    let config = Config::get()?;
     let username = "admin";
 
     let client = Client::new();
 
     let creatable_action_rules: Vec<CreatableActionRule> = client
-        .get(format!("{}/v1/adm/creatable_action_rule", config.base_url))
-        .basic_auth(username, Some(&config.admin_password))
-        .send()
-        .map_err(Error::Reqwest)?
-        .json()
-        .map_err(Error::Reqwest)?;
+        .get(format!("{}/v1/adm/creatable_action_rule", CONFIG.base_url))
+        .basic_auth(username, Some(&CONFIG.admin_password))
+        .send()?
+        .json()?;
 
     println!("{:#?}", creatable_action_rules);
 
@@ -107,19 +105,16 @@ fn main() -> Result<()> {
     println!("{:#?}", action_events);
 
     client
-        .post(format!("{}/v1/adm/action_events", config.base_url))
-        .basic_auth(username, Some(&config.admin_password))
+        .post(format!("{}/v1/adm/action_events", CONFIG.base_url))
+        .basic_auth(username, Some(&CONFIG.admin_password))
         .json(&action_events)
-        .send()
-        .map_err(Error::Reqwest)?;
+        .send()?;
 
     let deletable_action_events: Vec<DeletableActionEvent> = client
-        .get(format!("{}/v1/adm/deletable_action_event", config.base_url))
-        .basic_auth(username, Some(&config.admin_password))
-        .send()
-        .map_err(Error::Reqwest)?
-        .json()
-        .map_err(Error::Reqwest)?;
+        .get(format!("{}/v1/adm/deletable_action_event", CONFIG.base_url))
+        .basic_auth(username, Some(&CONFIG.admin_password))
+        .send()?
+        .json()?;
 
     println!("{:#?}", deletable_action_events);
 
@@ -136,10 +131,10 @@ fn main() -> Result<()> {
     println!("{:#?}", action_event_ids);
 
     client
-        .delete(format!("{}/v1/adm/action_events", config.base_url,))
-        .basic_auth(username, Some(&config.admin_password))
+        .delete(format!("{}/v1/adm/action_events", CONFIG.base_url,))
+        .basic_auth(username, Some(&CONFIG.admin_password))
         .json(&action_event_ids)
-        .send()
-        .map_err(Error::Reqwest)?;
+        .send()?;
+
     Ok(())
 }

@@ -1,19 +1,21 @@
 use std::{
-    env, fs, io::Error as IoError, result::Result as StdResult, time::Duration as StdDuration,
+    env, fs, io::Error as IoError, process, result::Result as StdResult,
+    time::Duration as StdDuration,
 };
 
 use chrono::{Duration, Local, Utc};
 use err_derive::Error as StdError;
+use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError, StatusCode};
 use serde::Deserialize;
 use thirtyfour::{error::WebDriverError, prelude::*};
 use tokio::{process::Command, time};
-use toml::de::Error as TomlError;
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{Wod, WodId};
 
+const CONFIG_FILE: &str = "config.toml";
 const NAME: &str = "wodify-wod";
 const DESCRIPTION: &str =
     "Wodify Wod can fetch the Workout of the Day and save it in your wods. The action names correspond to the class type the wod should be fetched for.";
@@ -26,8 +28,6 @@ enum Error {
     #[error(display = "{}", _0)]
     Io(IoError),
     #[error(display = "{}", _0)]
-    Toml(TomlError),
-    #[error(display = "{}", _0)]
     WebDriver(WebDriverError),
 }
 
@@ -39,10 +39,20 @@ struct Config {
     base_url: String,
 }
 
-impl Config {
-    fn get() -> Result<Self> {
-        toml::from_str(&fs::read_to_string("config.toml").map_err(Error::Io)?).map_err(Error::Toml)
-    }
+lazy_static! {
+    static ref CONFIG: Config = match fs::read_to_string(CONFIG_FILE) {
+        Ok(file) => match toml::from_str(&file) {
+            Ok(config) => config,
+            Err(error) => {
+                println!("Failed to parse config.toml: {}", error);
+                process::exit(1);
+            }
+        },
+        Err(error) => {
+            println!("Failed to read config.toml: {}", error);
+            process::exit(1);
+        }
+    };
 }
 
 #[tokio::main]
@@ -62,12 +72,10 @@ async fn main() -> Result<()> {
 }
 
 async fn setup() -> Result<()> {
-    let config = Config::get()?;
-
     setup_db(
-        &config.base_url,
+        &CONFIG.base_url,
         NAME,
-        &config.password,
+        &CONFIG.password,
         DESCRIPTION,
         PLATFORM_NAME,
         true,
@@ -110,15 +118,13 @@ fn wrong_use() {
 }
 
 async fn login() -> Result<()> {
-    let config = Config::get()?;
-
     let client = Client::new();
 
     let exec_action_events = get_events(
         &client,
-        &config.base_url,
+        &CONFIG.base_url,
         NAME,
-        &config.password,
+        &CONFIG.password,
         Duration::hours(0),
         Duration::days(1) + Duration::minutes(1),
     )
@@ -263,8 +269,8 @@ async fn login() -> Result<()> {
         };
 
         if client
-            .post(format!("{}/v1/wod", config.base_url,))
-            .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&config.password))
+            .post(format!("{}/v1/wod", CONFIG.base_url,))
+            .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&CONFIG.password))
             .json(&wod)
             .send()
             .await
@@ -273,8 +279,8 @@ async fn login() -> Result<()> {
         {
             let today = Local::today().naive_local().format("%Y-%m-%d");
             let wods: Vec<Wod> = client
-                .get(format!("{}/v1/wod/timespan/{}/{}", config.base_url, today, today))
-                .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&config.password))
+                .get(format!("{}/v1/wod/timespan/{}/{}", CONFIG.base_url, today, today))
+                .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&CONFIG.password))
                 .send()
                 .await
                 .map_err(Error::Reqwest)?
@@ -291,8 +297,8 @@ async fn login() -> Result<()> {
                 wod.description = Some(description);
             }
             client
-                .put(format!("{}/v1/wod", config.base_url,))
-                .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&config.password))
+                .put(format!("{}/v1/wod", CONFIG.base_url,))
+                .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&CONFIG.password))
                 .json(&wod)
                 .send()
                 .await
@@ -308,9 +314,9 @@ async fn login() -> Result<()> {
     if !delete_action_event_ids.is_empty() {
         delete_events(
             &client,
-            &config.base_url,
+            &CONFIG.base_url,
             NAME,
-            &config.password,
+            &CONFIG.password,
             &delete_action_event_ids,
         )
         .await

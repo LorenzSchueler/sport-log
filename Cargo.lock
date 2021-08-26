@@ -1697,6 +1697,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "err-derive",
+ "lazy_static",
  "rand",
  "reqwest",
  "serde",
@@ -1712,6 +1713,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "err-derive",
+ "lazy_static",
  "rand",
  "reqwest",
  "serde",
@@ -1728,6 +1730,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "err-derive",
+ "lazy_static",
  "rand",
  "reqwest",
  "serde",
@@ -1770,6 +1773,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "err-derive",
+ "lazy_static",
  "rand",
  "reqwest",
  "serde",
