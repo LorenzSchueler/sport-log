@@ -9,6 +9,7 @@ use lazy_static::lazy_static;
 use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
 use thirtyfour::{error::WebDriverError, prelude::*};
+use tracing::{debug, error, info, warn};
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use tokio::{process::Command, time};
@@ -42,30 +43,39 @@ lazy_static! {
         Ok(file) => match toml::from_str(&file) {
             Ok(config) => config,
             Err(error) => {
-                println!("Failed to parse config.toml.: {}", error);
+                error!("Failed to parse config.toml.: {}", error);
                 process::exit(1);
             }
         },
         Err(error) => {
-            println!("Failed to read config.toml.: {}", error);
+            error!("Failed to read config.toml.: {}", error);
             process::exit(1);
         }
     };
 }
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() {
+    env::set_var(
+        "RUST_LOG",
+        "warn,sport_log_action_provider_wodify_login=debug",
+    );
+
+    tracing_subscriber::fmt::init();
+
     match &env::args().collect::<Vec<_>>()[1..] {
-        [] => login().await,
-        [option] if option == "--setup" => setup().await,
-        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => {
-            help();
-            Ok(())
+        [] => {
+            if let Err(error) = login().await {
+                error!("login failed: {}", error);
+            }
         }
-        _ => {
-            wrong_use();
-            Ok(())
+        [option] if option == "--setup" => {
+            if let Err(error) = setup().await {
+                error!("setup failed: {}", error);
+            }
         }
+        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
+        _ => wrong_use(),
     }
 }
 
@@ -119,7 +129,8 @@ async fn login() -> Result<()> {
     )
     .await
     .map_err(Error::Reqwest)?;
-    println!("executable action events: {}\n", exec_action_events.len());
+
+    info!("got {} executable action events", exec_action_events.len());
 
     if exec_action_events.is_empty() {
         return Ok(());
@@ -139,14 +150,14 @@ async fn login() -> Result<()> {
     let mut delete_action_event_ids = vec![];
     // TODO execute in parallel
     for exec_action_event in exec_action_events {
-        println!("{:#?}", exec_action_event);
+        info!("processing {:#?}", exec_action_event);
 
         let (username, password) = if let (Some(username), Some(password)) =
             (exec_action_event.username, exec_action_event.password)
         {
             (username, password)
         } else {
-            println!("not credential provided");
+            warn!("can not log in: no credential provided");
             continue;
         };
 
@@ -156,9 +167,6 @@ async fn login() -> Result<()> {
             .format("%-H:%M")
             .to_string();
         let date = exec_action_event.datetime.format("%m/%d/%Y").to_string();
-        println!("time: {:?}", time);
-        println!("date: {:?}", date);
-        println!("{:?}", exec_action_event.action_name);
 
         driver
             .delete_all_cookies()
@@ -199,28 +207,26 @@ async fn login() -> Result<()> {
             .await
             .is_err()
         {
-            println!("login failed");
+            warn!("login failed");
             continue;
         }
-        println!("login successful");
+        info!("login successful");
 
         if let Ok(duration) = (exec_action_event.datetime - Duration::days(1) - Utc::now()).to_std()
         {
             time::sleep(duration).await;
         }
-        println!("ready");
+        debug!("ready");
 
         'event_loop: while Utc::now() < exec_action_event.datetime
         // - Duration::days(1) + Duration::minutes(1) // TODO
         {
             driver.refresh().await.map_err(Error::WebDriver)?; // TODO can this be removed?
-            println!("searching");
 
             let rows = driver
                 .find_elements(By::XPath("//table[@class='TableRecords']/tbody/tr"))
                 .await
                 .map_err(Error::WebDriver)?;
-            println!("rows: {:?}", rows.len());
 
             let mut row_number = rows.len();
             for (i, row) in rows.iter().enumerate() {
@@ -234,13 +240,11 @@ async fn login() -> Result<()> {
                         .map_err(Error::WebDriver)?
                         .contains(&date)
                     {
-                        println!("day found");
                         row_number = i;
                         break;
                     }
                 }
             }
-            println!("row number: {:?}", row_number);
 
             for row in &rows[row_number + 1..] {
                 if let Ok(label) = row.find_element(By::XPath("./td[1]/div/span")).await {
@@ -249,16 +253,14 @@ async fn login() -> Result<()> {
                         .await
                         .map_err(Error::WebDriver)?
                         .unwrap();
-                    println!("title: {:?}", title);
                     if title.contains(&exec_action_event.action_name) && title.contains(&time) {
-                        println!("entry found");
                         row.find_element(By::XPath("./td[3]/div"))
                             .await
                             .map_err(Error::WebDriver)?
                             .click()
                             .await
                             .map_err(Error::WebDriver)?;
-                        println!("reserved");
+                        info!("reserved");
                         time::sleep(StdDuration::from_secs(2)).await; // TODO remove
 
                         delete_action_event_ids.push(exec_action_event.action_event_id);
@@ -268,7 +270,10 @@ async fn login() -> Result<()> {
             }
         }
     }
-    println!("delete event ids: {:?}", delete_action_event_ids);
+
+    info!("deleting {} action event", delete_action_event_ids.len());
+    debug!("delete event ids: {:?}", delete_action_event_ids);
+
     if !delete_action_event_ids.is_empty() {
         delete_events(
             &client,
@@ -281,10 +286,10 @@ async fn login() -> Result<()> {
         .map_err(Error::Reqwest)?;
     }
 
-    println!("closing browser");
+    info!("closing browser");
     driver.quit().await.map_err(Error::WebDriver)?;
 
-    println!("terminating webdriver");
+    info!("terminating webdriver");
     let _ = webdriver.kill();
 
     Ok(())
