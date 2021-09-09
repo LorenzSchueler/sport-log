@@ -11,6 +11,7 @@ use reqwest::{Client, Error as ReqwestError, StatusCode};
 use serde::Deserialize;
 use thirtyfour::{error::WebDriverError, prelude::*};
 use tokio::{process::Command, time};
+use tracing::{debug, error, info, warn};
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{Wod, WodId};
@@ -44,30 +45,39 @@ lazy_static! {
         Ok(file) => match toml::from_str(&file) {
             Ok(config) => config,
             Err(error) => {
-                println!("Failed to parse config.toml: {}", error);
+                error!("Failed to parse config.toml: {}", error);
                 process::exit(1);
             }
         },
         Err(error) => {
-            println!("Failed to read config.toml: {}", error);
+            error!("Failed to read config.toml: {}", error);
             process::exit(1);
         }
     };
 }
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() {
+    env::set_var(
+        "RUST_LOG",
+        "warn,sport_log_action_provider_wodify_wod=debug",
+    );
+
+    tracing_subscriber::fmt::init();
+
     match &env::args().collect::<Vec<_>>()[1..] {
-        [] => login().await,
-        [option] if option == "--setup" => setup().await,
-        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => {
-            help();
-            Ok(())
+        [] => {
+            if let Err(error) = login().await {
+                error!("login failed: {}", error);
+            }
         }
-        _ => {
-            wrong_use();
-            Ok(())
+        [option] if option == "--setup" => {
+            if let Err(error) = setup().await {
+                error!("login failed: {}", error);
+            }
         }
+        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
+        _ => wrong_use(),
     }
 }
 
@@ -130,7 +140,8 @@ async fn login() -> Result<()> {
     )
     .await
     .map_err(Error::Reqwest)?;
-    println!("executable action events: {}\n", exec_action_events.len());
+
+    info!("got {} executable action events", exec_action_events.len());
 
     if exec_action_events.is_empty() {
         return Ok(());
@@ -152,22 +163,16 @@ async fn login() -> Result<()> {
     let mut delete_action_event_ids = vec![];
     // TODO execute in parallel
     for exec_action_event in exec_action_events {
-        println!("{:#?}", exec_action_event);
+        info!("processing: {:#?}", exec_action_event);
 
         let (username, password) = if let (Some(username), Some(password)) =
             (exec_action_event.username, exec_action_event.password)
         {
             (username, password)
         } else {
-            println!("not credential provided");
+            warn!("can not log in: no credential provided");
             continue;
         };
-
-        let time = exec_action_event.datetime.format("%-H:%M").to_string();
-        let date = exec_action_event.datetime.format("%m/%d/%Y").to_string();
-        println!("time: {}", time);
-        println!("date: {}", date);
-        println!("name: {}", exec_action_event.action_name);
 
         driver
             .delete_all_cookies()
@@ -208,10 +213,10 @@ async fn login() -> Result<()> {
             .await
             .is_err()
         {
-            println!("login failed");
+            warn!("login failed");
             continue;
         }
-        println!("login successful");
+        debug!("login successful");
 
         // select wod type
         //let type_picker = driver
@@ -258,7 +263,7 @@ async fn login() -> Result<()> {
                 description += &content;
                 description += "\n";
         }
-        println!("{}", description);
+
         let wod = Wod {
             id: WodId(rng.gen()),
             user_id: exec_action_event.user_id,
@@ -268,49 +273,56 @@ async fn login() -> Result<()> {
             deleted: false,
         };
 
-        if client
+        let response = client
             .post(format!("{}/v1/wod", CONFIG.base_url,))
             .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&CONFIG.password))
             .json(&wod)
             .send()
             .await
-            .map_err(Error::Reqwest)?
-            .status() == StatusCode::CONFLICT
-        {
-            let today = Local::today().naive_local().format("%Y-%m-%d");
-            let wods: Vec<Wod> = client
-                .get(format!("{}/v1/wod/timespan/{}/{}", CONFIG.base_url, today, today))
-                .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&CONFIG.password))
-                .send()
-                .await
-                .map_err(Error::Reqwest)?
-                .json()
-                .await
-                .map_err(Error::Reqwest)?;
-            let mut wod = wods
-                .into_iter()
-                .next()
-                .expect("server returned multiple wods for the same date");
-            if let Some(old_description) = wod.description {
-                wod.description = Some(old_description + &description) ;
-            } else {
-                wod.description = Some(description);
+            .map_err(Error::Reqwest)?;
+        match response.status() {
+            StatusCode::CONFLICT => {
+                let today = Local::today().naive_local().format("%Y-%m-%d");
+                let wods: Vec<Wod> = client
+                    .get(format!("{}/v1/wod/timespan/{}/{}", CONFIG.base_url, today, today))
+                    .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&CONFIG.password))
+                    .send()
+                    .await
+                    .map_err(Error::Reqwest)?
+                    .json()
+                    .await
+                    .map_err(Error::Reqwest)?;
+                let mut wod = wods
+                    .into_iter()
+                    .next()
+                    .expect("server returned multiple wods for the same date");
+                if let Some(old_description) = wod.description {
+                    wod.description = Some(old_description + &description) ;
+                } else {
+                    wod.description = Some(description);
+                }
+                client
+                    .put(format!("{}/v1/wod", CONFIG.base_url,))
+                    .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&CONFIG.password))
+                    .json(&wod)
+                    .send()
+                    .await
+                    .map_err(Error::Reqwest)?;
             }
-            client
-                .put(format!("{}/v1/wod", CONFIG.base_url,))
-                .basic_auth(format!("{}$id${}", NAME , exec_action_event.user_id.0), Some(&CONFIG.password))
-                .json(&wod)
-                .send()
-                .await
-                .map_err(Error::Reqwest)?;
+            StatusCode::OK => {
+                info!("new wod created");
             }
-        } else {
-            println!("not wod found");
+            _ => {
+                response.json::<Wod>().await.map_err(Error::Reqwest)?; // this will always fail and return the error
+            }
         }
         delete_action_event_ids.push(exec_action_event.action_event_id);
     }
+    }
 
-    println!("delete event ids: {:?}", delete_action_event_ids);
+    info!("deleting {} action events", delete_action_event_ids.len());
+    debug!("delete event ids: {:?}", delete_action_event_ids);
+
     if !delete_action_event_ids.is_empty() {
         delete_events(
             &client,
@@ -323,10 +335,10 @@ async fn login() -> Result<()> {
         .map_err(Error::Reqwest)?;
     }
 
-    println!("closing browser");
+    info!("closing browser");
     driver.quit().await.map_err(Error::WebDriver)?;
 
-    println!("terminating webdriver");
+    info!("terminating webdriver");
     let _ = webdriver.kill();
 
     Ok(())
