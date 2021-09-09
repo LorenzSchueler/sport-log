@@ -26,6 +26,7 @@ pub mod platform;
 pub mod strength;
 pub mod user;
 
+#[derive(Debug)]
 pub struct JsonError {
     pub status: Status,
     pub message: Option<String>,

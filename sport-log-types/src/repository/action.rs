@@ -13,7 +13,7 @@ impl Create for ActionProvider {
     fn create(mut action_provider: Self, conn: &PgConnection) -> QueryResult<Self> {
         let salt = SaltString::generate(&mut OsRng);
         action_provider.password = Argon2::default()
-            .hash_password_simple(action_provider.password.as_bytes(), salt.as_ref())
+            .hash_password(action_provider.password.as_bytes(), salt.as_ref())
             .unwrap()
             .to_string();
 
