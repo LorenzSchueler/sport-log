@@ -13,51 +13,31 @@
 //!
 //! The config file must be called `config.toml` and must be deserializable to a [Config](sport_log_types::Config).
 
-use std::{env, io::Cursor};
+use std::env;
 
 #[macro_use]
 extern crate rocket;
 
 use rocket::{
     fairing::{Fairing, Info, Kind},
-    http::{ContentType, Header, Method, Status},
-    response::Responder,
+    http::{Header, Method, Status},
     Request, Response,
 };
-use serde::{Deserialize, Serialize};
 
 use sport_log_types::{Db, CONFIG};
 
 mod handler;
 
+use handler::JsonError;
+
 const BASE: &str = "/v1";
-
-struct JsonError {
-    status: Status,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct ErrorMessage {
-    pub status: u16,
-}
-
-impl<'r, 'o: 'r> Responder<'r, 'o> for JsonError {
-    fn respond_to(self, _request: &'r Request<'_>) -> Result<Response<'o>, Status> {
-        let json = serde_json::to_string(&ErrorMessage {
-            status: self.status.code,
-        })
-        .map_err(|_| Status::InternalServerError)?;
-        Ok(Response::build()
-            .status(self.status)
-            .header(ContentType::JSON)
-            .sized_body(json.len(), Cursor::new(json))
-            .finalize())
-    }
-}
 
 #[catch(default)]
 fn default_catcher(status: Status, _request: &Request) -> JsonError {
-    JsonError { status }
+    JsonError {
+        status,
+        message: None,
+    }
 }
 
 // TODO only send preflight if route exists
@@ -66,7 +46,10 @@ fn catcher_404(status: Status, request: &Request) -> Result<Status, JsonError> {
     if request.method() == Method::Options {
         Ok(Status::NoContent)
     } else {
-        Err(JsonError { status })
+        Err(JsonError {
+            status,
+            message: None,
+        })
     }
 }
 

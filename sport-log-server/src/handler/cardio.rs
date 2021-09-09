@@ -1,5 +1,3 @@
-use rocket::{http::Status, serde::json::Json};
-
 use sport_log_types::{
     AuthUserOrAP, CardioSession, CardioSessionDescription, CardioSessionId, Create, CreateMultiple,
     Db, GetById, GetByUser, Route, RouteId, Unverified, UnverifiedId, Update,
@@ -7,15 +5,20 @@ use sport_log_types::{
     VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
 };
 
-use crate::handler::{DateTimeWrapper, IntoJson};
+use crate::handler::{DateTimeWrapper, IntoJson, JsonError, JsonResult};
 
 #[post("/route", format = "application/json", data = "<route>")]
 pub async fn create_route(
     route: Unverified<Route>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Route>, Status> {
-    let route = route.verify_user_ap_without_db(&auth)?;
+) -> JsonResult<Route> {
+    let route = route
+        .verify_user_ap_without_db(&auth)
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| Route::create(route, c)).await.into_json()
 }
 
@@ -24,8 +27,13 @@ pub async fn create_routes(
     routes: Unverified<Vec<Route>>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<Route>>, Status> {
-    let routes = routes.verify_user_ap_without_db(&auth)?;
+) -> JsonResult<Vec<Route>> {
+    let routes = routes
+        .verify_user_ap_without_db(&auth)
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| Route::create_multiple(routes, c))
         .await
         .into_json()
@@ -36,15 +44,21 @@ pub async fn get_route(
     route_id: UnverifiedId<RouteId>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Route>, Status> {
-    let route_id = conn.run(move |c| route_id.verify_user_ap(&auth, c)).await?;
+) -> JsonResult<Route> {
+    let route_id = conn
+        .run(move |c| route_id.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(move |c| Route::get_by_id(route_id, c))
         .await
         .into_json()
 }
 
 #[get("/route")]
-pub async fn get_routes(auth: AuthUserOrAP, conn: Db) -> Result<Json<Vec<Route>>, Status> {
+pub async fn get_routes(auth: AuthUserOrAP, conn: Db) -> JsonResult<Vec<Route>> {
     conn.run(move |c| Route::get_by_user(*auth, c))
         .await
         .into_json()
@@ -55,8 +69,14 @@ pub async fn update_route(
     route: Unverified<Route>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Route>, Status> {
-    let route = conn.run(move |c| route.verify_user_ap(&auth, c)).await?;
+) -> JsonResult<Route> {
+    let route = conn
+        .run(move |c| route.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| Route::update(route, c)).await.into_json()
 }
 
@@ -65,8 +85,14 @@ pub async fn update_routes(
     routes: Unverified<Vec<Route>>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<Route>>, Status> {
-    let routes = conn.run(move |c| routes.verify_user_ap(&auth, c)).await?;
+) -> JsonResult<Vec<Route>> {
+    let routes = conn
+        .run(move |c| routes.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| Route::update_multiple(routes, c))
         .await
         .into_json()
@@ -81,8 +107,13 @@ pub async fn create_cardio_session(
     cardio_session: Unverified<CardioSession>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<CardioSession>, Status> {
-    let cardio_session = cardio_session.verify_user_ap_without_db(&auth)?;
+) -> JsonResult<CardioSession> {
+    let cardio_session = cardio_session
+        .verify_user_ap_without_db(&auth)
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| CardioSession::create(cardio_session, c))
         .await
         .into_json()
@@ -97,8 +128,13 @@ pub async fn create_cardio_sessions(
     cardio_sessions: Unverified<Vec<CardioSession>>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<CardioSession>>, Status> {
-    let cardio_sessions = cardio_sessions.verify_user_ap_without_db(&auth)?;
+) -> JsonResult<Vec<CardioSession>> {
+    let cardio_sessions = cardio_sessions
+        .verify_user_ap_without_db(&auth)
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| CardioSession::create_multiple(cardio_sessions, c))
         .await
         .into_json()
@@ -109,20 +145,21 @@ pub async fn get_cardio_session(
     cardio_session_id: UnverifiedId<CardioSessionId>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<CardioSession>, Status> {
+) -> JsonResult<CardioSession> {
     let cardio_session_id = conn
         .run(move |c| cardio_session_id.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(move |c| CardioSession::get_by_id(cardio_session_id, c))
         .await
         .into_json()
 }
 
 #[get("/cardio_session")]
-pub async fn get_cardio_sessions(
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Json<Vec<CardioSession>>, Status> {
+pub async fn get_cardio_sessions(auth: AuthUserOrAP, conn: Db) -> JsonResult<Vec<CardioSession>> {
     conn.run(move |c| CardioSession::get_by_user(*auth, c))
         .await
         .into_json()
@@ -137,10 +174,14 @@ pub async fn update_cardio_session(
     cardio_session: Unverified<CardioSession>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<CardioSession>, Status> {
+) -> JsonResult<CardioSession> {
     let cardio_session = conn
         .run(move |c| cardio_session.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| CardioSession::update(cardio_session, c))
         .await
         .into_json()
@@ -155,10 +196,14 @@ pub async fn update_cardio_sessions(
     cardio_sessions: Unverified<Vec<CardioSession>>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<CardioSession>>, Status> {
+) -> JsonResult<Vec<CardioSession>> {
     let cardio_sessions = conn
         .run(move |c| cardio_sessions.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| CardioSession::update_multiple(cardio_sessions, c))
         .await
         .into_json()
@@ -169,10 +214,14 @@ pub async fn get_cardio_session_description(
     cardio_session_id: UnverifiedId<CardioSessionId>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<CardioSessionDescription>, Status> {
+) -> JsonResult<CardioSessionDescription> {
     let cardio_session_id = conn
         .run(move |c| cardio_session_id.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(move |c| CardioSessionDescription::get_by_id(cardio_session_id, c))
         .await
         .into_json()
@@ -182,7 +231,7 @@ pub async fn get_cardio_session_description(
 pub async fn get_cardio_session_descriptions(
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<CardioSessionDescription>>, Status> {
+) -> JsonResult<Vec<CardioSessionDescription>> {
     conn.run(move |c| CardioSessionDescription::get_by_user(*auth, c))
         .await
         .into_json()
@@ -194,7 +243,7 @@ pub async fn get_ordered_cardio_session_descriptions_by_timespan(
     end_datetime: DateTimeWrapper,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<CardioSessionDescription>>, Status> {
+) -> JsonResult<Vec<CardioSessionDescription>> {
     conn.run(move |c| {
         CardioSessionDescription::get_ordered_by_user_and_timespan(
             *auth,

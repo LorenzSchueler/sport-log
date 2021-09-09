@@ -1,4 +1,4 @@
-use rocket::{http::Status, serde::json::Json};
+use rocket::http::Status;
 
 use sport_log_types::{
     AuthAdmin, AuthUser, Create, CreateMultiple, Db, GetAll, GetByUser, Platform,
@@ -7,49 +7,58 @@ use sport_log_types::{
     VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
 };
 
-use crate::handler::IntoJson;
+use crate::handler::{IntoJson, JsonError, JsonResult};
 
 #[post("/adm/platform", format = "application/json", data = "<platform>")]
 pub async fn adm_create_platform(
     platform: Unverified<Platform>,
     auth: AuthAdmin,
     conn: Db,
-) -> Result<Json<Platform>, Status> {
-    let platform = platform.verify_adm(&auth)?;
+) -> JsonResult<Platform> {
+    let platform = platform.verify_adm(&auth).map_err(|status| JsonError {
+        status,
+        message: None,
+    })?;
     conn.run(|c| Platform::create(platform, c))
         .await
         .into_json()
 }
 
 #[post("/ap/platform", format = "application/json", data = "<platform>")]
-pub async fn ap_create_platform(
-    platform: Unverified<Platform>,
-    conn: Db,
-) -> Result<Json<Platform>, Status> {
+pub async fn ap_create_platform(platform: Unverified<Platform>, conn: Db) -> JsonResult<Platform> {
     if !CONFIG.ap_self_registration {
-        return Err(Status::Forbidden);
+        return Err(JsonError {
+            status: Status::Forbidden,
+            message: None,
+        });
     }
-    let platform = platform.verify_unchecked()?;
+    let platform = platform.verify_unchecked().map_err(|status| JsonError {
+        status,
+        message: None,
+    })?;
     conn.run(|c| Platform::create(platform, c))
         .await
         .into_json()
 }
 
 #[get("/adm/platform")]
-pub async fn adm_get_platforms(_auth: AuthAdmin, conn: Db) -> Result<Json<Vec<Platform>>, Status> {
+pub async fn adm_get_platforms(_auth: AuthAdmin, conn: Db) -> JsonResult<Vec<Platform>> {
     conn.run(|c| Platform::get_all(c)).await.into_json()
 }
 
 #[get("/ap/platform")]
-pub async fn ap_get_platforms(conn: Db) -> Result<Json<Vec<Platform>>, Status> {
+pub async fn ap_get_platforms(conn: Db) -> JsonResult<Vec<Platform>> {
     if !CONFIG.ap_self_registration {
-        return Err(Status::Forbidden);
+        return Err(JsonError {
+            status: Status::Forbidden,
+            message: None,
+        });
     }
     conn.run(|c| Platform::get_all(c)).await.into_json()
 }
 
 #[get("/platform")]
-pub async fn get_platforms(_auth: AuthUser, conn: Db) -> Result<Json<Vec<Platform>>, Status> {
+pub async fn get_platforms(_auth: AuthUser, conn: Db) -> JsonResult<Vec<Platform>> {
     conn.run(|c| Platform::get_all(c)).await.into_json()
 }
 
@@ -58,8 +67,11 @@ pub async fn adm_update_platform(
     platform: Unverified<Platform>,
     auth: AuthAdmin,
     conn: Db,
-) -> Result<Json<Platform>, Status> {
-    let platform = platform.verify_adm(&auth)?;
+) -> JsonResult<Platform> {
+    let platform = platform.verify_adm(&auth).map_err(|status| JsonError {
+        status,
+        message: None,
+    })?;
     conn.run(|c| Platform::update(platform, c))
         .await
         .into_json()
@@ -74,8 +86,14 @@ pub async fn create_platform_credential(
     platform_credential: Unverified<PlatformCredential>,
     auth: AuthUser,
     conn: Db,
-) -> Result<Json<PlatformCredential>, Status> {
-    let platform_credential = platform_credential.verify_user_without_db(&auth)?;
+) -> JsonResult<PlatformCredential> {
+    let platform_credential =
+        platform_credential
+            .verify_user_without_db(&auth)
+            .map_err(|status| JsonError {
+                status,
+                message: None,
+            })?;
     conn.run(|c| PlatformCredential::create(platform_credential, c))
         .await
         .into_json()
@@ -90,8 +108,14 @@ pub async fn create_platform_credentials(
     platform_credentials: Unverified<Vec<PlatformCredential>>,
     auth: AuthUser,
     conn: Db,
-) -> Result<Json<Vec<PlatformCredential>>, Status> {
-    let platform_credentials = platform_credentials.verify_user_without_db(&auth)?;
+) -> JsonResult<Vec<PlatformCredential>> {
+    let platform_credentials =
+        platform_credentials
+            .verify_user_without_db(&auth)
+            .map_err(|status| JsonError {
+                status,
+                message: None,
+            })?;
     conn.run(|c| PlatformCredential::create_multiple(platform_credentials, c))
         .await
         .into_json()
@@ -101,7 +125,7 @@ pub async fn create_platform_credentials(
 pub async fn get_platform_credentials(
     auth: AuthUser,
     conn: Db,
-) -> Result<Json<Vec<PlatformCredential>>, Status> {
+) -> JsonResult<Vec<PlatformCredential>> {
     conn.run(move |c| PlatformCredential::get_by_user(*auth, c))
         .await
         .into_json()
@@ -112,8 +136,11 @@ pub async fn get_platform_credentials_by_platform(
     platform_id: UnverifiedId<PlatformId>,
     auth: AuthUser,
     conn: Db,
-) -> Result<Json<PlatformCredential>, Status> {
-    let platform_id = platform_id.verify_unchecked()?;
+) -> JsonResult<PlatformCredential> {
+    let platform_id = platform_id.verify_unchecked().map_err(|status| JsonError {
+        status,
+        message: None,
+    })?;
     conn.run(move |c| PlatformCredential::get_by_user_and_platform(*auth, platform_id, c))
         .await
         .into_json()
@@ -128,10 +155,14 @@ pub async fn update_platform_credential(
     platform_credential: Unverified<PlatformCredential>,
     auth: AuthUser,
     conn: Db,
-) -> Result<Json<PlatformCredential>, Status> {
+) -> JsonResult<PlatformCredential> {
     let platform_credential = conn
         .run(move |c| platform_credential.verify_user(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| PlatformCredential::update(platform_credential, c))
         .await
         .into_json()
@@ -146,10 +177,14 @@ pub async fn update_platform_credentials(
     platform_credentials: Unverified<Vec<PlatformCredential>>,
     auth: AuthUser,
     conn: Db,
-) -> Result<Json<Vec<PlatformCredential>>, Status> {
+) -> JsonResult<Vec<PlatformCredential>> {
     let platform_credentials = conn
         .run(move |c| platform_credentials.verify_user(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| PlatformCredential::update_multiple(platform_credentials, c))
         .await
         .into_json()
