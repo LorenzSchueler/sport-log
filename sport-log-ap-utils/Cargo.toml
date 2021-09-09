@@ -5,6 +5,8 @@ edition = "2018"
 
 [dependencies]
 sport-log-types = { path = "../sport-log-types" }
+
 reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls"] }
 chrono = { version = "0.4.19", features = ["serde"] }
 rand = "0.8.4"
+tracing = "0.1.26"

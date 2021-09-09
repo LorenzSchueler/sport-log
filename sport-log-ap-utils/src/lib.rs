@@ -3,6 +3,7 @@
 use chrono::{Duration, Utc};
 use rand::Rng;
 use reqwest::{Client, Error, StatusCode};
+use tracing::{error, info};
 
 use sport_log_types::{
     Action, ActionEventId, ActionId, ActionProvider, ActionProviderId, ExecutableActionEvent,
@@ -41,11 +42,11 @@ pub async fn setup(
 
     let platform_id = match response.status() {
         StatusCode::OK => {
-            println!("platform created");
+            info!("platform created");
             platform.id
         }
         StatusCode::CONFLICT => {
-            println!("platform already exists");
+            info!("platform already exists");
             let platforms: Vec<Platform> = client
                 .get(format!("{}/v1/ap/platform", base_url))
                 .send()
@@ -59,11 +60,11 @@ pub async fn setup(
             platform.id
         }
         StatusCode::FORBIDDEN => {
-            println!("action provider self registration is disabled");
+            error!("action provider self registration is disabled");
             response.json::<Platform>().await?.id // this will always fail and return the error
         }
         status => {
-            println!("an error occured (status {})", status);
+            error!("an error occured (status {})", status);
             response.json::<Platform>().await?.id // this will always fail and return the error
         }
     };
@@ -87,11 +88,11 @@ pub async fn setup(
 
     let action_provider_id = match response.status() {
         StatusCode::OK => {
-            println!("action provider created");
+            info!("action provider created");
             action_provider.id
         }
         StatusCode::CONFLICT => {
-            println!("action provider already exists");
+            info!("action provider already exists");
             let action_provider: ActionProvider = client
                 .get(format!("{}/v1/ap/action_provider", base_url))
                 .basic_auth(name, Some(&password))
@@ -102,11 +103,11 @@ pub async fn setup(
             action_provider.id
         }
         StatusCode::FORBIDDEN => {
-            println!("action provider self registration disabled");
+            error!("action provider self registration disabled");
             response.json::<ActionProvider>().await?.id // this will always fail and return the error
         }
         status => {
-            println!("an error occured (status {})", status);
+            error!("an error occured (status {})", status);
             response.json::<ActionProvider>().await?.id // this will always fail and return the error
         }
     };
@@ -133,9 +134,9 @@ pub async fn setup(
         .await?
         .status()
     {
-        StatusCode::OK => println!("action created\nsetup successful"),
-        StatusCode::CONFLICT => println!("action already exists\nsetup successful"),
-        status => println!("an error occured (status {})", status),
+        StatusCode::OK => info!("action created\nsetup successful"),
+        StatusCode::CONFLICT => info!("action already exists\nsetup successful"),
+        status => error!("an error occured (status {})", status),
     }
     Ok(())
 }
