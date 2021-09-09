@@ -1725,6 +1725,8 @@ dependencies = [
  "sport-log-types",
  "tokio",
  "toml",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
@@ -1741,6 +1743,8 @@ dependencies = [
  "sport-log-types",
  "tokio",
  "toml",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
@@ -1758,6 +1762,8 @@ dependencies = [
  "thirtyfour",
  "tokio",
  "toml",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
@@ -1775,6 +1781,8 @@ dependencies = [
  "thirtyfour",
  "tokio",
  "toml",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
@@ -1785,6 +1793,7 @@ dependencies = [
  "rand",
  "reqwest",
  "sport-log-types",
+ "tracing",
 ]
 
 [[package]]
@@ -1815,6 +1824,8 @@ dependencies = [
  "serde",
  "sport-log-types",
  "toml",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

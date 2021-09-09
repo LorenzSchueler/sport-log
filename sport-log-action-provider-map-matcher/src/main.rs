@@ -36,10 +36,11 @@ use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError};
 use serde::{Deserialize, Serialize};
+use tokio::process::Command;
+use tracing::{debug, error, info};
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{ActionEventId, CardioSession, CardioSessionId, Position, Route, RouteId};
-use tokio::process::Command;
 
 const CONFIG_FILE: &str = "config.toml";
 const NAME: &str = "map-matcher";
@@ -72,12 +73,12 @@ lazy_static! {
         Ok(file) => match toml::from_str(&file) {
             Ok(config) => config,
             Err(error) => {
-                println!("Failed to parse config.toml: {}", error);
+                error!("Failed to parse config.toml: {}", error);
                 process::exit(1);
             }
         },
         Err(error) => {
-            println!("Failed to read config.toml: {}", error);
+            error!("Failed to read config.toml: {}", error);
             process::exit(1);
         }
     };
@@ -108,22 +109,27 @@ struct LocationElevation {
 
 #[tokio::main]
 async fn main() {
-    let result = match &env::args().collect::<Vec<_>>()[1..] {
-        [] => map_match().await,
-        [option] if option == "--setup" => setup().await,
-        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => {
-            help();
-            Ok(())
-        }
-        _ => {
-            wrong_use();
-            Ok(())
-        }
-    };
+    env::set_var(
+        "RUST_LOG",
+        "warn,sport_log_action_provider_map_matcher=debug",
+    );
 
-    if let Err(error) = result {
-        println!("{}", error);
-    }
+    tracing_subscriber::fmt::init();
+
+    match &env::args().collect::<Vec<_>>()[1..] {
+        [] => {
+            if let Err(error) = map_match().await {
+                error!("map matching failed: {}", error);
+            }
+        }
+        [option] if option == "--setup" => {
+            if let Err(error) = setup().await {
+                error!("setup failed: {}", error);
+            }
+        }
+        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
+        _ => wrong_use(),
+    };
 }
 
 async fn setup() -> Result<()> {
@@ -172,14 +178,15 @@ async fn map_match() -> Result<()> {
     )
     .await
     .map_err(Error::Reqwest)?;
-    println!("executable action events: {}\n", exec_action_events.len());
+
+    info!("got {} executable action events", exec_action_events.len());
 
     let mut tasks = vec![];
     for exec_action_event in exec_action_events {
         let client = client.clone();
 
         tasks.push(tokio::spawn(async move {
-            println!("{:#?}", exec_action_event);
+            info!("processing {:#?}", exec_action_event);
 
             let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
 
@@ -248,7 +255,7 @@ async fn map_match() -> Result<()> {
             Err(Error::CardioSessionIdMissing(action_event_id)) => {
                 delete_action_event_ids.push(action_event_id)
             }
-            Err(error) => println!("{}", error),
+            Err(error) => error!("{}", error),
         }
     }
 
@@ -289,7 +296,7 @@ async fn match_to_map(cardio_session: &CardioSession) -> Result<Route> {
         .map_err(Error::Io)?;
 
     if !output.status.success() {
-        println!("{:?}", output);
+        debug!("output: {:?}", output);
     }
 
     let gpx = gpx::read(File::open(&filename_result).map_err(Error::Io)?).map_err(Error::Gpx)?;
