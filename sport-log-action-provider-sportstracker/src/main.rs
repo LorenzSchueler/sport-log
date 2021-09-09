@@ -1,10 +1,11 @@
-use std::{env, fs, process, result::Result as StdResult};
+use std::{env, fs, process};
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError, StatusCode};
 use serde::Deserialize;
+use tracing::{error, info, warn};
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{CardioSession, CardioSessionId, CardioType, Movement, Position};
@@ -13,8 +14,6 @@ const CONFIG_FILE: &str = "config.toml";
 const NAME: &str = "sportstracker-fetch";
 const DESCRIPTION: &str = "Sportstracker Fetch can fetch the latests workouts recorded with sportstracker and save them in your cardio sessions.";
 const PLATFORM_NAME: &str = "sportstracker";
-
-type Result<T> = StdResult<T, ReqwestError>;
 
 #[derive(Deserialize)]
 struct Config {
@@ -27,12 +26,12 @@ lazy_static! {
         Ok(file) => match toml::from_str(&file) {
             Ok(config) => config,
             Err(error) => {
-                println!("Failed to parse config.toml.: {}", error);
+                error!("Failed to parse config.toml.: {}", error);
                 process::exit(1);
             }
         },
         Err(error) => {
-            println!("Failed to read config.toml.: {}", error);
+            error!("Failed to read config.toml.: {}", error);
             process::exit(1);
         }
     };
@@ -120,22 +119,31 @@ struct Location {
 }
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() {
+    env::set_var(
+        "RUST_LOG",
+        "warn,sport_log_action_provider_sportstracker=debug",
+    );
+
+    tracing_subscriber::fmt::init();
+
     match &env::args().collect::<Vec<_>>()[1..] {
-        [] => fetch().await,
-        [option] if option == "--setup" => setup().await,
-        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => {
-            help();
-            Ok(())
+        [] => {
+            if let Err(error) = fetch().await {
+                error!("fetching new workouts failed: {}", error);
+            }
         }
-        _ => {
-            wrong_use();
-            Ok(())
+        [option] if option == "--setup" => {
+            if let Err(error) = setup().await {
+                error!("setup failed: {}", error);
+            }
         }
+        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
+        _ => wrong_use(),
     }
 }
 
-async fn setup() -> Result<()> {
+async fn setup() -> Result<(), ReqwestError> {
     setup_db(
         &CONFIG.base_url,
         NAME,
@@ -167,7 +175,7 @@ fn wrong_use() {
     println!("no such options");
 }
 
-async fn fetch() -> Result<()> {
+async fn fetch() -> Result<(), ReqwestError> {
     let client = Client::new();
 
     let exec_action_events = get_events(
@@ -180,26 +188,25 @@ async fn fetch() -> Result<()> {
     )
     .await?;
 
-    println!("executable action events: {}\n", exec_action_events.len());
+    info!("got {} executable action events", exec_action_events.len());
 
     let mut rng = rand::thread_rng();
 
     let mut delete_action_event_ids = vec![];
     for exec_action_event in exec_action_events {
-        println!("{:#?}", exec_action_event);
+        info!("processing {:#?}", exec_action_event);
 
         let (username, password) = if let (Some(username), Some(password)) =
             (exec_action_event.username, exec_action_event.password)
         {
             (username, password)
         } else {
-            println!("no credential provided");
+            warn!("can not log in: no credential provided");
             continue;
         };
 
         if let Some(token) = get_token(&client, &username, &password).await? {
             let token = (token.0, token.1.as_str());
-            println!("{:?}", token);
 
             let workouts = get_workouts(&client, &token).await?;
             let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
@@ -271,34 +278,33 @@ async fn fetch() -> Result<()> {
                     last_change: Utc::now(),
                     deleted: false,
                 };
-                //println!("{:?}", cardio_session);
-                match client
+
+                let response = client
                     .post(format!("{}/v1/cardio_session", CONFIG.base_url))
                     .basic_auth(&username, Some(&CONFIG.password))
                     .json(&cardio_session)
                     .send()
-                    .await?
-                    .status()
-                {
+                    .await?;
+                match response.status() {
                     status if status.is_success() => {
-                        println!("cardio session saved");
+                        info!("cardio session saved");
                     }
                     StatusCode::CONFLICT => {
-                        println!(
+                        info!(
                             "everything up to date for user {}",
                             exec_action_event.user_id.0
                         );
                         break;
                     }
-                    status => {
-                        println!("error (status {:?})", status);
+                    _ => {
+                        response.json::<CardioSession>().await?; // this will always fail and return the error
                         break;
                     }
                 }
             }
             delete_action_event_ids.push(exec_action_event.action_event_id);
         } else {
-            println!("login failed!\n");
+            warn!("login failed!\n");
         }
     }
     if !delete_action_event_ids.is_empty() {
@@ -318,7 +324,7 @@ async fn get_token(
     client: &Client,
     username: &str,
     password: &str,
-) -> Result<Option<(&'static str, String)>> {
+) -> Result<Option<(&'static str, String)>, ReqwestError> {
     let credentials = [("l", username), ("p", password)];
     let user: User = client
         .post("https://api.sports-tracker.com/apiserver/v1/login")
@@ -331,7 +337,7 @@ async fn get_token(
     Ok(user.session_key.map(|key| ("token", key)))
 }
 
-async fn get_workouts(client: &Client, token: &(&str, &str)) -> Result<Vec<Workout>> {
+async fn get_workouts(client: &Client, token: &(&str, &str)) -> Result<Vec<Workout>, ReqwestError> {
     let workouts: Workouts = client
         .get("https://api.sports-tracker.com/apiserver/v1/workouts")
         .query(&[token])
@@ -347,7 +353,7 @@ async fn get_workout_data(
     client: &Client,
     token: &(&str, &str),
     workout_key: &str,
-) -> Result<WorkoutData> {
+) -> Result<WorkoutData, ReqwestError> {
     let samples = &("samples", "100000");
 
     Ok(client
