@@ -19,19 +19,19 @@
 //!
 //! The config file must be called `sport-log-scheduler.toml` and must be deserializable to a [Config].
 
-use std::{fs, process, result::Result as StdResult};
+use std::{env, fs, process};
 
 use chrono::{Datelike, Duration, Utc};
 use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{blocking::Client, Error as ReqwestError};
 use serde::Deserialize;
+use tracing::{debug, error, info};
 
 use sport_log_types::{ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent};
 
 const CONFIG_FILE: &str = "config.toml";
-
-type Result<T> = StdResult<T, ReqwestError>;
+const USERNAME: &str = "admin";
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -44,29 +44,49 @@ lazy_static! {
         Ok(file) => match toml::from_str(&file) {
             Ok(config) => config,
             Err(error) => {
-                println!("Failed to parse config.toml...: {}", error);
+                error!("Failed to parse config.toml: {}", error);
                 process::exit(1);
             }
         },
         Err(error) => {
-            println!("Failed to read config.toml...: {}", error);
+            error!("Failed to read config.toml: {}", error);
             process::exit(1);
         }
     };
 }
 
-fn main() -> Result<()> {
-    let username = "admin";
+fn main() {
+    env::set_var("RUST_LOG", "warn,sport_log_scheduler=debug");
+
+    tracing_subscriber::fmt::init();
 
     let client = Client::new();
+    if let Err(error) = create_action_events(&client) {
+        error!(
+            "while creating new action events an error occured: {}",
+            error
+        );
+    }
+    if let Err(error) = delete_action_events(&client) {
+        error!(
+            "while deleting old action events an error occured: {}",
+            error
+        );
+    }
+}
 
+fn create_action_events(client: &Client) -> Result<(), ReqwestError> {
     let creatable_action_rules: Vec<CreatableActionRule> = client
         .get(format!("{}/v1/adm/creatable_action_rule", CONFIG.base_url))
-        .basic_auth(username, Some(&CONFIG.admin_password))
+        .basic_auth(USERNAME, Some(&CONFIG.admin_password))
         .send()?
         .json()?;
 
-    println!("{:#?}", creatable_action_rules);
+    info!(
+        "got {} creatable action events",
+        creatable_action_rules.len()
+    );
+    debug!("{:#?}", creatable_action_rules);
 
     let mut rng = rand::thread_rng();
 
@@ -102,21 +122,32 @@ fn main() -> Result<()> {
         }
     }
 
-    println!("{:#?}", action_events);
+    info!("creating {} new action events", action_events.len());
+    debug!("{:#?}", action_events);
 
     client
         .post(format!("{}/v1/adm/action_events", CONFIG.base_url))
-        .basic_auth(username, Some(&CONFIG.admin_password))
+        .basic_auth(USERNAME, Some(&CONFIG.admin_password))
         .json(&action_events)
         .send()?;
 
+    info!("creation of action events successful");
+
+    Ok(())
+}
+
+fn delete_action_events(client: &Client) -> Result<(), ReqwestError> {
     let deletable_action_events: Vec<DeletableActionEvent> = client
         .get(format!("{}/v1/adm/deletable_action_event", CONFIG.base_url))
-        .basic_auth(username, Some(&CONFIG.admin_password))
+        .basic_auth(USERNAME, Some(&CONFIG.admin_password))
         .send()?
         .json()?;
 
-    println!("{:#?}", deletable_action_events);
+    info!(
+        "got {} deletable action events",
+        deletable_action_events.len()
+    );
+    debug!("{:#?}", deletable_action_events);
 
     let mut action_event_ids = vec![];
     for deletable_action_event in deletable_action_events {
@@ -128,13 +159,16 @@ fn main() -> Result<()> {
         }
     }
 
-    println!("{:#?}", action_event_ids);
+    info!("deleting {} action events", action_event_ids.len());
+    debug!("{:#?}", action_event_ids);
 
     client
         .delete(format!("{}/v1/adm/action_events", CONFIG.base_url,))
-        .basic_auth(username, Some(&CONFIG.admin_password))
+        .basic_auth(USERNAME, Some(&CONFIG.admin_password))
         .json(&action_event_ids)
         .send()?;
+
+    info!("action events have been successfully deleted");
 
     Ok(())
 }
