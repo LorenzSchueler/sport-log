@@ -33,7 +33,8 @@
         local sport_log sport_admin md5
         ```
         as second entry (after entry for user postgres) to `/etc/postgresql/<pg_version>/main/pg_hba.conf`
-    *   ```bash
+    *   reload postgres config
+        ```bash
         sudo service postgresql reload
         ```
 
@@ -51,7 +52,7 @@ cd ../sport-log-types && diesel database reset && ./patch.sh && cd ../sport-log-
 
 ## SystemD Setup for deployment
 
-*replace ```<user>``` with the user you want to run the server with*
+*!!! replace ```<user>``` with the user you want to run the server with*
 
 1. install executable at: */usr/local/bin/sport-log-server*
     ```bash
