@@ -185,25 +185,25 @@ end;
     });
   }
 
-  static final _synchronized = {Keys.syncStatus: SyncStatus.synchronized.index};
+  static final synchronized = {Keys.syncStatus: SyncStatus.synchronized.index};
 
-  DbResult<void> setSynchronized(Int64 id) async {
+  DbResult<void> setSynchronized(Int64 id, [Transaction? txn]) async {
     return voidRequest(() async {
-      database.update(tableName, _synchronized,
+      (txn ?? database).update(tableName, synchronized,
           where: 'id = ?', whereArgs: [id.toInt()]);
     });
   }
 
   DbResult<void> setAllUpdatedSynchronized() async {
     return voidRequest(() async {
-      database.update(tableName, _synchronized,
+      database.update(tableName, synchronized,
           where: '${Keys.syncStatus} = ${SyncStatus.updated.index}');
     });
   }
 
   DbResult<void> setAllCreatedSynchronized() async {
     return voidRequest(() async {
-      database.update(tableName, _synchronized,
+      database.update(tableName, synchronized,
           where: '${Keys.syncStatus} = ${SyncStatus.created.index}');
     });
   }

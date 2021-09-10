@@ -1,12 +1,13 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/extensions/result_extension.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sqflite/sqflite.dart';
 
 class MetconTable extends Table<Metcon> {
-  @override String get setupSql => '''
+  @override
+  String get setupSql => '''
 create table metcon (
     user_id integer,
     name text check (length(name) <= 80),
@@ -17,27 +18,35 @@ create table metcon (
     $idAndDeletedAndStatus
 );
   ''';
-  @override DbSerializer<Metcon> get serde => DbMetconSerializer();
-  @override String get tableName => 'metcon';
-
-  late MetconMovementTable metconMovements;
 
   @override
-  DbResult<void> deleteSingle(Int64 id, [Transaction? txn]) async {
-    assert(txn == null);
+  DbSerializer<Metcon> get serde => DbMetconSerializer();
+
+  @override
+  String get tableName => 'metcon';
+
+  late MetconMovementTable metconMovements;
+  late MetconSessionTable metconSessions;
+
+  @override
+  DbResult<void> deleteSingle(Int64 id,
+      {Transaction? transaction, bool isSynchronized = false}) async {
+    assert(transaction == null);
     return voidRequest(() async {
       await database.transaction((transaction) async {
         metconMovements.deleteByMetcon(id, transaction);
-        super.deleteSingle(id, transaction);
+        super.deleteSingle(id,
+            transaction: transaction, isSynchronized: isSynchronized);
       });
     });
   }
 
   @override
-  DbResult<void> deleteMultiple(List<Int64> ids, [Transaction? txn]) async {
-    assert(txn == null);
+  DbResult<void> deleteMultiple(List<Int64> ids,
+      {Transaction? transaction, bool isSynchronized = false}) async {
+    assert(transaction == null);
     for (final id in ids) {
-      final result = await deleteSingle(id);
+      final result = await deleteSingle(id, isSynchronized: isSynchronized);
       if (result.isFailure) {
         return result;
       }
@@ -51,7 +60,7 @@ create table metcon (
     }
     return voidRequest(() async {
       await database.transaction((txn) async {
-        updateSingle(metconDescription.metcon, txn);
+        updateSingle(metconDescription.metcon, transaction: txn);
         final result = await metconMovements.get(
           where: "${Keys.metconId} = ?",
           whereArgs: [metconDescription.metcon.id.toInt()],
@@ -67,12 +76,12 @@ create table metcon (
           oldIds.contains(mm.id) ? toUpdate.add(mm) : toCreate.add(mm);
         }
 
-        List<Int64> toDelete = oldIds.difference(
-            toUpdate.map((mm) => mm.id).toSet()).toList();
+        List<Int64> toDelete =
+            oldIds.difference(toUpdate.map((mm) => mm.id).toSet()).toList();
 
-        metconMovements.deleteMultiple(toDelete, txn);
-        metconMovements.updateMultiple(toUpdate, txn);
-        metconMovements.createMultiple(toCreate, txn);
+        metconMovements.deleteMultiple(toDelete, transaction: txn);
+        metconMovements.updateMultiple(toUpdate, transaction: txn);
+        metconMovements.createMultiple(toCreate, transaction: txn);
       });
     });
   }
@@ -80,16 +89,46 @@ create table metcon (
   DbResult<void> createFull(MetconDescription metconDescription) async {
     return voidRequest(() async {
       await database.transaction((txn) async {
-        createSingle(metconDescription.metcon, txn);
-        metconMovements.createMultiple(metconDescription.moves, txn);
+        createSingle(metconDescription.metcon, transaction: txn);
+        metconMovements.createMultiple(metconDescription.moves,
+            transaction: txn);
       });
+    });
+  }
+
+  @override
+  DbResult<void> setSynchronized(Int64 id, [Transaction? txn]) {
+    assert(txn == null);
+    return voidRequest(() async {
+      return database.transaction((txn) async {
+        super.setSynchronized(id, txn);
+        metconMovements.setSynchronizedByMetcon(id, txn);
+      });
+    });
+  }
+
+  DbResult<List<MetconDescription>> getNonDeletedFull() async {
+    return request<List<MetconDescription>>(() async {
+      final result = await getNonDeleted();
+      if (result.isFailure) {
+        return Failure(result.failure);
+      }
+      return Success(await Future.wait(result.success.map((metcon) async {
+        return MetconDescription(
+            metcon: metcon,
+            moves: (await metconMovements.getByMetcon(metcon.id)).or([]),
+            hasReference: await metconSessions.existsByMetcon(metcon.id));
+      })));
     });
   }
 }
 
 class MetconMovementTable extends Table<MetconMovement> {
-  @override DbSerializer<MetconMovement> get serde => DbMetconMovementSerializer();
-  @override String get setupSql => '''
+  @override
+  DbSerializer<MetconMovement> get serde => DbMetconMovementSerializer();
+
+  @override
+  String get setupSql => '''
 create table metcon_movement (
     metcon_id integer not null references metcon(id) on delete cascade,
     movement_id integer not null references movement(id) on delete no action,
@@ -100,22 +139,38 @@ create table metcon_movement (
     $idAndDeletedAndStatus
 );
   ''';
-  @override String get tableName => 'metcon_movement';
+
+  @override
+  String get tableName => 'metcon_movement';
 
   DbResult<void> deleteByMetcon(Int64 id, [Transaction? txn]) async {
     return voidRequest(() async {
-      (txn ?? database).update(
-        tableName,
-        {Keys.deleted: 1},
-        where: '${Keys.metconId} = ?',
-        whereArgs: [id.toInt()]
-      );
+      (txn ?? database).update(tableName, {Keys.deleted: 1},
+          where: '${Keys.metconId} = ?', whereArgs: [id.toInt()]);
+    });
+  }
+
+  DbResult<void> setSynchronizedByMetcon(Int64 id, [Transaction? txn]) async {
+    return voidRequest(() async {
+      database.update(tableName, Table.synchronized,
+          where: '${Keys.metconId} = ?', whereArgs: [id.toInt()]);
+    });
+  }
+
+  DbResult<List<MetconMovement>> getByMetcon(Int64 id) async {
+    return request<List<MetconMovement>>(() async {
+      final result = await database.query(tableName,
+          where: '${Keys.metconId} = ? AND ${Keys.deleted} = 0',
+          whereArgs: [id.toInt()]);
+      return Success(result.map(serde.fromDbRecord).toList());
     });
   }
 }
 
 class MetconSessionTable extends Table<MetconSession> {
-  @override DbSerializer<MetconSession> get serde => DbMetconSessionSerializer();
+  @override
+  DbSerializer<MetconSession> get serde => DbMetconSessionSerializer();
+
   @override
   String get setupSql => '''
 create table metcon_session (
@@ -130,5 +185,13 @@ create table metcon_session (
     $idAndDeletedAndStatus
 );
   ''';
-  @override String get tableName => 'metcon_session';
+
+  @override
+  String get tableName => 'metcon_session';
+
+  Future<bool> existsByMetcon(Int64 id) async {
+    return (await database.rawQuery('''select 1 from $tableName
+            where ${Keys.metconId} = ${id.toInt()}
+              and ${Keys.deleted} = 0''')).isNotEmpty;
+  }
 }

@@ -12,13 +12,28 @@ void resultSink(Result<dynamic, dynamic> result) {
   }
 }
 
-abstract class DataProvider<T extends DbObject> {
+abstract class DataProvider<T> {
+  Future<bool> createSingle(T object);
+  Future<bool> updateSingle(T object);
+  Future<bool> deleteSingle(T object);
+
+  Future<List<T>> getNonDeleted();
+  Future<void> pushToServer();
+
+  void handleApiError(ApiError error) {
+    logger.e('Got an api error.', error);
+  }
+
+  void handleDbError(DbError error) {
+    logger.e('Got a database error.', error);
+  }
+}
+
+abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
   ApiAccessor<T> get api;
   Table<T> get db;
 
-  void handleApiError(ApiError error) {}
-  void handleDbError(DbError error) {}
-
+  @override
   Future<List<T>> getNonDeleted() async {
     final result = await db.getNonDeleted();
     if (result.isFailure) {
@@ -28,6 +43,7 @@ abstract class DataProvider<T extends DbObject> {
     return result.success;
   }
 
+  @override
   Future<void> pushToServer() async {
     await Future.wait([
       _pushUpdatedToServer(),
@@ -64,7 +80,8 @@ abstract class DataProvider<T extends DbObject> {
   }
 }
 
-mixin ConnectedMethods<T extends DbObject> on DataProvider<T> {
+mixin ConnectedMethods<T extends DbObject> on DataProviderImpl<T> {
+  @override
   Future<bool> createSingle(T object) async {
     assert(object.isValid());
     final result = await api.postSingle(object);
@@ -76,6 +93,7 @@ mixin ConnectedMethods<T extends DbObject> on DataProvider<T> {
     return true;
   }
 
+  @override
   Future<bool> updateSingle(T object) async {
     assert(object.deleted || object.isValid());
     final result = await api.putSingle(object);
@@ -87,12 +105,14 @@ mixin ConnectedMethods<T extends DbObject> on DataProvider<T> {
     return true;
   }
 
+  @override
   Future<bool> deleteSingle(T object) async {
     return updateSingle(object..deleted = true);
   }
 }
 
-mixin UnconnectedMethods<T extends DbObject> on DataProvider<T> {
+mixin UnconnectedMethods<T extends DbObject> on DataProviderImpl<T> {
+  @override
   Future<bool> createSingle(T object) async {
     assert(object.isValid());
     final result = await db.createSingle(object);
@@ -110,6 +130,7 @@ mixin UnconnectedMethods<T extends DbObject> on DataProvider<T> {
     return true;
   }
 
+  @override
   Future<bool> updateSingle(T object) async {
     assert(object.deleted || object.isValid());
     final result = await db.updateSingle(object);
@@ -127,6 +148,7 @@ mixin UnconnectedMethods<T extends DbObject> on DataProvider<T> {
     return true;
   }
 
+  @override
   Future<bool> deleteSingle(T object) async {
     return updateSingle(object..deleted = true);
   }
