@@ -1,8 +1,8 @@
-use rocket::http::Status;
+use rocket::{http::Status, State};
 
 use sport_log_types::{
-    AuthAdmin, AuthUser, Create, Db, GetById, Unverified, Update, User, VerifyForUserWithDb,
-    VerifyUnchecked, CONFIG,
+    AuthAdmin, AuthUser, Config, Create, Db, GetById, Unverified, Update, User,
+    VerifyForUserWithDb, VerifyUnchecked,
 };
 
 use crate::handler::{IntoJson, JsonError, JsonResult};
@@ -21,8 +21,12 @@ pub async fn adm_create_user(
 }
 
 #[post("/user", format = "application/json", data = "<user>")]
-pub async fn create_user(user: Unverified<User>, conn: Db) -> JsonResult<User> {
-    if !CONFIG.user_self_registration {
+pub async fn create_user(
+    user: Unverified<User>,
+    config: &State<Config>,
+    conn: Db,
+) -> JsonResult<User> {
+    if !config.user_self_registration {
         return Err(JsonError {
             status: Status::Forbidden,
             message: None,

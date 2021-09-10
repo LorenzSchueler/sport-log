@@ -1,14 +1,14 @@
-use rocket::http::Status;
+use rocket::{http::Status, State};
 
 use sport_log_types::{
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
-    ActionRuleId, AuthAP, AuthAdmin, AuthUser, CreatableActionRule, Create, CreateMultiple, Db,
-    DeletableActionEvent, ExecutableActionEvent, GetAll, GetById, GetByUser, Unverified,
+    ActionRuleId, AuthAP, AuthAdmin, AuthUser, Config, CreatableActionRule, Create, CreateMultiple,
+    Db, DeletableActionEvent, ExecutableActionEvent, GetAll, GetById, GetByUser, Unverified,
     UnverifiedId, UnverifiedIds, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForUser,
     VerifyIdUnchecked, VerifyIdsForActionProvider, VerifyIdsForAdmin,
     VerifyMultipleForActionProviderWithoutDb, VerifyMultipleForAdminWithoutDb,
-    VerifyMultipleForUserWithDb, VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
+    VerifyMultipleForUserWithDb, VerifyMultipleForUserWithoutDb, VerifyUnchecked,
 };
 
 use crate::handler::{DateTimeWrapper, IntoJson, JsonError, JsonResult};
@@ -41,9 +41,10 @@ pub async fn adm_create_action_provider(
 )]
 pub async fn ap_create_action_provider(
     action_provider: Unverified<ActionProvider>,
+    config: &State<Config>,
     conn: Db,
 ) -> JsonResult<ActionProvider> {
-    if !CONFIG.ap_self_registration {
+    if !config.ap_self_registration {
         return Err(JsonError {
             status: Status::Forbidden,
             message: None,

@@ -18,13 +18,17 @@ use std::env;
 #[macro_use]
 extern crate rocket;
 
+use figment::{
+    providers::{Format, Toml},
+    Figment,
+};
 use rocket::{
-    fairing::{Fairing, Info, Kind},
+    fairing::{AdHoc, Fairing, Info, Kind},
     http::{Header, Method, Status},
     Request, Response,
 };
 
-use sport_log_types::{Db, CONFIG};
+use sport_log_types::{Config, Db};
 
 mod handler;
 
@@ -78,15 +82,18 @@ impl Fairing for CORS {
 
 #[launch]
 fn rocket() -> _ {
-    env::set_var("RUST_LOG", "warn,sport_log_server=debug");
-    //let _ = tracing_subscriber::fmt::try_init();
-
-    dotenv::dotenv().ok();
-
-    lazy_static::initialize(&CONFIG);
+    let figment = Figment::from(rocket::Config::default())
+        .merge(Toml::file("sport-log-server-config.toml").nested());
+    if figment.profile() == "debug" {
+        env::set_var("RUST_LOG", "info,sport_log_server=debug");
+    } else {
+        env::set_var("RUST_LOG", "warn");
+    }
+    tracing_subscriber::fmt::try_init().unwrap_or(());
 
     use handler::*;
-    rocket::build()
+    rocket::custom(figment)
+        .attach(AdHoc::config::<Config>())
         .attach(Db::fairing())
         .attach(CORS)
         .register("/", catchers![default_catcher, catcher_404])

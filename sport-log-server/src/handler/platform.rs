@@ -1,10 +1,10 @@
-use rocket::http::Status;
+use rocket::{http::Status, State};
 
 use sport_log_types::{
-    AuthAdmin, AuthUser, Create, CreateMultiple, Db, GetAll, GetByUser, Platform,
+    AuthAdmin, AuthUser, Config, Create, CreateMultiple, Db, GetAll, GetByUser, Platform,
     PlatformCredential, PlatformId, Unverified, UnverifiedId, Update, VerifyForAdminWithoutDb,
     VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdUnchecked, VerifyMultipleForUserWithDb,
-    VerifyMultipleForUserWithoutDb, VerifyUnchecked, CONFIG,
+    VerifyMultipleForUserWithoutDb, VerifyUnchecked,
 };
 
 use crate::handler::{IntoJson, JsonError, JsonResult};
@@ -25,8 +25,12 @@ pub async fn adm_create_platform(
 }
 
 #[post("/ap/platform", format = "application/json", data = "<platform>")]
-pub async fn ap_create_platform(platform: Unverified<Platform>, conn: Db) -> JsonResult<Platform> {
-    if !CONFIG.ap_self_registration {
+pub async fn ap_create_platform(
+    platform: Unverified<Platform>,
+    config: &State<Config>,
+    conn: Db,
+) -> JsonResult<Platform> {
+    if !config.ap_self_registration {
         return Err(JsonError {
             status: Status::Forbidden,
             message: None,
@@ -47,8 +51,8 @@ pub async fn adm_get_platforms(_auth: AuthAdmin, conn: Db) -> JsonResult<Vec<Pla
 }
 
 #[get("/ap/platform")]
-pub async fn ap_get_platforms(conn: Db) -> JsonResult<Vec<Platform>> {
-    if !CONFIG.ap_self_registration {
+pub async fn ap_get_platforms(config: &State<Config>, conn: Db) -> JsonResult<Vec<Platform>> {
+    if !config.ap_self_registration {
         return Err(JsonError {
             status: Status::Forbidden,
             message: None,
