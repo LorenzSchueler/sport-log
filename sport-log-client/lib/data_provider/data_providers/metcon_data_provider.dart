@@ -12,12 +12,12 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
   final metconMovements = AppDatabase.instance!.metconMovements;
 
   @override
-  Future<bool> createSingle(MetconDescription object) async {
+  Future<void> createSingle(MetconDescription object) async {
     assert(object.isValid());
     final result = await db.createFull(object);
     if (result.isFailure) {
       handleDbError(result.failure);
-      return false;
+      throw result.failure;
     }
     api.postFull(object).then((result) {
       if (result.isFailure) {
@@ -26,15 +26,14 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
         db.setSynchronized(object.metcon.id).then(resultSink);
       }
     });
-    return true;
   }
 
   @override
-  Future<bool> deleteSingle(MetconDescription object) async {
+  Future<void> deleteSingle(MetconDescription object) async {
     final result = await db.deleteSingle(object.metcon.id);
     if (result.isFailure) {
       handleDbError(result.failure);
-      return false;
+      throw result.failure;
     }
     api.putFull(object).then((result) {
       if (result.isFailure) {
@@ -43,7 +42,6 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
         db.setSynchronized(object.metcon.id).then(resultSink);
       }
     });
-    return true;
   }
 
   @override
@@ -117,11 +115,11 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
   }
 
   @override
-  Future<bool> updateSingle(MetconDescription object) async {
+  Future<void> updateSingle(MetconDescription object) async {
     final result = await db.updateFull(object);
     if (result.isFailure) {
       handleDbError(result.failure);
-      return false;
+      throw result.failure;
     }
     api.putFull(object).then((result) {
       if (result.isFailure) {
@@ -130,6 +128,5 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
         db.setSynchronized(object.metcon.id).then(resultSink);
       }
     });
-    return true;
   }
 }

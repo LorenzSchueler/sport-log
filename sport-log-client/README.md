@@ -5,7 +5,7 @@
 * [ ] add github action checks
 * [ ] remove unique constraints and use unique partial indices
 * [ ] implement syncing and fix bugs in api/db
-* [ ] create action provider as a thin service layer between ui and api/db
+* [x] create action provider as a thin service layer between ui and api/db
 * [ ] adapt metcon pages and strength pages to new business logics (description classes instead of ui classes)
 
 ## Bugs
@@ -44,8 +44,9 @@
 * [ ] use Keys for everything (especially in table creation sql)
 * [x] use one string for last_modified, is_new, deleted in every table
 * [x] clean unified logging strategy
-* [ ] similar structure (like in database) in api with subobjects for actual routes
+* [x] similar structure (like in database) in api with subobjects for actual routes
 * [x] tidy up helpers directory
+* [ ] use mixins on api accessor objects to be more flexible with routes (get/post/put/delete)
 
 ## Ideas
 * [ ] use hive instead of shared preferences

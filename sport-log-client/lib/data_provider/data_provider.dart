@@ -13,9 +13,9 @@ void resultSink(Result<dynamic, dynamic> result) {
 }
 
 abstract class DataProvider<T> {
-  Future<bool> createSingle(T object);
-  Future<bool> updateSingle(T object);
-  Future<bool> deleteSingle(T object);
+  Future<void> createSingle(T object);
+  Future<void> updateSingle(T object);
+  Future<void> deleteSingle(T object);
 
   Future<List<T>> getNonDeleted();
   Future<void> pushToServer();
@@ -82,43 +82,41 @@ abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
 
 mixin ConnectedMethods<T extends DbObject> on DataProviderImpl<T> {
   @override
-  Future<bool> createSingle(T object) async {
+  Future<void> createSingle(T object) async {
     assert(object.isValid());
     final result = await api.postSingle(object);
     if (result.isFailure) {
       handleApiError(result.failure);
-      return false;
+      throw result.failure;
     }
     db.createSingle(object, isSynchronized: true).then(resultSink);
-    return true;
   }
 
   @override
-  Future<bool> updateSingle(T object) async {
+  Future<void> updateSingle(T object) async {
     assert(object.deleted || object.isValid());
     final result = await api.putSingle(object);
     if (result.isFailure) {
       handleApiError(result.failure);
-      return false;
+      throw result.failure;
     }
     db.updateSingle(object, isSynchronized: true).then(resultSink);
-    return true;
   }
 
   @override
-  Future<bool> deleteSingle(T object) async {
+  Future<void> deleteSingle(T object) async {
     return updateSingle(object..deleted = true);
   }
 }
 
 mixin UnconnectedMethods<T extends DbObject> on DataProviderImpl<T> {
   @override
-  Future<bool> createSingle(T object) async {
+  Future<void> createSingle(T object) async {
     assert(object.isValid());
     final result = await db.createSingle(object);
     if (result.isFailure) {
       handleDbError(result.failure);
-      return false;
+      throw result.failure;
     }
     api.postSingle(object).then((result) {
       if (result.isFailure) {
@@ -127,16 +125,15 @@ mixin UnconnectedMethods<T extends DbObject> on DataProviderImpl<T> {
         db.setSynchronized(object.id).then(resultSink);
       }
     });
-    return true;
   }
 
   @override
-  Future<bool> updateSingle(T object) async {
+  Future<void> updateSingle(T object) async {
     assert(object.deleted || object.isValid());
     final result = await db.updateSingle(object);
     if (result.isFailure) {
       handleDbError(result.failure);
-      return false;
+      throw result.failure;
     }
     api.putSingle(object).then((result) {
       if (result.isFailure) {
@@ -145,11 +142,10 @@ mixin UnconnectedMethods<T extends DbObject> on DataProviderImpl<T> {
         db.setSynchronized(object.id).then(resultSink);
       }
     });
-    return true;
   }
 
   @override
-  Future<bool> deleteSingle(T object) async {
+  Future<void> deleteSingle(T object) async {
     return updateSingle(object..deleted = true);
   }
 }
