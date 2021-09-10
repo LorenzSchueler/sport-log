@@ -38,15 +38,22 @@ struct SerializableJsonError {
     pub message: Option<String>,
 }
 
+impl From<JsonError> for SerializableJsonError {
+    fn from(json_error: JsonError) -> Self {
+        SerializableJsonError {
+            status: json_error.status.code,
+            message: json_error.message,
+        }
+    }
+}
+
 impl<'r, 'o: 'r> Responder<'r, 'o> for JsonError {
     fn respond_to(self, _request: &'r Request<'_>) -> Result<Response<'o>, Status> {
-        let json = serde_json::to_string(&SerializableJsonError {
-            status: self.status.code,
-            message: self.message,
-        })
-        .map_err(|_| Status::InternalServerError)?;
+        let status = self.status;
+        let json = serde_json::to_string::<SerializableJsonError>(&self.into())
+            .map_err(|_| Status::InternalServerError)?;
         Ok(Response::build()
-            .status(self.status)
+            .status(status)
             .header(ContentType::JSON)
             .sized_body(json.len(), Cursor::new(json))
             .finalize())
