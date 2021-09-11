@@ -1,6 +1,7 @@
 use std::{env, fs, process};
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
+use err_derive::Error as StdError;
 use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError, StatusCode};
@@ -8,12 +9,22 @@ use serde::Deserialize;
 use tracing::{error, info, warn};
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
-use sport_log_types::{CardioSession, CardioSessionId, CardioType, Movement, Position};
+use sport_log_types::{
+    ActionEventId, CardioSession, CardioSessionId, CardioType, Movement, Position,
+};
 
 const CONFIG_FILE: &str = "config.toml";
 const NAME: &str = "sportstracker-fetch";
 const DESCRIPTION: &str = "Sportstracker Fetch can fetch the latests workouts recorded with sportstracker and save them in your cardio sessions.";
 const PLATFORM_NAME: &str = "sportstracker";
+
+#[derive(Debug, StdError)]
+enum Error {
+    #[error(display = "{}", _0)]
+    Reqwest(ReqwestError),
+    #[error(display = "ExecutableActionEvent doesn't contain credentials")]
+    NoCredential(ActionEventId),
+}
 
 #[derive(Deserialize)]
 struct Config {
@@ -194,123 +205,150 @@ async fn fetch() -> Result<(), ReqwestError> {
 
     info!("got {} executable action events", exec_action_events.len());
 
-    let mut rng = rand::thread_rng();
-
-    let mut delete_action_event_ids = vec![];
+    let mut tasks = vec![];
     for exec_action_event in exec_action_events {
-        info!("processing {:#?}", exec_action_event);
+        let client = client.clone();
 
-        let (username, password) = if let (Some(username), Some(password)) =
-            (exec_action_event.username, exec_action_event.password)
-        {
-            (username, password)
-        } else {
-            warn!("can not log in: no credential provided");
-            continue;
-        };
+        tasks.push(tokio::spawn(async move {
+            info!("processing {:#?}", exec_action_event);
 
-        if let Some(token) = get_token(&client, &username, &password).await? {
-            let token = (token.0, token.1.as_str());
+            let (username, password) = if let (Some(username), Some(password)) =
+                (exec_action_event.username, exec_action_event.password)
+            {
+                (username, password)
+            } else {
+                warn!("can not log in: no credential provided");
+                return Err(Error::NoCredential(exec_action_event.action_event_id));
+            };
 
-            let workouts = get_workouts(&client, &token).await?;
-            let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
-            let movements: Vec<Movement> = client
-                .get(format!("{}/v1/movement", CONFIG.base_url))
-                .basic_auth(&username, Some(&CONFIG.password))
-                .send()
-                .await?
-                .json::<Vec<Movement>>()
-                .await?
-                .into_iter()
-                .map(|mut movement| {
-                    movement.name.make_ascii_lowercase();
-                    movement.name.retain(|c| !c.is_whitespace() && c != '-');
-                    movement
-                })
-                .collect();
+            if let Some(token) = get_token(&client, &username, &password)
+                .await
+                .map_err(Error::Reqwest)?
+            {
+                let token = (token.0, token.1.as_str());
 
-            for workout in workouts {
-                let workout_data = get_workout_data(&client, &token, &workout.workout_key).await?;
-                // TODO find more mappings or api endpoint
-                let activity = match workout.activity_id {
-                    1 => "running",
-                    22 => "trailrunning",
-                    _ => continue,
-                };
-                let movement_id = match movements.iter().find(|movement| movement.name == activity)
-                {
-                    Some(movement) => movement.id,
-                    None => continue,
-                };
-                let cardio_session = CardioSession {
-                    id: CardioSessionId(rng.gen()),
-                    user_id: exec_action_event.user_id,
-                    movement_id,
-                    cardio_type: CardioType::Training,
-                    datetime: DateTime::from_utc(
-                        NaiveDateTime::from_timestamp(workout.start_time as i64 / 1000, 0),
-                        Utc,
-                    ),
-                    distance: Some(workout.total_distance as i32),
-                    ascent: Some(workout.total_ascent as i32),
-                    descent: Some(workout.total_descent as i32),
-                    time: Some(workout.total_time as i32),
-                    calories: Some(workout.energy_consumption as i32),
-                    track: Some(
-                        workout_data
-                            .locations
-                            .into_iter()
-                            .map(|location| Position {
-                                latitude: location.la,
-                                longitude: location.ln,
-                                elevation: location.h as i32,
-                                distance: location.s as i32,
-                                time: location.t as i32,
-                            })
-                            .collect(),
-                    ),
-                    avg_cadence: if workout.cadence.avg > 0. {
-                        Some(workout.cadence.avg as i32)
-                    } else {
-                        None
-                    },
-                    cadence: None,
-                    avg_heart_rate: None,
-                    heart_rate: None,
-                    route_id: None,
-                    comments: workout.description,
-                    last_change: Utc::now(),
-                    deleted: false,
-                };
-
-                let response = client
-                    .post(format!("{}/v1/cardio_session", CONFIG.base_url))
+                let workouts = get_workouts(&client, &token)
+                    .await
+                    .map_err(Error::Reqwest)?;
+                let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
+                let movements: Vec<Movement> = client
+                    .get(format!("{}/v1/movement", CONFIG.base_url))
                     .basic_auth(&username, Some(&CONFIG.password))
-                    .json(&cardio_session)
                     .send()
-                    .await?;
-                match response.status() {
-                    status if status.is_success() => {
-                        info!("cardio session saved");
-                    }
-                    StatusCode::CONFLICT => {
-                        info!(
-                            "everything up to date for user {}",
-                            exec_action_event.user_id.0
-                        );
-                        break;
-                    }
-                    _ => {
-                        response.json::<CardioSession>().await?; // this will always fail and return the error
-                        break;
+                    .await
+                    .map_err(Error::Reqwest)?
+                    .json::<Vec<Movement>>()
+                    .await
+                    .map_err(Error::Reqwest)?
+                    .into_iter()
+                    .map(|mut movement| {
+                        movement.name.make_ascii_lowercase();
+                        movement.name.retain(|c| !c.is_whitespace() && c != '-');
+                        movement
+                    })
+                    .collect();
+
+                for workout in workouts {
+                    let workout_data = get_workout_data(&client, &token, &workout.workout_key)
+                        .await
+                        .map_err(Error::Reqwest)?;
+                    // TODO find more mappings or api endpoint
+                    let activity = match workout.activity_id {
+                        1 => "running",
+                        22 => "trailrunning",
+                        _ => continue,
+                    };
+                    let movement_id =
+                        match movements.iter().find(|movement| movement.name == activity) {
+                            Some(movement) => movement.id,
+                            None => continue,
+                        };
+                    let cardio_session = CardioSession {
+                        id: CardioSessionId(rand::thread_rng().gen()),
+                        user_id: exec_action_event.user_id,
+                        movement_id,
+                        cardio_type: CardioType::Training,
+                        datetime: DateTime::from_utc(
+                            NaiveDateTime::from_timestamp(workout.start_time as i64 / 1000, 0),
+                            Utc,
+                        ),
+                        distance: Some(workout.total_distance as i32),
+                        ascent: Some(workout.total_ascent as i32),
+                        descent: Some(workout.total_descent as i32),
+                        time: Some(workout.total_time as i32),
+                        calories: Some(workout.energy_consumption as i32),
+                        track: Some(
+                            workout_data
+                                .locations
+                                .into_iter()
+                                .map(|location| Position {
+                                    latitude: location.la,
+                                    longitude: location.ln,
+                                    elevation: location.h as i32,
+                                    distance: location.s as i32,
+                                    time: location.t as i32,
+                                })
+                                .collect(),
+                        ),
+                        avg_cadence: if workout.cadence.avg > 0. {
+                            Some(workout.cadence.avg as i32)
+                        } else {
+                            None
+                        },
+                        cadence: None,
+                        avg_heart_rate: None,
+                        heart_rate: None,
+                        route_id: None,
+                        comments: workout.description,
+                        last_change: Utc::now(),
+                        deleted: false,
+                    };
+
+                    let response = client
+                        .post(format!("{}/v1/cardio_session", CONFIG.base_url))
+                        .basic_auth(&username, Some(&CONFIG.password))
+                        .json(&cardio_session)
+                        .send()
+                        .await
+                        .map_err(Error::Reqwest)?;
+                    match response.status() {
+                        status if status.is_success() => {
+                            info!("cardio session saved");
+                        }
+                        StatusCode::CONFLICT => {
+                            info!(
+                                "everything up to date for user {}",
+                                exec_action_event.user_id.0
+                            );
+                            break;
+                        }
+                        _ => {
+                            response
+                                .json::<CardioSession>()
+                                .await
+                                .map_err(Error::Reqwest)?; // this will always fail and return the error
+                            break;
+                        }
                     }
                 }
+            } else {
+                warn!("login failed!\n");
             }
-            delete_action_event_ids.push(exec_action_event.action_event_id);
-        } else {
-            warn!("login failed!\n");
+            return Ok(exec_action_event.action_event_id);
+        }));
+    }
+
+    let mut delete_action_event_ids = vec![];
+    for task in tasks {
+        match task.await.unwrap() {
+            Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
+            Err(Error::NoCredential(action_event_id)) => {
+                delete_action_event_ids.push(action_event_id)
+            }
+            Err(error) => error!("{}", error),
         }
     }
+
     if !delete_action_event_ids.is_empty() {
         delete_events(
             &client,
