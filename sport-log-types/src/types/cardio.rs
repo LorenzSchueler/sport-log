@@ -1,8 +1,8 @@
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use std::io::Write;
 
 use chrono::{DateTime, Utc};
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use diesel::{
     deserialize,
     pg::Pg,
@@ -10,11 +10,11 @@ use diesel::{
     sql_types::{Double, Integer},
     types::{FromSql, Record, ToSql},
 };
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync,
     ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
@@ -22,14 +22,14 @@ use sport_log_types_derive::{
 use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, UserId};
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use crate::{
     schema::{cardio_session, route},
     User,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
-#[cfg_attr(feature = "full", derive(DbEnum))]
+#[cfg_attr(feature = "server", derive(DbEnum))]
 pub enum CardioType {
     Training,
     ActiveRecovery,
@@ -46,8 +46,8 @@ pub enum CardioType {
 ///
 /// `time` is the time in seconds since the start of the recording.
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(SqlType,))]
-#[cfg_attr(feature = "full", postgres(type_name = "position"))]
+#[cfg_attr(feature = "server", derive(SqlType,))]
+#[cfg_attr(feature = "server", postgres(type_name = "position"))]
 pub struct Position {
     #[serde(rename(serialize = "lo", deserialize = "lo"))]
     pub longitude: f64,
@@ -61,7 +61,7 @@ pub struct Position {
     pub time: i32,
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl ToSql<Position, Pg> for Position {
     fn to_sql<W: Write>(&self, out: &mut Output<W, Pg>) -> serialize::Result {
         WriteTuple::<(Double, Double, Integer, Integer, Integer)>::write_tuple(
@@ -77,7 +77,7 @@ impl ToSql<Position, Pg> for Position {
     }
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl FromSql<Position, Pg> for Position {
     fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
         let (longitude, latitude, elevation, distance, time) =
@@ -94,15 +94,15 @@ impl FromSql<Position, Pg> for Position {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct RouteId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -121,8 +121,8 @@ pub struct RouteId(pub i64);
         VerifyForUserOrAPWithoutDb
     )
 )]
-#[cfg_attr(feature = "full", table_name = "route")]
-#[cfg_attr(feature = "full", belongs_to(User))]
+#[cfg_attr(feature = "server", table_name = "route")]
+#[cfg_attr(feature = "server", belongs_to(User))]
 pub struct Route {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -132,11 +132,11 @@ pub struct Route {
     pub user_id: UserId,
     pub name: String,
     pub distance: i32,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub ascent: Option<i32>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub descent: Option<i32>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub track: Vec<Position>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -146,15 +146,15 @@ pub struct Route {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct CardioSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -173,9 +173,9 @@ pub struct CardioSessionId(pub i64);
         VerifyForUserOrAPWithoutDb
     )
 )]
-#[cfg_attr(feature = "full", table_name = "cardio_session")]
-#[cfg_attr(feature = "full", belongs_to(User))]
-#[cfg_attr(feature = "full", belongs_to(Movement))]
+#[cfg_attr(feature = "server", table_name = "cardio_session")]
+#[cfg_attr(feature = "server", belongs_to(User))]
+#[cfg_attr(feature = "server", belongs_to(Movement))]
 pub struct CardioSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -188,31 +188,31 @@ pub struct CardioSession {
     pub movement_id: MovementId,
     pub cardio_type: CardioType,
     pub datetime: DateTime<Utc>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub distance: Option<i32>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub ascent: Option<i32>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub descent: Option<i32>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub time: Option<i32>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub calories: Option<i32>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub track: Option<Vec<Position>>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub avg_cadence: Option<i32>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub cadence: Option<Vec<f32>>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub avg_heart_rate: Option<i32>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub heart_rate: Option<Vec<f32>>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     #[serde(serialize_with = "to_str_optional")]
     #[serde(deserialize_with = "from_str_optional")]
     pub route_id: Option<RouteId>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]

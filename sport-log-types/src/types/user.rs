@@ -1,27 +1,27 @@
 use chrono::{DateTime, Utc};
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 use sport_log_types_derive::{FromI64, ToI64};
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use sport_log_types_derive::{FromSql, GetById, GetByIds, ToSql, VerifyUnchecked};
 
 use crate::{from_str, to_str};
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use crate::{schema::user, AuthUser, CheckUserId, Unverified, VerifyForUserWithDb};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct UserId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -33,7 +33,7 @@ pub struct UserId(pub i64);
         VerifyUnchecked,
     )
 )]
-#[cfg_attr(feature = "full", table_name = "user")]
+#[cfg_attr(feature = "server", table_name = "user")]
 pub struct User {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -46,7 +46,7 @@ pub struct User {
     pub last_change: DateTime<Utc>,
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyForUserWithDb for Unverified<User> {
     type Entity = User;
 

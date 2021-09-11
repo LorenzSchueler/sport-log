@@ -1,11 +1,11 @@
 use chrono::{DateTime, Utc};
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use diesel_derive_enum::DbEnum;
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, CreateMultiple, FromSql, GetAll, GetById, GetByIds, ToSql, Update,
     VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
@@ -13,7 +13,7 @@ use sport_log_types_derive::{
 use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{from_str, from_str_optional, to_str, to_str_optional, UserId};
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use crate::{
     schema::{eorm, movement},
     AuthUserOrAP, CheckUserId, GetById, Unverified, UnverifiedId, UnverifiedIds, User,
@@ -22,14 +22,14 @@ use crate::{
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
-#[cfg_attr(feature = "full", derive(DbEnum))]
+#[cfg_attr(feature = "server", derive(DbEnum))]
 pub enum MovementCategory {
     Cardio,
     Strength,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
-#[cfg_attr(feature = "full", derive(DbEnum))]
+#[cfg_attr(feature = "server", derive(DbEnum))]
 pub enum MovementUnit {
     Reps,
     Cal,
@@ -42,7 +42,7 @@ pub enum MovementUnit {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Hash,
         FromSqlRow,
@@ -53,10 +53,10 @@ pub enum MovementUnit {
         VerifyIdUnchecked
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct MovementId(pub i64);
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
     type Id = MovementId;
 
@@ -71,7 +71,7 @@ impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
     }
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
     type Id = MovementId;
 
@@ -97,7 +97,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
 /// `category` decides whether the Movement can be used in Cardio or Strength Sessions. For Metcons the category does not matter.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -113,18 +113,18 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
         VerifyForAdminWithoutDb
     )
 )]
-#[cfg_attr(feature = "full", table_name = "movement")]
-#[cfg_attr(feature = "full", belongs_to(User))]
+#[cfg_attr(feature = "server", table_name = "movement")]
+#[cfg_attr(feature = "server", belongs_to(User))]
 pub struct Movement {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: MovementId,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     #[serde(serialize_with = "to_str_optional")]
     #[serde(deserialize_with = "from_str_optional")]
     pub user_id: Option<UserId>,
     pub name: String,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
     pub category: MovementCategory,
     #[serde(skip)]
@@ -133,7 +133,7 @@ pub struct Movement {
     pub deleted: bool,
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyForUserOrAPWithDb for Unverified<Movement> {
     type Entity = Movement;
 
@@ -156,7 +156,7 @@ impl VerifyForUserOrAPWithDb for Unverified<Movement> {
     }
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Movement>> {
     type Entity = Movement;
 
@@ -180,7 +180,7 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Movement>> {
     }
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyForUserOrAPWithoutDb for Unverified<Movement> {
     type Entity = Movement;
 
@@ -194,7 +194,7 @@ impl VerifyForUserOrAPWithoutDb for Unverified<Movement> {
     }
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
     type Entity = Movement;
 
@@ -213,15 +213,15 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForAdmin)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct EormId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -232,7 +232,7 @@ pub struct EormId(pub i64);
         GetAll
     )
 )]
-#[cfg_attr(feature = "full", table_name = "eorm")]
+#[cfg_attr(feature = "server", table_name = "eorm")]
 pub struct Eorm {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]

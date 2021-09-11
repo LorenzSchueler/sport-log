@@ -19,4 +19,4 @@ rand_core = { version = "0.6", features = ["std"], optional = true }
 tracing = { version = "0.1.26", optional = true }
 
 [features]
-full = ["rocket", "rocket_sync_db_pools", "diesel", "diesel-derive-enum", "base64", "toml", "argon2", "rand_core", "tracing"]
+server = ["rocket", "rocket_sync_db_pools", "diesel", "diesel-derive-enum", "base64", "toml", "argon2", "rand_core", "tracing"]
