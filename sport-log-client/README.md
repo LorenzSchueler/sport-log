@@ -53,6 +53,7 @@
 * [ ] page showing recent activity
 * [ ] syncing in different thread / background service
 * [ ] simplify error handling (no result type anymore?)
+* [ ] use upsert instead of separate create/update?
 
 ## Database
 * [ ] shouldn't be possible to delete e. g. movement when it is referenced by other resource

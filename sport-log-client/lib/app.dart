@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/material_color_generator.dart';
-import 'package:sport_log/models/metcon/ui_metcon.dart';
 import 'package:sport_log/models/movement/ui_movement.dart';
 import 'package:sport_log/pages/landing/landing_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
@@ -15,6 +14,7 @@ import 'package:sport_log/pages/workout/workout_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
 
 import 'data_provider/user_state.dart';
+import 'models/metcon/metcon_description.dart';
 import 'models/strength/strength_session_description.dart';
 import 'routes.dart';
 
@@ -40,7 +40,7 @@ class _AppState extends State<App> {
         Routes.editMetcon: (_) => ProtectedRoute(builder: (context) {
               final arg = ModalRoute.of(context)?.settings.arguments;
               return EditMetconPage(
-                initialMetcon: (arg is UiMetcon) ? arg : null,
+                initialMetcon: (arg is MetconDescription) ? arg : null,
               );
             }),
         Routes.syncing: (_) =>

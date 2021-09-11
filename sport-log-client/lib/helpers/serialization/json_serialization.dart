@@ -1,7 +1,6 @@
-
 import 'package:fixnum/fixnum.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:intl/intl.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 class IdConverter extends JsonConverter<Int64, String> {
   const IdConverter() : super();
@@ -57,5 +56,19 @@ class DateTimeConverter extends JsonConverter<DateTime, String> {
   String toJson(DateTime object) {
     // FIXME
     return object.toIso8601String() + '+00:00';
+  }
+}
+
+class DurationConverter extends JsonConverter<Duration?, int?> {
+  const DurationConverter() : super();
+
+  @override
+  Duration? fromJson(int? json) {
+    return json == null ? null : Duration(seconds: json);
+  }
+
+  @override
+  int? toJson(Duration? object) {
+    return object?.inSeconds;
   }
 }

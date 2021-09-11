@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'metcon.g.dart';
@@ -46,14 +47,29 @@ class Metcon implements DbObject {
   @OptionalIdConverter()
   Int64? userId;
   String? name;
+  // TODO: rename type
   MetconType metconType;
   int? rounds;
-  int? timecap;
+  @DurationConverter()
+  Duration? timecap;
   String? description;
   @override
   bool deleted;
 
+  static const Duration timecapDefaultValue = Duration(minutes: 30);
+  static const int roundsDefaultValue = 3;
+
+  Metcon.defaultValue(this.userId)
+      : id = randomId(),
+        name = "",
+        metconType = MetconType.amrap,
+        rounds = null,
+        timecap = timecapDefaultValue,
+        description = null,
+        deleted = false;
+
   factory Metcon.fromJson(Map<String, dynamic> json) => _$MetconFromJson(json);
+
   Map<String, dynamic> toJson() => _$MetconToJson(this);
 
   bool validateMetconType() {
@@ -71,9 +87,10 @@ class Metcon implements DbObject {
   bool isValid() {
     return userId != null &&
         name != null &&
+        name!.isNotEmpty &&
         deleted != true &&
         (rounds == null || rounds! >= 1) &&
-        (timecap == null || timecap! >= 1) &&
+        (timecap == null || timecap! >= const Duration(seconds: 1)) &&
         validateMetconType();
   }
 }
@@ -87,7 +104,9 @@ class DbMetconSerializer implements DbSerializer<Metcon> {
       name: r[Keys.name] as String?,
       metconType: MetconType.values[r[Keys.metconType]! as int],
       rounds: r[Keys.rounds] as int?,
-      timecap: r[Keys.timecap] as int?,
+      timecap: r[Keys.timecap] == null
+          ? null
+          : Duration(seconds: r[Keys.timecap]! as int),
       description: r[Keys.description] as String?,
       deleted: r[Keys.deleted]! as int == 1,
     );
@@ -101,7 +120,7 @@ class DbMetconSerializer implements DbSerializer<Metcon> {
       Keys.name: o.name,
       Keys.metconType: o.metconType.index,
       Keys.rounds: o.rounds,
-      Keys.timecap: o.timecap,
+      Keys.timecap: o.timecap?.inSeconds,
       Keys.description: o.description,
       Keys.deleted: o.deleted ? 1 : 0,
     };

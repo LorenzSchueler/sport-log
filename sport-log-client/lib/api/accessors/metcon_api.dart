@@ -13,8 +13,6 @@ class MetconSessionApi extends ApiAccessor<MetconSession> {
 }
 
 class MetconApi extends ApiAccessor<Metcon> {
-  final movements = Api.instance.metconMovements;
-
   @override
   Metcon fromJson(Map<String, dynamic> json) => Metcon.fromJson(json);
 
@@ -28,7 +26,8 @@ class MetconApi extends ApiAccessor<Metcon> {
     assert(metconDescription.isValid());
     final result1 = await postSingle(metconDescription.metcon);
     if (result1.isSuccess) {
-      final result2 = await movements.postMultiple(metconDescription.moves);
+      final result2 = await Api.instance.metconMovements
+          .postMultiple(metconDescription.moves);
       if (result2.isSuccess) {
         return Success(null);
       } else {
@@ -42,7 +41,8 @@ class MetconApi extends ApiAccessor<Metcon> {
   ApiResult<void> putFull(MetconDescription metconDescription) async {
     final result1 = await putSingle(metconDescription.metcon);
     if (result1.isSuccess) {
-      final result2 = await movements.putMultiple(metconDescription.moves);
+      final result2 = await Api.instance.metconMovements
+          .putMultiple(metconDescription.moves);
       if (result2.isSuccess) {
         return Success(null);
       } else {

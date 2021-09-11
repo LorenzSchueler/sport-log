@@ -1,6 +1,6 @@
-
-import 'package:sport_log/helpers/validation.dart';
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
+import 'package:sport_log/helpers/validation.dart';
 
 import 'all.dart';
 
@@ -15,15 +15,23 @@ class MetconDescription implements Validatable {
   List<MetconMovement> moves;
   bool hasReference; // whether there is a MetconSession referencing this metcon
 
+  MetconDescription.defaultValue(Int64 userId)
+      : metcon = Metcon.defaultValue(userId),
+        moves = [],
+        hasReference = false;
+
   @override
   bool isValid() {
-    return validate(metcon.isValid(), 'MetconDescription: metcon not valid')
-        && validate(moves.isNotEmpty, 'MetconDescription: moves empty')
-        && validate(moves.every((mm) => mm.metconId == metcon.id),
-            'MetconDescription: metcon id mismatch')
-        && validate(moves.everyIndexed((mm, index) => mm.movementNumber == index),
-            'MetconDescription: moves indices wrong')
-        && validate(moves.every((mm) => mm.isValid()),
+    return validate(metcon.isValid(), 'MetconDescription: metcon not valid') &&
+        validate(moves.isNotEmpty, 'MetconDescription: moves empty') &&
+        validate(moves.every((mm) => mm.metconId == metcon.id),
+            'MetconDescription: metcon id mismatch') &&
+        validate(moves.everyIndexed((mm, index) => mm.movementNumber == index),
+            'MetconDescription: moves indices wrong') &&
+        validate(moves.every((mm) => mm.isValid()),
             'MetconDescription: moves not valid');
   }
+
+  static bool areTheSame(MetconDescription m1, MetconDescription m2) =>
+      m1.metcon.id == m2.metcon.id;
 }

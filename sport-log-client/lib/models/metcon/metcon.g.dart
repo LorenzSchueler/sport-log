@@ -13,7 +13,7 @@ Metcon _$MetconFromJson(Map<String, dynamic> json) {
     name: json['name'] as String?,
     metconType: _$enumDecode(_$MetconTypeEnumMap, json['metcon_type']),
     rounds: json['rounds'] as int?,
-    timecap: json['timecap'] as int?,
+    timecap: const DurationConverter().fromJson(json['timecap'] as int?),
     description: json['description'] as String?,
     deleted: json['deleted'] as bool,
   );
@@ -25,7 +25,7 @@ Map<String, dynamic> _$MetconToJson(Metcon instance) => <String, dynamic>{
       'name': instance.name,
       'metcon_type': _$MetconTypeEnumMap[instance.metconType],
       'rounds': instance.rounds,
-      'timecap': instance.timecap,
+      'timecap': const DurationConverter().toJson(instance.timecap),
       'description': instance.description,
       'deleted': instance.deleted,
     };

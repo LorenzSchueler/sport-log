@@ -9,8 +9,6 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/movements/movements_cubit.dart';
-import 'package:sport_log/pages/workout/metcon/metcons_cubit.dart';
-import 'package:sport_log/repositories/metcon_repository.dart';
 import 'package:sport_log/repositories/movement_repository.dart';
 
 Future<void> initialize({bool doDownSync = true}) async {
@@ -37,13 +35,11 @@ void main() async {
     runApp(MultiBlocProvider(
       providers: [
         BlocProvider.value(value: AuthenticationBloc()),
-        BlocProvider.value(value: MetconsCubit()),
         BlocProvider.value(value: movementsCubit),
       ],
       child: MultiRepositoryProvider(
         providers: [
           RepositoryProvider.value(value: movementRepo),
-          RepositoryProvider.value(value: MetconRepository()),
         ],
         child: const App(),
       ),

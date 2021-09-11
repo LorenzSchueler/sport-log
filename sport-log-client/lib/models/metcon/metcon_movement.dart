@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
@@ -32,6 +33,16 @@ class MetconMovement implements DbObject {
   double? weight;
   @override
   bool deleted;
+
+  MetconMovement.defaultValue({
+    required this.metconId,
+    required this.movementId,
+    required this.movementNumber,
+  })  : id = randomId(),
+        count = 1,
+        movementUnit = MovementUnit.reps,
+        weight = null,
+        deleted = false;
 
   factory MetconMovement.fromJson(Map<String, dynamic> json) =>
       _$MetconMovementFromJson(json);

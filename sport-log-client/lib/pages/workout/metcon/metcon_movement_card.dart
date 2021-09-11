@@ -1,8 +1,7 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sport_log/models/metcon/ui_metcon.dart';
+import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/repositories/movement_repository.dart';
 import 'package:sport_log/widgets/int_picker.dart';
@@ -18,9 +17,9 @@ class MetconMovementCard extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
-  final UiMetconMovement move;
+  final MetconMovement move;
   final int index;
-  final Function(UiMetconMovement) editMetconMovement;
+  final Function(MetconMovement) editMetconMovement;
   final Function() deleteMetconMovement;
 
   static const _weightDefaultValue = 10.0;
@@ -32,10 +31,10 @@ class MetconMovementCard extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
-            title: Text(
-                context.read<MovementRepository>()
-                    .getMovement(move.movementId)!.name
-            ),
+            title: Text(context
+                .read<MovementRepository>()
+                .getMovement(move.movementId)!
+                .name),
             onTap: () => showMovementPickerDialog(context, (id) {
               move.movementId = id;
               editMetconMovement(move);
@@ -50,35 +49,35 @@ class MetconMovementCard extends StatelessWidget {
                   },
                 ),
                 ReorderableDragStartListener(
-                  child: const Icon(Icons.drag_handle),
-                  index: index
-                ),
+                    child: const Icon(Icons.drag_handle), index: index),
               ],
             ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IntPicker(initialValue: move.count, setValue: (count) {
-                move.count = count;
-                editMetconMovement(move);
-              }),
+              IntPicker(
+                  initialValue: move.count,
+                  setValue: (count) {
+                    move.count = count;
+                    editMetconMovement(move);
+                  }),
               const Padding(padding: EdgeInsets.all(8)),
               DropdownButton(
-                value: move.unit,
+                value: move.movementUnit,
                 onChanged: (MovementUnit? u) {
                   if (u != null) {
-                    move.unit = u;
+                    move.movementUnit = u;
                     editMetconMovement(move);
                   }
                 },
-                items: MovementUnit.values.map((u) =>
-                    DropdownMenuItem(
-                      child: Text(u.toDisplayName()),
-                      key: ValueKey(u.toString()),
-                      value: u,
-                    )
-                ).toList(),
+                items: MovementUnit.values
+                    .map((u) => DropdownMenuItem(
+                          child: Text(u.toDisplayName()),
+                          key: ValueKey(u.toString()),
+                          value: u,
+                        ))
+                    .toList(),
               ),
               const Padding(padding: EdgeInsets.all(8)),
             ],
@@ -95,8 +94,7 @@ class MetconMovementCard extends StatelessWidget {
                   icon: const Icon(Icons.add),
                   label: const Text("Add weight..."),
                 ),
-              if (move.weight != null)
-                const Text("Float picker to come"),
+              if (move.weight != null) const Text("Float picker to come"),
             ],
           ),
         ],
@@ -105,9 +103,7 @@ class MetconMovementCard extends StatelessWidget {
   }
 
   static void showMovementPickerDialog(
-      BuildContext context,
-      Function(Int64) onPicked
-  ) {
+      BuildContext context, Function(Int64) onPicked) {
     showDialog<Int64>(
       context: context,
       builder: (_) => const MovementPickerDialog(),
@@ -117,5 +113,4 @@ class MetconMovementCard extends StatelessWidget {
       }
     });
   }
-
 }
