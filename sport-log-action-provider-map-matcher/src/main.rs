@@ -109,10 +109,14 @@ struct LocationElevation {
 
 #[tokio::main]
 async fn main() {
-    env::set_var(
-        "RUST_LOG",
-        "warn,sport_log_action_provider_map_matcher=debug",
-    );
+    if cfg!(debug_assertions) {
+        env::set_var(
+            "RUST_LOG",
+            "info,sport_log_action_provider_map_matcher=debug",
+        );
+    } else {
+        env::set_var("RUST_LOG", "warn");
+    }
 
     tracing_subscriber::fmt::init();
 
