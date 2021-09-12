@@ -47,6 +47,10 @@ class DownSync {
     final result = _storage.getString(Keys.lastSync);
     return result == null ? null : DateTime.parse(result);
   }
+
+  Future<void> removeLastSync() async {
+    await _storage.remove(Keys.lastSync);
+  }
 }
 
 class UpSync {

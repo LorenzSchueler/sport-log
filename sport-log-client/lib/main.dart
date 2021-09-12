@@ -12,10 +12,12 @@ Future<void> initialize({bool doDownSync = true}) async {
   WidgetsFlutterBinding.ensureInitialized(); // TODO: necessary?
   await Config.init();
   await UserState.instance.init();
-  await AppDatabase.instance?.init().then((_) {
-    DownSync.instance.init().then((downSync) {
-      if (doDownSync) downSync.sync();
-    });
+  await AppDatabase.instance?.init();
+  await DownSync.instance.init().then((downSync) {
+    if (Config.doCleanStart) {
+      downSync.removeLastSync();
+    }
+    if (doDownSync) downSync.sync();
   });
   await UpSync.instance.init();
   Bloc.observer = SimpleBlocObserver();

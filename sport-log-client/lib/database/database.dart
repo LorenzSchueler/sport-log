@@ -18,11 +18,12 @@ class AppDatabase {
   AppDatabase._();
 
   Future<void> init() async {
-    const fileName = 'database.sqlite';
-    final File databaseFile = File(await getDatabasesPath() + '/' + fileName);
-    // TODO: remove this
-    if (await databaseFile.exists()) {
-      await databaseFile.delete();
+    const fileName = Config.databaseName;
+    if (Config.doCleanStart) {
+      final File databaseFile = File(await getDatabasesPath() + '/' + fileName);
+      if (await databaseFile.exists()) {
+        await databaseFile.delete();
+      }
     }
     await openDatabase(fileName,
         version: 1,
@@ -33,6 +34,11 @@ class AppDatabase {
             sql += await table.init(db);
           }
           _logger.d(sql);
+        },
+        onOpen: (db) {
+          for (final table in allTables) {
+            table.setDatabase(db);
+          }
           // FIXME: this is awkward
           metcons.metconMovements = metconMovements;
           metcons.metconSessions = metconSessions;

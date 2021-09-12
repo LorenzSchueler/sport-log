@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:logger/logger.dart';
 
 abstract class Config {
   static late String apiUrlBase;
@@ -29,7 +30,11 @@ abstract class Config {
     return false;
   }
 
-  static int debugApiDelay = 500; // ms
+  static const String databaseName = 'database.sqlite';
 
-  static String databaseName = 'database.sqlite';
+  // if true, the database will be deleted and re-created,
+  // and the account data will be fetched completely
+  static const bool doCleanStart = false;
+
+  static Level minLogLevel = Level.debug;
 }

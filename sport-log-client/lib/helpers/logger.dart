@@ -1,9 +1,11 @@
 import 'package:logger/logger.dart' as l;
+import 'package:sport_log/config.dart';
 
 class Logger extends l.Logger {
   Logger(String key)
       : super(
           printer: _Printer(key),
+          level: Config.minLogLevel,
         );
 }
 
