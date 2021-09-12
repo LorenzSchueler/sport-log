@@ -1,159 +1,128 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
-import 'package:provider/provider.dart';
-import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/models/movement/ui_movement.dart';
-import 'package:sport_log/pages/movements/movements_cubit.dart';
+import 'package:implicitly_animated_reorderable_list/transitions.dart';
+import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
+import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/api/api_error.dart';
-import 'package:implicitly_animated_reorderable_list/transitions.dart';
 
-import 'movement_request_bloc.dart';
-
-class MovementsPage extends StatelessWidget {
+class MovementsPage extends StatefulWidget {
   const MovementsPage({Key? key}) : super(key: key);
 
+  @override
+  State<MovementsPage> createState() => _MovementsPageState();
+}
+
+class _MovementsPageState extends State<MovementsPage> {
   static const _deleteChoice = 1;
   static const _editChoice = 2;
 
-  int _compareFunction(Movement m1, Movement m2) {
-    if (m1.userId != null) {
-      if (m2.userId != null) {
-        return m1.name.compareTo(m2.name);
-      } else {
-        return -1;
-      }
-    } else {
-      if (m2.userId != null) {
-        return 1;
-      } else {
-        return m1.name.compareTo(m2.name);
-      }
-    }
+  final _dataProvider = MovementDataProvider();
+  List<MovementDescription> _movementDescriptions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _dataProvider.getNonDeletedFull().then((mds) {
+      mds.sort(_compareFunction);
+      setState(() {
+        _movementDescriptions = mds;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Movements"),),
+      appBar: AppBar(
+        title: const Text("Movements"),
+      ),
       drawer: const MainDrawer(selectedRoute: Routes.movements),
       body: _body(context),
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.of(context).pushNamed(Routes.editMovement);
-        }
-      ),
+          child: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.of(context).pushNamed(Routes.editMovement);
+          }),
     );
   }
 
   Widget _body(BuildContext context) {
-    final requestBloc = MovementRequestBloc.fromContext(context);
-    if (context.read<MovementsCubit>().state is MovementsInitial) {
-      requestBloc.add(MovementRequestGetAll());
+    if (_movementDescriptions.isEmpty) {
+      return const Center(child: Text("No movements there."));
     }
-    return BlocConsumer<MovementRequestBloc, MovementRequestState>(
-      bloc: requestBloc,
-      listener: (context, state) {
-        if (state is MovementRequestFailed) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.reason.toErrorMessage()))
-          );
-        }
-      },
-      builder: (context, state) {
-        if (state is MovementRequestPending) {
-          return const Center(child: CircularProgressIndicator());
-        } else {
-          return BlocBuilder<MovementsCubit, MovementsState>(
-            builder: (context, state) {
-              if (state is MovementsInitial) {
-                return const Center(
-                  child: Text("Waiting for movements to be fetched."),
-                );
-              } else {
-                assert(state is MovementsLoaded);
-                final movements = (state as MovementsLoaded).movementsList;
-                movements.sort(_compareFunction);
-                if (movements.isEmpty) {
-                  return const Center(child: Text("No movements there."));
-                }
-                return ImplicitlyAnimatedList(
-                  items: movements,
-                  itemBuilder: _movementToWidget,
-                  areItemsTheSame: (Movement m1, Movement m2) =>
-                    m1.id == m2.id,
-                );
-              }
-            },
-          );
-        }
-      },
+    return ImplicitlyAnimatedList(
+      items: _movementDescriptions,
+      itemBuilder: _movementToWidget,
+      areItemsTheSame: MovementDescription.areTheSame,
     );
   }
 
   Widget _movementToWidget(
-      BuildContext context,
-      Animation<double> animation,
-      Movement movement,
-      int index,
+    BuildContext context,
+    Animation<double> animation,
+    MovementDescription md,
+    int index,
   ) {
-    final requestBloc = MovementRequestBloc.fromContext(context);
+    final movement = md.movement;
     return SizeFadeTransition(
       key: ValueKey(movement.id),
       animation: animation,
-      child: BlocConsumer<MovementRequestBloc, MovementRequestState>(
-        bloc: requestBloc,
-        listener: (context, state) {
-          if (state is MovementRequestFailed) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.reason.toErrorMessage()))
-            );
-          }
-        },
-        builder: (context, state) {
-          return Card(
-            child: ListTile(
-              title: Text(movement.name),
-              trailing: (movement.userId == null) ? null : PopupMenuButton(
-                enabled: state is! MovementRequestPending,
-                itemBuilder: (context) {
-                  return [
-                    const PopupMenuItem(
-                      value: _editChoice,
-                      child: Text("Edit"),
-                    ),
-                    const PopupMenuItem(
-                      value: _deleteChoice,
-                      child: Text("Delete"),
-                    )
-                  ];
-                },
-                onSelected: (choice) {
-                  assert(movement.userId != null);
-                  if (movement.userId == null) {
-                    return;
-                  }
-                  switch (choice) {
-                    case _deleteChoice:
-                      requestBloc.add(MovementRequestDelete(movement.id));
-                      break;
-                    case _editChoice:
-                      Navigator.of(context).pushNamed(
-                        Routes.editMovement,
-                        arguments: UiMovement.fromMovement(movement),
-                      );
-                      break;
-                  }
-                },
-              ),
-            ),
-          );
-        }
+      child: Card(
+        child: ListTile(
+          title: Text(movement.name),
+          trailing: (movement.userId == null)
+              ? null
+              : PopupMenuButton(
+                  itemBuilder: (context) {
+                    return [
+                      const PopupMenuItem(
+                        value: _editChoice,
+                        child: Text("Edit"),
+                      ),
+                      if (!md.hasReference)
+                        const PopupMenuItem(
+                          value: _deleteChoice,
+                          child: Text("Delete"),
+                        )
+                    ];
+                  },
+                  onSelected: (choice) {
+                    assert(movement.userId != null);
+                    if (movement.userId == null) {
+                      return;
+                    }
+                    switch (choice) {
+                      case _deleteChoice:
+                        _dataProvider.deleteSingle(movement);
+                        break;
+                      case _editChoice:
+                        Navigator.of(context).pushNamed(
+                          Routes.editMovement,
+                          arguments: md,
+                        );
+                        break;
+                    }
+                  },
+                ),
+        ),
       ),
     );
+  }
+
+  int _compareFunction(MovementDescription m1, MovementDescription m2) {
+    if (m1.movement.userId != null) {
+      if (m2.movement.userId != null) {
+        return m1.movement.name.compareTo(m2.movement.name);
+      } else {
+        return -1;
+      }
+    } else {
+      if (m2.movement.userId != null) {
+        return 1;
+      } else {
+        return m1.movement.name.compareTo(m2.movement.name);
+      }
+    }
   }
 }

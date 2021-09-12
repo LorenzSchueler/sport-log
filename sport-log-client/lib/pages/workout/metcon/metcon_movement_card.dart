@@ -1,9 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/repositories/movement_repository.dart';
 import 'package:sport_log/widgets/int_picker.dart';
 
 import 'movement_picker_dialog.dart';
@@ -31,10 +29,7 @@ class MetconMovementCard extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
-            title: Text(context
-                .read<MovementRepository>()
-                .getMovement(move.movementId)!
-                .name),
+            title: const Text('TODO'),
             onTap: () => showMovementPickerDialog(context, (id) {
               move.movementId = id;
               editMetconMovement(move);

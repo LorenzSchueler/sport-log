@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'movement.g.dart';
@@ -82,6 +83,13 @@ class Movement implements DbObject {
   MovementCategory category;
   @override
   bool deleted;
+
+  Movement.defaultValue(this.userId)
+      : id = randomId(),
+        name = '',
+        description = null,
+        category = MovementCategory.strength,
+        deleted = false;
 
   factory Movement.fromJson(Map<String, dynamic> json) =>
       _$MovementFromJson(json);

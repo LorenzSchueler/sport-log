@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/material_color_generator.dart';
-import 'package:sport_log/models/movement/ui_movement.dart';
+import 'package:sport_log/models/metcon/metcon_description.dart';
+import 'package:sport_log/models/movement/movement_description.dart';
+import 'package:sport_log/models/strength/strength_session_description.dart';
 import 'package:sport_log/pages/landing/landing_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
 import 'package:sport_log/pages/logs/logs_page.dart';
@@ -13,9 +16,6 @@ import 'package:sport_log/pages/workout/strength/edit_strength_session_page.dart
 import 'package:sport_log/pages/workout/workout_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
 
-import 'data_provider/user_state.dart';
-import 'models/metcon/metcon_description.dart';
-import 'models/strength/strength_session_description.dart';
 import 'routes.dart';
 
 class App extends StatefulWidget {
@@ -50,14 +50,12 @@ class _AppState extends State<App> {
             ProtectedRoute(builder: (_) => const MovementsPage()),
         Routes.editMovement: (_) => ProtectedRoute(builder: (context) {
               final arg = ModalRoute.of(context)?.settings.arguments;
-              if (arg is UiMovement) {
+              if (arg is MovementDescription) {
                 return EditMovementPage(initialMovement: arg);
               } else if (arg is String) {
-                return EditMovementPage(initialName: arg);
+                return EditMovementPage.fromName(initialName: arg);
               }
-              return EditMovementPage(
-                initialMovement: (arg is UiMovement) ? arg : null,
-              );
+              return EditMovementPage.newMovement();
             }),
         Routes.editStrengthSession: (context) =>
             ProtectedRoute(builder: (context) {

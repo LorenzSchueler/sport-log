@@ -1,7 +1,9 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/extensions/result_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 
 final logger = Logger('DP');
@@ -77,6 +79,13 @@ abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
       return;
     }
     db.setAllCreatedSynchronized().then(resultSink);
+  }
+
+  Future<T?> getById(Int64 id) async {
+    (await db.getSingle(id)).orDo((e) {
+      handleDbError(e);
+      return null;
+    });
   }
 }
 

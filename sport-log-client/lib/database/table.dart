@@ -24,15 +24,17 @@ abstract class Table<T extends DbObject> {
   ''';
 
   @mustCallSuper
-  Future<void> init(Database db) async {
+  Future<String> init(Database db) async {
     database = db;
     await database.execute(setupSql);
-    await database.execute('''
+    final String updateTrigger = '''
 create trigger ${tableName}_update before update on $tableName
 begin
   update $tableName set sync_status = 1 where id = new.id and sync_status = 0;
 end;
-    ''');
+    ''';
+    await database.execute(updateTrigger);
+    return setupSql + updateTrigger;
   }
 
   DbResult<R> request<R>(DbResult<R> Function() req) async {

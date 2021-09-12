@@ -1,8 +1,6 @@
-
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/repositories/movement_repository.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
@@ -14,7 +12,6 @@ class MovementPickerDialog extends StatefulWidget {
 }
 
 class _MovementPickerDialogState extends State<MovementPickerDialog> {
-
   List<Movement> _movements = [];
   String _searchTerm = "";
   bool _anyFullMatches = false;
@@ -22,10 +19,14 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
   bool get _canCreateNewMovement =>
       _searchTerm.isNotEmpty && _anyFullMatches == false;
 
+  final _dataProvider = MovementDataProvider();
+
   @override
   void initState() {
-    setState(() {
-      _movements = context.read<MovementRepository>().getAllMovements();
+    _dataProvider.getNonDeleted().then((ms) {
+      setState(() {
+        _movements = ms;
+      });
     });
     super.initState();
   }
@@ -34,10 +35,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
   Widget build(BuildContext context) {
     return WideScreenFrame(
       child: Dialog(
-        insetPadding: const EdgeInsets.symmetric(
-          vertical: 20,
-          horizontal: 10
-        ),
+        insetPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
         child: CustomScrollView(
           slivers: [
             SliverAppBar(
@@ -59,7 +57,8 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
                   }
                 },
                 childCount: _canCreateNewMovement
-                    ? _movements.length + 1 : _movements.length,
+                    ? _movements.length + 1
+                    : _movements.length,
               ),
             ),
           ],
@@ -71,19 +70,18 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
   Widget _searchTextField() {
     return TextFormField(
       initialValue: _searchTerm,
-      onChanged: (text) {
+      onChanged: (text) async {
+        final ms = await _dataProvider.searchByName(text);
         setState(() {
-          _movements = context.read<MovementRepository>().searchByName(text);
+          _movements = ms;
           _searchTerm = text;
           final search = _searchTerm.toLowerCase();
-          _anyFullMatches = _movements.any((movement) =>
-            movement.name.toLowerCase() == search);
+          _anyFullMatches = _movements
+              .any((movement) => movement.name.toLowerCase() == search);
         });
       },
-      decoration: const InputDecoration(
-        labelText: "Search",
-        icon: Icon(Icons.search)
-      ),
+      decoration:
+          const InputDecoration(labelText: "Search", icon: Icon(Icons.search)),
     );
   }
 
@@ -108,9 +106,10 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
       title: Text(m.name),
       subtitle: (m.description != null && m.description!.isNotEmpty)
           ? Text(
-        m.description!,
-        overflow: TextOverflow.ellipsis,
-      ) : null,
+              m.description!,
+              overflow: TextOverflow.ellipsis,
+            )
+          : null,
       onTap: () => Navigator.of(context).pop(m.id),
     );
   }

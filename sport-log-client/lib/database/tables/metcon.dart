@@ -117,6 +117,7 @@ create table metcon (
         return MetconDescription(
             metcon: metcon,
             moves: (await metconMovements.getByMetcon(metcon.id)).or([]),
+            // TODO: do this with a join
             hasReference: await metconSessions.existsByMetcon(metcon.id));
       })));
     });

@@ -3,10 +3,13 @@ import 'dart:io';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'tables/all.dart';
+
+final _logger = Logger('DB');
 
 class AppDatabase {
   static final AppDatabase? instance =
@@ -23,14 +26,18 @@ class AppDatabase {
     }
     await openDatabase(fileName,
         version: 1,
-        onConfigure: (db) => db.execute("PRAGMA foreign_keys = ON;"),
+        onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
         onCreate: (db, version) async {
+          String sql = '';
           for (final table in allTables) {
-            await table.init(db);
+            sql += await table.init(db);
           }
+          _logger.d(sql);
           // FIXME: this is awkward
           metcons.metconMovements = metconMovements;
+          metcons.metconSessions = metconSessions;
         });
+    _logger.d("Database initialization done.");
   }
 
   DbResult<void> upsertAccountData(AccountData data) async {

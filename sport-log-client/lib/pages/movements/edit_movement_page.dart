@@ -1,60 +1,52 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sport_log/api/api_error.dart';
-import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/models/movement/ui_movement.dart';
-import 'package:sport_log/pages/movements/movement_request_bloc.dart';
-import 'package:sport_log/widgets/loading_dialog.dart';
+import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
+import 'package:sport_log/data_provider/user_state.dart';
+import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 class EditMovementPage extends StatefulWidget {
-  EditMovementPage({
+  // TODO: split into two constructors
+  const EditMovementPage({
     Key? key,
-    UiMovement? initialMovement,
-    String? initialName,
-  }) : assert(initialMovement == null || initialName == null),
-       _initialMovement = initialMovement,
-       _initialName = initialName,
-       super(key: key) {
-    if (initialMovement != null) {
-      assert(_initialMovement!.id != null);
-    }
-  }
+    required MovementDescription initialMovement,
+  })  : _initialMovement = initialMovement,
+        _isEditing = true,
+        super(key: key);
 
-  final UiMovement? _initialMovement;
-  final String? _initialName;
+  EditMovementPage.fromName({
+    Key? key,
+    required String initialName,
+  })  : _initialMovement =
+            MovementDescription.defaultValue(UserState.instance.currentUser!.id)
+              ..movement.name = initialName,
+        _isEditing = false,
+        super(key: key);
+
+  EditMovementPage.newMovement({Key? key})
+      : _isEditing = false,
+        _initialMovement = MovementDescription.defaultValue(
+            UserState.instance.currentUser!.id),
+        super(key: key);
+
+  final MovementDescription _initialMovement;
+  final bool _isEditing;
 
   @override
   State<StatefulWidget> createState() => _EditMovementPageState();
-
-  bool get _isEditing => _initialMovement != null;
 }
 
 class _EditMovementPageState extends State<EditMovementPage> {
-
-  _EditMovementPageState();
+  final _dataProvider = MovementDataProvider();
 
   @override
   void initState() {
     super.initState();
-    if (widget._initialMovement != null) {
-      _movement = widget._initialMovement!;
-    } else {
-      _movement = UiMovement(
-        id: null,
-        userId: null,
-        name: widget._initialName ?? "",
-        category: _categoryDefaultValue,
-        description: null
-      );
-    }
+    _movement = widget._initialMovement.movement;
   }
 
-  late UiMovement _movement;
+  late Movement _movement;
 
   final _descriptionFocusNode = FocusNode();
-  static const _categoryDefaultValue = MovementCategory.strength;
 
   void _setName(String name) {
     setState(() => _movement.name = name);
@@ -73,25 +65,23 @@ class _EditMovementPageState extends State<EditMovementPage> {
     return _movement.name != "";
   }
 
-  void _submit(MovementRequestBloc requestBloc) {
+  void _submit() {
     FocusManager.instance.primaryFocus?.unfocus();
     if (!_inputIsValid()) {
       return;
     }
     if (widget._isEditing) {
-      assert(_movement.id != null);
       assert(_movement.userId != null);
-      requestBloc.add(MovementRequestUpdate(_movement));
+      _dataProvider.updateSingle(_movement);
     } else {
-      requestBloc.add(MovementRequestCreate(_movement));
+      _dataProvider.createSingle(_movement);
     }
   }
 
-  void _delete(MovementRequestBloc requestBloc) {
+  void _delete() {
     if (widget._isEditing) {
-      assert(_movement.id != null);
       assert(_movement.userId != null);
-      requestBloc.add(MovementRequestDelete(_movement.id!));
+      _dataProvider.deleteSingle(_movement);
     } else {
       Navigator.of(context).pop();
     }
@@ -99,46 +89,18 @@ class _EditMovementPageState extends State<EditMovementPage> {
 
   @override
   Widget build(BuildContext context) {
-    final requestBloc = MovementRequestBloc.fromContext(context);
-    return BlocConsumer(
-      bloc: requestBloc,
-      listener: (context, state) {
-        if (state is MovementRequestFailed) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.reason.toErrorMessage()))
-          );
-        } else if (state is MovementRequestSucceeded) {
-          final navigator = Navigator.of(context);
-          navigator.pop();
-          if (state.payload is int) {
-            navigator.pop(state.payload);
-          } else {
-            navigator.pop();
-          }
-        } else if (state is MovementRequestPending) {
-          showDialog<void>(
-            context: context,
-            builder: (_) => const LoadingDialog(),
-          );
-        }
-      },
-      builder: (context, state) => _buildForm(context, requestBloc),
-    );
-  }
-
-  Widget _buildForm(BuildContext context, MovementRequestBloc requestBloc) {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget._isEditing ? "Edit Movement" : "New Movement"),
           leading: IconButton(
-            onPressed: _inputIsValid() ? () => _submit(requestBloc) : null,
+            onPressed: _inputIsValid() ? () => _submit() : null,
             icon: const Icon(Icons.save),
           ),
           actions: [
             IconButton(
-              onPressed: () => _delete(requestBloc),
+              onPressed: () => _delete(),
               icon: const Icon(Icons.delete),
             )
           ],
@@ -206,8 +168,8 @@ class _EditMovementPageState extends State<EditMovementPage> {
           suffixIcon: IconButton(
             icon: const Icon(Icons.cancel),
             onPressed: () => _setDescription(null),
-          )
-        )
+          ),
+        ),
       ),
     );
   }
@@ -217,17 +179,19 @@ class _EditMovementPageState extends State<EditMovementPage> {
     final style = theme.textTheme.button!;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: MovementCategory.values.map((category) => TextButton(
-        onPressed: () => _setCategory(category),
-        child: Text(
-          category.toDisplayName(),
-          style: style.copyWith(
-            color: (category == _movement.category)
-                ? theme.primaryColor
-                : theme.disabledColor,
-          ),
-        ),
-      )).toList(),
+      children: MovementCategory.values
+          .map((category) => TextButton(
+                onPressed: () => _setCategory(category),
+                child: Text(
+                  category.toDisplayName(),
+                  style: style.copyWith(
+                    color: (category == _movement.category)
+                        ? theme.primaryColor
+                        : theme.disabledColor,
+                  ),
+                ),
+              ))
+          .toList(),
     );
   }
 }
