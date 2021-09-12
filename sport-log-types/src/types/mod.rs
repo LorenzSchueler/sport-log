@@ -310,6 +310,23 @@ pub trait CheckUserId {
 }
 
 #[cfg(feature = "server")]
+pub trait CheckOptionalUserId {
+    type Id;
+
+    fn check_optional_user_id(
+        id: Self::Id,
+        user_id: UserId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool>;
+
+    fn check_optional_user_ids(
+        ids: &[Self::Id],
+        user_id: UserId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool>;
+}
+
+#[cfg(feature = "server")]
 pub trait CheckAPId {
     type Id;
 

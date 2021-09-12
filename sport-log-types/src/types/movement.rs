@@ -12,7 +12,7 @@ use sport_log_types_derive::{
 };
 use sport_log_types_derive::{FromI64, ToI64};
 
-use crate::{from_str, from_str_optional, to_str, to_str_optional, UserId};
+use crate::{from_str, from_str_optional, to_str, to_str_optional, CheckOptionalUserId, UserId};
 #[cfg(feature = "server")]
 use crate::{
     schema::{eorm, movement},
@@ -61,7 +61,7 @@ impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
     type Id = MovementId;
 
     fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
-        if Movement::check_user_id_null(self.0, **auth, conn)
+        if Movement::check_optional_user_id(self.0, **auth, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?
         {
             Ok(self.0)
@@ -80,7 +80,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
         auth: &AuthUserOrAP,
         conn: &PgConnection,
     ) -> Result<Vec<Self::Id>, Status> {
-        if Movement::check_user_ids_null(&self.0, **auth, conn)
+        if Movement::check_optional_user_ids(&self.0, **auth, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?
         {
             Ok(self.0)

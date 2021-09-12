@@ -3,8 +3,9 @@ use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
     schema::{metcon, metcon_movement, metcon_session, movement},
-    CheckUserId, GetById, GetByUser, GetByUserSync, Metcon, MetconId, MetconMovement,
-    MetconMovementId, MetconSession, MetconSessionDescription, MetconSessionId, Movement, UserId,
+    CheckOptionalUserId, CheckUserId, GetById, GetByUser, GetByUserSync, Metcon, MetconId,
+    MetconMovement, MetconMovementId, MetconSession, MetconSessionDescription, MetconSessionId,
+    Movement, UserId,
 };
 
 impl GetByUser for Metcon {
@@ -39,9 +40,11 @@ impl GetByUserSync for Metcon {
     }
 }
 
-impl Metcon {
-    pub fn check_user_id_null(
-        id: MetconId,
+impl CheckOptionalUserId for Metcon {
+    type Id = MetconId;
+
+    fn check_optional_user_id(
+        id: Self::Id,
         user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {
@@ -57,8 +60,8 @@ impl Metcon {
             .map(|count: i64| count == 1)
     }
 
-    pub fn check_user_ids_null(
-        ids: &[MetconId],
+    fn check_optional_user_ids(
+        ids: &[Self::Id],
         user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {
@@ -162,9 +165,11 @@ impl CheckUserId for MetconMovement {
     }
 }
 
-impl MetconMovement {
-    pub fn check_user_id_null(
-        id: MetconMovementId,
+impl CheckOptionalUserId for MetconMovement {
+    type Id = MetconMovementId;
+
+    fn check_optional_user_id(
+        id: Self::Id,
         user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {
@@ -187,8 +192,8 @@ impl MetconMovement {
             .map(|count: i64| count == 1)
     }
 
-    pub fn check_user_ids_null(
-        ids: &[MetconMovementId],
+    fn check_optional_user_ids(
+        ids: &[Self::Id],
         user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {

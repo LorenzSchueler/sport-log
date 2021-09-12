@@ -15,8 +15,8 @@ use sport_log_types_derive::{
 use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{
-    from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, MovementUnit,
-    UserId,
+    from_str, from_str_optional, to_str, to_str_optional, CheckOptionalUserId, Movement,
+    MovementId, MovementUnit, UserId,
 };
 #[cfg(feature = "server")]
 use crate::{
@@ -47,7 +47,7 @@ impl VerifyIdForUserOrAP for UnverifiedId<MetconId> {
     type Id = MetconId;
 
     fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
-        if Metcon::check_user_id_null(self.0, **auth, conn)
+        if Metcon::check_optional_user_id(self.0, **auth, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?
         {
             Ok(self.0)
@@ -66,7 +66,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconId> {
         auth: &AuthUserOrAP,
         conn: &PgConnection,
     ) -> Result<Vec<Self::Id>, Status> {
-        if Metcon::check_user_ids_null(&self.0, **auth, conn)
+        if Metcon::check_optional_user_ids(&self.0, **auth, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?
         {
             Ok(self.0)
@@ -211,7 +211,7 @@ impl VerifyIdForUserOrAP for UnverifiedId<MetconMovementId> {
     type Id = MetconMovementId;
 
     fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
-        if MetconMovement::check_user_id_null(self.0, **auth, conn)
+        if MetconMovement::check_optional_user_id(self.0, **auth, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?
         {
             Ok(self.0)
@@ -230,7 +230,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconMovementId> {
         auth: &AuthUserOrAP,
         conn: &PgConnection,
     ) -> Result<Vec<Self::Id>, Status> {
-        if MetconMovement::check_user_ids_null(&self.0, **auth, conn)
+        if MetconMovement::check_optional_user_ids(&self.0, **auth, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?
         {
             Ok(self.0)

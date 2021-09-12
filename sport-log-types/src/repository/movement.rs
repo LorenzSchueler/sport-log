@@ -1,6 +1,8 @@
 use diesel::prelude::*;
 
-use crate::{schema::movement, GetByUser, GetByUserSync, Movement, MovementId, UserId};
+use crate::{
+    schema::movement, CheckOptionalUserId, GetByUser, GetByUserSync, Movement, MovementId, UserId,
+};
 
 impl GetByUser for Movement {
     fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>> {
@@ -34,9 +36,11 @@ impl GetByUserSync for Movement {
     }
 }
 
-impl Movement {
-    pub fn check_user_id_null(
-        id: MovementId,
+impl CheckOptionalUserId for Movement {
+    type Id = MovementId;
+
+    fn check_optional_user_id(
+        id: Self::Id,
         user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {
@@ -52,8 +56,8 @@ impl Movement {
             .map(|count: i64| count == 1)
     }
 
-    pub fn check_user_ids_null(
-        ids: &[MovementId],
+    fn check_optional_user_ids(
+        ids: &[Self::Id],
         user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {
