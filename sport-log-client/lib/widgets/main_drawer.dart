@@ -1,10 +1,10 @@
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
+import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
-import 'package:provider/provider.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({
@@ -16,11 +16,13 @@ class MainDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = UserState.instance.currentUser!;
     return Drawer(
       child: Column(
         children: [
-          const DrawerHeader(
-            child: null,
+          UserAccountsDrawerHeader(
+            accountName: Text(user.username),
+            accountEmail: Text(user.email),
           ),
           ListTile(
             title: const Text("Movements"),
@@ -44,16 +46,14 @@ class MainDrawer extends StatelessWidget {
               onTap: () {
                 Nav.changeNamed(context, Routes.logs);
               },
-              selected: selectedRoute == Routes.logs
-          ),
+              selected: selectedRoute == Routes.logs),
           ListTile(
-            title: const Text("Syncing"),
-            leading: const Icon(Icons.sync),
-            onTap: () {
-              Nav.changeNamed(context, Routes.syncing);
-            },
-            selected: selectedRoute == Routes.syncing
-          ),
+              title: const Text("Syncing"),
+              leading: const Icon(Icons.sync),
+              onTap: () {
+                Nav.changeNamed(context, Routes.syncing);
+              },
+              selected: selectedRoute == Routes.syncing),
           const Spacer(),
           ListTile(
             title: const Text("Logout"),
