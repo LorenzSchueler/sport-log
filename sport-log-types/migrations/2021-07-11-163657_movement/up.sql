@@ -6,28 +6,28 @@ create table movement (
     user_id bigint references "user" on delete cascade,
     name varchar(80) not null,
     description text,
-    category movement_category not null,
+    categories movement_category[] not null check (array_length(categories, 1) >= 1 and array_length(categories, 1) <= 2),
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
 
-create unique index movement_idx on movement (user_id, name, category) where deleted = false;
+create unique index movement_idx on movement (user_id, name) where deleted = false;
 
 create trigger set_timestamp before update on movement
     for each row execute procedure trigger_set_timestamp();
 
-insert into movement (id, user_id, name, description, category) values
-    (1, null, 'Back Squat', null, 'strength'),
-    (2, null, 'Front Squat', null, 'strength'),
-    (3, null, 'Over Head Squat', null, 'strength'),
-    (4, 1, 'Yoke Carry', null, 'strength'),
-    (5, null, 'Running', 'road running without significant altitude change', 'cardio'),
-    (6, null, 'Trailrunning', null, 'cardio'),
-    (7, null, 'Swimming Freestyle', 'indoor freestyle swimming', 'cardio'),
-    (8, 1, 'Rowing', null, 'cardio'),
-    (9, null, 'Pull-Up', null, 'strength'),
-    (10, null, 'Push-Up', null, 'strength'),
-    (11, null, 'Air Squat', null, 'strength');
+insert into movement (id, user_id, name, description, categories) values
+    (1, null, 'Back Squat', null, '{strength}'),
+    (2, null, 'Front Squat', null, '{strength}'),
+    (3, null, 'Over Head Squat', null, '{strength}'),
+    (4, 1, 'Yoke Carry', null, '{strength}'),
+    (5, null, 'Running', 'road running without significant altitude change', '{cardio}'),
+    (6, null, 'Trailrunning', null, '{cardio}'),
+    (7, null, 'Swimming Freestyle', 'indoor freestyle swimming', '{cardio}'),
+    (8, 1, 'Rowing', null, '{strength, cardio}'),
+    (9, null, 'Pull-Up', null, '{strength}'),
+    (10, null, 'Push-Up', null, '{strength}'),
+    (11, null, 'Air Squat', null, '{strength}');
 
 create table eorm (
     id bigserial primary key,

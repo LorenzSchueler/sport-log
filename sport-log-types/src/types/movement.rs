@@ -12,13 +12,13 @@ use sport_log_types_derive::{
 };
 use sport_log_types_derive::{FromI64, ToI64};
 
-use crate::{from_str, from_str_optional, to_str, to_str_optional, CheckOptionalUserId, UserId};
+use crate::{from_str, from_str_optional, to_str, to_str_optional, UserId};
 #[cfg(feature = "server")]
 use crate::{
     schema::{eorm, movement},
-    AuthUserOrAP, CheckUserId, GetById, Unverified, UnverifiedId, UnverifiedIds, User,
-    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
-    VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
+    AuthUserOrAP, CheckOptionalUserId, CheckUserId, GetById, Unverified, UnverifiedId,
+    UnverifiedIds, User, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -94,7 +94,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
 ///
 /// Movements can be predefined (`user_id` is [None]) or can be user-defined (`user_id` contains the id of the user).
 ///
-/// `category` decides whether the Movement can be used in Cardio or Strength Sessions. For Metcons the category does not matter.
+/// `categories` decides whether the Movement can be used in Cardio or Strength Sessions or both. For Metcons the `categories` does not matter.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "server",
@@ -126,7 +126,7 @@ pub struct Movement {
     pub name: String,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
-    pub category: MovementCategory,
+    pub categories: Vec<MovementCategory>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,

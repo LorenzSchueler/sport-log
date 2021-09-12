@@ -15,13 +15,13 @@ use sport_log_types_derive::{
 use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{
-    from_str, from_str_optional, to_str, to_str_optional, CheckOptionalUserId, Movement,
-    MovementId, MovementUnit, UserId,
+    from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, MovementUnit,
+    UserId,
 };
 #[cfg(feature = "server")]
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
-    AuthUserOrAP, CheckUserId, Unverified, UnverifiedId, UnverifiedIds, User,
+    AuthUserOrAP, CheckOptionalUserId, CheckUserId, Unverified, UnverifiedId, UnverifiedIds, User,
     VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
     VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
 };
