@@ -290,10 +290,8 @@ impl VerifyForUserOrAPWithDb for Unverified<MetconMovement> {
         conn: &PgConnection,
     ) -> Result<Self::Entity, Status> {
         let metcon_movement = self.0.into_inner();
-        if Metcon::check_user_id(metcon_movement.metcon_id, **auth, conn)
+        if MetconMovement::check_user_id(metcon_movement.id, **auth, conn)
             .map_err(|_| rocket::http::Status::InternalServerError)?
-            && MetconMovement::check_user_id(metcon_movement.id, **auth, conn)
-                .map_err(|_| rocket::http::Status::InternalServerError)?
         {
             Ok(metcon_movement)
         } else {
@@ -316,14 +314,8 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
             .iter()
             .map(|metcon_movement| metcon_movement.id)
             .collect();
-        let metcon_ids: Vec<_> = metcon_movements
-            .iter()
-            .map(|metcon_movement| metcon_movement.metcon_id)
-            .collect();
-        if Metcon::check_user_ids(&metcon_ids, **auth, conn)
+        if MetconMovement::check_user_ids(&metcon_movement_ids, **auth, conn)
             .map_err(|_| rocket::http::Status::InternalServerError)?
-            && MetconMovement::check_user_ids(&metcon_movement_ids, **auth, conn)
-                .map_err(|_| rocket::http::Status::InternalServerError)?
         {
             Ok(metcon_movements)
         } else {

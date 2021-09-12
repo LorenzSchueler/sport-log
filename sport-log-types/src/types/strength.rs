@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
-    CheckUserId, Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync,
-    ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, ToSql, Update,
+    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
 };
 use sport_log_types_derive::{FromI64, ToI64};
 
@@ -42,7 +42,6 @@ pub struct StrengthSessionId(pub i64);
         GetByUser,
         GetByUserSync,
         Update,
-        CheckUserId,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb
     )
@@ -123,10 +122,8 @@ impl VerifyForUserOrAPWithDb for Unverified<StrengthSet> {
         conn: &PgConnection,
     ) -> Result<Self::Entity, Status> {
         let strength_set = self.0.into_inner();
-        if StrengthSession::check_user_id(strength_set.strength_session_id, **auth, conn)
+        if StrengthSet::check_user_id(strength_set.id, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
-            && StrengthSet::check_user_id(strength_set.id, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
         {
             Ok(strength_set)
         } else {
@@ -149,14 +146,8 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthSet>> {
             .iter()
             .map(|strength_set| strength_set.id)
             .collect();
-        let strength_session_ids: Vec<_> = strength_sets
-            .iter()
-            .map(|strength_set| strength_set.strength_session_id)
-            .collect();
-        if StrengthSession::check_user_ids(&strength_session_ids, **auth, conn)
+        if StrengthSet::check_user_ids(&strength_set_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
-            && StrengthSet::check_user_ids(&strength_set_ids, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
         {
             Ok(strength_sets)
         } else {

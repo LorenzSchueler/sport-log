@@ -2,9 +2,44 @@ use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
-    schema::cardio_session, CardioSession, CardioSessionDescription, CardioSessionId, GetById,
-    GetByUser, Movement, Route, UserId,
+    schema::{cardio_session, movement},
+    CardioSession, CardioSessionDescription, CardioSessionId, CheckUserId, GetById, GetByUser,
+    Movement, Route, UserId,
 };
+
+impl CheckUserId for CardioSession {
+    type Id = CardioSessionId;
+
+    fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+        cardio_session::table
+            .inner_join(movement::table)
+            .filter(cardio_session::columns::id.eq(id))
+            .filter(cardio_session::columns::user_id.eq(user_id))
+            .filter(
+                movement::columns::user_id
+                    .eq(user_id)
+                    .or(movement::columns::user_id.is_null()),
+            )
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == 1)
+    }
+
+    fn check_user_ids(ids: &[Self::Id], user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+        cardio_session::table
+            .inner_join(movement::table)
+            .filter(cardio_session::columns::id.eq_any(ids))
+            .filter(cardio_session::columns::user_id.eq(user_id))
+            .filter(
+                movement::columns::user_id
+                    .eq(user_id)
+                    .or(movement::columns::user_id.is_null()),
+            )
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == ids.len() as i64)
+    }
+}
 
 impl CardioSession {
     pub fn get_ordered_by_user_and_timespan(

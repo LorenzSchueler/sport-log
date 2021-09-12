@@ -334,7 +334,8 @@ async fn fetch() -> Result<(), ReqwestError> {
             } else {
                 warn!("login failed!\n");
             }
-            return Ok(exec_action_event.action_event_id);
+
+            Ok(exec_action_event.action_event_id)
         }));
     }
 

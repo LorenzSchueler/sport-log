@@ -168,7 +168,6 @@ pub struct CardioSessionId(pub i64);
         GetByUser,
         GetByUserSync,
         Update,
-        CheckUserId,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb
     )
