@@ -16,3 +16,6 @@ chrono = { version = "0.4.19", features = ["serde"] }
 tracing = "0.1.26"
 tracing-subscriber = "0.2.20"
 figment = { version = "0.10", features = ["toml"] }
+
+[dev-dependencies]
+base64 = "0.13.0"

@@ -28,10 +28,11 @@ use reqwest::{blocking::Client, Error as ReqwestError};
 use serde::Deserialize;
 use tracing::{debug, error, info};
 
-use sport_log_types::{ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent};
+use sport_log_types::{
+    ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent, ADMIN_USERNAME,
+};
 
 const CONFIG_FILE: &str = "config.toml";
-const USERNAME: &str = "admin";
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -82,7 +83,7 @@ fn main() {
 fn create_action_events(client: &Client) -> Result<(), ReqwestError> {
     let creatable_action_rules: Vec<CreatableActionRule> = client
         .get(format!("{}/v1/adm/creatable_action_rule", CONFIG.base_url))
-        .basic_auth(USERNAME, Some(&CONFIG.admin_password))
+        .basic_auth(ADMIN_USERNAME, Some(&CONFIG.admin_password))
         .send()?
         .json()?;
 
@@ -131,7 +132,7 @@ fn create_action_events(client: &Client) -> Result<(), ReqwestError> {
 
     client
         .post(format!("{}/v1/adm/action_events", CONFIG.base_url))
-        .basic_auth(USERNAME, Some(&CONFIG.admin_password))
+        .basic_auth(ADMIN_USERNAME, Some(&CONFIG.admin_password))
         .json(&action_events)
         .send()?;
 
@@ -143,7 +144,7 @@ fn create_action_events(client: &Client) -> Result<(), ReqwestError> {
 fn delete_action_events(client: &Client) -> Result<(), ReqwestError> {
     let deletable_action_events: Vec<DeletableActionEvent> = client
         .get(format!("{}/v1/adm/deletable_action_event", CONFIG.base_url))
-        .basic_auth(USERNAME, Some(&CONFIG.admin_password))
+        .basic_auth(ADMIN_USERNAME, Some(&CONFIG.admin_password))
         .send()?
         .json()?;
 
@@ -168,7 +169,7 @@ fn delete_action_events(client: &Client) -> Result<(), ReqwestError> {
 
     client
         .delete(format!("{}/v1/adm/action_events", CONFIG.base_url,))
-        .basic_auth(USERNAME, Some(&CONFIG.admin_password))
+        .basic_auth(ADMIN_USERNAME, Some(&CONFIG.admin_password))
         .json(&action_event_ids)
         .send()?;
 

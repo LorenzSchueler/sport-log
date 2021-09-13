@@ -31,6 +31,8 @@ use rocket::{
 use sport_log_types::{Config, Db};
 
 mod handler;
+#[cfg(test)]
+mod tests;
 
 use handler::JsonError;
 

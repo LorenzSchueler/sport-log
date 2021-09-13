@@ -57,9 +57,9 @@ dependencies = [
 
 [[package]]
 name = "argon2"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d805bb12b532be9ce066df7913311f43716b41d8d780e9322113e8a6ae7c41ab"
+checksum = "34f8cda1a0ecf6f19d2bf64b9349d86900fa9bf98c979e655347a9e9dbe588c1"
 dependencies = [
  "base64ct",
  "blake2",
@@ -1848,6 +1848,7 @@ dependencies = [
 name = "sport-log-server"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "chrono",
  "diesel",
  "figment",
@@ -1864,7 +1865,7 @@ dependencies = [
 name = "sport-log-types"
 version = "0.1.0"
 dependencies = [
- "argon2 0.3.0",
+ "argon2 0.3.1",
  "base64",
  "chrono",
  "diesel",
@@ -2118,9 +2119,9 @@ dependencies = [
 
 [[package]]
 name = "tinyvec"
-version = "1.3.1"
+version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "848a1e1181b9f6753b5e96a092749e29b11d19ede67dfbbd6c7dc7e0f49b5338"
+checksum = "5241dd6f21443a3606b432718b166d3cedc962fd4b8bea54a8bc7f514ebda986"
 dependencies = [
  "tinyvec_macros",
 ]
