@@ -36,14 +36,7 @@ abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
   Table<T> get db;
 
   @override
-  Future<List<T>> getNonDeleted() async {
-    final result = await db.getNonDeleted();
-    if (result.isFailure) {
-      handleDbError(result.failure);
-      return [];
-    }
-    return result.success;
-  }
+  Future<List<T>> getNonDeleted() async => db.getNonDeleted();
 
   @override
   Future<void> pushToServer() async {
@@ -53,40 +46,28 @@ abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
     ]);
   }
 
+  // TODO: this makes only sense with UnconnectedMethods
   Future<void> _pushUpdatedToServer() async {
-    final dbResult = await db.getWithSyncStatus(SyncStatus.updated);
-    if (dbResult.isFailure) {
-      handleDbError(dbResult.failure);
-      return;
-    }
-    final apiResult = await api.putMultiple(dbResult.success);
+    final recordsToUpdate = await db.getWithSyncStatus(SyncStatus.updated);
+    final apiResult = await api.putMultiple(recordsToUpdate);
     if (apiResult.isFailure) {
       handleApiError(apiResult.failure);
       return;
     }
-    db.setAllUpdatedSynchronized().then(resultSink);
+    db.setAllUpdatedSynchronized();
   }
 
   Future<void> _pushCreatedToServer() async {
-    final dbResult = await db.getWithSyncStatus(SyncStatus.created);
-    if (dbResult.isFailure) {
-      handleDbError(dbResult.failure);
-      return;
-    }
-    final apiResult = await api.postMultiple(dbResult.success);
+    final recordsToCreate = await db.getWithSyncStatus(SyncStatus.created);
+    final apiResult = await api.postMultiple(recordsToCreate);
     if (apiResult.isFailure) {
       handleApiError(apiResult.failure);
       return;
     }
-    db.setAllCreatedSynchronized().then(resultSink);
+    db.setAllCreatedSynchronized();
   }
 
-  Future<T?> getById(Int64 id) async {
-    (await db.getSingle(id)).orDo((e) {
-      handleDbError(e);
-      return null;
-    });
-  }
+  Future<T?> getById(Int64 id) async => db.getSingle(id);
 }
 
 mixin ConnectedMethods<T extends DbObject> on DataProviderImpl<T> {
@@ -98,23 +79,28 @@ mixin ConnectedMethods<T extends DbObject> on DataProviderImpl<T> {
       handleApiError(result.failure);
       throw result.failure;
     }
-    db.createSingle(object, isSynchronized: true).then(resultSink);
+    db.createSingle(object, isSynchronized: true);
   }
 
   @override
   Future<void> updateSingle(T object) async {
-    assert(object.deleted || object.isValid());
+    assert(object.isValid());
     final result = await api.putSingle(object);
     if (result.isFailure) {
       handleApiError(result.failure);
       throw result.failure;
     }
-    db.updateSingle(object, isSynchronized: true).then(resultSink);
+    db.updateSingle(object, isSynchronized: true);
   }
 
   @override
   Future<void> deleteSingle(T object) async {
-    return updateSingle(object..deleted = true);
+    final result = await api.putSingle(object..deleted = true);
+    if (result.isFailure) {
+      handleApiError(result.failure);
+      throw result.failure;
+    }
+    db.deleteSingle(object.id, isSynchronized: true);
   }
 }
 
@@ -122,39 +108,41 @@ mixin UnconnectedMethods<T extends DbObject> on DataProviderImpl<T> {
   @override
   Future<void> createSingle(T object) async {
     assert(object.isValid());
-    final result = await db.createSingle(object);
-    if (result.isFailure) {
-      handleDbError(result.failure);
-      throw result.failure;
-    }
+    // TODO: catch errors
+    await db.createSingle(object);
     api.postSingle(object).then((result) {
       if (result.isFailure) {
         handleApiError(result.failure);
       } else {
-        db.setSynchronized(object.id).then(resultSink);
+        db.setSynchronized(object.id);
       }
     });
   }
 
   @override
   Future<void> updateSingle(T object) async {
-    assert(object.deleted || object.isValid());
-    final result = await db.updateSingle(object);
-    if (result.isFailure) {
-      handleDbError(result.failure);
-      throw result.failure;
-    }
+    assert(object.isValid());
+    // TODO: catch errors
+    await db.updateSingle(object);
     api.putSingle(object).then((result) {
       if (result.isFailure) {
         handleApiError(result.failure);
       } else {
-        db.setSynchronized(object.id).then(resultSink);
+        db.setSynchronized(object.id);
       }
     });
   }
 
   @override
   Future<void> deleteSingle(T object) async {
-    return updateSingle(object..deleted = true);
+    // TODO: catch errors
+    await db.deleteSingle(object.id);
+    api.putSingle(object..deleted = true).then((result) {
+      if (result.isFailure) {
+        handleApiError(result.failure);
+      } else {
+        db.setSynchronized(object.id);
+      }
+    });
   }
 }

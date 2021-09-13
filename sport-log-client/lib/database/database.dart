@@ -39,9 +39,6 @@ class AppDatabase {
           for (final table in allTables) {
             table.setDatabase(db);
           }
-          // FIXME: this is awkward
-          metcons.metconMovements = metconMovements;
-          metcons.metconSessions = metconSessions;
         });
     _logger.d("Database initialization done.");
   }

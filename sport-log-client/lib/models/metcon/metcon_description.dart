@@ -34,4 +34,11 @@ class MetconDescription implements Validatable {
 
   static bool areTheSame(MetconDescription m1, MetconDescription m2) =>
       m1.metcon.id == m2.metcon.id;
+
+  void setDeleted() {
+    metcon.deleted = true;
+    for (final move in moves) {
+      move.deleted = true;
+    }
+  }
 }

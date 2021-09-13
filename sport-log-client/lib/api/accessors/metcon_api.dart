@@ -22,6 +22,7 @@ class MetconApi extends ApiAccessor<Metcon> {
   @override
   Map<String, dynamic> toJson(Metcon object) => object.toJson();
 
+  // TODO: put this into data provider?
   ApiResult<void> postFull(MetconDescription metconDescription) async {
     assert(metconDescription.isValid());
     final result1 = await postSingle(metconDescription.metcon);
@@ -38,7 +39,9 @@ class MetconApi extends ApiAccessor<Metcon> {
     }
   }
 
-  ApiResult<void> putFull(MetconDescription metconDescription) async {
+  // TODO: put this into data provider?
+  ApiResult<void> deleteFull(MetconDescription metconDescription) async {
+    metconDescription.setDeleted();
     final result1 = await putSingle(metconDescription.metcon);
     if (result1.isSuccess) {
       final result2 = await Api.instance.metconMovements

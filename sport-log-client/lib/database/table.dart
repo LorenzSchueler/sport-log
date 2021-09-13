@@ -58,170 +58,123 @@ end;
     });
   }
 
-  // TODO: remove deletion methods
-  DbResult<void> deleteSingle(Int64 id,
-      {Transaction? transaction, bool isSynchronized = false}) {
-    return deleteMultiple([id],
-        transaction: transaction, isSynchronized: isSynchronized);
-  }
-
-  // TODO: remove deletion methods
-  DbResult<void> deleteMultiple(List<Int64> ids,
-      {Transaction? transaction, bool isSynchronized = false}) {
-    return voidRequest(() async {
-      await (transaction ?? database).update(
+  Future<void> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
+    await database.update(
         tableName,
         {
           Keys.deleted: 1,
-          Keys.syncStatus: SyncStatus.synchronized.index,
+          if (isSynchronized) Keys.syncStatus: SyncStatus.synchronized.index,
         },
-        where: "deleted = 0 AND id = ?",
-        whereArgs: ids.map((id) => id.toInt()).toList(),
-      );
-    });
+        where: '${Keys.deleted} = 0 AND ${Keys.id} = ?',
+        whereArgs: [id.toInt()]);
   }
 
-  DbResult<void> updateSingle(T object,
-      {Transaction? transaction, bool isSynchronized = false}) async {
-    return updateMultiple([object],
-        transaction: transaction, isSynchronized: isSynchronized);
-  }
-
-  DbResult<void> updateMultiple(
-    List<T> objects, {
-    Transaction? transaction,
-    bool isSynchronized = false,
-  }) async {
-    return voidRequest(() async {
-      final batch = (transaction ?? database).batch();
-      for (final object in objects) {
-        assert(object.isValid());
-        batch.update(
+  Future<void> deleteMultiple(List<Int64> ids,
+      {bool isSynchronized = false}) async {
+    final batch = database.batch();
+    for (final id in ids) {
+      batch.update(
           tableName,
           {
-            ...serde.toDbRecord(object),
+            Keys.deleted: 1,
             if (isSynchronized) Keys.syncStatus: SyncStatus.synchronized.index,
           },
-          where: "deleted = 0 AND id = ?",
-          whereArgs: [object.id.toInt()],
-        );
-      }
-      await batch.commit(noResult: true, continueOnError: true);
-    });
+          where: '${Keys.deleted} = 0 AND ${Keys.id} = ?',
+          whereArgs: [id.toInt()]);
+    }
+    await batch.commit(noResult: true, continueOnError: true);
   }
 
-  DbResult<void> createSingle(T object,
-      {Transaction? transaction, bool isSynchronized = false}) async {
-    return createMultiple([object],
-        transaction: transaction, isSynchronized: isSynchronized);
+  Future<void> updateSingle(T object, {bool isSynchronized = false}) async {
+    await database.update(
+      tableName,
+      {
+        ...serde.toDbRecord(object),
+        if (isSynchronized) Keys.syncStatus: SyncStatus.synchronized.index
+      },
+      where: '${Keys.deleted} = 0 AND ${Keys.id} = ?',
+      whereArgs: [object.id.toInt()],
+    );
   }
 
-  DbResult<void> createMultiple(List<T> objects,
-      {Transaction? transaction, bool isSynchronized = false}) async {
-    return voidRequest(() async {
-      final batch = (transaction ?? database).batch();
-      for (final object in objects) {
-        assert(object.isValid());
-        batch.insert(tableName, {
+  Future<void> updateMultiple(List<T> objects,
+      {bool isSynchronized = false}) async {
+    final batch = database.batch();
+    for (final object in objects) {
+      batch.update(
+        tableName,
+        {
           ...serde.toDbRecord(object),
-          if (isSynchronized) Keys.syncStatus: SyncStatus.synchronized.index,
-        });
-      }
-      await batch.commit(noResult: true, continueOnError: true);
+          if (isSynchronized) Keys.syncStatus: SyncStatus.synchronized.index
+        },
+        where: '${Keys.deleted} = 0 AND ${Keys.id} = ?',
+        whereArgs: [object.id.toInt()],
+      );
+    }
+    await batch.commit(noResult: true, continueOnError: true);
+  }
+
+  Future<void> createSingle(T object, {bool isSynchronized = false}) async {
+    await database.insert(tableName, {
+      ...serde.toDbRecord(object),
+      if (isSynchronized) Keys.syncStatus: SyncStatus.synchronized.index,
     });
   }
 
-  DbResult<List<T>> getNonDeleted([Transaction? txn]) async {
-    return request(() async {
-      final List<DbRecord> result =
-          await (txn ?? database).query(tableName, where: 'deleted = 0');
-      return Success(result.map(serde.fromDbRecord).toList());
-    });
+  Future<void> createMultiple(List<T> objects,
+      {bool isSynchronized = false}) async {
+    final batch = database.batch();
+    for (final object in objects) {
+      batch.insert(tableName, {
+        ...serde.toDbRecord(object),
+        if (isSynchronized) Keys.syncStatus: SyncStatus.synchronized.index,
+      });
+    }
+    await batch.commit(noResult: true, continueOnError: true);
   }
 
-  DbResult<List<T>> getWithSyncStatus(SyncStatus syncStatus) async {
-    return request(() async {
-      final List<DbRecord> result = await database.query(tableName,
-          where: '${Keys.syncStatus} = ${syncStatus.index}');
-      return Success(result.map(serde.fromDbRecord).toList());
-    });
+  Future<List<T>> getNonDeleted() async {
+    final result =
+        await database.query(tableName, where: '${Keys.deleted} = 0');
+    return result.map(serde.fromDbRecord).toList();
   }
 
-  DbResult<List<T>> get({
-    String? where,
-    List<Object?>? whereArgs,
-    Transaction? transaction,
-  }) async {
-    return request(() async {
-      final List<DbRecord> result = await (transaction ?? database)
-          .query(tableName, where: where, whereArgs: whereArgs);
-      return Success(result.map(serde.fromDbRecord).toList());
-    });
+  Future<List<T>> getWithSyncStatus(SyncStatus syncStatus) async {
+    final result = await database.query(tableName,
+        where: '${Keys.syncStatus} = ?', whereArgs: [syncStatus.index]);
+    return result.map(serde.fromDbRecord).toList();
   }
 
-  DbResult<T?> getSingle(
-    Int64 id, {
-    bool includeDeleted = false,
-    Transaction? transaction,
-  }) async {
-    final filter = includeDeleted ? 'id = ?' : 'deleted = 0 and id = ?';
-    return request(() async {
-      final List<DbRecord> result = await (transaction ?? database)
-          .query(tableName, where: filter, whereArgs: [id.toInt()]);
-      if (result.isEmpty) {
-        return Success(null);
-      } else {
-        assert(result.length == 1);
-        return Success(serde.fromDbRecord(result.first));
-      }
-    });
-  }
-
-  DbResult<bool> exists(
-    Int64 id, {
-    bool includeDeleted = false,
-    Transaction? transaction,
-  }) async {
-    return request(() async {
-      final filter = includeDeleted ? 'id = ?' : 'deleted = 0 and id = ?';
-      final List<DbRecord> result = await (transaction ?? database)
-          .rawQuery("SELECT 1 FROM $tableName where $filter;", [id.toInt()]);
-      return Success(result.isNotEmpty);
-    });
+  Future<T?> getSingle(Int64 id) async {
+    final result = await database
+        .query(tableName, where: "${Keys.id} = ?", whereArgs: [id.toInt()]);
+    return result.isEmpty ? null : serde.fromDbRecord(result.first);
   }
 
   static final synchronized = {Keys.syncStatus: SyncStatus.synchronized.index};
 
-  DbResult<void> setSynchronized(Int64 id, [Transaction? txn]) async {
-    return voidRequest(() async {
-      (txn ?? database).update(tableName, synchronized,
-          where: 'id = ?', whereArgs: [id.toInt()]);
-    });
+  Future<void> setSynchronized(Int64 id) async {
+    await database.update(tableName, synchronized,
+        where: '${Keys.id} = ?', whereArgs: [id.toInt()]);
   }
 
-  DbResult<void> setAllUpdatedSynchronized() async {
-    return voidRequest(() async {
-      database.update(tableName, synchronized,
-          where: '${Keys.syncStatus} = ${SyncStatus.updated.index}');
-    });
+  Future<void> setAllUpdatedSynchronized() async {
+    await database.update(tableName, synchronized,
+        where: '${Keys.syncStatus} = ${SyncStatus.updated.index}');
   }
 
-  DbResult<void> setAllCreatedSynchronized() async {
-    return voidRequest(() async {
-      database.update(tableName, synchronized,
-          where: '${Keys.syncStatus} = ${SyncStatus.created.index}');
-    });
+  Future<void> setAllCreatedSynchronized() async {
+    await database.update(tableName, synchronized,
+        where: '${Keys.syncStatus} = ${SyncStatus.created.index}');
   }
 
-  DbResult<void> upsertMultiple(List<T> objects, [Transaction? txn]) async {
-    return voidRequest(() async {
-      final batch = (txn ?? database).batch();
-      for (final object in objects) {
-        // TODO: what it sync_status == 1 or sync_status == 2?
-        batch.insert(tableName, serde.toDbRecord(object),
-            conflictAlgorithm: ConflictAlgorithm.replace);
-      }
-      await batch.commit(noResult: true, continueOnError: true);
-    });
+  Future<void> upsertMultiple(List<T> objects) async {
+    final batch = database.batch();
+    for (final object in objects) {
+      // TODO: what it sync_status == 1 or sync_status == 2?
+      batch.insert(tableName, serde.toDbRecord(object),
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+    await batch.commit(noResult: true, continueOnError: true);
   }
 }

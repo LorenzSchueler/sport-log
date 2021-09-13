@@ -21,9 +21,6 @@ Future<void> initialize({bool doDownSync = true}) async {
   });
   await UpSync.instance.init();
   Bloc.observer = SimpleBlocObserver();
-  (await AppDatabase.instance!.movements.getNonDeleted()).result((movements) {
-    print(movements);
-  }, (error) {});
 }
 
 void main() async {

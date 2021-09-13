@@ -1,9 +1,6 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:result_type/result_type.dart';
 import 'package:sport_log/database/table.dart';
-import 'package:sport_log/helpers/extensions/result_extension.dart';
 import 'package:sport_log/models/metcon/all.dart';
-import 'package:sqflite/sqflite.dart';
 
 class MetconTable extends Table<Metcon> {
   @override
@@ -24,104 +21,6 @@ create table metcon (
 
   @override
   String get tableName => 'metcon';
-
-  late MetconMovementTable metconMovements;
-  late MetconSessionTable metconSessions;
-
-  @override
-  DbResult<void> deleteSingle(Int64 id,
-      {Transaction? transaction, bool isSynchronized = false}) async {
-    assert(transaction == null);
-    return voidRequest(() async {
-      await database.transaction((transaction) async {
-        metconMovements.deleteByMetcon(id, transaction);
-        super.deleteSingle(id,
-            transaction: transaction, isSynchronized: isSynchronized);
-      });
-    });
-  }
-
-  @override
-  DbResult<void> deleteMultiple(List<Int64> ids,
-      {Transaction? transaction, bool isSynchronized = false}) async {
-    assert(transaction == null);
-    for (final id in ids) {
-      final result = await deleteSingle(id, isSynchronized: isSynchronized);
-      if (result.isFailure) {
-        return result;
-      }
-    }
-    return Success(null);
-  }
-
-  DbResult<void> updateFull(MetconDescription metconDescription) async {
-    if (!metconDescription.isValid()) {
-      return Failure(DbError.validationFailed);
-    }
-    return voidRequest(() async {
-      await database.transaction((txn) async {
-        updateSingle(metconDescription.metcon, transaction: txn);
-        final result = await metconMovements.get(
-          where: "${Keys.metconId} = ?",
-          whereArgs: [metconDescription.metcon.id.toInt()],
-          transaction: txn,
-        );
-        if (result.isFailure) {
-          throw result.failure;
-        }
-        final Set<Int64> oldIds = result.success.map((mm) => mm.id).toSet();
-        List<MetconMovement> toCreate = [], toUpdate = [];
-
-        for (final mm in metconDescription.moves) {
-          oldIds.contains(mm.id) ? toUpdate.add(mm) : toCreate.add(mm);
-        }
-
-        List<Int64> toDelete =
-            oldIds.difference(toUpdate.map((mm) => mm.id).toSet()).toList();
-
-        metconMovements.deleteMultiple(toDelete, transaction: txn);
-        metconMovements.updateMultiple(toUpdate, transaction: txn);
-        metconMovements.createMultiple(toCreate, transaction: txn);
-      });
-    });
-  }
-
-  DbResult<void> createFull(MetconDescription metconDescription) async {
-    return voidRequest(() async {
-      await database.transaction((txn) async {
-        createSingle(metconDescription.metcon, transaction: txn);
-        metconMovements.createMultiple(metconDescription.moves,
-            transaction: txn);
-      });
-    });
-  }
-
-  @override
-  DbResult<void> setSynchronized(Int64 id, [Transaction? txn]) {
-    assert(txn == null);
-    return voidRequest(() async {
-      return database.transaction((txn) async {
-        super.setSynchronized(id, txn);
-        metconMovements.setSynchronizedByMetcon(id, txn);
-      });
-    });
-  }
-
-  DbResult<List<MetconDescription>> getNonDeletedFull() async {
-    return request<List<MetconDescription>>(() async {
-      final result = await getNonDeleted();
-      if (result.isFailure) {
-        return Failure(result.failure);
-      }
-      return Success(await Future.wait(result.success.map((metcon) async {
-        return MetconDescription(
-            metcon: metcon,
-            moves: (await metconMovements.getByMetcon(metcon.id)).or([]),
-            // TODO: do this with a join
-            hasReference: await metconSessions.existsByMetcon(metcon.id));
-      })));
-    });
-  }
 }
 
 class MetconMovementTable extends Table<MetconMovement> {
@@ -144,27 +43,22 @@ create table metcon_movement (
   @override
   String get tableName => 'metcon_movement';
 
-  DbResult<void> deleteByMetcon(Int64 id, [Transaction? txn]) async {
-    return voidRequest(() async {
-      (txn ?? database).update(tableName, {Keys.deleted: 1},
-          where: '${Keys.metconId} = ?', whereArgs: [id.toInt()]);
-    });
+  Future<void> setSynchronizedByMetcon(Int64 id) async {
+    database.update(tableName, Table.synchronized,
+        where: '${Keys.metconId} = ?', whereArgs: [id.toInt()]);
   }
 
-  DbResult<void> setSynchronizedByMetcon(Int64 id, [Transaction? txn]) async {
-    return voidRequest(() async {
-      database.update(tableName, Table.synchronized,
-          where: '${Keys.metconId} = ?', whereArgs: [id.toInt()]);
-    });
+  Future<List<MetconMovement>> getByMetcon(Int64 id) async {
+    final result = await database.query(tableName,
+        where: '${Keys.metconId} = ? AND ${Keys.deleted} = 0',
+        whereArgs: [id.toInt()]);
+    return result.map(serde.fromDbRecord).toList();
   }
 
-  DbResult<List<MetconMovement>> getByMetcon(Int64 id) async {
-    return request<List<MetconMovement>>(() async {
-      final result = await database.query(tableName,
-          where: '${Keys.metconId} = ? AND ${Keys.deleted} = 0',
-          whereArgs: [id.toInt()]);
-      return Success(result.map(serde.fromDbRecord).toList());
-    });
+  Future<void> deleteByMetcon(Int64 id) async {
+    await database.update(tableName, {Keys.deleted: 1},
+        where: '${Keys.deleted} = 0 AND ${Keys.metconId} = ?',
+        whereArgs: [id.toInt()]);
   }
 }
 
