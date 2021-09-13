@@ -46,14 +46,15 @@ class MetconMovement implements DbObject {
 
   factory MetconMovement.fromJson(Map<String, dynamic> json) =>
       _$MetconMovementFromJson(json);
+
   Map<String, dynamic> toJson() => _$MetconMovementToJson(this);
 
   @override
   bool isValid() {
-    return deleted != true &&
-        movementNumber >= 0 &&
-        count > 0 &&
-        (weight == null || weight! > 0);
+    return validate(deleted != true, 'MetconMovement: deleted == true') &&
+        validate(movementNumber >= 0, 'MetconMovement: movement number < 0') &&
+        validate(count > 0, 'MetconMovement: count <= 0') &&
+        validate(weight == null || weight! > 0, 'MetconMovement: weight <= 0');
   }
 }
 

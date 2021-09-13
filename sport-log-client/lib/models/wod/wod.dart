@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
@@ -17,19 +16,23 @@ class Wod implements DbObject {
   });
 
   @override
-  @IdConverter() Int64 id;
-  @IdConverter() Int64 userId;
-  @DateConverter() DateTime date;
+  @IdConverter()
+  Int64 id;
+  @IdConverter()
+  Int64 userId;
+  @DateConverter()
+  DateTime date;
   String? description;
   @override
   bool deleted;
 
   factory Wod.fromJson(Map<String, dynamic> json) => _$WodFromJson(json);
+
   Map<String, dynamic> toJson() => _$WodToJson(this);
 
   @override
   bool isValid() {
-    return !deleted;
+    return validate(!deleted, 'Wod: deleted == true');
   }
 }
 

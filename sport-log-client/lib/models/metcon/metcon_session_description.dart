@@ -1,4 +1,3 @@
-
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/metcon/metcon_session.dart';
@@ -14,7 +13,9 @@ class MetconSessionDescription implements Validatable {
 
   @override
   bool isValid() {
-    return metconDescription.isValid()
-        && metconSession.metconId == metconDescription.metcon.id;
+    return validate(metconDescription.isValid(),
+            'MetconSessionDescription: metcon description not valid') &&
+        validate(metconSession.metconId == metconDescription.metcon.id,
+            'MetconSessionDescription: metcon id mismatch');
   }
 }

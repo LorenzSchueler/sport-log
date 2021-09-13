@@ -70,7 +70,7 @@ mixin ApiHelpers on ApiLogging, ApiHeaders {
   ApiResult<R> _errorHandling<R>(
       Future<Result<R, ApiError>> Function(Client client) req) async {
     try {
-      return req(_client);
+      return await req(_client);
     } on SocketException {
       return Failure(ApiError.noInternetConnection);
     } on TypeError {

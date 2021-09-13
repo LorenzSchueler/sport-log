@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
@@ -22,10 +21,14 @@ class MetconSession implements DbObject {
   });
 
   @override
-  @IdConverter() Int64 id;
-  @IdConverter() Int64 userId;
-  @IdConverter() Int64 metconId;
-  @DateTimeConverter() DateTime datetime;
+  @IdConverter()
+  Int64 id;
+  @IdConverter()
+  Int64 userId;
+  @IdConverter()
+  Int64 metconId;
+  @DateTimeConverter()
+  DateTime datetime;
   int? time;
   int? rounds;
   int? reps;
@@ -34,15 +37,17 @@ class MetconSession implements DbObject {
   @override
   bool deleted;
 
-  factory MetconSession.fromJson(Map<String, dynamic> json) => _$MetconSessionFromJson(json);
+  factory MetconSession.fromJson(Map<String, dynamic> json) =>
+      _$MetconSessionFromJson(json);
+
   Map<String, dynamic> toJson() => _$MetconSessionToJson(this);
 
   @override
   bool isValid() {
-    return deleted != true
-        && (time == null || time! > 0)
-        && (rounds == null || rounds! > 0)
-        && (reps == null || reps! > 0);
+    return validate(deleted != true, 'MetconSession: deleted == true') &&
+        validate(time == null || time! > 0, 'MetconSession: time <= 0') &&
+        validate(rounds == null || rounds! > 0, 'MetconSession: rounds <= 0') &&
+        validate(reps == null || reps! > 0, 'MetconSession: reps <= 0');
   }
 }
 

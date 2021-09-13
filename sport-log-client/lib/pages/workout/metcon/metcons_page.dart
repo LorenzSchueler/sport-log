@@ -60,15 +60,17 @@ class _MetconsPageState extends State<MetconsPage> {
                   value: _editChoice,
                   child: Text("Edit"),
                 ),
-                const PopupMenuItem(
-                  value: _deleteChoice,
-                  child: Text("Delete"),
-                ),
+                if (!md.hasReference && md.metcon.userId != null)
+                  const PopupMenuItem(
+                    value: _deleteChoice,
+                    child: Text("Delete"),
+                  ),
               ];
             },
             onSelected: (choice) {
               switch (choice) {
                 case _deleteChoice:
+                  assert(!md.hasReference && md.metcon.userId != null);
                   _dataProvider.deleteSingle(md).then((_) {
                     setState(() {
                       _metconDescriptions.removeWhere(

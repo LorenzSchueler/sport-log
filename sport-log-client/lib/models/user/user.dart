@@ -26,6 +26,7 @@ class User implements Validatable {
   String email;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+
   Map<String, dynamic> toJson() => _$UserToJson(this);
 
   @override
@@ -76,8 +77,8 @@ class User implements Validatable {
 
   @override
   bool isValid() {
-    return username.isNotEmpty &&
-        password.isNotEmpty &&
-        EmailValidator.validate(email);
+    return validate(username.isNotEmpty, 'User: username is empty') &&
+        validate(password.isNotEmpty, 'User: password is empty') &&
+        validate(EmailValidator.validate(email), 'User: email is not valid');
   }
 }

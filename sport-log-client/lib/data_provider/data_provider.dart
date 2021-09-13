@@ -3,7 +3,6 @@ import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/database/table.dart';
-import 'package:sport_log/helpers/extensions/result_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 
 final logger = Logger('DP');
@@ -23,7 +22,7 @@ abstract class DataProvider<T> {
   Future<void> pushToServer();
 
   void handleApiError(ApiError error) {
-    logger.e('Got an api error.', error);
+    logger.w('Got an api error.', error);
   }
 
   void handleDbError(DbError error) {

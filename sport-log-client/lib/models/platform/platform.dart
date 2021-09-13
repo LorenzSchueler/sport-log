@@ -1,6 +1,5 @@
-
-import 'package:json_annotation/json_annotation.dart';
 import 'package:fixnum/fixnum.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
@@ -15,17 +14,21 @@ class Platform implements DbObject {
   });
 
   @override
-  @IdConverter() Int64 id;
+  @IdConverter()
+  Int64 id;
   String name;
   @override
   bool deleted;
 
-  factory Platform.fromJson(Map<String, dynamic> json) => _$PlatformFromJson(json);
+  factory Platform.fromJson(Map<String, dynamic> json) =>
+      _$PlatformFromJson(json);
+
   Map<String, dynamic> toJson() => _$PlatformToJson(this);
 
   @override
   bool isValid() {
-    return name.isNotEmpty && !deleted;
+    return validate(name.isNotEmpty, 'Platform: name is empty') &&
+        validate(!deleted, 'Platform: deleted == true');
   }
 }
 
@@ -33,10 +36,9 @@ class DbPlatformSerializer implements DbSerializer<Platform> {
   @override
   Platform fromDbRecord(DbRecord r) {
     return Platform(
-      id: Int64(r[Keys.id]! as int),
-      name: r[Keys.name]! as String,
-      deleted: r[Keys.deleted]! as int == 1
-    );
+        id: Int64(r[Keys.id]! as int),
+        name: r[Keys.name]! as String,
+        deleted: r[Keys.deleted]! as int == 1);
   }
 
   @override

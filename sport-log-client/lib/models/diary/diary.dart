@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
@@ -18,9 +17,12 @@ class Diary implements DbObject {
   });
 
   @override
-  @IdConverter() Int64 id;
-  @IdConverter() Int64 userId;
-  @DateConverter() DateTime date;
+  @IdConverter()
+  Int64 id;
+  @IdConverter()
+  Int64 userId;
+  @DateConverter()
+  DateTime date;
   double? bodyweight;
   String? comments;
   @override
@@ -31,8 +33,9 @@ class Diary implements DbObject {
 
   @override
   bool isValid() {
-    return (bodyweight == null || bodyweight! > 0)
-        && !deleted;
+    return validate(
+            bodyweight == null || bodyweight! > 0, 'Diary: bodyweight <= 0') &&
+        validate(!deleted, 'Diary: deleted == true');
   }
 }
 

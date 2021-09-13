@@ -47,6 +47,7 @@ class Metcon implements DbObject {
   @OptionalIdConverter()
   Int64? userId;
   String? name;
+
   // TODO: rename type
   MetconType metconType;
   int? rounds;
@@ -75,23 +76,26 @@ class Metcon implements DbObject {
   bool validateMetconType() {
     switch (metconType) {
       case MetconType.amrap:
-        return rounds == null && timecap != null;
+        return validate(rounds == null, 'Metcon: amrap: rounds != null') &&
+            validate(timecap != null, 'Metcon: amrap: timecap == null');
       case MetconType.emom:
-        return rounds != null && timecap != null;
+        return validate(rounds != null, 'Metcon: emom: rounds == null') &&
+            validate(timecap != null, 'Metcon: emom: timecap == null');
       case MetconType.forTime:
-        return rounds != null;
+        return validate(rounds != null, 'Metcon: forTime: rounds == null');
     }
   }
 
   @override
   bool isValid() {
-    return userId != null &&
-        name != null &&
-        name!.isNotEmpty &&
-        deleted != true &&
-        (rounds == null || rounds! >= 1) &&
-        (timecap == null || timecap! >= const Duration(seconds: 1)) &&
-        validateMetconType();
+    return validate(userId != null, 'Metcon: userId == null') &&
+        validate(name != null, 'Metcon: name == null') &&
+        validate(name!.isNotEmpty, 'Metcon: name is empty') &&
+        validate(deleted != true, 'Metcon: deleted == true') &&
+        validate(rounds == null || rounds! >= 1, 'Metcon: rounds < 1') &&
+        validate(timecap == null || timecap! >= const Duration(seconds: 1),
+            'Metcon: timecap < 1s') &&
+        validate(validateMetconType(), 'Metcon: metcon type validation failed');
   }
 }
 

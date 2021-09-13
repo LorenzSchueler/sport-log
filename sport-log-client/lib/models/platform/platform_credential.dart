@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
@@ -18,24 +17,33 @@ class PlatformCredential implements DbObject {
   });
 
   @override
-  @IdConverter() Int64 id;
-  @IdConverter() Int64 userId;
-  @IdConverter() Int64 platformId;
+  @IdConverter()
+  Int64 id;
+  @IdConverter()
+  Int64 userId;
+  @IdConverter()
+  Int64 platformId;
   String username;
   String password;
   @override
   bool deleted;
 
-  factory PlatformCredential.fromJson(Map<String, dynamic> json) => _$PlatformCredentialFromJson(json);
+  factory PlatformCredential.fromJson(Map<String, dynamic> json) =>
+      _$PlatformCredentialFromJson(json);
+
   Map<String, dynamic> toJson() => _$PlatformCredentialToJson(this);
 
   @override
   bool isValid() {
-    return !deleted && username.isNotEmpty && password.isNotEmpty;
+    return validate(!deleted, 'PlatformCredential: deleted == true') &&
+        validate(
+            username.isNotEmpty, 'PlatformCredential: username is empty') &&
+        validate(password.isNotEmpty, 'PlatformCredential: password is empty');
   }
 }
 
-class DbPlatformCredentialSerializer implements DbSerializer<PlatformCredential> {
+class DbPlatformCredentialSerializer
+    implements DbSerializer<PlatformCredential> {
   @override
   PlatformCredential fromDbRecord(DbRecord r) {
     return PlatformCredential(

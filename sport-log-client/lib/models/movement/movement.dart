@@ -93,11 +93,14 @@ class Movement implements DbObject {
 
   factory Movement.fromJson(Map<String, dynamic> json) =>
       _$MovementFromJson(json);
+
   Map<String, dynamic> toJson() => _$MovementToJson(this);
 
   @override
   bool isValid() {
-    return userId != null && name.isNotEmpty && deleted == false;
+    return validate(userId != null, 'Movement: userId == null') &&
+        validate(name.isNotEmpty, 'Movement: name is empty') &&
+        validate(deleted == false, 'Movement: deleted == true');
   }
 }
 

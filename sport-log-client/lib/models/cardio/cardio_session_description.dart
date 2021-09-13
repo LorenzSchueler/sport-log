@@ -1,7 +1,6 @@
-
+import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
 import 'package:sport_log/models/cardio/route.dart';
-import 'package:sport_log/helpers/validation.dart';
 
 class CardioSessionDescription implements Validatable {
   CardioSessionDescription({
@@ -14,9 +13,15 @@ class CardioSessionDescription implements Validatable {
 
   @override
   bool isValid() {
-    return cardioSession.isValid()
-        && (route == null || route!.isValid())
-        && (route == null || cardioSession.routeId != null)
-        && (route == null || cardioSession.routeId! == route!.id);
+    return cardioSession.isValid() &&
+        (route == null ||
+            validate(route!.isValid(),
+                'CardioSessionDescription: route is not valid')) &&
+        (route == null ||
+            validate(cardioSession.routeId != null,
+                'CardioSessionDescription: cardio session route id is null')) &&
+        (route == null ||
+            validate(cardioSession.routeId! == route!.id,
+                'CardioSessionDescription: route id mismatch'));
   }
 }

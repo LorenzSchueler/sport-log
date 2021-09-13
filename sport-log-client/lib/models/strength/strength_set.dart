@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
@@ -20,7 +19,8 @@ class StrengthSet implements DbObject {
   @override
   @IdConverter()
   Int64 id;
-  @IdConverter() Int64 strengthSessionId;
+  @IdConverter()
+  Int64 strengthSessionId;
   int setNumber;
   int count;
   double? weight;
@@ -34,10 +34,10 @@ class StrengthSet implements DbObject {
 
   @override
   bool isValid() {
-    return !deleted
-        && setNumber >= 0
-        && count > 0
-        && (weight == null || weight! > 0);
+    return validate(!deleted, 'StrengthSet: deleted == true') &&
+        validate(setNumber >= 0, 'StrengthSet: setNumber < 0') &&
+        validate(count > 0, 'StrengthSet: count <= 0') &&
+        validate(weight == null || weight! > 0, 'StrengthSet: weight <= 0');
   }
 
   String toDisplayName() {
