@@ -1,3 +1,5 @@
+use chrono::{Duration, Utc};
+use rand::Rng;
 use rocket::{
     http::{
         hyper::header::{
@@ -11,7 +13,7 @@ use rocket::{
     Build, Rocket,
 };
 
-use sport_log_types::{Config, ADMIN_USERNAME};
+use sport_log_types::{ActionEvent, ActionEventId, ActionId, Config, UserId, ADMIN_USERNAME};
 
 use crate::rocket;
 
@@ -238,6 +240,79 @@ fn admin_as_user_auth_wrong_credentials() {
 #[test]
 fn admin_as_user_auth_without_credentials() {
     auth_as_without_credentials("/v1/user", 1);
+}
+
+#[test]
+fn user_ap_auth() {
+    auth("/v1/diary", "user1", "user1-passwd");
+}
+
+#[test]
+fn user_ap_auth_wrong_credentials() {
+    auth_wrong_credentials("/v1/diary", "user1");
+}
+
+#[test]
+fn user_ap_auth_without_credentials() {
+    auth_without_credentials("/v1/diary");
+}
+
+fn create_action_event(username: &str, password: &str, user_id: i64) {
+    let client = Client::untracked(rocket()).expect("valid rocket instance");
+    let mut request = client.post("/v1/action_event");
+    request.add_header(basic_auth(username, password));
+    let action_event = ActionEvent {
+        id: ActionEventId(rand::thread_rng().gen()),
+        user_id: UserId(user_id),
+        action_id: ActionId(1),
+        datetime: Utc::now() + Duration::days(1),
+        arguments: None,
+        enabled: true,
+        last_change: Utc::now(),
+        deleted: false,
+    };
+    let request = request.json(&action_event);
+    let response = request.dispatch();
+    assert_ok_json(&response);
+}
+
+#[test]
+fn ap_as_user_ap_auth() {
+    // create ActionEvent to ensure access permission for user
+    create_action_event("user1", "user1-passwd", 1);
+
+    auth_as("/v1/diary", "wodify-login", 1, "wodify-login-passwd");
+}
+
+#[test]
+fn ap_as_user_ap_auth_wrong_credentials() {
+    // create ActionEvent to ensure access permission for user
+    create_action_event("user1", "user1-passwd", 1);
+
+    auth_as_wrong_credentials("/v1/diary", "wodify-login", 1);
+}
+
+#[test]
+fn ap_as_user_ap_auth_without_credentials() {
+    // create ActionEvent to ensure access permission for user
+    create_action_event("user1", "user1-passwd", 1);
+
+    auth_as_without_credentials("/v1/diary", 1);
+}
+
+#[test]
+fn admin_as_user_ap_auth() {
+    auth_as("/v1/diary", ADMIN_USERNAME, 1, ADMIN_PASSWORD);
+}
+
+#[test]
+fn admin_as_user_ap_auth_wrong_credentials() {
+    auth_as_wrong_credentials("/v1/diary", ADMIN_USERNAME, 1);
+}
+
+#[test]
+fn admin_as_user_ap_auth_without_credentials() {
+    auth_as_without_credentials("/v1/diary", 1);
 }
 
 // TODO test Status::Forbidden if access to element not allowed

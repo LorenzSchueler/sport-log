@@ -1852,6 +1852,7 @@ dependencies = [
  "chrono",
  "diesel",
  "figment",
+ "rand",
  "rocket",
  "rocket_sync_db_pools",
  "serde",

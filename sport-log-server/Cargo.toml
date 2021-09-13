@@ -19,3 +19,4 @@ figment = { version = "0.10", features = ["toml"] }
 
 [dev-dependencies]
 base64 = "0.13.0"
+rand = "0.8.4"

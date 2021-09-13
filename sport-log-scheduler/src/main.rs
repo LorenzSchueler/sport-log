@@ -32,7 +32,7 @@ use sport_log_types::{
     ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent, ADMIN_USERNAME,
 };
 
-const CONFIG_FILE: &str = "config.toml";
+const CONFIG_FILE: &str = "sport-log-scheduler.toml";
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -45,12 +45,12 @@ lazy_static! {
         Ok(file) => match toml::from_str(&file) {
             Ok(config) => config,
             Err(error) => {
-                error!("Failed to parse config.toml: {}", error);
+                error!("Failed to parse {}: {}", CONFIG_FILE, error);
                 process::exit(1);
             }
         },
         Err(error) => {
-            error!("Failed to read config.toml: {}", error);
+            error!("Failed to read {}: {}", CONFIG_FILE, error);
             process::exit(1);
         }
     };

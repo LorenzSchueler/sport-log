@@ -15,7 +15,6 @@ use serde::{de, Deserialize, Deserializer, Serializer};
 mod account;
 mod action;
 mod activity;
-#[cfg(feature = "server")]
 mod admin;
 #[cfg(feature = "server")]
 mod auth;
@@ -35,7 +34,6 @@ mod user;
 pub use account::*;
 pub use action::*;
 pub use activity::*;
-#[cfg(feature = "server")]
 pub use admin::*;
 #[cfg(feature = "server")]
 pub use auth::*;
