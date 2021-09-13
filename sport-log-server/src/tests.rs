@@ -1,4 +1,4 @@
-use chrono::{Duration, Utc};
+use chrono::{Duration, NaiveDate, Utc};
 use rand::Rng;
 use rocket::{
     http::{
@@ -13,7 +13,9 @@ use rocket::{
     Build, Rocket,
 };
 
-use sport_log_types::{ActionEvent, ActionEventId, ActionId, Config, UserId, ADMIN_USERNAME};
+use sport_log_types::{
+    ActionEvent, ActionEventId, ActionId, Config, Diary, DiaryId, UserId, ADMIN_USERNAME,
+};
 
 use crate::rocket;
 
@@ -47,20 +49,24 @@ fn rocket_with_config() -> (Rocket<Build>, Config) {
     (rocket, config)
 }
 
-fn assert_ok_json(response: &LocalResponse) {
-    assert_eq!(Status::Ok, response.status());
+fn assert_status_json(response: &LocalResponse, status: Status) {
+    assert_eq!(status, response.status());
     assert_eq!(
         "application/json",
         response.headers().get_one("Content-Type").unwrap(),
     );
 }
 
+fn assert_ok_json(response: &LocalResponse) {
+    assert_status_json(response, Status::Ok);
+}
+
 fn assert_unauthorized_json(response: &LocalResponse) {
-    assert_eq!(Status::Unauthorized, response.status());
-    assert_eq!(
-        "application/json",
-        response.headers().get_one("Content-Type").unwrap(),
-    );
+    assert_status_json(response, Status::Unauthorized);
+}
+
+fn assert_forbidden_json(response: &LocalResponse) {
+    assert_status_json(response, Status::Forbidden);
 }
 
 #[test]
@@ -315,5 +321,94 @@ fn admin_as_user_ap_auth_without_credentials() {
     auth_as_without_credentials("/v1/diary", 1);
 }
 
-// TODO test Status::Forbidden if access to element not allowed
+fn create_diary<'c>(
+    client: &'c Client,
+    username: &str,
+    password: &str,
+    user_id: i64,
+) -> (DiaryId, LocalResponse<'c>) {
+    let mut request = client.post("/v1/diary");
+    request.add_header(basic_auth(username, password));
+    let diary_id = DiaryId(rand::thread_rng().gen());
+    let diary = Diary {
+        id: diary_id,
+        user_id: UserId(user_id),
+        date: NaiveDate::from_num_days_from_ce(rand::thread_rng().gen::<i32>() % 1_500_000),
+        bodyweight: None,
+        comments: None,
+        last_change: Utc::now(),
+        deleted: false,
+    };
+    let request = request.json(&diary);
+    let response = request.dispatch();
+
+    (diary_id, response)
+}
+
+#[test]
+fn foreign_create() {
+    let client = Client::untracked(rocket()).expect("valid rocket instance");
+
+    // check that create works for same user
+    let (_, response) = create_diary(&client, "user1", "user1-passwd", 1);
+    assert_ok_json(&response);
+
+    // check that create does not work for other user
+    let (_, response) = create_diary(&client, "user2", "user2-passwd", 1);
+    assert_forbidden_json(&response);
+}
+
+#[test]
+fn foreign_get() {
+    let client = Client::untracked(rocket()).expect("valid rocket instance");
+
+    let (diary_id, response) = create_diary(&client, "user1", "user1-passwd", 1);
+    assert_ok_json(&response);
+
+    // check that get works for same user
+    let mut request = client.get(format!("/v1/diary/{}", diary_id.0));
+    request.add_header(basic_auth("user1", "user1-passwd"));
+    let response = request.dispatch();
+    assert_ok_json(&response);
+
+    // check that get does not work for other user
+    let mut request = client.get(format!("/v1/diary/{}", diary_id.0));
+    request.add_header(basic_auth("user2", "user2-passwd"));
+    let response = request.dispatch();
+    assert_forbidden_json(&response);
+}
+
+#[test]
+fn foreign_update() {
+    let client = Client::untracked(rocket()).expect("valid rocket instance");
+
+    let (diary_id, response) = create_diary(&client, "user1", "user1-passwd", 1);
+    assert_ok_json(&response);
+
+    let diary = Diary {
+        id: diary_id,
+        user_id: UserId(1),
+        date: NaiveDate::from_num_days_from_ce(rand::thread_rng().gen::<i32>() % 1_500_000),
+        bodyweight: None,
+        comments: None,
+        last_change: Utc::now(),
+        deleted: false,
+    };
+
+    // check that update works for same user
+    let mut request = client.put("/v1/diary");
+    request.add_header(basic_auth("user1", "user1-passwd"));
+    let request = request.json(&diary);
+    let response = request.dispatch();
+    assert_ok_json(&response);
+
+    // check that update does not work for other user
+    let mut request = client.put("/v1/diary");
+    request.add_header(basic_auth("user2", "user2-passwd"));
+    let request = request.json(&diary);
+    let response = request.dispatch();
+    assert_forbidden_json(&response);
+}
+
 // TODO test self registration
+// update not exists
