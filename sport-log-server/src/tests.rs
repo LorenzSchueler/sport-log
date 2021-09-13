@@ -17,12 +17,22 @@ use crate::rocket;
 
 const ADMIN_PASSWORD: &str = "admin-passwd";
 
-fn basic_auth_header<'h>(username: &str, password: &str) -> Header<'h> {
+fn basic_auth<'h>(username: &str, password: &str) -> Header<'h> {
     Header::new(
         AUTHORIZATION.as_str(),
         format!(
             "Basic {}",
             base64::encode(format!("{}:{}", username, password))
+        ),
+    )
+}
+
+fn basic_auth_as<'h>(username: &str, id: i64, password: &str) -> Header<'h> {
+    Header::new(
+        AUTHORIZATION.as_str(),
+        format!(
+            "Basic {}",
+            base64::encode(format!("{}$id${}:{}", username, id, password))
         ),
     )
 }
@@ -97,7 +107,7 @@ fn cors() {
 fn admin_auth() {
     let client = Client::untracked(rocket()).expect("valid rocket instance");
     let mut request = client.get("/v1/adm/platform");
-    request.add_header(basic_auth_header(ADMIN_USERNAME, ADMIN_PASSWORD));
+    request.add_header(basic_auth(ADMIN_USERNAME, ADMIN_PASSWORD));
     let response = request.dispatch();
     assert_ok_json(response);
 }
@@ -107,12 +117,12 @@ fn admin_auth_wrong_credentials() {
     let client = Client::untracked(rocket()).expect("valid rocket instance");
 
     let mut request = client.get("/v1/adm/platform");
-    request.add_header(basic_auth_header("admin", "wrong password"));
+    request.add_header(basic_auth(ADMIN_USERNAME, "wrong password"));
     let response = request.dispatch();
     assert_unauthorized_json(response);
 
     request = client.get("/v1/adm/platform");
-    request.add_header(basic_auth_header("wrong username", "wrong password"));
+    request.add_header(basic_auth("wrong username", "wrong password"));
     let response = request.dispatch();
     assert_unauthorized_json(response);
 }
@@ -128,7 +138,7 @@ fn admin_auth_without_credentials() {
 fn ap_auth() {
     let client = Client::untracked(rocket()).expect("valid rocket instance");
     let mut request = client.get("/v1/ap/action_provider");
-    request.add_header(basic_auth_header("wodify-login", "wodify-login-passwd"));
+    request.add_header(basic_auth("wodify-login", "wodify-login-passwd"));
     let response = request.dispatch();
     assert_ok_json(response);
 }
@@ -138,12 +148,12 @@ fn ap_auth_wrong_credentials() {
     let client = Client::untracked(rocket()).expect("valid rocket instance");
 
     let mut request = client.get("/v1/ap/action_provider");
-    request.add_header(basic_auth_header("wodify-login", "wrong password"));
+    request.add_header(basic_auth("wodify-login", "wrong password"));
     let response = request.dispatch();
     assert_unauthorized_json(response);
 
-    request = client.get("/v1/adm/platform");
-    request.add_header(basic_auth_header("wrong username", "wrong password"));
+    request = client.get("/v1/ap/action_provider");
+    request.add_header(basic_auth("wrong username", "wrong password"));
     let response = request.dispatch();
     assert_unauthorized_json(response);
 }
@@ -152,6 +162,39 @@ fn ap_auth_wrong_credentials() {
 fn ap_auth_without_credentials() {
     let client = Client::untracked(rocket()).expect("valid rocket instance");
     let response = client.get("/v1/ap/action_provider").dispatch();
+    assert_unauthorized_json(response);
+}
+
+#[test]
+fn admin_as_ap_auth() {
+    let client = Client::untracked(rocket()).expect("valid rocket instance");
+    let mut request = client.get("/v1/ap/action_provider");
+    request.add_header(basic_auth_as(ADMIN_USERNAME, 1, ADMIN_PASSWORD));
+    let response = request.dispatch();
+    assert_ok_json(response);
+}
+
+#[test]
+fn admin_as_ap_auth_wrong_credentials() {
+    let client = Client::untracked(rocket()).expect("valid rocket instance");
+
+    let mut request = client.get("/v1/ap/action_provider");
+    request.add_header(basic_auth_as(ADMIN_USERNAME, 1, "wrong password"));
+    let response = request.dispatch();
+    assert_unauthorized_json(response);
+
+    request = client.get("/v1/ap/action_provider");
+    request.add_header(basic_auth_as("wrong username", 1, "wrong password"));
+    let response = request.dispatch();
+    assert_unauthorized_json(response);
+}
+
+#[test]
+fn admin_as_ap_auth_without_credentials() {
+    let client = Client::untracked(rocket()).expect("valid rocket instance");
+    let mut request = client.get("/v1/ap/action_provider");
+    request.add_header(basic_auth_as("", 1, "wrong password"));
+    let response = request.dispatch();
     assert_unauthorized_json(response);
 }
 
