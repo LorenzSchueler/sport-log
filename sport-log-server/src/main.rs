@@ -86,7 +86,9 @@ impl Fairing for CORS {
 fn rocket() -> _ {
     let figment = Figment::from(rocket::Config::default())
         .merge(Toml::file("sport-log-server-config.toml").nested());
-    if figment.profile() == "debug" {
+    if cfg!(test) {
+        env::set_var("RUST_LOG", "error");
+    } else if figment.profile() == "debug" {
         env::set_var("RUST_LOG", "info,sport_log_server=debug");
     } else {
         env::set_var("RUST_LOG", "warn");

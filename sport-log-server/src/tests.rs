@@ -7,7 +7,7 @@ use rocket::{
         },
         Header, Status,
     },
-    local::blocking::Client,
+    local::blocking::{Client, LocalResponse},
     Build, Rocket,
 };
 
@@ -33,6 +33,22 @@ fn rocket_with_config() -> (Rocket<Build>, Config) {
     let config: Config = figment.extract().expect("unable to extract Config");
 
     (rocket, config)
+}
+
+fn assert_ok_json(response: LocalResponse) {
+    assert_eq!(Status::Ok, response.status());
+    assert_eq!(
+        "application/json",
+        response.headers().get_one("Content-Type").unwrap(),
+    );
+}
+
+fn assert_unauthorized_json(response: LocalResponse) {
+    assert_eq!(Status::Unauthorized, response.status());
+    assert_eq!(
+        "application/json",
+        response.headers().get_one("Content-Type").unwrap(),
+    );
 }
 
 #[test]
@@ -83,11 +99,7 @@ fn admin_auth() {
     let mut request = client.get("/v1/adm/platform");
     request.add_header(basic_auth_header(ADMIN_USERNAME, ADMIN_PASSWORD));
     let response = request.dispatch();
-    assert_eq!(response.status(), Status::Ok);
-    assert_eq!(
-        response.headers().get_one("Content-Type").unwrap(),
-        "application/json"
-    );
+    assert_ok_json(response);
 }
 
 #[test]
@@ -97,31 +109,51 @@ fn admin_auth_wrong_credentials() {
     let mut request = client.get("/v1/adm/platform");
     request.add_header(basic_auth_header("admin", "wrong password"));
     let response = request.dispatch();
-    assert_eq!(response.status(), Status::Unauthorized);
-    assert_eq!(
-        response.headers().get_one("Content-Type").unwrap(),
-        "application/json"
-    );
+    assert_unauthorized_json(response);
 
     request = client.get("/v1/adm/platform");
     request.add_header(basic_auth_header("wrong username", "wrong password"));
     let response = request.dispatch();
-    assert_eq!(response.status(), Status::Unauthorized);
-    assert_eq!(
-        response.headers().get_one("Content-Type").unwrap(),
-        "application/json"
-    );
+    assert_unauthorized_json(response);
 }
 
 #[test]
 fn admin_auth_without_credentials() {
     let client = Client::untracked(rocket()).expect("valid rocket instance");
     let response = client.get("/v1/adm/platform").dispatch();
-    assert_eq!(response.status(), Status::Unauthorized);
-    assert_eq!(
-        response.headers().get_one("Content-Type").unwrap(),
-        "application/json"
-    );
+    assert_unauthorized_json(response);
+}
+
+#[test]
+fn ap_auth() {
+    let client = Client::untracked(rocket()).expect("valid rocket instance");
+    let mut request = client.get("/v1/ap/action_provider");
+    request.add_header(basic_auth_header("wodify-login", "wodify-login-passwd"));
+    let response = request.dispatch();
+    assert_ok_json(response);
+}
+
+#[test]
+fn ap_auth_wrong_credentials() {
+    let client = Client::untracked(rocket()).expect("valid rocket instance");
+
+    let mut request = client.get("/v1/ap/action_provider");
+    request.add_header(basic_auth_header("wodify-login", "wrong password"));
+    let response = request.dispatch();
+    assert_unauthorized_json(response);
+
+    request = client.get("/v1/adm/platform");
+    request.add_header(basic_auth_header("wrong username", "wrong password"));
+    let response = request.dispatch();
+    assert_unauthorized_json(response);
+}
+
+#[test]
+fn ap_auth_without_credentials() {
+    let client = Client::untracked(rocket()).expect("valid rocket instance");
+    let response = client.get("/v1/ap/action_provider").dispatch();
+    assert_unauthorized_json(response);
 }
 
 // TODO test Status::Forbidden if access to element not allowed
+// TODO test self registration
