@@ -14,7 +14,7 @@
     ```bash
     sudo -u postgres createuser --createdb --pwprompt sport_admin
     ```
-1. create `.env` file in repo root with the following content:
+1. create `.env` file in [sport-log-types](sport-log-types) with the following content:
     ```
     DATABASE_URL=postgres://sport_admin:<password>@localhost/sport_log
     ```
