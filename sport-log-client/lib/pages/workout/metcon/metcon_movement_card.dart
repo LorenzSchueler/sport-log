@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -9,30 +8,30 @@ import 'movement_picker_dialog.dart';
 class MetconMovementCard extends StatelessWidget {
   const MetconMovementCard({
     required this.deleteMetconMovement,
-    required this.editMetconMovement,
-    required this.move,
-    required this.index,
+    required this.editMetconMovementDescription,
+    required this.mmd,
     Key? key,
   }) : super(key: key);
 
-  final MetconMovement move;
-  final int index;
-  final Function(MetconMovement) editMetconMovement;
+  final MetconMovementDescription mmd;
+  final Function(MetconMovementDescription) editMetconMovementDescription;
   final Function() deleteMetconMovement;
 
   static const _weightDefaultValue = 10.0;
 
   @override
   Widget build(BuildContext context) {
+    final move = mmd.metconMovement;
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
       child: Column(
         children: [
           ListTile(
-            title: const Text('TODO'),
-            onTap: () => showMovementPickerDialog(context, (id) {
-              move.movementId = id;
-              editMetconMovement(move);
+            title: Text(mmd.movement.name),
+            onTap: () => showMovementPickerDialog(context, (mm) {
+              mmd.movement = mm;
+              mmd.metconMovement.movementId = mm.id;
+              editMetconMovementDescription(mmd);
             }),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -44,7 +43,8 @@ class MetconMovementCard extends StatelessWidget {
                   },
                 ),
                 ReorderableDragStartListener(
-                    child: const Icon(Icons.drag_handle), index: index),
+                    child: const Icon(Icons.drag_handle),
+                    index: move.movementNumber),
               ],
             ),
           ),
@@ -54,16 +54,16 @@ class MetconMovementCard extends StatelessWidget {
               IntPicker(
                   initialValue: move.count,
                   setValue: (count) {
-                    move.count = count;
-                    editMetconMovement(move);
+                    mmd.metconMovement.count = count;
+                    editMetconMovementDescription(mmd);
                   }),
               const Padding(padding: EdgeInsets.all(8)),
               DropdownButton(
                 value: move.movementUnit,
                 onChanged: (MovementUnit? u) {
                   if (u != null) {
-                    move.movementUnit = u;
-                    editMetconMovement(move);
+                    mmd.metconMovement.movementUnit = u;
+                    editMetconMovementDescription(mmd);
                   }
                 },
                 items: MovementUnit.values
@@ -83,8 +83,8 @@ class MetconMovementCard extends StatelessWidget {
               if (move.weight == null)
                 OutlinedButton.icon(
                   onPressed: () {
-                    move.weight = _weightDefaultValue;
-                    editMetconMovement(move);
+                    mmd.metconMovement.weight = _weightDefaultValue;
+                    editMetconMovementDescription(mmd);
                   },
                   icon: const Icon(Icons.add),
                   label: const Text("Add weight..."),
@@ -98,13 +98,13 @@ class MetconMovementCard extends StatelessWidget {
   }
 
   static void showMovementPickerDialog(
-      BuildContext context, Function(Int64) onPicked) {
-    showDialog<Int64>(
+      BuildContext context, Function(Movement) onPicked) {
+    showDialog<Movement>(
       context: context,
       builder: (_) => const MovementPickerDialog(),
-    ).then((movementId) {
-      if (movementId is Int64) {
-        onPicked(movementId);
+    ).then((movement) {
+      if (movement is Movement) {
+        onPicked(movement);
       }
     });
   }

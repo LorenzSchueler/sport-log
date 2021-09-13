@@ -33,6 +33,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: if no movements found (without entering anything), create new
     return WideScreenFrame(
       child: Dialog(
         insetPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
@@ -90,12 +91,12 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
       leading: const Icon(Icons.add),
       title: Text("Create new movement '$_searchTerm'"),
       onTap: () async {
-        dynamic payload = await Navigator.of(context).pushNamed(
+        dynamic movement = await Navigator.of(context).pushNamed(
           Routes.editMovement,
           arguments: _searchTerm,
         );
-        if (payload is int) {
-          Navigator.of(context).pop(payload);
+        if (movement is Movement) {
+          Navigator.of(context).pop(movement);
         }
       },
     );
@@ -110,7 +111,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
               overflow: TextOverflow.ellipsis,
             )
           : null,
-      onTap: () => Navigator.of(context).pop(m.id),
+      onTap: () => Navigator.of(context).pop(m),
     );
   }
 }

@@ -5,7 +5,6 @@ import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 class EditMovementPage extends StatefulWidget {
-  // TODO: split into two constructors
   const EditMovementPage({
     Key? key,
     required MovementDescription initialMovement,
@@ -65,16 +64,20 @@ class _EditMovementPageState extends State<EditMovementPage> {
     return _movement.name != "";
   }
 
-  void _submit() {
+  void _submit() async {
     FocusManager.instance.primaryFocus?.unfocus();
     if (!_inputIsValid()) {
       return;
     }
     if (widget._isEditing) {
       assert(_movement.userId != null);
-      _dataProvider.updateSingle(_movement);
+      // TODO: do error handling
+      await _dataProvider.updateSingle(_movement);
+      Navigator.of(context).pop(_movement);
     } else {
-      _dataProvider.createSingle(_movement);
+      // TODO: do error handling
+      await _dataProvider.createSingle(_movement);
+      Navigator.of(context).pop(_movement);
     }
   }
 
@@ -99,6 +102,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
             icon: const Icon(Icons.save),
           ),
           actions: [
+            // TODO: possibility to disable deletion when used for movement creation on the fly
             IconButton(
               onPressed: () => _delete(),
               icon: const Icon(Icons.delete),

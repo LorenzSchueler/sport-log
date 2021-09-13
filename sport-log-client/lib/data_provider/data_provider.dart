@@ -5,11 +5,11 @@ import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/logger.dart';
 
-final logger = Logger('DP');
+final _logger = Logger('DP');
 
 void resultSink(Result<dynamic, dynamic> result) {
   if (result.isFailure) {
-    logger.e('Got result with failure.', result.failure, StackTrace.current);
+    _logger.e('Got result with failure.', result.failure, StackTrace.current);
   }
 }
 
@@ -22,11 +22,11 @@ abstract class DataProvider<T> {
   Future<void> pushToServer();
 
   void handleApiError(ApiError error) {
-    logger.w('Got an api error.', error);
+    _logger.w('Got an api error.', error);
   }
 
   void handleDbError(DbError error) {
-    logger.e('Got a database error.', error);
+    _logger.e('Got a database error.', error);
   }
 }
 

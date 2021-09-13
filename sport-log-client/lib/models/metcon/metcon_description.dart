@@ -12,7 +12,7 @@ class MetconDescription implements Validatable {
   });
 
   Metcon metcon;
-  List<MetconMovement> moves;
+  List<MetconMovementDescription> moves;
   bool hasReference; // whether there is a MetconSession referencing this metcon
 
   MetconDescription.defaultValue(Int64 userId)
@@ -24,9 +24,11 @@ class MetconDescription implements Validatable {
   bool isValid() {
     return validate(metcon.isValid(), 'MetconDescription: metcon not valid') &&
         validate(moves.isNotEmpty, 'MetconDescription: moves empty') &&
-        validate(moves.every((mm) => mm.metconId == metcon.id),
+        validate(moves.every((mmd) => mmd.metconMovement.metconId == metcon.id),
             'MetconDescription: metcon id mismatch') &&
-        validate(moves.everyIndexed((mm, index) => mm.movementNumber == index),
+        validate(
+            moves.everyIndexed(
+                (mmd, index) => mmd.metconMovement.movementNumber == index),
             'MetconDescription: moves indices wrong') &&
         validate(moves.every((mm) => mm.isValid()),
             'MetconDescription: moves not valid');
@@ -38,7 +40,7 @@ class MetconDescription implements Validatable {
   void setDeleted() {
     metcon.deleted = true;
     for (final move in moves) {
-      move.deleted = true;
+      move.metconMovement.deleted = true;
     }
   }
 }

@@ -22,6 +22,7 @@ class AppDatabase {
     if (Config.doCleanStart) {
       final File databaseFile = File(await getDatabasesPath() + '/' + fileName);
       if (await databaseFile.exists()) {
+        _logger.i('Clean start on: deleting existing database...');
         await databaseFile.delete();
       }
     }

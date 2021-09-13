@@ -27,8 +27,8 @@ class MetconApi extends ApiAccessor<Metcon> {
     assert(metconDescription.isValid());
     final result1 = await postSingle(metconDescription.metcon);
     if (result1.isSuccess) {
-      final result2 = await Api.instance.metconMovements
-          .postMultiple(metconDescription.moves);
+      final result2 = await Api.instance.metconMovements.postMultiple(
+          metconDescription.moves.map((mmd) => mmd.metconMovement).toList());
       if (result2.isSuccess) {
         return Success(null);
       } else {
@@ -44,8 +44,8 @@ class MetconApi extends ApiAccessor<Metcon> {
     metconDescription.setDeleted();
     final result1 = await putSingle(metconDescription.metcon);
     if (result1.isSuccess) {
-      final result2 = await Api.instance.metconMovements
-          .putMultiple(metconDescription.moves);
+      final result2 = await Api.instance.metconMovements.putMultiple(
+          metconDescription.moves.map((mmd) => mmd.metconMovement).toList());
       if (result2.isSuccess) {
         return Success(null);
       } else {

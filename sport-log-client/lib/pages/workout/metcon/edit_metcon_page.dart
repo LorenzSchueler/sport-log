@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
@@ -6,6 +5,7 @@ import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/pluralize.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
+import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/widgets/int_picker.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
@@ -84,9 +84,9 @@ class _EditMetconPageState extends State<EditMetconPage> {
     setState(() => _md.moves.removeAt(index));
   }
 
-  void _setMetconMovement(int index, MetconMovement mm) {
+  void _setMetconMovementDescription(int index, MetconMovementDescription mmd) {
     FocusManager.instance.primaryFocus?.unfocus();
-    setState(() => _md.moves[index] = mm);
+    setState(() => _md.moves[index] = mmd);
   }
 
   void _reorderMetconMovements(int oldIndex, int newIndex) {
@@ -100,13 +100,15 @@ class _EditMetconPageState extends State<EditMetconPage> {
     });
   }
 
-  void _addMetconMovementWithMovementId(Int64 movementId) {
+  void _addMetconMovementWithMovement(Movement movement) {
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() {
-      _md.moves.add(MetconMovement.defaultValue(
-          metconId: _md.metcon.id,
-          movementId: movementId,
-          movementNumber: _md.moves.length));
+      _md.moves.add(MetconMovementDescription(
+          metconMovement: MetconMovement.defaultValue(
+              metconId: _md.metcon.id,
+              movementId: movement.id,
+              movementNumber: _md.moves.length),
+          movement: movement));
     });
   }
 
@@ -119,11 +121,11 @@ class _EditMetconPageState extends State<EditMetconPage> {
     }
     if (widget._isEditing) {
       _dataProvider.updateSingle(_md).then((_) {
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(_md);
       });
     } else {
       _dataProvider.createSingle(_md).then((_) {
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(_md);
       });
     }
   }
@@ -358,10 +360,10 @@ class _EditMetconPageState extends State<EditMetconPage> {
         final move = _md.moves[index];
         return MetconMovementCard(
           key: ObjectKey(move),
-          index: index,
           deleteMetconMovement: () => _removeMetconMovement(index),
-          editMetconMovement: (mm) => _setMetconMovement(index, mm),
-          move: move,
+          editMetconMovementDescription: (mm) =>
+              _setMetconMovementDescription(index, mm),
+          mmd: move,
         );
       },
       itemCount: _md.moves.length,
@@ -372,7 +374,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
   Widget _addMetconMovementButton(BuildContext context) {
     return OutlinedButton.icon(
       onPressed: () => MetconMovementCard.showMovementPickerDialog(
-          context, _addMetconMovementWithMovementId),
+          context, _addMetconMovementWithMovement),
       icon: const Icon(Icons.add),
       label: const Text("Add movement..."),
     );

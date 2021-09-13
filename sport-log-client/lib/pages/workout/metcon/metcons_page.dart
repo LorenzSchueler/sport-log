@@ -35,7 +35,7 @@ class _MetconsPageState extends State<MetconsPage> {
   @override
   Widget build(BuildContext context) {
     if (_metconDescriptions.isEmpty) {
-      return const Center(child: Text("No metcons there."));
+      return const Center(child: Text('No metcons there.'));
     }
     return ImplicitlyAnimatedList(
       items: _metconDescriptions,
@@ -51,19 +51,19 @@ class _MetconsPageState extends State<MetconsPage> {
       animation: animation,
       child: Card(
         child: ListTile(
-          title: Text(md.metcon.name ?? "Unnamed"),
-          subtitle: _subtitle(md.metcon),
+          title: Text(md.metcon.name ?? 'Unnamed'),
+          subtitle: _subtitle(md),
           trailing: PopupMenuButton(
             itemBuilder: (BuildContext context) {
               return [
                 const PopupMenuItem(
                   value: _editChoice,
-                  child: Text("Edit"),
+                  child: Text('Edit'),
                 ),
                 if (!md.hasReference && md.metcon.userId != null)
                   const PopupMenuItem(
                     value: _deleteChoice,
-                    child: Text("Delete"),
+                    child: Text('Delete'),
                   ),
               ];
             },
@@ -93,9 +93,9 @@ class _MetconsPageState extends State<MetconsPage> {
     );
   }
 
-  Widget _subtitle(Metcon metcon) {
-    return const Text(
-      "subtitle",
+  Widget _subtitle(MetconDescription md) {
+    return Text(
+      md.moves.map((mmd) => mmd.movement.name).join(' • '),
       overflow: TextOverflow.ellipsis,
     );
   }

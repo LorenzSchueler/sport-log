@@ -7,6 +7,9 @@ import 'package:sport_log/data_provider/syncing.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
+import 'package:sport_log/helpers/logger.dart';
+
+final _logger = Logger('MAIN');
 
 Future<void> initialize({bool doDownSync = true}) async {
   WidgetsFlutterBinding.ensureInitialized(); // TODO: necessary?
@@ -15,6 +18,7 @@ Future<void> initialize({bool doDownSync = true}) async {
   await AppDatabase.instance?.init();
   await DownSync.instance.init().then((downSync) {
     if (Config.doCleanStart) {
+      _logger.i('Clean start on: deleting last sync datetime');
       downSync.removeLastSync();
     }
     if (doDownSync) downSync.sync();

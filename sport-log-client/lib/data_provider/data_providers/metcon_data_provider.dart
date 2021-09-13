@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
@@ -18,7 +19,8 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
     assert(object.isValid());
     // TODO: catch errors
     await metconDb.createSingle(object.metcon);
-    await metconMovementDb.createMultiple(object.moves);
+    await metconMovementDb
+        .createMultiple(object.moves.map((mmd) => mmd.metconMovement).toList());
     metconApi.postFull(object).then((result) {
       if (result.isFailure) {
         handleApiError(result.failure);
@@ -44,13 +46,22 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
     });
   }
 
+  Future<List<MetconMovementDescription>> _getMmdByMetcon(Int64 id) async {
+    final metconMovements = await metconMovementDb.getByMetcon(id);
+    return Future.wait(metconMovements
+        .map((mm) async => MetconMovementDescription(
+            metconMovement: mm,
+            movement: (await movementDb.getSingle(mm.movementId))!))
+        .toList());
+  }
+
   @override
   Future<List<MetconDescription>> getNonDeleted() async {
     final metcons = await metconDb.getNonDeleted();
     return Future.wait(metcons
         .map((metcon) async => MetconDescription(
             metcon: metcon,
-            moves: await metconMovementDb.getByMetcon(metcon.id),
+            moves: await _getMmdByMetcon(metcon.id),
             hasReference: await metconSessionDb.existsByMetcon(metcon.id)))
         .toList());
   }
@@ -117,14 +128,14 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
     final oldMetconMovements =
         await metconMovementDb.getByMetcon(object.metcon.id);
     final oldIds = oldMetconMovements.map((mm) => mm.id).toList();
-    final newIds = object.moves.map((mm) => mm.id).toList();
+    final newIds = object.moves.map((mmd) => mmd.metconMovement.id).toList();
     List<MetconMovement> toCreate = [], toUpdate = [], toDelete = [];
 
     // TODO: use faster algorithm
-    for (final newMetconMovement in object.moves) {
-      oldIds.contains(newMetconMovement.id)
-          ? toUpdate.add(newMetconMovement)
-          : toCreate.add(newMetconMovement);
+    for (final mmd in object.moves) {
+      oldIds.contains(mmd.metconMovement.id)
+          ? toUpdate.add(mmd.metconMovement)
+          : toCreate.add(mmd.metconMovement);
     }
     for (final oldMetconMovement in oldMetconMovements) {
       if (!newIds.contains(oldMetconMovement.id)) {
