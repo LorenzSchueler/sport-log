@@ -14,7 +14,8 @@ use rocket::{
 };
 
 use sport_log_types::{
-    ActionEvent, ActionEventId, ActionId, Config, Diary, DiaryId, UserId, ADMIN_USERNAME,
+    ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, Config, Diary, DiaryId,
+    Platform, PlatformId, User, UserId, ADMIN_USERNAME,
 };
 
 use crate::rocket;
@@ -410,5 +411,82 @@ fn foreign_update() {
     assert_forbidden_json(&response);
 }
 
-// TODO test self registration
+#[test]
+fn user_self_registration() {
+    let (rocket, config) = rocket_with_config();
+    let client = Client::untracked(rocket).expect("valid rocket instance");
+
+    let user = User {
+        id: UserId(rand::thread_rng().gen()),
+        username: format!("user{}", rand::thread_rng().gen::<u64>()),
+        password: "password".to_owned(),
+        email: format!("email{}", rand::thread_rng().gen::<u64>()),
+        last_change: Utc::now(),
+    };
+
+    let request = client.post("/v1/user");
+    let request = request.json(&user);
+    let response = request.dispatch();
+
+    if config.user_self_registration {
+        assert_ok_json(&response);
+    } else {
+        assert_forbidden_json(&response);
+    }
+}
+
+#[test]
+fn ap_self_registration() {
+    let (rocket, config) = rocket_with_config();
+    let client = Client::untracked(rocket).expect("valid rocket instance");
+
+    let platform = Platform {
+        id: PlatformId(rand::thread_rng().gen()),
+        name: format!("platform{}", rand::thread_rng().gen::<u64>()),
+        credential: false,
+        last_change: Utc::now(),
+        deleted: false,
+    };
+
+    let request = client.post("/v1/ap/platform");
+    let request = request.json(&platform);
+    let response = request.dispatch();
+
+    if config.ap_self_registration {
+        assert_ok_json(&response);
+    } else {
+        assert_forbidden_json(&response);
+    }
+
+    let request = client.get("/v1/ap/platform");
+    let response = request.dispatch();
+
+    if config.ap_self_registration {
+        assert_ok_json(&response);
+    } else {
+        assert_forbidden_json(&response);
+    }
+
+    let action_provider = ActionProvider {
+        id: ActionProviderId(rand::thread_rng().gen()),
+        name: format!("ap{}", rand::thread_rng().gen::<u64>()),
+        password: "password".to_owned(),
+        platform_id: PlatformId(1),
+        description: None,
+        last_change: Utc::now(),
+        deleted: false,
+    };
+
+    let request = client.post("/v1/ap/action_provider");
+    let request = request.json(&action_provider);
+    let response = request.dispatch();
+
+    if config.ap_self_registration {
+        assert_ok_json(&response);
+    } else {
+        assert_forbidden_json(&response);
+    }
+}
+
 // update not exists
+// deleted tests
