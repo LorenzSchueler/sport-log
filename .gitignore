@@ -1,5 +1,5 @@
 /target
-/.vscode
+**/.vscode
 /.idea
 /sport-log-action-provider-map-matching/map-matching
 .env
