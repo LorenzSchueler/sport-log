@@ -488,5 +488,25 @@ fn ap_self_registration() {
     }
 }
 
-// update not exists
+#[test]
+fn update_non_existing() {
+    let client = Client::untracked(rocket()).expect("valid rocket instance");
+
+    let diary = Diary {
+        id: DiaryId(rand::thread_rng().gen()),
+        user_id: UserId(1),
+        date: NaiveDate::from_num_days_from_ce(rand::thread_rng().gen::<i32>() % 1_500_000),
+        bodyweight: None,
+        comments: None,
+        last_change: Utc::now(),
+        deleted: false,
+    };
+
+    let mut request = client.put("/v1/diary");
+    request.add_header(basic_auth("user1", "user1-passwd"));
+    let request = request.json(&diary);
+    let response = request.dispatch();
+    assert_forbidden_json(&response);
+}
+
 // deleted tests
