@@ -20,6 +20,17 @@ insert into strength_session (id, user_id, datetime, movement_id, movement_unit,
     (1, 1, '2021-08-20 16:00:00', 2, 'reps', 120, null),
     (2, 1, '2021-08-22 16:00:00', 1, 'reps', null, null);
 
+create table strength_session_archive (
+    primary key (id),
+    foreign key (user_id) references "user",
+    check (deleted = true)
+) inherits (strength_session);
+
+create trigger archive_strength_session
+    after update of deleted or delete
+    on strength_session
+    for each row execute procedure archive_record();
+
 create table strength_set (
     id bigint primary key,
     strength_session_id bigint not null references strength_session on delete cascade,
@@ -46,3 +57,14 @@ insert into strength_set (id, strength_session_id, set_number, count, weight) va
     (7, 2, 2, 3, 130),
     (8, 2, 3, 3, 135),
     (9, 2, 4, 3, 130);
+
+create table strength_set_archive (
+    primary key (id),
+    foreign key (strength_session_id) references strength_session,
+    check (deleted = true)
+) inherits (strength_set);
+
+create trigger archive_strength_set
+    after update of deleted or delete
+    on strength_set
+    for each row execute procedure archive_record();

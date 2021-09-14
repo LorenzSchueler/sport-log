@@ -20,6 +20,17 @@ insert into diary (id, user_id, date, bodyweight, comments) values
     (4, 1, '2021-08-23', 77.9, null),
     (5, 1, '2021-08-24', 78.3, null);
 
+create table diary_archive (
+    primary key (id),
+    foreign key (user_id) references "user",
+    check (deleted = true)
+) inherits (diary);
+
+create trigger archive_diary
+    after update of deleted or delete
+    on diary
+    for each row execute procedure archive_record();
+
 create table wod (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
@@ -41,3 +52,14 @@ insert into wod (id, user_id, date, description) values
     (3, 1, '2021-08-22', E'Cindy\n20 min AMRAP:\n5 Pull-Ups\n10 Push-Ups\n15 Air Squats'),
     (4, 1, '2021-08-23', E''),
     (5, 1, '2021-08-24', E'Deadlift 8x2\nSkill: Clean & Jerk');
+
+create table wod_archive (
+    primary key (id),
+    foreign key (user_id) references "user",
+    check (deleted = true)
+) inherits (wod);
+
+create trigger archive_wod
+    after update of deleted or delete
+    on wod
+    for each row execute procedure archive_record();

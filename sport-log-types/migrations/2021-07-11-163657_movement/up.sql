@@ -29,6 +29,17 @@ insert into movement (id, user_id, name, description, categories) values
     (10, null, 'Push-Up', null, '{strength}'),
     (11, null, 'Air Squat', null, '{strength}');
 
+create table movement_archive (
+    primary key (id),
+    foreign key (user_id) references "user",
+    check (deleted = true)
+) inherits (movement);
+
+create trigger archive_movement
+    after update of deleted or delete
+    on movement
+    for each row execute procedure archive_record();
+
 create table eorm (
     id bigserial primary key,
     reps integer not null check (reps >= 1),

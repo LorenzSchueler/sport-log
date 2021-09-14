@@ -48,6 +48,16 @@ insert into action (id, name, action_provider_id, description, create_before, de
     (6, 'Open Fridge', 2, 'Fetch and save the Open Fridge wod for the current day.', 168, 0), 
     (7, 'fetch', 3, 'Fetch and save new workouts.', 168, 0);
 
+create table action_archive (
+    primary key (id),
+    check (deleted = true)
+) inherits (action);
+
+create trigger archive_action
+    after update of deleted or delete
+    on action
+    for each row execute procedure archive_record();
+
 create table action_rule (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
@@ -77,6 +87,17 @@ insert into action_rule (id, user_id, action_id, weekday, time, enabled) values
     (9, 1, 4, 'saturday', '1970-01-01 00:00:00', true),
     (10, 1, 4, 'sunday', '1970-01-01 00:00:00', true);
 
+create table action_rule_archive (
+    primary key (id),
+    foreign key (user_id) references "user",
+    check (deleted = true)
+) inherits (action_rule);
+
+create trigger archive_action_rule
+    after update of deleted or delete
+    on action_rule
+    for each row execute procedure archive_record();
+
 create table action_event (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
@@ -104,3 +125,14 @@ insert into action_event (id, user_id, action_id, datetime, enabled) values
     (7, 1, 4, '2021-08-30 00:00:00', true), 
     (8, 1, 7, '2021-07-01 09:00:00', true), 
     (9, 3, 7, '2021-07-01 11:00:00', true); 
+
+create table action_event_archive (
+    primary key (id),
+    foreign key (user_id) references "user",
+    check (deleted = true)
+) inherits (action_event);
+
+create trigger archive_action_event
+    after update of deleted or delete
+    on action_event
+    for each row execute procedure archive_record();
