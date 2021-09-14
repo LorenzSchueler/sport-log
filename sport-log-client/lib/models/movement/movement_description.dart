@@ -3,7 +3,7 @@ import 'package:sport_log/database/defs.dart';
 
 import 'movement.dart';
 
-class MovementDescription implements Validatable {
+class MovementDescription implements Validatable, HasId {
   MovementDescription({
     required this.movement,
     required this.hasReference,
@@ -24,4 +24,7 @@ class MovementDescription implements Validatable {
     return validate(
         movement.isValid(), 'MovementDescription: movement is not valid');
   }
+
+  @override
+  Int64 get id => movement.id;
 }

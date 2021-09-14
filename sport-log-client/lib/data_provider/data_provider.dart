@@ -15,10 +15,13 @@ void resultSink(Result<dynamic, dynamic> result) {
 
 abstract class DataProvider<T> {
   Future<void> createSingle(T object);
+
   Future<void> updateSingle(T object);
+
   Future<void> deleteSingle(T object);
 
   Future<List<T>> getNonDeleted();
+
   Future<void> pushToServer();
 
   void handleApiError(ApiError error) {
@@ -32,6 +35,7 @@ abstract class DataProvider<T> {
 
 abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
   ApiAccessor<T> get api;
+
   Table<T> get db;
 
   @override
@@ -111,6 +115,7 @@ mixin UnconnectedMethods<T extends DbObject> on DataProviderImpl<T> {
     await db.createSingle(object);
     api.postSingle(object).then((result) {
       if (result.isFailure) {
+        // TODO: what if request fails due to conflict (when connected to internet)?
         handleApiError(result.failure);
       } else {
         db.setSynchronized(object.id);

@@ -1,6 +1,5 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:result_type/result_type.dart';
-import 'package:sport_log/helpers/validation.dart';
+import 'package:sport_log/helpers/interfaces.dart';
 
 export 'package:sport_log/helpers/validation.dart';
 
@@ -17,9 +16,7 @@ enum SyncStatus {
   created,
 }
 
-abstract class DbObject extends Validatable {
-  Int64 get id;
-
+abstract class DbObject implements Validatable, HasId {
   bool get deleted;
   set deleted(bool deleted);
 }

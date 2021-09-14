@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/data_provider/user_state.dart';
+import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
@@ -40,28 +41,28 @@ class _EditMovementPageState extends State<EditMovementPage> {
   @override
   void initState() {
     super.initState();
-    _movement = widget._initialMovement.movement;
+    _md = widget._initialMovement;
   }
 
-  late Movement _movement;
+  late MovementDescription _md;
 
   final _descriptionFocusNode = FocusNode();
 
   void _setName(String name) {
-    setState(() => _movement.name = name);
+    setState(() => _md.movement.name = name);
   }
 
   void _setCategory(MovementCategory category) {
     FocusManager.instance.primaryFocus?.unfocus();
-    setState(() => _movement.category = category);
+    setState(() => _md.movement.category = category);
   }
 
   void _setDescription(String? description) {
-    setState(() => _movement.description = description);
+    setState(() => _md.movement.description = description);
   }
 
   bool _inputIsValid() {
-    return _movement.name != "";
+    return _md.movement.name != "";
   }
 
   void _submit() async {
@@ -70,21 +71,25 @@ class _EditMovementPageState extends State<EditMovementPage> {
       return;
     }
     if (widget._isEditing) {
-      assert(_movement.userId != null);
+      assert(_md.movement.userId != null);
       // TODO: do error handling
-      await _dataProvider.updateSingle(_movement);
-      Navigator.of(context).pop(_movement);
+      await _dataProvider.updateSingle(_md.movement);
+      Navigator.of(context)
+          .pop(ReturnObject(action: ReturnAction.updated, object: _md));
     } else {
       // TODO: do error handling
-      await _dataProvider.createSingle(_movement);
-      Navigator.of(context).pop(_movement);
+      await _dataProvider.createSingle(_md.movement);
+      Navigator.of(context)
+          .pop(ReturnObject(action: ReturnAction.created, object: _md));
     }
   }
 
   void _delete() {
     if (widget._isEditing) {
-      assert(_movement.userId != null);
-      _dataProvider.deleteSingle(_movement);
+      assert(_md.movement.userId != null);
+      _dataProvider.deleteSingle(_md.movement);
+      Navigator.of(context)
+          .pop(ReturnObject(action: ReturnAction.deleted, object: _md));
     } else {
       Navigator.of(context).pop();
     }
@@ -129,7 +134,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
 
   Widget _nameInput(BuildContext context) {
     return TextFormField(
-      initialValue: _movement.name,
+      initialValue: _md.movement.name,
       onChanged: _setName,
       style: Theme.of(context).textTheme.headline6,
       textInputAction: TextInputAction.next,
@@ -142,7 +147,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
   }
 
   Widget _maybeDescriptionInput(BuildContext context) {
-    if (_movement.description == null) {
+    if (_md.movement.description == null) {
       return OutlinedButton.icon(
         onPressed: () {
           _setDescription("");
@@ -160,7 +165,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: TextFormField(
-        initialValue: _movement.description ?? "",
+        initialValue: _md.movement.description ?? "",
         focusNode: _descriptionFocusNode,
         keyboardType: TextInputType.multiline,
         minLines: 1,
@@ -189,7 +194,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
                 child: Text(
                   category.toDisplayName(),
                   style: style.copyWith(
-                    color: (category == _movement.category)
+                    color: (category == _md.movement.category)
                         ? theme.primaryColor
                         : theme.disabledColor,
                   ),

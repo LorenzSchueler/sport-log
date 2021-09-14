@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
+import 'package:sport_log/helpers/state/local_state.dart';
+import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -18,17 +20,31 @@ class _MovementsPageState extends State<MovementsPage> {
   static const _editChoice = 2;
 
   final _dataProvider = MovementDataProvider();
-  List<MovementDescription> _movementDescriptions = [];
+  LocalState<MovementDescription> _state = LocalState.empty();
 
   @override
   void initState() {
     super.initState();
     _dataProvider.getNonDeletedFull().then((mds) {
-      mds.sort(_compareFunction);
       setState(() {
-        _movementDescriptions = mds;
+        _state = LocalState.fromList(mds);
       });
     });
+  }
+
+  void handlePageReturn(dynamic object) {
+    if (object is ReturnObject<MovementDescription>) {
+      switch (object.action) {
+        case ReturnAction.created:
+          setState(() => _state.create(object.object));
+          break;
+        case ReturnAction.updated:
+          setState(() => _state.update(object.object));
+          break;
+        case ReturnAction.deleted:
+          setState(() => _state.delete(object.object.id));
+      }
+    }
   }
 
   @override
@@ -42,17 +58,19 @@ class _MovementsPageState extends State<MovementsPage> {
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
-            Navigator.of(context).pushNamed(Routes.editMovement);
+            Navigator.of(context)
+                .pushNamed(Routes.editMovement)
+                .then(handlePageReturn);
           }),
     );
   }
 
   Widget _body(BuildContext context) {
-    if (_movementDescriptions.isEmpty) {
+    if (_state.isEmpty) {
       return const Center(child: Text("No movements there."));
     }
     return ImplicitlyAnimatedList(
-      items: _movementDescriptions,
+      items: _state.sortedBy(_compareFunction),
       itemBuilder: _movementToWidget,
       areItemsTheSame: MovementDescription.areTheSame,
     );
@@ -95,12 +113,15 @@ class _MovementsPageState extends State<MovementsPage> {
                     switch (choice) {
                       case _deleteChoice:
                         _dataProvider.deleteSingle(movement);
+                        setState(() => _state.delete(md.id));
                         break;
                       case _editChoice:
-                        Navigator.of(context).pushNamed(
-                          Routes.editMovement,
-                          arguments: md,
-                        );
+                        Navigator.of(context)
+                            .pushNamed(
+                              Routes.editMovement,
+                              arguments: md,
+                            )
+                            .then(handlePageReturn);
                         break;
                     }
                   },

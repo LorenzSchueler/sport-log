@@ -51,7 +51,8 @@ create table metcon_movement (
   Future<List<MetconMovement>> getByMetcon(Int64 id) async {
     final result = await database.query(tableName,
         where: '${Keys.metconId} = ? AND ${Keys.deleted} = 0',
-        whereArgs: [id.toInt()]);
+        whereArgs: [id.toInt()],
+        orderBy: Keys.movementNumber);
     return result.map(serde.fromDbRecord).toList();
   }
 

@@ -67,7 +67,7 @@ class _MetconsPageState extends State<MetconsPage> {
                   ),
               ];
             },
-            onSelected: (choice) {
+            onSelected: (choice) async {
               switch (choice) {
                 case _deleteChoice:
                   assert(!md.hasReference && md.metcon.userId != null);
@@ -79,11 +79,16 @@ class _MetconsPageState extends State<MetconsPage> {
                   });
                   break;
                 case _editChoice:
-                  Navigator.of(context)
+                  final dynamic updatedMd = await Navigator.of(context)
                       .pushNamed(Routes.editMetcon, arguments: md)
                       .then((_) {
                     _update();
                   });
+                  if (updatedMd is MetconDescription) {
+                    setState(() {
+
+                    });
+                  }
                   break;
               }
             },

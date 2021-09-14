@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/user_state.dart';
+import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/helpers/pluralize.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
@@ -121,11 +122,13 @@ class _EditMetconPageState extends State<EditMetconPage> {
     }
     if (widget._isEditing) {
       _dataProvider.updateSingle(_md).then((_) {
-        Navigator.of(context).pop(_md);
+        Navigator.of(context)
+            .pop(ReturnObject(action: ReturnAction.updated, object: _md));
       });
     } else {
       _dataProvider.createSingle(_md).then((_) {
-        Navigator.of(context).pop(_md);
+        Navigator.of(context)
+            .pop(ReturnObject(action: ReturnAction.created, object: _md));
       });
     }
   }
@@ -133,7 +136,8 @@ class _EditMetconPageState extends State<EditMetconPage> {
   void _delete() {
     if (widget._isEditing) {
       _dataProvider.deleteSingle(_md).then((_) {
-        Navigator.of(context).pop();
+        Navigator.of(context)
+            .pop(ReturnObject(action: ReturnAction.deleted, object: _md));
       });
     } else {
       Navigator.of(context).pop();
