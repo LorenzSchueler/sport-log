@@ -4,3 +4,5 @@
 [print_schema]
 file = "src/schema.rs"
 import_types = ["diesel::sql_types::*", "crate::*"]
+filter = { except_tables = ["platform_archive"] }
+patch_file = "src/schema.patch"

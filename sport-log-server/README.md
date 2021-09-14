@@ -25,7 +25,7 @@
 1. edit *sport-log-server-config.toml*
 1. set up tables: 
     ```bash
-    cd ../sport-log-types && diesel database setup && ./patch.sh && cd ../sport-log-server
+    cd ../sport-log-types && diesel database setup && cd ../sport-log-server
     ```
 1. (optional) enable password auth for Unix Domain Socket connections (for psql): 
     *   add entry 
@@ -47,7 +47,7 @@ cargo run
 ## Update DB Schema
 
 ```bash
-cd ../sport-log-types && diesel database reset && ./patch.sh && cd ../sport-log-server
+cd ../sport-log-types && diesel database reset && cd ../sport-log-server
 ```
 
 ## SystemD Setup for deployment
