@@ -5,8 +5,9 @@ use rand_core::OsRng;
 
 use crate::{
     schema::{action, action_event, action_provider, action_rule, platform_credential},
-    Action, ActionEvent, ActionEventId, ActionProvider, ActionProviderId, ActionRule, CheckAPId,
-    CreatableActionRule, Create, DeletableActionEvent, ExecutableActionEvent, GetAll, UserId,
+    Action, ActionEvent, ActionEventId, ActionProvider, ActionProviderId, ActionRule,
+    AuthApForUser, CheckAPId, CreatableActionRule, Create, DeletableActionEvent,
+    ExecutableActionEvent, GetAll, UserId,
 };
 
 impl Create for ActionProvider {
@@ -50,25 +51,10 @@ impl ActionProvider {
         password: &str,
         user_id: UserId,
         conn: &PgConnection,
-    ) -> QueryResult<ActionProviderId> {
+    ) -> QueryResult<AuthApForUser> {
         let (action_provider_id, password_hash): (ActionProviderId, String) =
             action_provider::table
                 .filter(action_provider::columns::name.eq(name))
-                .filter(
-                    action_provider::columns::id.eq_any(
-                        action::table
-                            .filter(
-                                action::columns::id.eq_any(
-                                    action_event::table
-                                        .filter(action_event::columns::user_id.eq(user_id))
-                                        .filter(action_event::columns::enabled.eq(true))
-                                        .filter(action_event::columns::deleted.eq(false))
-                                        .select(action_event::columns::action_id),
-                                ),
-                            )
-                            .select(action::columns::action_provider_id),
-                    ),
-                )
                 .select((
                     action_provider::columns::id,
                     action_provider::columns::password,
@@ -80,7 +66,20 @@ impl ActionProvider {
             .verify_password(password.as_bytes(), &password_hash)
             .is_ok()
         {
-            Ok(action_provider_id)
+            let action_events: i64 = action::table
+                .inner_join(action_event::table)
+                .filter(action::columns::action_provider_id.eq(action_provider_id))
+                .filter(action_event::columns::user_id.eq(user_id))
+                .filter(action_event::columns::enabled.eq(true))
+                .filter(action_event::columns::deleted.eq(false))
+                .count()
+                .get_result(conn)?;
+
+            if action_events > 0 {
+                Ok(AuthApForUser::Allowed(action_provider_id))
+            } else {
+                Ok(AuthApForUser::Forbidden)
+            }
         } else {
             Err(Error::NotFound)
         }

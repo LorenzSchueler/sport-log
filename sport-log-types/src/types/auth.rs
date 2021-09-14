@@ -134,17 +134,33 @@ impl<'r> FromRequest<'r> for AuthUserOrAP {
                     .split_once("$id$")
                     .map(|(name, id)| (name, id.parse().map(UserId)))
                 {
-                    if ActionProvider::auth_as_user(name, &password, user_id, c).is_ok()
-                        || Admin::auth(name, &password, &admin_password, c).is_ok()
-                    {
-                        return Outcome::Success(AuthUserOrAP(user_id));
+                    match ActionProvider::auth_as_user(name, &password, user_id, c) {
+                        Ok(AuthApForUser::Allowed(_)) => {
+                            return Outcome::Success(AuthUserOrAP(user_id))
+                        }
+                        Ok(AuthApForUser::Forbidden) => {
+                            return Outcome::Failure((Status::Forbidden, ()))
+                        }
+                        Err(_) => {
+                            if Admin::auth(name, &password, &admin_password, c).is_ok() {
+                                return Outcome::Success(AuthUserOrAP(user_id));
+                            } else {
+                                return Outcome::Failure((Status::Unauthorized, ()));
+                            }
+                        }
                     }
-                };
-                Outcome::Failure((Status::Unauthorized, ()))
+                } else {
+                    return Outcome::Failure((Status::Unauthorized, ()));
+                }
             }
         })
         .await
     }
+}
+
+pub enum AuthApForUser {
+    Allowed(ActionProviderId),
+    Forbidden,
 }
 
 /// [AuthAP] is used as a request guard to ensure that the endpoint can only be accessed by the [ActionProvider] who provides the [ActionEvent](crate::ActionEvent).
