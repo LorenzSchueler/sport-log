@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/state/local_state.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/approve_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 class MovementsPage extends StatefulWidget {
@@ -17,9 +18,6 @@ class MovementsPage extends StatefulWidget {
 }
 
 class _MovementsPageState extends State<MovementsPage> {
-  static const _deleteChoice = 1;
-  static const _editChoice = 2;
-
   final _dataProvider = MovementDataProvider();
   LocalState<MovementDescription> _state = LocalState.empty();
 
@@ -114,12 +112,19 @@ class _MovementsPageState extends State<MovementsPage> {
                       icon: const Icon(Icons.delete),
                     ),
                   IconButton(
-                    onPressed: () {
+                    onPressed: () async {
                       assert(movement.userId != null);
+                      if (md.hasReference) {
+                        final bool? approved = await showApproveDialog(
+                            context,
+                            'Warning',
+                            'Changes will be reflected in existing workouts.');
+                        if (approved == null || !approved) return;
+                      }
                       Navigator.of(context)
                           .pushNamed(
                             Routes.editMovement,
-                            arguments: md,
+                            arguments: md.copy(),
                           )
                           .then(handlePageReturn);
                     },

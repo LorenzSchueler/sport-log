@@ -27,4 +27,16 @@ class MovementDescription implements Validatable, HasId {
 
   @override
   Int64 get id => movement.id;
+
+  MovementDescription copy() => MovementDescription(
+      movement: movement.copy(), hasReference: hasReference);
+
+  @override
+  bool operator ==(other) =>
+      other is MovementDescription &&
+      other.hasReference == hasReference &&
+      other.movement == movement;
+
+  @override
+  int get hashCode => Object.hash(hasReference, movement);
 }

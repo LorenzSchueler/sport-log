@@ -3,6 +3,7 @@ import 'package:sport_log/data_provider/data_providers/movement_data_provider.da
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/movement/all.dart';
+import 'package:sport_log/widgets/approve_dialog.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 class EditMovementPage extends StatefulWidget {
@@ -37,19 +38,13 @@ class EditMovementPage extends StatefulWidget {
 
 class _EditMovementPageState extends State<EditMovementPage> {
   final _dataProvider = MovementDataProvider();
+  final _descriptionFocusNode = FocusNode();
+  late MovementDescription _md;
 
   @override
   void initState() {
     super.initState();
-    _md = widget._initialMovement;
-  }
-
-  late MovementDescription _md;
-
-  final _descriptionFocusNode = FocusNode();
-
-  void _setName(String name) {
-    setState(() => _md.movement.name = name);
+    _md = widget._initialMovement.copy();
   }
 
   void _setCategory(MovementCategory category) {
@@ -61,17 +56,16 @@ class _EditMovementPageState extends State<EditMovementPage> {
     setState(() => _md.movement.description = description);
   }
 
-  bool _inputIsValid() {
-    return _md.movement.name != "";
-  }
+  bool get _inputIsValid => _md.isValid();
+  bool get _hasChanges => _md != widget._initialMovement;
 
   void _submit() async {
     FocusManager.instance.primaryFocus?.unfocus();
-    if (!_inputIsValid()) {
+    if (!_inputIsValid) {
       return;
     }
     if (widget._isEditing) {
-      assert(_md.movement.userId != null);
+      assert(_md.movement.userId != null && _hasChanges);
       // TODO: do error handling
       await _dataProvider.updateSingle(_md.movement);
       Navigator.of(context)
@@ -103,15 +97,26 @@ class _EditMovementPageState extends State<EditMovementPage> {
         appBar: AppBar(
           title: Text(widget._isEditing ? "Edit Movement" : "New Movement"),
           leading: IconButton(
-            onPressed: _inputIsValid() ? () => _submit() : null,
-            icon: const Icon(Icons.save),
+            onPressed: () async {
+              FocusManager.instance.primaryFocus?.unfocus();
+              if (_hasChanges) {
+                final bool? approved = await showDiscardWarningDialog(context);
+                if (approved == null || !approved) return;
+              }
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back),
           ),
           actions: [
-            // TODO: possibility to disable deletion when used for movement creation on the fly
+            if (widget._isEditing)
+              IconButton(
+                onPressed: () => _delete(),
+                icon: const Icon(Icons.delete),
+              ),
             IconButton(
-              onPressed: () => _delete(),
-              icon: const Icon(Icons.delete),
-            )
+                onPressed:
+                    _inputIsValid && _hasChanges ? () => _submit() : null,
+                icon: const Icon(Icons.save))
           ],
         ),
         body: WideScreenFrame(
@@ -135,7 +140,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
   Widget _nameInput(BuildContext context) {
     return TextFormField(
       initialValue: _md.movement.name,
-      onChanged: _setName,
+      onChanged: (name) => setState(() => _md.movement.name = name),
       style: Theme.of(context).textTheme.headline6,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.text,

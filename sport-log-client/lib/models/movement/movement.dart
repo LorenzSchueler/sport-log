@@ -17,9 +17,9 @@ extension MovementCategoryToDisplayName on MovementCategory {
   String toDisplayName() {
     switch (this) {
       case MovementCategory.strength:
-        return "strength";
+        return "Strength";
       case MovementCategory.cardio:
-        return "cardio";
+        return "Cardio";
     }
   }
 }
@@ -102,6 +102,28 @@ class Movement implements DbObject {
         validate(name.isNotEmpty, 'Movement: name is empty') &&
         validate(deleted == false, 'Movement: deleted == true');
   }
+
+  Movement copy() => Movement(
+      id: id,
+      userId: userId,
+      name: name,
+      description: description,
+      category: category,
+      deleted: deleted);
+
+  @override
+  bool operator ==(other) =>
+      other is Movement &&
+      other.id == id &&
+      other.userId == userId &&
+      other.name == name &&
+      other.description == description &&
+      other.category == category &&
+      other.deleted == deleted;
+
+  @override
+  int get hashCode =>
+      Object.hash(id, userId, name, description, category, deleted);
 }
 
 class DbMovementSerializer implements DbSerializer<Movement> {
