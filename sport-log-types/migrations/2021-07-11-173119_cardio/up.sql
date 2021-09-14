@@ -28,7 +28,7 @@ create trigger set_timestamp before update on route
 create table cardio_session (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
-    movement_id bigint not null references movement on delete no action,
+    movement_id bigint not null references movement on delete cascade,
     cardio_type cardio_type not null,
     datetime timestamptz not null default now(),
     distance integer check (distance > 0),

@@ -25,7 +25,7 @@ insert into metcon (id, user_id, name, metcon_type, rounds, timecap, description
 create table metcon_movement (
     id bigint primary key,
     metcon_id bigint not null references metcon on delete cascade,
-    movement_id bigint not null references movement on delete no action,
+    movement_id bigint not null references movement on delete cascade,
     movement_number integer not null check (movement_number >= 0),
     count integer not null check (count >= 1),
     movement_unit movement_unit not null,
@@ -54,7 +54,7 @@ insert into metcon_movement (id, metcon_id, movement_id, movement_number, count,
 create table metcon_session (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
-    metcon_id bigint not null references metcon on delete no action,
+    metcon_id bigint not null references metcon on delete cascade,
     datetime timestamptz not null default now(),
     time integer check (time > 0), -- seconds
     rounds integer check (rounds >= 0),

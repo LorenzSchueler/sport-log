@@ -2,7 +2,7 @@ create table strength_session (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
     datetime timestamptz not null default now(),
-    movement_id bigint not null references movement on delete no action,
+    movement_id bigint not null references movement on delete cascade,
     movement_unit movement_unit not null,
     interval integer check (interval > 0),
     comments text,
