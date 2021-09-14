@@ -31,6 +31,8 @@ abstract class DataProvider<T> {
   void handleDbError(DbError error) {
     _logger.e('Got a database error.', error);
   }
+
+  Future<void> doFullUpdate();
 }
 
 abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
@@ -52,9 +54,9 @@ abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
   // TODO: this makes only sense with UnconnectedMethods
   Future<void> _pushUpdatedToServer() async {
     final recordsToUpdate = await db.getWithSyncStatus(SyncStatus.updated);
-    final apiResult = await api.putMultiple(recordsToUpdate);
-    if (apiResult.isFailure) {
-      handleApiError(apiResult.failure);
+    final result = await api.putMultiple(recordsToUpdate);
+    if (result.isFailure) {
+      handleApiError(result.failure);
       return;
     }
     db.setAllUpdatedSynchronized();
@@ -62,15 +64,25 @@ abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
 
   Future<void> _pushCreatedToServer() async {
     final recordsToCreate = await db.getWithSyncStatus(SyncStatus.created);
-    final apiResult = await api.postMultiple(recordsToCreate);
-    if (apiResult.isFailure) {
-      handleApiError(apiResult.failure);
+    final result = await api.postMultiple(recordsToCreate);
+    if (result.isFailure) {
+      handleApiError(result.failure);
       return;
     }
     db.setAllCreatedSynchronized();
   }
 
   Future<T?> getById(Int64 id) async => db.getSingle(id);
+
+  @override
+  Future<void> doFullUpdate() async {
+    final result = await api.getMultiple();
+    if (result.isFailure) {
+      handleApiError(result.failure);
+      throw result.failure;
+    }
+    await db.upsertMultiple(result.success);
+  }
 }
 
 mixin ConnectedMethods<T extends DbObject> on DataProviderImpl<T> {

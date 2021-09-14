@@ -175,4 +175,21 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
     }
     metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
   }
+
+  @override
+  Future<void> doFullUpdate() async {
+    final result1 = await metconApi.getMultiple();
+    if (result1.isFailure) {
+      handleApiError(result1.failure);
+      throw result1.failure;
+    }
+    metconDb.upsertMultiple(result1.success);
+
+    final result2 = await metconMovementApi.getMultiple();
+    if (result2.isFailure) {
+      handleApiError(result2.failure);
+      throw result2.failure;
+    }
+    metconMovementDb.upsertMultiple(result2.success);
+  }
 }
