@@ -23,5 +23,7 @@ create function archive_record()
             using old;
         end if;
         return null;
+    exception when foreign_key_violation then raise notice 'hard deleting';
+        return null;
     end;
     $$ language plpgsql;
