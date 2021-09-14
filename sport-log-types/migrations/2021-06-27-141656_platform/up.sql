@@ -15,6 +15,16 @@ insert into platform (id, name, credential) values
     (1, 'wodify', true),
     (2, 'sportstracker', true);
 
+--create table platform_archive (
+    --primary key (id),
+    --check (deleted = true)
+--) inherits (platform);
+
+--create trigger archive_platform
+    --after update of deleted --or delete
+    --on platform_archive
+    --for each row execute procedure archive_record();
+
 create table platform_credential (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
