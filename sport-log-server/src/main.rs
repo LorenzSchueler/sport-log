@@ -11,7 +11,8 @@
 //!
 //! # Config
 //!
-//! The config file must be called `config.toml` and must be deserializable to a [Config](sport_log_types::Config).
+//! The config file must be called `sport-log-server-config.toml`, supports configuration of different profiles and must at least contain all fields of [Config](sport_log_types::Config).
+//! Additionally it can also be used to configure the webserver itself. Please refer to [rocket::config].
 
 use std::env;
 

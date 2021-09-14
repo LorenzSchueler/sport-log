@@ -61,6 +61,8 @@ impl ActionProvider {
                                 action::columns::id.eq_any(
                                     action_event::table
                                         .filter(action_event::columns::user_id.eq(user_id))
+                                        .filter(action_event::columns::enabled.eq(true))
+                                        .filter(action_event::columns::deleted.eq(false))
                                         .select(action_event::columns::action_id),
                                 ),
                             )
