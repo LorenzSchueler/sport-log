@@ -1,3 +1,8 @@
+//! test must be run sequentially
+//! ```bash
+//! cargo test -- --test-threads=1
+//! ```
+
 use chrono::{Duration, NaiveDate, Utc};
 use rand::Rng;
 use rocket::{
@@ -148,6 +153,14 @@ fn auth_as(route: &str, username: &str, id: i64, password: &str) {
     assert_ok_json(&response);
 }
 
+fn auth_as_not_allowed(route: &str, username: &str, id: i64, password: &str) {
+    let client = Client::untracked(rocket()).expect("valid rocket instance");
+    let mut request = client.get(route);
+    request.add_header(basic_auth_as(username, id, password));
+    let response = request.dispatch();
+    assert_forbidden_json(&response);
+}
+
 fn auth_as_wrong_credentials(route: &str, username: &str, id: i64) {
     let client = Client::untracked(rocket()).expect("valid rocket instance");
 
@@ -264,21 +277,11 @@ fn user_ap_auth_without_credentials() {
     auth_without_credentials("/v1/diary");
 }
 
-fn create_action_event(username: &str, password: &str, user_id: i64) {
+fn create_action_event(username: &str, password: &str, action_event: &ActionEvent) {
     let client = Client::untracked(rocket()).expect("valid rocket instance");
     let mut request = client.post("/v1/action_event");
     request.add_header(basic_auth(username, password));
-    let action_event = ActionEvent {
-        id: ActionEventId(rand::thread_rng().gen()),
-        user_id: UserId(user_id),
-        action_id: ActionId(1),
-        datetime: Utc::now() + Duration::days(1),
-        arguments: None,
-        enabled: true,
-        last_change: Utc::now(),
-        deleted: false,
-    };
-    let request = request.json(&action_event);
+    let request = request.json(action_event);
     let response = request.dispatch();
     assert_ok_json(&response);
 }
@@ -286,15 +289,92 @@ fn create_action_event(username: &str, password: &str, user_id: i64) {
 #[test]
 fn ap_as_user_ap_auth() {
     // create ActionEvent to ensure access permission for user
-    create_action_event("user1", "user1-passwd", 1);
+    let action_event = ActionEvent {
+        id: ActionEventId(rand::thread_rng().gen()),
+        user_id: UserId(1),
+        action_id: ActionId(1),
+        datetime: Utc::now() + Duration::days(1),
+        arguments: None,
+        enabled: true,
+        last_change: Utc::now(),
+        deleted: false,
+    };
+    create_action_event("user1", "user1-passwd", &action_event);
 
     auth_as("/v1/diary", "wodify-login", 1, "wodify-login-passwd");
 }
 
 #[test]
+fn ap_as_user_ap_auth_no_event() {
+    // delete all action events
+    let (username, password) = ("user1", "user1-passwd");
+    let client = Client::untracked(rocket()).expect("valid rocket instance");
+
+    let mut request = client.get("/v1/action_event");
+    request.add_header(basic_auth(username, password));
+    let response = request.dispatch();
+    assert_ok_json(&response);
+    let action_events: Vec<ActionEvent> = response.into_json().unwrap();
+    let action_events: Vec<ActionEvent> = action_events
+        .into_iter()
+        .map(|mut action_event| {
+            action_event.enabled = false;
+            action_event.deleted = true;
+            action_event
+        })
+        .collect();
+
+    let mut request = client.put("/v1/action_events");
+    request.add_header(basic_auth(username, password));
+    let request = request.json(&action_events);
+    let response = request.dispatch();
+    assert_ok_json(&response);
+
+    // create disabled ActionEvent
+    let action_event = ActionEvent {
+        id: ActionEventId(rand::thread_rng().gen()),
+        user_id: UserId(1),
+        action_id: ActionId(1),
+        datetime: Utc::now() + Duration::days(1),
+        arguments: None,
+        enabled: false,
+        last_change: Utc::now(),
+        deleted: false,
+    };
+    create_action_event("user1", "user1-passwd", &action_event);
+
+    // create deleted ActionEvent
+    let action_event = ActionEvent {
+        id: ActionEventId(rand::thread_rng().gen()),
+        user_id: UserId(1),
+        action_id: ActionId(1),
+        datetime: Utc::now() + Duration::days(1),
+        arguments: None,
+        enabled: true,
+        last_change: Utc::now(),
+        deleted: true,
+    };
+    create_action_event("user1", "user1-passwd", &action_event);
+
+    //  check that ap has no access
+    println!("{:?}", "okook");
+    auth_as_not_allowed("/v1/diary", "wodify-login", 1, "wodify-login-passwd");
+}
+
+#[test]
 fn ap_as_user_ap_auth_wrong_credentials() {
     // create ActionEvent to ensure access permission for user
-    create_action_event("user1", "user1-passwd", 1);
+    let action_event = ActionEvent {
+        id: ActionEventId(rand::thread_rng().gen()),
+        user_id: UserId(1),
+        action_id: ActionId(1),
+        datetime: Utc::now() + Duration::days(1),
+        arguments: None,
+        enabled: true,
+        last_change: Utc::now(),
+        deleted: false,
+    };
+    create_action_event("user1", "user1-passwd", &action_event);
 
     auth_as_wrong_credentials("/v1/diary", "wodify-login", 1);
 }
@@ -302,7 +382,17 @@ fn ap_as_user_ap_auth_wrong_credentials() {
 #[test]
 fn ap_as_user_ap_auth_without_credentials() {
     // create ActionEvent to ensure access permission for user
-    create_action_event("user1", "user1-passwd", 1);
+    let action_event = ActionEvent {
+        id: ActionEventId(rand::thread_rng().gen()),
+        user_id: UserId(1),
+        action_id: ActionId(1),
+        datetime: Utc::now() + Duration::days(1),
+        arguments: None,
+        enabled: true,
+        last_change: Utc::now(),
+        deleted: false,
+    };
+    create_action_event("user1", "user1-passwd", &action_event);
 
     auth_as_without_credentials("/v1/diary", 1);
 }
@@ -509,5 +599,4 @@ fn update_non_existing() {
     assert_forbidden_json(&response);
 }
 
-// deleted and enabled tests for ap access as user
 // create directly without handler && use test transaction
