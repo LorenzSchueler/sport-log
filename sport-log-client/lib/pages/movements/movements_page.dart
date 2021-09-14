@@ -1,3 +1,4 @@
+import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
@@ -86,48 +87,47 @@ class _MovementsPageState extends State<MovementsPage> {
     return SizeFadeTransition(
       key: ValueKey(movement.id),
       animation: animation,
-      child: Card(
-        child: ListTile(
+      child: ExpansionTileCard(
+          leading: CircleAvatar(child: Text(movement.name[0])),
           title: Text(movement.name),
-          trailing: (movement.userId == null)
-              ? null
-              : PopupMenuButton(
-                  itemBuilder: (context) {
-                    return [
-                      const PopupMenuItem(
-                        value: _editChoice,
-                        child: Text("Edit"),
-                      ),
-                      if (!md.hasReference)
-                        const PopupMenuItem(
-                          value: _deleteChoice,
-                          child: Text("Delete"),
-                        )
-                    ];
-                  },
-                  onSelected: (choice) {
-                    assert(movement.userId != null);
-                    if (movement.userId == null) {
-                      return;
-                    }
-                    switch (choice) {
-                      case _deleteChoice:
+          subtitle: Text(movement.category.toDisplayName()),
+          children: [
+            if (movement.description != null) const Divider(),
+            if (movement.description != null)
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Text(movement.description!),
+              ),
+            if (movement.userId != null) const Divider(),
+            if (movement.userId != null)
+              ButtonBar(
+                alignment: MainAxisAlignment.spaceAround,
+                children: [
+                  if (!md.hasReference)
+                    IconButton(
+                      onPressed: () {
+                        assert(movement.userId != null && !md.hasReference);
                         _dataProvider.deleteSingle(movement);
                         setState(() => _state.delete(md.id));
-                        break;
-                      case _editChoice:
-                        Navigator.of(context)
-                            .pushNamed(
-                              Routes.editMovement,
-                              arguments: md,
-                            )
-                            .then(handlePageReturn);
-                        break;
-                    }
-                  },
-                ),
-        ),
-      ),
+                      },
+                      icon: const Icon(Icons.delete),
+                    ),
+                  IconButton(
+                    onPressed: () {
+                      assert(movement.userId != null);
+                      Navigator.of(context)
+                          .pushNamed(
+                            Routes.editMovement,
+                            arguments: md,
+                          )
+                          .then(handlePageReturn);
+                    },
+                    icon: const Icon(Icons.edit),
+                  ),
+                ],
+              ),
+          ]),
     );
   }
 
