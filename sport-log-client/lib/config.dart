@@ -34,7 +34,7 @@ abstract class Config {
 
   // if true, the database will be deleted and re-created,
   // and the account data will be fetched completely
-  static const bool doCleanStart = true;
+  static const bool doCleanStart = false;
 
   static Level minLogLevel = Level.debug;
 }
