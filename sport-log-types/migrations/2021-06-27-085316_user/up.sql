@@ -1,11 +1,3 @@
-create function trigger_set_timestamp()
-    returns trigger as $$
-    begin
-        new.last_change = now();
-        return new;
-    end;
-    $$ language plpgsql;
-
 create table "user" (
     id bigint primary key,
     username varchar(80) not null check (length(username) >= 2),
