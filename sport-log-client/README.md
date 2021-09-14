@@ -21,7 +21,7 @@
 * [ ] create double picker
 * [ ] create duration picker
 * [ ] OutlinedButtons bigger (all of those '+ Select/Add ...' buttons)
-* [ ] movements: show description and category in list
+* [x] movements: show description and category in list
 * [ ] show last sync time in side drawer
 
 ## Localization
