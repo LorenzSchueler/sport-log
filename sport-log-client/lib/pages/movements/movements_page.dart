@@ -2,6 +2,7 @@ import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
+import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/helpers/state/local_state.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
@@ -46,6 +47,20 @@ class _MovementsPageState extends State<MovementsPage> {
     }
   }
 
+  Future<void> refreshPage() async {
+    _dataProvider.doFullUpdate().onError((error, stackTrace) {
+      if (error is ApiError) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
+      }
+    });
+    _dataProvider.getNonDeletedFull().then((mds) {
+      setState(() {
+        _state = LocalState.fromList(mds);
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +68,10 @@ class _MovementsPageState extends State<MovementsPage> {
         title: const Text("Movements"),
       ),
       drawer: const MainDrawer(selectedRoute: Routes.movements),
-      body: _body(context),
+      body: RefreshIndicator(
+        onRefresh: refreshPage,
+        child: _body(context),
+      ),
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
