@@ -19,10 +19,9 @@
 //!
 //! The config file must be called `sport-log-scheduler.toml` and must be deserializable to a [Config].
 
-use std::{env, fs, process};
+use std::{env, fs};
 
 use chrono::{Datelike, Duration, Utc};
-use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{blocking::Client, Error as ReqwestError};
 use serde::Deserialize;
@@ -40,22 +39,6 @@ pub struct Config {
     pub base_url: String,
 }
 
-lazy_static! {
-    static ref CONFIG: Config = match fs::read_to_string(CONFIG_FILE) {
-        Ok(file) => match toml::from_str(&file) {
-            Ok(config) => config,
-            Err(error) => {
-                error!("Failed to parse {}: {}", CONFIG_FILE, error);
-                process::exit(1);
-            }
-        },
-        Err(error) => {
-            error!("Failed to read {}: {}", CONFIG_FILE, error);
-            process::exit(1);
-        }
-    };
-}
-
 fn main() {
     if cfg!(debug_assertions) {
         env::set_var("RUST_LOG", "info,sport_log_scheduler=debug");
@@ -65,14 +48,28 @@ fn main() {
 
     tracing_subscriber::fmt::init();
 
+    let config: Config = match fs::read_to_string(CONFIG_FILE) {
+        Ok(file) => match toml::from_str(&file) {
+            Ok(config) => config,
+            Err(error) => {
+                error!("Failed to parse {}: {}", CONFIG_FILE, error);
+                return;
+            }
+        },
+        Err(error) => {
+            error!("Failed to read {}: {}", CONFIG_FILE, error);
+            return;
+        }
+    };
+
     let client = Client::new();
-    if let Err(error) = create_action_events(&client) {
+    if let Err(error) = create_action_events(&client, &config) {
         error!(
             "while creating new action events an error occured: {}",
             error
         );
     }
-    if let Err(error) = delete_action_events(&client) {
+    if let Err(error) = delete_action_events(&client, &config) {
         error!(
             "while deleting old action events an error occured: {}",
             error
@@ -80,10 +77,10 @@ fn main() {
     }
 }
 
-fn create_action_events(client: &Client) -> Result<(), ReqwestError> {
+fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestError> {
     let creatable_action_rules: Vec<CreatableActionRule> = client
-        .get(format!("{}/v1/adm/creatable_action_rule", CONFIG.base_url))
-        .basic_auth(ADMIN_USERNAME, Some(&CONFIG.admin_password))
+        .get(format!("{}/v1/adm/creatable_action_rule", config.base_url))
+        .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .send()?
         .json()?;
 
@@ -131,8 +128,8 @@ fn create_action_events(client: &Client) -> Result<(), ReqwestError> {
     debug!("{:#?}", action_events);
 
     client
-        .post(format!("{}/v1/adm/action_events", CONFIG.base_url))
-        .basic_auth(ADMIN_USERNAME, Some(&CONFIG.admin_password))
+        .post(format!("{}/v1/adm/action_events", config.base_url))
+        .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .json(&action_events)
         .send()?;
 
@@ -141,10 +138,10 @@ fn create_action_events(client: &Client) -> Result<(), ReqwestError> {
     Ok(())
 }
 
-fn delete_action_events(client: &Client) -> Result<(), ReqwestError> {
+fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestError> {
     let deletable_action_events: Vec<DeletableActionEvent> = client
-        .get(format!("{}/v1/adm/deletable_action_event", CONFIG.base_url))
-        .basic_auth(ADMIN_USERNAME, Some(&CONFIG.admin_password))
+        .get(format!("{}/v1/adm/deletable_action_event", config.base_url))
+        .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .send()?
         .json()?;
 
@@ -168,8 +165,8 @@ fn delete_action_events(client: &Client) -> Result<(), ReqwestError> {
     debug!("{:#?}", action_event_ids);
 
     client
-        .delete(format!("{}/v1/adm/action_events", CONFIG.base_url,))
-        .basic_auth(ADMIN_USERNAME, Some(&CONFIG.admin_password))
+        .delete(format!("{}/v1/adm/action_events", config.base_url,))
+        .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .json(&action_event_ids)
         .send()?;
 
