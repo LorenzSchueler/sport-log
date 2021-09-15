@@ -3,6 +3,23 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 
 enum TimeFrame { day, week, month, year, all }
 
+extension ToDisplayName on TimeFrame {
+  String toDisplayName() {
+    switch (this) {
+      case TimeFrame.day:
+        return 'Day';
+      case TimeFrame.week:
+        return 'Week';
+      case TimeFrame.month:
+        return 'Month';
+      case TimeFrame.year:
+        return 'Year';
+      case TimeFrame.all:
+        return 'All';
+    }
+  }
+}
+
 // most elegant piece of code I've ever written :)
 class DateFilterState {
   DateFilterState({required DateTime start, required this.timeFrame})
@@ -137,7 +154,7 @@ class DateFilterState {
         if (today.isInYear(start.yearLater())) return 'Last year';
         return start.year.toString();
       case TimeFrame.all:
-        return 'All times';
+        return 'All';
     }
   }
 }
