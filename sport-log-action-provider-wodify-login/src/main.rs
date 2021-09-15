@@ -8,7 +8,10 @@ use err_derive::Error as StdError;
 use lazy_static::lazy_static;
 use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
-use thirtyfour::{error::WebDriverError, prelude::*};
+use sport_log_types::{ActionEventId, ExecutableActionEvent};
+use thirtyfour::{
+    error::WebDriverError, http::reqwest_async::ReqwestDriverAsync, prelude::*, GenericWebDriver,
+};
 use tracing::{debug, error, info, warn};
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
@@ -28,11 +31,17 @@ enum Error {
     Io(IoError),
     #[error(display = "{}", _0)]
     WebDriver(WebDriverError),
+    #[error(display = "ExecutableActionEvent doesn't contain credentials")]
+    NoCredential(ActionEventId),
+    #[error(display = "login failed")]
+    LoginFailed(ActionEventId),
+    #[error(display = "the class could not be found within the timeout")]
+    Timeout(ActionEventId),
 }
 
 type Result<T> = StdResult<T, Error>;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 struct Config {
     password: String,
     base_url: String,
@@ -54,6 +63,12 @@ lazy_static! {
     };
 }
 
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+enum Mode {
+    Headless,
+    Interactive,
+}
+
 #[tokio::main]
 async fn main() {
     if cfg!(debug_assertions) {
@@ -69,7 +84,12 @@ async fn main() {
 
     match &env::args().collect::<Vec<_>>()[1..] {
         [] => {
-            if let Err(error) = login().await {
+            if let Err(error) = login(Mode::Headless).await {
+                error!("login failed: {}", error);
+            }
+        }
+        [option] if option == "--interactive" => {
+            if let Err(error) = login(Mode::Interactive).await {
                 error!("login failed: {}", error);
             }
         }
@@ -112,6 +132,7 @@ fn help() {
 
         OPTIONS:\n\
         -h, --help\tprint this help page\n\
+        --interactive\tuse interactive webdriver session (with browser window)\n\
         --setup\t\tcreate own actions"
     );
 }
@@ -120,7 +141,7 @@ fn wrong_use() {
     println!("no such options");
 }
 
-async fn login() -> Result<()> {
+async fn login(mode: Mode) -> Result<()> {
     let client = Client::new();
 
     let exec_action_events = get_events(
@@ -142,136 +163,57 @@ async fn login() -> Result<()> {
 
     let mut webdriver = Command::new("../geckodriver").spawn().map_err(Error::Io)?;
 
-    let caps = DesiredCapabilities::firefox();
-    let driver = WebDriver::new_with_timeout(
-        "http://localhost:4444/",
-        &caps,
-        Some(StdDuration::from_secs(5)),
-    )
-    .await
-    .map_err(Error::WebDriver)?;
+    let mut caps = DesiredCapabilities::firefox();
+    if mode == Mode::Headless {
+        caps.set_headless().unwrap_or(());
+    }
+
+    let mut tasks = vec![];
+    for exec_action_event in exec_action_events {
+        let caps = caps.clone();
+
+        tasks.push(tokio::spawn(async move {
+            info!("processing {:#?}", exec_action_event);
+
+            match (&exec_action_event.username, &exec_action_event.password) {
+                (Some(username), Some(password)) => {
+                    let driver = WebDriver::new_with_timeout(
+                        "http://localhost:4444/",
+                        &caps,
+                        Some(StdDuration::from_secs(5)),
+                    )
+                    .await
+                    .map_err(Error::WebDriver)?;
+
+                    let result =
+                        try_login(&driver, username, password, &exec_action_event, mode).await;
+
+                    info!("closing browser");
+                    driver.quit().await.map_err(Error::WebDriver)?;
+
+                    result
+                }
+                _ => {
+                    warn!("can not log in: no credential provided");
+
+                    Err(Error::NoCredential(exec_action_event.action_event_id))
+                }
+            }
+        }));
+    }
 
     let mut delete_action_event_ids = vec![];
-    // TODO execute in parallel
-    for exec_action_event in exec_action_events {
-        info!("processing {:#?}", exec_action_event);
-
-        let (username, password) = if let (Some(username), Some(password)) =
-            (exec_action_event.username, exec_action_event.password)
-        {
-            (username, password)
-        } else {
-            warn!("can not log in: no credential provided");
-            continue;
-        };
-
-        let time = exec_action_event
-            .datetime
-            .with_timezone(&Local)
-            .format("%-H:%M")
-            .to_string();
-        let date = exec_action_event.datetime.format("%m/%d/%Y").to_string();
-
-        driver
-            .delete_all_cookies()
-            .await
-            .map_err(Error::WebDriver)?;
-        driver
-            .get("https://app.wodify.com/Schedule/CalendarListView.aspx")
-            .await
-            .map_err(Error::WebDriver)?;
-
-        time::sleep(StdDuration::from_secs(3)).await;
-
-        driver
-            .find_element(By::Id("Input_UserName"))
-            .await
-            .map_err(Error::WebDriver)?
-            .send_keys(&username)
-            .await
-            .map_err(Error::WebDriver)?;
-        driver
-            .find_element(By::Id("Input_Password"))
-            .await
-            .map_err(Error::WebDriver)?
-            .send_keys(&password)
-            .await
-            .map_err(Error::WebDriver)?;
-        driver
-            .find_element(By::ClassName("signin-btn"))
-            .await
-            .map_err(Error::WebDriver)?
-            .click()
-            .await
-            .map_err(Error::WebDriver)?;
-        time::sleep(StdDuration::from_secs(2)).await;
-
-        if driver
-            .find_element(By::Id("AthleteTheme_wt6_block_wt9_wtLogoutLink"))
-            .await
-            .is_err()
-        {
-            warn!("login failed");
-            continue;
-        }
-        info!("login successful");
-
-        if let Ok(duration) = (exec_action_event.datetime - Duration::days(1) - Utc::now()).to_std()
-        {
-            time::sleep(duration).await;
-        }
-        debug!("ready");
-
-        'event_loop: while Utc::now() < exec_action_event.datetime
-        // - Duration::days(1) + Duration::minutes(1) // TODO
-        {
-            driver.refresh().await.map_err(Error::WebDriver)?; // TODO can this be removed?
-
-            let rows = driver
-                .find_elements(By::XPath("//table[@class='TableRecords']/tbody/tr"))
-                .await
-                .map_err(Error::WebDriver)?;
-
-            let mut row_number = rows.len();
-            for (i, row) in rows.iter().enumerate() {
-                if let Ok(day) = row
-                    .find_element(By::XPath("./td[1]/span[contains(@class, \"h3\")]"))
-                    .await
-                {
-                    if day
-                        .inner_html()
-                        .await
-                        .map_err(Error::WebDriver)?
-                        .contains(&date)
-                    {
-                        row_number = i;
-                        break;
-                    }
-                }
+    for task in tasks {
+        match task.await.unwrap() {
+            Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
+            Err(Error::NoCredential(action_event_id)) => {
+                delete_action_event_ids.push(action_event_id)
             }
-
-            for row in &rows[row_number + 1..] {
-                if let Ok(label) = row.find_element(By::XPath("./td[1]/div/span")).await {
-                    let title = label
-                        .get_attribute("title")
-                        .await
-                        .map_err(Error::WebDriver)?
-                        .unwrap();
-                    if title.contains(&exec_action_event.action_name) && title.contains(&time) {
-                        row.find_element(By::XPath("./td[3]/div"))
-                            .await
-                            .map_err(Error::WebDriver)?
-                            .click()
-                            .await
-                            .map_err(Error::WebDriver)?;
-                        info!("reserved");
-                        time::sleep(StdDuration::from_secs(2)).await; // TODO remove
-
-                        delete_action_event_ids.push(exec_action_event.action_event_id);
-                        break 'event_loop;
-                    }
-                }
+            Err(Error::LoginFailed(action_event_id)) => {
+                delete_action_event_ids.push(action_event_id)
             }
+            Err(Error::Timeout(action_event_id)) => delete_action_event_ids.push(action_event_id),
+            Err(error) => error!("{}", error),
         }
     }
 
@@ -290,11 +232,128 @@ async fn login() -> Result<()> {
         .map_err(Error::Reqwest)?;
     }
 
-    info!("closing browser");
-    driver.quit().await.map_err(Error::WebDriver)?;
-
     info!("terminating webdriver");
     let _ = webdriver.kill();
 
     Ok(())
+}
+
+async fn try_login(
+    driver: &GenericWebDriver<ReqwestDriverAsync>,
+    username: &str,
+    password: &str,
+    exec_action_event: &ExecutableActionEvent,
+    mode: Mode,
+) -> Result<ActionEventId> {
+    let time = exec_action_event
+        .datetime
+        .with_timezone(&Local)
+        .format("%-H:%M")
+        .to_string();
+    let date = exec_action_event.datetime.format("%m/%d/%Y").to_string();
+
+    driver
+        .delete_all_cookies()
+        .await
+        .map_err(Error::WebDriver)?;
+    driver
+        .get("https://app.wodify.com/Schedule/CalendarListView.aspx")
+        .await
+        .map_err(Error::WebDriver)?;
+
+    time::sleep(StdDuration::from_secs(3)).await;
+
+    driver
+        .find_element(By::Id("Input_UserName"))
+        .await
+        .map_err(Error::WebDriver)?
+        .send_keys(username)
+        .await
+        .map_err(Error::WebDriver)?;
+    driver
+        .find_element(By::Id("Input_Password"))
+        .await
+        .map_err(Error::WebDriver)?
+        .send_keys(password)
+        .await
+        .map_err(Error::WebDriver)?;
+    driver
+        .find_element(By::ClassName("signin-btn"))
+        .await
+        .map_err(Error::WebDriver)?
+        .click()
+        .await
+        .map_err(Error::WebDriver)?;
+    time::sleep(StdDuration::from_secs(2)).await;
+
+    if driver
+        .find_element(By::Id("AthleteTheme_wt6_block_wt9_wtLogoutLink"))
+        .await
+        .is_err()
+    {
+        warn!("login failed");
+        return Err(Error::LoginFailed(exec_action_event.action_event_id));
+    }
+    info!("login successful");
+
+    if let Ok(duration) = (exec_action_event.datetime - Duration::days(1) - Utc::now()).to_std() {
+        time::sleep(duration).await;
+    }
+    debug!("ready");
+
+    while Utc::now() < exec_action_event.datetime
+    // - Duration::days(1) + Duration::minutes(1) // TODO
+    {
+        driver.refresh().await.map_err(Error::WebDriver)?; // TODO can this be removed?
+
+        let rows = driver
+            .find_elements(By::XPath("//table[@class='TableRecords']/tbody/tr"))
+            .await
+            .map_err(Error::WebDriver)?;
+
+        let mut row_number = rows.len();
+        for (i, row) in rows.iter().enumerate() {
+            if let Ok(day) = row
+                .find_element(By::XPath("./td[1]/span[contains(@class, \"h3\")]"))
+                .await
+            {
+                if day
+                    .inner_html()
+                    .await
+                    .map_err(Error::WebDriver)?
+                    .contains(&date)
+                {
+                    row_number = i;
+                    break;
+                }
+            }
+        }
+
+        for row in &rows[row_number + 1..] {
+            if let Ok(label) = row.find_element(By::XPath("./td[1]/div/span")).await {
+                let title = label
+                    .get_attribute("title")
+                    .await
+                    .map_err(Error::WebDriver)?
+                    .unwrap();
+                if title.contains(&exec_action_event.action_name) && title.contains(&time) {
+                    row.find_element(By::XPath("./td[3]/div"))
+                        .await
+                        .map_err(Error::WebDriver)?
+                        .click()
+                        .await
+                        .map_err(Error::WebDriver)?;
+                    info!("reservation successful");
+
+                    if mode == Mode::Interactive {
+                        time::sleep(StdDuration::from_secs(3)).await;
+                    }
+
+                    return Ok(exec_action_event.action_event_id);
+                }
+            }
+        }
+    }
+
+    Err(Error::Timeout(exec_action_event.action_event_id))
 }
