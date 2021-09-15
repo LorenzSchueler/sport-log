@@ -7,13 +7,13 @@ extension ToDisplayName on TimeFrame {
   String toDisplayName() {
     switch (this) {
       case TimeFrame.day:
-        return 'Day';
+        return 'Today';
       case TimeFrame.week:
-        return 'Week';
+        return 'This week';
       case TimeFrame.month:
-        return 'Month';
+        return 'This month';
       case TimeFrame.year:
-        return 'Year';
+        return 'This year';
       case TimeFrame.all:
         return 'All';
     }
@@ -43,8 +43,8 @@ class DateFilterState {
     }
   }
 
-  static DateTime _beginningOfTimeFrame(DateTime start, TimeFrame duration) {
-    switch (duration) {
+  static DateTime _beginningOfTimeFrame(DateTime start, TimeFrame timeFrame) {
+    switch (timeFrame) {
       case TimeFrame.day:
         return start.beginningOfDay();
       case TimeFrame.week:
@@ -60,7 +60,7 @@ class DateFilterState {
 
   void setTimeFrame(TimeFrame timeFrame) {
     this.timeFrame = timeFrame;
-    start = _beginningOfTimeFrame(start, timeFrame);
+    start = _beginningOfTimeFrame(DateTime.now(), timeFrame);
   }
 
   bool get goingForwardPossible {
