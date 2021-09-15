@@ -135,22 +135,15 @@ impl<'r> FromRequest<'r> for AuthUserOrAP {
                     .map(|(name, id)| (name, id.parse().map(UserId)))
                 {
                     match ActionProvider::auth_as_user(name, &password, user_id, c) {
-                        Ok(AuthApForUser::Allowed(_)) => {
-                            return Outcome::Success(AuthUserOrAP(user_id))
-                        }
-                        Ok(AuthApForUser::Forbidden) => {
-                            return Outcome::Failure((Status::Forbidden, ()))
-                        }
-                        Err(_) => {
-                            if Admin::auth(name, &password, &admin_password, c).is_ok() {
-                                return Outcome::Success(AuthUserOrAP(user_id));
-                            } else {
-                                return Outcome::Failure((Status::Unauthorized, ()));
-                            }
-                        }
+                        Ok(AuthApForUser::Allowed(_)) => Outcome::Success(AuthUserOrAP(user_id)),
+                        Ok(AuthApForUser::Forbidden) => Outcome::Failure((Status::Forbidden, ())),
+                        Err(_) => match Admin::auth(name, &password, &admin_password, c) {
+                            Ok(()) => Outcome::Success(AuthUserOrAP(user_id)),
+                            Err(_) => Outcome::Failure((Status::Unauthorized, ())),
+                        },
                     }
                 } else {
-                    return Outcome::Failure((Status::Unauthorized, ()));
+                    Outcome::Failure((Status::Unauthorized, ()))
                 }
             }
         })

@@ -8,6 +8,7 @@ use crate::{
 ///
 /// Used for the activity endpoint which provides a single endpoint for retrieving all Activities in a given timespan.
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[allow(clippy::large_enum_variant)]
 pub enum Activity {
     Diary(Diary),
     Wod(Wod),
