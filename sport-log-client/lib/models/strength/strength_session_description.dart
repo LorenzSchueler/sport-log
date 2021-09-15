@@ -1,10 +1,11 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
 import 'package:sport_log/models/strength/strength_set.dart';
 
-class StrengthSessionDescription implements Validatable {
+class StrengthSessionDescription implements Validatable, HasId {
   StrengthSessionDescription({
     required this.strengthSession,
     required this.strengthSets,
@@ -32,5 +33,15 @@ class StrengthSessionDescription implements Validatable {
             'StrengthSessionDescription: strengthSets not valid') &&
         validate(strengthSession.movementId == movement.id,
             'StrengthSessionDescription: movement id mismatch');
+  }
+
+  @override
+  Int64 get id => strengthSession.id;
+
+  void setDeleted() {
+    strengthSession.deleted = true;
+    for (final set in strengthSets) {
+      set.deleted = true;
+    }
   }
 }

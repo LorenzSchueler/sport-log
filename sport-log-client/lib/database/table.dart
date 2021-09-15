@@ -69,10 +69,10 @@ end;
         whereArgs: [id.toInt()]);
   }
 
-  Future<void> deleteMultiple(List<Int64> ids,
+  Future<void> deleteMultiple(List<T> objects,
       {bool isSynchronized = false}) async {
     final batch = database.batch();
-    for (final id in ids) {
+    for (final object in objects) {
       batch.update(
           tableName,
           {
@@ -80,7 +80,7 @@ end;
             if (isSynchronized) Keys.syncStatus: SyncStatus.synchronized.index,
           },
           where: '${Keys.deleted} = 0 AND ${Keys.id} = ?',
-          whereArgs: [id.toInt()]);
+          whereArgs: [object.id.toInt()]);
     }
     await batch.commit(noResult: true, continueOnError: true);
   }

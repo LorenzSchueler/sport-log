@@ -34,8 +34,9 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
   @override
   Future<void> deleteSingle(MetconDescription object) async {
     // TODO: catch errors
-    await metconDb.deleteSingle(object.metcon.id);
     await metconMovementDb.deleteByMetcon(object.metcon.id);
+    await metconDb.deleteSingle(object.metcon.id);
+    // TODO: server deletes metcon movements automatically
     metconApi.deleteFull(object).then((result) {
       if (result.isFailure) {
         handleApiError(result.failure);
@@ -145,7 +146,7 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
 
     await Future.wait([
       metconMovementDb.updateMultiple(toUpdate),
-      metconMovementDb.deleteMultiple(toDelete.map((mm) => mm.id).toList()),
+      metconMovementDb.deleteMultiple(toDelete),
       metconMovementDb.createMultiple(toCreate),
     ]);
 

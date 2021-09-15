@@ -1,10 +1,12 @@
-
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/models/strength/all.dart';
 
 class StrengthSessionTable extends Table<StrengthSession> {
-  @override DbSerializer<StrengthSession> get serde => DbStrengthSessionSerializer();
-  @override String get setupSql => '''
+  @override
+  DbSerializer<StrengthSession> get serde => DbStrengthSessionSerializer();
+  @override
+  String get setupSql => '''
 create table strength_session (
     user_id integer not null,
     datetime text not null default (datetime('now')),
@@ -15,12 +17,15 @@ create table strength_session (
     $idAndDeletedAndStatus
 );
   ''';
-  @override String get tableName => 'strength_session';
+  @override
+  String get tableName => 'strength_session';
 }
 
 class StrengthSetTable extends Table<StrengthSet> {
-  @override DbSerializer<StrengthSet> get serde => DbStrengthSetSerializer();
-  @override String get setupSql => '''
+  @override
+  DbSerializer<StrengthSet> get serde => DbStrengthSetSerializer();
+  @override
+  String get setupSql => '''
 create table strength_set (
     strength_session_id integer not null references strength_session on delete cascade,
     set_number integer not null check (set_number >= 0),
@@ -29,5 +34,25 @@ create table strength_set (
     $idAndDeletedAndStatus
 );
   ''';
-  @override String get tableName => 'strength_set';
+  @override
+  String get tableName => 'strength_set';
+
+  Future<void> setSynchronizedByStrengthSession(Int64 id) async {
+    database.update(tableName, Table.synchronized,
+        where: '${Keys.strengthSessionId} = ?', whereArgs: [id.toInt()]);
+  }
+
+  Future<List<StrengthSet>> getByStrengthSession(Int64 id) async {
+    final result = await database.query(tableName,
+        where: '${Keys.strengthSessionId} = ? AND ${Keys.deleted} = 0',
+        whereArgs: [id.toInt()],
+        orderBy: Keys.setNumber);
+    return result.map(serde.fromDbRecord).toList();
+  }
+
+  Future<void> deleteByStrengthSession(Int64 id) async {
+    await database.update(tableName, {Keys.deleted: 1},
+        where: '${Keys.strengthSessionId} = ? AND ${Keys.deleted} = 0',
+        whereArgs: [id.toInt()]);
+  }
 }

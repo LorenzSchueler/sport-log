@@ -40,6 +40,7 @@ class MetconApi extends ApiAccessor<Metcon> {
   }
 
   // TODO: put this into data provider?
+  // TODO: server deletes metcon movements automatically
   ApiResult<void> deleteFull(MetconDescription metconDescription) async {
     metconDescription.setDeleted();
     final result1 = await putSingle(metconDescription.metcon);

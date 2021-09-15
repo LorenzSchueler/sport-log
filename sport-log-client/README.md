@@ -35,6 +35,7 @@
 * [ ] length restrictions for string inputs
 * [ ] restrict int numbers coming from user input
 * [ ] push changes in user object to server on up sync
+* [ ] adapt login/registration page to data providers (without bloc)
 
 ## Debugging/Testing/Code Quality
 * [ ] add to string methods to types for debugging
@@ -57,7 +58,7 @@
 * [ ] use upsert instead of separate create/update?
 
 ## Database
-* [ ] shouldn't be possible to delete e. g. movement when it is referenced by other resource
+* [x] shouldn't be possible to delete e. g. movement when it is referenced by other resource
 * [ ] delete database on logout/user deletion
 
 
