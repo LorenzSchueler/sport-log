@@ -33,7 +33,8 @@ abstract class Config {
   static const String databaseName = 'database.sqlite';
 
   // if true, the database will be deleted and re-created,
-  // and the account data will be fetched completely
+  // and the account data will be fetched completely;
+  // should be false normally
   static const bool doCleanStart = false;
 
   static Level minLogLevel = Level.debug;

@@ -44,4 +44,8 @@ class StrengthSessionDescription implements Validatable, HasId {
       set.deleted = true;
     }
   }
+
+  static bool areTheSame(
+          StrengthSessionDescription ssd1, StrengthSessionDescription ssd2) =>
+      ssd1.strengthSession.id == ssd2.strengthSession.id;
 }

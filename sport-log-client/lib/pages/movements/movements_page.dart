@@ -32,7 +32,7 @@ class _MovementsPageState extends State<MovementsPage> {
     });
   }
 
-  void handlePageReturn(dynamic object) {
+  void _handlePageReturn(dynamic object) {
     if (object is ReturnObject<MovementDescription>) {
       switch (object.action) {
         case ReturnAction.created:
@@ -47,17 +47,15 @@ class _MovementsPageState extends State<MovementsPage> {
     }
   }
 
-  Future<void> refreshPage() async {
-    _dataProvider.doFullUpdate().onError((error, stackTrace) {
+  Future<void> _refreshPage() async {
+    await _dataProvider.doFullUpdate().onError((error, stackTrace) {
       if (error is ApiError) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
       }
     });
     _dataProvider.getNonDeletedFull().then((mds) {
-      setState(() {
-        _state = LocalState.fromList(mds);
-      });
+      setState(() => _state = LocalState.fromList(mds));
     });
   }
 
@@ -69,7 +67,7 @@ class _MovementsPageState extends State<MovementsPage> {
       ),
       drawer: const MainDrawer(selectedRoute: Routes.movements),
       body: RefreshIndicator(
-        onRefresh: refreshPage,
+        onRefresh: _refreshPage,
         child: _body(context),
       ),
       floatingActionButton: FloatingActionButton(
@@ -77,7 +75,7 @@ class _MovementsPageState extends State<MovementsPage> {
           onPressed: () {
             Navigator.of(context)
                 .pushNamed(Routes.editMovement)
-                .then(handlePageReturn);
+                .then(_handlePageReturn);
           }),
     );
   }
@@ -144,7 +142,7 @@ class _MovementsPageState extends State<MovementsPage> {
                             Routes.editMovement,
                             arguments: md.copy(),
                           )
-                          .then(handlePageReturn);
+                          .then(_handlePageReturn);
                     },
                     icon: const Icon(Icons.edit),
                   ),
