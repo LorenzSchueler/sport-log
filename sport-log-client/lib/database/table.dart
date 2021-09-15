@@ -201,4 +201,12 @@ mixin DateTimeMethods<T extends DbObjectWithDateTime> on Table<T> {
     }
     return serde.fromDbRecord(result.first).datetime;
   }
+
+  Future<List<T>> getBetweenDates(DateTime earliest, DateTime latest) async {
+    final result = await database.query(tableName,
+        where: '${Keys.deleted} = 0 AND ${Keys.datetime} BETWEEN ? AND ?',
+        whereArgs: [earliest.toString(), latest.toString()],
+        orderBy: 'datetime(${Keys.datetime}) DESC');
+    return result.map(serde.fromDbRecord).toList();
+  }
 }

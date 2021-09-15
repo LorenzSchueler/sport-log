@@ -71,14 +71,18 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     strengthSetDb.upsertMultiple(result2.success);
   }
 
-  @override
-  Future<List<StrengthSessionDescription>> getNonDeleted() async {
-    final strengthSessions = await strengthSessionDb.getNonDeleted();
+  Future<List<StrengthSessionDescription>> _expandStrengthSessions(
+      List<StrengthSession> strengthSessions) async {
     return Future.wait(strengthSessions.map((ss) async =>
         StrengthSessionDescription(
             strengthSession: ss,
             strengthSets: await strengthSetDb.getByStrengthSession(ss.id),
             movement: (await movementDb.getSingle(ss.movementId))!)));
+  }
+
+  @override
+  Future<List<StrengthSessionDescription>> getNonDeleted() async {
+    return _expandStrengthSessions(await strengthSessionDb.getNonDeleted());
   }
 
   @override
@@ -175,4 +179,9 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
 
   Future<DateTime?> mostRecentDateTime() async =>
       strengthSessionDb.mostRecentDateTime();
+
+  Future<List<StrengthSessionDescription>> getBetweenDates(
+          DateTime earliest, DateTime latest) async =>
+      _expandStrengthSessions(
+          await strengthSessionDb.getBetweenDates(earliest, latest));
 }

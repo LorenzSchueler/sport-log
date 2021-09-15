@@ -6,9 +6,9 @@ import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
-enum BottomNavPage { workout, strength, cardio, other }
+import 'date_filter_state.dart';
 
-enum TimeFrame { day, week, month, year, all }
+enum BottomNavPage { workout, strength, cardio, other }
 
 class WorkoutPage extends StatefulWidget {
   const WorkoutPage({Key? key}) : super(key: key);
@@ -19,8 +19,8 @@ class WorkoutPage extends StatefulWidget {
 
 class _WorkoutPageState extends State<WorkoutPage> {
   BottomNavPage _currentPage = BottomNavPage.workout;
-  TimeFrame _timeFrame = TimeFrame.month;
-  DateTime _timeFilterStart = DateTime.now();
+  final DateFilterState _dateFilter =
+      DateFilterState(timeFrame: TimeFrame.month, start: DateTime.now());
 
   @override
   Widget build(BuildContext context) {
@@ -111,16 +111,16 @@ class _WorkoutPageState extends State<WorkoutPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-                onPressed: () {
-                  setState(() {
-                    switch (_timeFrame) {
-                      case TimeFrame.day:
-                        
-                    }
-                  });
-                }, icon: const Icon(Icons.arrow_back_ios_sharp)),
+                onPressed: _dateFilter.goingForwardPossible
+                    ? () => setState(_dateFilter.goForwardInTime)
+                    : null,
+                icon: const Icon(Icons.arrow_back_ios_sharp)),
+            TextButton.icon(
+                icon: Text(_dateFilter.getLabel()),
+                label: const Icon(Icons.arrow_drop_down_sharp),
+                onPressed: () {}),
             IconButton(
-                onPressed: () {},
+                onPressed: () => setState(_dateFilter.goBackInTime),
                 icon: const Icon(Icons.arrow_forward_ios_sharp)),
           ],
         ));

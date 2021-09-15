@@ -48,6 +48,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
     }
   }
 
+  // full update (from server)
   Future<void> _refreshPage() async {
     await _dataProvider.doFullUpdate().onError((error, stackTrace) {
       if (error is ApiError) {
