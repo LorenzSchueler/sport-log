@@ -178,3 +178,27 @@ end;
     await batch.commit(noResult: true, continueOnError: true);
   }
 }
+
+mixin DateTimeMethods<T extends DbObjectWithDateTime> on Table<T> {
+  Future<DateTime?> earliestDateTime() async {
+    final result = await database.query(tableName,
+        where: '${Keys.deleted} = 0',
+        orderBy: 'datetime(${Keys.datetime}) ASC',
+        limit: 1);
+    if (result.isEmpty) {
+      return null;
+    }
+    return serde.fromDbRecord(result.first).datetime;
+  }
+
+  Future<DateTime?> mostRecentDateTime() async {
+    final result = await database.query(tableName,
+        where: '${Keys.deleted} = 0',
+        orderBy: 'datetime(${Keys.datetime}) DESC',
+        limit: 1);
+    if (result.isEmpty) {
+      return null;
+    }
+    return serde.fromDbRecord(result.first).datetime;
+  }
+}

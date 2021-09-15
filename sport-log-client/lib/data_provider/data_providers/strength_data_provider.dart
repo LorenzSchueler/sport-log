@@ -169,4 +169,10 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     }
     strengthSetDb.setSynchronizedByStrengthSession(object.id);
   }
+
+  Future<DateTime?> earliestDateTime() async =>
+      strengthSessionDb.earliestDateTime();
+
+  Future<DateTime?> mostRecentDateTime() async =>
+      strengthSessionDb.mostRecentDateTime();
 }

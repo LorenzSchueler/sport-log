@@ -2,7 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/models/strength/all.dart';
 
-class StrengthSessionTable extends Table<StrengthSession> {
+class StrengthSessionTable extends Table<StrengthSession> with DateTimeMethods {
   @override
   DbSerializer<StrengthSession> get serde => DbStrengthSessionSerializer();
   @override
@@ -19,6 +19,14 @@ create table strength_session (
   ''';
   @override
   String get tableName => 'strength_session';
+
+  @override
+  Future<List<StrengthSession>> getNonDeleted() async {
+    final result =
+        await database.query(tableName, where: '${Keys.deleted} = 0',
+        orderBy: 'datetime(${Keys.datetime}) DESC');
+    return result.map(serde.fromDbRecord).toList();
+  }
 }
 
 class StrengthSetTable extends Table<StrengthSet> {

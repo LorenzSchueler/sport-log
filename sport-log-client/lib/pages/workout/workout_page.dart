@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_page.dart';
 import 'package:sport_log/pages/workout/strength/strength_sessions_page.dart';
@@ -7,9 +6,9 @@ import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
-enum BottomNavPage {
-  workout, strength, cardio, other
-}
+enum BottomNavPage { workout, strength, cardio, other }
+
+enum TimeFrame { day, week, month, year, all }
 
 class WorkoutPage extends StatefulWidget {
   const WorkoutPage({Key? key}) : super(key: key);
@@ -19,14 +18,16 @@ class WorkoutPage extends StatefulWidget {
 }
 
 class _WorkoutPageState extends State<WorkoutPage> {
-
   BottomNavPage _currentPage = BottomNavPage.workout;
+  TimeFrame _timeFrame = TimeFrame.month;
+  DateTime _timeFilterStart = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home"),
+        bottom: _timeFilter,
       ),
       body: WideScreenFrame(child: _mainPage),
       bottomNavigationBar: BottomNavigationBar(
@@ -101,5 +102,27 @@ class _WorkoutPageState extends State<WorkoutPage> {
         break;
       default:
     }
+  }
+
+  PreferredSizeWidget get _timeFilter {
+    return PreferredSize(
+        preferredSize: const Size.fromHeight(30),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+                onPressed: () {
+                  setState(() {
+                    switch (_timeFrame) {
+                      case TimeFrame.day:
+                        
+                    }
+                  });
+                }, icon: const Icon(Icons.arrow_back_ios_sharp)),
+            IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.arrow_forward_ios_sharp)),
+          ],
+        ));
   }
 }

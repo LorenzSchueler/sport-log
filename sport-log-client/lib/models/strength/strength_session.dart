@@ -7,7 +7,7 @@ import 'package:sport_log/models/movement/movement.dart';
 part 'strength_session.g.dart';
 
 @JsonSerializable()
-class StrengthSession implements DbObject {
+class StrengthSession implements DbObjectWithDateTime {
   StrengthSession({
     required this.id,
     required this.userId,
@@ -24,6 +24,7 @@ class StrengthSession implements DbObject {
   Int64 id;
   @IdConverter()
   Int64 userId;
+  @override
   @DateTimeConverter()
   DateTime datetime;
   @IdConverter()

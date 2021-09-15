@@ -21,6 +21,8 @@ abstract class DbObject implements Validatable, HasId {
   set deleted(bool deleted);
 }
 
+abstract class DbObjectWithDateTime implements DbObject, HasDateTime {}
+
 abstract class DbSerializer<T> {
   DbRecord toDbRecord(T o);
   T fromDbRecord(DbRecord r);

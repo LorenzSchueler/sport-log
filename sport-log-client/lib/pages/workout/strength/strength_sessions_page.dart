@@ -74,7 +74,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
     }
     return ImplicitlyAnimatedList(
       items: _state.sortedBy((o1, o2) =>
-          o1.strengthSession.datetime.compareTo(o2.strengthSession.datetime)),
+          -o1.strengthSession.datetime.compareTo(o2.strengthSession.datetime)),
       itemBuilder: _buildStrengthSession,
       areItemsTheSame: StrengthSessionDescription.areTheSame,
     );
