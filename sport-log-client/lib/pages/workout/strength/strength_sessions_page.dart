@@ -12,14 +12,14 @@ import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
 
-class StrengthPage extends StatefulWidget {
-  const StrengthPage({Key? key}) : super(key: key);
+class StrengthSessionsPage extends StatefulWidget {
+  const StrengthSessionsPage({Key? key}) : super(key: key);
 
   @override
-  State<StrengthPage> createState() => _StrengthPageState();
+  State<StrengthSessionsPage> createState() => _StrengthSessionsPageState();
 }
 
-class _StrengthPageState extends State<StrengthPage> {
+class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   final _dataProvider = StrengthDataProvider();
   LocalState<StrengthSessionDescription> _state = LocalState.empty();
 
