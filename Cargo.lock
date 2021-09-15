@@ -47,23 +47,13 @@ dependencies = [
 
 [[package]]
 name = "argon2"
-version = "0.2.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca5162d1b961cb589a8ca08a2aa7cabc6341e05e0bf18d66a07697900b5d2ad0"
-dependencies = [
- "blake2",
- "password-hash 0.2.3",
-]
-
-[[package]]
-name = "argon2"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "34f8cda1a0ecf6f19d2bf64b9349d86900fa9bf98c979e655347a9e9dbe588c1"
 dependencies = [
  "base64ct",
  "blake2",
- "password-hash 0.3.0",
+ "password-hash",
 ]
 
 [[package]]
@@ -1067,17 +1057,6 @@ dependencies = [
 
 [[package]]
 name = "password-hash"
-version = "0.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77e0b28ace46c5a396546bcf443bf422b57049617433d8854227352a4a9b24e7"
-dependencies = [
- "base64ct",
- "rand_core",
- "subtle",
-]
-
-[[package]]
-name = "password-hash"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ad7268ef9bc463fddde8361d358fbfae1aeeb1fb62eca111cd8c763bf1c5891"
@@ -1824,7 +1803,7 @@ dependencies = [
 name = "sport-log-password-hasher"
 version = "0.1.0"
 dependencies = [
- "argon2 0.2.4",
+ "argon2",
  "rand_core",
 ]
 
@@ -1866,7 +1845,7 @@ dependencies = [
 name = "sport-log-types"
 version = "0.1.0"
 dependencies = [
- "argon2 0.3.1",
+ "argon2",
  "base64",
  "chrono",
  "diesel",
