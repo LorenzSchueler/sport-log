@@ -10,6 +10,7 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/test_data/movement_test_data.dart';
 import 'package:sport_log/test_data/strength_test_data.dart';
 
 final _logger = Logger('MAIN');
@@ -49,6 +50,10 @@ Future<void> insertTestData() async {
   final userId = UserState.instance.currentUser?.id;
   if (userId != null) {
     _logger.i('Generating test data ...');
+    if ((await AppDatabase.instance!.movements.getNonDeleted()).isEmpty) {
+      await AppDatabase.instance!.movements
+          .upsertMultiple(generateMovements(userId));
+    }
     final sessions = await generateStrengthSessions(userId);
     await AppDatabase.instance!.strengthSessions.upsertMultiple(sessions);
     final sets = await generateStrengthSets();
