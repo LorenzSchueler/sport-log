@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/id_generation.dart';
+import 'package:sport_log/helpers/serialization/db_serialization.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'movement.g.dart';
@@ -69,7 +70,7 @@ class Movement implements DbObject {
     required this.userId,
     required this.name,
     required this.description,
-    required this.category,
+    required this.categories,
     required this.deleted,
   });
 
@@ -80,7 +81,7 @@ class Movement implements DbObject {
   Int64? userId;
   String name;
   String? description;
-  MovementCategory category;
+  List<MovementCategory> categories;
   @override
   bool deleted;
 
@@ -88,7 +89,7 @@ class Movement implements DbObject {
       : id = randomId(),
         name = '',
         description = null,
-        category = MovementCategory.strength,
+        categories = [MovementCategory.strength],
         deleted = false;
 
   factory Movement.fromJson(Map<String, dynamic> json) =>
@@ -100,7 +101,8 @@ class Movement implements DbObject {
   bool isValid() {
     return validate(userId != null, 'Movement: userId == null') &&
         validate(name.isNotEmpty, 'Movement: name is empty') &&
-        validate(deleted == false, 'Movement: deleted == true');
+        validate(deleted == false, 'Movement: deleted == true') &&
+        validate(categories.isNotEmpty, 'Movement: categories empty');
   }
 
   Movement copy() => Movement(
@@ -108,7 +110,7 @@ class Movement implements DbObject {
       userId: userId,
       name: name,
       description: description,
-      category: category,
+      categories: categories,
       deleted: deleted);
 
   @override
@@ -118,12 +120,12 @@ class Movement implements DbObject {
       other.userId == userId &&
       other.name == name &&
       other.description == description &&
-      other.category == category &&
+      other.categories == categories &&
       other.deleted == deleted;
 
   @override
   int get hashCode =>
-      Object.hash(id, userId, name, description, category, deleted);
+      Object.hash(id, userId, name, description, categories, deleted);
 }
 
 class DbMovementSerializer implements DbSerializer<Movement> {
@@ -134,7 +136,8 @@ class DbMovementSerializer implements DbSerializer<Movement> {
       userId: r[Keys.userId] == null ? null : Int64(r[Keys.userId]! as int),
       name: r[Keys.name]! as String,
       description: r[Keys.description] as String?,
-      category: MovementCategory.values[r[Keys.category]! as int],
+      categories: const DbMovementCategoriesConverter()
+          .mapToDart(r[Keys.categories]! as int),
       deleted: r[Keys.deleted]! as int == 1,
     );
   }
@@ -146,7 +149,8 @@ class DbMovementSerializer implements DbSerializer<Movement> {
       Keys.userId: o.userId?.toInt(),
       Keys.name: o.name,
       Keys.description: o.description,
-      Keys.category: o.category.index,
+      Keys.categories:
+          const DbMovementCategoriesConverter().mapToSql(o.categories),
       Keys.deleted: o.deleted ? 1 : 0,
     };
   }

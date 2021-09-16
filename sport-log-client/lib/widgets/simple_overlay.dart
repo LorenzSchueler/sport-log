@@ -17,7 +17,7 @@ class SimpleOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const duration = Duration(milliseconds: 300);
+    const duration = Duration(milliseconds: 100);
     return Stack(
       fit: StackFit.expand,
       children: [

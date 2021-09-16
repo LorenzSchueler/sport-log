@@ -49,7 +49,11 @@ class _EditMovementPageState extends State<EditMovementPage> {
 
   void _setCategory(MovementCategory category) {
     FocusManager.instance.primaryFocus?.unfocus();
-    setState(() => _md.movement.category = category);
+    setState(() {
+      if (!_md.movement.categories.contains(category)) {
+        _md.movement.categories.add(category);
+      }
+    });
   }
 
   void _setDescription(String? description) {
@@ -199,7 +203,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
                 child: Text(
                   category.toDisplayName(),
                   style: style.copyWith(
-                    color: (category == _md.movement.category)
+                    color: (category == _md.movement.categories)
                         ? theme.primaryColor
                         : theme.disabledColor,
                   ),

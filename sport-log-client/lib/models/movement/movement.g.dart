@@ -12,7 +12,9 @@ Movement _$MovementFromJson(Map<String, dynamic> json) {
     userId: const OptionalIdConverter().fromJson(json['user_id'] as String?),
     name: json['name'] as String,
     description: json['description'] as String?,
-    category: _$enumDecode(_$MovementCategoryEnumMap, json['category']),
+    categories: (json['categories'] as List<dynamic>)
+        .map((e) => _$enumDecode(_$MovementCategoryEnumMap, e))
+        .toList(),
     deleted: json['deleted'] as bool,
   );
 }
@@ -22,7 +24,8 @@ Map<String, dynamic> _$MovementToJson(Movement instance) => <String, dynamic>{
       'user_id': const OptionalIdConverter().toJson(instance.userId),
       'name': instance.name,
       'description': instance.description,
-      'category': _$MovementCategoryEnumMap[instance.category],
+      'categories':
+          instance.categories.map((e) => _$MovementCategoryEnumMap[e]).toList(),
       'deleted': instance.deleted,
     };
 

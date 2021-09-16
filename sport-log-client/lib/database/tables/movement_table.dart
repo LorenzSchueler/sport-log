@@ -14,7 +14,7 @@ create table movement (
     user_id integer,
     name text not null,
     description text,
-    category integer not null check (category in (0, 1)),
+    categories integer not null,
     $idAndDeletedAndStatus
 );
   ''';
