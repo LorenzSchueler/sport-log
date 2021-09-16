@@ -24,7 +24,7 @@ insert into metcon (id, user_id, name, metcon_type, rounds, timecap, description
 
 create table metcon_archive (
     primary key (id),
-    foreign key (user_id) references "user",
+    foreign key (user_id) references "user" on delete cascade,
     check (deleted = true)
 ) inherits (metcon);
 
@@ -64,7 +64,7 @@ insert into metcon_movement (id, metcon_id, movement_id, movement_number, count,
 
 create table metcon_movement_archive (
     primary key (id),
-    foreign key (metcon_id) references metcon,
+    --foreign key (metcon_id) references metcon_archive on delete cascade,
     check (deleted = true)
 ) inherits (metcon_movement);
 
@@ -72,6 +72,11 @@ create trigger archive_metcon_movement
     after update of deleted or delete
     on metcon_movement
     for each row execute procedure archive_record();
+
+create trigger check_metcon_exists_trigger
+    after insert 
+    on metcon_movement_archive
+    for each row execute procedure check_metcon_exists();
 
 create table metcon_session (
     id bigint primary key,
@@ -99,7 +104,7 @@ insert into metcon_session (id, user_id, metcon_id, datetime, time, rounds, reps
 
 create table metcon_session_archive (
     primary key (id),
-    foreign key (user_id) references "user",
+    foreign key (user_id) references "user" on delete cascade,
     check (deleted = true)
 ) inherits (metcon_session);
 

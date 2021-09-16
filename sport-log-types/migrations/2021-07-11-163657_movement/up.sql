@@ -31,7 +31,7 @@ insert into movement (id, user_id, name, description, categories) values
 
 create table movement_archive (
     primary key (id),
-    foreign key (user_id) references "user",
+    foreign key (user_id) references "user" on delete cascade,
     check (deleted = true)
 ) inherits (movement);
 

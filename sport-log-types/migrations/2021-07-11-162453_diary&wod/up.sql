@@ -22,7 +22,7 @@ insert into diary (id, user_id, date, bodyweight, comments) values
 
 create table diary_archive (
     primary key (id),
-    foreign key (user_id) references "user",
+    foreign key (user_id) references "user" on delete cascade,
     check (deleted = true)
 ) inherits (diary);
 
@@ -55,7 +55,7 @@ insert into wod (id, user_id, date, description) values
 
 create table wod_archive (
     primary key (id),
-    foreign key (user_id) references "user",
+    foreign key (user_id) references "user" on delete cascade,
     check (deleted = true)
 ) inherits (wod);
 

@@ -89,7 +89,7 @@ insert into action_rule (id, user_id, action_id, weekday, time, enabled) values
 
 create table action_rule_archive (
     primary key (id),
-    foreign key (user_id) references "user",
+    foreign key (user_id) references "user" on delete cascade,
     check (deleted = true)
 ) inherits (action_rule);
 
@@ -128,7 +128,7 @@ insert into action_event (id, user_id, action_id, datetime, enabled) values
 
 create table action_event_archive (
     primary key (id),
-    foreign key (user_id) references "user",
+    foreign key (user_id) references "user" on delete cascade,
     check (deleted = true)
 ) inherits (action_event);
 

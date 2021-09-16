@@ -47,7 +47,7 @@ insert into platform_credential (id, user_id, platform_id, username, password) v
 
 create table platform_credential_archive (
     primary key (id),
-    foreign key (user_id) references "user",
+    foreign key (user_id) references "user" on delete cascade,
     check (deleted = true)
 ) inherits (platform_credential);
 

@@ -27,7 +27,7 @@ create trigger set_timestamp before update on route
 
 create table route_archive (
     primary key (id),
-    foreign key (user_id) references "user",
+    foreign key (user_id) references "user" on delete cascade,
     check (deleted = true)
 ) inherits (route);
 
@@ -73,7 +73,7 @@ insert into cardio_session (id, user_id, movement_id, cardio_type, datetime,
 
 create table cardio_session_archive (
     primary key (id),
-    foreign key (user_id) references "user",
+    foreign key (user_id) references "user" on delete cascade,
     check (deleted = true)
 ) inherits (cardio_session);
 
