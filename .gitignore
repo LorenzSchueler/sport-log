@@ -1,7 +1,7 @@
 /target
 **/.vscode
-/.idea
+**/.idea
 /sport-log-action-provider-map-matching/map-matching
 /sport-log-server/sport-log-server-config.toml
-.env
+**/.env
 private_data.sh
