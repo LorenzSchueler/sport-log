@@ -271,6 +271,13 @@ pub async fn get_metcon_movement(
         .into_json()
 }
 
+#[get("/metcon_movement")]
+pub async fn get_metcon_movements(auth: AuthUserOrAP, conn: Db) -> JsonResult<Vec<MetconMovement>> {
+    conn.run(move |c| MetconMovement::get_by_user(*auth, c))
+        .await
+        .into_json()
+}
+
 #[get("/metcon_movement/metcon/<metcon_id>")]
 pub async fn get_metcon_movements_by_metcon(
     metcon_id: UnverifiedId<MetconId>,

@@ -180,6 +180,13 @@ pub async fn get_strength_set(
         .into_json()
 }
 
+#[get("/strength_set")]
+pub async fn get_strength_sets(auth: AuthUserOrAP, conn: Db) -> JsonResult<Vec<StrengthSet>> {
+    conn.run(move |c| StrengthSet::get_by_user(*auth, c))
+        .await
+        .into_json()
+}
+
 #[get("/strength_set/strength_session/<strength_session_id>")]
 pub async fn get_strength_sets_by_strength_session(
     strength_session_id: UnverifiedId<StrengthSessionId>,
