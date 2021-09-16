@@ -23,24 +23,28 @@ extension ToDisplayName on TimeFrame {
 // most elegant piece of code I've ever written :)
 class DateFilterState {
   DateFilterState({required DateTime start, required this.timeFrame})
-      : start = _beginningOfTimeFrame(start, timeFrame);
+      : _start = _beginningOfTimeFrame(start, timeFrame);
 
-  DateTime start;
+  DateTime _start;
   TimeFrame timeFrame;
 
-  DateTime get end {
+  DateTime? get end {
     switch (timeFrame) {
       case TimeFrame.day:
-        return start.dayLater();
+        return _start.dayLater();
       case TimeFrame.week:
-        return start.weekLater();
+        return _start.weekLater();
       case TimeFrame.month:
-        return start.monthLater();
+        return _start.monthLater();
       case TimeFrame.year:
-        return start.yearLater();
+        return _start.yearLater();
       case TimeFrame.all:
-        return start;
+        return null;
     }
+  }
+
+  DateTime? get start {
+    return timeFrame == TimeFrame.all ? null : _start;
   }
 
   static DateTime _beginningOfTimeFrame(DateTime start, TimeFrame timeFrame) {
@@ -60,19 +64,19 @@ class DateFilterState {
 
   void setTimeFrame(TimeFrame timeFrame) {
     this.timeFrame = timeFrame;
-    start = _beginningOfTimeFrame(DateTime.now(), timeFrame);
+    _start = _beginningOfTimeFrame(DateTime.now(), timeFrame);
   }
 
   bool get goingForwardPossible {
     switch (timeFrame) {
       case TimeFrame.day:
-        return start.endOfDay().isBefore(DateTime.now());
+        return _start.endOfDay().isBefore(DateTime.now());
       case TimeFrame.week:
-        return start.endOfWeek().isBefore(DateTime.now());
+        return _start.endOfWeek().isBefore(DateTime.now());
       case TimeFrame.month:
-        return start.endOfMonth().isBefore(DateTime.now());
+        return _start.endOfMonth().isBefore(DateTime.now());
       case TimeFrame.year:
-        return start.endOfYear().isBefore(DateTime.now());
+        return _start.endOfYear().isBefore(DateTime.now());
       case TimeFrame.all:
         return false;
     }
@@ -81,16 +85,16 @@ class DateFilterState {
   void goBackInTime() {
     switch (timeFrame) {
       case TimeFrame.day:
-        start = start.dayEarlier();
+        _start = _start.dayEarlier();
         break;
       case TimeFrame.week:
-        start = start.weekEarlier();
+        _start = _start.weekEarlier();
         break;
       case TimeFrame.month:
-        start = start.monthEarlier();
+        _start = _start.monthEarlier();
         break;
       case TimeFrame.year:
-        start = start.yearEarlier();
+        _start = _start.yearEarlier();
         break;
       case TimeFrame.all:
         break;
@@ -101,16 +105,16 @@ class DateFilterState {
     if (goingForwardPossible) {
       switch (timeFrame) {
         case TimeFrame.day:
-          start = start.dayLater();
+          _start = _start.dayLater();
           break;
         case TimeFrame.week:
-          start = start.weekLater();
+          _start = _start.weekLater();
           break;
         case TimeFrame.month:
-          start = start.monthLater();
+          _start = _start.monthLater();
           break;
         case TimeFrame.year:
-          start = start.yearLater();
+          _start = _start.yearLater();
           break;
         case TimeFrame.all:
           break;
@@ -127,32 +131,32 @@ class DateFilterState {
     final today = DateTime.now().beginningOfDay();
     switch (timeFrame) {
       case TimeFrame.day:
-        if (start.isAtSameMomentAs(today)) return 'Today';
-        if (start.isAtSameMomentAs(today.dayEarlier())) return 'Yesterday';
-        if (today.isInYear(start)) return dateWithoutYear.format(start);
-        return dateWithYear.format(start);
+        if (_start.isAtSameMomentAs(today)) return 'Today';
+        if (_start.isAtSameMomentAs(today.dayEarlier())) return 'Yesterday';
+        if (today.isInYear(_start)) return dateWithoutYear.format(_start);
+        return dateWithYear.format(_start);
       case TimeFrame.week:
-        if (today.isInWeek(start)) return 'This week';
-        final weekLater = start.weekLater();
+        if (today.isInWeek(_start)) return 'This week';
+        final weekLater = _start.weekLater();
         if (today.isInWeek(weekLater)) return 'Last week';
         final endDate = weekLater.dayEarlier();
-        if (start.isInYear(today) && weekLater.isInYear(today)) {
-          return dateWithoutYear.format(start) +
+        if (_start.isInYear(today) && weekLater.isInYear(today)) {
+          return dateWithoutYear.format(_start) +
               ' - ' +
               dateWithoutYear.format(endDate);
         }
-        return dateWithYear.format(start) +
+        return dateWithYear.format(_start) +
             ' - ' +
             dateWithYear.format(endDate);
       case TimeFrame.month:
-        if (today.isInMonth(start)) return 'This month';
-        if (today.isInMonth(start.monthLater())) return 'Last month';
-        if (today.isInYear(start)) return monthWithoutYear.format(start);
-        return monthWithYear.format(start);
+        if (today.isInMonth(_start)) return 'This month';
+        if (today.isInMonth(_start.monthLater())) return 'Last month';
+        if (today.isInYear(_start)) return monthWithoutYear.format(_start);
+        return monthWithYear.format(_start);
       case TimeFrame.year:
-        if (today.isInYear(start)) return 'This year';
-        if (today.isInYear(start.yearLater())) return 'Last year';
-        return start.year.toString();
+        if (today.isInYear(_start)) return 'This year';
+        if (today.isInYear(_start.yearLater())) return 'Last year';
+        return _start.year.toString();
       case TimeFrame.all:
         return 'All';
     }

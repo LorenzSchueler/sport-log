@@ -13,7 +13,18 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
 
 class StrengthSessionsPage extends StatefulWidget {
-  const StrengthSessionsPage({Key? key}) : super(key: key);
+  const StrengthSessionsPage({
+    Key? key,
+    required this.start,
+    required this.end,
+  })  : assert(
+            (start != null && end != null) || (start == null && end == null)),
+        super(key: key);
+
+  final DateTime? start;
+  final DateTime? end;
+
+  bool get showAll => start == null || end == null;
 
   @override
   State<StrengthSessionsPage> createState() => _StrengthSessionsPageState();
@@ -26,11 +37,14 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   @override
   void initState() {
     super.initState();
-    _dataProvider.getNonDeleted().then((ssds) {
-      setState(() {
-        _state = LocalState.fromList(ssds);
-      });
-    });
+    update();
+  }
+
+  void update() async {
+    final ssds = widget.showAll
+        ? await _dataProvider.getNonDeleted()
+        : await _dataProvider.getBetweenDates(widget.start!, widget.end!);
+    setState(() => _state = LocalState.fromList(ssds));
   }
 
   void _handlePageReturn(dynamic object) {
@@ -56,9 +70,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
             .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
       }
     });
-    _dataProvider.getNonDeleted().then((ssds) {
-      setState(() => _state = LocalState.fromList(ssds));
-    });
+    update();
   }
 
   @override
@@ -67,6 +79,12 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
       onRefresh: _refreshPage,
       child: _buildStrengthSessionList(context),
     );
+  }
+
+  @override
+  void didUpdateWidget(StrengthSessionsPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    update();
   }
 
   Widget _buildStrengthSessionList(BuildContext context) {

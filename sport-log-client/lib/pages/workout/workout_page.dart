@@ -65,7 +65,10 @@ class _WorkoutPageState extends State<WorkoutPage> {
       case BottomNavPage.workout:
         return const MetconsPage();
       case BottomNavPage.strength:
-        return const StrengthSessionsPage();
+        return StrengthSessionsPage(
+          start: _dateFilter.start,
+          end: _dateFilter.end,
+        );
       case BottomNavPage.cardio:
         return const Center(
           child: Text("Cardio"),
