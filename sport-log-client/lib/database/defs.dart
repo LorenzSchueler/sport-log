@@ -40,8 +40,8 @@ abstract class Keys {
   static const bodyweight = 'bodyweight';
   static const cadence = 'cadence';
   static const calories = 'calories';
+  static const cardio = 'cardio';
   static const cardioType = 'cardio_type';
-  static const categories = 'categories';
   static const comments = 'comments';
   static const count = 'count';
   static const createBefore = 'create_before';

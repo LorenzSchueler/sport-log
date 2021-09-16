@@ -48,7 +48,7 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
               userId: userId,
               name: '',
               description: null,
-              categories: [MovementCategory.strength],
+              cardio: true,
               deleted: false),
         );
     movementInitialized = widget.initial != null;

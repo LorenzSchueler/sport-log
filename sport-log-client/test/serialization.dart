@@ -36,14 +36,4 @@ void main() {
       expect(positions1[i] == positions2[i], true);
     }
   });
-
-  test('test movement category list', () {
-    const serde = DbMovementCategoriesConverter();
-    final cats = [MovementCategory.cardio, MovementCategory.strength];
-    final serialized = serde.mapToSql(cats);
-    final catsNew = serde.mapToDart(serialized);
-    for (final c in cats) {
-      expect(catsNew.contains(c), true);
-    }
-  });
 }

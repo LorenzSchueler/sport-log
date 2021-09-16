@@ -104,8 +104,6 @@ class _MovementsPageState extends State<MovementsPage> {
       child: ExpansionTileCard(
           leading: CircleAvatar(child: Text(movement.name[0])),
           title: Text(movement.name),
-          subtitle: Text(
-              movement.categories.map((c) => c.toDisplayName()).join(', ')),
           children: [
             if (movement.description != null) const Divider(),
             if (movement.description != null)

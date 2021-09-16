@@ -47,13 +47,11 @@ class _EditMovementPageState extends State<EditMovementPage> {
     _md = widget._initialMovement.copy();
   }
 
-  void _setCategory(MovementCategory category) {
+  void _setIsCardio(bool? isCardio) {
     FocusManager.instance.primaryFocus?.unfocus();
-    setState(() {
-      if (!_md.movement.categories.contains(category)) {
-        _md.movement.categories.add(category);
-      }
-    });
+    if (isCardio != null) {
+      setState(() => _md.movement.cardio = isCardio);
+    }
   }
 
   void _setDescription(String? description) {
@@ -193,23 +191,11 @@ class _EditMovementPageState extends State<EditMovementPage> {
   }
 
   Widget _categoryInput(BuildContext context) {
-    final theme = Theme.of(context);
-    final style = theme.textTheme.button!;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: MovementCategory.values
-          .map((category) => TextButton(
-                onPressed: () => _setCategory(category),
-                child: Text(
-                  category.toDisplayName(),
-                  style: style.copyWith(
-                    color: (category == _md.movement.categories)
-                        ? theme.primaryColor
-                        : theme.disabledColor,
-                  ),
-                ),
-              ))
-          .toList(),
+    return CheckboxListTile(
+      value: _md.movement.cardio,
+      onChanged: _setIsCardio,
+      controlAffinity: ListTileControlAffinity.leading,
+      title: const Text('Is suitable for cardio sessions'),
     );
   }
 }
