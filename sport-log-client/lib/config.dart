@@ -37,5 +37,7 @@ abstract class Config {
   // should be false normally
   static const bool doCleanStart = false;
 
+  static const bool generateTestData = doCleanStart && true;
+
   static Level minLogLevel = Level.debug;
 }

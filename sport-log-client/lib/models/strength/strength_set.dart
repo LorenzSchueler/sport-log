@@ -42,7 +42,7 @@ class StrengthSet implements DbObject {
 
   String toDisplayName() {
     if (weight != null) {
-      return '${count}x${weight!}kg';
+      return '${count}x${(weight! * 10).roundToDouble() / 10}kg';
     } else {
       return '${count}x';
     }

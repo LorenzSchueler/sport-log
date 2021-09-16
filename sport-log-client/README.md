@@ -23,6 +23,7 @@
 * [ ] OutlinedButtons bigger (all of those '+ Select/Add ...' buttons)
 * [x] movements: show description and category in list
 * [ ] show last sync time in side drawer
+* [ ] date filter: first click after app start is very slow
 
 ## Localization
 * [ ] i18n
@@ -56,6 +57,7 @@
 * [ ] syncing in different thread / background service
 * [ ] simplify error handling (no result type anymore?)
 * [ ] use upsert instead of separate create/update?
+* [ ] look into debouncing for heavy request (e. g. filtering for 'all' in strength sessions page)
 
 ## Database
 * [x] shouldn't be possible to delete e. g. movement when it is referenced by other resource

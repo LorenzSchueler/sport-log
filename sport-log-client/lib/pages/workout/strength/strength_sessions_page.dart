@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/helpers/human_readable.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/state/local_state.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/all.dart';
@@ -33,6 +34,7 @@ class StrengthSessionsPage extends StatefulWidget {
 class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   final _dataProvider = StrengthDataProvider();
   LocalState<StrengthSessionDescription> _state = LocalState.empty();
+  final _logger = Logger('StrengthSessionsPage');
 
   @override
   void initState() {
@@ -41,6 +43,8 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   }
 
   void update() async {
+    _logger.d(
+        'Updating strength sessions with start = ${widget.start}, end = ${widget.end}');
     final ssds = widget.showAll
         ? await _dataProvider.getNonDeleted()
         : await _dataProvider.getBetweenDates(widget.start!, widget.end!);
@@ -75,6 +79,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
 
   @override
   Widget build(BuildContext context) {
+    _logger.d('build');
     return RefreshIndicator(
       onRefresh: _refreshPage,
       child: _buildStrengthSessionList(context),
@@ -83,8 +88,11 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
 
   @override
   void didUpdateWidget(StrengthSessionsPage oldWidget) {
+    _logger.d('didUpdateWidget');
     super.didUpdateWidget(oldWidget);
-    update();
+    if (widget.start != oldWidget.start || widget.end != oldWidget.end) {
+      update();
+    }
   }
 
   Widget _buildStrengthSessionList(BuildContext context) {
