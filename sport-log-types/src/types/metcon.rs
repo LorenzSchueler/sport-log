@@ -1,13 +1,13 @@
 use chrono::{DateTime, Utc};
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use diesel::PgConnection;
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use diesel_derive_enum::DbEnum;
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync,
     ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
@@ -18,16 +18,16 @@ use crate::{
     from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, MovementUnit,
     UserId,
 };
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use crate::{
     schema::{metcon, metcon_movement, metcon_session},
-    AuthUserOrAP, CheckUserId, Unverified, UnverifiedId, UnverifiedIds, User,
+    AuthUserOrAP, CheckOptionalUserId, CheckUserId, Unverified, UnverifiedId, UnverifiedIds, User,
     VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
     VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
-#[cfg_attr(feature = "full", derive(DbEnum))]
+#[cfg_attr(feature = "server", derive(DbEnum))]
 pub enum MetconType {
     Amrap,
     Emom,
@@ -36,18 +36,18 @@ pub enum MetconType {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql,)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct MetconId(pub i64);
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyIdForUserOrAP for UnverifiedId<MetconId> {
     type Id = MetconId;
 
     fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
-        if Metcon::check_user_id_null(self.0, **auth, conn)
+        if Metcon::check_optional_user_id(self.0, **auth, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?
         {
             Ok(self.0)
@@ -57,7 +57,7 @@ impl VerifyIdForUserOrAP for UnverifiedId<MetconId> {
     }
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyIdsForUserOrAP for UnverifiedIds<MetconId> {
     type Id = MetconId;
 
@@ -66,7 +66,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconId> {
         auth: &AuthUserOrAP,
         conn: &PgConnection,
     ) -> Result<Vec<Self::Id>, Status> {
-        if Metcon::check_user_ids_null(&self.0, **auth, conn)
+        if Metcon::check_optional_user_ids(&self.0, **auth, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?
         {
             Ok(self.0)
@@ -87,7 +87,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconId> {
 /// If `metcon_type` is [MetconType::ForTime] `rounds` should be set and `timecap` can be None or have a value.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -102,24 +102,24 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconId> {
         CheckUserId,
     )
 )]
-#[cfg_attr(feature = "full", table_name = "metcon")]
-#[cfg_attr(feature = "full", belongs_to(User))]
+#[cfg_attr(feature = "server", table_name = "metcon")]
+#[cfg_attr(feature = "server", belongs_to(User))]
 pub struct Metcon {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub id: MetconId,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     #[serde(serialize_with = "to_str_optional")]
     #[serde(deserialize_with = "from_str_optional")]
     pub user_id: Option<UserId>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub name: Option<String>,
     pub metcon_type: MetconType,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub rounds: Option<i32>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub timecap: Option<i32>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -127,7 +127,7 @@ pub struct Metcon {
     pub deleted: bool,
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyForUserOrAPWithDb for Unverified<Metcon> {
     type Entity = Metcon;
 
@@ -148,7 +148,7 @@ impl VerifyForUserOrAPWithDb for Unverified<Metcon> {
     }
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Metcon>> {
     type Entity = Metcon;
 
@@ -170,7 +170,7 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Metcon>> {
     }
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyForUserOrAPWithoutDb for Unverified<Metcon> {
     type Entity = Metcon;
 
@@ -184,7 +184,7 @@ impl VerifyForUserOrAPWithoutDb for Unverified<Metcon> {
     }
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Metcon>> {
     type Entity = Metcon;
 
@@ -200,18 +200,18 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Metcon>> {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct MetconMovementId(pub i64);
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyIdForUserOrAP for UnverifiedId<MetconMovementId> {
     type Id = MetconMovementId;
 
     fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
-        if MetconMovement::check_user_id_null(self.0, **auth, conn)
+        if MetconMovement::check_optional_user_id(self.0, **auth, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?
         {
             Ok(self.0)
@@ -221,7 +221,7 @@ impl VerifyIdForUserOrAP for UnverifiedId<MetconMovementId> {
     }
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyIdsForUserOrAP for UnverifiedIds<MetconMovementId> {
     type Id = MetconMovementId;
 
@@ -230,7 +230,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconMovementId> {
         auth: &AuthUserOrAP,
         conn: &PgConnection,
     ) -> Result<Vec<Self::Id>, Status> {
-        if MetconMovement::check_user_ids_null(&self.0, **auth, conn)
+        if MetconMovement::check_optional_user_ids(&self.0, **auth, conn)
             .map_err(|_| rocket::http::Status::Forbidden)?
         {
             Ok(self.0)
@@ -242,7 +242,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconMovementId> {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -256,9 +256,9 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconMovementId> {
         Update,
     )
 )]
-#[cfg_attr(feature = "full", table_name = "metcon_movement")]
-#[cfg_attr(feature = "full", belongs_to(Movement))]
-#[cfg_attr(feature = "full", belongs_to(Metcon))]
+#[cfg_attr(feature = "server", table_name = "metcon_movement")]
+#[cfg_attr(feature = "server", belongs_to(Movement))]
+#[cfg_attr(feature = "server", belongs_to(Metcon))]
 pub struct MetconMovement {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -272,7 +272,7 @@ pub struct MetconMovement {
     pub movement_number: i32,
     pub count: i32,
     pub movement_unit: MovementUnit,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub weight: Option<f32>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -280,7 +280,7 @@ pub struct MetconMovement {
     pub deleted: bool,
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyForUserOrAPWithDb for Unverified<MetconMovement> {
     type Entity = MetconMovement;
 
@@ -290,10 +290,8 @@ impl VerifyForUserOrAPWithDb for Unverified<MetconMovement> {
         conn: &PgConnection,
     ) -> Result<Self::Entity, Status> {
         let metcon_movement = self.0.into_inner();
-        if Metcon::check_user_id(metcon_movement.metcon_id, **auth, conn)
+        if MetconMovement::check_user_id(metcon_movement.id, **auth, conn)
             .map_err(|_| rocket::http::Status::InternalServerError)?
-            && MetconMovement::check_user_id(metcon_movement.id, **auth, conn)
-                .map_err(|_| rocket::http::Status::InternalServerError)?
         {
             Ok(metcon_movement)
         } else {
@@ -302,7 +300,7 @@ impl VerifyForUserOrAPWithDb for Unverified<MetconMovement> {
     }
 }
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
     type Entity = MetconMovement;
 
@@ -316,14 +314,8 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
             .iter()
             .map(|metcon_movement| metcon_movement.id)
             .collect();
-        let metcon_ids: Vec<_> = metcon_movements
-            .iter()
-            .map(|metcon_movement| metcon_movement.metcon_id)
-            .collect();
-        if Metcon::check_user_ids(&metcon_ids, **auth, conn)
+        if MetconMovement::check_user_ids(&metcon_movement_ids, **auth, conn)
             .map_err(|_| rocket::http::Status::InternalServerError)?
-            && MetconMovement::check_user_ids(&metcon_movement_ids, **auth, conn)
-                .map_err(|_| rocket::http::Status::InternalServerError)?
         {
             Ok(metcon_movements)
         } else {
@@ -334,15 +326,15 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct MetconSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -361,9 +353,9 @@ pub struct MetconSessionId(pub i64);
         VerifyForUserOrAPWithoutDb
     )
 )]
-#[cfg_attr(feature = "full", table_name = "metcon_session")]
-#[cfg_attr(feature = "full", belongs_to(User))]
-#[cfg_attr(feature = "full", belongs_to(Metcon))]
+#[cfg_attr(feature = "server", table_name = "metcon_session")]
+#[cfg_attr(feature = "server", belongs_to(User))]
+#[cfg_attr(feature = "server", belongs_to(Metcon))]
 pub struct MetconSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -375,14 +367,14 @@ pub struct MetconSession {
     #[serde(deserialize_with = "from_str")]
     pub metcon_id: MetconId,
     pub datetime: DateTime<Utc>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub time: Option<i32>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub rounds: Option<i32>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub reps: Option<i32>,
     pub rx: bool,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]

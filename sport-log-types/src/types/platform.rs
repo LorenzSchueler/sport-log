@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, CreateMultiple, FromSql, GetAll, GetById, GetByIds, GetBySync, GetByUser,
     GetByUserSync, ToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb,
@@ -10,7 +10,7 @@ use sport_log_types_derive::{
 use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{from_str, to_str, UserId};
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use crate::{
     schema::{platform, platform_credential},
     User,
@@ -18,7 +18,7 @@ use crate::{
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Hash,
         FromSqlRow,
@@ -29,17 +29,17 @@ use crate::{
         VerifyIdUnchecked
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct PlatformId(pub i64);
 
 /// A represantation for an external resource for which [ActionProvider](crate::ActionProvider) can provide [Actions](crate::Action).
 ///
-/// `credential` is true if the external resource is only useable with credentials which the [User] has to supply as [PlatformCredential].
+/// `credential` is true if the external resource is only useable with credentials which the [User](crate::User) has to supply as [PlatformCredential].
 ///
 /// If `credential` is false the resource can be accessed without credentials. (This is f.ex. the case if the data if fetched from public websites or only data from **Sport Log** is used.)
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -55,7 +55,7 @@ pub struct PlatformId(pub i64);
         VerifyUnchecked
     )
 )]
-#[cfg_attr(feature = "full", table_name = "platform")]
+#[cfg_attr(feature = "server", table_name = "platform")]
 pub struct Platform {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -70,18 +70,18 @@ pub struct Platform {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUser)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct PlatformCredentialId(pub i64);
 
-/// Credentials of a [User] for a [Platform].
+/// Credentials of a [User](crate::User) for a [Platform].
 ///
 /// [PlatformCredential] are needed for [Platforms](Platform) where `credential` is true.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -100,9 +100,9 @@ pub struct PlatformCredentialId(pub i64);
         VerifyForUserWithoutDb
     )
 )]
-#[cfg_attr(feature = "full", table_name = "platform_credential")]
-#[cfg_attr(feature = "full", belongs_to(User))]
-#[cfg_attr(feature = "full", belongs_to(Platform))]
+#[cfg_attr(feature = "server", table_name = "platform_credential")]
+#[cfg_attr(feature = "server", belongs_to(User))]
+#[cfg_attr(feature = "server", belongs_to(Platform))]
 pub struct PlatformCredential {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]

@@ -1,7 +1,7 @@
 use chrono::{DateTime, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync,
     ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
@@ -10,7 +10,7 @@ use sport_log_types_derive::{
 use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{from_str, to_str, UserId};
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use crate::{
     schema::{diary, wod},
     User,
@@ -18,15 +18,15 @@ use crate::{
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct DiaryId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -46,8 +46,8 @@ pub struct DiaryId(pub i64);
         VerifyUnchecked
     )
 )]
-#[cfg_attr(feature = "full", table_name = "diary")]
-#[cfg_attr(feature = "full", belongs_to(User))]
+#[cfg_attr(feature = "server", table_name = "diary")]
+#[cfg_attr(feature = "server", belongs_to(User))]
 pub struct Diary {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -56,9 +56,9 @@ pub struct Diary {
     #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
     pub date: NaiveDate,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub bodyweight: Option<f32>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -68,15 +68,15 @@ pub struct Diary {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct WodId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -96,8 +96,8 @@ pub struct WodId(pub i64);
         VerifyUnchecked
     )
 )]
-#[cfg_attr(feature = "full", table_name = "wod")]
-#[cfg_attr(feature = "full", belongs_to(User))]
+#[cfg_attr(feature = "server", table_name = "wod")]
+#[cfg_attr(feature = "server", belongs_to(User))]
 pub struct Wod {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -106,7 +106,7 @@ pub struct Wod {
     #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
     pub date: NaiveDate,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]

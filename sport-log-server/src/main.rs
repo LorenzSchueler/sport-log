@@ -1,48 +1,50 @@
-use std::io::Cursor;
+//! Central server for **Sport Log**.
+//!
+//! **Sport Log Server** is a multi-user server backend which stores user data and provides synchonization.
+//!
+//! # Usage
+//!
+//! **Sport Log Server** should be started at system startup, perferably as a systemd service.
+//! It listens on port 8000 for HTTP request.
+//! It is highly recommended to use an HTTP server linke apache or nginx and configure it as a reverse proxy.
+//! Make sure only connections via HTTPS are allowed since otherwise you data will be send in clear text.
+//!
+//! # Config
+//!
+//! The config file must be called `sport-log-server-config.toml`, supports configuration of different profiles and must at least contain all fields of [Config](sport_log_types::Config).
+//! Additionally it can also be used to configure the webserver itself. Please refer to [rocket::config].
+
+use std::env;
 
 #[macro_use]
 extern crate rocket;
 
+use figment::{
+    providers::{Format, Toml},
+    Figment,
+};
 use rocket::{
-    fairing::{Fairing, Info, Kind},
-    http::{ContentType, Header, Method, Status},
-    response::Responder,
+    fairing::{AdHoc, Fairing, Info, Kind},
+    http::{Header, Method, Status},
     Request, Response,
 };
-use serde::{Deserialize, Serialize};
 
-use sport_log_types::{Db, CONFIG};
+use sport_log_types::{Config, Db};
 
 mod handler;
+#[cfg(test)]
+mod tests;
+
+use handler::JsonError;
 
 const BASE: &str = "/v1";
 
-struct JsonError {
-    status: Status,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct ErrorMessage {
-    pub status: u16,
-}
-
-impl<'r, 'o: 'r> Responder<'r, 'o> for JsonError {
-    fn respond_to(self, _request: &'r Request<'_>) -> Result<Response<'o>, Status> {
-        let json = serde_json::to_string(&ErrorMessage {
-            status: self.status.code,
-        })
-        .map_err(|_| Status::InternalServerError)?;
-        Ok(Response::build()
-            .status(self.status)
-            .header(ContentType::JSON)
-            .sized_body(json.len(), Cursor::new(json))
-            .finalize())
-    }
-}
-
 #[catch(default)]
 fn default_catcher(status: Status, _request: &Request) -> JsonError {
-    JsonError { status }
+    JsonError {
+        status,
+        message: None,
+    }
 }
 
 // TODO only send preflight if route exists
@@ -51,7 +53,10 @@ fn catcher_404(status: Status, request: &Request) -> Result<Status, JsonError> {
     if request.method() == Method::Options {
         Ok(Status::NoContent)
     } else {
-        Err(JsonError { status })
+        Err(JsonError {
+            status,
+            message: None,
+        })
     }
 }
 
@@ -80,12 +85,20 @@ impl Fairing for CORS {
 
 #[launch]
 fn rocket() -> _ {
-    dotenv::dotenv().ok();
-
-    lazy_static::initialize(&CONFIG);
+    let figment = Figment::from(rocket::Config::default())
+        .merge(Toml::file("sport-log-server-config.toml").nested());
+    if cfg!(test) {
+        env::set_var("RUST_LOG", "error");
+    } else if figment.profile() == "debug" {
+        env::set_var("RUST_LOG", "info,sport_log_server=debug");
+    } else {
+        env::set_var("RUST_LOG", "warn");
+    }
+    tracing_subscriber::fmt::try_init().unwrap_or(());
 
     use handler::*;
-    rocket::build()
+    rocket::custom(figment)
+        .attach(AdHoc::config::<Config>())
         .attach(Db::fairing())
         .attach(CORS)
         .register("/", catchers![default_catcher, catcher_404])

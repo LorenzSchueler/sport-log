@@ -1,9 +1,9 @@
 use chrono::{DateTime, Utc};
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckAPId, CheckUserId, Create, CreateMultiple, FromSql, GetAll, GetById, GetByIds, GetBySync,
     GetByUser, GetByUserSync, ToSql, Update, VerifyForActionProviderWithDb,
@@ -14,7 +14,7 @@ use sport_log_types_derive::{
 use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{from_str, to_str, PlatformId, UserId};
-#[cfg(feature = "full")]
+#[cfg(feature = "server")]
 use crate::{
     schema::{action, action_event, action_provider, action_rule},
     Platform, User,
@@ -22,7 +22,7 @@ use crate::{
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Hash,
         FromSqlRow,
@@ -33,12 +33,12 @@ use crate::{
         VerifyIdUnchecked
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct ActionProviderId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -53,8 +53,8 @@ pub struct ActionProviderId(pub i64);
         VerifyUnchecked
     )
 )]
-#[cfg_attr(feature = "full", table_name = "action_provider")]
-#[cfg_attr(feature = "full", belongs_to(Platform))]
+#[cfg_attr(feature = "server", table_name = "action_provider")]
+#[cfg_attr(feature = "server", belongs_to(Platform))]
 pub struct ActionProvider {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -64,7 +64,7 @@ pub struct ActionProvider {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub platform_id: PlatformId,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -74,7 +74,7 @@ pub struct ActionProvider {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Hash,
         FromSqlRow,
@@ -84,12 +84,12 @@ pub struct ActionProvider {
         VerifyIdForActionProvider
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct ActionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -107,8 +107,8 @@ pub struct ActionId(pub i64);
         VerifyForActionProviderWithoutDb,
     )
 )]
-#[cfg_attr(feature = "full", table_name = "action")]
-#[cfg_attr(feature = "full", belongs_to(ActionProvider))]
+#[cfg_attr(feature = "server", table_name = "action")]
+#[cfg_attr(feature = "server", belongs_to(ActionProvider))]
 pub struct Action {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -117,7 +117,7 @@ pub struct Action {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub action_provider_id: ActionProviderId,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
     pub create_before: i32,
     pub delete_after: i32,
@@ -128,7 +128,7 @@ pub struct Action {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
-#[cfg_attr(feature = "full", derive(DbEnum))]
+#[cfg_attr(feature = "server", derive(DbEnum))]
 pub enum Weekday {
     Monday,
     Tuesday,
@@ -155,15 +155,15 @@ impl Weekday {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUser)
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct ActionRuleId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -182,9 +182,9 @@ pub struct ActionRuleId(pub i64);
         VerifyForUserWithoutDb,
     )
 )]
-#[cfg_attr(feature = "full", table_name = "action_rule")]
-#[cfg_attr(feature = "full", belongs_to(User))]
-#[cfg_attr(feature = "full", belongs_to(Action))]
+#[cfg_attr(feature = "server", table_name = "action_rule")]
+#[cfg_attr(feature = "server", belongs_to(User))]
+#[cfg_attr(feature = "server", belongs_to(Action))]
 pub struct ActionRule {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -197,7 +197,7 @@ pub struct ActionRule {
     pub action_id: ActionId,
     pub weekday: Weekday,
     pub time: DateTime<Utc>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub arguments: Option<String>,
     pub enabled: bool,
     #[serde(skip)]
@@ -208,7 +208,7 @@ pub struct ActionRule {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Hash,
         FromSqlRow,
@@ -220,12 +220,12 @@ pub struct ActionRule {
         VerifyIdForAdmin
     )
 )]
-#[cfg_attr(feature = "full", sql_type = "diesel::sql_types::BigInt")]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct ActionEventId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "full",
+    feature = "server",
     derive(
         Insertable,
         Associations,
@@ -245,9 +245,9 @@ pub struct ActionEventId(pub i64);
         VerifyForAdminWithoutDb,
     )
 )]
-#[cfg_attr(feature = "full", table_name = "action_event")]
-#[cfg_attr(feature = "full", belongs_to(User))]
-#[cfg_attr(feature = "full", belongs_to(Action))]
+#[cfg_attr(feature = "server", table_name = "action_event")]
+#[cfg_attr(feature = "server", belongs_to(User))]
+#[cfg_attr(feature = "server", belongs_to(Action))]
 pub struct ActionEvent {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -259,7 +259,7 @@ pub struct ActionEvent {
     #[serde(deserialize_with = "from_str")]
     pub action_id: ActionId,
     pub datetime: DateTime<Utc>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub arguments: Option<String>,
     pub enabled: bool,
     #[serde(skip)]
@@ -269,7 +269,7 @@ pub struct ActionEvent {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Queryable))]
+#[cfg_attr(feature = "server", derive(Queryable))]
 pub struct CreatableActionRule {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -282,32 +282,32 @@ pub struct CreatableActionRule {
     pub action_id: ActionId,
     pub weekday: Weekday,
     pub time: DateTime<Utc>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub arguments: Option<String>,
     pub create_before: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Queryable))]
+#[cfg_attr(feature = "server", derive(Queryable))]
 pub struct ExecutableActionEvent {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub action_event_id: ActionEventId,
     pub action_name: String,
     pub datetime: DateTime<Utc>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub arguments: Option<String>,
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub username: Option<String>,
-    #[cfg_attr(features = "full", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub password: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "full", derive(Queryable))]
+#[cfg_attr(feature = "server", derive(Queryable))]
 pub struct DeletableActionEvent {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]

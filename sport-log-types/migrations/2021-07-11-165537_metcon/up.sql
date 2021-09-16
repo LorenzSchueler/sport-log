@@ -22,10 +22,21 @@ insert into metcon (id, user_id, name, metcon_type, rounds, timecap, description
     (2, null, 'Murph', 'for_time', 1, null, 'wear a weight vest (20/14) lbs'),
     (3, 1, '5k Row', 'for_time', 1, 1800, null);
 
+create table metcon_archive (
+    primary key (id),
+    foreign key (user_id) references "user",
+    check (deleted = true)
+) inherits (metcon);
+
+create trigger archive_metcon
+    after update of deleted or delete
+    on metcon
+    for each row execute procedure archive_record();
+
 create table metcon_movement (
     id bigint primary key,
     metcon_id bigint not null references metcon on delete cascade,
-    movement_id bigint not null references movement on delete no action,
+    movement_id bigint not null references movement on delete cascade,
     movement_number integer not null check (movement_number >= 0),
     count integer not null check (count >= 1),
     movement_unit movement_unit not null,
@@ -51,10 +62,21 @@ insert into metcon_movement (id, metcon_id, movement_id, movement_number, count,
     (8, 2, 5, 5, 1, 'mile', 9),
     (9, 3, 8, 5, 1, 'km', null);
 
+create table metcon_movement_archive (
+    primary key (id),
+    foreign key (metcon_id) references metcon,
+    check (deleted = true)
+) inherits (metcon_movement);
+
+create trigger archive_metcon_movement
+    after update of deleted or delete
+    on metcon_movement
+    for each row execute procedure archive_record();
+
 create table metcon_session (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
-    metcon_id bigint not null references metcon on delete no action,
+    metcon_id bigint not null references metcon on delete cascade,
     datetime timestamptz not null default now(),
     time integer check (time > 0), -- seconds
     rounds integer check (rounds >= 0),
@@ -74,3 +96,14 @@ create trigger set_timestamp before update on metcon_session
 insert into metcon_session (id, user_id, metcon_id, datetime, time, rounds, reps, rx, comments) values
     (1, 1, 1, '2020-08-20 16:00:00', null, 17, 8, true, null),
     (2, 1, 2, '2020-08-23 18:00:00', 1800, null, null, false, 'without vest');
+
+create table metcon_session_archive (
+    primary key (id),
+    foreign key (user_id) references "user",
+    check (deleted = true)
+) inherits (metcon_session);
+
+create trigger archive_metcon_session
+    after update of deleted or delete
+    on metcon_session
+    for each row execute procedure archive_record();

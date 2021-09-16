@@ -18,9 +18,9 @@
 ---
 >         movement_unit -> MovementUnitMapping,
 154c154
-<         category -> Movement_category,
+<         categories -> Array<Movement_category>,
 ---
->         category -> MovementCategoryMapping,
+>         categories -> Array<MovementCategoryMapping>,
 217c217
 <         movement_unit -> Movement_unit,
 ---

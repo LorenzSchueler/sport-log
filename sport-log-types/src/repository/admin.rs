@@ -4,12 +4,17 @@ use argon2::{
 };
 use diesel::{result::Error, PgConnection, QueryResult};
 
-use crate::{Admin, CONFIG};
+use crate::{Admin, ADMIN_USERNAME};
 
 impl Admin {
-    pub fn auth(username: &str, password: &str, _conn: &PgConnection) -> QueryResult<()> {
-        let password_hash = PasswordHash::new(CONFIG.admin_password.as_str()).unwrap();
-        if username == "admin"
+    pub fn auth(
+        username: &str,
+        password: &str,
+        admin_password: &str,
+        _conn: &PgConnection,
+    ) -> QueryResult<()> {
+        let password_hash = PasswordHash::new(admin_password).unwrap();
+        if username == ADMIN_USERNAME
             && Argon2::default()
                 .verify_password(password.as_bytes(), &password_hash)
                 .is_ok()

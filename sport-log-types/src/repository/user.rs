@@ -12,7 +12,7 @@ impl Create for User {
     fn create(mut user: Self, conn: &PgConnection) -> QueryResult<Self> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
-            .hash_password_simple(user.password.as_bytes(), &salt)
+            .hash_password(user.password.as_bytes(), &salt)
             .unwrap()
             .to_string();
 
@@ -26,7 +26,7 @@ impl Update for User {
     fn update(mut user: Self, conn: &PgConnection) -> QueryResult<Self> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
-            .hash_password_simple(user.password.as_bytes(), &salt)
+            .hash_password(user.password.as_bytes(), &salt)
             .unwrap()
             .to_string();
 
@@ -42,7 +42,7 @@ impl Update for User {
                 .map(|mut user| {
                     let salt = SaltString::generate(&mut OsRng);
                     user.password = Argon2::default()
-                        .hash_password_simple(user.password.as_bytes(), &salt)
+                        .hash_password(user.password.as_bytes(), &salt)
                         .unwrap()
                         .to_string();
 

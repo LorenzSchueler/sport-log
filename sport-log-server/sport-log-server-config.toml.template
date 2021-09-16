@@ -1,3 +1,15 @@
+[global]
 admin_password = "$argon2id$v=19$m=4096,t=3,p=1$jfQMFwbuWJW6kYF3K6Opxg$8zmHSEMYeXuxhxl7HNv8/zsgSx/LWm6Iy1EciOBJdQM" # = "admin-passwd"
 user_self_registration = true
 ap_self_registration = true
+
+[global.databases]
+sport_log = { url="postgres://sport_admin:<password>@localhost/sport_log" }
+
+[release]
+#port = 8000
+#address = "0.0.0.0"
+
+[debug]
+#port = 8000
+#address = "0.0.0.0"

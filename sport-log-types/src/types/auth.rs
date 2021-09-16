@@ -4,9 +4,10 @@ use rocket::{
     http::Status,
     outcome::Outcome,
     request::{FromRequest, Request},
+    State,
 };
 
-use crate::{ActionProvider, ActionProviderId, Admin, Db, User, UserId};
+use crate::{ActionProvider, ActionProviderId, Admin, Config, Db, User, UserId};
 
 fn parse_username_password(request: &'_ Request<'_>) -> Option<(String, String)> {
     let auth_header = request.headers().get("Authorization").next()?;
@@ -55,6 +56,13 @@ impl<'r> FromRequest<'r> for AuthUser {
             Outcome::Failure(f) => return Outcome::Failure(f),
             Outcome::Forward(f) => return Outcome::Forward(f),
         };
+        let config = match <&'r State<Config>>::from_request(request).await {
+            Outcome::Success(config) => config,
+            Outcome::Failure(f) => return Outcome::Failure(f),
+            Outcome::Forward(f) => return Outcome::Forward(f),
+        }
+        .inner();
+        let admin_password = config.admin_password.clone();
         conn.run(move |c| match User::auth(&username, &password, c) {
             Ok(id) => Outcome::Success(AuthUser(id)),
             Err(_) => {
@@ -62,7 +70,7 @@ impl<'r> FromRequest<'r> for AuthUser {
                     .split_once("$id$")
                     .map(|(name, id)| (name, id.parse().map(UserId)))
                 {
-                    if Admin::auth(name, &password, c).is_ok() {
+                    if Admin::auth(name, &password, &admin_password, c).is_ok() {
                         return Outcome::Success(AuthUser(user_id));
                     }
                 };
@@ -112,6 +120,13 @@ impl<'r> FromRequest<'r> for AuthUserOrAP {
             Outcome::Failure(f) => return Outcome::Failure(f),
             Outcome::Forward(f) => return Outcome::Forward(f),
         };
+        let config = match <&'r State<Config>>::from_request(request).await {
+            Outcome::Success(config) => config,
+            Outcome::Failure(f) => return Outcome::Failure(f),
+            Outcome::Forward(f) => return Outcome::Forward(f),
+        }
+        .inner();
+        let admin_password = config.admin_password.clone();
         conn.run(move |c| match User::auth(&username, &password, c) {
             Ok(id) => Outcome::Success(AuthUserOrAP(id)),
             Err(_) => {
@@ -119,17 +134,26 @@ impl<'r> FromRequest<'r> for AuthUserOrAP {
                     .split_once("$id$")
                     .map(|(name, id)| (name, id.parse().map(UserId)))
                 {
-                    if ActionProvider::auth_as_user(name, &password, user_id, c).is_ok()
-                        || Admin::auth(name, &password, c).is_ok()
-                    {
-                        return Outcome::Success(AuthUserOrAP(user_id));
+                    match ActionProvider::auth_as_user(name, &password, user_id, c) {
+                        Ok(AuthApForUser::Allowed(_)) => Outcome::Success(AuthUserOrAP(user_id)),
+                        Ok(AuthApForUser::Forbidden) => Outcome::Failure((Status::Forbidden, ())),
+                        Err(_) => match Admin::auth(name, &password, &admin_password, c) {
+                            Ok(()) => Outcome::Success(AuthUserOrAP(user_id)),
+                            Err(_) => Outcome::Failure((Status::Unauthorized, ())),
+                        },
                     }
-                };
-                Outcome::Failure((Status::Unauthorized, ()))
+                } else {
+                    Outcome::Failure((Status::Unauthorized, ()))
+                }
             }
         })
         .await
     }
+}
+
+pub enum AuthApForUser {
+    Allowed(ActionProviderId),
+    Forbidden,
 }
 
 /// [AuthAP] is used as a request guard to ensure that the endpoint can only be accessed by the [ActionProvider] who provides the [ActionEvent](crate::ActionEvent).
@@ -165,6 +189,13 @@ impl<'r> FromRequest<'r> for AuthAP {
             Outcome::Failure(f) => return Outcome::Failure(f),
             Outcome::Forward(f) => return Outcome::Forward(f),
         };
+        let config = match <&'r State<Config>>::from_request(request).await {
+            Outcome::Success(config) => config,
+            Outcome::Failure(f) => return Outcome::Failure(f),
+            Outcome::Forward(f) => return Outcome::Forward(f),
+        }
+        .inner();
+        let admin_password = config.admin_password.clone();
         conn.run(
             move |c| match ActionProvider::auth(&username, &password, c) {
                 Ok(id) => Outcome::Success(AuthAP(id)),
@@ -173,7 +204,7 @@ impl<'r> FromRequest<'r> for AuthAP {
                         .split_once("$id$")
                         .map(|(name, id)| (name, id.parse()))
                     {
-                        if Admin::auth(name, &password, c).is_ok() {
+                        if Admin::auth(name, &password, &admin_password, c).is_ok() {
                             return Outcome::Success(AuthAP(ActionProviderId(id)));
                         }
                     };
@@ -207,10 +238,19 @@ impl<'r> FromRequest<'r> for AuthAdmin {
             Outcome::Failure(f) => return Outcome::Failure(f),
             Outcome::Forward(f) => return Outcome::Forward(f),
         };
-        conn.run(move |c| match Admin::auth(&username, &password, c) {
-            Ok(_) => Outcome::Success(AuthAdmin),
-            Err(_) => Outcome::Failure((Status::Unauthorized, ())),
-        })
+        let config = match <&'r State<Config>>::from_request(request).await {
+            Outcome::Success(config) => config,
+            Outcome::Failure(f) => return Outcome::Failure(f),
+            Outcome::Forward(f) => return Outcome::Forward(f),
+        }
+        .inner();
+        let admin_password = config.admin_password.clone();
+        conn.run(
+            move |c| match Admin::auth(&username, &password, &admin_password, c) {
+                Ok(_) => Outcome::Success(AuthAdmin),
+                Err(_) => Outcome::Failure((Status::Unauthorized, ())),
+            },
+        )
         .await
     }
 }

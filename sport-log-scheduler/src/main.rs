@@ -1,4 +1,7 @@
-//! The Sport Log Scheduler creates [ActionEvents](sport_log_types::ActionEvent) from [ActionRules](sport_log_types::ActionRule) and deletes old [ActionEvents](sport_log_types::ActionEvent).
+//! **Sport Log Scheduler** is responsible for scheduling [ActionEvents](ActionEvent).
+//!
+//! **Sport Log Scheduler** creates [ActionEvents](sport_log_types::ActionEvent) from [ActionRules](sport_log_types::ActionRule)
+//! and deletes old [ActionEvents](sport_log_types::ActionEvent).
 //!
 //! [ActionEvents](sport_log_types::ActionEvent) are only created from enabled [ActionRules](sport_log_types::ActionRule).
 //!
@@ -6,24 +9,29 @@
 //!
 //! Similarly the timespan they are deleted after their `datetime` is determined by the `delete_after` field of the corresponding [Action](sport_log_types::Action).
 //!
-//! However most [ActionProvider](sport_log_types::ActionProvider) will delete an [ActionEvent](sport_log_types::ActionEvent) after it has been executed.
+//! However most [ActionProvider](sport_log_types::ActionProvider) will delete a [ActionEvents](sport_log_types::ActionEvent) directly after execution.
 //!
 //! # Usage
 //!
-//! The Sport Log Scheduler has do be executed periodically, perferably as a cron job every hour.
+//! The **Sport Log Scheduler** has do be executed periodically, perferably as a cron job every hour.
 //!
 //! # Config
 //!
 //! The config file must be called `sport-log-scheduler.toml` and must be deserializable to a [Config].
 
-use std::fs;
+use std::{env, fs};
 
 use chrono::{Datelike, Duration, Utc};
 use rand::Rng;
-use reqwest::blocking::Client;
+use reqwest::{blocking::Client, Error as ReqwestError};
 use serde::Deserialize;
+use tracing::{debug, error, info};
 
-use sport_log_types::{ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent};
+use sport_log_types::{
+    ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent, ADMIN_USERNAME,
+};
+
+const CONFIG_FILE: &str = "sport-log-scheduler.toml";
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -31,27 +39,56 @@ pub struct Config {
     pub base_url: String,
 }
 
-impl Config {
-    pub fn get() -> Self {
-        toml::from_str(&fs::read_to_string("sport-log-scheduler.toml").unwrap()).unwrap()
+fn main() {
+    if cfg!(debug_assertions) {
+        env::set_var("RUST_LOG", "info,sport_log_scheduler=debug");
+    } else {
+        env::set_var("RUST_LOG", "warn");
+    }
+
+    tracing_subscriber::fmt::init();
+
+    let config: Config = match fs::read_to_string(CONFIG_FILE) {
+        Ok(file) => match toml::from_str(&file) {
+            Ok(config) => config,
+            Err(error) => {
+                error!("Failed to parse {}: {}", CONFIG_FILE, error);
+                return;
+            }
+        },
+        Err(error) => {
+            error!("Failed to read {}: {}", CONFIG_FILE, error);
+            return;
+        }
+    };
+
+    let client = Client::new();
+    if let Err(error) = create_action_events(&client, &config) {
+        error!(
+            "while creating new action events an error occured: {}",
+            error
+        );
+    }
+    if let Err(error) = delete_action_events(&client, &config) {
+        error!(
+            "while deleting old action events an error occured: {}",
+            error
+        );
     }
 }
 
-fn main() {
-    let config = Config::get();
-    let username = "admin";
-
-    let client = Client::new();
-
+fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestError> {
     let creatable_action_rules: Vec<CreatableActionRule> = client
         .get(format!("{}/v1/adm/creatable_action_rule", config.base_url))
-        .basic_auth(username, Some(&config.admin_password))
-        .send()
-        .unwrap()
-        .json()
-        .unwrap();
+        .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
+        .send()?
+        .json()?;
 
-    println!("{:#?}", creatable_action_rules);
+    info!(
+        "got {} creatable action events",
+        creatable_action_rules.len()
+    );
+    debug!("{:#?}", creatable_action_rules);
 
     let mut rng = rand::thread_rng();
 
@@ -87,24 +124,32 @@ fn main() {
         }
     }
 
-    println!("{:#?}", action_events);
+    info!("creating {} new action events", action_events.len());
+    debug!("{:#?}", action_events);
 
     client
         .post(format!("{}/v1/adm/action_events", config.base_url))
-        .basic_auth(username, Some(&config.admin_password))
+        .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .json(&action_events)
-        .send()
-        .unwrap();
+        .send()?;
 
+    info!("creation of action events successful");
+
+    Ok(())
+}
+
+fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestError> {
     let deletable_action_events: Vec<DeletableActionEvent> = client
         .get(format!("{}/v1/adm/deletable_action_event", config.base_url))
-        .basic_auth(username, Some(&config.admin_password))
-        .send()
-        .unwrap()
-        .json()
-        .unwrap();
+        .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
+        .send()?
+        .json()?;
 
-    println!("{:#?}", deletable_action_events);
+    info!(
+        "got {} deletable action events",
+        deletable_action_events.len()
+    );
+    debug!("{:#?}", deletable_action_events);
 
     let mut action_event_ids = vec![];
     for deletable_action_event in deletable_action_events {
@@ -116,12 +161,16 @@ fn main() {
         }
     }
 
-    println!("{:#?}", action_event_ids);
+    info!("deleting {} action events", action_event_ids.len());
+    debug!("{:#?}", action_event_ids);
 
     client
         .delete(format!("{}/v1/adm/action_events", config.base_url,))
-        .basic_auth(username, Some(&config.admin_password))
+        .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .json(&action_event_ids)
-        .send()
-        .unwrap();
+        .send()?;
+
+    info!("action events have been successfully deleted");
+
+    Ok(())
 }

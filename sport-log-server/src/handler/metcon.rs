@@ -1,5 +1,3 @@
-use rocket::{http::Status, serde::json::Json};
-
 use sport_log_types::{
     AuthUserOrAP, Create, CreateMultiple, Db, GetById, GetByUser, Metcon, MetconId, MetconMovement,
     MetconMovementId, MetconSession, MetconSessionDescription, MetconSessionId, Unverified,
@@ -7,7 +5,7 @@ use sport_log_types::{
     VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
 };
 
-use crate::handler::{DateTimeWrapper, IntoJson};
+use crate::handler::{DateTimeWrapper, IntoJson, JsonError, JsonResult};
 
 #[post(
     "/metcon_session",
@@ -18,8 +16,13 @@ pub async fn create_metcon_session(
     metcon_session: Unverified<MetconSession>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<MetconSession>, Status> {
-    let metcon_session = metcon_session.verify_user_ap_without_db(&auth)?;
+) -> JsonResult<MetconSession> {
+    let metcon_session = metcon_session
+        .verify_user_ap_without_db(&auth)
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| MetconSession::create(metcon_session, c))
         .await
         .into_json()
@@ -34,8 +37,13 @@ pub async fn create_metcon_sessions(
     metcon_sessions: Unverified<Vec<MetconSession>>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<MetconSession>>, Status> {
-    let metcon_sessions = metcon_sessions.verify_user_ap_without_db(&auth)?;
+) -> JsonResult<Vec<MetconSession>> {
+    let metcon_sessions = metcon_sessions
+        .verify_user_ap_without_db(&auth)
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| MetconSession::create_multiple(metcon_sessions, c))
         .await
         .into_json()
@@ -46,20 +54,21 @@ pub async fn get_metcon_session(
     metcon_session_id: UnverifiedId<MetconSessionId>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<MetconSession>, Status> {
+) -> JsonResult<MetconSession> {
     let metcon_session_id = conn
         .run(move |c| metcon_session_id.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(move |c| MetconSession::get_by_id(metcon_session_id, c))
         .await
         .into_json()
 }
 
 #[get("/metcon_session")]
-pub async fn get_metcon_sessions(
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> Result<Json<Vec<MetconSession>>, Status> {
+pub async fn get_metcon_sessions(auth: AuthUserOrAP, conn: Db) -> JsonResult<Vec<MetconSession>> {
     conn.run(move |c| MetconSession::get_by_user(*auth, c))
         .await
         .into_json()
@@ -74,10 +83,14 @@ pub async fn update_metcon_session(
     metcon_session: Unverified<MetconSession>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<MetconSession>, Status> {
+) -> JsonResult<MetconSession> {
     let metcon_session = conn
         .run(move |c| metcon_session.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| MetconSession::update(metcon_session, c))
         .await
         .into_json()
@@ -92,10 +105,14 @@ pub async fn update_metcon_sessions(
     metcon_sessions: Unverified<Vec<MetconSession>>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<MetconSession>>, Status> {
+) -> JsonResult<Vec<MetconSession>> {
     let metcon_sessions = conn
         .run(move |c| metcon_sessions.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| MetconSession::update_multiple(metcon_sessions, c))
         .await
         .into_json()
@@ -106,8 +123,13 @@ pub async fn create_metcon(
     metcon: Unverified<Metcon>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Metcon>, Status> {
-    let metcon = metcon.verify_user_ap_without_db(&auth)?;
+) -> JsonResult<Metcon> {
+    let metcon = metcon
+        .verify_user_ap_without_db(&auth)
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| Metcon::create(metcon, c)).await.into_json()
 }
 
@@ -116,8 +138,13 @@ pub async fn create_metcons(
     metcons: Unverified<Vec<Metcon>>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<Metcon>>, Status> {
-    let metcons = metcons.verify_user_ap_without_db(&auth)?;
+) -> JsonResult<Vec<Metcon>> {
+    let metcons = metcons
+        .verify_user_ap_without_db(&auth)
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| Metcon::create_multiple(metcons, c))
         .await
         .into_json()
@@ -128,17 +155,21 @@ pub async fn get_metcon(
     metcon_id: UnverifiedId<MetconId>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Metcon>, Status> {
+) -> JsonResult<Metcon> {
     let metcon_id = conn
         .run(move |c| metcon_id.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(move |c| Metcon::get_by_id(metcon_id, c))
         .await
         .into_json()
 }
 
 #[get("/metcon")]
-pub async fn get_metcons(auth: AuthUserOrAP, conn: Db) -> Result<Json<Vec<Metcon>>, Status> {
+pub async fn get_metcons(auth: AuthUserOrAP, conn: Db) -> JsonResult<Vec<Metcon>> {
     conn.run(move |c| Metcon::get_by_user(*auth, c))
         .await
         .into_json()
@@ -149,8 +180,14 @@ pub async fn update_metcon(
     metcon: Unverified<Metcon>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Metcon>, Status> {
-    let metcon = conn.run(move |c| metcon.verify_user_ap(&auth, c)).await?;
+) -> JsonResult<Metcon> {
+    let metcon = conn
+        .run(move |c| metcon.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| Metcon::update(metcon, c)).await.into_json()
 }
 
@@ -159,8 +196,14 @@ pub async fn update_metcons(
     metcons: Unverified<Vec<Metcon>>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<Metcon>>, Status> {
-    let metcons = conn.run(move |c| metcons.verify_user_ap(&auth, c)).await?;
+) -> JsonResult<Vec<Metcon>> {
+    let metcons = conn
+        .run(move |c| metcons.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| Metcon::update_multiple(metcons, c))
         .await
         .into_json()
@@ -175,10 +218,14 @@ pub async fn create_metcon_movement(
     metcon_movement: Unverified<MetconMovement>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<MetconMovement>, Status> {
+) -> JsonResult<MetconMovement> {
     let metcon_movement = conn
         .run(move |c| metcon_movement.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| MetconMovement::create(metcon_movement, c))
         .await
         .into_json()
@@ -193,10 +240,14 @@ pub async fn create_metcon_movements(
     metcon_movements: Unverified<Vec<MetconMovement>>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<MetconMovement>>, Status> {
+) -> JsonResult<Vec<MetconMovement>> {
     let metcon_movements = conn
         .run(move |c| metcon_movements.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| MetconMovement::create_multiple(metcon_movements, c))
         .await
         .into_json()
@@ -207,10 +258,14 @@ pub async fn get_metcon_movement(
     metcon_movement_id: UnverifiedId<MetconMovementId>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<MetconMovement>, Status> {
+) -> JsonResult<MetconMovement> {
     let metcon_movement_id = conn
         .run(move |c| metcon_movement_id.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(move |c| MetconMovement::get_by_id(metcon_movement_id, c))
         .await
         .into_json()
@@ -221,10 +276,14 @@ pub async fn get_metcon_movements_by_metcon(
     metcon_id: UnverifiedId<MetconId>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<MetconMovement>>, Status> {
+) -> JsonResult<Vec<MetconMovement>> {
     let metcon_id = conn
         .run(move |c| metcon_id.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(move |c| MetconMovement::get_by_metcon(metcon_id, c))
         .await
         .into_json()
@@ -239,10 +298,14 @@ pub async fn update_metcon_movement(
     metcon_movement: Unverified<MetconMovement>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<MetconMovement>, Status> {
+) -> JsonResult<MetconMovement> {
     let metcon_movement = conn
         .run(move |c| metcon_movement.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| MetconMovement::update(metcon_movement, c))
         .await
         .into_json()
@@ -257,10 +320,14 @@ pub async fn update_metcon_movements(
     metcon_movements: Unverified<Vec<MetconMovement>>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<MetconMovement>>, Status> {
+) -> JsonResult<Vec<MetconMovement>> {
     let metcon_movements = conn
         .run(move |c| metcon_movements.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(|c| MetconMovement::update_multiple(metcon_movements, c))
         .await
         .into_json()
@@ -271,10 +338,14 @@ pub async fn get_metcon_session_description(
     metcon_session_id: UnverifiedId<MetconSessionId>,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<MetconSessionDescription>, Status> {
+) -> JsonResult<MetconSessionDescription> {
     let metcon_session_id = conn
         .run(move |c| metcon_session_id.verify_user_ap(&auth, c))
-        .await?;
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
     conn.run(move |c| MetconSessionDescription::get_by_id(metcon_session_id, c))
         .await
         .into_json()
@@ -284,7 +355,7 @@ pub async fn get_metcon_session_description(
 pub async fn get_metcon_session_descriptions(
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<MetconSessionDescription>>, Status> {
+) -> JsonResult<Vec<MetconSessionDescription>> {
     conn.run(move |c| MetconSessionDescription::get_by_user(*auth, c))
         .await
         .into_json()
@@ -296,7 +367,7 @@ pub async fn get_ordered_metcon_session_descriptions_by_timespan(
     end_datetime: DateTimeWrapper,
     auth: AuthUserOrAP,
     conn: Db,
-) -> Result<Json<Vec<MetconSessionDescription>>, Status> {
+) -> JsonResult<Vec<MetconSessionDescription>> {
     conn.run(move |c| {
         MetconSessionDescription::get_ordered_by_user_and_timespan(
             *auth,

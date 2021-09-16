@@ -2,10 +2,44 @@ use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
-    schema::{strength_session, strength_set},
+    schema::{movement, strength_session, strength_set},
     CheckUserId, GetById, GetByUser, GetByUserSync, Movement, StrengthSession,
     StrengthSessionDescription, StrengthSessionId, StrengthSet, StrengthSetId, UserId,
 };
+
+impl CheckUserId for StrengthSession {
+    type Id = StrengthSessionId;
+
+    fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+        strength_session::table
+            .inner_join(movement::table)
+            .filter(strength_session::columns::id.eq(id))
+            .filter(strength_session::columns::user_id.eq(user_id))
+            .filter(
+                movement::columns::user_id
+                    .eq(user_id)
+                    .or(movement::columns::user_id.is_null()),
+            )
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == 1)
+    }
+
+    fn check_user_ids(ids: &[Self::Id], user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+        strength_session::table
+            .inner_join(movement::table)
+            .filter(strength_session::columns::id.eq_any(ids))
+            .filter(strength_session::columns::user_id.eq(user_id))
+            .filter(
+                movement::columns::user_id
+                    .eq(user_id)
+                    .or(movement::columns::user_id.is_null()),
+            )
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == ids.len() as i64)
+    }
+}
 
 impl StrengthSession {
     pub fn get_ordered_by_user_and_timespan(

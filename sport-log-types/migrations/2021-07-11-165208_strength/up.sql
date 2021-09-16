@@ -2,7 +2,7 @@ create table strength_session (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
     datetime timestamptz not null default now(),
-    movement_id bigint not null references movement on delete no action,
+    movement_id bigint not null references movement on delete cascade,
     movement_unit movement_unit not null,
     interval integer check (interval > 0),
     comments text,
@@ -19,6 +19,17 @@ create trigger set_timestamp before update on strength_session
 insert into strength_session (id, user_id, datetime, movement_id, movement_unit, interval, comments) values
     (1, 1, '2021-08-20 16:00:00', 2, 'reps', 120, null),
     (2, 1, '2021-08-22 16:00:00', 1, 'reps', null, null);
+
+create table strength_session_archive (
+    primary key (id),
+    foreign key (user_id) references "user",
+    check (deleted = true)
+) inherits (strength_session);
+
+create trigger archive_strength_session
+    after update of deleted or delete
+    on strength_session
+    for each row execute procedure archive_record();
 
 create table strength_set (
     id bigint primary key,
@@ -46,3 +57,14 @@ insert into strength_set (id, strength_session_id, set_number, count, weight) va
     (7, 2, 2, 3, 130),
     (8, 2, 3, 3, 135),
     (9, 2, 4, 3, 130);
+
+create table strength_set_archive (
+    primary key (id),
+    foreign key (strength_session_id) references strength_session,
+    check (deleted = true)
+) inherits (strength_set);
+
+create trigger archive_strength_set
+    after update of deleted or delete
+    on strength_set
+    for each row execute procedure archive_record();

@@ -4,3 +4,23 @@
 [print_schema]
 file = "src/schema.rs"
 import_types = ["diesel::sql_types::*", "crate::*"]
+patch_file = "src/schema.patch"
+
+[print_schema.filter]
+except_tables = [
+    "platform_archive",
+    "platform_credential_archive",
+    "action_archive",
+    "action_rule_archive",
+    "action_event_archive",
+    "diary_archive",
+    "wod_archive",
+    "movement_archive",
+    "strength_session_archive",
+    "strength_set_archive",
+    "metcon_archive",
+    "metcon_movement_archive",
+    "metcon_session_archive",
+    "cardio_session_archive",
+    "route_archive",
+]

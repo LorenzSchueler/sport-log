@@ -2,9 +2,10 @@ use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
-    schema::{metcon, metcon_movement, metcon_session},
-    CheckUserId, GetById, GetByUser, GetByUserSync, Metcon, MetconId, MetconMovement,
-    MetconMovementId, MetconSession, MetconSessionDescription, MetconSessionId, Movement, UserId,
+    schema::{metcon, metcon_movement, metcon_session, movement},
+    CheckOptionalUserId, CheckUserId, GetById, GetByUser, GetByUserSync, Metcon, MetconId,
+    MetconMovement, MetconMovementId, MetconSession, MetconSessionDescription, MetconSessionId,
+    Movement, UserId,
 };
 
 impl GetByUser for Metcon {
@@ -39,9 +40,11 @@ impl GetByUserSync for Metcon {
     }
 }
 
-impl Metcon {
-    pub fn check_user_id_null(
-        id: MetconId,
+impl CheckOptionalUserId for Metcon {
+    type Id = MetconId;
+
+    fn check_optional_user_id(
+        id: Self::Id,
         user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {
@@ -57,8 +60,8 @@ impl Metcon {
             .map(|count: i64| count == 1)
     }
 
-    pub fn check_user_ids_null(
-        ids: &[MetconId],
+    fn check_optional_user_ids(
+        ids: &[Self::Id],
         user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {
@@ -132,8 +135,14 @@ impl CheckUserId for MetconMovement {
     fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
+            .inner_join(movement::table)
             .filter(metcon_movement::columns::id.eq(id))
             .filter(metcon::columns::user_id.eq(user_id))
+            .filter(
+                movement::columns::user_id
+                    .eq(user_id)
+                    .or(movement::columns::user_id.is_null()),
+            )
             .count()
             .get_result(conn)
             .map(|count: i64| count == 1)
@@ -142,41 +151,61 @@ impl CheckUserId for MetconMovement {
     fn check_user_ids(ids: &[Self::Id], user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
+            .inner_join(movement::table)
             .filter(metcon_movement::columns::id.eq_any(ids))
             .filter(metcon::columns::user_id.eq(user_id))
+            .filter(
+                movement::columns::user_id
+                    .eq(user_id)
+                    .or(movement::columns::user_id.is_null()),
+            )
             .count()
             .get_result(conn)
             .map(|count: i64| count == ids.len() as i64)
     }
 }
 
-impl MetconMovement {
-    pub fn check_user_id_null(
-        id: MetconMovementId,
+impl CheckOptionalUserId for MetconMovement {
+    type Id = MetconMovementId;
+
+    fn check_optional_user_id(
+        id: Self::Id,
         user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
+            .inner_join(movement::table)
             .filter(metcon_movement::columns::id.eq(id))
             .filter(
                 metcon::columns::user_id
                     .eq(user_id)
                     .or(metcon::columns::user_id.is_null()),
             )
+            .filter(
+                movement::columns::user_id
+                    .eq(user_id)
+                    .or(movement::columns::user_id.is_null()),
+            )
             .count()
             .get_result(conn)
             .map(|count: i64| count == 1)
     }
 
-    pub fn check_user_ids_null(
-        ids: &[MetconMovementId],
+    fn check_optional_user_ids(
+        ids: &[Self::Id],
         user_id: UserId,
         conn: &PgConnection,
     ) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
+            .inner_join(movement::table)
             .filter(metcon_movement::columns::id.eq_any(ids))
+            .filter(
+                movement::columns::user_id
+                    .eq(user_id)
+                    .or(movement::columns::user_id.is_null()),
+            )
             .filter(
                 metcon::columns::user_id
                     .eq(user_id)
