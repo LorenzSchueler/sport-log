@@ -4,7 +4,7 @@
 ## Good to know
 * to make a clean start (delete the local database) set `doCleanStart` in [Config](lib/config.dart) to `true` (but don't forget to change it back afterwards!)
 * to generate test data set `generateTestData` in [Config](lib/config.dart) to `true` (but don't forget to change it back afterwards!); this works best if `doCleanStart` is true also
-* to re-run code generate run `flutter pub run build_runner build` (mere build) or `flutter pub run build_runner watch` (build every time, the relevant code changes)
+* to re-run code generation (for json serialization methods) run `flutter pub run build_runner build` (mere build) or `flutter pub run build_runner watch` (build every time the relevant code changes)
 
 ## Syncing Strategy
 **making changes**
