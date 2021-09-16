@@ -12,10 +12,13 @@ abstract class Config {
 
   static Future<void> init() async {
     // this is only for convenience; should be remove later
-    apiUrlBase = await isAndroidEmulator
-        ? "http://10.0.2.2:8000"
-        : "http://127.0.0.1:8000";
-
+    if (await isAndroidEmulator) {
+      apiUrlBase = "http://10.0.2.2:8000";
+    } else if (isAndroid) {
+      apiUrlBase = "http://192.168.0.169:8000";
+    } else {
+      apiUrlBase = "http://127.0.0.1:8000";
+    }
     _logger.i('Clean start: $doCleanStart');
     _logger.i('Generate text data: $generateTestData');
     if (loggedInStart) {
