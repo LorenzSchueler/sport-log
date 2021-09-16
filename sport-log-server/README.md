@@ -50,6 +50,13 @@ cargo run
 cd ../sport-log-types && diesel database reset && cd ../sport-log-server
 ```
 
+## Change database password
+
+```bash
+sudo -u postgres psql
+postgres=# \password sport_admin
+```
+
 ## SystemD Setup for deployment
 
 *!!! replace ```<user>``` with the user you want to run the server with*

@@ -29,8 +29,8 @@ jobs:
            cargo check --manifest-path sport-log-server/Cargo.toml &&
            cargo check --manifest-path sport-log-types/Cargo.toml &&
            cargo check --manifest-path sport-log-types-derive/Cargo.toml
-    - name: Run tests
-      run: cargo test --verbose
+    #- name: Run tests
+    #  run: cargo test --verbose
   
   style:
     name: Check style

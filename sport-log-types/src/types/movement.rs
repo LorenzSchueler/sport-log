@@ -23,13 +23,6 @@ use crate::{
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "server", derive(DbEnum))]
-pub enum MovementCategory {
-    Cardio,
-    Strength,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
-#[cfg_attr(feature = "server", derive(DbEnum))]
 pub enum MovementUnit {
     Reps,
     Cal,
@@ -126,7 +119,7 @@ pub struct Movement {
     pub name: String,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
-    pub categories: Vec<MovementCategory>,
+    pub cardio: bool,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,

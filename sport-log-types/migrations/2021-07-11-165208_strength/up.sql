@@ -22,7 +22,7 @@ insert into strength_session (id, user_id, datetime, movement_id, movement_unit,
 
 create table strength_session_archive (
     primary key (id),
-    foreign key (user_id) references "user",
+    foreign key (user_id) references "user" on delete cascade,
     check (deleted = true)
 ) inherits (strength_session);
 
@@ -60,7 +60,6 @@ insert into strength_set (id, strength_session_id, set_number, count, weight) va
 
 create table strength_set_archive (
     primary key (id),
-    foreign key (strength_session_id) references strength_session,
     check (deleted = true)
 ) inherits (strength_set);
 
@@ -68,3 +67,8 @@ create trigger archive_strength_set
     after update of deleted or delete
     on strength_set
     for each row execute procedure archive_record();
+
+create trigger check_strength_session_exists_trigger
+    after insert 
+    on strength_set_archive
+    for each row execute procedure check_strength_session_exists();
