@@ -1,4 +1,3 @@
-create type movement_category as enum('strength', 'cardio');
 create type movement_unit as enum('reps', 'cal', 'meter', 'km', 'yard', 'foot', 'mile');
 
 create table movement (
@@ -6,7 +5,7 @@ create table movement (
     user_id bigint references "user" on delete cascade,
     name varchar(80) not null,
     description text,
-    categories movement_category[] not null check (array_length(categories, 1) >= 1 and array_length(categories, 1) <= 2),
+    cardio boolean not null,
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
@@ -16,18 +15,18 @@ create unique index movement_idx on movement (user_id, name) where deleted = fal
 create trigger set_timestamp before update on movement
     for each row execute procedure trigger_set_timestamp();
 
-insert into movement (id, user_id, name, description, categories) values
-    (1, null, 'Back Squat', null, '{strength}'),
-    (2, null, 'Front Squat', null, '{strength}'),
-    (3, null, 'Over Head Squat', null, '{strength}'),
-    (4, 1, 'Yoke Carry', null, '{strength}'),
-    (5, null, 'Running', 'road running without significant altitude change', '{cardio}'),
-    (6, null, 'Trailrunning', null, '{cardio}'),
-    (7, null, 'Swimming Freestyle', 'indoor freestyle swimming', '{cardio}'),
-    (8, 1, 'Rowing', null, '{strength, cardio}'),
-    (9, null, 'Pull-Up', null, '{strength}'),
-    (10, null, 'Push-Up', null, '{strength}'),
-    (11, null, 'Air Squat', null, '{strength}');
+insert into movement (id, user_id, name, description, cardio) values
+    (1, null, 'Back Squat', null, false),
+    (2, null, 'Front Squat', null, false),
+    (3, null, 'Over Head Squat', null, false),
+    (4, 1, 'Yoke Carry', null, false),
+    (5, null, 'Running', 'road running without significant altitude change', true),
+    (6, null, 'Trailrunning', null, true),
+    (7, null, 'Swimming Freestyle', 'indoor freestyle swimming', true),
+    (8, 1, 'Rowing', null, true),
+    (9, null, 'Pull-Up', null, false),
+    (10, null, 'Push-Up', null, false),
+    (11, null, 'Air Squat', null, false);
 
 create table movement_archive (
     primary key (id),

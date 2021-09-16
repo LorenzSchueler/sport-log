@@ -17,10 +17,6 @@
 <         movement_unit -> Movement_unit,
 ---
 >         movement_unit -> MovementUnitMapping,
-154c154
-<         categories -> Array<Movement_category>,
----
->         categories -> Array<MovementCategoryMapping>,
 217c217
 <         movement_unit -> Movement_unit,
 ---

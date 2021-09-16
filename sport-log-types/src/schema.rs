@@ -203,7 +203,7 @@ table! {
         user_id -> Nullable<Int8>,
         name -> Varchar,
         description -> Nullable<Text>,
-        categories -> Array<MovementCategoryMapping>,
+        cardio -> Bool,
         last_change -> Timestamptz,
         deleted -> Bool,
     }
