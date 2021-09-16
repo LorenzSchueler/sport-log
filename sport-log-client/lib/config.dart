@@ -8,24 +8,45 @@ import 'package:logger/logger.dart' as l;
 final _logger = Logger('CONFIG');
 
 abstract class Config {
-  static late String apiUrlBase;
+  static late final String apiUrlBase;
+  static late final bool deleteDatabase;
+  static late final bool generateTestData;
+  static const l.Level minLogLevel = l.Level.debug;
 
   static Future<void> init() async {
+    const String defaultAddress = "127.0.0.1:8000";
     // this is only for convenience; should be remove later
     if (await isAndroidEmulator) {
       apiUrlBase = "http://10.0.2.2:8000";
     } else if (isAndroid) {
-      apiUrlBase = "http://192.168.0.169:8000";
-    } else {
-      apiUrlBase = "http://127.0.0.1:8000";
+      const address = String.fromEnvironment("ANDROID_SERVER_ADDRESS",
+          defaultValue: defaultAddress);
+      apiUrlBase = "http://$address";
+    } else if (isWeb) {
+      const address = String.fromEnvironment("WEB_SERVER_ADDRESS",
+          defaultValue: defaultAddress);
+      apiUrlBase = "http://$address";
+    } else if (isLinux) {
+      const address = String.fromEnvironment("LINUX_SERVER_ADDRESS",
+          defaultValue: defaultAddress);
+      apiUrlBase = "http://$address";
+    } else if (isIOS) {
+      const address = String.fromEnvironment("IOS_SERVER_ADDRESS",
+          defaultValue: defaultAddress);
+      apiUrlBase = "http://$address";
     }
-    _logger.i('Clean start: $doCleanStart');
-    _logger.i('Generate text data: $generateTestData');
-    if (loggedInStart) {
-      _logger.w('Logged in at start: $loggedInStart');
-    } else {
-      _logger.i('Logged in at start: $loggedInStart');
-    }
+
+    const deleteDatabaseEnvVar =
+        String.fromEnvironment("DELETE_DATABASE", defaultValue: "false");
+    deleteDatabase = deleteDatabaseEnvVar.toLowerCase() == "true";
+
+    const generateTestDataEnvVar =
+        String.fromEnvironment("GENERATE_TEST_DATA", defaultValue: "false");
+    generateTestData = generateTestDataEnvVar.toLowerCase() == "true";
+
+    _logger.i('Server url: $apiUrlBase');
+    _logger.i('Delete database: $deleteDatabase');
+    _logger.i('Generate test data: $generateTestData');
   }
 
   static bool get isWeb => kIsWeb;
@@ -45,17 +66,4 @@ abstract class Config {
   }
 
   static const String databaseName = 'database.sqlite';
-
-  // if true, the database will be deleted and re-created,
-  // and the account data will be fetched completely;
-  // should be false normally
-  static const bool doCleanStart = true;
-
-  static const bool generateTestData = doCleanStart && true;
-
-  // workaround to not having a connection to server on real device;
-  // sets user1 (user1-passwd) as current user
-  static const bool loggedInStart = true;
-
-  static l.Level minLogLevel = l.Level.debug;
 }

@@ -19,7 +19,7 @@ class AppDatabase {
 
   Future<void> init() async {
     const fileName = Config.databaseName;
-    if (Config.doCleanStart) {
+    if (Config.deleteDatabase) {
       final File databaseFile = File(await getDatabasesPath() + '/' + fileName);
       if (await databaseFile.exists()) {
         _logger.i('Clean start on: deleting existing database...');
