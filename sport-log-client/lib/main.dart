@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/app.dart';
@@ -8,6 +9,7 @@ import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/models/all.dart';
 import 'package:sport_log/test_data/strength_test_data.dart';
 
 final _logger = Logger('MAIN');
@@ -16,6 +18,15 @@ Future<void> initialize({bool doDownSync = true}) async {
   WidgetsFlutterBinding.ensureInitialized(); // TODO: necessary?
   await Config.init();
   await UserState.instance.init();
+  if (UserState.instance.currentUser == null && Config.loggedInStart) {
+    _logger.i('Logging in user1...');
+    UserState.instance.setUser(User(
+      id: Int64(1),
+      username: 'user1',
+      password: 'user1-passwd',
+      email: 'email1',
+    ));
+  }
   await AppDatabase.instance?.init();
   await DownSync.instance.init().then((downSync) async {
     if (Config.doCleanStart) {

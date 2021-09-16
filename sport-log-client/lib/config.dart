@@ -2,7 +2,10 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
-import 'package:logger/logger.dart';
+import 'package:sport_log/helpers/logger.dart';
+import 'package:logger/logger.dart' as l;
+
+final _logger = Logger('CONFIG');
 
 abstract class Config {
   static late String apiUrlBase;
@@ -12,6 +15,14 @@ abstract class Config {
     apiUrlBase = await isAndroidEmulator
         ? "http://10.0.2.2:8000"
         : "http://127.0.0.1:8000";
+
+    _logger.i('Clean start: $doCleanStart');
+    _logger.i('Generate text data: $generateTestData');
+    if (loggedInStart) {
+      _logger.w('Logged in at start: $loggedInStart');
+    } else {
+      _logger.i('Logged in at start: $loggedInStart');
+    }
   }
 
   static bool get isWeb => kIsWeb;
@@ -35,9 +46,13 @@ abstract class Config {
   // if true, the database will be deleted and re-created,
   // and the account data will be fetched completely;
   // should be false normally
-  static const bool doCleanStart = false;
+  static const bool doCleanStart = true;
 
-  static const bool generateTestData = doCleanStart && false;
+  static const bool generateTestData = doCleanStart && true;
 
-  static Level minLogLevel = Level.debug;
+  // workaround to not having a connection to server on real device;
+  // sets user1 (user1-passwd) as current user
+  static const bool loggedInStart = true;
+
+  static l.Level minLogLevel = l.Level.debug;
 }
