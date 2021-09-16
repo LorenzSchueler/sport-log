@@ -35,7 +35,7 @@ abstract class Config {
   // if true, the database will be deleted and re-created,
   // and the account data will be fetched completely;
   // should be false normally
-  static const bool doCleanStart = true;
+  static const bool doCleanStart = false;
 
   static const bool generateTestData = doCleanStart && false;
 
