@@ -45,10 +45,12 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   void update() async {
     _logger.d(
         'Updating strength sessions with start = ${widget.start}, end = ${widget.end}');
-    final ssds = widget.showAll
-        ? await _dataProvider.getNonDeleted()
-        : await _dataProvider.getBetweenDates(widget.start!, widget.end!);
-    setState(() => _state = LocalState.fromList(ssds));
+    (widget.showAll
+            ? _dataProvider.getNonDeleted()
+            : _dataProvider.getBetweenDates(widget.start!, widget.end!))
+        .then((ssds) {
+      setState(() => _state = LocalState.fromList(ssds));
+    });
   }
 
   void _handlePageReturn(dynamic object) {
