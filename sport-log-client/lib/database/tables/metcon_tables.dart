@@ -1,5 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/keys.dart';
 import 'package:sport_log/models/metcon/all.dart';
 
 class MetconTable extends Table<Metcon> {

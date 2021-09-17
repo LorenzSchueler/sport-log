@@ -1,5 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/keys.dart';
 import 'package:sport_log/models/strength/all.dart';
 
 class StrengthSessionTable extends Table<StrengthSession> with DateTimeMethods {
