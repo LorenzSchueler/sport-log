@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table_names.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
@@ -11,7 +12,7 @@ class MovementTable extends Table<Movement> {
 
   @override
   String get setupSql => '''
-create table movement (
+create table $tableName (
     user_id integer,
     name text not null,
     description text,
@@ -21,7 +22,7 @@ create table movement (
   ''';
 
   @override
-  String get tableName => 'movement';
+  String get tableName => Tables.movement;
 
   Future<List<Movement>> searchByName(String name) async {
     final result = await database.query(tableName,
