@@ -28,10 +28,6 @@ abstract class DataProvider<T> {
     _logger.w('Got an api error.', error);
   }
 
-  void handleDbError(DbError error) {
-    _logger.e('Got a database error.', error);
-  }
-
   Future<void> doFullUpdate();
 }
 

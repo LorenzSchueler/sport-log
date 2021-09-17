@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -44,7 +43,7 @@ class AppDatabase {
     _logger.d("Database initialization done.");
   }
 
-  DbResult<void> upsertAccountData(AccountData data) async {
+  Future<void> upsertAccountData(AccountData data) async {
     diaries.upsertMultiple(data.diaries);
     wods.upsertMultiple(data.wods);
     movements.upsertMultiple(data.movements);
@@ -61,7 +60,6 @@ class AppDatabase {
     actions.upsertMultiple(data.actions);
     actionRules.upsertMultiple(data.actionRules);
     actionEvents.upsertMultiple(data.actionEvents);
-    return Success(null);
   }
 
   final movements = MovementTable();

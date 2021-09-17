@@ -1,6 +1,5 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:result_type/result_type.dart';
 import 'package:sport_log/helpers/keys.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sqflite/sqflite.dart';
@@ -8,8 +7,6 @@ import 'package:sqflite/sqflite.dart';
 import 'defs.dart';
 
 export 'defs.dart';
-
-final _logger = Logger('DB');
 
 abstract class Table<T extends DbObject> {
   String get setupSql;
@@ -39,24 +36,6 @@ end;
 
   void setDatabase(Database db) {
     database = db;
-  }
-
-  DbResult<R> request<R>(DbResult<R> Function() req) async {
-    try {
-      return await req();
-    } on DbError catch (e) {
-      return Failure(e);
-    } catch (e) {
-      _logger.e('Unhandled database error in table $tableName.', e);
-      return Failure(DbError.unknown);
-    }
-  }
-
-  DbResult<void> voidRequest(Future<void> Function() req) async {
-    return request(() async {
-      await req();
-      return Success(null);
-    });
   }
 
   Future<void> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
