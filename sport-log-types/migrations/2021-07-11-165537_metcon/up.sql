@@ -31,7 +31,12 @@ create table metcon_archive (
 create trigger archive_metcon
     after update of deleted or delete
     on metcon
-    for each row execute procedure archive_record();
+    for each row execute procedure archive_record_metcon();
+
+create trigger delete_metcon_archive
+    after delete
+    on metcon_archive
+    for each row execute procedure delete_record_metcon();
 
 create table metcon_movement (
     id bigint primary key,
@@ -64,7 +69,6 @@ insert into metcon_movement (id, metcon_id, movement_id, movement_number, count,
 
 create table metcon_movement_archive (
     primary key (id),
-    --foreign key (metcon_id) references metcon_archive on delete cascade,
     check (deleted = true)
 ) inherits (metcon_movement);
 

@@ -29,7 +29,12 @@ create table strength_session_archive (
 create trigger archive_strength_session
     after update of deleted or delete
     on strength_session
-    for each row execute procedure archive_record();
+    for each row execute procedure archive_record_strength_session();
+
+create trigger delete_strength_session_archive
+    after delete
+    on strength_session_archive
+    for each row execute procedure delete_record_strength_session();
 
 create table strength_set (
     id bigint primary key,
