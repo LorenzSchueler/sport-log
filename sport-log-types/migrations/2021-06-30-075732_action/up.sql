@@ -54,7 +54,7 @@ create table action_archive (
 ) inherits (action);
 
 create trigger archive_action
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on action
     for each row execute procedure archive_record();
 
@@ -94,7 +94,7 @@ create table action_rule_archive (
 ) inherits (action_rule);
 
 create trigger archive_action_rule
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on action_rule
     for each row execute procedure archive_record();
 
@@ -133,6 +133,6 @@ create table action_event_archive (
 ) inherits (action_event);
 
 create trigger archive_action_event
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on action_event
     for each row execute procedure archive_record();

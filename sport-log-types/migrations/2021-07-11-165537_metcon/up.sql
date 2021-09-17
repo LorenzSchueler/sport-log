@@ -29,7 +29,7 @@ create table metcon_archive (
 ) inherits (metcon);
 
 create trigger archive_metcon
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on metcon
     for each row execute procedure archive_record_metcon();
 
@@ -73,7 +73,7 @@ create table metcon_movement_archive (
 ) inherits (metcon_movement);
 
 create trigger archive_metcon_movement
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on metcon_movement
     for each row execute procedure archive_record();
 
@@ -113,6 +113,6 @@ create table metcon_session_archive (
 ) inherits (metcon_session);
 
 create trigger archive_metcon_session
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on metcon_session
     for each row execute procedure archive_record();

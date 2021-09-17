@@ -27,7 +27,7 @@ create table strength_session_archive (
 ) inherits (strength_session);
 
 create trigger archive_strength_session
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on strength_session
     for each row execute procedure archive_record_strength_session();
 
@@ -69,7 +69,7 @@ create table strength_set_archive (
 ) inherits (strength_set);
 
 create trigger archive_strength_set
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on strength_set
     for each row execute procedure archive_record();
 

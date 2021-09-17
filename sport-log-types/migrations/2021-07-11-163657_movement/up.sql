@@ -35,7 +35,7 @@ create table movement_archive (
 ) inherits (movement);
 
 create trigger archive_movement
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on movement
     for each row execute procedure archive_record();
 

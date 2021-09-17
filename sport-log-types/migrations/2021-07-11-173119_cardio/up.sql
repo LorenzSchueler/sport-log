@@ -32,7 +32,7 @@ create table route_archive (
 ) inherits (route);
 
 create trigger archive_route
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on route
     for each row execute procedure archive_record();
 
@@ -78,6 +78,6 @@ create table cardio_session_archive (
 ) inherits (cardio_session);
 
 create trigger archive_cardio_session
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on cardio_session
     for each row execute procedure archive_record();

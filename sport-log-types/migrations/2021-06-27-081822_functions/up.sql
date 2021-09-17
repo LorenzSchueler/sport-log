@@ -9,6 +9,10 @@ create function trigger_set_timestamp()
 create function archive_record()
     returns trigger as $$
     begin
+        if (tg_op = 'INSERT' and new.deleted = true) then
+            execute format('delete from %I.%I where id = $1', tg_table_schema, tg_table_name) using new.id;
+            return old;
+        end if;
         -- when a soft-delete happens...
         if (tg_op = 'UPDATE' and new.deleted = true) then
             execute format('delete from %I.%I where id = $1', tg_table_schema, tg_table_name) using old.id;
@@ -33,6 +37,10 @@ create function archive_record()
 create function archive_record_strength_session()
     returns trigger as $$
     begin
+        if (tg_op = 'INSERT' and new.deleted = true) then
+            execute format('delete from %I.%I where id = $1', tg_table_schema, tg_table_name) using new.id;
+            return old;
+        end if;
         -- when a soft-delete happens...
         if (tg_op = 'UPDATE' and new.deleted = true) then
             execute format('delete from %I.%I where id = $1', tg_table_schema, tg_table_name) using old.id;
@@ -82,6 +90,10 @@ create function check_strength_session_exists()
 create function archive_record_metcon()
     returns trigger as $$
     begin
+        if (tg_op = 'INSERT' and new.deleted = true) then
+            execute format('delete from %I.%I where id = $1', tg_table_schema, tg_table_name) using new.id;
+            return old;
+        end if;
         -- when a soft-delete happens...
         if (tg_op = 'UPDATE' and new.deleted = true) then
             execute format('delete from %I.%I where id = $1', tg_table_schema, tg_table_name) using old.id;
