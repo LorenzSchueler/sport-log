@@ -20,14 +20,14 @@
 * server address `10.0.2.2:8000` will be used which will be mapped to localhost
 
 **Making changes to database schema**
-* use command line option `--dart-define DELETE_DATABASE=<boolean>` to make a clean start – removes and recreates database and removes last sync datetime (default: `false`)
+* use command line option `--dart-define DELETE_DATABASE=true` to make a clean start – removes and recreates database and removes last sync datetime (default: `false`)
 
 **Making changes to model types**
 * json serialization methods are generated with package `json_serializable`
 * to re-run code generation use `flutter pub run build_runner build --delete-conflicting-outputs` (mere build) or `flutter pub run build_runner watch --delete-conflicting-outputs` (build every time the relevant code changes)
 
 **Wanting to have test data**
-* use `--dart-define GENERATE_TEST_DATA=<boolean>` to generate test data
+* use `--dart-define GENERATE_TEST_DATA=true` to generate test data
 * see `test_data` directory for implementation
 
 **Additional Parameters**
