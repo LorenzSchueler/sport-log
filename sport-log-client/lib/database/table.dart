@@ -1,6 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:sport_log/helpers/keys.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sqflite/sqflite.dart';
 

@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
-import 'package:sport_log/helpers/keys.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'diary.g.dart';

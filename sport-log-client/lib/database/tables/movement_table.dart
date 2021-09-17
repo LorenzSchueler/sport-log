@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
-import 'package:sport_log/helpers/keys.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 

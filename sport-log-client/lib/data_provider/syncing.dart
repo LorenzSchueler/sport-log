@@ -2,7 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/helpers/keys.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/logger.dart';
 
 final _logger = Logger('SYNC');
