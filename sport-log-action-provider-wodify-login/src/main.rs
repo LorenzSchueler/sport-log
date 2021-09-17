@@ -204,16 +204,21 @@ async fn login(mode: Mode) -> Result<()> {
 
     let mut delete_action_event_ids = vec![];
     for task in tasks {
-        match task.await.unwrap() {
-            Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
-            Err(Error::NoCredential(action_event_id)) => {
-                delete_action_event_ids.push(action_event_id)
-            }
-            Err(Error::LoginFailed(action_event_id)) => {
-                delete_action_event_ids.push(action_event_id)
-            }
-            Err(Error::Timeout(action_event_id)) => delete_action_event_ids.push(action_event_id),
-            Err(error) => error!("{}", error),
+        match task.await {
+            Ok(result) => match result {
+                Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
+                Err(Error::NoCredential(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(Error::LoginFailed(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(Error::Timeout(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(error) => error!("{}", error),
+            },
+            Err(join_error) => error!("execution of action event failed: {}", join_error),
         }
     }
 
@@ -331,25 +336,26 @@ async fn try_login(
 
         for row in &rows[row_number + 1..] {
             if let Ok(label) = row.find_element(By::XPath("./td[1]/div/span")).await {
-                let title = label
+                if let Some(title) = label
                     .get_attribute("title")
                     .await
                     .map_err(Error::WebDriver)?
-                    .unwrap();
-                if title.contains(&exec_action_event.action_name) && title.contains(&time) {
-                    row.find_element(By::XPath("./td[3]/div"))
-                        .await
-                        .map_err(Error::WebDriver)?
-                        .click()
-                        .await
-                        .map_err(Error::WebDriver)?;
-                    info!("reservation successful");
+                {
+                    if title.contains(&exec_action_event.action_name) && title.contains(&time) {
+                        row.find_element(By::XPath("./td[3]/div"))
+                            .await
+                            .map_err(Error::WebDriver)?
+                            .click()
+                            .await
+                            .map_err(Error::WebDriver)?;
+                        info!("reservation successful");
 
-                    if mode == Mode::Interactive {
-                        time::sleep(StdDuration::from_secs(3)).await;
+                        if mode == Mode::Interactive {
+                            time::sleep(StdDuration::from_secs(3)).await;
+                        }
+
+                        return Ok(exec_action_event.action_event_id);
                     }
-
-                    return Ok(exec_action_event.action_event_id);
                 }
             }
         }

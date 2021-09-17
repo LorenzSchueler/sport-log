@@ -254,12 +254,15 @@ async fn map_match() -> Result<()> {
 
     let mut delete_action_event_ids = vec![];
     for task in tasks {
-        match task.await.unwrap() {
-            Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
-            Err(Error::CardioSessionIdMissing(action_event_id)) => {
-                delete_action_event_ids.push(action_event_id)
-            }
-            Err(error) => error!("{}", error),
+        match task.await {
+            Ok(result) => match result {
+                Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
+                Err(Error::CardioSessionIdMissing(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(error) => error!("{}", error),
+            },
+            Err(join_error) => error!("execution of action event failed: {}", join_error),
         }
     }
 
@@ -279,7 +282,7 @@ async fn map_match() -> Result<()> {
 }
 
 async fn match_to_map(cardio_session: &CardioSession) -> Result<Route> {
-    let gpx = to_gpx(cardio_session.track.as_ref().unwrap()); // function only called if track is not None
+    let gpx = to_gpx(cardio_session.track.as_ref().unwrap_or(vec![].as_ref()));
 
     let filename = format!("/tmp/map-matcher-{}.gpx", rand::thread_rng().gen::<u64>());
     let filename_result = format!("{}{}", filename, ".res.gpx");
@@ -397,7 +400,10 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Result<Route> {
         id: RouteId(rand::thread_rng().gen()),
         user_id: cardio_session.user_id,
         name: format!("{} workout route", cardio_session.datetime),
-        distance: positions.last().unwrap().distance,
+        distance: positions
+            .last()
+            .map(|position| position.distance)
+            .unwrap_or(0),
         ascent: Some(ascent as i32),
         descent: Some(descent as i32),
         track: positions,

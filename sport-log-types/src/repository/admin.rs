@@ -13,7 +13,8 @@ impl Admin {
         admin_password: &str,
         _conn: &PgConnection,
     ) -> QueryResult<()> {
-        let password_hash = PasswordHash::new(admin_password).unwrap();
+        let password_hash =
+            PasswordHash::new(admin_password).map_err(|_| Error::RollbackTransaction)?; // this shoud not happen but prevents panic
         if username == ADMIN_USERNAME
             && Argon2::default()
                 .verify_password(password.as_bytes(), &password_hash)

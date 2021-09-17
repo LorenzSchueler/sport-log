@@ -222,18 +222,21 @@ async fn get_wod(mode: Mode) -> Result<()> {
 
     let mut delete_action_event_ids = vec![];
     for task in tasks {
-        match task.await.unwrap() {
-            Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
-            Err(Error::NoCredential(action_event_id)) => {
-                delete_action_event_ids.push(action_event_id)
-            }
-            Err(Error::LoginFailed(action_event_id)) => {
-                delete_action_event_ids.push(action_event_id)
-            }
-            Err(Error::WodNotFound(action_event_id)) => {
-                delete_action_event_ids.push(action_event_id)
-            }
-            Err(error) => error!("{}", error),
+        match task.await {
+            Ok(result) => match result {
+                Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
+                Err(Error::NoCredential(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(Error::LoginFailed(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(Error::WodNotFound(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(error) => error!("{}", error),
+            },
+            Err(join_error) => error!("execution of action event failed: {}", join_error),
         }
     }
 
