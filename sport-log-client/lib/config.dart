@@ -15,23 +15,14 @@ abstract class Config {
 
   static Future<void> init() async {
     const String defaultAddress = "127.0.0.1:8000";
-    // this is only for convenience; should be remove later
     if (await isAndroidEmulator) {
       apiUrlBase = "http://10.0.2.2:8000";
-    } else if (isAndroid) {
-      const address = String.fromEnvironment("ANDROID_SERVER_ADDRESS",
+    } else if (isAndroid || isIOS) {
+      const address = String.fromEnvironment("PHONE_SERVER_ADDRESS",
           defaultValue: defaultAddress);
       apiUrlBase = "http://$address";
-    } else if (isWeb) {
-      const address = String.fromEnvironment("WEB_SERVER_ADDRESS",
-          defaultValue: defaultAddress);
-      apiUrlBase = "http://$address";
-    } else if (isLinux) {
-      const address = String.fromEnvironment("LINUX_SERVER_ADDRESS",
-          defaultValue: defaultAddress);
-      apiUrlBase = "http://$address";
-    } else if (isIOS) {
-      const address = String.fromEnvironment("IOS_SERVER_ADDRESS",
+    } else {
+      const address = String.fromEnvironment("LOCAL_SERVER_ADDRESS",
           defaultValue: defaultAddress);
       apiUrlBase = "http://$address";
     }
