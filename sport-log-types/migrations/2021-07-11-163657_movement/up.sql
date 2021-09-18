@@ -39,6 +39,20 @@ create trigger archive_movement
     on movement
     for each row execute procedure archive_record();
 
+create table muscle_group (
+    id bigint primary key,
+    name varchar(80) not null,
+    description text
+);
+
+create table movement_muscle (
+    id bigint primary key,
+    movement_id bigint not null references movement on delete cascade,
+    muscle_group_id bigint not null references muscle_group on delete cascade,
+    last_change timestamptz not null default now(),
+    deleted boolean not null default false
+);
+
 create table eorm (
     id bigserial primary key,
     reps integer not null check (reps >= 1),
