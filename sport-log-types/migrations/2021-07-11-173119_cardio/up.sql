@@ -36,9 +36,28 @@ create trigger archive_route
     on route
     for each row execute procedure archive_record();
 
+create table cardio_blueprint (
+    id bigint primary key,
+    user_id bigint not null references "user" on delete cascade,
+    name varchar(80) not null,
+    description text,
+    movement_id bigint not null references movement on delete cascade,
+    cardio_type cardio_type not null,
+    distance integer check (distance > 0),
+    ascent integer check (ascent >= 0),
+    descent integer check (descent >= 0),
+    time integer check (time > 0), -- seconds
+    calories integer check (calories >= 0),
+    avg_heart_rate integer check (avg_heart_rate > 0),
+    route_id bigint references route on delete set null,
+    last_change timestamptz not null default now(),
+    deleted boolean not null default false
+);
+
 create table cardio_session (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
+    blueprint_id bigint references cardio_blueprint on delete set null,
     movement_id bigint not null references movement on delete cascade,
     cardio_type cardio_type not null,
     datetime timestamptz not null default now(),
