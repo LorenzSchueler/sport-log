@@ -32,6 +32,10 @@ class MainDrawer extends StatelessWidget {
             },
             selected: selectedRoute == Routes.workout,
           ),
+          const ListTile(
+            title: Text('Training Plan'),
+            leading: Icon(CustomIcons.plan),
+          ),
           ListTile(
             title: const Text('Server Actions'),
             leading: const Icon(Icons.play_circle_fill_sharp),
