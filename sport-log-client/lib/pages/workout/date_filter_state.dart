@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/helpers/formatting.dart';
 
 enum TimeFrame { day, week, month, year, all }
 
@@ -124,10 +125,6 @@ class DateFilterState {
 
   String getLabel() {
     // TODO: deal with locale
-    final dateWithoutYear = DateFormat('dd.MM.');
-    final dateWithYear = DateFormat('dd.MM.yyyy');
-    final monthWithoutYear = DateFormat.MMMM();
-    final monthWithYear = DateFormat('MMMM yyyy');
     final today = DateTime.now().beginningOfDay();
     switch (timeFrame) {
       case TimeFrame.day:
@@ -151,7 +148,7 @@ class DateFilterState {
       case TimeFrame.month:
         if (today.isInMonth(_start)) return 'This month';
         if (today.isInMonth(_start.monthLater())) return 'Last month';
-        if (today.isInYear(_start)) return monthWithoutYear.format(_start);
+        if (today.isInYear(_start)) return monthName.format(_start);
         return monthWithYear.format(_start);
       case TimeFrame.year:
         if (today.isInYear(_start)) return 'This year';

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
-import 'package:sport_log/helpers/pluralize.dart';
+import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/models/movement/movement.dart';

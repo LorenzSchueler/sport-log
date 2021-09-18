@@ -4,6 +4,7 @@ import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
 import 'package:sport_log/data_provider/syncing.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
+import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 
@@ -71,20 +72,23 @@ class MainDrawer extends StatelessWidget {
           ListTile(
             title: Text(lastSync == null
                 ? 'No sync done yet.'
-                : 'Last sync: ' + lastSync.toString()),
-            leading: const Icon(Icons.sync_sharp),
+                : 'Last sync: ' + dateTimeFull.format(lastSync)),
             trailing: IconButton(
+              color: Theme.of(context).primaryColor,
               icon: const Icon(Icons.sync_sharp),
               onPressed: () => DownSync.instance.sync(),
             ),
           ),
           ListTile(
             title: const Text('Logout'),
-            leading: const Icon(Icons.logout),
-            onTap: () {
-              context.read<AuthenticationBloc>().add(const LogoutEvent());
-              Nav.changeNamed(context, Routes.landing);
-            },
+            trailing: IconButton(
+              color: Theme.of(context).primaryColor,
+              icon: const Icon(Icons.logout_sharp),
+              onPressed: () {
+                context.read<AuthenticationBloc>().add(const LogoutEvent());
+                Nav.changeNamed(context, Routes.landing);
+              },
+            ),
           ),
         ],
       ),
