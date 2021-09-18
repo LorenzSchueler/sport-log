@@ -41,8 +41,8 @@ class Column {
     return this;
   }
 
-  Column references(String table, String column,
-      {OnAction? onDelete, OnAction? onUpdate}) {
+  Column references(String table,
+      {String? column, OnAction? onDelete, OnAction? onUpdate}) {
     _referenceTable = table;
     _referenceColumn = column;
     _onDeleteReference = onDelete;
@@ -87,6 +87,22 @@ class Column {
     }
   }
 
+  String get _referenceString {
+    if (_referenceTable == null) {
+      return '';
+    }
+    final String referenceName = _referenceColumn == null
+        ? _referenceTable!
+        : '${_referenceTable!}(${_referenceColumn!})';
+    final onUpdateStr = _onUpdateReference == null
+        ? ''
+        : ' ON UPDATE ${onActionToString(_onUpdateReference!)}';
+    final onDeleteStr = _onDeleteReference == null
+        ? ''
+        : 'ON DELETE ${onActionToString(_onDeleteReference!)}';
+    return 'REFERENCES $referenceName $onDeleteStr'.trimRight() + onUpdateStr;
+  }
+
   String setUpSql() {
     assert(name.isNotEmpty);
     if (_check == null && type == DbType.bool) {
@@ -97,17 +113,6 @@ class Column {
     final uniqueStr = _isUnique ? 'UNIQUE' : '';
     final defaultValueStr =
         _defaultValue == null ? '' : 'DEFAULT(${_defaultValue!})';
-    final onUpdateStr = _onUpdateReference == null
-        ? ''
-        : ' ON UPDATE ${onActionToString(_onUpdateReference!)}';
-    final onDeleteStr = _onDeleteReference == null
-        ? ''
-        : 'ON DELETE ${onActionToString(_onDeleteReference!)}';
-    final referenceStr = _referenceColumn == null || _referenceTable == null
-        ? ''
-        : 'REFERENCES ${_referenceTable!}(${_referenceColumn!}) $onDeleteStr'
-                .trimRight() +
-            onUpdateStr;
     final checkStr = _check == null ? '' : 'CHECK(${_check!})';
     return [
       name,
@@ -115,7 +120,7 @@ class Column {
       nonNullStr,
       uniqueStr,
       defaultValueStr,
-      referenceStr,
+      _referenceString,
       checkStr
     ].where((s) => s.isNotEmpty).join(' ');
   }
@@ -127,7 +132,7 @@ class Table {
   List<Column> columns;
   String name;
 
-  String setUpSql() {
+  String setupSql() {
     final primaryKey =
         columns.where((c) => c.getIsPrimaryKey()).map((c) => c.name).toList();
     final primaryKeyStr =
