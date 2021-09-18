@@ -29,6 +29,7 @@ mod movement;
 mod platform;
 mod sharing;
 mod strength;
+mod training_plan;
 mod user;
 
 pub use account::*;
@@ -48,6 +49,7 @@ pub use movement::*;
 pub use platform::*;
 pub use sharing::*;
 pub use strength::*;
+pub use training_plan::*;
 pub use user::*;
 
 /// Wrapper around incoming json data for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
