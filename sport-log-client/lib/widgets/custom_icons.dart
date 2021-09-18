@@ -25,5 +25,4 @@ class CustomIcons {
   static const IconData heart = IconData(0xe803, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData dumbbellRotated = IconData(0xe804, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData plan = IconData(0xe805, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData database = IconData(0xf1c0, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

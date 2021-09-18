@@ -25,15 +25,7 @@ class MainDrawer extends StatelessWidget {
             accountEmail: Text(user.email),
           ),
           ListTile(
-            title: const Text("Movements"),
-            leading: const Icon(Icons.apps),
-            onTap: () {
-              Nav.changeNamed(context, Routes.movements);
-            },
-            selected: selectedRoute == Routes.movements,
-          ),
-          ListTile(
-            title: const Text("Workout"),
+            title: const Text('Workout'),
             leading: const Icon(CustomIcons.dumbbellRotated),
             onTap: () {
               Nav.changeNamed(context, Routes.workout);
@@ -41,15 +33,37 @@ class MainDrawer extends StatelessWidget {
             selected: selectedRoute == Routes.workout,
           ),
           ListTile(
-              title: const Text("Syncing"),
-              leading: const Icon(Icons.sync),
-              onTap: () {
-                Nav.changeNamed(context, Routes.actions);
-              },
-              selected: selectedRoute == Routes.actions),
+            title: const Text('Server Actions'),
+            leading: const Icon(Icons.play_circle_fill_sharp),
+            onTap: () {
+              Nav.changeNamed(context, Routes.actions);
+            },
+            selected: selectedRoute == Routes.actions,
+          ),
+          ExpansionTile(
+            title: const Text('Primitives'),
+            children: [
+              ListTile(
+                title: const Text('Movements'),
+                leading: const Icon(Icons.apps),
+                onTap: () {
+                  Nav.changeNamed(context, Routes.movements);
+                },
+                selected: selectedRoute == Routes.movements,
+              ),
+              const ListTile(
+                title: Text('Routes'),
+                leading: Icon(Icons.map_sharp),
+              ),
+              const ListTile(
+                title: Text('CrossFit – Metcons'),
+                leading: Icon(CustomIcons.heart),
+              ),
+            ],
+          ),
           const Spacer(),
           ListTile(
-            title: const Text("Logout"),
+            title: const Text('Logout'),
             leading: const Icon(Icons.logout),
             onTap: () {
               context.read<AuthenticationBloc>().add(const LogoutEvent());
