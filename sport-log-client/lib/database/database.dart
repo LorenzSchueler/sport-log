@@ -79,7 +79,7 @@ class AppDatabase {
   final diaries = DiaryTable();
   final wods = WodTable();
 
-  List<Table> get allTables => [
+  List<DbAccessor> get allTables => [
         movements,
         metcons,
         metconMovements,

@@ -3,7 +3,7 @@ import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_names.dart';
 import 'package:sport_log/models/cardio/all.dart';
 
-class CardioSessionTable extends Table<CardioSession> {
+class CardioSessionTable extends DbAccessor<CardioSession> {
   @override DbSerializer<CardioSession> get serde => DbCardioSessionSerializer();
   @override String get setupSql => '''
 create table $tableName (
@@ -29,7 +29,7 @@ create table $tableName (
   @override String get tableName => Tables.cardioSession;
 }
 
-class RouteTable extends Table<Route> {
+class RouteTable extends DbAccessor<Route> {
   @override DbSerializer<Route> get serde => DbRouteSerializer();
   @override String get setupSql => '''
 create table $tableName (

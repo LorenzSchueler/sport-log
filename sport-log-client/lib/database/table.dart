@@ -8,7 +8,7 @@ import 'defs.dart';
 
 export 'defs.dart';
 
-abstract class Table<T extends DbObject> {
+abstract class DbAccessor<T extends DbObject> {
   String get setupSql;
   String get tableName;
   DbSerializer<T> get serde;
@@ -159,7 +159,7 @@ end;
   }
 }
 
-mixin DateTimeMethods<T extends DbObjectWithDateTime> on Table<T> {
+mixin DateTimeMethods<T extends DbObjectWithDateTime> on DbAccessor<T> {
   Future<DateTime?> earliestDateTime() async {
     final result = await database.query(tableName,
         where: '${Keys.deleted} = 0',

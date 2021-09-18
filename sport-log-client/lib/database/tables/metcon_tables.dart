@@ -4,7 +4,7 @@ import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/database/table_names.dart';
 import 'package:sport_log/models/metcon/all.dart';
 
-class MetconTable extends Table<Metcon> {
+class MetconTable extends DbAccessor<Metcon> {
   @override
   String get setupSql => '''
 create table $tableName (
@@ -25,7 +25,7 @@ create table $tableName (
   String get tableName => Tables.metcon;
 }
 
-class MetconMovementTable extends Table<MetconMovement> {
+class MetconMovementTable extends DbAccessor<MetconMovement> {
   @override
   DbSerializer<MetconMovement> get serde => DbMetconMovementSerializer();
 
@@ -46,7 +46,7 @@ create table $tableName (
   String get tableName => Tables.metconMovement;
 
   Future<void> setSynchronizedByMetcon(Int64 id) async {
-    database.update(tableName, Table.synchronized,
+    database.update(tableName, DbAccessor.synchronized,
         where: '${Keys.metconId} = ?', whereArgs: [id.toInt()]);
   }
 
@@ -65,7 +65,7 @@ create table $tableName (
   }
 }
 
-class MetconSessionTable extends Table<MetconSession> {
+class MetconSessionTable extends DbAccessor<MetconSession> {
   @override
   DbSerializer<MetconSession> get serde => DbMetconSessionSerializer();
 

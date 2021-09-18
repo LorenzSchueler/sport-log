@@ -11,6 +11,6 @@ class PlatformCredentialDataProvider
   final ApiAccessor<PlatformCredential> api = Api.instance.platformCredentials;
 
   @override
-  final Table<PlatformCredential> db =
+  final DbAccessor<PlatformCredential> db =
       AppDatabase.instance!.platformCredentials;
 }

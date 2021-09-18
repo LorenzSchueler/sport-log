@@ -11,5 +11,5 @@ class DiaryDataProvider extends DataProviderImpl<Diary>
 
   // FIXME: nullable unwrap!
   @override
-  final Table<Diary> db = AppDatabase.instance!.diaries;
+  final DbAccessor<Diary> db = AppDatabase.instance!.diaries;
 }

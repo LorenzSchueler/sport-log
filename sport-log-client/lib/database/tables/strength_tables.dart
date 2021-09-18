@@ -4,7 +4,7 @@ import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_names.dart';
 import 'package:sport_log/models/strength/all.dart';
 
-class StrengthSessionTable extends Table<StrengthSession> with DateTimeMethods {
+class StrengthSessionTable extends DbAccessor<StrengthSession> with DateTimeMethods {
   @override
   DbSerializer<StrengthSession> get serde => DbStrengthSessionSerializer();
   @override
@@ -31,7 +31,7 @@ create table $tableName (
   }
 }
 
-class StrengthSetTable extends Table<StrengthSet> {
+class StrengthSetTable extends DbAccessor<StrengthSet> {
   @override
   DbSerializer<StrengthSet> get serde => DbStrengthSetSerializer();
   @override
@@ -48,7 +48,7 @@ create table $tableName (
   String get tableName => Tables.strengthSet;
 
   Future<void> setSynchronizedByStrengthSession(Int64 id) async {
-    database.update(tableName, Table.synchronized,
+    database.update(tableName, DbAccessor.synchronized,
         where: '${Keys.strengthSessionId} = ?', whereArgs: [id.toInt()]);
   }
 

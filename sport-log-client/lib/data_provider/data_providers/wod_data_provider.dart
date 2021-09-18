@@ -10,5 +10,5 @@ class WodDataProvider extends DataProviderImpl<Wod>
   final ApiAccessor<Wod> api = Api.instance.wods;
 
   @override
-  final Table<Wod> db = AppDatabase.instance!.wods;
+  final DbAccessor<Wod> db = AppDatabase.instance!.wods;
 }

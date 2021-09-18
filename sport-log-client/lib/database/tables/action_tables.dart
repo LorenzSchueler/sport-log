@@ -3,7 +3,7 @@ import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_names.dart';
 import 'package:sport_log/models/action/all.dart';
 
-class ActionTable extends Table<Action> {
+class ActionTable extends DbAccessor<Action> {
   @override DbSerializer<Action> get serde => DbActionSerializer();
   @override String get setupSql => '''
 create table $tableName (
@@ -18,7 +18,7 @@ create table $tableName (
   @override String get tableName => Tables.action;
 }
 
-class ActionEventTable extends Table<ActionEvent> {
+class ActionEventTable extends DbAccessor<ActionEvent> {
   @override DbSerializer<ActionEvent> get serde => DbActionEventSerializer();
   @override String get setupSql => '''
 create table $tableName (
@@ -33,7 +33,7 @@ create table $tableName (
   @override String get tableName => Tables.actionEvent;
 }
 
-class ActionRuleTable extends Table<ActionRule> {
+class ActionRuleTable extends DbAccessor<ActionRule> {
   @override DbSerializer<ActionRule> get serde => DbActionRuleSerializer();
   @override String get setupSql => '''
 create table $tableName (
@@ -49,7 +49,7 @@ create table $tableName (
   @override String get tableName => Tables.actionRule;
 }
 
-class ActionProviderTable extends Table<ActionProvider> {
+class ActionProviderTable extends DbAccessor<ActionProvider> {
   @override DbSerializer<ActionProvider> get serde => DbActionProviderSerializer();
   @override String get setupSql => '''
 create table $tableName (

@@ -10,5 +10,5 @@ class ActionEventDataProvider extends DataProviderImpl<ActionEvent>
   final ApiAccessor<ActionEvent> api = Api.instance.actionEvents;
 
   @override
-  final Table<ActionEvent> db = AppDatabase.instance!.actionEvents;
+  final DbAccessor<ActionEvent> db = AppDatabase.instance!.actionEvents;
 }

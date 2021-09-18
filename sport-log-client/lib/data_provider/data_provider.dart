@@ -34,7 +34,7 @@ abstract class DataProvider<T> {
 abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
   ApiAccessor<T> get api;
 
-  Table<T> get db;
+  DbAccessor<T> get db;
 
   @override
   Future<List<T>> getNonDeleted() async => db.getNonDeleted();
