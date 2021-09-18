@@ -58,6 +58,8 @@ enum Error {
     Gpx(GpxError),
     #[error(display = "ExecutableActionEvent doesn't contain a valid CardioSessionId")]
     CardioSessionIdMissing(ActionEventId),
+    #[error(display = "CardioSession doesn't contain a Track")]
+    NoTrack(ActionEventId),
 }
 
 type Result<T> = StdResult<T, Error>;
@@ -216,7 +218,7 @@ async fn map_match() -> Result<()> {
                 .await
                 .map_err(Error::Reqwest)?;
 
-            let route = match_to_map(&cardio_session).await?;
+            let route = match_to_map(&cardio_session, exec_action_event.action_event_id).await?;
 
             let routes: Vec<Route> = client
                 .get(format!("{}/v1/route", CONFIG.base_url))
@@ -260,6 +262,9 @@ async fn map_match() -> Result<()> {
                 Err(Error::CardioSessionIdMissing(action_event_id)) => {
                     delete_action_event_ids.push(action_event_id)
                 }
+                Err(Error::NoTrack(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
                 Err(error) => error!("{}", error),
             },
             Err(join_error) => error!("execution of action event failed: {}", join_error),
@@ -281,8 +286,16 @@ async fn map_match() -> Result<()> {
     Ok(())
 }
 
-async fn match_to_map(cardio_session: &CardioSession) -> Result<Route> {
-    let gpx = to_gpx(cardio_session.track.as_ref().unwrap_or(vec![].as_ref()));
+async fn match_to_map(
+    cardio_session: &CardioSession,
+    action_event_id: ActionEventId,
+) -> Result<Route> {
+    let track = match &cardio_session.track {
+        Some(track) => track,
+        None => return Err(Error::NoTrack(action_event_id)),
+    };
+
+    let gpx = to_gpx(track);
 
     let filename = format!("/tmp/map-matcher-{}.gpx", rand::thread_rng().gen::<u64>());
     let filename_result = format!("{}{}", filename, ".res.gpx");

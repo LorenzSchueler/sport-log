@@ -272,6 +272,7 @@ async fn fetch() -> Result<(), ReqwestError> {
                         let cardio_session = CardioSession {
                             id: CardioSessionId(rand::thread_rng().gen()),
                             user_id: exec_action_event.user_id,
+                            blueprint_id: None,
                             movement_id,
                             cardio_type: CardioType::Training,
                             datetime: DateTime::from_utc(
