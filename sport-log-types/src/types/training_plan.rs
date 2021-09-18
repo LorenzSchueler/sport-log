@@ -1,5 +1,4 @@
 use chrono::{DateTime, NaiveDate, Utc};
-#[cfg(feature = "server")]
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "server")]
