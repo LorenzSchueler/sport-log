@@ -41,19 +41,12 @@ class MainDrawer extends StatelessWidget {
             selected: selectedRoute == Routes.workout,
           ),
           ListTile(
-              title: const Text("Logs"),
-              leading: const Icon(Icons.calendar_today),
-              onTap: () {
-                Nav.changeNamed(context, Routes.logs);
-              },
-              selected: selectedRoute == Routes.logs),
-          ListTile(
               title: const Text("Syncing"),
               leading: const Icon(Icons.sync),
               onTap: () {
-                Nav.changeNamed(context, Routes.syncing);
+                Nav.changeNamed(context, Routes.actions);
               },
-              selected: selectedRoute == Routes.syncing),
+              selected: selectedRoute == Routes.actions),
           const Spacer(),
           ListTile(
             title: const Text("Logout"),

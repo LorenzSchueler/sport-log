@@ -6,11 +6,10 @@ import 'package:sport_log/models/movement/movement_description.dart';
 import 'package:sport_log/models/strength/strength_session_description.dart';
 import 'package:sport_log/pages/landing/landing_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
-import 'package:sport_log/pages/logs/logs_page.dart';
 import 'package:sport_log/pages/movements/edit_movement_page.dart';
 import 'package:sport_log/pages/movements/movements_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
-import 'package:sport_log/pages/syncing/syncing_page.dart';
+import 'package:sport_log/pages/syncing/actions_page.dart';
 import 'package:sport_log/pages/workout/metcon/edit_metcon_page.dart';
 import 'package:sport_log/pages/workout/strength/edit_strength_session_page.dart';
 import 'package:sport_log/pages/workout/workout_page.dart';
@@ -43,9 +42,8 @@ class _AppState extends State<App> {
                 initialMetcon: (arg is MetconDescription) ? arg : null,
               );
             }),
-        Routes.syncing: (_) =>
-            ProtectedRoute(builder: (_) => const SyncingPage()),
-        Routes.logs: (_) => ProtectedRoute(builder: (_) => const LogsPage()),
+        Routes.actions: (_) =>
+            ProtectedRoute(builder: (_) => const ActionsPage()),
         Routes.movements: (_) =>
             ProtectedRoute(builder: (_) => const MovementsPage()),
         Routes.editMovement: (_) => ProtectedRoute(builder: (context) {
