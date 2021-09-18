@@ -1,6 +1,29 @@
+create table strength_blueprint (
+    id bigint primary key,
+    user_id bigint not null references "user" on delete cascade,
+    name varchar(80) not null,
+    description text,
+    movement_id bigint not null references movement on delete cascade,
+    movement_unit movement_unit not null,
+    interval integer check (interval > 0),
+    last_change timestamptz not null default now(),
+    deleted boolean not null default false
+);
+
+create table strength_blueprint_set (
+    id bigint primary key,
+    strength_blueprint_id bigint not null references strength_blueprint on delete cascade,
+    set_number integer not null check (set_number >= 0),
+    count integer not null check (count >= 1), -- number of completed movement_unit
+    weight real check (weight > 0),
+    last_change timestamptz not null default now(),
+    deleted boolean not null default false
+);
+
 create table strength_session (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
+    blueprint_id bigint references strength_blueprint on delete set null,
     datetime timestamptz not null default now(),
     movement_id bigint not null references movement on delete cascade,
     movement_unit movement_unit not null,
