@@ -24,5 +24,5 @@ abstract class DbObjectWithDateTime implements DbObject, HasDateTime {}
 
 abstract class DbSerializer<T> {
   DbRecord toDbRecord(T o);
-  T fromDbRecord(DbRecord r);
+  T fromDbRecord(DbRecord r, {String prefix = ''});
 }

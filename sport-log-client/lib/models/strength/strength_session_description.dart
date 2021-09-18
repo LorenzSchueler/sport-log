@@ -13,23 +13,27 @@ class StrengthSessionDescription implements Validatable, HasId {
   });
 
   StrengthSession strengthSession;
-  List<StrengthSet> strengthSets;
+  List<StrengthSet>? strengthSets;
   Movement movement;
 
   @override
   bool isValid() {
     return validate(strengthSession.isValid(),
             'StrengthSessionDescription: strength session not valid') &&
-        validate(strengthSets.isNotEmpty,
+        validate(strengthSets != null,
+            'StrengthSessionDescription: strength sets == null') &&
+        validate(strengthSets?.isNotEmpty ?? true,
             'StrengthSessionDescription: strength sets empty') &&
         validate(
-            strengthSets
-                .every((ss) => ss.strengthSessionId == strengthSession.id),
+            strengthSets?.every(
+                    (ss) => ss.strengthSessionId == strengthSession.id) ??
+                true,
             'StrengthSessionDescription: strengthSessionId != strengthSession.id') &&
         validate(
-            strengthSets.everyIndexed((ss, index) => ss.setNumber == index),
+            strengthSets?.everyIndexed((ss, index) => ss.setNumber == index) ??
+                true,
             'StrengthSessionDescription: strengthSets indices wrong') &&
-        validate(strengthSets.every((ss) => ss.isValid()),
+        validate(strengthSets?.every((ss) => ss.isValid()) ?? true,
             'StrengthSessionDescription: strengthSets not valid') &&
         validate(strengthSession.movementId == movement.id,
             'StrengthSessionDescription: movement id mismatch');
@@ -40,7 +44,7 @@ class StrengthSessionDescription implements Validatable, HasId {
 
   void setDeleted() {
     strengthSession.deleted = true;
-    for (final set in strengthSets) {
+    for (final set in strengthSets ?? <StrengthSet>[]) {
       set.deleted = true;
     }
   }

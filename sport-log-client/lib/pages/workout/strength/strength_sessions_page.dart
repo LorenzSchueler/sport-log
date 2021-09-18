@@ -115,16 +115,18 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
         DateFormat('dd.MM.yyyy').format(ssd.strengthSession.datetime);
     final String time =
         DateFormat('HH:mm').format(ssd.strengthSession.datetime);
-    final String sets = '${ssd.strengthSets.length} sets';
+    // TODO: precalculate length
+    // final String sets = '${ssd.strengthSets.length} sets';
     final String? duration = ssd.strengthSession.interval == null
         ? null
         : formatDuration(Duration(seconds: ssd.strengthSession.interval!));
-    final String subtitle =
-        [date, time, sets, if (duration != null) duration].join(' · ');
+    // TODO: fetch sets on expand
+    // final String subtitle =
+    //     [date, time, sets, if (duration != null) duration].join(' · ');
 
     final String title = ssd.movement.name;
     final String text =
-        ssd.strengthSets.map((ss) => ss.toDisplayName()).join(', ');
+        ssd.strengthSets?.map((ss) => ss.toDisplayName()).join(', ') ?? '';
 
     return SizeFadeTransition(
       key: ValueKey(ssd.strengthSession.id),
@@ -135,13 +137,16 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
         child: ExpansionTileCard(
           leading: CircleAvatar(child: Text(ssd.movement.name[0])),
           title: Text(title),
-          subtitle: Text(subtitle),
+          // subtitle: Text(subtitle),
           children: [
             const Divider(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              child: Text(text),
-            ),
+            ssd.strengthSets == null
+                ? const CircularProgressIndicator()
+                : Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Text(text),
+                  ),
             const Divider(),
             if (ssd.strengthSession.comments != null)
               Padding(
@@ -164,6 +169,13 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
               ],
             ),
           ],
+          onExpansionChanged: (expanded) async {
+            if (expanded && ssd.strengthSets == null) {
+              ssd.strengthSets =
+                  await _dataProvider.getStrengthSetsByStrengthSession(ssd.id);
+              setState(() {});
+            }
+          },
         ),
       ),
     );

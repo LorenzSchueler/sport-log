@@ -42,7 +42,7 @@ class Diary implements DbObject {
 
 class DbDiarySerializer implements DbSerializer<Diary> {
   @override
-  Diary fromDbRecord(DbRecord r) {
+  Diary fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Diary(
       id: Int64(r[Keys.id]! as int),
       userId: Int64(r[Keys.userId]! as int),

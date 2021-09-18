@@ -92,7 +92,7 @@ class CardioSession implements DbObject {
 
 class DbCardioSessionSerializer implements DbSerializer<CardioSession> {
   @override
-  CardioSession fromDbRecord(DbRecord r) {
+  CardioSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return CardioSession(
       id: Int64(r[Keys.id]! as int),
       userId: Int64(r[Keys.userId]! as int),

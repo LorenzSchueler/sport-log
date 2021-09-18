@@ -35,7 +35,7 @@ class Platform implements DbObject {
 
 class DbPlatformSerializer implements DbSerializer<Platform> {
   @override
-  Platform fromDbRecord(DbRecord r) {
+  Platform fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Platform(
         id: Int64(r[Keys.id]! as int),
         name: r[Keys.name]! as String,

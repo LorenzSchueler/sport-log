@@ -111,14 +111,16 @@ class Movement implements DbObject {
 
 class DbMovementSerializer implements DbSerializer<Movement> {
   @override
-  Movement fromDbRecord(DbRecord r) {
+  Movement fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Movement(
-      id: Int64(r[Keys.id]! as int),
-      userId: r[Keys.userId] == null ? null : Int64(r[Keys.userId]! as int),
-      name: r[Keys.name]! as String,
-      description: r[Keys.description] as String?,
-      cardio: r[Keys.cardio]! as int == 1,
-      deleted: r[Keys.deleted]! as int == 1,
+      id: Int64(r[prefix + Keys.id]! as int),
+      userId: r[prefix + Keys.userId] == null
+          ? null
+          : Int64(r[prefix + Keys.userId]! as int),
+      name: r[prefix + Keys.name]! as String,
+      description: r[prefix + Keys.description] as String?,
+      cardio: r[prefix + Keys.cardio]! as int == 1,
+      deleted: r[prefix + Keys.deleted]! as int == 1,
     );
   }
 

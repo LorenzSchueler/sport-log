@@ -1,4 +1,3 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
@@ -20,16 +19,21 @@ class ActionEvent implements DbObject {
   });
 
   @override
-  @IdConverter() Int64 id;
-  @IdConverter() Int64 userId;
-  @IdConverter() Int64 actionId;
-  @DateTimeConverter() DateTime datetime;
+  @IdConverter()
+  Int64 id;
+  @IdConverter()
+  Int64 userId;
+  @IdConverter()
+  Int64 actionId;
+  @DateTimeConverter()
+  DateTime datetime;
   String? arguments;
   bool enabled;
   @override
   bool deleted;
 
-  factory ActionEvent.fromJson(Map<String, dynamic> json) => _$ActionEventFromJson(json);
+  factory ActionEvent.fromJson(Map<String, dynamic> json) =>
+      _$ActionEventFromJson(json);
   Map<String, dynamic> toJson() => _$ActionEventToJson(this);
 
   @override
@@ -40,7 +44,7 @@ class ActionEvent implements DbObject {
 
 class DbActionEventSerializer implements DbSerializer<ActionEvent> {
   @override
-  ActionEvent fromDbRecord(DbRecord r) {
+  ActionEvent fromDbRecord(DbRecord r, {String prefix = ''}) {
     return ActionEvent(
       id: Int64(r[Keys.id]! as int),
       userId: Int64(r[Keys.userId]! as int),

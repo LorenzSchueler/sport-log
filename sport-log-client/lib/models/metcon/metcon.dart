@@ -102,7 +102,7 @@ class Metcon implements DbObject {
 
 class DbMetconSerializer implements DbSerializer<Metcon> {
   @override
-  Metcon fromDbRecord(DbRecord r) {
+  Metcon fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Metcon(
       id: Int64(r[Keys.id]! as int),
       userId: r[Keys.userId] == null ? null : Int64(r[Keys.userId]! as int),

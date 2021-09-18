@@ -46,7 +46,7 @@ class PlatformCredential implements DbObject {
 class DbPlatformCredentialSerializer
     implements DbSerializer<PlatformCredential> {
   @override
-  PlatformCredential fromDbRecord(DbRecord r) {
+  PlatformCredential fromDbRecord(DbRecord r, {String prefix = ''}) {
     return PlatformCredential(
       id: Int64(r[Keys.id]! as int),
       userId: Int64(r[Keys.userId]! as int),

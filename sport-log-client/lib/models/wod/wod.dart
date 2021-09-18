@@ -39,7 +39,7 @@ class Wod implements DbObject {
 
 class DbWodSerializer implements DbSerializer<Wod> {
   @override
-  Wod fromDbRecord(DbRecord r) {
+  Wod fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Wod(
       id: Int64(r[Keys.id]! as int),
       userId: Int64(r[Keys.userId]! as int),

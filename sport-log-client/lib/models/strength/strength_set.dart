@@ -52,7 +52,7 @@ class StrengthSet implements DbObject {
 
 class DbStrengthSetSerializer implements DbSerializer<StrengthSet> {
   @override
-  StrengthSet fromDbRecord(DbRecord r) {
+  StrengthSet fromDbRecord(DbRecord r, {String prefix = ''}) {
     return StrengthSet(
       id: Int64(r[Keys.id]! as int),
       strengthSessionId: Int64(r[Keys.strengthSessionId]! as int),

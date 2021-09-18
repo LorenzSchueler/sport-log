@@ -1,9 +1,7 @@
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/models/cardio/all.dart';
-import 'package:sport_log/models/movement/all.dart';
 
 class DbIdConverter {
   const DbIdConverter() : super();

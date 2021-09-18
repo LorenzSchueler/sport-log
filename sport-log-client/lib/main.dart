@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/app.dart';
@@ -11,6 +10,8 @@ import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/test_data/movement_test_data.dart';
 import 'package:sport_log/test_data/strength_test_data.dart';
+
+import 'models/movement/movement.dart';
 
 final _logger = Logger('MAIN');
 
@@ -39,16 +40,20 @@ Future<void> insertTestData() async {
   final userId = UserState.instance.currentUser?.id;
   if (userId != null) {
     _logger.i('Generating test data ...');
+    List<Movement> movements = [];
     if ((await AppDatabase.instance!.movements.getNonDeleted()).isEmpty) {
-      await AppDatabase.instance!.movements
-          .upsertMultiple(generateMovements(userId));
+      movements = generateMovements(userId);
+      await AppDatabase.instance!.movements.upsertMultiple(movements);
     }
     final sessions = await generateStrengthSessions(userId);
     await AppDatabase.instance!.strengthSessions.upsertMultiple(sessions);
     final sets = await generateStrengthSets();
     await AppDatabase.instance!.strengthSets.upsertMultiple(sets);
-    _logger.i(
-        'Generated ${sessions.length} strength sessions, ${sets.length} strength sets');
+    _logger.i('''
+        Generated
+        ${movements.length} movements,
+        ${sessions.length} strength sessions,
+        ${sets.length} strength sets''');
   }
 }
 

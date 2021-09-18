@@ -61,7 +61,7 @@ class MetconMovement implements DbObject {
 
 class DbMetconMovementSerializer implements DbSerializer<MetconMovement> {
   @override
-  MetconMovement fromDbRecord(DbRecord r) {
+  MetconMovement fromDbRecord(DbRecord r, {String prefix = ''}) {
     return MetconMovement(
       id: Int64(r[Keys.id]! as int),
       metconId: Int64(r[Keys.id]! as int),

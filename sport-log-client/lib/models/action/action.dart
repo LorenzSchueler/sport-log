@@ -40,7 +40,7 @@ class Action implements DbObject {
 class DbActionSerializer implements DbSerializer<Action> {
 
   @override
-  Action fromDbRecord(DbRecord r) {
+  Action fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Action(
       id: Int64(r[Keys.id]! as int),
       name: r[Keys.name]! as String,

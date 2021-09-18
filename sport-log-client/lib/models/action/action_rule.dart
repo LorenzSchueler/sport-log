@@ -47,7 +47,7 @@ class ActionRule implements DbObject {
 
 class DbActionRuleSerializer implements DbSerializer<ActionRule> {
   @override
-  ActionRule fromDbRecord(DbRecord r) {
+  ActionRule fromDbRecord(DbRecord r, {String prefix = ''}) {
     return ActionRule(
       id: Int64(r[Keys.id]! as int),
       userId: Int64(r[Keys.userId]! as int),

@@ -127,10 +127,13 @@ class Column {
 }
 
 class Table {
-  Table(this.name, {required List<Column> withColumns}) : columns = withColumns;
+  Table(this.name, {required List<Column> withColumns})
+      : columns = withColumns,
+        prefix = name + '__';
 
-  List<Column> columns;
-  String name;
+  final List<Column> columns;
+  final String name;
+  final String prefix;
 
   String setupSql() {
     final primaryKey =
@@ -149,6 +152,6 @@ ${[
 
   // used for select statement
   String get allColumns {
-    return columns.map((c) => '$name.${c.name}').join(', ');
+    return columns.map((c) => '$name.${c.name} AS $prefix${c.name}').join(', ');
   }
 }

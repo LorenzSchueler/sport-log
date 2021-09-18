@@ -54,7 +54,7 @@ class MetconSession implements DbObject {
 
 class DbMetconSessionSerializer implements DbSerializer<MetconSession> {
   @override
-  MetconSession fromDbRecord(DbRecord r) {
+  MetconSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return MetconSession(
       id: Int64(r[Keys.id]! as int),
       userId: Int64(r[Keys.userId]! as int),

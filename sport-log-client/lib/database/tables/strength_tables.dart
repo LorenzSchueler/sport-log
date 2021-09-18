@@ -1,18 +1,23 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_creator.dart';
 import 'package:sport_log/database/table_names.dart';
+import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
 
 class StrengthSessionTable extends DbAccessor<StrengthSession>
     with DateTimeMethods {
+  final _logger = Logger('StrengthSessionTable');
+
   @override
   DbSerializer<StrengthSession> get serde => DbStrengthSessionSerializer();
   @override
   String get setupSql => _table.setupSql();
   @override
-  String get tableName => Tables.strengthSession;
+  String get tableName => _table.name;
 
   final Table _table = Table(Tables.strengthSession, withColumns: [
     Column.int(Keys.id).primaryKey(),
@@ -29,12 +34,35 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
     Column.text(Keys.comments).nullable(),
   ]);
 
-  @override
-  Future<List<StrengthSession>> getNonDeleted() async {
-    final result = await database.query(tableName,
-        where: '${Keys.deleted} = 0',
-        orderBy: 'datetime(${Keys.datetime}) DESC');
-    return result.map(serde.fromDbRecord).toList();
+  Future<List<StrengthSessionDescription>> getDescriptions() async {
+    final movementTable = AppDatabase.instance!.movements;
+    const strengthSet = Tables.strengthSet;
+    const movement = Tables.movement;
+    const strengthSessionId = Keys.strengthSessionId;
+    const id = Keys.id;
+    const movementId = Keys.movementId;
+    const deleted = Keys.deleted;
+    const datetime = Keys.datetime;
+    final allColumns =
+        [_table.allColumns, movementTable.table.allColumns].join(', ');
+    final result = await database.rawQuery('''
+    SELECT $allColumns, COUNT($strengthSet.$id) AS num_sets FROM $tableName
+    JOIN $strengthSet ON $tableName.$id = $strengthSet.$strengthSessionId
+    JOIN $movement ON $tableName.$movementId = $movement.$id
+    WHERE $tableName.$deleted = 0 AND $strengthSet.$deleted = 0
+    GROUP BY $tableName.$id
+    ORDER BY datetime($datetime) DESC;
+    ''');
+    _logger.d(result.first);
+    return result
+        .map((record) => StrengthSessionDescription(
+              strengthSession:
+                  serde.fromDbRecord(record, prefix: _table.prefix),
+              strengthSets: null,
+              movement: movementTable.serde
+                  .fromDbRecord(record, prefix: movementTable.table.prefix),
+            ))
+        .toList();
   }
 }
 

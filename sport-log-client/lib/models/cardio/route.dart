@@ -52,7 +52,7 @@ class Route implements DbObject {
 
 class DbRouteSerializer implements DbSerializer<Route> {
   @override
-  Route fromDbRecord(DbRecord r) {
+  Route fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Route(
       id: Int64(r[Keys.id]! as int),
       userId: Int64(r[Keys.userId]! as int),
