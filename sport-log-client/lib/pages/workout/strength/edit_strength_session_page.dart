@@ -6,7 +6,7 @@ import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
-import 'package:sport_log/widgets/duration_picker.dart';
+import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 
 class EditStrengthSessionPage extends StatefulWidget {
   const EditStrengthSessionPage({

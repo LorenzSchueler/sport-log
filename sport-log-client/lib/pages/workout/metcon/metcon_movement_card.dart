@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/widgets/int_picker.dart';
+import 'package:sport_log/widgets/form_widgets/int_picker.dart';
 
 import 'movement_picker_dialog.dart';
 
