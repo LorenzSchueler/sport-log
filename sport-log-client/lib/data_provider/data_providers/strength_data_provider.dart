@@ -177,8 +177,16 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
   Future<DateTime?> mostRecentDateTime() async =>
       strengthSessionDb.mostRecentDateTime();
 
-  Future<List<StrengthSessionDescription>> getBetweenDates(
-          DateTime earliest, DateTime latest) async =>
-      // TODO: fixme
-      strengthSessionDb.getDescriptions();
+  Future<List<StrengthSessionDescription>> filterDescriptions({
+    Int64? movementId,
+    DateTime? from,
+    DateTime? until,
+  }) async {
+    assert((from == null) == (until == null));
+    return strengthSessionDb.getDescriptions(
+      from: from,
+      until: until,
+      movementIdValue: movementId,
+    );
+  }
 }

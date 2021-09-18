@@ -25,8 +25,6 @@ class StrengthSessionsPage extends StatefulWidget {
   final DateTime? start;
   final DateTime? end;
 
-  bool get showAll => start == null || end == null;
-
   @override
   State<StrengthSessionsPage> createState() => _StrengthSessionsPageState();
 }
@@ -45,9 +43,8 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   void update() async {
     _logger.d(
         'Updating strength sessions with start = ${widget.start}, end = ${widget.end}');
-    (widget.showAll
-            ? _dataProvider.getNonDeleted()
-            : _dataProvider.getBetweenDates(widget.start!, widget.end!))
+    _dataProvider
+        .filterDescriptions(from: widget.start, until: widget.end)
         .then((ssds) {
       setState(() => _state = LocalState.fromList(ssds));
     });
@@ -101,11 +98,13 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
     if (_state.isEmpty) {
       return const Center(child: Text('No strength sessions there.'));
     }
-    return ImplicitlyAnimatedList(
-      items: _state.sortedBy((o1, o2) =>
-          -o1.strengthSession.datetime.compareTo(o2.strengthSession.datetime)),
-      itemBuilder: _buildStrengthSession,
-      areItemsTheSame: StrengthSessionDescription.areTheSame,
+    return Scrollbar(
+      child: ImplicitlyAnimatedList(
+        items: _state.sortedBy((o1, o2) =>
+            -o1.strengthSession.datetime.compareTo(o2.strengthSession.datetime)),
+        itemBuilder: _buildStrengthSession,
+        areItemsTheSame: StrengthSessionDescription.areTheSame,
+      ),
     );
   }
 
@@ -115,14 +114,12 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
         DateFormat('dd.MM.yyyy').format(ssd.strengthSession.datetime);
     final String time =
         DateFormat('HH:mm').format(ssd.strengthSession.datetime);
-    // TODO: precalculate length
-    // final String sets = '${ssd.strengthSets.length} sets';
+    final String sets = '${ssd.numberOfSets} sets';
     final String? duration = ssd.strengthSession.interval == null
         ? null
         : formatDuration(Duration(seconds: ssd.strengthSession.interval!));
-    // TODO: fetch sets on expand
-    // final String subtitle =
-    //     [date, time, sets, if (duration != null) duration].join(' · ');
+    final String subtitle =
+        [date, time, sets, if (duration != null) duration].join(' · ');
 
     final String title = ssd.movement.name;
     final String text =
@@ -137,7 +134,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
         child: ExpansionTileCard(
           leading: CircleAvatar(child: Text(ssd.movement.name[0])),
           title: Text(title),
-          // subtitle: Text(subtitle),
+          subtitle: Text(subtitle),
           children: [
             const Divider(),
             ssd.strengthSets == null

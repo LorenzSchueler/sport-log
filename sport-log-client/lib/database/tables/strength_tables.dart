@@ -34,26 +34,42 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
     Column.text(Keys.comments).nullable(),
   ]);
 
-  Future<List<StrengthSessionDescription>> getDescriptions() async {
+  static const strengthSet = Tables.strengthSet;
+  static const movement = Tables.movement;
+  static const strengthSessionId = Keys.strengthSessionId;
+  static const id = Keys.id;
+  static const movementId = Keys.movementId;
+  static const deleted = Keys.deleted;
+  static const datetime = Keys.datetime;
+
+  Future<List<StrengthSessionDescription>> getDescriptions({
+    Int64? movementIdValue,
+    DateTime? from,
+    DateTime? until,
+  }) async {
+    assert((from == null) == (until == null));
     final movementTable = AppDatabase.instance!.movements;
-    const strengthSet = Tables.strengthSet;
-    const movement = Tables.movement;
-    const strengthSessionId = Keys.strengthSessionId;
-    const id = Keys.id;
-    const movementId = Keys.movementId;
-    const deleted = Keys.deleted;
-    const datetime = Keys.datetime;
     final allColumns =
         [_table.allColumns, movementTable.table.allColumns].join(', ');
+    final filter = [
+      '$tableName.$deleted = 0',
+      '$strengthSet.$deleted = 0',
+      '$movement.$deleted = 0',
+      if (from != null && until != null) '$datetime BETWEEN ? AND ?',
+      if (movementIdValue != null) '$movementId = ?'
+    ].join(' AND ');
     final result = await database.rawQuery('''
     SELECT $allColumns, COUNT($strengthSet.$id) AS num_sets FROM $tableName
     JOIN $strengthSet ON $tableName.$id = $strengthSet.$strengthSessionId
     JOIN $movement ON $tableName.$movementId = $movement.$id
-    WHERE $tableName.$deleted = 0 AND $strengthSet.$deleted = 0
+    WHERE $filter
     GROUP BY $tableName.$id
     ORDER BY datetime($datetime) DESC;
-    ''');
-    _logger.d(result.first);
+    ''', [
+      if (from != null && until != null) from.toString(),
+      if (from != null && until != null) until.toString(),
+      if (movementIdValue != null) movementIdValue.toInt()
+    ]);
     return result
         .map((record) => StrengthSessionDescription(
               strengthSession:
@@ -61,6 +77,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
               strengthSets: null,
               movement: movementTable.serde
                   .fromDbRecord(record, prefix: movementTable.table.prefix),
+              numberOfSets: record['num_sets']! as int,
             ))
         .toList();
   }
