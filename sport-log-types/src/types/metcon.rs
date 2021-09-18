@@ -16,11 +16,11 @@ use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{
     from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, MovementUnit,
-    UserId,
+    TrainingPlan, TrainingPlanId, UserId,
 };
 #[cfg(feature = "server")]
 use crate::{
-    schema::{metcon, metcon_movement, metcon_session},
+    schema::{metcon, metcon_item, metcon_movement, metcon_session},
     AuthUserOrAP, CheckOptionalUserId, CheckUserId, Unverified, UnverifiedId, UnverifiedIds, User,
     VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
     VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
@@ -380,6 +380,93 @@ pub struct MetconSession {
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
     pub deleted: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
+#[cfg_attr(
+    feature = "server",
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
+)]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
+pub struct MetconItemId(pub i64);
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(
+    feature = "server",
+    derive(
+        Insertable,
+        Associations,
+        Identifiable,
+        Queryable,
+        AsChangeset,
+        Create,
+        CreateMultiple,
+        GetById,
+        GetByIds,
+        Update,
+    )
+)]
+#[cfg_attr(feature = "server", table_name = "metcon_item")]
+#[cfg_attr(feature = "server", belongs_to(TrainingPlan))]
+#[cfg_attr(feature = "server", belongs_to(Metcon))]
+pub struct MetconItem {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
+    pub id: MetconItemId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
+    pub training_plan_id: TrainingPlanId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
+    pub metcon_id: MetconId,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
+}
+
+#[cfg(feature = "server")]
+impl VerifyForUserOrAPWithDb for Unverified<MetconItem> {
+    type Entity = MetconItem;
+
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Self::Entity, Status> {
+        let metcon_item = self.0.into_inner();
+        if MetconItem::check_user_id(metcon_item.id, **auth, conn)
+            .map_err(|_| rocket::http::Status::InternalServerError)?
+        {
+            Ok(metcon_item)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "server")]
+impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconItem>> {
+    type Entity = MetconItem;
+
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status> {
+        let metcon_items = self.0.into_inner();
+        let metcon_item_ids: Vec<_> = metcon_items
+            .iter()
+            .map(|metcon_item| metcon_item.id)
+            .collect();
+        if MetconItem::check_user_ids(&metcon_item_ids, **auth, conn)
+            .map_err(|_| rocket::http::Status::InternalServerError)?
+        {
+            Ok(metcon_items)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
