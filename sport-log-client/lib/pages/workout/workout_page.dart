@@ -26,36 +26,27 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (_showDateFilter == true) {
-          setState(() => _showDateFilter = false);
-          return false;
-        }
-        return true;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Home"),
-          bottom: _timeFilter,
-        ),
-        body: SimpleOverlay(
-          child: WideScreenFrame(child: _mainPage),
-          overlay: _overlay,
-          hideOverlay: () => setState(() => _showDateFilter = false),
-          showOverlay: _showDateFilter,
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: BottomNavPage.values.map(_toBottomNavItem).toList(),
-          currentIndex: _currentPage.index,
-          onTap: _onBottomNavItemTapped,
-          type: BottomNavigationBarType.fixed,
-        ),
-        drawer: const MainDrawer(selectedRoute: Routes.workout),
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: () => _onFabTapped(context),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Home"),
+        bottom: _timeFilter,
+      ),
+      body: SimpleOverlay(
+        child: WideScreenFrame(child: _mainPage),
+        overlay: _overlay,
+        hideOverlay: () => setState(() => _showDateFilter = false),
+        showOverlay: _showDateFilter,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: BottomNavPage.values.map(_toBottomNavItem).toList(),
+        currentIndex: _currentPage.index,
+        onTap: _onBottomNavItemTapped,
+        type: BottomNavigationBarType.fixed,
+      ),
+      drawer: const MainDrawer(selectedRoute: Routes.workout),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () => _onFabTapped(context),
       ),
     );
   }

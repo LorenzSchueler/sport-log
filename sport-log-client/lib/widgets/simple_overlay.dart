@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_log/helpers/logger.dart';
 
 class SimpleOverlay extends StatelessWidget {
-  const SimpleOverlay({
+  SimpleOverlay({
     Key? key,
     required this.child,
     required this.overlay,
@@ -17,25 +17,31 @@ class SimpleOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const duration = Duration(milliseconds: 100);
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        child,
-        AnimatedSwitcher(
-          duration: duration,
-          child: showOverlay
-              ? GestureDetector(
-                  child: Container(color: Colors.black.withAlpha(100)),
-                  onTap: () => hideOverlay(),
-                )
-              : null,
-        ),
-        AnimatedSwitcher(
-          duration: duration,
-          child: showOverlay ? overlay : null,
-        ),
-      ],
+    return WillPopScope(
+      onWillPop: () async {
+        if (showOverlay) {
+          hideOverlay();
+          return false;
+        }
+        return true;
+      },
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          child,
+          Visibility(
+            child: GestureDetector(
+              child: Container(color: Colors.black.withAlpha(100)),
+              onTap: () => hideOverlay(),
+            ),
+            visible: showOverlay,
+          ),
+          Visibility(
+            child: overlay,
+            visible: showOverlay,
+          ),
+        ],
+      ),
     );
   }
 }
