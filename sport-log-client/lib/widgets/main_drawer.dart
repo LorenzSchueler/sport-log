@@ -76,7 +76,8 @@ class MainDrawer extends StatelessWidget {
             trailing: IconButton(
               color: Theme.of(context).primaryColor,
               icon: const Icon(Icons.sync_sharp),
-              onPressed: () => DownSync.instance.sync(),
+              // TODO: trigger sync on button press
+              onPressed: null,
             ),
           ),
           ListTile(
