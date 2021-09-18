@@ -116,3 +116,11 @@ create trigger archive_metcon_session
     after insert or update of deleted or delete
     on metcon_session
     for each row execute procedure archive_record();
+
+create table metcon_item (
+    id bigint primary key,
+    training_plan_id bigint not null references training_plan on delete cascade,
+    metcon_id bigint not null references metcon on delete cascade,
+    last_change timestamptz not null default now(),
+    deleted boolean not null default false
+);

@@ -70,6 +70,7 @@ table! {
     cardio_blueprint (id) {
         id -> Int8,
         user_id -> Int8,
+        training_plan_id -> Int8,
         name -> Varchar,
         description -> Nullable<Text>,
         movement_id -> Int8,
@@ -81,19 +82,6 @@ table! {
         calories -> Nullable<Int4>,
         avg_heart_rate -> Nullable<Int4>,
         route_id -> Nullable<Int8>,
-        last_change -> Timestamptz,
-        deleted -> Bool,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use crate::*;
-
-    cardio_item (id) {
-        id -> Int8,
-        trainingsplan_id -> Int8,
-        cardio_blueprint_id -> Int8,
         last_change -> Timestamptz,
         deleted -> Bool,
     }
@@ -201,7 +189,7 @@ table! {
 
     metcon_item (id) {
         id -> Int8,
-        trainingsplan_id -> Int8,
+        training_plan_id -> Int8,
         metcon_id -> Int8,
         last_change -> Timestamptz,
         deleted -> Bool,
@@ -387,6 +375,7 @@ table! {
     strength_blueprint (id) {
         id -> Int8,
         user_id -> Int8,
+        training_plan_id -> Int8,
         name -> Varchar,
         description -> Nullable<Text>,
         movement_id -> Int8,
@@ -407,19 +396,6 @@ table! {
         set_number -> Int4,
         count -> Int4,
         weight -> Nullable<Float4>,
-        last_change -> Timestamptz,
-        deleted -> Bool,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use crate::*;
-
-    strength_item (id) {
-        id -> Int8,
-        trainingsplan_id -> Int8,
-        strength_blueprint_id -> Int8,
         last_change -> Timestamptz,
         deleted -> Bool,
     }
@@ -462,7 +438,7 @@ table! {
     use diesel::sql_types::*;
     use crate::*;
 
-    trainingsplan (id) {
+    training_plan (id) {
         id -> Int8,
         user_id -> Int8,
         name -> Varchar,
@@ -509,9 +485,8 @@ joinable!(action_rule -> action (action_id));
 joinable!(action_rule -> user (user_id));
 joinable!(cardio_blueprint -> movement (movement_id));
 joinable!(cardio_blueprint -> route (route_id));
+joinable!(cardio_blueprint -> training_plan (training_plan_id));
 joinable!(cardio_blueprint -> user (user_id));
-joinable!(cardio_item -> cardio_blueprint (cardio_blueprint_id));
-joinable!(cardio_item -> trainingsplan (trainingsplan_id));
 joinable!(cardio_session -> cardio_blueprint (blueprint_id));
 joinable!(cardio_session -> movement (movement_id));
 joinable!(cardio_session -> route (route_id));
@@ -521,7 +496,7 @@ joinable!(group_user -> group (group_id));
 joinable!(group_user -> user (user_id));
 joinable!(metcon -> user (user_id));
 joinable!(metcon_item -> metcon (metcon_id));
-joinable!(metcon_item -> trainingsplan (trainingsplan_id));
+joinable!(metcon_item -> training_plan (training_plan_id));
 joinable!(metcon_movement -> metcon (metcon_id));
 joinable!(metcon_movement -> movement (movement_id));
 joinable!(metcon_session -> metcon (metcon_id));
@@ -541,15 +516,14 @@ joinable!(shared_metcon_session -> metcon_session (metcon_session_id));
 joinable!(shared_strength_session -> group (group_id));
 joinable!(shared_strength_session -> strength_session (strength_session_id));
 joinable!(strength_blueprint -> movement (movement_id));
+joinable!(strength_blueprint -> training_plan (training_plan_id));
 joinable!(strength_blueprint -> user (user_id));
 joinable!(strength_blueprint_set -> strength_blueprint (strength_blueprint_id));
-joinable!(strength_item -> strength_blueprint (strength_blueprint_id));
-joinable!(strength_item -> trainingsplan (trainingsplan_id));
 joinable!(strength_session -> movement (movement_id));
 joinable!(strength_session -> strength_blueprint (blueprint_id));
 joinable!(strength_session -> user (user_id));
 joinable!(strength_set -> strength_session (strength_session_id));
-joinable!(trainingsplan -> user (user_id));
+joinable!(training_plan -> user (user_id));
 joinable!(wod -> user (user_id));
 
 allow_tables_to_appear_in_same_query!(
@@ -558,7 +532,6 @@ allow_tables_to_appear_in_same_query!(
     action_provider,
     action_rule,
     cardio_blueprint,
-    cardio_item,
     cardio_session,
     diary,
     eorm,
@@ -580,10 +553,9 @@ allow_tables_to_appear_in_same_query!(
     shared_strength_session,
     strength_blueprint,
     strength_blueprint_set,
-    strength_item,
     strength_session,
     strength_set,
-    trainingsplan,
+    training_plan,
     user,
     wod,
 );
