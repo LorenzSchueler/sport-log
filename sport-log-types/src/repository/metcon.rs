@@ -99,7 +99,11 @@ impl GetByUser for MetconMovement {
             .filter(
                 metcon_movement::columns::metcon_id.eq_any(
                     metcon::table
-                        .filter(metcon::columns::user_id.eq(user_id))
+                        .filter(
+                            metcon::columns::user_id
+                                .eq(user_id)
+                                .or(metcon::columns::user_id.is_null()),
+                        )
                         .select(metcon::columns::id),
                 ),
             )
@@ -120,7 +124,11 @@ impl GetByUserSync for MetconMovement {
             .filter(
                 metcon_movement::columns::metcon_id.eq_any(
                     metcon::table
-                        .filter(metcon::columns::user_id.eq(user_id))
+                        .filter(
+                            metcon::columns::user_id
+                                .eq(user_id)
+                                .or(metcon::columns::user_id.is_null()),
+                        )
                         .select(metcon::columns::id),
                 ),
             )
