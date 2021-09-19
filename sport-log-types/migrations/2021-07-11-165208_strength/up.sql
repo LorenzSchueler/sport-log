@@ -15,8 +15,9 @@ create table strength_blueprint_set (
     id bigint primary key,
     strength_blueprint_id bigint not null references strength_blueprint on delete cascade,
     set_number integer not null check (set_number >= 0),
-    count integer not null check (count >= 1), -- number of completed movement_unit
+    count integer not null check (count >= 1),
     weight real check (weight > 0),
+    time integer check (time > 0),
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
@@ -64,8 +65,9 @@ create table strength_set (
     id bigint primary key,
     strength_session_id bigint not null references strength_session on delete cascade,
     set_number integer not null check (set_number >= 0),
-    count integer not null check (count >= 1), -- number of completed movement_unit
+    count integer not null check (count >= 1),
     weight real check (weight > 0),
+    time integer check (time > 0),
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
