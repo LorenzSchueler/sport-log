@@ -37,7 +37,12 @@ create table movement_archive (
 create trigger archive_movement
     after insert or update of deleted or delete
     on movement
-    for each row execute procedure archive_record();
+    for each row execute procedure archive_record_movement();
+
+create trigger delete_movement_archive
+    after delete
+    on movement_archive
+    for each row execute procedure delete_record_movement();
 
 create table muscle_group (
     id bigint primary key,
@@ -52,6 +57,24 @@ create table movement_muscle (
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
+
+create trigger set_timestamp before update on movement_muscle
+    for each row execute procedure trigger_set_timestamp();
+
+create table movement_muscle_archive (
+    primary key (id),
+    check (deleted = true)
+) inherits (movement_muscle);
+
+create trigger archive_movement_muscle
+    after insert or update of deleted or delete
+    on movement_muscle
+    for each row execute procedure archive_record();
+
+create trigger check_movement_exists_trigger
+    after insert 
+    on movement_muscle_archive
+    for each row execute procedure check_movement_exists();
 
 create table eorm (
     id bigserial primary key,

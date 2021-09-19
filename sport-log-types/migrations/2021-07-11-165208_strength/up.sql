@@ -11,6 +11,25 @@ create table strength_blueprint (
     deleted boolean not null default false
 );
 
+create trigger set_timestamp before update on strength_blueprint
+    for each row execute procedure trigger_set_timestamp();
+
+create table strength_blueprint_archive (
+    primary key (id),
+    foreign key (user_id) references "user" on delete cascade,
+    check (deleted = true)
+) inherits (strength_blueprint);
+
+create trigger archive_strength_blueprint
+    after insert or update of deleted or delete
+    on strength_blueprint
+    for each row execute procedure archive_record_strength_blueprint();
+
+create trigger delete_strength_blueprint_archive
+    after delete
+    on strength_blueprint_archive
+    for each row execute procedure delete_record_strength_blueprint();
+
 create table strength_blueprint_set (
     id bigint primary key,
     strength_blueprint_id bigint not null references strength_blueprint on delete cascade,
@@ -21,6 +40,27 @@ create table strength_blueprint_set (
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
+
+create unique index strength_blueprint_set_idx on strength_blueprint_set (strength_blueprint_id, set_number) 
+    where deleted = false;
+
+create trigger set_timestamp before update on strength_blueprint_set
+    for each row execute procedure trigger_set_timestamp();
+
+create table strength_blueprint_set_archive (
+    primary key (id),
+    check (deleted = true)
+) inherits (strength_blueprint_set);
+
+create trigger archive_strength_blueprint_set
+    after insert or update of deleted or delete
+    on strength_blueprint_set
+    for each row execute procedure archive_record();
+
+create trigger check_strength_blueprint_exists_trigger
+    after insert 
+    on strength_blueprint_set_archive
+    for each row execute procedure check_strength_blueprint_exists();
 
 create table strength_session (
     id bigint primary key,

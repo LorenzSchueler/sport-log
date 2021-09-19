@@ -1,11 +1,9 @@
+drop table metcon_item_archive;
 drop table metcon_item;
 drop table metcon_session_archive;
-drop index metcon_session_idx;
 drop table metcon_session;
 drop table metcon_movement_archive;
-drop index metcon_movement_idx;
 drop table metcon_movement;
 drop table metcon_archive;
-drop index metcon_idx;
 drop table metcon;
 drop type metcon_type;

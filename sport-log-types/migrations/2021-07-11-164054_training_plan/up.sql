@@ -8,3 +8,17 @@ create table training_plan (
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
+
+create trigger set_timestamp before update on training_plan
+    for each row execute procedure trigger_set_timestamp();
+
+create table training_plan_archive (
+    primary key (id),
+    foreign key (user_id) references "user" on delete cascade,
+    check (deleted = true)
+) inherits (training_plan);
+
+create trigger archive_training_plan
+    after insert or update of deleted or delete
+    on training_plan
+    for each row execute procedure archive_record();

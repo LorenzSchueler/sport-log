@@ -124,3 +124,21 @@ create table metcon_item (
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
+
+create trigger set_timestamp before update on metcon_item
+    for each row execute procedure trigger_set_timestamp();
+
+create table metcon_item_archive (
+    primary key (id),
+    check (deleted = true)
+) inherits (metcon_item);
+
+create trigger archive_metcon_item
+    after insert or update of deleted or delete
+    on metcon_item
+    for each row execute procedure archive_record();
+
+create trigger check_metcon_exists_trigger
+    after insert 
+    on metcon_item_archive
+    for each row execute procedure check_metcon_exists();

@@ -55,6 +55,20 @@ create table cardio_blueprint (
     deleted boolean not null default false
 );
 
+create trigger set_timestamp before update on cardio_blueprint
+    for each row execute procedure trigger_set_timestamp();
+
+create table cardio_blueprint_archive (
+    primary key (id),
+    foreign key (user_id) references "user" on delete cascade,
+    check (deleted = true)
+) inherits (cardio_blueprint);
+
+create trigger archive_cardio_blueprint
+    after insert or update of deleted or delete
+    on cardio_blueprint
+    for each row execute procedure archive_record();
+
 create table cardio_session (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
