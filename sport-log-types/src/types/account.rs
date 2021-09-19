@@ -2,8 +2,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     Action, ActionEvent, ActionProvider, ActionRule, CardioBlueprint, CardioSession, Diary, Metcon,
-    MetconItem, MetconMovement, MetconSession, Movement, Platform, PlatformCredential, Route,
-    StrengthBlueprint, StrengthBlueprintSet, StrengthSession, StrengthSet, TrainingPlan, User, Wod,
+    MetconItem, MetconMovement, MetconSession, Movement, MovementMuscle, Platform,
+    PlatformCredential, Route, StrengthBlueprint, StrengthBlueprintSet, StrengthSession,
+    StrengthSet, TrainingPlan, User, Wod,
 };
 
 /// A representation of all or recentily updated data belonging to a user account.
@@ -15,6 +16,7 @@ pub struct AccountData {
     pub diaries: Vec<Diary>,
     pub wods: Vec<Wod>,
     pub movements: Vec<Movement>,
+    pub movement_muscles: Vec<MovementMuscle>,
     pub strength_blueprints: Vec<StrengthBlueprint>,
     pub strength_blueprint_sets: Vec<StrengthBlueprintSet>,
     pub strength_sessions: Vec<StrengthSession>,

@@ -4,7 +4,7 @@ use diesel::{PgConnection, QueryResult};
 use crate::{
     AccountData, Action, ActionEvent, ActionProvider, ActionRule, CardioBlueprint, CardioSession,
     Diary, GetAll, GetById, GetBySync, GetByUser, GetByUserSync, Metcon, MetconItem,
-    MetconMovement, MetconSession, Movement, Platform, PlatformCredential, Route,
+    MetconMovement, MetconSession, Movement, MovementMuscle, Platform, PlatformCredential, Route,
     StrengthBlueprint, StrengthBlueprintSet, StrengthSession, StrengthSet, TrainingPlan, User,
     UserId, Wod,
 };
@@ -16,6 +16,7 @@ impl AccountData {
             diaries: Diary::get_by_user(user_id, conn)?,
             wods: Wod::get_by_user(user_id, conn)?,
             movements: Movement::get_by_user(user_id, conn)?,
+            movement_muscles: MovementMuscle::get_by_user(user_id, conn)?,
             strength_blueprints: StrengthBlueprint::get_by_user(user_id, conn)?,
             strength_blueprint_sets: StrengthBlueprintSet::get_by_user(user_id, conn)?,
             strength_sessions: StrengthSession::get_by_user(user_id, conn)?,
@@ -47,6 +48,7 @@ impl AccountData {
             diaries: Diary::get_by_user_and_last_sync(user_id, last_sync, conn)?,
             wods: Wod::get_by_user_and_last_sync(user_id, last_sync, conn)?,
             movements: Movement::get_by_user_and_last_sync(user_id, last_sync, conn)?,
+            movement_muscles: MovementMuscle::get_by_user_and_last_sync(user_id, last_sync, conn)?,
             strength_blueprints: StrengthBlueprint::get_by_user_and_last_sync(
                 user_id, last_sync, conn,
             )?,
