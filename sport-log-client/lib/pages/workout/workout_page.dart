@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
+import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_page.dart';
 import 'package:sport_log/pages/workout/strength/strength_sessions_page.dart';
@@ -164,13 +165,14 @@ class _WorkoutPageState extends State<WorkoutPage> {
   }
 
   PreferredSizeWidget get _filter {
-    final primaryColor = Theme.of(context).primaryColor;
+    final onAppBar = appBarForegroundOf(context);
     return PreferredSize(
         preferredSize: const Size.fromHeight(40),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
+              color: onAppBar,
               onPressed: _dateFilter.timeFrame == TimeFrame.all
                   ? null
                   : () {
@@ -181,11 +183,15 @@ class _WorkoutPageState extends State<WorkoutPage> {
                     },
               icon: const Icon(Icons.arrow_back_ios_sharp),
             ),
-            TextButton(
-              child: Text(
+            TextButton.icon(
+              label: Icon(
+                Icons.arrow_drop_down_sharp,
+                color: onAppBar,
+              ),
+              icon: Text(
                 _dateFilter.getLabel(),
                 style: TextStyle(
-                  color: primaryColor,
+                  color: onAppBar,
                 ),
               ),
               onPressed: () {
@@ -193,6 +199,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
               },
             ),
             IconButton(
+              color: onAppBar,
               onPressed: _dateFilter.goingForwardPossible
                   ? () {
                       setState(() {

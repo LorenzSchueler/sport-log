@@ -1,8 +1,8 @@
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sport_log/helpers/theme.dart';
 
 class IntPicker extends StatefulWidget {
   const IntPicker({
@@ -44,27 +44,29 @@ class _IntPickerState extends State<IntPicker> {
         GestureDetector(
           child: IconButton(
             icon: const Icon(Icons.indeterminate_check_box_rounded),
-            color: Theme.of(context).primaryColor,
-            onPressed: (_isValidNumber(_value - 1)) ? () {
-              setState(() {
-                _value -= 1;
-              });
-              _controller.text = "$_value";
-              widget.setValue(_value);
-            } : null,
-          ),
-          onTapDown: (details) {
-            setState(() {
-              _decreaseTimer = Timer.periodic(
-                const Duration(milliseconds: _timeBetweenValueChanges),
-                (timer) {
-                  if (_isValidNumber(_value - 1)) {
+            color: primaryColorOf(context),
+            onPressed: (_isValidNumber(_value - 1))
+                ? () {
                     setState(() {
                       _value -= 1;
                     });
                     _controller.text = "$_value";
                     widget.setValue(_value);
                   }
+                : null,
+          ),
+          onTapDown: (details) {
+            setState(() {
+              _decreaseTimer = Timer.periodic(
+                  const Duration(milliseconds: _timeBetweenValueChanges),
+                  (timer) {
+                if (_isValidNumber(_value - 1)) {
+                  setState(() {
+                    _value -= 1;
+                  });
+                  _controller.text = "$_value";
+                  widget.setValue(_value);
+                }
               });
             });
           },
@@ -111,28 +113,30 @@ class _IntPickerState extends State<IntPicker> {
         GestureDetector(
           child: IconButton(
             icon: const Icon(Icons.add_box_rounded),
-            color: Theme.of(context).primaryColor,
-            onPressed: (_isValidNumber(_value + 1)) ? () {
-              setState(() {
-                _value += 1;
-              });
-              _controller.text = "$_value";
-              widget.setValue(_value);
-            } : null,
+            color: primaryColorOf(context),
+            onPressed: (_isValidNumber(_value + 1))
+                ? () {
+                    setState(() {
+                      _value += 1;
+                    });
+                    _controller.text = "$_value";
+                    widget.setValue(_value);
+                  }
+                : null,
           ),
           onTapDown: (details) {
             setState(() {
               _increaseTimer = Timer.periodic(
                   const Duration(milliseconds: _timeBetweenValueChanges),
-                      (timer) {
-                    if (_isValidNumber(_value + 1)) {
-                      setState(() {
-                        _value += 1;
-                      });
-                      _controller.text = "$_value";
-                      widget.setValue(_value);
-                    }
+                  (timer) {
+                if (_isValidNumber(_value + 1)) {
+                  setState(() {
+                    _value += 1;
                   });
+                  _controller.text = "$_value";
+                  widget.setValue(_value);
+                }
+              });
             });
           },
           onTapCancel: () {

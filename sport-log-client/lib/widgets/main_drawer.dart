@@ -5,6 +5,7 @@ import 'package:sport_log/data_provider/syncing.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 
@@ -74,7 +75,7 @@ class MainDrawer extends StatelessWidget {
                 ? 'No sync done yet.'
                 : 'Last sync: ' + dateTimeFull.format(lastSync)),
             trailing: IconButton(
-              color: Theme.of(context).primaryColor,
+              color: secondaryVariantOf(context),
               icon: const Icon(Icons.sync_sharp),
               // TODO: trigger sync on button press
               onPressed: null,
@@ -83,7 +84,7 @@ class MainDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Logout'),
             trailing: IconButton(
-              color: Theme.of(context).primaryColor,
+              color: secondaryVariantOf(context),
               icon: const Icon(Icons.logout_sharp),
               onPressed: () {
                 context.read<AuthenticationBloc>().add(const LogoutEvent());

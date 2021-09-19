@@ -1,12 +1,10 @@
-
 import 'package:flutter/material.dart';
+import 'package:sport_log/helpers/theme.dart';
 
 class DurationPicker extends StatefulWidget {
-  const DurationPicker({
-    Key? key,
-    required this.setValue,
-    required this.initialValue
-  }) : super(key: key);
+  const DurationPicker(
+      {Key? key, required this.setValue, required this.initialValue})
+      : super(key: key);
 
   final void Function(Duration) setValue;
   final Duration initialValue;
@@ -16,7 +14,6 @@ class DurationPicker extends StatefulWidget {
 }
 
 class _DurationPickerState extends State<DurationPicker> {
-
   late Duration value;
 
   @override
@@ -63,7 +60,7 @@ class _DurationPickerState extends State<DurationPicker> {
       constraints: const BoxConstraints(),
       onPressed: onPressed,
       icon: const Icon(Icons.add_box_rounded),
-      color: Theme.of(context).primaryColor,
+      color: primaryColorOf(context),
     );
   }
 
@@ -73,7 +70,7 @@ class _DurationPickerState extends State<DurationPicker> {
       constraints: const BoxConstraints(),
       onPressed: onPressed,
       icon: const Icon(Icons.indeterminate_check_box_rounded),
-      color: Theme.of(context).primaryColor,
+      color: primaryColorOf(context),
     );
   }
 

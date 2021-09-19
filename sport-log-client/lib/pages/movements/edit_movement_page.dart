@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
+import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/widgets/approve_dialog.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
@@ -193,8 +194,8 @@ class _EditMovementPageState extends State<EditMovementPage> {
   Widget _categoryInput(BuildContext context) {
     return CheckboxListTile(
       value: _md.movement.cardio,
+      checkColor: Theme.of(context).colorScheme.onPrimary,
       onChanged: _setIsCardio,
-      controlAffinity: ListTileControlAffinity.leading,
       title: const Text('Is suitable for cardio sessions'),
     );
   }

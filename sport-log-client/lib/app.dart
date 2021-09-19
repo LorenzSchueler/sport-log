@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/user_state.dart';
-import 'package:sport_log/helpers/material_color_generator.dart';
+import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/movement/movement_description.dart';
 import 'package:sport_log/models/strength/strength_session_description.dart';
@@ -27,7 +27,22 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
-    final primarySwatch = generateMaterialColor(const Color(0xff55d2db));
+    // use themeDataFromColors to change theme data
+    final darkTheme = themeDataFromColors(
+      // for selected/clickable things
+      primary: const Color(0xffa8d8ff),
+      // only for small accents
+      secondary: const Color(0xffba2f2f),
+      brightness: Brightness.dark,
+    );
+
+    final lightTheme = themeDataFromColors(
+      primary: const Color(0xff1f67a3), // for selected things
+      secondary:
+          const Color(0xffffa896), // for important things that you can click
+      brightness: Brightness.light,
+    );
+
     bool isAuthenticated = UserState.instance.currentUser != null;
     return MaterialApp(
       routes: {
@@ -64,15 +79,8 @@ class _AppState extends State<App> {
       },
       initialRoute: isAuthenticated ? Routes.workout : Routes.landing,
       debugShowCheckedModeBanner: false,
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: primarySwatch,
-        primaryColor: primarySwatch[500],
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: primarySwatch,
-          brightness: Brightness.dark,
-        ),
-      ),
+      theme: lightTheme,
+      darkTheme: darkTheme,
       themeMode: ThemeMode.dark,
       builder: (context, child) {
         if (child != null) {
