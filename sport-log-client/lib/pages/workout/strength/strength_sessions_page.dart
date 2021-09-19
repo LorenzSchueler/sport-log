@@ -10,15 +10,18 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
 
 class StrengthSessionsPage extends StatefulWidget {
-  const StrengthSessionsPage({
+  StrengthSessionsPage({
     Key? key,
     required this.start,
     required this.end,
   })  : assert((start == null) == (end == null)),
+        _filterHash = Object.hash(start, end),
         super(key: key);
 
   final DateTime? start;
   final DateTime? end;
+
+  final int _filterHash;
 
   @override
   State<StrengthSessionsPage> createState() => _StrengthSessionsPageState();
@@ -113,6 +116,9 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
       child: ExpansionTileCard(
+        // dirty fix for forcing an expansion tile card to be non-expanded at the start
+        // (without it, an expanded card might show an everloading circular progress indicator)
+        key: ValueKey(Object.hash(ssd.id, widget._filterHash)),
         leading: CircleAvatar(child: Text(ssd.movement.name[0])),
         title: Text(title),
         subtitle: Text(subtitle),
