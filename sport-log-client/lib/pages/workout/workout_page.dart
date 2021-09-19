@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
+import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_page.dart';
 import 'package:sport_log/pages/workout/strength/strength_sessions_page.dart';
 import 'package:sport_log/routes.dart';
@@ -9,7 +11,7 @@ import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 import 'date_filter_state.dart';
 
-enum BottomNavPage { workout, strength, cardio, other }
+enum BottomNavPage { metcon, strength, cardio, diary }
 
 class WorkoutPage extends StatefulWidget {
   const WorkoutPage({Key? key}) : super(key: key);
@@ -19,17 +21,63 @@ class WorkoutPage extends StatefulWidget {
 }
 
 class _WorkoutPageState extends State<WorkoutPage> {
-  BottomNavPage _currentPage = BottomNavPage.workout;
+  BottomNavPage _currentPage = BottomNavPage.metcon;
   final DateFilterState _dateFilter =
       DateFilterState(timeFrame: TimeFrame.month, start: DateTime.now());
   bool _showDateFilter = false;
+
+  Movement? _selectedMovement;
+
+  final _movementDataProvider = MovementDataProvider();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Home"),
-        bottom: _timeFilter,
+        title: Text(_selectedMovement?.name ?? 'Sessions'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              // TODO: doesn't work like that
+              final movements = await _movementDataProvider.getNonDeletedFull();
+              showDialog<void>(
+                  context: context,
+                  builder: (context) {
+                    return Dialog(
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          final md = movements[index];
+                          final selected = _selectedMovement != null &&
+                              _selectedMovement!.id == md.movement.id;
+                          return ListTile(
+                              title: Text(md.movement.name),
+                              trailing:
+                                  selected ? const Icon(Icons.check) : null,
+                              selected: selected,
+                              onTap: () {
+                                setState(() {
+                                  if (selected) {
+                                    _selectedMovement = null;
+                                  } else {
+                                    _selectedMovement = md.movement;
+                                  }
+                                  Navigator.of(context).pop();
+                                });
+                              });
+                        },
+                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        itemCount: movements.length,
+                      ),
+                    );
+                  });
+            },
+            icon: Icon(_selectedMovement != null
+                ? Icons.filter_alt
+                : Icons.filter_alt_outlined),
+          ),
+        ],
+        bottom: _filter,
       ),
       body: SimpleOverlay(
         child: WideScreenFrame(child: _mainPage),
@@ -52,8 +100,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
   }
 
   Widget get _mainPage {
+    // TODO: preserve state and/or widget when changing tab
     switch (_currentPage) {
-      case BottomNavPage.workout:
+      case BottomNavPage.metcon:
         return const MetconsPage();
       case BottomNavPage.strength:
         return StrengthSessionsPage(
@@ -64,7 +113,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
         return const Center(
           child: Text("Cardio"),
         );
-      case BottomNavPage.other:
+      case BottomNavPage.diary:
         return const Center(
           child: Text("Weight and Comments"),
         );
@@ -73,7 +122,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   BottomNavigationBarItem _toBottomNavItem(BottomNavPage page) {
     switch (page) {
-      case BottomNavPage.workout:
+      case BottomNavPage.metcon:
         return const BottomNavigationBarItem(
           icon: Icon(CustomIcons.plan),
           label: "Workouts",
@@ -88,7 +137,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
           icon: Icon(CustomIcons.heart),
           label: "Cardio",
         );
-      case BottomNavPage.other:
+      case BottomNavPage.diary:
         return const BottomNavigationBarItem(
           icon: Icon(Icons.edit),
           label: "Other",
@@ -104,7 +153,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   void _onFabTapped(BuildContext context) {
     switch (_currentPage) {
-      case BottomNavPage.workout:
+      case BottomNavPage.metcon:
         Navigator.of(context).pushNamed(Routes.editMetcon);
         break;
       case BottomNavPage.strength:
@@ -114,7 +163,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     }
   }
 
-  PreferredSizeWidget get _timeFilter {
+  PreferredSizeWidget get _filter {
     final primaryColor = Theme.of(context).primaryColor;
     return PreferredSize(
         preferredSize: const Size.fromHeight(40),
@@ -122,21 +171,20 @@ class _WorkoutPageState extends State<WorkoutPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-                onPressed: _dateFilter.timeFrame == TimeFrame.all
-                    ? null
-                    : () {
-                        setState(() {
-                          _dateFilter.goBackInTime();
-                          _showDateFilter = false;
-                        });
-                      },
-                icon: const Icon(Icons.arrow_back_ios_sharp)),
-            TextButton.icon(
-              label: const Icon(Icons.arrow_drop_down_sharp),
-              icon: Text(
+              onPressed: _dateFilter.timeFrame == TimeFrame.all
+                  ? null
+                  : () {
+                      setState(() {
+                        _dateFilter.goBackInTime();
+                        _showDateFilter = false;
+                      });
+                    },
+              icon: const Icon(Icons.arrow_back_ios_sharp),
+            ),
+            TextButton(
+              child: Text(
                 _dateFilter.getLabel(),
                 style: TextStyle(
-                  fontSize: 20,
                   color: primaryColor,
                 ),
               ),
@@ -145,15 +193,16 @@ class _WorkoutPageState extends State<WorkoutPage> {
               },
             ),
             IconButton(
-                onPressed: _dateFilter.goingForwardPossible
-                    ? () {
-                        setState(() {
-                          _dateFilter.goForwardInTime();
-                          _showDateFilter = false;
-                        });
-                      }
-                    : null,
-                icon: const Icon(Icons.arrow_forward_ios_sharp)),
+              onPressed: _dateFilter.goingForwardPossible
+                  ? () {
+                      setState(() {
+                        _dateFilter.goForwardInTime();
+                        _showDateFilter = false;
+                      });
+                    }
+                  : null,
+              icon: const Icon(Icons.arrow_forward_ios_sharp),
+            ),
           ],
         ));
   }
