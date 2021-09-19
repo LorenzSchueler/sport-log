@@ -15,7 +15,7 @@ use sport_log_types_derive::{FromI64, ToI64};
 use crate::{from_str, from_str_optional, to_str, to_str_optional, UserId};
 #[cfg(feature = "server")]
 use crate::{
-    schema::{eorm, movement},
+    schema::{eorm, movement, movement_muscle, muscle_group},
     AuthUserOrAP, CheckOptionalUserId, CheckUserId, GetById, Unverified, UnverifiedId,
     UnverifiedIds, User, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
     VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
@@ -200,6 +200,157 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
             Ok(movements)
         } else {
             Err(Status::Forbidden)
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
+#[cfg_attr(
+    feature = "server",
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForAdmin)
+)]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
+pub struct MuscleGroupId(pub i64);
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(
+    feature = "server",
+    derive(
+        Insertable,
+        Associations,
+        Identifiable,
+        Queryable,
+        GetById,
+        GetByIds,
+        GetAll
+    )
+)]
+#[cfg_attr(feature = "server", table_name = "muscle_group")]
+pub struct MuscleGroup {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
+    pub id: MuscleGroupId,
+    pub name: String,
+    pub description: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
+#[cfg_attr(
+    feature = "server",
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
+)]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
+pub struct MovementMuscleId(pub i64);
+
+#[cfg(feature = "server")]
+impl VerifyIdForUserOrAP for UnverifiedId<MovementMuscleId> {
+    type Id = MovementMuscleId;
+
+    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
+        if MovementMuscle::check_optional_user_id(self.0, **auth, conn)
+            .map_err(|_| rocket::http::Status::Forbidden)?
+        {
+            Ok(self.0)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "server")]
+impl VerifyIdsForUserOrAP for UnverifiedIds<MovementMuscleId> {
+    type Id = MovementMuscleId;
+
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Id>, Status> {
+        if MovementMuscle::check_optional_user_ids(&self.0, **auth, conn)
+            .map_err(|_| rocket::http::Status::Forbidden)?
+        {
+            Ok(self.0)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(
+    feature = "server",
+    derive(
+        Insertable,
+        Associations,
+        Identifiable,
+        Queryable,
+        AsChangeset,
+        Create,
+        CreateMultiple,
+        GetById,
+        GetByIds,
+        Update,
+    )
+)]
+#[cfg_attr(feature = "server", table_name = "movement_muscle")]
+#[cfg_attr(feature = "server", belongs_to(Movement))]
+#[cfg_attr(feature = "server", belongs_to(MuscleGroup))]
+pub struct MovementMuscle {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
+    pub id: MovementMuscleId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
+    pub movement_id: MovementId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
+    pub muscle_group_id: MuscleGroupId,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
+}
+
+#[cfg(feature = "server")]
+impl VerifyForUserOrAPWithDb for Unverified<MovementMuscle> {
+    type Entity = MovementMuscle;
+
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Self::Entity, Status> {
+        let metcon_movement = self.0.into_inner();
+        if MovementMuscle::check_user_id(metcon_movement.id, **auth, conn)
+            .map_err(|_| rocket::http::Status::InternalServerError)?
+        {
+            Ok(metcon_movement)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "server")]
+impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MovementMuscle>> {
+    type Entity = MovementMuscle;
+
+    fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status> {
+        let metcon_movements = self.0.into_inner();
+        let metcon_movement_ids: Vec<_> = metcon_movements
+            .iter()
+            .map(|metcon_movement| metcon_movement.id)
+            .collect();
+        if MovementMuscle::check_user_ids(&metcon_movement_ids, **auth, conn)
+            .map_err(|_| rocket::http::Status::InternalServerError)?
+        {
+            Ok(metcon_movements)
+        } else {
+            Err(rocket::http::Status::Forbidden)
         }
     }
 }
