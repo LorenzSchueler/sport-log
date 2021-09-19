@@ -8,18 +8,21 @@ import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class StrengthSessionsPage extends StatefulWidget {
   StrengthSessionsPage({
     Key? key,
     required this.start,
     required this.end,
+    required this.movement,
   })  : assert((start == null) == (end == null)),
-        _filterHash = Object.hash(start, end),
+        _filterHash = Object.hash(start, end, movement?.id),
         super(key: key);
 
   final DateTime? start;
   final DateTime? end;
+  final Movement? movement;
 
   final int _filterHash;
 
@@ -49,7 +52,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
         'Updating strength sessions with start = ${widget.start}, end = ${widget.end}');
     _dataProvider
         .filterDescriptions(from: widget.start, until: widget.end)
-        .then((ssds) {
+        .then((ssds) async {
       ssds.sort(byDate);
       setState(() => _ssds = ssds);
     });
@@ -71,7 +74,14 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
     _logger.d('build');
     return RefreshIndicator(
       onRefresh: _refreshPage,
-      child: _buildStrengthSessionList(context),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            if (widget.movement != null) _chart,
+            _buildStrengthSessionList(context),
+          ],
+        ),
+      ),
     );
   }
 
@@ -79,9 +89,23 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   void didUpdateWidget(StrengthSessionsPage oldWidget) {
     _logger.d('didUpdateWidget');
     super.didUpdateWidget(oldWidget);
-    if (widget.start != oldWidget.start || widget.end != oldWidget.end) {
+    if (widget.start != oldWidget.start ||
+        widget.end != oldWidget.end ||
+        widget.movement != oldWidget.movement) {
       update();
     }
+  }
+
+  Widget get _chart {
+    assert(widget.movement != null);
+    return LineChart(
+      LineChartData(
+        lineBarsData: [
+          LineChartBarData(
+          ),
+        ]
+      ),
+    );
   }
 
   Widget _buildStrengthSessionList(BuildContext context) {
@@ -92,6 +116,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
       child: ListView.builder(
         itemBuilder: _strengthSessionBuilder,
         itemCount: _ssds.length,
+        shrinkWrap: true,
       ),
     );
   }

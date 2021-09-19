@@ -80,6 +80,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
         return StrengthSessionsPage(
           start: _dateFilter.start,
           end: _dateFilter.end,
+          movement: _selectedMovement,
         );
       case BottomNavPage.cardio:
         return const Center(
