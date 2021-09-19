@@ -24,6 +24,7 @@ pub mod metcon;
 pub mod movement;
 pub mod platform;
 pub mod strength;
+pub mod training_plan;
 pub mod user;
 
 #[derive(Debug)]
