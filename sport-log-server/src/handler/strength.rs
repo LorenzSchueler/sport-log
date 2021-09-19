@@ -1,11 +1,260 @@
 use sport_log_types::{
-    AuthUserOrAP, Create, CreateMultiple, Db, GetById, GetByUser, StrengthSession,
+    AuthUserOrAP, Create, CreateMultiple, Db, GetById, GetByUser, StrengthBlueprint,
+    StrengthBlueprintId, StrengthBlueprintSet, StrengthBlueprintSetId, StrengthSession,
     StrengthSessionDescription, StrengthSessionId, StrengthSet, StrengthSetId, Unverified,
     UnverifiedId, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
     VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
 };
 
 use crate::handler::{DateTimeWrapper, IntoJson, JsonError, JsonResult};
+
+#[post(
+    "/strength_blueprint",
+    format = "application/json",
+    data = "<strength_blueprint>"
+)]
+pub async fn create_strength_blueprint(
+    strength_blueprint: Unverified<StrengthBlueprint>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<StrengthBlueprint> {
+    let strength_blueprint = strength_blueprint
+        .verify_user_ap_without_db(&auth)
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(|c| StrengthBlueprint::create(strength_blueprint, c))
+        .await
+        .into_json()
+}
+
+#[post(
+    "/strength_blueprints",
+    format = "application/json",
+    data = "<strength_blueprints>"
+)]
+pub async fn create_strength_blueprints(
+    strength_blueprints: Unverified<Vec<StrengthBlueprint>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<Vec<StrengthBlueprint>> {
+    let strength_blueprint = strength_blueprints
+        .verify_user_ap_without_db(&auth)
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(|c| StrengthBlueprint::create_multiple(strength_blueprint, c))
+        .await
+        .into_json()
+}
+
+#[get("/strength_blueprint/<strength_blueprint_id>")]
+pub async fn get_strength_blueprint(
+    strength_blueprint_id: UnverifiedId<StrengthBlueprintId>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<StrengthBlueprint> {
+    let strength_blueprint_id = conn
+        .run(move |c| strength_blueprint_id.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(move |c| StrengthBlueprint::get_by_id(strength_blueprint_id, c))
+        .await
+        .into_json()
+}
+
+#[get("/strength_blueprint")]
+pub async fn get_strength_blueprints(
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<Vec<StrengthBlueprint>> {
+    conn.run(move |c| StrengthBlueprint::get_by_user(*auth, c))
+        .await
+        .into_json()
+}
+
+#[put(
+    "/strength_blueprint",
+    format = "application/json",
+    data = "<strength_blueprint>"
+)]
+pub async fn update_strength_blueprint(
+    strength_blueprint: Unverified<StrengthBlueprint>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<StrengthBlueprint> {
+    let strength_blueprint = conn
+        .run(move |c| strength_blueprint.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(|c| StrengthBlueprint::update(strength_blueprint, c))
+        .await
+        .into_json()
+}
+
+#[put(
+    "/strength_blueprints",
+    format = "application/json",
+    data = "<strength_blueprints>"
+)]
+pub async fn update_strength_blueprints(
+    strength_blueprints: Unverified<Vec<StrengthBlueprint>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<Vec<StrengthBlueprint>> {
+    let strength_blueprints = conn
+        .run(move |c| strength_blueprints.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(|c| StrengthBlueprint::update_multiple(strength_blueprints, c))
+        .await
+        .into_json()
+}
+
+#[post(
+    "/strength_blueprint_set",
+    format = "application/json",
+    data = "<strength_blueprint_set>"
+)]
+pub async fn create_strength_blueprint_set(
+    strength_blueprint_set: Unverified<StrengthBlueprintSet>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<StrengthBlueprintSet> {
+    let strength_blueprint_set = conn
+        .run(move |c| strength_blueprint_set.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(|c| StrengthBlueprintSet::create(strength_blueprint_set, c))
+        .await
+        .into_json()
+}
+
+#[post(
+    "/strength_blueprint_sets",
+    format = "application/json",
+    data = "<strength_blueprint_sets>"
+)]
+pub async fn create_strength_blueprint_sets(
+    strength_blueprint_sets: Unverified<Vec<StrengthBlueprintSet>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<Vec<StrengthBlueprintSet>> {
+    let strength_blueprint_set = conn
+        .run(move |c| strength_blueprint_sets.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(|c| StrengthBlueprintSet::create_multiple(strength_blueprint_set, c))
+        .await
+        .into_json()
+}
+
+#[get("/strength_blueprint_set/<strength_blueprint_set_id>")]
+pub async fn get_strength_blueprint_set(
+    strength_blueprint_set_id: UnverifiedId<StrengthBlueprintSetId>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<StrengthBlueprintSet> {
+    let strength_blueprint_set_id = conn
+        .run(move |c| strength_blueprint_set_id.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(move |c| StrengthBlueprintSet::get_by_id(strength_blueprint_set_id, c))
+        .await
+        .into_json()
+}
+
+#[get("/strength_blueprint_set")]
+pub async fn get_strength_blueprint_sets(
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<Vec<StrengthBlueprintSet>> {
+    conn.run(move |c| StrengthBlueprintSet::get_by_user(*auth, c))
+        .await
+        .into_json()
+}
+
+#[get("/strength_blueprint_set/strength_blueprint/<strength_blueprint_id>")]
+pub async fn get_strength_blueprint_sets_by_strength_blueprint(
+    strength_blueprint_id: UnverifiedId<StrengthBlueprintId>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<Vec<StrengthBlueprintSet>> {
+    let strength_blueprint_id = conn
+        .run(move |c| strength_blueprint_id.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(move |c| StrengthBlueprintSet::get_by_strength_blueprint(strength_blueprint_id, c))
+        .await
+        .into_json()
+}
+
+#[put(
+    "/strength_blueprint_set",
+    format = "application/json",
+    data = "<strength_blueprint_set>"
+)]
+pub async fn update_strength_blueprint_set(
+    strength_blueprint_set: Unverified<StrengthBlueprintSet>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<StrengthBlueprintSet> {
+    let strength_blueprint_set = conn
+        .run(move |c| strength_blueprint_set.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(|c| StrengthBlueprintSet::update(strength_blueprint_set, c))
+        .await
+        .into_json()
+}
+
+#[put(
+    "/strength_blueprint_sets",
+    format = "application/json",
+    data = "<strength_blueprint_sets>"
+)]
+pub async fn update_strength_blueprint_sets(
+    strength_blueprint_sets: Unverified<Vec<StrengthBlueprintSet>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<Vec<StrengthBlueprintSet>> {
+    let strength_blueprint_sets = conn
+        .run(move |c| strength_blueprint_sets.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(|c| StrengthBlueprintSet::update_multiple(strength_blueprint_sets, c))
+        .await
+        .into_json()
+}
 
 #[post(
     "/strength_session",
