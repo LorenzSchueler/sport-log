@@ -40,7 +40,7 @@ create table cardio_blueprint (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
     training_plan_id bigint not null references training_plan on delete cascade,
-    name varchar(80) not null,
+    name varchar(80),
     description text,
     movement_id bigint not null references movement on delete cascade,
     cardio_type cardio_type not null,

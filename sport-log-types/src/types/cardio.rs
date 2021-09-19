@@ -188,7 +188,8 @@ pub struct CardioBlueprint {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub training_plan_id: TrainingPlanId,
-    pub name: String,
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    pub name: Option<String>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
     #[serde(serialize_with = "to_str")]
