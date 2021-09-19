@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
+import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/helpers/theme.dart';
+import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_page.dart';
 import 'package:sport_log/pages/workout/strength/strength_sessions_page.dart';
@@ -39,39 +41,8 @@ class _WorkoutPageState extends State<WorkoutPage> {
         actions: [
           IconButton(
             onPressed: () async {
-              // TODO: doesn't work like that
-              final movements = await _movementDataProvider.getNonDeletedFull();
               showDialog<void>(
-                  context: context,
-                  builder: (context) {
-                    return Dialog(
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          final md = movements[index];
-                          final selected = _selectedMovement != null &&
-                              _selectedMovement!.id == md.movement.id;
-                          return ListTile(
-                              title: Text(md.movement.name),
-                              trailing:
-                                  selected ? const Icon(Icons.check) : null,
-                              selected: selected,
-                              onTap: () {
-                                setState(() {
-                                  if (selected) {
-                                    _selectedMovement = null;
-                                  } else {
-                                    _selectedMovement = md.movement;
-                                  }
-                                  Navigator.of(context).pop();
-                                });
-                              });
-                        },
-                        separatorBuilder: (_, __) => const Divider(height: 1),
-                        itemCount: movements.length,
-                      ),
-                    );
-                  });
+                  context: context, builder: _movementPickerBuilder);
             },
             icon: Icon(_selectedMovement != null
                 ? Icons.filter_alt
@@ -246,6 +217,52 @@ class _WorkoutPageState extends State<WorkoutPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _movementPickerBuilder(BuildContext context) {
+    return Dialog(
+      child: FutureBuilder<List<Movement>>(
+        future: _movementDataProvider.getNonDeleted(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data!.isEmpty) {
+              return const Center(
+                  child: Text('Nothing here. Create a movement first.'));
+            }
+            return ListView.separated(
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                final movement = snapshot.data![index];
+                final selected = _selectedMovement != null &&
+                    _selectedMovement!.id == movement.id;
+                return ListTile(
+                    title: Text(movement.name),
+                    trailing: selected ? const Icon(Icons.check) : null,
+                    selected: selected,
+                    onTap: () {
+                      setState(() {
+                        if (selected) {
+                          _selectedMovement = null;
+                        } else {
+                          _selectedMovement = movement;
+                        }
+                        Navigator.of(context).pop();
+                      });
+                    });
+              },
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemCount: snapshot.data!.length,
+            );
+          } else if (snapshot.hasError) {
+            Future(() =>
+                showSimpleSnackBar(context, 'Failed to select movements.'));
+            return const Center(child: Text('Nothing here'));
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
       ),
     );
   }
