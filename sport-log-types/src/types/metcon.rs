@@ -10,7 +10,8 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync,
-    ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    HardDelete, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
+    VerifyIdForUserOrAP,
 };
 use sport_log_types_derive::{FromI64, ToI64};
 
@@ -99,6 +100,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconId> {
         GetById,
         GetByIds,
         Update,
+        HardDelete,
         CheckUserId,
     )
 )]
@@ -254,6 +256,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconMovementId> {
         GetById,
         GetByIds,
         Update,
+        HardDelete,
     )
 )]
 #[cfg_attr(feature = "server", table_name = "metcon_movement")]
@@ -348,6 +351,7 @@ pub struct MetconSessionId(pub i64);
         GetByUser,
         GetByUserSync,
         Update,
+        HardDelete,
         CheckUserId,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb
@@ -404,6 +408,7 @@ pub struct MetconItemId(pub i64);
         GetById,
         GetByIds,
         Update,
+        HardDelete,
     )
 )]
 #[cfg_attr(feature = "server", table_name = "metcon_item")]

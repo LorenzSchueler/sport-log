@@ -7,8 +7,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
-    CheckUserId, Create, CreateMultiple, FromSql, GetAll, GetById, GetByIds, ToSql, Update,
-    VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
+    CheckUserId, Create, CreateMultiple, FromSql, GetAll, GetById, GetByIds, HardDelete, ToSql,
+    Update, VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
 };
 use sport_log_types_derive::{FromI64, ToI64};
 
@@ -102,6 +102,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
         GetById,
         GetByIds,
         Update,
+        HardDelete,
         CheckUserId,
         VerifyForAdminWithoutDb
     )
@@ -290,6 +291,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementMuscleId> {
         GetById,
         GetByIds,
         Update,
+        HardDelete,
     )
 )]
 #[cfg_attr(feature = "server", table_name = "movement_muscle")]

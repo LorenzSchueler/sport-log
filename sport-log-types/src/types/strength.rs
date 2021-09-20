@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, ToSql, Update,
-    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete,
+    ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
 };
 use sport_log_types_derive::{FromI64, ToI64};
 
@@ -45,6 +45,7 @@ pub struct StrengthBlueprintId(pub i64);
         GetByUser,
         GetByUserSync,
         Update,
+        HardDelete,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb
     )
@@ -98,6 +99,7 @@ pub struct StrengthBlueprintSetId(pub i64);
         GetById,
         GetByIds,
         Update,
+        HardDelete,
     )
 )]
 #[cfg_attr(feature = "server", table_name = "strength_blueprint_set")]
@@ -189,6 +191,7 @@ pub struct StrengthSessionId(pub i64);
         GetByUser,
         GetByUserSync,
         Update,
+        HardDelete,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb
     )
@@ -242,6 +245,7 @@ pub struct StrengthSetId(pub i64);
         GetById,
         GetByIds,
         Update,
+        HardDelete,
     )
 )]
 #[cfg_attr(feature = "server", table_name = "strength_set")]

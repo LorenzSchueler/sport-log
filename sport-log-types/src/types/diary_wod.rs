@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync,
-    ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
-    VerifyUnchecked,
+    HardDelete, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
+    VerifyIdForUserOrAP, VerifyUnchecked,
 };
 use sport_log_types_derive::{FromI64, ToI64};
 
@@ -40,6 +40,7 @@ pub struct DiaryId(pub i64);
         GetByUser,
         GetByUserSync,
         Update,
+        HardDelete,
         CheckUserId,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb,
@@ -90,6 +91,7 @@ pub struct WodId(pub i64);
         GetByUser,
         GetByUserSync,
         Update,
+        HardDelete,
         CheckUserId,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb,

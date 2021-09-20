@@ -3,7 +3,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, ToSql, Update,
+    Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete,
+    ToSql, Update,
 };
 use sport_log_types_derive::{FromI64, ToI64};
 
@@ -41,6 +42,7 @@ pub struct GroupId(pub i64);
         GetById,
         GetByIds,
         Update,
+        HardDelete,
     )
 )]
 #[cfg_attr(feature = "server", table_name = "group")]
@@ -79,6 +81,7 @@ pub struct GroupUserId(pub i64);
         GetByUser,
         GetByUserSync,
         Update,
+        HardDelete,
     )
 )]
 #[cfg_attr(feature = "server", table_name = "group_user")]
@@ -122,6 +125,7 @@ pub struct SharedMetconSessionId(pub i64);
         GetById,
         GetByIds,
         Update,
+        HardDelete,
     )
 )]
 #[cfg_attr(feature = "server", table_name = "shared_metcon_session")]
@@ -165,6 +169,7 @@ pub struct SharedStrengthSessionId(pub i64);
         GetById,
         GetByIds,
         Update,
+        HardDelete,
     )
 )]
 #[cfg_attr(feature = "server", table_name = "shared_strength_session")]
@@ -208,6 +213,7 @@ pub struct SharedCardioSessionId(pub i64);
         GetById,
         GetByIds,
         Update,
+        HardDelete,
     )
 )]
 #[cfg_attr(feature = "server", table_name = "shared_cardio_session")]
@@ -251,6 +257,7 @@ pub struct SharedDiaryId(pub i64);
         GetById,
         GetByIds,
         Update,
+        HardDelete,
     )
 )]
 #[cfg_attr(feature = "server", table_name = "shared_diary")]
