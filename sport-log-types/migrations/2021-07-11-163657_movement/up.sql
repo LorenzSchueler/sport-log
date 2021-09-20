@@ -1,4 +1,4 @@
-create type movement_unit as enum('reps', 'cal', 'meter', 'km', 'yard', 'foot', 'mile');
+create type movement_unit as enum('reps', 'cal', 'meter', 'km', 'yard', 'foot', 'mile', 'msec');
 
 create table movement (
     id bigint primary key,

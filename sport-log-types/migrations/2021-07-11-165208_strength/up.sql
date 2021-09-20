@@ -36,7 +36,6 @@ create table strength_blueprint_set (
     set_number integer not null check (set_number >= 0),
     count integer not null check (count >= 1),
     weight real check (weight > 0),
-    time integer check (time > 0),
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
@@ -107,7 +106,6 @@ create table strength_set (
     set_number integer not null check (set_number >= 0),
     count integer not null check (count >= 1),
     weight real check (weight > 0),
-    time integer check (time > 0),
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );

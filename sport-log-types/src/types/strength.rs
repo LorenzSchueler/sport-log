@@ -115,8 +115,6 @@ pub struct StrengthBlueprintSet {
     pub count: i32,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub weight: Option<f32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
-    pub time: Option<i32>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,
@@ -261,8 +259,6 @@ pub struct StrengthSet {
     pub count: i32,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub weight: Option<f32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
-    pub time: Option<i32>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,

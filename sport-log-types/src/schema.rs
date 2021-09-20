@@ -396,7 +396,6 @@ table! {
         set_number -> Int4,
         count -> Int4,
         weight -> Nullable<Float4>,
-        time -> Nullable<Int4>,
         last_change -> Timestamptz,
         deleted -> Bool,
     }
@@ -430,7 +429,6 @@ table! {
         set_number -> Int4,
         count -> Int4,
         weight -> Nullable<Float4>,
-        time -> Nullable<Int4>,
         last_change -> Timestamptz,
         deleted -> Bool,
     }

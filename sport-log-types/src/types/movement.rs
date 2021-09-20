@@ -31,6 +31,7 @@ pub enum MovementUnit {
     Yard,
     Foot,
     Mile,
+    Msec,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
