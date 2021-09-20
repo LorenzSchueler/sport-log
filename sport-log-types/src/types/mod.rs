@@ -304,7 +304,7 @@ pub trait Update {
 ///
 /// This is only inteded for garbage collection triggered by `sport_log_scheduler`.
 ///
-/// The function [hard_delete] will permanentily delete all entities that are already soft deleted and which have not been changed since `last_change`.
+/// The function [hard_delete](HardDelete::hard_delete) will permanentily delete all entities that are already soft deleted and which have not been changed since `last_change`.
 ///
 /// ### Deriving
 ///

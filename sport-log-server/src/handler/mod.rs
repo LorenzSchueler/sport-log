@@ -20,6 +20,7 @@ pub mod action;
 pub mod activity;
 pub mod cardio;
 pub mod diary_wod;
+pub mod garbage_collection;
 pub mod metcon;
 pub mod movement;
 pub mod platform;
