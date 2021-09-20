@@ -2,9 +2,10 @@ use rocket::http::Status;
 
 use sport_log_types::{
     Action, ActionEvent, ActionProvider, ActionRule, AuthAdmin, CardioBlueprint, CardioSession, Db,
-    Diary, HardDelete, Metcon, MetconItem, MetconMovement, MetconSession, Movement, MovementMuscle,
-    Platform, PlatformCredential, Route, StrengthBlueprint, StrengthBlueprintSet, StrengthSession,
-    StrengthSet, TrainingPlan, Wod,
+    Diary, Group, GroupUser, HardDelete, Metcon, MetconItem, MetconMovement, MetconSession,
+    Movement, MovementMuscle, Platform, PlatformCredential, Route, SharedCardioSession,
+    SharedDiary, SharedMetconSession, SharedStrengthSession, StrengthBlueprint,
+    StrengthBlueprintSet, StrengthSession, StrengthSet, TrainingPlan, Wod,
 };
 
 use crate::handler::DateTimeWrapper;
@@ -40,6 +41,15 @@ pub async fn adm_garbage_collect(
         Route::hard_delete(*last_change, c).map_err(|_| Status::InternalServerError)?;
         CardioBlueprint::hard_delete(*last_change, c).map_err(|_| Status::InternalServerError)?;
         CardioSession::hard_delete(*last_change, c).map_err(|_| Status::InternalServerError)?;
+        Group::hard_delete(*last_change, c).map_err(|_| Status::InternalServerError)?;
+        GroupUser::hard_delete(*last_change, c).map_err(|_| Status::InternalServerError)?;
+        SharedDiary::hard_delete(*last_change, c).map_err(|_| Status::InternalServerError)?;
+        SharedStrengthSession::hard_delete(*last_change, c)
+            .map_err(|_| Status::InternalServerError)?;
+        SharedMetconSession::hard_delete(*last_change, c)
+            .map_err(|_| Status::InternalServerError)?;
+        SharedCardioSession::hard_delete(*last_change, c)
+            .map_err(|_| Status::InternalServerError)?;
 
         Ok(Status::NoContent)
     })

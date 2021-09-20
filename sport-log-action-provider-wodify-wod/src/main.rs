@@ -422,7 +422,7 @@ async fn try_get_wod(
                 info!("new wod created");
             }
             _ => {
-                response.json::<Wod>().await.map_err(Error::Reqwest)?; // this will always fail and return the error
+                response.error_for_status().map_err(Error::Reqwest)?; // this will always fail and return the error
             }
         }
 

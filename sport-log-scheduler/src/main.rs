@@ -37,6 +37,7 @@ const CONFIG_FILE: &str = "sport-log-scheduler.toml";
 pub struct Config {
     pub admin_password: String,
     pub base_url: String,
+    pub garbage_collection_min_days: u32,
 }
 
 fn main() {
@@ -75,6 +76,13 @@ fn main() {
             error
         );
     }
+
+    if let Err(error) = garbage_collection(&client, &config) {
+        error!(
+            "while running garbage collection an error occured: {}",
+            error
+        );
+    }
 }
 
 fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestError> {
@@ -82,6 +90,7 @@ fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
         .get(format!("{}/v1/adm/creatable_action_rule", config.base_url))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .send()?
+        .error_for_status()?
         .json()?;
 
     info!(
@@ -131,7 +140,8 @@ fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
         .post(format!("{}/v1/adm/action_events", config.base_url))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .json(&action_events)
-        .send()?;
+        .send()?
+        .error_for_status()?;
 
     info!("creation of action events successful");
 
@@ -143,6 +153,7 @@ fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
         .get(format!("{}/v1/adm/deletable_action_event", config.base_url))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .send()?
+        .error_for_status()?
         .json()?;
 
     info!(
@@ -168,9 +179,33 @@ fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
         .delete(format!("{}/v1/adm/action_events", config.base_url,))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .json(&action_event_ids)
-        .send()?;
+        .send()?
+        .error_for_status()?;
 
     info!("action events have been successfully deleted");
+
+    Ok(())
+}
+
+fn garbage_collection(client: &Client, config: &Config) -> Result<(), ReqwestError> {
+    if config.garbage_collection_min_days > 0 {
+        info!(
+            "deleting if older than {} days",
+            config.garbage_collection_min_days
+        );
+
+        client
+            .delete(format!(
+                "{}/v1/adm/garbage_collection/{}",
+                config.base_url,
+                Utc::now() - Duration::days(config.garbage_collection_min_days as i64)
+            ))
+            .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
+            .send()?
+            .error_for_status()?;
+
+        info!("old data has been successfully deleted");
+    }
 
     Ok(())
 }
