@@ -300,6 +300,22 @@ pub trait Update {
         Self: Sized;
 }
 
+/// A type for which all soft deleted entities can be hard deleted.
+///
+/// This is only inteded for garbage collection triggered by `sport_log_scheduler`.
+///
+/// The function [hard_delete] will permanentily delete all entities that are already soft deleted and which have not been changed since `last_change`.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(HardDelete)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::HardDelete].
+#[cfg(feature = "server")]
+pub trait HardDelete {
+    fn hard_delete(last_change: DateTime<Utc>, conn: &PgConnection) -> QueryResult<usize>;
+}
+
 /// A type which can be checked if it belongs to a User.
 ///
 /// ### Deriving

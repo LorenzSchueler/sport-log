@@ -195,6 +195,26 @@ pub fn impl_update(ast: &syn::DeriveInput) -> TokenStream {
     gen.into()
 }
 
+pub fn impl_hard_delete(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+    let (_, _, _, tablename) = get_identifiers(typename);
+
+    let gen = quote! {
+        use diesel::prelude::*;
+
+        impl crate::HardDelete for #typename {
+            fn hard_delete(last_change: DateTime<Utc>, conn: &PgConnection) -> QueryResult<usize> {
+                diesel::delete(
+                    #tablename::table
+                        .filter(#tablename::columns::deleted.eq(true))
+                        .filter(#tablename::columns::last_change.le(last_change))
+                ).execute(conn)
+            }
+        }
+    };
+    gen.into()
+}
+
 pub fn impl_check_user_id(ast: &syn::DeriveInput) -> TokenStream {
     let typename = &ast.ident;
     let (idtypename, _, _, tablename) = get_identifiers(typename);

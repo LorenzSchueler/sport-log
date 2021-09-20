@@ -110,6 +110,17 @@ pub fn update_derive(input: TokenStream) -> TokenStream {
     impl_update(&ast)
 }
 
+/// Derives `sport_log_types::HardDelete`.
+///
+/// This macro only works if the following conditions are satisfied:
+/// - the corresponding table has the same name like this type but in snake_case
+/// - the table has the columns `deleted` ([bool]) and `last_change` ([DateTime])
+#[proc_macro_derive(HardDelete)]
+pub fn hard_delete_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_hard_delete(&ast)
+}
+
 #[proc_macro_derive(CheckUserId)]
 pub fn check_user_id_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
