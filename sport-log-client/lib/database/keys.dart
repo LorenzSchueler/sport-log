@@ -1,4 +1,3 @@
-
 abstract class Keys {
   static const actionId = 'action_id';
   static const actionProviderId = 'action_provider_id';
@@ -26,12 +25,17 @@ abstract class Keys {
   static const id = 'id';
   static const interval = 'interval';
   static const lastSync = 'last_sync';
+  static const maxCount = 'max_count';
+  static const maxEorm = 'max_eorm';
+  static const maxWeight = 'max_weight';
   static const metconId = 'metcon_id';
   static const metconType = 'metcon_type';
+  static const minCount = 'min_count';
   static const movementId = 'movement_id';
   static const movementNumber = 'movement_number';
   static const movementUnit = 'movement_unit';
   static const name = 'name';
+  static const numSets = 'num_sets';
   static const password = 'password';
   static const platformId = 'platform_id';
   static const reps = 'reps';
@@ -40,6 +44,8 @@ abstract class Keys {
   static const rx = 'rx';
   static const setNumber = 'set_number';
   static const strengthSessionId = 'strength_session_id';
+  static const sumCount = 'sum_count';
+  static const sumVolume = 'sum_volume';
   static const syncNeeded = 'sync_needed';
   static const syncStatus = 'sync_status';
   static const time = 'time';
