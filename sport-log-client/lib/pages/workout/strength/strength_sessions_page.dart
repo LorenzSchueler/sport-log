@@ -98,7 +98,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: AspectRatio(
-        aspectRatio: 2.6,
+        aspectRatio: 2,
         child: LineChart(LineChartData(
           borderData: FlBorderData(show: false),
           titlesData: FlTitlesData(
@@ -106,8 +106,8 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
             rightTitles: SideTitles(showTitles: false),
             leftTitles: SideTitles(
               showTitles: true,
-              reservedSize: 30,
-              margin: -29,
+              reservedSize: 40,
+              margin: -39,
             ),
             bottomTitles: SideTitles(
               showTitles: true,
@@ -126,11 +126,12 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
             LineChartBarData(
               colors: [primaryColorOf(context)],
               spots: _ssds
+                  .where((ssd) => ssd.stats!.maxEorm != null)
                   .map((ssd) => FlSpot(
                       (ssd.strengthSession.datetime.millisecondsSinceEpoch -
                               startMs)
                           .toDouble(),
-                      ssd.stats!.minCount.toDouble()))
+                      ssd.stats!.maxEorm!))
                   .toList(),
               isCurved: false,
               dotData: FlDotData(show: false),
@@ -148,7 +149,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
     return Scrollbar(
       child: ListView.builder(
         itemBuilder: _strengthSessionBuilder,
-        itemCount: _ssds.length,
+        itemCount: _ssds.length + 1,
         shrinkWrap: true,
       ),
     );
