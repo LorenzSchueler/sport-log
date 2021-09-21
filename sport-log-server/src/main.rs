@@ -37,7 +37,9 @@ mod tests;
 
 use handler::{IntoJson, JsonError, JsonResult};
 
-const VERSION: &str = "1";
+const VERSION_1: &str = "1";
+const MIN_VERSION: &str = VERSION_1;
+const MAX_VERSION: &str = VERSION_1;
 
 #[catch(default)]
 fn default_catcher(status: Status, _request: &Request) -> JsonError {
@@ -86,8 +88,8 @@ impl Fairing for CORS {
 #[get("/version")]
 pub async fn get_version() -> JsonResult<Version> {
     Ok(Version {
-        min_version: VERSION.to_owned(),
-        max_version: VERSION.to_owned(),
+        min: MIN_VERSION.to_owned(),
+        max: MAX_VERSION.to_owned(),
     })
     .into_json()
 }
@@ -113,7 +115,7 @@ fn rocket() -> _ {
         .register("/", catchers![default_catcher, catcher_404])
         .mount("/", routes![get_version])
         .mount(
-            format!("/v{}", VERSION),
+            format!("/v{}", VERSION_1),
             routes![
                 user::adm_create_user,
                 platform::adm_create_platform,
