@@ -78,14 +78,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
     _logger.d('build');
     return RefreshIndicator(
       onRefresh: _refreshPage,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            if (widget.movement != null) _chart,
-            _buildStrengthSessionList(context),
-          ],
-        ),
-      ),
+      child: _buildStrengthSessionList(context),
     );
   }
 
