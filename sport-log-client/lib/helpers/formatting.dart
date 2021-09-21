@@ -31,3 +31,22 @@ final dateWithYear = DateFormat('dd.MM.yyyy');
 final monthName = DateFormat.MMMM();
 final monthWithYear = DateFormat('MMMM yyyy');
 final dateTimeFull = DateFormat('dd.MM.yyyy HH:mm');
+
+const _shortMonthNames = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+String shortMonthName(int month) {
+  return _shortMonthNames[month - 1];
+}

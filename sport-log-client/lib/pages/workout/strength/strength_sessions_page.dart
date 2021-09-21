@@ -6,6 +6,7 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -42,10 +43,6 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
     super.initState();
     update();
   }
-
-  static int byDate(
-          StrengthSessionDescription ssd1, StrengthSessionDescription ssd2) =>
-      ssd2.strengthSession.datetime.compareTo(ssd1.strengthSession.datetime);
 
   Future<void> update() async {
     _logger.d(
@@ -94,11 +91,53 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   }
 
   Widget get _chart {
-    assert(widget.movement != null);
-    return LineChart(
-      LineChartData(lineBarsData: [
-        LineChartBarData(),
-      ]),
+    if (widget.movement == null || widget.start == null || widget.end == null) {
+      return const SizedBox();
+    }
+    final startMs = widget.start!.millisecondsSinceEpoch;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: AspectRatio(
+        aspectRatio: 2.6,
+        child: LineChart(LineChartData(
+          borderData: FlBorderData(show: false),
+          titlesData: FlTitlesData(
+            topTitles: SideTitles(showTitles: false),
+            rightTitles: SideTitles(showTitles: false),
+            leftTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 30,
+              margin: -29,
+            ),
+            bottomTitles: SideTitles(
+              showTitles: true,
+              interval: Duration.millisecondsPerDay.toDouble(),
+              checkToShowTitle: (a, b, c, d, value) {
+                final datetime = DateTime.fromMillisecondsSinceEpoch(
+                    value.toInt() + startMs);
+                return datetime.day == 15;
+              },
+              getTitles: (ms) => shortMonthName(
+                  DateTime.fromMillisecondsSinceEpoch(ms.toInt() + startMs)
+                      .month),
+            ),
+          ),
+          lineBarsData: [
+            LineChartBarData(
+              colors: [primaryColorOf(context)],
+              spots: _ssds
+                  .map((ssd) => FlSpot(
+                      (ssd.strengthSession.datetime.millisecondsSinceEpoch -
+                              startMs)
+                          .toDouble(),
+                      ssd.stats!.minCount.toDouble()))
+                  .toList(),
+              isCurved: false,
+              dotData: FlDotData(show: false),
+            ),
+          ],
+        )),
+      ),
     );
   }
 
@@ -116,6 +155,10 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   }
 
   Widget _strengthSessionBuilder(BuildContext context, int index) {
+    if (index == 0) {
+      return _chart;
+    }
+    index--;
     final ssd = _ssds[index];
     final String date =
         DateFormat('dd.MM.yyyy').format(ssd.strengthSession.datetime);
