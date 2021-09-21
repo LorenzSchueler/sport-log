@@ -29,11 +29,14 @@ class AppDatabase {
         version: 1,
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
         onCreate: (db, version) async {
-          String sql = '';
+          List<String> sql = [];
           for (final table in allTables) {
-            sql += await table.init(db);
+            sql += await table.init();
           }
-          _logger.d(sql);
+          for (final statement in sql) {
+            db.execute(statement);
+            _logger.d(statement);
+          }
         },
         onOpen: (db) {
           for (final table in allTables) {

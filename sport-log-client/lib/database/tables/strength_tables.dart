@@ -7,6 +7,7 @@ import 'package:sport_log/database/table_names.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
+import 'package:sqflite/sqflite.dart';
 
 import 'movement_table.dart';
 
@@ -39,68 +40,75 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
   static const eormPercentage = Keys.eormPercentage;
 
   @override
-  String get setupSql =>
-      _table.setupSql() +
+  Future<List<String>> init() async {
+    return [
+      _table.setupSql(),
+      updateTrigger,
       '''
-    CREATE TABLE $eorm (
-        $eormReps INTEGER NOT NULL UNIQUE CHECK ($eormReps >= 1),
-        $eormPercentage REAL NOT NULL CHECK ($eormPercentage > 0)
-    );
+        CREATE TABLE $eorm (
+          $eormReps INTEGER PRIMARY KEY CHECK ($eormReps >= 1),
+          $eormPercentage REAL NOT NULL CHECK ($eormPercentage > 0)
+        );
+      ''',
+      '''
+        INSERT INTO $eorm ($eormReps, $eormPercentage) VALUES
+          (1, 1.0),
+          (2, 0.97),
+          (3, 0.94),
+          (4, 0.92),
+          (5, 0.89),
+          (6, 0.86),
+          (7, 0.83),
+          (8, 0.81),
+          (9, 0.78),
+          (10, 0.75),
+          (11, 0.73),
+          (12, 0.71),
+          (13, 0.70),
+          (14, 0.68),
+          (15, 0.67),
+          (16, 0.65),
+          (17, 0.64),
+          (18, 0.63),
+          (19, 0.61),
+          (20, 0.60),
+          (21, 0.59),
+          (22, 0.58),
+          (23, 0.57),
+          (24, 0.56),
+          (25, 0.55),
+          (26, 0.54),
+          (27, 0.53),
+          (28, 0.52),
+          (29, 0.51),
+          (30, 0.50);
+        ''',
+      '''
+          CREATE VIEW $statsView AS
+          SELECT
+            ${_table.allColumns},
+            ${_movementTable.table.allColumns},
+            COUNT($strengthSet.$id) AS $numSets,
+            MIN($strengthSet.$count) AS $minCount,
+            MAX($strengthSet.$count) AS $maxCount,
+            SUM($strengthSet.$count) AS $sumCount,
+            MAX($strengthSet.$weight) AS $maxWeight,
+            SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
+            MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
+          FROM $tableName
+            JOIN $movement ON $movement.$id = $tableName.$movementId
+            JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
+            LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
+          WHERE $movement.$deleted = 0
+            AND $strengthSet.$deleted = 0
+            AND $tableName.$deleted = 0
+          GROUP BY $tableName.$id
+          HAVING COUNT($strengthSet.$id) > 0
+          ORDER BY datetime($tableName.$datetime);
+        '''
+    ];
+  }
 
-    INSERT INTO $eorm ($eormReps, $eormPercentage) VALUES
-        (1, 1.0),
-        (2, 0.97),
-        (3, 0.94),
-        (4, 0.92),
-        (5, 0.89),
-        (6, 0.86),
-        (7, 0.83),
-        (8, 0.81),
-        (9, 0.78),
-        (10, 0.75),
-        (11, 0.73),
-        (12, 0.71),
-        (13, 0.70),
-        (14, 0.68),
-        (15, 0.67),
-        (16, 0.65),
-        (17, 0.64),
-        (18, 0.63),
-        (19, 0.61),
-        (20, 0.60),
-        (21, 0.59),
-        (22, 0.58),
-        (23, 0.57),
-        (24, 0.56),
-        (25, 0.55),
-        (26, 0.54),
-        (27, 0.53),
-        (28, 0.52),
-        (29, 0.51),
-        (30, 0.50);
-
-    CREATE VIEW $statsView AS
-    SELECT
-      ${_table.allColumns},
-      ${_movementTable.table.allColumns},
-      COUNT($strengthSet.$id) AS $numSets,
-      MIN($strengthSet.$count) AS $minCount,
-      MAX($strengthSet.$count) AS $maxCount,
-      SUM($strengthSet.$count) AS $sumCount,
-      MAX($strengthSet.$weight) AS $maxWeight,
-      SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
-      MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
-    FROM $tableName
-      JOIN $movement ON $movement.$id = $tableName.$movementId
-      JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
-      LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
-    WHERE $movement.$deleted = 0
-      AND $strengthSet.$deleted = 0
-      AND $tableName.$deleted = 0
-      AND $numSets > 0
-    GROUP BY $tableName.$id
-    ORDER BY datetime($tableName.$datetime);
-  ''';
   @override
   String get tableName => _table.name;
 
@@ -127,20 +135,20 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
     DateTime? until,
   }) async {
     final now = DateTime.now();
-    final whereClause = [
-      if (from != null) '$datetime >= ?',
-      if (until != null) '$datetime <= ?',
-      if (movementIdValue != null) '$movementId = ?',
-    ].join(' AND ');
-    final records = await database.query(
-      statsView,
-      where: whereClause,
-      whereArgs: [
-        if (from != null) from.toString(),
-        if (until != null) until.toString(),
-        if (movementIdValue != null) movementIdValue.toInt(),
-      ],
-    );
+    final whereFilters = [
+      if (from != null) '${_table.prefix}$datetime >= ?',
+      if (until != null) '${_table.prefix}$datetime <= ?',
+      if (movementIdValue != null) '${_table.prefix}$movementId = ?',
+    ];
+    final whereClause =
+        whereFilters.isEmpty ? '' : 'WHERE ' + whereFilters.join(' AND ');
+    final args = [
+      if (from != null) from.toString(),
+      if (until != null) until.toString(),
+      if (movementIdValue != null) movementIdValue.toInt(),
+    ];
+    final records =
+        await database.rawQuery('SELECT * FROM $statsView $whereClause;', args);
     final result = records
         .map((record) => StrengthSessionDescription(
               strengthSession:
@@ -155,6 +163,9 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
         'seleted strength sessions with stats: ${DateTime.now().difference(now).toString()}');
     return result;
   }
+
+  @override
+  String? get setupSql => null;
 }
 
 class StrengthSetTable extends DbAccessor<StrengthSet> {

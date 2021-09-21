@@ -47,7 +47,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
           StrengthSessionDescription ssd1, StrengthSessionDescription ssd2) =>
       ssd2.strengthSession.datetime.compareTo(ssd1.strengthSession.datetime);
 
-  void update() async {
+  Future<void> update() async {
     _logger.d(
         'Updating strength sessions with start = ${widget.start}, end = ${widget.end}');
     _dataProvider
@@ -56,7 +56,9 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
             until: widget.end,
             movementId: widget.movement?.id)
         .then((ssds) async {
+      final now = DateTime.now();
       setState(() => _ssds = ssds);
+      _logger.d('set state: ${DateTime.now().difference(now)}');
     });
   }
 
