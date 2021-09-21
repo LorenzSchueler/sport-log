@@ -33,6 +33,16 @@ use sport_log_types::{
 
 const CONFIG_FILE: &str = "sport-log-scheduler.toml";
 
+/// The config for [sport-log-scheduler](crate).
+///
+/// The name of the config file is specified in [CONFIG_FILE].
+///
+/// `admin_password` is the password for the admin endpoints.
+///
+/// `base_url` is the left part of the URL (everthing before `/<version>/...`)
+///
+/// `garbage_collection_min_days` is the number of days for which an entry has to been deleted and not changed in order to get hard deleted.
+/// If set to `0` garbage collection is disabled.
 #[derive(Deserialize)]
 pub struct Config {
     pub admin_password: String,

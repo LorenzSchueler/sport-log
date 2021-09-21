@@ -42,6 +42,13 @@ enum Error {
 
 type Result<T> = StdResult<T, Error>;
 
+/// The config for [sport-log-action-provider-wodify-wod](crate).
+///
+/// The name of the config file is specified in [CONFIG_FILE].
+///
+/// `admin_password` is the password for the admin endpoints.
+///
+/// `base_url` is the left part of the URL (everthing before `/<version>/...`)
 #[derive(Deserialize, Debug)]
 struct Config {
     password: String,
