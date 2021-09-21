@@ -27,7 +27,6 @@ class _WorkoutPageState extends State<WorkoutPage> {
   BottomNavPage _currentPage = BottomNavPage.metcon;
   final DateFilterState _dateFilter =
       DateFilterState(timeFrame: TimeFrame.month, start: DateTime.now());
-  bool _showDateFilter = false;
 
   Movement? _selectedMovement;
 
@@ -51,12 +50,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
         ],
         bottom: _filter,
       ),
-      body: SimpleOverlay(
-        child: WideScreenFrame(child: _mainPage),
-        overlay: _overlay,
-        hideOverlay: () => setState(() => _showDateFilter = false),
-        showOverlay: _showDateFilter,
-      ),
+      body: WideScreenFrame(child: _mainPage),
       bottomNavigationBar: BottomNavigationBar(
         items: BottomNavPage.values.map(_toBottomNavItem).toList(),
         currentIndex: _currentPage.index,
@@ -150,7 +144,6 @@ class _WorkoutPageState extends State<WorkoutPage> {
                   : () {
                       setState(() {
                         _dateFilter.goBackInTime();
-                        _showDateFilter = false;
                       });
                     },
               icon: const Icon(Icons.arrow_back_ios_sharp),
@@ -167,7 +160,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                 ),
               ),
               onPressed: () {
-                setState(() => _showDateFilter = !_showDateFilter);
+                showDialog<void>(context: context, builder: _datePickerBuilder);
               },
             ),
             IconButton(
@@ -176,7 +169,6 @@ class _WorkoutPageState extends State<WorkoutPage> {
                   ? () {
                       setState(() {
                         _dateFilter.goForwardInTime();
-                        _showDateFilter = false;
                       });
                     }
                   : null,
@@ -186,37 +178,28 @@ class _WorkoutPageState extends State<WorkoutPage> {
         ));
   }
 
-  Widget get _overlay {
-    final appBarColor = Theme.of(context).cardColor;
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 23),
-        child: Material(
-          color: appBarColor,
-          clipBehavior: Clip.none,
-          elevation: 3,
-          shape: const _CustomDateShape(
-            borderRadius: BorderRadius.all(Radius.circular(20)),
-          ),
-          child: Container(
-            width: 200,
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemBuilder: (context, index) => ListTile(
-                title: Center(
-                    child: Text(TimeFrame.values[index].toDisplayName())),
-                onTap: () {
-                  setState(() {
-                    _dateFilter.setTimeFrame(TimeFrame.values[index]);
-                    _showDateFilter = false;
-                  });
-                },
-              ),
-              separatorBuilder: (_, __) => const Divider(height: 1),
-              itemCount: TimeFrame.values.length,
-            ),
-          ),
+  Widget _datePickerBuilder(BuildContext context) {
+    return Dialog(
+      child: SizedBox(
+        width: 0,
+        child: ListView.separated(
+          shrinkWrap: true,
+          itemBuilder: (context, index) {
+            final selected = TimeFrame.values[index] == _dateFilter.timeFrame;
+            return ListTile(
+              title:
+                  Center(child: Text(TimeFrame.values[index].toDisplayName())),
+              onTap: () {
+                setState(() {
+                  _dateFilter.setTimeFrame(TimeFrame.values[index]);
+                });
+                Navigator.of(context).pop();
+              },
+              selected: selected,
+            );
+          },
+          separatorBuilder: (_, __) => const Divider(height: 1),
+          itemCount: TimeFrame.values.length,
         ),
       ),
     );

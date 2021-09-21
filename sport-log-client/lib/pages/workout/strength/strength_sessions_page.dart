@@ -124,8 +124,9 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
     final String? duration = ssd.strengthSession.interval == null
         ? null
         : formatDuration(Duration(seconds: ssd.strengthSession.interval!));
+    final sets = ssd.stats!.numSets.toString() + ' sets';
     final String subtitle =
-        [date, time, if (duration != null) duration].join(' · ');
+        [date, time, sets, if (duration != null) duration].join(' · ');
 
     final String title = ssd.movement.name;
     final String text =
