@@ -31,6 +31,7 @@ mod sharing;
 mod strength;
 mod training_plan;
 mod user;
+mod version;
 
 pub use account::*;
 pub use action::*;
@@ -51,6 +52,7 @@ pub use sharing::*;
 pub use strength::*;
 pub use training_plan::*;
 pub use user::*;
+pub use version::*;
 
 /// Wrapper around incoming json data for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///

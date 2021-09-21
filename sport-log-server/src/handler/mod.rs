@@ -64,7 +64,7 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for JsonError {
 
 pub type JsonResult<T> = Result<Json<T>, JsonError>;
 
-trait IntoJson<T> {
+pub trait IntoJson<T> {
     fn into_json(self) -> JsonResult<T>;
 }
 

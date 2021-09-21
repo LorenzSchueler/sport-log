@@ -29,15 +29,15 @@ use rocket::{
     Request, Response,
 };
 
-use sport_log_types::{Config, Db};
+use sport_log_types::{Config, Db, Version};
 
 mod handler;
 #[cfg(test)]
 mod tests;
 
-use handler::JsonError;
+use handler::{IntoJson, JsonError, JsonResult};
 
-const BASE: &str = "/v1";
+const VERSION: &str = "1";
 
 #[catch(default)]
 fn default_catcher(status: Status, _request: &Request) -> JsonError {
@@ -83,6 +83,15 @@ impl Fairing for CORS {
     }
 }
 
+#[get("/version")]
+pub async fn get_version() -> JsonResult<Version> {
+    Ok(Version {
+        min_version: VERSION.to_owned(),
+        max_version: VERSION.to_owned(),
+    })
+    .into_json()
+}
+
 #[launch]
 fn rocket() -> _ {
     let figment = Figment::from(rocket::Config::default())
@@ -102,8 +111,9 @@ fn rocket() -> _ {
         .attach(Db::fairing())
         .attach(CORS)
         .register("/", catchers![default_catcher, catcher_404])
+        .mount("/", routes![get_version])
         .mount(
-            BASE,
+            format!("/v{}", VERSION),
             routes![
                 user::adm_create_user,
                 platform::adm_create_platform,
