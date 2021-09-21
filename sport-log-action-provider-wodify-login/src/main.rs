@@ -17,7 +17,7 @@ use tracing::{debug, error, info, warn};
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use tokio::{process::Command, time};
 
-const CONFIG_FILE: &str = "config.toml";
+const CONFIG_FILE: &str = "sport-log-action-provider-wodify-login.toml";
 const NAME: &str = "wodify-login";
 const DESCRIPTION: &str =
     "Wodify Login can reserve spots in classes. The action names correspond to the class types.";
@@ -59,12 +59,12 @@ lazy_static! {
         Ok(file) => match toml::from_str(&file) {
             Ok(config) => config,
             Err(error) => {
-                error!("Failed to parse config.toml.: {}", error);
+                error!("Failed to parse {}: {}", CONFIG_FILE, error);
                 process::exit(1);
             }
         },
         Err(error) => {
-            error!("Failed to read config.toml.: {}", error);
+            error!("Failed to read {}: {}", CONFIG_FILE, error);
             process::exit(1);
         }
     };

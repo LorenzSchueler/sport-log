@@ -17,7 +17,7 @@
 //!
 //! # Config
 //!
-//! The config file must be called `CONFIG.toml` and must be deserializable to a [Config].
+//! Please refer to [Config].
 
 use std::{
     env,
@@ -42,7 +42,7 @@ use tracing::{debug, error, info};
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{ActionEventId, CardioSession, CardioSessionId, Position, Route, RouteId};
 
-const CONFIG_FILE: &str = "config.toml";
+const CONFIG_FILE: &str = "sport-log-action-provider-map-matcher.toml";
 const NAME: &str = "map-matcher";
 const DESCRIPTION: &str =
     "Map Matcher will try to match GPX tracks to the closest path that exists in OSM.";
@@ -64,6 +64,13 @@ enum Error {
 
 type Result<T> = StdResult<T, Error>;
 
+/// The config for [sport-log-action-provider-map-matcher](crate).
+///
+/// The name of the config file is specified in [CONFIG_FILE].
+///
+/// `admin_password` is the password for the admin endpoints.
+///
+/// `base_url` is the left part of the URL (everthing before `/<version>/...`)
 #[derive(Deserialize)]
 pub struct Config {
     password: String,
@@ -75,12 +82,12 @@ lazy_static! {
         Ok(file) => match toml::from_str(&file) {
             Ok(config) => config,
             Err(error) => {
-                error!("Failed to parse config.toml: {}", error);
+                error!("Failed to parse {}: {}", CONFIG_FILE, error);
                 process::exit(1);
             }
         },
         Err(error) => {
-            error!("Failed to read config.toml: {}", error);
+            error!("Failed to read {}: {}", CONFIG_FILE, error);
             process::exit(1);
         }
     };

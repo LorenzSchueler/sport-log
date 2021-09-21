@@ -11,8 +11,9 @@
 //!
 //! # Config
 //!
-//! The config file must be called `sport-log-server-config.toml`, supports configuration of different profiles and must at least contain all fields of [Config](sport_log_types::Config).
-//! Additionally it can also be used to configure the webserver itself. Please refer to [rocket::config].
+//! The config supports configuration of different profiles and must at least contain all fields of [Config](sport_log_types::Config).
+//! The name of the config file is specified in [CONFIG_FILE].
+//! Additionally it can also be used to configure the webserver itself. Herefore please refer to [rocket::config].
 
 use std::env;
 
@@ -36,6 +37,8 @@ mod handler;
 mod tests;
 
 use handler::{IntoJson, JsonError, JsonResult};
+
+const CONFIG_FILE: &str = "sport-log-server.toml";
 
 const VERSION_1_0: &str = "1.0";
 const MIN_VERSION: &str = VERSION_1_0;
@@ -96,8 +99,7 @@ pub async fn get_version() -> JsonResult<Version> {
 
 #[launch]
 fn rocket() -> _ {
-    let figment = Figment::from(rocket::Config::default())
-        .merge(Toml::file("sport-log-server-config.toml").nested());
+    let figment = Figment::from(rocket::Config::default()).merge(Toml::file(CONFIG_FILE).nested());
     if cfg!(test) {
         env::set_var("RUST_LOG", "error");
     } else if figment.profile() == "debug" {

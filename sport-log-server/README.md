@@ -18,11 +18,11 @@
     ```
     DATABASE_URL=postgres://sport_admin:<password>@localhost/sport_log
     ```
-1. copy *sport-log-server-config.toml.template* to *sport-log-server-config.toml*: 
+1. copy *sport-log-server.toml.template* to *sport-log-server.toml*: 
     ```bash
-    cp sport-log-server-config.toml.template sport-log-server-config.toml
+    cp sport-log-server.toml.template sport-log-server.toml
     ```
-1. edit *sport-log-server-config.toml*
+1. edit *sport-log-server.toml*
 1. set up tables: 
     ```bash
     cd ../sport-log-types && diesel database setup && cd ../sport-log-server
@@ -68,15 +68,15 @@ postgres=# \password sport_admin
     sudo chmod 740 /usr/local/bin/sport-log-server
     sudo chown <user> /usr/local/bin/sport-log-server
     ```
-1. install config at: */etc/sport-log-server/sport-log-server-config.toml*
+1. install config at: */etc/sport-log-server/sport-log-server.toml*
     ```bash
     sudo mkdir -p /etc/sport-log-server
-    sudo cp sport-log-server-config.toml /etc/sport-log-server/sport-log-server-config.toml
-    sudo chmod 600 /etc/sport-log-server/sport-log-server-config.toml
+    sudo cp sport-log-server.toml /etc/sport-log-server/sport-log-server.toml
+    sudo chmod 600 /etc/sport-log-server/sport-log-server.toml
     sudo chown -R <user> /etc/sport-log-server
     ```
 1. generate admin password with [sport-log-password-hasher](../sport-log-password-hasher)
-1. edit */etc/sport-log-server/sport-log-server-config.toml* and set new admin password
+1. edit */etc/sport-log-server/sport-log-server.toml* and set new admin password
 1. install systemd start script
     ```bash
     sudo cp sport-log-server.service /etc/systemd/system/sport-log-server.service
