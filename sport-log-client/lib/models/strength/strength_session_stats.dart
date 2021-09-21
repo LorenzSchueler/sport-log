@@ -1,3 +1,5 @@
+import 'strength_set.dart';
+
 class StrengthSessionStats {
   StrengthSessionStats({
     required this.numSets,
@@ -25,4 +27,37 @@ class StrengthSessionStats {
   double? maxEorm;
   double? sumVolume;
   double? maxWeight;
+
+  void updateWithStrengthSet(StrengthSet set) {
+    numSets += 1;
+    if (minCount < 0 || set.count < minCount) {
+      minCount = set.count;
+    }
+    if (maxCount < 0 || set.count > maxCount) {
+      maxCount = set.count;
+    }
+    sumCount += set.count;
+    final eorm = set.eorm;
+    if (eorm != null) {
+      if (maxEorm == null || eorm > maxEorm!) {
+        maxEorm = eorm;
+      }
+    }
+    final volume = set.volume;
+    if (volume != null) {
+      if (sumVolume == null) {
+        sumVolume = volume;
+      } else {
+        sumVolume = sumVolume! + volume;
+      }
+    }
+    final weight = set.weight;
+    if (weight != null) {
+      if (maxWeight == null) {
+        maxWeight = weight;
+      } else {
+        maxWeight = maxWeight! + weight;
+      }
+    }
+  }
 }
