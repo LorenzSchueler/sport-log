@@ -252,19 +252,3 @@ class _WorkoutPageState extends State<WorkoutPage> {
     );
   }
 }
-
-class _CustomDateShape extends RoundedRectangleBorder {
-  const _CustomDateShape({
-    BorderSide side = BorderSide.none,
-    BorderRadiusGeometry borderRadius = BorderRadius.zero,
-  }) : super(side: side, borderRadius: borderRadius);
-
-  @override
-  Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
-    return Path()
-      ..moveTo(rect.width / 2 - 15, rect.top)
-      ..lineTo(rect.width / 2, rect.top - 20)
-      ..lineTo(rect.width / 2 + 15, rect.top)
-      ..addRRect(borderRadius.resolve(textDirection).toRRect(rect));
-  }
-}
