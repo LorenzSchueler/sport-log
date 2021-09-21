@@ -185,23 +185,23 @@ fn auth_as_without_credentials(route: &str, id: i64) {
 
 #[test]
 fn admin_auth() {
-    auth("/v1/adm/platform", ADMIN_USERNAME, ADMIN_PASSWORD)
+    auth("/v1.0/adm/platform", ADMIN_USERNAME, ADMIN_PASSWORD)
 }
 
 #[test]
 fn admin_auth_wrong_credentials() {
-    auth_wrong_credentials("/v1/adm/platform", ADMIN_USERNAME);
+    auth_wrong_credentials("/v1.0/adm/platform", ADMIN_USERNAME);
 }
 
 #[test]
 fn admin_auth_without_credentials() {
-    auth_without_credentials("/v1/adm/platform");
+    auth_without_credentials("/v1.0/adm/platform");
 }
 
 #[test]
 fn ap_auth() {
     auth(
-        "/v1/ap/action_provider",
+        "/v1.0/ap/action_provider",
         "wodify-login",
         "wodify-login-passwd",
     );
@@ -209,77 +209,82 @@ fn ap_auth() {
 
 #[test]
 fn ap_auth_wrong_credentials() {
-    auth_wrong_credentials("/v1/ap/action_provider", "wodify-login");
+    auth_wrong_credentials("/v1.0/ap/action_provider", "wodify-login");
 }
 
 #[test]
 fn ap_auth_without_credentials() {
-    auth_without_credentials("/v1/ap/action_provider");
+    auth_without_credentials("/v1.0/ap/action_provider");
 }
 
 #[test]
 fn admin_as_ap_auth() {
-    auth_as("/v1/ap/action_provider", ADMIN_USERNAME, 1, ADMIN_PASSWORD);
+    auth_as(
+        "/v1.0/ap/action_provider",
+        ADMIN_USERNAME,
+        1,
+        ADMIN_PASSWORD,
+    );
 }
 
 #[test]
 fn admin_as_ap_auth_wrong_credentials() {
-    auth_as_wrong_credentials("/v1/ap/action_provider", ADMIN_USERNAME, 1);
+    auth_as_wrong_credentials("/v1.0/ap/action_provider", ADMIN_USERNAME, 1);
 }
 
 #[test]
 fn admin_as_ap_auth_without_credentials() {
-    auth_as_without_credentials("/v1/ap/action_provider", 1);
+    auth_as_without_credentials("/v1.0/ap/action_provider", 1);
 }
 
 #[test]
 fn user_auth() {
-    auth("/v1/user", "user1", "user1-passwd");
+    auth("/v1.0/user", "user1", "user1-passwd");
 }
 
 #[test]
 fn user_auth_wrong_credentials() {
-    auth_wrong_credentials("/v1/user", "user1");
+    auth_wrong_credentials("/v1.0/user", "user1");
 }
 
 #[test]
 fn user_auth_without_credentials() {
-    auth_without_credentials("/v1/user");
+    auth_without_credentials("/v1.0/user");
 }
 
 #[test]
 fn admin_as_user_auth() {
-    auth_as("/v1/user", ADMIN_USERNAME, 1, ADMIN_PASSWORD);
+    auth_as("/v1.0/user", ADMIN_USERNAME, 1, ADMIN_PASSWORD);
 }
 
 #[test]
 fn admin_as_user_auth_wrong_credentials() {
-    auth_as_wrong_credentials("/v1/user", ADMIN_USERNAME, 1);
+    auth_as_wrong_credentials("/v1.0/user", ADMIN_USERNAME, 1);
 }
 
 #[test]
 fn admin_as_user_auth_without_credentials() {
-    auth_as_without_credentials("/v1/user", 1);
+    auth_as_without_credentials("/v1.0/user", 1);
 }
 
 #[test]
 fn user_ap_auth() {
-    auth("/v1/diary", "user1", "user1-passwd");
+    auth("/v1.0/diary", "user1", "user1-passwd");
 }
 
 #[test]
 fn user_ap_auth_wrong_credentials() {
-    auth_wrong_credentials("/v1/diary", "user1");
+    auth_wrong_credentials("/v1.0/diary", "user1");
 }
 
 #[test]
 fn user_ap_auth_without_credentials() {
-    auth_without_credentials("/v1/diary");
+    auth_without_credentials("/v1.0/diary");
 }
 
 fn create_action_event(username: &str, password: &str, action_event: &ActionEvent) {
     let client = Client::untracked(rocket()).expect("valid rocket instance");
-    let mut request = client.post("/v1/action_event");
+    let mut request = client.post("/v1.0/action_event");
     request.add_header(basic_auth(username, password));
     let request = request.json(action_event);
     let response = request.dispatch();
@@ -301,7 +306,7 @@ fn ap_as_user_ap_auth() {
     };
     create_action_event("user1", "user1-passwd", &action_event);
 
-    auth_as("/v1/diary", "wodify-login", 1, "wodify-login-passwd");
+    auth_as("/v1.0/diary", "wodify-login", 1, "wodify-login-passwd");
 }
 
 #[test]
@@ -310,7 +315,7 @@ fn ap_as_user_ap_auth_no_event() {
     let (username, password) = ("user1", "user1-passwd");
     let client = Client::untracked(rocket()).expect("valid rocket instance");
 
-    let mut request = client.get("/v1/action_event");
+    let mut request = client.get("/v1.0/action_event");
     request.add_header(basic_auth(username, password));
     let response = request.dispatch();
     assert_ok_json(&response);
@@ -324,7 +329,7 @@ fn ap_as_user_ap_auth_no_event() {
         })
         .collect();
 
-    let mut request = client.put("/v1/action_events");
+    let mut request = client.put("/v1.0/action_events");
     request.add_header(basic_auth(username, password));
     let request = request.json(&action_events);
     let response = request.dispatch();
@@ -358,7 +363,7 @@ fn ap_as_user_ap_auth_no_event() {
 
     //  check that ap has no access
     println!("{:?}", "okook");
-    auth_as_not_allowed("/v1/diary", "wodify-login", 1, "wodify-login-passwd");
+    auth_as_not_allowed("/v1.0/diary", "wodify-login", 1, "wodify-login-passwd");
 }
 
 #[test]
@@ -376,7 +381,7 @@ fn ap_as_user_ap_auth_wrong_credentials() {
     };
     create_action_event("user1", "user1-passwd", &action_event);
 
-    auth_as_wrong_credentials("/v1/diary", "wodify-login", 1);
+    auth_as_wrong_credentials("/v1.0/diary", "wodify-login", 1);
 }
 
 #[test]
@@ -394,22 +399,22 @@ fn ap_as_user_ap_auth_without_credentials() {
     };
     create_action_event("user1", "user1-passwd", &action_event);
 
-    auth_as_without_credentials("/v1/diary", 1);
+    auth_as_without_credentials("/v1.0/diary", 1);
 }
 
 #[test]
 fn admin_as_user_ap_auth() {
-    auth_as("/v1/diary", ADMIN_USERNAME, 1, ADMIN_PASSWORD);
+    auth_as("/v1.0/diary", ADMIN_USERNAME, 1, ADMIN_PASSWORD);
 }
 
 #[test]
 fn admin_as_user_ap_auth_wrong_credentials() {
-    auth_as_wrong_credentials("/v1/diary", ADMIN_USERNAME, 1);
+    auth_as_wrong_credentials("/v1.0/diary", ADMIN_USERNAME, 1);
 }
 
 #[test]
 fn admin_as_user_ap_auth_without_credentials() {
-    auth_as_without_credentials("/v1/diary", 1);
+    auth_as_without_credentials("/v1.0/diary", 1);
 }
 
 fn create_diary<'c>(
@@ -418,7 +423,7 @@ fn create_diary<'c>(
     password: &str,
     user_id: i64,
 ) -> (DiaryId, LocalResponse<'c>) {
-    let mut request = client.post("/v1/diary");
+    let mut request = client.post("/v1.0/diary");
     request.add_header(basic_auth(username, password));
     let diary_id = DiaryId(rand::thread_rng().gen());
     let diary = Diary {
@@ -457,13 +462,13 @@ fn foreign_get() {
     assert_ok_json(&response);
 
     // check that get works for same user
-    let mut request = client.get(format!("/v1/diary/{}", diary_id.0));
+    let mut request = client.get(format!("/v1.0/diary/{}", diary_id.0));
     request.add_header(basic_auth("user1", "user1-passwd"));
     let response = request.dispatch();
     assert_ok_json(&response);
 
     // check that get does not work for other user
-    let mut request = client.get(format!("/v1/diary/{}", diary_id.0));
+    let mut request = client.get(format!("/v1.0/diary/{}", diary_id.0));
     request.add_header(basic_auth("user2", "user2-passwd"));
     let response = request.dispatch();
     assert_forbidden_json(&response);
@@ -487,14 +492,14 @@ fn foreign_update() {
     };
 
     // check that update works for same user
-    let mut request = client.put("/v1/diary");
+    let mut request = client.put("/v1.0/diary");
     request.add_header(basic_auth("user1", "user1-passwd"));
     let request = request.json(&diary);
     let response = request.dispatch();
     assert_ok_json(&response);
 
     // check that update does not work for other user
-    let mut request = client.put("/v1/diary");
+    let mut request = client.put("/v1.0/diary");
     request.add_header(basic_auth("user2", "user2-passwd"));
     let request = request.json(&diary);
     let response = request.dispatch();
@@ -514,7 +519,7 @@ fn user_self_registration() {
         last_change: Utc::now(),
     };
 
-    let request = client.post("/v1/user");
+    let request = client.post("/v1.0/user");
     let request = request.json(&user);
     let response = request.dispatch();
 
@@ -538,7 +543,7 @@ fn ap_self_registration() {
         deleted: false,
     };
 
-    let request = client.post("/v1/ap/platform");
+    let request = client.post("/v1.0/ap/platform");
     let request = request.json(&platform);
     let response = request.dispatch();
 
@@ -548,7 +553,7 @@ fn ap_self_registration() {
         assert_forbidden_json(&response);
     }
 
-    let request = client.get("/v1/ap/platform");
+    let request = client.get("/v1.0/ap/platform");
     let response = request.dispatch();
 
     if config.ap_self_registration {
@@ -567,7 +572,7 @@ fn ap_self_registration() {
         deleted: false,
     };
 
-    let request = client.post("/v1/ap/action_provider");
+    let request = client.post("/v1.0/ap/action_provider");
     let request = request.json(&action_provider);
     let response = request.dispatch();
 
@@ -592,7 +597,7 @@ fn update_non_existing() {
         deleted: false,
     };
 
-    let mut request = client.put("/v1/diary");
+    let mut request = client.put("/v1.0/diary");
     request.add_header(basic_auth("user1", "user1-passwd"));
     let request = request.json(&diary);
     let response = request.dispatch();

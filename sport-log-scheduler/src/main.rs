@@ -87,7 +87,10 @@ fn main() {
 
 fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestError> {
     let creatable_action_rules: Vec<CreatableActionRule> = client
-        .get(format!("{}/v1/adm/creatable_action_rule", config.base_url))
+        .get(format!(
+            "{}/v1.0/adm/creatable_action_rule",
+            config.base_url
+        ))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .send()?
         .error_for_status()?
@@ -137,7 +140,7 @@ fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     debug!("{:#?}", action_events);
 
     client
-        .post(format!("{}/v1/adm/action_events", config.base_url))
+        .post(format!("{}/v1.0/adm/action_events", config.base_url))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .json(&action_events)
         .send()?
@@ -150,7 +153,10 @@ fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
 
 fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestError> {
     let deletable_action_events: Vec<DeletableActionEvent> = client
-        .get(format!("{}/v1/adm/deletable_action_event", config.base_url))
+        .get(format!(
+            "{}/v1.0/adm/deletable_action_event",
+            config.base_url
+        ))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .send()?
         .error_for_status()?
@@ -176,7 +182,7 @@ fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     debug!("{:#?}", action_event_ids);
 
     client
-        .delete(format!("{}/v1/adm/action_events", config.base_url,))
+        .delete(format!("{}/v1.0/adm/action_events", config.base_url,))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .json(&action_event_ids)
         .send()?
@@ -196,7 +202,7 @@ fn garbage_collection(client: &Client, config: &Config) -> Result<(), ReqwestErr
 
         client
             .delete(format!(
-                "{}/v1/adm/garbage_collection/{}",
+                "{}/v1.0/adm/garbage_collection/{}",
                 config.base_url,
                 Utc::now() - Duration::days(config.garbage_collection_min_days as i64)
             ))

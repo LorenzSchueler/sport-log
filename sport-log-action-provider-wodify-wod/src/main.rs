@@ -371,7 +371,7 @@ async fn try_get_wod(
         };
 
         let response = client
-            .post(format!("{}/v1/wod", CONFIG.base_url,))
+            .post(format!("{}/v1.0/wod", CONFIG.base_url,))
             .basic_auth(
                 format!("{}$id${}", NAME, exec_action_event.user_id.0),
                 Some(&CONFIG.password),
@@ -385,7 +385,7 @@ async fn try_get_wod(
                 let today = Local::today().naive_local().format("%Y-%m-%d");
                 let wods: Vec<Wod> = client
                     .get(format!(
-                        "{}/v1/wod/timespan/{}/{}",
+                        "{}/v1.0/wod/timespan/{}/{}",
                         CONFIG.base_url, today, today
                     ))
                     .basic_auth(
@@ -408,7 +408,7 @@ async fn try_get_wod(
                     wod.description = Some(description);
                 }
                 client
-                    .put(format!("{}/v1/wod", CONFIG.base_url,))
+                    .put(format!("{}/v1.0/wod", CONFIG.base_url,))
                     .basic_auth(
                         format!("{}$id${}", NAME, exec_action_event.user_id.0),
                         Some(&CONFIG.password),

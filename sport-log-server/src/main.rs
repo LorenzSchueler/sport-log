@@ -37,9 +37,9 @@ mod tests;
 
 use handler::{IntoJson, JsonError, JsonResult};
 
-const VERSION_1: &str = "1";
-const MIN_VERSION: &str = VERSION_1;
-const MAX_VERSION: &str = VERSION_1;
+const VERSION_1_0: &str = "1.0";
+const MIN_VERSION: &str = VERSION_1_0;
+const MAX_VERSION: &str = VERSION_1_0;
 
 #[catch(default)]
 fn default_catcher(status: Status, _request: &Request) -> JsonError {
@@ -115,7 +115,7 @@ fn rocket() -> _ {
         .register("/", catchers![default_catcher, catcher_404])
         .mount("/", routes![get_version])
         .mount(
-            format!("/v{}", VERSION_1),
+            format!("/v{}", VERSION_1_0),
             routes![
                 user::adm_create_user,
                 platform::adm_create_platform,
