@@ -158,7 +158,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
   ) {
     final filters = [
       if (from != null) '${_table.prefix}$datetime >= ?',
-      if (until != null) '${_table.prefix}$datetime <= ?',
+      if (until != null) '${_table.prefix}$datetime < ?',
       if (movementIdValue != null) '${_table.prefix}$movementId = ?',
     ];
     return filters.isEmpty ? null : filters.join(' AND ');
