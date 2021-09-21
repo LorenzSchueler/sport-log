@@ -18,7 +18,8 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
   @override
   DbSerializer<StrengthSession> get serde => DbStrengthSessionSerializer();
 
-  static const statsView = 'strength_session_stats_view';
+  static const statsViewBySession = 'strength_session_stats_view_by_session';
+  static const statsViewByDay = 'strength_session_stats_view_by_day';
   static const strengthSet = Tables.strengthSet;
   static const movement = Tables.movement;
   static const strengthSessionId = Keys.strengthSessionId;
@@ -84,7 +85,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
           (30, 0.50);
         ''',
       '''
-          CREATE VIEW $statsView AS
+          CREATE VIEW $statsViewBySession AS
           SELECT
             ${_table.allColumns},
             ${_movementTable.table.allColumns},
@@ -105,6 +106,27 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
           GROUP BY $tableName.$id
           HAVING COUNT($strengthSet.$id) > 0
           ORDER BY datetime($tableName.$datetime);
+        ''',
+      '''
+          CREATE VIEW $statsViewByDay AS
+          SELECT
+            $tableName.$datetime,
+            COUNT($strengthSet.$id) AS $numSets,
+            MIN($strengthSet.$count) AS $minCount,
+            MAX($strengthSet.$count) AS $maxCount,
+            SUM($strengthSet.$count) AS $sumCount,
+            MAX($strengthSet.$weight) AS $maxWeight,
+            SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
+            MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
+          FROM $tableName
+            JOIN $movement ON $movement.$id = $tableName.$movementId
+            JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
+            LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
+          WHERE $movement.$deleted = 0
+            AND $strengthSet.$deleted = 0
+            AND $tableName.$deleted = 0
+          GROUP BY date($tableName.$datetime)
+          ORDER BY date($tableName.$datetime);
         '''
     ];
   }
@@ -129,27 +151,39 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
 
   MovementTable get _movementTable => AppDatabase.instance!.movements;
 
-  Future<List<StrengthSessionDescription>> getDescriptions({
+  String? _whereFilter(
     Int64? movementIdValue,
     DateTime? from,
     DateTime? until,
-  }) async {
-    final now = DateTime.now();
-    final whereFilters = [
+  ) {
+    final filters = [
       if (from != null) '${_table.prefix}$datetime >= ?',
       if (until != null) '${_table.prefix}$datetime <= ?',
       if (movementIdValue != null) '${_table.prefix}$movementId = ?',
     ];
-    final whereClause =
-        whereFilters.isEmpty ? '' : 'WHERE ' + whereFilters.join(' AND ');
-    final args = [
-      if (from != null) from.toString(),
-      if (until != null) until.toString(),
-      if (movementIdValue != null) movementIdValue.toInt(),
-    ];
-    final records =
-        await database.rawQuery('SELECT * FROM $statsView $whereClause;', args);
-    final result = records
+    return filters.isEmpty ? null : filters.join(' AND ');
+  }
+
+  List<Object> _args(
+    Int64? movementIdValue,
+    DateTime? from,
+    DateTime? until,
+  ) =>
+      [
+        if (from != null) from.toString(),
+        if (until != null) until.toString(),
+        if (movementIdValue != null) movementIdValue.toInt(),
+      ];
+
+  Future<List<StrengthSessionDescription>> getDescriptionsBySession({
+    Int64? movementIdValue,
+    DateTime? from,
+    DateTime? until,
+  }) async {
+    final records = await database.query(statsViewBySession,
+        where: _whereFilter(movementIdValue, from, until),
+        whereArgs: _args(movementIdValue, from, until));
+    return records
         .map((record) => StrengthSessionDescription(
               strengthSession:
                   serde.fromDbRecord(record, prefix: _table.prefix),
@@ -159,9 +193,19 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
               stats: StrengthSessionStats.fromDbRecord(record),
             ))
         .toList();
-    _logger.d(
-        'seleted strength sessions with stats: ${DateTime.now().difference(now).toString()}');
-    return result;
+  }
+
+  Future<List<StrengthSessionStats>> getDescriptionsByDay({
+    Int64? movementIdValue,
+    DateTime? from,
+    DateTime? until,
+  }) async {
+    final records = await database.query(statsViewByDay,
+        where: _whereFilter(movementIdValue, from, until),
+        whereArgs: _args(movementIdValue, from, until));
+    return records
+        .map((record) => StrengthSessionStats.fromDbRecord(record))
+        .toList();
   }
 
   @override

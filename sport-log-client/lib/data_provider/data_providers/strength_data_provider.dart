@@ -75,7 +75,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
 
   @override
   Future<List<StrengthSessionDescription>> getNonDeleted() async {
-    return (await strengthSessionDb.getDescriptions());
+    return (await strengthSessionDb.getDescriptionsBySession());
   }
 
   Future<List<StrengthSet>> getStrengthSetsByStrengthSession(Int64 id) {
@@ -177,15 +177,36 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
   Future<DateTime?> mostRecentDateTime() async =>
       strengthSessionDb.mostRecentDateTime();
 
-  Future<List<StrengthSessionDescription>> filterDescriptions({
+  Future<List<StrengthSessionDescription>> getSessionsWithStats({
     Int64? movementId,
     DateTime? from,
     DateTime? until,
   }) async {
-    return strengthSessionDb.getDescriptions(
+    return strengthSessionDb.getDescriptionsBySession(
       from: from,
       until: until,
       movementIdValue: movementId,
     );
+  }
+
+  Future<List<StrengthSessionStats>> getStatsByDay({
+    Int64? movementId,
+    DateTime? from,
+    DateTime? until,
+  }) async {
+    return strengthSessionDb.getDescriptionsByDay(
+      from: from,
+      until: until,
+      movementIdValue: movementId,
+    );
+  }
+
+  // this can be very inefficient and should be avoided when having huge lists of sessions
+  Future<void> populateWithSets(
+      List<StrengthSessionDescription> sessions) async {
+    for (final session in sessions) {
+      session.strengthSets =
+          await strengthSetDb.getByStrengthSession(session.id);
+    }
   }
 }

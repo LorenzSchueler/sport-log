@@ -48,7 +48,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
     _logger.d(
         'Updating strength sessions with start = ${widget.start}, end = ${widget.end}');
     _dataProvider
-        .filterDescriptions(
+        .getSessionsWithStats(
             from: widget.start,
             until: widget.end,
             movementId: widget.movement?.id)
