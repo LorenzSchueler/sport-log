@@ -8,6 +8,8 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
 
+import 'movement_table.dart';
+
 class StrengthSessionTable extends DbAccessor<StrengthSession>
     with DateTimeMethods {
   final _logger = Logger('StrengthSessionTable');
@@ -41,6 +43,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
   static const movementId = Keys.movementId;
   static const deleted = Keys.deleted;
   static const datetime = Keys.datetime;
+  MovementTable get _movementTable => AppDatabase.instance!.movements;
 
   Future<List<StrengthSessionDescription>> getDescriptions({
     Int64? movementIdValue,
@@ -48,9 +51,8 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
     DateTime? until,
   }) async {
     assert((from == null) == (until == null));
-    final movementTable = AppDatabase.instance!.movements;
     final allColumns =
-        [_table.allColumns, movementTable.table.allColumns].join(', ');
+        [_table.allColumns, _movementTable.table.allColumns].join(', ');
     final filter = [
       '$tableName.$deleted = 0',
       '$strengthSet.$deleted = 0',
@@ -75,11 +77,20 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
               strengthSession:
                   serde.fromDbRecord(record, prefix: _table.prefix),
               strengthSets: null,
-              movement: movementTable.serde
-                  .fromDbRecord(record, prefix: movementTable.table.prefix),
+              movement: _movementTable.serde
+                  .fromDbRecord(record, prefix: _movementTable.table.prefix),
               numberOfSets: record['num_sets']! as int,
             ))
         .toList();
+  }
+
+  @override
+  Future<List<StrengthSession>> getNonDeleted() async {
+    final allColumns =
+        [_table.allColumns, _movementTable.table.allColumns].join(', ');
+    final result = await database.rawQuery('''
+    SELECT $allColumns FROM $strength
+    ''');
   }
 }
 

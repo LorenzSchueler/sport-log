@@ -127,12 +127,11 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
         DateFormat('dd.MM.yyyy').format(ssd.strengthSession.datetime);
     final String time =
         DateFormat('HH:mm').format(ssd.strengthSession.datetime);
-    final String sets = '${ssd.numberOfSets} sets';
     final String? duration = ssd.strengthSession.interval == null
         ? null
         : formatDuration(Duration(seconds: ssd.strengthSession.interval!));
     final String subtitle =
-        [date, time, sets, if (duration != null) duration].join(' · ');
+        [date, time, if (duration != null) duration].join(' · ');
 
     final String title = ssd.movement.name;
     final String text =

@@ -34,22 +34,25 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
     ssd = widget.initial ??
         StrengthSessionDescription(
           strengthSession: StrengthSession(
-              id: randomId(),
-              userId: userId,
-              datetime: DateTime.now(),
-              movementId: Int64(0),
-              movementUnit: MovementUnit.reps,
-              interval: null,
-              comments: null,
-              deleted: false),
+            id: randomId(),
+            userId: userId,
+            datetime: DateTime.now(),
+            movementId: Int64(0),
+            movementUnit: MovementUnit.reps,
+            interval: null,
+            comments: null,
+            deleted: false,
+          ),
           strengthSets: [],
           movement: Movement(
-              id: Int64(1),
-              userId: userId,
-              name: '',
-              description: null,
-              cardio: true,
-              deleted: false),
+            id: Int64(1),
+            userId: userId,
+            name: '',
+            description: null,
+            cardio: true,
+            deleted: false,
+          ),
+          stats: null,
         );
     movementInitialized = widget.initial != null;
     datetimeIsNow = widget.initial == null ? true : false;

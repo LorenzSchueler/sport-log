@@ -5,20 +5,20 @@ import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
 import 'package:sport_log/models/strength/strength_set.dart';
 
+import 'strength_session_stats.dart';
+
 class StrengthSessionDescription implements Validatable, HasId {
   StrengthSessionDescription({
     required this.strengthSession,
-    required this.strengthSets,
     required this.movement,
-    int? numberOfSets,
-  })  : assert((strengthSets != null) != (numberOfSets != null)),
-        assert(numberOfSets == null || numberOfSets >= 0),
-        _numberOfSets = numberOfSets ?? strengthSets!.length;
+    required this.strengthSets,
+    required this.stats,
+  });
 
   StrengthSession strengthSession;
-  List<StrengthSet>? strengthSets;
   Movement movement;
-  final int _numberOfSets;
+  List<StrengthSet>? strengthSets;
+  StrengthSessionStats? stats;
 
   @override
   bool isValid() {
@@ -40,9 +40,7 @@ class StrengthSessionDescription implements Validatable, HasId {
         validate(strengthSets?.every((ss) => ss.isValid()) ?? true,
             'StrengthSessionDescription: strengthSets not valid') &&
         validate(strengthSession.movementId == movement.id,
-            'StrengthSessionDescription: movement id mismatch') &&
-        validate((strengthSets?.length ?? _numberOfSets) == _numberOfSets,
-            'StrengthSessionDescription: numberOfSets does not match sets length');
+            'StrengthSessionDescription: movement id mismatch');
   }
 
   @override
@@ -58,7 +56,4 @@ class StrengthSessionDescription implements Validatable, HasId {
   static bool areTheSame(
           StrengthSessionDescription ssd1, StrengthSessionDescription ssd2) =>
       ssd1.strengthSession.id == ssd2.strengthSession.id;
-
-  int get numberOfSets =>
-      strengthSets == null ? _numberOfSets : strengthSets!.length;
 }
