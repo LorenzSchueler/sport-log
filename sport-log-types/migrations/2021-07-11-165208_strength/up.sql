@@ -64,7 +64,7 @@ create trigger check_strength_blueprint_exists_trigger
 create table strength_session (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
-    blueprint_id bigint references strength_blueprint on delete set null,
+    strength_blueprint_id bigint references strength_blueprint on delete set null,
     datetime timestamptz not null default now(),
     movement_id bigint not null references movement on delete cascade,
     movement_unit movement_unit not null,

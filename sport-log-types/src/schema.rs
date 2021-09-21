@@ -94,7 +94,7 @@ table! {
     cardio_session (id) {
         id -> Int8,
         user_id -> Int8,
-        blueprint_id -> Nullable<Int8>,
+        cardio_blueprint_id -> Nullable<Int8>,
         movement_id -> Int8,
         cardio_type -> CardioTypeMapping,
         datetime -> Timestamptz,
@@ -408,7 +408,7 @@ table! {
     strength_session (id) {
         id -> Int8,
         user_id -> Int8,
-        blueprint_id -> Nullable<Int8>,
+        strength_blueprint_id -> Nullable<Int8>,
         datetime -> Timestamptz,
         movement_id -> Int8,
         movement_unit -> MovementUnitMapping,
@@ -487,7 +487,7 @@ joinable!(cardio_blueprint -> movement (movement_id));
 joinable!(cardio_blueprint -> route (route_id));
 joinable!(cardio_blueprint -> training_plan (training_plan_id));
 joinable!(cardio_blueprint -> user (user_id));
-joinable!(cardio_session -> cardio_blueprint (blueprint_id));
+joinable!(cardio_session -> cardio_blueprint (cardio_blueprint_id));
 joinable!(cardio_session -> movement (movement_id));
 joinable!(cardio_session -> route (route_id));
 joinable!(cardio_session -> user (user_id));
@@ -520,7 +520,7 @@ joinable!(strength_blueprint -> training_plan (training_plan_id));
 joinable!(strength_blueprint -> user (user_id));
 joinable!(strength_blueprint_set -> strength_blueprint (strength_blueprint_id));
 joinable!(strength_session -> movement (movement_id));
-joinable!(strength_session -> strength_blueprint (blueprint_id));
+joinable!(strength_session -> strength_blueprint (strength_blueprint_id));
 joinable!(strength_session -> user (user_id));
 joinable!(strength_set -> strength_session (strength_session_id));
 joinable!(training_plan -> user (user_id));

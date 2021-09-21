@@ -29,7 +29,7 @@ use crate::{
 #[cfg(feature = "server")]
 use crate::{
     schema::{cardio_blueprint, cardio_session, route},
-    User,
+    TrainingPlan, User,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -180,7 +180,9 @@ pub struct CardioBlueprintId(pub i64);
 )]
 #[cfg_attr(feature = "server", table_name = "cardio_blueprint")]
 #[cfg_attr(feature = "server", belongs_to(User))]
+#[cfg_attr(feature = "server", belongs_to(TrainingPlan))]
 #[cfg_attr(feature = "server", belongs_to(Movement))]
+#[cfg_attr(feature = "server", belongs_to(Route))]
 pub struct CardioBlueprint {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -252,7 +254,9 @@ pub struct CardioSessionId(pub i64);
 )]
 #[cfg_attr(feature = "server", table_name = "cardio_session")]
 #[cfg_attr(feature = "server", belongs_to(User))]
+#[cfg_attr(feature = "server", belongs_to(CardioBlueprint))]
 #[cfg_attr(feature = "server", belongs_to(Movement))]
+#[cfg_attr(feature = "server", belongs_to(Route))]
 pub struct CardioSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -262,7 +266,7 @@ pub struct CardioSession {
     pub user_id: UserId,
     #[serde(serialize_with = "to_str_optional")]
     #[serde(deserialize_with = "from_str_optional")]
-    pub blueprint_id: Option<CardioBlueprintId>,
+    pub cardio_blueprint_id: Option<CardioBlueprintId>,
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub movement_id: MovementId,

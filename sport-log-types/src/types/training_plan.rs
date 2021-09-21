@@ -9,9 +9,9 @@ use sport_log_types_derive::{
 };
 use sport_log_types_derive::{FromI64, ToI64};
 
-#[cfg(feature = "server")]
-use crate::schema::training_plan;
 use crate::{from_str, to_str, UserId, Weekday};
+#[cfg(feature = "server")]
+use crate::{schema::training_plan, User};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
@@ -44,6 +44,7 @@ pub struct TrainingPlanId(pub i64);
     )
 )]
 #[cfg_attr(feature = "server", table_name = "training_plan")]
+#[cfg_attr(feature = "server", belongs_to(User))]
 pub struct TrainingPlan {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]

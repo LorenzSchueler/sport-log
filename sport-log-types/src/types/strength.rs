@@ -17,7 +17,7 @@ use crate::{
 #[cfg(feature = "server")]
 use crate::{
     schema::{strength_blueprint, strength_blueprint_set, strength_session, strength_set},
-    AuthUserOrAP, CheckUserId, Unverified, VerifyForUserOrAPWithDb,
+    AuthUserOrAP, CheckUserId, TrainingPlan, Unverified, User, VerifyForUserOrAPWithDb,
     VerifyMultipleForUserOrAPWithDb,
 };
 
@@ -51,6 +51,9 @@ pub struct StrengthBlueprintId(pub i64);
     )
 )]
 #[cfg_attr(feature = "server", table_name = "strength_blueprint")]
+#[cfg_attr(feature = "server", belongs_to(User))]
+#[cfg_attr(feature = "server", belongs_to(TrainingPlan))]
+#[cfg_attr(feature = "server", belongs_to(Movement))]
 pub struct StrengthBlueprint {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -195,6 +198,9 @@ pub struct StrengthSessionId(pub i64);
     )
 )]
 #[cfg_attr(feature = "server", table_name = "strength_session")]
+#[cfg_attr(feature = "server", belongs_to(User))]
+#[cfg_attr(feature = "server", belongs_to(StrengthBlueprint))]
+#[cfg_attr(feature = "server", belongs_to(Movement))]
 pub struct StrengthSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -205,7 +211,7 @@ pub struct StrengthSession {
     #[serde(serialize_with = "to_str_optional")]
     #[serde(deserialize_with = "from_str_optional")]
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
-    pub blueprint_id: Option<StrengthBlueprintId>,
+    pub strength_blueprint_id: Option<StrengthBlueprintId>,
     pub datetime: DateTime<Utc>,
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
