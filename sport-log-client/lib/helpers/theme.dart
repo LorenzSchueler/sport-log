@@ -35,6 +35,11 @@ ThemeData themeDataFromColors({
     toggleableActiveColor: cs.primary,
     // ignore: deprecated_member_use
     accentColor: cs.primary, // still needed for expansion tile cards
+    dialogTheme: const DialogTheme(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(32)),
+      ),
+    ),
   );
 }
 
