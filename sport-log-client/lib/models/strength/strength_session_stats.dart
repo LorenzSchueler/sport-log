@@ -1,4 +1,6 @@
 import 'strength_set.dart';
+import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/keys.dart';
 
 class StrengthSessionStats {
   StrengthSessionStats({
@@ -60,4 +62,23 @@ class StrengthSessionStats {
       }
     }
   }
+
+  static const allColumns = [
+    Keys.numSets,
+    Keys.minCount,
+    Keys.maxCount,
+    Keys.sumCount,
+    Keys.maxEorm,
+    Keys.maxWeight,
+    Keys.sumVolume
+  ];
+
+  StrengthSessionStats.fromDbRecord(DbRecord r)
+      : numSets = r[Keys.numSets]! as int,
+        minCount = r[Keys.minCount]! as int,
+        maxCount = r[Keys.maxCount]! as int,
+        sumCount = r[Keys.sumCount]! as int,
+        maxEorm = r[Keys.maxEorm] as double?,
+        maxWeight = r[Keys.maxWeight] as double?,
+        sumVolume = r[Keys.sumVolume] as double?;
 }
