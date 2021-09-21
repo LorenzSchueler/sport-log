@@ -51,9 +51,11 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
     _logger.d(
         'Updating strength sessions with start = ${widget.start}, end = ${widget.end}');
     _dataProvider
-        .filterDescriptions(from: widget.start, until: widget.end)
+        .filterDescriptions(
+            from: widget.start,
+            until: widget.end,
+            movementId: widget.movement?.id)
         .then((ssds) async {
-      ssds.sort(byDate);
       setState(() => _ssds = ssds);
     });
   }
@@ -99,12 +101,9 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   Widget get _chart {
     assert(widget.movement != null);
     return LineChart(
-      LineChartData(
-        lineBarsData: [
-          LineChartBarData(
-          ),
-        ]
-      ),
+      LineChartData(lineBarsData: [
+        LineChartBarData(),
+      ]),
     );
   }
 

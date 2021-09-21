@@ -5,6 +5,7 @@ abstract class Tables {
   static const actionRule = 'action_rule';
   static const cardioSession = 'cardio_session';
   static const diary = 'diary';
+  static const eorm = 'eorm';
   static const metcon = 'metcon';
   static const metconMovement = 'metcon_movement';
   static const metconSession = 'metcon_session';

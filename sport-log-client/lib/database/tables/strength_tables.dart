@@ -16,8 +16,91 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
 
   @override
   DbSerializer<StrengthSession> get serde => DbStrengthSessionSerializer();
+
+  static const statsView = 'strength_session_stats_view';
+  static const strengthSet = Tables.strengthSet;
+  static const movement = Tables.movement;
+  static const strengthSessionId = Keys.strengthSessionId;
+  static const id = Keys.id;
+  static const movementId = Keys.movementId;
+  static const deleted = Keys.deleted;
+  static const datetime = Keys.datetime;
+  static const numSets = Keys.numSets;
+  static const minCount = Keys.minCount;
+  static const maxCount = Keys.maxCount;
+  static const sumCount = Keys.sumCount;
+  static const sumVolume = Keys.sumVolume;
+  static const maxWeight = Keys.maxWeight;
+  static const maxEorm = Keys.maxEorm;
+  static const count = Keys.count;
+  static const weight = Keys.weight;
+  static const eorm = Tables.eorm;
+  static const eormReps = Keys.eormReps;
+  static const eormPercentage = Keys.eormPercentage;
+
   @override
-  String get setupSql => _table.setupSql();
+  String get setupSql =>
+      _table.setupSql() +
+      '''
+    CREATE TABLE $eorm (
+        $eormReps INTEGER NOT NULL UNIQUE CHECK ($eormReps >= 1),
+        $eormPercentage REAL NOT NULL CHECK ($eormPercentage > 0)
+    );
+
+    INSERT INTO $eorm ($eormReps, $eormPercentage) VALUES
+        (1, 1.0),
+        (2, 0.97),
+        (3, 0.94),
+        (4, 0.92),
+        (5, 0.89),
+        (6, 0.86),
+        (7, 0.83),
+        (8, 0.81),
+        (9, 0.78),
+        (10, 0.75),
+        (11, 0.73),
+        (12, 0.71),
+        (13, 0.70),
+        (14, 0.68),
+        (15, 0.67),
+        (16, 0.65),
+        (17, 0.64),
+        (18, 0.63),
+        (19, 0.61),
+        (20, 0.60),
+        (21, 0.59),
+        (22, 0.58),
+        (23, 0.57),
+        (24, 0.56),
+        (25, 0.55),
+        (26, 0.54),
+        (27, 0.53),
+        (28, 0.52),
+        (29, 0.51),
+        (30, 0.50);
+
+    CREATE VIEW $statsView AS
+    SELECT
+      ${_table.allColumns},
+      ${_movementTable.table.allColumns},
+      COUNT($strengthSet.$id) AS $numSets,
+      MIN($strengthSet.$count) AS $minCount,
+      MAX($strengthSet.$count) AS $maxCount,
+      SUM($strengthSet.$count) AS $sumCount,
+      MAX($strengthSet.$weight) AS $maxWeight,
+      SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
+      MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
+    FROM $tableName
+      JOIN $movement ON $movement.$id = $tableName.$movementId
+      JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
+      LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
+    WHERE $movement.$deleted = 0
+      AND $strengthSet.$deleted = 0
+      AND $tableName.$deleted = 0
+      AND $numSets > 0
+    GROUP BY $tableName.$id
+    ORDER BY datetime($tableName.$datetime);
+  ''';
   @override
   String get tableName => _table.name;
 
@@ -36,13 +119,6 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
     Column.text(Keys.comments).nullable(),
   ]);
 
-  static const strengthSet = Tables.strengthSet;
-  static const movement = Tables.movement;
-  static const strengthSessionId = Keys.strengthSessionId;
-  static const id = Keys.id;
-  static const movementId = Keys.movementId;
-  static const deleted = Keys.deleted;
-  static const datetime = Keys.datetime;
   MovementTable get _movementTable => AppDatabase.instance!.movements;
 
   Future<List<StrengthSessionDescription>> getDescriptions({
@@ -50,47 +126,34 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
     DateTime? from,
     DateTime? until,
   }) async {
-    assert((from == null) == (until == null));
-    final allColumns =
-        [_table.allColumns, _movementTable.table.allColumns].join(', ');
-    final filter = [
-      '$tableName.$deleted = 0',
-      '$strengthSet.$deleted = 0',
-      '$movement.$deleted = 0',
-      if (from != null && until != null) '$datetime BETWEEN ? AND ?',
-      if (movementIdValue != null) '$movementId = ?'
+    final now = DateTime.now();
+    final whereClause = [
+      if (from != null) '$datetime >= ?',
+      if (until != null) '$datetime <= ?',
+      if (movementIdValue != null) '$movementId = ?',
     ].join(' AND ');
-    final result = await database.rawQuery('''
-    SELECT $allColumns, COUNT($strengthSet.$id) AS num_sets FROM $tableName
-    JOIN $strengthSet ON $tableName.$id = $strengthSet.$strengthSessionId
-    JOIN $movement ON $tableName.$movementId = $movement.$id
-    WHERE $filter
-    GROUP BY $tableName.$id
-    ORDER BY datetime($datetime) DESC;
-    ''', [
-      if (from != null && until != null) from.toString(),
-      if (from != null && until != null) until.toString(),
-      if (movementIdValue != null) movementIdValue.toInt()
-    ]);
-    return result
+    final records = await database.query(
+      statsView,
+      where: whereClause,
+      whereArgs: [
+        if (from != null) from.toString(),
+        if (until != null) until.toString(),
+        if (movementIdValue != null) movementIdValue.toInt(),
+      ],
+    );
+    final result = records
         .map((record) => StrengthSessionDescription(
               strengthSession:
                   serde.fromDbRecord(record, prefix: _table.prefix),
               strengthSets: null,
               movement: _movementTable.serde
                   .fromDbRecord(record, prefix: _movementTable.table.prefix),
-              numberOfSets: record['num_sets']! as int,
+              stats: StrengthSessionStats.fromDbRecord(record),
             ))
         .toList();
-  }
-
-  @override
-  Future<List<StrengthSession>> getNonDeleted() async {
-    final allColumns =
-        [_table.allColumns, _movementTable.table.allColumns].join(', ');
-    final result = await database.rawQuery('''
-    SELECT $allColumns FROM $strength
-    ''');
+    _logger.d(
+        'seleted strength sessions with stats: ${DateTime.now().difference(now).toString()}');
+    return result;
   }
 }
 
@@ -106,6 +169,8 @@ create table $tableName (
     weight real check (weight > 0),
     $idAndDeletedAndStatus
 );
+
+create index ${tableName}_session_index on $tableName (strength_session_id)
   ''';
   @override
   String get tableName => Tables.strengthSet;

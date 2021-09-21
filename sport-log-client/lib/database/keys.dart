@@ -21,6 +21,8 @@ abstract class Keys {
   static const description = 'description';
   static const distance = 'distance';
   static const enabled = 'enabled';
+  static const eormPercentage = 'eorm_percentage';
+  static const eormReps = 'eorm_reps';
   static const heartRate = 'heart_rate';
   static const id = 'id';
   static const interval = 'interval';

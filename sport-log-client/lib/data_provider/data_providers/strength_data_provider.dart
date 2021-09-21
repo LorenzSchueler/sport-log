@@ -182,7 +182,6 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     DateTime? from,
     DateTime? until,
   }) async {
-    assert((from == null) == (until == null));
     return strengthSessionDb.getDescriptions(
       from: from,
       until: until,
