@@ -190,7 +190,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
   }
 
   Future<List<StrengthSessionStats>> getStatsByDay({
-    Int64? movementId,
+    required Int64 movementId,
     DateTime? from,
     DateTime? until,
   }) async {

@@ -196,7 +196,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
   }
 
   Future<List<StrengthSessionStats>> getDescriptionsByDay({
-    Int64? movementIdValue,
+    required Int64 movementIdValue,
     DateTime? from,
     DateTime? until,
   }) async {
