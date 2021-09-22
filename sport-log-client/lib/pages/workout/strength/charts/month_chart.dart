@@ -1,5 +1,8 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
+import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -67,6 +70,41 @@ class _MonthChartState extends State<MonthChart> {
     if (_stats.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
-    return Container();
+    final getValue = accessor(widget.series);
+    final isTime = widget.movement.unit == MovementUnit.msecs;
+    return LineChart(
+      LineChartData(
+        lineBarsData: [
+          LineChartBarData(
+            spots: _stats.map((s) {
+              return FlSpot(s.datetime.day.toDouble(), getValue(s));
+            }).toList(),
+            colors: [primaryColorOf(context)],
+          ),
+        ],
+        titlesData: FlTitlesData(
+          topTitles: SideTitles(showTitles: false),
+          rightTitles: SideTitles(showTitles: false),
+          bottomTitles: SideTitles(
+            showTitles: true,
+            interval: 2,
+          ),
+          leftTitles: SideTitles(
+            showTitles: true,
+            reservedSize: isTime ? 60 : 40,
+            getTitles: isTime
+                ? (value) =>
+                    formatDurationShort(Duration(milliseconds: value.round()))
+                : null,
+          ),
+        ),
+        gridData: FlGridData(
+          verticalInterval: 2,
+        ),
+        minX: 1.0,
+        maxX: widget.start.numDaysInMonth.toDouble(),
+        borderData: FlBorderData(show: false),
+      ),
+    );
   }
 }

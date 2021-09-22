@@ -44,7 +44,7 @@ class _StrengthChartState extends State<StrengthChart> {
         AspectRatio(
           aspectRatio: 1.8,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: const EdgeInsets.fromLTRB(0, 8, 10, 5),
             child: _chart,
           ),
         ),
