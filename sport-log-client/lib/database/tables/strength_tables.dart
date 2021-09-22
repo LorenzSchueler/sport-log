@@ -108,30 +108,6 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
 
   MovementTable get _movementTable => AppDatabase.instance!.movements;
 
-  String? _whereFilter(
-    Int64? movementIdValue,
-    DateTime? from,
-    DateTime? until,
-  ) {
-    final filters = [
-      if (from != null) '${_table.prefix}$datetime >= ?',
-      if (until != null) '${_table.prefix}$datetime < ?',
-      if (movementIdValue != null) '${_table.prefix}$movementId = ?',
-    ];
-    return filters.isEmpty ? null : filters.join(' AND ');
-  }
-
-  List<Object> _args(
-    Int64? movementIdValue,
-    DateTime? from,
-    DateTime? until,
-  ) =>
-      [
-        if (from != null) from.toString(),
-        if (until != null) until.toString(),
-        if (movementIdValue != null) movementIdValue.toInt(),
-      ];
-
   // return strength sessions without order, without sets, without stats
   Future<List<StrengthSessionDescription>> getNonDeletedDescriptions() async {
     final records = await database.rawQuery('''
