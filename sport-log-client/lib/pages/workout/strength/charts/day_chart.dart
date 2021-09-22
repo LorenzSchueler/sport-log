@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -12,16 +11,14 @@ class DayChart extends StatefulWidget {
   DayChart({
     Key? key,
     required this.series,
-    required this.unit,
     required DateTime date,
-    required this.movementId,
+    required this.movement,
   })  : date = date.beginningOfDay(),
         super(key: key);
 
   final SeriesType series;
-  final MovementUnit unit;
   final DateTime date;
-  final Int64 movementId;
+  final Movement movement;
 
   @override
   State<DayChart> createState() => _DayChartState();
@@ -41,7 +38,7 @@ class _DayChartState extends State<DayChart> {
   void update() {
     _dataProvider
         .getSessionsWithStats(
-      movementId: widget.movementId,
+      movementId: widget.movement.id,
       from: widget.date,
       until: widget.date.dayLater(),
       withSets: true,
@@ -57,9 +54,8 @@ class _DayChartState extends State<DayChart> {
   void didUpdateWidget(DayChart oldWidget) {
     super.didUpdateWidget(oldWidget);
     // ignore a change in series type
-    if (oldWidget.unit != widget.unit ||
-        oldWidget.date != widget.date ||
-        oldWidget.movementId != widget.movementId) {
+    if (oldWidget.movement != widget.movement ||
+        oldWidget.date != widget.date) {
       update();
     }
   }

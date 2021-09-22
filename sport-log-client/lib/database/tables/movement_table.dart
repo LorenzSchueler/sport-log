@@ -24,6 +24,7 @@ class MovementTable extends DbAccessor<Movement> {
     Column.text(Keys.name),
     Column.text(Keys.description).nullable(),
     Column.bool(Keys.cardio),
+    Column.int(Keys.unit),
   ]);
 
   @override

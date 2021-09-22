@@ -35,7 +35,6 @@ abstract class Keys {
   static const minCount = 'min_count';
   static const movementId = 'movement_id';
   static const movementNumber = 'movement_number';
-  static const movementUnit = 'movement_unit';
   static const name = 'name';
   static const numSets = 'num_sets';
   static const password = 'password';
@@ -53,6 +52,7 @@ abstract class Keys {
   static const time = 'time';
   static const timecap = 'timecap';
   static const track = 'track';
+  static const unit = 'unit';
   static const userId = 'user_id';
   static const username = 'username';
   static const weekday = 'weekday';

@@ -16,7 +16,6 @@ class MetconMovement implements DbObject {
     required this.movementId,
     required this.movementNumber,
     required this.count,
-    required this.movementUnit,
     required this.weight,
     required this.deleted,
   });
@@ -30,7 +29,6 @@ class MetconMovement implements DbObject {
   Int64 movementId;
   int movementNumber;
   int count;
-  MovementUnit movementUnit;
   double? weight;
   @override
   bool deleted;
@@ -41,7 +39,6 @@ class MetconMovement implements DbObject {
     required this.movementNumber,
   })  : id = randomId(),
         count = 1,
-        movementUnit = MovementUnit.reps,
         weight = null,
         deleted = false;
 
@@ -68,7 +65,6 @@ class DbMetconMovementSerializer implements DbSerializer<MetconMovement> {
       movementId: Int64(r[Keys.movementId]! as int),
       movementNumber: r[Keys.movementNumber]! as int,
       count: r[Keys.count]! as int,
-      movementUnit: MovementUnit.values[r[Keys.movementUnit]! as int],
       weight: r[Keys.weight] as double?,
       deleted: r[Keys.deleted]! as int == 1,
     );
@@ -82,7 +78,6 @@ class DbMetconMovementSerializer implements DbSerializer<MetconMovement> {
       Keys.movementId: o.movementId.toInt(),
       Keys.movementNumber: o.movementNumber,
       Keys.count: o.count,
-      Keys.movementUnit: o.movementUnit.index,
       Keys.weight: o.weight,
       Keys.deleted: o.deleted ? 1 : 0,
     };

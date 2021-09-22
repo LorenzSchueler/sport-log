@@ -10,14 +10,12 @@ import 'charts/series_type.dart';
 class StrengthChart extends StatefulWidget {
   StrengthChart({
     Key? key,
-    required this.unit,
     required this.dateFilter,
     required this.movement,
     required this.firstSessionDateTime,
-  })  : availableSeries = getAvailableSeries(unit),
+  })  : availableSeries = getAvailableSeries(movement.unit),
         super(key: key);
 
-  final MovementUnit unit;
   final DateFilterState dateFilter;
   final Movement movement;
   final List<SeriesType> availableSeries;
@@ -54,35 +52,30 @@ class _StrengthChartState extends State<StrengthChart> {
       case TimeFrame.day:
         return DayChart(
           series: _activeSeriesType,
-          unit: widget.unit,
           date: widget.dateFilter.start!,
-          movementId: widget.movement.id,
+          movement: widget.movement,
         );
       case TimeFrame.week:
         return WeekChart(
             series: _activeSeriesType,
-            unit: widget.unit,
             start: widget.dateFilter.start!,
-            movementId: widget.movement.id);
+            movement: widget.movement);
       case TimeFrame.month:
         return MonthChart(
           series: _activeSeriesType,
-          unit: widget.unit,
           start: widget.dateFilter.start!,
-          movementId: widget.movement.id,
+          movement: widget.movement,
         );
       case TimeFrame.year:
         return YearChart(
           series: _activeSeriesType,
-          unit: widget.unit,
           start: widget.dateFilter.start!,
-          movementId: widget.movement.id,
+          movement: widget.movement,
         );
       case TimeFrame.all:
         return AllChart(
           series: _activeSeriesType,
-          unit: widget.unit,
-          movementId: widget.movement.id,
+          movement: widget.movement,
           firstDateTime: widget.firstSessionDateTime,
         );
     }
@@ -97,13 +90,15 @@ class _StrengthChartState extends State<StrengthChart> {
           onPressed: () {
             setState(() => _activeSeriesType = s);
           },
-          child: Text(s.toDisplayName(widget.unit)),
-          style: selected ? OutlinedButton.styleFrom(
-            backgroundColor: primaryColorOf(context),
-            primary: onPrimaryColorOf(context),
-          ) : OutlinedButton.styleFrom(
-            side: BorderSide.none,
-          ),
+          child: Text(s.toDisplayName(widget.movement.unit)),
+          style: selected
+              ? OutlinedButton.styleFrom(
+                  backgroundColor: primaryColorOf(context),
+                  primary: onPrimaryColorOf(context),
+                )
+              : OutlinedButton.styleFrom(
+                  side: BorderSide.none,
+                ),
         );
       }).toList(),
     );

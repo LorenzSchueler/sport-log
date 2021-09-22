@@ -36,7 +36,6 @@ create table $tableName (
     movement_id integer not null references movement(id) on delete no action,
     movement_number integer not null check (movement_number >= 0),
     count integer not null check (count >= 1),
-    movement_unit integer not null check (movement_unit between 0 and 6),
     weight real check (weight > 0),
     $idAndDeletedAndStatus
 );

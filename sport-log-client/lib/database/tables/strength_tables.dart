@@ -102,7 +102,6 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
     Column.text(Keys.datetime).withDefault("DATETIME('now')"),
     Column.int(Keys.movementId)
         .references(Tables.movement, onDelete: OnAction.cascade),
-    Column.int(Keys.movementUnit).check('${Keys.movementUnit} BETWEEN 0 AND 6'),
     Column.int(Keys.interval).nullable().check('${Keys.interval} > 0'),
     Column.text(Keys.comments).nullable(),
   ]);
@@ -132,6 +131,24 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
         if (until != null) until.toString(),
         if (movementIdValue != null) movementIdValue.toInt(),
       ];
+
+  // return strength sessions without order, without sets, without stats
+  Future<List<StrengthSessionDescription>> getNonDeletedDescriptions() async {
+    final records = await database.rawQuery('''
+      SELECT ${_table.allColumns}, ${_movementTable.table.allColumns}
+      FROM $tableName JOIN $movement ON $tableName.$movementId = $movement.id
+      WHERE $movement.$deleted = 0
+        AND $tableName.$deleted = 0;
+    ''');
+    return records
+        .map((record) => StrengthSessionDescription(
+            strengthSession: serde.fromDbRecord(record, prefix: _table.prefix),
+            movement: _movementTable.serde
+                .fromDbRecord(record, prefix: _movementTable.table.prefix),
+            strengthSets: null,
+            stats: null))
+        .toList();
+  }
 
   Future<List<StrengthSessionDescription>> getSessionDescriptions({
     Int64? movementIdValue,

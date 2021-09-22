@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -11,16 +10,14 @@ class AllChart extends StatefulWidget {
   const AllChart({
     Key? key,
     required this.series,
-    required this.unit,
-    required this.movementId,
+    required this.movement,
     /// only needed for year and month
     required this.firstDateTime,
   }) : super(key: key);
 
   final DateTime firstDateTime; // TODO: can this be done more elegantly?
   final SeriesType series;
-  final MovementUnit unit;
-  final Int64 movementId;
+  final Movement movement;
 
   @override
   State<AllChart> createState() => _AllChartState();
@@ -38,7 +35,7 @@ class _AllChartState extends State<AllChart> {
   }
 
   void update() {
-    _dataProvider.getStatsByMonth(movementId: widget.movementId).then((stats) {
+    _dataProvider.getStatsByMonth(movementId: widget.movement.id).then((stats) {
       setState(() {
         _stats = stats;
       });
@@ -49,8 +46,7 @@ class _AllChartState extends State<AllChart> {
   void didUpdateWidget(AllChart oldWidget) {
     super.didUpdateWidget(oldWidget);
     // ignore a change in series type
-    if (oldWidget.unit != widget.unit ||
-        oldWidget.movementId != widget.movementId) {
+    if (oldWidget.movement != widget.movement) {
       update();
     }
   }

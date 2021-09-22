@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -12,15 +11,13 @@ class YearChart extends StatefulWidget {
   YearChart({
     Key? key,
     required this.series,
-    required this.unit,
     required DateTime start,
-    required this.movementId,
+    required this.movement,
   }) : start = start.beginningOfYear(), super(key: key);
 
   final SeriesType series;
-  final MovementUnit unit;
   final DateTime start;
-  final Int64 movementId;
+  final Movement movement;
 
   @override
   State<YearChart> createState() => _YearChartState();
@@ -40,7 +37,7 @@ class _YearChartState extends State<YearChart> {
   void update() {
     _dataProvider
         .getStatsByWeek(
-      movementId: widget.movementId,
+      movementId: widget.movement.id,
       from: widget.start,
       until: widget.start.yearLater(),
     )
@@ -56,9 +53,8 @@ class _YearChartState extends State<YearChart> {
   void didUpdateWidget(YearChart oldWidget) {
     super.didUpdateWidget(oldWidget);
     // ignore a change in series type
-    if (oldWidget.unit != widget.unit ||
-        oldWidget.start != widget.start ||
-        oldWidget.movementId != widget.movementId) {
+    if (oldWidget.movement != widget.movement ||
+        oldWidget.start != widget.start) {
       update();
     }
   }

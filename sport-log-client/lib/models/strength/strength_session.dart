@@ -14,7 +14,6 @@ class StrengthSession implements DbObjectWithDateTime {
     required this.userId,
     required this.datetime,
     required this.movementId,
-    required this.movementUnit,
     required this.interval,
     required this.comments,
     required this.deleted,
@@ -30,7 +29,6 @@ class StrengthSession implements DbObjectWithDateTime {
   DateTime datetime;
   @IdConverter()
   Int64 movementId;
-  MovementUnit movementUnit;
   int? interval;
   String? comments;
   @override
@@ -57,7 +55,6 @@ class DbStrengthSessionSerializer implements DbSerializer<StrengthSession> {
       userId: Int64(r[prefix + Keys.userId]! as int),
       datetime: DateTime.parse(r[prefix + Keys.datetime]! as String),
       movementId: Int64(r[prefix + Keys.movementId]! as int),
-      movementUnit: MovementUnit.values[r[prefix + Keys.movementUnit]! as int],
       interval: r[prefix + Keys.interval] as int?,
       comments: r[prefix + Keys.comments] as String?,
       deleted: r[prefix + Keys.deleted]! as int == 1,
@@ -71,7 +68,6 @@ class DbStrengthSessionSerializer implements DbSerializer<StrengthSession> {
       Keys.userId: o.userId.toInt(),
       Keys.datetime: o.datetime.toString(),
       Keys.movementId: o.movementId.toInt(),
-      Keys.movementUnit: o.movementUnit.index,
       Keys.interval: o.interval,
       Keys.comments: o.comments,
       Keys.deleted: o.deleted ? 1 : 0,

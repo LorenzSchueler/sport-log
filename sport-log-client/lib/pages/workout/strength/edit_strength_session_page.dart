@@ -38,7 +38,6 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
             userId: userId,
             datetime: DateTime.now(),
             movementId: Int64(0),
-            movementUnit: MovementUnit.reps,
             interval: null,
             comments: null,
             deleted: false,
@@ -50,6 +49,7 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
             name: '',
             description: null,
             cardio: true,
+            unit: MovementUnit.reps,
             deleted: false,
           ),
           stats: null,
@@ -145,12 +145,6 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
     }
   }
 
-  void _setMovementUnit(MovementUnit unit) {
-    setState(() {
-      ssd.strengthSession.movementUnit = unit;
-    });
-  }
-
   void _setComment([String? text]) {
     setState(() {
       ssd.strengthSession.comments = text;
@@ -195,24 +189,6 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
           leading: const Icon(Icons.calendar_today_outlined),
           title: Text(datetimeIsNow ? 'now' : datetimeStr),
           onTap: _pickDateAndTime,
-        ),
-        const Divider(),
-        ListTile(
-          leading: const Icon(Icons.stop), // TODO: Icon for movement unit
-          title: DropdownButtonFormField<MovementUnit>(
-            items: MovementUnit.values
-                .map((unit) => DropdownMenuItem<MovementUnit>(
-                      child: Text(unit.toDisplayName()),
-                      value: unit,
-                    ))
-                .toList(),
-            onChanged: (unit) {
-              if (unit != null) {
-                _setMovementUnit(unit);
-              }
-            },
-            value: MovementUnit.reps,
-          ),
         ),
         _maybeIntervalInput(context),
         _maybeCommentsInput(context),

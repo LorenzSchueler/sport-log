@@ -94,7 +94,6 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
       return const SizedBox.shrink();
     }
     return StrengthChart(
-      unit: _ssds.first.strengthSession.movementUnit,
       dateFilter: widget.dateFilter,
       movement: widget.movement!,
       firstSessionDateTime: _ssds.first.strengthSession.datetime,
