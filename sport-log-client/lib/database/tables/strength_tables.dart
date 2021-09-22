@@ -136,6 +136,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
           SELECT
             ${_table.allColumns},
             ${_movementTable.table.allColumns},
+            $tableName.$datetime AS [$datetime],
             COUNT($strengthSet.$id) AS $numSets,
             MIN($strengthSet.$count) AS $minCount,
             MAX($strengthSet.$count) AS $maxCount,
@@ -180,6 +181,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
   }) async {
     final records = await database.rawQuery('''
           SELECT
+            $tableName.$datetime AS [$datetime],
             date($tableName.$datetime) AS [date],
             COUNT($strengthSet.$id) AS $numSets,
             MIN($strengthSet.$count) AS $minCount,
@@ -199,6 +201,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
           GROUP BY [date]
           ORDER BY [date];
      ''', [movementIdValue.toInt(), from.toString(), until.toString()]);
+    _logger.d(records);
     return records
         .map((record) => StrengthSessionStats.fromDbRecord(record))
         .toList();
@@ -213,6 +216,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
         from.year == until.year || from.beginningOfYear().yearLater() == until);
     final records = await database.rawQuery('''
           SELECT
+            $tableName.$datetime AS [$datetime],
             strftime('%W', $tableName.$datetime) AS week,
             COUNT($strengthSet.$id) AS $numSets,
             MIN($strengthSet.$count) AS $minCount,
@@ -232,6 +236,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
           GROUP BY week
           ORDER BY week;
     ''', [movementIdValue.toInt(), from.toString(), until.toString()]);
+    _logger.d(records);
     return records
         .map((record) => StrengthSessionStats.fromDbRecord(record))
         .toList();
@@ -242,6 +247,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
   }) async {
     final records = await database.rawQuery('''
           SELECT
+            $tableName.$datetime AS [$datetime],
             strftime('%Y_%m', $tableName.$datetime) AS month,
             COUNT($strengthSet.$id) AS $numSets,
             MIN($strengthSet.$count) AS $minCount,
@@ -259,6 +265,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
           GROUP BY month
           ORDER BY month;
     ''', [movementIdValue.toInt()]);
+    _logger.d(records);
     return records
         .map((record) => StrengthSessionStats.fromDbRecord(record))
         .toList();

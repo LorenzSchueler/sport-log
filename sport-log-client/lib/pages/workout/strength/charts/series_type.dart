@@ -1,4 +1,5 @@
 import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/models/strength/strength_session_stats.dart';
 
 enum SeriesType {
   maxCount, // m
@@ -54,27 +55,46 @@ extension DisplayName on SeriesType {
 }
 
 List<SeriesType> getAvailableSeries(MovementUnit unit) {
-    switch (unit) {
-      case MovementUnit.reps:
-        return [
-          SeriesType.maxEorm,
-          SeriesType.sumVolume,
-          SeriesType.maxWeight,
-          SeriesType.avgCount,
-        ];
-      case MovementUnit.cals:
-        return [SeriesType.sumCount];
-      case MovementUnit.m:
-        return [SeriesType.maxCount];
-      case MovementUnit.msecs:
-        return [SeriesType.minCount];
-      case MovementUnit.km:
-        throw StateError('MovementUnit.km cannot be in a strength session.');
-      case MovementUnit.yards:
-        throw StateError('MovementUnit.yard cannot be in a strength session.');
-      case MovementUnit.feet:
-        throw StateError('MovementUnit.foot cannot be in a strength session.');
-      case MovementUnit.miles:
-        throw StateError('MovementUnit.foot cannot be in a strength session.');
-    }
+  switch (unit) {
+    case MovementUnit.reps:
+      return [
+        SeriesType.maxEorm,
+        SeriesType.sumVolume,
+        SeriesType.maxWeight,
+        SeriesType.avgCount,
+      ];
+    case MovementUnit.cals:
+      return [SeriesType.sumCount];
+    case MovementUnit.m:
+      return [SeriesType.maxCount];
+    case MovementUnit.msecs:
+      return [SeriesType.minCount];
+    case MovementUnit.km:
+      throw StateError('MovementUnit.km cannot be in a strength session.');
+    case MovementUnit.yards:
+      throw StateError('MovementUnit.yard cannot be in a strength session.');
+    case MovementUnit.feet:
+      throw StateError('MovementUnit.foot cannot be in a strength session.');
+    case MovementUnit.miles:
+      throw StateError('MovementUnit.foot cannot be in a strength session.');
+  }
+}
+
+double Function(StrengthSessionStats stats) accessor(SeriesType type) {
+  switch (type) {
+    case SeriesType.maxCount:
+      return (stats) => stats.maxCount.toDouble();
+    case SeriesType.minCount:
+      return (stats) => stats.minCount.toDouble();
+    case SeriesType.sumCount:
+      return (stats) => stats.sumCount.toDouble();
+    case SeriesType.avgCount:
+      return (stats) => stats.sumCount.toDouble() / stats.numSets.toDouble();
+    case SeriesType.maxEorm:
+      return (stats) => stats.maxEorm ?? 0;
+    case SeriesType.sumVolume:
+      return (stats) => stats.sumVolume ?? 0;
+    case SeriesType.maxWeight:
+      return (stats) => stats.maxWeight ?? 0;
+  }
 }

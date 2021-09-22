@@ -68,7 +68,6 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    _logger.d('build');
     return RefreshIndicator(
       onRefresh: _refreshPage,
       child: _buildStrengthSessionList(context),

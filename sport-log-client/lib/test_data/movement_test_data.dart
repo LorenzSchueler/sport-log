@@ -17,5 +17,12 @@ List<Movement> generateMovements(Int64 userId) {
       unit: faker.randomGenerator.element(MovementUnit.values),
       deleted: false,
     ),
-  );
+  )..add(Movement(
+      id: randomId(),
+      userId: userId,
+      name: 'RepsMovement',
+      description: null,
+      cardio: false,
+      deleted: false,
+      unit: MovementUnit.reps));
 }

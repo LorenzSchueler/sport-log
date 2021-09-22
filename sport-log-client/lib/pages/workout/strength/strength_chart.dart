@@ -27,13 +27,26 @@ class StrengthChart extends StatefulWidget {
 
 class _StrengthChartState extends State<StrengthChart> {
   @override
+  void didUpdateWidget(StrengthChart oldWidget) {
+    if (oldWidget.movement.id != widget.movement.id) {
+      setState(() {
+        _activeSeriesType = widget.availableSeries.first;
+      });
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         _seriesSelection,
         AspectRatio(
-          aspectRatio: 2,
-          child: _chart,
+          aspectRatio: 1.8,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: _chart,
+          ),
         ),
       ],
     );

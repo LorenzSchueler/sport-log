@@ -4,6 +4,7 @@ import 'package:sport_log/database/keys.dart';
 
 class StrengthSessionStats {
   StrengthSessionStats({
+    required this.datetime,
     required this.numSets,
     required this.minCount,
     required this.maxCount,
@@ -13,15 +14,7 @@ class StrengthSessionStats {
     required this.maxWeight,
   });
 
-  StrengthSessionStats.unsafeDefault()
-      : numSets = 0,
-        minCount = -1,
-        maxCount = -1,
-        sumCount = 0,
-        maxEorm = null,
-        sumVolume = null,
-        maxWeight = null;
-
+  DateTime datetime;
   int numSets;
   int minCount;
   int maxCount;
@@ -64,6 +57,7 @@ class StrengthSessionStats {
   }
 
   static const allColumns = [
+    Keys.datetime,
     Keys.numSets,
     Keys.minCount,
     Keys.maxCount,
@@ -74,11 +68,26 @@ class StrengthSessionStats {
   ];
 
   StrengthSessionStats.fromDbRecord(DbRecord r)
-      : numSets = r[Keys.numSets]! as int,
+      : datetime = DateTime.parse(r[Keys.datetime]! as String),
+        numSets = r[Keys.numSets]! as int,
         minCount = r[Keys.minCount]! as int,
         maxCount = r[Keys.maxCount]! as int,
         sumCount = r[Keys.sumCount]! as int,
         maxEorm = r[Keys.maxEorm] as double?,
         maxWeight = r[Keys.maxWeight] as double?,
         sumVolume = r[Keys.sumVolume] as double?;
+
+  // this is only for debugging/pretty-printing
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      Keys.datetime: datetime,
+      Keys.numSets: numSets,
+      Keys.minCount: minCount,
+      Keys.maxCount: maxCount,
+      Keys.sumCount: sumCount,
+      Keys.maxEorm: maxEorm,
+      Keys.maxWeight: maxWeight,
+      Keys.sumVolume: sumVolume,
+    };
+  }
 }
