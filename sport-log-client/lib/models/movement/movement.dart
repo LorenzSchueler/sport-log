@@ -11,17 +11,19 @@ enum MovementUnit {
   @JsonValue("Reps")
   reps,
   @JsonValue("Cal")
-  cal,
+  cals,
   @JsonValue("Meter")
-  meter,
+  m,
   @JsonValue("Km")
   km,
   @JsonValue("Yard")
-  yard,
+  yards,
   @JsonValue("Foot")
-  foot,
+  feet,
   @JsonValue("Mile")
-  mile,
+  miles,
+  @JsonValue("Msec")
+  msecs,
 }
 
 extension MovementUniToDisplayName on MovementUnit {
@@ -29,18 +31,20 @@ extension MovementUniToDisplayName on MovementUnit {
     switch (this) {
       case MovementUnit.reps:
         return "Reps";
-      case MovementUnit.cal:
+      case MovementUnit.cals:
         return "Cals";
-      case MovementUnit.meter:
+      case MovementUnit.m:
         return "m";
       case MovementUnit.km:
         return "km";
-      case MovementUnit.yard:
+      case MovementUnit.yards:
         return "yd";
-      case MovementUnit.foot:
+      case MovementUnit.feet:
         return "ft";
-      case MovementUnit.mile:
+      case MovementUnit.miles:
         return "mi";
+      case MovementUnit.msecs:
+        return "ms";
     }
   }
 }

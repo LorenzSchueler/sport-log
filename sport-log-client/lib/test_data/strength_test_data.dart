@@ -32,7 +32,7 @@ Future<List<StrengthSession>> generateStrengthSessions(Int64 userId) async {
                 random.integer(24), random.integer(60), random.integer(60)),
             movementId: movement.id,
             movementUnit: random.element(
-                [MovementUnit.km, MovementUnit.reps, MovementUnit.cal]),
+                [MovementUnit.km, MovementUnit.reps, MovementUnit.cals]),
             interval: random.integer(2) == 0
                 ? Duration(minutes: random.integer(90, min: 10)).inSeconds
                 : null,
@@ -50,18 +50,20 @@ int _generateCount(MovementUnit unit) {
   switch (unit) {
     case MovementUnit.reps:
       return random.integer(20, min: 1);
-    case MovementUnit.cal:
+    case MovementUnit.cals:
       return random.integer(3000, min: 50);
-    case MovementUnit.meter:
+    case MovementUnit.m:
       return random.integer(42000, min: 20);
     case MovementUnit.km:
       return random.integer(42, min: 1);
-    case MovementUnit.yard:
+    case MovementUnit.yards:
       return random.integer(42000, min: 20);
-    case MovementUnit.foot:
+    case MovementUnit.feet:
       return random.integer(120000, min: 60);
-    case MovementUnit.mile:
+    case MovementUnit.miles:
       return random.integer(26, min: 1);
+    case MovementUnit.msecs:
+      return random.integer(10*60*1000, min: 10*1000);
   }
 }
 

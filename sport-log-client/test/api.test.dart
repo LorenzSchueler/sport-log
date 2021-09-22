@@ -89,7 +89,7 @@ void testStrengthSession(Api api) async {
     expect(await api.strengthSessions.getMultiple(), isA<Success>());
     expect(
         await api.strengthSessions
-            .putSingle(strengthSession..movementUnit = MovementUnit.cal),
+            .putSingle(strengthSession..movementUnit = MovementUnit.cals),
         isA<Success>());
     expect(
         await api.strengthSessions.putSingle(strengthSession..deleted = true),
