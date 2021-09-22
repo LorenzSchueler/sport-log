@@ -6,10 +6,8 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:sport_log/pages/workout/date_filter_state.dart';
 import 'package:sport_log/pages/workout/strength/strength_chart.dart';
 
@@ -53,9 +51,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
             until: widget.dateFilter.end,
             movementId: widget.movement?.id)
         .then((ssds) async {
-      final now = DateTime.now();
       setState(() => _ssds = ssds);
-      _logger.d('set state: ${DateTime.now().difference(now)}');
     });
   }
 
@@ -72,7 +68,6 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    _logger.d('build');
     return RefreshIndicator(
       onRefresh: _refreshPage,
       child: _buildStrengthSessionList(context),

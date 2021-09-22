@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/helpers/logger.dart';
 
 class SimpleOverlay extends StatelessWidget {
-  SimpleOverlay({
+  const SimpleOverlay({
     Key? key,
     required this.child,
     required this.overlay,

@@ -9,7 +9,6 @@ import 'package:sport_log/pages/workout/strength/strength_sessions_page.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/simple_overlay.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 import 'date_filter_state.dart';

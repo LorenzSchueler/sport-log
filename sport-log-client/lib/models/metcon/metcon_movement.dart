@@ -4,7 +4,6 @@ import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
-import 'package:sport_log/models/movement/movement.dart';
 
 part 'metcon_movement.g.dart';
 

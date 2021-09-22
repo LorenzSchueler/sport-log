@@ -1,5 +1,4 @@
 import 'package:intl/intl.dart';
-import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 
 String formatDuration(Duration d) {
   String result = '';
