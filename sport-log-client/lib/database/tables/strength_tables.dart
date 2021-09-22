@@ -4,12 +4,19 @@ import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_creator.dart';
 import 'package:sport_log/database/table_names.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'movement_table.dart';
+
+enum AggregationFrame {
+  byDay,
+  byWeek,
+  byMonth,
+}
 
 class StrengthSessionTable extends DbAccessor<StrengthSession>
     with DateTimeMethods {
@@ -20,6 +27,8 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
 
   static const statsViewBySession = 'strength_session_stats_view_by_session';
   static const statsViewByDay = 'strength_session_stats_view_by_day';
+  static const statsViewByWeek = 'strength_session_stats_view_by_week';
+  static const statsViewByMonth = 'strength_session_stats_view_by_month';
   static const strengthSet = Tables.strengthSet;
   static const movement = Tables.movement;
   static const strengthSessionId = Keys.strengthSessionId;
@@ -127,7 +136,49 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
             AND $tableName.$deleted = 0
           GROUP BY date($tableName.$datetime)
           ORDER BY date($tableName.$datetime);
+        ''',
+      '''
+          CREATE VIEW $statsViewByWeek AS
+          SELECT
+            strftime('%W', $tableName.$datetime) AS week_number,
+            COUNT($strengthSet.$id) AS $numSets,
+            MIN($strengthSet.$count) AS $minCount,
+            MAX($strengthSet.$count) AS $maxCount,
+            SUM($strengthSet.$count) AS $sumCount,
+            MAX($strengthSet.$weight) AS $maxWeight,
+            SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
+            MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
+          FROM $tableName
+            JOIN $movement ON $movement.$id = $tableName.$movementId
+            JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
+            LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
+          WHERE $movement.$deleted = 0
+            AND $strengthSet.$deleted = 0
+            AND $tableName.$deleted = 0
+          GROUP BY week_number
+          ORDER BY date($tableName.$datetime);
+        ''',
         '''
+          CREATE VIEW $statsViewByMonth AS
+          SELECT
+            strftime('%Y_%m', $tableName.$datetime) AS month,
+            COUNT($strengthSet.$id) AS $numSets,
+            MIN($strengthSet.$count) AS $minCount,
+            MAX($strengthSet.$count) AS $maxCount,
+            SUM($strengthSet.$count) AS $sumCount,
+            MAX($strengthSet.$weight) AS $maxWeight,
+            SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
+            MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
+          FROM $tableName
+            JOIN $movement ON $movement.$id = $tableName.$movementId
+            JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
+            LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
+          WHERE $movement.$deleted = 0
+            AND $strengthSet.$deleted = 0
+            AND $tableName.$deleted = 0
+          GROUP BY month
+          ORDER BY date($tableName.$datetime);
+        ''',
     ];
   }
 
@@ -195,12 +246,28 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
         .toList();
   }
 
-  Future<List<StrengthSessionStats>> getDescriptionsByDay({
+  String _getAggregationView(AggregationFrame frame) {
+    switch (frame) {
+      case AggregationFrame.byDay:
+        return statsViewByDay;
+      case AggregationFrame.byWeek:
+        return statsViewByWeek;
+      case AggregationFrame.byMonth:
+        return statsViewByMonth;
+    }
+  }
+
+  Future<List<StrengthSessionStats>> getStatsAggregations({
+    required AggregationFrame frame,
     required Int64 movementIdValue,
     DateTime? from,
     DateTime? until,
   }) async {
-    final records = await database.query(statsViewByDay,
+
+    if (frame == AggregationFrame.byWeek && from != null && until != null) {
+      assert(from.year == until.year || until == from.yearLater());
+    }
+    final records = await database.query(_getAggregationView(frame),
         where: _whereFilter(movementIdValue, from, until),
         whereArgs: _args(movementIdValue, from, until));
     return records

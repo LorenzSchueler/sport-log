@@ -3,6 +3,7 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/tables/all.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
 import 'package:sport_log/models/strength/all.dart';
 
@@ -177,36 +178,77 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
   Future<DateTime?> mostRecentDateTime() async =>
       strengthSessionDb.mostRecentDateTime();
 
-  Future<List<StrengthSessionDescription>> getSessionsWithStats({
-    Int64? movementId,
-    DateTime? from,
-    DateTime? until,
-  }) async {
-    return strengthSessionDb.getDescriptionsBySession(
-      from: from,
-      until: until,
-      movementIdValue: movementId,
-    );
-  }
-
-  Future<List<StrengthSessionStats>> getStatsByDay({
-    required Int64 movementId,
-    DateTime? from,
-    DateTime? until,
-  }) async {
-    return strengthSessionDb.getDescriptionsByDay(
-      from: from,
-      until: until,
-      movementIdValue: movementId,
-    );
-  }
-
   // this can be very inefficient and should be avoided when having huge lists of sessions
-  Future<void> populateWithSets(
+  Future<List<StrengthSessionDescription>> populateWithSets(
       List<StrengthSessionDescription> sessions) async {
     for (final session in sessions) {
       session.strengthSets =
           await strengthSetDb.getByStrengthSession(session.id);
     }
+    return sessions;
+  }
+
+  Future<List<StrengthSessionDescription>> getSessionsWithStats({
+    Int64? movementId,
+    DateTime? from,
+    DateTime? until,
+    bool withSets = false,
+  }) async {
+    if (withSets == false) {
+      return strengthSessionDb.getDescriptionsBySession(
+        from: from,
+        until: until,
+        movementIdValue: movementId,
+      );
+    } else {
+      return strengthSessionDb
+          .getDescriptionsBySession(
+            from: from,
+            until: until,
+            movementIdValue: movementId,
+          )
+          .then((sessions) => populateWithSets(sessions));
+    }
+  }
+
+  // weekly/monthly view
+  Future<List<StrengthSessionStats>> getStatsByDay({
+    required Int64 movementId,
+    DateTime? from,
+    DateTime? until,
+  }) async {
+    return strengthSessionDb.getStatsAggregations(
+      frame: AggregationFrame.byDay,
+      from: from,
+      until: until,
+      movementIdValue: movementId,
+    );
+  }
+
+  // yearly view
+  Future<List<StrengthSessionStats>> getStatsByWeek({
+    required Int64 movementId,
+    DateTime? from,
+    DateTime? until,
+  }) async {
+    return strengthSessionDb.getStatsAggregations(
+      frame: AggregationFrame.byWeek,
+      from: from,
+      until: until,
+      movementIdValue: movementId,
+    );
+  }
+
+  Future<List<StrengthSessionStats>> getStatsByMonth({
+    required Int64 movementId,
+    DateTime? from,
+    DateTime? until,
+  }) async {
+    return strengthSessionDb.getStatsAggregations(
+      frame: AggregationFrame.byMonth,
+      from: from,
+      until: until,
+      movementIdValue: movementId,
+    );
   }
 }
