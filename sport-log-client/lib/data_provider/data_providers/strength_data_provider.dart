@@ -76,7 +76,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
 
   @override
   Future<List<StrengthSessionDescription>> getNonDeleted() async {
-    return (await strengthSessionDb.getDescriptionsBySession());
+    return (await strengthSessionDb.getSessionDescriptions());
   }
 
   Future<List<StrengthSet>> getStrengthSetsByStrengthSession(Int64 id) {
@@ -195,14 +195,14 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     bool withSets = false,
   }) async {
     if (withSets == false) {
-      return strengthSessionDb.getDescriptionsBySession(
+      return strengthSessionDb.getSessionDescriptions(
         from: from,
         until: until,
         movementIdValue: movementId,
       );
     } else {
       return strengthSessionDb
-          .getDescriptionsBySession(
+          .getSessionDescriptions(
             from: from,
             until: until,
             movementIdValue: movementId,
@@ -214,41 +214,27 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
   // weekly/monthly view
   Future<List<StrengthSessionStats>> getStatsByDay({
     required Int64 movementId,
-    DateTime? from,
-    DateTime? until,
+    required DateTime from,
+    required DateTime until,
   }) async {
-    return strengthSessionDb.getStatsAggregations(
-      frame: AggregationFrame.byDay,
-      from: from,
-      until: until,
-      movementIdValue: movementId,
-    );
+    return strengthSessionDb.getStatsAggregationsByDay(
+        movementIdValue: movementId, from: from, until: until);
   }
 
   // yearly view
   Future<List<StrengthSessionStats>> getStatsByWeek({
     required Int64 movementId,
-    DateTime? from,
-    DateTime? until,
+    required DateTime from,
+    required DateTime until,
   }) async {
-    return strengthSessionDb.getStatsAggregations(
-      frame: AggregationFrame.byWeek,
-      from: from,
-      until: until,
-      movementIdValue: movementId,
-    );
+    return strengthSessionDb.getStatsAggregationsByWeek(
+        from: from, until: until, movementIdValue: movementId);
   }
 
-  Future<List<StrengthSessionStats>> getStatsByMonth({
-    required Int64 movementId,
-    DateTime? from,
-    DateTime? until,
-  }) async {
-    return strengthSessionDb.getStatsAggregations(
-      frame: AggregationFrame.byMonth,
-      from: from,
-      until: until,
-      movementIdValue: movementId,
-    );
+  // all time view
+  Future<List<StrengthSessionStats>> getStatsByMonth(
+      {required Int64 movementId}) async {
+    return strengthSessionDb.getStatsAggregationsByMonth(
+        movementIdValue: movementId);
   }
 }

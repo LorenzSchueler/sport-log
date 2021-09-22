@@ -47,6 +47,15 @@ class DateFilterState {
     return timeFrame == TimeFrame.all ? null : _start;
   }
 
+  @override
+  bool operator ==(Object other) =>
+      other is DateFilterState &&
+      other._start == start &&
+      other.timeFrame == timeFrame;
+
+  @override
+  int get hashCode => Object.hash(_start, timeFrame);
+
   static DateTime _beginningOfTimeFrame(DateTime start, TimeFrame timeFrame) {
     switch (timeFrame) {
       case TimeFrame.day:

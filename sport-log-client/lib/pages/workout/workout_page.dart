@@ -72,8 +72,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
         return const MetconsPage();
       case BottomNavPage.strength:
         return StrengthSessionsPage(
-          start: _dateFilter.start,
-          end: _dateFilter.end,
+          dateFilter: _dateFilter,
           movement: _selectedMovement,
         );
       case BottomNavPage.cardio:

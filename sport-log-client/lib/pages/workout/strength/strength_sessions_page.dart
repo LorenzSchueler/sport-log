@@ -10,19 +10,19 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:sport_log/pages/workout/date_filter_state.dart';
+import 'package:sport_log/pages/workout/strength/strength_chart.dart';
 
 class StrengthSessionsPage extends StatefulWidget {
   StrengthSessionsPage({
     Key? key,
-    required this.start,
-    required this.end,
+    required this.dateFilter,
     required this.movement,
-  })  : assert((start == null) == (end == null)),
-        _filterHash = Object.hash(start, end, movement?.id),
+  })  : _filterHash =
+            Object.hash(dateFilter.start, dateFilter.end, movement?.id),
         super(key: key);
 
-  final DateTime? start;
-  final DateTime? end;
+  final DateFilterState dateFilter;
   final Movement? movement;
 
   final int _filterHash;
@@ -46,11 +46,11 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
 
   Future<void> update() async {
     _logger.d(
-        'Updating strength sessions with start = ${widget.start}, end = ${widget.end}');
+        'Updating strength sessions with start = ${widget.dateFilter.start}, end = ${widget.dateFilter.end}');
     _dataProvider
         .getSessionsWithStats(
-            from: widget.start,
-            until: widget.end,
+            from: widget.dateFilter.start,
+            until: widget.dateFilter.end,
             movementId: widget.movement?.id)
         .then((ssds) async {
       final now = DateTime.now();
@@ -83,63 +83,71 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   void didUpdateWidget(StrengthSessionsPage oldWidget) {
     _logger.d('didUpdateWidget');
     super.didUpdateWidget(oldWidget);
-    if (widget.start != oldWidget.start ||
-        widget.end != oldWidget.end ||
+    if (widget.dateFilter != oldWidget.dateFilter ||
         widget.movement != oldWidget.movement) {
       update();
     }
   }
 
   Widget get _chart {
-    if (widget.movement == null || widget.start == null || widget.end == null) {
-      return const SizedBox();
+    if (widget.movement == null) {
+      return const SizedBox.shrink();
     }
-    final startMs = widget.start!.millisecondsSinceEpoch;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: AspectRatio(
-        aspectRatio: 2,
-        child: LineChart(LineChartData(
-          borderData: FlBorderData(show: false),
-          titlesData: FlTitlesData(
-            topTitles: SideTitles(showTitles: false),
-            rightTitles: SideTitles(showTitles: false),
-            leftTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 40,
-              margin: -39,
-            ),
-            bottomTitles: SideTitles(
-              showTitles: true,
-              interval: Duration.millisecondsPerDay.toDouble(),
-              checkToShowTitle: (a, b, c, d, value) {
-                final datetime = DateTime.fromMillisecondsSinceEpoch(
-                    value.toInt() + startMs);
-                return datetime.day == 15;
-              },
-              getTitles: (ms) => shortMonthName(
-                  DateTime.fromMillisecondsSinceEpoch(ms.toInt() + startMs)
-                      .month),
-            ),
-          ),
-          lineBarsData: [
-            LineChartBarData(
-              colors: [primaryColorOf(context)],
-              spots: _ssds
-                  .where((ssd) => ssd.stats!.maxEorm != null)
-                  .map((ssd) => FlSpot(
-                      (ssd.strengthSession.datetime.millisecondsSinceEpoch -
-                              startMs)
-                          .toDouble(),
-                      ssd.stats!.maxEorm!))
-                  .toList(),
-              isCurved: false,
-              dotData: FlDotData(show: false),
-            ),
-          ],
-        )),
-      ),
+    return StrengthChart(
+      unit: _ssds.first.strengthSession.movementUnit,
+      dateFilter: widget.dateFilter,
+      movement: widget.movement!,
+      firstSessionDateTime: _ssds.first.strengthSession.datetime,
     );
+    // if (widget.movement == null || widget.start == null || widget.end == null) {
+    //   return const SizedBox();
+    // }
+    // final startMs = widget.start!.millisecondsSinceEpoch;
+    // return Padding(
+    //   padding: const EdgeInsets.symmetric(vertical: 12),
+    //   child: AspectRatio(
+    //     aspectRatio: 2,
+    //     child: LineChart(LineChartData(
+    //       borderData: FlBorderData(show: false),
+    //       titlesData: FlTitlesData(
+    //         topTitles: SideTitles(showTitles: false),
+    //         rightTitles: SideTitles(showTitles: false),
+    //         leftTitles: SideTitles(
+    //           showTitles: true,
+    //           reservedSize: 40,
+    //           margin: -39,
+    //         ),
+    //         bottomTitles: SideTitles(
+    //           showTitles: true,
+    //           interval: Duration.millisecondsPerDay.toDouble(),
+    //           checkToShowTitle: (a, b, c, d, value) {
+    //             final datetime = DateTime.fromMillisecondsSinceEpoch(
+    //                 value.toInt() + startMs);
+    //             return datetime.day == 15;
+    //           },
+    //           getTitles: (ms) => shortMonthName(
+    //               DateTime.fromMillisecondsSinceEpoch(ms.toInt() + startMs)
+    //                   .month),
+    //         ),
+    //       ),
+    //       lineBarsData: [
+    //         LineChartBarData(
+    //           colors: [primaryColorOf(context)],
+    //           spots: _ssds
+    //               .where((ssd) => ssd.stats!.maxEorm != null)
+    //               .map((ssd) => FlSpot(
+    //                   (ssd.strengthSession.datetime.millisecondsSinceEpoch -
+    //                           startMs)
+    //                       .toDouble(),
+    //                   ssd.stats!.maxEorm!))
+    //               .toList(),
+    //           isCurved: false,
+    //           dotData: FlDotData(show: false),
+    //         ),
+    //       ],
+    //     )),
+    //   ),
+    // );
   }
 
   Widget _buildStrengthSessionList(BuildContext context) {
@@ -157,6 +165,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
 
   Widget _strengthSessionBuilder(BuildContext context, int index) {
     if (index == 0) {
+      assert(_ssds.isNotEmpty);
       return _chart;
     }
     index--;

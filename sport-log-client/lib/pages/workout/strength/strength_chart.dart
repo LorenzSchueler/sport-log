@@ -1,61 +1,27 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
-import 'package:sport_log/helpers/snackbar.dart';
+import 'package:flutter/rendering.dart';
+import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/models/strength/strength_session_description.dart';
 import 'package:sport_log/pages/workout/date_filter_state.dart';
+import 'package:sport_log/pages/workout/strength/charts/all.dart';
 
-enum SeriesType {
-  maxCount, // m
-  minCount, // mSecs
-  sumCount, // cal
-  avgCount, // reps (maybe even with maxWeight)
-  maxEorm, // reps
-  sumVolume, // reps
-  maxWeight, // reps
-}
+import 'charts/series_type.dart';
 
 class StrengthChart extends StatefulWidget {
   StrengthChart({
     Key? key,
-    required this.sessions,
+    required this.unit,
     required this.dateFilter,
     required this.movement,
-  })  : assert(sessions.isNotEmpty),
-        super(key: key) {
-    final movementUnit = sessions.first.strengthSession.movementUnit;
-    switch (movementUnit) {
-      // TODO: add MovementUni.mSecs
-      case MovementUnit.reps:
-        availableSeries = [
-          SeriesType.avgCount,
-          SeriesType.maxEorm,
-          SeriesType.sumVolume,
-          SeriesType.maxWeight
-        ];
-        break;
-      case MovementUnit.cal:
-        availableSeries = [SeriesType.sumCount];
-        break;
-      case MovementUnit.meter:
-        availableSeries = [SeriesType.maxCount];
-        break;
-      case MovementUnit.km:
-        throw StateError('MovementUnit.km cannot be in a strength session.');
-      case MovementUnit.yard:
-        throw StateError('MovementUnit.yard cannot be in a strength session.');
-      case MovementUnit.foot:
-        throw StateError('MovementUnit.foot cannot be in a strength session.');
-      case MovementUnit.mile:
-        throw StateError('MovementUnit.foot cannot be in a strength session.');
-    }
-  }
+    required this.firstSessionDateTime,
+  })  : availableSeries = getAvailableSeries(unit),
+        super(key: key);
 
-  final List<StrengthSessionDescription> sessions;
+  final MovementUnit unit;
   final DateFilterState dateFilter;
   final Movement movement;
-  late final List<SeriesType> availableSeries;
+  final List<SeriesType> availableSeries;
+  final DateTime firstSessionDateTime;
 
   @override
   State<StrengthChart> createState() => _StrengthChartState();
@@ -64,137 +30,82 @@ class StrengthChart extends StatefulWidget {
 class _StrengthChartState extends State<StrengthChart> {
   @override
   Widget build(BuildContext context) {
-    return _chart;
+    return Column(
+      children: [
+        _seriesSelection,
+        AspectRatio(
+          aspectRatio: 2,
+          child: _chart,
+        ),
+      ],
+    );
   }
 
-  final _dataProvider = StrengthDataProvider();
   late SeriesType _activeSeriesType;
 
   @override
   void initState() {
-    _activeSeriesType = widget.availableSeries.first;
     super.initState();
+    _activeSeriesType = widget.availableSeries.first;
   }
 
   Widget get _chart {
     switch (widget.dateFilter.timeFrame) {
       case TimeFrame.day:
-        return _dayChart;
+        return DayChart(
+          series: _activeSeriesType,
+          unit: widget.unit,
+          date: widget.dateFilter.start!,
+          movementId: widget.movement.id,
+        );
       case TimeFrame.week:
-        return _weekChart;
+        return WeekChart(
+            series: _activeSeriesType,
+            unit: widget.unit,
+            start: widget.dateFilter.start!,
+            movementId: widget.movement.id);
       case TimeFrame.month:
-        return _monthChart;
+        return MonthChart(
+          series: _activeSeriesType,
+          unit: widget.unit,
+          start: widget.dateFilter.start!,
+          movementId: widget.movement.id,
+        );
       case TimeFrame.year:
-        return _yearChart;
+        return YearChart(
+          series: _activeSeriesType,
+          unit: widget.unit,
+          start: widget.dateFilter.start!,
+          movementId: widget.movement.id,
+        );
       case TimeFrame.all:
-        return _allChart;
+        return AllChart(
+          series: _activeSeriesType,
+          unit: widget.unit,
+          movementId: widget.movement.id,
+          firstDateTime: widget.firstSessionDateTime,
+        );
     }
   }
 
-  Widget get _dayChart {
-    return FutureBuilder(
-      future: _dataProvider.populateWithSets(widget.sessions),
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-          case ConnectionState.active:
-            return const CircularProgressIndicator();
-          case ConnectionState.done:
-            if (snapshot.hasError) {
-              Future(
-                  () => showSimpleSnackBar(context, 'Something went wrong.'));
-              return Container();
-            } else {
-              return DayChart(
-                  sessions: widget.sessions, series: _activeSeriesType);
-            }
-        }
-      },
+  Widget get _seriesSelection {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: widget.availableSeries.map((s) {
+        final selected = s == _activeSeriesType;
+        return OutlinedButton(
+          onPressed: () {
+            setState(() => _activeSeriesType = s);
+          },
+          child: Text(s.toDisplayName(widget.unit)),
+          style: selected ? OutlinedButton.styleFrom(
+            backgroundColor: primaryColorOf(context),
+            primary: onPrimaryColorOf(context),
+          ) : OutlinedButton.styleFrom(
+            side: BorderSide.none,
+          ),
+        );
+      }).toList(),
     );
-  }
-
-  Widget get _weekChart {
-    return notImplemented;
-  }
-
-  Widget get _monthChart {
-    return notImplemented;
-  }
-
-  Widget get _yearChart {
-    return notImplemented;
-  }
-
-  Widget get _allChart {
-    return notImplemented;
-  }
-
-  final Widget notImplemented = const Center(child: Text('not implemented'));
-}
-
-class DayChart extends StatelessWidget {
-  DayChart({Key? key, required this.sessions, required this.series})
-      : assert(sessions.every((session) => session.strengthSets != null)),
-        super(key: key);
-
-  final List<StrengthSessionDescription> sessions; // these have to be with sets
-  final SeriesType series;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-
-class WeekChart extends StatelessWidget {
-  const WeekChart({Key? key, required this.sessions, required this.series})
-      : super(key: key);
-
-  final List<StrengthSessionDescription> sessions;
-  final SeriesType series;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-
-class MonthChart extends StatelessWidget {
-  const MonthChart({Key? key, required this.sessions, required this.series})
-      : super(key: key);
-
-  final List<StrengthSessionDescription> sessions;
-  final SeriesType series;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-
-class YearChart extends StatelessWidget {
-  const YearChart({Key? key, required this.sessions, required this.series})
-      : super(key: key);
-
-  final List<StrengthSessionDescription> sessions;
-  final SeriesType series;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-
-class AllChart extends StatelessWidget {
-  const AllChart({Key? key, required this.sessions, required this.series})
-      : super(key: key);
-
-  final List<StrengthSessionDescription> sessions;
-  final SeriesType series;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
   }
 }

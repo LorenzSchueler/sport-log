@@ -59,10 +59,11 @@ K _$enumDecode<K, V>(
 
 const _$MovementUnitEnumMap = {
   MovementUnit.reps: 'Reps',
-  MovementUnit.cal: 'Cal',
-  MovementUnit.meter: 'Meter',
+  MovementUnit.cals: 'Cal',
+  MovementUnit.m: 'Meter',
   MovementUnit.km: 'Km',
-  MovementUnit.yard: 'Yard',
-  MovementUnit.foot: 'Foot',
-  MovementUnit.mile: 'Mile',
+  MovementUnit.yards: 'Yard',
+  MovementUnit.feet: 'Foot',
+  MovementUnit.miles: 'Mile',
+  MovementUnit.msecs: 'Msec',
 };

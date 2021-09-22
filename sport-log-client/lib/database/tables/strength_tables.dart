@@ -12,12 +12,6 @@ import 'package:sqflite/sqflite.dart';
 
 import 'movement_table.dart';
 
-enum AggregationFrame {
-  byDay,
-  byWeek,
-  byMonth,
-}
-
 class StrengthSessionTable extends DbAccessor<StrengthSession>
     with DateTimeMethods {
   final _logger = Logger('StrengthSessionTable');
@@ -26,9 +20,6 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
   DbSerializer<StrengthSession> get serde => DbStrengthSessionSerializer();
 
   static const statsViewBySession = 'strength_session_stats_view_by_session';
-  static const statsViewByDay = 'strength_session_stats_view_by_day';
-  static const statsViewByWeek = 'strength_session_stats_view_by_week';
-  static const statsViewByMonth = 'strength_session_stats_view_by_month';
   static const strengthSet = Tables.strengthSet;
   static const movement = Tables.movement;
   static const strengthSessionId = Keys.strengthSessionId;
@@ -94,90 +85,6 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
           (30, 0.50);
         ''',
       '''
-          CREATE VIEW $statsViewBySession AS
-          SELECT
-            ${_table.allColumns},
-            ${_movementTable.table.allColumns},
-            COUNT($strengthSet.$id) AS $numSets,
-            MIN($strengthSet.$count) AS $minCount,
-            MAX($strengthSet.$count) AS $maxCount,
-            SUM($strengthSet.$count) AS $sumCount,
-            MAX($strengthSet.$weight) AS $maxWeight,
-            SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
-            MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
-          FROM $tableName
-            JOIN $movement ON $movement.$id = $tableName.$movementId
-            JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
-            LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
-          WHERE $movement.$deleted = 0
-            AND $strengthSet.$deleted = 0
-            AND $tableName.$deleted = 0
-          GROUP BY $tableName.$id
-          HAVING COUNT($strengthSet.$id) > 0
-          ORDER BY datetime($tableName.$datetime);
-        ''',
-      '''
-          CREATE VIEW $statsViewByDay AS
-          SELECT
-            $tableName.$datetime,
-            COUNT($strengthSet.$id) AS $numSets,
-            MIN($strengthSet.$count) AS $minCount,
-            MAX($strengthSet.$count) AS $maxCount,
-            SUM($strengthSet.$count) AS $sumCount,
-            MAX($strengthSet.$weight) AS $maxWeight,
-            SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
-            MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
-          FROM $tableName
-            JOIN $movement ON $movement.$id = $tableName.$movementId
-            JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
-            LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
-          WHERE $movement.$deleted = 0
-            AND $strengthSet.$deleted = 0
-            AND $tableName.$deleted = 0
-          GROUP BY date($tableName.$datetime)
-          ORDER BY date($tableName.$datetime);
-        ''',
-      '''
-          CREATE VIEW $statsViewByWeek AS
-          SELECT
-            strftime('%W', $tableName.$datetime) AS week_number,
-            COUNT($strengthSet.$id) AS $numSets,
-            MIN($strengthSet.$count) AS $minCount,
-            MAX($strengthSet.$count) AS $maxCount,
-            SUM($strengthSet.$count) AS $sumCount,
-            MAX($strengthSet.$weight) AS $maxWeight,
-            SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
-            MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
-          FROM $tableName
-            JOIN $movement ON $movement.$id = $tableName.$movementId
-            JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
-            LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
-          WHERE $movement.$deleted = 0
-            AND $strengthSet.$deleted = 0
-            AND $tableName.$deleted = 0
-          GROUP BY week_number
-          ORDER BY date($tableName.$datetime);
-        ''',
-        '''
-          CREATE VIEW $statsViewByMonth AS
-          SELECT
-            strftime('%Y_%m', $tableName.$datetime) AS month,
-            COUNT($strengthSet.$id) AS $numSets,
-            MIN($strengthSet.$count) AS $minCount,
-            MAX($strengthSet.$count) AS $maxCount,
-            SUM($strengthSet.$count) AS $sumCount,
-            MAX($strengthSet.$weight) AS $maxWeight,
-            SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
-            MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
-          FROM $tableName
-            JOIN $movement ON $movement.$id = $tableName.$movementId
-            JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
-            LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
-          WHERE $movement.$deleted = 0
-            AND $strengthSet.$deleted = 0
-            AND $tableName.$deleted = 0
-          GROUP BY month
-          ORDER BY date($tableName.$datetime);
         ''',
     ];
   }
@@ -226,14 +133,44 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
         if (movementIdValue != null) movementIdValue.toInt(),
       ];
 
-  Future<List<StrengthSessionDescription>> getDescriptionsBySession({
+  Future<List<StrengthSessionDescription>> getSessionDescriptions({
     Int64? movementIdValue,
     DateTime? from,
     DateTime? until,
   }) async {
-    final records = await database.query(statsViewBySession,
-        where: _whereFilter(movementIdValue, from, until),
-        whereArgs: _args(movementIdValue, from, until));
+    final fromFilter = from == null ? '' : 'AND $tableName.$datetime >= ?';
+    final untilFilter = until == null ? '' : 'AND $tableName.$datetime < ?';
+    final movementIdFilter =
+        movementIdValue == null ? '' : 'AND $tableName.$movementId = ?';
+    final records = await database.rawQuery('''
+          SELECT
+            ${_table.allColumns},
+            ${_movementTable.table.allColumns},
+            COUNT($strengthSet.$id) AS $numSets,
+            MIN($strengthSet.$count) AS $minCount,
+            MAX($strengthSet.$count) AS $maxCount,
+            SUM($strengthSet.$count) AS $sumCount,
+            MAX($strengthSet.$weight) AS $maxWeight,
+            SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
+            MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
+          FROM $tableName
+            JOIN $movement ON $movement.$id = $tableName.$movementId
+            JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
+            LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
+          WHERE $movement.$deleted = 0
+            AND $strengthSet.$deleted = 0
+            AND $tableName.$deleted = 0
+            $fromFilter
+            $untilFilter
+            $movementIdFilter
+          GROUP BY $tableName.$id
+          HAVING COUNT($strengthSet.$id) > 0
+          ORDER BY datetime($tableName.$datetime);
+    ''', [
+      if (from != null) from.toString(),
+      if (until != null) until.toString(),
+      if (movementIdValue != null) movementIdValue.toInt(),
+    ]);
     return records
         .map((record) => StrengthSessionDescription(
               strengthSession:
@@ -246,30 +183,92 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
         .toList();
   }
 
-  String _getAggregationView(AggregationFrame frame) {
-    switch (frame) {
-      case AggregationFrame.byDay:
-        return statsViewByDay;
-      case AggregationFrame.byWeek:
-        return statsViewByWeek;
-      case AggregationFrame.byMonth:
-        return statsViewByMonth;
-    }
+  Future<List<StrengthSessionStats>> getStatsAggregationsByDay({
+    required Int64 movementIdValue,
+    required DateTime from,
+    required DateTime until,
+  }) async {
+    final records = await database.rawQuery('''
+          SELECT
+            date($tableName.$datetime) AS [date],
+            COUNT($strengthSet.$id) AS $numSets,
+            MIN($strengthSet.$count) AS $minCount,
+            MAX($strengthSet.$count) AS $maxCount,
+            SUM($strengthSet.$count) AS $sumCount,
+            MAX($strengthSet.$weight) AS $maxWeight,
+            SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
+            MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
+          FROM $tableName
+            JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
+            LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
+          WHERE $strengthSet.$deleted = 0
+            AND $tableName.$deleted = 0
+            AND $tableName.$movementId = ?
+            AND $tableName.$datetime >= ?
+            AND $tableName.$datetime < ?
+          GROUP BY [date]
+          ORDER BY [date];
+     ''', [movementIdValue.toInt(), from.toString(), until.toString()]);
+    return records
+        .map((record) => StrengthSessionStats.fromDbRecord(record))
+        .toList();
   }
 
-  Future<List<StrengthSessionStats>> getStatsAggregations({
-    required AggregationFrame frame,
+  Future<List<StrengthSessionStats>> getStatsAggregationsByWeek({
     required Int64 movementIdValue,
-    DateTime? from,
-    DateTime? until,
+    required DateTime from,
+    required DateTime until,
   }) async {
+    assert(
+        from.year == until.year || from.beginningOfYear().yearLater() == until);
+    final records = await database.rawQuery('''
+          SELECT
+            strftime('%W', $tableName.$datetime) AS week,
+            COUNT($strengthSet.$id) AS $numSets,
+            MIN($strengthSet.$count) AS $minCount,
+            MAX($strengthSet.$count) AS $maxCount,
+            SUM($strengthSet.$count) AS $sumCount,
+            MAX($strengthSet.$weight) AS $maxWeight,
+            SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
+            MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
+          FROM $tableName
+            JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
+            LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
+          WHERE $strengthSet.$deleted = 0
+            AND $tableName.$deleted = 0
+            AND $tableName.$movementId = ?
+            AND $tableName.$datetime >= ?
+            AND $tableName.$datetime < ?
+          GROUP BY week
+          ORDER BY week;
+    ''', [movementIdValue.toInt(), from.toString(), until.toString()]);
+    return records
+        .map((record) => StrengthSessionStats.fromDbRecord(record))
+        .toList();
+  }
 
-    if (frame == AggregationFrame.byWeek && from != null && until != null) {
-      assert(from.year == until.year || until == from.yearLater());
-    }
-    final records = await database.query(_getAggregationView(frame),
-        where: _whereFilter(movementIdValue, from, until),
-        whereArgs: _args(movementIdValue, from, until));
+  Future<List<StrengthSessionStats>> getStatsAggregationsByMonth({
+    required Int64 movementIdValue,
+  }) async {
+    final records = await database.rawQuery('''
+          SELECT
+            strftime('%Y_%m', $tableName.$datetime) AS month,
+            COUNT($strengthSet.$id) AS $numSets,
+            MIN($strengthSet.$count) AS $minCount,
+            MAX($strengthSet.$count) AS $maxCount,
+            SUM($strengthSet.$count) AS $sumCount,
+            MAX($strengthSet.$weight) AS $maxWeight,
+            SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
+            MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
+          FROM $tableName
+            JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
+            LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
+          WHERE $strengthSet.$deleted = 0
+            AND $tableName.$deleted = 0
+            AND $tableName.$movementId = ?
+          GROUP BY month
+          ORDER BY month;
+    ''', [movementIdValue.toInt()]);
     return records
         .map((record) => StrengthSessionStats.fromDbRecord(record))
         .toList();

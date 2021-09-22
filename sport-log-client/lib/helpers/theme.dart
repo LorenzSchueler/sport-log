@@ -51,12 +51,20 @@ Color primaryVariantOf(BuildContext context) {
   return Theme.of(context).colorScheme.primaryVariant;
 }
 
+Color onPrimaryColorOf(BuildContext context) {
+  return Theme.of(context).colorScheme.onPrimary;
+}
+
 Color secondaryColorOf(BuildContext context) {
   return Theme.of(context).colorScheme.secondary;
 }
 
 Color secondaryVariantOf(BuildContext context) {
   return Theme.of(context).colorScheme.secondaryVariant;
+}
+
+Color onSecondaryColorOf(BuildContext context) {
+  return Theme.of(context).colorScheme.onSecondary;
 }
 
 Color appBarForegroundOf(BuildContext context) {
