@@ -19,6 +19,8 @@ use std::env;
 
 #[macro_use]
 extern crate rocket;
+#[macro_use]
+extern crate diesel_migrations;
 
 use figment::{
     providers::{Format, Toml},
@@ -27,7 +29,7 @@ use figment::{
 use rocket::{
     fairing::{AdHoc, Fairing, Info, Kind},
     http::{Header, Method, Status},
-    Request, Response,
+    Build, Request, Response, Rocket,
 };
 
 use sport_log_types::{Config, Db, Version};
@@ -97,8 +99,7 @@ pub async fn get_version() -> JsonResult<Version> {
     .into_json()
 }
 
-#[launch]
-fn rocket() -> _ {
+fn rocket() -> Rocket<Build> {
     let figment = Figment::from(rocket::Config::default()).merge(Toml::file(CONFIG_FILE).nested());
     if cfg!(test) {
         env::set_var("RUST_LOG", "error");
@@ -286,4 +287,25 @@ fn rocket() -> _ {
                 account::sync,
             ],
         )
+}
+
+#[rocket::main]
+async fn main() -> Result<(), rocket::Error> {
+    embed_migrations!();
+
+    let rocket = rocket();
+    info!("rocket build successful");
+
+    let rocket = rocket.ignite().await?;
+    info!("rocket ignite successful");
+
+    info!("running migrations...");
+    let db = Db::get_one(&rocket).await.unwrap();
+    if let Err(error) = db.run(|c| embedded_migrations::run(c)).await {
+        error!("an error occured while running new migrations: {}", error);
+    }
+    info!("db is up to date");
+
+    info!("launching rocket");
+    rocket.launch().await
 }
