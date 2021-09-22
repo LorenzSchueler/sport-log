@@ -44,9 +44,11 @@ class _MonthChartState extends State<MonthChart> {
     )
         .then((stats) {
       assert(stats.length <= 31);
-      setState(() {
-        _stats = stats;
-      });
+      if (mounted) {
+        setState(() {
+          _stats = stats;
+        });
+      }
     });
   }
 

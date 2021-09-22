@@ -44,9 +44,11 @@ class _DayChartState extends State<DayChart> {
       withSets: true,
     )
         .then((sessions) {
-      setState(() {
-        _sessions = sessions;
-      });
+      if (mounted) {
+        setState(() {
+          _sessions = sessions;
+        });
+      }
     });
   }
 

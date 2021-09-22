@@ -27,6 +27,10 @@ class MovementTable extends DbAccessor<Movement> {
     Column.int(Keys.unit),
   ]);
 
+  static const deleted = Keys.deleted;
+  static const unit = Keys.unit;
+  static const name = Keys.name;
+
   @override
   String get tableName => _table.name;
 
@@ -69,5 +73,15 @@ class MovementTable extends DbAccessor<Movement> {
         hasReference: await hasReference(movement.id),
       );
     }).toList());
+  }
+
+  Future<List<Movement>> getMovementsWithUnits(List<MovementUnit> units) async {
+    if (units.isEmpty) {
+      return [];
+    }
+    final unitsStr = units.map((unit) => unit.index).join(', ');
+    final records = await database.query(tableName,
+        where: '$deleted = 0 AND $unit in ($unitsStr)', orderBy: name);
+    return records.map((record) => serde.fromDbRecord(record)).toList();
   }
 }

@@ -83,8 +83,6 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
           (29, 0.51),
           (30, 0.50);
         ''',
-      '''
-        ''',
     ];
   }
 
@@ -157,7 +155,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
             $movementIdFilter
           GROUP BY $tableName.$id
           HAVING COUNT($strengthSet.$id) > 0
-          ORDER BY datetime($tableName.$datetime);
+          ORDER BY datetime($tableName.$datetime) DESC;
     ''', [
       if (from != null) from.toString(),
       if (until != null) until.toString(),

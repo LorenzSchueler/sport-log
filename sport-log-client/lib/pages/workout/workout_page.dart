@@ -24,7 +24,7 @@ class WorkoutPage extends StatefulWidget {
 
 class _WorkoutPageState extends State<WorkoutPage> {
   BottomNavPage _currentPage = BottomNavPage.metcon;
-  final DateFilterState _dateFilter =
+  DateFilterState _dateFilter =
       DateFilterState(timeFrame: TimeFrame.month, start: DateTime.now());
 
   Movement? _selectedMovement;
@@ -141,7 +141,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                   ? null
                   : () {
                       setState(() {
-                        _dateFilter.goBackInTime();
+                        _dateFilter = _dateFilter.goBackInTime();
                       });
                     },
               icon: const Icon(Icons.arrow_back_ios_sharp),
@@ -166,7 +166,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
               onPressed: _dateFilter.goingForwardPossible
                   ? () {
                       setState(() {
-                        _dateFilter.goForwardInTime();
+                        _dateFilter = _dateFilter.goForwardInTime();
                       });
                     }
                   : null,
@@ -189,7 +189,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
               title: Center(child: Text(timeFrame.toDisplayName())),
               onTap: () {
                 setState(() {
-                  _dateFilter.setTimeFrame(timeFrame);
+                  _dateFilter = _dateFilter.withTimeFrame(timeFrame);
                 });
                 Navigator.of(context).pop();
               },
@@ -207,7 +207,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
       child: SizedBox(
         width: 0,
         child: FutureBuilder<List<Movement>>(
-          future: _movementDataProvider.getNonDeleted(),
+          future: _movementDataProvider.getStrengthSessionMovements(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               if (snapshot.data!.isEmpty) {

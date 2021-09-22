@@ -43,9 +43,11 @@ class _WeekChartState extends State<WeekChart> {
     )
         .then((stats) {
       assert(stats.length <= 7);
-      setState(() {
-        _stats = stats;
-      });
+      if (mounted) {
+        setState(() {
+          _stats = stats;
+        });
+      }
     });
   }
 

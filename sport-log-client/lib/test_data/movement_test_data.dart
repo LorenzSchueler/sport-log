@@ -7,7 +7,7 @@ const int numberOfMovements = 15;
 
 List<Movement> generateMovements(Int64 userId) {
   return List.generate(
-    10,
+    numberOfMovements,
     (index) => Movement(
       id: randomId(),
       userId: userId,

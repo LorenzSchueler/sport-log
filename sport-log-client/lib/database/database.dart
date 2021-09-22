@@ -34,8 +34,8 @@ class AppDatabase {
             sql += await table.init();
           }
           for (final statement in sql) {
-            db.execute(statement);
             _logger.d(statement);
+            db.execute(statement);
           }
         },
         onOpen: (db) {

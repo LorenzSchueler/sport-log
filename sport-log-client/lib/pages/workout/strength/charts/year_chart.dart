@@ -13,7 +13,8 @@ class YearChart extends StatefulWidget {
     required this.series,
     required DateTime start,
     required this.movement,
-  }) : start = start.beginningOfYear(), super(key: key);
+  })  : start = start.beginningOfYear(),
+        super(key: key);
 
   final SeriesType series;
   final DateTime start;
@@ -43,9 +44,11 @@ class _YearChartState extends State<YearChart> {
     )
         .then((stats) {
       assert(stats.length <= 54);
-      setState(() {
-        _stats = stats;
-      });
+      if (mounted) {
+        setState(() {
+          _stats = stats;
+        });
+      }
     });
   }
 

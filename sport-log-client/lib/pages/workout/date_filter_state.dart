@@ -25,8 +25,10 @@ class DateFilterState {
   DateFilterState({required DateTime start, required this.timeFrame})
       : _start = _beginningOfTimeFrame(start, timeFrame);
 
-  DateTime _start;
-  TimeFrame timeFrame;
+  DateFilterState._(this._start, this.timeFrame);
+
+  final DateTime _start;
+  final TimeFrame timeFrame;
 
   DateTime? get end {
     switch (timeFrame) {
@@ -45,6 +47,10 @@ class DateFilterState {
 
   DateTime? get start {
     return timeFrame == TimeFrame.all ? null : _start;
+  }
+
+  DateFilterState copy() {
+    return DateFilterState._(_start.copy(), timeFrame);
   }
 
   @override
@@ -71,9 +77,9 @@ class DateFilterState {
     }
   }
 
-  void setTimeFrame(TimeFrame timeFrame) {
-    this.timeFrame = timeFrame;
-    _start = _beginningOfTimeFrame(DateTime.now(), timeFrame);
+  DateFilterState withTimeFrame(TimeFrame timeFrame) {
+    return DateFilterState._(
+        _beginningOfTimeFrame(DateTime.now(), timeFrame), timeFrame);
   }
 
   bool get goingForwardPossible {
@@ -91,43 +97,36 @@ class DateFilterState {
     }
   }
 
-  void goBackInTime() {
+  DateFilterState goBackInTime() {
     switch (timeFrame) {
       case TimeFrame.day:
-        _start = _start.dayEarlier();
-        break;
+        return DateFilterState._(_start.dayEarlier(), timeFrame);
       case TimeFrame.week:
-        _start = _start.weekEarlier();
-        break;
+        return DateFilterState._(_start.weekEarlier(), timeFrame);
       case TimeFrame.month:
-        _start = _start.monthEarlier();
-        break;
+        return DateFilterState._(_start.monthEarlier(), timeFrame);
       case TimeFrame.year:
-        _start = _start.yearEarlier();
-        break;
+        return DateFilterState._(_start.yearEarlier(), timeFrame);
       case TimeFrame.all:
-        break;
+        return copy();
     }
   }
 
-  void goForwardInTime() {
-    if (goingForwardPossible) {
-      switch (timeFrame) {
-        case TimeFrame.day:
-          _start = _start.dayLater();
-          break;
-        case TimeFrame.week:
-          _start = _start.weekLater();
-          break;
-        case TimeFrame.month:
-          _start = _start.monthLater();
-          break;
-        case TimeFrame.year:
-          _start = _start.yearLater();
-          break;
-        case TimeFrame.all:
-          break;
-      }
+  DateFilterState goForwardInTime() {
+    if (!goingForwardPossible) {
+      return copy();
+    }
+    switch (timeFrame) {
+      case TimeFrame.day:
+        return DateFilterState._(_start.dayLater(), timeFrame);
+      case TimeFrame.week:
+        return DateFilterState._(_start.weekLater(), timeFrame);
+      case TimeFrame.month:
+        return DateFilterState._(_start.monthLater(), timeFrame);
+      case TimeFrame.year:
+        return DateFilterState._(_start.yearLater(), timeFrame);
+      case TimeFrame.all:
+        return copy();
     }
   }
 

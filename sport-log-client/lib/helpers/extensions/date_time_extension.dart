@@ -1,4 +1,8 @@
 extension DateTimeExtension on DateTime {
+  DateTime copy() {
+    return DateTime.fromMillisecondsSinceEpoch(millisecondsSinceEpoch);
+  }
+
   DateTime beginningOfDay() {
     return DateTime(year, month, day);
   }

@@ -11,6 +11,7 @@ class AllChart extends StatefulWidget {
     Key? key,
     required this.series,
     required this.movement,
+
     /// only needed for year and month
     required this.firstDateTime,
   }) : super(key: key);
@@ -36,9 +37,11 @@ class _AllChartState extends State<AllChart> {
 
   void update() {
     _dataProvider.getStatsByMonth(movementId: widget.movement.id).then((stats) {
-      setState(() {
-        _stats = stats;
-      });
+      if (mounted) {
+        setState(() {
+          _stats = stats;
+        });
+      }
     });
   }
 

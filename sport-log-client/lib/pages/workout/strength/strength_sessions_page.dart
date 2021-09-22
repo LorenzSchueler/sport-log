@@ -68,6 +68,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
 
   @override
   Widget build(BuildContext context) {
+    _logger.d('build');
     return RefreshIndicator(
       onRefresh: _refreshPage,
       child: _buildStrengthSessionList(context),
@@ -77,11 +78,11 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   @override
   void didUpdateWidget(StrengthSessionsPage oldWidget) {
     _logger.d('didUpdateWidget');
-    super.didUpdateWidget(oldWidget);
     if (widget.dateFilter != oldWidget.dateFilter ||
         widget.movement != oldWidget.movement) {
       update();
     }
+    super.didUpdateWidget(oldWidget);
   }
 
   Widget get _chart {
