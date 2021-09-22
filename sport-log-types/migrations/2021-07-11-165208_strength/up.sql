@@ -5,7 +5,6 @@ create table strength_blueprint (
     name varchar(80),
     description text,
     movement_id bigint not null references movement on delete cascade,
-    movement_unit movement_unit not null,
     interval integer check (interval > 0),
     last_change timestamptz not null default now(),
     deleted boolean not null default false
@@ -67,7 +66,6 @@ create table strength_session (
     strength_blueprint_id bigint references strength_blueprint on delete set null,
     datetime timestamptz not null default now(),
     movement_id bigint not null references movement on delete cascade,
-    movement_unit movement_unit not null,
     interval integer check (interval > 0),
     comments text,
     last_change timestamptz not null default now(),
@@ -80,9 +78,9 @@ create unique index strength_session_idx on strength_session (user_id, datetime,
 create trigger set_timestamp before update on strength_session
     for each row execute procedure trigger_set_timestamp();
 
-insert into strength_session (id, user_id, datetime, movement_id, movement_unit, interval, comments) values
-    (1, 1, '2021-08-20 16:00:00', 2, 'reps', 120, null),
-    (2, 1, '2021-08-22 16:00:00', 1, 'reps', null, null);
+insert into strength_session (id, user_id, datetime, movement_id, interval, comments) values
+    (1, 1, '2021-08-20 16:00:00', 2, 120, null),
+    (2, 1, '2021-08-22 16:00:00', 1, null, null);
 
 create table strength_session_archive (
     primary key (id),

@@ -16,8 +16,8 @@ use sport_log_types_derive::{
 use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{
-    from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, MovementUnit,
-    TrainingPlanId, UserId,
+    from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, TrainingPlanId,
+    UserId,
 };
 #[cfg(feature = "server")]
 use crate::{
@@ -274,7 +274,6 @@ pub struct MetconMovement {
     pub movement_id: MovementId,
     pub movement_number: i32,
     pub count: i32,
-    pub movement_unit: MovementUnit,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub weight: Option<f32>,
     #[serde(skip)]

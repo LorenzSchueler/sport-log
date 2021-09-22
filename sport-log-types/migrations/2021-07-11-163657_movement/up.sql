@@ -5,28 +5,30 @@ create table movement (
     user_id bigint references "user" on delete cascade,
     name varchar(80) not null,
     description text,
+    movement_unit movement_unit not null,
     cardio boolean not null,
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
 
-create unique index movement_idx on movement (user_id, name) where deleted = false;
+create unique index movement_idx on movement (user_id, name, movement_unit) where deleted = false;
 
 create trigger set_timestamp before update on movement
     for each row execute procedure trigger_set_timestamp();
 
-insert into movement (id, user_id, name, description, cardio) values
-    (1, null, 'Back Squat', null, false),
-    (2, null, 'Front Squat', null, false),
-    (3, null, 'Over Head Squat', null, false),
-    (4, 1, 'Yoke Carry', null, false),
-    (5, null, 'Running', 'road running without significant altitude change', true),
-    (6, null, 'Trailrunning', null, true),
-    (7, null, 'Swimming Freestyle', 'indoor freestyle swimming', true),
-    (8, 1, 'Rowing', null, true),
-    (9, null, 'Pull-Up', null, false),
-    (10, null, 'Push-Up', null, false),
-    (11, null, 'Air Squat', null, false);
+insert into movement (id, user_id, name, description, movement_unit, cardio) values
+    (1, null, 'Back Squat', null, 'reps', false),
+    (2, null, 'Front Squat', null, 'reps', false),
+    (3, null, 'Over Head Squat', null, 'reps', false),
+    (4, 1, 'Yoke Carry', null, 'meter', false),
+    (5, null, 'Running', 'road running without significant altitude change', 'reps', true),
+    (6, null, 'Trailrunning', null, 'reps', true),
+    (7, null, 'Swimming Freestyle', 'indoor freestyle swimming', 'reps', true),
+    (8, 1, 'Row Ergo', null, 'meter', true),
+    (9, 1, 'Row Ergo', null, 'cal', true),
+    (10, null, 'Pull-Up', null, 'reps', false),
+    (11, null, 'Push-Up', null, 'reps', false),
+    (12, null, 'Air Squat', null, 'reps', false);
 
 create table movement_archive (
     primary key (id),

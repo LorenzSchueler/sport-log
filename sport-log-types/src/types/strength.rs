@@ -11,8 +11,8 @@ use sport_log_types_derive::{
 use sport_log_types_derive::{FromI64, ToI64};
 
 use crate::{
-    from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, MovementUnit,
-    TrainingPlanId, UserId,
+    from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, TrainingPlanId,
+    UserId,
 };
 #[cfg(feature = "server")]
 use crate::{
@@ -71,7 +71,6 @@ pub struct StrengthBlueprint {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub movement_id: MovementId,
-    pub movement_unit: MovementUnit,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub interval: Option<i32>,
     #[serde(skip)]
@@ -216,7 +215,6 @@ pub struct StrengthSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub movement_id: MovementId,
-    pub movement_unit: MovementUnit,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub interval: Option<i32>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]

@@ -17,15 +17,7 @@
 <         metcon_type -> Metcon_type,
 ---
 >         metcon_type -> MetconTypeMapping,
-123c123
-<         movement_unit -> Movement_unit,
----
->         movement_unit -> MovementUnitMapping,
 217c217
-<         movement_unit -> Movement_unit,
----
->         movement_unit -> MovementUnitMapping,
-250c250
 <         movement_unit -> Movement_unit,
 ---
 >         movement_unit -> MovementUnitMapping,

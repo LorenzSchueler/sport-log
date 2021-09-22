@@ -121,6 +121,7 @@ pub struct Movement {
     pub name: String,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
+    pub movement_unit: MovementUnit,
     pub cardio: bool,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
