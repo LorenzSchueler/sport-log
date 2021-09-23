@@ -6,6 +6,7 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/pages/workout/strength/charts/helpers.dart';
 
 import 'series_type.dart';
 
@@ -100,6 +101,8 @@ class _MonthChartState extends State<MonthChart> {
         ),
         gridData: FlGridData(
           verticalInterval: 2,
+          getDrawingHorizontalLine: gridLineDrawer(context),
+          getDrawingVerticalLine: gridLineDrawer(context),
         ),
         minX: 1.0,
         maxX: widget.start.numDaysInMonth.toDouble(),

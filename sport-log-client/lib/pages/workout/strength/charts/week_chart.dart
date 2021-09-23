@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/pages/workout/strength/charts/helpers.dart';
 
 import 'series_type.dart';
 
@@ -115,6 +116,10 @@ class _WeekChartState extends State<WeekChart> {
         ),
         rightTitles: SideTitles(showTitles: false),
         topTitles: SideTitles(showTitles: false),
+      ),
+      gridData: FlGridData(
+        getDrawingHorizontalLine: gridLineDrawer(context),
+        getDrawingVerticalLine: gridLineDrawer(context),
       ),
     ));
   }
