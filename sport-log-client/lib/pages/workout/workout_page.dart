@@ -5,7 +5,7 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_page.dart';
-import 'package:sport_log/pages/workout/strength/strength_sessions_page.dart';
+import 'package:sport_log/pages/workout/strength/overview_page.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';

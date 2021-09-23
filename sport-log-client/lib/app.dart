@@ -11,7 +11,7 @@ import 'package:sport_log/pages/movements/movements_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
 import 'package:sport_log/pages/syncing/actions_page.dart';
 import 'package:sport_log/pages/workout/metcon/edit_metcon_page.dart';
-import 'package:sport_log/pages/workout/strength/edit_strength_session_page.dart';
+import 'package:sport_log/pages/workout/strength/edit_page.dart';
 import 'package:sport_log/pages/workout/workout_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
 
