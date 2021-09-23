@@ -18,26 +18,26 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
   @override
   DbSerializer<StrengthSession> get serde => DbStrengthSessionSerializer();
 
-  static const statsViewBySession = 'strength_session_stats_view_by_session';
-  static const strengthSet = Tables.strengthSet;
-  static const movement = Tables.movement;
-  static const strengthSessionId = Keys.strengthSessionId;
-  static const id = Keys.id;
-  static const movementId = Keys.movementId;
-  static const deleted = Keys.deleted;
+  static const count = Keys.count;
   static const datetime = Keys.datetime;
-  static const numSets = Keys.numSets;
-  static const minCount = Keys.minCount;
+  static const deleted = Keys.deleted;
+  static const eorm = Tables.eorm;
+  static const eormPercentage = Keys.eormPercentage;
+  static const eormReps = Keys.eormReps;
+  static const id = Keys.id;
   static const maxCount = Keys.maxCount;
+  static const maxEorm = Keys.maxEorm;
+  static const maxWeight = Keys.maxWeight;
+  static const minCount = Keys.minCount;
+  static const movement = Tables.movement;
+  static const movementId = Keys.movementId;
+  static const name = Keys.name;
+  static const numSets = Keys.numSets;
+  static const strengthSessionId = Keys.strengthSessionId;
+  static const strengthSet = Tables.strengthSet;
   static const sumCount = Keys.sumCount;
   static const sumVolume = Keys.sumVolume;
-  static const maxWeight = Keys.maxWeight;
-  static const maxEorm = Keys.maxEorm;
-  static const count = Keys.count;
   static const weight = Keys.weight;
-  static const eorm = Tables.eorm;
-  static const eormReps = Keys.eormReps;
-  static const eormPercentage = Keys.eormPercentage;
 
   @override
   Future<List<String>> init() async {
@@ -125,6 +125,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
 
   Future<List<StrengthSessionDescription>> getSessionDescriptions({
     Int64? movementIdValue,
+    String? movementName,
     DateTime? from,
     DateTime? until,
   }) async {
@@ -132,6 +133,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
     final untilFilter = until == null ? '' : 'AND $tableName.$datetime < ?';
     final movementIdFilter =
         movementIdValue == null ? '' : 'AND $tableName.$movementId = ?';
+    final nameFilter = movementName == null ? '' : 'AND $movement.$name = ?';
     final records = await database.rawQuery('''
           SELECT
             ${_table.allColumns},
@@ -154,6 +156,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
             $fromFilter
             $untilFilter
             $movementIdFilter
+            $nameFilter
           GROUP BY $tableName.$id
           HAVING COUNT($strengthSet.$id) > 0
           ORDER BY datetime($tableName.$datetime) DESC;
@@ -161,6 +164,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
       if (from != null) from.toString(),
       if (until != null) until.toString(),
       if (movementIdValue != null) movementIdValue.toInt(),
+      if (movementName != null) movementName,
     ]);
     return records
         .map((record) => StrengthSessionDescription(

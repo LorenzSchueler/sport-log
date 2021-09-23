@@ -48,7 +48,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
         .getSessionsWithStats(
             from: widget.dateFilter.start,
             until: widget.dateFilter.end,
-            movementId: widget.movement?.id)
+            movementName: widget.movement?.name)
         .then((ssds) async {
       setState(() => _ssds = ssds);
     });
@@ -75,7 +75,6 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
 
   @override
   void didUpdateWidget(StrengthSessionsPage oldWidget) {
-    _logger.d('didUpdateWidget');
     if (widget.dateFilter != oldWidget.dateFilter ||
         widget.movement != oldWidget.movement) {
       update();

@@ -178,36 +178,32 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
       strengthSessionDb.mostRecentDateTime();
 
   // this can be very inefficient and should be avoided when having huge lists of sessions
-  Future<List<StrengthSessionDescription>> populateWithSets(
+  Future<void> populateWithSets(
       List<StrengthSessionDescription> sessions) async {
     for (final session in sessions) {
       session.strengthSets =
           await strengthSetDb.getByStrengthSession(session.id);
     }
-    return sessions;
   }
 
   Future<List<StrengthSessionDescription>> getSessionsWithStats({
     Int64? movementId,
     DateTime? from,
     DateTime? until,
+    String? movementName,
     bool withSets = false,
   }) async {
-    if (withSets == false) {
-      return strengthSessionDb.getSessionDescriptions(
-        from: from,
-        until: until,
-        movementIdValue: movementId,
-      );
-    } else {
-      return strengthSessionDb
-          .getSessionDescriptions(
-            from: from,
-            until: until,
-            movementIdValue: movementId,
-          )
-          .then((sessions) => populateWithSets(sessions));
+    assert(movementName == null || movementId == null);
+    final sessions = await strengthSessionDb.getSessionDescriptions(
+      from: from,
+      until: until,
+      movementIdValue: movementId,
+      movementName: movementName,
+    );
+    if (withSets) {
+      await populateWithSets(sessions);
     }
+    return sessions;
   }
 
   // weekly/monthly view
