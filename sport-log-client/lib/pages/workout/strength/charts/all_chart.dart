@@ -16,7 +16,7 @@ class AllChart extends StatefulWidget {
     required this.firstDateTime,
   }) : super(key: key);
 
-  final DateTime firstDateTime; // TODO: can this be done more elegantly?
+  final DateTime firstDateTime; // needed for all times filter
   final SeriesType series;
   final Movement movement;
 

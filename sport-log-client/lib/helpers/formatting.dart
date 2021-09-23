@@ -49,8 +49,8 @@ String formatDurationShort(Duration d) {
     result += '$seconds.$milliSeconds';
     return result;
   }
-  result += '0';
-  return result;
+  final int milliSeconds = d.inMilliseconds;
+  return '$milliSeconds';
 }
 
 String plural(String singular, String plural, int count) {

@@ -1,5 +1,6 @@
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/strength_session_stats.dart';
+import 'package:sport_log/models/strength/strength_set.dart';
 
 enum SeriesType {
   maxCount, // m
@@ -96,5 +97,21 @@ double Function(StrengthSessionStats stats) accessor(SeriesType type) {
       return (stats) => stats.sumVolume ?? 0;
     case SeriesType.maxWeight:
       return (stats) => stats.maxWeight ?? 0;
+  }
+}
+
+double Function(StrengthSet set) setAccessor(SeriesType type) {
+  switch (type) {
+    case SeriesType.maxCount:
+    case SeriesType.minCount:
+    case SeriesType.sumCount:
+    case SeriesType.avgCount:
+      return (set) => set.count.toDouble();
+    case SeriesType.maxEorm:
+      return (set) => set.eorm ?? 0;
+    case SeriesType.sumVolume:
+      return (set) => set.volume ?? 0;
+    case SeriesType.maxWeight:
+      return (set) => set.weight ?? 0;
   }
 }
