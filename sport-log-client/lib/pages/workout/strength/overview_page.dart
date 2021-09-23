@@ -16,11 +16,10 @@ class StrengthSessionsPage extends StatefulWidget {
     Key? key,
     required this.dateFilter,
     required this.movement,
-  })  : _filterHash =
-            Object.hash(dateFilter.start, dateFilter.end, movement?.id),
+  })  : _filterHash = Object.hash(dateFilter, movement?.id),
         super(key: key);
 
-  final DateFilterState dateFilter;
+  final DateFilter dateFilter;
   final Movement? movement;
 
   final int _filterHash;
@@ -93,55 +92,6 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
       movement: widget.movement!,
       firstSessionDateTime: _ssds.first.strengthSession.datetime,
     );
-    // if (widget.movement == null || widget.start == null || widget.end == null) {
-    //   return const SizedBox();
-    // }
-    // final startMs = widget.start!.millisecondsSinceEpoch;
-    // return Padding(
-    //   padding: const EdgeInsets.symmetric(vertical: 12),
-    //   child: AspectRatio(
-    //     aspectRatio: 2,
-    //     child: LineChart(LineChartData(
-    //       borderData: FlBorderData(show: false),
-    //       titlesData: FlTitlesData(
-    //         topTitles: SideTitles(showTitles: false),
-    //         rightTitles: SideTitles(showTitles: false),
-    //         leftTitles: SideTitles(
-    //           showTitles: true,
-    //           reservedSize: 40,
-    //           margin: -39,
-    //         ),
-    //         bottomTitles: SideTitles(
-    //           showTitles: true,
-    //           interval: Duration.millisecondsPerDay.toDouble(),
-    //           checkToShowTitle: (a, b, c, d, value) {
-    //             final datetime = DateTime.fromMillisecondsSinceEpoch(
-    //                 value.toInt() + startMs);
-    //             return datetime.day == 15;
-    //           },
-    //           getTitles: (ms) => shortMonthName(
-    //               DateTime.fromMillisecondsSinceEpoch(ms.toInt() + startMs)
-    //                   .month),
-    //         ),
-    //       ),
-    //       lineBarsData: [
-    //         LineChartBarData(
-    //           colors: [primaryColorOf(context)],
-    //           spots: _ssds
-    //               .where((ssd) => ssd.stats!.maxEorm != null)
-    //               .map((ssd) => FlSpot(
-    //                   (ssd.strengthSession.datetime.millisecondsSinceEpoch -
-    //                           startMs)
-    //                       .toDouble(),
-    //                   ssd.stats!.maxEorm!))
-    //               .toList(),
-    //           isCurved: false,
-    //           dotData: FlDotData(show: false),
-    //         ),
-    //       ],
-    //     )),
-    //   ),
-    // );
   }
 
   Widget _buildStrengthSessionList(BuildContext context) {

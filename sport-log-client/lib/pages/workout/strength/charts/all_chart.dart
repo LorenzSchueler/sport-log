@@ -15,12 +15,8 @@ class AllChart extends StatefulWidget {
     Key? key,
     required this.series,
     required this.movement,
-
-    /// only needed for year and month
-    required this.firstDateTime,
   }) : super(key: key);
 
-  final DateTime firstDateTime; // needed for all times filter
   final SeriesType series;
   final Movement movement;
 

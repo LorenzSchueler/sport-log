@@ -16,7 +16,7 @@ class StrengthChart extends StatefulWidget {
   })  : availableSeries = getAvailableSeries(movement.unit),
         super(key: key);
 
-  final DateFilterState dateFilter;
+  final DateFilter dateFilter;
   final Movement movement;
   final List<SeriesType> availableSeries;
   final DateTime firstSessionDateTime;
@@ -61,37 +61,37 @@ class _StrengthChartState extends State<StrengthChart> {
   }
 
   Widget get _chart {
-    switch (widget.dateFilter.timeFrame) {
-      case TimeFrame.day:
-        return DayChart(
-          series: _activeSeriesType,
-          date: widget.dateFilter.start!,
-          movement: widget.movement,
-        );
-      case TimeFrame.week:
+    if (widget.dateFilter is DayFilter) {
+      return DayChart(
+        series: _activeSeriesType,
+        date: (widget.dateFilter as DayFilter).start,
+        movement: widget.movement,
+      );
+    }
+    if (widget.dateFilter is WeekFilter) {
         return WeekChart(
             series: _activeSeriesType,
-            start: widget.dateFilter.start!,
+            start: (widget.dateFilter as WeekFilter).start,
             movement: widget.movement);
-      case TimeFrame.month:
+    }
+    if (widget.dateFilter is MonthFilter) {
         return MonthChart(
           series: _activeSeriesType,
-          start: widget.dateFilter.start!,
+          start: (widget.dateFilter as MonthFilter).start,
           movement: widget.movement,
-        );
-      case TimeFrame.year:
-        return YearChart(
-          series: _activeSeriesType,
-          start: widget.dateFilter.start!,
-          movement: widget.movement,
-        );
-      case TimeFrame.all:
-        return AllChart(
-          series: _activeSeriesType,
-          movement: widget.movement,
-          firstDateTime: widget.firstSessionDateTime,
         );
     }
+    if (widget.dateFilter is YearFilter) {
+        return YearChart(
+          series: _activeSeriesType,
+          start: (widget.dateFilter as YearFilter).start,
+          movement: widget.movement,
+        );
+    }
+    return AllChart(
+      series: _activeSeriesType,
+      movement: widget.movement,
+    );
   }
 
   Widget get _seriesSelection {

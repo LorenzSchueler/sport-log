@@ -24,8 +24,7 @@ class WorkoutPage extends StatefulWidget {
 
 class _WorkoutPageState extends State<WorkoutPage> {
   BottomNavPage _currentPage = BottomNavPage.metcon;
-  DateFilterState _dateFilter =
-      DateFilterState(timeFrame: TimeFrame.month, start: DateTime.now());
+  DateFilter _dateFilter = MonthFilter.current();
 
   Movement? _selectedMovement;
 
@@ -133,26 +132,27 @@ class _WorkoutPageState extends State<WorkoutPage> {
     return PreferredSize(
         preferredSize: const Size.fromHeight(40),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: _dateFilter is NoFilter
+              ? MainAxisAlignment.center
+              : MainAxisAlignment.spaceBetween,
           children: [
-            IconButton(
-              color: onAppBar,
-              onPressed: _dateFilter.timeFrame == TimeFrame.all
-                  ? null
-                  : () {
-                      setState(() {
-                        _dateFilter = _dateFilter.goBackInTime();
-                      });
-                    },
-              icon: const Icon(Icons.arrow_back_ios_sharp),
-            ),
+            if (_dateFilter is! NoFilter)
+              IconButton(
+                color: onAppBar,
+                onPressed: () {
+                  setState(() {
+                    _dateFilter = _dateFilter.earlier;
+                  });
+                },
+                icon: const Icon(Icons.arrow_back_ios_sharp),
+              ),
             TextButton.icon(
               label: Icon(
                 Icons.arrow_drop_down_sharp,
                 color: onAppBar,
               ),
               icon: Text(
-                _dateFilter.getLabel(),
+                _dateFilter.label,
                 style: TextStyle(
                   color: onAppBar,
                 ),
@@ -161,17 +161,18 @@ class _WorkoutPageState extends State<WorkoutPage> {
                 showDialog<void>(context: context, builder: _datePickerBuilder);
               },
             ),
-            IconButton(
-              color: onAppBar,
-              onPressed: _dateFilter.goingForwardPossible
-                  ? () {
-                      setState(() {
-                        _dateFilter = _dateFilter.goForwardInTime();
-                      });
-                    }
-                  : null,
-              icon: const Icon(Icons.arrow_forward_ios_sharp),
-            ),
+            if (_dateFilter is! NoFilter)
+              IconButton(
+                color: onAppBar,
+                onPressed: _dateFilter.goingForwardPossible
+                    ? () {
+                        setState(() {
+                          _dateFilter = _dateFilter.later;
+                        });
+                      }
+                    : null,
+                icon: const Icon(Icons.arrow_forward_ios_sharp),
+              ),
           ],
         ));
   }
@@ -183,13 +184,19 @@ class _WorkoutPageState extends State<WorkoutPage> {
         width: 0,
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: TimeFrame.values.map((timeFrame) {
-            final selected = timeFrame == _dateFilter.timeFrame;
+          children: [
+            DayFilter.current(),
+            WeekFilter.current(),
+            MonthFilter.current(),
+            YearFilter.current(),
+            const NoFilter()
+          ].map((filter) {
+            final selected = filter.runtimeType == _dateFilter.runtimeType;
             return ListTile(
-              title: Center(child: Text(timeFrame.toDisplayName())),
+              title: Center(child: Text(filter.name)),
               onTap: () {
                 setState(() {
-                  _dateFilter = _dateFilter.withTimeFrame(timeFrame);
+                  _dateFilter = filter;
                 });
                 Navigator.of(context).pop();
               },

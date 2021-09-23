@@ -1,168 +1,184 @@
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
 
-enum TimeFrame { day, week, month, year, all }
+abstract class DateFilter {
+  const DateFilter();
 
-extension ToDisplayName on TimeFrame {
-  String toDisplayName() {
-    switch (this) {
-      case TimeFrame.day:
-        return 'Today';
-      case TimeFrame.week:
-        return 'This week';
-      case TimeFrame.month:
-        return 'This month';
-      case TimeFrame.year:
-        return 'This year';
-      case TimeFrame.all:
-        return 'All';
-    }
-  }
-}
+  DateTime? get start;
 
-// most elegant piece of code I've ever written :)
-class DateFilterState {
-  DateFilterState({required DateTime start, required this.timeFrame})
-      : _start = _beginningOfTimeFrame(start, timeFrame);
+  DateTime? get end;
 
-  DateFilterState._(this._start, this.timeFrame);
+  bool get goingForwardPossible =>
+      end == null ? false : end!.isBefore(DateTime.now());
 
-  final DateTime _start;
-  final TimeFrame timeFrame;
+  DateFilter get earlier;
 
-  DateTime? get end {
-    switch (timeFrame) {
-      case TimeFrame.day:
-        return _start.dayLater();
-      case TimeFrame.week:
-        return _start.weekLater();
-      case TimeFrame.month:
-        return _start.monthLater();
-      case TimeFrame.year:
-        return _start.yearLater();
-      case TimeFrame.all:
-        return null;
-    }
-  }
+  DateFilter get later;
 
-  DateTime? get start {
-    return timeFrame == TimeFrame.all ? null : _start;
-  }
+  /// returns String with human readable formatted date
+  String get label;
 
-  DateFilterState copy() {
-    return DateFilterState._(_start.copy(), timeFrame);
-  }
+  /// return static String with name of filter
+  String get name;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, start);
 
   @override
   bool operator ==(Object other) =>
-      other is DateFilterState &&
-      other._start == start &&
-      other.timeFrame == timeFrame;
+      other is DateFilter && other.start == start && other.end == start;
+}
+
+class DayFilter extends DateFilter {
+  const DayFilter._(this.start) : super();
+
+  factory DayFilter.current() {
+    return DayFilter._(DateTime.now().beginningOfDay());
+  }
 
   @override
-  int get hashCode => Object.hash(_start, timeFrame);
+  final DateTime start;
 
-  static DateTime _beginningOfTimeFrame(DateTime start, TimeFrame timeFrame) {
-    switch (timeFrame) {
-      case TimeFrame.day:
-        return start.beginningOfDay();
-      case TimeFrame.week:
-        return start.beginningOfWeek();
-      case TimeFrame.month:
-        return start.beginningOfMonth();
-      case TimeFrame.year:
-        return start.beginningOfYear();
-      case TimeFrame.all:
-        return start;
-    }
+  @override
+  DateTime get end => start.dayLater();
+
+  @override
+  DayFilter get earlier => DayFilter._(start.dayEarlier());
+
+  @override
+  DayFilter get later => DayFilter._(end);
+
+  @override
+  String get label {
+    final now = DateTime.now();
+    if (now.isOnDay(start)) return 'Today';
+    if (now.dayEarlier().isOnDay(start)) return 'Yesterday';
+    if (now.isInYear(start)) return dateWithoutYear.format(start);
+    return dateWithYear.format(start);
   }
 
-  DateFilterState withTimeFrame(TimeFrame timeFrame) {
-    return DateFilterState._(
-        _beginningOfTimeFrame(DateTime.now(), timeFrame), timeFrame);
+  @override
+  String get name => 'Today';
+}
+
+class WeekFilter extends DateFilter {
+  const WeekFilter._(this.start) : super();
+
+  factory WeekFilter.current() {
+    return WeekFilter._(DateTime.now().beginningOfWeek());
   }
 
-  bool get goingForwardPossible {
-    switch (timeFrame) {
-      case TimeFrame.day:
-        return _start.endOfDay().isBefore(DateTime.now());
-      case TimeFrame.week:
-        return _start.endOfWeek().isBefore(DateTime.now());
-      case TimeFrame.month:
-        return _start.endOfMonth().isBefore(DateTime.now());
-      case TimeFrame.year:
-        return _start.endOfYear().isBefore(DateTime.now());
-      case TimeFrame.all:
-        return false;
+  @override
+  final DateTime start;
+
+  @override
+  DateTime get end => start.weekLater();
+
+  @override
+  WeekFilter get earlier => WeekFilter._(start.weekEarlier());
+
+  @override
+  WeekFilter get later => WeekFilter._(end);
+
+  @override
+  String get label {
+    final now = DateTime.now();
+    if (now.isInWeek(start)) return 'This week';
+    if (now.weekEarlier().isInWeek(start)) return 'Last week';
+    final lastDay = end.dayEarlier();
+    if (now.isInYear(start) && now.isInYear(lastDay)) {
+      return dateWithoutYear.format(start) +
+          ' - ' +
+          dateWithoutYear.format(lastDay);
     }
+    return dateWithYear.format(start) + ' - ' + dateWithYear.format(lastDay);
   }
 
-  DateFilterState goBackInTime() {
-    switch (timeFrame) {
-      case TimeFrame.day:
-        return DateFilterState._(_start.dayEarlier(), timeFrame);
-      case TimeFrame.week:
-        return DateFilterState._(_start.weekEarlier(), timeFrame);
-      case TimeFrame.month:
-        return DateFilterState._(_start.monthEarlier(), timeFrame);
-      case TimeFrame.year:
-        return DateFilterState._(_start.yearEarlier(), timeFrame);
-      case TimeFrame.all:
-        return copy();
-    }
+  @override
+  String get name => 'This Week';
+}
+
+class MonthFilter extends DateFilter {
+  const MonthFilter._(this.start) : super();
+
+  factory MonthFilter.current() {
+    return MonthFilter._(DateTime.now().beginningOfMonth());
   }
 
-  DateFilterState goForwardInTime() {
-    if (!goingForwardPossible) {
-      return copy();
-    }
-    switch (timeFrame) {
-      case TimeFrame.day:
-        return DateFilterState._(_start.dayLater(), timeFrame);
-      case TimeFrame.week:
-        return DateFilterState._(_start.weekLater(), timeFrame);
-      case TimeFrame.month:
-        return DateFilterState._(_start.monthLater(), timeFrame);
-      case TimeFrame.year:
-        return DateFilterState._(_start.yearLater(), timeFrame);
-      case TimeFrame.all:
-        return copy();
-    }
+  @override
+  final DateTime start;
+
+  @override
+  DateTime get end => start.monthLater();
+
+  @override
+  MonthFilter get earlier => MonthFilter._(start.monthEarlier());
+
+  @override
+  MonthFilter get later => MonthFilter._(end);
+
+  @override
+  String get label {
+    final now = DateTime.now();
+    if (now.isInMonth(start)) return 'This month';
+    if (now.monthEarlier().isInMonth(start)) return 'Last month';
+    if (now.isInYear(start)) return monthName.format(start);
+    return monthWithYear.format(start);
   }
 
-  String getLabel() {
-    // TODO: deal with locale
-    final today = DateTime.now().beginningOfDay();
-    switch (timeFrame) {
-      case TimeFrame.day:
-        if (_start.isAtSameMomentAs(today)) return 'Today';
-        if (_start.isAtSameMomentAs(today.dayEarlier())) return 'Yesterday';
-        if (today.isInYear(_start)) return dateWithoutYear.format(_start);
-        return dateWithYear.format(_start);
-      case TimeFrame.week:
-        if (today.isInWeek(_start)) return 'This week';
-        final weekLater = _start.weekLater();
-        if (today.isInWeek(weekLater)) return 'Last week';
-        final endDate = weekLater.dayEarlier();
-        if (_start.isInYear(today) && weekLater.isInYear(today)) {
-          return dateWithoutYear.format(_start) +
-              ' - ' +
-              dateWithoutYear.format(endDate);
-        }
-        return dateWithYear.format(_start) +
-            ' - ' +
-            dateWithYear.format(endDate);
-      case TimeFrame.month:
-        if (today.isInMonth(_start)) return 'This month';
-        if (today.isInMonth(_start.monthLater())) return 'Last month';
-        if (today.isInYear(_start)) return monthName.format(_start);
-        return monthWithYear.format(_start);
-      case TimeFrame.year:
-        if (today.isInYear(_start)) return 'This year';
-        if (today.isInYear(_start.yearLater())) return 'Last year';
-        return _start.year.toString();
-      case TimeFrame.all:
-        return 'All';
-    }
+  @override
+  String get name => 'This Month';
+}
+
+class YearFilter extends DateFilter {
+  const YearFilter._(this.start) : super();
+
+  factory YearFilter.current() {
+    return YearFilter._(DateTime.now().beginningOfYear());
   }
+
+  @override
+  final DateTime start;
+
+  @override
+  DateTime get end => start.yearLater();
+
+  @override
+  YearFilter get earlier => YearFilter._(start.yearEarlier());
+
+  @override
+  YearFilter get later => YearFilter._(end);
+
+  @override
+  String get label {
+    final now = DateTime.now();
+    if (now.isInYear(start)) return 'This year';
+    if (now.yearEarlier().isInYear(start)) return 'Last year';
+    return start.year.toString();
+  }
+
+  @override
+  String get name => 'This Year';
+}
+
+class NoFilter extends DateFilter {
+  const NoFilter() : super();
+
+  @override
+  String get label => 'All';
+
+  @override
+  DateFilter get earlier => this;
+
+  @override
+  DateFilter get later => this;
+
+  @override
+  String get name => 'Everything';
+
+  @override
+  DateTime? get end => null;
+
+  @override
+  DateTime? get start => null;
 }
