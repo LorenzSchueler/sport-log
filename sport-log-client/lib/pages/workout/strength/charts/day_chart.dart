@@ -92,30 +92,27 @@ class _DayChartState extends State<DayChart> {
       return const Center(child: CircularProgressIndicator());
     }
     final isTime = widget.movement.unit == MovementUnit.msecs;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: BarChart(BarChartData(
-        barGroups: _barData,
-        borderData: FlBorderData(show: false),
-        titlesData: FlTitlesData(
-          leftTitles: SideTitles(
-            interval: null,
-            showTitles: true,
-            reservedSize: isTime ? 60 : 40,
-            getTitles: isTime
-                ? (value) =>
-                    formatDurationShort(Duration(milliseconds: value.round()))
-                : null,
-          ),
-          bottomTitles: SideTitles(showTitles: false),
-          rightTitles: SideTitles(showTitles: false),
-          topTitles: SideTitles(showTitles: false),
+    return BarChart(BarChartData(
+      barGroups: _barData,
+      borderData: FlBorderData(show: false),
+      titlesData: FlTitlesData(
+        leftTitles: SideTitles(
+          interval: null,
+          showTitles: true,
+          reservedSize: isTime ? 60 : 40,
+          getTitles: isTime
+              ? (value) =>
+                  formatDurationShort(Duration(milliseconds: value.round()))
+              : null,
         ),
-        gridData: FlGridData(
-          getDrawingHorizontalLine: gridLineDrawer(context),
-          getDrawingVerticalLine: gridLineDrawer(context),
-        ),
-      )),
-    );
+        bottomTitles: SideTitles(showTitles: false),
+        rightTitles: SideTitles(showTitles: false),
+        topTitles: SideTitles(showTitles: false),
+      ),
+      gridData: FlGridData(
+        getDrawingHorizontalLine: gridLineDrawer(context),
+        getDrawingVerticalLine: gridLineDrawer(context),
+      ),
+    ));
   }
 }

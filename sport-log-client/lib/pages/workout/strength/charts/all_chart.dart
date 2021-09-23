@@ -1,8 +1,12 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
+import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 
+import 'helpers.dart';
 import 'series_type.dart';
 
 /// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
@@ -59,6 +63,58 @@ class _AllChartState extends State<AllChart> {
     if (_stats.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
-    return Container();
+    final getValue = accessor(widget.series);
+    final isTime = widget.movement.unit == MovementUnit.msecs;
+
+    double fromDate(DateTime date) =>
+        (date.year * 12 + date.month - 1).toDouble();
+    DateTime fromValue(double value) {
+      final intValue = value.round();
+      final remainder = intValue % 12;
+      final year = ((intValue - remainder) / 12).round();
+      return DateTime(year, remainder + 1);
+    }
+
+    return LineChart(
+      LineChartData(
+        lineBarsData: [
+          LineChartBarData(
+            spots: _stats.map((s) {
+              return FlSpot(fromDate(s.datetime), getValue(s));
+            }).toList(),
+            colors: [primaryColorOf(context)],
+            dotData: FlDotData(show: false),
+            isCurved: true,
+            preventCurveOverShooting: true,
+            preventCurveOvershootingThreshold: 1.5,
+          ),
+        ],
+        titlesData: FlTitlesData(
+          topTitles: SideTitles(showTitles: false),
+          rightTitles: SideTitles(showTitles: false),
+          bottomTitles: SideTitles(
+              showTitles: true,
+              getTitles: (value) {
+                final date = fromValue(value);
+                return shortMonthName(date.month) + '\n' + '${date.year}';
+              }),
+          leftTitles: SideTitles(
+            showTitles: true,
+            reservedSize: isTime ? 60 : 40,
+            getTitles: isTime
+                ? (value) =>
+                    formatDurationShort(Duration(milliseconds: value.round()))
+                : null,
+          ),
+        ),
+        borderData: FlBorderData(show: false),
+        gridData: FlGridData(
+          verticalInterval: 1,
+          checkToShowVerticalLine: (value) => fromValue(value).month == 1,
+          getDrawingVerticalLine: gridLineDrawer(context),
+          getDrawingHorizontalLine: gridLineDrawer(context),
+        ),
+      ),
+    );
   }
 }
