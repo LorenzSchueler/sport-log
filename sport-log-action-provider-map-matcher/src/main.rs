@@ -42,7 +42,7 @@ use tracing::{debug, error, info};
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{ActionEventId, CardioSession, CardioSessionId, Position, Route, RouteId};
 
-const CONFIG_FILE: &str = "sport-log-action-provider-map-matcher.toml";
+pub const CONFIG_FILE: &str = "sport-log-action-provider-map-matcher.toml";
 const NAME: &str = "map-matcher";
 const DESCRIPTION: &str =
     "Map Matcher will try to match GPX tracks to the closest path that exists in OSM.";

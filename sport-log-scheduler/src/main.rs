@@ -31,7 +31,7 @@ use sport_log_types::{
     ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent, ADMIN_USERNAME,
 };
 
-const CONFIG_FILE: &str = "sport-log-scheduler.toml";
+pub const CONFIG_FILE: &str = "sport-log-scheduler.toml";
 
 /// The config for [sport-log-scheduler](crate).
 ///

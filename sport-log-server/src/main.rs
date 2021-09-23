@@ -40,7 +40,7 @@ mod tests;
 
 use handler::{IntoJson, JsonError, JsonResult};
 
-const CONFIG_FILE: &str = "sport-log-server.toml";
+pub const CONFIG_FILE: &str = "sport-log-server.toml";
 
 const VERSION_1_0: &str = "1.0";
 const MIN_VERSION: &str = VERSION_1_0;
