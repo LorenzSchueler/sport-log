@@ -33,6 +33,7 @@ class _WeekChartState extends State<WeekChart> {
   final _dataProvider = StrengthDataProvider();
 
   List<StrengthSessionStats> _stats = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -41,6 +42,7 @@ class _WeekChartState extends State<WeekChart> {
   }
 
   void update() {
+    setState(() => isLoading = true);
     _dataProvider
         .getStatsByDay(
       movementId: widget.movement.id,
@@ -52,6 +54,7 @@ class _WeekChartState extends State<WeekChart> {
       if (mounted) {
         setState(() {
           _stats = stats;
+          isLoading = false;
         });
       }
     });
@@ -93,8 +96,11 @@ class _WeekChartState extends State<WeekChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (_stats.isEmpty) {
+    if (isLoading) {
       return const Center(child: CircularProgressIndicator());
+    }
+    if (_stats.isEmpty) {
+      return const Center(child: Text('Nothing to show here.'));
     }
     final isTime = widget.movement.unit == MovementUnit.msecs;
     return BarChart(BarChartData(

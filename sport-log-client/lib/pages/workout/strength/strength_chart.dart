@@ -12,14 +12,12 @@ class StrengthChart extends StatefulWidget {
     Key? key,
     required this.dateFilter,
     required this.movement,
-    required this.firstSessionDateTime,
   })  : availableSeries = getAvailableSeries(movement.unit),
         super(key: key);
 
   final DateFilter dateFilter;
   final Movement movement;
   final List<SeriesType> availableSeries;
-  final DateTime firstSessionDateTime;
 
   @override
   State<StrengthChart> createState() => _StrengthChartState();

@@ -89,7 +89,6 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
     return StrengthChart(
       dateFilter: widget.dateFilter,
       movement: widget.movement!,
-      firstSessionDateTime: _ssds.first.strengthSession.datetime,
     );
   }
 

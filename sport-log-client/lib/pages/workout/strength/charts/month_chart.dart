@@ -32,6 +32,7 @@ class _MonthChartState extends State<MonthChart> {
   final _dataProvider = StrengthDataProvider();
 
   List<StrengthSessionStats> _stats = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -40,6 +41,7 @@ class _MonthChartState extends State<MonthChart> {
   }
 
   void update() {
+    setState(() => isLoading = true);
     _dataProvider
         .getStatsByDay(
       movementId: widget.movement.id,
@@ -51,6 +53,7 @@ class _MonthChartState extends State<MonthChart> {
       if (mounted) {
         setState(() {
           _stats = stats;
+          isLoading = false;
         });
       }
     });
@@ -68,8 +71,11 @@ class _MonthChartState extends State<MonthChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (_stats.isEmpty) {
+    if (isLoading) {
       return const Center(child: CircularProgressIndicator());
+    }
+    if (_stats.isEmpty) {
+      return const Center(child: Text('Nothing to show here.'));
     }
     final getValue = accessor(widget.series);
     final isTime = widget.movement.unit == MovementUnit.msecs;
