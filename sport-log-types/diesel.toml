@@ -8,6 +8,7 @@ except_tables = [
     "platform_archive",
     "platform_credential_archive",
     "action_archive",
+    "action_provider_archive",
     "action_rule_archive",
     "action_event_archive",
     "diary_archive",

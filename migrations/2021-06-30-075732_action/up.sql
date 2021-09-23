@@ -23,6 +23,16 @@ insert into action_provider (id, name, password, platform_id, description) value
     (3, 'sportstracker-fetch', '$argon2id$v=19$m=4096,t=3,p=1$mmRowryKPKBhRSvrRZRFmg$VPInpHpMq47ZEymwSojrst+CWVOoHopBlvSIwybchAg', 2,  
         'Sportstracker Fetch can fetch the latests workouts recorded with sportstracker and save them in your cardio sessions.'); -- "sportstracker-fetch-passwd"
 
+create table action_provider_archive (
+    primary key (id),
+    check (deleted = true)
+) inherits (action_provider);
+
+create trigger archive_action_provider
+    after insert or update of deleted or delete
+    on action_provider
+    for each row execute procedure archive_record();
+
 create table action (
     id bigint primary key,
     name varchar(80) not null check (length(name) >= 2),
