@@ -13,7 +13,7 @@ import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 import 'date_filter_state.dart';
 
-enum BottomNavPage { metcon, strength, cardio, diary }
+enum BottomNavPage { strength, metcon, cardio, diary }
 
 class WorkoutPage extends StatefulWidget {
   const WorkoutPage({Key? key}) : super(key: key);
@@ -23,7 +23,7 @@ class WorkoutPage extends StatefulWidget {
 }
 
 class _WorkoutPageState extends State<WorkoutPage> {
-  BottomNavPage _currentPage = BottomNavPage.metcon;
+  BottomNavPage _currentPage = BottomNavPage.strength;
   DateFilter _dateFilter = MonthFilter.current();
 
   Movement? _selectedMovement;
@@ -89,7 +89,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
       case BottomNavPage.metcon:
         return const BottomNavigationBarItem(
           icon: Icon(CustomIcons.plan),
-          label: "Workouts",
+          label: "Metcons",
         );
       case BottomNavPage.strength:
         return const BottomNavigationBarItem(
