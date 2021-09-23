@@ -98,7 +98,7 @@ async fn aa_setup() {
         id: USER_ID,
         username: USER_USERNAME.to_owned(),
         password: USER_PASSWORD.to_owned(),
-        email: "email".to_owned(),
+        email: "email123456789".to_owned(),
         last_change: Utc::now(),
     };
     db.run(|c| User::create(user, c)).await.unwrap();
@@ -107,7 +107,7 @@ async fn aa_setup() {
         id: USER2_ID,
         username: USER2_USERNAME.to_owned(),
         password: USER2_PASSWORD.to_owned(),
-        email: "email2".to_owned(),
+        email: "email2123456789".to_owned(),
         last_change: Utc::now(),
     };
     db.run(|c| User::create(user2, c)).await.unwrap();
@@ -165,6 +165,9 @@ async fn zz_teardown() {
         .await
         .unwrap();
     db.run(|c| Action::hard_delete(Utc::now() - Duration::seconds(10), c))
+        .await
+        .unwrap();
+    db.run(|c| ActionProvider::hard_delete(Utc::now() - Duration::seconds(10), c))
         .await
         .unwrap();
 }
