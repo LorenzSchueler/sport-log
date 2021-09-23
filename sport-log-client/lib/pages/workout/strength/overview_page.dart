@@ -121,12 +121,17 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
         ? null
         : formatDuration(Duration(seconds: ssd.strengthSession.interval!));
     final sets = ssd.stats!.numSets.toString() + ' sets';
-    final String subtitle =
-        [date, time, sets, if (duration != null) duration].join(' · ');
-
-    final String title = ssd.movement.name;
-    final String text =
-        ssd.strengthSets?.map((ss) => ss.toDisplayName()).join(', ') ?? '';
+    final movementSelected = widget.movement != null;
+    final String title =
+        movementSelected ? [date, time].join(' · ') : ssd.movement.name;
+    final subtitleParts = movementSelected
+        ? [sets, if (duration != null) duration]
+        : [date, time, sets, if (duration != null) duration];
+    final subtitle = subtitleParts.join(' · ');
+    final String text = ssd.strengthSets
+            ?.map((ss) => ss.toDisplayName(ssd.movement.unit))
+            .join(', ') ??
+        '';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),

@@ -30,9 +30,9 @@ extension MovementUniToDisplayName on MovementUnit {
   String toDisplayName() {
     switch (this) {
       case MovementUnit.reps:
-        return "Reps";
+        return "reps";
       case MovementUnit.cals:
-        return "Cals";
+        return "cals";
       case MovementUnit.m:
         return "m";
       case MovementUnit.km:

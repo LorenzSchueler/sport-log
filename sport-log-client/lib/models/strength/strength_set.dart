@@ -2,7 +2,9 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/models/movement/movement.dart';
 
 part 'strength_set.g.dart';
 
@@ -41,12 +43,33 @@ class StrengthSet implements DbObject {
         validate(weight == null || weight! > 0, 'StrengthSet: weight <= 0');
   }
 
-  String toDisplayName() {
-    if (weight != null) {
-      return '${count}x${(weight! * 10).roundToDouble() / 10}kg';
-    } else {
-      return '${count}x';
+  String toDisplayName(MovementUnit unit) {
+    String result;
+    final weightStr = weight == null
+        ? null
+        : ((weight! * 10).roundToDouble() / 10).toString();
+    switch (unit) {
+      case MovementUnit.reps:
+        if (weightStr != null) {
+          result = '${count}x${weightStr}kg';
+        } else {
+          result = '${count}reps';
+        }
+        break;
+      case MovementUnit.msecs:
+        result = formatDuration(Duration(milliseconds: count));
+        if (weightStr != null) {
+          result += ' (${weightStr}kg)';
+        }
+        break;
+      default:
+        result = '$count${unit.toDisplayName()}';
+        if (weightStr != null) {
+          result += ' (${weightStr}kg)';
+        }
+        break;
     }
+    return result;
   }
 
   double? get volume => weight == null ? null : weight! * count.toDouble();

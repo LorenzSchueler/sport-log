@@ -18,6 +18,10 @@ String formatDuration(Duration d) {
   if (seconds != 0) {
     result += '${seconds}s';
   }
+  final int milliseconds = d.inMilliseconds % 1000;
+  if (milliseconds != 0) {
+    result += '${milliseconds}ms';
+  }
   return result;
 }
 
