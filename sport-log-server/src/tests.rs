@@ -14,13 +14,13 @@ use rocket::{
         },
         Header, Status,
     },
-    local::blocking::{Client, LocalResponse},
-    Build, Rocket,
+    local::asynchronous::{Client, LocalResponse},
+    Build, Ignite, Phase, Rocket,
 };
 
 use sport_log_types::{
-    ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, Config, Diary, DiaryId,
-    Platform, PlatformId, User, UserId, ADMIN_USERNAME,
+    ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, Config, Create, Db,
+    Diary, DiaryId, Platform, PlatformId, User, UserId, ADMIN_USERNAME,
 };
 
 use crate::rocket;
@@ -47,12 +47,11 @@ fn basic_auth_as<'h>(username: &str, id: i64, password: &str) -> Header<'h> {
     )
 }
 
-fn rocket_with_config() -> (Rocket<Build>, Config) {
-    let rocket = rocket();
+fn get_config<P: Phase>(rocket: &Rocket<P>) -> Config {
     let figment = rocket.figment();
     let config: Config = figment.extract().expect("unable to extract Config");
 
-    (rocket, config)
+    config
 }
 
 fn assert_status_json(response: &LocalResponse, status: Status) {
@@ -75,10 +74,12 @@ fn assert_forbidden_json(response: &LocalResponse) {
     assert_status_json(response, Status::Forbidden);
 }
 
-#[test]
-fn cors_preflight() {
-    let client = Client::untracked(rocket()).expect("valid rocket instance");
-    let response = client.options("/").dispatch();
+#[tokio::test]
+async fn cors_preflight() {
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
+    let response = client.options("/").dispatch().await;
     assert_eq!(response.status(), Status::NoContent);
     assert_eq!(
         response
@@ -117,182 +118,210 @@ fn cors_preflight() {
     );
 }
 
-fn auth(route: &str, username: &str, password: &str) {
-    let client = Client::untracked(rocket()).expect("valid rocket instance");
+async fn auth<P: Phase>(rocket: Rocket<P>, route: &str, username: &str, password: &str) {
+    println!("ok 3.1");
+    let client = Client::untracked(rocket)
+        .await
+        .expect("valid rocket instance");
+    println!("ok 3.2");
     let mut request = client.get(route);
     request.add_header(basic_auth(username, password));
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_ok_json(&response);
 }
 
-fn auth_wrong_credentials(route: &str, username: &str) {
-    let client = Client::untracked(rocket()).expect("valid rocket instance");
+async fn auth_wrong_credentials(route: &str, username: &str) {
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
 
     let mut request = client.get(route);
     request.add_header(basic_auth(username, "wrong password"));
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_unauthorized_json(&response);
 
     request = client.get(route);
     request.add_header(basic_auth("wrong username", "wrong password"));
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_unauthorized_json(&response);
 }
 
-fn auth_without_credentials(route: &str) {
-    let client = Client::untracked(rocket()).expect("valid rocket instance");
-    let response = client.get(route).dispatch();
+async fn auth_without_credentials(route: &str) {
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
+    let response = client.get(route).dispatch().await;
     assert_unauthorized_json(&response);
 }
 
-fn auth_as(route: &str, username: &str, id: i64, password: &str) {
-    let client = Client::untracked(rocket()).expect("valid rocket instance");
+async fn auth_as(route: &str, username: &str, id: i64, password: &str) {
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
     let mut request = client.get(route);
     request.add_header(basic_auth_as(username, id, password));
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_ok_json(&response);
 }
 
-fn auth_as_not_allowed(route: &str, username: &str, id: i64, password: &str) {
-    let client = Client::untracked(rocket()).expect("valid rocket instance");
+async fn auth_as_not_allowed(route: &str, username: &str, id: i64, password: &str) {
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
     let mut request = client.get(route);
     request.add_header(basic_auth_as(username, id, password));
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_forbidden_json(&response);
 }
 
-fn auth_as_wrong_credentials(route: &str, username: &str, id: i64) {
-    let client = Client::untracked(rocket()).expect("valid rocket instance");
+async fn auth_as_wrong_credentials(route: &str, username: &str, id: i64) {
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
 
     let mut request = client.get(route);
     request.add_header(basic_auth_as(username, id, "wrong password"));
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_unauthorized_json(&response);
 
     request = client.get(route);
     request.add_header(basic_auth_as("wrong username", 1, "wrong password"));
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_unauthorized_json(&response);
 }
 
-fn auth_as_without_credentials(route: &str, id: i64) {
-    let client = Client::untracked(rocket()).expect("valid rocket instance");
+async fn auth_as_without_credentials(route: &str, id: i64) {
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
     let mut request = client.get(route);
     request.add_header(basic_auth_as("", id, "wrong password"));
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_unauthorized_json(&response);
 }
 
-#[test]
-fn admin_auth() {
-    auth("/v1.0/adm/platform", ADMIN_USERNAME, ADMIN_PASSWORD)
-}
-
-#[test]
-fn admin_auth_wrong_credentials() {
-    auth_wrong_credentials("/v1.0/adm/platform", ADMIN_USERNAME);
-}
-
-#[test]
-fn admin_auth_without_credentials() {
-    auth_without_credentials("/v1.0/adm/platform");
-}
-
-#[test]
-fn ap_auth() {
+#[tokio::test]
+async fn admin_auth() {
     auth(
+        rocket(),
+        "/v1.0/adm/platform",
+        ADMIN_USERNAME,
+        ADMIN_PASSWORD,
+    )
+    .await
+}
+
+#[tokio::test]
+async fn admin_auth_wrong_credentials() {
+    auth_wrong_credentials("/v1.0/adm/platform", ADMIN_USERNAME).await;
+}
+
+#[tokio::test]
+async fn admin_auth_without_credentials() {
+    auth_without_credentials("/v1.0/adm/platform").await;
+}
+
+#[tokio::test]
+async fn ap_auth() {
+    auth(
+        rocket(),
         "/v1.0/ap/action_provider",
         "wodify-login",
         "wodify-login-passwd",
-    );
+    )
+    .await;
 }
 
-#[test]
-fn ap_auth_wrong_credentials() {
-    auth_wrong_credentials("/v1.0/ap/action_provider", "wodify-login");
+#[tokio::test]
+async fn ap_auth_wrong_credentials() {
+    auth_wrong_credentials("/v1.0/ap/action_provider", "wodify-login").await;
 }
 
-#[test]
-fn ap_auth_without_credentials() {
-    auth_without_credentials("/v1.0/ap/action_provider");
+#[tokio::test]
+async fn ap_auth_without_credentials() {
+    auth_without_credentials("/v1.0/ap/action_provider").await;
 }
 
-#[test]
-fn admin_as_ap_auth() {
+#[tokio::test]
+async fn admin_as_ap_auth() {
     auth_as(
         "/v1.0/ap/action_provider",
         ADMIN_USERNAME,
         1,
         ADMIN_PASSWORD,
-    );
+    )
+    .await;
 }
 
-#[test]
-fn admin_as_ap_auth_wrong_credentials() {
-    auth_as_wrong_credentials("/v1.0/ap/action_provider", ADMIN_USERNAME, 1);
+#[tokio::test]
+async fn admin_as_ap_auth_wrong_credentials() {
+    auth_as_wrong_credentials("/v1.0/ap/action_provider", ADMIN_USERNAME, 1).await;
 }
 
-#[test]
-fn admin_as_ap_auth_without_credentials() {
-    auth_as_without_credentials("/v1.0/ap/action_provider", 1);
+#[tokio::test]
+async fn admin_as_ap_auth_without_credentials() {
+    auth_as_without_credentials("/v1.0/ap/action_provider", 1).await;
 }
 
-#[test]
-fn user_auth() {
-    auth("/v1.0/user", "user1", "user1-passwd");
+#[tokio::test]
+async fn user_auth() {
+    let rocket = rocket();
+    auth(rocket, "/v1.0/user", "user1", "user1-passwd").await;
 }
 
-#[test]
-fn user_auth_wrong_credentials() {
-    auth_wrong_credentials("/v1.0/user", "user1");
+#[tokio::test]
+async fn user_auth_wrong_credentials() {
+    auth_wrong_credentials("/v1.0/user", "user1").await;
 }
 
-#[test]
-fn user_auth_without_credentials() {
-    auth_without_credentials("/v1.0/user");
+#[tokio::test]
+async fn user_auth_without_credentials() {
+    auth_without_credentials("/v1.0/user").await;
 }
 
-#[test]
-fn admin_as_user_auth() {
-    auth_as("/v1.0/user", ADMIN_USERNAME, 1, ADMIN_PASSWORD);
+#[tokio::test]
+async fn admin_as_user_auth() {
+    auth_as("/v1.0/user", ADMIN_USERNAME, 1, ADMIN_PASSWORD).await;
 }
 
-#[test]
-fn admin_as_user_auth_wrong_credentials() {
-    auth_as_wrong_credentials("/v1.0/user", ADMIN_USERNAME, 1);
+#[tokio::test]
+async fn admin_as_user_auth_wrong_credentials() {
+    auth_as_wrong_credentials("/v1.0/user", ADMIN_USERNAME, 1).await;
 }
 
-#[test]
-fn admin_as_user_auth_without_credentials() {
-    auth_as_without_credentials("/v1.0/user", 1);
+#[tokio::test]
+async fn admin_as_user_auth_without_credentials() {
+    auth_as_without_credentials("/v1.0/user", 1).await;
 }
 
-#[test]
-fn user_ap_auth() {
-    auth("/v1.0/diary", "user1", "user1-passwd");
+#[tokio::test]
+async fn user_ap_auth() {
+    auth(rocket(), "/v1.0/diary", "user1", "user1-passwd").await;
 }
 
-#[test]
-fn user_ap_auth_wrong_credentials() {
-    auth_wrong_credentials("/v1.0/diary", "user1");
+#[tokio::test]
+async fn user_ap_auth_wrong_credentials() {
+    auth_wrong_credentials("/v1.0/diary", "user1").await;
 }
 
-#[test]
-fn user_ap_auth_without_credentials() {
-    auth_without_credentials("/v1.0/diary");
+#[tokio::test]
+async fn user_ap_auth_without_credentials() {
+    auth_without_credentials("/v1.0/diary").await;
 }
 
-fn create_action_event(username: &str, password: &str, action_event: &ActionEvent) {
-    let client = Client::untracked(rocket()).expect("valid rocket instance");
+async fn create_action_event(username: &str, password: &str, action_event: &ActionEvent) {
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
     let mut request = client.post("/v1.0/action_event");
     request.add_header(basic_auth(username, password));
     let request = request.json(action_event);
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_ok_json(&response);
 }
 
-#[test]
-fn ap_as_user_ap_auth() {
+#[tokio::test]
+async fn ap_as_user_ap_auth() {
     // create ActionEvent to ensure access permission for user
     let action_event = ActionEvent {
         id: ActionEventId(rand::thread_rng().gen()),
@@ -304,22 +333,24 @@ fn ap_as_user_ap_auth() {
         last_change: Utc::now(),
         deleted: false,
     };
-    create_action_event("user1", "user1-passwd", &action_event);
+    create_action_event("user1", "user1-passwd", &action_event).await;
 
-    auth_as("/v1.0/diary", "wodify-login", 1, "wodify-login-passwd");
+    auth_as("/v1.0/diary", "wodify-login", 1, "wodify-login-passwd").await;
 }
 
-#[test]
-fn ap_as_user_ap_auth_no_event() {
+#[tokio::test]
+async fn ap_as_user_ap_auth_no_event() {
     // delete all action events
     let (username, password) = ("user1", "user1-passwd");
-    let client = Client::untracked(rocket()).expect("valid rocket instance");
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
 
     let mut request = client.get("/v1.0/action_event");
     request.add_header(basic_auth(username, password));
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_ok_json(&response);
-    let action_events: Vec<ActionEvent> = response.into_json().unwrap();
+    let action_events: Vec<ActionEvent> = response.into_json().await.unwrap();
     let action_events: Vec<ActionEvent> = action_events
         .into_iter()
         .map(|mut action_event| {
@@ -332,7 +363,7 @@ fn ap_as_user_ap_auth_no_event() {
     let mut request = client.put("/v1.0/action_events");
     request.add_header(basic_auth(username, password));
     let request = request.json(&action_events);
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_ok_json(&response);
 
     // create disabled ActionEvent
@@ -346,7 +377,7 @@ fn ap_as_user_ap_auth_no_event() {
         last_change: Utc::now(),
         deleted: false,
     };
-    create_action_event("user1", "user1-passwd", &action_event);
+    create_action_event("user1", "user1-passwd", &action_event).await;
 
     // create deleted ActionEvent
     let action_event = ActionEvent {
@@ -359,15 +390,15 @@ fn ap_as_user_ap_auth_no_event() {
         last_change: Utc::now(),
         deleted: true,
     };
-    create_action_event("user1", "user1-passwd", &action_event);
+    create_action_event("user1", "user1-passwd", &action_event).await;
 
     //  check that ap has no access
     println!("{:?}", "okook");
-    auth_as_not_allowed("/v1.0/diary", "wodify-login", 1, "wodify-login-passwd");
+    auth_as_not_allowed("/v1.0/diary", "wodify-login", 1, "wodify-login-passwd").await;
 }
 
-#[test]
-fn ap_as_user_ap_auth_wrong_credentials() {
+#[tokio::test]
+async fn ap_as_user_ap_auth_wrong_credentials() {
     // create ActionEvent to ensure access permission for user
     let action_event = ActionEvent {
         id: ActionEventId(rand::thread_rng().gen()),
@@ -379,13 +410,13 @@ fn ap_as_user_ap_auth_wrong_credentials() {
         last_change: Utc::now(),
         deleted: false,
     };
-    create_action_event("user1", "user1-passwd", &action_event);
+    create_action_event("user1", "user1-passwd", &action_event).await;
 
-    auth_as_wrong_credentials("/v1.0/diary", "wodify-login", 1);
+    auth_as_wrong_credentials("/v1.0/diary", "wodify-login", 1).await;
 }
 
-#[test]
-fn ap_as_user_ap_auth_without_credentials() {
+#[tokio::test]
+async fn ap_as_user_ap_auth_without_credentials() {
     // create ActionEvent to ensure access permission for user
     let action_event = ActionEvent {
         id: ActionEventId(rand::thread_rng().gen()),
@@ -397,27 +428,27 @@ fn ap_as_user_ap_auth_without_credentials() {
         last_change: Utc::now(),
         deleted: false,
     };
-    create_action_event("user1", "user1-passwd", &action_event);
+    create_action_event("user1", "user1-passwd", &action_event).await;
 
-    auth_as_without_credentials("/v1.0/diary", 1);
+    auth_as_without_credentials("/v1.0/diary", 1).await;
 }
 
-#[test]
-fn admin_as_user_ap_auth() {
-    auth_as("/v1.0/diary", ADMIN_USERNAME, 1, ADMIN_PASSWORD);
+#[tokio::test]
+async fn admin_as_user_ap_auth() {
+    auth_as("/v1.0/diary", ADMIN_USERNAME, 1, ADMIN_PASSWORD).await;
 }
 
-#[test]
-fn admin_as_user_ap_auth_wrong_credentials() {
-    auth_as_wrong_credentials("/v1.0/diary", ADMIN_USERNAME, 1);
+#[tokio::test]
+async fn admin_as_user_ap_auth_wrong_credentials() {
+    auth_as_wrong_credentials("/v1.0/diary", ADMIN_USERNAME, 1).await;
 }
 
-#[test]
-fn admin_as_user_ap_auth_without_credentials() {
-    auth_as_without_credentials("/v1.0/diary", 1);
+#[tokio::test]
+async fn admin_as_user_ap_auth_without_credentials() {
+    auth_as_without_credentials("/v1.0/diary", 1).await;
 }
 
-fn create_diary<'c>(
+async fn create_diary<'c>(
     client: &'c Client,
     username: &str,
     password: &str,
@@ -436,49 +467,55 @@ fn create_diary<'c>(
         deleted: false,
     };
     let request = request.json(&diary);
-    let response = request.dispatch();
+    let response = request.dispatch().await;
 
     (diary_id, response)
 }
 
-#[test]
-fn foreign_create() {
-    let client = Client::untracked(rocket()).expect("valid rocket instance");
+#[tokio::test]
+async fn foreign_create() {
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
 
     // check that create works for same user
-    let (_, response) = create_diary(&client, "user1", "user1-passwd", 1);
+    let (_, response) = create_diary(&client, "user1", "user1-passwd", 1).await;
     assert_ok_json(&response);
 
     // check that create does not work for other user
-    let (_, response) = create_diary(&client, "user2", "user2-passwd", 1);
+    let (_, response) = create_diary(&client, "user2", "user2-passwd", 1).await;
     assert_forbidden_json(&response);
 }
 
-#[test]
-fn foreign_get() {
-    let client = Client::untracked(rocket()).expect("valid rocket instance");
+#[tokio::test]
+async fn foreign_get() {
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
 
-    let (diary_id, response) = create_diary(&client, "user1", "user1-passwd", 1);
+    let (diary_id, response) = create_diary(&client, "user1", "user1-passwd", 1).await;
     assert_ok_json(&response);
 
     // check that get works for same user
     let mut request = client.get(format!("/v1.0/diary/{}", diary_id.0));
     request.add_header(basic_auth("user1", "user1-passwd"));
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_ok_json(&response);
 
     // check that get does not work for other user
     let mut request = client.get(format!("/v1.0/diary/{}", diary_id.0));
     request.add_header(basic_auth("user2", "user2-passwd"));
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_forbidden_json(&response);
 }
 
-#[test]
-fn foreign_update() {
-    let client = Client::untracked(rocket()).expect("valid rocket instance");
+#[tokio::test]
+async fn foreign_update() {
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
 
-    let (diary_id, response) = create_diary(&client, "user1", "user1-passwd", 1);
+    let (diary_id, response) = create_diary(&client, "user1", "user1-passwd", 1).await;
     assert_ok_json(&response);
 
     let diary = Diary {
@@ -495,21 +532,24 @@ fn foreign_update() {
     let mut request = client.put("/v1.0/diary");
     request.add_header(basic_auth("user1", "user1-passwd"));
     let request = request.json(&diary);
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_ok_json(&response);
 
     // check that update does not work for other user
     let mut request = client.put("/v1.0/diary");
     request.add_header(basic_auth("user2", "user2-passwd"));
     let request = request.json(&diary);
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_forbidden_json(&response);
 }
 
-#[test]
-fn user_self_registration() {
-    let (rocket, config) = rocket_with_config();
-    let client = Client::untracked(rocket).expect("valid rocket instance");
+#[tokio::test]
+async fn user_self_registration() {
+    let rocket = rocket();
+    let config = get_config(&rocket);
+    let client = Client::untracked(rocket)
+        .await
+        .expect("valid rocket instance");
 
     let user = User {
         id: UserId(rand::thread_rng().gen()),
@@ -521,7 +561,7 @@ fn user_self_registration() {
 
     let request = client.post("/v1.0/user");
     let request = request.json(&user);
-    let response = request.dispatch();
+    let response = request.dispatch().await;
 
     if config.user_self_registration {
         assert_ok_json(&response);
@@ -530,10 +570,13 @@ fn user_self_registration() {
     }
 }
 
-#[test]
-fn ap_self_registration() {
-    let (rocket, config) = rocket_with_config();
-    let client = Client::untracked(rocket).expect("valid rocket instance");
+#[tokio::test]
+async fn ap_self_registration() {
+    let rocket = rocket();
+    let config = get_config(&rocket);
+    let client = Client::untracked(rocket)
+        .await
+        .expect("valid rocket instance");
 
     let platform = Platform {
         id: PlatformId(rand::thread_rng().gen()),
@@ -545,7 +588,7 @@ fn ap_self_registration() {
 
     let request = client.post("/v1.0/ap/platform");
     let request = request.json(&platform);
-    let response = request.dispatch();
+    let response = request.dispatch().await;
 
     if config.ap_self_registration {
         assert_ok_json(&response);
@@ -554,7 +597,7 @@ fn ap_self_registration() {
     }
 
     let request = client.get("/v1.0/ap/platform");
-    let response = request.dispatch();
+    let response = request.dispatch().await;
 
     if config.ap_self_registration {
         assert_ok_json(&response);
@@ -574,7 +617,7 @@ fn ap_self_registration() {
 
     let request = client.post("/v1.0/ap/action_provider");
     let request = request.json(&action_provider);
-    let response = request.dispatch();
+    let response = request.dispatch().await;
 
     if config.ap_self_registration {
         assert_ok_json(&response);
@@ -583,9 +626,11 @@ fn ap_self_registration() {
     }
 }
 
-#[test]
-fn update_non_existing() {
-    let client = Client::untracked(rocket()).expect("valid rocket instance");
+#[tokio::test]
+async fn update_non_existing() {
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
 
     let diary = Diary {
         id: DiaryId(rand::thread_rng().gen()),
@@ -600,7 +645,7 @@ fn update_non_existing() {
     let mut request = client.put("/v1.0/diary");
     request.add_header(basic_auth("user1", "user1-passwd"));
     let request = request.json(&diary);
-    let response = request.dispatch();
+    let response = request.dispatch().await;
     assert_forbidden_json(&response);
 }
 
