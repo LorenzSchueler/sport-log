@@ -191,13 +191,7 @@ async fn delete_action_event(mut action_event: ActionEvent) {
         .unwrap();
 }
 
-#[tokio::test]
-async fn cors_preflight() {
-    let client = Client::untracked(rocket())
-        .await
-        .expect("valid rocket instance");
-    let response = client.options("/").dispatch().await;
-    assert_eq!(response.status(), Status::NoContent);
+async fn assert_cors(response: &LocalResponse<'_>) {
     assert_eq!(
         response
             .headers()
@@ -233,6 +227,24 @@ async fn cors_preflight() {
             .unwrap(),
         "864000"
     );
+}
+
+#[tokio::test]
+async fn cors() {
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
+    let response = client.get("/version").dispatch().await;
+    assert_cors(&response).await;
+}
+
+#[tokio::test]
+async fn cors_preflight() {
+    let client = Client::untracked(rocket())
+        .await
+        .expect("valid rocket instance");
+    let response = client.options("/").dispatch().await;
+    assert_cors(&response).await;
 }
 
 async fn auth(route: &str, username: &str, password: &str) {
