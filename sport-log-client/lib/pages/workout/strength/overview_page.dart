@@ -8,7 +8,7 @@ import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
-import 'package:sport_log/pages/workout/date_filter_state.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/strength/strength_chart.dart';
 
 class StrengthSessionsPage extends StatefulWidget {
@@ -19,7 +19,7 @@ class StrengthSessionsPage extends StatefulWidget {
   })  : _filterHash = Object.hash(dateFilter, movement?.id),
         super(key: key);
 
-  final DateFilter dateFilter;
+  final DateFilterState dateFilter;
   final Movement? movement;
 
   final int _filterHash;

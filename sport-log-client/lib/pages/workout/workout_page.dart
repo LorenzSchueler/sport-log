@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/helpers/snackbar.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_page.dart';
@@ -11,7 +10,8 @@ import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
-import 'date_filter_state.dart';
+import 'date_filter/date_filter_state.dart';
+import 'date_filter/date_filter_widget.dart';
 
 enum BottomNavPage { strength, metcon, cardio, diary }
 
@@ -24,7 +24,7 @@ class WorkoutPage extends StatefulWidget {
 
 class _WorkoutPageState extends State<WorkoutPage> {
   BottomNavPage _currentPage = BottomNavPage.strength;
-  DateFilter _dateFilter = MonthFilter.current();
+  DateFilterState _dateFilter = MonthFilter.current();
 
   Movement? _selectedMovement;
 
@@ -128,84 +128,13 @@ class _WorkoutPageState extends State<WorkoutPage> {
   }
 
   PreferredSizeWidget get _filter {
-    final onAppBar = appBarForegroundOf(context);
     return PreferredSize(
         preferredSize: const Size.fromHeight(40),
-        child: Row(
-          mainAxisAlignment: _dateFilter is NoFilter
-              ? MainAxisAlignment.center
-              : MainAxisAlignment.spaceBetween,
-          children: [
-            if (_dateFilter is! NoFilter)
-              IconButton(
-                color: onAppBar,
-                onPressed: () {
-                  setState(() {
-                    _dateFilter = _dateFilter.earlier;
-                  });
-                },
-                icon: const Icon(Icons.arrow_back_ios_sharp),
-              ),
-            TextButton.icon(
-              label: Icon(
-                Icons.arrow_drop_down_sharp,
-                color: onAppBar,
-              ),
-              icon: Text(
-                _dateFilter.label,
-                style: TextStyle(
-                  color: onAppBar,
-                ),
-              ),
-              onPressed: () {
-                showDialog<void>(context: context, builder: _datePickerBuilder);
-              },
-            ),
-            if (_dateFilter is! NoFilter)
-              IconButton(
-                color: onAppBar,
-                onPressed: _dateFilter.goingForwardPossible
-                    ? () {
-                        setState(() {
-                          _dateFilter = _dateFilter.later;
-                        });
-                      }
-                    : null,
-                icon: const Icon(Icons.arrow_forward_ios_sharp),
-              ),
-          ],
+        child: DateFilter(
+          initialState: _dateFilter,
+          onFilterChanged: (newFilter) =>
+              setState(() => _dateFilter = newFilter),
         ));
-  }
-
-  Widget _datePickerBuilder(BuildContext context) {
-    return Dialog(
-      clipBehavior: Clip.antiAlias,
-      child: SizedBox(
-        width: 0,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DayFilter.current(),
-            WeekFilter.current(),
-            MonthFilter.current(),
-            YearFilter.current(),
-            const NoFilter()
-          ].map((filter) {
-            final selected = filter.runtimeType == _dateFilter.runtimeType;
-            return ListTile(
-              title: Center(child: Text(filter.name)),
-              onTap: () {
-                setState(() {
-                  _dateFilter = filter;
-                });
-                Navigator.of(context).pop();
-              },
-              selected: selected,
-            );
-          }).toList(),
-        ),
-      ),
-    );
   }
 
   Widget _movementPickerBuilder(BuildContext context) {

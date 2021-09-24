@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/pages/workout/date_filter_state.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/strength/charts/all.dart';
 
 import 'charts/series_type.dart';
@@ -15,7 +15,7 @@ class StrengthChart extends StatefulWidget {
   })  : availableSeries = getAvailableSeries(movement.unit),
         super(key: key);
 
-  final DateFilter dateFilter;
+  final DateFilterState dateFilter;
   final Movement movement;
   final List<SeriesType> availableSeries;
 

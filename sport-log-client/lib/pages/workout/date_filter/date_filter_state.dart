@@ -1,8 +1,8 @@
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
 
-abstract class DateFilter {
-  const DateFilter();
+abstract class DateFilterState {
+  const DateFilterState();
 
   DateTime? get start;
 
@@ -11,9 +11,9 @@ abstract class DateFilter {
   bool get goingForwardPossible =>
       end == null ? false : end!.isBefore(DateTime.now());
 
-  DateFilter get earlier;
+  DateFilterState get earlier;
 
-  DateFilter get later;
+  DateFilterState get later;
 
   /// returns String with human readable formatted date
   String get label;
@@ -26,10 +26,10 @@ abstract class DateFilter {
 
   @override
   bool operator ==(Object other) =>
-      other is DateFilter && other.start == start && other.end == start;
+      other is DateFilterState && other.start == start && other.end == end;
 }
 
-class DayFilter extends DateFilter {
+class DayFilter extends DateFilterState {
   const DayFilter._(this.start) : super();
 
   factory DayFilter.current() {
@@ -50,10 +50,12 @@ class DayFilter extends DateFilter {
 
   @override
   String get label {
-    final now = DateTime.now();
-    if (now.isOnDay(start)) return 'Today';
-    if (now.dayEarlier().isOnDay(start)) return 'Yesterday';
-    if (now.isInYear(start)) return dateWithoutYear.format(start);
+    final today = DateTime.now().beginningOfDay();
+    if (today.isAtSameMomentAs(start)) return 'Today';
+    if (today.subtract(const Duration(days: 1)).isAtSameMomentAs(start)) {
+      return 'Yesterday';
+    }
+    if (today.isInYear(start)) return dateWithoutYear.format(start);
     return dateWithYear.format(start);
   }
 
@@ -61,7 +63,7 @@ class DayFilter extends DateFilter {
   String get name => 'Today';
 }
 
-class WeekFilter extends DateFilter {
+class WeekFilter extends DateFilterState {
   const WeekFilter._(this.start) : super();
 
   factory WeekFilter.current() {
@@ -98,7 +100,7 @@ class WeekFilter extends DateFilter {
   String get name => 'This Week';
 }
 
-class MonthFilter extends DateFilter {
+class MonthFilter extends DateFilterState {
   const MonthFilter._(this.start) : super();
 
   factory MonthFilter.current() {
@@ -130,7 +132,7 @@ class MonthFilter extends DateFilter {
   String get name => 'This Month';
 }
 
-class YearFilter extends DateFilter {
+class YearFilter extends DateFilterState {
   const YearFilter._(this.start) : super();
 
   factory YearFilter.current() {
@@ -161,17 +163,17 @@ class YearFilter extends DateFilter {
   String get name => 'This Year';
 }
 
-class NoFilter extends DateFilter {
+class NoFilter extends DateFilterState {
   const NoFilter() : super();
 
   @override
   String get label => 'All';
 
   @override
-  DateFilter get earlier => this;
+  DateFilterState get earlier => this;
 
   @override
-  DateFilter get later => this;
+  DateFilterState get later => this;
 
   @override
   String get name => 'Everything';
