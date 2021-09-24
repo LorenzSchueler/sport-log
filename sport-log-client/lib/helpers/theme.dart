@@ -67,6 +67,10 @@ Color onSecondaryColorOf(BuildContext context) {
   return Theme.of(context).colorScheme.onSecondary;
 }
 
+Color disabledColorOf(BuildContext context) {
+  return Theme.of(context).disabledColor;
+}
+
 Color appBarForegroundOf(BuildContext context) {
   final theme = Theme.of(context);
   return theme.appBarTheme.foregroundColor ??
