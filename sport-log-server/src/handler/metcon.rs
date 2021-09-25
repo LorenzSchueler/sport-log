@@ -221,7 +221,7 @@ pub async fn create_metcon_movement(
     conn: Db,
 ) -> JsonResult<MetconMovement> {
     let metcon_movement = conn
-        .run(move |c| metcon_movement.verify_user_ap(&auth, c))
+        .run(move |c| metcon_movement.verify_user_ap_create(&auth, c))
         .await
         .map_err(|status| JsonError {
             status,
@@ -243,7 +243,7 @@ pub async fn create_metcon_movements(
     conn: Db,
 ) -> JsonResult<Vec<MetconMovement>> {
     let metcon_movements = conn
-        .run(move |c| metcon_movements.verify_user_ap(&auth, c))
+        .run(move |c| metcon_movements.verify_user_ap_create(&auth, c))
         .await
         .map_err(|status| JsonError {
             status,

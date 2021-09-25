@@ -313,6 +313,46 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthSet>> {
     }
 }
 
+#[cfg(feature = "server")]
+impl Unverified<StrengthSet> {
+    pub fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<StrengthSet, Status> {
+        let strength_set = self.0.into_inner();
+        if StrengthSession::check_user_id(strength_set.strength_session_id, **auth, conn)
+            .map_err(|_| Status::InternalServerError)?
+        {
+            Ok(strength_set)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "server")]
+impl Unverified<Vec<StrengthSet>> {
+    pub fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<StrengthSet>, Status> {
+        let strength_sets = self.0.into_inner();
+        let strength_session_ids: Vec<_> = strength_sets
+            .iter()
+            .map(|strength_set| strength_set.strength_session_id)
+            .collect();
+        if StrengthSession::check_user_ids(&strength_session_ids, **auth, conn)
+            .map_err(|_| Status::InternalServerError)?
+        {
+            Ok(strength_sets)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct StrengthSessionDescription {
     pub strength_session: StrengthSession,

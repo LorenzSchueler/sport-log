@@ -326,6 +326,54 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
     }
 }
 
+#[cfg(feature = "server")]
+impl Unverified<MetconMovement> {
+    pub fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<MetconMovement, Status> {
+        let metcon_movement = self.0.into_inner();
+        if Metcon::check_user_id(metcon_movement.metcon_id, **auth, conn)
+            .map_err(|_| rocket::http::Status::InternalServerError)?
+            && Movement::check_optional_user_id(metcon_movement.movement_id, **auth, conn)
+                .map_err(|_| rocket::http::Status::InternalServerError)?
+        {
+            Ok(metcon_movement)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "server")]
+impl Unverified<Vec<MetconMovement>> {
+    pub fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<MetconMovement>, Status> {
+        let metcon_movements = self.0.into_inner();
+        let metcon_ids: Vec<_> = metcon_movements
+            .iter()
+            .map(|metcon_movement| metcon_movement.metcon_id)
+            .collect();
+        let movement_ids: Vec<_> = metcon_movements
+            .iter()
+            .map(|metcon_movement| metcon_movement.movement_id)
+            .collect();
+        if Metcon::check_user_ids(&metcon_ids, **auth, conn)
+            .map_err(|_| rocket::http::Status::InternalServerError)?
+            && Movement::check_optional_user_ids(&movement_ids, **auth, conn)
+                .map_err(|_| rocket::http::Status::InternalServerError)?
+        {
+            Ok(metcon_movements)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "server",

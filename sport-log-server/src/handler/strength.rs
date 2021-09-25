@@ -378,7 +378,7 @@ pub async fn create_strength_set(
     conn: Db,
 ) -> JsonResult<StrengthSet> {
     let strength_set = conn
-        .run(move |c| strength_set.verify_user_ap(&auth, c))
+        .run(move |c| strength_set.verify_user_ap_create(&auth, c))
         .await
         .map_err(|status| JsonError {
             status,
@@ -400,7 +400,7 @@ pub async fn create_strength_sets(
     conn: Db,
 ) -> JsonResult<Vec<StrengthSet>> {
     let strength_set = conn
-        .run(move |c| strength_sets.verify_user_ap(&auth, c))
+        .run(move |c| strength_sets.verify_user_ap_create(&auth, c))
         .await
         .map_err(|status| JsonError {
             status,
