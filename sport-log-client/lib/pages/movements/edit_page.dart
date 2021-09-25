@@ -4,6 +4,7 @@ import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/widgets/approve_dialog.dart';
+import 'package:sport_log/widgets/form_widgets/selection_bar.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 class EditMovementPage extends StatefulWidget {
@@ -52,6 +53,10 @@ class _EditMovementPageState extends State<EditMovementPage> {
     if (isCardio != null) {
       setState(() => _md.movement.cardio = isCardio);
     }
+  }
+
+  void _setUnit(MovementUnit unit) {
+    setState(() => _md.movement.unit = unit);
   }
 
   void _setDescription(String? description) {
@@ -129,6 +134,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
                 children: [
                   _nameInput(context),
                   _maybeDescriptionInput(context),
+                  _unitInput,
                   _categoryInput(context),
                 ],
               ),
@@ -187,6 +193,20 @@ class _EditMovementPageState extends State<EditMovementPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget get _unitInput {
+    return SelectionBar<MovementUnit>(
+      onChange: _setUnit,
+      items: const [
+        MovementUnit.reps,
+        MovementUnit.msecs,
+        MovementUnit.m,
+        MovementUnit.cals
+      ],
+      getLabel: (unit) => unit.toDimensionName(),
+      selectedItem: _md.movement.unit,
     );
   }
 
