@@ -21,6 +21,8 @@ class StrengthSession implements DbObjectWithDateTime {
   @override
   @IdConverter()
   Int64 id;
+  @OptionalIdConverter()
+  Int64? strengthBlueprintId;
   @IdConverter()
   Int64 userId;
   @override

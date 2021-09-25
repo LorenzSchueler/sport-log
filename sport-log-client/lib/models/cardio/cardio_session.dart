@@ -45,6 +45,8 @@ class CardioSession implements DbObject {
   @override
   @IdConverter()
   Int64 id;
+  @OptionalIdConverter()
+  Int64? cardioBlueprintId;
   @IdConverter()
   Int64 userId;
   @IdConverter()

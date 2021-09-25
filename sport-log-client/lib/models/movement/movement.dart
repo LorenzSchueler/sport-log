@@ -106,8 +106,7 @@ class Movement implements DbObject {
 
   @override
   bool isValid() {
-    return validate(userId != null, 'Movement: userId == null') &&
-        validate(name.isNotEmpty, 'Movement: name is empty') &&
+    return validate(name.isNotEmpty, 'Movement: name is empty') &&
         validate(deleted == false, 'Movement: deleted == true');
   }
 
