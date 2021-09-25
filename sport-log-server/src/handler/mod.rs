@@ -28,7 +28,7 @@ pub mod strength;
 pub mod training_plan;
 pub mod user;
 
-fn parse_db_error(error: &Box<dyn DatabaseErrorInformation + Sync + Send>) -> &str {
+fn parse_db_error(error: &(dyn DatabaseErrorInformation + Sync + Send)) -> &str {
     let string = error.message();
     if let (Some(left), Some(right)) = (string.find('»'), string.find('«')) {
         if left < right {
@@ -96,13 +96,13 @@ impl<T> IntoJson<T> for QueryResult<T> {
                 DbError::UniqueViolation => JsonError {
                     status: Status::Conflict,
                     message: Some(ErrorMessage::UniqueViolation(
-                        parse_db_error(db_error_info).to_owned(),
+                        parse_db_error(&**db_error_info).to_owned(),
                     )),
                 },
                 DbError::ForeignKeyViolation => JsonError {
                     status: Status::Conflict,
                     message: Some(ErrorMessage::ForeignKeyViolation(
-                        parse_db_error(db_error_info).to_owned(),
+                        parse_db_error(&**db_error_info).to_owned(),
                     )),
                 },
                 _ => {
