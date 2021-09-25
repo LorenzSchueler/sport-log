@@ -66,7 +66,7 @@ fn get_config<P: Phase>(rocket: &Rocket<P>) -> Config {
 }
 
 async fn get_db(rocket: &Rocket<Ignite>) -> Db {
-    Db::get_one(&rocket).await.unwrap()
+    Db::get_one(rocket).await.unwrap()
 }
 
 fn assert_status_json(response: &LocalResponse, status: Status) {
@@ -532,6 +532,7 @@ async fn admin_as_user_ap_auth_without_credentials() {
     auth_as_without_credentials("/v1.0/diary", USER_ID.0).await;
 }
 
+#[allow(clippy::needless_lifetimes)]
 async fn create_diary<'c>(
     client: &'c Client,
     username: &str,

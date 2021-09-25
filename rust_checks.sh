@@ -14,5 +14,5 @@ cargo check --manifest-path sport-log-types-derive/Cargo.toml
 
 cargo test -- --test-threads=1
 cargo fmt --all 
-cargo clippy 
+cargo clippy --all-targets
 cargo doc
