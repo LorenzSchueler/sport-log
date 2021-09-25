@@ -60,6 +60,7 @@ class DownSync {
 
   Future<void> removeLastSync() async {
     _logger.d('Deleting last sync datetime...');
+    _lastSync = null;
     await _storage.remove(Keys.lastSync);
   }
 }
