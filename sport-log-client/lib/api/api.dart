@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:http/http.dart';
+import 'package:logger/logger.dart' as l;
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/config.dart';
