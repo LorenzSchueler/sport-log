@@ -150,28 +150,31 @@ class _WorkoutPageState extends State<WorkoutPage> {
                 return const Center(
                     child: Text('Nothing here. Create a movement first.'));
               }
-              return ListView.separated(
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  final movement = snapshot.data![index];
-                  final selected = _selectedMovement != null &&
-                      _selectedMovement!.id == movement.id;
-                  return ListTile(
-                      title: Center(child: Text(movement.name)),
-                      selected: selected,
-                      onTap: () {
-                        setState(() {
-                          if (selected) {
-                            _selectedMovement = null;
-                          } else {
-                            _selectedMovement = movement;
-                          }
-                          Navigator.of(context).pop();
+              return Scrollbar(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    final movement = snapshot.data![index];
+                    final selected = _selectedMovement != null &&
+                        _selectedMovement!.id == movement.id;
+                    return ListTile(
+                        title: Center(child: Text(movement.name)),
+                        subtitle: Center(child: Text(movement.unit.toDimensionName())),
+                        selected: selected,
+                        onTap: () {
+                          setState(() {
+                            if (selected) {
+                              _selectedMovement = null;
+                            } else {
+                              _selectedMovement = movement;
+                            }
+                            Navigator.of(context).pop();
+                          });
                         });
-                      });
-                },
-                separatorBuilder: (_, __) => const Divider(height: 1),
-                itemCount: snapshot.data!.length,
+                  },
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemCount: snapshot.data!.length,
+                ),
               );
             } else if (snapshot.hasError) {
               Future(() =>
