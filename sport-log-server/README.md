@@ -38,6 +38,12 @@
         sudo service postgresql reload
         ```
 
+## Connect to database
+
+```bash
+psql -h localhost -U sport_admin -d sport_log
+```
+
 ## Run server in debug mode
 
 ```bash
