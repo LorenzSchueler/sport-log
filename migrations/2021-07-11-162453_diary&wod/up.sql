@@ -27,7 +27,7 @@ create table diary_archive (
 ) inherits (diary);
 
 create trigger archive_diary
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on diary
     for each row execute procedure archive_record();
 
@@ -60,6 +60,6 @@ create table wod_archive (
 ) inherits (wod);
 
 create trigger archive_wod
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on wod
     for each row execute procedure archive_record();

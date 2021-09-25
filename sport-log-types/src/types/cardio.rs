@@ -17,15 +17,19 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync,
-    ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    HardDelete, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
+    VerifyIdForUserOrAP,
 };
 use sport_log_types_derive::{FromI64, ToI64};
 
-use crate::{from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, UserId};
+use crate::{
+    from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, TrainingPlanId,
+    UserId,
+};
 #[cfg(feature = "server")]
 use crate::{
-    schema::{cardio_session, route},
-    User,
+    schema::{cardio_blueprint, cardio_session, route},
+    TrainingPlan, User,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -116,6 +120,7 @@ pub struct RouteId(pub i64);
         GetByUser,
         GetByUserSync,
         Update,
+        HardDelete,
         CheckUserId,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb
@@ -150,6 +155,80 @@ pub struct Route {
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
 )]
 #[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
+pub struct CardioBlueprintId(pub i64);
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(
+    feature = "server",
+    derive(
+        Insertable,
+        Associations,
+        Identifiable,
+        Queryable,
+        AsChangeset,
+        Create,
+        CreateMultiple,
+        GetById,
+        GetByIds,
+        GetByUser,
+        GetByUserSync,
+        Update,
+        HardDelete,
+        VerifyForUserOrAPWithDb,
+        VerifyForUserOrAPWithoutDb
+    )
+)]
+#[cfg_attr(feature = "server", table_name = "cardio_blueprint")]
+#[cfg_attr(feature = "server", belongs_to(User))]
+#[cfg_attr(feature = "server", belongs_to(TrainingPlan))]
+#[cfg_attr(feature = "server", belongs_to(Movement))]
+#[cfg_attr(feature = "server", belongs_to(Route))]
+pub struct CardioBlueprint {
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
+    pub id: CardioBlueprintId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
+    pub user_id: UserId,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
+    pub training_plan_id: TrainingPlanId,
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    pub name: Option<String>,
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    pub description: Option<String>,
+    #[serde(serialize_with = "to_str")]
+    #[serde(deserialize_with = "from_str")]
+    pub movement_id: MovementId,
+    pub cardio_type: CardioType,
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    pub distance: Option<i32>,
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    pub ascent: Option<i32>,
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    pub descent: Option<i32>,
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    pub time: Option<i32>,
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    pub calories: Option<i32>,
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    pub avg_heart_rate: Option<i32>,
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[serde(serialize_with = "to_str_optional")]
+    #[serde(deserialize_with = "from_str_optional")]
+    pub route_id: Option<RouteId>,
+    #[serde(skip)]
+    #[serde(default = "Utc::now")]
+    pub last_change: DateTime<Utc>,
+    pub deleted: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
+#[cfg_attr(
+    feature = "server",
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
+)]
+#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct CardioSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -168,13 +247,16 @@ pub struct CardioSessionId(pub i64);
         GetByUser,
         GetByUserSync,
         Update,
+        HardDelete,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb
     )
 )]
 #[cfg_attr(feature = "server", table_name = "cardio_session")]
 #[cfg_attr(feature = "server", belongs_to(User))]
+#[cfg_attr(feature = "server", belongs_to(CardioBlueprint))]
 #[cfg_attr(feature = "server", belongs_to(Movement))]
+#[cfg_attr(feature = "server", belongs_to(Route))]
 pub struct CardioSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -182,6 +264,9 @@ pub struct CardioSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
+    #[serde(serialize_with = "to_str_optional")]
+    #[serde(deserialize_with = "from_str_optional")]
+    pub cardio_blueprint_id: Option<CardioBlueprintId>,
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub movement_id: MovementId,

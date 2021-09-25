@@ -7,6 +7,7 @@ drop table action_rule;
 drop table action_archive;
 drop index action_idx;
 drop table action;
+drop table action_provider_archive;
 drop index action_provider_idx;
 drop table action_provider;
 drop type weekday;

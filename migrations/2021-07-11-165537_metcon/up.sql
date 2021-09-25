@@ -29,9 +29,14 @@ create table metcon_archive (
 ) inherits (metcon);
 
 create trigger archive_metcon
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on metcon
-    for each row execute procedure archive_record();
+    for each row execute procedure archive_record_metcon();
+
+create trigger delete_metcon_archive
+    after delete
+    on metcon_archive
+    for each row execute procedure delete_record_metcon();
 
 create table metcon_movement (
     id bigint primary key,
@@ -39,7 +44,6 @@ create table metcon_movement (
     movement_id bigint not null references movement on delete cascade,
     movement_number integer not null check (movement_number >= 0),
     count integer not null check (count >= 1),
-    movement_unit movement_unit not null,
     weight real check (weight > 0),
     last_change timestamptz not null default now(),
     deleted boolean not null default false
@@ -51,25 +55,24 @@ create unique index metcon_movement_idx on metcon_movement (metcon_id, movement_
 create trigger set_timestamp before update on metcon_movement
     for each row execute procedure trigger_set_timestamp();
 
-insert into metcon_movement (id, metcon_id, movement_id, movement_number, count, movement_unit, weight) values
-    (1, 1, 9, 1, 5, 'reps', null),
-    (2, 1, 10, 2, 10, 'reps', null),
-    (3, 1, 11, 3, 15, 'reps', null),
-    (4, 2, 5, 1, 1, 'mile', 9),
-    (5, 2, 9, 2, 100, 'reps', 9),
-    (6, 2, 10, 3, 200, 'reps', 9),
-    (7, 2, 11, 4, 300, 'reps', 9),
-    (8, 2, 5, 5, 1, 'mile', 9),
-    (9, 3, 8, 5, 1, 'km', null);
+insert into metcon_movement (id, metcon_id, movement_id, movement_number, count, weight) values
+    (1, 1, 10, 1, 5, null),
+    (2, 1, 11, 2, 10, null),
+    (3, 1, 12, 3, 15, null),
+    (4, 2, 5, 1, 1, 9),
+    (5, 2, 10, 2, 100, 9),
+    (6, 2, 11, 3, 200, 9),
+    (7, 2, 12, 4, 300, 9),
+    (8, 2, 5, 5, 1, 9),
+    (9, 3, 8, 5, 1, null);
 
 create table metcon_movement_archive (
     primary key (id),
-    --foreign key (metcon_id) references metcon_archive on delete cascade,
     check (deleted = true)
 ) inherits (metcon_movement);
 
 create trigger archive_metcon_movement
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on metcon_movement
     for each row execute procedure archive_record();
 
@@ -109,6 +112,32 @@ create table metcon_session_archive (
 ) inherits (metcon_session);
 
 create trigger archive_metcon_session
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on metcon_session
     for each row execute procedure archive_record();
+
+create table metcon_item (
+    id bigint primary key,
+    training_plan_id bigint not null references training_plan on delete cascade,
+    metcon_id bigint not null references metcon on delete cascade,
+    last_change timestamptz not null default now(),
+    deleted boolean not null default false
+);
+
+create trigger set_timestamp before update on metcon_item
+    for each row execute procedure trigger_set_timestamp();
+
+create table metcon_item_archive (
+    primary key (id),
+    check (deleted = true)
+) inherits (metcon_item);
+
+create trigger archive_metcon_item
+    after insert or update of deleted or delete
+    on metcon_item
+    for each row execute procedure archive_record();
+
+create trigger check_metcon_exists_trigger
+    after insert 
+    on metcon_item_archive
+    for each row execute procedure check_metcon_exists();

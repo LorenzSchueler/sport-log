@@ -1,7 +1,7 @@
 use sport_log_types::{
-    AuthUserOrAP, CardioSession, CardioSessionDescription, CardioSessionId, Create, CreateMultiple,
-    Db, GetById, GetByUser, Route, RouteId, Unverified, UnverifiedId, Update,
-    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    AuthUserOrAP, CardioBlueprint, CardioBlueprintId, CardioSession, CardioSessionDescription,
+    CardioSessionId, Create, CreateMultiple, Db, GetById, GetByUser, Route, RouteId, Unverified,
+    UnverifiedId, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
     VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
 };
 
@@ -94,6 +94,121 @@ pub async fn update_routes(
             message: None,
         })?;
     conn.run(|c| Route::update_multiple(routes, c))
+        .await
+        .into_json()
+}
+
+#[post(
+    "/cardio_blueprint",
+    format = "application/json",
+    data = "<cardio_blueprint>"
+)]
+pub async fn create_cardio_blueprint(
+    cardio_blueprint: Unverified<CardioBlueprint>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<CardioBlueprint> {
+    let cardio_blueprint = cardio_blueprint
+        .verify_user_ap_without_db(&auth)
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(|c| CardioBlueprint::create(cardio_blueprint, c))
+        .await
+        .into_json()
+}
+
+#[post(
+    "/cardio_blueprints",
+    format = "application/json",
+    data = "<cardio_blueprints>"
+)]
+pub async fn create_cardio_blueprints(
+    cardio_blueprints: Unverified<Vec<CardioBlueprint>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<Vec<CardioBlueprint>> {
+    let cardio_blueprints =
+        cardio_blueprints
+            .verify_user_ap_without_db(&auth)
+            .map_err(|status| JsonError {
+                status,
+                message: None,
+            })?;
+    conn.run(|c| CardioBlueprint::create_multiple(cardio_blueprints, c))
+        .await
+        .into_json()
+}
+
+#[get("/cardio_blueprint/<cardio_blueprint_id>")]
+pub async fn get_cardio_blueprint(
+    cardio_blueprint_id: UnverifiedId<CardioBlueprintId>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<CardioBlueprint> {
+    let cardio_blueprint_id = conn
+        .run(move |c| cardio_blueprint_id.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(move |c| CardioBlueprint::get_by_id(cardio_blueprint_id, c))
+        .await
+        .into_json()
+}
+
+#[get("/cardio_blueprint")]
+pub async fn get_cardio_blueprints(
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<Vec<CardioBlueprint>> {
+    conn.run(move |c| CardioBlueprint::get_by_user(*auth, c))
+        .await
+        .into_json()
+}
+
+#[put(
+    "/cardio_blueprint",
+    format = "application/json",
+    data = "<cardio_blueprint>"
+)]
+pub async fn update_cardio_blueprint(
+    cardio_blueprint: Unverified<CardioBlueprint>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<CardioBlueprint> {
+    let cardio_blueprint = conn
+        .run(move |c| cardio_blueprint.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(|c| CardioBlueprint::update(cardio_blueprint, c))
+        .await
+        .into_json()
+}
+
+#[put(
+    "/cardio_blueprints",
+    format = "application/json",
+    data = "<cardio_blueprints>"
+)]
+pub async fn update_cardio_blueprints(
+    cardio_blueprints: Unverified<Vec<CardioBlueprint>>,
+    auth: AuthUserOrAP,
+    conn: Db,
+) -> JsonResult<Vec<CardioBlueprint>> {
+    let cardio_blueprints = conn
+        .run(move |c| cardio_blueprints.verify_user_ap(&auth, c))
+        .await
+        .map_err(|status| JsonError {
+            status,
+            message: None,
+        })?;
+    conn.run(|c| CardioBlueprint::update_multiple(cardio_blueprints, c))
         .await
         .into_json()
 }

@@ -17,7 +17,7 @@ use tracing::{debug, error, info, warn};
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use tokio::{process::Command, time};
 
-const CONFIG_FILE: &str = "config.toml";
+const CONFIG_FILE: &str = "sport-log-action-provider-wodify-login.toml";
 const NAME: &str = "wodify-login";
 const DESCRIPTION: &str =
     "Wodify Login can reserve spots in classes. The action names correspond to the class types.";
@@ -41,6 +41,13 @@ enum Error {
 
 type Result<T> = StdResult<T, Error>;
 
+/// The config for [sport-log-action-provider-wodify-login](crate).
+///
+/// The name of the config file is specified in [CONFIG_FILE].
+///
+/// `admin_password` is the password for the admin endpoints.
+///
+/// `base_url` is the left part of the URL (everthing before `/<version>/...`)
 #[derive(Deserialize, Debug)]
 struct Config {
     password: String,
@@ -52,12 +59,12 @@ lazy_static! {
         Ok(file) => match toml::from_str(&file) {
             Ok(config) => config,
             Err(error) => {
-                error!("Failed to parse config.toml.: {}", error);
+                error!("Failed to parse {}: {}", CONFIG_FILE, error);
                 process::exit(1);
             }
         },
         Err(error) => {
-            error!("Failed to read config.toml.: {}", error);
+            error!("Failed to read {}: {}", CONFIG_FILE, error);
             process::exit(1);
         }
     };
@@ -204,16 +211,21 @@ async fn login(mode: Mode) -> Result<()> {
 
     let mut delete_action_event_ids = vec![];
     for task in tasks {
-        match task.await.unwrap() {
-            Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
-            Err(Error::NoCredential(action_event_id)) => {
-                delete_action_event_ids.push(action_event_id)
-            }
-            Err(Error::LoginFailed(action_event_id)) => {
-                delete_action_event_ids.push(action_event_id)
-            }
-            Err(Error::Timeout(action_event_id)) => delete_action_event_ids.push(action_event_id),
-            Err(error) => error!("{}", error),
+        match task.await {
+            Ok(result) => match result {
+                Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
+                Err(Error::NoCredential(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(Error::LoginFailed(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(Error::Timeout(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(error) => error!("{}", error),
+            },
+            Err(join_error) => error!("execution of action event failed: {}", join_error),
         }
     }
 
@@ -331,25 +343,26 @@ async fn try_login(
 
         for row in &rows[row_number + 1..] {
             if let Ok(label) = row.find_element(By::XPath("./td[1]/div/span")).await {
-                let title = label
+                if let Some(title) = label
                     .get_attribute("title")
                     .await
                     .map_err(Error::WebDriver)?
-                    .unwrap();
-                if title.contains(&exec_action_event.action_name) && title.contains(&time) {
-                    row.find_element(By::XPath("./td[3]/div"))
-                        .await
-                        .map_err(Error::WebDriver)?
-                        .click()
-                        .await
-                        .map_err(Error::WebDriver)?;
-                    info!("reservation successful");
+                {
+                    if title.contains(&exec_action_event.action_name) && title.contains(&time) {
+                        row.find_element(By::XPath("./td[3]/div"))
+                            .await
+                            .map_err(Error::WebDriver)?
+                            .click()
+                            .await
+                            .map_err(Error::WebDriver)?;
+                        info!("reservation successful");
 
-                    if mode == Mode::Interactive {
-                        time::sleep(StdDuration::from_secs(3)).await;
+                        if mode == Mode::Interactive {
+                            time::sleep(StdDuration::from_secs(3)).await;
+                        }
+
+                        return Ok(exec_action_event.action_event_id);
                     }
-
-                    return Ok(exec_action_event.action_event_id);
                 }
             }
         }

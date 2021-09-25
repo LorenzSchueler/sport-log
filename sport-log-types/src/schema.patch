@@ -9,15 +9,19 @@
 <         cardio_type -> Cardio_type,
 ---
 >         cardio_type -> CardioTypeMapping,
+78c78
+<         cardio_type -> Cardio_type,
+---
+>         cardio_type -> CardioTypeMapping,
 108c108
 <         metcon_type -> Metcon_type,
 ---
 >         metcon_type -> MetconTypeMapping,
-123c123
-<         movement_unit -> Movement_unit,
----
->         movement_unit -> MovementUnitMapping,
 217c217
 <         movement_unit -> Movement_unit,
 ---
 >         movement_unit -> MovementUnitMapping,
+290c290
+<         weekday -> Nullable<Weekday>,
+---
+>         weekday -> Nullable<WeekdayMapping>,

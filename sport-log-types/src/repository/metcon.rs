@@ -2,10 +2,10 @@ use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
 
 use crate::{
-    schema::{metcon, metcon_movement, metcon_session, movement},
+    schema::{metcon, metcon_item, metcon_movement, metcon_session, movement, training_plan},
     CheckOptionalUserId, CheckUserId, GetById, GetByUser, GetByUserSync, Metcon, MetconId,
-    MetconMovement, MetconMovementId, MetconSession, MetconSessionDescription, MetconSessionId,
-    Movement, UserId,
+    MetconItem, MetconItemId, MetconMovement, MetconMovementId, MetconSession,
+    MetconSessionDescription, MetconSessionId, Movement, UserId,
 };
 
 impl GetByUser for Metcon {
@@ -99,7 +99,11 @@ impl GetByUser for MetconMovement {
             .filter(
                 metcon_movement::columns::metcon_id.eq_any(
                     metcon::table
-                        .filter(metcon::columns::user_id.eq(user_id))
+                        .filter(
+                            metcon::columns::user_id
+                                .eq(user_id)
+                                .or(metcon::columns::user_id.is_null()),
+                        )
                         .select(metcon::columns::id),
                 ),
             )
@@ -120,7 +124,11 @@ impl GetByUserSync for MetconMovement {
             .filter(
                 metcon_movement::columns::metcon_id.eq_any(
                     metcon::table
-                        .filter(metcon::columns::user_id.eq(user_id))
+                        .filter(
+                            metcon::columns::user_id
+                                .eq(user_id)
+                                .or(metcon::columns::user_id.is_null()),
+                        )
                         .select(metcon::columns::id),
                 ),
             )
@@ -202,14 +210,14 @@ impl CheckOptionalUserId for MetconMovement {
             .inner_join(movement::table)
             .filter(metcon_movement::columns::id.eq_any(ids))
             .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .filter(
                 metcon::columns::user_id
                     .eq(user_id)
                     .or(metcon::columns::user_id.is_null()),
+            )
+            .filter(
+                movement::columns::user_id
+                    .eq(user_id)
+                    .or(movement::columns::user_id.is_null()),
             )
             .count()
             .get_result(conn)
@@ -222,6 +230,114 @@ impl MetconMovement {
         metcon_movement::table
             .filter(metcon_movement::columns::metcon_id.eq(metcon_id))
             .get_results(conn)
+    }
+}
+
+impl GetByUser for MetconItem {
+    fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+        metcon_item::table
+            .filter(
+                metcon_item::columns::training_plan_id.eq_any(
+                    training_plan::table
+                        .filter(training_plan::columns::user_id.eq(user_id))
+                        .select(training_plan::columns::id),
+                ),
+            )
+            .get_results(conn)
+    }
+}
+
+impl GetByUserSync for MetconItem {
+    fn get_by_user_and_last_sync(
+        user_id: UserId,
+        last_sync: DateTime<Utc>,
+        conn: &PgConnection,
+    ) -> QueryResult<Vec<Self>>
+    where
+        Self: Sized,
+    {
+        metcon_item::table
+            .filter(
+                metcon_item::columns::training_plan_id.eq_any(
+                    training_plan::table
+                        .filter(training_plan::columns::user_id.eq(user_id))
+                        .select(training_plan::columns::id),
+                ),
+            )
+            .filter(metcon_item::columns::last_change.ge(last_sync))
+            .get_results(conn)
+    }
+}
+
+impl CheckUserId for MetconItem {
+    type Id = MetconItemId;
+
+    fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+        metcon_item::table
+            .inner_join(metcon::table)
+            .inner_join(training_plan::table)
+            .filter(metcon_item::columns::id.eq(id))
+            .filter(metcon::columns::user_id.eq(user_id))
+            .filter(training_plan::columns::user_id.eq(user_id))
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == 1)
+    }
+
+    fn check_user_ids(ids: &[Self::Id], user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+        metcon_item::table
+            .inner_join(metcon::table)
+            .inner_join(training_plan::table)
+            .filter(metcon_item::columns::id.eq_any(ids))
+            .filter(metcon::columns::user_id.eq(user_id))
+            .filter(training_plan::columns::user_id.eq(user_id))
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == ids.len() as i64)
+    }
+}
+
+impl CheckOptionalUserId for MetconItem {
+    type Id = MetconItemId;
+
+    fn check_optional_user_id(
+        id: Self::Id,
+        user_id: UserId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool> {
+        metcon_item::table
+            .inner_join(metcon::table)
+            .inner_join(training_plan::table)
+            .filter(metcon_item::columns::id.eq(id))
+            .filter(
+                metcon::columns::user_id
+                    .eq(user_id)
+                    .or(metcon::columns::user_id.is_null()),
+            )
+            .filter(training_plan::columns::user_id.eq(user_id))
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == 1)
+    }
+
+    fn check_optional_user_ids(
+        ids: &[Self::Id],
+        user_id: UserId,
+        conn: &PgConnection,
+    ) -> QueryResult<bool> {
+        metcon_item::table
+            .inner_join(metcon::table)
+            .inner_join(training_plan::table)
+            .filter(metcon_item::columns::id.eq_any(ids))
+            .filter(
+                metcon::columns::user_id
+                    .eq(user_id)
+                    .or(metcon::columns::user_id.is_null()),
+            )
+            .filter(training_plan::columns::user_id.eq(user_id))
+            .count()
+            .get_result(conn)
+            .map(|count: i64| count == ids.len() as i64)
     }
 }
 

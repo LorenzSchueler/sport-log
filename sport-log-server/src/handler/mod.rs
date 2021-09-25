@@ -20,10 +20,12 @@ pub mod action;
 pub mod activity;
 pub mod cardio;
 pub mod diary_wod;
+pub mod garbage_collection;
 pub mod metcon;
 pub mod movement;
 pub mod platform;
 pub mod strength;
+pub mod training_plan;
 pub mod user;
 
 #[derive(Debug)]
@@ -62,7 +64,7 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for JsonError {
 
 pub type JsonResult<T> = Result<Json<T>, JsonError>;
 
-trait IntoJson<T> {
+pub trait IntoJson<T> {
     fn into_json(self) -> JsonResult<T>;
 }
 

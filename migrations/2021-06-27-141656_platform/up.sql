@@ -21,7 +21,7 @@ create table platform_archive (
 ) inherits (platform);
 
 create trigger archive_platform
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on platform
     for each row execute procedure archive_record();
 
@@ -52,6 +52,6 @@ create table platform_credential_archive (
 ) inherits (platform_credential);
 
 create trigger archive_platform_credential
-    after update of deleted or delete
+    after insert or update of deleted or delete
     on platform_credential
     for each row execute procedure archive_record();
