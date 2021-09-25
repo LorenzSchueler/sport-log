@@ -2,7 +2,7 @@ use std::{io::Cursor, ops::Deref};
 
 use chrono::{DateTime, NaiveTime, Utc};
 use diesel::{
-    result::{DatabaseErrorKind as DbError, Error as DieselError},
+    result::{DatabaseErrorInformation, DatabaseErrorKind as DbError, Error as DieselError},
     QueryResult,
 };
 use rocket::{
@@ -28,16 +28,33 @@ pub mod strength;
 pub mod training_plan;
 pub mod user;
 
+fn parse_db_error(error: &Box<dyn DatabaseErrorInformation + Sync + Send>) -> &str {
+    let string = error.message();
+    if let (Some(left), Some(right)) = (string.find('»'), string.find('«')) {
+        if left < right {
+            return &string[left + 2..right];
+        }
+    }
+    string
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub enum ErrorMessage {
+    UniqueViolation(String),
+    ForeignKeyViolation(String),
+    Other(String),
+}
+
 #[derive(Debug)]
 pub struct JsonError {
     pub status: Status,
-    pub message: Option<String>,
+    pub message: Option<ErrorMessage>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 struct SerializableJsonError {
     pub status: u16,
-    pub message: Option<String>,
+    pub message: Option<ErrorMessage>,
 }
 
 impl From<JsonError> for SerializableJsonError {
@@ -78,17 +95,21 @@ impl<T> IntoJson<T> for QueryResult<T> {
             DieselError::DatabaseError(ref db_error, ref db_error_info) => match db_error {
                 DbError::UniqueViolation => JsonError {
                     status: Status::Conflict,
-                    message: Some(db_error_info.message().to_owned()),
+                    message: Some(ErrorMessage::UniqueViolation(
+                        parse_db_error(db_error_info).to_owned(),
+                    )),
                 },
                 DbError::ForeignKeyViolation => JsonError {
                     status: Status::Conflict,
-                    message: Some(db_error_info.message().to_owned()),
+                    message: Some(ErrorMessage::ForeignKeyViolation(
+                        parse_db_error(db_error_info).to_owned(),
+                    )),
                 },
                 _ => {
                     warn!("{:?}", diesel_error);
                     JsonError {
                         status: Status::InternalServerError,
-                        message: None,
+                        message: Some(ErrorMessage::Other(db_error_info.message().to_owned())),
                     }
                 }
             },
