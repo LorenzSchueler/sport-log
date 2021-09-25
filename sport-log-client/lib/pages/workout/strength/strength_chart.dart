@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/strength/charts/all.dart';
+import 'package:sport_log/widgets/form_widgets/selection_bar.dart';
 
 import 'charts/series_type.dart';
 
@@ -52,6 +52,10 @@ class _StrengthChartState extends State<StrengthChart> {
 
   late SeriesType _activeSeriesType;
 
+  void _setSeriesType(SeriesType type) {
+    setState(() => _activeSeriesType = type);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -67,24 +71,24 @@ class _StrengthChartState extends State<StrengthChart> {
       );
     }
     if (widget.dateFilter is WeekFilter) {
-        return WeekChart(
-            series: _activeSeriesType,
-            start: (widget.dateFilter as WeekFilter).start,
-            movement: widget.movement);
+      return WeekChart(
+          series: _activeSeriesType,
+          start: (widget.dateFilter as WeekFilter).start,
+          movement: widget.movement);
     }
     if (widget.dateFilter is MonthFilter) {
-        return MonthChart(
-          series: _activeSeriesType,
-          start: (widget.dateFilter as MonthFilter).start,
-          movement: widget.movement,
-        );
+      return MonthChart(
+        series: _activeSeriesType,
+        start: (widget.dateFilter as MonthFilter).start,
+        movement: widget.movement,
+      );
     }
     if (widget.dateFilter is YearFilter) {
-        return YearChart(
-          series: _activeSeriesType,
-          start: (widget.dateFilter as YearFilter).start,
-          movement: widget.movement,
-        );
+      return YearChart(
+        series: _activeSeriesType,
+        start: (widget.dateFilter as YearFilter).start,
+        movement: widget.movement,
+      );
     }
     return AllChart(
       series: _activeSeriesType,
@@ -93,25 +97,11 @@ class _StrengthChartState extends State<StrengthChart> {
   }
 
   Widget get _seriesSelection {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: widget.availableSeries.map((s) {
-        final selected = s == _activeSeriesType;
-        return OutlinedButton(
-          onPressed: () {
-            setState(() => _activeSeriesType = s);
-          },
-          child: Text(s.toDisplayName(widget.movement.unit)),
-          style: selected
-              ? OutlinedButton.styleFrom(
-                  backgroundColor: primaryColorOf(context),
-                  primary: onPrimaryColorOf(context),
-                )
-              : OutlinedButton.styleFrom(
-                  side: BorderSide.none,
-                ),
-        );
-      }).toList(),
+    return SelectionBar(
+      onChange: _setSeriesType,
+      items: widget.availableSeries,
+      getLabel: (SeriesType type) => type.toDisplayName(widget.movement.unit),
+      selectedItem: _activeSeriesType,
     );
   }
 }
