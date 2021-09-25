@@ -25,6 +25,7 @@ class AppDatabase {
         await databaseFile.delete();
       }
     }
+    String version = '';
     await openDatabase(fileName,
         version: 1,
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
@@ -38,12 +39,14 @@ class AppDatabase {
             db.execute(statement);
           }
         },
-        onOpen: (db) {
+        onOpen: (db) async {
           for (final table in allTables) {
             table.setDatabase(db);
           }
+          version = (await db.rawQuery('select sqlite_version() AS version'))
+                  .first['version'] as String;
         });
-    _logger.d("Database initialization done.");
+    _logger.d("Database initialization done (sqlite version $version).");
   }
 
   Future<void> upsertAccountData(AccountData data) async {
