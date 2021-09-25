@@ -25,7 +25,7 @@ part 'accessors/wod_api.dart';
 part 'api_accessor.dart';
 part 'api_helpers.dart';
 
-const String version = '/v1';
+const String version = '/v1.0';
 
 class Api {
   static final Api instance = Api._();
