@@ -9,6 +9,7 @@ import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/widgets/form_widgets/int_picker.dart';
+import 'package:sport_log/widgets/movement_picker.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 import 'metcon_movement_card.dart';
@@ -378,8 +379,12 @@ class _EditMetconPageState extends State<EditMetconPage> {
 
   Widget _addMetconMovementButton(BuildContext context) {
     return OutlinedButton.icon(
-      onPressed: () => MetconMovementCard.showMovementPickerDialog(
-          context, _addMetconMovementWithMovement),
+      onPressed: () async {
+        final movement = await showMovementPickerDialog(context);
+        if (movement != null) {
+          _addMetconMovementWithMovement(movement);
+        }
+      },
       icon: const Icon(Icons.add),
       label: const Text("Add movement..."),
     );

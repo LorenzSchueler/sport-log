@@ -8,6 +8,7 @@ import 'package:sport_log/pages/workout/strength/overview_page.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/movement_picker.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 import 'date_filter/date_filter_state.dart';
@@ -38,8 +39,16 @@ class _WorkoutPageState extends State<WorkoutPage> {
         actions: [
           IconButton(
             onPressed: () async {
-              showDialog<void>(
-                  context: context, builder: _movementPickerBuilder);
+              final Movement? movement = await showMovementPickerDialog(context,
+                  selectedMovement: _selectedMovement);
+              if (movement == null) {
+                return;
+              }
+              if (movement.id == _selectedMovement?.id) {
+                setState(() => _selectedMovement = null);
+              } else {
+                setState(() => _selectedMovement = movement);
+              }
             },
             icon: Icon(_selectedMovement != null
                 ? Icons.filter_alt
@@ -135,57 +144,5 @@ class _WorkoutPageState extends State<WorkoutPage> {
           onFilterChanged: (newFilter) =>
               setState(() => _dateFilter = newFilter),
         ));
-  }
-
-  Widget _movementPickerBuilder(BuildContext context) {
-    return Dialog(
-      clipBehavior: Clip.antiAlias,
-      child: SizedBox(
-        width: 0,
-        child: FutureBuilder<List<Movement>>(
-          future: _movementDataProvider.getStrengthSessionMovements(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              if (snapshot.data!.isEmpty) {
-                return const Center(
-                    child: Text('Nothing here. Create a movement first.'));
-              }
-              return Scrollbar(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    final movement = snapshot.data![index];
-                    final selected = _selectedMovement != null &&
-                        _selectedMovement!.id == movement.id;
-                    return ListTile(
-                        title: Center(child: Text(movement.name)),
-                        subtitle: Center(child: Text(movement.unit.toDimensionName())),
-                        selected: selected,
-                        onTap: () {
-                          setState(() {
-                            if (selected) {
-                              _selectedMovement = null;
-                            } else {
-                              _selectedMovement = movement;
-                            }
-                            Navigator.of(context).pop();
-                          });
-                        });
-                  },
-                  separatorBuilder: (_, __) => const Divider(height: 1),
-                  itemCount: snapshot.data!.length,
-                ),
-              );
-            } else if (snapshot.hasError) {
-              Future(() =>
-                  showSimpleSnackBar(context, 'Failed to select movements.'));
-              return const Center(child: Text('Nothing here'));
-            } else {
-              return const Center(child: CircularProgressIndicator());
-            }
-          },
-        ),
-      ),
-    );
   }
 }

@@ -29,4 +29,8 @@ class MovementDataProvider extends DataProviderImpl<Movement>
         MovementUnit.msecs,
         MovementUnit.reps
       ]);
+
+  Future<List<Movement>> getMovements({String? byName}) async =>
+      db.getMovements(
+          byName: byName != null && byName.isNotEmpty ? byName : null);
 }

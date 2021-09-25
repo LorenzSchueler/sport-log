@@ -121,8 +121,9 @@ class _EditMovementPageState extends State<EditMovementPage> {
                 icon: const Icon(Icons.delete),
               ),
             IconButton(
-                onPressed:
-                    _inputIsValid && _hasChanges ? () => _submit() : null,
+                onPressed: _inputIsValid && (!widget._isEditing || _hasChanges)
+                    ? () => _submit()
+                    : null,
                 icon: const Icon(Icons.save))
           ],
         ),

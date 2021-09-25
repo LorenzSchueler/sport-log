@@ -30,6 +30,8 @@ class MovementTable extends DbAccessor<Movement> {
   static const deleted = Keys.deleted;
   static const unit = Keys.unit;
   static const name = Keys.name;
+  static const userId = Keys.userId;
+  static const id = Keys.id;
 
   @override
   String get tableName => _table.name;
@@ -83,5 +85,27 @@ class MovementTable extends DbAccessor<Movement> {
     final records = await database.query(tableName,
         where: '$deleted = 0 AND $unit in ($unitsStr)', orderBy: name);
     return records.map((record) => serde.fromDbRecord(record)).toList();
+  }
+
+  Future<List<Movement>> getMovements({
+    String? byName,
+  }) async {
+    final nameFilter = byName != null ? '$name LIKE ?' : '1 = 1';
+    final records = await database.rawQuery('''
+      SELECT * FROM $tableName m1
+      WHERE $deleted = 0
+        AND $nameFilter
+        AND ($userId IS NOT NULL
+          OR NOT EXISTS (
+            SELECT * FROM $tableName m2
+            WHERE m1.$id <> m2.$id
+              AND m1.$name = m2.$name
+              AND m1.$unit = m2.$unit
+              AND m2.$userId IS NOT NULL
+          )
+        )
+      ORDER BY $name
+    ''', [if (byName != null) '%$byName%']);
+    return records.map((r) => serde.fromDbRecord(r)).toList();
   }
 }
