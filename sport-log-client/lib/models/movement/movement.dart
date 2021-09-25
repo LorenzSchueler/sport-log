@@ -26,7 +26,7 @@ enum MovementUnit {
   msecs,
 }
 
-extension MovementUniToDisplayName on MovementUnit {
+extension MovementUnitStrings on MovementUnit {
   String toDisplayName() {
     switch (this) {
       case MovementUnit.reps:
@@ -45,6 +45,23 @@ extension MovementUniToDisplayName on MovementUnit {
         return "mi";
       case MovementUnit.msecs:
         return "ms";
+    }
+  }
+
+  String toDimensionName() {
+    switch (this) {
+      case MovementUnit.reps:
+        return "Reps";
+      case MovementUnit.cals:
+        return "Cals";
+      case MovementUnit.m:
+      case MovementUnit.km:
+      case MovementUnit.yards:
+      case MovementUnit.feet:
+      case MovementUnit.miles:
+        return "Distance";
+      case MovementUnit.msecs:
+        return "Time";
     }
   }
 }
