@@ -1,26 +1,40 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table_creator.dart';
+import 'package:sport_log/database/table_names.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
-class MovementTable extends Table<Movement> {
+class MovementTable extends DbAccessor<Movement> {
   @override
   DbSerializer<Movement> get serde => DbMovementSerializer();
 
   @override
-  String get setupSql => '''
-create table movement (
-    user_id integer,
-    name text not null,
-    description text,
-    categories integer not null,
-    $idAndDeletedAndStatus
-);
-  ''';
+  String get setupSql => _table.setupSql();
+
+  final Table _table = Table(Tables.movement, withColumns: [
+    Column.int(Keys.id).primaryKey(),
+    Column.bool(Keys.deleted).withDefault('0'),
+    Column.int(Keys.syncStatus)
+        .withDefault('2')
+        .check('${Keys.syncStatus} IN (0, 1, 2)'),
+    Column.int(Keys.userId).nullable(),
+    Column.text(Keys.name),
+    Column.text(Keys.description).nullable(),
+    Column.bool(Keys.cardio),
+    Column.int(Keys.unit),
+  ]);
+
+  static const deleted = Keys.deleted;
+  static const unit = Keys.unit;
+  static const name = Keys.name;
 
   @override
-  String get tableName => 'movement';
+  String get tableName => _table.name;
+
+  Table get table => _table;
 
   Future<List<Movement>> searchByName(String name) async {
     final result = await database.query(tableName,
@@ -59,5 +73,15 @@ create table movement (
         hasReference: await hasReference(movement.id),
       );
     }).toList());
+  }
+
+  Future<List<Movement>> getMovementsWithUnits(List<MovementUnit> units) async {
+    if (units.isEmpty) {
+      return [];
+    }
+    final unitsStr = units.map((unit) => unit.index).join(', ');
+    final records = await database.query(tableName,
+        where: '$deleted = 0 AND $unit in ($unitsStr)', orderBy: name);
+    return records.map((record) => serde.fromDbRecord(record)).toList();
   }
 }

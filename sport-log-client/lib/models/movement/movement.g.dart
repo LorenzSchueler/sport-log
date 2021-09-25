@@ -12,10 +12,9 @@ Movement _$MovementFromJson(Map<String, dynamic> json) {
     userId: const OptionalIdConverter().fromJson(json['user_id'] as String?),
     name: json['name'] as String,
     description: json['description'] as String?,
-    categories: (json['categories'] as List<dynamic>)
-        .map((e) => _$enumDecode(_$MovementCategoryEnumMap, e))
-        .toList(),
+    cardio: json['cardio'] as bool,
     deleted: json['deleted'] as bool,
+    unit: _$enumDecode(_$MovementUnitEnumMap, json['movement_unit']),
   );
 }
 
@@ -24,9 +23,9 @@ Map<String, dynamic> _$MovementToJson(Movement instance) => <String, dynamic>{
       'user_id': const OptionalIdConverter().toJson(instance.userId),
       'name': instance.name,
       'description': instance.description,
-      'categories':
-          instance.categories.map((e) => _$MovementCategoryEnumMap[e]).toList(),
+      'cardio': instance.cardio,
       'deleted': instance.deleted,
+      'movement_unit': _$MovementUnitEnumMap[instance.unit],
     };
 
 K _$enumDecode<K, V>(
@@ -55,7 +54,13 @@ K _$enumDecode<K, V>(
   ).key;
 }
 
-const _$MovementCategoryEnumMap = {
-  MovementCategory.cardio: 'Cardio',
-  MovementCategory.strength: 'Strength',
+const _$MovementUnitEnumMap = {
+  MovementUnit.reps: 'Reps',
+  MovementUnit.cals: 'Cal',
+  MovementUnit.m: 'Meter',
+  MovementUnit.km: 'Km',
+  MovementUnit.yards: 'Yard',
+  MovementUnit.feet: 'Foot',
+  MovementUnit.miles: 'Mile',
+  MovementUnit.msecs: 'Msec',
 };

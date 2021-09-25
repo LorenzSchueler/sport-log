@@ -1,6 +1,3 @@
-# For documentation on how to configure this file,
-# see diesel.rs/guides/configuring-diesel-cli
-
 [print_schema]
 file = "src/schema.rs"
 import_types = ["diesel::sql_types::*", "crate::*"]
@@ -11,16 +8,23 @@ except_tables = [
     "platform_archive",
     "platform_credential_archive",
     "action_archive",
+    "action_provider_archive",
     "action_rule_archive",
     "action_event_archive",
     "diary_archive",
     "wod_archive",
     "movement_archive",
+    "movement_muscle_archive",
+    "training_plan_archive",
+    "strength_blueprint_archive",
+    "strength_blueprint_set_archive",
     "strength_session_archive",
     "strength_set_archive",
     "metcon_archive",
     "metcon_movement_archive",
     "metcon_session_archive",
+    "metcon_item_archive",
+    "cardio_blueprint_archive",
     "cardio_session_archive",
     "route_archive",
 ]

@@ -18,7 +18,7 @@ use tracing::{debug, error, info, warn};
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use sport_log_types::{ActionEventId, ExecutableActionEvent, Wod, WodId};
 
-const CONFIG_FILE: &str = "config.toml";
+const CONFIG_FILE: &str = "sport-log-action-provider-wodify-wod.toml";
 const NAME: &str = "wodify-wod";
 const DESCRIPTION: &str =
     "Wodify Wod can fetch the Workout of the Day and save it in your wods. The action names correspond to the class type the wod should be fetched for.";
@@ -42,6 +42,13 @@ enum Error {
 
 type Result<T> = StdResult<T, Error>;
 
+/// The config for [sport-log-action-provider-wodify-wod](crate).
+///
+/// The name of the config file is specified in [CONFIG_FILE].
+///
+/// `admin_password` is the password for the admin endpoints.
+///
+/// `base_url` is the left part of the URL (everthing before `/<version>/...`)
 #[derive(Deserialize, Debug)]
 struct Config {
     password: String,
@@ -53,12 +60,12 @@ lazy_static! {
         Ok(file) => match toml::from_str(&file) {
             Ok(config) => config,
             Err(error) => {
-                error!("Failed to parse config.toml: {}", error);
+                error!("Failed to parse {}: {}", CONFIG_FILE, error);
                 process::exit(1);
             }
         },
         Err(error) => {
-            error!("Failed to read config.toml: {}", error);
+            error!("Failed to read {}: {}", CONFIG_FILE, error);
             process::exit(1);
         }
     };
@@ -222,18 +229,21 @@ async fn get_wod(mode: Mode) -> Result<()> {
 
     let mut delete_action_event_ids = vec![];
     for task in tasks {
-        match task.await.unwrap() {
-            Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
-            Err(Error::NoCredential(action_event_id)) => {
-                delete_action_event_ids.push(action_event_id)
-            }
-            Err(Error::LoginFailed(action_event_id)) => {
-                delete_action_event_ids.push(action_event_id)
-            }
-            Err(Error::WodNotFound(action_event_id)) => {
-                delete_action_event_ids.push(action_event_id)
-            }
-            Err(error) => error!("{}", error),
+        match task.await {
+            Ok(result) => match result {
+                Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
+                Err(Error::NoCredential(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(Error::LoginFailed(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(Error::WodNotFound(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(error) => error!("{}", error),
+            },
+            Err(join_error) => error!("execution of action event failed: {}", join_error),
         }
     }
 
@@ -368,7 +378,7 @@ async fn try_get_wod(
         };
 
         let response = client
-            .post(format!("{}/v1/wod", CONFIG.base_url,))
+            .post(format!("{}/v1.0/wod", CONFIG.base_url,))
             .basic_auth(
                 format!("{}$id${}", NAME, exec_action_event.user_id.0),
                 Some(&CONFIG.password),
@@ -382,7 +392,7 @@ async fn try_get_wod(
                 let today = Local::today().naive_local().format("%Y-%m-%d");
                 let wods: Vec<Wod> = client
                     .get(format!(
-                        "{}/v1/wod/timespan/{}/{}",
+                        "{}/v1.0/wod/timespan/{}/{}",
                         CONFIG.base_url, today, today
                     ))
                     .basic_auth(
@@ -405,7 +415,7 @@ async fn try_get_wod(
                     wod.description = Some(description);
                 }
                 client
-                    .put(format!("{}/v1/wod", CONFIG.base_url,))
+                    .put(format!("{}/v1.0/wod", CONFIG.base_url,))
                     .basic_auth(
                         format!("{}$id${}", NAME, exec_action_event.user_id.0),
                         Some(&CONFIG.password),
@@ -419,7 +429,7 @@ async fn try_get_wod(
                 info!("new wod created");
             }
             _ => {
-                response.json::<Wod>().await.map_err(Error::Reqwest)?; // this will always fail and return the error
+                response.error_for_status().map_err(Error::Reqwest)?; // this will always fail and return the error
             }
         }
 

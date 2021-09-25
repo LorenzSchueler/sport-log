@@ -13,7 +13,7 @@ use sport_log_types::{
     ActionEventId, CardioSession, CardioSessionId, CardioType, Movement, Position,
 };
 
-const CONFIG_FILE: &str = "config.toml";
+const CONFIG_FILE: &str = "sport-log-action-provider-sportstracker.toml";
 const NAME: &str = "sportstracker-fetch";
 const DESCRIPTION: &str = "Sportstracker Fetch can fetch the latests workouts recorded with sportstracker and save them in your cardio sessions.";
 const PLATFORM_NAME: &str = "sportstracker";
@@ -28,6 +28,13 @@ enum Error {
     LoginFailed(ActionEventId),
 }
 
+/// The config for [sport-log-action-provider-sportstracker](crate).
+///
+/// The name of the config file is specified in [CONFIG_FILE].
+///
+/// `admin_password` is the password for the admin endpoints.
+///
+/// `base_url` is the left part of the URL (everthing before `/<version>/...`)
 #[derive(Deserialize, Debug)]
 struct Config {
     password: String,
@@ -39,12 +46,12 @@ lazy_static! {
         Ok(file) => match toml::from_str(&file) {
             Ok(config) => config,
             Err(error) => {
-                error!("Failed to parse config.toml.: {}", error);
+                error!("Failed to parse {}: {}", CONFIG_FILE, error);
                 process::exit(1);
             }
         },
         Err(error) => {
-            error!("Failed to read config.toml.: {}", error);
+            error!("Failed to read {}: {}", CONFIG_FILE, error);
             process::exit(1);
         }
     };
@@ -235,7 +242,7 @@ async fn fetch() -> Result<(), ReqwestError> {
                         .map_err(Error::Reqwest)?;
                     let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
                     let movements: Vec<Movement> = client
-                        .get(format!("{}/v1/movement", CONFIG.base_url))
+                        .get(format!("{}/v1.0/movement", CONFIG.base_url))
                         .basic_auth(&username, Some(&CONFIG.password))
                         .send()
                         .await
@@ -272,6 +279,7 @@ async fn fetch() -> Result<(), ReqwestError> {
                         let cardio_session = CardioSession {
                             id: CardioSessionId(rand::thread_rng().gen()),
                             user_id: exec_action_event.user_id,
+                            cardio_blueprint_id: None,
                             movement_id,
                             cardio_type: CardioType::Training,
                             datetime: DateTime::from_utc(
@@ -311,7 +319,7 @@ async fn fetch() -> Result<(), ReqwestError> {
                         };
 
                         let response = client
-                            .post(format!("{}/v1/cardio_session", CONFIG.base_url))
+                            .post(format!("{}/v1.0/cardio_session", CONFIG.base_url))
                             .basic_auth(&username, Some(&CONFIG.password))
                             .json(&cardio_session)
                             .send()
@@ -330,10 +338,7 @@ async fn fetch() -> Result<(), ReqwestError> {
                                 break;
                             }
                             _ => {
-                                response
-                                    .json::<CardioSession>()
-                                    .await
-                                    .map_err(Error::Reqwest)?; // this will always fail and return the error
+                                response.error_for_status().map_err(Error::Reqwest)?; // this will always fail and return the error
                                 break;
                             }
                         }
@@ -351,15 +356,18 @@ async fn fetch() -> Result<(), ReqwestError> {
 
     let mut delete_action_event_ids = vec![];
     for task in tasks {
-        match task.await.unwrap() {
-            Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
-            Err(Error::NoCredential(action_event_id)) => {
-                delete_action_event_ids.push(action_event_id)
-            }
-            Err(Error::LoginFailed(action_event_id)) => {
-                delete_action_event_ids.push(action_event_id)
-            }
-            Err(error) => error!("{}", error),
+        match task.await {
+            Ok(result) => match result {
+                Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
+                Err(Error::NoCredential(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(Error::LoginFailed(action_event_id)) => {
+                    delete_action_event_ids.push(action_event_id)
+                }
+                Err(error) => error!("{}", error),
+            },
+            Err(join_error) => error!("execution of action event failed: {}", join_error),
         }
     }
 

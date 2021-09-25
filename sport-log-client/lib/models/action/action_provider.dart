@@ -1,7 +1,7 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'action_provider.g.dart';
@@ -18,28 +18,31 @@ class ActionProvider implements DbObject {
   });
 
   @override
-  @IdConverter() Int64 id;
+  @IdConverter()
+  Int64 id;
   String name;
   String password;
-  @IdConverter() Int64 platformId;
+  @IdConverter()
+  Int64 platformId;
   String? description;
   @override
   bool deleted;
 
-  factory ActionProvider.fromJson(Map<String, dynamic> json) => _$ActionProviderFromJson(json);
+  factory ActionProvider.fromJson(Map<String, dynamic> json) =>
+      _$ActionProviderFromJson(json);
   Map<String, dynamic> toJson() => _$ActionProviderToJson(this);
 
   @override
   bool isValid() {
-    return validate(name.isNotEmpty, 'ActionProvider: name is empty')
-        && validate(password.isNotEmpty, 'ActionProvider: password is empty')
-        && validate(!deleted, 'ActionProvider: deleted is true');
+    return validate(name.isNotEmpty, 'ActionProvider: name is empty') &&
+        validate(password.isNotEmpty, 'ActionProvider: password is empty') &&
+        validate(!deleted, 'ActionProvider: deleted is true');
   }
 }
 
 class DbActionProviderSerializer implements DbSerializer<ActionProvider> {
   @override
-  ActionProvider fromDbRecord(DbRecord r) {
+  ActionProvider fromDbRecord(DbRecord r, {String prefix = ''}) {
     return ActionProvider(
       id: Int64(r[Keys.id]! as int),
       name: r[Keys.name]! as String,

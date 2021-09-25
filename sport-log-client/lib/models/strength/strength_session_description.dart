@@ -5,31 +5,39 @@ import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
 import 'package:sport_log/models/strength/strength_set.dart';
 
+import 'strength_session_stats.dart';
+
 class StrengthSessionDescription implements Validatable, HasId {
   StrengthSessionDescription({
     required this.strengthSession,
-    required this.strengthSets,
     required this.movement,
+    required this.strengthSets,
+    required this.stats,
   });
 
   StrengthSession strengthSession;
-  List<StrengthSet> strengthSets;
   Movement movement;
+  List<StrengthSet>? strengthSets;
+  StrengthSessionStats? stats;
 
   @override
   bool isValid() {
     return validate(strengthSession.isValid(),
             'StrengthSessionDescription: strength session not valid') &&
-        validate(strengthSets.isNotEmpty,
+        validate(strengthSets != null,
+            'StrengthSessionDescription: strength sets == null') &&
+        validate(strengthSets?.isNotEmpty ?? true,
             'StrengthSessionDescription: strength sets empty') &&
         validate(
-            strengthSets
-                .every((ss) => ss.strengthSessionId == strengthSession.id),
+            strengthSets?.every(
+                    (ss) => ss.strengthSessionId == strengthSession.id) ??
+                true,
             'StrengthSessionDescription: strengthSessionId != strengthSession.id') &&
         validate(
-            strengthSets.everyIndexed((ss, index) => ss.setNumber == index),
+            strengthSets?.everyIndexed((ss, index) => ss.setNumber == index) ??
+                true,
             'StrengthSessionDescription: strengthSets indices wrong') &&
-        validate(strengthSets.every((ss) => ss.isValid()),
+        validate(strengthSets?.every((ss) => ss.isValid()) ?? true,
             'StrengthSessionDescription: strengthSets not valid') &&
         validate(strengthSession.movementId == movement.id,
             'StrengthSessionDescription: movement id mismatch');
@@ -40,7 +48,7 @@ class StrengthSessionDescription implements Validatable, HasId {
 
   void setDeleted() {
     strengthSession.deleted = true;
-    for (final set in strengthSets) {
+    for (final set in strengthSets ?? <StrengthSet>[]) {
       set.deleted = true;
     }
   }

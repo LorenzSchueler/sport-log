@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'wod.g.dart';
@@ -38,7 +39,7 @@ class Wod implements DbObject {
 
 class DbWodSerializer implements DbSerializer<Wod> {
   @override
-  Wod fromDbRecord(DbRecord r) {
+  Wod fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Wod(
       id: Int64(r[Keys.id]! as int),
       userId: Int64(r[Keys.userId]! as int),

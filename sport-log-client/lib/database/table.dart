@@ -1,17 +1,13 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:result_type/result_type.dart';
-import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'defs.dart';
 
 export 'defs.dart';
 
-final _logger = Logger('DB');
-
-abstract class Table<T extends DbObject> {
-  String get setupSql;
+abstract class DbAccessor<T extends DbObject> {
+  String? get setupSql;
   String get tableName;
   DbSerializer<T> get serde;
 
@@ -23,39 +19,24 @@ abstract class Table<T extends DbObject> {
     sync_status integer not null default 2 check (sync_status in (0, 1, 2))
   ''';
 
-  @mustCallSuper
-  Future<String> init(Database db) async {
-    await db.execute(setupSql);
-    final String updateTrigger = '''
-create trigger ${tableName}_update before update on $tableName
-begin
-  update $tableName set sync_status = 1 where id = new.id and sync_status = 0;
-end;
-    ''';
-    await db.execute(updateTrigger);
-    return setupSql + updateTrigger;
+  String get updateTrigger => '''
+    create trigger ${tableName}_update before update on $tableName
+    begin
+      update $tableName set sync_status = 1 where id = new.id and sync_status = 0;
+    end;
+  ''';
+
+  Future<List<String>> init() async {
+    final s = setupSql;
+    assert(s != null);
+    if (s != null) {
+      return [s, updateTrigger];
+    }
+    return [];
   }
 
   void setDatabase(Database db) {
     database = db;
-  }
-
-  DbResult<R> request<R>(DbResult<R> Function() req) async {
-    try {
-      return await req();
-    } on DbError catch (e) {
-      return Failure(e);
-    } catch (e) {
-      _logger.e('Unhandled database error in table $tableName.', e);
-      return Failure(DbError.unknown);
-    }
-  }
-
-  DbResult<void> voidRequest(Future<void> Function() req) async {
-    return request(() async {
-      await req();
-      return Success(null);
-    });
   }
 
   Future<void> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
@@ -179,7 +160,7 @@ end;
   }
 }
 
-mixin DateTimeMethods<T extends DbObjectWithDateTime> on Table<T> {
+mixin DateTimeMethods<T extends DbObjectWithDateTime> on DbAccessor<T> {
   Future<DateTime?> earliestDateTime() async {
     final result = await database.query(tableName,
         where: '${Keys.deleted} = 0',

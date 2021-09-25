@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/widgets/int_picker.dart';
+import 'package:sport_log/widgets/form_widgets/int_picker.dart';
 
 import 'movement_picker_dialog.dart';
 
@@ -58,22 +58,7 @@ class MetconMovementCard extends StatelessWidget {
                     editMetconMovementDescription(mmd);
                   }),
               const Padding(padding: EdgeInsets.all(8)),
-              DropdownButton(
-                value: move.movementUnit,
-                onChanged: (MovementUnit? u) {
-                  if (u != null) {
-                    mmd.metconMovement.movementUnit = u;
-                    editMetconMovementDescription(mmd);
-                  }
-                },
-                items: MovementUnit.values
-                    .map((u) => DropdownMenuItem(
-                          child: Text(u.toDisplayName()),
-                          key: ValueKey(u.toString()),
-                          value: u,
-                        ))
-                    .toList(),
-              ),
+              Text(mmd.movement.unit.toDisplayName()),
               const Padding(padding: EdgeInsets.all(8)),
             ],
           ),

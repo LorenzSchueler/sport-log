@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
+import 'package:sport_log/helpers/snackbar.dart';
+import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_page.dart';
-import 'package:sport_log/pages/workout/strength/strength_sessions_page.dart';
+import 'package:sport_log/pages/workout/strength/overview_page.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/simple_overlay.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
-import 'date_filter_state.dart';
+import 'date_filter/date_filter_state.dart';
+import 'date_filter/date_filter_widget.dart';
 
-enum BottomNavPage { workout, strength, cardio, other }
+enum BottomNavPage { strength, metcon, cardio, diary }
 
 class WorkoutPage extends StatefulWidget {
   const WorkoutPage({Key? key}) : super(key: key);
@@ -19,61 +23,61 @@ class WorkoutPage extends StatefulWidget {
 }
 
 class _WorkoutPageState extends State<WorkoutPage> {
-  BottomNavPage _currentPage = BottomNavPage.workout;
-  final DateFilterState _dateFilter =
-      DateFilterState(timeFrame: TimeFrame.month, start: DateTime.now());
-  bool _showDateFilter = false;
+  BottomNavPage _currentPage = BottomNavPage.strength;
+  DateFilterState _dateFilter = MonthFilter.current();
+
+  Movement? _selectedMovement;
+
+  final _movementDataProvider = MovementDataProvider();
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (_showDateFilter == true) {
-          setState(() => _showDateFilter = false);
-          return false;
-        }
-        return true;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Home"),
-          bottom: _timeFilter,
-        ),
-        body: SimpleOverlay(
-          child: WideScreenFrame(child: _mainPage),
-          overlay: _overlay,
-          hideOverlay: () => setState(() => _showDateFilter = false),
-          showOverlay: _showDateFilter,
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: BottomNavPage.values.map(_toBottomNavItem).toList(),
-          currentIndex: _currentPage.index,
-          onTap: _onBottomNavItemTapped,
-          type: BottomNavigationBarType.fixed,
-        ),
-        drawer: const MainDrawer(selectedRoute: Routes.workout),
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: () => _onFabTapped(context),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_selectedMovement?.name ?? 'Sessions'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              showDialog<void>(
+                  context: context, builder: _movementPickerBuilder);
+            },
+            icon: Icon(_selectedMovement != null
+                ? Icons.filter_alt
+                : Icons.filter_alt_outlined),
+          ),
+        ],
+        bottom: _filter,
+      ),
+      body: WideScreenFrame(child: _mainPage),
+      bottomNavigationBar: BottomNavigationBar(
+        items: BottomNavPage.values.map(_toBottomNavItem).toList(),
+        currentIndex: _currentPage.index,
+        onTap: _onBottomNavItemTapped,
+        type: BottomNavigationBarType.fixed,
+      ),
+      drawer: const MainDrawer(selectedRoute: Routes.workout),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () => _onFabTapped(context),
       ),
     );
   }
 
   Widget get _mainPage {
+    // TODO: preserve state and/or widget when changing tab
     switch (_currentPage) {
-      case BottomNavPage.workout:
+      case BottomNavPage.metcon:
         return const MetconsPage();
       case BottomNavPage.strength:
         return StrengthSessionsPage(
-          start: _dateFilter.start,
-          end: _dateFilter.end,
+          dateFilter: _dateFilter,
+          movement: _selectedMovement,
         );
       case BottomNavPage.cardio:
         return const Center(
           child: Text("Cardio"),
         );
-      case BottomNavPage.other:
+      case BottomNavPage.diary:
         return const Center(
           child: Text("Weight and Comments"),
         );
@@ -82,10 +86,10 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   BottomNavigationBarItem _toBottomNavItem(BottomNavPage page) {
     switch (page) {
-      case BottomNavPage.workout:
+      case BottomNavPage.metcon:
         return const BottomNavigationBarItem(
           icon: Icon(CustomIcons.plan),
-          label: "Workouts",
+          label: "Metcons",
         );
       case BottomNavPage.strength:
         return const BottomNavigationBarItem(
@@ -97,7 +101,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
           icon: Icon(CustomIcons.heart),
           label: "Cardio",
         );
-      case BottomNavPage.other:
+      case BottomNavPage.diary:
         return const BottomNavigationBarItem(
           icon: Icon(Icons.edit),
           label: "Other",
@@ -113,7 +117,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   void _onFabTapped(BuildContext context) {
     switch (_currentPage) {
-      case BottomNavPage.workout:
+      case BottomNavPage.metcon:
         Navigator.of(context).pushNamed(Routes.editMetcon);
         break;
       case BottomNavPage.strength:
@@ -123,99 +127,62 @@ class _WorkoutPageState extends State<WorkoutPage> {
     }
   }
 
-  PreferredSizeWidget get _timeFilter {
-    final primaryColor = Theme.of(context).primaryColor;
+  PreferredSizeWidget get _filter {
     return PreferredSize(
         preferredSize: const Size.fromHeight(40),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-                onPressed: _dateFilter.timeFrame == TimeFrame.all
-                    ? null
-                    : () {
-                        setState(() {
-                          _dateFilter.goBackInTime();
-                          _showDateFilter = false;
-                        });
-                      },
-                icon: const Icon(Icons.arrow_back_ios_sharp)),
-            TextButton.icon(
-              label: const Icon(Icons.arrow_drop_down_sharp),
-              icon: Text(
-                _dateFilter.getLabel(),
-                style: TextStyle(
-                  fontSize: 20,
-                  color: primaryColor,
-                ),
-              ),
-              onPressed: () {
-                setState(() => _showDateFilter = !_showDateFilter);
-              },
-            ),
-            IconButton(
-                onPressed: _dateFilter.goingForwardPossible
-                    ? () {
-                        setState(() {
-                          _dateFilter.goForwardInTime();
-                          _showDateFilter = false;
-                        });
-                      }
-                    : null,
-                icon: const Icon(Icons.arrow_forward_ios_sharp)),
-          ],
+        child: DateFilter(
+          initialState: _dateFilter,
+          onFilterChanged: (newFilter) =>
+              setState(() => _dateFilter = newFilter),
         ));
   }
 
-  Widget get _overlay {
-    final appBarColor = Theme.of(context).cardColor;
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 23),
-        child: Material(
-          color: appBarColor,
-          clipBehavior: Clip.none,
-          elevation: 3,
-          shape: const _CustomDateShape(
-            borderRadius: BorderRadius.all(Radius.circular(20)),
-          ),
-          child: Container(
-            width: 200,
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemBuilder: (context, index) => ListTile(
-                title: Center(
-                    child: Text(TimeFrame.values[index].toDisplayName())),
-                onTap: () {
-                  setState(() {
-                    _dateFilter.setTimeFrame(TimeFrame.values[index]);
-                    _showDateFilter = false;
-                  });
+  Widget _movementPickerBuilder(BuildContext context) {
+    return Dialog(
+      clipBehavior: Clip.antiAlias,
+      child: SizedBox(
+        width: 0,
+        child: FutureBuilder<List<Movement>>(
+          future: _movementDataProvider.getStrengthSessionMovements(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              if (snapshot.data!.isEmpty) {
+                return const Center(
+                    child: Text('Nothing here. Create a movement first.'));
+              }
+              return ListView.separated(
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  final movement = snapshot.data![index];
+                  final selected = _selectedMovement != null &&
+                      _selectedMovement!.id == movement.id;
+                  return ListTile(
+                      title: Center(child: Text(movement.name)),
+                      selected: selected,
+                      onTap: () {
+                        setState(() {
+                          if (selected) {
+                            _selectedMovement = null;
+                          } else {
+                            _selectedMovement = movement;
+                          }
+                          Navigator.of(context).pop();
+                        });
+                      });
                 },
-              ),
-              separatorBuilder: (_, __) => const Divider(height: 1),
-              itemCount: TimeFrame.values.length,
-            ),
-          ),
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemCount: snapshot.data!.length,
+              );
+            } else if (snapshot.hasError) {
+              Future(() =>
+                  showSimpleSnackBar(context, 'Failed to select movements.'));
+              return const Center(child: Text('Nothing here'));
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          },
         ),
       ),
     );
-  }
-}
-
-class _CustomDateShape extends RoundedRectangleBorder {
-  const _CustomDateShape({
-    BorderSide side = BorderSide.none,
-    BorderRadiusGeometry borderRadius = BorderRadius.zero,
-  }) : super(side: side, borderRadius: borderRadius);
-
-  @override
-  Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
-    return Path()
-      ..moveTo(rect.width / 2 - 15, rect.top)
-      ..lineTo(rect.width / 2, rect.top - 20)
-      ..lineTo(rect.width / 2 + 15, rect.top)
-      ..addRRect(borderRadius.resolve(textDirection).toRRect(rect));
   }
 }

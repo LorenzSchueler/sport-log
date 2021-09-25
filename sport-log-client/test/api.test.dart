@@ -77,7 +77,6 @@ void testStrengthSession(Api api) async {
       userId: sampleUser.id,
       datetime: DateTime.now(),
       movementId: Int64(1),
-      movementUnit: MovementUnit.reps,
       interval: 10,
       comments: null,
       deleted: false,
@@ -89,7 +88,7 @@ void testStrengthSession(Api api) async {
     expect(await api.strengthSessions.getMultiple(), isA<Success>());
     expect(
         await api.strengthSessions
-            .putSingle(strengthSession..movementUnit = MovementUnit.cal),
+            .putSingle(strengthSession..comments = 'comments'),
         isA<Success>());
     expect(
         await api.strengthSessions.putSingle(strengthSession..deleted = true),

@@ -8,7 +8,10 @@ import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/test_data/movement_test_data.dart';
 import 'package:sport_log/test_data/strength_test_data.dart';
+
+import 'models/movement/movement.dart';
 
 final _logger = Logger('MAIN');
 
@@ -18,8 +21,7 @@ Future<void> initialize({bool doDownSync = true}) async {
   await UserState.instance.init();
   await AppDatabase.instance?.init();
   await DownSync.instance.init().then((downSync) async {
-    if (Config.doCleanStart) {
-      _logger.i('Clean start on: deleting last sync datetime');
+    if (Config.deleteDatabase) {
       await downSync.removeLastSync();
     }
     if (doDownSync) {
@@ -38,12 +40,20 @@ Future<void> insertTestData() async {
   final userId = UserState.instance.currentUser?.id;
   if (userId != null) {
     _logger.i('Generating test data ...');
+    List<Movement> movements = [];
+    if ((await AppDatabase.instance!.movements.getNonDeleted()).isEmpty) {
+      movements = generateMovements(userId);
+      await AppDatabase.instance!.movements.upsertMultiple(movements);
+    }
     final sessions = await generateStrengthSessions(userId);
     await AppDatabase.instance!.strengthSessions.upsertMultiple(sessions);
     final sets = await generateStrengthSets();
     await AppDatabase.instance!.strengthSets.upsertMultiple(sets);
-    _logger.i(
-        'Generated ${sessions.length} strength sessions, ${sets.length} strength sets');
+    _logger.i('''
+        Generated
+        ${movements.length} movements,
+        ${sessions.length} strength sessions,
+        ${sets.length} strength sets''');
   }
 }
 

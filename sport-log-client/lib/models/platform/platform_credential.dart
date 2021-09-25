@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'platform_credential.g.dart';
@@ -45,7 +46,7 @@ class PlatformCredential implements DbObject {
 class DbPlatformCredentialSerializer
     implements DbSerializer<PlatformCredential> {
   @override
-  PlatformCredential fromDbRecord(DbRecord r) {
+  PlatformCredential fromDbRecord(DbRecord r, {String prefix = ''}) {
     return PlatformCredential(
       id: Int64(r[Keys.id]! as int),
       userId: Int64(r[Keys.userId]! as int),

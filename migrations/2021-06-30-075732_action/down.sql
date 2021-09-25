@@ -1,0 +1,13 @@
+drop table action_event_archive;
+drop index action_event_idx;
+drop table action_event;
+drop table action_rule_archive;
+drop index action_rule_idx;
+drop table action_rule;
+drop table action_archive;
+drop index action_idx;
+drop table action;
+drop table action_provider_archive;
+drop index action_provider_idx;
+drop table action_provider;
+drop type weekday;

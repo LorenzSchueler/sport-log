@@ -21,4 +21,12 @@ class MovementDataProvider extends DataProviderImpl<Movement>
 
   Future<List<MovementDescription>> getNonDeletedFull() async =>
       db.getNonDeletedFull();
+
+  Future<List<Movement>> getStrengthSessionMovements() async =>
+      db.getMovementsWithUnits([
+        MovementUnit.m,
+        MovementUnit.cals,
+        MovementUnit.msecs,
+        MovementUnit.reps
+      ]);
 }

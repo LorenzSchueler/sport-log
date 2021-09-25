@@ -10,5 +10,5 @@ class ActionRuleDataProvider extends DataProviderImpl<ActionRule>
   final ApiAccessor<ActionRule> api = Api.instance.actionRules;
 
   @override
-  final Table<ActionRule> db = AppDatabase.instance!.actionRules;
+  final DbAccessor<ActionRule> db = AppDatabase.instance!.actionRules;
 }

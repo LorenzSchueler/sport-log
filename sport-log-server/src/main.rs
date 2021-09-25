@@ -11,13 +11,16 @@
 //!
 //! # Config
 //!
-//! The config file must be called `sport-log-server-config.toml`, supports configuration of different profiles and must at least contain all fields of [Config](sport_log_types::Config).
-//! Additionally it can also be used to configure the webserver itself. Please refer to [rocket::config].
+//! The config supports configuration of different profiles and must at least contain all fields of [Config](sport_log_types::Config).
+//! The name of the config file is specified in [CONFIG_FILE].
+//! Additionally it can also be used to configure the webserver itself. Herefore please refer to [rocket::config].
 
 use std::env;
 
 #[macro_use]
 extern crate rocket;
+#[macro_use]
+extern crate diesel_migrations;
 
 use figment::{
     providers::{Format, Toml},
@@ -26,18 +29,22 @@ use figment::{
 use rocket::{
     fairing::{AdHoc, Fairing, Info, Kind},
     http::{Header, Method, Status},
-    Request, Response,
+    Build, Request, Response, Rocket,
 };
 
-use sport_log_types::{Config, Db};
+use sport_log_types::{Config, Db, Version};
 
 mod handler;
 #[cfg(test)]
 mod tests;
 
-use handler::JsonError;
+use handler::{IntoJson, JsonError, JsonResult};
 
-const BASE: &str = "/v1";
+pub const CONFIG_FILE: &str = "sport-log-server.toml";
+
+const VERSION_1_0: &str = "1.0";
+const MIN_VERSION: &str = VERSION_1_0;
+const MAX_VERSION: &str = VERSION_1_0;
 
 #[catch(default)]
 fn default_catcher(status: Status, _request: &Request) -> JsonError {
@@ -83,10 +90,17 @@ impl Fairing for CORS {
     }
 }
 
-#[launch]
-fn rocket() -> _ {
-    let figment = Figment::from(rocket::Config::default())
-        .merge(Toml::file("sport-log-server-config.toml").nested());
+#[get("/version")]
+pub async fn get_version() -> JsonResult<Version> {
+    Ok(Version {
+        min: MIN_VERSION.to_owned(),
+        max: MAX_VERSION.to_owned(),
+    })
+    .into_json()
+}
+
+fn rocket() -> Rocket<Build> {
+    let figment = Figment::from(rocket::Config::default()).merge(Toml::file(CONFIG_FILE).nested());
     if cfg!(test) {
         env::set_var("RUST_LOG", "error");
     } else if figment.profile() == "debug" {
@@ -102,8 +116,9 @@ fn rocket() -> _ {
         .attach(Db::fairing())
         .attach(CORS)
         .register("/", catchers![default_catcher, catcher_404])
+        .mount("/", routes![get_version])
         .mount(
-            BASE,
+            format!("/v{}", VERSION_1_0),
             routes![
                 user::adm_create_user,
                 platform::adm_create_platform,
@@ -115,7 +130,8 @@ fn rocket() -> _ {
                 action::adm_get_deletable_action_events, // for scheduler
                 action::adm_create_action_events,       // for scheduler
                 action::adm_update_action_event,        // for scheduler
-                action::adm_delete_action_events,
+                action::adm_delete_action_events,       // for scheduler
+                garbage_collection::adm_garbage_collect, // for scheduler
                 platform::ap_create_platform,
                 platform::ap_get_platforms,
                 action::ap_create_action_provider,
@@ -173,7 +189,27 @@ fn rocket() -> _ {
                 movement::get_movements,
                 movement::update_movement,
                 movement::update_movements,
+                movement::create_movement_muscle,
+                movement::create_movement_muscles,
+                movement::get_movement_muscle,
+                movement::get_movement_muscles,
+                movement::update_movement_muscle,
+                movement::update_movement_muscles,
+                movement::get_muscle_groups,
                 movement::get_eorms,
+                strength::create_strength_blueprint,
+                strength::create_strength_blueprints,
+                strength::get_strength_blueprint,
+                strength::get_strength_blueprints,
+                strength::update_strength_blueprint,
+                strength::update_strength_blueprints,
+                strength::create_strength_blueprint_set,
+                strength::create_strength_blueprint_sets,
+                strength::get_strength_blueprint_set,
+                strength::get_strength_blueprint_sets,
+                strength::get_strength_blueprint_sets_by_strength_blueprint,
+                strength::update_strength_blueprint_set,
+                strength::update_strength_blueprint_sets,
                 strength::create_strength_session,
                 strength::create_strength_sessions,
                 strength::get_strength_session,
@@ -183,6 +219,7 @@ fn rocket() -> _ {
                 strength::create_strength_set,
                 strength::create_strength_sets,
                 strength::get_strength_set,
+                strength::get_strength_sets,
                 strength::get_strength_sets_by_strength_session,
                 strength::update_strength_set,
                 strength::update_strength_sets,
@@ -204,9 +241,16 @@ fn rocket() -> _ {
                 metcon::create_metcon_movements,
                 metcon::create_metcon_movement,
                 metcon::get_metcon_movement,
+                metcon::get_metcon_movements,
                 metcon::get_metcon_movements_by_metcon,
                 metcon::update_metcon_movement,
                 metcon::update_metcon_movements,
+                metcon::create_metcon_items,
+                metcon::create_metcon_item,
+                metcon::get_metcon_item,
+                metcon::get_metcon_items,
+                metcon::update_metcon_item,
+                metcon::update_metcon_items,
                 metcon::get_metcon_session_description,
                 metcon::get_metcon_session_descriptions,
                 metcon::get_ordered_metcon_session_descriptions_by_timespan,
@@ -216,6 +260,12 @@ fn rocket() -> _ {
                 cardio::get_routes,
                 cardio::update_route,
                 cardio::update_routes,
+                cardio::create_cardio_blueprint,
+                cardio::create_cardio_blueprints,
+                cardio::get_cardio_blueprint,
+                cardio::get_cardio_blueprints,
+                cardio::update_cardio_blueprint,
+                cardio::update_cardio_blueprints,
                 cardio::create_cardio_session,
                 cardio::create_cardio_sessions,
                 cardio::get_cardio_session,
@@ -225,10 +275,37 @@ fn rocket() -> _ {
                 cardio::get_cardio_session_description,
                 cardio::get_cardio_session_descriptions,
                 cardio::get_ordered_cardio_session_descriptions_by_timespan,
+                training_plan::create_training_plan,
+                training_plan::create_training_plans,
+                training_plan::get_training_plan,
+                training_plan::get_training_plans,
+                training_plan::update_training_plan,
+                training_plan::update_training_plans,
                 activity::get_ordered_activities_by_timespan,
                 activity::get_activities,
                 account::get_account_data,
                 account::sync,
             ],
         )
+}
+
+#[rocket::main]
+async fn main() -> Result<(), rocket::Error> {
+    embed_migrations!();
+
+    let rocket = rocket();
+    info!("rocket build successful");
+
+    let rocket = rocket.ignite().await?;
+    info!("rocket ignite successful");
+
+    info!("running migrations...");
+    let db = Db::get_one(&rocket).await.unwrap();
+    if let Err(error) = db.run(|c| embedded_migrations::run(c)).await {
+        error!("an error occured while running new migrations: {}", error);
+    }
+    info!("db is up to date");
+
+    info!("launching rocket");
+    rocket.launch().await
 }

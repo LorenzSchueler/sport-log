@@ -2,63 +2,66 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/id_generation.dart';
-import 'package:sport_log/helpers/serialization/db_serialization.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'movement.g.dart';
-
-enum MovementCategory {
-  @JsonValue("Cardio")
-  cardio,
-  @JsonValue("Strength")
-  strength,
-}
-
-extension MovementCategoryToDisplayName on MovementCategory {
-  String toDisplayName() {
-    switch (this) {
-      case MovementCategory.strength:
-        return "Strength";
-      case MovementCategory.cardio:
-        return "Cardio";
-    }
-  }
-}
 
 enum MovementUnit {
   @JsonValue("Reps")
   reps,
   @JsonValue("Cal")
-  cal,
+  cals,
   @JsonValue("Meter")
-  meter,
+  m,
   @JsonValue("Km")
   km,
   @JsonValue("Yard")
-  yard,
+  yards,
   @JsonValue("Foot")
-  foot,
+  feet,
   @JsonValue("Mile")
-  mile,
+  miles,
+  @JsonValue("Msec")
+  msecs,
 }
 
-extension MovementUniToDisplayName on MovementUnit {
+extension MovementUnitStrings on MovementUnit {
   String toDisplayName() {
     switch (this) {
       case MovementUnit.reps:
-        return "Reps";
-      case MovementUnit.cal:
-        return "Cals";
-      case MovementUnit.meter:
+        return "reps";
+      case MovementUnit.cals:
+        return "cals";
+      case MovementUnit.m:
         return "m";
       case MovementUnit.km:
         return "km";
-      case MovementUnit.yard:
+      case MovementUnit.yards:
         return "yd";
-      case MovementUnit.foot:
+      case MovementUnit.feet:
         return "ft";
-      case MovementUnit.mile:
+      case MovementUnit.miles:
         return "mi";
+      case MovementUnit.msecs:
+        return "ms";
+    }
+  }
+
+  String toDimensionName() {
+    switch (this) {
+      case MovementUnit.reps:
+        return "Reps";
+      case MovementUnit.cals:
+        return "Cals";
+      case MovementUnit.m:
+      case MovementUnit.km:
+      case MovementUnit.yards:
+      case MovementUnit.feet:
+      case MovementUnit.miles:
+        return "Distance";
+      case MovementUnit.msecs:
+        return "Time";
     }
   }
 }
@@ -70,8 +73,9 @@ class Movement implements DbObject {
     required this.userId,
     required this.name,
     required this.description,
-    required this.categories,
+    required this.cardio,
     required this.deleted,
+    required this.unit,
   });
 
   @override
@@ -81,16 +85,19 @@ class Movement implements DbObject {
   Int64? userId;
   String name;
   String? description;
-  List<MovementCategory> categories;
+  bool cardio;
   @override
   bool deleted;
+  @JsonKey(name: 'movement_unit')
+  MovementUnit unit;
 
   Movement.defaultValue(this.userId)
       : id = randomId(),
         name = '',
         description = null,
-        categories = [MovementCategory.strength],
-        deleted = false;
+        cardio = true,
+        deleted = false,
+        unit = MovementUnit.reps;
 
   factory Movement.fromJson(Map<String, dynamic> json) =>
       _$MovementFromJson(json);
@@ -101,8 +108,7 @@ class Movement implements DbObject {
   bool isValid() {
     return validate(userId != null, 'Movement: userId == null') &&
         validate(name.isNotEmpty, 'Movement: name is empty') &&
-        validate(deleted == false, 'Movement: deleted == true') &&
-        validate(categories.isNotEmpty, 'Movement: categories empty');
+        validate(deleted == false, 'Movement: deleted == true');
   }
 
   Movement copy() => Movement(
@@ -110,8 +116,9 @@ class Movement implements DbObject {
       userId: userId,
       name: name,
       description: description,
-      categories: categories,
-      deleted: deleted);
+      cardio: cardio,
+      deleted: deleted,
+      unit: unit);
 
   @override
   bool operator ==(other) =>
@@ -120,25 +127,28 @@ class Movement implements DbObject {
       other.userId == userId &&
       other.name == name &&
       other.description == description &&
-      other.categories == categories &&
-      other.deleted == deleted;
+      other.cardio == cardio &&
+      other.deleted == deleted &&
+      other.unit == unit;
 
   @override
   int get hashCode =>
-      Object.hash(id, userId, name, description, categories, deleted);
+      Object.hash(id, userId, name, description, cardio, deleted, unit);
 }
 
 class DbMovementSerializer implements DbSerializer<Movement> {
   @override
-  Movement fromDbRecord(DbRecord r) {
+  Movement fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Movement(
-      id: Int64(r[Keys.id]! as int),
-      userId: r[Keys.userId] == null ? null : Int64(r[Keys.userId]! as int),
-      name: r[Keys.name]! as String,
-      description: r[Keys.description] as String?,
-      categories: const DbMovementCategoriesConverter()
-          .mapToDart(r[Keys.categories]! as int),
-      deleted: r[Keys.deleted]! as int == 1,
+      id: Int64(r[prefix + Keys.id]! as int),
+      userId: r[prefix + Keys.userId] == null
+          ? null
+          : Int64(r[prefix + Keys.userId]! as int),
+      name: r[prefix + Keys.name]! as String,
+      description: r[prefix + Keys.description] as String?,
+      cardio: r[prefix + Keys.cardio]! as int == 1,
+      deleted: r[prefix + Keys.deleted]! as int == 1,
+      unit: MovementUnit.values[r[prefix + Keys.unit]! as int],
     );
   }
 
@@ -149,9 +159,9 @@ class DbMovementSerializer implements DbSerializer<Movement> {
       Keys.userId: o.userId?.toInt(),
       Keys.name: o.name,
       Keys.description: o.description,
-      Keys.categories:
-          const DbMovementCategoriesConverter().mapToSql(o.categories),
+      Keys.cardio: o.cardio ? 1 : 0,
       Keys.deleted: o.deleted ? 1 : 0,
+      Keys.unit: o.unit.index,
     };
   }
 }

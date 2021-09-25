@@ -2,6 +2,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'action.g.dart';
@@ -39,7 +40,7 @@ class Action implements DbObject {
 class DbActionSerializer implements DbSerializer<Action> {
 
   @override
-  Action fromDbRecord(DbRecord r) {
+  Action fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Action(
       id: Int64(r[Keys.id]! as int),
       name: r[Keys.name]! as String,

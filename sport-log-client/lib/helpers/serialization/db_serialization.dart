@@ -1,9 +1,7 @@
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/models/cardio/all.dart';
-import 'package:sport_log/models/movement/all.dart';
 
 class DbIdConverter {
   const DbIdConverter() : super();
@@ -59,29 +57,5 @@ class DbPositionListConverter {
       p += Position.byteSize;
     }
     return bytes;
-  }
-}
-
-class DbMovementCategoriesConverter {
-  const DbMovementCategoriesConverter();
-
-  int mapToSql(List<MovementCategory> value) {
-    int result = 0;
-    for (final category in value) {
-      result += pow(2, category.index) as int;
-    }
-    return result;
-  }
-
-  List<MovementCategory> mapToDart(int fromDb) {
-    assert(fromDb >= 0);
-    List<MovementCategory> result = [];
-    for (final category in MovementCategory.values) {
-      if (fromDb % 2 != 0) {
-        fromDb ~/= 2;
-        result.add(category);
-      }
-    }
-    return result;
   }
 }

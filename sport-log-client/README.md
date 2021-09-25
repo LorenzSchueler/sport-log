@@ -2,9 +2,36 @@
 # Sport Log Client
 
 ## Good to know
-* to make a clean start (delete the local database) set `doCleanStart` in [Config](lib/config.dart) to `true` (but don't forget to change it back afterwards!)
-* to generate test data set `generateTestData` in [Config](lib/config.dart) to `true` (but don't forget to change it back afterwards!); this works best if `doCleanStart` is true also
-* to re-run code generate run `flutter pub run build_runner build` (mere build) or `flutter pub run build_runner watch` (build every time, the relevant code changes)
+**VS Code**
+* `cp .vscode/launch.json.template .vscode/launch.json` to use the launch.json template
+* in `.vscode/launch.json` you can find all command line arguments ready to use
+
+**Android Studio/Intellij**
+* you can set command line arguments in Edit Configurations &#8594; Additional arguments
+
+**Running on real Android device**
+1. enable Developer Options on your Android phone (Settings &#8594; About phone &#8594; tap Build number 7 times)
+2. enable USB debugging (Settings &#8594; System &#8594; Developer options)
+3. connect your phone with your computer via USB
+4. use command line option `--dart-define PHONE_SERVER_ADDRESS=<address:port>` with the IP address of your machine (where the server is running on; must be in same Wifi network as your phone)
+5. remember to bind the IP address of the server to `0.0.0.0` (in `sport-log-server/sport-log-server-config`, see [Server Setup instructions](../sport-log-server/README.md))
+
+**Running on Android Emulator**
+* server address `10.0.2.2:8000` will be used which will be mapped to localhost
+
+**Making changes to database schema**
+* use command line option `--dart-define DELETE_DATABASE=true` to make a clean start – removes and recreates database and removes last sync datetime (default: `false`)
+
+**Making changes to model types**
+* json serialization methods are generated with package `json_serializable`
+* to re-run code generation use `flutter pub run build_runner build --delete-conflicting-outputs` (mere build) or `flutter pub run build_runner watch --delete-conflicting-outputs` (build every time the relevant code changes)
+
+**Wanting to have test data**
+* use `--dart-define GENERATE_TEST_DATA=true` to generate test data
+* see `test_data` directory for implementation
+
+**Additional Parameters**
+* use `--dart-define LOCAL_SERVER_ADDRESS=<address:port>` to set the server address for Web and Linux (default: `127.0.0.1:8000`, so running your server locally there shouldn't be any need to configure this)
 
 ## Syncing Strategy
 **making changes**

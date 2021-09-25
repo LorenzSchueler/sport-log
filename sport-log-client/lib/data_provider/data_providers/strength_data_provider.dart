@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
@@ -18,14 +19,14 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     assert(object.isValid());
     // TODO: catch errors
     await strengthSessionDb.createSingle(object.strengthSession);
-    await strengthSetDb.createMultiple(object.strengthSets);
+    await strengthSetDb.createMultiple(object.strengthSets!);
     final result1 = await strengthSessionApi.postSingle(object.strengthSession);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return;
     }
     strengthSessionDb.setSynchronized(object.id);
-    final result2 = await strengthSetApi.postMultiple(object.strengthSets);
+    final result2 = await strengthSetApi.postMultiple(object.strengthSets!);
     if (result2.isFailure) {
       handleApiError(result2.failure);
       return;
@@ -35,12 +36,13 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
 
   @override
   Future<void> deleteSingle(StrengthSessionDescription object) async {
+    assert(object.strengthSets != null);
     object.setDeleted();
     // TODO: catch errors
     await strengthSetDb.deleteByStrengthSession(object.id);
     await strengthSessionDb.deleteSingle(object.id);
     // TODO: server deletes strength sets automatically
-    final result1 = await strengthSetApi.putMultiple(object.strengthSets);
+    final result1 = await strengthSetApi.putMultiple(object.strengthSets!);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return;
@@ -71,18 +73,13 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     strengthSetDb.upsertMultiple(result2.success);
   }
 
-  Future<List<StrengthSessionDescription>> _expandStrengthSessions(
-      List<StrengthSession> strengthSessions) async {
-    return Future.wait(strengthSessions.map((ss) async =>
-        StrengthSessionDescription(
-            strengthSession: ss,
-            strengthSets: await strengthSetDb.getByStrengthSession(ss.id),
-            movement: (await movementDb.getSingle(ss.movementId))!)));
-  }
-
   @override
   Future<List<StrengthSessionDescription>> getNonDeleted() async {
-    return _expandStrengthSessions(await strengthSessionDb.getNonDeleted());
+    return (await strengthSessionDb.getSessionDescriptions());
+  }
+
+  Future<List<StrengthSet>> getStrengthSetsByStrengthSession(Int64 id) {
+    return strengthSetDb.getByStrengthSession(id);
   }
 
   @override
@@ -138,7 +135,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     assert(object.isValid());
 
     final oldSets = await strengthSetDb.getByStrengthSession(object.id);
-    final newSets = [...object.strengthSets];
+    final newSets = [...object.strengthSets!];
 
     final diffing = diff(oldSets, newSets);
 
@@ -180,8 +177,59 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
   Future<DateTime?> mostRecentDateTime() async =>
       strengthSessionDb.mostRecentDateTime();
 
-  Future<List<StrengthSessionDescription>> getBetweenDates(
-          DateTime earliest, DateTime latest) async =>
-      _expandStrengthSessions(
-          await strengthSessionDb.getBetweenDates(earliest, latest));
+  // this can be very inefficient and should be avoided when having huge lists of sessions
+  Future<void> populateWithSets(
+      List<StrengthSessionDescription> sessions) async {
+    for (final session in sessions) {
+      session.strengthSets =
+          await strengthSetDb.getByStrengthSession(session.id);
+    }
+  }
+
+  Future<List<StrengthSessionDescription>> getSessionsWithStats({
+    Int64? movementId,
+    DateTime? from,
+    DateTime? until,
+    String? movementName,
+    bool withSets = false,
+  }) async {
+    assert(movementName == null || movementId == null);
+    final sessions = await strengthSessionDb.getSessionDescriptions(
+      from: from,
+      until: until,
+      movementIdValue: movementId,
+      movementName: movementName,
+    );
+    if (withSets) {
+      await populateWithSets(sessions);
+    }
+    return sessions;
+  }
+
+  // weekly/monthly view
+  Future<List<StrengthSessionStats>> getStatsByDay({
+    required Int64 movementId,
+    required DateTime from,
+    required DateTime until,
+  }) async {
+    return strengthSessionDb.getStatsAggregationsByDay(
+        movementIdValue: movementId, from: from, until: until);
+  }
+
+  // yearly view
+  Future<List<StrengthSessionStats>> getStatsByWeek({
+    required Int64 movementId,
+    required DateTime from,
+    required DateTime until,
+  }) async {
+    return strengthSessionDb.getStatsAggregationsByWeek(
+        from: from, until: until, movementIdValue: movementId);
+  }
+
+  // all time view
+  Future<List<StrengthSessionStats>> getStatsByMonth(
+      {required Int64 movementId}) async {
+    return strengthSessionDb.getStatsAggregationsByMonth(
+        movementIdValue: movementId);
+  }
 }

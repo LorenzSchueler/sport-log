@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'diary.g.dart';
@@ -41,7 +42,7 @@ class Diary implements DbObject {
 
 class DbDiarySerializer implements DbSerializer<Diary> {
   @override
-  Diary fromDbRecord(DbRecord r) {
+  Diary fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Diary(
       id: Int64(r[Keys.id]! as int),
       userId: Int64(r[Keys.userId]! as int),

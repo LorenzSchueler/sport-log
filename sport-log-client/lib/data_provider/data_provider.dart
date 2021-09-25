@@ -28,17 +28,13 @@ abstract class DataProvider<T> {
     _logger.w('Got an api error.', error);
   }
 
-  void handleDbError(DbError error) {
-    _logger.e('Got a database error.', error);
-  }
-
   Future<void> doFullUpdate();
 }
 
 abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
   ApiAccessor<T> get api;
 
-  Table<T> get db;
+  DbAccessor<T> get db;
 
   @override
   Future<List<T>> getNonDeleted() async => db.getNonDeleted();

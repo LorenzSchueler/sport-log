@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'metcon_session.g.dart';
@@ -53,7 +54,7 @@ class MetconSession implements DbObject {
 
 class DbMetconSessionSerializer implements DbSerializer<MetconSession> {
   @override
-  MetconSession fromDbRecord(DbRecord r) {
+  MetconSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return MetconSession(
       id: Int64(r[Keys.id]! as int),
       userId: Int64(r[Keys.userId]! as int),

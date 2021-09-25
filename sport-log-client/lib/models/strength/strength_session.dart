@@ -1,8 +1,8 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
-import 'package:sport_log/models/movement/movement.dart';
 
 part 'strength_session.g.dart';
 
@@ -13,7 +13,6 @@ class StrengthSession implements DbObjectWithDateTime {
     required this.userId,
     required this.datetime,
     required this.movementId,
-    required this.movementUnit,
     required this.interval,
     required this.comments,
     required this.deleted,
@@ -29,7 +28,6 @@ class StrengthSession implements DbObjectWithDateTime {
   DateTime datetime;
   @IdConverter()
   Int64 movementId;
-  MovementUnit movementUnit;
   int? interval;
   String? comments;
   @override
@@ -50,16 +48,15 @@ class StrengthSession implements DbObjectWithDateTime {
 
 class DbStrengthSessionSerializer implements DbSerializer<StrengthSession> {
   @override
-  StrengthSession fromDbRecord(DbRecord r) {
+  StrengthSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return StrengthSession(
-      id: Int64(r[Keys.id]! as int),
-      userId: Int64(r[Keys.userId]! as int),
-      datetime: DateTime.parse(r[Keys.datetime]! as String),
-      movementId: Int64(r[Keys.movementId]! as int),
-      movementUnit: MovementUnit.values[r[Keys.movementUnit]! as int],
-      interval: r[Keys.interval] as int?,
-      comments: r[Keys.comments] as String?,
-      deleted: r[Keys.deleted]! as int == 1,
+      id: Int64(r[prefix + Keys.id]! as int),
+      userId: Int64(r[prefix + Keys.userId]! as int),
+      datetime: DateTime.parse(r[prefix + Keys.datetime]! as String),
+      movementId: Int64(r[prefix + Keys.movementId]! as int),
+      interval: r[prefix + Keys.interval] as int?,
+      comments: r[prefix + Keys.comments] as String?,
+      deleted: r[prefix + Keys.deleted]! as int == 1,
     );
   }
 
@@ -70,7 +67,6 @@ class DbStrengthSessionSerializer implements DbSerializer<StrengthSession> {
       Keys.userId: o.userId.toInt(),
       Keys.datetime: o.datetime.toString(),
       Keys.movementId: o.movementId.toInt(),
-      Keys.movementUnit: o.movementUnit.index,
       Keys.interval: o.interval,
       Keys.comments: o.comments,
       Keys.deleted: o.deleted ? 1 : 0,

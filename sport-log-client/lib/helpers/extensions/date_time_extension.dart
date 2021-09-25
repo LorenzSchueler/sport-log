@@ -1,4 +1,8 @@
 extension DateTimeExtension on DateTime {
+  DateTime copy() {
+    return DateTime.fromMillisecondsSinceEpoch(millisecondsSinceEpoch);
+  }
+
   DateTime beginningOfDay() {
     return DateTime(year, month, day);
   }
@@ -84,5 +88,15 @@ extension DateTimeExtension on DateTime {
 
   bool isInYear(DateTime date) {
     return year == date.year;
+  }
+
+  bool get isLeapYear {
+    return (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
+  }
+
+  int get numDaysInMonth {
+    const numDaysNormYear = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    const numDaysLeapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    return isLeapYear ? numDaysLeapYear[month - 1] : numDaysNormYear[month - 1];
   }
 }

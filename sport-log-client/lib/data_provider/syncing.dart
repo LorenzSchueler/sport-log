@@ -2,7 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/logger.dart';
 
 final _logger = Logger('SYNC');
@@ -13,25 +13,30 @@ class DownSync {
 
   Future<DownSync> init() async {
     _storage = await SharedPreferences.getInstance();
+    _lastSync = await _readLastSync();
     return this;
   }
 
   late final SharedPreferences _storage;
+  late DateTime? _lastSync;
+
+  DateTime? get lastSync => _lastSync;
 
   Future<void> sync() async {
     if (UserState.instance.currentUser == null) {
       return;
     }
     final api = Api.instance;
-    final lastSync = await _lastSync();
-    _storage.setString(Keys.lastSync, DateTime.now().toString());
-    final result = await api.accountData.get(lastSync);
+    final oldLastSync = _lastSync;
+    final newLastSync = DateTime.now();
+    final result = await api.accountData.get(oldLastSync);
     if (result.isFailure) {
       // TODO: what to do now?
       _logger.w(
           'Could not fetch account data: ${result.failure.toErrorMessage()}');
       return;
     }
+    _writeLastSync(newLastSync);
     final db = AppDatabase.instance;
     if (db == null) {
       // TODO: syncing on the web?
@@ -43,12 +48,18 @@ class DownSync {
     // TODO: handle user update
   }
 
-  Future<DateTime?> _lastSync() async {
+  Future<void> _writeLastSync(DateTime dateTime) async {
+    _lastSync = dateTime;
+    _storage.setString(Keys.lastSync, dateTime.toString());
+  }
+
+  Future<DateTime?> _readLastSync() async {
     final result = _storage.getString(Keys.lastSync);
     return result == null ? null : DateTime.parse(result);
   }
 
   Future<void> removeLastSync() async {
+    _logger.d('Deleting last sync datetime...');
     await _storage.remove(Keys.lastSync);
   }
 }

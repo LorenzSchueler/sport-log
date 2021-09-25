@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
-import 'package:sport_log/helpers/pluralize.dart';
+import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/widgets/int_picker.dart';
+import 'package:sport_log/widgets/form_widgets/int_picker.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 import 'metcon_movement_card.dart';
@@ -209,7 +210,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
             type.toDisplayName(),
             style: style.copyWith(
               color: (type == _md.metcon.metconType)
-                  ? Theme.of(context).primaryColor
+                  ? primaryColorOf(context)
                   : Theme.of(context).disabledColor,
             ),
           ),

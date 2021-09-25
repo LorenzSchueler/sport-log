@@ -50,6 +50,7 @@ dependencies:
   expansion_tile_card: ^2.0.0 # ui
   flutter_rounded_date_picker: ^2.0.2 # ui (standard time picker has a weird clock division)
   logger: ^1.0.0
+  fl_chart: ^0.40.0
 
 dev_dependencies:
   flutter_test:

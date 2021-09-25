@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -19,32 +18,38 @@ class AppDatabase {
 
   Future<void> init() async {
     const fileName = Config.databaseName;
-    if (Config.doCleanStart) {
+    if (Config.deleteDatabase) {
       final File databaseFile = File(await getDatabasesPath() + '/' + fileName);
       if (await databaseFile.exists()) {
         _logger.i('Clean start on: deleting existing database...');
         await databaseFile.delete();
       }
     }
+    String version = '';
     await openDatabase(fileName,
         version: 1,
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
         onCreate: (db, version) async {
-          String sql = '';
+          List<String> sql = [];
           for (final table in allTables) {
-            sql += await table.init(db);
+            sql += await table.init();
           }
-          _logger.d(sql);
+          for (final statement in sql) {
+            _logger.d(statement);
+            db.execute(statement);
+          }
         },
-        onOpen: (db) {
+        onOpen: (db) async {
           for (final table in allTables) {
             table.setDatabase(db);
           }
+          version = (await db.rawQuery('select sqlite_version() AS version'))
+                  .first['version'] as String;
         });
-    _logger.d("Database initialization done.");
+    _logger.d("Database initialization done (sqlite version $version).");
   }
 
-  DbResult<void> upsertAccountData(AccountData data) async {
+  Future<void> upsertAccountData(AccountData data) async {
     diaries.upsertMultiple(data.diaries);
     wods.upsertMultiple(data.wods);
     movements.upsertMultiple(data.movements);
@@ -61,7 +66,6 @@ class AppDatabase {
     actions.upsertMultiple(data.actions);
     actionRules.upsertMultiple(data.actionRules);
     actionEvents.upsertMultiple(data.actionEvents);
-    return Success(null);
   }
 
   final movements = MovementTable();
@@ -81,7 +85,7 @@ class AppDatabase {
   final diaries = DiaryTable();
   final wods = WodTable();
 
-  List<Table> get allTables => [
+  List<DbAccessor> get allTables => [
         movements,
         metcons,
         metconMovements,

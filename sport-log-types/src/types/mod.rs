@@ -29,7 +29,9 @@ mod movement;
 mod platform;
 mod sharing;
 mod strength;
+mod training_plan;
 mod user;
+mod version;
 
 pub use account::*;
 pub use action::*;
@@ -48,7 +50,9 @@ pub use movement::*;
 pub use platform::*;
 pub use sharing::*;
 pub use strength::*;
+pub use training_plan::*;
 pub use user::*;
+pub use version::*;
 
 /// Wrapper around incoming json data for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///
@@ -296,6 +300,22 @@ pub trait Update {
     fn update_multiple(entities: Vec<Self>, conn: &PgConnection) -> QueryResult<Vec<Self>>
     where
         Self: Sized;
+}
+
+/// A type for which all soft deleted entities can be hard deleted.
+///
+/// This is only inteded for garbage collection triggered by `sport_log_scheduler`.
+///
+/// The function [hard_delete](HardDelete::hard_delete) will permanentily delete all entities that are already soft deleted and which have not been changed since `last_change`.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(HardDelete)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [sport_log_types_derive::HardDelete].
+#[cfg(feature = "server")]
+pub trait HardDelete {
+    fn hard_delete(last_change: DateTime<Utc>, conn: &PgConnection) -> QueryResult<usize>;
 }
 
 /// A type which can be checked if it belongs to a User.

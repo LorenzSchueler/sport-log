@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/action/weekday.dart';
 
@@ -46,7 +47,7 @@ class ActionRule implements DbObject {
 
 class DbActionRuleSerializer implements DbSerializer<ActionRule> {
   @override
-  ActionRule fromDbRecord(DbRecord r) {
+  ActionRule fromDbRecord(DbRecord r, {String prefix = ''}) {
     return ActionRule(
       id: Int64(r[Keys.id]! as int),
       userId: Int64(r[Keys.userId]! as int),

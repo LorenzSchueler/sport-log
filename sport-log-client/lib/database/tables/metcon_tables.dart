@@ -1,11 +1,13 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table_names.dart';
 import 'package:sport_log/models/metcon/all.dart';
 
-class MetconTable extends Table<Metcon> {
+class MetconTable extends DbAccessor<Metcon> {
   @override
   String get setupSql => '''
-create table metcon (
+create table $tableName (
     user_id integer,
     name text check (length(name) <= 80),
     metcon_type integer not null check (metcon_type between 0 and 2),
@@ -20,31 +22,30 @@ create table metcon (
   DbSerializer<Metcon> get serde => DbMetconSerializer();
 
   @override
-  String get tableName => 'metcon';
+  String get tableName => Tables.metcon;
 }
 
-class MetconMovementTable extends Table<MetconMovement> {
+class MetconMovementTable extends DbAccessor<MetconMovement> {
   @override
   DbSerializer<MetconMovement> get serde => DbMetconMovementSerializer();
 
   @override
   String get setupSql => '''
-create table metcon_movement (
+create table $tableName (
     metcon_id integer not null references metcon(id) on delete cascade,
     movement_id integer not null references movement(id) on delete no action,
     movement_number integer not null check (movement_number >= 0),
     count integer not null check (count >= 1),
-    movement_unit integer not null check (movement_unit between 0 and 6),
     weight real check (weight > 0),
     $idAndDeletedAndStatus
 );
   ''';
 
   @override
-  String get tableName => 'metcon_movement';
+  String get tableName => Tables.metconMovement;
 
   Future<void> setSynchronizedByMetcon(Int64 id) async {
-    database.update(tableName, Table.synchronized,
+    database.update(tableName, DbAccessor.synchronized,
         where: '${Keys.metconId} = ?', whereArgs: [id.toInt()]);
   }
 
@@ -63,13 +64,13 @@ create table metcon_movement (
   }
 }
 
-class MetconSessionTable extends Table<MetconSession> {
+class MetconSessionTable extends DbAccessor<MetconSession> {
   @override
   DbSerializer<MetconSession> get serde => DbMetconSessionSerializer();
 
   @override
   String get setupSql => '''
-create table metcon_session (
+create table $tableName (
     user_id integer not null,
     metcon_id integer not null references metcon(id) on delete no action,
     datetime text not null default (datetime('now')),
@@ -83,7 +84,7 @@ create table metcon_session (
   ''';
 
   @override
-  String get tableName => 'metcon_session';
+  String get tableName => Tables.metconSession;
 
   Future<bool> existsByMetcon(Int64 id) async {
     return (await database.rawQuery('''select 1 from $tableName

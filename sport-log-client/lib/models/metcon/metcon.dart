@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/id_generation.dart';
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'metcon.g.dart';
@@ -101,7 +102,7 @@ class Metcon implements DbObject {
 
 class DbMetconSerializer implements DbSerializer<Metcon> {
   @override
-  Metcon fromDbRecord(DbRecord r) {
+  Metcon fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Metcon(
       id: Int64(r[Keys.id]! as int),
       userId: r[Keys.userId] == null ? null : Int64(r[Keys.userId]! as int),
