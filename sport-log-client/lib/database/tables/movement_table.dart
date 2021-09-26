@@ -84,7 +84,7 @@ class MovementTable extends DbAccessor<Movement> {
             AND m2.$userId IS NOT NULL
         )
       )
-    ORDER BY $name
+    ORDER BY $name COLLATE NOCASE
     ''');
     _logger.d('Select movement descriptions: ' +
         DateTime.now().difference(now).toString());
@@ -113,7 +113,7 @@ class MovementTable extends DbAccessor<Movement> {
               AND m2.$userId IS NOT NULL
           )
         )
-      ORDER BY $name
+      ORDER BY $name COLLATE NOCASE
     ''', [if (byName != null) '%$byName%']);
     return records.map((r) => serde.fromDbRecord(r)).toList();
   }

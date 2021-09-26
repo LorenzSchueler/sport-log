@@ -38,7 +38,7 @@ class _MovementsPageState extends State<MovementsPage> {
         case ReturnAction.created:
           setState(() {
             _movementDescriptions.add(object.object);
-            _movementDescriptions.sortBy((m) => m.movement.name);
+            _movementDescriptions.sortBy((m) => m.movement.name.toUpperCase());
           });
           break;
         case ReturnAction.updated:
