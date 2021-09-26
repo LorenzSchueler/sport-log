@@ -4,6 +4,7 @@ import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/database/table_creator.dart';
 import 'package:sport_log/database/table_names.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
@@ -32,43 +33,58 @@ class MovementTable extends DbAccessor<Movement> {
   static const name = Keys.name;
   static const userId = Keys.userId;
   static const id = Keys.id;
+  static const metconMovement = Tables.metconMovement;
+  static const strengthSession = Tables.strengthSession;
+  static const cardioSession = Tables.cardioSession;
+  static const movementId = Keys.movementId;
 
   @override
   String get tableName => _table.name;
 
   Table get table => _table;
 
-  Future<bool> hasReference(Int64 id) async {
-    // TODO: this is awkward, maybe with sql
-    final metconMovements = AppDatabase.instance!.metconMovements.tableName;
-    final strengthSessions = AppDatabase.instance!.strengthSessions.tableName;
-    final cardioSessions = AppDatabase.instance!.cardioSessions.tableName;
-    final s1 = await database.rawQuery(
-        'select 1 from $metconMovements where ${Keys.deleted} = 0 and ${Keys.movementId} = ${id.toInt()}');
-    if (s1.isNotEmpty) {
-      return true;
-    }
-    final s2 = await database.rawQuery(
-        'select 1 from $strengthSessions where ${Keys.deleted} = 0 and ${Keys.movementId} = ${id.toInt()}');
-    if (s2.isNotEmpty) {
-      return true;
-    }
-    final s3 = await database.rawQuery(
-        'select 1 from $cardioSessions where ${Keys.deleted} = 0 and ${Keys.movementId} = ${id.toInt()}');
-    if (s3.isNotEmpty) {
-      return true;
-    }
-    return false;
-  }
+  final _logger = Logger('MovementTable');
 
-  Future<List<MovementDescription>> getNonDeletedFull() async {
-    final result = await getNonDeleted();
-    return Future.wait(result.map((movement) async {
-      return MovementDescription(
-        movement: movement,
-        hasReference: await hasReference(movement.id),
-      );
-    }).toList());
+  Future<List<MovementDescription>> getMovementDescriptions() async {
+    // TODO: check for references to cardio blueprint, strength blueprint
+    final now = DateTime.now();
+    const hasReference = 'has_reference';
+    final records = await database.rawQuery('''
+    SELECT
+      ${_table.allColumns},
+      (
+        EXISTS (
+          SELECT * FROM $metconMovement
+          WHERE $metconMovement.$movementId = $tableName.$id
+        ) OR EXISTS (
+          SELECT * FROM $cardioSession
+          WHERE $cardioSession.$movementId = $tableName.$id
+        ) OR EXISTS (
+          SELECT * FROM $strengthSession
+          WHERE $strengthSession.$movementId = $tableName.$id
+        )
+      ) AS $hasReference
+    FROM $tableName
+    WHERE $tableName.$deleted = 0
+      AND ($userId IS NOT NULL
+        OR NOT EXISTS (
+          SELECT * FROM $tableName m2
+          WHERE $tableName.$id <> m2.$id
+            AND $tableName.$name = m2.$name
+            AND $tableName.$unit = m2.$unit
+            AND m2.$userId IS NOT NULL
+        )
+      )
+    ORDER BY $name
+    ''');
+    _logger
+        .d('Select movement descriptions: ' + DateTime.now().difference(now).toString());
+    return records
+        .map((r) => MovementDescription(
+              movement: serde.fromDbRecord(r, prefix: _table.prefix),
+              hasReference: r[hasReference]! as int == 1,
+            ))
+        .toList();
   }
 
   Future<List<Movement>> getMovements({

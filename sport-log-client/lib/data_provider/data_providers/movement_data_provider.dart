@@ -12,8 +12,8 @@ class MovementDataProvider extends DataProviderImpl<Movement>
   @override
   final MovementTable db = AppDatabase.instance!.movements;
 
-  Future<List<MovementDescription>> getNonDeletedFull() async =>
-      db.getNonDeletedFull();
+  Future<List<MovementDescription>> getMovementDescriptions() async =>
+      db.getMovementDescriptions();
 
   Future<List<Movement>> getMovements({String? byName}) async =>
       db.getMovements(

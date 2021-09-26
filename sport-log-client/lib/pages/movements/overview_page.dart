@@ -25,7 +25,7 @@ class _MovementsPageState extends State<MovementsPage> {
   @override
   void initState() {
     super.initState();
-    _dataProvider.getNonDeletedFull().then((mds) {
+    _dataProvider.getMovementDescriptions().then((mds) {
       setState(() {
         _state = LocalState.fromList(mds);
       });
@@ -54,7 +54,7 @@ class _MovementsPageState extends State<MovementsPage> {
             .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
       }
     });
-    _dataProvider.getNonDeletedFull().then((mds) {
+    _dataProvider.getMovementDescriptions().then((mds) {
       setState(() => _state = LocalState.fromList(mds));
     });
   }
@@ -85,7 +85,7 @@ class _MovementsPageState extends State<MovementsPage> {
       return const Center(child: Text("No movements there."));
     }
     return ImplicitlyAnimatedList(
-      items: _state.sortedBy(_compareFunction),
+      items: _state.asList,
       itemBuilder: _movementToWidget,
       areItemsTheSame: MovementDescription.areTheSame,
     );
@@ -150,21 +150,5 @@ class _MovementsPageState extends State<MovementsPage> {
               ),
           ]),
     );
-  }
-
-  int _compareFunction(MovementDescription m1, MovementDescription m2) {
-    if (m1.movement.userId != null) {
-      if (m2.movement.userId != null) {
-        return m1.movement.name.compareTo(m2.movement.name);
-      } else {
-        return -1;
-      }
-    } else {
-      if (m2.movement.userId != null) {
-        return 1;
-      } else {
-        return m1.movement.name.compareTo(m2.movement.name);
-      }
-    }
   }
 }
