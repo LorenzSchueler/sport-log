@@ -7,6 +7,8 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'metcon_movement.g.dart';
 
+enum DistanceUnit { m, km, yards, feet, inches }
+
 @JsonSerializable()
 class MetconMovement implements DbObject {
   MetconMovement({
@@ -16,6 +18,7 @@ class MetconMovement implements DbObject {
     required this.movementNumber,
     required this.count,
     required this.weight,
+    required this.distanceUnit,
     required this.deleted,
   });
 
@@ -29,6 +32,7 @@ class MetconMovement implements DbObject {
   int movementNumber;
   int count;
   double? weight;
+  DistanceUnit? distanceUnit;
   @override
   bool deleted;
 
@@ -39,6 +43,7 @@ class MetconMovement implements DbObject {
   })  : id = randomId(),
         count = 1,
         weight = null,
+        distanceUnit = DistanceUnit.m,
         deleted = false;
 
   factory MetconMovement.fromJson(Map<String, dynamic> json) =>
@@ -59,13 +64,16 @@ class DbMetconMovementSerializer implements DbSerializer<MetconMovement> {
   @override
   MetconMovement fromDbRecord(DbRecord r, {String prefix = ''}) {
     return MetconMovement(
-      id: Int64(r[Keys.id]! as int),
-      metconId: Int64(r[Keys.id]! as int),
-      movementId: Int64(r[Keys.movementId]! as int),
-      movementNumber: r[Keys.movementNumber]! as int,
-      count: r[Keys.count]! as int,
-      weight: r[Keys.weight] as double?,
-      deleted: r[Keys.deleted]! as int == 1,
+      id: Int64(r[prefix + Keys.id]! as int),
+      metconId: Int64(r[prefix + Keys.id]! as int),
+      movementId: Int64(r[prefix + Keys.movementId]! as int),
+      movementNumber: r[prefix + Keys.movementNumber]! as int,
+      count: r[prefix + Keys.count]! as int,
+      weight: r[prefix + Keys.weight] as double?,
+      distanceUnit: r[prefix + Keys.distanceUnit] == null
+          ? null
+          : DistanceUnit.values[r[prefix + Keys.distanceUnit] as int],
+      deleted: r[prefix + Keys.deleted]! as int == 1,
     );
   }
 
@@ -78,6 +86,7 @@ class DbMetconMovementSerializer implements DbSerializer<MetconMovement> {
       Keys.movementNumber: o.movementNumber,
       Keys.count: o.count,
       Keys.weight: o.weight,
+      Keys.distanceUnit: o.distanceUnit?.index,
       Keys.deleted: o.deleted ? 1 : 0,
     };
   }
