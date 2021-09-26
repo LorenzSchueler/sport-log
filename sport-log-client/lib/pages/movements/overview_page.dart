@@ -42,8 +42,11 @@ class _MovementsPageState extends State<MovementsPage> {
           });
           break;
         case ReturnAction.updated:
-          setState(() => _movementDescriptions.update(object.payload,
-              by: (o) => o.movement.id));
+          setState(() {
+            _movementDescriptions.update(object.payload,
+                by: (o) => o.movement.id);
+            _movementDescriptions.sortBy((m) => m.movement.name.toUpperCase());
+          });
           break;
         case ReturnAction.deleted:
           setState(() => _movementDescriptions.delete(object.payload,
