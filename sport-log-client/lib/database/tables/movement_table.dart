@@ -37,15 +37,15 @@ class MovementTable extends DbAccessor<Movement> {
     ],
   );
 
+  static const cardioSession = Tables.cardioSession;
   static const deleted = Keys.deleted;
-  static const unit = Keys.unit;
-  static const name = Keys.name;
-  static const userId = Keys.userId;
   static const id = Keys.id;
   static const metconMovement = Tables.metconMovement;
-  static const strengthSession = Tables.strengthSession;
-  static const cardioSession = Tables.cardioSession;
   static const movementId = Keys.movementId;
+  static const name = Keys.name;
+  static const strengthSession = Tables.strengthSession;
+  static const unit = Keys.unit;
+  static const userId = Keys.userId;
 
   @override
   String get tableName => _table.name;
@@ -116,5 +116,15 @@ class MovementTable extends DbAccessor<Movement> {
       ORDER BY $name
     ''', [if (byName != null) '%$byName%']);
     return records.map((r) => serde.fromDbRecord(r)).toList();
+  }
+
+  Future<bool> exists(String nameValue, MovementUnit unitValue) async {
+    final result = await database.rawQuery('''
+      SELECT 1 FROM $tableName
+      WHERE $deleted = 0
+        AND $name = ?
+        AND $unit = ?
+    ''', [nameValue, unitValue.index]);
+    return result.isNotEmpty;
   }
 }

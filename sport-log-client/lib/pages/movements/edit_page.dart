@@ -71,6 +71,13 @@ class _EditMovementPageState extends State<EditMovementPage> {
     if (!_inputIsValid) {
       return;
     }
+    if (await _dataProvider.movementExists(
+        _md.movement.name, _md.movement.unit)) {
+      await showWarning(
+          context, 'Movement exists!', 'Please use the existing movement.');
+
+      return;
+    }
     if (widget._isEditing) {
       assert(_md.movement.userId != null && _hasChanges);
       // TODO: do error handling
