@@ -38,12 +38,6 @@ class MovementTable extends DbAccessor<Movement> {
 
   Table get table => _table;
 
-  Future<List<Movement>> searchByName(String name) async {
-    final result = await database.query(tableName,
-        where: "${Keys.name} like '%$name%' and ${Keys.deleted} = 0");
-    return result.map(serde.fromDbRecord).toList();
-  }
-
   Future<bool> hasReference(Int64 id) async {
     // TODO: this is awkward, maybe with sql
     final metconMovements = AppDatabase.instance!.metconMovements.tableName;
@@ -75,16 +69,6 @@ class MovementTable extends DbAccessor<Movement> {
         hasReference: await hasReference(movement.id),
       );
     }).toList());
-  }
-
-  Future<List<Movement>> getMovementsWithUnits(List<MovementUnit> units) async {
-    if (units.isEmpty) {
-      return [];
-    }
-    final unitsStr = units.map((unit) => unit.index).join(', ');
-    final records = await database.query(tableName,
-        where: '$deleted = 0 AND $unit in ($unitsStr)', orderBy: name);
-    return records.map((record) => serde.fromDbRecord(record)).toList();
   }
 
   Future<List<Movement>> getMovements({
