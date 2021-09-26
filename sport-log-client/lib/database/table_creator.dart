@@ -126,14 +126,35 @@ class Column {
   }
 }
 
+abstract class Constraint {
+  const Constraint();
+
+  String setupSql();
+}
+
+class Unique extends Constraint {
+  const Unique(this.columns) : super();
+  final List<String> columns;
+
+  @override
+  String setupSql() {
+    return 'UNIQUE (${columns.join(', ')})';
+  }
+}
+
 class Table {
-  Table(this.name, {required List<Column> withColumns})
-      : columns = withColumns,
+  Table(
+    this.name, {
+    required List<Column> withColumns,
+    List<Constraint>? withConstraints,
+  })  : columns = withColumns,
+        constraints = withConstraints ?? [],
         prefix = name + '__';
 
   final List<Column> columns;
   final String name;
   final String prefix;
+  final List<Constraint> constraints;
 
   String setupSql() {
     final primaryKey =
@@ -141,13 +162,14 @@ class Table {
     final primaryKeyStr =
         primaryKey.isEmpty ? '' : 'PRIMARY KEY(${primaryKey.join(', ')})';
     return '''
-CREATE TABLE $name (
-${[
+    CREATE TABLE $name (
+      ${[
       ...columns.map((c) => c.setUpSql()),
       primaryKeyStr,
+      ...constraints.map((c) => c.setupSql()),
     ].map((s) => '\t' + s).join(',\n')}
-);
-''';
+    );
+    ''';
   }
 
   // used for select statement
