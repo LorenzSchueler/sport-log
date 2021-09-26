@@ -118,7 +118,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
         movement.id == widget.selectedMovement!.id;
     return ListTile(
       title: Text(movement.name),
-      subtitle: Text(movement.unit.toDimensionName()),
+      subtitle: Text(movement.dimension.displayName),
       onTap: () {
         Navigator.of(context).pop(movement);
       },

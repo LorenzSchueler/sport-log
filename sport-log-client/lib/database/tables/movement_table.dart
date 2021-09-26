@@ -15,7 +15,7 @@ class MovementTable extends DbAccessor<Movement> {
         _table.setupSql(),
         '''
       CREATE UNIQUE INDEX unique_movement_idx
-      ON $tableName ($name, $unit, $userId)
+      ON $tableName ($name, $dimension, $userId)
       WHERE $deleted = 0;
       ''',
         updateTrigger,
@@ -33,7 +33,7 @@ class MovementTable extends DbAccessor<Movement> {
       Column.text(Keys.name),
       Column.text(Keys.description).nullable(),
       Column.bool(Keys.cardio),
-      Column.int(Keys.unit),
+      Column.int(Keys.dimension),
     ],
   );
 
@@ -44,7 +44,7 @@ class MovementTable extends DbAccessor<Movement> {
   static const movementId = Keys.movementId;
   static const name = Keys.name;
   static const strengthSession = Tables.strengthSession;
-  static const unit = Keys.unit;
+  static const dimension = Keys.dimension;
   static const userId = Keys.userId;
 
   @override
@@ -80,7 +80,7 @@ class MovementTable extends DbAccessor<Movement> {
           SELECT * FROM $tableName m2
           WHERE $tableName.$id <> m2.$id
             AND $tableName.$name = m2.$name
-            AND $tableName.$unit = m2.$unit
+            AND $tableName.$dimension = m2.$dimension
             AND m2.$userId IS NOT NULL
         )
       )
@@ -109,7 +109,7 @@ class MovementTable extends DbAccessor<Movement> {
             SELECT * FROM $tableName m2
             WHERE m1.$id <> m2.$id
               AND m1.$name = m2.$name
-              AND m1.$unit = m2.$unit
+              AND m1.$dimension = m2.$dimension
               AND m2.$userId IS NOT NULL
           )
         )
@@ -118,13 +118,13 @@ class MovementTable extends DbAccessor<Movement> {
     return records.map((r) => serde.fromDbRecord(r)).toList();
   }
 
-  Future<bool> exists(String nameValue, MovementUnit unitValue) async {
+  Future<bool> exists(String nameValue, MovementDimension dimValue) async {
     final result = await database.rawQuery('''
       SELECT 1 FROM $tableName
       WHERE $deleted = 0
         AND $name = ?
-        AND $unit = ?
-    ''', [nameValue, unitValue.index]);
+        AND $dimension = ?
+    ''', [nameValue, dimValue.index]);
     return result.isNotEmpty;
   }
 }

@@ -14,7 +14,7 @@ Movement _$MovementFromJson(Map<String, dynamic> json) {
     description: json['description'] as String?,
     cardio: json['cardio'] as bool,
     deleted: json['deleted'] as bool,
-    unit: _$enumDecode(_$MovementUnitEnumMap, json['movement_unit']),
+    dimension: _$enumDecode(_$MovementDimensionEnumMap, json['dimension']),
   );
 }
 
@@ -25,7 +25,7 @@ Map<String, dynamic> _$MovementToJson(Movement instance) => <String, dynamic>{
       'description': instance.description,
       'cardio': instance.cardio,
       'deleted': instance.deleted,
-      'movement_unit': _$MovementUnitEnumMap[instance.unit],
+      'dimension': _$MovementDimensionEnumMap[instance.dimension],
     };
 
 K _$enumDecode<K, V>(
@@ -54,13 +54,9 @@ K _$enumDecode<K, V>(
   ).key;
 }
 
-const _$MovementUnitEnumMap = {
-  MovementUnit.reps: 'Reps',
-  MovementUnit.cals: 'Cal',
-  MovementUnit.m: 'Meter',
-  MovementUnit.km: 'Km',
-  MovementUnit.yards: 'Yard',
-  MovementUnit.feet: 'Foot',
-  MovementUnit.miles: 'Mile',
-  MovementUnit.msecs: 'Msec',
+const _$MovementDimensionEnumMap = {
+  MovementDimension.reps: 'Reps',
+  MovementDimension.time: 'Time',
+  MovementDimension.distance: 'Distance',
+  MovementDimension.cals: 'Cal',
 };

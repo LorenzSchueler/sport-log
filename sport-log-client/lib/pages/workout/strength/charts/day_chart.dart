@@ -97,7 +97,7 @@ class _DayChartState extends State<DayChart> {
     if (_sessions.isEmpty) {
       return const Center(child: Text('Nothing to show here.'));
     }
-    final isTime = widget.movement.unit == MovementUnit.msecs;
+    final isTime = widget.movement.dimension == MovementDimension.time;
     return BarChart(BarChartData(
       barGroups: _barData,
       borderData: FlBorderData(show: false),

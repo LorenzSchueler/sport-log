@@ -128,7 +128,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
         : [date, time, sets, if (duration != null) duration];
     final subtitle = subtitleParts.join(' · ');
     final String text = ssd.strengthSets
-            ?.map((ss) => ss.toDisplayName(ssd.movement.unit))
+            ?.map((ss) => ss.toDisplayName(ssd.movement.dimension))
             .join(', ') ??
         '';
 

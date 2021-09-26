@@ -43,34 +43,8 @@ class StrengthSet implements DbObject {
         validate(weight == null || weight! > 0, 'StrengthSet: weight <= 0');
   }
 
-  String toDisplayName(MovementUnit unit) {
-    String result;
-    final weightStr = weight == null
-        ? null
-        : ((weight! * 10).roundToDouble() / 10).toString();
-    switch (unit) {
-      case MovementUnit.reps:
-        if (weightStr != null) {
-          result = '${count}x${weightStr}kg';
-        } else {
-          result = '${count}reps';
-        }
-        break;
-      case MovementUnit.msecs:
-        result = formatDuration(Duration(milliseconds: count));
-        if (weightStr != null) {
-          result += ' (${weightStr}kg)';
-        }
-        break;
-      default:
-        result = '$count${unit.toDisplayName()}';
-        if (weightStr != null) {
-          result += ' (${weightStr}kg)';
-        }
-        break;
-    }
-    return result;
-  }
+  String toDisplayName(MovementDimension dim) =>
+      formatCountWeight(dim, count, weight);
 
   double? get volume => weight == null ? null : weight! * count.toDouble();
 

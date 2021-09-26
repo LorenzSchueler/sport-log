@@ -77,8 +77,8 @@ class _MonthChartState extends State<MonthChart> {
     if (_stats.isEmpty) {
       return const Center(child: Text('Nothing to show here.'));
     }
-    final getValue = accessor(widget.series);
-    final isTime = widget.movement.unit == MovementUnit.msecs;
+    final getValue = statsAccessor(widget.series);
+    final isTime = widget.movement.dimension == MovementDimension.time;
     return LineChart(
       LineChartData(
         lineBarsData: [

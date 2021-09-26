@@ -53,6 +53,7 @@ class MetconMovementCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // use different inputs for different MovementDimensions
               IntPicker(
                   initialValue: move.count,
                   setValue: (count) {
@@ -60,7 +61,7 @@ class MetconMovementCard extends StatelessWidget {
                     editMetconMovementDescription(mmd);
                   }),
               const Padding(padding: EdgeInsets.all(8)),
-              Text(mmd.movement.unit.toDisplayName()),
+              // Text(mmd.movement.dimension.toDisplayName()),
               const Padding(padding: EdgeInsets.all(8)),
             ],
           ),

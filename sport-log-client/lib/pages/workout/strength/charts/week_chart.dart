@@ -70,7 +70,7 @@ class _WeekChartState extends State<WeekChart> {
   }
 
   List<BarChartGroupData> get _barData {
-    final getValue = accessor(widget.series);
+    final getValue = statsAccessor(widget.series);
     final result = <BarChartGroupData>[];
 
     var statIndex = 0;
@@ -101,7 +101,7 @@ class _WeekChartState extends State<WeekChart> {
     if (_stats.isEmpty) {
       return const Center(child: Text('Nothing to show here.'));
     }
-    final isTime = widget.movement.unit == MovementUnit.msecs;
+    final isTime = widget.movement.dimension == MovementDimension.time;
     return BarChart(BarChartData(
       barGroups: _barData,
       borderData: FlBorderData(show: false),

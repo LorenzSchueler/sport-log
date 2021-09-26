@@ -284,7 +284,7 @@ class StrengthSetTable extends DbAccessor<StrengthSet> {
           create table $tableName (
               strength_session_id integer not null references strength_session on delete cascade,
               set_number integer not null check (set_number >= 0),
-              count integer not null check (count >= 1), -- number of completed movement_unit
+              count integer not null check (count >= 1),
               weight real check (weight > 0),
               $idAndDeletedAndStatus
           );

@@ -55,8 +55,8 @@ class _EditMovementPageState extends State<EditMovementPage> {
     }
   }
 
-  void _setUnit(MovementUnit unit) {
-    setState(() => _md.movement.unit = unit);
+  void _setDim(MovementDimension dim) {
+    setState(() => _md.movement.dimension = dim);
   }
 
   void _setDescription(String? description) {
@@ -72,7 +72,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
       return;
     }
     if (await _dataProvider.movementExists(
-        _md.movement.name, _md.movement.unit)) {
+        _md.movement.name, _md.movement.dimension)) {
       await showWarning(
           context, 'Movement exists!', 'Please use the existing movement.');
 
@@ -142,7 +142,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
                 children: [
                   _nameInput(context),
                   _maybeDescriptionInput(context),
-                  _unitInput,
+                  _dimInput,
                   _categoryInput(context),
                 ],
               ),
@@ -204,17 +204,17 @@ class _EditMovementPageState extends State<EditMovementPage> {
     );
   }
 
-  Widget get _unitInput {
-    return SelectionBar<MovementUnit>(
-      onChange: _setUnit,
+  Widget get _dimInput {
+    return SelectionBar<MovementDimension>(
+      onChange: _setDim,
       items: const [
-        MovementUnit.reps,
-        MovementUnit.msecs,
-        MovementUnit.m,
-        MovementUnit.cals
+        MovementDimension.reps,
+        MovementDimension.time,
+        MovementDimension.distance,
+        MovementDimension.cals
       ],
-      getLabel: (unit) => unit.toDimensionName(),
-      selectedItem: _md.movement.unit,
+      getLabel: (dim) => dim.displayName,
+      selectedItem: _md.movement.dimension,
     );
   }
 

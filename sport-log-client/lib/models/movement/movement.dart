@@ -7,60 +7,27 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'movement.g.dart';
 
-enum MovementUnit {
+enum MovementDimension {
   @JsonValue("Reps")
   reps,
+  @JsonValue("Time")
+  time,
+  @JsonValue("Distance")
+  distance,
   @JsonValue("Cal")
   cals,
-  @JsonValue("Meter")
-  m,
-  @JsonValue("Km")
-  km,
-  @JsonValue("Yard")
-  yards,
-  @JsonValue("Foot")
-  feet,
-  @JsonValue("Mile")
-  miles,
-  @JsonValue("Msec")
-  msecs,
 }
 
-extension MovementUnitStrings on MovementUnit {
-  String toDisplayName() {
+extension MovementDimensionStrings on MovementDimension {
+  String get displayName {
     switch (this) {
-      case MovementUnit.reps:
-        return "reps";
-      case MovementUnit.cals:
-        return "cals";
-      case MovementUnit.m:
-        return "m";
-      case MovementUnit.km:
-        return "km";
-      case MovementUnit.yards:
-        return "yd";
-      case MovementUnit.feet:
-        return "ft";
-      case MovementUnit.miles:
-        return "mi";
-      case MovementUnit.msecs:
-        return "ms";
-    }
-  }
-
-  String toDimensionName() {
-    switch (this) {
-      case MovementUnit.reps:
+      case MovementDimension.reps:
         return "Reps";
-      case MovementUnit.cals:
+      case MovementDimension.cals:
         return "Cals";
-      case MovementUnit.m:
-      case MovementUnit.km:
-      case MovementUnit.yards:
-      case MovementUnit.feet:
-      case MovementUnit.miles:
+      case MovementDimension.distance:
         return "Distance";
-      case MovementUnit.msecs:
+      case MovementDimension.time:
         return "Time";
     }
   }
@@ -75,7 +42,7 @@ class Movement implements DbObject {
     required this.description,
     required this.cardio,
     required this.deleted,
-    required this.unit,
+    required this.dimension,
   });
 
   @override
@@ -88,8 +55,7 @@ class Movement implements DbObject {
   bool cardio;
   @override
   bool deleted;
-  @JsonKey(name: 'movement_unit')
-  MovementUnit unit;
+  MovementDimension dimension;
 
   Movement.defaultValue(this.userId)
       : id = randomId(),
@@ -97,7 +63,7 @@ class Movement implements DbObject {
         description = null,
         cardio = true,
         deleted = false,
-        unit = MovementUnit.reps;
+        dimension = MovementDimension.reps;
 
   factory Movement.fromJson(Map<String, dynamic> json) =>
       _$MovementFromJson(json);
@@ -117,7 +83,7 @@ class Movement implements DbObject {
       description: description,
       cardio: cardio,
       deleted: deleted,
-      unit: unit);
+      dimension: dimension);
 
   @override
   bool operator ==(other) =>
@@ -128,11 +94,11 @@ class Movement implements DbObject {
       other.description == description &&
       other.cardio == cardio &&
       other.deleted == deleted &&
-      other.unit == unit;
+      other.dimension == dimension;
 
   @override
   int get hashCode =>
-      Object.hash(id, userId, name, description, cardio, deleted, unit);
+      Object.hash(id, userId, name, description, cardio, deleted, dimension);
 }
 
 class DbMovementSerializer implements DbSerializer<Movement> {
@@ -147,7 +113,7 @@ class DbMovementSerializer implements DbSerializer<Movement> {
       description: r[prefix + Keys.description] as String?,
       cardio: r[prefix + Keys.cardio]! as int == 1,
       deleted: r[prefix + Keys.deleted]! as int == 1,
-      unit: MovementUnit.values[r[prefix + Keys.unit]! as int],
+      dimension: MovementDimension.values[r[prefix + Keys.dimension]! as int],
     );
   }
 
@@ -160,7 +126,7 @@ class DbMovementSerializer implements DbSerializer<Movement> {
       Keys.description: o.description,
       Keys.cardio: o.cardio ? 1 : 0,
       Keys.deleted: o.deleted ? 1 : 0,
-      Keys.unit: o.unit.index,
+      Keys.dimension: o.dimension.index,
     };
   }
 }

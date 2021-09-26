@@ -49,7 +49,7 @@ class _EditStrengthSessionPageState extends State<EditStrengthSessionPage> {
             name: '',
             description: null,
             cardio: true,
-            unit: MovementUnit.reps,
+            dimension: MovementDimension.reps,
             deleted: false,
           ),
           stats: null,

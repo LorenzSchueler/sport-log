@@ -12,7 +12,7 @@ class StrengthChart extends StatefulWidget {
     Key? key,
     required this.dateFilter,
     required this.movement,
-  })  : availableSeries = getAvailableSeries(movement.unit),
+  })  : availableSeries = getAvailableSeries(movement.dimension),
         super(key: key);
 
   final DateFilterState dateFilter;
@@ -100,7 +100,7 @@ class _StrengthChartState extends State<StrengthChart> {
     return SelectionBar(
       onChange: _setSeriesType,
       items: widget.availableSeries,
-      getLabel: (SeriesType type) => type.toDisplayName(widget.movement.unit),
+      getLabel: (SeriesType type) => type.toDisplayName(widget.movement.dimension),
       selectedItem: _activeSeriesType,
     );
   }

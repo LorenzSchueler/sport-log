@@ -65,8 +65,8 @@ class _AllChartState extends State<AllChart> {
     if (_stats.isEmpty) {
       return const Center(child: Text('Nothing to show here.'));
     }
-    final getValue = accessor(widget.series);
-    final isTime = widget.movement.unit == MovementUnit.msecs;
+    final getValue = statsAccessor(widget.series);
+    final isTime = widget.movement.dimension == MovementDimension.time;
 
     double fromDate(DateTime date) =>
         (date.year * 12 + date.month - 1).toDouble();

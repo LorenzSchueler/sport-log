@@ -19,6 +19,6 @@ class MovementDataProvider extends DataProviderImpl<Movement>
       db.getMovements(
           byName: byName != null && byName.isNotEmpty ? byName : null);
 
-  Future<bool> movementExists(String name, MovementUnit unit) async =>
-      db.exists(name, unit);
+  Future<bool> movementExists(String name, MovementDimension dim) async =>
+      db.exists(name, dim);
 }

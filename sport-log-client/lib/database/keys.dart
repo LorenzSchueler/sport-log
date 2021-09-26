@@ -52,7 +52,7 @@ abstract class Keys {
   static const time = 'time';
   static const timecap = 'timecap';
   static const track = 'track';
-  static const unit = 'unit';
+  static const dimension = 'dimension';
   static const userId = 'user_id';
   static const username = 'username';
   static const weekday = 'weekday';

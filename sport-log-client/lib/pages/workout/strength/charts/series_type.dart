@@ -13,75 +13,67 @@ enum SeriesType {
 }
 
 extension DisplayName on SeriesType {
-  String toDisplayName(MovementUnit unit) {
+  String toDisplayName(MovementDimension dim) {
     switch (this) {
       case SeriesType.maxCount:
-        if (unit == MovementUnit.m) {
+        if (dim == MovementDimension.distance) {
           return 'Best Distance';
         }
         break;
       case SeriesType.minCount:
-        if (unit == MovementUnit.msecs) {
+        if (dim == MovementDimension.time) {
           return 'Best Time';
         }
         break;
       case SeriesType.sumCount:
-        if (unit == MovementUnit.cals) {
+        if (dim == MovementDimension.cals) {
           return 'Total Calories';
         }
         break;
       case SeriesType.avgCount:
-        if (unit == MovementUnit.reps) {
+        if (dim == MovementDimension.reps) {
           return 'Avg Reps';
         }
         break;
       case SeriesType.maxEorm:
-        if (unit == MovementUnit.reps) {
+        if (dim == MovementDimension.reps) {
           return 'Best Eorm';
         }
         break;
       case SeriesType.sumVolume:
-        if (unit == MovementUnit.reps) {
+        if (dim == MovementDimension.reps) {
           return 'Total Volume';
         }
         break;
       case SeriesType.maxWeight:
-        if (unit == MovementUnit.reps) {
+        if (dim == MovementDimension.reps) {
           return 'Max Weight';
         }
         break;
     }
-    throw StateError('${toString()} and ${unit.toDisplayName()} doesn\'t work');
+    throw StateError('${toString()} and ${dim.displayName} doesn\'t work');
   }
 }
 
-List<SeriesType> getAvailableSeries(MovementUnit unit) {
-  switch (unit) {
-    case MovementUnit.reps:
+List<SeriesType> getAvailableSeries(MovementDimension dim) {
+  switch (dim) {
+    case MovementDimension.reps:
       return [
         SeriesType.maxEorm,
         SeriesType.sumVolume,
         SeriesType.maxWeight,
         SeriesType.avgCount,
       ];
-    case MovementUnit.cals:
+    case MovementDimension.cals:
       return [SeriesType.sumCount];
-    case MovementUnit.m:
+    case MovementDimension.distance:
       return [SeriesType.maxCount];
-    case MovementUnit.msecs:
+    case MovementDimension.time:
       return [SeriesType.minCount];
-    case MovementUnit.km:
-      throw StateError('MovementUnit.km cannot be in a strength session.');
-    case MovementUnit.yards:
-      throw StateError('MovementUnit.yard cannot be in a strength session.');
-    case MovementUnit.feet:
-      throw StateError('MovementUnit.foot cannot be in a strength session.');
-    case MovementUnit.miles:
-      throw StateError('MovementUnit.foot cannot be in a strength session.');
   }
 }
 
-double Function(StrengthSessionStats stats) accessor(SeriesType type) {
+double Function(StrengthSessionStats stats) statsAccessor(SeriesType type) {
   switch (type) {
     case SeriesType.maxCount:
       return (stats) => stats.maxCount.toDouble();

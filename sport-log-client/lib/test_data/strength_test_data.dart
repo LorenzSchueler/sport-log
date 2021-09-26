@@ -23,27 +23,20 @@ Future<List<StrengthSession>> generateStrengthSessions(Int64 userId) async {
 
   for (final date in allDates) {
     for (final movement in movements) {
-      if (const [
-        MovementUnit.cals,
-        MovementUnit.m,
-        MovementUnit.msecs,
-        MovementUnit.reps
-      ].contains(movement.unit)) {
-        for (int i = 0; i < 3; ++i) {
-          if (random.integer(9) == 0) {
-            result.add(StrengthSession(
-              id: randomId(),
-              userId: userId,
-              datetime: DateTime(date.year, date.month, date.day,
-                  random.integer(24), random.integer(60), random.integer(60)),
-              movementId: movement.id,
-              interval: random.integer(2) == 0
-                  ? Duration(minutes: random.integer(90, min: 10)).inSeconds
-                  : null,
-              comments: random.integer(2) == 0 ? faker.lorem.sentence() : null,
-              deleted: false,
-            ));
-          }
+      for (int i = 0; i < 3; ++i) {
+        if (random.integer(9) == 0) {
+          result.add(StrengthSession(
+            id: randomId(),
+            userId: userId,
+            datetime: DateTime(date.year, date.month, date.day,
+                random.integer(24), random.integer(60), random.integer(60)),
+            movementId: movement.id,
+            interval: random.integer(2) == 0
+                ? Duration(minutes: random.integer(90, min: 10)).inSeconds
+                : null,
+            comments: random.integer(2) == 0 ? faker.lorem.sentence() : null,
+            deleted: false,
+          ));
         }
       }
     }
@@ -51,33 +44,21 @@ Future<List<StrengthSession>> generateStrengthSessions(Int64 userId) async {
   return result;
 }
 
-int _generateCount(MovementUnit unit) {
-  switch (unit) {
-    case MovementUnit.reps:
+int _generateCount(MovementDimension dim) {
+  switch (dim) {
+    case MovementDimension.reps:
       return random.integer(20, min: 1);
-    case MovementUnit.cals:
+    case MovementDimension.cals:
       return random.integer(3000, min: 50);
-    case MovementUnit.m:
+    case MovementDimension.distance:
       return random.integer(42000, min: 20);
-    case MovementUnit.km:
-      assert(false);
-      return random.integer(42, min: 1);
-    case MovementUnit.yards:
-      assert(false);
-      return random.integer(42000, min: 20);
-    case MovementUnit.feet:
-      assert(false);
-      return random.integer(120000, min: 60);
-    case MovementUnit.miles:
-      assert(false);
-      return random.integer(26, min: 1);
-    case MovementUnit.msecs:
+    case MovementDimension.time:
       return random.integer(10 * 60 * 1000, min: 10 * 1000);
   }
 }
 
-double? _generateWeight(MovementUnit unit) {
-  if (unit != MovementUnit.reps) {
+double? _generateWeight(MovementDimension dim) {
+  if (dim != MovementDimension.reps) {
     return null;
   }
   if (random.integer(10) == 0) {
@@ -99,8 +80,8 @@ Future<List<StrengthSet>> generateStrengthSets() async {
         id: randomId(),
         strengthSessionId: session.id,
         setNumber: i,
-        count: _generateCount(session.movement.unit),
-        weight: _generateWeight(session.movement.unit),
+        count: _generateCount(session.movement.dimension),
+        weight: _generateWeight(session.movement.dimension),
         deleted: false,
       ));
     }

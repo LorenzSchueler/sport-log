@@ -14,7 +14,7 @@ List<Movement> generateMovements(Int64 userId) {
       name: faker.sport.name(),
       description: faker.lorem.sentence(),
       cardio: faker.randomGenerator.boolean(),
-      unit: faker.randomGenerator.element(MovementUnit.values),
+      dimension: faker.randomGenerator.element(MovementDimension.values),
       deleted: false,
     ),
   )..add(Movement(
@@ -24,5 +24,5 @@ List<Movement> generateMovements(Int64 userId) {
       description: null,
       cardio: false,
       deleted: false,
-      unit: MovementUnit.reps));
+      dimension: MovementDimension.reps));
 }
