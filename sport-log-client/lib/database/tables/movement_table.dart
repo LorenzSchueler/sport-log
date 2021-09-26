@@ -11,19 +11,15 @@ class MovementTable extends DbAccessor<Movement> {
   DbSerializer<Movement> get serde => DbMovementSerializer();
 
   @override
-  String? get setupSql => null;
-
-  @override
-  List<String> init() {
-    return [
-      _table.setupSql(),
-      '''
+  List<String> get setupSql => [
+        _table.setupSql(),
+        '''
       CREATE UNIQUE INDEX unique_movement_idx
       ON $tableName ($name, $unit, $userId)
       WHERE $deleted = 0;
-      '''
-    ];
-  }
+      ''',
+        updateTrigger,
+      ];
 
   final Table _table = Table(
     Tables.movement,

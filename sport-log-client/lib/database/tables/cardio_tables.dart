@@ -1,11 +1,13 @@
-
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_names.dart';
 import 'package:sport_log/models/cardio/all.dart';
 
 class CardioSessionTable extends DbAccessor<CardioSession> {
-  @override DbSerializer<CardioSession> get serde => DbCardioSessionSerializer();
-  @override String get setupSql => '''
+  @override
+  DbSerializer<CardioSession> get serde => DbCardioSessionSerializer();
+  @override
+  List<String> get setupSql => [
+        '''
 create table $tableName (
     user_id integer not null,
     movement_id integer not null references movement(id) on delete no action,
@@ -25,13 +27,19 @@ create table $tableName (
     comments text,
     $idAndDeletedAndStatus
 );
-  ''';
-  @override String get tableName => Tables.cardioSession;
+  ''',
+        updateTrigger,
+      ];
+  @override
+  String get tableName => Tables.cardioSession;
 }
 
 class RouteTable extends DbAccessor<Route> {
-  @override DbSerializer<Route> get serde => DbRouteSerializer();
-  @override String get setupSql => '''
+  @override
+  DbSerializer<Route> get serde => DbRouteSerializer();
+  @override
+  List<String> get setupSql => [
+        '''
 create table $tableName (
     user_id integer not null,
     name text not null check (length(name) >= 2),
@@ -41,6 +49,9 @@ create table $tableName (
     track blob not null,
     $idAndDeletedAndStatus
 );
-  ''';
-  @override String get tableName => Tables.route;
+  ''',
+        updateTrigger,
+      ];
+  @override
+  String get tableName => Tables.route;
 }

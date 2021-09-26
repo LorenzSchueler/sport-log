@@ -6,7 +6,8 @@ import 'package:sport_log/models/metcon/all.dart';
 
 class MetconTable extends DbAccessor<Metcon> {
   @override
-  String get setupSql => '''
+  List<String> get setupSql => [
+        '''
 create table $tableName (
     user_id integer,
     name text check (length(name) <= 80),
@@ -16,7 +17,9 @@ create table $tableName (
     description text,
     $idAndDeletedAndStatus
 );
-  ''';
+  ''',
+        updateTrigger,
+      ];
 
   @override
   DbSerializer<Metcon> get serde => DbMetconSerializer();
@@ -30,7 +33,8 @@ class MetconMovementTable extends DbAccessor<MetconMovement> {
   DbSerializer<MetconMovement> get serde => DbMetconMovementSerializer();
 
   @override
-  String get setupSql => '''
+  List<String> get setupSql => [
+        '''
 create table $tableName (
     metcon_id integer not null references metcon(id) on delete cascade,
     movement_id integer not null references movement(id) on delete no action,
@@ -39,7 +43,9 @@ create table $tableName (
     weight real check (weight > 0),
     $idAndDeletedAndStatus
 );
-  ''';
+  ''',
+        updateTrigger,
+      ];
 
   @override
   String get tableName => Tables.metconMovement;
@@ -69,7 +75,8 @@ class MetconSessionTable extends DbAccessor<MetconSession> {
   DbSerializer<MetconSession> get serde => DbMetconSessionSerializer();
 
   @override
-  String get setupSql => '''
+  List<String> get setupSql => [
+        '''
 create table $tableName (
     user_id integer not null,
     metcon_id integer not null references metcon(id) on delete no action,
@@ -81,7 +88,9 @@ create table $tableName (
     comments text,
     $idAndDeletedAndStatus
 );
-  ''';
+  ''',
+        updateTrigger,
+      ];
 
   @override
   String get tableName => Tables.metconSession;

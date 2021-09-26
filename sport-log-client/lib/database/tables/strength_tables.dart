@@ -40,17 +40,16 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
   static const weight = Keys.weight;
 
   @override
-  List<String> init() {
-    return [
-      _table.setupSql(),
-      updateTrigger,
-      '''
+  List<String> get setupSql => [
+        _table.setupSql(),
+        updateTrigger,
+        '''
         CREATE TABLE $eorm (
           $eormReps INTEGER PRIMARY KEY CHECK ($eormReps >= 1),
           $eormPercentage REAL NOT NULL CHECK ($eormPercentage > 0)
         );
-      ''',
-      '''
+        ''',
+        '''
         INSERT INTO $eorm ($eormReps, $eormPercentage) VALUES
           (1, 1.0),
           (2, 0.97),
@@ -83,8 +82,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
           (29, 0.51),
           (30, 0.50);
         ''',
-    ];
-  }
+      ];
 
   @override
   String get tableName => _table.name;
@@ -106,6 +104,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
   MovementTable get _movementTable => AppDatabase.instance!.movements;
 
   // return strength sessions without order, without sets, without stats
+  // TODO: do we need this?
   Future<List<StrengthSessionDescription>> getNonDeletedDescriptions() async {
     final records = await database.rawQuery('''
       SELECT ${_table.allColumns}, ${_movementTable.table.allColumns}
@@ -274,26 +273,24 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
         .map((record) => StrengthSessionStats.fromDbRecord(record))
         .toList();
   }
-
-  @override
-  String? get setupSql => null;
 }
 
 class StrengthSetTable extends DbAccessor<StrengthSet> {
   @override
   DbSerializer<StrengthSet> get serde => DbStrengthSetSerializer();
   @override
-  String get setupSql => '''
-create table $tableName (
-    strength_session_id integer not null references strength_session on delete cascade,
-    set_number integer not null check (set_number >= 0),
-    count integer not null check (count >= 1), -- number of completed movement_unit
-    weight real check (weight > 0),
-    $idAndDeletedAndStatus
-);
-
-create index ${tableName}_session_index on $tableName (strength_session_id)
-  ''';
+  List<String> get setupSql => [
+        '''
+          create table $tableName (
+              strength_session_id integer not null references strength_session on delete cascade,
+              set_number integer not null check (set_number >= 0),
+              count integer not null check (count >= 1), -- number of completed movement_unit
+              weight real check (weight > 0),
+              $idAndDeletedAndStatus
+          );
+        ''',
+        updateTrigger
+      ];
   @override
   String get tableName => Tables.strengthSet;
 

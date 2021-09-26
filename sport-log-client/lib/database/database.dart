@@ -32,7 +32,7 @@ class AppDatabase {
         onCreate: (db, version) async {
           List<String> sql = [];
           for (final table in allTables) {
-            sql += await table.init();
+            sql += table.setupSql;
           }
           for (final statement in sql) {
             _logger.d(statement);

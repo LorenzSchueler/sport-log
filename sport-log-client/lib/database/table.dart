@@ -7,7 +7,7 @@ import 'defs.dart';
 export 'defs.dart';
 
 abstract class DbAccessor<T extends DbObject> {
-  String? get setupSql;
+  List<String> get setupSql;
   String get tableName;
   DbSerializer<T> get serde;
 
@@ -25,15 +25,6 @@ abstract class DbAccessor<T extends DbObject> {
       update $tableName set sync_status = 1 where id = new.id and sync_status = 0;
     end;
   ''';
-
-  List<String> init() {
-    final s = setupSql;
-    assert(s != null);
-    if (s != null) {
-      return [s, updateTrigger];
-    }
-    return [];
-  }
 
   void setDatabase(Database db) {
     database = db;
