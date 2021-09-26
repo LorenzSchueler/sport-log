@@ -50,6 +50,7 @@ class MainDrawer extends StatelessWidget {
           ),
           ExpansionTile(
             title: const Text('Primitives'),
+            initiallyExpanded: true,
             children: [
               ListTile(
                 title: const Text('Movements'),
