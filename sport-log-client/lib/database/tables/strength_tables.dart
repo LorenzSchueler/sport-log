@@ -103,8 +103,9 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
 
   MovementTable get _movementTable => AppDatabase.instance!.movements;
 
-  // return strength sessions without order, without sets, without stats
-  // TODO: do we need this?
+  /// returns strength sessions descriptions
+  /// without order, without sets, without stats
+  /// (needed for test data generation)
   Future<List<StrengthSessionDescription>> getNonDeletedDescriptions() async {
     final records = await database.rawQuery('''
       SELECT ${_table.allColumns}, ${_movementTable.table.allColumns}
@@ -122,6 +123,8 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
         .toList();
   }
 
+  /// returns strength session descriptions with stats, without sets
+  /// ordered by datetime
   Future<List<StrengthSessionDescription>> getSessionDescriptions({
     Int64? movementIdValue,
     String? movementName,
