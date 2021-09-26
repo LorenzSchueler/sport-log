@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
-import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/metcon/metcons_page.dart';
@@ -28,8 +26,6 @@ class _WorkoutPageState extends State<WorkoutPage> {
   DateFilterState _dateFilter = MonthFilter.current();
 
   Movement? _selectedMovement;
-
-  final _movementDataProvider = MovementDataProvider();
 
   @override
   Widget build(BuildContext context) {

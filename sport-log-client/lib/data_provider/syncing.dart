@@ -96,8 +96,6 @@ class UpSync {
     if (db == null) {
       return;
     }
-    final api = Api.instance;
-
     // TODO: push database records and changed user
     throw UnimplementedError();
   }
