@@ -4,7 +4,7 @@ import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorder
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
-import 'package:sport_log/helpers/state/local_state.dart';
+import 'package:sport_log/helpers/extensions/list_extension.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/routes.dart';
@@ -20,14 +20,14 @@ class MovementsPage extends StatefulWidget {
 
 class _MovementsPageState extends State<MovementsPage> {
   final _dataProvider = MovementDataProvider();
-  LocalState<MovementDescription> _state = LocalState.empty();
+  List<MovementDescription> _movementDescriptions = [];
 
   @override
   void initState() {
     super.initState();
     _dataProvider.getMovementDescriptions().then((mds) {
       setState(() {
-        _state = LocalState.fromList(mds);
+        _movementDescriptions = mds;
       });
     });
   }
@@ -36,13 +36,18 @@ class _MovementsPageState extends State<MovementsPage> {
     if (object is ReturnObject<MovementDescription>) {
       switch (object.action) {
         case ReturnAction.created:
-          setState(() => _state.create(object.object));
+          setState(() {
+            _movementDescriptions.add(object.object);
+            _movementDescriptions.sortBy((m) => m.movement.name);
+          });
           break;
         case ReturnAction.updated:
-          setState(() => _state.update(object.object));
+          setState(() => _movementDescriptions.update(object.object,
+              by: (o) => o.movement.id));
           break;
         case ReturnAction.deleted:
-          setState(() => _state.delete(object.object.id));
+          setState(() => _movementDescriptions.delete(object.object,
+              by: (m) => m.movement.id));
       }
     }
   }
@@ -55,7 +60,7 @@ class _MovementsPageState extends State<MovementsPage> {
       }
     });
     _dataProvider.getMovementDescriptions().then((mds) {
-      setState(() => _state = LocalState.fromList(mds));
+      setState(() => _movementDescriptions = mds);
     });
   }
 
@@ -81,11 +86,11 @@ class _MovementsPageState extends State<MovementsPage> {
   }
 
   Widget _body(BuildContext context) {
-    if (_state.isEmpty) {
+    if (_movementDescriptions.isEmpty) {
       return const Center(child: Text("No movements there."));
     }
     return ImplicitlyAnimatedList(
-      items: _state.asList,
+      items: _movementDescriptions,
       itemBuilder: _movementToWidget,
       areItemsTheSame: MovementDescription.areTheSame,
     );
@@ -123,7 +128,8 @@ class _MovementsPageState extends State<MovementsPage> {
                       onPressed: () {
                         assert(movement.userId != null && !md.hasReference);
                         _dataProvider.deleteSingle(movement);
-                        setState(() => _state.delete(md.id));
+                        setState(() => _movementDescriptions.delete(md,
+                            by: (m) => m.movement.id));
                       },
                       icon: const Icon(Icons.delete),
                     ),
