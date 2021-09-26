@@ -26,7 +26,7 @@ abstract class DbAccessor<T extends DbObject> {
     end;
   ''';
 
-  Future<List<String>> init() async {
+  List<String> init() {
     final s = setupSql;
     assert(s != null);
     if (s != null) {

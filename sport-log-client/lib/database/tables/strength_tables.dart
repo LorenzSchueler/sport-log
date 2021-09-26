@@ -40,7 +40,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession>
   static const weight = Keys.weight;
 
   @override
-  Future<List<String>> init() async {
+  List<String> init() {
     return [
       _table.setupSql(),
       updateTrigger,

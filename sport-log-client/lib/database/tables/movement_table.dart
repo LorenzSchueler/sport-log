@@ -1,5 +1,3 @@
-import 'package:fixnum/fixnum.dart';
-import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/database/table_creator.dart';
@@ -13,20 +11,30 @@ class MovementTable extends DbAccessor<Movement> {
   DbSerializer<Movement> get serde => DbMovementSerializer();
 
   @override
-  String get setupSql => _table.setupSql();
+  String? get setupSql => null;
 
-  final Table _table = Table(Tables.movement, withColumns: [
-    Column.int(Keys.id).primaryKey(),
-    Column.bool(Keys.deleted).withDefault('0'),
-    Column.int(Keys.syncStatus)
-        .withDefault('2')
-        .check('${Keys.syncStatus} IN (0, 1, 2)'),
-    Column.int(Keys.userId).nullable(),
-    Column.text(Keys.name),
-    Column.text(Keys.description).nullable(),
-    Column.bool(Keys.cardio),
-    Column.int(Keys.unit),
-  ]);
+  @override
+  List<String> init() {
+    return [
+      _table.setupSql(),
+    ];
+  }
+
+  final Table _table = Table(
+    Tables.movement,
+    withColumns: [
+      Column.int(Keys.id).primaryKey(),
+      Column.bool(Keys.deleted).withDefault('0'),
+      Column.int(Keys.syncStatus)
+          .withDefault('2')
+          .check('${Keys.syncStatus} IN (0, 1, 2)'),
+      Column.int(Keys.userId).nullable(),
+      Column.text(Keys.name),
+      Column.text(Keys.description).nullable(),
+      Column.bool(Keys.cardio),
+      Column.int(Keys.unit),
+    ],
+  );
 
   static const deleted = Keys.deleted;
   static const unit = Keys.unit;
@@ -77,8 +85,8 @@ class MovementTable extends DbAccessor<Movement> {
       )
     ORDER BY $name
     ''');
-    _logger
-        .d('Select movement descriptions: ' + DateTime.now().difference(now).toString());
+    _logger.d('Select movement descriptions: ' +
+        DateTime.now().difference(now).toString());
     return records
         .map((r) => MovementDescription(
               movement: serde.fromDbRecord(r, prefix: _table.prefix),
