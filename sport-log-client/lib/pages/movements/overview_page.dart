@@ -39,6 +39,7 @@ class _MovementsPageState extends State<MovementsPage> {
           setState(() {
             _movementDescriptions.add(object.payload);
             _movementDescriptions.sortBy((m) => m.movement.name.toUpperCase());
+            // TODO: "hide" server defined movements with same name/dimension
           });
           break;
         case ReturnAction.updated:
@@ -46,11 +47,13 @@ class _MovementsPageState extends State<MovementsPage> {
             _movementDescriptions.update(object.payload,
                 by: (o) => o.movement.id);
             _movementDescriptions.sortBy((m) => m.movement.name.toUpperCase());
+            // TODO: "hide" server defined movements with same name/dimension
           });
           break;
         case ReturnAction.deleted:
           setState(() => _movementDescriptions.delete(object.payload,
               by: (m) => m.movement.id));
+        // TODO: "unhide" server defined movements with same name/dimension
       }
     }
   }
