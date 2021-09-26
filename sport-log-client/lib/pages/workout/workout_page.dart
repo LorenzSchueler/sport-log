@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/pages/workout/metcon/metcons_page.dart';
 import 'package:sport_log/pages/workout/strength/overview_page.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
@@ -11,6 +10,7 @@ import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 import 'date_filter/date_filter_state.dart';
 import 'date_filter/date_filter_widget.dart';
+import 'metcon_sessions/overview_page.dart';
 
 enum BottomNavPage { strength, metcon, cardio, diary }
 
@@ -61,10 +61,10 @@ class _WorkoutPageState extends State<WorkoutPage> {
         type: BottomNavigationBarType.fixed,
       ),
       drawer: const MainDrawer(selectedRoute: Routes.workout),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () => _onFabTapped(context),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   child: const Icon(Icons.add),
+      //   onPressed: () => _onFabTapped(context),
+      // ),
     );
   }
 
@@ -72,7 +72,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     // TODO: preserve state and/or widget when changing tab
     switch (_currentPage) {
       case BottomNavPage.metcon:
-        return const MetconsPage();
+        return const MetconSessionsPage();
       case BottomNavPage.strength:
         return StrengthSessionsPage(
           dateFilter: _dateFilter,
@@ -118,18 +118,6 @@ class _WorkoutPageState extends State<WorkoutPage> {
     setState(() {
       _currentPage = BottomNavPage.values[index];
     });
-  }
-
-  void _onFabTapped(BuildContext context) {
-    switch (_currentPage) {
-      case BottomNavPage.metcon:
-        Navigator.of(context).pushNamed(Routes.editMetcon);
-        break;
-      case BottomNavPage.strength:
-        Navigator.of(context).pushNamed(Routes.editStrengthSession);
-        break;
-      default:
-    }
   }
 
   PreferredSizeWidget get _filter {

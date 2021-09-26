@@ -6,11 +6,12 @@ import 'package:sport_log/models/movement/movement_description.dart';
 import 'package:sport_log/models/strength/strength_session_description.dart';
 import 'package:sport_log/pages/landing/landing_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
+import 'package:sport_log/pages/metcons/edit_page.dart';
+import 'package:sport_log/pages/metcons/overview_page.dart';
 import 'package:sport_log/pages/movements/edit_page.dart';
 import 'package:sport_log/pages/movements/overview_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
 import 'package:sport_log/pages/actions/actions_page.dart';
-import 'package:sport_log/pages/workout/metcon/edit_metcon_page.dart';
 import 'package:sport_log/pages/workout/strength/edit_page.dart';
 import 'package:sport_log/pages/workout/workout_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
@@ -51,6 +52,7 @@ class _AppState extends State<App> {
         Routes.registration: (_) => const RegistrationPage(),
         Routes.workout: (_) =>
             ProtectedRoute(builder: (_) => const WorkoutPage()),
+        Routes.metconOverview: (_) => const MetconsPage(),
         Routes.editMetcon: (_) => ProtectedRoute(builder: (context) {
               final arg = ModalRoute.of(context)?.settings.arguments;
               return EditMetconPage(

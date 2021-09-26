@@ -55,18 +55,18 @@ class MainDrawer extends StatelessWidget {
               ListTile(
                 title: const Text('Movements'),
                 leading: const Icon(Icons.apps),
-                onTap: () {
-                  Nav.changeNamed(context, Routes.movements);
-                },
+                onTap: () => Nav.changeNamed(context, Routes.movements),
                 selected: selectedRoute == Routes.movements,
               ),
               const ListTile(
                 title: Text('Routes'),
                 leading: Icon(Icons.map_sharp),
               ),
-              const ListTile(
-                title: Text('CrossFit – Metcons'),
-                leading: Icon(CustomIcons.heart),
+              ListTile(
+                title: const Text('CrossFit – Metcons'),
+                leading: const Icon(CustomIcons.heart),
+                selected: selectedRoute == Routes.metconOverview,
+                onTap: () => Nav.changeNamed(context, Routes.metconOverview),
               ),
             ],
           ),
