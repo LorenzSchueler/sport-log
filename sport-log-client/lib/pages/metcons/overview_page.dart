@@ -54,7 +54,7 @@ class _MetconsPageState extends State<MetconsPage> {
             switch (returnObject.action) {
               case ReturnAction.updated:
                 setState(() {
-                  _metconDescriptions.update(returnObject.object,
+                  _metconDescriptions.update(returnObject.payload,
                       by: (md) => md.metcon.id);
                   _metconDescriptions.sortBy(
                       (md) => (md.metcon.name ?? 'Unnamed').toUpperCase());
@@ -62,14 +62,14 @@ class _MetconsPageState extends State<MetconsPage> {
                 break;
               case ReturnAction.created:
                 setState(() {
-                  _metconDescriptions.add(returnObject.object);
+                  _metconDescriptions.add(returnObject.payload);
                   _metconDescriptions.sortBy(
                       (md) => (md.metcon.name ?? 'Unnamed').toUpperCase());
                 });
                 break;
               case ReturnAction.deleted:
                 setState(() {
-                  _metconDescriptions.delete(returnObject.object,
+                  _metconDescriptions.delete(returnObject.payload,
                       by: (md) => md.metcon.id);
                 });
                 break;

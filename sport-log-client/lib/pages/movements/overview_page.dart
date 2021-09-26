@@ -37,16 +37,16 @@ class _MovementsPageState extends State<MovementsPage> {
       switch (object.action) {
         case ReturnAction.created:
           setState(() {
-            _movementDescriptions.add(object.object);
+            _movementDescriptions.add(object.payload);
             _movementDescriptions.sortBy((m) => m.movement.name.toUpperCase());
           });
           break;
         case ReturnAction.updated:
-          setState(() => _movementDescriptions.update(object.object,
+          setState(() => _movementDescriptions.update(object.payload,
               by: (o) => o.movement.id));
           break;
         case ReturnAction.deleted:
-          setState(() => _movementDescriptions.delete(object.object,
+          setState(() => _movementDescriptions.delete(object.payload,
               by: (m) => m.movement.id));
       }
     }

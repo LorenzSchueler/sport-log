@@ -89,7 +89,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
                       return;
                     }
                     assert(returnObject.action == ReturnAction.created);
-                    Navigator.of(context).pop(returnObject.object.movement);
+                    Navigator.of(context).pop(returnObject.payload.movement);
                   },
                   icon: const Icon(Icons.add),
                 )

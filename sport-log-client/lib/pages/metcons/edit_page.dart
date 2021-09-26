@@ -125,12 +125,12 @@ class _EditMetconPageState extends State<EditMetconPage> {
     if (widget._isEditing) {
       _dataProvider.updateSingle(_md).then((_) {
         Navigator.of(context)
-            .pop(ReturnObject(action: ReturnAction.updated, object: _md));
+            .pop(ReturnObject(action: ReturnAction.updated, payload: _md));
       });
     } else {
       _dataProvider.createSingle(_md).then((_) {
         Navigator.of(context)
-            .pop(ReturnObject(action: ReturnAction.created, object: _md));
+            .pop(ReturnObject(action: ReturnAction.created, payload: _md));
       });
     }
   }
@@ -139,7 +139,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
     if (widget._isEditing) {
       _dataProvider.deleteSingle(_md).then((_) {
         Navigator.of(context)
-            .pop(ReturnObject(action: ReturnAction.deleted, object: _md));
+            .pop(ReturnObject(action: ReturnAction.deleted, payload: _md));
       });
     } else {
       Navigator.of(context).pop();

@@ -83,12 +83,12 @@ class _EditMovementPageState extends State<EditMovementPage> {
       // TODO: do error handling
       await _dataProvider.updateSingle(_md.movement);
       Navigator.of(context)
-          .pop(ReturnObject(action: ReturnAction.updated, object: _md));
+          .pop(ReturnObject(action: ReturnAction.updated, payload: _md));
     } else {
       // TODO: do error handling
       await _dataProvider.createSingle(_md.movement);
       Navigator.of(context)
-          .pop(ReturnObject(action: ReturnAction.created, object: _md));
+          .pop(ReturnObject(action: ReturnAction.created, payload: _md));
     }
   }
 
@@ -97,7 +97,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
       assert(_md.movement.userId != null);
       _dataProvider.deleteSingle(_md.movement);
       Navigator.of(context)
-          .pop(ReturnObject(action: ReturnAction.deleted, object: _md));
+          .pop(ReturnObject(action: ReturnAction.deleted, payload: _md));
     } else {
       Navigator.of(context).pop();
     }
