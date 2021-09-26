@@ -17,6 +17,11 @@ class MovementTable extends DbAccessor<Movement> {
   List<String> init() {
     return [
       _table.setupSql(),
+      '''
+      CREATE UNIQUE INDEX unique_movement_idx
+      ON $tableName ($name, $unit, $userId)
+      WHERE $deleted = 0;
+      '''
     ];
   }
 
