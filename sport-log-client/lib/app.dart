@@ -11,7 +11,6 @@ import 'package:sport_log/pages/metcons/overview_page.dart';
 import 'package:sport_log/pages/movements/edit_page.dart';
 import 'package:sport_log/pages/movements/overview_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
-import 'package:sport_log/pages/actions/actions_page.dart';
 import 'package:sport_log/pages/workout/strength/edit_page.dart';
 import 'package:sport_log/pages/workout/workout_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
@@ -52,18 +51,17 @@ class _AppState extends State<App> {
         Routes.registration: (_) => const RegistrationPage(),
         Routes.workout: (_) =>
             ProtectedRoute(builder: (_) => const WorkoutPage()),
-        Routes.metconOverview: (_) => const MetconsPage(),
-        Routes.editMetcon: (_) => ProtectedRoute(builder: (context) {
+        Routes.metcon.overview: (_) =>
+            ProtectedRoute(builder: (_) => const MetconsPage()),
+        Routes.metcon.edit: (_) => ProtectedRoute(builder: (context) {
               final arg = ModalRoute.of(context)?.settings.arguments;
               return EditMetconPage(
                 initialMetcon: (arg is MetconDescription) ? arg : null,
               );
             }),
-        Routes.actions: (_) =>
-            ProtectedRoute(builder: (_) => const ActionsPage()),
-        Routes.movements: (_) =>
+        Routes.movement.overview: (_) =>
             ProtectedRoute(builder: (_) => const MovementsPage()),
-        Routes.editMovement: (_) => ProtectedRoute(builder: (context) {
+        Routes.movement.edit: (_) => ProtectedRoute(builder: (context) {
               final arg = ModalRoute.of(context)?.settings.arguments;
               if (arg is MovementDescription) {
                 return EditMovementPage(initialMovement: arg);

@@ -83,7 +83,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
               ? IconButton(
                   onPressed: () async {
                     final returnObject = await Navigator.pushNamed(
-                        context, Routes.editMovement,
+                        context, Routes.movement.edit,
                         arguments: _search);
                     if (returnObject is! ReturnObject<MovementDescription>) {
                       return;

@@ -3,10 +3,21 @@ abstract class Routes {
   static const login = '/login';
   static const registration = '/register';
   static const workout = '/workout';
-  static const editMetcon = '/edit-metcon';
-  static const metconOverview = '/metcons';
-  static const actions = '/actions';
-  static const movements = '/movements';
-  static const editMovement = '/edit-movement';
   static const editStrengthSession = '/edit-strength-session';
+  static const metcon = _MetconRoutes();
+  static const movement = _MovementRoutes();
+}
+
+class _MetconRoutes {
+  const _MetconRoutes();
+
+  final String overview = '/metcon/overview';
+  final String edit = '/metcon/edit';
+}
+
+class _MovementRoutes {
+  const _MovementRoutes();
+
+  final String overview = '/movement/overview';
+  final String edit = '/movement/edit';
 }

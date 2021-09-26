@@ -36,17 +36,15 @@ class MainDrawer extends StatelessWidget {
             },
             selected: selectedRoute == Routes.workout,
           ),
-          const ListTile(
-            title: Text('Training Plan'),
-            leading: Icon(CustomIcons.plan),
+          ListTile(
+            title: Text('Training Plan',
+                style: TextStyle(color: disabledColorOf(context))),
+            leading: const Icon(CustomIcons.plan),
           ),
           ListTile(
-            title: const Text('Server Actions'),
+            title: Text('Server Actions',
+                style: TextStyle(color: disabledColorOf(context))),
             leading: const Icon(Icons.play_circle_fill_sharp),
-            onTap: () {
-              Nav.changeNamed(context, Routes.actions);
-            },
-            selected: selectedRoute == Routes.actions,
           ),
           ExpansionTile(
             title: const Text('Primitives'),
@@ -55,18 +53,19 @@ class MainDrawer extends StatelessWidget {
               ListTile(
                 title: const Text('Movements'),
                 leading: const Icon(Icons.apps),
-                onTap: () => Nav.changeNamed(context, Routes.movements),
-                selected: selectedRoute == Routes.movements,
+                onTap: () => Nav.changeNamed(context, Routes.movement.overview),
+                selected: selectedRoute == Routes.movement.overview,
               ),
-              const ListTile(
-                title: Text('Routes'),
-                leading: Icon(Icons.map_sharp),
+              ListTile(
+                title: Text('Routes',
+                    style: TextStyle(color: disabledColorOf(context))),
+                leading: const Icon(Icons.map_sharp),
               ),
               ListTile(
                 title: const Text('CrossFit – Metcons'),
                 leading: const Icon(CustomIcons.heart),
-                selected: selectedRoute == Routes.metconOverview,
-                onTap: () => Nav.changeNamed(context, Routes.metconOverview),
+                selected: selectedRoute == Routes.metcon.overview,
+                onTap: () => Nav.changeNamed(context, Routes.metcon.overview),
               ),
             ],
           ),

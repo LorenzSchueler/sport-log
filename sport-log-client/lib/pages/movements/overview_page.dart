@@ -70,7 +70,7 @@ class _MovementsPageState extends State<MovementsPage> {
       appBar: AppBar(
         title: const Text("Movements"),
       ),
-      drawer: const MainDrawer(selectedRoute: Routes.movements),
+      drawer: MainDrawer(selectedRoute: Routes.movement.overview),
       body: RefreshIndicator(
         onRefresh: _refreshPage,
         child: _body(context),
@@ -79,7 +79,7 @@ class _MovementsPageState extends State<MovementsPage> {
           child: const Icon(Icons.add),
           onPressed: () {
             Navigator.of(context)
-                .pushNamed(Routes.editMovement)
+                .pushNamed(Routes.movement.edit)
                 .then(_handlePageReturn);
           }),
     );
@@ -145,7 +145,7 @@ class _MovementsPageState extends State<MovementsPage> {
                       }
                       Navigator.of(context)
                           .pushNamed(
-                            Routes.editMovement,
+                            Routes.movement.edit,
                             arguments: md.copy(),
                           )
                           .then(_handlePageReturn);

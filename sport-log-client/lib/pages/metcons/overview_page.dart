@@ -42,12 +42,12 @@ class _MetconsPageState extends State<MetconsPage> {
         title: const Text('Metcons'),
       ),
       body: _content,
-      drawer: const MainDrawer(selectedRoute: Routes.metconOverview),
+      drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () async {
             final returnObject =
-                await Navigator.of(context).pushNamed(Routes.editMetcon);
+                await Navigator.of(context).pushNamed(Routes.metcon.edit);
             if (returnObject is! ReturnObject<MetconDescription>) {
               return;
             }
@@ -125,7 +125,7 @@ class _MetconsPageState extends State<MetconsPage> {
                   break;
                 case _editChoice:
                   final dynamic updatedMd = await Navigator.of(context)
-                      .pushNamed(Routes.editMetcon, arguments: md)
+                      .pushNamed(Routes.metcon.edit, arguments: md)
                       .then((_) {
                     _update();
                   });
