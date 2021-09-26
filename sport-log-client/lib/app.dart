@@ -9,7 +9,7 @@ import 'package:sport_log/pages/login/login_page.dart';
 import 'package:sport_log/pages/movements/edit_page.dart';
 import 'package:sport_log/pages/movements/overview_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
-import 'package:sport_log/pages/syncing/actions_page.dart';
+import 'package:sport_log/pages/actions/actions_page.dart';
 import 'package:sport_log/pages/workout/metcon/edit_metcon_page.dart';
 import 'package:sport_log/pages/workout/strength/edit_page.dart';
 import 'package:sport_log/pages/workout/workout_page.dart';
