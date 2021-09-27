@@ -43,7 +43,7 @@ fn parse_db_error(error: &(dyn DatabaseErrorInformation + Sync + Send)) -> Error
         }
     }
 
-    return ErrorMessage::Other(error.to_owned());
+    ErrorMessage::Other(error.to_owned())
 }
 
 #[derive(Debug)]
