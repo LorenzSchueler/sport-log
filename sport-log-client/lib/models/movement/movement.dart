@@ -8,27 +8,27 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 part 'movement.g.dart';
 
 enum MovementDimension {
-  @JsonValue("Reps")
+  @JsonValue('Reps')
   reps,
-  @JsonValue("Time")
+  @JsonValue('Time')
   time,
-  @JsonValue("Distance")
+  @JsonValue('Distance')
   distance,
-  @JsonValue("Cal")
-  cals,
+  @JsonValue('Energy')
+  energy,
 }
 
 extension MovementDimensionStrings on MovementDimension {
   String get displayName {
     switch (this) {
       case MovementDimension.reps:
-        return "Reps";
-      case MovementDimension.cals:
-        return "Cals";
+        return 'Reps';
+      case MovementDimension.energy:
+        return 'Energy';
       case MovementDimension.distance:
-        return "Distance";
+        return 'Distance';
       case MovementDimension.time:
-        return "Time";
+        return 'Time';
     }
   }
 }
@@ -55,6 +55,7 @@ class Movement implements DbObject {
   bool cardio;
   @override
   bool deleted;
+  @JsonKey(name: 'movement_dimension')
   MovementDimension dimension;
 
   Movement.defaultValue(this.userId)

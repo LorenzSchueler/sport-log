@@ -131,7 +131,7 @@ String formatCountWeight(MovementDimension dim, int count, double? weight) {
     case MovementDimension.time:
       var result = formatDuration(Duration(milliseconds: count));
       return weightStr != null ? result + ' ($weightStr)' : result;
-    case MovementDimension.cals:
+    case MovementDimension.energy:
       var result = '${count}cals';
       return weightStr != null ? result + ' ($weightStr)' : result;
     case MovementDimension.distance:

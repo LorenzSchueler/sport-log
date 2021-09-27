@@ -70,9 +70,9 @@ K? _$enumDecodeNullable<K, V>(
 }
 
 const _$DistanceUnitEnumMap = {
-  DistanceUnit.m: 'm',
-  DistanceUnit.km: 'km',
-  DistanceUnit.yards: 'yards',
-  DistanceUnit.feet: 'feet',
-  DistanceUnit.inches: 'inches',
+  DistanceUnit.m: 'Meter',
+  DistanceUnit.km: 'Km',
+  DistanceUnit.yards: 'Yard',
+  DistanceUnit.feet: 'Foot',
+  DistanceUnit.miles: 'Mile',
 };

@@ -26,7 +26,7 @@ extension DisplayName on SeriesType {
         }
         break;
       case SeriesType.sumCount:
-        if (dim == MovementDimension.cals) {
+        if (dim == MovementDimension.energy) {
           return 'Total Calories';
         }
         break;
@@ -64,7 +64,7 @@ List<SeriesType> getAvailableSeries(MovementDimension dim) {
         SeriesType.maxWeight,
         SeriesType.avgCount,
       ];
-    case MovementDimension.cals:
+    case MovementDimension.energy:
       return [SeriesType.sumCount];
     case MovementDimension.distance:
       return [SeriesType.maxCount];
