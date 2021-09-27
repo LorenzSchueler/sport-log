@@ -24,6 +24,7 @@ mod config;
 #[cfg(feature = "server")]
 mod db;
 mod diary_wod;
+mod error;
 mod metcon;
 mod movement;
 mod platform;
@@ -45,6 +46,7 @@ pub use config::*;
 #[cfg(feature = "server")]
 pub use db::*;
 pub use diary_wod::*;
+pub use error::*;
 pub use metcon::*;
 pub use movement::*;
 pub use platform::*;

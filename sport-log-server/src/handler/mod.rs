@@ -12,7 +12,7 @@ use rocket::{
     serde::json::Json,
     Request, Response,
 };
-use serde::{Deserialize, Serialize};
+use sport_log_types::{Error, ErrorMessage};
 use tracing::warn;
 
 pub mod account;
@@ -46,29 +46,15 @@ fn parse_db_error(error: &(dyn DatabaseErrorInformation + Sync + Send)) -> Error
     return ErrorMessage::Other(error.to_owned());
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub enum ErrorMessage {
-    UniqueViolation(String),
-    ForeignKeyViolation(String),
-    PrimaryKeyViolation(String),
-    Other(String),
-}
-
 #[derive(Debug)]
 pub struct JsonError {
     pub status: Status,
     pub message: Option<ErrorMessage>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-struct SerializableJsonError {
-    pub status: u16,
-    pub message: Option<ErrorMessage>,
-}
-
-impl From<JsonError> for SerializableJsonError {
+impl From<JsonError> for Error {
     fn from(json_error: JsonError) -> Self {
-        SerializableJsonError {
+        Error {
             status: json_error.status.code,
             message: json_error.message,
         }
@@ -82,7 +68,7 @@ impl<'r, 'o: 'r> Responder<'r, 'o> for JsonError {
             Some(message) => warn!("responding with status {}: {:?}", self.status.code, message),
         }
         let status = self.status;
-        let json = serde_json::to_string::<SerializableJsonError>(&self.into())
+        let json = serde_json::to_string::<Error>(&self.into())
             .map_err(|_| Status::InternalServerError)?;
         Ok(Response::build()
             .status(status)
