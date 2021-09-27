@@ -132,13 +132,17 @@ impl VerifyForUserOrAPWithDb for Unverified<StrengthBlueprintSet> {
         auth: &AuthUserOrAP,
         conn: &PgConnection,
     ) -> Result<Self::Entity, Status> {
-        let strength_set = self.0.into_inner();
-        if StrengthBlueprintSet::check_user_id(strength_set.id, **auth, conn)
+        let strength_blueprint_set = self.0.into_inner();
+        if StrengthBlueprintSet::check_user_id(strength_blueprint_set.id, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
-            && StrengthBlueprint::check_user_id(strength_set.strength_blueprint_id, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
+            && StrengthBlueprint::check_user_id(
+                strength_blueprint_set.strength_blueprint_id,
+                **auth,
+                conn,
+            )
+            .map_err(|_| Status::InternalServerError)?
         {
-            Ok(strength_set)
+            Ok(strength_blueprint_set)
         } else {
             Err(Status::Forbidden)
         }
@@ -154,21 +158,65 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthBlueprintSet>> {
         auth: &AuthUserOrAP,
         conn: &PgConnection,
     ) -> Result<Vec<Self::Entity>, Status> {
-        let strength_sets = self.0.into_inner();
-        let strength_set_ids: Vec<_> = strength_sets
+        let strength_blueprint_sets = self.0.into_inner();
+        let strength_blueprint_set_ids: Vec<_> = strength_blueprint_sets
             .iter()
             .map(|strength_set| strength_set.id)
             .collect();
-        let strength_blueprint_ids: Vec<_> = strength_sets
+        let strength_blueprint_ids: Vec<_> = strength_blueprint_sets
             .iter()
             .map(|strength_set| strength_set.strength_blueprint_id)
             .collect();
-        if StrengthBlueprintSet::check_user_ids(&strength_set_ids, **auth, conn)
+        if StrengthBlueprintSet::check_user_ids(&strength_blueprint_set_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
             && StrengthBlueprint::check_user_ids(&strength_blueprint_ids, **auth, conn)
                 .map_err(|_| Status::InternalServerError)?
         {
-            Ok(strength_sets)
+            Ok(strength_blueprint_sets)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "server")]
+impl Unverified<StrengthBlueprintSet> {
+    pub fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<StrengthBlueprintSet, Status> {
+        let strength_blueprint_set = self.0.into_inner();
+        if StrengthBlueprint::check_user_id(
+            strength_blueprint_set.strength_blueprint_id,
+            **auth,
+            conn,
+        )
+        .map_err(|_| Status::InternalServerError)?
+        {
+            Ok(strength_blueprint_set)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "server")]
+impl Unverified<Vec<StrengthBlueprintSet>> {
+    pub fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<StrengthBlueprintSet>, Status> {
+        let strength_blueprint_sets = self.0.into_inner();
+        let strength_blueprint_ids: Vec<_> = strength_blueprint_sets
+            .iter()
+            .map(|strength_set| strength_set.strength_blueprint_id)
+            .collect();
+        if StrengthBlueprint::check_user_ids(&strength_blueprint_ids, **auth, conn)
+            .map_err(|_| Status::InternalServerError)?
+        {
+            Ok(strength_blueprint_sets)
         } else {
             Err(Status::Forbidden)
         }
