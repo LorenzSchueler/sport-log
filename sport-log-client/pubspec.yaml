@@ -52,6 +52,9 @@ dependencies:
   logger: ^1.0.0
   fl_chart: ^0.40.0
 
+  mapbox_gl: ^0.12.0 # mapping lib for osm
+  location: ^4.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

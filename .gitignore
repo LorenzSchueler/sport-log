@@ -7,3 +7,4 @@
 /sport-log-server/sport-log-server.toml
 .env
 private_data.sh
+/sport-log-client/lib/helpers/secrets.dart
