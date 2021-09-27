@@ -25,15 +25,11 @@ use crate::{
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "server", derive(DbEnum))]
-pub enum MovementUnit {
+pub enum MovementDimension {
     Reps,
-    Cal,
-    Meter,
-    Km,
-    Yard,
-    Foot,
-    Mile,
-    Msec,
+    Time,
+    Energy,
+    Distance,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
@@ -121,7 +117,7 @@ pub struct Movement {
     pub name: String,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
-    pub movement_unit: MovementUnit,
+    pub movement_dimension: MovementDimension,
     pub cardio: bool,
     #[serde(skip)]
     #[serde(default = "Utc::now")]

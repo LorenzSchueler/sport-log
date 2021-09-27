@@ -37,6 +37,16 @@ pub enum MetconType {
     ForTime,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[cfg_attr(feature = "server", derive(DbEnum))]
+pub enum DistanceUnit {
+    Meter,
+    Km,
+    Yard,
+    Foot,
+    Mile,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
 #[cfg_attr(
     feature = "server",
@@ -270,6 +280,7 @@ pub struct MetconMovement {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
     pub movement_id: MovementId,
+    pub distance_unit: Option<DistanceUnit>,
     pub movement_number: i32,
     pub count: i32,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]

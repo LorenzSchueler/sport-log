@@ -1,4 +1,5 @@
 create type metcon_type as enum('amrap', 'emom', 'for_time');
+create type distance_unit as enum('meter', 'km', 'yard', 'foot', 'mile');
 
 create table metcon (
     id bigint primary key,
@@ -42,6 +43,7 @@ create table metcon_movement (
     id bigint primary key,
     metcon_id bigint not null references metcon on delete cascade,
     movement_id bigint not null references movement on delete cascade,
+    distance_unit distance_unit,
     movement_number integer not null check (movement_number >= 0),
     count integer not null check (count >= 1),
     weight real check (weight > 0),

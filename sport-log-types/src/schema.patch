@@ -17,10 +17,14 @@
 <         metcon_type -> Metcon_type,
 ---
 >         metcon_type -> MetconTypeMapping,
-217c217
-<         movement_unit -> Movement_unit,
+205c205
+<         distance_unit -> Nullable<Distance_unit>,
 ---
->         movement_unit -> MovementUnitMapping,
+>         distance_unit -> Nullable<DistanceUnitMapping>,
+217c217
+<         movement_dimension -> Movement_dimension,
+---
+>         movement_dimension -> MovementDimensionMapping,
 290c290
 <         weekday -> Nullable<Weekday>,
 ---
