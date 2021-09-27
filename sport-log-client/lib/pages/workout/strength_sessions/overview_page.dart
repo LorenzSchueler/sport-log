@@ -1,6 +1,7 @@
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
@@ -8,107 +9,102 @@ import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
-import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
-import 'package:sport_log/pages/workout/strength/strength_chart.dart';
+import 'package:sport_log/pages/workout/ui_cubit.dart';
+
+import 'strength_chart.dart';
 
 class StrengthSessionsPage extends StatefulWidget {
-  StrengthSessionsPage({
+  const StrengthSessionsPage({
     Key? key,
-    required this.dateFilter,
-    required this.movement,
-  })  : _filterHash = Object.hash(dateFilter, movement?.id),
-        super(key: key);
-
-  final DateFilterState dateFilter;
-  final Movement? movement;
-
-  final int _filterHash;
+  }) : super(key: key);
 
   @override
-  State<StrengthSessionsPage> createState() => _StrengthSessionsPageState();
+  State<StrengthSessionsPage> createState() => StrengthSessionsPageState();
 }
 
-class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
+class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   final _dataProvider = StrengthDataProvider();
-
   final _logger = Logger('StrengthSessionsPage');
-
   List<StrengthSessionDescription> _ssds = [];
 
   @override
   void initState() {
     super.initState();
-    update();
+    final state = context.read<SessionsUiCubit>().state;
+    update(state);
   }
 
-  Future<void> update() async {
+  Future<void> update(SessionsUiState state) async {
     _logger.d(
-        'Updating strength sessions with start = ${widget.dateFilter.start}, end = ${widget.dateFilter.end}');
+        'Updating strength sessions with start = ${state.dateFilter.start}, end = ${state.dateFilter.end}');
     _dataProvider
         .getSessionsWithStats(
-            from: widget.dateFilter.start,
-            until: widget.dateFilter.end,
-            movementName: widget.movement?.name)
+            from: state.dateFilter.start,
+            until: state.dateFilter.end,
+            movementName: state.movement?.name)
         .then((ssds) async {
       setState(() => _ssds = ssds);
     });
   }
 
+  // will be called by workout/sessions page via global key
+  void onFabTapped(BuildContext context) {
+    _logger.d('FAB tapped!');
+  }
+
   // full update (from server)
-  Future<void> _refreshPage() async {
+  Future<void> _refreshPage(SessionsUiState state) async {
     await _dataProvider.doFullUpdate().onError((error, stackTrace) {
       if (error is ApiError) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
       }
     });
-    update();
+    update(state);
   }
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: _refreshPage,
-      child: _buildStrengthSessionList(context),
-    );
+    return BlocConsumer<SessionsUiCubit, SessionsUiState>(
+        builder: (context, state) => RefreshIndicator(
+              onRefresh: () => _refreshPage(state),
+              child: _buildStrengthSessionList(state),
+            ),
+        listenWhen: (oldState, newState) {
+          return newState.isStrengthPage &&
+              (oldState.dateFilter != newState.dateFilter ||
+                  oldState.movement != newState.movement);
+        },
+        listener: (context, state) {
+          update(state);
+        });
   }
 
-  @override
-  void didUpdateWidget(StrengthSessionsPage oldWidget) {
-    if (widget.dateFilter != oldWidget.dateFilter ||
-        widget.movement != oldWidget.movement) {
-      update();
-    }
-    super.didUpdateWidget(oldWidget);
-  }
-
-  Widget get _chart {
-    if (widget.movement == null) {
+  Widget _chart(SessionsUiState state) {
+    if (!state.isMovementSelected) {
       return const SizedBox.shrink();
     }
-    return StrengthChart(
-      dateFilter: widget.dateFilter,
-      movement: widget.movement!,
-    );
+    return const StrengthChart();
   }
 
-  Widget _buildStrengthSessionList(BuildContext context) {
+  Widget _buildStrengthSessionList(SessionsUiState state) {
     if (_ssds.isEmpty) {
       return const Center(child: Text('No strength sessions there.'));
     }
     return Scrollbar(
       child: ListView.builder(
-        itemBuilder: _strengthSessionBuilder,
+        itemBuilder: (_, index) => _strengthSessionBuilder(state, index),
         itemCount: _ssds.length + 1,
         shrinkWrap: true,
       ),
     );
   }
 
-  Widget _strengthSessionBuilder(BuildContext context, int index) {
+  // TODO: put into seperate widget
+  Widget _strengthSessionBuilder(SessionsUiState state, int index) {
     if (index == 0) {
       assert(_ssds.isNotEmpty);
-      return _chart;
+      return _chart(state);
     }
     index--;
     final ssd = _ssds[index];
@@ -120,15 +116,14 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
         ? null
         : formatDuration(Duration(seconds: ssd.strengthSession.interval!));
     final sets = ssd.stats!.numSets.toString() + ' sets';
-    final movementSelected = widget.movement != null;
     final String title =
-        movementSelected ? [date, time].join(' · ') : ssd.movement.name;
-    final subtitleParts = movementSelected
+        state.isMovementSelected ? [date, time].join(' · ') : ssd.movement.name;
+    final subtitleParts = state.isMovementSelected
         ? [sets, if (duration != null) duration]
         : [date, time, sets, if (duration != null) duration];
     final subtitle = subtitleParts.join(' · ');
     final String text = ssd.strengthSets
-            ?.map((ss) => ss.toDisplayName(ssd.movement.unit))
+            ?.map((ss) => ss.toDisplayName(ssd.movement.dimension))
             .join(', ') ??
         '';
 
@@ -137,7 +132,8 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
       child: ExpansionTileCard(
         // dirty fix for forcing an expansion tile card to be non-expanded at the start
         // (without it, an expanded card might show an everloading circular progress indicator)
-        key: ValueKey(Object.hash(ssd.id, widget._filterHash)),
+        key:
+            ValueKey(Object.hash(ssd.id, state.dateFilter, state.movement?.id)),
         leading: CircleAvatar(child: Text(ssd.movement.name[0])),
         title: Text(title),
         subtitle: Text(subtitle),

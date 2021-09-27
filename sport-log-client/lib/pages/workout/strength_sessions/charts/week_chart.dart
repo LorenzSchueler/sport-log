@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
@@ -7,7 +6,7 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/pages/workout/strength/charts/helpers.dart';
+import 'package:sport_log/pages/workout/strength_sessions/charts/helpers.dart';
 
 import 'series_type.dart';
 
@@ -71,7 +70,7 @@ class _WeekChartState extends State<WeekChart> {
   }
 
   List<BarChartGroupData> get _barData {
-    final getValue = accessor(widget.series);
+    final getValue = statsAccessor(widget.series);
     final result = <BarChartGroupData>[];
 
     var statIndex = 0;
@@ -102,7 +101,7 @@ class _WeekChartState extends State<WeekChart> {
     if (_stats.isEmpty) {
       return const Center(child: Text('Nothing to show here.'));
     }
-    final isTime = widget.movement.unit == MovementUnit.msecs;
+    final isTime = widget.movement.dimension == MovementDimension.time;
     return BarChart(BarChartData(
       barGroups: _barData,
       borderData: FlBorderData(show: false),

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/metcon/all.dart';
-import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/widgets/form_widgets/int_picker.dart';
-
-import 'movement_picker_dialog.dart';
+import 'package:sport_log/widgets/movement_picker.dart';
 
 class MetconMovementCard extends StatelessWidget {
   const MetconMovementCard({
@@ -28,11 +26,14 @@ class MetconMovementCard extends StatelessWidget {
         children: [
           ListTile(
             title: Text(mmd.movement.name),
-            onTap: () => showMovementPickerDialog(context, (mm) {
-              mmd.movement = mm;
-              mmd.metconMovement.movementId = mm.id;
-              editMetconMovementDescription(mmd);
-            }),
+            onTap: () async {
+              final movement = await showMovementPickerDialog(context);
+              if (movement != null) {
+                mmd.movement = movement;
+                mmd.metconMovement.movementId = movement.id;
+                editMetconMovementDescription(mmd);
+              }
+            },
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -51,6 +52,7 @@ class MetconMovementCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // use different inputs for different MovementDimensions
               IntPicker(
                   initialValue: move.count,
                   setValue: (count) {
@@ -58,7 +60,7 @@ class MetconMovementCard extends StatelessWidget {
                     editMetconMovementDescription(mmd);
                   }),
               const Padding(padding: EdgeInsets.all(8)),
-              Text(mmd.movement.unit.toDisplayName()),
+              // Text(mmd.movement.dimension.toDisplayName()),
               const Padding(padding: EdgeInsets.all(8)),
             ],
           ),
@@ -80,17 +82,5 @@ class MetconMovementCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  static void showMovementPickerDialog(
-      BuildContext context, Function(Movement) onPicked) {
-    showDialog<Movement>(
-      context: context,
-      builder: (_) => const MovementPickerDialog(),
-    ).then((movement) {
-      if (movement is Movement) {
-        onPicked(movement);
-      }
-    });
   }
 }

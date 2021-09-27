@@ -55,8 +55,8 @@ class _EditMovementPageState extends State<EditMovementPage> {
     }
   }
 
-  void _setUnit(MovementUnit unit) {
-    setState(() => _md.movement.unit = unit);
+  void _setDim(MovementDimension dim) {
+    setState(() => _md.movement.dimension = dim);
   }
 
   void _setDescription(String? description) {
@@ -71,17 +71,24 @@ class _EditMovementPageState extends State<EditMovementPage> {
     if (!_inputIsValid) {
       return;
     }
+    if (await _dataProvider.movementExists(
+        _md.movement.name, _md.movement.dimension)) {
+      await showWarning(
+          context, 'Movement exists!', 'Please use the existing movement.');
+
+      return;
+    }
     if (widget._isEditing) {
       assert(_md.movement.userId != null && _hasChanges);
       // TODO: do error handling
       await _dataProvider.updateSingle(_md.movement);
       Navigator.of(context)
-          .pop(ReturnObject(action: ReturnAction.updated, object: _md));
+          .pop(ReturnObject(action: ReturnAction.updated, payload: _md));
     } else {
       // TODO: do error handling
       await _dataProvider.createSingle(_md.movement);
       Navigator.of(context)
-          .pop(ReturnObject(action: ReturnAction.created, object: _md));
+          .pop(ReturnObject(action: ReturnAction.created, payload: _md));
     }
   }
 
@@ -90,7 +97,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
       assert(_md.movement.userId != null);
       _dataProvider.deleteSingle(_md.movement);
       Navigator.of(context)
-          .pop(ReturnObject(action: ReturnAction.deleted, object: _md));
+          .pop(ReturnObject(action: ReturnAction.deleted, payload: _md));
     } else {
       Navigator.of(context).pop();
     }
@@ -121,8 +128,9 @@ class _EditMovementPageState extends State<EditMovementPage> {
                 icon: const Icon(Icons.delete),
               ),
             IconButton(
-                onPressed:
-                    _inputIsValid && _hasChanges ? () => _submit() : null,
+                onPressed: _inputIsValid && (!widget._isEditing || _hasChanges)
+                    ? () => _submit()
+                    : null,
                 icon: const Icon(Icons.save))
           ],
         ),
@@ -134,7 +142,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
                 children: [
                   _nameInput(context),
                   _maybeDescriptionInput(context),
-                  _unitInput,
+                  _dimInput,
                   _categoryInput(context),
                 ],
               ),
@@ -196,17 +204,17 @@ class _EditMovementPageState extends State<EditMovementPage> {
     );
   }
 
-  Widget get _unitInput {
-    return SelectionBar<MovementUnit>(
-      onChange: _setUnit,
+  Widget get _dimInput {
+    return SelectionBar<MovementDimension>(
+      onChange: _setDim,
       items: const [
-        MovementUnit.reps,
-        MovementUnit.msecs,
-        MovementUnit.m,
-        MovementUnit.cals
+        MovementDimension.reps,
+        MovementDimension.time,
+        MovementDimension.distance,
+        MovementDimension.cals
       ],
-      getLabel: (unit) => unit.toDimensionName(),
-      selectedItem: _md.movement.unit,
+      getLabel: (dim) => dim.displayName,
+      selectedItem: _md.movement.dimension,
     );
   }
 

@@ -46,7 +46,7 @@ mixin ApiLogging {
   }
 
   void _logResponse(Response response) {
-    final body = response.body;
+    final body = utf8.decode(response.bodyBytes);
     final successful = response.statusCode >= 200 && response.statusCode < 300;
     if (body.isEmpty) {
       logger.log(successful ? l.Level.debug : l.Level.error,
@@ -91,7 +91,7 @@ mixin ApiHelpers on ApiLogging, ApiHeaders {
       if (response.statusCode < 200 || response.statusCode >= 300) {
         return Failure(ApiError.unknown);
       }
-      return Success(fromJson(jsonDecode(response.body)));
+      return Success(fromJson(jsonDecode(utf8.decode(response.bodyBytes))));
     });
   }
 }

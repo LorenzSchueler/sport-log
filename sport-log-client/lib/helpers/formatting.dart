@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:sport_log/models/all.dart';
 
 String formatDuration(Duration d) {
   String result = '';
@@ -98,4 +99,43 @@ const _shortWeekdayNames = [
 
 String shortWeekdayName(int weekday) {
   return _shortWeekdayNames[weekday - 1];
+}
+
+String formatDistance(int meters) {
+  assert(meters >= 0);
+  final kmRemainder = meters % 1000;
+  if (kmRemainder == 0) {
+    return '${meters ~/ 1000}k';
+  }
+  final remainder100 = meters % 100;
+  if (remainder100 == 0) {
+    final km = meters.toDouble() / 1000.0;
+    return '${km.toStringAsFixed(1)}k';
+  }
+  const double metersPerMile = 1609.344;
+  final miRemainder = meters.toDouble() % metersPerMile;
+  if (miRemainder < 10) {
+    final miles = (meters.toDouble() / metersPerMile).round();
+    return '${miles}mi';
+  }
+  return '${meters}m';
+}
+
+String formatCountWeight(MovementDimension dim, int count, double? weight) {
+  final weightStr = weight == null
+      ? null
+      : ((weight * 10).roundToDouble() / 10).toString() + 'kg';
+  switch (dim) {
+    case MovementDimension.reps:
+      return weight != null ? '${count}x$weightStr' : '${count}reps';
+    case MovementDimension.time:
+      var result = formatDuration(Duration(milliseconds: count));
+      return weightStr != null ? result + ' ($weightStr)' : result;
+    case MovementDimension.cals:
+      var result = '${count}cals';
+      return weightStr != null ? result + ' ($weightStr)' : result;
+    case MovementDimension.distance:
+      var result = formatDistance(count);
+      return weightStr != null ? result + ' ($weightStr)' : result;
+  }
 }

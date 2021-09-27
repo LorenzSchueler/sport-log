@@ -6,18 +6,18 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/pages/workout/strength/charts/helpers.dart';
+import 'package:sport_log/pages/workout/strength_sessions/charts/helpers.dart';
 
 import 'series_type.dart';
 
 /// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
-class MonthChart extends StatefulWidget {
-  MonthChart({
+class YearChart extends StatefulWidget {
+  YearChart({
     Key? key,
     required this.series,
     required DateTime start,
     required this.movement,
-  })  : start = start.beginningOfMonth(),
+  })  : start = start.beginningOfYear(),
         super(key: key);
 
   final SeriesType series;
@@ -25,10 +25,10 @@ class MonthChart extends StatefulWidget {
   final Movement movement;
 
   @override
-  State<MonthChart> createState() => _MonthChartState();
+  State<YearChart> createState() => _YearChartState();
 }
 
-class _MonthChartState extends State<MonthChart> {
+class _YearChartState extends State<YearChart> {
   final _dataProvider = StrengthDataProvider();
 
   List<StrengthSessionStats> _stats = [];
@@ -43,13 +43,13 @@ class _MonthChartState extends State<MonthChart> {
   void update() {
     setState(() => isLoading = true);
     _dataProvider
-        .getStatsByDay(
+        .getStatsByWeek(
       movementId: widget.movement.id,
       from: widget.start,
-      until: widget.start.monthLater(),
+      until: widget.start.yearLater(),
     )
         .then((stats) {
-      assert(stats.length <= 31);
+      assert(stats.length <= 54);
       if (mounted) {
         setState(() {
           _stats = stats;
@@ -60,7 +60,7 @@ class _MonthChartState extends State<MonthChart> {
   }
 
   @override
-  void didUpdateWidget(MonthChart oldWidget) {
+  void didUpdateWidget(YearChart oldWidget) {
     super.didUpdateWidget(oldWidget);
     // ignore a change in series type
     if (oldWidget.movement != widget.movement ||
@@ -77,16 +77,22 @@ class _MonthChartState extends State<MonthChart> {
     if (_stats.isEmpty) {
       return const Center(child: Text('Nothing to show here.'));
     }
-    final getValue = accessor(widget.series);
-    final isTime = widget.movement.unit == MovementUnit.msecs;
+    final getValue = statsAccessor(widget.series);
+    final isTime = widget.movement.dimension == MovementDimension.time;
     return LineChart(
       LineChartData(
         lineBarsData: [
           LineChartBarData(
             spots: _stats.map((s) {
-              return FlSpot(s.datetime.day.toDouble(), getValue(s));
+              return FlSpot(
+                  (s.datetime.difference(widget.start).inDays + 1).toDouble(),
+                  getValue(s));
             }).toList(),
             colors: [primaryColorOf(context)],
+            dotData: FlDotData(show: false),
+            isCurved: true,
+            preventCurveOverShooting: true,
+            preventCurveOvershootingThreshold: 1.5,
           ),
         ],
         titlesData: FlTitlesData(
@@ -94,7 +100,13 @@ class _MonthChartState extends State<MonthChart> {
           rightTitles: SideTitles(showTitles: false),
           bottomTitles: SideTitles(
             showTitles: true,
-            interval: 2,
+            interval: 1,
+            checkToShowTitle: (_, __, ___, ____, value) {
+              final date = DateTime(widget.start.year, 1, value.round());
+              return date.day == 15;
+            },
+            getTitles: (value) => shortMonthName(
+                DateTime(widget.start.year, 1, value.round()).month),
           ),
           leftTitles: SideTitles(
             showTitles: true,
@@ -105,14 +117,16 @@ class _MonthChartState extends State<MonthChart> {
                 : null,
           ),
         ),
-        gridData: FlGridData(
-          verticalInterval: 2,
-          getDrawingHorizontalLine: gridLineDrawer(context),
-          getDrawingVerticalLine: gridLineDrawer(context),
-        ),
-        minX: 1.0,
-        maxX: widget.start.numDaysInMonth.toDouble(),
+        minX: 0,
+        maxX: (widget.start.isLeapYear ? 366 : 365).toDouble(),
         borderData: FlBorderData(show: false),
+        gridData: FlGridData(
+          verticalInterval: 1,
+          checkToShowVerticalLine: (value) =>
+              DateTime(widget.start.year, 1, value.round()).day == 1,
+          getDrawingVerticalLine: gridLineDrawer(context),
+          getDrawingHorizontalLine: gridLineDrawer(context),
+        ),
       ),
     );
   }

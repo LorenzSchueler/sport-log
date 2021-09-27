@@ -5,30 +5,26 @@ import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
-import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/pages/workout/strength/charts/helpers.dart';
 
+import 'helpers.dart';
 import 'series_type.dart';
 
 /// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
-class YearChart extends StatefulWidget {
-  YearChart({
+class AllChart extends StatefulWidget {
+  const AllChart({
     Key? key,
     required this.series,
-    required DateTime start,
     required this.movement,
-  })  : start = start.beginningOfYear(),
-        super(key: key);
+  }) : super(key: key);
 
   final SeriesType series;
-  final DateTime start;
   final Movement movement;
 
   @override
-  State<YearChart> createState() => _YearChartState();
+  State<AllChart> createState() => _AllChartState();
 }
 
-class _YearChartState extends State<YearChart> {
+class _AllChartState extends State<AllChart> {
   final _dataProvider = StrengthDataProvider();
 
   List<StrengthSessionStats> _stats = [];
@@ -42,14 +38,7 @@ class _YearChartState extends State<YearChart> {
 
   void update() {
     setState(() => isLoading = true);
-    _dataProvider
-        .getStatsByWeek(
-      movementId: widget.movement.id,
-      from: widget.start,
-      until: widget.start.yearLater(),
-    )
-        .then((stats) {
-      assert(stats.length <= 54);
+    _dataProvider.getStatsByMonth(movementId: widget.movement.id).then((stats) {
       if (mounted) {
         setState(() {
           _stats = stats;
@@ -60,11 +49,10 @@ class _YearChartState extends State<YearChart> {
   }
 
   @override
-  void didUpdateWidget(YearChart oldWidget) {
+  void didUpdateWidget(AllChart oldWidget) {
     super.didUpdateWidget(oldWidget);
     // ignore a change in series type
-    if (oldWidget.movement != widget.movement ||
-        oldWidget.start != widget.start) {
+    if (oldWidget.movement != widget.movement) {
       update();
     }
   }
@@ -77,16 +65,24 @@ class _YearChartState extends State<YearChart> {
     if (_stats.isEmpty) {
       return const Center(child: Text('Nothing to show here.'));
     }
-    final getValue = accessor(widget.series);
-    final isTime = widget.movement.unit == MovementUnit.msecs;
+    final getValue = statsAccessor(widget.series);
+    final isTime = widget.movement.dimension == MovementDimension.time;
+
+    double fromDate(DateTime date) =>
+        (date.year * 12 + date.month - 1).toDouble();
+    DateTime fromValue(double value) {
+      final intValue = value.round();
+      final remainder = intValue % 12;
+      final year = ((intValue - remainder) / 12).round();
+      return DateTime(year, remainder + 1);
+    }
+
     return LineChart(
       LineChartData(
         lineBarsData: [
           LineChartBarData(
             spots: _stats.map((s) {
-              return FlSpot(
-                  (s.datetime.difference(widget.start).inDays + 1).toDouble(),
-                  getValue(s));
+              return FlSpot(fromDate(s.datetime), getValue(s));
             }).toList(),
             colors: [primaryColorOf(context)],
             dotData: FlDotData(show: false),
@@ -99,15 +95,11 @@ class _YearChartState extends State<YearChart> {
           topTitles: SideTitles(showTitles: false),
           rightTitles: SideTitles(showTitles: false),
           bottomTitles: SideTitles(
-            showTitles: true,
-            interval: 1,
-            checkToShowTitle: (_, __, ___, ____, value) {
-              final date = DateTime(widget.start.year, 1, value.round());
-              return date.day == 15;
-            },
-            getTitles: (value) => shortMonthName(
-                DateTime(widget.start.year, 1, value.round()).month),
-          ),
+              showTitles: true,
+              getTitles: (value) {
+                final date = fromValue(value);
+                return shortMonthName(date.month) + '\n' + '${date.year}';
+              }),
           leftTitles: SideTitles(
             showTitles: true,
             reservedSize: isTime ? 60 : 40,
@@ -117,13 +109,10 @@ class _YearChartState extends State<YearChart> {
                 : null,
           ),
         ),
-        minX: 0,
-        maxX: (widget.start.isLeapYear ? 366 : 365).toDouble(),
         borderData: FlBorderData(show: false),
         gridData: FlGridData(
           verticalInterval: 1,
-          checkToShowVerticalLine: (value) =>
-              DateTime(widget.start.year, 1, value.round()).day == 1,
+          checkToShowVerticalLine: (value) => fromValue(value).month == 1,
           getDrawingVerticalLine: gridLineDrawer(context),
           getDrawingHorizontalLine: gridLineDrawer(context),
         ),

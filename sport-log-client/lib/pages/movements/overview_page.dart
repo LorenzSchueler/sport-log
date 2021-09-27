@@ -4,7 +4,7 @@ import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorder
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
-import 'package:sport_log/helpers/state/local_state.dart';
+import 'package:sport_log/helpers/extensions/list_extension.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/routes.dart';
@@ -20,14 +20,14 @@ class MovementsPage extends StatefulWidget {
 
 class _MovementsPageState extends State<MovementsPage> {
   final _dataProvider = MovementDataProvider();
-  LocalState<MovementDescription> _state = LocalState.empty();
+  List<MovementDescription> _movementDescriptions = [];
 
   @override
   void initState() {
     super.initState();
-    _dataProvider.getNonDeletedFull().then((mds) {
+    _dataProvider.getMovementDescriptions().then((mds) {
       setState(() {
-        _state = LocalState.fromList(mds);
+        _movementDescriptions = mds;
       });
     });
   }
@@ -36,13 +36,24 @@ class _MovementsPageState extends State<MovementsPage> {
     if (object is ReturnObject<MovementDescription>) {
       switch (object.action) {
         case ReturnAction.created:
-          setState(() => _state.create(object.object));
+          setState(() {
+            _movementDescriptions.add(object.payload);
+            _movementDescriptions.sortBy((m) => m.movement.name.toUpperCase());
+            // TODO: "hide" server defined movements with same name/dimension
+          });
           break;
         case ReturnAction.updated:
-          setState(() => _state.update(object.object));
+          setState(() {
+            _movementDescriptions.update(object.payload,
+                by: (o) => o.movement.id);
+            _movementDescriptions.sortBy((m) => m.movement.name.toUpperCase());
+            // TODO: "hide" server defined movements with same name/dimension
+          });
           break;
         case ReturnAction.deleted:
-          setState(() => _state.delete(object.object.id));
+          setState(() => _movementDescriptions.delete(object.payload,
+              by: (m) => m.movement.id));
+        // TODO: "unhide" server defined movements with same name/dimension
       }
     }
   }
@@ -54,8 +65,8 @@ class _MovementsPageState extends State<MovementsPage> {
             .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
       }
     });
-    _dataProvider.getNonDeletedFull().then((mds) {
-      setState(() => _state = LocalState.fromList(mds));
+    _dataProvider.getMovementDescriptions().then((mds) {
+      setState(() => _movementDescriptions = mds);
     });
   }
 
@@ -65,7 +76,7 @@ class _MovementsPageState extends State<MovementsPage> {
       appBar: AppBar(
         title: const Text("Movements"),
       ),
-      drawer: const MainDrawer(selectedRoute: Routes.movements),
+      drawer: MainDrawer(selectedRoute: Routes.movement.overview),
       body: RefreshIndicator(
         onRefresh: _refreshPage,
         child: _body(context),
@@ -74,18 +85,18 @@ class _MovementsPageState extends State<MovementsPage> {
           child: const Icon(Icons.add),
           onPressed: () {
             Navigator.of(context)
-                .pushNamed(Routes.editMovement)
+                .pushNamed(Routes.movement.edit)
                 .then(_handlePageReturn);
           }),
     );
   }
 
   Widget _body(BuildContext context) {
-    if (_state.isEmpty) {
+    if (_movementDescriptions.isEmpty) {
       return const Center(child: Text("No movements there."));
     }
     return ImplicitlyAnimatedList(
-      items: _state.sortedBy(_compareFunction),
+      items: _movementDescriptions,
       itemBuilder: _movementToWidget,
       areItemsTheSame: MovementDescription.areTheSame,
     );
@@ -104,6 +115,7 @@ class _MovementsPageState extends State<MovementsPage> {
       child: ExpansionTileCard(
           leading: CircleAvatar(child: Text(movement.name[0])),
           title: Text(movement.name),
+          subtitle: Text(movement.dimension.displayName),
           children: [
             if (movement.description != null) const Divider(),
             if (movement.description != null)
@@ -122,7 +134,8 @@ class _MovementsPageState extends State<MovementsPage> {
                       onPressed: () {
                         assert(movement.userId != null && !md.hasReference);
                         _dataProvider.deleteSingle(movement);
-                        setState(() => _state.delete(md.id));
+                        setState(() => _movementDescriptions.delete(md,
+                            by: (m) => m.movement.id));
                       },
                       icon: const Icon(Icons.delete),
                     ),
@@ -138,7 +151,7 @@ class _MovementsPageState extends State<MovementsPage> {
                       }
                       Navigator.of(context)
                           .pushNamed(
-                            Routes.editMovement,
+                            Routes.movement.edit,
                             arguments: md.copy(),
                           )
                           .then(_handlePageReturn);
@@ -149,21 +162,5 @@ class _MovementsPageState extends State<MovementsPage> {
               ),
           ]),
     );
-  }
-
-  int _compareFunction(MovementDescription m1, MovementDescription m2) {
-    if (m1.movement.userId != null) {
-      if (m2.movement.userId != null) {
-        return m1.movement.name.compareTo(m2.movement.name);
-      } else {
-        return -1;
-      }
-    } else {
-      if (m2.movement.userId != null) {
-        return 1;
-      } else {
-        return m1.movement.name.compareTo(m2.movement.name);
-      }
-    }
   }
 }

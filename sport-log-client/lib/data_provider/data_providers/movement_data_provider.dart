@@ -12,21 +12,13 @@ class MovementDataProvider extends DataProviderImpl<Movement>
   @override
   final MovementTable db = AppDatabase.instance!.movements;
 
-  Future<List<Movement>> searchByName(String name) async {
-    if (name.isEmpty) {
-      return getNonDeleted();
-    }
-    return db.searchByName(name);
-  }
+  Future<List<MovementDescription>> getMovementDescriptions() async =>
+      db.getMovementDescriptions();
 
-  Future<List<MovementDescription>> getNonDeletedFull() async =>
-      db.getNonDeletedFull();
+  Future<List<Movement>> getMovements({String? byName}) async =>
+      db.getMovements(
+          byName: byName != null && byName.isNotEmpty ? byName : null);
 
-  Future<List<Movement>> getStrengthSessionMovements() async =>
-      db.getMovementsWithUnits([
-        MovementUnit.m,
-        MovementUnit.cals,
-        MovementUnit.msecs,
-        MovementUnit.reps
-      ]);
+  Future<bool> movementExists(String name, MovementDimension dim) async =>
+      db.exists(name, dim);
 }

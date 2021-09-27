@@ -6,12 +6,12 @@ import 'package:sport_log/models/movement/movement_description.dart';
 import 'package:sport_log/models/strength/strength_session_description.dart';
 import 'package:sport_log/pages/landing/landing_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
+import 'package:sport_log/pages/metcons/edit_page.dart';
+import 'package:sport_log/pages/metcons/overview_page.dart';
 import 'package:sport_log/pages/movements/edit_page.dart';
 import 'package:sport_log/pages/movements/overview_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
-import 'package:sport_log/pages/syncing/actions_page.dart';
-import 'package:sport_log/pages/workout/metcon/edit_metcon_page.dart';
-import 'package:sport_log/pages/workout/strength/edit_page.dart';
+import 'package:sport_log/pages/workout/strength_sessions/edit_page.dart';
 import 'package:sport_log/pages/workout/workout_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
 
@@ -50,18 +50,18 @@ class _AppState extends State<App> {
         Routes.login: (_) => const LoginPage(),
         Routes.registration: (_) => const RegistrationPage(),
         Routes.workout: (_) =>
-            ProtectedRoute(builder: (_) => const WorkoutPage()),
-        Routes.editMetcon: (_) => ProtectedRoute(builder: (context) {
+            ProtectedRoute(builder: (_) => WorkoutPage()),
+        Routes.metcon.overview: (_) =>
+            ProtectedRoute(builder: (_) => const MetconsPage()),
+        Routes.metcon.edit: (_) => ProtectedRoute(builder: (context) {
               final arg = ModalRoute.of(context)?.settings.arguments;
               return EditMetconPage(
                 initialMetcon: (arg is MetconDescription) ? arg : null,
               );
             }),
-        Routes.actions: (_) =>
-            ProtectedRoute(builder: (_) => const ActionsPage()),
-        Routes.movements: (_) =>
+        Routes.movement.overview: (_) =>
             ProtectedRoute(builder: (_) => const MovementsPage()),
-        Routes.editMovement: (_) => ProtectedRoute(builder: (context) {
+        Routes.movement.edit: (_) => ProtectedRoute(builder: (context) {
               final arg = ModalRoute.of(context)?.settings.arguments;
               if (arg is MovementDescription) {
                 return EditMovementPage(initialMovement: arg);

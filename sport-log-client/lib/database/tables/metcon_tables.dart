@@ -1,12 +1,14 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table_creator.dart';
 import 'package:sport_log/database/table_names.dart';
 import 'package:sport_log/models/metcon/all.dart';
 
 class MetconTable extends DbAccessor<Metcon> {
   @override
-  String get setupSql => '''
+  List<String> get setupSql => [
+        '''
 create table $tableName (
     user_id integer,
     name text check (length(name) <= 80),
@@ -16,7 +18,9 @@ create table $tableName (
     description text,
     $idAndDeletedAndStatus
 );
-  ''';
+  ''',
+        updateTrigger,
+      ];
 
   @override
   DbSerializer<Metcon> get serde => DbMetconSerializer();
@@ -30,19 +34,31 @@ class MetconMovementTable extends DbAccessor<MetconMovement> {
   DbSerializer<MetconMovement> get serde => DbMetconMovementSerializer();
 
   @override
-  String get setupSql => '''
-create table $tableName (
-    metcon_id integer not null references metcon(id) on delete cascade,
-    movement_id integer not null references movement(id) on delete no action,
-    movement_number integer not null check (movement_number >= 0),
-    count integer not null check (count >= 1),
-    weight real check (weight > 0),
-    $idAndDeletedAndStatus
-);
-  ''';
+  List<String> get setupSql => [_table.setupSql(), updateTrigger];
+
+  final Table _table = Table(
+    Tables.metconMovement,
+    withColumns: [
+      Column.int(Keys.id).primaryKey(),
+      Column.bool(Keys.deleted).withDefault('0'),
+      Column.int(Keys.syncStatus)
+          .withDefault('2')
+          .check('${Keys.syncStatus} IN (0, 1, 2)'),
+      Column.int(Keys.metconId)
+          .references(Tables.metcon, onDelete: OnAction.cascade),
+      Column.int(Keys.movementId)
+          .references(Tables.movement, onDelete: OnAction.noAction),
+      Column.int(Keys.movementNumber).check('${Keys.movementNumber} >= 0'),
+      Column.int(Keys.count).check('${Keys.count} >= 1'),
+      Column.real(Keys.weight).nullable().check('${Keys.weight} > 0'),
+      Column.int(Keys.distanceUnit)
+          .nullable()
+          .check('${Keys.distanceUnit} BETWEEN 0 AND 4'),
+    ],
+  );
 
   @override
-  String get tableName => Tables.metconMovement;
+  String get tableName => _table.name;
 
   Future<void> setSynchronizedByMetcon(Int64 id) async {
     database.update(tableName, DbAccessor.synchronized,
@@ -69,7 +85,8 @@ class MetconSessionTable extends DbAccessor<MetconSession> {
   DbSerializer<MetconSession> get serde => DbMetconSessionSerializer();
 
   @override
-  String get setupSql => '''
+  List<String> get setupSql => [
+        '''
 create table $tableName (
     user_id integer not null,
     metcon_id integer not null references metcon(id) on delete no action,
@@ -81,7 +98,9 @@ create table $tableName (
     comments text,
     $idAndDeletedAndStatus
 );
-  ''';
+  ''',
+        updateTrigger,
+      ];
 
   @override
   String get tableName => Tables.metconSession;

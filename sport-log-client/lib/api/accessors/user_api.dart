@@ -17,9 +17,9 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       if (response.statusCode < 200 || response.statusCode >= 300) {
         return Failure(ApiError.unknown);
       }
-      final user =
-          User.fromJson(jsonDecode(response.body) as Map<String, dynamic>)
-            ..password = password;
+      final user = User.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>)
+        ..password = password;
       UserState.instance.setUser(user);
       return Success(user);
     });

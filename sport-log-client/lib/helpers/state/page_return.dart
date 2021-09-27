@@ -3,9 +3,9 @@ enum ReturnAction { updated, created, deleted }
 class ReturnObject<T> {
   ReturnObject({
     required this.action,
-    required this.object,
+    required this.payload,
   });
 
   ReturnAction action;
-  T object;
+  T payload;
 }
