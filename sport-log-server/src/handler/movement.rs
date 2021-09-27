@@ -1,8 +1,9 @@
 use sport_log_types::{
     AuthUserOrAP, Create, CreateMultiple, Db, Eorm, GetAll, GetById, GetByUser, Movement,
     MovementId, MovementMuscle, MovementMuscleId, MuscleGroup, Unverified, UnverifiedId, Update,
-    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
-    VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
+    VerifyForUserOrAPCreate, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
+    VerifyIdForUserOrAP, VerifyMultipleForUserOrAPCreate, VerifyMultipleForUserOrAPWithDb,
+    VerifyMultipleForUserOrAPWithoutDb,
 };
 
 use crate::handler::{IntoJson, JsonError, JsonResult};

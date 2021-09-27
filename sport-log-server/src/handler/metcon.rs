@@ -1,8 +1,9 @@
 use sport_log_types::{
     AuthUserOrAP, Create, CreateMultiple, Db, GetById, GetByUser, Metcon, MetconId, MetconItem,
     MetconItemId, MetconMovement, MetconMovementId, MetconSession, MetconSessionDescription,
-    MetconSessionId, Unverified, UnverifiedId, Update, VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyMultipleForUserOrAPWithDb,
+    MetconSessionId, Unverified, UnverifiedId, Update, VerifyForUserOrAPCreate,
+    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    VerifyMultipleForUserOrAPCreate, VerifyMultipleForUserOrAPWithDb,
     VerifyMultipleForUserOrAPWithoutDb,
 };
 

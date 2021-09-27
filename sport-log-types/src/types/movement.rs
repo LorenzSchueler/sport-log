@@ -17,8 +17,10 @@ use crate::{from_str, from_str_optional, to_str, to_str_optional, UserId};
 use crate::{
     schema::{eorm, movement, movement_muscle, muscle_group},
     AuthUserOrAP, CheckOptionalUserId, CheckUserId, GetById, Unverified, UnverifiedId,
-    UnverifiedIds, User, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
-    VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
+    UnverifiedIds, User, VerifyForUserOrAPCreate, VerifyForUserOrAPWithDb,
+    VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
+    VerifyMultipleForUserOrAPCreate, VerifyMultipleForUserOrAPWithDb,
+    VerifyMultipleForUserOrAPWithoutDb,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -366,12 +368,14 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MovementMuscle>> {
 }
 
 #[cfg(feature = "server")]
-impl Unverified<MovementMuscle> {
-    pub fn verify_user_ap_create(
+impl VerifyForUserOrAPCreate for Unverified<MovementMuscle> {
+    type Entity = MovementMuscle;
+
+    fn verify_user_ap_create(
         self,
         auth: &AuthUserOrAP,
         conn: &PgConnection,
-    ) -> Result<MovementMuscle, Status> {
+    ) -> Result<Self::Entity, Status> {
         let movement_muscle = self.0.into_inner();
         if Movement::check_user_id(movement_muscle.movement_id, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
@@ -384,12 +388,14 @@ impl Unverified<MovementMuscle> {
 }
 
 #[cfg(feature = "server")]
-impl Unverified<Vec<MovementMuscle>> {
-    pub fn verify_user_ap_create(
+impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MovementMuscle>> {
+    type Entity = MovementMuscle;
+
+    fn verify_user_ap_create(
         self,
         auth: &AuthUserOrAP,
         conn: &PgConnection,
-    ) -> Result<Vec<MovementMuscle>, Status> {
+    ) -> Result<Vec<Self::Entity>, Status> {
         let movement_muscle = self.0.into_inner();
         let movement_ids: Vec<_> = movement_muscle
             .iter()

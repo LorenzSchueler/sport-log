@@ -23,8 +23,10 @@ use crate::{
 use crate::{
     schema::{metcon, metcon_item, metcon_movement, metcon_session},
     AuthUserOrAP, CheckOptionalUserId, CheckUserId, TrainingPlan, Unverified, UnverifiedId,
-    UnverifiedIds, User, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
-    VerifyIdsForUserOrAP, VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
+    UnverifiedIds, User, VerifyForUserOrAPCreate, VerifyForUserOrAPWithDb,
+    VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyIdsForUserOrAP,
+    VerifyMultipleForUserOrAPCreate, VerifyMultipleForUserOrAPWithDb,
+    VerifyMultipleForUserOrAPWithoutDb,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
@@ -339,12 +341,14 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
 }
 
 #[cfg(feature = "server")]
-impl Unverified<MetconMovement> {
-    pub fn verify_user_ap_create(
+impl VerifyForUserOrAPCreate for Unverified<MetconMovement> {
+    type Entity = MetconMovement;
+
+    fn verify_user_ap_create(
         self,
         auth: &AuthUserOrAP,
         conn: &PgConnection,
-    ) -> Result<MetconMovement, Status> {
+    ) -> Result<Self::Entity, Status> {
         let metcon_movement = self.0.into_inner();
         if Metcon::check_user_id(metcon_movement.metcon_id, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
@@ -359,12 +363,14 @@ impl Unverified<MetconMovement> {
 }
 
 #[cfg(feature = "server")]
-impl Unverified<Vec<MetconMovement>> {
-    pub fn verify_user_ap_create(
+impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconMovement>> {
+    type Entity = MetconMovement;
+
+    fn verify_user_ap_create(
         self,
         auth: &AuthUserOrAP,
         conn: &PgConnection,
-    ) -> Result<Vec<MetconMovement>, Status> {
+    ) -> Result<Vec<Self::Entity>, Status> {
         let metcon_movements = self.0.into_inner();
         let metcon_ids: Vec<_> = metcon_movements
             .iter()
@@ -550,12 +556,14 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconItem>> {
 }
 
 #[cfg(feature = "server")]
-impl Unverified<MetconItem> {
-    pub fn verify_user_ap_create(
+impl VerifyForUserOrAPCreate for Unverified<MetconItem> {
+    type Entity = MetconItem;
+
+    fn verify_user_ap_create(
         self,
         auth: &AuthUserOrAP,
         conn: &PgConnection,
-    ) -> Result<MetconItem, Status> {
+    ) -> Result<Self::Entity, Status> {
         let metcon_item = self.0.into_inner();
         if Metcon::check_optional_user_id(metcon_item.metcon_id, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
@@ -570,12 +578,14 @@ impl Unverified<MetconItem> {
 }
 
 #[cfg(feature = "server")]
-impl Unverified<Vec<MetconItem>> {
-    pub fn verify_user_ap_create(
+impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconItem>> {
+    type Entity = MetconItem;
+
+    fn verify_user_ap_create(
         self,
         auth: &AuthUserOrAP,
         conn: &PgConnection,
-    ) -> Result<Vec<MetconItem>, Status> {
+    ) -> Result<Vec<Self::Entity>, Status> {
         let metcon_items = self.0.into_inner();
         let metcon_ids: Vec<_> = metcon_items
             .iter()

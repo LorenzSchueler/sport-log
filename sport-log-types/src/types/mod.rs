@@ -487,6 +487,28 @@ pub trait VerifyMultipleForUserOrAPWithDb {
 }
 
 #[cfg(feature = "server")]
+pub trait VerifyForUserOrAPCreate {
+    type Entity;
+
+    fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Self::Entity, Status>;
+}
+
+#[cfg(feature = "server")]
+pub trait VerifyMultipleForUserOrAPCreate {
+    type Entity;
+
+    fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status>;
+}
+
+#[cfg(feature = "server")]
 pub trait VerifyForUserOrAPWithoutDb {
     type Entity;
 

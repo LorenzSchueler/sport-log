@@ -2,7 +2,8 @@ use sport_log_types::{
     AuthUserOrAP, Create, CreateMultiple, Db, GetById, GetByUser, StrengthBlueprint,
     StrengthBlueprintId, StrengthBlueprintSet, StrengthBlueprintSetId, StrengthSession,
     StrengthSessionDescription, StrengthSessionId, StrengthSet, StrengthSetId, Unverified,
-    UnverifiedId, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    UnverifiedId, Update, VerifyForUserOrAPCreate, VerifyForUserOrAPWithDb,
+    VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyMultipleForUserOrAPCreate,
     VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
 };
 
