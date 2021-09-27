@@ -1,31 +1,31 @@
-create type movement_unit as enum('reps', 'cal', 'meter', 'km', 'yard', 'foot', 'mile', 'msec');
+create type movement_dimension as enum('reps', 'time', 'energy', 'distance');
 
 create table movement (
     id bigint primary key,
     user_id bigint references "user" on delete cascade,
     name varchar(80) not null,
     description text,
-    movement_unit movement_unit not null,
+    movement_dimension movement_dimension not null,
     cardio boolean not null,
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
 
-create unique index movement_idx on movement (user_id, name, movement_unit) where deleted = false;
+create unique index movement_idx on movement (user_id, name, movement_dimension) where deleted = false;
 
 create trigger set_timestamp before update on movement
     for each row execute procedure trigger_set_timestamp();
 
-insert into movement (id, user_id, name, description, movement_unit, cardio) values
+insert into movement (id, user_id, name, description, movement_dimension, cardio) values
     (1, null, 'Back Squat', null, 'reps', false),
     (2, null, 'Front Squat', null, 'reps', false),
     (3, null, 'Over Head Squat', null, 'reps', false),
-    (4, 1, 'Yoke Carry', null, 'meter', false),
+    (4, 1, 'Yoke Carry', null, 'distance', false),
     (5, null, 'Running', 'road running without significant altitude change', 'reps', true),
     (6, null, 'Trailrunning', null, 'reps', true),
     (7, null, 'Swimming Freestyle', 'indoor freestyle swimming', 'reps', true),
-    (8, 1, 'Row Ergo', null, 'meter', true),
-    (9, 1, 'Row Ergo', null, 'cal', true),
+    (8, 1, 'Row Ergo', null, 'distance', true),
+    (9, 1, 'Row Ergo', null, 'energy', true),
     (10, null, 'Pull-Up', null, 'reps', false),
     (11, null, 'Push-Up', null, 'reps', false),
     (12, null, 'Air Squat', null, 'reps', false);

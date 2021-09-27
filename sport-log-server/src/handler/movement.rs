@@ -1,8 +1,9 @@
 use sport_log_types::{
     AuthUserOrAP, Create, CreateMultiple, Db, Eorm, GetAll, GetById, GetByUser, Movement,
     MovementId, MovementMuscle, MovementMuscleId, MuscleGroup, Unverified, UnverifiedId, Update,
-    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
-    VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
+    VerifyForUserOrAPCreate, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
+    VerifyIdForUserOrAP, VerifyMultipleForUserOrAPCreate, VerifyMultipleForUserOrAPWithDb,
+    VerifyMultipleForUserOrAPWithoutDb,
 };
 
 use crate::handler::{IntoJson, JsonError, JsonResult};
@@ -113,7 +114,7 @@ pub async fn create_movement_muscle(
     conn: Db,
 ) -> JsonResult<MovementMuscle> {
     let movement_muscle = conn
-        .run(move |c| movement_muscle.verify_user_ap(&auth, c))
+        .run(move |c| movement_muscle.verify_user_ap_create(&auth, c))
         .await
         .map_err(|status| JsonError {
             status,
@@ -135,7 +136,7 @@ pub async fn create_movement_muscles(
     conn: Db,
 ) -> JsonResult<Vec<MovementMuscle>> {
     let movement_muscles = conn
-        .run(move |c| movement_muscles.verify_user_ap(&auth, c))
+        .run(move |c| movement_muscles.verify_user_ap_create(&auth, c))
         .await
         .map_err(|status| JsonError {
             status,

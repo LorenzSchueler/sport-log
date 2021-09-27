@@ -2,7 +2,7 @@ use std::{io::Cursor, ops::Deref};
 
 use chrono::{DateTime, NaiveTime, Utc};
 use diesel::{
-    result::{DatabaseErrorKind as DbError, Error as DieselError},
+    result::{DatabaseErrorInformation, DatabaseErrorKind as DbError, Error as DieselError},
     QueryResult,
 };
 use rocket::{
@@ -12,7 +12,7 @@ use rocket::{
     serde::json::Json,
     Request, Response,
 };
-use serde::{Deserialize, Serialize};
+use sport_log_types::{Error, ErrorMessage};
 use tracing::warn;
 
 pub mod account;
@@ -28,21 +28,33 @@ pub mod strength;
 pub mod training_plan;
 pub mod user;
 
+fn parse_db_error(error: &(dyn DatabaseErrorInformation + Sync + Send)) -> ErrorMessage {
+    let error = error.message();
+
+    if let (Some(left), Some(right)) = (error.rfind('»'), error.rfind('«')) {
+        if left < right {
+            if error[left..right].ends_with("_pkey") {
+                return ErrorMessage::PrimaryKeyViolation(error[left + 2..right - 5].to_owned());
+            } else if error[left..right].ends_with("_fkey") {
+                return ErrorMessage::ForeignKeyViolation(error[left + 2..right - 5].to_owned());
+            } else if error[left..right].ends_with("_key") {
+                return ErrorMessage::UniqueViolation(error[left + 2..right - 4].to_owned());
+            }
+        }
+    }
+
+    ErrorMessage::Other(error.to_owned())
+}
+
 #[derive(Debug)]
 pub struct JsonError {
     pub status: Status,
-    pub message: Option<String>,
+    pub message: Option<ErrorMessage>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-struct SerializableJsonError {
-    pub status: u16,
-    pub message: Option<String>,
-}
-
-impl From<JsonError> for SerializableJsonError {
+impl From<JsonError> for Error {
     fn from(json_error: JsonError) -> Self {
-        SerializableJsonError {
+        Error {
             status: json_error.status.code,
             message: json_error.message,
         }
@@ -51,8 +63,12 @@ impl From<JsonError> for SerializableJsonError {
 
 impl<'r, 'o: 'r> Responder<'r, 'o> for JsonError {
     fn respond_to(self, _request: &'r Request<'_>) -> Result<Response<'o>, Status> {
+        match &self.message {
+            None => warn!("responding with status {}", self.status.code),
+            Some(message) => warn!("responding with status {}: {:?}", self.status.code, message),
+        }
         let status = self.status;
-        let json = serde_json::to_string::<SerializableJsonError>(&self.into())
+        let json = serde_json::to_string::<Error>(&self.into())
             .map_err(|_| Status::InternalServerError)?;
         Ok(Response::build()
             .status(status)
@@ -78,17 +94,17 @@ impl<T> IntoJson<T> for QueryResult<T> {
             DieselError::DatabaseError(ref db_error, ref db_error_info) => match db_error {
                 DbError::UniqueViolation => JsonError {
                     status: Status::Conflict,
-                    message: Some(db_error_info.message().to_owned()),
+                    message: Some(parse_db_error(&**db_error_info)),
                 },
                 DbError::ForeignKeyViolation => JsonError {
                     status: Status::Conflict,
-                    message: Some(db_error_info.message().to_owned()),
+                    message: Some(parse_db_error(&**db_error_info)),
                 },
                 _ => {
                     warn!("{:?}", diesel_error);
                     JsonError {
                         status: Status::InternalServerError,
-                        message: None,
+                        message: Some(ErrorMessage::Other(db_error_info.message().to_owned())),
                     }
                 }
             },

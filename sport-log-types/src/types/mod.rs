@@ -24,6 +24,7 @@ mod config;
 #[cfg(feature = "server")]
 mod db;
 mod diary_wod;
+mod error;
 mod metcon;
 mod movement;
 mod platform;
@@ -45,6 +46,7 @@ pub use config::*;
 #[cfg(feature = "server")]
 pub use db::*;
 pub use diary_wod::*;
+pub use error::*;
 pub use metcon::*;
 pub use movement::*;
 pub use platform::*;
@@ -480,6 +482,28 @@ pub trait VerifyMultipleForUserOrAPWithDb {
     type Entity;
 
     fn verify_user_ap(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status>;
+}
+
+#[cfg(feature = "server")]
+pub trait VerifyForUserOrAPCreate {
+    type Entity;
+
+    fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Self::Entity, Status>;
+}
+
+#[cfg(feature = "server")]
+pub trait VerifyMultipleForUserOrAPCreate {
+    type Entity;
+
+    fn verify_user_ap_create(
         self,
         auth: &AuthUserOrAP,
         conn: &PgConnection,

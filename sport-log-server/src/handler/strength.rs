@@ -2,7 +2,8 @@ use sport_log_types::{
     AuthUserOrAP, Create, CreateMultiple, Db, GetById, GetByUser, StrengthBlueprint,
     StrengthBlueprintId, StrengthBlueprintSet, StrengthBlueprintSetId, StrengthSession,
     StrengthSessionDescription, StrengthSessionId, StrengthSet, StrengthSetId, Unverified,
-    UnverifiedId, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    UnverifiedId, Update, VerifyForUserOrAPCreate, VerifyForUserOrAPWithDb,
+    VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP, VerifyMultipleForUserOrAPCreate,
     VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
 };
 
@@ -133,7 +134,7 @@ pub async fn create_strength_blueprint_set(
     conn: Db,
 ) -> JsonResult<StrengthBlueprintSet> {
     let strength_blueprint_set = conn
-        .run(move |c| strength_blueprint_set.verify_user_ap(&auth, c))
+        .run(move |c| strength_blueprint_set.verify_user_ap_create(&auth, c))
         .await
         .map_err(|status| JsonError {
             status,
@@ -155,7 +156,7 @@ pub async fn create_strength_blueprint_sets(
     conn: Db,
 ) -> JsonResult<Vec<StrengthBlueprintSet>> {
     let strength_blueprint_set = conn
-        .run(move |c| strength_blueprint_sets.verify_user_ap(&auth, c))
+        .run(move |c| strength_blueprint_sets.verify_user_ap_create(&auth, c))
         .await
         .map_err(|status| JsonError {
             status,
@@ -378,7 +379,7 @@ pub async fn create_strength_set(
     conn: Db,
 ) -> JsonResult<StrengthSet> {
     let strength_set = conn
-        .run(move |c| strength_set.verify_user_ap(&auth, c))
+        .run(move |c| strength_set.verify_user_ap_create(&auth, c))
         .await
         .map_err(|status| JsonError {
             status,
@@ -400,7 +401,7 @@ pub async fn create_strength_sets(
     conn: Db,
 ) -> JsonResult<Vec<StrengthSet>> {
     let strength_set = conn
-        .run(move |c| strength_sets.verify_user_ap(&auth, c))
+        .run(move |c| strength_sets.verify_user_ap_create(&auth, c))
         .await
         .map_err(|status| JsonError {
             status,

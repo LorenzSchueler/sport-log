@@ -17,8 +17,8 @@ use crate::{
 #[cfg(feature = "server")]
 use crate::{
     schema::{strength_blueprint, strength_blueprint_set, strength_session, strength_set},
-    AuthUserOrAP, CheckUserId, TrainingPlan, Unverified, User, VerifyForUserOrAPWithDb,
-    VerifyMultipleForUserOrAPWithDb,
+    AuthUserOrAP, CheckUserId, TrainingPlan, Unverified, User, VerifyForUserOrAPCreate,
+    VerifyForUserOrAPWithDb, VerifyMultipleForUserOrAPCreate, VerifyMultipleForUserOrAPWithDb,
 };
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
@@ -132,11 +132,17 @@ impl VerifyForUserOrAPWithDb for Unverified<StrengthBlueprintSet> {
         auth: &AuthUserOrAP,
         conn: &PgConnection,
     ) -> Result<Self::Entity, Status> {
-        let strength_set = self.0.into_inner();
-        if StrengthBlueprintSet::check_user_id(strength_set.id, **auth, conn)
+        let strength_blueprint_set = self.0.into_inner();
+        if StrengthBlueprintSet::check_user_id(strength_blueprint_set.id, **auth, conn)
+            .map_err(|_| Status::InternalServerError)?
+            && StrengthBlueprint::check_user_id(
+                strength_blueprint_set.strength_blueprint_id,
+                **auth,
+                conn,
+            )
             .map_err(|_| Status::InternalServerError)?
         {
-            Ok(strength_set)
+            Ok(strength_blueprint_set)
         } else {
             Err(Status::Forbidden)
         }
@@ -152,15 +158,69 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthBlueprintSet>> {
         auth: &AuthUserOrAP,
         conn: &PgConnection,
     ) -> Result<Vec<Self::Entity>, Status> {
-        let strength_sets = self.0.into_inner();
-        let strength_set_ids: Vec<_> = strength_sets
+        let strength_blueprint_sets = self.0.into_inner();
+        let strength_blueprint_set_ids: Vec<_> = strength_blueprint_sets
             .iter()
             .map(|strength_set| strength_set.id)
             .collect();
-        if StrengthBlueprintSet::check_user_ids(&strength_set_ids, **auth, conn)
+        let strength_blueprint_ids: Vec<_> = strength_blueprint_sets
+            .iter()
+            .map(|strength_set| strength_set.strength_blueprint_id)
+            .collect();
+        if StrengthBlueprintSet::check_user_ids(&strength_blueprint_set_ids, **auth, conn)
+            .map_err(|_| Status::InternalServerError)?
+            && StrengthBlueprint::check_user_ids(&strength_blueprint_ids, **auth, conn)
+                .map_err(|_| Status::InternalServerError)?
+        {
+            Ok(strength_blueprint_sets)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "server")]
+impl VerifyForUserOrAPCreate for Unverified<StrengthBlueprintSet> {
+    type Entity = StrengthBlueprintSet;
+
+    fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Self::Entity, Status> {
+        let strength_blueprint_set = self.0.into_inner();
+        if StrengthBlueprint::check_user_id(
+            strength_blueprint_set.strength_blueprint_id,
+            **auth,
+            conn,
+        )
+        .map_err(|_| Status::InternalServerError)?
+        {
+            Ok(strength_blueprint_set)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "server")]
+impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthBlueprintSet>> {
+    type Entity = StrengthBlueprintSet;
+
+    fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status> {
+        let strength_blueprint_sets = self.0.into_inner();
+        let strength_blueprint_ids: Vec<_> = strength_blueprint_sets
+            .iter()
+            .map(|strength_set| strength_set.strength_blueprint_id)
+            .collect();
+        if StrengthBlueprint::check_user_ids(&strength_blueprint_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
         {
-            Ok(strength_sets)
+            Ok(strength_blueprint_sets)
         } else {
             Err(Status::Forbidden)
         }
@@ -281,6 +341,8 @@ impl VerifyForUserOrAPWithDb for Unverified<StrengthSet> {
         let strength_set = self.0.into_inner();
         if StrengthSet::check_user_id(strength_set.id, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
+            && StrengthSession::check_user_id(strength_set.strength_session_id, **auth, conn)
+                .map_err(|_| Status::InternalServerError)?
         {
             Ok(strength_set)
         } else {
@@ -303,7 +365,57 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthSet>> {
             .iter()
             .map(|strength_set| strength_set.id)
             .collect();
+        let strength_session_ids: Vec<_> = strength_sets
+            .iter()
+            .map(|strength_set| strength_set.strength_session_id)
+            .collect();
         if StrengthSet::check_user_ids(&strength_set_ids, **auth, conn)
+            .map_err(|_| Status::InternalServerError)?
+            && StrengthSession::check_user_ids(&strength_session_ids, **auth, conn)
+                .map_err(|_| Status::InternalServerError)?
+        {
+            Ok(strength_sets)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "server")]
+impl VerifyForUserOrAPCreate for Unverified<StrengthSet> {
+    type Entity = StrengthSet;
+
+    fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Self::Entity, Status> {
+        let strength_set = self.0.into_inner();
+        if StrengthSession::check_user_id(strength_set.strength_session_id, **auth, conn)
+            .map_err(|_| Status::InternalServerError)?
+        {
+            Ok(strength_set)
+        } else {
+            Err(Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "server")]
+impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthSet>> {
+    type Entity = StrengthSet;
+
+    fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, Status> {
+        let strength_sets = self.0.into_inner();
+        let strength_session_ids: Vec<_> = strength_sets
+            .iter()
+            .map(|strength_set| strength_set.strength_session_id)
+            .collect();
+        if StrengthSession::check_user_ids(&strength_session_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
         {
             Ok(strength_sets)
