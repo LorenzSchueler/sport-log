@@ -29,7 +29,7 @@ class DayChart extends StatefulWidget {
 }
 
 class _DayChartState extends State<DayChart> {
-  final _dataProvider = StrengthDataProvider();
+  final _dataProvider = StrengthDataProvider.instance;
 
   List<StrengthSessionDescription> _sessions = [];
   bool isLoading = true;

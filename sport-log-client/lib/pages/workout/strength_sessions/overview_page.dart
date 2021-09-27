@@ -23,7 +23,7 @@ class StrengthSessionsPage extends StatefulWidget {
 }
 
 class StrengthSessionsPageState extends State<StrengthSessionsPage> {
-  final _dataProvider = StrengthDataProvider();
+  final _dataProvider = StrengthDataProvider.instance;
   final _logger = Logger('StrengthSessionsPage');
   List<StrengthSessionDescription> _ssds = [];
 
