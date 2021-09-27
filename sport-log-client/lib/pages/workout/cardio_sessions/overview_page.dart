@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/logger.dart';
 
-class MetconSessionsPage extends StatefulWidget {
-  const MetconSessionsPage({Key? key}) : super(key: key);
+class CardioSessionsPage extends StatefulWidget {
+  const CardioSessionsPage({Key? key}) : super(key: key);
 
   @override
-  State<MetconSessionsPage> createState() => MetconSessionsPageState();
+  State<CardioSessionsPage> createState() => CardioSessionsPageState();
 }
 
-class MetconSessionsPageState extends State<MetconSessionsPage> {
-  final _logger = Logger('MetconSessionsPage');
+class CardioSessionsPageState extends State<CardioSessionsPage> {
+  final _logger = Logger('CardioSessionsPage');
 
   @override
   Widget build(BuildContext context) {

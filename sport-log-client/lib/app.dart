@@ -11,7 +11,7 @@ import 'package:sport_log/pages/metcons/overview_page.dart';
 import 'package:sport_log/pages/movements/edit_page.dart';
 import 'package:sport_log/pages/movements/overview_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
-import 'package:sport_log/pages/workout/strength/edit_page.dart';
+import 'package:sport_log/pages/workout/strength_sessions/edit_page.dart';
 import 'package:sport_log/pages/workout/workout_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
 
@@ -50,7 +50,7 @@ class _AppState extends State<App> {
         Routes.login: (_) => const LoginPage(),
         Routes.registration: (_) => const RegistrationPage(),
         Routes.workout: (_) =>
-            ProtectedRoute(builder: (_) => const WorkoutPage()),
+            ProtectedRoute(builder: (_) => WorkoutPage()),
         Routes.metcon.overview: (_) =>
             ProtectedRoute(builder: (_) => const MetconsPage()),
         Routes.metcon.edit: (_) => ProtectedRoute(builder: (context) {

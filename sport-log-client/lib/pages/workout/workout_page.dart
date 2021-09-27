@@ -1,112 +1,126 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/pages/workout/strength/overview_page.dart';
+import 'package:sport_log/pages/workout/diary/overview_page.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/movement_picker.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
-import 'date_filter/date_filter_state.dart';
+import 'cardio_sessions/overview_page.dart';
+import 'strength_sessions/overview_page.dart';
 import 'date_filter/date_filter_widget.dart';
 import 'metcon_sessions/overview_page.dart';
+import 'ui_cubit.dart';
 
-enum BottomNavPage { strength, metcon, cardio, diary }
+class WorkoutPage extends StatelessWidget {
+  WorkoutPage({Key? key}) : super(key: key);
 
-class WorkoutPage extends StatefulWidget {
-  const WorkoutPage({Key? key}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => _WorkoutPageState();
-}
-
-class _WorkoutPageState extends State<WorkoutPage> {
-  BottomNavPage _currentPage = BottomNavPage.strength;
-  DateFilterState _dateFilter = MonthFilter.current();
-
-  Movement? _selectedMovement;
+  final GlobalKey<StrengthSessionsPageState> _strengthKey = GlobalKey();
+  final GlobalKey<MetconSessionsPageState> _metconKey = GlobalKey();
+  final GlobalKey<CardioSessionsPageState> _cardioKey = GlobalKey();
+  final GlobalKey<DiaryPageState> _diaryKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_selectedMovement?.name ?? 'Sessions'),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              final Movement? movement = await showMovementPickerDialog(context,
-                  selectedMovement: _selectedMovement);
-              if (movement == null) {
-                return;
-              }
-              if (movement.id == _selectedMovement?.id) {
-                setState(() => _selectedMovement = null);
-              } else {
-                setState(() => _selectedMovement = movement);
-              }
-            },
-            icon: Icon(_selectedMovement != null
-                ? Icons.filter_alt
-                : Icons.filter_alt_outlined),
-          ),
-        ],
-        bottom: _filter,
+    return BlocProvider(
+      create: (context) => SessionsUiCubit(),
+      child: BlocBuilder<SessionsUiCubit, SessionsUiState>(
+        buildWhen: (oldState, newState) =>
+            oldState.dateFilter != newState.dateFilter ||
+            oldState.movement != newState.movement ||
+            oldState.tab != newState.tab ||
+            oldState.shouldShowFab != newState.shouldShowFab,
+        builder: (context, state) {
+          final cubit = context.read<SessionsUiCubit>();
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(state.titleText),
+              actions: [
+                IconButton(
+                  onPressed: () =>
+                      _onMovementSelection(context, state.movement, cubit),
+                  icon: Icon(state.isMovementSelected
+                      ? Icons.filter_alt
+                      : Icons.filter_alt_outlined),
+                ),
+              ],
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(40),
+                child: DateFilter(
+                  initialState: state.dateFilter,
+                  onFilterChanged: cubit.setDateFilter,
+                ),
+              ),
+            ),
+            body: WideScreenFrame(child: _mainPage(state)),
+            bottomNavigationBar: BottomNavigationBar(
+              items: SessionsPageTab.values.map(_toBottomNavItem).toList(),
+              currentIndex: state.tab.index,
+              onTap: _onBottomNavItemTapped(cubit),
+              type: BottomNavigationBarType.fixed,
+            ),
+            drawer: const MainDrawer(selectedRoute: Routes.workout),
+            floatingActionButton: state.shouldShowFab
+                ? FloatingActionButton(
+                    child: const Icon(Icons.add),
+                    onPressed: () => _onFabTapped,
+                  )
+                : null,
+          );
+        },
       ),
-      body: WideScreenFrame(child: _mainPage),
-      bottomNavigationBar: BottomNavigationBar(
-        items: BottomNavPage.values.map(_toBottomNavItem).toList(),
-        currentIndex: _currentPage.index,
-        onTap: _onBottomNavItemTapped,
-        type: BottomNavigationBarType.fixed,
-      ),
-      drawer: const MainDrawer(selectedRoute: Routes.workout),
-      // floatingActionButton: FloatingActionButton(
-      //   child: const Icon(Icons.add),
-      //   onPressed: () => _onFabTapped(context),
-      // ),
     );
   }
 
-  Widget get _mainPage {
-    // TODO: preserve state and/or widget when changing tab
-    switch (_currentPage) {
-      case BottomNavPage.metcon:
-        return const MetconSessionsPage();
-      case BottomNavPage.strength:
-        return StrengthSessionsPage(
-          dateFilter: _dateFilter,
-          movement: _selectedMovement,
-        );
-      case BottomNavPage.cardio:
-        return const Center(
-          child: Text("Cardio"),
-        );
-      case BottomNavPage.diary:
-        return const Center(
-          child: Text("Weight and Comments"),
-        );
+  void _onMovementSelection(BuildContext context, Movement? oldMovement,
+      SessionsUiCubit cubit) async {
+    final Movement? movement =
+        await showMovementPickerDialog(context, selectedMovement: oldMovement);
+    if (movement == null) {
+      return;
+    }
+    if (movement.id == oldMovement?.id) {
+      cubit.removeMovement();
+    } else {
+      cubit.setMovement(movement);
     }
   }
 
-  BottomNavigationBarItem _toBottomNavItem(BottomNavPage page) {
+  Widget _mainPage(SessionsUiState state) {
+    // TODO: preserve state and/or widget when changing tab
+    switch (state.tab) {
+      case SessionsPageTab.strength:
+        return StrengthSessionsPage(key: _strengthKey);
+      case SessionsPageTab.metcon:
+        return MetconSessionsPage(key: _metconKey);
+      case SessionsPageTab.cardio:
+        return CardioSessionsPage(key: _cardioKey);
+      case SessionsPageTab.diary:
+        return DiaryPage(key: _diaryKey);
+    }
+  }
+
+  BottomNavigationBarItem _toBottomNavItem(SessionsPageTab page) {
     switch (page) {
-      case BottomNavPage.metcon:
+      case SessionsPageTab.metcon:
         return const BottomNavigationBarItem(
           icon: Icon(CustomIcons.plan),
           label: "Metcons",
         );
-      case BottomNavPage.strength:
+      case SessionsPageTab.strength:
         return const BottomNavigationBarItem(
           icon: Icon(CustomIcons.dumbbellNotRotated),
           label: "Strength",
         );
-      case BottomNavPage.cardio:
+      case SessionsPageTab.cardio:
         return const BottomNavigationBarItem(
           icon: Icon(CustomIcons.heart),
           label: "Cardio",
         );
-      case BottomNavPage.diary:
+      case SessionsPageTab.diary:
         return const BottomNavigationBarItem(
           icon: Icon(Icons.edit),
           label: "Other",
@@ -114,19 +128,24 @@ class _WorkoutPageState extends State<WorkoutPage> {
     }
   }
 
-  void _onBottomNavItemTapped(int index) {
-    setState(() {
-      _currentPage = BottomNavPage.values[index];
-    });
+  void Function(int) _onBottomNavItemTapped(SessionsUiCubit cubit) {
+    return (index) => cubit.setTab(SessionsPageTab.values[index]);
   }
 
-  PreferredSizeWidget get _filter {
-    return PreferredSize(
-        preferredSize: const Size.fromHeight(40),
-        child: DateFilter(
-          initialState: _dateFilter,
-          onFilterChanged: (newFilter) =>
-              setState(() => _dateFilter = newFilter),
-        ));
+  void _onFabTapped(SessionsUiState state, BuildContext context) {
+    switch (state.tab) {
+      case SessionsPageTab.strength:
+        _strengthKey.currentState?.onFabTapped(context);
+        break;
+      case SessionsPageTab.metcon:
+        _metconKey.currentState?.onFabTapped(context);
+        break;
+      case SessionsPageTab.cardio:
+        _cardioKey.currentState?.onFabTapped(context);
+        break;
+      case SessionsPageTab.diary:
+        _diaryKey.currentState?.onFabTapped(context);
+        break;
+    }
   }
 }
