@@ -1,4 +1,5 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:flutter/foundation.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/database/defs.dart';
@@ -13,7 +14,7 @@ void resultSink(Result<dynamic, dynamic> result) {
   }
 }
 
-abstract class DataProvider<T> {
+abstract class DataProvider<T> extends ChangeNotifier {
   Future<void> createSingle(T object);
 
   Future<void> updateSingle(T object);
@@ -90,7 +91,9 @@ mixin ConnectedMethods<T extends DbObject> on DataProviderImpl<T> {
       handleApiError(result.failure);
       throw result.failure;
     }
-    db.createSingle(object, isSynchronized: true);
+    db
+        .createSingle(object, isSynchronized: true)
+        .then((_) => notifyListeners());
   }
 
   @override
@@ -101,7 +104,9 @@ mixin ConnectedMethods<T extends DbObject> on DataProviderImpl<T> {
       handleApiError(result.failure);
       throw result.failure;
     }
-    db.updateSingle(object, isSynchronized: true);
+    db
+        .updateSingle(object, isSynchronized: true)
+        .then((_) => notifyListeners());
   }
 
   @override
@@ -111,7 +116,9 @@ mixin ConnectedMethods<T extends DbObject> on DataProviderImpl<T> {
       handleApiError(result.failure);
       throw result.failure;
     }
-    db.deleteSingle(object.id, isSynchronized: true);
+    db
+        .deleteSingle(object.id, isSynchronized: true)
+        .then((_) => notifyListeners());
   }
 }
 
@@ -121,6 +128,7 @@ mixin UnconnectedMethods<T extends DbObject> on DataProviderImpl<T> {
     assert(object.isValid());
     // TODO: catch errors
     await db.createSingle(object);
+    notifyListeners();
     api.postSingle(object).then((result) {
       if (result.isFailure) {
         // TODO: what if request fails due to conflict (when connected to internet)?
@@ -136,6 +144,7 @@ mixin UnconnectedMethods<T extends DbObject> on DataProviderImpl<T> {
     assert(object.isValid());
     // TODO: catch errors
     await db.updateSingle(object);
+    notifyListeners();
     api.putSingle(object).then((result) {
       if (result.isFailure) {
         handleApiError(result.failure);
@@ -149,6 +158,7 @@ mixin UnconnectedMethods<T extends DbObject> on DataProviderImpl<T> {
   Future<void> deleteSingle(T object) async {
     // TODO: catch errors
     await db.deleteSingle(object.id);
+    notifyListeners();
     api.putSingle(object..deleted = true).then((result) {
       if (result.isFailure) {
         handleApiError(result.failure);

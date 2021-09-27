@@ -23,6 +23,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     // TODO: catch errors
     await strengthSessionDb.createSingle(object.strengthSession);
     await strengthSetDb.createMultiple(object.strengthSets!);
+    notifyListeners();
     final result1 = await strengthSessionApi.postSingle(object.strengthSession);
     if (result1.isFailure) {
       handleApiError(result1.failure);
@@ -44,6 +45,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     // TODO: catch errors
     await strengthSetDb.deleteByStrengthSession(object.id);
     await strengthSessionDb.deleteSingle(object.id);
+    notifyListeners();
     // TODO: server deletes strength sets automatically
     final result1 = await strengthSetApi.putMultiple(object.strengthSets!);
     if (result1.isFailure) {
@@ -66,14 +68,16 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
       handleApiError(result1.failure);
       throw result1.failure;
     }
-    strengthSessionDb.upsertMultiple(result1.success);
+    await strengthSessionDb.upsertMultiple(result1.success);
 
     final result2 = await strengthSetApi.getMultiple();
     if (result2.isFailure) {
       handleApiError(result2.failure);
       throw result2.failure;
     }
-    strengthSetDb.upsertMultiple(result2.success);
+    strengthSetDb
+        .upsertMultiple(result2.success)
+        .then((_) => notifyListeners());
   }
 
   @override
@@ -143,11 +147,10 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     final diffing = diff(oldSets, newSets);
 
     await strengthSessionDb.updateSingle(object.strengthSession);
-    await Future.wait([
-      strengthSetDb.updateMultiple(diffing.toUpdate),
-      strengthSetDb.deleteMultiple(diffing.toDelete),
-      strengthSetDb.createMultiple(diffing.toCreate),
-    ]);
+    await strengthSetDb.updateMultiple(diffing.toUpdate);
+    await strengthSetDb.deleteMultiple(diffing.toDelete);
+    await strengthSetDb.createMultiple(diffing.toCreate);
+    notifyListeners();
 
     final result1 = await strengthSessionApi.putSingle(object.strengthSession);
     if (result1.isFailure) {

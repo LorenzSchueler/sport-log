@@ -21,6 +21,7 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
     await metconDb.createSingle(object.metcon);
     await metconMovementDb
         .createMultiple(object.moves.map((mmd) => mmd.metconMovement).toList());
+    notifyListeners();
     metconApi.postFull(object).then((result) {
       if (result.isFailure) {
         handleApiError(result.failure);
@@ -36,6 +37,7 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
     // TODO: catch errors
     await metconMovementDb.deleteByMetcon(object.metcon.id);
     await metconDb.deleteSingle(object.metcon.id);
+    notifyListeners();
     // TODO: server deletes metcon movements automatically
     metconApi.deleteFull(object).then((result) {
       if (result.isFailure) {
@@ -149,6 +151,7 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
       metconMovementDb.deleteMultiple(toDelete),
       metconMovementDb.createMultiple(toCreate),
     ]);
+    notifyListeners();
 
     // update server
 
@@ -184,13 +187,15 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
       handleApiError(result1.failure);
       throw result1.failure;
     }
-    metconDb.upsertMultiple(result1.success);
+    await metconDb.upsertMultiple(result1.success);
 
     final result2 = await metconMovementApi.getMultiple();
     if (result2.isFailure) {
       handleApiError(result2.failure);
       throw result2.failure;
     }
-    metconMovementDb.upsertMultiple(result2.success);
+    metconMovementDb
+        .upsertMultiple(result2.success)
+        .then((_) => notifyListeners());
   }
 }
