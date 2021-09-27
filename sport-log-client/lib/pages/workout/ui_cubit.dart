@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class StrengthUiState {
-  const StrengthUiState({
+class SessionsUiState {
+  const SessionsUiState({
     required this.showFab,
   });
 
@@ -9,20 +9,20 @@ class StrengthUiState {
 
   @override
   bool operator ==(Object other) =>
-      other is StrengthUiState && other.showFab == showFab;
+      other is SessionsUiState && other.showFab == showFab;
 
   @override
   int get hashCode => showFab.hashCode;
 
-  StrengthUiState copyWith({bool? showFab}) {
-    return StrengthUiState(
+  SessionsUiState copyWith({bool? showFab}) {
+    return SessionsUiState(
       showFab: showFab ?? this.showFab,
     );
   }
 }
 
-class StrengthUiCubit extends Cubit<StrengthUiState> {
-  StrengthUiCubit() : super(const StrengthUiState(showFab: false));
+class SessionsUiCubit extends Cubit<SessionsUiState> {
+  SessionsUiCubit() : super(const SessionsUiState(showFab: false));
 
   void hideFab() {
     emit(state.copyWith(showFab: false));
