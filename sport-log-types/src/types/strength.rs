@@ -135,6 +135,8 @@ impl VerifyForUserOrAPWithDb for Unverified<StrengthBlueprintSet> {
         let strength_set = self.0.into_inner();
         if StrengthBlueprintSet::check_user_id(strength_set.id, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
+            && StrengthBlueprint::check_user_id(strength_set.strength_blueprint_id, **auth, conn)
+                .map_err(|_| Status::InternalServerError)?
         {
             Ok(strength_set)
         } else {
@@ -157,8 +159,14 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthBlueprintSet>> {
             .iter()
             .map(|strength_set| strength_set.id)
             .collect();
+        let strength_blueprint_ids: Vec<_> = strength_sets
+            .iter()
+            .map(|strength_set| strength_set.strength_blueprint_id)
+            .collect();
         if StrengthBlueprintSet::check_user_ids(&strength_set_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
+            && StrengthBlueprint::check_user_ids(&strength_blueprint_ids, **auth, conn)
+                .map_err(|_| Status::InternalServerError)?
         {
             Ok(strength_sets)
         } else {
@@ -281,6 +289,8 @@ impl VerifyForUserOrAPWithDb for Unverified<StrengthSet> {
         let strength_set = self.0.into_inner();
         if StrengthSet::check_user_id(strength_set.id, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
+            && StrengthSession::check_user_id(strength_set.strength_session_id, **auth, conn)
+                .map_err(|_| Status::InternalServerError)?
         {
             Ok(strength_set)
         } else {
@@ -303,8 +313,14 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthSet>> {
             .iter()
             .map(|strength_set| strength_set.id)
             .collect();
+        let strength_session_ids: Vec<_> = strength_sets
+            .iter()
+            .map(|strength_set| strength_set.strength_session_id)
+            .collect();
         if StrengthSet::check_user_ids(&strength_set_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
+            && StrengthSession::check_user_ids(&strength_session_ids, **auth, conn)
+                .map_err(|_| Status::InternalServerError)?
         {
             Ok(strength_sets)
         } else {

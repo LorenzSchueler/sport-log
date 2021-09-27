@@ -324,11 +324,13 @@ impl VerifyForUserOrAPWithDb for Unverified<MovementMuscle> {
         auth: &AuthUserOrAP,
         conn: &PgConnection,
     ) -> Result<Self::Entity, Status> {
-        let metcon_movement = self.0.into_inner();
-        if MovementMuscle::check_user_id(metcon_movement.id, **auth, conn)
+        let movement_muscle = self.0.into_inner();
+        if MovementMuscle::check_user_id(movement_muscle.id, **auth, conn)
             .map_err(|_| rocket::http::Status::InternalServerError)?
+            && Movement::check_user_id(movement_muscle.movement_id, **auth, conn)
+                .map_err(|_| rocket::http::Status::InternalServerError)?
         {
-            Ok(metcon_movement)
+            Ok(movement_muscle)
         } else {
             Err(rocket::http::Status::Forbidden)
         }
@@ -344,15 +346,61 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MovementMuscle>> {
         auth: &AuthUserOrAP,
         conn: &PgConnection,
     ) -> Result<Vec<Self::Entity>, Status> {
-        let metcon_movements = self.0.into_inner();
-        let metcon_movement_ids: Vec<_> = metcon_movements
+        let movement_muscle = self.0.into_inner();
+        let movement_muscle_ids: Vec<_> = movement_muscle
             .iter()
             .map(|metcon_movement| metcon_movement.id)
             .collect();
-        if MovementMuscle::check_user_ids(&metcon_movement_ids, **auth, conn)
+        let movement_ids: Vec<_> = movement_muscle
+            .iter()
+            .map(|metcon_movement| metcon_movement.movement_id)
+            .collect();
+        if MovementMuscle::check_user_ids(&movement_muscle_ids, **auth, conn)
+            .map_err(|_| rocket::http::Status::InternalServerError)?
+            && Movement::check_user_ids(&movement_ids, **auth, conn)
+                .map_err(|_| rocket::http::Status::InternalServerError)?
+        {
+            Ok(movement_muscle)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "server")]
+impl Unverified<MovementMuscle> {
+    pub fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<MovementMuscle, Status> {
+        let movement_muscle = self.0.into_inner();
+        if Movement::check_user_id(movement_muscle.movement_id, **auth, conn)
             .map_err(|_| rocket::http::Status::InternalServerError)?
         {
-            Ok(metcon_movements)
+            Ok(movement_muscle)
+        } else {
+            Err(rocket::http::Status::Forbidden)
+        }
+    }
+}
+
+#[cfg(feature = "server")]
+impl Unverified<Vec<MovementMuscle>> {
+    pub fn verify_user_ap_create(
+        self,
+        auth: &AuthUserOrAP,
+        conn: &PgConnection,
+    ) -> Result<Vec<MovementMuscle>, Status> {
+        let movement_muscle = self.0.into_inner();
+        let movement_ids: Vec<_> = movement_muscle
+            .iter()
+            .map(|metcon_movement| metcon_movement.movement_id)
+            .collect();
+        if Movement::check_user_ids(&movement_ids, **auth, conn)
+            .map_err(|_| rocket::http::Status::InternalServerError)?
+        {
+            Ok(movement_muscle)
         } else {
             Err(rocket::http::Status::Forbidden)
         }
