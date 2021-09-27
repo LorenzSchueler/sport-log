@@ -28,20 +28,29 @@ pub mod strength;
 pub mod training_plan;
 pub mod user;
 
-fn parse_db_error(error: &(dyn DatabaseErrorInformation + Sync + Send)) -> &str {
-    let string = error.message();
-    if let (Some(left), Some(right)) = (string.find('»'), string.find('«')) {
+fn parse_db_error(error: &(dyn DatabaseErrorInformation + Sync + Send)) -> ErrorMessage {
+    let error = error.message();
+
+    if let (Some(left), Some(right)) = (error.rfind('»'), error.rfind('«')) {
         if left < right {
-            return &string[left + 2..right];
+            if error[left..right].ends_with("_pkey") {
+                return ErrorMessage::PrimaryKeyViolation(error[left + 2..right - 5].to_owned());
+            } else if error[left..right].ends_with("_fkey") {
+                return ErrorMessage::ForeignKeyViolation(error[left + 2..right - 5].to_owned());
+            } else if error[left..right].ends_with("_key") {
+                return ErrorMessage::UniqueViolation(error[left + 2..right - 4].to_owned());
+            }
         }
     }
-    string
+
+    return ErrorMessage::Other(error.to_owned());
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum ErrorMessage {
     UniqueViolation(String),
     ForeignKeyViolation(String),
+    PrimaryKeyViolation(String),
     Other(String),
 }
 
@@ -68,6 +77,10 @@ impl From<JsonError> for SerializableJsonError {
 
 impl<'r, 'o: 'r> Responder<'r, 'o> for JsonError {
     fn respond_to(self, _request: &'r Request<'_>) -> Result<Response<'o>, Status> {
+        match &self.message {
+            None => warn!("responding with status {}", self.status.code),
+            Some(message) => warn!("responding with status {}: {:?}", self.status.code, message),
+        }
         let status = self.status;
         let json = serde_json::to_string::<SerializableJsonError>(&self.into())
             .map_err(|_| Status::InternalServerError)?;
@@ -95,15 +108,11 @@ impl<T> IntoJson<T> for QueryResult<T> {
             DieselError::DatabaseError(ref db_error, ref db_error_info) => match db_error {
                 DbError::UniqueViolation => JsonError {
                     status: Status::Conflict,
-                    message: Some(ErrorMessage::UniqueViolation(
-                        parse_db_error(&**db_error_info).to_owned(),
-                    )),
+                    message: Some(parse_db_error(&**db_error_info)),
                 },
                 DbError::ForeignKeyViolation => JsonError {
                     status: Status::Conflict,
-                    message: Some(ErrorMessage::ForeignKeyViolation(
-                        parse_db_error(&**db_error_info).to_owned(),
-                    )),
+                    message: Some(parse_db_error(&**db_error_info)),
                 },
                 _ => {
                     warn!("{:?}", diesel_error);
