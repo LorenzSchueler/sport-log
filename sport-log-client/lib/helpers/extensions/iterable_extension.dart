@@ -31,4 +31,8 @@ extension IterableExtension<T> on Iterable<T> {
       action(element, index++);
     }
   }
+
+  List<R> mapToL<R>(R Function(T) mapping) {
+    return map(mapping).toList();
+  }
 }
