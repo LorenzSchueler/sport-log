@@ -170,35 +170,102 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        height: 250,
-        padding: const EdgeInsets.all(5),
-        margin: const EdgeInsets.symmetric(vertical: 5),
-        color: onPrimaryColorOf(context),
-        child: MapboxMap(
-          accessToken: token,
-          styleString: style,
-          initialCameraPosition: const CameraPosition(
-            zoom: 12.0,
-            target: LatLng(47.27, 11.33),
-          ),
-          compassEnabled: true,
-          compassViewPosition: CompassViewPosition.TopRight,
-          myLocationEnabled: true,
-          myLocationRenderMode: MyLocationRenderMode.GPS,
-          myLocationTrackingMode: MyLocationTrackingMode.TrackingGPS,
-          onMapCreated: (MapboxMapController controller) =>
-              mapController = controller,
-          onStyleLoadedCallback: () => init(mapController),
-          onMapClick: (point, LatLng coordinates) =>
-              markPosition(mapController, coordinates),
-          onMapLongClick: (point, LatLng coordinates) =>
-              extendLine(mapController, coordinates),
-          onUserLocationUpdated: (UserLocation location) {
-            _logger.i(
-                "position ${location.position}; elevation ${location.altitude}");
-          },
-        ));
+    return Column(children: [
+      Expanded(
+          child: MapboxMap(
+        accessToken: token,
+        styleString: style,
+        initialCameraPosition: const CameraPosition(
+          zoom: 12.0,
+          target: LatLng(47.27, 11.33),
+        ),
+        compassEnabled: true,
+        compassViewPosition: CompassViewPosition.TopRight,
+        myLocationEnabled: true,
+        myLocationRenderMode: MyLocationRenderMode.GPS,
+        myLocationTrackingMode: MyLocationTrackingMode.TrackingGPS,
+        onMapCreated: (MapboxMapController controller) =>
+            mapController = controller,
+        onStyleLoadedCallback: () => init(mapController),
+        onMapClick: (point, LatLng coordinates) =>
+            markPosition(mapController, coordinates),
+        onMapLongClick: (point, LatLng coordinates) =>
+            extendLine(mapController, coordinates),
+        onUserLocationUpdated: (UserLocation location) {
+          _logger.i(
+              "position ${location.position}; elevation ${location.altitude}");
+        },
+      )),
+      Container(
+          height: 200,
+          padding: EdgeInsets.all(5),
+          color: onPrimaryColorOf(context),
+          child: Table(
+            border: TableBorder(
+                verticalInside:
+                    BorderSide(width: 1, color: secondaryColorOf(context)),
+                horizontalInside:
+                    BorderSide(width: 1, color: secondaryColorOf(context))),
+            children: [
+              const TableRow(children: [
+                const Text(
+                  "00:31:15",
+                  style: TextStyle(fontSize: 12),
+                  textAlign: TextAlign.center,
+                ),
+                const Text(
+                  "6.17 km",
+                  style: TextStyle(fontSize: 12),
+                  textAlign: TextAlign.center,
+                ),
+              ]),
+              const TableRow(children: [
+                const Text(
+                  "10.7 km/h",
+                  style: TextStyle(fontSize: 12),
+                  textAlign: TextAlign.center,
+                ),
+                const Text(
+                  "241 m",
+                  style: TextStyle(fontSize: 12),
+                  textAlign: TextAlign.center,
+                ),
+              ]),
+              const TableRow(children: [
+                const Text(
+                  "10.7 km/h",
+                  style: TextStyle(fontSize: 12),
+                  textAlign: TextAlign.center,
+                ),
+                const Text(
+                  "241 m",
+                  style: TextStyle(fontSize: 12),
+                  textAlign: TextAlign.center,
+                ),
+              ]),
+            ],
+          )),
+      Container(
+          height: 50,
+          color: onPrimaryColorOf(context),
+          padding: EdgeInsets.all(5),
+          child: Row(
+            children: [
+              const Expanded(
+                  child: ElevatedButton(
+                      onPressed: null, child: const Text("start"))),
+              SizedBox(
+                width: 5,
+              ),
+              Expanded(
+                  child: ElevatedButton(
+                      onPressed: null,
+                      style: ElevatedButton.styleFrom(
+                          textStyle: TextStyle(color: primaryColorOf(context))),
+                      child: const Text("cancel"))),
+            ],
+          ))
+    ]);
   }
 }
 
