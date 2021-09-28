@@ -28,7 +28,6 @@ class _AllChartState extends State<AllChart> {
   final _dataProvider = StrengthDataProvider.instance;
 
   List<StrengthSessionStats> _stats = [];
-  bool isLoading = true;
 
   @override
   void initState() {
@@ -38,13 +37,9 @@ class _AllChartState extends State<AllChart> {
   }
 
   void update() {
-    setState(() => isLoading = true);
     _dataProvider.getStatsByMonth(movementId: widget.movement.id).then((stats) {
       if (mounted) {
-        setState(() {
-          _stats = stats;
-          isLoading = false;
-        });
+        setState(() => _stats = stats);
       }
     });
   }
@@ -60,12 +55,6 @@ class _AllChartState extends State<AllChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_stats.isEmpty) {
-      return const Center(child: Text('Nothing to show here.'));
-    }
     final getValue = statsAccessor(widget.series);
     final isTime = widget.movement.dimension == MovementDimension.time;
 

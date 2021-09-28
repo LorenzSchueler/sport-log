@@ -32,7 +32,6 @@ class _YearChartState extends State<YearChart> {
   final _dataProvider = StrengthDataProvider.instance;
 
   List<StrengthSessionStats> _stats = [];
-  bool isLoading = true;
 
   @override
   void initState() {
@@ -42,7 +41,6 @@ class _YearChartState extends State<YearChart> {
   }
 
   void update() {
-    setState(() => isLoading = true);
     _dataProvider
         .getStatsByWeek(
       movementId: widget.movement.id,
@@ -52,10 +50,7 @@ class _YearChartState extends State<YearChart> {
         .then((stats) {
       assert(stats.length <= 54);
       if (mounted) {
-        setState(() {
-          _stats = stats;
-          isLoading = false;
-        });
+        setState(() => _stats = stats);
       }
     });
   }
@@ -72,12 +67,6 @@ class _YearChartState extends State<YearChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_stats.isEmpty) {
-      return const Center(child: Text('Nothing to show here.'));
-    }
     final getValue = statsAccessor(widget.series);
     final isTime = widget.movement.dimension == MovementDimension.time;
     return LineChart(

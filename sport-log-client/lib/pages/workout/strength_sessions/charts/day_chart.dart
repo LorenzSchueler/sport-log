@@ -32,7 +32,6 @@ class _DayChartState extends State<DayChart> {
   final _dataProvider = StrengthDataProvider.instance;
 
   List<StrengthSessionDescription> _sessions = [];
-  bool isLoading = true;
 
   @override
   void initState() {
@@ -42,7 +41,6 @@ class _DayChartState extends State<DayChart> {
   }
 
   void update() {
-    setState(() => isLoading = true);
     _dataProvider
         .getSessionsWithStats(
       movementId: widget.movement.id,
@@ -52,10 +50,7 @@ class _DayChartState extends State<DayChart> {
     )
         .then((sessions) {
       if (mounted) {
-        setState(() {
-          _sessions = sessions;
-          isLoading = false;
-        });
+        setState(() => _sessions = sessions);
       }
     });
   }
@@ -92,12 +87,6 @@ class _DayChartState extends State<DayChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_sessions.isEmpty) {
-      return const Center(child: Text('Nothing to show here.'));
-    }
     final isTime = widget.movement.dimension == MovementDimension.time;
     return BarChart(BarChartData(
       barGroups: _barData,
