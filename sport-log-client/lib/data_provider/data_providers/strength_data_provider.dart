@@ -147,8 +147,8 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     final diffing = diff(oldSets, newSets);
 
     await strengthSessionDb.updateSingle(object.strengthSession);
-    await strengthSetDb.updateMultiple(diffing.toUpdate);
     await strengthSetDb.deleteMultiple(diffing.toDelete);
+    await strengthSetDb.updateMultiple(diffing.toUpdate);
     await strengthSetDb.createMultiple(diffing.toCreate);
     notifyListeners();
 
