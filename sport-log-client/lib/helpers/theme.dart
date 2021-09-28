@@ -67,6 +67,22 @@ Color onSecondaryColorOf(BuildContext context) {
   return Theme.of(context).colorScheme.onSecondary;
 }
 
+Color surfaceColorOf(BuildContext context) {
+  return Theme.of(context).colorScheme.surface;
+}
+
+Color onSurfaceColorOf(BuildContext context) {
+  return Theme.of(context).colorScheme.onSurface;
+}
+
+Color backgroundColorOf(BuildContext context) {
+  return Theme.of(context).colorScheme.background;
+}
+
+Color onBackgroundColorOf(BuildContext context) {
+  return Theme.of(context).colorScheme.onBackground;
+}
+
 Color disabledColorOf(BuildContext context) {
   return Theme.of(context).disabledColor;
 }
