@@ -42,6 +42,9 @@ abstract class ApiAccessor<T> with ApiHeaders, ApiLogging, ApiHelpers {
   }
 
   ApiResult<void> postMultiple(List<T> objects) async {
+    if (objects.isEmpty) {
+      return Success(null);
+    }
     return _errorHandling((client) async {
       final body = objects.map(toJson).toList();
       _logRequest('POST', pluralRoute, body);
@@ -79,6 +82,9 @@ abstract class ApiAccessor<T> with ApiHeaders, ApiLogging, ApiHelpers {
   }
 
   ApiResult<void> putMultiple(List<T> objects) async {
+    if (objects.isEmpty) {
+      return Success(null);
+    }
     return _errorHandling((client) async {
       final body = objects.map(toJson).toList();
       _logRequest('PUT', pluralRoute, body);
