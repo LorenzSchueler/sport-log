@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/models/user/user.dart';
 
@@ -35,16 +36,19 @@ class AuthenticationBloc
 
   Stream<AuthenticationState> _logoutStream(LogoutEvent event) async* {
     _userState.deleteUser();
+    Sync.instance.logout();
     yield Unauthenticated();
   }
 
   Stream<AuthenticationState> _loginStream(LoginEvent event) async* {
     _userState.setUser(event.user);
+    Sync.instance.login();
     yield Authenticated(user: event.user);
   }
 
   Stream<AuthenticationState> _registrationStream(RegisterEvent event) async* {
     _userState.setUser(event.user);
+    Sync.instance.login();
     yield Authenticated(user: event.user);
   }
 }

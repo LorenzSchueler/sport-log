@@ -1,10 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
-import 'package:sport_log/data_provider/syncing.dart';
+import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
@@ -18,22 +19,14 @@ final _logger = Logger('MAIN');
 
 Future<void> initialize({bool doDownSync = true}) async {
   WidgetsFlutterBinding.ensureInitialized(); // TODO: necessary?
+  await Hive.initFlutter();
   await Config.init();
   await UserState.instance.init();
   await AppDatabase.instance?.init();
-  await DownSync.instance.init().then((downSync) async {
-    if (Config.deleteDatabase) {
-      await downSync.removeLastSync();
-    }
-    if (doDownSync) {
-      downSync.sync().then((_) async {
-        if (Config.generateTestData) {
-          insertTestData();
-        }
-      });
-    }
-  });
-  await UpSync.instance.init();
+  await Sync.instance.init();
+  if (Config.generateTestData) {
+    insertTestData();
+  }
   Bloc.observer = SimpleBlocObserver();
 }
 

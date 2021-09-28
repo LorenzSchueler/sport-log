@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
-import 'package:sport_log/data_provider/syncing.dart';
+import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
@@ -20,7 +20,7 @@ class MainDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = UserState.instance.currentUser!;
-    final lastSync = DownSync.instance.lastSync;
+    final lastSync = Sync.instance.lastSync;
     return Drawer(
       child: Column(
         children: [
