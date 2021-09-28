@@ -7,6 +7,9 @@ import 'package:sport_log/models/wod/wod.dart';
 
 class WodDataProvider extends DataProviderImpl<Wod>
     with UnconnectedMethods<Wod> {
+  static final instance = WodDataProvider._();
+  WodDataProvider._();
+
   @override
   final ApiAccessor<Wod> api = Api.instance.wods;
 

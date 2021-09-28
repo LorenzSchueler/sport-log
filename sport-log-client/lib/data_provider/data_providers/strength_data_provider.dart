@@ -15,8 +15,8 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
   final strengthSessionApi = Api.instance.strengthSessions;
   final strengthSetApi = Api.instance.strengthSets;
 
-  StrengthDataProvider._();
   static final instance = StrengthDataProvider._();
+  StrengthDataProvider._();
 
   @override
   Future<void> createSingle(StrengthSessionDescription object) async {

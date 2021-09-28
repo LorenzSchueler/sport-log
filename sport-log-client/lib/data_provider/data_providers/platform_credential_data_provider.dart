@@ -8,6 +8,9 @@ import 'package:sport_log/models/platform/platform_credential.dart';
 class PlatformCredentialDataProvider
     extends DataProviderImpl<PlatformCredential>
     with ConnectedMethods<PlatformCredential> {
+  static final instance = PlatformCredentialDataProvider._();
+  PlatformCredentialDataProvider._();
+
   @override
   final ApiAccessor<PlatformCredential> api = Api.instance.platformCredentials;
 

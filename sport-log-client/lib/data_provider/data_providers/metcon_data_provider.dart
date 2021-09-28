@@ -8,6 +8,9 @@ import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/metcon/all.dart';
 
 class MetconDataProvider extends DataProvider<MetconDescription> {
+  static final instance = MetconDataProvider._();
+  MetconDataProvider._();
+
   final metconApi = Api.instance.metcons;
   final metconMovementApi = Api.instance.metconMovements;
 

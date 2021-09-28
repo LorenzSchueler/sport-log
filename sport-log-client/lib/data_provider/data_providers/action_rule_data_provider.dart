@@ -7,6 +7,9 @@ import 'package:sport_log/models/action/action_rule.dart';
 
 class ActionRuleDataProvider extends DataProviderImpl<ActionRule>
     with ConnectedMethods<ActionRule> {
+  static final instance = ActionRuleDataProvider._();
+  ActionRuleDataProvider._();
+
   @override
   final ApiAccessor<ActionRule> api = Api.instance.actionRules;
 

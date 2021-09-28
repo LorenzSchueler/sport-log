@@ -7,6 +7,9 @@ import 'package:sport_log/models/movement/all.dart';
 
 class MovementDataProvider extends DataProviderImpl<Movement>
     with UnconnectedMethods<Movement> {
+  static final instance = MovementDataProvider._();
+  MovementDataProvider._();
+
   @override
   final ApiAccessor<Movement> api = Api.instance.movements;
 

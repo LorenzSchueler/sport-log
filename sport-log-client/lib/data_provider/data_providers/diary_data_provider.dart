@@ -7,10 +7,12 @@ import 'package:sport_log/models/diary/diary.dart';
 
 class DiaryDataProvider extends DataProviderImpl<Diary>
     with UnconnectedMethods<Diary> {
+  static final instance = DiaryDataProvider._();
+  DiaryDataProvider._();
+
   @override
   final ApiAccessor<Diary> api = Api.instance.diaries;
 
-  // FIXME: nullable unwrap!
   @override
   final DbAccessor<Diary> db = AppDatabase.instance!.diaries;
 

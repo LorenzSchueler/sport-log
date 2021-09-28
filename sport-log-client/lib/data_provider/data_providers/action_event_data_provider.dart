@@ -7,6 +7,9 @@ import 'package:sport_log/models/action/action_event.dart';
 
 class ActionEventDataProvider extends DataProviderImpl<ActionEvent>
     with ConnectedMethods<ActionEvent> {
+  static final instance = ActionEventDataProvider._();
+  ActionEventDataProvider._();
+
   @override
   final ApiAccessor<ActionEvent> api = Api.instance.actionEvents;
 
