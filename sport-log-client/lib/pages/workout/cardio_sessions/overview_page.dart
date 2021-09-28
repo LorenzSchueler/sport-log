@@ -13,11 +13,21 @@ class CardioSessionsPage extends StatefulWidget {
 
 class CardioSessionsPageState extends State<CardioSessionsPage> {
   final _logger = Logger('CardioSessionsPage');
+
   final String token = Secrets.mapboxAccessToken;
   final String style = 'mapbox://styles/mapbox/outdoors-v11';
+
+  List<LatLng> locations = [];
+  late Line line;
+  LineOptions lineoptions =
+      const LineOptions(lineColor: "red", lineWidth: 3, geometry: []);
+
   late MapboxMapController mapController;
 
-  void addSymbol(MapboxMapController controller) async {
+  void init(MapboxMapController controller) async {
+    await controller.addLine(lineoptions);
+    line = controller.lines.first;
+
     var location = await acquireCurrentLocation();
     //var location = LatLng(47.28, 11.33);
 
@@ -28,7 +38,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
     await controller.addCircle(
       CircleOptions(
         circleRadius: 8.0,
-        circleColor: '#006992',
+        circleColor: '#0060a0',
         circleOpacity: 0.8,
         geometry: location,
         draggable: false,
@@ -46,18 +56,27 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         ]));
     await controller.addSymbol(const SymbolOptions(
         iconImage: "town-hall-15", geometry: LatLng(47.29, 11.34)));
+
+    _logger.i("requesting location");
+    var x = await controller.requestMyLocationLatLng();
+    _logger.i("requested location: ${x}");
   }
 
-  void markLocation(MapboxMapController controller, LatLng location) async {
+  void markPosition(MapboxMapController controller, LatLng location) async {
     await controller.addCircle(
       CircleOptions(
         circleRadius: 8.0,
-        circleColor: '#006992',
+        circleColor: '#008080',
         circleOpacity: 0.8,
         geometry: location,
         draggable: false,
       ),
     );
+  }
+
+  void extendLine(MapboxMapController controller, LatLng location) async {
+    locations.add(location);
+    await controller.updateLine(line, LineOptions(geometry: locations));
   }
 
   @override
@@ -77,13 +96,14 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         myLocationTrackingMode: MyLocationTrackingMode.TrackingGPS,
         onMapCreated: (MapboxMapController controller) =>
             mapController = controller,
-        onStyleLoadedCallback: () => addSymbol(mapController),
+        onStyleLoadedCallback: () => init(mapController),
+        onMapClick: (point, LatLng coordinates) =>
+            markPosition(mapController, coordinates),
         onMapLongClick: (point, LatLng coordinates) =>
-            markLocation(mapController, coordinates),
+            extendLine(mapController, coordinates),
         onUserLocationUpdated: (UserLocation location) {
-          print(location.altitude);
-          print(location.position.latitude);
-          print(location.position.longitude);
+          _logger.i(
+              "position ${location.position}; elevation ${location.altitude}");
         },
       ),
     );
