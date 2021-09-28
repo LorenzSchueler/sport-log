@@ -166,15 +166,16 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
       handleApiError(result1.failure);
       throw result1.failure;
     }
-    await metconDb.upsertMultiple(result1.success);
+    await metconDb.upsertMultiple(result1.success, synchronized: true);
 
     final result2 = await metconMovementApi.getMultiple();
     if (result2.isFailure) {
       handleApiError(result2.failure);
+      notifyListeners();
       throw result2.failure;
     }
     metconMovementDb
-        .upsertMultiple(result2.success)
+        .upsertMultiple(result2.success, synchronized: true)
         .then((_) => notifyListeners());
   }
 }

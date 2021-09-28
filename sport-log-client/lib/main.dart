@@ -44,12 +44,15 @@ Future<void> insertTestData() async {
     List<Movement> movements = [];
     if ((await AppDatabase.instance!.movements.getNonDeleted()).isEmpty) {
       movements = generateMovements(userId);
-      await AppDatabase.instance!.movements.upsertMultiple(movements);
+      await AppDatabase.instance!.movements
+          .upsertMultiple(movements, synchronized: false);
     }
     final sessions = await generateStrengthSessions(userId);
-    await StrengthDataProvider.instance.upsertMultipleSessions(sessions);
+    await StrengthDataProvider.instance
+        .upsertMultipleSessions(sessions, synchronized: false);
     final sets = await generateStrengthSets();
-    await StrengthDataProvider.instance.upsertMultipleSets(sets);
+    await StrengthDataProvider.instance
+        .upsertMultipleSets(sets, synchronized: false);
     _logger.i('''
         Generated
         ${movements.length} movements,

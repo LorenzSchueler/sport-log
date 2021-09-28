@@ -44,12 +44,13 @@ class DownSync {
       return;
     }
     // TODO: fix this!
+    await StrengthDataProvider.instance.upsertMultipleSessions(
+        result.success.strengthSessions,
+        synchronized: true);
     await StrengthDataProvider.instance
-        .upsertMultipleSessions(result.success.strengthSessions);
-    await StrengthDataProvider.instance
-        .upsertMultipleSets(result.success.strengthSets);
+        .upsertMultipleSets(result.success.strengthSets, synchronized: true);
     db
-        .upsertAccountData(result.success)
+        .upsertAccountData(result.success, synchronized: true)
         .then((_) => _logger.i('down sync done'));
     // TODO: handle user update
   }

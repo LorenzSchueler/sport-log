@@ -44,26 +44,32 @@ class AppDatabase {
             table.setDatabase(db);
           }
           version = (await db.rawQuery('select sqlite_version() AS version'))
-                  .first['version'] as String;
+              .first['version'] as String;
         });
     _logger.d("Database initialization done (sqlite version $version).");
   }
 
-  Future<void> upsertAccountData(AccountData data) async {
-    diaries.upsertMultiple(data.diaries);
-    wods.upsertMultiple(data.wods);
-    movements.upsertMultiple(data.movements);
-    metcons.upsertMultiple(data.metcons);
-    metconMovements.upsertMultiple(data.metconMovements);
-    metconSessions.upsertMultiple(data.metconSessions);
-    routes.upsertMultiple(data.routes);
-    cardioSessions.upsertMultiple(data.cardioSessions);
-    platforms.upsertMultiple(data.platforms);
-    platformCredentials.upsertMultiple(data.platformCredentials);
-    actionProviders.upsertMultiple(data.actionProviders);
-    actions.upsertMultiple(data.actions);
-    actionRules.upsertMultiple(data.actionRules);
-    actionEvents.upsertMultiple(data.actionEvents);
+  Future<void> upsertAccountData(AccountData data,
+      {required bool synchronized}) async {
+    diaries.upsertMultiple(data.diaries, synchronized: synchronized);
+    wods.upsertMultiple(data.wods, synchronized: synchronized);
+    movements.upsertMultiple(data.movements, synchronized: synchronized);
+    metcons.upsertMultiple(data.metcons, synchronized: synchronized);
+    metconMovements.upsertMultiple(data.metconMovements,
+        synchronized: synchronized);
+    metconSessions.upsertMultiple(data.metconSessions,
+        synchronized: synchronized);
+    routes.upsertMultiple(data.routes, synchronized: synchronized);
+    cardioSessions.upsertMultiple(data.cardioSessions,
+        synchronized: synchronized);
+    platforms.upsertMultiple(data.platforms, synchronized: synchronized);
+    platformCredentials.upsertMultiple(data.platformCredentials,
+        synchronized: synchronized);
+    actionProviders.upsertMultiple(data.actionProviders,
+        synchronized: synchronized);
+    actions.upsertMultiple(data.actions, synchronized: synchronized);
+    actionRules.upsertMultiple(data.actionRules, synchronized: synchronized);
+    actionEvents.upsertMultiple(data.actionEvents, synchronized: synchronized);
   }
 
   final movements = MovementTable();

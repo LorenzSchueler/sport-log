@@ -140,11 +140,17 @@ abstract class DbAccessor<T extends DbObject> {
         where: '${Keys.syncStatus} = ${SyncStatus.created.index}');
   }
 
-  Future<void> upsertMultiple(List<T> objects) async {
+  Future<void> upsertMultiple(List<T> objects,
+      {required bool synchronized}) async {
     final batch = database.batch();
     for (final object in objects) {
       // TODO: what it sync_status == 1 or sync_status == 2?
-      batch.insert(tableName, serde.toDbRecord(object),
+      batch.insert(
+          tableName,
+          {
+            ...serde.toDbRecord(object),
+            if (synchronized) Keys.syncStatus: SyncStatus.synchronized.index,
+          },
           conflictAlgorithm: ConflictAlgorithm.replace);
     }
     await batch.commit(noResult: true, continueOnError: true);

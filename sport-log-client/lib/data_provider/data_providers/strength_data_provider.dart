@@ -68,15 +68,16 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
       handleApiError(result1.failure);
       throw result1.failure;
     }
-    await strengthSessionDb.upsertMultiple(result1.success);
+    await strengthSessionDb.upsertMultiple(result1.success, synchronized: true);
 
     final result2 = await strengthSetApi.getMultiple();
     if (result2.isFailure) {
+      notifyListeners();
       handleApiError(result2.failure);
       throw result2.failure;
     }
     strengthSetDb
-        .upsertMultiple(result2.success)
+        .upsertMultiple(result2.success, synchronized: true)
         .then((_) => notifyListeners());
   }
 
@@ -239,13 +240,16 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
         movementIdValue: movementId);
   }
 
-  Future<void> upsertMultipleSessions(List<StrengthSession> sessions) async {
-    await strengthSessionDb.upsertMultiple(sessions);
+  Future<void> upsertMultipleSessions(List<StrengthSession> sessions,
+      {required bool synchronized}) async {
+    await strengthSessionDb.upsertMultiple(sessions,
+        synchronized: synchronized);
     notifyListeners();
   }
 
-  Future<void> upsertMultipleSets(List<StrengthSet> sets) async {
-    await strengthSetDb.upsertMultiple(sets);
+  Future<void> upsertMultipleSets(List<StrengthSet> sets,
+      {required bool synchronized}) async {
+    await strengthSetDb.upsertMultiple(sets, synchronized: synchronized);
     notifyListeners();
   }
 }
