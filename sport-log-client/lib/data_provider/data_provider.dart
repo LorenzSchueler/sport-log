@@ -78,7 +78,12 @@ abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
       handleApiError(result.failure);
       throw result.failure;
     }
-    await db.upsertMultiple(result.success);
+    await upsertMultiple(result.success);
+  }
+
+  Future<void> upsertMultiple(List<T> objects) async {
+    await db.upsertMultiple(objects);
+    notifyListeners();
   }
 }
 

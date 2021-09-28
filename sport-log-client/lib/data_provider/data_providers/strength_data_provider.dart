@@ -238,4 +238,14 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     return strengthSessionDb.getStatsAggregationsByMonth(
         movementIdValue: movementId);
   }
+
+  Future<void> upsertMultipleSessions(List<StrengthSession> sessions) async {
+    await strengthSessionDb.upsertMultiple(sessions);
+    notifyListeners();
+  }
+
+  Future<void> upsertMultipleSets(List<StrengthSet> sets) async {
+    await strengthSetDb.upsertMultiple(sets);
+    notifyListeners();
+  }
 }

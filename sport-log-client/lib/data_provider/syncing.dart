@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_log/api/api.dart';
+import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/keys.dart';
@@ -42,6 +43,11 @@ class DownSync {
       // TODO: syncing on the web?
       return;
     }
+    // TODO: fix this!
+    await StrengthDataProvider.instance
+        .upsertMultipleSessions(result.success.strengthSessions);
+    await StrengthDataProvider.instance
+        .upsertMultipleSets(result.success.strengthSets);
     db
         .upsertAccountData(result.success)
         .then((_) => _logger.i('down sync done'));

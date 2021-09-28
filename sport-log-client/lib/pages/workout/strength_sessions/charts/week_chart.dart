@@ -37,6 +37,7 @@ class _WeekChartState extends State<WeekChart> {
   @override
   void initState() {
     super.initState();
+    _dataProvider.addListener(update);
     update();
   }
 
@@ -127,5 +128,11 @@ class _WeekChartState extends State<WeekChart> {
         getDrawingVerticalLine: gridLineDrawer(context),
       ),
     ));
+  }
+
+  @override
+  void dispose() {
+    _dataProvider.removeListener(update);
+    super.dispose();
   }
 }

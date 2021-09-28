@@ -30,11 +30,18 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   @override
   void initState() {
     super.initState();
-    final state = context.read<SessionsUiCubit>().state;
-    update(state);
+    _dataProvider.addListener(update);
+    update();
   }
 
-  Future<void> update(SessionsUiState state) async {
+  @override
+  void dispose() {
+    _dataProvider.removeListener(update);
+    super.dispose();
+  }
+
+  Future<void> update([SessionsUiState? uiState]) async {
+    final state = uiState ?? context.read<SessionsUiCubit>().state;
     _logger.d(
         'Updating strength sessions with start = ${state.dateFilter.start}, end = ${state.dateFilter.end}');
     _dataProvider
@@ -53,44 +60,38 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   }
 
   // full update (from server)
-  Future<void> _refreshPage(SessionsUiState state) async {
+  Future<void> _refreshPage() async {
     await _dataProvider.doFullUpdate().onError((error, stackTrace) {
       if (error is ApiError) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
       }
     });
-    update(state);
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<SessionsUiCubit, SessionsUiState>(
-        builder: (context, state) => RefreshIndicator(
-              onRefresh: () => _refreshPage(state),
-              child: _buildStrengthSessionList(state),
-            ),
-        listenWhen: (oldState, newState) {
-          return newState.isStrengthPage &&
-              (oldState.dateFilter != newState.dateFilter ||
-                  oldState.movement != newState.movement);
-        },
-        listener: (context, state) {
-          update(state);
-        });
+    return BlocListener<SessionsUiCubit, SessionsUiState>(
+      listenWhen: (oldState, newState) {
+        return newState.isStrengthPage &&
+            (oldState.dateFilter != newState.dateFilter ||
+                oldState.movement != newState.movement);
+      },
+      listener: (context, state) {
+        update(state);
+      },
+      child: RefreshIndicator(
+        onRefresh: _refreshPage,
+        child: _strengthSessionsList,
+      ),
+    );
   }
 
-  Widget _chart(SessionsUiState state) {
-    if (!state.isMovementSelected) {
-      return const SizedBox.shrink();
-    }
-    return const StrengthChart();
-  }
-
-  Widget _buildStrengthSessionList(SessionsUiState state) {
+  Widget get _strengthSessionsList {
     if (_ssds.isEmpty) {
       return const Center(child: Text('No strength sessions there.'));
     }
+    final state = context.read<SessionsUiCubit>().state;
     return Scrollbar(
       child: ListView.builder(
         itemBuilder: (_, index) => _strengthSessionBuilder(state, index),
@@ -104,7 +105,10 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   Widget _strengthSessionBuilder(SessionsUiState state, int index) {
     if (index == 0) {
       assert(_ssds.isNotEmpty);
-      return _chart(state);
+      if (!state.isMovementSelected) {
+        return const SizedBox.shrink();
+      }
+      return const StrengthChart();
     }
     index--;
     final ssd = _ssds[index];
@@ -157,7 +161,9 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
             alignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
-                onPressed: () {}, // TODO
+                onPressed: () {
+                  _dataProvider.deleteSingle(ssd);
+                },
                 icon: const Icon(Icons.delete),
               ),
               IconButton(

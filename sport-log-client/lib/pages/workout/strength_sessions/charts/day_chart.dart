@@ -37,6 +37,7 @@ class _DayChartState extends State<DayChart> {
   @override
   void initState() {
     super.initState();
+    _dataProvider.addListener(update);
     update();
   }
 
@@ -120,5 +121,11 @@ class _DayChartState extends State<DayChart> {
         getDrawingVerticalLine: gridLineDrawer(context),
       ),
     ));
+  }
+
+  @override
+  void dispose() {
+    _dataProvider.removeListener(update);
+    super.dispose();
   }
 }

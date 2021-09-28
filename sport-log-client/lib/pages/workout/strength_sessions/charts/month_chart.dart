@@ -37,6 +37,7 @@ class _MonthChartState extends State<MonthChart> {
   @override
   void initState() {
     super.initState();
+    _dataProvider.addListener(update);
     update();
   }
 
@@ -115,5 +116,11 @@ class _MonthChartState extends State<MonthChart> {
         borderData: FlBorderData(show: false),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _dataProvider.removeListener(update);
+    super.dispose();
   }
 }

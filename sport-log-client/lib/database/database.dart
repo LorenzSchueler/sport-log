@@ -53,8 +53,6 @@ class AppDatabase {
     diaries.upsertMultiple(data.diaries);
     wods.upsertMultiple(data.wods);
     movements.upsertMultiple(data.movements);
-    strengthSessions.upsertMultiple(data.strengthSessions);
-    strengthSets.upsertMultiple(data.strengthSets);
     metcons.upsertMultiple(data.metcons);
     metconMovements.upsertMultiple(data.metconMovements);
     metconSessions.upsertMultiple(data.metconSessions);

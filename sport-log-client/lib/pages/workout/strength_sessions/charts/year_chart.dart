@@ -37,6 +37,7 @@ class _YearChartState extends State<YearChart> {
   @override
   void initState() {
     super.initState();
+    _dataProvider.addListener(update);
     update();
   }
 
@@ -129,5 +130,11 @@ class _YearChartState extends State<YearChart> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _dataProvider.removeListener(update);
+    super.dispose();
   }
 }

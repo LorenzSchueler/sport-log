@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
 import 'package:sport_log/config.dart';
+import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/data_provider/syncing.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/database.dart';
@@ -46,9 +47,9 @@ Future<void> insertTestData() async {
       await AppDatabase.instance!.movements.upsertMultiple(movements);
     }
     final sessions = await generateStrengthSessions(userId);
-    await AppDatabase.instance!.strengthSessions.upsertMultiple(sessions);
+    await StrengthDataProvider.instance.upsertMultipleSessions(sessions);
     final sets = await generateStrengthSets();
-    await AppDatabase.instance!.strengthSets.upsertMultiple(sets);
+    await StrengthDataProvider.instance.upsertMultipleSets(sets);
     _logger.i('''
         Generated
         ${movements.length} movements,

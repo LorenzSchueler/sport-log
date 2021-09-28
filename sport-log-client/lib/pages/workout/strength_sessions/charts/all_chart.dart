@@ -33,6 +33,7 @@ class _AllChartState extends State<AllChart> {
   @override
   void initState() {
     super.initState();
+    _dataProvider.addListener(update);
     update();
   }
 
@@ -118,5 +119,11 @@ class _AllChartState extends State<AllChart> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _dataProvider.removeListener(update);
+    super.dispose();
   }
 }
