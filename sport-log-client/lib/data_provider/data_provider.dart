@@ -5,6 +5,7 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/models/account_data/account_data.dart';
 
 final _logger = Logger('DP');
 
@@ -30,12 +31,16 @@ abstract class DataProvider<T> extends ChangeNotifier {
   }
 
   Future<void> doFullUpdate();
+
+  Future<void> upsertPartOfAccountData(AccountData accountData);
 }
 
 abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
   ApiAccessor<T> get api;
 
   DbAccessor<T> get db;
+
+  List<T> getFromAccountData(AccountData accountData);
 
   @override
   Future<List<T>> getNonDeleted() async => db.getNonDeleted();
@@ -81,8 +86,15 @@ abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
     await upsertMultiple(result.success, synchronized: true);
   }
 
-  Future<void> upsertMultiple(List<T> objects, {required bool synchronized}) async {
+  Future<void> upsertMultiple(List<T> objects,
+      {required bool synchronized}) async {
     await db.upsertMultiple(objects, synchronized: synchronized);
+    notifyListeners();
+  }
+
+  @override
+  Future<void> upsertPartOfAccountData(AccountData accountData) async {
+    await upsertMultiple(getFromAccountData(accountData), synchronized: true);
     notifyListeners();
   }
 }

@@ -2,6 +2,7 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/diary/diary.dart';
 
 class DiaryDataProvider extends DataProviderImpl<Diary>
@@ -12,4 +13,8 @@ class DiaryDataProvider extends DataProviderImpl<Diary>
   // FIXME: nullable unwrap!
   @override
   final DbAccessor<Diary> db = AppDatabase.instance!.diaries;
+
+  @override
+  List<Diary> getFromAccountData(AccountData accountData) =>
+      accountData.diaries;
 }

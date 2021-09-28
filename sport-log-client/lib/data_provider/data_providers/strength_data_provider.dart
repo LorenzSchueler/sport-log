@@ -4,6 +4,7 @@ import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
+import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/strength/all.dart';
 
 class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
@@ -250,6 +251,15 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
   Future<void> upsertMultipleSets(List<StrengthSet> sets,
       {required bool synchronized}) async {
     await strengthSetDb.upsertMultiple(sets, synchronized: synchronized);
+    notifyListeners();
+  }
+
+  @override
+  Future<void> upsertPartOfAccountData(AccountData accountData) async {
+    await strengthSessionDb.upsertMultiple(accountData.strengthSessions,
+        synchronized: true);
+    await strengthSetDb.upsertMultiple(accountData.strengthSets,
+        synchronized: true);
     notifyListeners();
   }
 }

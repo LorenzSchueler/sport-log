@@ -4,6 +4,7 @@ import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
+import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/metcon/all.dart';
 
 class MetconDataProvider extends DataProvider<MetconDescription> {
@@ -177,5 +178,13 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
     metconMovementDb
         .upsertMultiple(result2.success, synchronized: true)
         .then((_) => notifyListeners());
+  }
+
+  @override
+  Future<void> upsertPartOfAccountData(AccountData accountData) async {
+    await metconDb.upsertMultiple(accountData.metcons, synchronized: true);
+    await metconMovementDb.upsertMultiple(accountData.metconMovements,
+        synchronized: true);
+    notifyListeners();
   }
 }
