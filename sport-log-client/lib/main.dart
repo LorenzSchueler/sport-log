@@ -12,6 +12,7 @@ import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/test_data/movement_test_data.dart';
 import 'package:sport_log/test_data/strength_test_data.dart';
+import 'package:provider/provider.dart';
 
 import 'models/movement/movement.dart';
 
@@ -60,7 +61,10 @@ void main() async {
       providers: [
         BlocProvider.value(value: AuthenticationBloc()),
       ],
-      child: const App(),
+      child: ChangeNotifierProvider.value(
+        value: Sync.instance,
+        child: const App(),
+      ),
     ));
   });
 }

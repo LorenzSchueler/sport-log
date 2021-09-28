@@ -9,6 +9,8 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 
+import 'spinning_sync.dart';
+
 class MainDrawer extends StatelessWidget {
   const MainDrawer({
     Key? key,
@@ -20,7 +22,6 @@ class MainDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = UserState.instance.currentUser!;
-    final lastSync = Sync.instance.lastSync;
     return Drawer(
       child: Column(
         children: [
@@ -70,16 +71,25 @@ class MainDrawer extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          ListTile(
-            title: Text(lastSync == null
-                ? 'No sync done yet.'
-                : 'Last sync: ' + dateTimeFull.format(lastSync)),
-            trailing: IconButton(
-              color: secondaryVariantOf(context),
-              icon: const Icon(Icons.sync_sharp),
-              // TODO: trigger sync on button press
-              onPressed: null,
-            ),
+          Consumer<Sync>(
+            builder: (context, sync, _) {
+              String title;
+              if (sync.isSyncing) {
+                title = 'Syncing...';
+              } else if (sync.lastSync == null) {
+                title = 'No syncs yet';
+              } else {
+                title = 'Last sync: ' + dateTimeFull.format(sync.lastSync!);
+              }
+              return ListTile(
+                title: Text(title),
+                trailing: SpinningSync(
+                  color: secondaryVariantOf(context),
+                  onPressed: sync.isSyncing ? null : Sync.instance.sync,
+                  isSpinning: sync.isSyncing,
+                ),
+              );
+            },
           ),
           ListTile(
             title: const Text('Logout'),
