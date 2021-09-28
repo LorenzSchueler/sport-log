@@ -6,6 +6,7 @@ abstract class Routes {
   static const editStrengthSession = '/edit-strength-session';
   static const metcon = _MetconRoutes();
   static const movement = _MovementRoutes();
+  static const cardio = _CardioRoutes();
 }
 
 class _MetconRoutes {
@@ -20,4 +21,11 @@ class _MovementRoutes {
 
   final String overview = '/movement/overview';
   final String edit = '/movement/edit';
+}
+
+class _CardioRoutes {
+  const _CardioRoutes();
+
+  final String overview = '/cardio/overview';
+  final String tracking = '/cardio/tracking';
 }

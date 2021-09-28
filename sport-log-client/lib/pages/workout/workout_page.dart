@@ -66,7 +66,7 @@ class WorkoutPage extends StatelessWidget {
             floatingActionButton: state.shouldShowFab
                 ? FloatingActionButton(
                     child: const Icon(Icons.add),
-                    onPressed: () => _onFabTapped,
+                    onPressed: () => _onFabTapped(state, context),
                   )
                 : null,
           );
