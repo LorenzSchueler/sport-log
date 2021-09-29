@@ -7,7 +7,3 @@ abstract class HasId {
 abstract class Validatable {
   bool isValid();
 }
-
-abstract class HasDateTime {
-  DateTime get datetime;
-}

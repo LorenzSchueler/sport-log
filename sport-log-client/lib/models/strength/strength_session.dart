@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 part 'strength_session.g.dart';
 
 @JsonSerializable()
-class StrengthSession implements DbObjectWithDateTime {
+class StrengthSession implements DbObject {
   StrengthSession({
     required this.id,
     required this.userId,
@@ -25,7 +25,6 @@ class StrengthSession implements DbObjectWithDateTime {
   Int64? strengthBlueprintId;
   @IdConverter()
   Int64 userId;
-  @override
   @DateTimeConverter()
   DateTime datetime;
   @IdConverter()

@@ -179,12 +179,6 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     strengthSetDb.setSynchronizedByStrengthSession(object.id);
   }
 
-  Future<DateTime?> earliestDateTime() async =>
-      strengthSessionDb.earliestDateTime();
-
-  Future<DateTime?> mostRecentDateTime() async =>
-      strengthSessionDb.mostRecentDateTime();
-
   // this can be very inefficient and should be avoided when having huge lists of sessions
   Future<void> populateWithSets(
       List<StrengthSessionDescription> sessions) async {

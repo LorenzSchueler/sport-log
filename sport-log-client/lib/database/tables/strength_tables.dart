@@ -12,8 +12,7 @@ import 'package:sport_log/models/strength/all.dart';
 
 import 'movement_table.dart';
 
-class StrengthSessionTable extends DbAccessor<StrengthSession>
-    with DateTimeMethods {
+class StrengthSessionTable extends DbAccessor<StrengthSession> {
   final _logger = Logger('StrengthSessionTable');
 
   @override
