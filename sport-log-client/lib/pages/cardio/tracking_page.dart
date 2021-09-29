@@ -218,10 +218,6 @@ time: ${location.time}""";
         onMapCreated: (MapboxMapController controller) =>
             mapController = controller,
         onStyleLoadedCallback: () => init(mapController),
-        onMapClick: (point, LatLng coordinates) =>
-            markLatLng(mapController, coordinates),
-        onMapLongClick: (point, LatLng coordinates) =>
-            extendLine(mapController, coordinates),
       )),
       Container(
           padding: const EdgeInsets.all(5),
