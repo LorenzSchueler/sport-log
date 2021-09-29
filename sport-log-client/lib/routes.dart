@@ -28,4 +28,6 @@ class _CardioRoutes {
 
   final String overview = '/cardio/overview';
   final String tracking = '/cardio/tracking';
+  final String route_planning = '/cardio/route_planning';
+  final String data_input = '/cardio/data_input';
 }

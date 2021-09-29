@@ -47,9 +47,10 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
     });
   }
 
-  // will be called by workout/sessions page via global key
-  void onFabTapped(BuildContext context) {
+  Widget? fab(BuildContext context) {
     _logger.d('FAB tapped!');
+
+    return null;
   }
 
   // full update (from server)

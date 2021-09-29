@@ -6,6 +6,7 @@ import 'package:sport_log/helpers/secrets.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/pages/workout/ui_cubit.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/expandable_fab.dart';
 
 class CardioSessionsPage extends StatefulWidget {
   const CardioSessionsPage({Key? key}) : super(key: key);
@@ -43,7 +44,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
 
   Widget _buildSessionCard() {
     late MapboxMapController _sessionMapController;
-    var _locations = [
+    var _locations = const [
       LatLng(47.27, 11.33),
       LatLng(47.27, 11.331),
       LatLng(47.271, 11.33),
@@ -93,8 +94,28 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
     );
   }
 
-  void onFabTapped(BuildContext context) {
+  Widget? fab(BuildContext context) {
     _logger.d('FAB tapped!');
-    Navigator.of(context).pushNamed(Routes.cardio.tracking);
+
+    return ExpandableFab(
+      icon: const Icon(Icons.add),
+      children: [
+        ActionButton(
+          onPressed: () =>
+              Navigator.of(context).pushNamed(Routes.cardio.tracking),
+          icon: const Icon(Icons.play_arrow_rounded),
+        ),
+        ActionButton(
+          //onPressed: () =>
+          //Navigator.of(context).pushNamed(Routes.cardio.data_input),
+          icon: const Icon(Icons.notes_rounded),
+        ),
+        ActionButton(
+          onPressed: () =>
+              Navigator.of(context).pushNamed(Routes.cardio.route_planning),
+          icon: const Icon(Icons.map),
+        ),
+      ],
+    );
   }
 }

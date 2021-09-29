@@ -63,12 +63,7 @@ class WorkoutPage extends StatelessWidget {
               type: BottomNavigationBarType.fixed,
             ),
             drawer: const MainDrawer(selectedRoute: Routes.workout),
-            floatingActionButton: state.shouldShowFab
-                ? FloatingActionButton(
-                    child: const Icon(Icons.add),
-                    onPressed: () => _onFabTapped(state, context),
-                  )
-                : null,
+            floatingActionButton: _fab(state, context),
           );
         },
       ),
@@ -132,20 +127,16 @@ class WorkoutPage extends StatelessWidget {
     return (index) => cubit.setTab(SessionsPageTab.values[index]);
   }
 
-  void _onFabTapped(SessionsUiState state, BuildContext context) {
+  Widget? _fab(SessionsUiState state, BuildContext context) {
     switch (state.tab) {
       case SessionsPageTab.strength:
-        _strengthKey.currentState?.onFabTapped(context);
-        break;
+        return _strengthKey.currentState?.fab(context);
       case SessionsPageTab.metcon:
-        _metconKey.currentState?.onFabTapped(context);
-        break;
+        return _metconKey.currentState?.fab(context);
       case SessionsPageTab.cardio:
-        _cardioKey.currentState?.onFabTapped(context);
-        break;
+        return _cardioKey.currentState?.fab(context);
       case SessionsPageTab.diary:
-        _diaryKey.currentState?.onFabTapped(context);
-        break;
+        return _diaryKey.currentState?.fab(context);
     }
   }
 }

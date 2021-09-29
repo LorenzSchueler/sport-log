@@ -4,6 +4,7 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/movement/movement_description.dart';
 import 'package:sport_log/models/strength/strength_session_description.dart';
+import 'package:sport_log/pages/cardio/route_planing_page.dart';
 import 'package:sport_log/pages/cardio/tracking_page.dart';
 import 'package:sport_log/pages/landing/landing_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
@@ -77,6 +78,7 @@ class _AppState extends State<App> {
                   description: arg is StrengthSessionDescription ? arg : null);
             }),
         Routes.cardio.tracking: (_) => const CardioTrackingPage(),
+        Routes.cardio.route_planning: (_) => const RoutePlanningPage(),
       },
       initialRoute: isAuthenticated ? Routes.workout : Routes.landing,
       debugShowCheckedModeBanner: false,
