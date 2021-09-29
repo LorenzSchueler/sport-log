@@ -5,7 +5,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/secrets.dart';
 import 'package:sport_log/helpers/theme.dart';
 
-enum TrackingMode { Tracking, Paused, NotStarted }
+enum TrackingMode { tracking, paused, notStarted }
 
 class CardioTrackingPage extends StatefulWidget {
   const CardioTrackingPage({Key? key}) : super(key: key);
@@ -21,15 +21,16 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   final String style = 'mapbox://styles/mapbox/outdoors-v11';
 
   List<LatLng> locations = [];
-  late Line line;
+  Line? line;
+  List<Circle>? circles;
 
-  TrackingMode trackingMode = TrackingMode.NotStarted;
+  TrackingMode trackingMode = TrackingMode.notStarted;
 
   String locationInfo = "";
 
   late MapboxMapController mapController;
 
-  Future<LatLng?> acquireCurrentLocation() async {
+  Future<LatLng?> startLocationStream() async {
     Location location = Location();
 
     bool serviceEnabled = await location.serviceEnabled();
@@ -50,50 +51,16 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
     location.changeSettings(accuracy: LocationAccuracy.high);
 
-    //location.enableBackgroundMode(enable: true);
+    location.enableBackgroundMode(enable: true);
     location.onLocationChanged.listen(
         (LocationData currentLocation) => locationConsumer(currentLocation));
-
-    final locationData = await location.getLocation();
-    return LatLng(locationData.latitude, locationData.longitude);
   }
 
   void init(MapboxMapController controller) async {
-    await controller.addLine(
-        const LineOptions(lineColor: "red", lineWidth: 3, geometry: []));
-    line = controller.lines.first;
-
-    var location = await acquireCurrentLocation();
-
-    await controller.animateCamera(
-      CameraUpdate.newLatLng(location),
-    );
-
-    await controller.addCircle(
-      CircleOptions(
-        circleRadius: 8.0,
-        circleColor: '#0060a0',
-        circleOpacity: 0.5,
-        geometry: location,
-        draggable: false,
-      ),
-    );
-    await controller.addCircle(
-      CircleOptions(
-        circleRadius: 20.0,
-        circleColor: '#0060a0',
-        circleOpacity: 0.3,
-        geometry: location,
-        draggable: false,
-      ),
-    );
-
-    //_logger.i("requesting location");
-    //var mapboxLocation = await controller.requestMyLocationLatLng();
-    //_logger.i("requested location: $mapboxLocation");
+    await startLocationStream();
   }
 
-  void locationConsumer(LocationData location) {
+  void locationConsumer(LocationData location) async {
     setState(() {
       locationInfo = """location provider: ${location.provider}
 accuracy: ${location.accuracy}
@@ -102,7 +69,33 @@ time: ${location.time}""";
 
     _logger.i(locationInfo);
 
-    if (trackingMode == TrackingMode.Tracking) {
+    LatLng latLng = LatLng(location.latitude, location.longitude);
+
+    await mapController.animateCamera(
+      CameraUpdate.newLatLng(latLng),
+    );
+
+    if (circles != null) {
+      await mapController.removeCircles(circles);
+    }
+    circles = await mapController.addCircles([
+      CircleOptions(
+        circleRadius: 8.0,
+        circleColor: '#0060a0',
+        circleOpacity: 0.5,
+        geometry: latLng,
+        draggable: false,
+      ),
+      CircleOptions(
+        circleRadius: 20.0,
+        circleColor: '#0060a0',
+        circleOpacity: 0.3,
+        geometry: latLng,
+        draggable: false,
+      ),
+    ]);
+
+    if (trackingMode == TrackingMode.tracking) {
       extendLine(mapController, LatLng(location.latitude, location.longitude));
     }
   }
@@ -121,6 +114,8 @@ time: ${location.time}""";
 
   void extendLine(MapboxMapController controller, LatLng location) async {
     locations.add(location);
+    line ??= await controller.addLine(
+        const LineOptions(lineColor: "red", lineWidth: 3, geometry: []));
     await controller.updateLine(line, LineOptions(geometry: locations));
   }
 
@@ -143,13 +138,13 @@ time: ${location.time}""";
   }
 
   List<Widget> _buildButtons() {
-    if (trackingMode == TrackingMode.Tracking) {
+    if (trackingMode == TrackingMode.tracking) {
       return [
         Expanded(
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
                 onPressed: () => setState(() {
-                      trackingMode = TrackingMode.Paused;
+                      trackingMode = TrackingMode.paused;
                     }),
                 child: const Text("pause"))),
         const SizedBox(
@@ -159,17 +154,17 @@ time: ${location.time}""";
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
                 onPressed: () => setState(() {
-                      trackingMode = TrackingMode.NotStarted;
+                      trackingMode = TrackingMode.notStarted;
                     }),
                 child: const Text("stop"))),
       ];
-    } else if (trackingMode == TrackingMode.Paused) {
+    } else if (trackingMode == TrackingMode.paused) {
       return [
         Expanded(
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.green[400]),
                 onPressed: () => setState(() {
-                      trackingMode = TrackingMode.Tracking;
+                      trackingMode = TrackingMode.tracking;
                     }),
                 child: const Text("continue"))),
         const SizedBox(
@@ -179,7 +174,7 @@ time: ${location.time}""";
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
                 onPressed: () => setState(() {
-                      trackingMode = TrackingMode.NotStarted;
+                      trackingMode = TrackingMode.notStarted;
                     }),
                 child: const Text("stop"))),
       ];
@@ -189,7 +184,7 @@ time: ${location.time}""";
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.green[400]),
                 onPressed: () => setState(() {
-                      trackingMode = TrackingMode.Tracking;
+                      trackingMode = TrackingMode.tracking;
                     }),
                 child: const Text("start"))),
         const SizedBox(
@@ -215,14 +210,11 @@ time: ${location.time}""";
         accessToken: token,
         styleString: style,
         initialCameraPosition: const CameraPosition(
-          zoom: 12.0,
+          zoom: 13.0,
           target: LatLng(47.27, 11.33),
         ),
         compassEnabled: true,
         compassViewPosition: CompassViewPosition.TopRight,
-        //myLocationEnabled: true,
-        //myLocationRenderMode: MyLocationRenderMode.NORMAL,
-        //myLocationTrackingMode: MyLocationTrackingMode.Tracking,
         onMapCreated: (MapboxMapController controller) =>
             mapController = controller,
         onStyleLoadedCallback: () => init(mapController),
@@ -230,11 +222,6 @@ time: ${location.time}""";
             markLatLng(mapController, coordinates),
         onMapLongClick: (point, LatLng coordinates) =>
             extendLine(mapController, coordinates),
-        onUserLocationUpdated: (UserLocation location) {
-          _logger.i(
-              "position ${location.position}; elevation ${location.altitude}");
-          //extendLine(mapController, location.position);
-        },
       )),
       Container(
           padding: const EdgeInsets.all(5),
