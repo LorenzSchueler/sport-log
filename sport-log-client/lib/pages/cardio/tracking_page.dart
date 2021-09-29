@@ -71,6 +71,24 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     await controller.updateLine(line, LineOptions(geometry: locations));
   }
 
+  Widget _buildCard(String title, String subtitle) {
+    return Card(
+      child: ListTile(
+        contentPadding: EdgeInsets.fromLTRB(0, 2, 0, 0),
+        title: Text(
+          title,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 25),
+        ),
+        subtitle: Text(
+          subtitle,
+          textAlign: TextAlign.center,
+        ),
+        dense: true,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(children: [
@@ -100,71 +118,42 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
         },
       )),
       Container(
-          height: 200,
           padding: const EdgeInsets.all(5),
           color: onPrimaryColorOf(context),
           child: Table(
-            border: TableBorder(
-                verticalInside:
-                    BorderSide(width: 1, color: secondaryColorOf(context)),
-                horizontalInside:
-                    BorderSide(width: 1, color: secondaryColorOf(context))),
             children: [
-              const TableRow(children: [
-                const Text(
-                  "00:31:15",
-                  style: TextStyle(fontSize: 12),
-                  textAlign: TextAlign.center,
-                ),
-                const Text(
-                  "6.17 km",
-                  style: TextStyle(fontSize: 12),
-                  textAlign: TextAlign.center,
-                ),
+              TableRow(children: [
+                _buildCard("00:31:15", "time"),
+                _buildCard("6.17 km", "distance"),
               ]),
-              const TableRow(children: [
-                const Text(
-                  "10.7 km/h",
-                  style: TextStyle(fontSize: 12),
-                  textAlign: TextAlign.center,
-                ),
-                const Text(
-                  "241 m",
-                  style: TextStyle(fontSize: 12),
-                  textAlign: TextAlign.center,
-                ),
+              TableRow(children: [
+                _buildCard("10.7 km/h", "speed"),
+                _buildCard("163", "step rate"),
               ]),
-              const TableRow(children: [
-                const Text(
-                  "10.7 km/h",
-                  style: TextStyle(fontSize: 12),
-                  textAlign: TextAlign.center,
-                ),
-                const Text(
-                  "241 m",
-                  style: TextStyle(fontSize: 12),
-                  textAlign: TextAlign.center,
-                ),
+              TableRow(children: [
+                _buildCard("231 m", "ascent"),
+                _buildCard("51 m", "descent"),
               ]),
             ],
           )),
       Container(
-          height: 50,
           color: onPrimaryColorOf(context),
-          padding: EdgeInsets.all(5),
+          padding: const EdgeInsets.all(5),
           child: Row(
             children: [
-              const Expanded(
+              Expanded(
                   child: ElevatedButton(
-                      onPressed: null, child: const Text("start"))),
-              SizedBox(
-                width: 5,
+                      style:
+                          ElevatedButton.styleFrom(primary: Colors.green[400]),
+                      onPressed: null,
+                      child: const Text("start"))),
+              const SizedBox(
+                width: 10,
               ),
               Expanded(
                   child: ElevatedButton(
-                      onPressed: null,
-                      style: ElevatedButton.styleFrom(
-                          textStyle: TextStyle(color: primaryColorOf(context))),
+                      style: ElevatedButton.styleFrom(primary: Colors.red[400]),
+                      onPressed: () => Navigator.of(context).pop(),
                       child: const Text("cancel"))),
             ],
           ))
