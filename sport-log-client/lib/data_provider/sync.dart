@@ -25,7 +25,7 @@ class Sync extends ChangeNotifier {
     }
   }
 
-  Future<void> sync() async {
+  Future<void> sync({VoidCallback? onNoInternet}) async {
     if (_isSyncing == true) {
       _logger.d('Sync is alread running.');
       return;
@@ -34,13 +34,13 @@ class Sync extends ChangeNotifier {
       _logger.d('Sync cannot be run: no user.');
       return;
     }
-    _logger.i('Starting sync...');
     _isSyncing = true;
     notifyListeners();
     final syncStart = DateTime.now();
-    await _upSync();
-    await _downSync();
-    _setLastSync(syncStart);
+    if (await _downSync(onNoInternet: onNoInternet)) {
+      await _upSync();
+      _setLastSync(syncStart);
+    }
     _isSyncing = false;
     notifyListeners();
   }
@@ -102,26 +102,27 @@ class Sync extends ChangeNotifier {
       ];
 
   Future<void> _upSync() async {
-    final now = DateTime.now();
     for (final db in allDataProviders) {
       // TODO: this can be sped up
       await db.pushToServer();
     }
     // TODO: upsync routes, cardio sessions, metcon sessions, movement muscle, training plan, metcon item, strength blueprint, cardio blueprint
     // TODO: deal with user updates
-    _logger.i('Up sync: ${DateTime.now().difference(now)}');
   }
 
-  Future<void> _downSync() async {
-    final now = DateTime.now();
+  Future<bool> _downSync({VoidCallback? onNoInternet}) async {
     final accountDataResult = await Api.instance.accountData.get(lastSync);
     if (accountDataResult.isFailure) {
       if (accountDataResult.failure == ApiError.noInternetConnection) {
-        _logger.i('Tried down sync, but got no internet connection.');
+        _logger.d('Tried sync but got no Internet connection.',
+            accountDataResult.failure);
+        if (onNoInternet != null) {
+          onNoInternet();
+        }
       } else {
         _logger.e('Tried down sync, but got error.', accountDataResult.failure);
       }
-      return;
+      return false;
     }
     final accountData = accountDataResult.success;
     for (final db in allDataProviders) {
@@ -130,6 +131,6 @@ class Sync extends ChangeNotifier {
     }
     // TODO: downsync routes, cardio sessions, metcon sessions, movement muscle, training plan, metcon item, strength blueprint, cardio blueprint
     // TODO: deal with user updates
-    _logger.i('Down sync: ${DateTime.now().difference(now)}');
+    return true;
   }
 }

@@ -5,6 +5,7 @@ import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
@@ -85,21 +86,34 @@ class MainDrawer extends StatelessWidget {
                 title: Text(title),
                 trailing: SpinningSync(
                   color: secondaryVariantOf(context),
-                  onPressed: sync.isSyncing ? null : Sync.instance.sync,
+                  onPressed: sync.isSyncing
+                      ? null
+                      : () => Sync.instance.sync(
+                            onNoInternet: () {
+                              showSimpleToast(
+                                  context, 'No Internet connection.');
+                            },
+                          ),
                   isSpinning: sync.isSyncing,
                 ),
               );
             },
           ),
-          ListTile(
-            title: const Text('Logout'),
-            trailing: IconButton(
-              color: secondaryVariantOf(context),
-              icon: const Icon(Icons.logout_sharp),
-              onPressed: () {
-                context.read<AuthenticationBloc>().add(const LogoutEvent());
-                Nav.changeNamed(context, Routes.landing);
-              },
+          Consumer<Sync>(
+            builder: (context, sync, _) => ListTile(
+              title: const Text('Logout'),
+              trailing: IconButton(
+                color: secondaryVariantOf(context),
+                icon: const Icon(Icons.logout_sharp),
+                onPressed: sync.isSyncing
+                    ? null
+                    : () {
+                        context
+                            .read<AuthenticationBloc>()
+                            .add(const LogoutEvent());
+                        Nav.changeNamed(context, Routes.landing);
+                      },
+              ),
             ),
           ),
         ],
