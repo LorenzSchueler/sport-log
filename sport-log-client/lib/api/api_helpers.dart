@@ -37,7 +37,7 @@ mixin ApiLogging {
   }
 
   void _logRequest(String httpMethod, String route, [dynamic json]) {
-    if (json != null) {
+    if (json != null && Config.outputRequestJson) {
       final prettyJson = _prettyJson(json);
       logger.d('request: $httpMethod $route\n$prettyJson');
     } else {
@@ -48,13 +48,13 @@ mixin ApiLogging {
   void _logResponse(Response response) {
     final body = utf8.decode(response.bodyBytes);
     final successful = response.statusCode >= 200 && response.statusCode < 300;
-    if (body.isEmpty) {
-      logger.log(successful ? l.Level.debug : l.Level.error,
-          'response: ${response.statusCode}');
-    } else {
+    if (body.isNotEmpty && (!successful  || Config.outputRequestJson)) {
       dynamic jsonObject = jsonDecode(body);
       logger.log(successful ? l.Level.debug : l.Level.error,
           'response: ${response.statusCode}\n${_prettyJson(jsonObject)}');
+    } else {
+      logger.log(successful ? l.Level.debug : l.Level.error,
+          'response: ${response.statusCode}');
     }
   }
 }
