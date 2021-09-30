@@ -88,6 +88,9 @@ abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
 
   Future<void> upsertMultiple(List<T> objects,
       {required bool synchronized}) async {
+    if (objects.isEmpty) {
+      return;
+    }
     await db.upsertMultiple(objects, synchronized: synchronized);
     notifyListeners();
   }
@@ -95,7 +98,6 @@ abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
   @override
   Future<void> upsertPartOfAccountData(AccountData accountData) async {
     await upsertMultiple(getFromAccountData(accountData), synchronized: true);
-    notifyListeners();
   }
 }
 
