@@ -102,9 +102,9 @@ class Sync extends ChangeNotifier {
       ];
 
   Future<void> _upSync() async {
-    for (final db in allDataProviders) {
+    for (final dp in allDataProviders) {
       // TODO: this can be sped up
-      await db.pushToServer();
+      await dp.pushToServer();
     }
     // TODO: upsync routes, cardio sessions, metcon sessions, movement muscle, training plan, metcon item, strength blueprint, cardio blueprint
     // TODO: deal with user updates
@@ -125,9 +125,9 @@ class Sync extends ChangeNotifier {
       return false;
     }
     final accountData = accountDataResult.success;
-    for (final db in allDataProviders) {
+    for (final dp in allDataProviders) {
       // TODO: this can be sped up
-      await db.upsertPartOfAccountData(accountData);
+      await dp.upsertPartOfAccountData(accountData);
     }
     // TODO: downsync routes, cardio sessions, metcon sessions, movement muscle, training plan, metcon item, strength blueprint, cardio blueprint
     // TODO: deal with user updates
