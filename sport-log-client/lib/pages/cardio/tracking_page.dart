@@ -17,20 +17,20 @@ class CardioTrackingPage extends StatefulWidget {
 class CardioTrackingPageState extends State<CardioTrackingPage> {
   final _logger = Logger('CardioTrackingPage');
 
-  final String token = Secrets.mapboxAccessToken;
-  final String style = 'mapbox://styles/mapbox/outdoors-v11';
+  final String _token = Secrets.mapboxAccessToken;
+  final String _style = 'mapbox://styles/mapbox/outdoors-v11';
 
-  List<LatLng> locations = [];
-  Line? line;
-  List<Circle>? circles;
+  final List<LatLng> _locations = [];
+  Line? _line;
+  List<Circle>? _circles;
 
-  TrackingMode trackingMode = TrackingMode.notStarted;
+  TrackingMode _trackingMode = TrackingMode.notStarted;
 
-  String locationInfo = "";
+  String _locationInfo = "";
 
-  late MapboxMapController mapController;
+  late MapboxMapController _mapController;
 
-  Future<LatLng?> startLocationStream() async {
+  Future<LatLng?> _startLocationStream() async {
     Location location = Location();
 
     bool serviceEnabled = await location.serviceEnabled();
@@ -53,32 +53,28 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
     location.enableBackgroundMode(enable: true);
     location.onLocationChanged.listen(
-        (LocationData currentLocation) => locationConsumer(currentLocation));
+        (LocationData currentLocation) => _locationConsumer(currentLocation));
   }
 
-  void init(MapboxMapController controller) async {
-    await startLocationStream();
-  }
-
-  void locationConsumer(LocationData location) async {
+  void _locationConsumer(LocationData location) async {
     setState(() {
-      locationInfo = """location provider: ${location.provider}
+      _locationInfo = """location provider: ${location.provider}
 accuracy: ${location.accuracy}
 time: ${location.time}""";
     });
 
-    _logger.i(locationInfo);
+    _logger.i(_locationInfo);
 
     LatLng latLng = LatLng(location.latitude, location.longitude);
 
-    await mapController.animateCamera(
+    await _mapController.animateCamera(
       CameraUpdate.newLatLng(latLng),
     );
 
-    if (circles != null) {
-      await mapController.removeCircles(circles);
+    if (_circles != null) {
+      await _mapController.removeCircles(_circles);
     }
-    circles = await mapController.addCircles([
+    _circles = await _mapController.addCircles([
       CircleOptions(
         circleRadius: 8.0,
         circleColor: '#0060a0',
@@ -95,28 +91,17 @@ time: ${location.time}""";
       ),
     ]);
 
-    if (trackingMode == TrackingMode.tracking) {
-      extendLine(mapController, LatLng(location.latitude, location.longitude));
+    if (_trackingMode == TrackingMode.tracking) {
+      _extendLine(
+          _mapController, LatLng(location.latitude, location.longitude));
     }
   }
 
-  void markLatLng(MapboxMapController controller, LatLng location) async {
-    await controller.addCircle(
-      CircleOptions(
-        circleRadius: 8.0,
-        circleColor: '#008080',
-        circleOpacity: 0.5,
-        geometry: location,
-        draggable: false,
-      ),
-    );
-  }
-
-  void extendLine(MapboxMapController controller, LatLng location) async {
-    locations.add(location);
-    line ??= await controller.addLine(
+  void _extendLine(MapboxMapController controller, LatLng location) async {
+    _locations.add(location);
+    _line ??= await controller.addLine(
         const LineOptions(lineColor: "red", lineWidth: 3, geometry: []));
-    await controller.updateLine(line, LineOptions(geometry: locations));
+    await controller.updateLine(_line, LineOptions(geometry: _locations));
   }
 
   Widget _buildCard(String title, String subtitle) {
@@ -138,13 +123,13 @@ time: ${location.time}""";
   }
 
   List<Widget> _buildButtons() {
-    if (trackingMode == TrackingMode.tracking) {
+    if (_trackingMode == TrackingMode.tracking) {
       return [
         Expanded(
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
                 onPressed: () => setState(() {
-                      trackingMode = TrackingMode.paused;
+                      _trackingMode = TrackingMode.paused;
                     }),
                 child: const Text("pause"))),
         const SizedBox(
@@ -154,17 +139,17 @@ time: ${location.time}""";
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
                 onPressed: () => setState(() {
-                      trackingMode = TrackingMode.notStarted;
+                      _trackingMode = TrackingMode.notStarted;
                     }),
                 child: const Text("stop"))),
       ];
-    } else if (trackingMode == TrackingMode.paused) {
+    } else if (_trackingMode == TrackingMode.paused) {
       return [
         Expanded(
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.green[400]),
                 onPressed: () => setState(() {
-                      trackingMode = TrackingMode.tracking;
+                      _trackingMode = TrackingMode.tracking;
                     }),
                 child: const Text("continue"))),
         const SizedBox(
@@ -174,7 +159,7 @@ time: ${location.time}""";
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
                 onPressed: () => setState(() {
-                      trackingMode = TrackingMode.notStarted;
+                      _trackingMode = TrackingMode.notStarted;
                     }),
                 child: const Text("stop"))),
       ];
@@ -184,7 +169,7 @@ time: ${location.time}""";
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.green[400]),
                 onPressed: () => setState(() {
-                      trackingMode = TrackingMode.tracking;
+                      _trackingMode = TrackingMode.tracking;
                     }),
                 child: const Text("start"))),
         const SizedBox(
@@ -204,23 +189,23 @@ time: ${location.time}""";
     return Column(children: [
       Card(
           margin: const EdgeInsets.only(top: 25, bottom: 5),
-          child: Text(locationInfo)),
+          child: Text(_locationInfo)),
       Expanded(
           child: MapboxMap(
-        accessToken: token,
-        styleString: style,
+        accessToken: _token,
+        styleString: _style,
         initialCameraPosition: const CameraPosition(
-          zoom: 13.0,
+          zoom: 14.0,
           target: LatLng(47.27, 11.33),
         ),
         compassEnabled: true,
         compassViewPosition: CompassViewPosition.TopRight,
         onMapCreated: (MapboxMapController controller) =>
-            mapController = controller,
-        onStyleLoadedCallback: () => init(mapController),
+            _mapController = controller,
+        onStyleLoadedCallback: () => _startLocationStream(),
       )),
       Container(
-          padding: const EdgeInsets.all(5),
+          padding: const EdgeInsets.only(top: 5),
           color: onPrimaryColorOf(context),
           child: Table(
             children: [

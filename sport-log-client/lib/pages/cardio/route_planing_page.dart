@@ -14,23 +14,24 @@ class RoutePlanningPage extends StatefulWidget {
 class RoutePlanningPageState extends State<RoutePlanningPage> {
   final _logger = Logger('RoutePlanningPage');
 
-  final String token = Secrets.mapboxAccessToken;
-  final String style = 'mapbox://styles/mapbox/outdoors-v11';
+  final String _token = Secrets.mapboxAccessToken;
+  final String _style = 'mapbox://styles/mapbox/outdoors-v11';
 
-  List<LatLng> locations = [];
-  Line? line;
-  List<Circle> circles = [];
-  List<Symbol> symbols = [];
+  List<LatLng> _locations = [];
+  Line? _line;
+  List<Circle> _circles = [];
+  List<Symbol> _symbols = [];
 
-  late MapboxMapController mapController;
+  bool _listExpanded = false;
 
-  void markLatLng(
-      MapboxMapController controller, LatLng latLng, int number) async {
-    symbols.add(await controller.addSymbol(SymbolOptions(
+  late MapboxMapController _mapController;
+
+  void _addPoint(LatLng latLng, int number) async {
+    _symbols.add(await _mapController.addSymbol(SymbolOptions(
         textField: "$number",
         textOffset: const Offset(0, 1),
         geometry: latLng)));
-    circles.add(await controller.addCircle(
+    _circles.add(await _mapController.addCircle(
       CircleOptions(
         circleRadius: 8.0,
         circleColor: '#0060a0',
@@ -41,54 +42,53 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     ));
   }
 
-  void extendLine(MapboxMapController controller, LatLng location) async {
+  void _extendLine(LatLng location) async {
     setState(() {
-      locations.add(location);
+      _locations.add(location);
     });
-    markLatLng(controller, location, locations.length);
-    line ??= await controller.addLine(
+    _addPoint(location, _locations.length);
+    _line ??= await _mapController.addLine(
         const LineOptions(lineColor: "red", lineWidth: 3, geometry: []));
-    await controller.updateLine(line, LineOptions(geometry: locations));
+    await _mapController.updateLine(_line, LineOptions(geometry: _locations));
   }
 
-  void removePoint(MapboxMapController controller, int index) async {
+  void _removePoint(int index) async {
     setState(() {
-      locations.removeAt(index);
+      _locations.removeAt(index);
     });
-    await controller.removeCircles(circles);
-    circles = [];
-    await controller.removeSymbols(symbols);
-    symbols = [];
-    locations.asMap().forEach((index, latLng) {
-      markLatLng(controller, latLng, index + 1);
+    await _mapController.removeCircles(_circles);
+    _circles = [];
+    await _mapController.removeSymbols(_symbols);
+    _symbols = [];
+    _locations.asMap().forEach((index, latLng) {
+      _addPoint(latLng, index + 1);
     });
-    await controller.updateLine(line, LineOptions(geometry: locations));
+    await _mapController.updateLine(_line, LineOptions(geometry: _locations));
   }
 
-  void switchOrder(
-      MapboxMapController controller, int oldIndex, int newIndex) async {
+  void _switchPoints(int oldIndex, int newIndex) async {
     setState(() {
       _logger.i("old: $oldIndex, new: $newIndex");
       if (oldIndex < newIndex - 1) {
-        LatLng location = locations.removeAt(oldIndex);
-        if (newIndex - 1 == locations.length) {
-          locations.add(location);
+        LatLng location = _locations.removeAt(oldIndex);
+        if (newIndex - 1 == _locations.length) {
+          _locations.add(location);
         } else {
-          locations.insert(newIndex - 1, location);
+          _locations.insert(newIndex - 1, location);
         }
       } else if (oldIndex > newIndex) {
-        locations.insert(newIndex, locations.removeAt(oldIndex));
+        _locations.insert(newIndex, _locations.removeAt(oldIndex));
       }
     });
 
-    await controller.removeCircles(circles);
-    circles = [];
-    await controller.removeSymbols(symbols);
-    symbols = [];
-    locations.asMap().forEach((index, latLng) {
-      markLatLng(controller, latLng, index + 1);
+    await _mapController.removeCircles(_circles);
+    _circles = [];
+    await _mapController.removeSymbols(_symbols);
+    _symbols = [];
+    _locations.asMap().forEach((index, latLng) {
+      _addPoint(latLng, index + 1);
     });
-    await controller.updateLine(line, LineOptions(geometry: locations));
+    await _mapController.updateLine(_line, LineOptions(geometry: _locations));
   }
 
   Widget _buildCard(String title, String subtitle) {
@@ -109,13 +109,13 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     );
   }
 
-  Widget _buildDraggableList(List<LatLng> locations) {
+  Widget _buildDraggableList() {
     List<Widget> listElements = [];
 
     Widget _buildDragTarget(int index) {
       return DragTarget(
           onWillAccept: (value) => true,
-          onAccept: (value) => switchOrder(mapController, value as int, index),
+          onAccept: (value) => _switchPoints(value as int, index),
           builder: (context, candidates, reject) {
             if (candidates.isNotEmpty) {
               int index = candidates[0] as int;
@@ -138,7 +138,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
           });
     }
 
-    for (int index = 0; index < locations.length; index++) {
+    for (int index = 0; index < _locations.length; index++) {
       listElements.add(_buildDragTarget(index));
 
       var icon = const Icon(
@@ -150,7 +150,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
       );
       listElements.add(ListTile(
         leading: IconButton(
-            onPressed: () => removePoint(mapController, index),
+            onPressed: () => _removePoint(index),
             icon: const Icon(Icons.delete_rounded)),
         trailing: Draggable(
           axis: Axis.vertical,
@@ -167,9 +167,46 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
       ));
     }
 
-    listElements.add(_buildDragTarget(locations.length));
+    listElements.add(_buildDragTarget(_locations.length));
 
     return ListView(children: listElements);
+  }
+
+  Widget _buildExpandableListContainer() {
+    if (_listExpanded) {
+      return Container(
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+          color: onPrimaryColorOf(context),
+          height: 350,
+          child: Column(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => setState(() {
+                    _listExpanded = false;
+                  }),
+                  child: const Text("hide List"),
+                ),
+              ),
+              Expanded(
+                child: _buildDraggableList(),
+              ),
+            ],
+          ));
+    } else {
+      return Container(
+        width: double.infinity,
+        color: onPrimaryColorOf(context),
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+        child: ElevatedButton(
+          onPressed: () => setState(() {
+            _listExpanded = true;
+          }),
+          child: const Text("show List"),
+        ),
+      );
+    }
   }
 
   @override
@@ -178,8 +215,8 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
         body: Column(children: [
       Expanded(
           child: MapboxMap(
-        accessToken: token,
-        styleString: style,
+        accessToken: _token,
+        styleString: _style,
         initialCameraPosition: const CameraPosition(
           zoom: 13.0,
           target: LatLng(47.27, 11.33),
@@ -187,15 +224,10 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
         compassEnabled: true,
         compassViewPosition: CompassViewPosition.TopRight,
         onMapCreated: (MapboxMapController controller) =>
-            mapController = controller,
-        onMapLongClick: (point, LatLng coordinates) =>
-            extendLine(mapController, coordinates),
+            _mapController = controller,
+        onMapLongClick: (point, LatLng coordinates) => _extendLine(coordinates),
       )),
-      Container(
-        height: 250,
-        color: onPrimaryColorOf(context),
-        child: _buildDraggableList(locations),
-      ),
+      _buildExpandableListContainer(),
       Container(
           padding: const EdgeInsets.all(5),
           color: onPrimaryColorOf(context),
@@ -213,7 +245,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
           )),
       Container(
           color: onPrimaryColorOf(context),
-          padding: const EdgeInsets.all(5),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
             children: [
               const Expanded(
@@ -225,7 +257,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
               ElevatedButton(
                   style: ElevatedButton.styleFrom(primary: Colors.green[400]),
                   onPressed: null,
-                  //onPressed: () => updateLocations(mapController),
+                  //onPressed: () => updateLocations(),
                   child: const Text("create")),
             ],
           ))
