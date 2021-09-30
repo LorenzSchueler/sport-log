@@ -51,6 +51,20 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     await controller.updateLine(line, LineOptions(geometry: locations));
   }
 
+  void removePoint(MapboxMapController controller, int index) async {
+    setState(() {
+      locations.removeAt(index);
+    });
+    await controller.removeCircles(circles);
+    circles = [];
+    await controller.removeSymbols(symbols);
+    symbols = [];
+    locations.asMap().forEach((index, latLng) {
+      markLatLng(controller, latLng, index + 1);
+    });
+    await controller.updateLine(line, LineOptions(geometry: locations));
+  }
+
   void switchOrder(
       MapboxMapController controller, int oldIndex, int newIndex) async {
     setState(() {
@@ -97,71 +111,63 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
 
   Widget _buildDraggableList(List<LatLng> locations) {
     List<Widget> listElements = [];
-    for (int index = 0; index < locations.length; index++) {
-      listElements.add(
-        DragTarget(
-            onWillAccept: (value) => true,
-            onAccept: (value) =>
-                switchOrder(mapController, value as int, index),
-            builder: (context, candidates, reject) {
-              if (candidates.isNotEmpty) {
-                int index = candidates[0] as int;
-                return ListTile(
-                  trailing: const Icon(
-                    Icons.drag_handle,
-                    color: Colors.red,
-                  ),
-                  title: Text("${index + 1}"),
-                  dense: true,
-                );
-              } else {
-                return const Divider();
-              }
-            }),
-      );
 
-      ListTile listTile = ListTile(
-        trailing: const Icon(
-          Icons.drag_handle,
-        ),
-        title: Text("${index + 1}"),
-        dense: true,
-      );
-
-      listElements.add(
-        Draggable(
-          data: index,
-          child: listTile,
-          childWhenDragging: Opacity(
-            opacity: 0.4,
-            child: listTile,
-          ),
-          feedback: Text("${index + 1}"),
-        ),
-      );
-    }
-
-    listElements.add(
-      DragTarget(
+    Widget _buildDragTarget(int index) {
+      return DragTarget(
           onWillAccept: (value) => true,
-          onAccept: (value) =>
-              switchOrder(mapController, value as int, locations.length),
+          onAccept: (value) => switchOrder(mapController, value as int, index),
           builder: (context, candidates, reject) {
             if (candidates.isNotEmpty) {
               int index = candidates[0] as int;
               return ListTile(
-                trailing: const Icon(
-                  Icons.drag_handle,
-                  color: Colors.red,
+                leading: Container(
+                  margin: const EdgeInsets.only(left: 12),
+                  child: const Icon(
+                    Icons.add_rounded,
+                  ),
                 ),
-                title: Text("${index + 1}"),
+                title: Text(
+                  "${index + 1}",
+                  style: const TextStyle(fontSize: 20),
+                ),
                 dense: true,
               );
             } else {
               return const Divider();
             }
-          }),
-    );
+          });
+    }
+
+    for (int index = 0; index < locations.length; index++) {
+      listElements.add(_buildDragTarget(index));
+
+      var icon = const Icon(
+        Icons.drag_handle,
+      );
+      Text title = Text(
+        "${index + 1}",
+        style: const TextStyle(fontSize: 20),
+      );
+      listElements.add(ListTile(
+        leading: IconButton(
+            onPressed: () => removePoint(mapController, index),
+            icon: const Icon(Icons.delete_rounded)),
+        trailing: Draggable(
+          axis: Axis.vertical,
+          data: index,
+          child: icon,
+          childWhenDragging: Opacity(
+            opacity: 0.4,
+            child: icon,
+          ),
+          feedback: icon,
+        ),
+        title: title,
+        dense: true,
+      ));
+    }
+
+    listElements.add(_buildDragTarget(locations.length));
 
     return ListView(children: listElements);
   }
@@ -186,7 +192,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
             extendLine(mapController, coordinates),
       )),
       Container(
-        height: 350,
+        height: 250,
         color: onPrimaryColorOf(context),
         child: _buildDraggableList(locations),
       ),
