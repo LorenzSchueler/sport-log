@@ -8,9 +8,15 @@ import 'package:sport_log/routes.dart';
 Future<Movement?> showMovementPickerDialog(
   BuildContext context, {
   Movement? selectedMovement,
+  bool dismissable = true,
+  bool cardioOnly = false,
 }) async {
   return showDialog<Movement>(
-    builder: (_) => MovementPickerDialog(selectedMovement: selectedMovement),
+    builder: (_) => MovementPickerDialog(
+      selectedMovement: selectedMovement,
+      cardioOnly: cardioOnly,
+    ),
+    barrierDismissible: dismissable,
     context: context,
   );
 }
@@ -19,9 +25,11 @@ class MovementPickerDialog extends StatefulWidget {
   const MovementPickerDialog({
     Key? key,
     required this.selectedMovement,
+    required this.cardioOnly,
   }) : super(key: key);
 
   final Movement? selectedMovement;
+  final bool cardioOnly;
 
   @override
   State<MovementPickerDialog> createState() => _MovementPickerDialogState();
@@ -40,7 +48,9 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
   }
 
   void _update(String newSearch) {
-    _dataProvider.getMovements(byName: newSearch.trim()).then((movements) {
+    _dataProvider
+        .getMovements(byName: newSearch.trim(), cardioOnly: widget.cardioOnly)
+        .then((movements) {
       if (widget.selectedMovement != null) {
         final index = movements.indexWhere(
             (movement) => movement.id == widget.selectedMovement!.id);

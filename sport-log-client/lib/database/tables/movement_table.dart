@@ -98,12 +98,15 @@ class MovementTable extends DbAccessor<Movement> {
 
   Future<List<Movement>> getMovements({
     String? byName,
+    bool cardioOnly = false,
   }) async {
-    final nameFilter = byName != null ? '$name LIKE ?' : '1 = 1';
+    final nameFilter = byName != null ? 'AND $name LIKE ?' : '';
+    final cardioFilter = cardioOnly == true ? 'AND cardio = true' : '';
     final records = await database.rawQuery('''
       SELECT * FROM $tableName m1
       WHERE $deleted = 0
-        AND $nameFilter
+        $nameFilter
+        $cardioFilter
         AND ($userId IS NOT NULL
           OR NOT EXISTS (
             SELECT * FROM $tableName m2
