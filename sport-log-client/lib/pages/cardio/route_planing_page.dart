@@ -1,8 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:sport_log/data_provider/user_state.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/secrets.dart';
 import 'package:sport_log/helpers/theme.dart';
+import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/cardio/route.dart';
 
 class RoutePlanningPage extends StatefulWidget {
   const RoutePlanningPage({Key? key}) : super(key: key);
@@ -17,7 +21,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
   final String _token = Secrets.mapboxAccessToken;
   final String _style = 'mapbox://styles/mapbox/outdoors-v11';
 
-  List<LatLng> _locations = [];
+  final List<LatLng> _locations = [];
   Line? _line;
   List<Circle> _circles = [];
   List<Symbol> _symbols = [];
@@ -25,6 +29,28 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
   bool _listExpanded = false;
 
   late MapboxMapController _mapController;
+
+  String _routeName = "";
+
+  void _saveRoute() {
+    Route route = Route(
+      id: randomId(),
+      userId: UserState.instance.currentUser!.id,
+      name: _routeName,
+      distance: 0, // TODO
+      ascent: null, // TODO
+      descent: null, //TODO
+      track: _locations
+          .map((position) => Position(
+              longitude: position.longitude,
+              latitude: position.latitude,
+              elevation: 0, //TODO
+              distance: 0, //TODO
+              time: 0))
+          .toList(),
+      deleted: false,
+    );
+  }
 
   void _addPoint(LatLng latLng, int number) async {
     _symbols.add(await _mapController.addSymbol(SymbolOptions(
@@ -225,7 +251,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
         compassViewPosition: CompassViewPosition.TopRight,
         onMapCreated: (MapboxMapController controller) =>
             _mapController = controller,
-        onMapLongClick: (point, LatLng coordinates) => _extendLine(coordinates),
+        onMapLongClick: (point, LatLng latLng) => _extendLine(latLng),
       )),
       _buildExpandableListContainer(),
       Container(
@@ -248,16 +274,21 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
             children: [
-              const Expanded(
+              Expanded(
                   child: TextField(
-                decoration: InputDecoration(
+                onTap: () => setState(() {
+                  _listExpanded = false;
+                }),
+                onSubmitted: (name) => setState(() {
+                  _routeName = name;
+                }),
+                decoration: const InputDecoration(
                   labelText: "name",
                 ),
               )),
               ElevatedButton(
                   style: ElevatedButton.styleFrom(primary: Colors.green[400]),
-                  onPressed: null,
-                  //onPressed: () => updateLocations(),
+                  onPressed: _routeName.isNotEmpty ? () => _saveRoute() : null,
                   child: const Text("create")),
             ],
           ))
