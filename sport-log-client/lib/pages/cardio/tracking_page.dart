@@ -44,7 +44,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     CardioSession(
       id: randomId(),
       userId: UserState.instance.currentUser!.id,
-      movementId: Int64(1), //TODO
+      movementId: movement.id,
       cardioType: CardioType.training, //TODO
       datetime: startTime,
       distance: 0, //TODO

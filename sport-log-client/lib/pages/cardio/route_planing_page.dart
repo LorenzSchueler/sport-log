@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:polyline/polyline.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/secrets.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:mapbox_api/mapbox_api.dart';
 import 'package:sport_log/models/cardio/route.dart';
 
 class RoutePlanningPage extends StatefulWidget {
@@ -31,6 +33,61 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
   late MapboxMapController _mapController;
 
   String _routeName = "";
+  MapboxApi mapbox = MapboxApi(accessToken: Secrets.mapboxAccessToken);
+
+  void test() async {
+    DirectionsApiResponse response = await mapbox.directions.request(
+      profile: NavigationProfile.WALKING,
+      overview: NavigationOverview.FULL,
+      geometries: NavigationGeometries.POLYLINE6,
+      //annotations: [NavigationAnnotations.DISTANCE],
+      coordinates: [
+        [
+          47.27,
+          11.33,
+        ],
+        [
+          47.27,
+          11.34,
+        ],
+      ],
+    );
+    if (response.error != null) {
+      if (response.error is NavigationNoRouteError) {
+        _logger.i(response.error);
+      } else if (response.error is NavigationNoSegmentError) {
+        _logger.i(response.error);
+      }
+      return;
+    } else if (response.routes != null && response.routes!.isNotEmpty) {
+      NavigationRoute route = response.routes![0];
+      _logger.i(route.distance);
+
+      final polyline = Polyline.Decode(
+        encodedString: route.geometry as String,
+        precision: 6,
+      );
+      List<LatLng> line = polyline.decodedCoords
+          .map(
+            (coordinate) => LatLng(
+              coordinate[0],
+              coordinate[1],
+            ),
+          )
+          .toList();
+      if (line.isNotEmpty) {
+        await _mapController.addLine(
+          LineOptions(
+            geometry: line,
+            lineColor: "#2196F3",
+            lineWidth: 3.0,
+            lineOpacity: 1,
+            draggable: false,
+          ),
+        );
+      }
+    }
+  }
 
   void _saveRoute() {
     Route route = Route(
@@ -290,6 +347,10 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
                   style: ElevatedButton.styleFrom(primary: Colors.green[400]),
                   onPressed: _routeName.isNotEmpty ? () => _saveRoute() : null,
                   child: const Text("create")),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(primary: Colors.green[400]),
+                  onPressed: test,
+                  child: const Text("draw")),
             ],
           ))
     ]));
