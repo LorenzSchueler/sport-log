@@ -8,7 +8,6 @@ import 'package:sport_log/helpers/secrets.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:mapbox_api/mapbox_api.dart';
-import 'package:sport_log/models/cardio/route.dart';
 
 class RoutePlanningPage extends StatefulWidget {
   const RoutePlanningPage({Key? key}) : super(key: key);
@@ -24,6 +23,8 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
   final String _style = 'mapbox://styles/mapbox/outdoors-v11';
 
   final List<LatLng> _locations = [];
+  List<LatLng> _matchedLocations = [];
+
   Line? _line;
   List<Circle> _circles = [];
   List<Symbol> _symbols = [];
@@ -32,25 +33,15 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
 
   late MapboxMapController _mapController;
 
+  int _distance = 0;
   String _routeName = "";
   MapboxApi mapbox = MapboxApi(accessToken: Secrets.mapboxAccessToken);
 
-  void test() async {
+  Future<List<LatLng>?> _matchLocations() async {
     DirectionsApiResponse response = await mapbox.directions.request(
       profile: NavigationProfile.WALKING,
-      overview: NavigationOverview.FULL,
       geometries: NavigationGeometries.POLYLINE6,
-      //annotations: [NavigationAnnotations.DISTANCE],
-      coordinates: [
-        [
-          47.27,
-          11.33,
-        ],
-        [
-          47.27,
-          11.34,
-        ],
-      ],
+      coordinates: _locations.map((e) => [e.latitude, e.longitude]).toList(),
     );
     if (response.error != null) {
       if (response.error is NavigationNoRouteError) {
@@ -58,16 +49,18 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
       } else if (response.error is NavigationNoSegmentError) {
         _logger.i(response.error);
       }
-      return;
+      return null;
     } else if (response.routes != null && response.routes!.isNotEmpty) {
       NavigationRoute route = response.routes![0];
-      _logger.i(route.distance);
+      setState(() {
+        _distance = route.distance!.round();
+      });
 
-      final polyline = Polyline.Decode(
+      _matchedLocations = Polyline.Decode(
         encodedString: route.geometry as String,
         precision: 6,
-      );
-      List<LatLng> line = polyline.decodedCoords
+      )
+          .decodedCoords
           .map(
             (coordinate) => LatLng(
               coordinate[0],
@@ -75,17 +68,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
             ),
           )
           .toList();
-      if (line.isNotEmpty) {
-        await _mapController.addLine(
-          LineOptions(
-            geometry: line,
-            lineColor: "#2196F3",
-            lineWidth: 3.0,
-            lineOpacity: 1,
-            draggable: false,
-          ),
-        );
-      }
+      return _matchedLocations;
     }
   }
 
@@ -94,10 +77,10 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
       id: randomId(),
       userId: UserState.instance.currentUser!.id,
       name: _routeName,
-      distance: 0, // TODO
+      distance: _distance,
       ascent: null, // TODO
       descent: null, //TODO
-      track: _locations
+      track: _matchedLocations
           .map((position) => Position(
               longitude: position.longitude,
               latitude: position.latitude,
@@ -125,14 +108,34 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     ));
   }
 
+  void _updateLine() async {
+    var locations = await _matchLocations();
+    await _mapController.updateLine(_line, LineOptions(geometry: locations));
+  }
+
   void _extendLine(LatLng location) async {
+    if (_locations.length == 25) {
+      await showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Point maximum reached"),
+          content: const Text("You can only set 25 points."),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"))
+          ],
+        ),
+      );
+      return;
+    }
     setState(() {
       _locations.add(location);
     });
     _addPoint(location, _locations.length);
     _line ??= await _mapController.addLine(
         const LineOptions(lineColor: "red", lineWidth: 3, geometry: []));
-    await _mapController.updateLine(_line, LineOptions(geometry: _locations));
+    _updateLine();
   }
 
   void _removePoint(int index) async {
@@ -146,7 +149,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     _locations.asMap().forEach((index, latLng) {
       _addPoint(latLng, index + 1);
     });
-    await _mapController.updateLine(_line, LineOptions(geometry: _locations));
+    _updateLine();
   }
 
   void _switchPoints(int oldIndex, int newIndex) async {
@@ -171,7 +174,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     _locations.asMap().forEach((index, latLng) {
       _addPoint(latLng, index + 1);
     });
-    await _mapController.updateLine(_line, LineOptions(geometry: _locations));
+    _updateLine();
   }
 
   Widget _buildCard(String title, String subtitle) {
@@ -317,7 +320,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
           child: Table(
             children: [
               TableRow(children: [
-                _buildCard("6.17 km", "distance"),
+                _buildCard("${_distance / 1000} km", "distance"),
                 _buildCard("???", "???"),
               ]),
               TableRow(children: [
@@ -340,7 +343,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
                   _routeName = name;
                 }),
                 decoration: const InputDecoration(
-                  labelText: "name",
+                  labelText: "Name",
                 ),
               )),
               ElevatedButton(
@@ -349,7 +352,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
                   child: const Text("create")),
               ElevatedButton(
                   style: ElevatedButton.styleFrom(primary: Colors.green[400]),
-                  onPressed: test,
+                  onPressed: _matchLocations,
                   child: const Text("draw")),
             ],
           ))
