@@ -69,7 +69,7 @@ double? _generateWeight(MovementDimension dim) {
 
 Future<List<StrengthSet>> generateStrengthSets() async {
   final sessions =
-      await AppDatabase.instance!.strengthSessions.getNonDeletedDescriptions();
+      await AppDatabase.instance!.strengthSessions.getSessionsWithMovements();
 
   List<StrengthSet> result = [];
 
@@ -78,7 +78,7 @@ Future<List<StrengthSet>> generateStrengthSets() async {
     for (int i = 0; i < numberOfSets; ++i) {
       result.add(StrengthSet(
         id: randomId(),
-        strengthSessionId: session.id,
+        strengthSessionId: session.session.id,
         setNumber: i,
         count: _generateCount(session.movement.dimension),
         weight: _generateWeight(session.movement.dimension),

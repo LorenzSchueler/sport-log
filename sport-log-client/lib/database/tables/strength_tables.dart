@@ -6,11 +6,21 @@ import 'package:sport_log/database/table_creator.dart';
 import 'package:sport_log/database/table_names.dart';
 import 'package:sport_log/helpers/eorm.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
 
 import 'movement_table.dart';
+
+class StrengthSessionAndMovement {
+  StrengthSessionAndMovement({
+    required this.session,
+    required this.movement,
+  });
+  StrengthSession session;
+  Movement movement;
+}
 
 class StrengthSessionTable extends DbAccessor<StrengthSession> {
   final _logger = Logger('StrengthSessionTable');
@@ -33,6 +43,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
   static const movementId = Keys.movementId;
   static const name = Keys.name;
   static const numSets = Keys.numSets;
+  static const setNumber = Keys.setNumber;
   static const strengthSessionId = Keys.strengthSessionId;
   static const strengthSet = Tables.strengthSet;
   static const sumCount = Keys.sumCount;
@@ -72,26 +83,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
   ]);
 
   MovementTable get _movementTable => AppDatabase.instance!.movements;
-
-  /// returns strength sessions descriptions
-  /// without order, without sets, without stats
-  /// (needed for test data generation)
-  Future<List<StrengthSessionDescription>> getNonDeletedDescriptions() async {
-    final records = await database.rawQuery('''
-      SELECT ${_table.allColumns}, ${_movementTable.table.allColumns}
-      FROM $tableName JOIN $movement ON $tableName.$movementId = $movement.id
-      WHERE $movement.$deleted = 0
-        AND $tableName.$deleted = 0;
-    ''');
-    return records
-        .map((record) => StrengthSessionDescription(
-            strengthSession: serde.fromDbRecord(record, prefix: _table.prefix),
-            movement: _movementTable.serde
-                .fromDbRecord(record, prefix: _movementTable.table.prefix),
-            strengthSets: null,
-            stats: null))
-        .toList();
-  }
+  StrengthSetTable get _strengthSetTable => AppDatabase.instance!.strengthSets;
 
   /// returns strength session descriptions with stats, without sets
   /// ordered by datetime
@@ -101,53 +93,88 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
     DateTime? from,
     DateTime? until,
   }) async {
+    final now = DateTime.now();
+    assert(movementIdValue == null || movementName == null);
     final fromFilter = from == null ? '' : 'AND $tableName.$datetime >= ?';
     final untilFilter = until == null ? '' : 'AND $tableName.$datetime < ?';
     final movementIdFilter =
         movementIdValue == null ? '' : 'AND $tableName.$movementId = ?';
     final nameFilter = movementName == null ? '' : 'AND $movement.$name = ?';
     final records = await database.rawQuery('''
-          SELECT
-            ${_table.allColumns},
-            ${_movementTable.table.allColumns},
-            $tableName.$datetime AS [$datetime],
-            COUNT($strengthSet.$id) AS $numSets,
-            MIN($strengthSet.$count) AS $minCount,
-            MAX($strengthSet.$count) AS $maxCount,
-            SUM($strengthSet.$count) AS $sumCount,
-            MAX($strengthSet.$weight) AS $maxWeight,
-            SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
-            MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
-          FROM $tableName
-            JOIN $movement ON $movement.$id = $tableName.$movementId
-            JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
-            LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
-          WHERE $movement.$deleted = 0
-            AND $strengthSet.$deleted = 0
-            AND $tableName.$deleted = 0
-            $fromFilter
-            $untilFilter
-            $movementIdFilter
-            $nameFilter
-          GROUP BY $tableName.$id
-          HAVING COUNT($strengthSet.$id) > 0
-          ORDER BY datetime($tableName.$datetime) DESC;
+      SELECT
+        ${_table.allColumns},
+        ${_movementTable.table.allColumns},
+        ${_strengthSetTable.table.allColumns}
+      FROM $tableName
+        JOIN $movement ON $movement.$id = $tableName.$movementId
+        JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
+      WHERE $movement.$deleted = 0
+        AND $tableName.$deleted = 0
+        AND $strengthSet.$deleted = 0
+        $fromFilter
+        $untilFilter
+        $movementIdFilter
+        $nameFilter
+      ORDER BY
+        datetime($tableName.$datetime) DESC,
+        $tableName.$id,
+        $strengthSet.$setNumber;
     ''', [
       if (from != null) from.toString(),
       if (until != null) until.toString(),
       if (movementIdValue != null) movementIdValue.toInt(),
       if (movementName != null) movementName,
     ]);
-    return records
-        .map((record) => StrengthSessionDescription(
-              strengthSession:
-                  serde.fromDbRecord(record, prefix: _table.prefix),
-              strengthSets: null,
-              movement: _movementTable.serde
-                  .fromDbRecord(record, prefix: _movementTable.table.prefix),
-              stats: StrengthSessionStats.fromDbRecord(record),
-            ))
-        .toList();
+    if (records.isEmpty) {
+      return [];
+    }
+
+    List<StrengthSessionDescription> result = [];
+
+    var current = StrengthSessionDescription(
+      strengthSession: serde.fromDbRecord(records.first, prefix: _table.prefix),
+      movement: _movementTable.serde
+          .fromDbRecord(records.first, prefix: _movementTable.table.prefix),
+      strengthSets: [],
+      stats: null,
+    );
+
+    for (final record in records) {
+      if (record[_table.prefix + id] as int != current.id.toInt()) {
+        result.add(current);
+        current = StrengthSessionDescription(
+          strengthSession: serde.fromDbRecord(record, prefix: _table.prefix),
+          movement: _movementTable.serde
+              .fromDbRecord(record, prefix: _movementTable.table.prefix),
+          strengthSets: [],
+          stats: null,
+        );
+      }
+      current.strengthSets.add(_strengthSetTable.serde
+          .fromDbRecord(record, prefix: _strengthSetTable.table.prefix));
+    }
+
+    result.add(current);
+    _logger.d('Select sessions with sets: ${DateTime.now().difference(now)}');
+    return result;
+  }
+
+  // this is only needed for test data generation
+  Future<List<StrengthSessionAndMovement>> getSessionsWithMovements() async {
+    final records = await database.rawQuery('''
+      SELECT
+        ${_table.allColumns},
+        ${_movementTable.table.allColumns}
+      FROM $tableName
+      JOIN $movement ON $movement.id = $tableName.$movementId
+      WHERE $tableName.$deleted = 0
+        AND $movement.$deleted = 0;
+    ''');
+    return records.mapToL((r) => StrengthSessionAndMovement(
+          session: serde.fromDbRecord(r, prefix: _table.prefix),
+          movement: _movementTable.serde
+              .fromDbRecord(r, prefix: _movementTable.table.prefix),
+        ));
   }
 
   Future<List<StrengthSessionStats>> getStatsAggregationsByDay({
@@ -253,19 +280,27 @@ class StrengthSetTable extends DbAccessor<StrengthSet> {
   DbSerializer<StrengthSet> get serde => DbStrengthSetSerializer();
   @override
   List<String> get setupSql => [
-        '''
-          create table $tableName (
-              strength_session_id integer not null references strength_session on delete cascade,
-              set_number integer not null check (set_number >= 0),
-              count integer not null check (count >= 1),
-              weight real check (weight > 0),
-              $idAndDeletedAndStatus
-          );
-        ''',
-        updateTrigger
+        table.setupSql(),
+        updateTrigger,
       ];
   @override
-  String get tableName => Tables.strengthSet;
+  String get tableName => table.name;
+
+  final Table table = Table(
+    Tables.strengthSet,
+    withColumns: [
+      Column.int(Keys.id).primaryKey(),
+      Column.bool(Keys.deleted).withDefault('0'),
+      Column.int(Keys.syncStatus)
+          .withDefault('2')
+          .check('${Keys.syncStatus} IN (0, 1, 2)'),
+      Column.int(Keys.strengthSessionId)
+          .references(Tables.strengthSession, onDelete: OnAction.cascade),
+      Column.int(Keys.setNumber).check('${Keys.setNumber} >= 0'),
+      Column.int(Keys.count).check('${Keys.count} >= 1'),
+      Column.real(Keys.weight).check('${Keys.weight} > 0'),
+    ],
+  );
 
   Future<void> setSynchronizedByStrengthSession(Int64 id) async {
     database.update(tableName, DbAccessor.synchronized,

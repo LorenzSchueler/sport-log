@@ -46,7 +46,6 @@ class _DayChartState extends State<DayChart> {
       movementId: widget.movement.id,
       from: widget.date,
       until: widget.date.dayLater(),
-      withSets: true,
     )
         .then((sessions) {
       if (mounted) {
@@ -73,7 +72,7 @@ class _DayChartState extends State<DayChart> {
 
     var index = 0;
     for (final session in _sessions) {
-      for (final set in session.strengthSets!) {
+      for (final set in session.strengthSets) {
         result.add(BarChartGroupData(x: index++, barRods: [
           BarChartRodData(
             y: getValue(set),

@@ -58,12 +58,12 @@ class DbStrengthSetSerializer implements DbSerializer<StrengthSet> {
   @override
   StrengthSet fromDbRecord(DbRecord r, {String prefix = ''}) {
     return StrengthSet(
-      id: Int64(r[Keys.id]! as int),
-      strengthSessionId: Int64(r[Keys.strengthSessionId]! as int),
-      setNumber: r[Keys.setNumber]! as int,
-      count: r[Keys.count]! as int,
-      weight: r[Keys.weight] as double?,
-      deleted: r[Keys.deleted]! as int == 1,
+      id: Int64(r[prefix + Keys.id]! as int),
+      strengthSessionId: Int64(r[prefix + Keys.strengthSessionId]! as int),
+      setNumber: r[prefix + Keys.setNumber]! as int,
+      count: r[prefix + Keys.count]! as int,
+      weight: r[prefix + Keys.weight] as double?,
+      deleted: r[prefix + Keys.deleted]! as int == 1,
     );
   }
 

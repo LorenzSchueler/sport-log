@@ -119,17 +119,16 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
     final String? duration = ssd.strengthSession.interval == null
         ? null
         : formatDuration(Duration(seconds: ssd.strengthSession.interval!));
-    final sets = ssd.stats!.numSets.toString() + ' sets';
+    // final sets = ssd.stats!.numSets.toString() + ' sets';
     final String title =
         state.isMovementSelected ? [date, time].join(' · ') : ssd.movement.name;
     final subtitleParts = state.isMovementSelected
-        ? [sets, if (duration != null) duration]
-        : [date, time, sets, if (duration != null) duration];
+        ? [if (duration != null) duration]
+        : [date, time, if (duration != null) duration];
     final subtitle = subtitleParts.join(' · ');
     final String text = ssd.strengthSets
-            ?.map((ss) => ss.toDisplayName(ssd.movement.dimension))
-            .join(', ') ??
-        '';
+        .map((ss) => ss.toDisplayName(ssd.movement.dimension))
+        .join(', ');
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
@@ -143,13 +142,10 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
         subtitle: Text(subtitle),
         children: [
           const Divider(),
-          ssd.strengthSets == null
-              ? const CircularProgressIndicator()
-              : Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  child: Text(text),
-                ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Text(text),
+          ),
           const Divider(),
           if (ssd.strengthSession.comments != null)
             Padding(
@@ -173,13 +169,6 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
             ],
           ),
         ],
-        onExpansionChanged: (expanded) async {
-          if (expanded && ssd.strengthSets == null) {
-            ssd.strengthSets =
-                await _dataProvider.getStrengthSetsByStrengthSession(ssd.id);
-            setState(() {});
-          }
-        },
       ),
     );
   }

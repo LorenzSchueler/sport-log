@@ -23,7 +23,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     assert(object.isValid());
     // TODO: catch errors
     await strengthSessionDb.createSingle(object.strengthSession);
-    await strengthSetDb.createMultiple(object.strengthSets!);
+    await strengthSetDb.createMultiple(object.strengthSets);
     notifyListeners();
     final result1 = await strengthSessionApi.postSingle(object.strengthSession);
     if (result1.isFailure) {
@@ -31,7 +31,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
       return;
     }
     strengthSessionDb.setSynchronized(object.id);
-    final result2 = await strengthSetApi.postMultiple(object.strengthSets!);
+    final result2 = await strengthSetApi.postMultiple(object.strengthSets);
     if (result2.isFailure) {
       handleApiError(result2.failure);
       return;
@@ -41,14 +41,13 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
 
   @override
   Future<void> deleteSingle(StrengthSessionDescription object) async {
-    assert(object.strengthSets != null);
     object.setDeleted();
     // TODO: catch errors
     await strengthSetDb.deleteByStrengthSession(object.id);
     await strengthSessionDb.deleteSingle(object.id);
     notifyListeners();
     // TODO: server deletes strength sets automatically
-    final result1 = await strengthSetApi.putMultiple(object.strengthSets!);
+    final result1 = await strengthSetApi.putMultiple(object.strengthSets);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return;
@@ -144,7 +143,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     assert(object.isValid());
 
     final oldSets = await strengthSetDb.getByStrengthSession(object.id);
-    final newSets = [...object.strengthSets!];
+    final newSets = [...object.strengthSets];
 
     final diffing = diff(oldSets, newSets);
 
@@ -179,21 +178,11 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     strengthSetDb.setSynchronizedByStrengthSession(object.id);
   }
 
-  // this can be very inefficient and should be avoided when having huge lists of sessions
-  Future<void> populateWithSets(
-      List<StrengthSessionDescription> sessions) async {
-    for (final session in sessions) {
-      session.strengthSets =
-          await strengthSetDb.getByStrengthSession(session.id);
-    }
-  }
-
   Future<List<StrengthSessionDescription>> getSessionsWithStats({
     Int64? movementId,
     DateTime? from,
     DateTime? until,
     String? movementName,
-    bool withSets = false,
   }) async {
     assert(movementName == null || movementId == null);
     final sessions = await strengthSessionDb.getSessionDescriptions(
@@ -202,9 +191,6 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
       movementIdValue: movementId,
       movementName: movementName,
     );
-    if (withSets) {
-      await populateWithSets(sessions);
-    }
     return sessions;
   }
 
