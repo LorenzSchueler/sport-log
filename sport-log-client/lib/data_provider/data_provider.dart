@@ -1,10 +1,11 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 
 final _logger = Logger('DP');
@@ -26,8 +27,26 @@ abstract class DataProvider<T> extends ChangeNotifier {
 
   Future<void> pushToServer();
 
-  void handleApiError(ApiError error) {
-    _logger.w('Got an api error.', error);
+  /// only called if internet connection is needed
+  /// (call [handleApiError] with isCritical = true)
+  VoidCallback? _onNoInternetNeeded;
+
+  void handleApiError(ApiError error, {bool isCritical = false}) {
+    if (isCritical) {
+      _logger.e('Api error: ${error.toErrorMessage()}', error);
+      if (error == ApiError.noInternetConnection &&
+          _onNoInternetNeeded != null) {
+        _onNoInternetNeeded!();
+      } else {
+        throw error;
+      }
+    } else {
+      _logger.i('Api error: ${error.toErrorMessage()}');
+    }
+  }
+
+  void onNoInternetConnection(VoidCallback? callback) {
+    _onNoInternetNeeded = callback;
   }
 
   Future<void> doFullUpdate();

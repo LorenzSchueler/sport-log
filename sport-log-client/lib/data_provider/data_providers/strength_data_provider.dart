@@ -65,16 +65,16 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
   Future<void> doFullUpdate() async {
     final result1 = await strengthSessionApi.getMultiple();
     if (result1.isFailure) {
-      handleApiError(result1.failure);
-      throw result1.failure;
+      handleApiError(result1.failure, isCritical: true);
+      return;
     }
     await strengthSessionDb.upsertMultiple(result1.success, synchronized: true);
 
     final result2 = await strengthSetApi.getMultiple();
     if (result2.isFailure) {
       notifyListeners();
-      handleApiError(result2.failure);
-      throw result2.failure;
+      handleApiError(result2.failure, isCritical: true);
+      return;
     }
     strengthSetDb
         .upsertMultiple(result2.success, synchronized: true)

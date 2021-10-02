@@ -6,6 +6,7 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/ui_cubit.dart';
@@ -30,12 +31,15 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   void initState() {
     super.initState();
     _dataProvider.addListener(update);
+    _dataProvider.onNoInternetConnection(
+        () => showSimpleSnackBar(context, 'No Internet connection.'));
     update();
   }
 
   @override
   void dispose() {
     _dataProvider.removeListener(update);
+    _dataProvider.onNoInternetConnection(null);
     super.dispose();
   }
 
