@@ -84,9 +84,13 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
         update(state);
       },
       child: RefreshIndicator(
-        onRefresh: _refreshPage,
-        child: _strengthSessionsList,
-      ),
+          onRefresh: _refreshPage,
+          child: Stack(
+            children: [
+              ListView(),
+              _strengthSessionsList,
+            ],
+          )),
     );
   }
 
