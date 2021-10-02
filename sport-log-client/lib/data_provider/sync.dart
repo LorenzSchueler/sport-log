@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:hive/hive.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
@@ -8,6 +8,7 @@ import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/typedefs.dart';
 
 import 'data_providers/all.dart';
 
