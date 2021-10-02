@@ -1,5 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
@@ -48,6 +49,18 @@ class StrengthSessionDescription implements Validatable, HasId {
       set.deleted = true;
     }
   }
+
+  StrengthSessionDescription.defaultValue(this.movement, Int64 userId)
+      : strengthSession = StrengthSession(
+          id: randomId(),
+          userId: userId,
+          datetime: DateTime.now(),
+          movementId: movement.id,
+          interval: null,
+          comments: null,
+          deleted: false,
+        ),
+        strengthSets = [];
 
   static bool areTheSame(
           StrengthSessionDescription ssd1, StrengthSessionDescription ssd2) =>
