@@ -66,7 +66,7 @@ class WorkoutPage extends StatelessWidget {
             floatingActionButton: state.shouldShowFab
                 ? FloatingActionButton(
                     child: const Icon(Icons.add),
-                    onPressed: () => _onFabTapped,
+                    onPressed: () => _onFabTapped(state),
                   )
                 : null,
           );
@@ -132,19 +132,19 @@ class WorkoutPage extends StatelessWidget {
     return (index) => cubit.setTab(SessionsPageTab.values[index]);
   }
 
-  void _onFabTapped(SessionsUiState state, BuildContext context) {
+  void _onFabTapped(SessionsUiState state) {
     switch (state.tab) {
       case SessionsPageTab.strength:
-        _strengthKey.currentState?.onFabTapped(context);
+        _strengthKey.currentState?.onFabTapped();
         break;
       case SessionsPageTab.metcon:
-        _metconKey.currentState?.onFabTapped(context);
+        _metconKey.currentState?.onFabTapped();
         break;
       case SessionsPageTab.cardio:
-        _cardioKey.currentState?.onFabTapped(context);
+        _cardioKey.currentState?.onFabTapped();
         break;
       case SessionsPageTab.diary:
-        _diaryKey.currentState?.onFabTapped(context);
+        _diaryKey.currentState?.onFabTapped();
         break;
     }
   }

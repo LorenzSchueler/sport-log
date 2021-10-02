@@ -58,7 +58,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   }
 
   // will be called by workout/sessions page via global key
-  void onFabTapped(BuildContext context) {
+  void onFabTapped() {
     _logger.d('FAB tapped!');
   }
 

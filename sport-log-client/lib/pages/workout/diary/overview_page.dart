@@ -16,7 +16,7 @@ class DiaryPageState extends State<DiaryPage> {
     return const Center(child: Text('Not implemented yet :('));
   }
 
-  void onFabTapped(BuildContext context) {
+  void onFabTapped() {
     _logger.d('FAB tapped!');
   }
 }
