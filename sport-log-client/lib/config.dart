@@ -15,7 +15,7 @@ abstract class Config {
   static late final bool outputRequestJson;
 
   // this is only an approximate value (due to limitations of timer)
-  static const syncInterval = Duration(minutes: 1);
+  static const syncInterval = Duration(minutes: 100);
 
   static Future<void> init() async {
     const String defaultAddress = '127.0.0.1:8000';
