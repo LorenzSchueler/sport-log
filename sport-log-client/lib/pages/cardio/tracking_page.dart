@@ -20,13 +20,6 @@ class CardioTrackingPage extends StatefulWidget {
   State<CardioTrackingPage> createState() => CardioTrackingPageState();
 }
 
-class StepTime {
-  final int seconds;
-  final int steps;
-
-  StepTime(this.seconds, this.steps);
-}
-
 class CardioTrackingPageState extends State<CardioTrackingPage> {
   final _logger = Logger('CardioTrackingPage');
 
@@ -38,11 +31,13 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   double _descent = 0;
   double? _lastElevation;
 
-  final List<StepTime> _stepTimes = [];
+  final List<double> _stepTimes = [];
+  late int _lastStepCount;
+  late DateTime _lastStepTime;
   int _stepRate = 0;
 
   late DateTime _startTime;
-  DateTime? _pauseStopTime;
+  DateTime? _pauseTime;
   int _seconds = 0;
   String _time = "00:00:00";
 
@@ -56,24 +51,23 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   String _locationInfo = "null";
   String _stepInfo = "null";
 
+  late Timer _timer;
+  late StreamSubscription _locationSubscription;
+  late StreamSubscription _stepCountSubscription;
   late MapboxMapController _mapController;
 
   void _updateData() {
     Duration duration = _trackingMode == TrackingMode.tracking
-        ? Duration(seconds: _seconds) +
-            DateTime.now().difference(_pauseStopTime!)
+        ? Duration(seconds: _seconds) + DateTime.now().difference(_pauseTime!)
         : Duration(seconds: _seconds);
     setState(() {
       _time = duration.toString().split('.').first.padLeft(8, '0');
 
       _stepRate = duration.inSeconds > 0 && _stepTimes.isNotEmpty
-          ? ((_stepTimes.last.steps - _stepTimes.first.steps) /
-                  duration.inSeconds *
-                  60)
-              .round()
+          ? (_stepTimes.length / duration.inSeconds * 60).round()
           : 0;
       _stepInfo =
-          "steps: ${_stepTimes.last.steps - _stepTimes.first.steps}\ntime: ${_stepTimes.last.seconds}\nstep rate: $_stepRate";
+          "steps: ${_stepTimes.length}\ntime: ${_stepTimes.isNotEmpty ? _stepTimes.last : 0}\nstep rate: $_stepRate";
     });
     _logger.i(_stepInfo);
   }
@@ -91,8 +85,8 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       time: _seconds,
       calories: null,
       track: _positions,
-      avgCadence: null, //TODO
-      cadence: null, //TODO
+      avgCadence: (_stepTimes.length / _seconds * 60).round(),
+      cadence: _stepTimes,
       avgHeartRate: null,
       heartRate: null,
       routeId: null,
@@ -102,10 +96,22 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   }
 
   void _onStepCountUpdate(StepCount stepCountEvent) {
-    // TODO ignore steps when paused or not started
-    _stepTimes.add(StepTime(
-        stepCountEvent.timeStamp.millisecondsSinceEpoch ~/ 1000,
-        stepCountEvent.steps));
+    if (_trackingMode == TrackingMode.tracking) {
+      if (_stepTimes.isEmpty) {
+        _stepTimes.add(stepCountEvent.timeStamp.millisecondsSinceEpoch / 1000);
+      } else {
+        /// interpolate steps since last stepCount update
+        int newSteps = stepCountEvent.steps - _lastStepCount;
+        double avgTimeDiff = (stepCountEvent.timeStamp.millisecondsSinceEpoch -
+                _lastStepTime.millisecondsSinceEpoch) /
+            newSteps;
+        for (int i = 1; i <= newSteps; i++) {
+          _stepTimes.add(_stepTimes.last + avgTimeDiff * i / 1000);
+        }
+      }
+    }
+    _lastStepTime = stepCountEvent.timeStamp;
+    _lastStepCount = stepCountEvent.steps;
   }
 
   void _onStepCountError(Object error) {
@@ -114,10 +120,11 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
   void _startStepCountStream() {
     Stream<StepCount> _stepCountStream = Pedometer.stepCountStream;
-    _stepCountStream.listen(_onStepCountUpdate).onError(_onStepCountError);
+    _stepCountSubscription = _stepCountStream.listen(_onStepCountUpdate);
+    _stepCountSubscription.onError(_onStepCountError);
   }
 
-  Future<void> _startLocationStream() async {
+  void _startLocationStream() async {
     Location location = Location();
 
     bool serviceEnabled = await location.serviceEnabled();
@@ -138,7 +145,8 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
     location.changeSettings(accuracy: LocationAccuracy.high);
     location.enableBackgroundMode(enable: true);
-    location.onLocationChanged.listen(_onLocationUpdate);
+    _locationSubscription =
+        location.onLocationChanged.listen(_onLocationUpdate);
   }
 
   void _onLocationUpdate(LocationData location) async {
@@ -178,16 +186,16 @@ satelites: ${location.satelliteNumber}""";
     ]);
 
     if (_trackingMode == TrackingMode.tracking) {
+      _lastElevation ??= location.altitude;
+      double elevationDifference = location.altitude! - _lastElevation!;
       setState(() {
-        _lastElevation ??= location.altitude;
-        double elevationDifference = location.altitude! - _lastElevation!;
         if (elevationDifference > 0) {
           _ascent += elevationDifference;
         } else {
           _descent -= elevationDifference;
         }
-        _lastElevation = location.altitude;
       });
+      _lastElevation = location.altitude;
 
       _positions.add(Position(
           latitude: location.latitude!,
@@ -239,8 +247,7 @@ satelites: ${location.satelliteNumber}""";
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
                 onPressed: () {
                   _trackingMode = TrackingMode.paused;
-                  _seconds +=
-                      DateTime.now().difference(_pauseStopTime!).inSeconds;
+                  _seconds += DateTime.now().difference(_pauseTime!).inSeconds;
                 },
                 child: const Text("pause"))),
         const SizedBox(
@@ -263,7 +270,7 @@ satelites: ${location.satelliteNumber}""";
                             onPressed: () {
                               _trackingMode = TrackingMode.stopped;
                               _seconds += DateTime.now()
-                                  .difference(_pauseStopTime!)
+                                  .difference(_pauseTime!)
                                   .inSeconds;
                               _saveCardioSession();
                               Navigator.pop(context);
@@ -283,7 +290,7 @@ satelites: ${location.satelliteNumber}""";
                 style: ElevatedButton.styleFrom(primary: Colors.green[400]),
                 onPressed: () {
                   _trackingMode = TrackingMode.tracking;
-                  _pauseStopTime = DateTime.now();
+                  _pauseTime = DateTime.now();
                 },
                 child: const Text("continue"))),
         const SizedBox(
@@ -324,7 +331,7 @@ satelites: ${location.satelliteNumber}""";
                 onPressed: () {
                   _trackingMode = TrackingMode.tracking;
                   _startTime = DateTime.now();
-                  _pauseStopTime = DateTime.now();
+                  _pauseTime = DateTime.now();
                 },
                 child: const Text("start"))),
         const SizedBox(
@@ -357,15 +364,15 @@ satelites: ${location.satelliteNumber}""";
         accessToken: _token,
         styleString: _style,
         initialCameraPosition: const CameraPosition(
-          zoom: 14.0,
+          zoom: 15.0,
           target: LatLng(47.27, 11.33),
         ),
         compassEnabled: true,
         compassViewPosition: CompassViewPosition.TopRight,
         onMapCreated: (MapboxMapController controller) =>
             _mapController = controller,
-        onStyleLoadedCallback: () async {
-          await _startLocationStream();
+        onStyleLoadedCallback: () {
+          _startLocationStream();
           _startStepCountStream();
         },
       )),
@@ -404,6 +411,15 @@ satelites: ${location.satelliteNumber}""";
       _movement = await showMovementPickerDialog(context,
           dismissable: false, cardioOnly: true) as Movement;
     });
-    Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateData());
+    _timer =
+        Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateData());
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    _locationSubscription.cancel();
+    _stepCountSubscription.cancel();
+    super.dispose();
   }
 }

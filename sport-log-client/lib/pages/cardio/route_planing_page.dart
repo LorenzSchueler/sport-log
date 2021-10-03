@@ -106,7 +106,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     ));
   }
 
-  void _updateLine() async {
+  Future<void> _updateLine() async {
     await _matchLocations();
     await _mapController.updateLine(
         _line, LineOptions(geometry: _matchedLocations));
@@ -134,7 +134,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     _addPoint(location, _locations.length);
     _line ??= await _mapController.addLine(
         const LineOptions(lineColor: "red", lineWidth: 3, geometry: []));
-    _updateLine();
+    await _updateLine();
   }
 
   void _removePoint(int index) async {
@@ -148,7 +148,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     _locations.asMap().forEach((index, latLng) {
       _addPoint(latLng, index + 1);
     });
-    _updateLine();
+    await _updateLine();
   }
 
   void _switchPoints(int oldIndex, int newIndex) async {
@@ -173,7 +173,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     _locations.asMap().forEach((index, latLng) {
       _addPoint(latLng, index + 1);
     });
-    _updateLine();
+    await _updateLine();
   }
 
   Widget _buildCard(String title, String subtitle) {
