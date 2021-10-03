@@ -99,22 +99,15 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
 
     return ExpandableFab(
       icon: const Icon(Icons.add),
-      children: [
-        ActionButton(
-          onPressed: () =>
-              Navigator.of(context).pushNamed(Routes.cardio.tracking),
-          icon: const Icon(Icons.play_arrow_rounded),
-        ),
-        ActionButton(
-          //onPressed: () =>
-          //Navigator.of(context).pushNamed(Routes.cardio.data_input),
-          icon: const Icon(Icons.notes_rounded),
-        ),
-        ActionButton(
-          onPressed: () =>
-              Navigator.of(context).pushNamed(Routes.cardio.route_planning),
-          icon: const Icon(Icons.map),
-        ),
+      icons: const [
+        Icon(Icons.play_arrow_rounded),
+        Icon(Icons.notes_rounded),
+        Icon(Icons.map),
+      ],
+      onPressed: [
+        () => Navigator.of(context).pushNamed(Routes.cardio.tracking),
+        () => Navigator.of(context).pushNamed(Routes.cardio.data_input),
+        () => Navigator.of(context).pushNamed(Routes.cardio.route_planning),
       ],
     );
   }

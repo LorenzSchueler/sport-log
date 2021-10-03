@@ -349,10 +349,6 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
                   style: ElevatedButton.styleFrom(primary: Colors.green[400]),
                   onPressed: _routeName.isNotEmpty ? () => _saveRoute() : null,
                   child: const Text("create")),
-              ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.green[400]),
-                  onPressed: _matchLocations,
-                  child: const Text("draw")),
             ],
           ))
     ]));
