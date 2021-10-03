@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:pedometer/pedometer.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/id_generation.dart';
@@ -36,7 +37,8 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
   TrackingMode _trackingMode = TrackingMode.notStarted;
 
-  String _locationInfo = "";
+  String _locationInfo = "null";
+  String _stepInfo = "null";
 
   late MapboxMapController _mapController;
 
@@ -63,14 +65,33 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     );
   }
 
-  Future<LatLng?> _startLocationStream() async {
+  void _onStepCountUpdate(StepCount stepCountEvent) {
+    int steps = stepCountEvent.steps;
+    DateTime timeStamp = stepCountEvent.timeStamp;
+    setState(() {
+      _stepInfo = "steps: $steps\ntime: $timeStamp";
+    });
+    _logger.i(_stepInfo);
+  }
+
+  void _onStepCountError(Object error) {
+    _logger.i(error);
+  }
+
+  void _startStepStream() {
+    Stream<StepCount> _stepCountStream = Pedometer.stepCountStream;
+    _stepCountStream.listen(_onStepCountUpdate).onError(_onStepCountError);
+    _logger.i("step stream started");
+  }
+
+  Future<void> _startLocationStream() async {
     Location location = Location();
 
     bool serviceEnabled = await location.serviceEnabled();
     if (!serviceEnabled) {
       serviceEnabled = await location.requestService();
       if (!serviceEnabled) {
-        return null;
+        return;
       }
     }
 
@@ -78,18 +99,16 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     if (permissionGranted == PermissionStatus.denied) {
       permissionGranted = await location.requestPermission();
       if (permissionGranted != PermissionStatus.granted) {
-        return null;
+        return;
       }
     }
 
     location.changeSettings(accuracy: LocationAccuracy.high);
-
     location.enableBackgroundMode(enable: true);
-    location.onLocationChanged.listen(
-        (LocationData currentLocation) => _locationConsumer(currentLocation));
+    location.onLocationChanged.listen(_onLocationUpdate);
   }
 
-  void _locationConsumer(LocationData location) async {
+  void _onLocationUpdate(LocationData location) async {
     setState(() {
       _locationInfo = """location provider: ${location.provider}
 accuracy: ${location.accuracy?.toInt()} m
@@ -250,9 +269,16 @@ satelites: ${location.satelliteNumber}""";
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      Card(
-          margin: const EdgeInsets.only(top: 25, bottom: 5),
-          child: Text(_locationInfo)),
+      Row(
+        children: [
+          Card(
+              margin: const EdgeInsets.only(top: 25, bottom: 5),
+              child: Text(_locationInfo)),
+          Card(
+              margin: const EdgeInsets.only(top: 25, bottom: 5),
+              child: Text(_stepInfo)),
+        ],
+      ),
       Expanded(
           child: MapboxMap(
         accessToken: _token,
@@ -265,7 +291,10 @@ satelites: ${location.satelliteNumber}""";
         compassViewPosition: CompassViewPosition.TopRight,
         onMapCreated: (MapboxMapController controller) =>
             _mapController = controller,
-        onStyleLoadedCallback: () => _startLocationStream(),
+        onStyleLoadedCallback: () async {
+          await _startLocationStream();
+          _startStepStream();
+        },
       )),
       Container(
           padding: const EdgeInsets.only(top: 5),

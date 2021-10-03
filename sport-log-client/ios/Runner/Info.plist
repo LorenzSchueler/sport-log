@@ -4,6 +4,12 @@
 	<dict>
 		<key>NSLocationWhenInUseUsageDescription</key>
 		<string>true</string>
+		<key>NSMotionUsageDescription</key>
+		<string>This application tracks your steps</string>
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>processing</string>
+		</array>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleExecutable</key>

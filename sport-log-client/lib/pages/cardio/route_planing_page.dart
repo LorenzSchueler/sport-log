@@ -37,7 +37,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
   String _routeName = "";
   MapboxApi mapbox = MapboxApi(accessToken: Secrets.mapboxAccessToken);
 
-  Future<List<LatLng>?> _matchLocations() async {
+  Future<void> _matchLocations() async {
     DirectionsApiResponse response = await mapbox.directions.request(
       profile: NavigationProfile.WALKING,
       geometries: NavigationGeometries.POLYLINE6,
@@ -49,7 +49,6 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
       } else if (response.error is NavigationNoSegmentError) {
         _logger.i(response.error);
       }
-      return null;
     } else if (response.routes != null && response.routes!.isNotEmpty) {
       NavigationRoute route = response.routes![0];
       setState(() {
@@ -68,7 +67,6 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
             ),
           )
           .toList();
-      return _matchedLocations;
     }
   }
 
@@ -109,8 +107,9 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
   }
 
   void _updateLine() async {
-    var locations = await _matchLocations();
-    await _mapController.updateLine(_line, LineOptions(geometry: locations));
+    await _matchLocations();
+    await _mapController.updateLine(
+        _line, LineOptions(geometry: _matchedLocations));
   }
 
   void _extendLine(LatLng location) async {
