@@ -238,9 +238,7 @@ satelites: ${location.satelliteNumber}""";
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
                 onPressed: () {
-                  setState(() {
-                    _trackingMode = TrackingMode.paused;
-                  });
+                  _trackingMode = TrackingMode.paused;
                   _seconds +=
                       DateTime.now().difference(_pauseStopTime!).inSeconds;
                 },
@@ -251,11 +249,30 @@ satelites: ${location.satelliteNumber}""";
         Expanded(
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
-                onPressed: () {
-                  setState(() {
-                    _trackingMode = TrackingMode.stopped;
-                  });
-                  _saveCardioSession();
+                onPressed: () async {
+                  await showDialog<void>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Stop Recording?"),
+                      content: const Text("Do you want to stop the recording?"),
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("No")),
+                        TextButton(
+                            onPressed: () {
+                              _trackingMode = TrackingMode.stopped;
+                              _seconds += DateTime.now()
+                                  .difference(_pauseStopTime!)
+                                  .inSeconds;
+                              _saveCardioSession();
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Yes"))
+                      ],
+                    ),
+                  );
                 },
                 child: const Text("stop"))),
       ];
@@ -265,9 +282,7 @@ satelites: ${location.satelliteNumber}""";
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.green[400]),
                 onPressed: () {
-                  setState(() {
-                    _trackingMode = TrackingMode.tracking;
-                  });
+                  _trackingMode = TrackingMode.tracking;
                   _pauseStopTime = DateTime.now();
                 },
                 child: const Text("continue"))),
@@ -277,13 +292,27 @@ satelites: ${location.satelliteNumber}""";
         Expanded(
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
-                onPressed: () {
-                  setState(() {
-                    _trackingMode = TrackingMode.stopped;
-                  });
-                  _saveCardioSession();
-                  _seconds +=
-                      DateTime.now().difference(_pauseStopTime!).inSeconds;
+                onPressed: () async {
+                  await showDialog<void>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Stop Recording?"),
+                      content: const Text("Do you want to stop the recording?"),
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("No")),
+                        TextButton(
+                            onPressed: () {
+                              _trackingMode = TrackingMode.stopped;
+                              _saveCardioSession();
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Yes"))
+                      ],
+                    ),
+                  );
                 },
                 child: const Text("stop"))),
       ];
@@ -293,9 +322,7 @@ satelites: ${location.satelliteNumber}""";
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.green[400]),
                 onPressed: () {
-                  setState(() {
-                    _trackingMode = TrackingMode.tracking;
-                  });
+                  _trackingMode = TrackingMode.tracking;
                   _startTime = DateTime.now();
                   _pauseStopTime = DateTime.now();
                 },
