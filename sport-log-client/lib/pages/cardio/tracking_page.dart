@@ -1,9 +1,9 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/user_state.dart';
+import 'dart:async';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/secrets.dart';
@@ -20,6 +20,13 @@ class CardioTrackingPage extends StatefulWidget {
   State<CardioTrackingPage> createState() => CardioTrackingPageState();
 }
 
+class StepTime {
+  final int seconds;
+  final int steps;
+
+  StepTime(this.seconds, this.steps);
+}
+
 class CardioTrackingPageState extends State<CardioTrackingPage> {
   final _logger = Logger('CardioTrackingPage');
 
@@ -27,10 +34,19 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   final String _style = 'mapbox://styles/mapbox/outdoors-v11';
 
   final List<Position> _positions = [];
-  late DateTime startTime;
-  late DateTime pauseStopTime;
-  int seconds = 0;
-  late Movement movement;
+  double _ascent = 0;
+  double _descent = 0;
+  double? _lastElevation;
+
+  final List<StepTime> _stepTimes = [];
+  int _stepRate = 0;
+
+  late DateTime _startTime;
+  DateTime? _pauseStopTime;
+  int _seconds = 0;
+  String _time = "00:00:00";
+
+  late Movement _movement;
 
   Line? _line;
   List<Circle>? _circles;
@@ -42,17 +58,37 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
   late MapboxMapController _mapController;
 
+  void _updateData() {
+    Duration duration = _trackingMode == TrackingMode.tracking
+        ? Duration(seconds: _seconds) +
+            DateTime.now().difference(_pauseStopTime!)
+        : Duration(seconds: _seconds);
+    setState(() {
+      _time = duration.toString().split('.').first.padLeft(8, '0');
+
+      _stepRate = duration.inSeconds > 0 && _stepTimes.isNotEmpty
+          ? ((_stepTimes.last.steps - _stepTimes.first.steps) /
+                  duration.inSeconds *
+                  60)
+              .round()
+          : 0;
+      _stepInfo =
+          "steps: ${_stepTimes.last.steps - _stepTimes.first.steps}\ntime: ${_stepTimes.last.seconds}\nstep rate: $_stepRate";
+    });
+    _logger.i(_stepInfo);
+  }
+
   void _saveCardioSession() {
     CardioSession(
       id: randomId(),
       userId: UserState.instance.currentUser!.id,
-      movementId: movement.id,
+      movementId: _movement.id,
       cardioType: CardioType.training, //TODO
-      datetime: startTime,
+      datetime: _startTime,
       distance: 0, //TODO
-      ascent: null, //TODO
-      descent: null, //TODO
-      time: seconds,
+      ascent: _ascent.round(),
+      descent: _descent.round(),
+      time: _seconds,
       calories: null,
       track: _positions,
       avgCadence: null, //TODO
@@ -66,22 +102,19 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   }
 
   void _onStepCountUpdate(StepCount stepCountEvent) {
-    int steps = stepCountEvent.steps;
-    DateTime timeStamp = stepCountEvent.timeStamp;
-    setState(() {
-      _stepInfo = "steps: $steps\ntime: $timeStamp";
-    });
-    _logger.i(_stepInfo);
+    // TODO ignore steps when paused or not started
+    _stepTimes.add(StepTime(
+        stepCountEvent.timeStamp.millisecondsSinceEpoch ~/ 1000,
+        stepCountEvent.steps));
   }
 
   void _onStepCountError(Object error) {
     _logger.i(error);
   }
 
-  void _startStepStream() {
+  void _startStepCountStream() {
     Stream<StepCount> _stepCountStream = Pedometer.stepCountStream;
     _stepCountStream.listen(_onStepCountUpdate).onError(_onStepCountError);
-    _logger.i("step stream started");
   }
 
   Future<void> _startLocationStream() async {
@@ -145,6 +178,17 @@ satelites: ${location.satelliteNumber}""";
     ]);
 
     if (_trackingMode == TrackingMode.tracking) {
+      setState(() {
+        _lastElevation ??= location.altitude;
+        double elevationDifference = location.altitude! - _lastElevation!;
+        if (elevationDifference > 0) {
+          _ascent += elevationDifference;
+        } else {
+          _descent -= elevationDifference;
+        }
+        _lastElevation = location.altitude;
+      });
+
       _positions.add(Position(
           latitude: location.latitude!,
           longitude: location.longitude!,
@@ -197,7 +241,8 @@ satelites: ${location.satelliteNumber}""";
                   setState(() {
                     _trackingMode = TrackingMode.paused;
                   });
-                  seconds += DateTime.now().difference(pauseStopTime).inSeconds;
+                  _seconds +=
+                      DateTime.now().difference(_pauseStopTime!).inSeconds;
                 },
                 child: const Text("pause"))),
         const SizedBox(
@@ -223,7 +268,7 @@ satelites: ${location.satelliteNumber}""";
                   setState(() {
                     _trackingMode = TrackingMode.tracking;
                   });
-                  pauseStopTime = DateTime.now();
+                  _pauseStopTime = DateTime.now();
                 },
                 child: const Text("continue"))),
         const SizedBox(
@@ -237,7 +282,8 @@ satelites: ${location.satelliteNumber}""";
                     _trackingMode = TrackingMode.stopped;
                   });
                   _saveCardioSession();
-                  seconds += DateTime.now().difference(pauseStopTime).inSeconds;
+                  _seconds +=
+                      DateTime.now().difference(_pauseStopTime!).inSeconds;
                 },
                 child: const Text("stop"))),
       ];
@@ -250,8 +296,8 @@ satelites: ${location.satelliteNumber}""";
                   setState(() {
                     _trackingMode = TrackingMode.tracking;
                   });
-                  startTime = DateTime.now();
-                  pauseStopTime = DateTime.now();
+                  _startTime = DateTime.now();
+                  _pauseStopTime = DateTime.now();
                 },
                 child: const Text("start"))),
         const SizedBox(
@@ -293,7 +339,7 @@ satelites: ${location.satelliteNumber}""";
             _mapController = controller,
         onStyleLoadedCallback: () async {
           await _startLocationStream();
-          _startStepStream();
+          _startStepCountStream();
         },
       )),
       Container(
@@ -302,16 +348,16 @@ satelites: ${location.satelliteNumber}""";
           child: Table(
             children: [
               TableRow(children: [
-                _buildCard("00:31:15", "time"),
+                _buildCard(_time, "time"),
                 _buildCard("6.17 km", "distance"),
               ]),
               TableRow(children: [
                 _buildCard("10.7 km/h", "speed"),
-                _buildCard("163", "step rate"),
+                _buildCard("$_stepRate", "step rate"),
               ]),
               TableRow(children: [
-                _buildCard("231 m", "ascent"),
-                _buildCard("51 m", "descent"),
+                _buildCard("${_ascent.round()} m", "ascent"),
+                _buildCard("${_descent.round()} m", "descent"),
               ]),
             ],
           )),
@@ -328,8 +374,9 @@ satelites: ${location.satelliteNumber}""";
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
-      movement = await showMovementPickerDialog(context,
+      _movement = await showMovementPickerDialog(context,
           dismissable: false, cardioOnly: true) as Movement;
     });
+    Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateData());
   }
 }
