@@ -105,7 +105,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         Icon(Icons.map),
       ],
       onPressed: [
-        () => Navigator.of(context).pushNamed(Routes.cardio.tracking),
+        () => Navigator.of(context).pushNamed(Routes.cardio.tracking_settings),
         () => Navigator.of(context).pushNamed(Routes.cardio.data_input),
         () => Navigator.of(context).pushNamed(Routes.cardio.route_planning),
       ],

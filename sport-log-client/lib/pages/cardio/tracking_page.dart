@@ -32,8 +32,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   double? _lastElevation;
 
   final List<double> _stepTimes = [];
-  late int _lastStepCount;
-  late DateTime _lastStepTime;
+  late StepCount _lastStepCount;
   int _stepRate = 0;
 
   late DateTime _startTime;
@@ -101,17 +100,16 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
         _stepTimes.add(stepCountEvent.timeStamp.millisecondsSinceEpoch / 1000);
       } else {
         /// interpolate steps since last stepCount update
-        int newSteps = stepCountEvent.steps - _lastStepCount;
+        int newSteps = stepCountEvent.steps - _lastStepCount.steps;
         double avgTimeDiff = (stepCountEvent.timeStamp.millisecondsSinceEpoch -
-                _lastStepTime.millisecondsSinceEpoch) /
+                _lastStepCount.timeStamp.millisecondsSinceEpoch) /
             newSteps;
         for (int i = 1; i <= newSteps; i++) {
           _stepTimes.add(_stepTimes.last + avgTimeDiff * i / 1000);
         }
       }
     }
-    _lastStepTime = stepCountEvent.timeStamp;
-    _lastStepCount = stepCountEvent.steps;
+    _lastStepCount = stepCountEvent;
   }
 
   void _onStepCountError(Object error) {
