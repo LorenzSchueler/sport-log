@@ -25,7 +25,7 @@ class StrengthSessionsPage extends StatefulWidget {
 class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   final _dataProvider = StrengthDataProvider.instance;
   final _logger = Logger('StrengthSessionsPage');
-  List<StrengthSessionWithSets> _ssds = [];
+  List<StrengthSessionWithStats> _sessions = [];
 
   @override
   void initState() {
@@ -51,9 +51,9 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
         .getSessionsWithStats(
             from: state.dateFilter.start,
             until: state.dateFilter.end,
-            movementName: state.movement?.name)
+            movementId: state.movement?.id)
         .then((ssds) async {
-      setState(() => _ssds = ssds);
+      setState(() => _sessions = ssds);
     });
   }
 
@@ -95,14 +95,14 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   }
 
   Widget get _strengthSessionsList {
-    if (_ssds.isEmpty) {
+    if (_sessions.isEmpty) {
       return const Center(child: Text('No strength sessions there.'));
     }
     final state = context.read<SessionsUiCubit>().state;
     return Scrollbar(
       child: ListView.builder(
         itemBuilder: (_, index) => _strengthSessionBuilder(state, index),
-        itemCount: _ssds.length + 1,
+        itemCount: _sessions.length + 1,
         shrinkWrap: true,
       ),
     );
@@ -111,62 +111,57 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   // TODO: put into seperate widget
   Widget _strengthSessionBuilder(SessionsUiState state, int index) {
     if (index == 0) {
-      assert(_ssds.isNotEmpty);
+      assert(_sessions.isNotEmpty);
       if (!state.isMovementSelected) {
         return const SizedBox.shrink();
       }
       return const StrengthChart();
     }
     index--;
-    final ssd = _ssds[index];
+    final session = _sessions[index];
     final String date =
-        DateFormat('dd.MM.yyyy').format(ssd.strengthSession.datetime);
-    final String time =
-        DateFormat('HH:mm').format(ssd.strengthSession.datetime);
-    final String? duration = ssd.strengthSession.interval == null
+        DateFormat('dd.MM.yyyy').format(session.session.datetime);
+    final String time = DateFormat('HH:mm').format(session.session.datetime);
+    final String? duration = session.session.interval == null
         ? null
-        : formatDuration(Duration(seconds: ssd.strengthSession.interval!));
+        : formatDuration(Duration(seconds: session.session.interval!));
     // final sets = ssd.stats!.numSets.toString() + ' sets';
-    final String title =
-        state.isMovementSelected ? [date, time].join(' · ') : ssd.movement.name;
+    final String title = state.isMovementSelected
+        ? [date, time].join(' · ')
+        : session.movement.name;
     final subtitleParts = state.isMovementSelected
         ? [if (duration != null) duration]
         : [date, time, if (duration != null) duration];
     final subtitle = subtitleParts.join(' · ');
-    final String text = ssd.strengthSets
-        .map((ss) => ss.toDisplayName(ssd.movement.dimension))
-        .join(', ');
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
       child: ExpansionTileCard(
         // dirty fix for forcing an expansion tile card to be non-expanded at the start
         // (without it, an expanded card might show an everloading circular progress indicator)
-        key:
-            ValueKey(Object.hash(ssd.id, state.dateFilter, state.movement?.id)),
-        leading: CircleAvatar(child: Text(ssd.movement.name[0])),
+        key: ValueKey(
+            Object.hash(session.id, state.dateFilter, state.movement?.id)),
+        leading: CircleAvatar(child: Text(session.movement.name[0])),
         title: Text(title),
         subtitle: Text(subtitle),
         children: [
           const Divider(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            child: Text(text),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Text('TODO'),
           ),
           const Divider(),
-          if (ssd.strengthSession.comments != null)
+          if (session.session.comments != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              child: Text(ssd.strengthSession.comments!),
+              child: Text(session.session.comments!),
             ),
-          if (ssd.strengthSession.comments != null) const Divider(),
+          if (session.session.comments != null) const Divider(),
           ButtonBar(
             alignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
-                onPressed: () {
-                  _dataProvider.deleteSingle(ssd);
-                },
+                onPressed: () {}, // TODO
                 icon: const Icon(Icons.delete),
               ),
               IconButton(

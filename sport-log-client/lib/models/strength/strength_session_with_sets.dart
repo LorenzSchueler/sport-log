@@ -8,46 +8,45 @@ import 'package:sport_log/models/strength/strength_set.dart';
 
 class StrengthSessionWithSets implements Validatable, HasId {
   StrengthSessionWithSets({
-    required this.strengthSession,
+    required this.session,
     required this.movement,
-    required this.strengthSets,
+    required this.sets,
   });
 
-  StrengthSession strengthSession;
+  StrengthSession session;
   Movement movement;
-  List<StrengthSet> strengthSets;
+  List<StrengthSet> sets;
 
   @override
   bool isValid() {
-    return validate(strengthSession.isValid(),
+    return validate(session.isValid(),
             'StrengthSessionDescription: strength session not valid') &&
-        validate(strengthSets.isNotEmpty,
+        validate(sets.isNotEmpty,
             'StrengthSessionDescription: strength sets empty') &&
-        validate(
-            strengthSets
-                .every((ss) => ss.strengthSessionId == strengthSession.id),
+        validate(sets.every((ss) => ss.strengthSessionId == session.id),
             'StrengthSessionDescription: strengthSessionId != strengthSession.id') &&
-        validate(
-            strengthSets.everyIndexed((ss, index) => ss.setNumber == index),
+        validate(sets.everyIndexed((ss, index) => ss.setNumber == index),
             'StrengthSessionDescription: strengthSets indices wrong') &&
-        validate(strengthSets.every((ss) => ss.isValid()),
+        validate(sets.every((ss) => ss.isValid()),
             'StrengthSessionDescription: strengthSets not valid') &&
-        validate(strengthSession.movementId == movement.id,
-            'StrengthSessionDescription: movement id mismatch');
+        validate(session.movementId == movement.id,
+            'StrengthSessionDescription: movement id mismatch') &&
+        validate(!movement.deleted,
+            'StrengthSessionDescription: movement is deleted');
   }
 
   @override
-  Int64 get id => strengthSession.id;
+  Int64 get id => session.id;
 
   void setDeleted() {
-    strengthSession.deleted = true;
-    for (final set in strengthSets) {
+    session.deleted = true;
+    for (final set in sets) {
       set.deleted = true;
     }
   }
 
   StrengthSessionWithSets.defaultValue(this.movement, Int64 userId)
-      : strengthSession = StrengthSession(
+      : session = StrengthSession(
           id: randomId(),
           userId: userId,
           datetime: DateTime.now(),
@@ -56,5 +55,5 @@ class StrengthSessionWithSets implements Validatable, HasId {
           comments: null,
           deleted: false,
         ),
-        strengthSets = [];
+        sets = [];
 }

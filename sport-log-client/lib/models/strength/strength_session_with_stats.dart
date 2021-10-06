@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
@@ -13,4 +14,6 @@ class StrengthSessionWithStats {
   final StrengthSession session;
   final Movement movement;
   final StrengthSessionStats stats;
+
+  Int64 get id => session.id;
 }

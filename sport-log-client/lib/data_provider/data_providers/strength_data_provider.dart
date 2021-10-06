@@ -22,16 +22,16 @@ class StrengthDataProvider extends DataProvider<StrengthSessionWithSets> {
   Future<void> createSingle(StrengthSessionWithSets object) async {
     assert(object.isValid());
     // TODO: catch errors
-    await strengthSessionDb.createSingle(object.strengthSession);
-    await strengthSetDb.createMultiple(object.strengthSets);
+    await strengthSessionDb.createSingle(object.session);
+    await strengthSetDb.createMultiple(object.sets);
     notifyListeners();
-    final result1 = await strengthSessionApi.postSingle(object.strengthSession);
+    final result1 = await strengthSessionApi.postSingle(object.session);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return;
     }
     strengthSessionDb.setSynchronized(object.id);
-    final result2 = await strengthSetApi.postMultiple(object.strengthSets);
+    final result2 = await strengthSetApi.postMultiple(object.sets);
     if (result2.isFailure) {
       handleApiError(result2.failure);
       return;
@@ -47,13 +47,13 @@ class StrengthDataProvider extends DataProvider<StrengthSessionWithSets> {
     await strengthSessionDb.deleteSingle(object.id);
     notifyListeners();
     // TODO: server deletes strength sets automatically
-    final result1 = await strengthSetApi.putMultiple(object.strengthSets);
+    final result1 = await strengthSetApi.putMultiple(object.sets);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return;
     }
     strengthSetDb.setSynchronizedByStrengthSession(object.id);
-    final result2 = await strengthSessionApi.putSingle(object.strengthSession);
+    final result2 = await strengthSessionApi.putSingle(object.session);
     if (result2.isFailure) {
       handleApiError(result2.failure);
       return;
@@ -83,7 +83,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionWithSets> {
 
   @override
   Future<List<StrengthSessionWithSets>> getNonDeleted() async {
-    return (await strengthSessionDb.getSessionDescriptions());
+    throw UnimplementedError();
   }
 
   Future<List<StrengthSet>> getStrengthSetsByStrengthSession(Int64 id) {
@@ -143,17 +143,17 @@ class StrengthDataProvider extends DataProvider<StrengthSessionWithSets> {
     assert(object.isValid());
 
     final oldSets = await strengthSetDb.getByStrengthSession(object.id);
-    final newSets = [...object.strengthSets];
+    final newSets = [...object.sets];
 
     final diffing = diff(oldSets, newSets);
 
-    await strengthSessionDb.updateSingle(object.strengthSession);
+    await strengthSessionDb.updateSingle(object.session);
     await strengthSetDb.deleteMultiple(diffing.toDelete);
     await strengthSetDb.updateMultiple(diffing.toUpdate);
     await strengthSetDb.createMultiple(diffing.toCreate);
     notifyListeners();
 
-    final result1 = await strengthSessionApi.putSingle(object.strengthSession);
+    final result1 = await strengthSessionApi.putSingle(object.session);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return;
@@ -178,21 +178,20 @@ class StrengthDataProvider extends DataProvider<StrengthSessionWithSets> {
     strengthSetDb.setSynchronizedByStrengthSession(object.id);
   }
 
-  Future<List<StrengthSessionWithSets>> getSessionsWithStats({
+  Future<List<StrengthSessionWithStats>> getSessionsWithStats({
     Int64? movementId,
     DateTime? from,
     DateTime? until,
-    String? movementName,
   }) async {
-    assert(movementName == null || movementId == null);
-    final sessions = await strengthSessionDb.getSessionDescriptions(
-      from: from,
-      until: until,
-      movementIdValue: movementId,
-      movementName: movementName,
-    );
-    return sessions;
+    return strengthSessionDb.getSessionsWithStats(
+        from: from, until: until, movementIdValue: movementId);
   }
+
+  Future<List<StrengthSet>> getSetsOnDay({
+    required DateTime date,
+    required Int64 movementId,
+  }) async =>
+      strengthSessionDb.getSetsOnDay(date: date, movementIdValue: movementId);
 
   // weekly/monthly view
   Future<List<StrengthSessionStats>> getStatsByDay({
