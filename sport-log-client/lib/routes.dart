@@ -3,7 +3,6 @@ abstract class Routes {
   static const login = '/login';
   static const registration = '/register';
   static const workout = '/workout';
-  static const editStrengthSession = '/edit-strength-session';
   static const metcon = _MetconRoutes();
   static const movement = _MovementRoutes();
 }

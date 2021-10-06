@@ -3,7 +3,6 @@ import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/movement/movement_description.dart';
-import 'package:sport_log/models/strength/strength_session_description.dart';
 import 'package:sport_log/pages/landing/landing_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
 import 'package:sport_log/pages/metcons/edit_page.dart';
@@ -11,7 +10,6 @@ import 'package:sport_log/pages/metcons/overview_page.dart';
 import 'package:sport_log/pages/movements/edit_page.dart';
 import 'package:sport_log/pages/movements/overview_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
-import 'package:sport_log/pages/workout/strength_sessions/edit_page.dart';
 import 'package:sport_log/pages/workout/workout_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
 
@@ -69,12 +67,6 @@ class _AppState extends State<App> {
                 return EditMovementPage.fromName(initialName: arg);
               }
               return EditMovementPage.newMovement();
-            }),
-        Routes.editStrengthSession: (context) =>
-            ProtectedRoute(builder: (context) {
-              final dynamic arg = ModalRoute.of(context)?.settings.arguments;
-              return EditStrengthSessionPage(
-                  description: arg is StrengthSessionDescription ? arg : null);
             }),
       },
       initialRoute: isAuthenticated ? Routes.workout : Routes.landing,
