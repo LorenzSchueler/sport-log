@@ -72,7 +72,7 @@ class _AllChartState extends State<AllChart> {
         lineBarsData: [
           LineChartBarData(
             spots: _stats.map((s) {
-              return FlSpot(fromDate(s.datetime), getValue(s));
+              return FlSpot(fromDate(s.dateTime), getValue(s));
             }).toList(),
             colors: [primaryColorOf(context)],
             dotData: FlDotData(show: false),

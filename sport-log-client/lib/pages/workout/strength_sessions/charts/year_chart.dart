@@ -75,7 +75,7 @@ class _YearChartState extends State<YearChart> {
           LineChartBarData(
             spots: _stats.map((s) {
               return FlSpot(
-                  (s.datetime.difference(widget.start).inDays + 1).toDouble(),
+                  (s.dateTime.difference(widget.start).inDays + 1).toDouble(),
                   getValue(s));
             }).toList(),
             colors: [primaryColorOf(context)],

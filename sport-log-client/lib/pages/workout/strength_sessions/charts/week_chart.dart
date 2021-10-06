@@ -73,7 +73,7 @@ class _WeekChartState extends State<WeekChart> {
     for (int i = 0; i < 7; ++i) {
       if (statIndex < _stats.length &&
           _stats[statIndex]
-              .datetime
+              .dateTime
               .isOnDay(widget.start.add(Duration(days: i)))) {
         result.add(BarChartGroupData(x: i, barRods: [
           BarChartRodData(

@@ -74,7 +74,7 @@ class _MonthChartState extends State<MonthChart> {
         lineBarsData: [
           LineChartBarData(
             spots: _stats.map((s) {
-              return FlSpot(s.datetime.day.toDouble(), getValue(s));
+              return FlSpot(s.dateTime.day.toDouble(), getValue(s));
             }).toList(),
             colors: [primaryColorOf(context)],
           ),
