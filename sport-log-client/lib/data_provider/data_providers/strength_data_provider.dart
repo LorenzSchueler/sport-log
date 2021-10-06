@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/diff_algorithm.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/strength/all.dart';
 
-class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
+class StrengthDataProvider extends DataProvider<StrengthSessionWithSets> {
   final strengthSessionDb = AppDatabase.instance!.strengthSessions;
   final strengthSetDb = AppDatabase.instance!.strengthSets;
   final movementDb = AppDatabase.instance!.movements;
@@ -19,7 +19,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
   StrengthDataProvider._();
 
   @override
-  Future<void> createSingle(StrengthSessionDescription object) async {
+  Future<void> createSingle(StrengthSessionWithSets object) async {
     assert(object.isValid());
     // TODO: catch errors
     await strengthSessionDb.createSingle(object.strengthSession);
@@ -40,7 +40,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
   }
 
   @override
-  Future<void> deleteSingle(StrengthSessionDescription object) async {
+  Future<void> deleteSingle(StrengthSessionWithSets object) async {
     object.setDeleted();
     // TODO: catch errors
     await strengthSetDb.deleteByStrengthSession(object.id);
@@ -82,7 +82,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
   }
 
   @override
-  Future<List<StrengthSessionDescription>> getNonDeleted() async {
+  Future<List<StrengthSessionWithSets>> getNonDeleted() async {
     return (await strengthSessionDb.getSessionDescriptions());
   }
 
@@ -139,7 +139,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
   }
 
   @override
-  Future<void> updateSingle(StrengthSessionDescription object) async {
+  Future<void> updateSingle(StrengthSessionWithSets object) async {
     assert(object.isValid());
 
     final oldSets = await strengthSetDb.getByStrengthSession(object.id);
@@ -178,7 +178,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionDescription> {
     strengthSetDb.setSynchronizedByStrengthSession(object.id);
   }
 
-  Future<List<StrengthSessionDescription>> getSessionsWithStats({
+  Future<List<StrengthSessionWithSets>> getSessionsWithStats({
     Int64? movementId,
     DateTime? from,
     DateTime? until,

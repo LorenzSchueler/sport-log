@@ -87,7 +87,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
 
   /// returns strength session descriptions with stats, without sets
   /// ordered by datetime
-  Future<List<StrengthSessionDescription>> getSessionDescriptions({
+  Future<List<StrengthSessionWithSets>> getSessionDescriptions({
     Int64? movementIdValue,
     String? movementName,
     DateTime? from,
@@ -129,9 +129,9 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
       return [];
     }
 
-    List<StrengthSessionDescription> result = [];
+    List<StrengthSessionWithSets> result = [];
 
-    var current = StrengthSessionDescription(
+    var current = StrengthSessionWithSets(
       strengthSession: serde.fromDbRecord(records.first, prefix: _table.prefix),
       movement: _movementTable.serde
           .fromDbRecord(records.first, prefix: _movementTable.table.prefix),
@@ -142,7 +142,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
     for (final record in records) {
       if (record[_table.prefix + id] as int != current.id.toInt()) {
         result.add(current);
-        current = StrengthSessionDescription(
+        current = StrengthSessionWithSets(
           strengthSession: serde.fromDbRecord(record, prefix: _table.prefix),
           movement: _movementTable.serde
               .fromDbRecord(record, prefix: _movementTable.table.prefix),

@@ -6,20 +6,16 @@ import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
 import 'package:sport_log/models/strength/strength_set.dart';
 
-import 'strength_session_stats.dart';
-
-class StrengthSessionDescription implements Validatable, HasId {
-  StrengthSessionDescription({
+class StrengthSessionWithSets implements Validatable, HasId {
+  StrengthSessionWithSets({
     required this.strengthSession,
     required this.movement,
     required this.strengthSets,
-    required this.stats,
   });
 
   StrengthSession strengthSession;
   Movement movement;
   List<StrengthSet> strengthSets;
-  StrengthSessionStats? stats;
 
   @override
   bool isValid() {
@@ -50,7 +46,7 @@ class StrengthSessionDescription implements Validatable, HasId {
     }
   }
 
-  StrengthSessionDescription.defaultValue(this.movement, Int64 userId)
+  StrengthSessionWithSets.defaultValue(this.movement, Int64 userId)
       : strengthSession = StrengthSession(
           id: randomId(),
           userId: userId,
@@ -61,8 +57,4 @@ class StrengthSessionDescription implements Validatable, HasId {
           deleted: false,
         ),
         strengthSets = [];
-
-  static bool areTheSame(
-          StrengthSessionDescription ssd1, StrengthSessionDescription ssd2) =>
-      ssd1.strengthSession.id == ssd2.strengthSession.id;
 }
