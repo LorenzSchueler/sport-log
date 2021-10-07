@@ -86,10 +86,6 @@ class StrengthDataProvider extends DataProvider<StrengthSessionWithSets> {
     throw UnimplementedError();
   }
 
-  Future<List<StrengthSet>> getStrengthSetsByStrengthSession(Int64 id) {
-    return strengthSetDb.getByStrengthSession(id);
-  }
-
   @override
   Future<void> pushToServer() async {
     await Future.wait([
@@ -177,6 +173,9 @@ class StrengthDataProvider extends DataProvider<StrengthSessionWithSets> {
     }
     strengthSetDb.setSynchronizedByStrengthSession(object.id);
   }
+
+  Future<StrengthSessionWithSets?> getSessionWithSets(Int64 id) async =>
+      strengthSessionDb.getSessionWithSets(id);
 
   Future<List<StrengthSessionWithStats>> getSessionsWithStats({
     Int64? movementId,

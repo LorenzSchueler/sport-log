@@ -85,6 +85,28 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
   MovementTable get _movementTable => AppDatabase.instance!.movements;
   StrengthSetTable get _strengthSetTable => AppDatabase.instance!.strengthSets;
 
+  Future<StrengthSessionWithSets?> getSessionWithSets(Int64 idValue) async {
+    final records = await database.rawQuery('''
+      SELECT
+        ${_table.allColumns},
+        ${_movementTable.table.allColumns}
+      FROM $tableName
+        JOIN $movement ON $movement.$id = $tableName.$movementId
+      WHERE $tableName.$deleted = 0
+        AND $movement.$deleted = 0
+        AND $tableName.$id = ?;
+    ''', [idValue.toInt()]);
+    if (records.isEmpty) {
+      return null;
+    }
+    return StrengthSessionWithSets(
+      session: serde.fromDbRecord(records.first, prefix: _table.prefix),
+      movement: _movementTable.serde
+          .fromDbRecord(records.first, prefix: _movementTable.table.prefix),
+      sets: await _strengthSetTable.getByStrengthSession(idValue),
+    );
+  }
+
   /// returns strength session descriptions with stats, without sets
   /// ordered by datetime, leaving out sessions without sets
   Future<List<StrengthSessionWithStats>> getSessionsWithStats({

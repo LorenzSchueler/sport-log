@@ -6,6 +6,8 @@ import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
 import 'package:sport_log/models/strength/strength_set.dart';
 
+import 'strength_session_stats.dart';
+
 class StrengthSessionWithSets implements Validatable, HasId {
   StrengthSessionWithSets({
     required this.session,
@@ -56,4 +58,12 @@ class StrengthSessionWithSets implements Validatable, HasId {
           deleted: false,
         ),
         sets = [];
+
+  StrengthSessionStats? calculateStats() {
+    if (sets.isEmpty) {
+      return null;
+    }
+    return StrengthSessionStats.fromStrengthSets(
+        sets: sets, dateTime: session.datetime);
+  }
 }

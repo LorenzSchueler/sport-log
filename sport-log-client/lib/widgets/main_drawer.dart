@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/data_provider/user_state.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/snackbar.dart';
@@ -80,7 +81,7 @@ class MainDrawer extends StatelessWidget {
               } else if (sync.lastSync == null) {
                 title = 'No syncs yet';
               } else {
-                title = 'Last sync: ' + dateTimeFull.format(sync.lastSync!);
+                title = 'Last sync: ' + sync.lastSync!.toHumanWithTime();
               }
               return ListTile(
                 title: Text(title),

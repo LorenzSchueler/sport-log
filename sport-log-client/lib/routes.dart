@@ -5,6 +5,7 @@ abstract class Routes {
   static const workout = '/workout';
   static const metcon = _MetconRoutes();
   static const movement = _MovementRoutes();
+  static const strength = _StrengthRoutes();
 }
 
 class _MetconRoutes {
@@ -19,4 +20,10 @@ class _MovementRoutes {
 
   final String overview = '/movement/overview';
   final String edit = '/movement/edit';
+}
+
+class _StrengthRoutes {
+  const _StrengthRoutes();
+
+  final String details = '/strength/details';
 }

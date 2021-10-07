@@ -10,6 +10,7 @@ import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/ui_cubit.dart';
+import 'package:sport_log/routes.dart';
 
 import 'strength_chart.dart';
 
@@ -167,6 +168,13 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
               IconButton(
                 onPressed: () {}, // TODO
                 icon: const Icon(Icons.edit),
+              ),
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(Routes.strength.details,
+                      arguments: session.id);
+                },
+                icon: const Icon(Icons.search),
               ),
             ],
           ),

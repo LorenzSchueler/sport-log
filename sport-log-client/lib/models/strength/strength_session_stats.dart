@@ -79,6 +79,8 @@ class StrengthSessionStats {
   double? sumVolume;
   double? maxWeight;
 
+  double get avgCount => sumCount / numSets;
+
   static const allColumns = [
     Keys.datetime,
     Keys.numSets,
