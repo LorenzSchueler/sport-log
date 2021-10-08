@@ -54,6 +54,7 @@ dependencies:
   hive: ^2.0.4
   hive_flutter: ^1.1.0
   fluttertoast: ^8.0.8
+  flutter_keyboard_visibility: ^5.0.3
 
 dev_dependencies:
   flutter_test:
