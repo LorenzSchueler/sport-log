@@ -30,7 +30,7 @@ class _DurationPickerState extends State<DurationPicker> {
   static const double _iconSize = 40;
   static const double _textWidth = 33;
   static const double _fontSize = 25;
-  static const int _timeStep = 10; // seconds
+  static const int _timeStep = 30; // seconds
   static const int _maxSeconds = 60 * 100 - 1;
 
   @override
