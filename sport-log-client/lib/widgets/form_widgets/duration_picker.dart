@@ -39,7 +39,9 @@ class _DurationPickerState extends State<DurationPicker> {
     super.initState();
     _duration = widget.initialDuration;
     _updateTextFieldsWithPadding();
-    KeyboardVisibilityController().onChange.listen(_onKeyboardVisibilityEvent);
+    _keyboardSubscription = KeyboardVisibilityController()
+        .onChange
+        .listen(_onKeyboardVisibilityEvent);
   }
 
   @override
