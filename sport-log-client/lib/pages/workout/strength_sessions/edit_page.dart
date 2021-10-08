@@ -6,6 +6,7 @@ import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
+import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/form_widgets/int_picker.dart';
@@ -53,22 +54,32 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Edit session')),
-      body: Scrollbar(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _movementInput,
-              _dateTimeInput,
-              if (_session.session.interval != null) _intervalInput,
-              if (_session.session.comments != null) _commentInput,
-              if (_session.session.interval == null ||
-                  _session.session.comments == null)
-                _buttonBar,
-              CaptionTile(caption: 'Sets'),
-              _setList,
-            ],
+      body: Column(
+        children: [
+          Expanded(
+            child: Scrollbar(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _movementInput,
+                    _dateTimeInput,
+                    if (_session.session.interval != null) _intervalInput,
+                    if (_session.session.comments != null) _commentInput,
+                    if (_session.session.interval == null ||
+                        _session.session.comments == null)
+                      _buttonBar,
+                    const CaptionTile(caption: 'Sets'),
+                    _setList,
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
+          NewSetInput(
+            dimension: _session.movement.dimension,
+            onNewSet: (set) => setState(() => _session.sets.add(set)),
+          ),
+        ],
       ),
     );
   }
