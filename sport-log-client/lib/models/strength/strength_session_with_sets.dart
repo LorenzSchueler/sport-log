@@ -66,4 +66,12 @@ class StrengthSessionWithSets implements Validatable, HasId {
     return StrengthSessionStats.fromStrengthSets(
         sets: sets, dateTime: session.datetime);
   }
+
+  StrengthSessionWithSets copy() {
+    return StrengthSessionWithSets(
+      session: session.copy(),
+      movement: movement.copy(),
+      sets: sets.mapToL((set) => set.copy()),
+    );
+  }
 }

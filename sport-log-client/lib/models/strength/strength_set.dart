@@ -52,6 +52,17 @@ class StrengthSet implements DbObject {
   double? get eorm {
     return weight == null ? null : getEorm(count, weight!);
   }
+
+  StrengthSet copy() {
+    return StrengthSet(
+      id: id,
+      strengthSessionId: strengthSessionId,
+      setNumber: setNumber,
+      count: count,
+      weight: weight,
+      deleted: deleted,
+    );
+  }
 }
 
 class DbStrengthSetSerializer implements DbSerializer<StrengthSet> {
