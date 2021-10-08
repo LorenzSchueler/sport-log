@@ -6,6 +6,7 @@ import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
+import 'package:sport_log/routes.dart';
 
 class StrengthSessionDetailsPage extends StatefulWidget {
   const StrengthSessionDetailsPage({
@@ -56,8 +57,14 @@ class _StrengthSessionDetailsPageState
     return Scaffold(
       appBar: AppBar(
         title: Text(session.movement.name),
-        actions: const [
-          IconButton(onPressed: null, icon: Icon(Icons.edit_sharp)),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamed(Routes.strength.edit, arguments: session);
+            },
+            icon: const Icon(Icons.edit_sharp),
+          ),
         ],
       ),
       body: Scrollbar(
@@ -78,7 +85,7 @@ class _StrengthSessionDetailsPageState
     final subtitle = [
       '${session.sets.length} sets',
       if (session.session.interval != null)
-        formatDuration(Duration(seconds: session.session.interval!)),
+        formatDuration(session.session.interval!),
     ].join(' • ');
     return Card(
       child: Padding(

@@ -40,6 +40,15 @@ ThemeData themeDataFromColors({
         borderRadius: BorderRadius.all(Radius.circular(32)),
       ),
     ),
+    textTheme: const TextTheme(
+      caption: TextStyle(
+        fontWeight: FontWeight.w900,
+        fontSize: 15,
+      ),
+      subtitle1: TextStyle(
+        fontSize: 20,
+      ),
+    ),
   );
 }
 

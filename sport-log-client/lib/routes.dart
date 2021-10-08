@@ -26,4 +26,5 @@ class _StrengthRoutes {
   const _StrengthRoutes();
 
   final String details = '/strength/details';
+  final String edit = '/strength/edit';
 }

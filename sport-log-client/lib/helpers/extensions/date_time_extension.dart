@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 extension DateTimeExtension on DateTime {
@@ -194,5 +195,9 @@ extension DateTimeExtension on DateTime {
     } else {
       return year.toString();
     }
+  }
+
+  DateTime withTime(TimeOfDay time) {
+    return DateTime(year, month, day, time.hour, time.minute);
   }
 }
