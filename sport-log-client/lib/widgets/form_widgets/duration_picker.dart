@@ -9,7 +9,6 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 class DurationPicker extends StatefulWidget {
   const DurationPicker({
     Key? key,
-    required BuildContext context,
     required this.setDuration,
     required this.initialDuration,
   }) : super(key: key);
