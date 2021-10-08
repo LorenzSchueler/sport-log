@@ -125,7 +125,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
     final String time = DateFormat('HH:mm').format(session.session.datetime);
     final String? duration = session.session.interval == null
         ? null
-        : formatDuration(Duration(seconds: session.session.interval!));
+        : formatDuration(session.session.interval!);
     // final sets = ssd.stats!.numSets.toString() + ' sets';
     final String title = state.isMovementSelected
         ? [date, time].join(' · ')
@@ -161,14 +161,6 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
           ButtonBar(
             alignment: MainAxisAlignment.spaceAround,
             children: [
-              IconButton(
-                onPressed: () {}, // TODO
-                icon: const Icon(Icons.delete),
-              ),
-              IconButton(
-                onPressed: () {}, // TODO
-                icon: const Icon(Icons.edit),
-              ),
               IconButton(
                 onPressed: () {
                   Navigator.of(context).pushNamed(Routes.strength.details,

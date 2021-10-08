@@ -32,7 +32,7 @@ Future<List<StrengthSession>> generateStrengthSessions(Int64 userId) async {
                 random.integer(24), random.integer(60), random.integer(60)),
             movementId: movement.id,
             interval: random.integer(2) == 0
-                ? Duration(minutes: random.integer(90, min: 10)).inSeconds
+                ? Duration(minutes: random.integer(90, min: 10))
                 : null,
             comments: random.integer(2) == 0 ? faker.lorem.sentence() : null,
             deleted: false,

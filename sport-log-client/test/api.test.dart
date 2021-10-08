@@ -77,7 +77,7 @@ void testStrengthSession(Api api) async {
       userId: sampleUser.id,
       datetime: DateTime.now(),
       movementId: Int64(1),
-      interval: 10,
+      interval: const Duration(minutes: 1),
       comments: null,
       deleted: false,
     );
