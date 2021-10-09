@@ -159,6 +159,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
 
   // this is only needed for test data generation
   Future<List<StrengthSessionAndMovement>> getSessionsWithMovements() async {
+    // TODO: ignore strength session that have strength sets
     final records = await database.rawQuery('''
       SELECT
         ${_table.allColumns},
@@ -318,7 +319,7 @@ class StrengthSetTable extends DbAccessor<StrengthSet> {
           .references(Tables.strengthSession, onDelete: OnAction.cascade),
       Column.int(Keys.setNumber).check('${Keys.setNumber} >= 0'),
       Column.int(Keys.count).check('${Keys.count} >= 1'),
-      Column.real(Keys.weight).check('${Keys.weight} > 0'),
+      Column.real(Keys.weight).nullable().check('${Keys.weight} > 0'),
     ],
   );
 

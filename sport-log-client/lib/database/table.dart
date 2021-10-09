@@ -54,7 +54,7 @@ abstract class DbAccessor<T extends DbObject> {
           where: '${Keys.deleted} = 0 AND ${Keys.id} = ?',
           whereArgs: [object.id.toInt()]);
     }
-    await batch.commit(noResult: true, continueOnError: true);
+    await batch.commit(noResult: true, continueOnError: false);
   }
 
   Future<void> updateSingle(T object, {bool isSynchronized = false}) async {
@@ -83,7 +83,7 @@ abstract class DbAccessor<T extends DbObject> {
         whereArgs: [object.id.toInt()],
       );
     }
-    await batch.commit(noResult: true, continueOnError: true);
+    await batch.commit(noResult: true, continueOnError: false);
   }
 
   Future<void> createSingle(T object, {bool isSynchronized = false}) async {
@@ -102,7 +102,7 @@ abstract class DbAccessor<T extends DbObject> {
         if (isSynchronized) Keys.syncStatus: SyncStatus.synchronized.index,
       });
     }
-    await batch.commit(noResult: true, continueOnError: true);
+    await batch.commit(noResult: true, continueOnError: false);
   }
 
   Future<List<T>> getNonDeleted() async {
@@ -153,6 +153,6 @@ abstract class DbAccessor<T extends DbObject> {
           },
           conflictAlgorithm: ConflictAlgorithm.replace);
     }
-    await batch.commit(noResult: true, continueOnError: true);
+    await batch.commit(noResult: true, continueOnError: false);
   }
 }
