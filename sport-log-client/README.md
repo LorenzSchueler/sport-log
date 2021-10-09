@@ -22,6 +22,11 @@
 **Running on Android Emulator**
 
 * server address `10.0.2.2:8000` will be used which will be mapped to localhost
+* to copy the database to your computer, use
+```bash
+adb root  # restart adb daemon as root
+adb pull /data/user/0/com.example.frontend/databases/database.sqlite <folder> # pull file to local storage
+```
 
 **Making changes to database schema**
 
