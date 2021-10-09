@@ -33,7 +33,7 @@ class MainDrawer extends StatelessWidget {
           ),
           ListTile(
             title: const Text('Workout'),
-            leading: const Icon(CustomIcons.dumbbellRotated),
+            leading: const Icon(CustomIcons.dumbbell_rotated),
             onTap: () {
               Nav.changeNamed(context, Routes.workout);
             },
@@ -55,14 +55,14 @@ class MainDrawer extends StatelessWidget {
             children: [
               ListTile(
                 title: const Text('Movements'),
-                leading: const Icon(Icons.apps),
+                leading: const Icon(CustomIcons.trending_up),
                 onTap: () => Nav.changeNamed(context, Routes.movement.overview),
                 selected: selectedRoute == Routes.movement.overview,
               ),
               ListTile(
                 title: Text('Routes',
                     style: TextStyle(color: disabledColorOf(context))),
-                leading: const Icon(Icons.map_sharp),
+                leading: const Icon(CustomIcons.route),
               ),
               ListTile(
                 title: const Text('CrossFit – Metcons'),

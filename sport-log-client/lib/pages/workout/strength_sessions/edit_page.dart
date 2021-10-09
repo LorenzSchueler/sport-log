@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/form_widgets/int_picker.dart';
@@ -89,8 +90,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       caption: 'Movement',
       child: Text(
           '${_session.movement.name} (${_session.movement.dimension.displayName})'),
-      // TODO: icon
-      leading: const Icon(Icons.edit),
+      leading: const Icon(CustomIcons.trending_up),
       onTap: () async {
         final maybeMovement = await showMovementPickerDialog(context);
         if (maybeMovement != null) {
@@ -162,8 +162,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         setDuration: (d) => setState(() => _session.session.interval = d),
         initialDuration: _session.session.interval!,
       ),
-      // TODO: icon
-      leading: const Icon(Icons.edit),
+      leading: const Icon(CustomIcons.time_interval),
       onCancel: () {
         setState(() => _session.session.interval = null);
       },
@@ -185,7 +184,6 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
           enabledBorder: InputBorder.none,
         ),
       ),
-      // TODO: icon
       leading: const Icon(Icons.edit),
       onCancel: () {
         setState(() => _session.session.comments = null);

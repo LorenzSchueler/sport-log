@@ -134,6 +134,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   Widget _sessionToWidgetWithoutMovement(
       StrengthSessionWithStats s, int index) {
     return ListTile(
+      leading: Icon(s.movement.dimension.iconData),
       title: Text(s.movement.name),
       subtitle: Text(
           '${s.session.datetime.toHumanWithTime()} • ${s.stats.numSets} ${plural('set', 'sets', s.stats.numSets)}'),
