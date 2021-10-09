@@ -1,3 +1,6 @@
+import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/models/movement/movement.dart';
+
 import 'strength_set.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/database/keys.dart';
@@ -114,5 +117,23 @@ class StrengthSessionStats {
       Keys.maxWeight: maxWeight,
       Keys.sumVolume: sumVolume,
     };
+  }
+
+  String toDisplayName(MovementDimension dimension) {
+    switch (dimension) {
+      case MovementDimension.reps:
+        return [
+          if (maxEorm != null) '1RM: ${roundedWeight(maxEorm!)}',
+          if (sumVolume != null) 'Vol: ${roundedWeight(sumVolume!)}',
+          if (maxWeight != null) 'Max Weight: ${roundedWeight(maxWeight!)}',
+          'Avg Reps: ${roundedValue(avgCount)}',
+        ].join(' • ');
+      case MovementDimension.time:
+        return 'Best time: ${formatDuration(Duration(milliseconds: minCount))}';
+      case MovementDimension.distance:
+        return 'Best distance: ${formatDistance(maxCount)}';
+      case MovementDimension.energy:
+        return 'Total energy: ${sumCount}cals';
+    }
   }
 }
