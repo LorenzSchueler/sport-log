@@ -21,7 +21,16 @@ ThemeData themeDataFromColors({
           secondaryVariant: _shadeColor(secondary, 0.4),
           brightness: brightness,
         );
+  final appBarBackgroundColor =
+      brightness == Brightness.light ? cs.primary : cs.surface;
   return ThemeData(
+    appBarTheme: AppBarTheme(
+      foregroundColor:
+          brightness == Brightness.light ? cs.onPrimary : cs.onSurface,
+      backgroundColor: appBarBackgroundColor
+    ),
+    bottomAppBarTheme: BottomAppBarTheme(color: appBarBackgroundColor),
+    bottomAppBarColor: appBarBackgroundColor,
     colorScheme: cs,
     primaryColor: cs.primary,
     primarySwatch: _generateMaterialColor(cs.primary),
@@ -94,14 +103,6 @@ Color onBackgroundColorOf(BuildContext context) {
 
 Color disabledColorOf(BuildContext context) {
   return Theme.of(context).disabledColor;
-}
-
-Color appBarForegroundOf(BuildContext context) {
-  final theme = Theme.of(context);
-  return theme.appBarTheme.foregroundColor ??
-      (theme.brightness == Brightness.light
-          ? theme.colorScheme.onPrimary
-          : theme.colorScheme.onSurface);
 }
 
 MaterialColor _generateMaterialColor(Color color) {
