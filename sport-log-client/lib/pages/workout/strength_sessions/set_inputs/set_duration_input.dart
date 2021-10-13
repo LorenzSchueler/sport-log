@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/theme.dart';
-import 'package:sport_log/helpers/typedefs.dart';
-import 'package:sport_log/models/strength/strength_set.dart';
 import 'package:sport_log/pages/workout/strength_sessions/set_inputs/box_int_input.dart';
 
 class SetDurationInput extends StatefulWidget {
   const SetDurationInput({Key? key, required this.onNewSet}) : super(key: key);
 
-  final ChangeCallback<StrengthSet> onNewSet;
+  final void Function(int count, [double? weight]) onNewSet;
 
   @override
   _SetDurationInputState createState() => _SetDurationInputState();
@@ -48,7 +45,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
           seconds: _seconds,
           milliseconds: _milliseconds,
         );
-        print(duration);
+        widget.onNewSet(duration.inMilliseconds);
       },
     );
   }

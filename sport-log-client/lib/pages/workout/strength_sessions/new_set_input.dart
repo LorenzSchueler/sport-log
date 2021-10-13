@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/set_inputs/set_duration_input.dart';
 
@@ -11,7 +10,7 @@ class NewSetInput extends StatelessWidget {
   }) : super(key: key);
 
   final MovementDimension dimension;
-  final ChangeCallback<StrengthSet> onNewSet;
+  final void Function(int count, [double? weight]) onNewSet;
 
   @override
   Widget build(BuildContext context) {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
@@ -31,6 +32,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   late final StrengthSessionWithSets _session;
 
   final _commentsNode = FocusNode();
+  final _scrollController = ScrollController();
   late final StreamSubscription<bool> _keyboardSubscription;
 
   @override
@@ -60,6 +62,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
           Expanded(
             child: Scrollbar(
               child: SingleChildScrollView(
+                controller: _scrollController,
                 child: Column(
                   children: [
                     _movementInput,
@@ -78,7 +81,26 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
           ),
           NewSetInput(
             dimension: _session.movement.dimension,
-            onNewSet: (set) => setState(() => _session.sets.add(set)),
+            onNewSet: (count, [weight]) {
+              final newSet = StrengthSet(
+                id: randomId(),
+                strengthSessionId: _session.session.id,
+                setNumber: _session.sets.length,
+                count: count,
+                weight: weight,
+                deleted: false,
+              );
+              setState(() {
+                _session.sets.add(newSet);
+              });
+              Future.delayed(
+                  const Duration(milliseconds: 100),
+                  () => _scrollController.animateTo(
+                        _scrollController.position.maxScrollExtent,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.decelerate,
+                      ));
+            },
           ),
         ],
       ),
@@ -186,6 +208,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       ),
       leading: const Icon(Icons.edit),
       onCancel: () {
+        _commentsNode.unfocus();
         setState(() => _session.session.comments = null);
       },
     );
@@ -204,6 +227,9 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
           }
           final set = _session.sets.removeAt(oldIndex);
           _session.sets.insert(newIndex, set);
+          _session.sets.forEachIndexed((set, index) {
+            set.setNumber = index;
+          });
         });
       },
     );
