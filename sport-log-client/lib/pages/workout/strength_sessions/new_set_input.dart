@@ -20,7 +20,7 @@ class NewSetInput extends StatelessWidget {
         // TODO: Handle this case.
         break;
       case MovementDimension.time:
-        return const SetDurationInput();
+        return BottomAppBar(child: SetDurationInput(onNewSet: onNewSet));
       case MovementDimension.distance:
         // TODO: Handle this case.
         break;

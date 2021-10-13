@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/widgets/form_widgets/repeat_icon_button.dart';
 
@@ -36,7 +35,7 @@ class _DateFilterState extends State<DateFilter> {
 
   @override
   Widget build(BuildContext context) {
-    final onAppBar = appBarForegroundOf(context);
+    final onAppBar = Theme.of(context).appBarTheme.foregroundColor!;
     return Row(
       mainAxisAlignment: _state is NoFilter
           ? MainAxisAlignment.center
