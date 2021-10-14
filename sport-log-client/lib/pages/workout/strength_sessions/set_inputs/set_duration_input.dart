@@ -17,10 +17,10 @@ class _SetDurationInputState extends State<SetDurationInput> {
   int _seconds = 0;
   int _milliseconds = 0;
 
-  final _hoursKey = GlobalKey<BoxIntInputState>();
-  final _minutesKey = GlobalKey<BoxIntInputState>();
-  final _secondsKey = GlobalKey<BoxIntInputState>();
-  final _millisecondsKey = GlobalKey<BoxIntInputState>();
+  final _hoursKey = GlobalKey<IntInputState>();
+  final _minutesKey = GlobalKey<IntInputState>();
+  final _secondsKey = GlobalKey<IntInputState>();
+  final _millisecondsKey = GlobalKey<IntInputState>();
 
   void _submit() {
     final duration = Duration(
@@ -71,14 +71,14 @@ class _SetDurationInputState extends State<SetDurationInput> {
     return IconButton(
       icon: const Icon(Icons.check),
       color: isSubmittable ? primaryColorOf(context) : null,
-      iconSize: BoxIntInput.textFontSize,
+      iconSize: IntInput.textFontSize,
       onPressed: isSubmittable ? _submit : null,
     );
   }
 
   Widget get _timeInput {
     return DefaultTextStyle(
-      style: const TextStyle(fontSize: BoxIntInput.textFontSize),
+      style: const TextStyle(fontSize: IntInput.textFontSize),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -96,7 +96,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
   }
 
   Widget get _hoursInput {
-    return BoxIntInput(
+    return IntInput(
       key: _hoursKey,
       placeholder: 0,
       caption: 'h',
@@ -108,7 +108,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
   }
 
   Widget get _minutesInput {
-    return BoxIntInput(
+    return IntInput(
       key: _minutesKey,
       placeholder: 0,
       caption: 'm',
@@ -121,7 +121,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
   }
 
   Widget get _secondsInput {
-    return BoxIntInput(
+    return IntInput(
       key: _secondsKey,
       placeholder: 0,
       caption: 's',
@@ -133,7 +133,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
   }
 
   Widget get _millisecondsInput {
-    return BoxIntInput(
+    return IntInput(
       key: _millisecondsKey,
       placeholder: 0,
       caption: 'ms',

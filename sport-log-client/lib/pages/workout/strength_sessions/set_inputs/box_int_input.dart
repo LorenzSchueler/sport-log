@@ -6,8 +6,8 @@ import 'package:sport_log/helpers/extensions/text_editing_controller_extension.d
 import 'package:sport_log/helpers/typedefs.dart';
 
 /// Text Field with box that only accepts non-negative ints
-class BoxIntInput extends StatefulWidget {
-  const BoxIntInput({
+class IntInput extends StatefulWidget {
+  const IntInput({
     Key? key,
     required this.placeholder,
     required this.onChanged,
@@ -31,10 +31,10 @@ class BoxIntInput extends StatefulWidget {
   static const double textFontSize = 45;
 
   @override
-  BoxIntInputState createState() => BoxIntInputState();
+  IntInputState createState() => IntInputState();
 }
 
-class BoxIntInputState extends State<BoxIntInput> {
+class IntInputState extends State<IntInput> {
   static const double _widthPerDigit = 34;
 
   final _focusNode = FocusNode();
@@ -66,7 +66,7 @@ class BoxIntInputState extends State<BoxIntInput> {
             style: Theme.of(context)
                 .textTheme
                 .caption!
-                .copyWith(fontSize: BoxIntInput.captionFontSize),
+                .copyWith(fontSize: IntInput.captionFontSize),
           ),
           _textField,
         ],
@@ -100,7 +100,7 @@ class BoxIntInputState extends State<BoxIntInput> {
         contentPadding: EdgeInsets.zero,
       ),
       style: const TextStyle(
-        fontSize: BoxIntInput.textFontSize,
+        fontSize: IntInput.textFontSize,
       ),
       scrollPhysics: const NeverScrollableScrollPhysics(),
     );
