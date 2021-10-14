@@ -35,7 +35,7 @@ class BoxIntInput extends StatefulWidget {
 }
 
 class BoxIntInputState extends State<BoxIntInput> {
-  static const double _widthPerDigit = 33;
+  static const double _widthPerDigit = 34;
 
   final _focusNode = FocusNode();
   final _controller = TextEditingController();
@@ -47,7 +47,10 @@ class BoxIntInputState extends State<BoxIntInput> {
 
   void clear() {
     _controller.clear();
+    widget.onChanged(widget.placeholder);
   }
+
+  bool get hasFocus => _focusNode.hasFocus;
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +84,7 @@ class BoxIntInputState extends State<BoxIntInput> {
         }
       },
       focusNode: _focusNode,
+      onTap: requestFocus,
       textInputAction: TextInputAction.next,
       inputFormatters: [
         FilteringTextInputFormatter.digitsOnly,

@@ -22,6 +22,38 @@ class _SetDurationInputState extends State<SetDurationInput> {
   final _secondsKey = GlobalKey<BoxIntInputState>();
   final _millisecondsKey = GlobalKey<BoxIntInputState>();
 
+  void _submit() {
+    final duration = Duration(
+      hours: _hours,
+      minutes: _minutes,
+      seconds: _seconds,
+      milliseconds: _milliseconds,
+    );
+    widget.onNewSet(duration.inMilliseconds);
+
+    // clear all inputs
+    _hoursKey.currentState?.clear();
+    _minutesKey.currentState?.clear();
+    _secondsKey.currentState?.clear();
+    _millisecondsKey.currentState?.clear();
+
+    // request focus on the right input
+    if ((_hoursKey.currentState?.hasFocus ?? false) ||
+        (_minutesKey.currentState?.hasFocus ?? false) ||
+        (_secondsKey.currentState?.hasFocus ?? false) ||
+        (_millisecondsKey.currentState?.hasFocus ?? false)) {
+      if (duration.inHours != 0) {
+        _hoursKey.currentState?.requestFocus();
+      } else if (duration.inMinutes != 0) {
+        _minutesKey.currentState?.requestFocus();
+      } else if (duration.inSeconds != 0) {
+        _secondsKey.currentState?.requestFocus();
+      } else if (duration.inMilliseconds != 0) {
+        _millisecondsKey.currentState?.requestFocus();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -34,19 +66,13 @@ class _SetDurationInputState extends State<SetDurationInput> {
   }
 
   Widget get _addButton {
+    final isSubmittable =
+        _hours != 0 || _minutes != 0 || _seconds != 0 || _milliseconds != 0;
     return IconButton(
       icon: const Icon(Icons.check),
-      color: primaryColorOf(context),
+      color: isSubmittable ? primaryColorOf(context) : null,
       iconSize: BoxIntInput.textFontSize,
-      onPressed: () {
-        final duration = Duration(
-          hours: _hours,
-          minutes: _minutes,
-          seconds: _seconds,
-          milliseconds: _milliseconds,
-        );
-        widget.onNewSet(duration.inMilliseconds);
-      },
+      onPressed: isSubmittable ? _submit : null,
     );
   }
 
@@ -75,7 +101,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
       placeholder: 0,
       caption: 'h',
       numberOfDigits: 2,
-      onChanged: (value) => _hours = value,
+      onChanged: (value) => setState(() => _hours = value),
       onSubmitted: () => _minutesKey.currentState?.requestFocus(),
       submitOnDigitsReached: true,
     );
@@ -88,7 +114,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
       caption: 'm',
       numberOfDigits: 2,
       maxValue: 59,
-      onChanged: (value) => _minutes = value,
+      onChanged: (value) => setState(() => _minutes = value),
       onSubmitted: () => _secondsKey.currentState?.requestFocus(),
       submitOnDigitsReached: true,
     );
@@ -100,7 +126,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
       placeholder: 0,
       caption: 's',
       numberOfDigits: 2,
-      onChanged: (value) => _seconds = value,
+      onChanged: (value) => setState(() => _seconds = value),
       onSubmitted: () => _millisecondsKey.currentState?.requestFocus(),
       submitOnDigitsReached: true,
     );
@@ -112,7 +138,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
       placeholder: 0,
       caption: 'ms',
       numberOfDigits: 3,
-      onChanged: (value) => _milliseconds = value,
+      onChanged: (value) => setState(() => _milliseconds = value),
     );
   }
 }

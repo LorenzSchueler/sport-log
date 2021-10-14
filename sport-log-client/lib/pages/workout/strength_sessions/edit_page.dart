@@ -11,7 +11,6 @@ import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
-import 'package:sport_log/widgets/form_widgets/int_picker.dart';
 import 'package:sport_log/widgets/movement_picker.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 
@@ -241,14 +240,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       child: Row(
         children: [
           CircleAvatar(child: Text((index + 1).toString())),
-          IntPicker(
-            initialValue: set.count,
-            setValue: (value) {
-              setState(() {
-                _session.sets[index].count = value;
-              });
-            },
-          ),
+          Text(set.toDisplayName(_session.movement.dimension)),
           if (set.weight == null)
             ActionChip(
               label: const Text('Weight'),
