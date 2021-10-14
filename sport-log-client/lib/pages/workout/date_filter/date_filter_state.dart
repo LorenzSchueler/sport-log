@@ -1,5 +1,4 @@
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/formatting.dart';
 
 abstract class DateFilterState {
   const DateFilterState();

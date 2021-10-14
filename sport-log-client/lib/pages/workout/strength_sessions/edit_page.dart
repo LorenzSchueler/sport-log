@@ -111,7 +111,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       caption: 'Movement',
       child: Text(
           '${_session.movement.name} (${_session.movement.dimension.displayName})'),
-      leading: const Icon(CustomIcons.trending_up),
+      leading: const Icon(CustomIcons.trendingUp),
       onTap: () async {
         final maybeMovement = await showMovementPickerDialog(context);
         if (maybeMovement != null) {
@@ -183,7 +183,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         setDuration: (d) => setState(() => _session.session.interval = d),
         initialDuration: _session.session.interval!,
       ),
-      leading: const Icon(CustomIcons.time_interval),
+      leading: const Icon(CustomIcons.timeInterval),
       onCancel: () {
         setState(() => _session.session.interval = null);
       },

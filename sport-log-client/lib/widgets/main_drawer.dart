@@ -5,7 +5,6 @@ import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
-import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/routes.dart';
@@ -33,7 +32,7 @@ class MainDrawer extends StatelessWidget {
           ),
           ListTile(
             title: const Text('Workout'),
-            leading: const Icon(CustomIcons.dumbbell_rotated),
+            leading: const Icon(CustomIcons.dumbbellRotated),
             onTap: () {
               Nav.changeNamed(context, Routes.workout);
             },
@@ -55,7 +54,7 @@ class MainDrawer extends StatelessWidget {
             children: [
               ListTile(
                 title: const Text('Movements'),
-                leading: const Icon(CustomIcons.trending_up),
+                leading: const Icon(CustomIcons.trendingUp),
                 onTap: () => Nav.changeNamed(context, Routes.movement.overview),
                 selected: selectedRoute == Routes.movement.overview,
               ),

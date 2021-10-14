@@ -37,7 +37,7 @@ extension MovementDimensionStrings on MovementDimension {
   IconData get iconData {
     switch (this) {
       case MovementDimension.reps:
-        return CustomIcons.cw_1;
+        return CustomIcons.cwAlt;
       case MovementDimension.time:
         return CustomIcons.stopwatch;
       case MovementDimension.distance:
