@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/set_inputs/set_duration_input.dart';
+import 'package:sport_log/pages/workout/strength_sessions/set_inputs/set_reps_input.dart';
 
 class NewSetInput extends StatelessWidget {
   const NewSetInput({
@@ -16,8 +17,7 @@ class NewSetInput extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (dimension) {
       case MovementDimension.reps:
-        // TODO: Handle this case.
-        break;
+        return BottomAppBar(child: SetRepsInput(onNewSet: onNewSet));
       case MovementDimension.time:
         return BottomAppBar(child: SetDurationInput(onNewSet: onNewSet));
       case MovementDimension.distance:

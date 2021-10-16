@@ -14,9 +14,10 @@ class _CaptionTextField extends StatelessWidget {
     required this.caption,
     required this.placeholder,
     required this.formatFn,
-    required this.onSubmitted,
+    this.onSubmitted,
     required this.onTap,
     required this.width,
+    required this.scrollable,
   }) : super(key: key);
 
   final TextEditingController controller;
@@ -25,9 +26,13 @@ class _CaptionTextField extends StatelessWidget {
   final String caption;
   final String placeholder;
   final TextInputFormatFunction formatFn;
-  final VoidCallback onSubmitted;
+  final VoidCallback? onSubmitted;
   final VoidCallback onTap;
   final double width;
+  final bool scrollable;
+
+  static const double captionFontSize = 15;
+  static const double textFontSize = 45;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +48,7 @@ class _CaptionTextField extends StatelessWidget {
             style: Theme.of(context)
                 .textTheme
                 .caption!
-                .copyWith(fontSize: IntInput.captionFontSize),
+                .copyWith(fontSize: captionFontSize),
           ),
           _textField,
         ],
@@ -55,7 +60,11 @@ class _CaptionTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       onChanged: onChanged,
-      onSubmitted: (_) => onSubmitted(),
+      onSubmitted: (_) {
+        if (onSubmitted != null) {
+          onSubmitted!();
+        }
+      },
       focusNode: focusNode,
       onTap: onTap,
       textInputAction: TextInputAction.next,
@@ -71,22 +80,23 @@ class _CaptionTextField extends StatelessWidget {
         contentPadding: EdgeInsets.zero,
       ),
       style: const TextStyle(
-        fontSize: IntInput.textFontSize,
+        fontSize: textFontSize,
       ),
-      scrollPhysics: const NeverScrollableScrollPhysics(),
+      scrollPhysics: scrollable ? null : const NeverScrollableScrollPhysics(),
     );
   }
 }
 
 /// Text Field with box that only accepts non-negative ints
-class IntInput extends StatefulWidget {
-  const IntInput({
+class PaddedIntInput extends StatefulWidget {
+  const PaddedIntInput({
     Key? key,
     required this.placeholder,
     required this.onChanged,
     required this.caption,
     required this.numberOfDigits,
     this.submitOnDigitsReached = false,
+    // TODO: not necessary
     this.onSubmitted,
     this.maxValue,
   })  : assert(numberOfDigits > 0),
@@ -100,14 +110,13 @@ class IntInput extends StatefulWidget {
   final int? maxValue;
   final bool submitOnDigitsReached;
 
-  static const double captionFontSize = 15;
-  static const double textFontSize = 45;
+  static double get fontSize => _CaptionTextField.textFontSize;
 
   @override
-  IntInputState createState() => IntInputState();
+  PaddedIntInputState createState() => PaddedIntInputState();
 }
 
-class IntInputState extends State<IntInput> {
+class PaddedIntInputState extends State<PaddedIntInput> {
   static const double _widthPerDigit = 34;
 
   final _focusNode = FocusNode();
@@ -135,13 +144,10 @@ class IntInputState extends State<IntInput> {
       placeholder:
           widget.placeholder.toString().padLeft(widget.numberOfDigits, '0'),
       formatFn: _inputFormatter,
-      onSubmitted: () {
-        if (widget.onSubmitted != null) {
-          widget.onSubmitted!();
-        }
-      },
+      onSubmitted: widget.onSubmitted,
       width: _widthPerDigit * widget.numberOfDigits,
       onTap: requestFocus,
+      scrollable: false,
     );
   }
 
@@ -186,5 +192,79 @@ class IntInputState extends State<IntInput> {
       text: newText,
       selection: TextSelection.collapsed(offset: newText.length - cursorPos),
     );
+  }
+}
+
+class UnrestrictedIntInput extends StatefulWidget {
+  const UnrestrictedIntInput({
+    Key? key,
+    required this.placeholder,
+    required this.onChanged,
+    required this.caption,
+    required this.width,
+  }) : super(key: key);
+
+  final int placeholder;
+  final ChangeCallback<int> onChanged;
+  final String caption;
+  final double width;
+
+  static double get fontSize => _CaptionTextField.textFontSize;
+
+  @override
+  _UnrestrictedIntInputState createState() => _UnrestrictedIntInputState();
+}
+
+class _UnrestrictedIntInputState extends State<UnrestrictedIntInput> {
+  final _focusNode = FocusNode();
+  final _controller = TextEditingController();
+
+  void requestFocus() {
+    _focusNode.requestFocus();
+    _controller.selectAll();
+  }
+
+  void clear() {
+    _controller.clear();
+    widget.onChanged(widget.placeholder);
+  }
+
+  bool get hasFocus => _focusNode.hasFocus;
+
+  @override
+  Widget build(BuildContext context) {
+    return _CaptionTextField(
+      controller: _controller,
+      focusNode: _focusNode,
+      onChanged: _onChanged,
+      caption: widget.caption,
+      placeholder: widget.placeholder.toString(),
+      formatFn: _inputFormatter,
+      onTap: () => requestFocus(),
+      width: widget.width,
+      scrollable: true,
+    );
+  }
+
+  void _onChanged(String text) {
+    if (text.isEmpty) {
+      widget.onChanged(widget.placeholder);
+      return;
+    }
+    final value = int.parse(text);
+    widget.onChanged(value);
+  }
+
+  TextEditingValue _inputFormatter(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty || oldValue.text == newValue.text) {
+      return newValue;
+    }
+
+    final maybeValue = int.tryParse(newValue.text);
+    if (maybeValue == null) {
+      return oldValue;
+    }
+    return newValue;
   }
 }
