@@ -44,11 +44,20 @@ class CardioTrackingSettingsPageState
                 }),
             const Divider(),
             ListTile(
-              leading: const Icon(Icons.sports),
-              title: Text(_cardioType?.name ?? ""),
-              subtitle: const Text("cardio type"),
-              trailing: const Icon(Icons.edit),
-            ),
+                leading: const Icon(Icons.sports),
+                title: Text(_cardioType?.name ?? ""),
+                subtitle: const Text("cardio type"),
+                trailing: const Icon(Icons.edit),
+                onTap: () async {
+                  CardioType? cardioType = await showCardioTypePickerDialog(
+                    context,
+                    dismissable: false,
+                  );
+                  setState(() {
+                    _cardioType = cardioType;
+                  });
+                  _logger.i(_cardioType?.name);
+                }),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.map),
@@ -60,7 +69,7 @@ class CardioTrackingSettingsPageState
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 width: double.infinity,
                 child: ElevatedButton(
-                    onPressed: _movement != null
+                    onPressed: _movement != null && _cardioType != null
                         ? () => Navigator.of(context)
                             .pushNamed(Routes.cardio.tracking)
                         : null,
