@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/cardio_type_picker.dart';
 import 'package:sport_log/widgets/movement_picker.dart';
 
 class CardioTrackingSettingsPage extends StatefulWidget {
@@ -16,6 +17,11 @@ class CardioTrackingSettingsPageState
     extends State<CardioTrackingSettingsPage> {
   final _logger = Logger('CardioTrackingSettingsPage');
 
+  Movement? _movement;
+  CardioType? _cardioType;
+  Route? _route;
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -24,29 +30,40 @@ class CardioTrackingSettingsPageState
         body: Column(
           children: [
             ListTile(
-              leading: Icon(Icons.sports),
-              title: Text("???"),
-              subtitle: Text("movement"),
-              trailing: Icon(Icons.edit),
-            ),
+                leading: const Icon(Icons.sports),
+                title: Text(_movement?.name ?? ""),
+                subtitle: const Text("movement"),
+                trailing: const Icon(Icons.edit),
+                onTap: () async {
+                  Movement? movement = await showMovementPickerDialog(context,
+                      dismissable: false, cardioOnly: true);
+                  setState(() {
+                    _movement = movement;
+                  });
+                  _logger.i(_movement?.name);
+                }),
+            const Divider(),
             ListTile(
-              leading: Icon(Icons.sports),
-              title: Text("???"),
-              subtitle: Text("cardio type"),
-              trailing: Icon(Icons.edit),
+              leading: const Icon(Icons.sports),
+              title: Text(_cardioType?.name ?? ""),
+              subtitle: const Text("cardio type"),
+              trailing: const Icon(Icons.edit),
             ),
+            const Divider(),
             ListTile(
-              leading: Icon(Icons.map),
-              title: Text("???"),
-              subtitle: Text("follow route"),
-              trailing: Icon(Icons.edit),
+              leading: const Icon(Icons.map),
+              title: Text(_route?.name ?? ""),
+              subtitle: const Text("route to follow"),
+              trailing: const Icon(Icons.edit),
             ),
             Container(
-                padding: EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 width: double.infinity,
                 child: ElevatedButton(
-                    onPressed: () =>
-                        Navigator.of(context).pushNamed(Routes.cardio.tracking),
+                    onPressed: _movement != null
+                        ? () => Navigator.of(context)
+                            .pushNamed(Routes.cardio.tracking)
+                        : null,
                     child: const Text("OK"))),
           ],
         ));
