@@ -1,7 +1,7 @@
 import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pedometer/pedometer.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/data_provider/user_state.dart';
 import 'dart:async';
 import 'package:sport_log/helpers/id_generation.dart';
@@ -14,7 +14,13 @@ import 'package:sport_log/widgets/movement_picker.dart';
 enum TrackingMode { notStarted, tracking, paused, stopped }
 
 class CardioTrackingPage extends StatefulWidget {
-  const CardioTrackingPage({Key? key}) : super(key: key);
+  final Movement _movement;
+  final CardioType _cardioType;
+  Route? _route;
+
+  CardioTrackingPage(this._movement, this._cardioType, Route? _route,
+      {Key? key})
+      : super(key: key);
 
   @override
   State<CardioTrackingPage> createState() => CardioTrackingPageState();
@@ -39,8 +45,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   DateTime? _pauseTime;
   int _seconds = 0;
   String _time = "00:00:00";
-
-  late Movement _movement;
 
   Line? _line;
   List<Circle>? _circles;
@@ -75,8 +79,8 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     CardioSession(
       id: randomId(),
       userId: UserState.instance.currentUser!.id,
-      movementId: _movement.id,
-      cardioType: CardioType.training, //TODO
+      movementId: widget._movement.id,
+      cardioType: widget._cardioType,
       datetime: _startTime,
       distance: 0, //TODO
       ascent: _ascent.round(),
@@ -88,7 +92,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       cadence: _stepTimes,
       avgHeartRate: null,
       heartRate: null,
-      routeId: null,
+      routeId: widget._route?.id,
       comments: null, //TODO
       deleted: false,
     );
@@ -405,10 +409,6 @@ satelites: ${location.satelliteNumber}""";
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
-      _movement = await showMovementPickerDialog(context,
-          dismissable: false, cardioOnly: true) as Movement;
-    });
     _timer =
         Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateData());
   }

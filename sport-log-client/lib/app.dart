@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/theme.dart';
-import 'package:sport_log/models/metcon/metcon_description.dart';
-import 'package:sport_log/models/movement/movement_description.dart';
-import 'package:sport_log/models/strength/strength_session_description.dart';
+import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/cardio/route_planing_page.dart';
 import 'package:sport_log/pages/cardio/tracking_page.dart';
 import 'package:sport_log/pages/cardio/tracking_settings_page.dart';
@@ -80,7 +78,12 @@ class _AppState extends State<App> {
             }),
         Routes.cardio.tracking_settings: (_) =>
             const CardioTrackingSettingsPage(),
-        Routes.cardio.tracking: (_) => const CardioTrackingPage(),
+        Routes.cardio.tracking: (context) {
+          final List<dynamic> args =
+              ModalRoute.of(context)?.settings.arguments as List<dynamic>;
+          return CardioTrackingPage(
+              args[0] as Movement, args[1] as CardioType, args[2] as Route?);
+        },
         Routes.cardio.route_planning: (_) => const RoutePlanningPage(),
       },
       initialRoute: isAuthenticated ? Routes.workout : Routes.landing,

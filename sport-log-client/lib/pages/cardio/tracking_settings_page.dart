@@ -70,8 +70,9 @@ class CardioTrackingSettingsPageState
                 width: double.infinity,
                 child: ElevatedButton(
                     onPressed: _movement != null && _cardioType != null
-                        ? () => Navigator.of(context)
-                            .pushNamed(Routes.cardio.tracking)
+                        ? () => Navigator.of(context).pushNamed(
+                            Routes.cardio.tracking,
+                            arguments: [_movement!, _cardioType!, _route])
                         : null,
                     child: const Text("OK"))),
           ],
