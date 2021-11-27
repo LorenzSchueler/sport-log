@@ -1,7 +1,7 @@
 [package]
 name = "sport-log-action-provider-wodify-login"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 sport-log-types = { path = "../sport-log-types" }
