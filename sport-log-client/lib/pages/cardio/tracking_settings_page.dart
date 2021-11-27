@@ -4,6 +4,7 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/cardio_type_picker.dart';
 import 'package:sport_log/widgets/movement_picker.dart';
+import 'package:sport_log/widgets/route_picker.dart';
 
 class CardioTrackingSettingsPage extends StatefulWidget {
   const CardioTrackingSettingsPage({Key? key}) : super(key: key);
@@ -60,11 +61,20 @@ class CardioTrackingSettingsPageState
                 }),
             const Divider(),
             ListTile(
-              leading: const Icon(Icons.map),
-              title: Text(_route?.name ?? ""),
-              subtitle: const Text("route to follow"),
-              trailing: const Icon(Icons.edit),
-            ),
+                leading: const Icon(Icons.map),
+                title: Text(_route?.name ?? ""),
+                subtitle: const Text("route to follow"),
+                trailing: const Icon(Icons.edit),
+                onTap: () async {
+                  Route? route = await showRoutePickerDialog(
+                    context,
+                    dismissable: false,
+                  );
+                  setState(() {
+                    _route = route;
+                  });
+                  _logger.i(_cardioType?.name);
+                }),
             Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 width: double.infinity,
