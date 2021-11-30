@@ -48,7 +48,7 @@ int _generateCount(MovementDimension dim) {
   switch (dim) {
     case MovementDimension.reps:
       return random.integer(20, min: 1);
-    case MovementDimension.cals:
+    case MovementDimension.energy:
       return random.integer(3000, min: 50);
     case MovementDimension.distance:
       return random.integer(42000, min: 20);

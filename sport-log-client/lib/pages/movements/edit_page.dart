@@ -211,7 +211,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
         MovementDimension.reps,
         MovementDimension.time,
         MovementDimension.distance,
-        MovementDimension.cals
+        MovementDimension.energy
       ],
       getLabel: (dim) => dim.displayName,
       selectedItem: _md.movement.dimension,

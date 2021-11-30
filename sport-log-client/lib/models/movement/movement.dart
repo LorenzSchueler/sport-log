@@ -14,8 +14,8 @@ enum MovementDimension {
   time,
   @JsonValue("Distance")
   distance,
-  @JsonValue("Cal")
-  cals,
+  @JsonValue("Energy")
+  energy,
 }
 
 extension MovementDimensionStrings on MovementDimension {
@@ -23,8 +23,8 @@ extension MovementDimensionStrings on MovementDimension {
     switch (this) {
       case MovementDimension.reps:
         return "Reps";
-      case MovementDimension.cals:
-        return "Cals";
+      case MovementDimension.energy:
+        return "Energy";
       case MovementDimension.distance:
         return "Distance";
       case MovementDimension.time:
@@ -55,6 +55,7 @@ class Movement implements DbObject {
   bool cardio;
   @override
   bool deleted;
+  @JsonKey(name: 'movement_dimension')
   MovementDimension dimension;
 
   Movement.defaultValue(this.userId)
