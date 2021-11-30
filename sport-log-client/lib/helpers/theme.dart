@@ -21,7 +21,16 @@ ThemeData themeDataFromColors({
           secondaryVariant: _shadeColor(secondary, 0.4),
           brightness: brightness,
         );
+  final appBarBackgroundColor =
+      brightness == Brightness.light ? cs.primary : cs.surface;
   return ThemeData(
+    appBarTheme: AppBarTheme(
+      foregroundColor:
+          brightness == Brightness.light ? cs.onPrimary : cs.onSurface,
+      backgroundColor: appBarBackgroundColor
+    ),
+    bottomAppBarTheme: BottomAppBarTheme(color: appBarBackgroundColor),
+    bottomAppBarColor: appBarBackgroundColor,
     colorScheme: cs,
     primaryColor: cs.primary,
     primarySwatch: _generateMaterialColor(cs.primary),
@@ -38,6 +47,15 @@ ThemeData themeDataFromColors({
     dialogTheme: const DialogTheme(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(32)),
+      ),
+    ),
+    textTheme: const TextTheme(
+      caption: TextStyle(
+        fontWeight: FontWeight.w900,
+        fontSize: 15,
+      ),
+      subtitle1: TextStyle(
+        fontSize: 20,
       ),
     ),
   );
@@ -67,16 +85,24 @@ Color onSecondaryColorOf(BuildContext context) {
   return Theme.of(context).colorScheme.onSecondary;
 }
 
-Color disabledColorOf(BuildContext context) {
-  return Theme.of(context).disabledColor;
+Color surfaceColorOf(BuildContext context) {
+  return Theme.of(context).colorScheme.surface;
 }
 
-Color appBarForegroundOf(BuildContext context) {
-  final theme = Theme.of(context);
-  return theme.appBarTheme.foregroundColor ??
-      (theme.brightness == Brightness.light
-          ? theme.colorScheme.onPrimary
-          : theme.colorScheme.onSurface);
+Color onSurfaceColorOf(BuildContext context) {
+  return Theme.of(context).colorScheme.onSurface;
+}
+
+Color backgroundColorOf(BuildContext context) {
+  return Theme.of(context).colorScheme.background;
+}
+
+Color onBackgroundColorOf(BuildContext context) {
+  return Theme.of(context).colorScheme.onBackground;
+}
+
+Color disabledColorOf(BuildContext context) {
+  return Theme.of(context).disabledColor;
 }
 
 MaterialColor _generateMaterialColor(Color color) {

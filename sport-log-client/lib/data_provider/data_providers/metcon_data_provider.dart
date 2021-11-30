@@ -3,9 +3,14 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/helpers/diff_algorithm.dart';
+import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/metcon/all.dart';
 
 class MetconDataProvider extends DataProvider<MetconDescription> {
+  static final instance = MetconDataProvider._();
+  MetconDataProvider._();
+
   final metconApi = Api.instance.metcons;
   final metconMovementApi = Api.instance.metconMovements;
 
@@ -21,6 +26,7 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
     await metconDb.createSingle(object.metcon);
     await metconMovementDb
         .createMultiple(object.moves.map((mmd) => mmd.metconMovement).toList());
+    notifyListeners();
     metconApi.postFull(object).then((result) {
       if (result.isFailure) {
         handleApiError(result.failure);
@@ -36,6 +42,7 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
     // TODO: catch errors
     await metconMovementDb.deleteByMetcon(object.metcon.id);
     await metconDb.deleteSingle(object.metcon.id);
+    notifyListeners();
     // TODO: server deletes metcon movements automatically
     metconApi.deleteFull(object).then((result) {
       if (result.isFailure) {
@@ -121,60 +128,39 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
   Future<void> updateSingle(MetconDescription object) async {
     assert(object.isValid());
 
-    // update db
-    // TODO: use transaction
+    final oldMMovements = await metconMovementDb.getByMetcon(object.id);
+    final newMMovements = [...object.moves.map((m) => m.metconMovement)];
+
+    final diffing = diff(oldMMovements, newMMovements);
 
     await metconDb.updateSingle(object.metcon);
-
-    final oldMetconMovements =
-        await metconMovementDb.getByMetcon(object.metcon.id);
-    final oldIds = oldMetconMovements.map((mm) => mm.id).toList();
-    final newIds = object.moves.map((mmd) => mmd.metconMovement.id).toList();
-    List<MetconMovement> toCreate = [], toUpdate = [], toDelete = [];
-
-    // TODO: use faster algorithm
-    for (final mmd in object.moves) {
-      oldIds.contains(mmd.metconMovement.id)
-          ? toUpdate.add(mmd.metconMovement)
-          : toCreate.add(mmd.metconMovement);
-    }
-    for (final oldMetconMovement in oldMetconMovements) {
-      if (!newIds.contains(oldMetconMovement.id)) {
-        toDelete.add(oldMetconMovement);
-      }
-    }
-
-    await Future.wait([
-      metconMovementDb.updateMultiple(toUpdate),
-      metconMovementDb.deleteMultiple(toDelete),
-      metconMovementDb.createMultiple(toCreate),
-    ]);
-
-    // update server
+    await metconMovementDb.deleteMultiple(diffing.toDelete);
+    await metconMovementDb.updateMultiple(diffing.toUpdate);
+    await metconMovementDb.createMultiple(diffing.toCreate);
+    notifyListeners();
 
     final result1 = await metconApi.putSingle(object.metcon);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return;
-    } else {
-      metconDb.setSynchronized(object.metcon.id);
     }
-    final result2 = await metconMovementApi.putMultiple(toUpdate);
+    metconDb.setSynchronized(object.id);
+
+    for (final mm in diffing.toDelete) {
+      mm.deleted = true;
+    }
+    final result2 = await metconMovementApi
+        .putMultiple(diffing.toDelete + diffing.toUpdate);
     if (result2.isFailure) {
       handleApiError(result2.failure);
-      return;
     }
-    final result3 = await metconMovementApi.putMultiple(toDelete);
+
+    final result3 = await metconMovementApi.postMultiple(diffing.toCreate);
     if (result3.isFailure) {
       handleApiError(result3.failure);
       return;
     }
-    final result4 = await metconMovementApi.postMultiple(toCreate);
-    if (result4.isFailure) {
-      handleApiError(result4.failure);
-      return;
-    }
-    metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
+    metconMovementDb.setSynchronizedByMetcon(object.id);
   }
 
   @override
@@ -184,13 +170,24 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
       handleApiError(result1.failure);
       throw result1.failure;
     }
-    metconDb.upsertMultiple(result1.success);
+    await metconDb.upsertMultiple(result1.success, synchronized: true);
 
     final result2 = await metconMovementApi.getMultiple();
     if (result2.isFailure) {
       handleApiError(result2.failure);
+      notifyListeners();
       throw result2.failure;
     }
-    metconMovementDb.upsertMultiple(result2.success);
+    metconMovementDb
+        .upsertMultiple(result2.success, synchronized: true)
+        .then((_) => notifyListeners());
+  }
+
+  @override
+  Future<void> upsertPartOfAccountData(AccountData accountData) async {
+    await metconDb.upsertMultiple(accountData.metcons, synchronized: true);
+    await metconMovementDb.upsertMultiple(accountData.metconMovements,
+        synchronized: true);
+    notifyListeners();
   }
 }

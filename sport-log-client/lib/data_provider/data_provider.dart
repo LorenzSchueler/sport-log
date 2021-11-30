@@ -1,9 +1,12 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/typedefs.dart';
+import 'package:sport_log/models/account_data/account_data.dart';
 
 final _logger = Logger('DP');
 
@@ -13,7 +16,7 @@ void resultSink(Result<dynamic, dynamic> result) {
   }
 }
 
-abstract class DataProvider<T> {
+abstract class DataProvider<T> extends ChangeNotifier {
   Future<void> createSingle(T object);
 
   Future<void> updateSingle(T object);
@@ -24,17 +27,39 @@ abstract class DataProvider<T> {
 
   Future<void> pushToServer();
 
-  void handleApiError(ApiError error) {
-    _logger.w('Got an api error.', error);
+  /// only called if internet connection is needed
+  /// (call [handleApiError] with isCritical = true)
+  VoidCallback? _onNoInternetNeeded;
+
+  void handleApiError(ApiError error, {bool isCritical = false}) {
+    if (isCritical) {
+      _logger.e('Api error: ${error.toErrorMessage()}', error);
+      if (error == ApiError.noInternetConnection &&
+          _onNoInternetNeeded != null) {
+        _onNoInternetNeeded!();
+      } else {
+        throw error;
+      }
+    } else {
+      _logger.i('Api error: ${error.toErrorMessage()}');
+    }
+  }
+
+  void onNoInternetConnection(VoidCallback? callback) {
+    _onNoInternetNeeded = callback;
   }
 
   Future<void> doFullUpdate();
+
+  Future<void> upsertPartOfAccountData(AccountData accountData);
 }
 
 abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
   ApiAccessor<T> get api;
 
   DbAccessor<T> get db;
+
+  List<T> getFromAccountData(AccountData accountData);
 
   @override
   Future<List<T>> getNonDeleted() async => db.getNonDeleted();
@@ -77,7 +102,21 @@ abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
       handleApiError(result.failure);
       throw result.failure;
     }
-    await db.upsertMultiple(result.success);
+    await upsertMultiple(result.success, synchronized: true);
+  }
+
+  Future<void> upsertMultiple(List<T> objects,
+      {required bool synchronized}) async {
+    if (objects.isEmpty) {
+      return;
+    }
+    await db.upsertMultiple(objects, synchronized: synchronized);
+    notifyListeners();
+  }
+
+  @override
+  Future<void> upsertPartOfAccountData(AccountData accountData) async {
+    await upsertMultiple(getFromAccountData(accountData), synchronized: true);
   }
 }
 
@@ -90,7 +129,9 @@ mixin ConnectedMethods<T extends DbObject> on DataProviderImpl<T> {
       handleApiError(result.failure);
       throw result.failure;
     }
-    db.createSingle(object, isSynchronized: true);
+    db
+        .createSingle(object, isSynchronized: true)
+        .then((_) => notifyListeners());
   }
 
   @override
@@ -101,7 +142,9 @@ mixin ConnectedMethods<T extends DbObject> on DataProviderImpl<T> {
       handleApiError(result.failure);
       throw result.failure;
     }
-    db.updateSingle(object, isSynchronized: true);
+    db
+        .updateSingle(object, isSynchronized: true)
+        .then((_) => notifyListeners());
   }
 
   @override
@@ -111,7 +154,9 @@ mixin ConnectedMethods<T extends DbObject> on DataProviderImpl<T> {
       handleApiError(result.failure);
       throw result.failure;
     }
-    db.deleteSingle(object.id, isSynchronized: true);
+    db
+        .deleteSingle(object.id, isSynchronized: true)
+        .then((_) => notifyListeners());
   }
 }
 
@@ -121,6 +166,7 @@ mixin UnconnectedMethods<T extends DbObject> on DataProviderImpl<T> {
     assert(object.isValid());
     // TODO: catch errors
     await db.createSingle(object);
+    notifyListeners();
     api.postSingle(object).then((result) {
       if (result.isFailure) {
         // TODO: what if request fails due to conflict (when connected to internet)?
@@ -136,6 +182,7 @@ mixin UnconnectedMethods<T extends DbObject> on DataProviderImpl<T> {
     assert(object.isValid());
     // TODO: catch errors
     await db.updateSingle(object);
+    notifyListeners();
     api.putSingle(object).then((result) {
       if (result.isFailure) {
         handleApiError(result.failure);
@@ -149,6 +196,7 @@ mixin UnconnectedMethods<T extends DbObject> on DataProviderImpl<T> {
   Future<void> deleteSingle(T object) async {
     // TODO: catch errors
     await db.deleteSingle(object.id);
+    notifyListeners();
     api.putSingle(object..deleted = true).then((result) {
       if (result.isFailure) {
         handleApiError(result.failure);

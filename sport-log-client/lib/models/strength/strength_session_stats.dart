@@ -1,10 +1,69 @@
+import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/models/movement/movement.dart';
+
 import 'strength_set.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/database/keys.dart';
 
 class StrengthSessionStats {
-  StrengthSessionStats({
-    required this.datetime,
+  /// list of sets cannot be empty
+  factory StrengthSessionStats.fromStrengthSets({
+    required List<StrengthSet> sets,
+    required DateTime dateTime,
+  }) {
+    assert(sets.isNotEmpty);
+    int? minCount;
+    int? maxCount;
+    int sumCount = 0;
+    double? maxEorm;
+    double? maxWeight;
+    double? sumVolume;
+
+    for (final set in sets) {
+      if (minCount == null || set.count < minCount) {
+        minCount = set.count;
+      }
+      if (maxCount == null || set.count > maxCount) {
+        maxCount = set.count;
+      }
+      sumCount += set.count;
+      final eorm = set.eorm;
+      if (eorm != null) {
+        if (maxEorm == null || eorm > maxEorm) {
+          maxEorm = eorm;
+        }
+      }
+      final volume = set.volume;
+      if (volume != null) {
+        if (sumVolume == null) {
+          sumVolume = volume;
+        } else {
+          sumVolume += volume;
+        }
+      }
+      final weight = set.weight;
+      if (weight != null) {
+        if (maxWeight == null) {
+          maxWeight = weight;
+        } else {
+          maxWeight += weight;
+        }
+      }
+    }
+    return StrengthSessionStats._(
+      dateTime: dateTime,
+      numSets: sets.length,
+      minCount: minCount!,
+      maxCount: maxCount!,
+      sumCount: sumCount,
+      maxEorm: maxEorm,
+      sumVolume: sumVolume,
+      maxWeight: maxWeight,
+    );
+  }
+
+  StrengthSessionStats._({
+    required this.dateTime,
     required this.numSets,
     required this.minCount,
     required this.maxCount,
@@ -14,7 +73,7 @@ class StrengthSessionStats {
     required this.maxWeight,
   });
 
-  DateTime datetime;
+  DateTime dateTime;
   int numSets;
   int minCount;
   int maxCount;
@@ -23,38 +82,7 @@ class StrengthSessionStats {
   double? sumVolume;
   double? maxWeight;
 
-  void updateWithStrengthSet(StrengthSet set) {
-    numSets += 1;
-    if (minCount < 0 || set.count < minCount) {
-      minCount = set.count;
-    }
-    if (maxCount < 0 || set.count > maxCount) {
-      maxCount = set.count;
-    }
-    sumCount += set.count;
-    final eorm = set.eorm;
-    if (eorm != null) {
-      if (maxEorm == null || eorm > maxEorm!) {
-        maxEorm = eorm;
-      }
-    }
-    final volume = set.volume;
-    if (volume != null) {
-      if (sumVolume == null) {
-        sumVolume = volume;
-      } else {
-        sumVolume = sumVolume! + volume;
-      }
-    }
-    final weight = set.weight;
-    if (weight != null) {
-      if (maxWeight == null) {
-        maxWeight = weight;
-      } else {
-        maxWeight = maxWeight! + weight;
-      }
-    }
-  }
+  double get avgCount => sumCount / numSets;
 
   static const allColumns = [
     Keys.datetime,
@@ -68,7 +96,7 @@ class StrengthSessionStats {
   ];
 
   StrengthSessionStats.fromDbRecord(DbRecord r)
-      : datetime = DateTime.parse(r[Keys.datetime]! as String),
+      : dateTime = DateTime.parse(r[Keys.datetime]! as String),
         numSets = r[Keys.numSets]! as int,
         minCount = r[Keys.minCount]! as int,
         maxCount = r[Keys.maxCount]! as int,
@@ -80,7 +108,7 @@ class StrengthSessionStats {
   // this is only for debugging/pretty-printing
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      Keys.datetime: datetime,
+      Keys.datetime: dateTime,
       Keys.numSets: numSets,
       Keys.minCount: minCount,
       Keys.maxCount: maxCount,
@@ -89,5 +117,23 @@ class StrengthSessionStats {
       Keys.maxWeight: maxWeight,
       Keys.sumVolume: sumVolume,
     };
+  }
+
+  String toDisplayName(MovementDimension dimension) {
+    switch (dimension) {
+      case MovementDimension.reps:
+        return [
+          if (maxEorm != null) '1RM: ${roundedWeight(maxEorm!)}',
+          if (sumVolume != null) 'Vol: ${roundedWeight(sumVolume!)}',
+          if (maxWeight != null) 'Max Weight: ${roundedWeight(maxWeight!)}',
+          'Avg Reps: ${roundedValue(avgCount)}',
+        ].join(' • ');
+      case MovementDimension.time:
+        return 'Best time: ${formatDuration(Duration(milliseconds: minCount))}';
+      case MovementDimension.distance:
+        return 'Best distance: ${formatDistance(maxCount)}';
+      case MovementDimension.energy:
+        return 'Total energy: ${sumCount}cals';
+    }
   }
 }

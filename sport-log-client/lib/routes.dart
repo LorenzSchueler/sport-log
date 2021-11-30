@@ -3,10 +3,10 @@ abstract class Routes {
   static const login = '/login';
   static const registration = '/register';
   static const workout = '/workout';
-  static const editStrengthSession = '/edit-strength-session';
   static const metcon = _MetconRoutes();
   static const movement = _MovementRoutes();
   static const cardio = _CardioRoutes();
+  static const strength = _StrengthRoutes();
 }
 
 class _MetconRoutes {
@@ -31,4 +31,11 @@ class _CardioRoutes {
   final String tracking = '/cardio/tracking';
   final String route_planning = '/cardio/route_planning';
   final String data_input = '/cardio/data_input';
+}
+
+class _StrengthRoutes {
+  const _StrengthRoutes();
+
+  final String details = '/strength/details';
+  final String edit = '/strength/edit';
 }

@@ -29,19 +29,18 @@ class WeekChart extends StatefulWidget {
 }
 
 class _WeekChartState extends State<WeekChart> {
-  final _dataProvider = StrengthDataProvider();
+  final _dataProvider = StrengthDataProvider.instance;
 
   List<StrengthSessionStats> _stats = [];
-  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _dataProvider.addListener(update);
     update();
   }
 
   void update() {
-    setState(() => isLoading = true);
     _dataProvider
         .getStatsByDay(
       movementId: widget.movement.id,
@@ -51,10 +50,7 @@ class _WeekChartState extends State<WeekChart> {
         .then((stats) {
       assert(stats.length <= 7);
       if (mounted) {
-        setState(() {
-          _stats = stats;
-          isLoading = false;
-        });
+        setState(() => _stats = stats);
       }
     });
   }
@@ -77,7 +73,7 @@ class _WeekChartState extends State<WeekChart> {
     for (int i = 0; i < 7; ++i) {
       if (statIndex < _stats.length &&
           _stats[statIndex]
-              .datetime
+              .dateTime
               .isOnDay(widget.start.add(Duration(days: i)))) {
         result.add(BarChartGroupData(x: i, barRods: [
           BarChartRodData(
@@ -95,12 +91,6 @@ class _WeekChartState extends State<WeekChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_stats.isEmpty) {
-      return const Center(child: Text('Nothing to show here.'));
-    }
     final isTime = widget.movement.dimension == MovementDimension.time;
     return BarChart(BarChartData(
       barGroups: _barData,
@@ -127,5 +117,11 @@ class _WeekChartState extends State<WeekChart> {
         getDrawingVerticalLine: gridLineDrawer(context),
       ),
     ));
+  }
+
+  @override
+  void dispose() {
+    _dataProvider.removeListener(update);
+    super.dispose();
   }
 }

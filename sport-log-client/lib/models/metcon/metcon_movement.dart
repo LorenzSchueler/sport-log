@@ -7,7 +7,18 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'metcon_movement.g.dart';
 
-enum DistanceUnit { m, km, yards, feet, inches }
+enum DistanceUnit {
+  @JsonValue('Meter')
+  m,
+  @JsonValue('Km')
+  km,
+  @JsonValue('Yard')
+  yards,
+  @JsonValue('Foot')
+  feet,
+  @JsonValue('Mile')
+  miles,
+}
 
 @JsonSerializable()
 class MetconMovement implements DbObject {

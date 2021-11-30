@@ -54,7 +54,7 @@ abstract class DbAccessor<T extends DbObject> {
           where: '${Keys.deleted} = 0 AND ${Keys.id} = ?',
           whereArgs: [object.id.toInt()]);
     }
-    await batch.commit(noResult: true, continueOnError: true);
+    await batch.commit(noResult: true, continueOnError: false);
   }
 
   Future<void> updateSingle(T object, {bool isSynchronized = false}) async {
@@ -83,7 +83,7 @@ abstract class DbAccessor<T extends DbObject> {
         whereArgs: [object.id.toInt()],
       );
     }
-    await batch.commit(noResult: true, continueOnError: true);
+    await batch.commit(noResult: true, continueOnError: false);
   }
 
   Future<void> createSingle(T object, {bool isSynchronized = false}) async {
@@ -102,7 +102,7 @@ abstract class DbAccessor<T extends DbObject> {
         if (isSynchronized) Keys.syncStatus: SyncStatus.synchronized.index,
       });
     }
-    await batch.commit(noResult: true, continueOnError: true);
+    await batch.commit(noResult: true, continueOnError: false);
   }
 
   Future<List<T>> getNonDeleted() async {
@@ -140,45 +140,19 @@ abstract class DbAccessor<T extends DbObject> {
         where: '${Keys.syncStatus} = ${SyncStatus.created.index}');
   }
 
-  Future<void> upsertMultiple(List<T> objects) async {
+  Future<void> upsertMultiple(List<T> objects,
+      {required bool synchronized}) async {
     final batch = database.batch();
     for (final object in objects) {
       // TODO: what it sync_status == 1 or sync_status == 2?
-      batch.insert(tableName, serde.toDbRecord(object),
+      batch.insert(
+          tableName,
+          {
+            ...serde.toDbRecord(object),
+            if (synchronized) Keys.syncStatus: SyncStatus.synchronized.index,
+          },
           conflictAlgorithm: ConflictAlgorithm.replace);
     }
-    await batch.commit(noResult: true, continueOnError: true);
-  }
-}
-
-mixin DateTimeMethods<T extends DbObjectWithDateTime> on DbAccessor<T> {
-  Future<DateTime?> earliestDateTime() async {
-    final result = await database.query(tableName,
-        where: '${Keys.deleted} = 0',
-        orderBy: 'datetime(${Keys.datetime}) ASC',
-        limit: 1);
-    if (result.isEmpty) {
-      return null;
-    }
-    return serde.fromDbRecord(result.first).datetime;
-  }
-
-  Future<DateTime?> mostRecentDateTime() async {
-    final result = await database.query(tableName,
-        where: '${Keys.deleted} = 0',
-        orderBy: 'datetime(${Keys.datetime}) DESC',
-        limit: 1);
-    if (result.isEmpty) {
-      return null;
-    }
-    return serde.fromDbRecord(result.first).datetime;
-  }
-
-  Future<List<T>> getBetweenDates(DateTime earliest, DateTime latest) async {
-    final result = await database.query(tableName,
-        where: '${Keys.deleted} = 0 AND ${Keys.datetime} BETWEEN ? AND ?',
-        whereArgs: [earliest.toString(), latest.toString()],
-        orderBy: 'datetime(${Keys.datetime}) DESC');
-    return result.map(serde.fromDbRecord).toList();
+    await batch.commit(noResult: true, continueOnError: false);
   }
 }

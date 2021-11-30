@@ -19,7 +19,7 @@ class MovementsPage extends StatefulWidget {
 }
 
 class _MovementsPageState extends State<MovementsPage> {
-  final _dataProvider = MovementDataProvider();
+  final _dataProvider = MovementDataProvider.instance;
   List<MovementDescription> _movementDescriptions = [];
 
   @override

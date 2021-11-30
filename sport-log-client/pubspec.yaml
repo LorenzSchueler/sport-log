@@ -51,6 +51,10 @@ dependencies:
   flutter_rounded_date_picker: ^2.0.2 # ui (standard time picker has a weird clock division)
   logger: ^1.0.0
   fl_chart: ^0.40.0
+  hive: ^2.0.4
+  hive_flutter: ^1.1.0
+  fluttertoast: ^8.0.8
+  flutter_keyboard_visibility: ^5.0.3
 
   mapbox_gl: ^0.12.0 # mapping lib for osm
   mapbox_api: ^1.0.0

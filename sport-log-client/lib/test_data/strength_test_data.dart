@@ -32,7 +32,7 @@ Future<List<StrengthSession>> generateStrengthSessions(Int64 userId) async {
                 random.integer(24), random.integer(60), random.integer(60)),
             movementId: movement.id,
             interval: random.integer(2) == 0
-                ? Duration(minutes: random.integer(90, min: 10)).inSeconds
+                ? Duration(minutes: random.integer(90, min: 10))
                 : null,
             comments: random.integer(2) == 0 ? faker.lorem.sentence() : null,
             deleted: false,
@@ -69,7 +69,7 @@ double? _generateWeight(MovementDimension dim) {
 
 Future<List<StrengthSet>> generateStrengthSets() async {
   final sessions =
-      await AppDatabase.instance!.strengthSessions.getNonDeletedDescriptions();
+      await AppDatabase.instance!.strengthSessions.getSessionsWithMovements();
 
   List<StrengthSet> result = [];
 
@@ -78,7 +78,7 @@ Future<List<StrengthSet>> generateStrengthSets() async {
     for (int i = 0; i < numberOfSets; ++i) {
       result.add(StrengthSet(
         id: randomId(),
-        strengthSessionId: session.id,
+        strengthSessionId: session.session.id,
         setNumber: i,
         count: _generateCount(session.movement.dimension),
         weight: _generateWeight(session.movement.dimension),

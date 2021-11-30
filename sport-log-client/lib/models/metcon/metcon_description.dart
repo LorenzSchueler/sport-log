@@ -43,4 +43,6 @@ class MetconDescription implements Validatable {
       move.metconMovement.deleted = true;
     }
   }
+
+  Int64 get id => metcon.id;
 }

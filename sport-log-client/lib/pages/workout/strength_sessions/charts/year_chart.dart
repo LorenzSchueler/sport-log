@@ -29,19 +29,18 @@ class YearChart extends StatefulWidget {
 }
 
 class _YearChartState extends State<YearChart> {
-  final _dataProvider = StrengthDataProvider();
+  final _dataProvider = StrengthDataProvider.instance;
 
   List<StrengthSessionStats> _stats = [];
-  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _dataProvider.addListener(update);
     update();
   }
 
   void update() {
-    setState(() => isLoading = true);
     _dataProvider
         .getStatsByWeek(
       movementId: widget.movement.id,
@@ -51,10 +50,7 @@ class _YearChartState extends State<YearChart> {
         .then((stats) {
       assert(stats.length <= 54);
       if (mounted) {
-        setState(() {
-          _stats = stats;
-          isLoading = false;
-        });
+        setState(() => _stats = stats);
       }
     });
   }
@@ -71,12 +67,6 @@ class _YearChartState extends State<YearChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_stats.isEmpty) {
-      return const Center(child: Text('Nothing to show here.'));
-    }
     final getValue = statsAccessor(widget.series);
     final isTime = widget.movement.dimension == MovementDimension.time;
     return LineChart(
@@ -85,7 +75,7 @@ class _YearChartState extends State<YearChart> {
           LineChartBarData(
             spots: _stats.map((s) {
               return FlSpot(
-                  (s.datetime.difference(widget.start).inDays + 1).toDouble(),
+                  (s.dateTime.difference(widget.start).inDays + 1).toDouble(),
                   getValue(s));
             }).toList(),
             colors: [primaryColorOf(context)],
@@ -129,5 +119,11 @@ class _YearChartState extends State<YearChart> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _dataProvider.removeListener(update);
+    super.dispose();
   }
 }

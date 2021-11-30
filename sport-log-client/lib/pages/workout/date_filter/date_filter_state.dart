@@ -1,5 +1,4 @@
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/formatting.dart';
 
 abstract class DateFilterState {
   const DateFilterState();
@@ -49,15 +48,7 @@ class DayFilter extends DateFilterState {
   DayFilter get later => DayFilter._(end);
 
   @override
-  String get label {
-    final today = DateTime.now().beginningOfDay();
-    if (today.isAtSameMomentAs(start)) return 'Today';
-    if (today.subtract(const Duration(days: 1)).isAtSameMomentAs(start)) {
-      return 'Yesterday';
-    }
-    if (today.isInYear(start)) return dateWithoutYear.format(start);
-    return dateWithYear.format(start);
-  }
+  String get label => start.toHumanDay();
 
   @override
   String get name => 'Today';
@@ -83,18 +74,7 @@ class WeekFilter extends DateFilterState {
   WeekFilter get later => WeekFilter._(end);
 
   @override
-  String get label {
-    final now = DateTime.now();
-    if (now.isInWeek(start)) return 'This week';
-    if (now.weekEarlier().isInWeek(start)) return 'Last week';
-    final lastDay = end.dayEarlier();
-    if (now.isInYear(start) && now.isInYear(lastDay)) {
-      return dateWithoutYear.format(start) +
-          ' - ' +
-          dateWithoutYear.format(lastDay);
-    }
-    return dateWithYear.format(start) + ' - ' + dateWithYear.format(lastDay);
-  }
+  String get label => start.toHumanWeek();
 
   @override
   String get name => 'This Week';
@@ -120,13 +100,7 @@ class MonthFilter extends DateFilterState {
   MonthFilter get later => MonthFilter._(end);
 
   @override
-  String get label {
-    final now = DateTime.now();
-    if (now.isInMonth(start)) return 'This month';
-    if (now.monthEarlier().isInMonth(start)) return 'Last month';
-    if (now.isInYear(start)) return monthName.format(start);
-    return monthWithYear.format(start);
-  }
+  String get label => start.toHumanMonth();
 
   @override
   String get name => 'This Month';
@@ -152,12 +126,7 @@ class YearFilter extends DateFilterState {
   YearFilter get later => YearFilter._(end);
 
   @override
-  String get label {
-    final now = DateTime.now();
-    if (now.isInYear(start)) return 'This year';
-    if (now.yearEarlier().isInYear(start)) return 'Last year';
-    return start.year.toString();
-  }
+  String get label => start.toHumanYear();
 
   @override
   String get name => 'This Year';

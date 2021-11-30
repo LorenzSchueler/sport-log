@@ -1,15 +1,15 @@
-import 'package:expansion_tile_card/expansion_tile_card.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/ui_cubit.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/routes.dart';
 
 import 'strength_chart.dart';
 
@@ -23,27 +23,37 @@ class StrengthSessionsPage extends StatefulWidget {
 }
 
 class StrengthSessionsPageState extends State<StrengthSessionsPage> {
-  final _dataProvider = StrengthDataProvider();
+  final _dataProvider = StrengthDataProvider.instance;
   final _logger = Logger('StrengthSessionsPage');
-  List<StrengthSessionDescription> _ssds = [];
+  List<StrengthSessionWithStats> _sessions = [];
 
   @override
   void initState() {
     super.initState();
-    final state = context.read<SessionsUiCubit>().state;
-    update(state);
+    _dataProvider.addListener(update);
+    _dataProvider.onNoInternetConnection(
+        () => showSimpleSnackBar(context, 'No Internet connection.'));
+    update();
   }
 
-  Future<void> update(SessionsUiState state) async {
+  @override
+  void dispose() {
+    _dataProvider.removeListener(update);
+    _dataProvider.onNoInternetConnection(null);
+    super.dispose();
+  }
+
+  Future<void> update([SessionsUiState? uiState]) async {
+    final state = uiState ?? context.read<SessionsUiCubit>().state;
     _logger.d(
         'Updating strength sessions with start = ${state.dateFilter.start}, end = ${state.dateFilter.end}');
     _dataProvider
         .getSessionsWithStats(
             from: state.dateFilter.start,
             until: state.dateFilter.end,
-            movementName: state.movement?.name)
+            movementId: state.movement?.id)
         .then((ssds) async {
-      setState(() => _ssds = ssds);
+      setState(() => _sessions = ssds);
     });
   }
 
@@ -54,128 +64,83 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   }
 
   // full update (from server)
-  Future<void> _refreshPage(SessionsUiState state) async {
+  Future<void> _refreshPage() async {
     await _dataProvider.doFullUpdate().onError((error, stackTrace) {
       if (error is ApiError) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
       }
     });
-    update(state);
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<SessionsUiCubit, SessionsUiState>(
-        builder: (context, state) => RefreshIndicator(
-              onRefresh: () => _refreshPage(state),
-              child: _buildStrengthSessionList(state),
-            ),
-        listenWhen: (oldState, newState) {
-          return newState.isStrengthPage &&
-              (oldState.dateFilter != newState.dateFilter ||
-                  oldState.movement != newState.movement);
-        },
-        listener: (context, state) {
-          update(state);
-        });
-  }
-
-  Widget _chart(SessionsUiState state) {
-    if (!state.isMovementSelected) {
-      return const SizedBox.shrink();
-    }
-    return const StrengthChart();
-  }
-
-  Widget _buildStrengthSessionList(SessionsUiState state) {
-    if (_ssds.isEmpty) {
-      return const Center(child: Text('No strength sessions there.'));
-    }
-    return Scrollbar(
-      child: ListView.builder(
-        itemBuilder: (_, index) => _strengthSessionBuilder(state, index),
-        itemCount: _ssds.length + 1,
-        shrinkWrap: true,
-      ),
+      listenWhen: (oldState, newState) {
+        return newState.isStrengthPage &&
+            (oldState.dateFilter != newState.dateFilter ||
+                oldState.movement != newState.movement);
+      },
+      listener: (context, state) {
+        update(state);
+      },
+      buildWhen: (oldState, newState) {
+        return newState.isStrengthPage &&
+            (oldState.dateFilter != newState.dateFilter ||
+                oldState.movement != newState.movement);
+      },
+      builder: (context, state) {
+        return RefreshIndicator(
+          onRefresh: _refreshPage,
+          child: CustomScrollView(
+            slivers: [
+              if (_sessions.isEmpty)
+                const SliverFillRemaining(
+                  child: Center(child: Text('No data :(')),
+                ),
+              if (_sessions.isNotEmpty && state.isMovementSelected)
+                const SliverToBoxAdapter(
+                  child: StrengthChart(),
+                ),
+              if (_sessions.isNotEmpty)
+                SliverList(
+                  delegate: state.isMovementSelected
+                      ? SliverChildBuilderDelegate(
+                          (context, index) => _sessionToWidgetWithMovement(
+                              _sessions[index], index),
+                          childCount: _sessions.length,
+                        )
+                      : SliverChildBuilderDelegate(
+                          (context, index) => _sessionToWidgetWithoutMovement(
+                              _sessions[index], index),
+                          childCount: _sessions.length),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  // TODO: put into seperate widget
-  Widget _strengthSessionBuilder(SessionsUiState state, int index) {
-    if (index == 0) {
-      assert(_ssds.isNotEmpty);
-      return _chart(state);
-    }
-    index--;
-    final ssd = _ssds[index];
-    final String date =
-        DateFormat('dd.MM.yyyy').format(ssd.strengthSession.datetime);
-    final String time =
-        DateFormat('HH:mm').format(ssd.strengthSession.datetime);
-    final String? duration = ssd.strengthSession.interval == null
-        ? null
-        : formatDuration(Duration(seconds: ssd.strengthSession.interval!));
-    final sets = ssd.stats!.numSets.toString() + ' sets';
-    final String title =
-        state.isMovementSelected ? [date, time].join(' · ') : ssd.movement.name;
-    final subtitleParts = state.isMovementSelected
-        ? [sets, if (duration != null) duration]
-        : [date, time, sets, if (duration != null) duration];
-    final subtitle = subtitleParts.join(' · ');
-    final String text = ssd.strengthSets
-            ?.map((ss) => ss.toDisplayName(ssd.movement.dimension))
-            .join(', ') ??
-        '';
+  Widget _sessionToWidgetWithMovement(StrengthSessionWithStats s, int index) {
+    return ListTile(
+      title: Text(
+          '${s.session.datetime.toHumanWithTime()} • ${s.stats.numSets} ${plural('set', 'sets', s.stats.numSets)}'),
+      subtitle: Text(s.stats.toDisplayName(s.movement.dimension)),
+      onTap: () => Navigator.of(context)
+          .pushNamed(Routes.strength.details, arguments: s.session.id),
+    );
+  }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-      child: ExpansionTileCard(
-        // dirty fix for forcing an expansion tile card to be non-expanded at the start
-        // (without it, an expanded card might show an everloading circular progress indicator)
-        key:
-            ValueKey(Object.hash(ssd.id, state.dateFilter, state.movement?.id)),
-        leading: CircleAvatar(child: Text(ssd.movement.name[0])),
-        title: Text(title),
-        subtitle: Text(subtitle),
-        children: [
-          const Divider(),
-          ssd.strengthSets == null
-              ? const CircularProgressIndicator()
-              : Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  child: Text(text),
-                ),
-          const Divider(),
-          if (ssd.strengthSession.comments != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              child: Text(ssd.strengthSession.comments!),
-            ),
-          if (ssd.strengthSession.comments != null) const Divider(),
-          ButtonBar(
-            alignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                onPressed: () {}, // TODO
-                icon: const Icon(Icons.delete),
-              ),
-              IconButton(
-                onPressed: () {}, // TODO
-                icon: const Icon(Icons.edit),
-              ),
-            ],
-          ),
-        ],
-        onExpansionChanged: (expanded) async {
-          if (expanded && ssd.strengthSets == null) {
-            ssd.strengthSets =
-                await _dataProvider.getStrengthSetsByStrengthSession(ssd.id);
-            setState(() {});
-          }
-        },
-      ),
+  Widget _sessionToWidgetWithoutMovement(
+      StrengthSessionWithStats s, int index) {
+    return ListTile(
+      leading: Icon(s.movement.dimension.iconData),
+      title: Text(s.movement.name),
+      subtitle: Text(
+          '${s.session.datetime.toHumanWithTime()} • ${s.stats.numSets} ${plural('set', 'sets', s.stats.numSets)}'),
+      onTap: () => Navigator.of(context)
+          .pushNamed(Routes.strength.details, arguments: s.session.id),
     );
   }
 }

@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:sport_log/models/all.dart';
 
 String formatDuration(Duration d) {
@@ -62,12 +61,6 @@ String plural(String singular, String plural, int count) {
   return (count == 1) ? singular : plural;
 }
 
-final dateWithoutYear = DateFormat('dd.MM.');
-final dateWithYear = DateFormat('dd.MM.yyyy');
-final monthName = DateFormat.MMMM();
-final monthWithYear = DateFormat('MMMM yyyy');
-final dateTimeFull = DateFormat('dd.MM.yyyy HH:mm');
-
 const _shortMonthNames = [
   'Jan',
   'Feb',
@@ -121,21 +114,32 @@ String formatDistance(int meters) {
   return '${meters}m';
 }
 
+String roundedValue(double value) {
+  // TODO: not quite right
+  if (value % 1 == 0) {
+    return value.toString();
+  }
+  return value.toStringAsFixed(1);
+}
+
+String roundedWeight(double weight) {
+  return roundedValue(weight) + 'kg';
+}
+
 String formatCountWeight(MovementDimension dim, int count, double? weight) {
-  final weightStr = weight == null
-      ? null
-      : ((weight * 10).roundToDouble() / 10).toString() + 'kg';
   switch (dim) {
     case MovementDimension.reps:
-      return weight != null ? '${count}x$weightStr' : '${count}reps';
+      return weight != null
+          ? '$count x ${roundedWeight(weight)}'
+          : '${count}reps';
     case MovementDimension.time:
       var result = formatDuration(Duration(milliseconds: count));
-      return weightStr != null ? result + ' ($weightStr)' : result;
+      return weight != null ? result + ' (${roundedWeight(weight)})' : result;
     case MovementDimension.energy:
       var result = '${count}cals';
-      return weightStr != null ? result + ' ($weightStr)' : result;
+      return weight != null ? result + ' (${roundedWeight(weight)})' : result;
     case MovementDimension.distance:
       var result = formatDistance(count);
-      return weightStr != null ? result + ' ($weightStr)' : result;
+      return weight != null ? result + ' (${roundedWeight(weight)})' : result;
   }
 }

@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
+import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -29,32 +30,26 @@ class DayChart extends StatefulWidget {
 }
 
 class _DayChartState extends State<DayChart> {
-  final _dataProvider = StrengthDataProvider();
+  final _dataProvider = StrengthDataProvider.instance;
 
-  List<StrengthSessionDescription> _sessions = [];
-  bool isLoading = true;
+  List<StrengthSet> _sets = [];
 
   @override
   void initState() {
     super.initState();
+    _dataProvider.addListener(update);
     update();
   }
 
   void update() {
-    setState(() => isLoading = true);
     _dataProvider
-        .getSessionsWithStats(
+        .getSetsOnDay(
       movementId: widget.movement.id,
-      from: widget.date,
-      until: widget.date.dayLater(),
-      withSets: true,
+      date: widget.date,
     )
-        .then((sessions) {
+        .then((sets) {
       if (mounted) {
-        setState(() {
-          _sessions = sessions;
-          isLoading = false;
-        });
+        setState(() => _sets = sets);
       }
     });
   }
@@ -69,37 +64,20 @@ class _DayChartState extends State<DayChart> {
     }
   }
 
-  List<BarChartGroupData> get _barData {
-    final getValue = setAccessor(widget.series);
-    final result = <BarChartGroupData>[];
-
-    final color = primaryColorOf(context);
-
-    var index = 0;
-    for (final session in _sessions) {
-      for (final set in session.strengthSets!) {
-        result.add(BarChartGroupData(x: index++, barRods: [
-          BarChartRodData(
-            y: getValue(set),
-            colors: [color],
-          )
-        ]));
-      }
-    }
-    return result;
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_sessions.isEmpty) {
-      return const Center(child: Text('Nothing to show here.'));
-    }
     final isTime = widget.movement.dimension == MovementDimension.time;
+    final getValue = setAccessor(widget.series);
+    final color = primaryColorOf(context);
     return BarChart(BarChartData(
-      barGroups: _barData,
+      barGroups: _sets
+          .mapIndexed((set, index) => BarChartGroupData(x: index, barRods: [
+                BarChartRodData(
+                  y: getValue(set),
+                  colors: [color],
+                )
+              ]))
+          .toList(),
       borderData: FlBorderData(show: false),
       titlesData: FlTitlesData(
         leftTitles: SideTitles(
@@ -120,5 +98,11 @@ class _DayChartState extends State<DayChart> {
         getDrawingVerticalLine: gridLineDrawer(context),
       ),
     ));
+  }
+
+  @override
+  void dispose() {
+    _dataProvider.removeListener(update);
+    super.dispose();
   }
 }

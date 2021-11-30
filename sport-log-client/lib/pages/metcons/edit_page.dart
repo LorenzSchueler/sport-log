@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/user_state.dart';
@@ -32,7 +31,7 @@ class EditMetconPage extends StatefulWidget {
 class _EditMetconPageState extends State<EditMetconPage> {
   late final MetconDescription _md;
   final _descriptionFocusNode = FocusNode();
-  final _dataProvider = MetconDataProvider();
+  final _dataProvider = MetconDataProvider.instance;
 
   @override
   void initState() {

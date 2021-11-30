@@ -1,8 +1,8 @@
 extension IterableExtension<T> on Iterable<T> {
-  Iterable<R> mapIndexed<R>(R Function(int index, T element) convert) sync* {
+  Iterable<R> mapIndexed<R>(R Function(T element, int index) convert) sync* {
     var index = 0;
     for (final element in this) {
-      yield convert(index++, element);
+      yield convert(element, index++);
     }
   }
 
@@ -30,5 +30,13 @@ extension IterableExtension<T> on Iterable<T> {
     for (final element in this) {
       action(element, index++);
     }
+  }
+
+  List<R> mapToL<R>(R Function(T) mapping) {
+    return map(mapping).toList();
+  }
+
+  List<R> mapToLIndexed<R>(R Function(T element, int index) mapping) {
+    return mapIndexed(mapping).toList();
   }
 }

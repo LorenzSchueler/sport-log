@@ -82,7 +82,8 @@ double Function(StrengthSessionStats stats) statsAccessor(SeriesType type) {
     case SeriesType.sumCount:
       return (stats) => stats.sumCount.toDouble();
     case SeriesType.avgCount:
-      return (stats) => stats.sumCount.toDouble() / stats.numSets.toDouble();
+      return (stats) =>
+          stats.sumCount.toDouble() / stats.numSets.toDouble();
     case SeriesType.maxEorm:
       return (stats) => stats.maxEorm ?? 0;
     case SeriesType.sumVolume:

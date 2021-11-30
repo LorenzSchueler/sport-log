@@ -112,13 +112,13 @@ class WorkoutPage extends StatelessWidget {
         );
       case SessionsPageTab.cardio:
         return const BottomNavigationBarItem(
-          icon: Icon(CustomIcons.heart),
+          icon: Icon(CustomIcons.heartbeat),
           label: "Cardio",
         );
       case SessionsPageTab.diary:
         return const BottomNavigationBarItem(
-          icon: Icon(Icons.edit),
-          label: "Other",
+          icon: Icon(Icons.calendar_today),
+          label: "Diary",
         );
     }
   }

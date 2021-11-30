@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class RepeatIconButton extends StatefulWidget {
@@ -45,6 +44,7 @@ class _RepeatIconButtonState extends State<RepeatIconButton> {
   Widget build(BuildContext context) {
     return GestureDetector(
       child: IconButton(
+        padding: EdgeInsets.zero,
         icon: widget.icon,
         onPressed: widget.enabled
             ? () {

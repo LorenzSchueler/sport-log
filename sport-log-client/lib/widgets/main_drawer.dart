@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
-import 'package:sport_log/data_provider/syncing.dart';
+import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/data_provider/user_state.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
-import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
+
+import 'spinning_sync.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({
@@ -20,7 +23,6 @@ class MainDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = UserState.instance.currentUser!;
-    final lastSync = DownSync.instance.lastSync;
     return Drawer(
       child: Column(
         children: [
@@ -52,14 +54,14 @@ class MainDrawer extends StatelessWidget {
             children: [
               ListTile(
                 title: const Text('Movements'),
-                leading: const Icon(Icons.apps),
+                leading: const Icon(CustomIcons.trendingUp),
                 onTap: () => Nav.changeNamed(context, Routes.movement.overview),
                 selected: selectedRoute == Routes.movement.overview,
               ),
               ListTile(
                 title: Text('Routes',
                     style: TextStyle(color: disabledColorOf(context))),
-                leading: const Icon(Icons.map_sharp),
+                leading: const Icon(CustomIcons.route),
               ),
               ListTile(
                 title: const Text('CrossFit – Metcons'),
@@ -70,26 +72,48 @@ class MainDrawer extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          ListTile(
-            title: Text(lastSync == null
-                ? 'No sync done yet.'
-                : 'Last sync: ' + dateTimeFull.format(lastSync)),
-            trailing: IconButton(
-              color: secondaryVariantOf(context),
-              icon: const Icon(Icons.sync_sharp),
-              // TODO: trigger sync on button press
-              onPressed: null,
-            ),
+          Consumer<Sync>(
+            builder: (context, sync, _) {
+              String title;
+              if (sync.isSyncing) {
+                title = 'Syncing...';
+              } else if (sync.lastSync == null) {
+                title = 'No syncs yet';
+              } else {
+                title = 'Last sync: ' + sync.lastSync!.toHumanWithTime();
+              }
+              return ListTile(
+                title: Text(title),
+                trailing: SpinningSync(
+                  color: secondaryVariantOf(context),
+                  onPressed: sync.isSyncing
+                      ? null
+                      : () => Sync.instance.sync(
+                            onNoInternet: () {
+                              showSimpleToast(
+                                  context, 'No Internet connection.');
+                            },
+                          ),
+                  isSpinning: sync.isSyncing,
+                ),
+              );
+            },
           ),
-          ListTile(
-            title: const Text('Logout'),
-            trailing: IconButton(
-              color: secondaryVariantOf(context),
-              icon: const Icon(Icons.logout_sharp),
-              onPressed: () {
-                context.read<AuthenticationBloc>().add(const LogoutEvent());
-                Nav.changeNamed(context, Routes.landing);
-              },
+          Consumer<Sync>(
+            builder: (context, sync, _) => ListTile(
+              title: const Text('Logout'),
+              trailing: IconButton(
+                color: secondaryVariantOf(context),
+                icon: const Icon(Icons.logout_sharp),
+                onPressed: sync.isSyncing
+                    ? null
+                    : () {
+                        context
+                            .read<AuthenticationBloc>()
+                            .add(const LogoutEvent());
+                        Nav.changeNamed(context, Routes.landing);
+                      },
+              ),
             ),
           ),
         ],

@@ -1,20 +1,22 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
 
 part 'movement.g.dart';
 
 enum MovementDimension {
-  @JsonValue("Reps")
+  @JsonValue('Reps')
   reps,
-  @JsonValue("Time")
+  @JsonValue('Time')
   time,
-  @JsonValue("Distance")
+  @JsonValue('Distance')
   distance,
-  @JsonValue("Energy")
+  @JsonValue('Energy')
   energy,
 }
 
@@ -22,13 +24,26 @@ extension MovementDimensionStrings on MovementDimension {
   String get displayName {
     switch (this) {
       case MovementDimension.reps:
-        return "Reps";
+        return 'Reps';
       case MovementDimension.energy:
-        return "Energy";
+        return 'Energy';
       case MovementDimension.distance:
-        return "Distance";
+        return 'Distance';
       case MovementDimension.time:
-        return "Time";
+        return 'Time';
+    }
+  }
+
+  IconData get iconData {
+    switch (this) {
+      case MovementDimension.reps:
+        return CustomIcons.cwAlt;
+      case MovementDimension.time:
+        return CustomIcons.stopwatch;
+      case MovementDimension.distance:
+        return CustomIcons.ruler;
+      case MovementDimension.energy:
+        return CustomIcons.fire;
     }
   }
 }

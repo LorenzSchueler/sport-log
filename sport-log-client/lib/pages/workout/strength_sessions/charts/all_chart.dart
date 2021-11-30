@@ -25,25 +25,21 @@ class AllChart extends StatefulWidget {
 }
 
 class _AllChartState extends State<AllChart> {
-  final _dataProvider = StrengthDataProvider();
+  final _dataProvider = StrengthDataProvider.instance;
 
   List<StrengthSessionStats> _stats = [];
-  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _dataProvider.addListener(update);
     update();
   }
 
   void update() {
-    setState(() => isLoading = true);
     _dataProvider.getStatsByMonth(movementId: widget.movement.id).then((stats) {
       if (mounted) {
-        setState(() {
-          _stats = stats;
-          isLoading = false;
-        });
+        setState(() => _stats = stats);
       }
     });
   }
@@ -59,12 +55,6 @@ class _AllChartState extends State<AllChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_stats.isEmpty) {
-      return const Center(child: Text('Nothing to show here.'));
-    }
     final getValue = statsAccessor(widget.series);
     final isTime = widget.movement.dimension == MovementDimension.time;
 
@@ -82,7 +72,7 @@ class _AllChartState extends State<AllChart> {
         lineBarsData: [
           LineChartBarData(
             spots: _stats.map((s) {
-              return FlSpot(fromDate(s.datetime), getValue(s));
+              return FlSpot(fromDate(s.dateTime), getValue(s));
             }).toList(),
             colors: [primaryColorOf(context)],
             dotData: FlDotData(show: false),
@@ -118,5 +108,11 @@ class _AllChartState extends State<AllChart> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _dataProvider.removeListener(update);
+    super.dispose();
   }
 }

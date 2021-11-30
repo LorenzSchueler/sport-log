@@ -29,19 +29,18 @@ class MonthChart extends StatefulWidget {
 }
 
 class _MonthChartState extends State<MonthChart> {
-  final _dataProvider = StrengthDataProvider();
+  final _dataProvider = StrengthDataProvider.instance;
 
   List<StrengthSessionStats> _stats = [];
-  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _dataProvider.addListener(update);
     update();
   }
 
   void update() {
-    setState(() => isLoading = true);
     _dataProvider
         .getStatsByDay(
       movementId: widget.movement.id,
@@ -51,10 +50,7 @@ class _MonthChartState extends State<MonthChart> {
         .then((stats) {
       assert(stats.length <= 31);
       if (mounted) {
-        setState(() {
-          _stats = stats;
-          isLoading = false;
-        });
+        setState(() => _stats = stats);
       }
     });
   }
@@ -71,12 +67,6 @@ class _MonthChartState extends State<MonthChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_stats.isEmpty) {
-      return const Center(child: Text('Nothing to show here.'));
-    }
     final getValue = statsAccessor(widget.series);
     final isTime = widget.movement.dimension == MovementDimension.time;
     return LineChart(
@@ -84,7 +74,7 @@ class _MonthChartState extends State<MonthChart> {
         lineBarsData: [
           LineChartBarData(
             spots: _stats.map((s) {
-              return FlSpot(s.datetime.day.toDouble(), getValue(s));
+              return FlSpot(s.dateTime.day.toDouble(), getValue(s));
             }).toList(),
             colors: [primaryColorOf(context)],
           ),
@@ -115,5 +105,11 @@ class _MonthChartState extends State<MonthChart> {
         borderData: FlBorderData(show: false),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _dataProvider.removeListener(update);
+    super.dispose();
   }
 }
