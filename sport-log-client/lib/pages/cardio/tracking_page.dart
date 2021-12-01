@@ -16,9 +16,9 @@ enum TrackingMode { notStarted, tracking, paused, stopped }
 class CardioTrackingPage extends StatefulWidget {
   final Movement _movement;
   final CardioType _cardioType;
-  Route? _route;
+  final Route? _route;
 
-  CardioTrackingPage(this._movement, this._cardioType, Route? _route,
+  const CardioTrackingPage(this._movement, this._cardioType, this._route,
       {Key? key})
       : super(key: key);
 
@@ -42,9 +42,11 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   int _stepRate = 0;
 
   late DateTime _startTime;
-  DateTime? _pauseTime;
+  DateTime? _pauseEndTime;
   int _seconds = 0;
   String _time = "00:00:00";
+
+  String? _comments;
 
   Line? _line;
   List<Circle>? _circles;
@@ -55,13 +57,14 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   String _stepInfo = "null";
 
   late Timer _timer;
-  late StreamSubscription _locationSubscription;
+  StreamSubscription? _locationSubscription;
   late StreamSubscription _stepCountSubscription;
   late MapboxMapController _mapController;
 
   void _updateData() {
     Duration duration = _trackingMode == TrackingMode.tracking
-        ? Duration(seconds: _seconds) + DateTime.now().difference(_pauseTime!)
+        ? Duration(seconds: _seconds) +
+            DateTime.now().difference(_pauseEndTime!)
         : Duration(seconds: _seconds);
     setState(() {
       _time = duration.toString().split('.').first.padLeft(8, '0');
@@ -93,9 +96,10 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       avgHeartRate: null,
       heartRate: null,
       routeId: widget._route?.id,
-      comments: null, //TODO
+      comments: _comments,
       deleted: false,
     );
+    // TODO save in db
   }
 
   void _onStepCountUpdate(StepCount stepCountEvent) {
@@ -241,6 +245,32 @@ satelites: ${location.satelliteNumber}""";
     );
   }
 
+  Future<void> _stopDialog() async {
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Save Recording"),
+        content: TextField(
+          onSubmitted: (comments) => _comments = comments,
+          decoration: const InputDecoration(hintText: "Comments"),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Back")),
+          TextButton(
+              onPressed: () {
+                _trackingMode = TrackingMode.stopped;
+                _saveCardioSession();
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+              child: const Text("Save"))
+        ],
+      ),
+    );
+  }
+
   List<Widget> _buildButtons() {
     if (_trackingMode == TrackingMode.tracking) {
       return [
@@ -249,7 +279,8 @@ satelites: ${location.satelliteNumber}""";
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
                 onPressed: () {
                   _trackingMode = TrackingMode.paused;
-                  _seconds += DateTime.now().difference(_pauseTime!).inSeconds;
+                  _seconds +=
+                      DateTime.now().difference(_pauseEndTime!).inSeconds;
                 },
                 child: const Text("pause"))),
         const SizedBox(
@@ -259,29 +290,10 @@ satelites: ${location.satelliteNumber}""";
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
                 onPressed: () async {
-                  await showDialog<void>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text("Stop Recording?"),
-                      content: const Text("Do you want to stop the recording?"),
-                      actions: [
-                        TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text("No")),
-                        TextButton(
-                            onPressed: () {
-                              _trackingMode = TrackingMode.stopped;
-                              _seconds += DateTime.now()
-                                  .difference(_pauseTime!)
-                                  .inSeconds;
-                              _saveCardioSession();
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                            },
-                            child: const Text("Yes"))
-                      ],
-                    ),
-                  );
+                  _trackingMode = TrackingMode.paused;
+                  _seconds +=
+                      DateTime.now().difference(_pauseEndTime!).inSeconds;
+                  await _stopDialog();
                 },
                 child: const Text("stop"))),
       ];
@@ -292,7 +304,7 @@ satelites: ${location.satelliteNumber}""";
                 style: ElevatedButton.styleFrom(primary: Colors.green[400]),
                 onPressed: () {
                   _trackingMode = TrackingMode.tracking;
-                  _pauseTime = DateTime.now();
+                  _pauseEndTime = DateTime.now();
                 },
                 child: const Text("continue"))),
         const SizedBox(
@@ -302,26 +314,7 @@ satelites: ${location.satelliteNumber}""";
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
                 onPressed: () async {
-                  await showDialog<void>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text("Stop Recording?"),
-                      content: const Text("Do you want to stop the recording?"),
-                      actions: [
-                        TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text("No")),
-                        TextButton(
-                            onPressed: () {
-                              _trackingMode = TrackingMode.stopped;
-                              _saveCardioSession();
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                            },
-                            child: const Text("Yes"))
-                      ],
-                    ),
-                  );
+                  await _stopDialog();
                 },
                 child: const Text("stop"))),
       ];
@@ -333,7 +326,7 @@ satelites: ${location.satelliteNumber}""";
                 onPressed: () {
                   _trackingMode = TrackingMode.tracking;
                   _startTime = DateTime.now();
-                  _pauseTime = DateTime.now();
+                  _pauseEndTime = DateTime.now();
                 },
                 child: const Text("start"))),
         const SizedBox(
@@ -416,7 +409,7 @@ satelites: ${location.satelliteNumber}""";
   @override
   void dispose() {
     _timer.cancel();
-    _locationSubscription.cancel();
+    _locationSubscription?.cancel();
     _stepCountSubscription.cancel();
     super.dispose();
   }
