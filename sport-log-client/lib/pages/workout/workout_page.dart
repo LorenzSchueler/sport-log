@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/pages/workout/cardio/overview_page.dart';
 import 'package:sport_log/pages/workout/diary/overview_page.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
@@ -10,7 +11,6 @@ import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/movement_picker.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
-import 'cardio_sessions/overview_page.dart';
 import 'strength_sessions/overview_page.dart';
 import 'date_filter/date_filter_widget.dart';
 import 'metcon_sessions/overview_page.dart';
