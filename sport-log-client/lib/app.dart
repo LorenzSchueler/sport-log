@@ -19,6 +19,7 @@ import 'package:sport_log/pages/metcons/overview_page.dart';
 import 'package:sport_log/pages/movements/edit_page.dart';
 import 'package:sport_log/pages/movements/overview_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
+import 'package:sport_log/pages/workout/diary/diary_edit_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/details_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/edit_page.dart';
 import 'package:sport_log/pages/workout/workout_page.dart';
@@ -103,6 +104,7 @@ class _AppState extends State<App> {
                 args[0] as Movement, args[1] as CardioType, args[2] as Route?);
           },
           Routes.cardio.route_planning: (_) => const RoutePlanningPage(),
+          Routes.diary.edit: (_) => const DiaryEditPage(),
         },
         initialRoute: isAuthenticated ? Routes.workout : Routes.landing,
         debugShowCheckedModeBanner: false,

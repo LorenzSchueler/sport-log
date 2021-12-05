@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/diary/overview_page.dart';
@@ -128,6 +129,9 @@ class WorkoutPage extends StatelessWidget {
   }
 
   Widget? _fab(SessionsUiState state, BuildContext context) {
+    Logger _logger = Logger('Fab Function');
+    _logger.i("fab called");
+
     switch (state.tab) {
       case SessionsPageTab.strength:
         return _strengthKey.currentState?.fab(context);

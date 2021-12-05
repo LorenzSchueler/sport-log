@@ -95,7 +95,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
   }
 
   Widget? fab(BuildContext context) {
-    _logger.d('FAB tapped!');
+    _logger.d('FAB called!');
 
     return ExpandableFab(
       icon: const Icon(Icons.add),

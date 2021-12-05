@@ -7,6 +7,7 @@ abstract class Routes {
   static const movement = _MovementRoutes();
   static const cardio = _CardioRoutes();
   static const strength = _StrengthRoutes();
+  static const diary = _DiaryRoutes();
 }
 
 class _MetconRoutes {
@@ -38,4 +39,10 @@ class _StrengthRoutes {
 
   final String details = '/strength/details';
   final String edit = '/strength/edit';
+}
+
+class _DiaryRoutes {
+  const _DiaryRoutes();
+
+  final String edit = '/diary/edit';
 }
