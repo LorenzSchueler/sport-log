@@ -1,0 +1,49 @@
+import 'package:flutter/material.dart';
+
+abstract class Defaults {
+  static const sizedBox = _SizedBox();
+  static const borderRadius = _BorderRadius();
+}
+
+class _SizedBox {
+  const _SizedBox();
+
+  final horizontal = const _Horizontal();
+  final vertical = const _Vertical();
+}
+
+class _Horizontal {
+  const _Horizontal();
+
+  final big = const SizedBox(
+    width: 20,
+  );
+  final normal = const SizedBox(
+    width: 10,
+  );
+  final small = const SizedBox(
+    width: 5,
+  );
+}
+
+class _Vertical {
+  const _Vertical();
+
+  final big = const SizedBox(
+    height: 20,
+  );
+  final normal = const SizedBox(
+    height: 10,
+  );
+  final small = const SizedBox(
+    height: 5,
+  );
+}
+
+class _BorderRadius {
+  const _BorderRadius();
+
+  final big = const BorderRadius.all(Radius.circular(20));
+  final normal = const BorderRadius.all(Radius.circular(10));
+  final small = const BorderRadius.all(Radius.circular(5));
+}

@@ -1,7 +1,7 @@
-
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 
@@ -28,38 +28,36 @@ class _RegistrationFormState extends State<RegistrationForm> {
     return Form(
       key: _formKey,
       child: BlocConsumer<RegistrationBloc, RegistrationState>(
-        listener: (context, state) {
-          if (state == RegistrationState.successful) {
-            Nav.changeNamed(context, Routes.workout);
-          }
-        },
-        builder: (context, RegistrationState state) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _usernameInput(context, state),
-              _padding,
-              _emailInput(context, state),
-              _padding,
-              _passwordInput1(context, state),
-              _padding,
-              _passwordInput2(context, state),
-              _padding,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  if (state == RegistrationState.pending)
-                    Container(
-                      child: const CircularProgressIndicator(),
-                      margin: const EdgeInsets.only(right: 20),
-                    ),
-                  _submitButton(context, state),
-                ],
-              )
-            ],
-          );
+          listener: (context, state) {
+        if (state == RegistrationState.successful) {
+          Nav.changeNamed(context, Routes.workout);
         }
-      ),
+      }, builder: (context, RegistrationState state) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _usernameInput(context, state),
+            _padding,
+            _emailInput(context, state),
+            _padding,
+            _passwordInput1(context, state),
+            _padding,
+            _passwordInput2(context, state),
+            _padding,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (state == RegistrationState.pending)
+                  Container(
+                    child: const CircularProgressIndicator(),
+                    margin: const EdgeInsets.only(right: 20),
+                  ),
+                _submitButton(context, state),
+              ],
+            )
+          ],
+        );
+      }),
     );
   }
 
@@ -70,18 +68,16 @@ class _RegistrationFormState extends State<RegistrationForm> {
           _username = username;
         });
       },
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: "Username",
-        border: OutlineInputBorder(
-            borderRadius: _borderRadius
-        ),
+        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
       ),
       validator: _usernameValidator,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: _inputsEnabled(state),
-      style: _inputsEnabled(state) ? null : TextStyle(
-        color: Theme.of(context).disabledColor
-      ),
+      style: _inputsEnabled(state)
+          ? null
+          : TextStyle(color: Theme.of(context).disabledColor),
       textInputAction: TextInputAction.next,
     );
   }
@@ -93,18 +89,16 @@ class _RegistrationFormState extends State<RegistrationForm> {
           _email = email;
         });
       },
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: "Email",
-        border: OutlineInputBorder(
-            borderRadius: _borderRadius
-        ),
+        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
       ),
       validator: _emailValidator,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: _inputsEnabled(state),
-      style: _inputsEnabled(state) ? null : TextStyle(
-          color: Theme.of(context).disabledColor
-      ),
+      style: _inputsEnabled(state)
+          ? null
+          : TextStyle(color: Theme.of(context).disabledColor),
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.emailAddress,
     );
@@ -117,18 +111,16 @@ class _RegistrationFormState extends State<RegistrationForm> {
           _password1 = password;
         });
       },
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: "Password",
-        border: OutlineInputBorder(
-          borderRadius: _borderRadius
-        ),
+        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
       ),
       validator: _password1Validator,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: _inputsEnabled(state),
-      style: _inputsEnabled(state) ? null : TextStyle(
-          color: Theme.of(context).disabledColor
-      ),
+      style: _inputsEnabled(state)
+          ? null
+          : TextStyle(color: Theme.of(context).disabledColor),
       textInputAction: TextInputAction.next,
       obscureText: true,
     );
@@ -141,33 +133,36 @@ class _RegistrationFormState extends State<RegistrationForm> {
           _password2 = password;
         });
       },
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: "Repeat password",
-        border: OutlineInputBorder(
-            borderRadius: _borderRadius
-        ),
+        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
       ),
       validator: _password2Validator,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: _inputsEnabled(state),
-      style: _inputsEnabled(state) ? null : TextStyle(
-          color: Theme.of(context).disabledColor
-      ),
+      style: _inputsEnabled(state)
+          ? null
+          : TextStyle(color: Theme.of(context).disabledColor),
       textInputAction: TextInputAction.done,
       obscureText: true,
       onFieldSubmitted: (state != RegistrationState.pending && _inputsAreValid)
-          ? (_) => _submit(context) : null,
+          ? (_) => _submit(context)
+          : null,
     );
   }
 
   Widget _submitButton(BuildContext context, RegistrationState state) {
     return ElevatedButton(
-      child: const Text("Register", style: TextStyle(fontSize: 18),), // TODO: use theme for this
+      child: const Text(
+        "Register",
+        style: TextStyle(fontSize: 18),
+      ), // TODO: use theme for this
       onPressed: (state != RegistrationState.pending && _inputsAreValid)
-          ? () => _submit(context) : null,
+          ? () => _submit(context)
+          : null,
       style: ElevatedButton.styleFrom(
-        shape: const RoundedRectangleBorder(
-          borderRadius: _borderRadius,
+        shape: RoundedRectangleBorder(
+          borderRadius: Defaults.borderRadius.big,
         ),
       ),
     );
@@ -182,10 +177,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
   void _submit(BuildContext context) {
     if (_formIsValid) {
       context.read<RegistrationBloc>().add(SubmitRegistration(
-          username: _username,
-          email: _email,
-          password: _password1
-      ));
+          username: _username, email: _email, password: _password1));
       _formKey.currentState!.deactivate();
     }
   }
@@ -223,14 +215,12 @@ class _RegistrationFormState extends State<RegistrationForm> {
   }
 
   bool get _inputsAreValid =>
-    _usernameValidator(_username) == null
-    && _emailValidator(_email) == null
-    && _password1Validator(_password1) == null
-    && _password2Validator(_password2) == null;
+      _usernameValidator(_username) == null &&
+      _emailValidator(_email) == null &&
+      _password1Validator(_password1) == null &&
+      _password2Validator(_password2) == null;
 
   static const Widget _padding = Padding(
-      padding: EdgeInsets.all(10),
+    padding: EdgeInsets.all(10),
   );
-  
-  static const BorderRadius _borderRadius = BorderRadius.all(Radius.circular(20));
 }

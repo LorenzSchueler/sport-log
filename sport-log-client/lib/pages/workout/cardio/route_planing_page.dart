@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:polyline/polyline.dart';
 import 'package:sport_log/data_provider/user_state.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/secrets.dart';
@@ -341,12 +342,17 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
                 onSubmitted: (name) => setState(() {
                   _routeName = name;
                 }),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: "Name",
+                  border: OutlineInputBorder(
+                      borderRadius: Defaults.borderRadius.big),
                 ),
               )),
+              Defaults.sizedBox.horizontal.big,
               ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.green[400]),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green[400],
+                  ),
                   onPressed: _routeName.isNotEmpty ? () => _saveRoute() : null,
                   child: const Text("create")),
             ],

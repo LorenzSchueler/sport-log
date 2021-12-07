@@ -3,6 +3,7 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/data_provider/user_state.dart';
+import 'package:sport_log/defaults.dart';
 import 'dart:async';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -283,9 +284,7 @@ satelites: ${location.satelliteNumber}""";
                       DateTime.now().difference(_pauseEndTime!).inSeconds;
                 },
                 child: const Text("pause"))),
-        const SizedBox(
-          width: 10,
-        ),
+        Defaults.sizedBox.horizontal.normal,
         Expanded(
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
@@ -307,9 +306,7 @@ satelites: ${location.satelliteNumber}""";
                   _pauseEndTime = DateTime.now();
                 },
                 child: const Text("continue"))),
-        const SizedBox(
-          width: 10,
-        ),
+        Defaults.sizedBox.horizontal.normal,
         Expanded(
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
@@ -329,9 +326,7 @@ satelites: ${location.satelliteNumber}""";
                   _pauseEndTime = DateTime.now();
                 },
                 child: const Text("start"))),
-        const SizedBox(
-          width: 10,
-        ),
+        Defaults.sizedBox.horizontal.normal,
         Expanded(
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),

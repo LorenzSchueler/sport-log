@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:sport_log/defaults.dart';
 
 ThemeData themeDataFromColors({
   required Color primary,
@@ -25,10 +26,9 @@ ThemeData themeDataFromColors({
       brightness == Brightness.light ? cs.primary : cs.surface;
   return ThemeData(
     appBarTheme: AppBarTheme(
-      foregroundColor:
-          brightness == Brightness.light ? cs.onPrimary : cs.onSurface,
-      backgroundColor: appBarBackgroundColor
-    ),
+        foregroundColor:
+            brightness == Brightness.light ? cs.onPrimary : cs.onSurface,
+        backgroundColor: appBarBackgroundColor),
     bottomAppBarTheme: BottomAppBarTheme(color: appBarBackgroundColor),
     bottomAppBarColor: appBarBackgroundColor,
     colorScheme: cs,
@@ -44,9 +44,9 @@ ThemeData themeDataFromColors({
     toggleableActiveColor: cs.primary,
     // ignore: deprecated_member_use
     accentColor: cs.primary, // still needed for expansion tile cards
-    dialogTheme: const DialogTheme(
+    dialogTheme: DialogTheme(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(32)),
+        borderRadius: Defaults.borderRadius.big,
       ),
     ),
     textTheme: const TextTheme(

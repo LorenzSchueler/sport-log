@@ -1,6 +1,7 @@
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/secrets.dart';
 import 'package:sport_log/helpers/theme.dart';
@@ -70,9 +71,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
               onStyleLoadedCallback: () => _sessionMapController
                   .addLine(LineOptions(lineColor: "red", geometry: _locations)),
             )),
-        const SizedBox(
-          height: 5,
-        ),
+        Defaults.sizedBox.vertical.small,
         Row(children: [
           Expanded(
               child: Text(

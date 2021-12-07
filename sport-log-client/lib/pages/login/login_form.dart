@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 
@@ -22,37 +22,32 @@ class _LoginFormState extends State<LoginForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: BlocConsumer<LoginBloc, LoginState>(
-        listener: (context, state) {
-          if (state == LoginState.successful) {
-            Nav.changeNamed(context, Routes.workout);
-          } else if (state == LoginState.failed) {
-
-          }
-        },
-        builder: (context, LoginState state) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _usernameInput(context, state),
-              _padding,
-              _passwordInput(context, state),
-              _padding,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  if (state == LoginState.pending)
-                    Container(
-                      child: const CircularProgressIndicator(),
-                      margin: const EdgeInsets.only(right: 20),
-                    ),
-                  _submitButton(context, state),
-                ],
-              )
-            ],
-          );
-        }
-      ),
+      child: BlocConsumer<LoginBloc, LoginState>(listener: (context, state) {
+        if (state == LoginState.successful) {
+          Nav.changeNamed(context, Routes.workout);
+        } else if (state == LoginState.failed) {}
+      }, builder: (context, LoginState state) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _usernameInput(context, state),
+            _padding,
+            _passwordInput(context, state),
+            _padding,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (state == LoginState.pending)
+                  Container(
+                    child: const CircularProgressIndicator(),
+                    margin: const EdgeInsets.only(right: 20),
+                  ),
+                _submitButton(context, state),
+              ],
+            )
+          ],
+        );
+      }),
     );
   }
 
@@ -63,18 +58,16 @@ class _LoginFormState extends State<LoginForm> {
           _username = username;
         });
       },
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: "Username",
-        border: OutlineInputBorder(
-            borderRadius: _borderRadius
-        ),
+        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
       ),
       validator: _usernameValidator,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: _inputsEnabled(state),
-      style: _inputsEnabled(state) ? null : TextStyle(
-        color: Theme.of(context).disabledColor
-      ),
+      style: _inputsEnabled(state)
+          ? null
+          : TextStyle(color: Theme.of(context).disabledColor),
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.emailAddress,
     );
@@ -87,33 +80,36 @@ class _LoginFormState extends State<LoginForm> {
           _password = password;
         });
       },
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: "Password",
-        border: OutlineInputBorder(
-          borderRadius: _borderRadius
-        ),
+        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
       ),
       validator: _passwordValidator,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: _inputsEnabled(state),
-      style: _inputsEnabled(state) ? null : TextStyle(
-          color: Theme.of(context).disabledColor
-      ),
+      style: _inputsEnabled(state)
+          ? null
+          : TextStyle(color: Theme.of(context).disabledColor),
       textInputAction: TextInputAction.done,
       obscureText: true,
       onFieldSubmitted: (state != LoginState.pending && _inputsAreValid)
-          ? (_) => _submit(context) : null,
+          ? (_) => _submit(context)
+          : null,
     );
   }
 
   Widget _submitButton(BuildContext context, LoginState state) {
     return ElevatedButton(
-      child: const Text("Login", style: TextStyle(fontSize: 18),), // TODO: use theme for this
+      child: const Text(
+        "Login",
+        style: TextStyle(fontSize: 18),
+      ), // TODO: use theme for this
       onPressed: (state != LoginState.pending && _inputsAreValid)
-          ? () => _submit(context) : null,
+          ? () => _submit(context)
+          : null,
       style: ElevatedButton.styleFrom(
-        shape: const RoundedRectangleBorder(
-          borderRadius: _borderRadius,
+        shape: RoundedRectangleBorder(
+          borderRadius: Defaults.borderRadius.big,
         ),
       ),
     );
@@ -127,10 +123,9 @@ class _LoginFormState extends State<LoginForm> {
 
   void _submit(BuildContext context) {
     if (_formIsValid) {
-      context.read<LoginBloc>().add(SubmitLogin(
-          username: _username,
-          password: _password
-      ));
+      context
+          .read<LoginBloc>()
+          .add(SubmitLogin(username: _username, password: _password));
       _formKey.currentState!.deactivate();
     }
   }
@@ -151,12 +146,10 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   bool get _inputsAreValid =>
-    _usernameValidator(_username) == null
-    && _passwordValidator(_password) == null;
+      _usernameValidator(_username) == null &&
+      _passwordValidator(_password) == null;
 
   static const Widget _padding = Padding(
-      padding: EdgeInsets.all(10),
+    padding: EdgeInsets.all(10),
   );
-  
-  static const BorderRadius _borderRadius = BorderRadius.all(Radius.circular(20));
 }

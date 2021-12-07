@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/widgets/form_widgets/repeat_icon_button.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -113,11 +114,11 @@ class _DurationPickerState extends State<DurationPicker> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _minusButton,
-        _space,
+        Defaults.sizedBox.horizontal.normal,
         _minutesInput,
         _divider,
         _secondsInput,
-        _space,
+        Defaults.sizedBox.horizontal.normal,
         _plusButton,
       ],
     );
@@ -237,6 +238,4 @@ class _DurationPickerState extends State<DurationPicker> {
 
   Widget get _divider =>
       const Text(' : ', style: TextStyle(fontSize: _fontSize));
-
-  Widget get _space => const SizedBox(width: 8);
 }
