@@ -1,4 +1,13 @@
+import 'package:intl/intl.dart';
 import 'package:sport_log/models/all.dart';
+
+String formatDatetime(DateTime dateTime) {
+  return DateFormat('dd.MM.yy kk:mm').format(dateTime);
+}
+
+String formatTime(int seconds) {
+  return Duration(seconds: seconds).toString().split('.').first.padLeft(8, "0");
+}
 
 String formatDuration(Duration d) {
   String result = '';
