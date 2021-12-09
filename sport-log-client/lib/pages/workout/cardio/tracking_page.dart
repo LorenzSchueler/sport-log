@@ -2,12 +2,15 @@ import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:flutter/material.dart' hide Route;
+import 'package:sport_log/data_provider/data_provider.dart';
+import 'package:sport_log/data_provider/data_providers/route_data_provider.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
 import 'dart:async';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/secrets.dart';
+import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/movement_picker.dart';
@@ -29,6 +32,8 @@ class CardioTrackingPage extends StatefulWidget {
 
 class CardioTrackingPageState extends State<CardioTrackingPage> {
   final _logger = Logger('CardioTrackingPage');
+
+  //final DataProvider<CardioSession> _dataProvider = CardioSessionDataProvider.instance;
 
   final String _token = Secrets.mapboxAccessToken;
   final String _style = 'mapbox://styles/mapbox/outdoors-v11';
@@ -79,8 +84,8 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     _logger.i(_stepInfo);
   }
 
-  void _saveCardioSession() {
-    CardioSession(
+  CardioSession _saveCardioSession() {
+    CardioSession cardioSession = CardioSession(
       id: randomId(),
       userId: UserState.instance.currentUser!.id,
       movementId: widget._movement.id,
@@ -101,6 +106,8 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       deleted: false,
     );
     // TODO save in db
+    // await _dataProvider.createSingle(cardioSession);
+    return cardioSession;
   }
 
   void _onStepCountUpdate(StepCount stepCountEvent) {
@@ -262,9 +269,12 @@ satelites: ${location.satelliteNumber}""";
           TextButton(
               onPressed: () {
                 _trackingMode = TrackingMode.stopped;
-                _saveCardioSession();
+                CardioSession cardioSession = _saveCardioSession();
                 Navigator.pop(context);
-                Navigator.pop(context);
+                Navigator.pop(
+                    context,
+                    ReturnObject(
+                        action: ReturnAction.created, payload: cardioSession));
               },
               child: const Text("Save"))
         ],
