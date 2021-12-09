@@ -1,8 +1,8 @@
-
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
 
 part 'position.g.dart';
 
@@ -16,13 +16,19 @@ class Position {
     required this.time,
   });
 
-  @JsonKey(name: "lo") double longitude;
-  @JsonKey(name: "la") double latitude;
-  @JsonKey(name: "e") int elevation;
-  @JsonKey(name: "d") int distance;
-  @JsonKey(name: "t") int time;
+  @JsonKey(name: "lo")
+  double longitude;
+  @JsonKey(name: "la")
+  double latitude;
+  @JsonKey(name: "e")
+  int elevation;
+  @JsonKey(name: "d")
+  int distance;
+  @JsonKey(name: "t")
+  int time;
 
-  factory Position.fromJson(Map<String, dynamic> json) => _$PositionFromJson(json);
+  factory Position.fromJson(Map<String, dynamic> json) =>
+      _$PositionFromJson(json);
   Map<String, dynamic> toJson() => _$PositionToJson(this);
 
   static const int byteSize = 40;
@@ -56,13 +62,16 @@ class Position {
     if (other is! Position) {
       return false;
     }
-    return longitude == other.longitude
-        && latitude == other.latitude
-        && elevation == other.elevation
-        && distance == other.distance
-        && time == other.time;
+    return longitude == other.longitude &&
+        latitude == other.latitude &&
+        elevation == other.elevation &&
+        distance == other.distance &&
+        time == other.time;
   }
 
   @override
-  int get hashCode => hashValues(longitude, latitude, elevation, distance, time);
+  int get hashCode =>
+      hashValues(longitude, latitude, elevation, distance, time);
+
+  LatLng get latLng => LatLng(latitude, longitude);
 }
