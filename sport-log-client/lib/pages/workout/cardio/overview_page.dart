@@ -13,6 +13,7 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/ui_cubit.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 
 class CardioSessionsPage extends StatefulWidget {
@@ -227,9 +228,9 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
     return ExpandableFab(
       icon: const Icon(Icons.add),
       icons: const [
-        Icon(Icons.play_arrow_rounded),
+        Icon(CustomIcons.stopwatch),
         Icon(Icons.notes_rounded),
-        Icon(Icons.map),
+        Icon(CustomIcons.route),
       ],
       onPressed: [
         () => Navigator.of(context)

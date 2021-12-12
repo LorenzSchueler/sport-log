@@ -5,6 +5,7 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/cardio/overview_page.dart';
 import 'package:sport_log/pages/workout/diary/overview_page.dart';
+import 'package:sport_log/pages/workout/timeline/overview_page.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -19,6 +20,7 @@ import 'ui_cubit.dart';
 class WorkoutPage extends StatelessWidget {
   WorkoutPage({Key? key}) : super(key: key);
 
+  final GlobalKey<TimelinePageState> _timelineKey = GlobalKey();
   final GlobalKey<StrengthSessionsPageState> _strengthKey = GlobalKey();
   final GlobalKey<MetconSessionsPageState> _metconKey = GlobalKey();
   final GlobalKey<CardioSessionsPageState> _cardioKey = GlobalKey();
@@ -88,6 +90,8 @@ class WorkoutPage extends StatelessWidget {
   Widget _mainPage(SessionsUiState state) {
     // TODO: preserve state and/or widget when changing tab
     switch (state.tab) {
+      case SessionsPageTab.timeline:
+        return TimelinePage(key: _timelineKey);
       case SessionsPageTab.strength:
         return StrengthSessionsPage(key: _strengthKey);
       case SessionsPageTab.metcon:
@@ -101,15 +105,20 @@ class WorkoutPage extends StatelessWidget {
 
   BottomNavigationBarItem _toBottomNavItem(SessionsPageTab page) {
     switch (page) {
-      case SessionsPageTab.metcon:
+      case SessionsPageTab.timeline:
         return const BottomNavigationBarItem(
-          icon: Icon(CustomIcons.plan),
-          label: "Metcons",
+          icon: Icon(Icons.timeline),
+          label: "Timeline",
         );
       case SessionsPageTab.strength:
         return const BottomNavigationBarItem(
           icon: Icon(CustomIcons.dumbbellNotRotated),
           label: "Strength",
+        );
+      case SessionsPageTab.metcon:
+        return const BottomNavigationBarItem(
+          icon: Icon(CustomIcons.plan),
+          label: "Metcons",
         );
       case SessionsPageTab.cardio:
         return const BottomNavigationBarItem(
@@ -130,14 +139,19 @@ class WorkoutPage extends StatelessWidget {
 
   Widget? _fab(SessionsUiState state, BuildContext context) {
     Logger _logger = Logger('Fab Function');
-    _logger.i("fab called");
+    _logger.i("fab calling");
+    _logger.i("${state.tab}");
 
+    // TODO currentState is sometimes null
     switch (state.tab) {
+      case SessionsPageTab.timeline:
+        return _timelineKey.currentState?.fab(context);
       case SessionsPageTab.strength:
         return _strengthKey.currentState?.fab(context);
       case SessionsPageTab.metcon:
         return _metconKey.currentState?.fab(context);
       case SessionsPageTab.cardio:
+        _logger.i("${_cardioKey.currentState}");
         return _cardioKey.currentState?.fab(context);
       case SessionsPageTab.diary:
         return _diaryKey.currentState?.fab(context);

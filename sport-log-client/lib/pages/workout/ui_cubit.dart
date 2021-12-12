@@ -3,7 +3,7 @@ import 'package:sport_log/models/movement/movement.dart';
 
 import 'date_filter/date_filter_state.dart';
 
-enum SessionsPageTab { strength, metcon, cardio, diary }
+enum SessionsPageTab { timeline, strength, metcon, cardio, diary }
 
 class SessionsUiState {
   const SessionsUiState({
@@ -55,6 +55,7 @@ class SessionsUiState {
     );
   }
 
+  bool get isTimelinePage => _tab == SessionsPageTab.timeline;
   bool get isStrengthPage => _tab == SessionsPageTab.strength;
   bool get isMetconPage => _tab == SessionsPageTab.metcon;
   bool get isCardioPage => _tab == SessionsPageTab.cardio;
@@ -74,7 +75,7 @@ class SessionsUiCubit extends Cubit<SessionsUiState> {
           showFab: false,
           dateFilter: MonthFilter.current(),
           movement: null,
-          tab: SessionsPageTab.strength,
+          tab: SessionsPageTab.timeline,
         ));
 
   void hideFab() {
