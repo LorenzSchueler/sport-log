@@ -14,6 +14,7 @@ import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/movement_picker.dart';
+import 'package:sport_log/widgets/value_unit_description.dart';
 
 enum TrackingMode { notStarted, tracking, paused, stopped }
 
@@ -234,24 +235,6 @@ satelites: ${location.satelliteNumber}""";
                 .toList()));
   }
 
-  Widget _buildCard(String title, String subtitle) {
-    return Card(
-      child: ListTile(
-        contentPadding: const EdgeInsets.only(top: 2),
-        title: Text(
-          title,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 25),
-        ),
-        subtitle: Text(
-          subtitle,
-          textAlign: TextAlign.center,
-        ),
-        dense: true,
-      ),
-    );
-  }
-
   Future<void> _stopDialog() async {
     await showDialog<void>(
       context: context,
@@ -347,60 +330,97 @@ satelites: ${location.satelliteNumber}""";
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Row(
-        children: [
-          Card(
-              margin: const EdgeInsets.only(top: 25, bottom: 5),
-              child: Text(_locationInfo)),
-          Card(
-              margin: const EdgeInsets.only(top: 25, bottom: 5),
-              child: Text(_stepInfo)),
-        ],
-      ),
-      Expanded(
-          child: MapboxMap(
-        accessToken: _token,
-        styleString: Defaults.mapbox.style.outdoor,
-        initialCameraPosition: const CameraPosition(
-          zoom: 15.0,
-          target: LatLng(47.27, 11.33),
-        ),
-        compassEnabled: true,
-        compassViewPosition: CompassViewPosition.TopRight,
-        onMapCreated: (MapboxMapController controller) =>
-            _mapController = controller,
-        onStyleLoadedCallback: () {
-          _startLocationStream();
-          _startStepCountStream();
-        },
-      )),
-      Container(
-          padding: const EdgeInsets.only(top: 5),
-          color: onPrimaryColorOf(context),
-          child: Table(
-            children: [
-              TableRow(children: [
-                _buildCard(_time, "time"),
-                _buildCard("6.17 km", "distance"),
-              ]),
-              TableRow(children: [
-                _buildCard("10.7 km/h", "speed"),
-                _buildCard("$_stepRate", "step rate"),
-              ]),
-              TableRow(children: [
-                _buildCard("${_ascent.round()} m", "ascent"),
-                _buildCard("${_descent.round()} m", "descent"),
-              ]),
-            ],
-          )),
-      Container(
-          color: onPrimaryColorOf(context),
-          padding: const EdgeInsets.all(5),
-          child: Row(
-            children: _buildButtons(),
-          ))
+    TableRow rowSpacer = TableRow(children: [
+      Defaults.sizedBox.vertical.normal,
+      Defaults.sizedBox.vertical.normal,
     ]);
+
+    return Container(
+        color: backgroundColorOf(context),
+        child: Column(children: [
+          Row(
+            children: [
+              Card(
+                  margin: const EdgeInsets.only(top: 25, bottom: 5),
+                  child: Text(_locationInfo)),
+              Card(
+                  margin: const EdgeInsets.only(top: 25, bottom: 5),
+                  child: Text(_stepInfo)),
+            ],
+          ),
+          Expanded(
+              child: MapboxMap(
+            accessToken: _token,
+            styleString: Defaults.mapbox.style.outdoor,
+            initialCameraPosition: const CameraPosition(
+              zoom: 15.0,
+              target: LatLng(47.27, 11.33),
+            ),
+            compassEnabled: true,
+            compassViewPosition: CompassViewPosition.TopRight,
+            onMapCreated: (MapboxMapController controller) =>
+                _mapController = controller,
+            onStyleLoadedCallback: () {
+              _startLocationStream();
+              _startStepCountStream();
+            },
+          )),
+          Container(
+              padding: const EdgeInsets.only(top: 10),
+              child: Table(
+                children: [
+                  TableRow(children: [
+                    ValueUnitDescription(
+                      value: _time,
+                      unit: null,
+                      description: "time",
+                      scale: 1.3,
+                    ),
+                    ValueUnitDescription(
+                      value: 6.17.toString(),
+                      unit: "km",
+                      description: "distance",
+                      scale: 1.3,
+                    ),
+                  ]),
+                  rowSpacer,
+                  TableRow(children: [
+                    ValueUnitDescription(
+                      value: 10.7.toString(),
+                      unit: "km/h",
+                      description: "speed",
+                      scale: 1.3,
+                    ),
+                    ValueUnitDescription(
+                      value: _stepRate.toString(),
+                      unit: "rpm",
+                      description: "cadence",
+                      scale: 1.3,
+                    ),
+                  ]),
+                  rowSpacer,
+                  TableRow(children: [
+                    ValueUnitDescription(
+                      value: _ascent.round().toString(),
+                      unit: "m",
+                      description: "ascent",
+                      scale: 1.3,
+                    ),
+                    ValueUnitDescription(
+                      value: _descent.round().toString(),
+                      unit: "m",
+                      description: "descent",
+                      scale: 1.3,
+                    ),
+                  ]),
+                ],
+              )),
+          Container(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                children: _buildButtons(),
+              ))
+        ]));
   }
 
   @override
