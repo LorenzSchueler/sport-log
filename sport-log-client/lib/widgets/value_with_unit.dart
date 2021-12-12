@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ValueWithUnit extends StatelessWidget {
   final String value;
-  final String unit;
+  final String? unit;
 
   const ValueWithUnit({
     Key? key,
@@ -15,7 +15,7 @@ class ValueWithUnit extends StatelessWidget {
     return RichText(
       text: TextSpan(children: [
         TextSpan(
-          text: "$value ",
+          text: unit == null ? value : "$value ",
           style: const TextStyle(fontSize: 20),
         ),
         TextSpan(
