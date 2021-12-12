@@ -15,7 +15,7 @@ import 'package:sport_log/pages/workout/ui_cubit.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
-import 'package:sport_log/widgets/value_with_unit.dart';
+import 'package:sport_log/widgets/value_unit_description.dart';
 
 class CardioSessionsPage extends StatefulWidget {
   const CardioSessionsPage({Key? key}) : super(key: key);
@@ -192,13 +192,25 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
             Defaults.sizedBox.vertical.small,
             Row(children: [
               Expanded(
-                child: ValueWithUnit(value: duration, unit: null),
+                child: ValueUnitDescription(
+                  value: duration,
+                  unit: null,
+                  description: null,
+                ),
               ),
               Expanded(
-                child: ValueWithUnit(value: distance, unit: "km"),
+                child: ValueUnitDescription(
+                  value: distance,
+                  unit: "km",
+                  description: null,
+                ),
               ),
               Expanded(
-                child: ValueWithUnit(value: speed, unit: "km/h"),
+                child: ValueUnitDescription(
+                  value: speed,
+                  unit: "km/h",
+                  description: null,
+                ),
               ),
             ]),
           ]),
