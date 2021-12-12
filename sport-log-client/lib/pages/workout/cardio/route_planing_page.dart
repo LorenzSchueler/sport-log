@@ -9,6 +9,7 @@ import 'package:sport_log/helpers/secrets.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:mapbox_api/mapbox_api.dart';
+import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RoutePlanningPage extends StatefulWidget {
   const RoutePlanningPage({Key? key}) : super(key: key);
@@ -176,24 +177,6 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     await _updateLine();
   }
 
-  Widget _buildCard(String title, String subtitle) {
-    return Card(
-      child: ListTile(
-        contentPadding: const EdgeInsets.only(top: 2),
-        title: Text(
-          title,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 25),
-        ),
-        subtitle: Text(
-          subtitle,
-          textAlign: TextAlign.center,
-        ),
-        dense: true,
-      ),
-    );
-  }
-
   Widget _buildDraggableList() {
     List<Widget> listElements = [];
 
@@ -261,7 +244,6 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     if (_listExpanded) {
       return Container(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-          color: onPrimaryColorOf(context),
           height: 350,
           child: Column(
             children: [
@@ -296,66 +278,94 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
 
   @override
   Widget build(BuildContext context) {
+    TableRow rowSpacer = TableRow(children: [
+      Defaults.sizedBox.vertical.normal,
+      Defaults.sizedBox.vertical.normal,
+    ]);
+
     return Scaffold(
-        body: Column(children: [
-      Expanded(
-          child: MapboxMap(
-        accessToken: _token,
-        styleString: Defaults.mapbox.style.outdoor,
-        initialCameraPosition: const CameraPosition(
-          zoom: 13.0,
-          target: LatLng(47.27, 11.33),
-        ),
-        compassEnabled: true,
-        compassViewPosition: CompassViewPosition.TopRight,
-        onMapCreated: (MapboxMapController controller) =>
-            _mapController = controller,
-        onMapLongClick: (point, LatLng latLng) => _extendLine(latLng),
-      )),
-      _buildExpandableListContainer(),
-      Container(
-          padding: const EdgeInsets.all(5),
-          color: onPrimaryColorOf(context),
-          child: Table(
-            children: [
-              TableRow(children: [
-                _buildCard("${_distance / 1000} km", "distance"),
-                _buildCard("???", "???"),
-              ]),
-              TableRow(children: [
-                _buildCard("231 m", "ascent"),
-                _buildCard("51 m", "descent"),
-              ]),
-            ],
-          )),
-      Container(
-          color: onPrimaryColorOf(context),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Row(
-            children: [
+        body: Container(
+            color: backgroundColorOf(context),
+            child: Column(children: [
               Expanded(
-                  child: TextField(
-                onTap: () => setState(() {
-                  _listExpanded = false;
-                }),
-                onSubmitted: (name) => setState(() {
-                  _routeName = name;
-                }),
-                decoration: InputDecoration(
-                  labelText: "Name",
-                  border: OutlineInputBorder(
-                      borderRadius: Defaults.borderRadius.big),
+                  child: MapboxMap(
+                accessToken: _token,
+                styleString: Defaults.mapbox.style.outdoor,
+                initialCameraPosition: const CameraPosition(
+                  zoom: 13.0,
+                  target: LatLng(47.27, 11.33),
                 ),
+                compassEnabled: true,
+                compassViewPosition: CompassViewPosition.TopRight,
+                onMapCreated: (MapboxMapController controller) =>
+                    _mapController = controller,
+                onMapLongClick: (point, LatLng latLng) => _extendLine(latLng),
               )),
-              Defaults.sizedBox.horizontal.big,
-              ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.green[400],
-                  ),
-                  onPressed: _routeName.isNotEmpty ? () => _saveRoute() : null,
-                  child: const Text("create")),
-            ],
-          ))
-    ]));
+              _buildExpandableListContainer(),
+              Table(
+                children: [
+                  TableRow(children: [
+                    ValueUnitDescription(
+                      value: (_distance / 1000).toString(),
+                      unit: "km",
+                      description: "distance",
+                      scale: 1.3,
+                    ),
+                    ValueUnitDescription(
+                      value: "???",
+                      unit: null,
+                      description: null,
+                      scale: 1.3,
+                    )
+                  ]),
+                  rowSpacer,
+                  TableRow(children: [
+                    ValueUnitDescription(
+                      value: 231.toString(),
+                      unit: "m",
+                      description: "ascent",
+                      scale: 1.3,
+                    ),
+                    ValueUnitDescription(
+                      value: 51.toString(),
+                      unit: "m",
+                      description: "descent",
+                      scale: 1.3,
+                    ),
+                  ]),
+                ],
+              ),
+              Defaults.sizedBox.vertical.normal,
+              Row(
+                children: [
+                  Defaults.sizedBox.horizontal.normal,
+                  Expanded(
+                      child: TextField(
+                    onTap: () => setState(() {
+                      _listExpanded = false;
+                    }),
+                    onSubmitted: (name) => setState(() {
+                      _routeName = name;
+                    }),
+                    style: const TextStyle(height: 1),
+                    decoration: InputDecoration(
+                      labelText: "Name",
+                      border: OutlineInputBorder(
+                          borderRadius: Defaults.borderRadius.big),
+                    ),
+                  )),
+                  Defaults.sizedBox.horizontal.big,
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.green[400],
+                      ),
+                      onPressed:
+                          _routeName.isNotEmpty ? () => _saveRoute() : null,
+                      child: const Text("create")),
+                  Defaults.sizedBox.horizontal.normal,
+                ],
+              ),
+              Defaults.sizedBox.vertical.normal,
+            ])));
   }
 }
