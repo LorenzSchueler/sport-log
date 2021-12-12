@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 abstract class Defaults {
   static const sizedBox = _SizedBox();
   static const borderRadius = _BorderRadius();
+  static const mapbox = _Mapbox();
 }
 
 class _SizedBox {
@@ -46,4 +47,16 @@ class _BorderRadius {
   final big = const BorderRadius.all(Radius.circular(20));
   final normal = const BorderRadius.all(Radius.circular(10));
   final small = const BorderRadius.all(Radius.circular(5));
+}
+
+class _Mapbox {
+  const _Mapbox();
+
+  final style = const _Style();
+}
+
+class _Style {
+  const _Style();
+
+  final String outdoor = 'mapbox://styles/mapbox/outdoors-v11';
 }

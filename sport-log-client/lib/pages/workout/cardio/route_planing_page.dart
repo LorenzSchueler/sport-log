@@ -21,7 +21,6 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
   final _logger = Logger('RoutePlanningPage');
 
   final String _token = Secrets.mapboxAccessToken;
-  final String _style = 'mapbox://styles/mapbox/outdoors-v11';
 
   final List<LatLng> _locations = [];
   List<LatLng> _matchedLocations = [];
@@ -302,7 +301,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
       Expanded(
           child: MapboxMap(
         accessToken: _token,
-        styleString: _style,
+        styleString: Defaults.mapbox.style.outdoor,
         initialCameraPosition: const CameraPosition(
           zoom: 13.0,
           target: LatLng(47.27, 11.33),
