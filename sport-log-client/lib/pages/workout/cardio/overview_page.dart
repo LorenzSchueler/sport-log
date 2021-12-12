@@ -28,7 +28,6 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
   final _logger = Logger('CardioSessionsPage');
 
   final String token = Secrets.mapboxAccessToken;
-  final String style = 'mapbox://styles/mapbox/outdoors-v11';
 
   final List<CardioSession> _cardioSessions = [
     CardioSession(
@@ -105,7 +104,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         avgHeartRate: 169,
         heartRate: null,
         routeId: null,
-        comments: null,
+        comments: "some comments here",
         deleted: false)
   ];
 
@@ -174,7 +173,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
                 height: 150,
                 child: MapboxMap(
                   accessToken: token,
-                  styleString: style,
+                  styleString: Defaults.mapbox.style.outdoor,
                   initialCameraPosition: CameraPosition(
                     zoom: 13.0,
                     target: cardioSession.track?.first.latLng,

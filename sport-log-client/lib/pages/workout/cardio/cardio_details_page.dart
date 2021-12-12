@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
@@ -28,6 +31,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final cardioSession = widget.cardioSession;
+
     final distance = cardioSession.distance == null
         ? '???'
         : (cardioSession.distance! / 1000).toStringAsFixed(3);
@@ -37,9 +41,15 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
             .toStringAsFixed(1);
     final duration =
         cardioSession.time == null ? "???" : formatTime(cardioSession.time!);
+    final calories = cardioSession.calories == null
+        ? "-"
+        : cardioSession.calories.toString();
     final avgCadence = cardioSession.avgCadence == null
         ? "-"
         : cardioSession.avgCadence.toString();
+    final avgHeartRate = cardioSession.avgHeartRate == null
+        ? "-"
+        : cardioSession.avgHeartRate.toString();
     final ascent =
         cardioSession.ascent == null ? "-" : cardioSession.ascent.toString();
     final descent =
@@ -52,88 +62,130 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Cardio Details"),
+          title: RichText(
+              text: TextSpan(children: [
+            TextSpan(
+              text: "${cardioSession.movementId} ",
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            TextSpan(
+              text: describeEnum(cardioSession.cardioType),
+              style: const TextStyle(fontSize: 14),
+            )
+          ])),
           actions: const [IconButton(onPressed: null, icon: Icon(Icons.edit))],
         ),
-        body: Column(
+        body: Stack(
           children: [
-            Expanded(
-                child: MapboxMap(
-              accessToken: _token,
-              styleString: Defaults.mapbox.style.outdoor,
-              initialCameraPosition: const CameraPosition(
-                zoom: 13.0,
-                target: LatLng(47.27, 11.33),
-              ),
-              compassEnabled: true,
-              compassViewPosition: CompassViewPosition.TopRight,
-              onMapCreated: (MapboxMapController controller) =>
-                  _mapController = controller,
-            )),
             Container(
-                padding: const EdgeInsets.all(5),
-                color: onPrimaryColorOf(context),
-                child: Table(
+                color: backgroundColorOf(context),
+                child: Column(
                   children: [
-                    rowSpacer,
-                    TableRow(children: [
-                      Expanded(
-                        child: ValueUnitDescription(
-                          value: distance,
-                          unit: "km",
-                          description: "Distance",
-                          scale: 1.3,
-                        ),
-                      ),
-                      Expanded(
-                        child: ValueUnitDescription(
-                          value: duration,
-                          unit: null,
-                          description: "Duration",
-                          scale: 1.3,
-                        ),
-                      ),
-                    ]),
-                    rowSpacer,
-                    TableRow(children: [
-                      Expanded(
-                        child: ValueUnitDescription(
-                          value: speed,
-                          unit: "km/h",
-                          description: "Speed",
-                          scale: 1.3,
-                        ),
-                      ),
-                      Expanded(
-                        child: ValueUnitDescription(
-                          value: avgCadence,
-                          unit: "bpm",
-                          description: "Cadence",
-                          scale: 1.3,
-                        ),
-                      ),
-                    ]),
-                    rowSpacer,
-                    TableRow(children: [
-                      Expanded(
-                        child: ValueUnitDescription(
-                          value: ascent,
-                          unit: "m",
-                          description: "Ascent",
-                          scale: 1.3,
-                        ),
-                      ),
-                      Expanded(
-                        child: ValueUnitDescription(
-                          value: descent,
-                          unit: "m",
-                          description: "Descent",
-                          scale: 1.3,
-                        ),
-                      ),
-                    ]),
+                    Expanded(
+                        child: MapboxMap(
+                            accessToken: _token,
+                            styleString: Defaults.mapbox.style.outdoor,
+                            initialCameraPosition: CameraPosition(
+                              zoom: 14.0,
+                              target: cardioSession.track?.first.latLng,
+                            ),
+                            onMapCreated: (MapboxMapController controller) =>
+                                _mapController = controller,
+                            onStyleLoadedCallback: () {
+                              _mapController.addLine(LineOptions(
+                                  lineColor: "red",
+                                  geometry: cardioSession.track
+                                      ?.map((c) => c.latLng)
+                                      .toList()));
+                              // TODO also show route if available
+                              // _mapController.addLine(LineOptions(
+                              // lineColor: "blue",
+                              // geometry: cardioSession.routeId
+                              // ?.map((c) => c.latLng)
+                              // .toList()));
+                            })),
+                    Defaults.sizedBox.vertical.normal,
+                    Table(
+                      children: [
+                        TableRow(children: [
+                          ValueUnitDescription(
+                            value: distance,
+                            unit: "km",
+                            description: "Distance",
+                            scale: 1.3,
+                          ),
+                          ValueUnitDescription(
+                            value: duration,
+                            unit: null,
+                            description: "Duration",
+                            scale: 1.3,
+                          ),
+                        ]),
+                        rowSpacer,
+                        TableRow(children: [
+                          ValueUnitDescription(
+                            value: speed,
+                            unit: "km/h",
+                            description: "Speed",
+                            scale: 1.3,
+                          ),
+                          ValueUnitDescription(
+                            value: calories,
+                            unit: "cal",
+                            description: "Energy",
+                            scale: 1.3,
+                          ),
+                        ]),
+                        rowSpacer,
+                        TableRow(children: [
+                          ValueUnitDescription(
+                            value: ascent,
+                            unit: "m",
+                            description: "Ascent",
+                            scale: 1.3,
+                          ),
+                          ValueUnitDescription(
+                            value: descent,
+                            unit: "m",
+                            description: "Descent",
+                            scale: 1.3,
+                          ),
+                        ]),
+                        rowSpacer,
+                        TableRow(children: [
+                          ValueUnitDescription(
+                            value: avgCadence,
+                            unit: "rpm",
+                            description: "Cadence",
+                            scale: 1.3,
+                          ),
+                          ValueUnitDescription(
+                            value: avgHeartRate,
+                            unit: "bpm",
+                            description: "Heart Rate",
+                            scale: 1.3,
+                          ),
+                        ]),
+                      ],
+                    ),
+                    Defaults.sizedBox.vertical.normal,
+                    if (cardioSession.comments != null)
+                      Text(cardioSession.comments!),
+                    if (cardioSession.comments != null)
+                      Defaults.sizedBox.vertical.normal,
                   ],
                 )),
+            Container(
+                width: double.infinity,
+                padding: const EdgeInsets.only(
+                  top: 5,
+                ),
+                child: Text(formatDatetime(cardioSession.datetime),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: backgroundColorOf(context),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold))),
           ],
         ));
   }
