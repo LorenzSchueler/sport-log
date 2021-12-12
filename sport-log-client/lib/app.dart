@@ -9,6 +9,7 @@ import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/movement/movement_description.dart';
 import 'package:sport_log/models/strength/strength_session_with_sets.dart';
+import 'package:sport_log/pages/workout/cardio/cardio_input_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_planing_page.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_page.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings_page.dart';
@@ -103,6 +104,7 @@ class _AppState extends State<App> {
             return CardioTrackingPage(
                 args[0] as Movement, args[1] as CardioType, args[2] as Route?);
           },
+          Routes.cardio.data_input: (_) => const CardioInputPage(),
           Routes.cardio.route_planning: (_) => const RoutePlanningPage(),
           Routes.diary.edit: (_) => const DiaryEditPage(),
         },

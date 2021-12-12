@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/routes.dart';
 
 class TimelinePage extends StatefulWidget {
   const TimelinePage({Key? key}) : super(key: key);
