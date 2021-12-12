@@ -89,6 +89,7 @@ class WorkoutPage extends StatelessWidget {
 
   Widget _mainPage(SessionsUiState state) {
     // TODO: preserve state and/or widget when changing tab
+    // ^^ do we really want this???
     switch (state.tab) {
       case SessionsPageTab.timeline:
         return TimelinePage(key: _timelineKey);
@@ -139,10 +140,15 @@ class WorkoutPage extends StatelessWidget {
 
   Widget? _fab(SessionsUiState state, BuildContext context) {
     Logger _logger = Logger('Fab Function');
-    _logger.i("fab calling");
-    _logger.i("${state.tab}");
+    _logger.i("### fab calling ###");
+    _logger.i("tab: ${state.tab}");
+    _logger.i("timeline: ${_timelineKey.currentState}");
+    _logger.i("strength: ${_strengthKey.currentState}");
+    _logger.i("metcon:   ${_metconKey.currentState}");
+    _logger.i("cardio:   ${_cardioKey.currentState}");
+    _logger.i("diary:    ${_diaryKey.currentState}");
 
-    // TODO currentState is sometimes null
+    // TODO after first tab switch state of current tab is null while state of last tab is not null
     switch (state.tab) {
       case SessionsPageTab.timeline:
         return _timelineKey.currentState?.fab(context);
@@ -151,7 +157,6 @@ class WorkoutPage extends StatelessWidget {
       case SessionsPageTab.metcon:
         return _metconKey.currentState?.fab(context);
       case SessionsPageTab.cardio:
-        _logger.i("${_cardioKey.currentState}");
         return _cardioKey.currentState?.fab(context);
       case SessionsPageTab.diary:
         return _diaryKey.currentState?.fab(context);

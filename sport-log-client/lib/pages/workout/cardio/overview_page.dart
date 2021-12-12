@@ -87,14 +87,14 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
               distance: 0,
               time: 0),
           Position(
-              longitude: 11.331,
+              longitude: 11.332,
               latitude: 47.27,
               elevation: 650,
               distance: 1000,
               time: 200),
           Position(
               longitude: 11.33,
-              latitude: 47.272,
+              latitude: 47.271,
               elevation: 600,
               distance: 2000,
               time: 500)
@@ -139,87 +139,94 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
 
     late MapboxMapController _sessionMapController;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: Defaults.borderRadius.normal,
-        color: backgroundColorOf(context),
-      ),
-      margin: const EdgeInsets.symmetric(vertical: 5),
-      padding: const EdgeInsets.only(bottom: 5),
-      child: Column(children: [
-        Defaults.sizedBox.vertical.small,
-        Row(children: [
-          Expanded(
-            child: Text(
-              formatDatetime(cardioSession.datetime),
-              textAlign: TextAlign.center,
-            ),
+    final showDetails = () => Navigator.of(context)
+        .pushNamed(Routes.cardio.cardio_details, arguments: cardioSession);
+
+    return GestureDetector(
+        onTap: showDetails,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: Defaults.borderRadius.normal,
+            color: backgroundColorOf(context),
           ),
-          const Spacer(),
-          Expanded(
-            child: Text(
-              "movement <${cardioSession.movementId}>", // TODO use movement name
-              textAlign: TextAlign.center,
-            ),
-          )
-        ]),
-        Defaults.sizedBox.vertical.small,
-        SizedBox(
-            height: 150,
-            child: MapboxMap(
-              accessToken: token,
-              styleString: style,
-              initialCameraPosition: CameraPosition(
-                zoom: 13.0,
-                target: cardioSession.track?.first.latLng,
+          margin: const EdgeInsets.symmetric(vertical: 5),
+          padding: const EdgeInsets.only(bottom: 5),
+          child: Column(children: [
+            Defaults.sizedBox.vertical.small,
+            Row(children: [
+              Expanded(
+                child: Text(
+                  formatDatetime(cardioSession.datetime),
+                  textAlign: TextAlign.center,
+                ),
               ),
-              onMapCreated: (MapboxMapController controller) =>
-                  _sessionMapController = controller,
-              onStyleLoadedCallback: () => _sessionMapController.addLine(
-                  LineOptions(
-                      lineColor: "red",
-                      geometry:
-                          cardioSession.track?.map((c) => c.latLng).toList())),
-            )),
-        Defaults.sizedBox.vertical.small,
-        Row(children: [
-          Expanded(
-              child: Text(
-            duration,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 20),
-          )),
-          Expanded(
-              child: RichText(
-            text: TextSpan(children: [
-              TextSpan(
-                text: "$distance ",
-                style: const TextStyle(fontSize: 20),
-              ),
-              const TextSpan(
-                text: "km",
-                style: TextStyle(fontSize: 14),
+              const Spacer(),
+              Expanded(
+                child: Text(
+                  "movement <${cardioSession.movementId}>", // TODO use movement name
+                  textAlign: TextAlign.center,
+                ),
               )
             ]),
-            textAlign: TextAlign.center,
-          )),
-          Expanded(
-              child: RichText(
-            text: TextSpan(children: [
-              TextSpan(
-                text: "$speed ",
+            Defaults.sizedBox.vertical.small,
+            SizedBox(
+                height: 150,
+                child: MapboxMap(
+                  accessToken: token,
+                  styleString: style,
+                  initialCameraPosition: CameraPosition(
+                    zoom: 13.0,
+                    target: cardioSession.track?.first.latLng,
+                  ),
+                  onMapCreated: (MapboxMapController controller) =>
+                      _sessionMapController = controller,
+                  onStyleLoadedCallback: () => _sessionMapController.addLine(
+                      LineOptions(
+                          lineColor: "red",
+                          geometry: cardioSession.track
+                              ?.map((c) => c.latLng)
+                              .toList())),
+                  onMapClick: (_, __) => showDetails(),
+                )),
+            Defaults.sizedBox.vertical.small,
+            Row(children: [
+              Expanded(
+                  child: Text(
+                duration,
+                textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 20),
-              ),
-              const TextSpan(
-                text: "km/h",
-                style: TextStyle(fontSize: 14),
-              )
+              )),
+              Expanded(
+                  child: RichText(
+                text: TextSpan(children: [
+                  TextSpan(
+                    text: "$distance ",
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  const TextSpan(
+                    text: "km",
+                    style: TextStyle(fontSize: 14),
+                  )
+                ]),
+                textAlign: TextAlign.center,
+              )),
+              Expanded(
+                  child: RichText(
+                text: TextSpan(children: [
+                  TextSpan(
+                    text: "$speed ",
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  const TextSpan(
+                    text: "km/h",
+                    style: TextStyle(fontSize: 14),
+                  )
+                ]),
+                textAlign: TextAlign.center,
+              )),
             ]),
-            textAlign: TextAlign.center,
-          )),
-        ]),
-      ]),
-    );
+          ]),
+        ));
   }
 
   Widget? fab(BuildContext context) {
@@ -236,7 +243,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         () => Navigator.of(context)
             .pushNamed(Routes.cardio.tracking_settings)
             .then(_handleNewCardioSession),
-        () => Navigator.of(context).pushNamed(Routes.cardio.data_input),
+        () => Navigator.of(context).pushNamed(Routes.cardio.cardio_input),
         () => Navigator.of(context).pushNamed(Routes.cardio.route_planning),
       ],
     );
