@@ -230,7 +230,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         () => Navigator.of(context)
             .pushNamed(Routes.cardio.tracking_settings)
             .then(_handleNewCardioSession),
-        () => Navigator.of(context).pushNamed(Routes.cardio.cardio_input),
+        () => Navigator.of(context).pushNamed(Routes.cardio.cardio_edit),
         () => Navigator.of(context).pushNamed(Routes.cardio.route_planning),
       ],
     );

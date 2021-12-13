@@ -10,7 +10,7 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/movement/movement_description.dart';
 import 'package:sport_log/models/strength/strength_session_with_sets.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_details_page.dart';
-import 'package:sport_log/pages/workout/cardio/cardio_input_page.dart';
+import 'package:sport_log/pages/workout/cardio/cardio_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_planing_page.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_page.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings_page.dart';
@@ -105,7 +105,14 @@ class _AppState extends State<App> {
             return CardioTrackingPage(
                 args[0] as Movement, args[1] as CardioType, args[2] as Route?);
           },
-          Routes.cardio.cardio_input: (_) => const CardioInputPage(),
+          Routes.cardio.cardio_edit: (context) {
+            final dynamic arg = ModalRoute.of(context)?.settings.arguments;
+            final CardioSession? cardioSession =
+                arg == null ? null : arg as CardioSession;
+            return CardioEditPage(
+              cardioSession: cardioSession,
+            );
+          },
           Routes.cardio.cardio_details: (context) {
             final cardioSession =
                 ModalRoute.of(context)?.settings.arguments as CardioSession;

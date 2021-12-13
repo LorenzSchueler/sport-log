@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/models/all.dart';
 
-class CardioInputPage extends StatefulWidget {
-  const CardioInputPage({Key? key}) : super(key: key);
+class CardioEditPage extends StatefulWidget {
+  final CardioSession? cardioSession;
+
+  const CardioEditPage({Key? key, this.cardioSession}) : super(key: key);
 
   @override
-  State<CardioInputPage> createState() => CardioInputPageState();
+  State<CardioEditPage> createState() => CardioEditPageState();
 }
 
-class CardioInputPageState extends State<CardioInputPage> {
-  final _logger = Logger('CardioInputPage');
+class CardioEditPageState extends State<CardioEditPage> {
+  final _logger = Logger('CardioEditPage');
 
   @override
   Widget build(BuildContext context) {
