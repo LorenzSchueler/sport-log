@@ -33,7 +33,7 @@ class CardioTrackingSettingsPageState
             ListTile(
                 leading: const Icon(Icons.sports),
                 title: Text(_movement?.name ?? ""),
-                subtitle: const Text("movement"),
+                subtitle: const Text("Movement"),
                 trailing: const Icon(Icons.edit),
                 onTap: () async {
                   Movement? movement = await showMovementPickerDialog(context,
@@ -47,7 +47,7 @@ class CardioTrackingSettingsPageState
             ListTile(
                 leading: const Icon(Icons.sports),
                 title: Text(_cardioType?.name ?? ""),
-                subtitle: const Text("cardio type"),
+                subtitle: const Text("Cardio Type"),
                 trailing: const Icon(Icons.edit),
                 onTap: () async {
                   CardioType? cardioType = await showCardioTypePickerDialog(
@@ -63,7 +63,7 @@ class CardioTrackingSettingsPageState
             ListTile(
                 leading: const Icon(Icons.map),
                 title: Text(_route?.name ?? ""),
-                subtitle: const Text("route to follow"),
+                subtitle: const Text("Route to follow"),
                 trailing: const Icon(Icons.edit),
                 onTap: () async {
                   Route? route = await showRoutePickerDialog(

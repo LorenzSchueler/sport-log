@@ -9,6 +9,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/secrets.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class CardioDetailsPage extends StatefulWidget {
@@ -30,7 +31,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final cardioSession = widget.cardioSession;
+    CardioSession cardioSession = widget.cardioSession;
 
     final distance = cardioSession.distance == null
         ? '???'
@@ -73,7 +74,18 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
               style: const TextStyle(fontSize: 14),
             )
           ])),
-          actions: const [IconButton(onPressed: null, icon: Icon(Icons.edit))],
+          actions: [
+            IconButton(
+                onPressed: () => Navigator.of(context)
+                        .pushNamed(Routes.cardio.cardio_edit,
+                            arguments: cardioSession)
+                        .then((value) {
+                      setState(() {
+                        cardioSession = value as CardioSession;
+                      });
+                    }),
+                icon: const Icon(Icons.edit))
+          ],
         ),
         body: Stack(
           children: [

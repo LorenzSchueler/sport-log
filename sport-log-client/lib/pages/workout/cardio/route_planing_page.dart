@@ -340,11 +340,11 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
                 children: [
                   Defaults.sizedBox.horizontal.normal,
                   Expanded(
-                      child: TextField(
+                      child: TextFormField(
                     onTap: () => setState(() {
                       _listExpanded = false;
                     }),
-                    onSubmitted: (name) => setState(() {
+                    onFieldSubmitted: (name) => setState(() {
                       _routeName = name;
                     }),
                     style: const TextStyle(height: 1),
