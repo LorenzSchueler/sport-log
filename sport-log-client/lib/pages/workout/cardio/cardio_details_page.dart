@@ -99,7 +99,8 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                             styleString: Defaults.mapbox.style.outdoor,
                             initialCameraPosition: CameraPosition(
                               zoom: 14.0,
-                              target: cardioSession.track?.first.latLng,
+                              target: cardioSession.track?.first.latLng ??
+                                  const LatLng(11.33, 47.27),
                             ),
                             onMapCreated: (MapboxMapController controller) =>
                                 _mapController = controller,

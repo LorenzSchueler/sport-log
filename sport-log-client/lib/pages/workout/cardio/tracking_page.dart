@@ -173,14 +173,14 @@ satelites: ${location.satelliteNumber}""";
 
     _logger.i(_locationInfo);
 
-    LatLng latLng = LatLng(location.latitude, location.longitude);
+    LatLng latLng = LatLng(location.latitude!, location.longitude!);
 
     await _mapController.animateCamera(
       CameraUpdate.newLatLng(latLng),
     );
 
     if (_circles != null) {
-      await _mapController.removeCircles(_circles);
+      await _mapController.removeCircles(_circles!);
     }
     _circles = await _mapController.addCircles([
       CircleOptions(
@@ -228,7 +228,7 @@ satelites: ${location.satelliteNumber}""";
     _line ??= await controller.addLine(
         const LineOptions(lineColor: "red", lineWidth: 3, geometry: []));
     await controller.updateLine(
-        _line,
+        _line!,
         LineOptions(
             geometry: _positions
                 .map((e) => LatLng(e.latitude, e.longitude))

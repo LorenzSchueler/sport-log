@@ -110,7 +110,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
   Future<void> _updateLine() async {
     await _matchLocations();
     await _mapController.updateLine(
-        _line, LineOptions(geometry: _matchedLocations));
+        _line!, LineOptions(geometry: _matchedLocations));
   }
 
   void _extendLine(LatLng location) async {
