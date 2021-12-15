@@ -1,12 +1,15 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/cardio_type_picker.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
+import 'package:sport_log/widgets/movement_picker.dart';
 import 'package:sport_log/widgets/route_picker.dart';
 
 class CardioEditPage extends StatefulWidget {
@@ -51,6 +54,10 @@ class CardioEditPageState extends State<CardioEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    Duration duration = Duration(seconds: _cardioSession.time ?? 0);
+    int hours = duration.inHours;
+    int minutes = duration.inMinutes - 60 * hours;
+    int seconds = duration.inSeconds - 60 * minutes - 3600 * hours;
     return Scaffold(
         appBar: AppBar(
           title: const Text("Cardio Edit"),
@@ -63,8 +70,73 @@ class CardioEditPageState extends State<CardioEditPage> {
         ),
         body: Container(
             padding: const EdgeInsets.all(10),
-            child: Column(
+            child: ListView(
               children: [
+                EditTile(
+                    leading: const Icon(Icons.sports),
+                    caption: "Movement",
+                    child: Text(_cardioSession.movementId.toString()),
+                    onTap: () async {
+                      Movement? movement = await showMovementPickerDialog(
+                          context,
+                          dismissable: true,
+                          cardioOnly: true);
+                      if (movement != null) {
+                        setState(() {
+                          _cardioSession.movementId = movement.id;
+                        });
+                      }
+                    }),
+                EditTile(
+                    leading: const Icon(Icons.sports),
+                    caption: "Cardio Type",
+                    child: Text(_cardioSession.cardioType.name),
+                    onTap: () async {
+                      CardioType? cardioType = await showCardioTypePickerDialog(
+                        context,
+                        dismissable: false,
+                      );
+                      if (cardioType != null) {
+                        setState(() {
+                          _cardioSession.cardioType = cardioType;
+                        });
+                      }
+                    }),
+                EditTile(
+                    leading: const Icon(Icons.crop),
+                    caption: "Start Time",
+                    child: Text(formatDatetime(_cardioSession.datetime)),
+                    onTap: () async {
+                      DateTime? datetime = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate:
+                            DateTime.now().subtract(const Duration(days: 365)),
+                        lastDate: DateTime.now(),
+                      );
+                      TimeOfDay? time = await showTimePicker(
+                          context: context, initialTime: TimeOfDay.now());
+                      if (datetime != null && time != null) {
+                        datetime = datetime.add(
+                            Duration(hours: time.hour, minutes: time.minute));
+                        setState(() {
+                          _cardioSession.datetime = datetime!;
+                        });
+                      }
+                    }),
+                EditTile(
+                    leading: const Icon(CustomIcons.route),
+                    caption: "Route",
+                    child: Text(_cardioSession.routeId.toString()),
+                    onTap: () async {
+                      Route? route = await showRoutePickerDialog(context,
+                          dismissable: true);
+                      if (route != null) {
+                        setState(() {
+                          _cardioSession.routeId = route.id;
+                        });
+                      }
+                    }),
                 TextFormField(
                   keyboardType: TextInputType.number,
                   onFieldSubmitted: (distance) => setState(() {
@@ -104,21 +176,94 @@ class CardioEditPageState extends State<CardioEditPage> {
                     labelText: "Descent (m)",
                   ),
                 ),
-                EditTile(
-                    leading: const Icon(Icons.sports),
-                    caption: "Cardio Type",
-                    child: Text(_cardioSession.cardioType.name),
-                    onTap: () async {
-                      CardioType? cardioType = await showCardioTypePickerDialog(
-                        context,
-                        dismissable: false,
-                      );
-                      if (cardioType != null) {
-                        setState(() {
-                          _cardioSession.cardioType = cardioType;
-                        });
-                      }
-                    }),
+                Row(
+                  children: [
+                    SizedBox(
+                        width: 70,
+                        child: TextFormField(
+                          textAlign: TextAlign.center,
+                          keyboardType: TextInputType.number,
+                          onFieldSubmitted: (newHours) => setState(() {
+                            hours = int.parse(newHours);
+                            _cardioSession.time =
+                                hours * 3600 + minutes * 60 + seconds;
+                          }),
+                          style: const TextStyle(height: 1),
+                          textInputAction: TextInputAction.next,
+                          initialValue: hours.toString().padLeft(2, "0"),
+                          decoration: const InputDecoration(
+                            icon: Icon(CustomIcons.timeInterval),
+                          ),
+                        )),
+                    const Text(":"),
+                    SizedBox(
+                      width: 30,
+                      child: TextFormField(
+                        textAlign: TextAlign.center,
+                        keyboardType: TextInputType.number,
+                        onFieldSubmitted: (newMinutes) => setState(() {
+                          minutes = int.parse(newMinutes);
+                          _cardioSession.time =
+                              hours * 3600 + minutes * 60 + seconds;
+                        }),
+                        style: const TextStyle(height: 1),
+                        textInputAction: TextInputAction.next,
+                        initialValue: minutes.toString().padLeft(2, "0"),
+                      ),
+                    ),
+                    const Text(":"),
+                    SizedBox(
+                      width: 30,
+                      child: TextFormField(
+                        textAlign: TextAlign.center,
+                        keyboardType: TextInputType.number,
+                        onFieldSubmitted: (newSeconds) => setState(() {
+                          seconds = int.parse(newSeconds);
+                          _cardioSession.time =
+                              hours * 3600 + minutes * 60 + seconds;
+                        }),
+                        style: const TextStyle(height: 1),
+                        initialValue: seconds.toString().padLeft(2, "0"),
+                      ),
+                    )
+                  ],
+                ),
+                TextFormField(
+                  keyboardType: TextInputType.number,
+                  onFieldSubmitted: (calories) => setState(() {
+                    _cardioSession.calories = int.parse(calories);
+                  }),
+                  style: const TextStyle(height: 1),
+                  initialValue: _cardioSession.calories?.toString(),
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.crop),
+                    labelText: "Calories",
+                  ),
+                ),
+                TextFormField(
+                  keyboardType: TextInputType.number,
+                  onFieldSubmitted: (avgCadence) => setState(() {
+                    _cardioSession.avgCadence = int.parse(avgCadence);
+                  }),
+                  style: const TextStyle(height: 1),
+                  initialValue: _cardioSession.avgCadence?.toString(),
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.crop),
+                    labelText: "Cadence",
+                  ),
+                ),
+                TextFormField(
+                  keyboardType: TextInputType.number,
+                  onFieldSubmitted: (avgHeartRate) => setState(() {
+                    _cardioSession.avgHeartRate = int.parse(avgHeartRate);
+                  }),
+                  style: const TextStyle(height: 1),
+                  initialValue: _cardioSession.avgHeartRate?.toString(),
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.crop),
+                    labelText: "Heart Rate",
+                  ),
+                ),
                 TextFormField(
                   onFieldSubmitted: (comments) => setState(() {
                     _cardioSession.comments = comments;
