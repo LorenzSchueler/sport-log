@@ -1,9 +1,12 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart' hide Route;
+import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/data_provider/user_state.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/secrets.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/cardio_type_picker.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
@@ -58,6 +61,9 @@ class CardioEditPageState extends State<CardioEditPage> {
     int hours = duration.inHours;
     int minutes = duration.inMinutes - 60 * hours;
     int seconds = duration.inSeconds - 60 * minutes - 3600 * hours;
+
+    late MapboxMapController _sessionMapController;
+
     return Scaffold(
         appBar: AppBar(
           title: const Text("Cardio Edit"),
@@ -72,6 +78,29 @@ class CardioEditPageState extends State<CardioEditPage> {
             padding: const EdgeInsets.all(10),
             child: ListView(
               children: [
+                if (_cardioSession.track != null)
+                  SizedBox(
+                      height: 150,
+                      child: MapboxMap(
+                          accessToken: Secrets.mapboxAccessToken,
+                          styleString: Defaults.mapbox.style.outdoor,
+                          initialCameraPosition: CameraPosition(
+                            zoom: 13.0,
+                            target: _cardioSession.track!.first.latLng,
+                          ),
+                          onMapCreated: (MapboxMapController controller) =>
+                              _sessionMapController = controller,
+                          onStyleLoadedCallback: () {
+                            if (_cardioSession.track != null) {
+                              _sessionMapController.addLine(LineOptions(
+                                  lineColor: "red",
+                                  geometry: _cardioSession.track
+                                      ?.map((c) => c.latLng)
+                                      .toList()));
+                            }
+                          }
+                          // TODO also draw route if available
+                          )),
                 EditTile(
                     leading: const Icon(Icons.sports),
                     caption: "Movement",
@@ -137,6 +166,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                         });
                       }
                     }),
+                // TODO add GPX/ GeoJson upload option for track
                 TextFormField(
                   keyboardType: TextInputType.number,
                   onFieldSubmitted: (distance) => setState(() {
