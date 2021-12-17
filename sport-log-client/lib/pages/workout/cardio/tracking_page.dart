@@ -36,8 +36,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
   //final DataProvider<CardioSession> _dataProvider = CardioSessionDataProvider.instance;
 
-  final String _token = Secrets.mapboxAccessToken;
-
   final List<Position> _positions = [];
   double _ascent = 0;
   double _descent = 0;
@@ -350,7 +348,7 @@ satelites: ${location.satelliteNumber}""";
           ),
           Expanded(
               child: MapboxMap(
-            accessToken: _token,
+            accessToken: Secrets.mapboxAccessToken,
             styleString: Defaults.mapbox.style.outdoor,
             initialCameraPosition: const CameraPosition(
               zoom: 15.0,

@@ -25,8 +25,6 @@ class CardioDetailsPage extends StatefulWidget {
 class CardioDetailsPageState extends State<CardioDetailsPage> {
   final _logger = Logger('CardioDetailsPage');
 
-  final String _token = Secrets.mapboxAccessToken;
-
   late MapboxMapController _mapController;
 
   @override
@@ -95,21 +93,23 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                   children: [
                     Expanded(
                         child: MapboxMap(
-                            accessToken: _token,
+                            accessToken: Secrets.mapboxAccessToken,
                             styleString: Defaults.mapbox.style.outdoor,
                             initialCameraPosition: CameraPosition(
                               zoom: 14.0,
                               target: cardioSession.track?.first.latLng ??
-                                  const LatLng(11.33, 47.27),
+                                  const LatLng(47.27, 11.33),
                             ),
                             onMapCreated: (MapboxMapController controller) =>
                                 _mapController = controller,
                             onStyleLoadedCallback: () {
-                              _mapController.addLine(LineOptions(
-                                  lineColor: "red",
-                                  geometry: cardioSession.track
-                                      ?.map((c) => c.latLng)
-                                      .toList()));
+                              if (cardioSession.track != null) {
+                                _mapController.addLine(LineOptions(
+                                    lineColor: "red",
+                                    geometry: cardioSession.track
+                                        ?.map((c) => c.latLng)
+                                        .toList()));
+                              }
                               // TODO also show route if available
                               // _mapController.addLine(LineOptions(
                               // lineColor: "blue",

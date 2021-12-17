@@ -21,8 +21,6 @@ class RoutePlanningPage extends StatefulWidget {
 class RoutePlanningPageState extends State<RoutePlanningPage> {
   final _logger = Logger('RoutePlanningPage');
 
-  final String _token = Secrets.mapboxAccessToken;
-
   final List<LatLng> _locations = [];
   List<LatLng> _matchedLocations = [];
 
@@ -289,7 +287,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
             child: Column(children: [
               Expanded(
                   child: MapboxMap(
-                accessToken: _token,
+                accessToken: Secrets.mapboxAccessToken,
                 styleString: Defaults.mapbox.style.outdoor,
                 initialCameraPosition: const CameraPosition(
                   zoom: 13.0,

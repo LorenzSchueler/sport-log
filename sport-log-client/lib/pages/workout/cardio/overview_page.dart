@@ -27,8 +27,6 @@ class CardioSessionsPage extends StatefulWidget {
 class CardioSessionsPageState extends State<CardioSessionsPage> {
   final _logger = Logger('CardioSessionsPage');
 
-  final String token = Secrets.mapboxAccessToken;
-
   final List<CardioSession> _cardioSessions = [
     CardioSession(
         id: randomId(),
@@ -79,26 +77,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         descent: 7,
         time: 489,
         calories: null,
-        track: [
-          Position(
-              longitude: 11.33,
-              latitude: 47.27,
-              elevation: 600,
-              distance: 0,
-              time: 0),
-          Position(
-              longitude: 11.332,
-              latitude: 47.27,
-              elevation: 650,
-              distance: 1000,
-              time: 200),
-          Position(
-              longitude: 11.33,
-              latitude: 47.271,
-              elevation: 600,
-              distance: 2000,
-              time: 500)
-        ],
+        track: null,
         avgCadence: 147,
         cadence: null,
         avgHeartRate: 169,
@@ -125,6 +104,11 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
     ;
   }
 
+  void showDetails(BuildContext context, CardioSession cardioSession) {
+    Navigator.of(context)
+        .pushNamed(Routes.cardio.cardio_details, arguments: cardioSession);
+  }
+
   Widget _buildSessionCard(BuildContext buildContext, int index) {
     final CardioSession cardioSession = _cardioSessions[index];
     final distance = cardioSession.distance == null
@@ -139,11 +123,11 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
 
     late MapboxMapController _sessionMapController;
 
-    final showDetails = () => Navigator.of(context)
-        .pushNamed(Routes.cardio.cardio_details, arguments: cardioSession);
-
     return GestureDetector(
-        onTap: showDetails,
+        onTap: () {
+          _logger.i("click");
+          showDetails(context, cardioSession);
+        },
         child: Container(
           decoration: BoxDecoration(
             borderRadius: Defaults.borderRadius.normal,
@@ -172,23 +156,33 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
             SizedBox(
                 height: 150,
                 child: MapboxMap(
-                  accessToken: token,
-                  styleString: Defaults.mapbox.style.outdoor,
-                  initialCameraPosition: CameraPosition(
-                    zoom: 13.0,
-                    target: cardioSession.track?.first.latLng ??
-                        const LatLng(11.33, 47.27),
-                  ),
-                  onMapCreated: (MapboxMapController controller) =>
-                      _sessionMapController = controller,
-                  onStyleLoadedCallback: () => _sessionMapController.addLine(
-                      LineOptions(
-                          lineColor: "red",
-                          geometry: cardioSession.track
-                              ?.map((c) => c.latLng)
-                              .toList())),
-                  onMapClick: (_, __) => showDetails(),
-                )),
+                    accessToken: Secrets.mapboxAccessToken,
+                    styleString: Defaults.mapbox.style.outdoor,
+                    initialCameraPosition: CameraPosition(
+                      zoom: 13.0,
+                      target: cardioSession.track?.first.latLng ??
+                          const LatLng(47.27, 11.33),
+                    ),
+                    onMapCreated: (MapboxMapController controller) =>
+                        _sessionMapController = controller,
+                    onStyleLoadedCallback: () {
+                      if (cardioSession.track != null) {
+                        _sessionMapController.addLine(LineOptions(
+                            lineColor: "red",
+                            geometry: cardioSession.track
+                                ?.map((c) => c.latLng)
+                                .toList()));
+                      }
+                    },
+                    onMapClick: (_, __) {
+                      // TODO does not work
+                      _logger.i("map click");
+                      showDetails(context, cardioSession);
+                    },
+                    onMapLongClick: (_, __) {
+                      _logger.i("map long click");
+                      showDetails(context, cardioSession);
+                    })),
             Defaults.sizedBox.vertical.small,
             Row(children: [
               Expanded(
