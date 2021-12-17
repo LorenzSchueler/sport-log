@@ -10,6 +10,7 @@ import 'package:sport_log/helpers/secrets.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class CardioDetailsPage extends StatefulWidget {
@@ -91,32 +92,42 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                 color: backgroundColorOf(context),
                 child: Column(
                   children: [
-                    Expanded(
-                        child: MapboxMap(
-                            accessToken: Secrets.mapboxAccessToken,
-                            styleString: Defaults.mapbox.style.outdoor,
-                            initialCameraPosition: CameraPosition(
-                              zoom: 14.0,
-                              target: cardioSession.track?.first.latLng ??
-                                  const LatLng(47.27, 11.33),
+                    cardioSession.track != null
+                        ? Expanded(
+                            child: MapboxMap(
+                                accessToken: Secrets.mapboxAccessToken,
+                                styleString: Defaults.mapbox.style.outdoor,
+                                initialCameraPosition: CameraPosition(
+                                  zoom: 14.0,
+                                  target: cardioSession.track!.first.latLng,
+                                ),
+                                onMapCreated:
+                                    (MapboxMapController controller) =>
+                                        _mapController = controller,
+                                onStyleLoadedCallback: () {
+                                  if (cardioSession.track != null) {
+                                    _mapController.addLine(LineOptions(
+                                        lineColor: "red",
+                                        geometry: cardioSession.track!
+                                            .map((c) => c.latLng)
+                                            .toList()));
+                                  }
+                                  // TODO also show route if available
+                                  // _mapController.addLine(LineOptions(
+                                  // lineColor: "blue",
+                                  // geometry: cardioSession.routeId
+                                  // ?.map((c) => c.latLng)
+                                  // .toList()));
+                                }))
+                        : Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(CustomIcons.route),
+                                Text(" no track available"),
+                              ],
                             ),
-                            onMapCreated: (MapboxMapController controller) =>
-                                _mapController = controller,
-                            onStyleLoadedCallback: () {
-                              if (cardioSession.track != null) {
-                                _mapController.addLine(LineOptions(
-                                    lineColor: "red",
-                                    geometry: cardioSession.track
-                                        ?.map((c) => c.latLng)
-                                        .toList()));
-                              }
-                              // TODO also show route if available
-                              // _mapController.addLine(LineOptions(
-                              // lineColor: "blue",
-                              // geometry: cardioSession.routeId
-                              // ?.map((c) => c.latLng)
-                              // .toList()));
-                            })),
+                          ),
                     Defaults.sizedBox.vertical.normal,
                     Table(
                       children: [
@@ -196,7 +207,9 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                 child: Text(formatDatetime(cardioSession.datetime),
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        color: backgroundColorOf(context),
+                        color: cardioSession.track != null
+                            ? backgroundColorOf(context)
+                            : Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold))),
           ],

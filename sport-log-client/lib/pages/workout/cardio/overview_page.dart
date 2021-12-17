@@ -153,36 +153,41 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
               )
             ]),
             Defaults.sizedBox.vertical.small,
-            SizedBox(
-                height: 150,
-                child: MapboxMap(
-                    accessToken: Secrets.mapboxAccessToken,
-                    styleString: Defaults.mapbox.style.outdoor,
-                    initialCameraPosition: CameraPosition(
-                      zoom: 13.0,
-                      target: cardioSession.track?.first.latLng ??
-                          const LatLng(47.27, 11.33),
-                    ),
-                    onMapCreated: (MapboxMapController controller) =>
-                        _sessionMapController = controller,
-                    onStyleLoadedCallback: () {
-                      if (cardioSession.track != null) {
-                        _sessionMapController.addLine(LineOptions(
-                            lineColor: "red",
-                            geometry: cardioSession.track
-                                ?.map((c) => c.latLng)
-                                .toList()));
-                      }
-                    },
-                    onMapClick: (_, __) {
-                      // TODO does not work
-                      _logger.i("map click");
-                      showDetails(context, cardioSession);
-                    },
-                    onMapLongClick: (_, __) {
-                      _logger.i("map long click");
-                      showDetails(context, cardioSession);
-                    })),
+            cardioSession.track != null
+                ? SizedBox(
+                    height: 150,
+                    child: MapboxMap(
+                        accessToken: Secrets.mapboxAccessToken,
+                        styleString: Defaults.mapbox.style.outdoor,
+                        initialCameraPosition: CameraPosition(
+                          zoom: 13.0,
+                          target: cardioSession.track!.first.latLng,
+                        ),
+                        onMapCreated: (MapboxMapController controller) =>
+                            _sessionMapController = controller,
+                        onStyleLoadedCallback: () {
+                          _sessionMapController.addLine(LineOptions(
+                              lineColor: "red",
+                              geometry: cardioSession.track!
+                                  .map((c) => c.latLng)
+                                  .toList()));
+                        },
+                        onMapClick: (_, __) {
+                          // TODO does not work
+                          _logger.i("map click");
+                          showDetails(context, cardioSession);
+                        },
+                        onMapLongClick: (_, __) {
+                          _logger.i("map long click");
+                          showDetails(context, cardioSession);
+                        }))
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(CustomIcons.route),
+                      Text(" no track available"),
+                    ],
+                  ),
             Defaults.sizedBox.vertical.small,
             Row(children: [
               Expanded(
