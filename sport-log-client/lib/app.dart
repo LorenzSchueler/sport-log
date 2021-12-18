@@ -106,9 +106,8 @@ class _AppState extends State<App> {
                 args[0] as Movement, args[1] as CardioType, args[2] as Route?);
           },
           Routes.cardio.cardio_edit: (context) {
-            final dynamic arg = ModalRoute.of(context)?.settings.arguments;
             final CardioSession? cardioSession =
-                arg == null ? null : arg as CardioSession;
+                ModalRoute.of(context)?.settings.arguments as CardioSession?;
             return CardioEditPage(
               cardioSession: cardioSession,
             );
@@ -118,7 +117,13 @@ class _AppState extends State<App> {
                 ModalRoute.of(context)?.settings.arguments as CardioSession;
             return CardioDetailsPage(cardioSession: cardioSession);
           },
-          Routes.cardio.route_planning: (_) => const RoutePlanningPage(),
+          Routes.cardio.route_planning: (_) {
+            final Route? route =
+                ModalRoute.of(context)?.settings.arguments as Route?;
+            return RoutePlanningPage(
+              route: route,
+            );
+          },
           Routes.diary.edit: (_) => const DiaryEditPage(),
         },
         initialRoute: isAuthenticated ? Routes.workout : Routes.landing,

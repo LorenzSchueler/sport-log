@@ -12,7 +12,9 @@ import 'package:mapbox_api/mapbox_api.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RoutePlanningPage extends StatefulWidget {
-  const RoutePlanningPage({Key? key}) : super(key: key);
+  final Route? route;
+
+  const RoutePlanningPage({Key? key, this.route}) : super(key: key);
 
   @override
   State<RoutePlanningPage> createState() => RoutePlanningPageState();
@@ -22,7 +24,6 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
   final _logger = Logger('RoutePlanningPage');
 
   final List<LatLng> _locations = [];
-  List<LatLng> _matchedLocations = [];
 
   Line? _line;
   List<Circle> _circles = [];
@@ -32,9 +33,24 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
 
   late MapboxMapController _mapController;
 
-  int _distance = 0;
-  String _routeName = "";
   MapboxApi mapbox = MapboxApi(accessToken: Secrets.mapboxAccessToken);
+
+  late Route _route;
+
+  @override
+  void initState() {
+    super.initState();
+    _route = widget.route ??
+        Route(
+            id: randomId(),
+            userId: UserState.instance.currentUser!.id,
+            name: "",
+            distance: 0,
+            ascent: 0,
+            descent: 0,
+            track: [],
+            deleted: false);
+  }
 
   Future<void> _matchLocations() async {
     DirectionsApiResponse response = await mapbox.directions.request(
@@ -49,44 +65,31 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
         _logger.i(response.error);
       }
     } else if (response.routes != null && response.routes!.isNotEmpty) {
-      NavigationRoute route = response.routes![0];
+      NavigationRoute navRoute = response.routes![0];
       setState(() {
-        _distance = route.distance!.round();
+        _route.distance = navRoute.distance!.round();
       });
 
-      _matchedLocations = Polyline.Decode(
-        encodedString: route.geometry as String,
+      _route.track = Polyline.Decode(
+        encodedString: navRoute.geometry as String,
         precision: 6,
       )
           .decodedCoords
           .map(
-            (coordinate) => LatLng(
-              coordinate[0],
-              coordinate[1],
-            ),
+            (coordinate) => Position(
+                latitude: coordinate[0],
+                longitude: coordinate[1],
+                elevation: 0, // TODO
+                distance: 0, // TODO
+                time: 0), // TODO
           )
           .toList();
     }
   }
 
   void _saveRoute() {
-    Route route = Route(
-      id: randomId(),
-      userId: UserState.instance.currentUser!.id,
-      name: _routeName,
-      distance: _distance,
-      ascent: null, // TODO
-      descent: null, //TODO
-      track: _matchedLocations
-          .map((position) => Position(
-              longitude: position.longitude,
-              latitude: position.latitude,
-              elevation: 0, //TODO
-              distance: 0, //TODO
-              time: 0))
-          .toList(),
-      deleted: false,
-    );
+    // TODO save in DB
+    Navigator.of(context).pop(_route);
   }
 
   void _addPoint(LatLng latLng, int number) async {
@@ -107,8 +110,8 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
 
   Future<void> _updateLine() async {
     await _matchLocations();
-    await _mapController.updateLine(
-        _line!, LineOptions(geometry: _matchedLocations));
+    await _mapController.updateLine(_line!,
+        LineOptions(geometry: _route.track.map((e) => e.latLng).toList()));
   }
 
   void _extendLine(LatLng location) async {
@@ -304,15 +307,15 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
                 children: [
                   TableRow(children: [
                     ValueUnitDescription(
-                      value: (_distance / 1000).toString(),
+                      value: (_route.distance / 1000).toString(),
                       unit: "km",
                       description: "distance",
                       scale: 1.3,
                     ),
                     ValueUnitDescription(
-                      value: "???",
+                      value: _route.name,
                       unit: null,
-                      description: null,
+                      description: "Name",
                       scale: 1.3,
                     )
                   ]),
@@ -343,7 +346,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
                       _listExpanded = false;
                     }),
                     onFieldSubmitted: (name) => setState(() {
-                      _routeName = name;
+                      _route.name = name;
                     }),
                     style: const TextStyle(height: 1),
                     decoration: InputDecoration(
@@ -358,7 +361,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
                         primary: Colors.green[400],
                       ),
                       onPressed:
-                          _routeName.isNotEmpty ? () => _saveRoute() : null,
+                          _route.name.isNotEmpty ? () => _saveRoute() : null,
                       child: const Text("create")),
                   Defaults.sizedBox.horizontal.normal,
                 ],
