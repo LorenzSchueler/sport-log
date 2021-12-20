@@ -286,6 +286,14 @@ class RouteEditPageState extends State<RouteEditPage> {
     ]);
 
     return Scaffold(
+        appBar: AppBar(
+          title: const Text("Cardio Edit"),
+          actions: [
+            IconButton(
+                onPressed: _route.name.isNotEmpty ? () => _saveRoute() : null,
+                icon: const Icon(Icons.save))
+          ],
+        ),
         body: Container(
             color: backgroundColorOf(context),
             child: Column(children: [
@@ -361,14 +369,6 @@ class RouteEditPageState extends State<RouteEditPage> {
                           borderRadius: Defaults.borderRadius.big),
                     ),
                   )),
-                  Defaults.sizedBox.horizontal.big,
-                  ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.green[400],
-                      ),
-                      onPressed:
-                          _route.name.isNotEmpty ? () => _saveRoute() : null,
-                      child: const Text("create")),
                   Defaults.sizedBox.horizontal.normal,
                 ],
               ),

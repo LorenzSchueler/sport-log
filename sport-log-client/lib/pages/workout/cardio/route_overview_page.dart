@@ -70,8 +70,7 @@ class RoutePageState extends State<RoutePage> {
   }
 
   void showDetails(BuildContext context, Route route) {
-    Navigator.of(context)
-        .pushNamed(Routes.cardio.route_planning, arguments: route);
+    Navigator.of(context).pushNamed(Routes.cardio.route_edit, arguments: route);
   }
 
   Widget _buildSessionCard(BuildContext buildContext, int index) {

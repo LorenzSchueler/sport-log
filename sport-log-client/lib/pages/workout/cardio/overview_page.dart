@@ -232,7 +232,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
             .pushNamed(Routes.cardio.tracking_settings)
             .then(_handleNewCardioSession),
         () => Navigator.of(context).pushNamed(Routes.cardio.cardio_edit),
-        () => Navigator.of(context).pushNamed(Routes.cardio.route_planning),
+        () => Navigator.of(context).pushNamed(Routes.cardio.route_edit),
       ],
     );
   }

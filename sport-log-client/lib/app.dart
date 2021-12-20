@@ -12,7 +12,7 @@ import 'package:sport_log/models/strength/strength_session_with_sets.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_details_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_overview_page.dart';
-import 'package:sport_log/pages/workout/cardio/route_planing_page.dart';
+import 'package:sport_log/pages/workout/cardio/route_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_page.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings_page.dart';
 import 'package:sport_log/pages/landing/landing_page.dart';
@@ -121,10 +121,10 @@ class _AppState extends State<App> {
           Routes.cardio.route_overview: (_) {
             return const RoutePage();
           },
-          Routes.cardio.route_planning: (context) {
+          Routes.cardio.route_edit: (context) {
             final Route? route =
                 ModalRoute.of(context)?.settings.arguments as Route?;
-            return RoutePlanningPage(
+            return RouteEditPage(
               route: route,
             );
           },
