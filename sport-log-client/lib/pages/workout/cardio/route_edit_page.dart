@@ -11,17 +11,17 @@ import 'package:sport_log/models/all.dart';
 import 'package:mapbox_api/mapbox_api.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
-class RoutePlanningPage extends StatefulWidget {
+class RouteEditPage extends StatefulWidget {
   final Route? route;
 
-  const RoutePlanningPage({Key? key, this.route}) : super(key: key);
+  const RouteEditPage({Key? key, this.route}) : super(key: key);
 
   @override
-  State<RoutePlanningPage> createState() => RoutePlanningPageState();
+  State<RouteEditPage> createState() => RouteEditPageState();
 }
 
-class RoutePlanningPageState extends State<RoutePlanningPage> {
-  final _logger = Logger('RoutePlanningPage');
+class RouteEditPageState extends State<RouteEditPage> {
+  final _logger = Logger('RouteEditPage');
 
   List<LatLng> _locations = [];
 
