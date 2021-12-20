@@ -2,7 +2,6 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/secrets.dart';
@@ -10,7 +9,6 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
@@ -59,7 +57,7 @@ class RoutePageState extends State<RoutePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("routes"),
+        title: const Text("Routes"),
       ),
       body: Scrollbar(
           child: ListView.builder(
@@ -72,8 +70,8 @@ class RoutePageState extends State<RoutePage> {
   }
 
   void showDetails(BuildContext context, Route route) {
-    //Navigator.of(context)
-    //.pushNamed(Routes.cardio.cardio_details, arguments: route);
+    Navigator.of(context)
+        .pushNamed(Routes.cardio.route_planning, arguments: route);
   }
 
   Widget _buildSessionCard(BuildContext buildContext, int index) {

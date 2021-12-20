@@ -121,7 +121,7 @@ class _AppState extends State<App> {
           Routes.cardio.route_overview: (_) {
             return const RoutePage();
           },
-          Routes.cardio.route_planning: (_) {
+          Routes.cardio.route_planning: (context) {
             final Route? route =
                 ModalRoute.of(context)?.settings.arguments as Route?;
             return RoutePlanningPage(

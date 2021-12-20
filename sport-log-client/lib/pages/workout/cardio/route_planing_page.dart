@@ -23,7 +23,7 @@ class RoutePlanningPage extends StatefulWidget {
 class RoutePlanningPageState extends State<RoutePlanningPage> {
   final _logger = Logger('RoutePlanningPage');
 
-  final List<LatLng> _locations = [];
+  List<LatLng> _locations = [];
 
   Line? _line;
   List<Circle> _circles = [];
@@ -40,6 +40,8 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
   @override
   void initState() {
     super.initState();
+    _logger.i("route");
+    _logger.i(widget.route);
     _route = widget.route ??
         Route(
             id: randomId(),
@@ -50,6 +52,14 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
             descent: 0,
             track: [],
             deleted: false);
+    _locations =
+        _route.track.map((e) => LatLng(e.latitude, e.longitude)).toList();
+    // TODO dont map every point to marked location
+  }
+
+  void _saveRoute() {
+    // TODO save in DB
+    Navigator.of(context).pop(_route);
   }
 
   Future<void> _matchLocations() async {
@@ -87,9 +97,10 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     }
   }
 
-  void _saveRoute() {
-    // TODO save in DB
-    Navigator.of(context).pop(_route);
+  Future<void> _updateLine() async {
+    await _matchLocations();
+    await _mapController.updateLine(_line!,
+        LineOptions(geometry: _route.track.map((e) => e.latLng).toList()));
   }
 
   void _addPoint(LatLng latLng, int number) async {
@@ -108,10 +119,14 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     ));
   }
 
-  Future<void> _updateLine() async {
-    await _matchLocations();
-    await _mapController.updateLine(_line!,
-        LineOptions(geometry: _route.track.map((e) => e.latLng).toList()));
+  Future<void> _updatePoints() async {
+    await _mapController.removeCircles(_circles);
+    _circles = [];
+    await _mapController.removeSymbols(_symbols);
+    _symbols = [];
+    _locations.asMap().forEach((index, latLng) {
+      _addPoint(latLng, index + 1);
+    });
   }
 
   void _extendLine(LatLng location) async {
@@ -134,8 +149,6 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
       _locations.add(location);
     });
     _addPoint(location, _locations.length);
-    _line ??= await _mapController.addLine(
-        const LineOptions(lineColor: "red", lineWidth: 3, geometry: []));
     await _updateLine();
   }
 
@@ -143,13 +156,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
     setState(() {
       _locations.removeAt(index);
     });
-    await _mapController.removeCircles(_circles);
-    _circles = [];
-    await _mapController.removeSymbols(_symbols);
-    _symbols = [];
-    _locations.asMap().forEach((index, latLng) {
-      _addPoint(latLng, index + 1);
-    });
+    await _updatePoints();
     await _updateLine();
   }
 
@@ -168,13 +175,7 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
       }
     });
 
-    await _mapController.removeCircles(_circles);
-    _circles = [];
-    await _mapController.removeSymbols(_symbols);
-    _symbols = [];
-    _locations.asMap().forEach((index, latLng) {
-      _addPoint(latLng, index + 1);
-    });
+    await _updatePoints();
     await _updateLine();
   }
 
@@ -298,8 +299,13 @@ class RoutePlanningPageState extends State<RoutePlanningPage> {
                 ),
                 compassEnabled: true,
                 compassViewPosition: CompassViewPosition.TopRight,
-                onMapCreated: (MapboxMapController controller) =>
-                    _mapController = controller,
+                onMapCreated: (MapboxMapController controller) async {
+                  _mapController = controller;
+                  _line ??= await _mapController.addLine(const LineOptions(
+                      lineColor: "red", lineWidth: 3, geometry: []));
+                  _updatePoints();
+                  _updateLine();
+                },
                 onMapLongClick: (point, LatLng latLng) => _extendLine(latLng),
               )),
               _buildExpandableListContainer(),
