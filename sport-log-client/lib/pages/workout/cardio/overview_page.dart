@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
+import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/list_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
@@ -30,7 +31,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
   final List<CardioSession> _cardioSessions = [
     CardioSession(
         id: randomId(),
-        userId: Int64(1),
+        userId: UserState.instance.currentUser!.id,
         movementId: Int64(1),
         cardioType: CardioType.training,
         datetime: DateTime.now(),
@@ -68,7 +69,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         deleted: false),
     CardioSession(
         id: randomId(),
-        userId: Int64(1),
+        userId: UserState.instance.currentUser!.id,
         movementId: Int64(1),
         cardioType: CardioType.activeRecovery,
         datetime: DateTime.now(),

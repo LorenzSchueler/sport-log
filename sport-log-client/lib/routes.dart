@@ -33,6 +33,7 @@ class _CardioRoutes {
   final String cardio_edit = '/cardio/cardio_edit';
   final String cardio_details = '/cardio/cardio_details';
   final String route_planning = '/cardio/route_planning';
+  final String route_overview = '/cardio/route_overview';
 }
 
 class _StrengthRoutes {
