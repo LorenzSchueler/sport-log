@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/secrets.dart';
+import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
@@ -76,10 +77,12 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                 onPressed: () => Navigator.of(context)
                         .pushNamed(Routes.cardio.cardio_edit,
                             arguments: cardioSession)
-                        .then((value) {
-                      setState(() {
-                        cardioSession = value as CardioSession;
-                      });
+                        .then((returnObj) {
+                      if (returnObj is ReturnObject<CardioSession>) {
+                        setState(() {
+                          cardioSession = returnObj.payload;
+                        });
+                      }
                     }),
                 icon: const Icon(Icons.edit))
           ],

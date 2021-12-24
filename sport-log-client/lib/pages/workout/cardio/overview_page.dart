@@ -231,6 +231,9 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         () => Navigator.of(context)
             .pushNamed(Routes.cardio.tracking_settings)
             .then(_handleNewCardioSession),
+        () => Navigator.of(context)
+            .pushNamed(Routes.cardio.cardio_edit)
+            .then(_handleNewCardioSession),
         () => Navigator.of(context).pushNamed(Routes.cardio.cardio_edit),
         () => Navigator.of(context).pushNamed(Routes.cardio.route_edit),
       ],
@@ -256,6 +259,8 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
           setState(
               () => _cardioSessions.delete(object.payload, by: (c) => c.id));
       }
+    } else {
+      _logger.i("poped item is not a ReturnObject");
     }
   }
 }

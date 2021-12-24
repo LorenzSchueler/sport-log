@@ -6,6 +6,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/secrets.dart';
+import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:mapbox_api/mapbox_api.dart';
@@ -59,7 +60,10 @@ class RouteEditPageState extends State<RouteEditPage> {
 
   void _saveRoute() {
     // TODO save in DB
-    Navigator.of(context).pop(_route);
+    Navigator.of(context).pop(ReturnObject(
+        action:
+            widget.route != null ? ReturnAction.updated : ReturnAction.created,
+        payload: _route));
   }
 
   Future<void> _matchLocations() async {

@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/secrets.dart';
+import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/cardio_type_picker.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
@@ -69,8 +70,11 @@ class CardioEditPageState extends State<CardioEditPage> {
           title: const Text("Cardio Edit"),
           actions: [
             IconButton(
-                onPressed: () => Navigator.of(context)
-                    .pop(_cardioSession), // TODO save in DB
+                onPressed: () => Navigator.of(context).pop(ReturnObject(
+                    action: widget.cardioSession != null
+                        ? ReturnAction.updated
+                        : ReturnAction.created,
+                    payload: _cardioSession)), // TODO save in DB
                 icon: const Icon(Icons.save))
           ],
         ),
