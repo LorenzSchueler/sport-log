@@ -61,25 +61,15 @@ class DiaryPageState extends State<DiaryPage> {
           ),
         ),
       ),
-      body: _innerbuild(context),
+      body: const Center(child: Text('Not implemented yet :(')),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
       drawer: MainDrawer(selectedRoute: route),
-      floatingActionButton: fab(context),
+      floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.of(context).pushNamed(Routes.diary.edit);
+          }),
     );
-  }
-
-  Widget _innerbuild(BuildContext context) {
-    return const Center(child: Text('Not implemented yet :('));
-  }
-
-  Widget? fab(BuildContext context) {
-    _logger.d('FAB called!');
-
-    return FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.of(context).pushNamed(Routes.diary.edit);
-        });
   }
 }

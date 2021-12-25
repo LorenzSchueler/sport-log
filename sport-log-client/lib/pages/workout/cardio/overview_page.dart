@@ -32,6 +32,12 @@ class CardioSessionsPage extends StatefulWidget {
 class CardioSessionsPageState extends State<CardioSessionsPage> {
   final _logger = Logger('CardioSessionsPage');
 
+  DateFilterState _dateFilter = MonthFilter.current();
+  Movement? _movement;
+  final SessionsPageTab sessionsPageTab = SessionsPageTab.cardio;
+  final String route = Routes.cardio.overview;
+  final String defaultTitle = "Cardio Sessions";
+
   final List<CardioSession> _cardioSessions = [
     CardioSession(
         id: randomId(),
@@ -92,12 +98,6 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         deleted: false)
   ];
 
-  DateFilterState _dateFilter = MonthFilter.current();
-  Movement? _movement;
-  final SessionsPageTab sessionsPageTab = SessionsPageTab.cardio;
-  final String route = Routes.cardio.overview;
-  final String defaultTitle = "Cardio Sessions";
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,22 +135,17 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
           ),
         ),
       ),
-      body: _innerbuild(context),
+      body: Scrollbar(
+          child: ListView.builder(
+        itemBuilder: _buildSessionCard,
+        itemCount: _cardioSessions.length,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      )),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
       drawer: MainDrawer(selectedRoute: route),
       floatingActionButton: fab(context),
     );
-  }
-
-  Widget _innerbuild(BuildContext context) {
-    return Scrollbar(
-        child: ListView.builder(
-      itemBuilder: _buildSessionCard,
-      itemCount: _cardioSessions.length,
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-    ));
-    ;
   }
 
   void showDetails(BuildContext context, CardioSession cardioSession) {

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/snackbar.dart';
-import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
@@ -30,6 +29,12 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   final _dataProvider = StrengthDataProvider.instance;
   final _logger = Logger('StrengthSessionsPage');
   List<StrengthSessionWithStats> _sessions = [];
+
+  DateFilterState _dateFilter = MonthFilter.current();
+  Movement? _movement;
+  final SessionsPageTab sessionsPageTab = SessionsPageTab.strength;
+  final String route = Routes.strength.overview;
+  final String defaultTitle = "Strength Sessions";
 
   @override
   void initState() {
@@ -60,12 +65,6 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
     });
   }
 
-  Widget? fab(BuildContext context) {
-    _logger.d('FAB tapped!');
-
-    return null;
-  }
-
   // full update (from server)
   Future<void> _refreshPage() async {
     await _dataProvider.doFullUpdate().onError((error, stackTrace) {
@@ -75,12 +74,6 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
       }
     });
   }
-
-  DateFilterState _dateFilter = MonthFilter.current();
-  Movement? _movement;
-  final SessionsPageTab sessionsPageTab = SessionsPageTab.strength;
-  final String route = Routes.strength.overview;
-  final String defaultTitle = "Strength Sessions";
 
   @override
   Widget build(BuildContext context) {
@@ -119,45 +112,41 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
           ),
         ),
       ),
-      body: _innerbuild(context),
+      body: RefreshIndicator(
+        onRefresh: _refreshPage,
+        child: CustomScrollView(
+          slivers: [
+            if (_sessions.isEmpty)
+              const SliverFillRemaining(
+                child: Center(child: Text('No data :(')),
+              ),
+            if (_sessions.isNotEmpty && _movement != null)
+              SliverToBoxAdapter(
+                child: StrengthChart(
+                  movement: _movement!,
+                  dateFilterState: _dateFilter,
+                ),
+              ),
+            if (_sessions.isNotEmpty)
+              SliverList(
+                delegate: _movement != null
+                    ? SliverChildBuilderDelegate(
+                        (context, index) => _sessionToWidgetWithMovement(
+                            _sessions[index], index),
+                        childCount: _sessions.length,
+                      )
+                    : SliverChildBuilderDelegate(
+                        (context, index) => _sessionToWidgetWithoutMovement(
+                            _sessions[index], index),
+                        childCount: _sessions.length),
+              ),
+          ],
+        ),
+      ),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
       drawer: MainDrawer(selectedRoute: route),
-      floatingActionButton: fab(context),
-    );
-  }
-
-  Widget _innerbuild(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: _refreshPage,
-      child: CustomScrollView(
-        slivers: [
-          if (_sessions.isEmpty)
-            const SliverFillRemaining(
-              child: Center(child: Text('No data :(')),
-            ),
-          if (_sessions.isNotEmpty && _movement != null)
-            SliverToBoxAdapter(
-              child: StrengthChart(
-                movement: _movement!,
-                dateFilterState: _dateFilter,
-              ),
-            ),
-          if (_sessions.isNotEmpty)
-            SliverList(
-              delegate: _movement != null
-                  ? SliverChildBuilderDelegate(
-                      (context, index) =>
-                          _sessionToWidgetWithMovement(_sessions[index], index),
-                      childCount: _sessions.length,
-                    )
-                  : SliverChildBuilderDelegate(
-                      (context, index) => _sessionToWidgetWithoutMovement(
-                          _sessions[index], index),
-                      childCount: _sessions.length),
-            ),
-        ],
-      ),
+      floatingActionButton: null,
     );
   }
 

@@ -61,21 +61,11 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
           ),
         ),
       ),
-      body: _innerbuild(context),
+      body: const Center(child: Text('Not implemented yet :(')),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
       drawer: MainDrawer(selectedRoute: route),
-      floatingActionButton: fab(context),
+      floatingActionButton: null,
     );
-  }
-
-  Widget _innerbuild(BuildContext context) {
-    return const Center(child: Text('Not implemented yet :('));
-  }
-
-  Widget? fab(BuildContext context) {
-    _logger.d('FAB tapped!');
-
-    return null;
   }
 }
