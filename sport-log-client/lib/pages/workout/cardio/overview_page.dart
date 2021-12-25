@@ -12,10 +12,14 @@ import 'package:sport_log/helpers/secrets.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/pages/workout/ui_cubit.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
+import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
+import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/movement_picker.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class CardioSessionsPage extends StatefulWidget {
@@ -88,14 +92,58 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         deleted: false)
   ];
 
-  @override
-  void initState() {
-    context.read<SessionsUiCubit>().showFab();
-    super.initState();
-  }
+  DateFilterState _dateFilter = MonthFilter.current();
+  Movement? _movement;
+  final SessionsPageTab sessionsPageTab = SessionsPageTab.cardio;
+  final String route = Routes.cardio.overview;
+  final String defaultTitle = "Cardio Sessions";
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_movement?.name ?? defaultTitle),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final Movement? movement = await showMovementPickerDialog(context,
+                  selectedMovement: _movement);
+              if (movement == null) {
+                return;
+              } else if (movement.id == _movement?.id) {
+                setState(() {
+                  _movement = null;
+                });
+              } else {
+                setState(() {
+                  _movement = movement;
+                });
+              }
+            },
+            icon: Icon(_movement != null
+                ? Icons.filter_alt
+                : Icons.filter_alt_outlined),
+          ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(40),
+          child: DateFilter(
+            initialState: _dateFilter,
+            onFilterChanged: (dateFilter) => setState(() {
+              _dateFilter = dateFilter;
+            }),
+          ),
+        ),
+      ),
+      body: _innerbuild(context),
+      bottomNavigationBar:
+          SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
+      drawer: MainDrawer(selectedRoute: route),
+      floatingActionButton: fab(context),
+    );
+  }
+
+  Widget _innerbuild(BuildContext context) {
     return Scrollbar(
         child: ListView.builder(
       itemBuilder: _buildSessionCard,
@@ -107,7 +155,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
 
   void showDetails(BuildContext context, CardioSession cardioSession) {
     Navigator.of(context)
-        .pushNamed(Routes.cardio.cardio_details, arguments: cardioSession);
+        .pushNamed(Routes.cardio.cardioDetails, arguments: cardioSession);
   }
 
   Widget _buildSessionCard(BuildContext buildContext, int index) {
@@ -229,13 +277,13 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
       ],
       onPressed: [
         () => Navigator.of(context)
-            .pushNamed(Routes.cardio.tracking_settings)
+            .pushNamed(Routes.cardio.trackingSettings)
             .then(_handleNewCardioSession),
         () => Navigator.of(context)
-            .pushNamed(Routes.cardio.cardio_edit)
+            .pushNamed(Routes.cardio.cardioEdit)
             .then(_handleNewCardioSession),
-        () => Navigator.of(context).pushNamed(Routes.cardio.cardio_edit),
-        () => Navigator.of(context).pushNamed(Routes.cardio.route_edit),
+        () => Navigator.of(context).pushNamed(Routes.cardio.cardioEdit),
+        () => Navigator.of(context).pushNamed(Routes.cardio.routeEdit),
       ],
     );
   }

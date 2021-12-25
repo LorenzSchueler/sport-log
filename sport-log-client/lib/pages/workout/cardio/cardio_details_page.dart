@@ -75,7 +75,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
           actions: [
             IconButton(
                 onPressed: () => Navigator.of(context)
-                        .pushNamed(Routes.cardio.cardio_edit,
+                        .pushNamed(Routes.cardio.cardioEdit,
                             arguments: cardioSession)
                         .then((returnObj) {
                       if (returnObj is ReturnObject<CardioSession>) {

@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/models/all.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/widgets/form_widgets/selection_bar.dart';
 
 import 'charts/all.dart';
 import 'charts/series_type.dart';
 import '../date_filter/date_filter_state.dart';
-import '../ui_cubit.dart';
 
 class StrengthChart extends StatefulWidget {
+  final Movement movement;
+  final DateFilterState dateFilterState;
+
   const StrengthChart({
     Key? key,
+    required this.movement,
+    required this.dateFilterState,
   }) : super(key: key);
 
   @override
@@ -17,36 +24,31 @@ class StrengthChart extends StatefulWidget {
 }
 
 class _StrengthChartState extends State<StrengthChart> {
+  final _logger = Logger('RoutePage');
+
   late SeriesType _activeSeriesType;
 
   @override
   void initState() {
     super.initState();
-    final state = context.read<SessionsUiCubit>().state;
-    assert(state.isMovementSelected);
-    _activeSeriesType = getAvailableSeries(state.movement!.dimension).first;
+    _activeSeriesType = getAvailableSeries(widget.movement.dimension).first;
+    _logger.i(widget.movement);
+    _logger.i(widget.dateFilterState);
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SessionsUiCubit, SessionsUiState>(
-      buildWhen: (oldState, newState) {
-        return oldState.isStrengthPage &&
-            (oldState.dateFilter != newState.dateFilter ||
-                oldState.movement != newState.movement);
-      },
-      builder: (context, state) => Column(
-        children: [
-          _seriesSelection(state),
-          AspectRatio(
-            aspectRatio: 1.8,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 8, 10, 20),
-              child: _chart(state),
-            ),
+    return Column(
+      children: [
+        _seriesSelection(),
+        AspectRatio(
+          aspectRatio: 1.8,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 8, 10, 20),
+            child: _chart(),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -54,49 +56,47 @@ class _StrengthChartState extends State<StrengthChart> {
     setState(() => _activeSeriesType = type);
   }
 
-  Widget _chart(SessionsUiState state) {
-    assert(state.isMovementSelected);
-    if (state.dateFilter is DayFilter) {
+  Widget _chart() {
+    if (widget.dateFilterState is DayFilter) {
       return DayChart(
         series: _activeSeriesType,
-        date: (state.dateFilter as DayFilter).start,
-        movement: state.movement!,
+        date: (widget.dateFilterState as DayFilter).start,
+        movement: widget.movement,
       );
     }
-    if (state.dateFilter is WeekFilter) {
+    if (widget.dateFilterState is WeekFilter) {
       return WeekChart(
           series: _activeSeriesType,
-          start: (state.dateFilter as WeekFilter).start,
-          movement: state.movement!);
+          start: (widget.dateFilterState as WeekFilter).start,
+          movement: widget.movement);
     }
-    if (state.dateFilter is MonthFilter) {
+    if (widget.dateFilterState is MonthFilter) {
       return MonthChart(
         series: _activeSeriesType,
-        start: (state.dateFilter as MonthFilter).start,
-        movement: state.movement!,
+        start: (widget.dateFilterState as MonthFilter).start,
+        movement: widget.movement,
       );
     }
-    if (state.dateFilter is YearFilter) {
+    if (widget.dateFilterState is YearFilter) {
       return YearChart(
         series: _activeSeriesType,
-        start: (state.dateFilter as YearFilter).start,
-        movement: state.movement!,
+        start: (widget.dateFilterState as YearFilter).start,
+        movement: widget.movement,
       );
     }
     return AllChart(
       series: _activeSeriesType,
-      movement: state.movement!,
+      movement: widget.movement,
     );
   }
 
-  Widget _seriesSelection(SessionsUiState state) {
-    assert(state.isMovementSelected);
-    final availableSeries = getAvailableSeries(state.movement!.dimension);
+  Widget _seriesSelection() {
+    final availableSeries = getAvailableSeries(widget.movement.dimension);
     return SelectionBar(
       onChange: _setSeriesType,
       items: availableSeries,
       getLabel: (SeriesType type) =>
-          type.toDisplayName(state.movement!.dimension),
+          type.toDisplayName(widget.movement.dimension),
       selectedItem: _activeSeriesType,
     );
   }

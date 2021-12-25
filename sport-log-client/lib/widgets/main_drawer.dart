@@ -31,12 +31,12 @@ class MainDrawer extends StatelessWidget {
             accountEmail: Text(user.email),
           ),
           ListTile(
-            title: const Text('Workout'),
+            title: const Text('Workout Tracking'),
             leading: const Icon(CustomIcons.dumbbellRotated),
             onTap: () {
-              Nav.changeNamed(context, Routes.workout);
+              Nav.changeNamed(context, Routes.timeline.overview);
             },
-            selected: selectedRoute == Routes.workout,
+            selected: selectedRoute == Routes.timeline.overview,
           ),
           ListTile(
             title: Text('Training Plan',
@@ -62,8 +62,8 @@ class MainDrawer extends StatelessWidget {
                 title: const Text('Routes'),
                 leading: const Icon(CustomIcons.route),
                 onTap: () =>
-                    Nav.changeNamed(context, Routes.cardio.route_overview),
-                selected: selectedRoute == Routes.cardio.route_overview,
+                    Nav.changeNamed(context, Routes.cardio.routeOverview),
+                selected: selectedRoute == Routes.cardio.routeOverview,
               ),
               ListTile(
                 title: const Text('CrossFit – Metcons'),

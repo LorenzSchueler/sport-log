@@ -7,9 +7,13 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/all.dart';
-import 'package:sport_log/pages/workout/ui_cubit.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
+import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/movement_picker.dart';
 
 import 'strength_chart.dart';
 
@@ -43,15 +47,14 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
     super.dispose();
   }
 
-  Future<void> update([SessionsUiState? uiState]) async {
-    final state = uiState ?? context.read<SessionsUiCubit>().state;
+  Future<void> update() async {
     _logger.d(
-        'Updating strength sessions with start = ${state.dateFilter.start}, end = ${state.dateFilter.end}');
+        'Updating strength sessions with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
     _dataProvider
         .getSessionsWithStats(
-            from: state.dateFilter.start,
-            until: state.dateFilter.end,
-            movementId: state.movement?.id)
+            from: _dateFilter.start,
+            until: _dateFilter.end,
+            movementId: _movement?.id)
         .then((ssds) async {
       setState(() => _sessions = ssds);
     });
@@ -73,52 +76,88 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
     });
   }
 
+  DateFilterState _dateFilter = MonthFilter.current();
+  Movement? _movement;
+  final SessionsPageTab sessionsPageTab = SessionsPageTab.strength;
+  final String route = Routes.strength.overview;
+  final String defaultTitle = "Strength Sessions";
+
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<SessionsUiCubit, SessionsUiState>(
-      listenWhen: (oldState, newState) {
-        return newState.isStrengthPage &&
-            (oldState.dateFilter != newState.dateFilter ||
-                oldState.movement != newState.movement);
-      },
-      listener: (context, state) {
-        update(state);
-      },
-      buildWhen: (oldState, newState) {
-        return newState.isStrengthPage &&
-            (oldState.dateFilter != newState.dateFilter ||
-                oldState.movement != newState.movement);
-      },
-      builder: (context, state) {
-        return RefreshIndicator(
-          onRefresh: _refreshPage,
-          child: CustomScrollView(
-            slivers: [
-              if (_sessions.isEmpty)
-                const SliverFillRemaining(
-                  child: Center(child: Text('No data :(')),
-                ),
-              if (_sessions.isNotEmpty && state.isMovementSelected)
-                const SliverToBoxAdapter(
-                  child: StrengthChart(),
-                ),
-              if (_sessions.isNotEmpty)
-                SliverList(
-                  delegate: state.isMovementSelected
-                      ? SliverChildBuilderDelegate(
-                          (context, index) => _sessionToWidgetWithMovement(
-                              _sessions[index], index),
-                          childCount: _sessions.length,
-                        )
-                      : SliverChildBuilderDelegate(
-                          (context, index) => _sessionToWidgetWithoutMovement(
-                              _sessions[index], index),
-                          childCount: _sessions.length),
-                ),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_movement?.name ?? defaultTitle),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final Movement? movement = await showMovementPickerDialog(context,
+                  selectedMovement: _movement);
+              if (movement == null) {
+                return;
+              } else if (movement.id == _movement?.id) {
+                setState(() {
+                  _movement = null;
+                });
+              } else {
+                setState(() {
+                  _movement = movement;
+                });
+              }
+            },
+            icon: Icon(_movement != null
+                ? Icons.filter_alt
+                : Icons.filter_alt_outlined),
           ),
-        );
-      },
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(40),
+          child: DateFilter(
+            initialState: _dateFilter,
+            onFilterChanged: (dateFilter) => setState(() {
+              _dateFilter = dateFilter;
+            }),
+          ),
+        ),
+      ),
+      body: _innerbuild(context),
+      bottomNavigationBar:
+          SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
+      drawer: MainDrawer(selectedRoute: route),
+      floatingActionButton: fab(context),
+    );
+  }
+
+  Widget _innerbuild(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: _refreshPage,
+      child: CustomScrollView(
+        slivers: [
+          if (_sessions.isEmpty)
+            const SliverFillRemaining(
+              child: Center(child: Text('No data :(')),
+            ),
+          if (_sessions.isNotEmpty && _movement != null)
+            SliverToBoxAdapter(
+              child: StrengthChart(
+                movement: _movement!,
+                dateFilterState: _dateFilter,
+              ),
+            ),
+          if (_sessions.isNotEmpty)
+            SliverList(
+              delegate: _movement != null
+                  ? SliverChildBuilderDelegate(
+                      (context, index) =>
+                          _sessionToWidgetWithMovement(_sessions[index], index),
+                      childCount: _sessions.length,
+                    )
+                  : SliverChildBuilderDelegate(
+                      (context, index) => _sessionToWidgetWithoutMovement(
+                          _sessions[index], index),
+                      childCount: _sessions.length),
+            ),
+        ],
+      ),
     );
   }
 

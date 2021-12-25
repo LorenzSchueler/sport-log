@@ -65,12 +65,12 @@ class RoutePageState extends State<RoutePage> {
         itemCount: _routes.length,
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       )),
-      drawer: const MainDrawer(selectedRoute: Routes.workout),
+      drawer: MainDrawer(selectedRoute: Routes.cardio.routeOverview),
     );
   }
 
   void showDetails(BuildContext context, Route route) {
-    Navigator.of(context).pushNamed(Routes.cardio.route_edit, arguments: route);
+    Navigator.of(context).pushNamed(Routes.cardio.routeEdit, arguments: route);
   }
 
   Widget _buildSessionCard(BuildContext buildContext, int index) {

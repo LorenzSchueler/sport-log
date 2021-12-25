@@ -30,7 +30,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
       child: BlocConsumer<RegistrationBloc, RegistrationState>(
           listener: (context, state) {
         if (state == RegistrationState.successful) {
-          Nav.changeNamed(context, Routes.workout);
+          Nav.changeNamed(context, Routes.timeline.overview);
         }
       }, builder: (context, RegistrationState state) {
         return Column(

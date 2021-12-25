@@ -24,7 +24,7 @@ class _LoginFormState extends State<LoginForm> {
       key: _formKey,
       child: BlocConsumer<LoginBloc, LoginState>(listener: (context, state) {
         if (state == LoginState.successful) {
-          Nav.changeNamed(context, Routes.workout);
+          Nav.changeNamed(context, Routes.timeline.overview);
         } else if (state == LoginState.failed) {}
       }, builder: (context, LoginState state) {
         return Column(

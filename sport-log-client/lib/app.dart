@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/theme.dart';
+import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
@@ -11,6 +12,7 @@ import 'package:sport_log/models/movement/movement_description.dart';
 import 'package:sport_log/models/strength/strength_session_with_sets.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_details_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_edit_page.dart';
+import 'package:sport_log/pages/workout/cardio/overview_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_overview_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_page.dart';
@@ -23,9 +25,12 @@ import 'package:sport_log/pages/movements/edit_page.dart';
 import 'package:sport_log/pages/movements/overview_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
 import 'package:sport_log/pages/workout/diary/diary_edit_page.dart';
+import 'package:sport_log/pages/workout/diary/overview_page.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/overview_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/details_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/edit_page.dart';
-import 'package:sport_log/pages/workout/workout_page.dart';
+import 'package:sport_log/pages/workout/strength_sessions/overview_page.dart';
+import 'package:sport_log/pages/workout/timeline/overview_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
 
 import 'routes.dart';
@@ -63,15 +68,7 @@ class _AppState extends State<App> {
           Routes.landing: (_) => const LandingPage(),
           Routes.login: (_) => const LoginPage(),
           Routes.registration: (_) => const RegistrationPage(),
-          Routes.workout: (_) => ProtectedRoute(builder: (_) => WorkoutPage()),
-          Routes.metcon.overview: (_) =>
-              ProtectedRoute(builder: (_) => const MetconsPage()),
-          Routes.metcon.edit: (_) => ProtectedRoute(builder: (context) {
-                final arg = ModalRoute.of(context)?.settings.arguments;
-                return EditMetconPage(
-                  initialMetcon: (arg is MetconDescription) ? arg : null,
-                );
-              }),
+          // movement
           Routes.movement.overview: (_) =>
               ProtectedRoute(builder: (_) => const MovementsPage()),
           Routes.movement.edit: (_) => ProtectedRoute(builder: (context) {
@@ -83,6 +80,24 @@ class _AppState extends State<App> {
                 }
                 return EditMovementPage.newMovement();
               }),
+          // metcon
+          Routes.metcon.overview: (_) =>
+              ProtectedRoute(builder: (_) => const MetconsPage()),
+          // timeline
+          Routes.timeline.overview: (_) =>
+              ProtectedRoute(builder: (_) => const TimelinePage()),
+          // metcon session
+          Routes.metcon.sessionOverview: (_) =>
+              ProtectedRoute(builder: (_) => const MetconSessionsPage()),
+          Routes.metcon.edit: (_) => ProtectedRoute(builder: (context) {
+                final arg = ModalRoute.of(context)?.settings.arguments;
+                return EditMetconPage(
+                  initialMetcon: (arg is MetconDescription) ? arg : null,
+                );
+              }),
+          // strength
+          Routes.strength.overview: (_) =>
+              ProtectedRoute(builder: (_) => const StrengthSessionsPage()),
           Routes.strength.details: (_) => ProtectedRoute(builder: (context) {
                 final arg = ModalRoute.of(context)?.settings.arguments;
                 if (arg is! Int64) {
@@ -98,7 +113,10 @@ class _AppState extends State<App> {
                 }
                 return StrengthSessionEditPage(initialSession: arg);
               }),
-          Routes.cardio.tracking_settings: (_) =>
+          // cardio
+          Routes.cardio.overview: (_) =>
+              ProtectedRoute(builder: (_) => const CardioSessionsPage()),
+          Routes.cardio.trackingSettings: (_) =>
               const CardioTrackingSettingsPage(),
           Routes.cardio.tracking: (context) {
             final List<dynamic> args =
@@ -106,31 +124,35 @@ class _AppState extends State<App> {
             return CardioTrackingPage(
                 args[0] as Movement, args[1] as CardioType, args[2] as Route?);
           },
-          Routes.cardio.cardio_edit: (context) {
+          Routes.cardio.cardioEdit: (context) {
             final CardioSession? cardioSession =
                 ModalRoute.of(context)?.settings.arguments as CardioSession?;
             return CardioEditPage(
               cardioSession: cardioSession,
             );
           },
-          Routes.cardio.cardio_details: (context) {
+          Routes.cardio.cardioDetails: (context) {
             final cardioSession =
                 ModalRoute.of(context)?.settings.arguments as CardioSession;
             return CardioDetailsPage(cardioSession: cardioSession);
           },
-          Routes.cardio.route_overview: (_) {
+          Routes.cardio.routeOverview: (_) {
             return const RoutePage();
           },
-          Routes.cardio.route_edit: (context) {
+          Routes.cardio.routeEdit: (context) {
             final Route? route =
                 ModalRoute.of(context)?.settings.arguments as Route?;
             return RouteEditPage(
               route: route,
             );
           },
+          // diary
+          Routes.diary.overview: (_) =>
+              ProtectedRoute(builder: (_) => const DiaryPage()),
           Routes.diary.edit: (_) => const DiaryEditPage(),
         },
-        initialRoute: isAuthenticated ? Routes.workout : Routes.landing,
+        initialRoute:
+            isAuthenticated ? Routes.timeline.overview : Routes.landing,
         debugShowCheckedModeBanner: false,
         theme: lightTheme,
         darkTheme: darkTheme,
