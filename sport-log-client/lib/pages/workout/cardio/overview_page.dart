@@ -135,12 +135,11 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
           ),
         ),
       ),
-      body: Scrollbar(
-          child: ListView.builder(
+      body: ListView.builder(
         itemBuilder: _buildSessionCard,
         itemCount: _cardioSessions.length,
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-      )),
+      ),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
       drawer: MainDrawer(selectedRoute: route),

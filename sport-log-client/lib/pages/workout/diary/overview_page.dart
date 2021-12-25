@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:sport_log/data_provider/user_state.dart';
+import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
@@ -7,6 +13,7 @@ import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/movement_picker.dart';
+import 'package:sport_log/widgets/value_unit_description.dart';
 
 class DiaryPage extends StatefulWidget {
   const DiaryPage({Key? key}) : super(key: key);
@@ -17,6 +24,45 @@ class DiaryPage extends StatefulWidget {
 
 class DiaryPageState extends State<DiaryPage> {
   final _logger = Logger('DiaryPage');
+
+  final List<Diary> _diaries = [
+    Diary(
+        id: randomId(),
+        userId: UserState.instance.currentUser!.id,
+        date: DateTime.now(),
+        bodyweight: null,
+        comments: null,
+        deleted: false),
+    Diary(
+        id: randomId(),
+        userId: UserState.instance.currentUser!.id,
+        date: DateTime.now().subtract(const Duration(days: 1)),
+        bodyweight: 78.3,
+        comments: null,
+        deleted: false),
+    Diary(
+        id: randomId(),
+        userId: UserState.instance.currentUser!.id,
+        date: DateTime.now().subtract(const Duration(days: 2)),
+        bodyweight: null,
+        comments: "bla bli\nblub\n..la",
+        deleted: false),
+    Diary(
+        id: randomId(),
+        userId: UserState.instance.currentUser!.id,
+        date: DateTime.now().subtract(const Duration(days: 3)),
+        bodyweight: 80.0,
+        comments: "bla",
+        deleted: false),
+    Diary(
+        id: randomId(),
+        userId: UserState.instance.currentUser!.id,
+        date: DateTime.now().subtract(const Duration(days: 5)),
+        bodyweight: 180.0,
+        comments:
+            "very long line bc abc abc abc abc abc abc abc abc abc abc abc",
+        deleted: false),
+  ];
 
   DateFilterState _dateFilter = MonthFilter.current();
   Movement? _movement;
@@ -61,7 +107,13 @@ class DiaryPageState extends State<DiaryPage> {
           ),
         ),
       ),
-      body: const Center(child: Text('Not implemented yet :(')),
+      body: Container(
+        padding: const EdgeInsets.all(10),
+        child: ListView.separated(
+            itemBuilder: _buildDiaryEntry,
+            itemCount: _diaries.length,
+            separatorBuilder: (_, __) => const Divider()),
+      ),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
       drawer: MainDrawer(selectedRoute: route),
@@ -70,6 +122,38 @@ class DiaryPageState extends State<DiaryPage> {
           onPressed: () {
             Navigator.of(context).pushNamed(Routes.diary.edit);
           }),
+    );
+  }
+
+  Widget _buildDiaryEntry(BuildContext buildContext, int index) {
+    final Diary diary = _diaries[index];
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          formatDate(diary.date),
+          style: const TextStyle(fontSize: 20),
+        ),
+        Defaults.sizedBox.horizontal.big,
+        SizedBox(
+          width: 80,
+          child: diary.bodyweight != null
+              ? ValueUnitDescription(
+                  value: diary.bodyweight!.toStringAsFixed(1),
+                  unit: "kg",
+                  description: null)
+              : null,
+        ),
+        Defaults.sizedBox.horizontal.big,
+        if (diary.comments != null)
+          Flexible(
+              child: Text(
+            diary.comments!,
+            textAlign: TextAlign.start,
+            softWrap: true,
+          ))
+      ],
     );
   }
 }
