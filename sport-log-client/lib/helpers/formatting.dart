@@ -5,6 +5,10 @@ String formatDatetime(DateTime dateTime) {
   return DateFormat('dd.MM.yy kk:mm').format(dateTime);
 }
 
+String formatDate(DateTime date) {
+  return DateFormat('dd.MM.yy').format(date);
+}
+
 String formatTime(int seconds) {
   return Duration(seconds: seconds).toString().split('.').first.padLeft(8, "0");
 }

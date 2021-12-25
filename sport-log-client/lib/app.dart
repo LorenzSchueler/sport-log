@@ -119,13 +119,13 @@ class _AppState extends State<App> {
           Routes.cardio.trackingSettings: (_) =>
               const CardioTrackingSettingsPage(),
           Routes.cardio.tracking: (context) {
-            final List<dynamic> args =
+            final args =
                 ModalRoute.of(context)?.settings.arguments as List<dynamic>;
             return CardioTrackingPage(
                 args[0] as Movement, args[1] as CardioType, args[2] as Route?);
           },
           Routes.cardio.cardioEdit: (context) {
-            final CardioSession? cardioSession =
+            final cardioSession =
                 ModalRoute.of(context)?.settings.arguments as CardioSession?;
             return CardioEditPage(
               cardioSession: cardioSession,
@@ -140,8 +140,7 @@ class _AppState extends State<App> {
             return const RoutePage();
           },
           Routes.cardio.routeEdit: (context) {
-            final Route? route =
-                ModalRoute.of(context)?.settings.arguments as Route?;
+            final route = ModalRoute.of(context)?.settings.arguments as Route?;
             return RouteEditPage(
               route: route,
             );
@@ -149,7 +148,10 @@ class _AppState extends State<App> {
           // diary
           Routes.diary.overview: (_) =>
               ProtectedRoute(builder: (_) => const DiaryPage()),
-          Routes.diary.edit: (_) => const DiaryEditPage(),
+          Routes.diary.edit: (context) {
+            final diary = ModalRoute.of(context)?.settings.arguments as Diary?;
+            return DiaryEditPage(diary: diary);
+          }
         },
         initialRoute:
             isAuthenticated ? Routes.timeline.overview : Routes.landing,
