@@ -56,6 +56,15 @@ class CardioEditPageState extends State<CardioEditPage> {
         );
   }
 
+  void _saveCardioSession() {
+    // TODO save in Db
+    Navigator.of(context).pop(ReturnObject(
+        action: widget.cardioSession != null
+            ? ReturnAction.updated
+            : ReturnAction.created,
+        payload: _cardioSession));
+  }
+
   @override
   Widget build(BuildContext context) {
     Duration duration = Duration(seconds: _cardioSession.time ?? 0);
@@ -70,12 +79,7 @@ class CardioEditPageState extends State<CardioEditPage> {
           title: const Text("Cardio Edit"),
           actions: [
             IconButton(
-                onPressed: () => Navigator.of(context).pop(ReturnObject(
-                    action: widget.cardioSession != null
-                        ? ReturnAction.updated
-                        : ReturnAction.created,
-                    payload: _cardioSession)), // TODO save in DB
-                icon: const Icon(Icons.save))
+                onPressed: _saveCardioSession, icon: const Icon(Icons.save))
           ],
         ),
         body: Container(
@@ -142,13 +146,15 @@ class CardioEditPageState extends State<CardioEditPage> {
                     onTap: () async {
                       DateTime? datetime = await showDatePicker(
                         context: context,
-                        initialDate: DateTime.now(),
+                        initialDate: _cardioSession.datetime,
                         firstDate:
                             DateTime.now().subtract(const Duration(days: 365)),
                         lastDate: DateTime.now(),
                       );
                       TimeOfDay? time = await showTimePicker(
-                          context: context, initialTime: TimeOfDay.now());
+                          context: context,
+                          initialTime:
+                              TimeOfDay.fromDateTime(_cardioSession.datetime));
                       if (datetime != null && time != null) {
                         datetime = datetime.add(
                             Duration(hours: time.hour, minutes: time.minute));
