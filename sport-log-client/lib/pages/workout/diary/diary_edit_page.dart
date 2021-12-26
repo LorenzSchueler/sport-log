@@ -44,7 +44,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text("Create Diary Entry"), actions: [
+        appBar: AppBar(title: const Text("Edit Diary Entry"), actions: [
           IconButton(onPressed: _saveDiary, icon: const Icon(Icons.save))
         ]),
         body: Container(
@@ -72,6 +72,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
               TextFormField(
                 decoration: const InputDecoration(
                     icon: Icon(Icons.crop), labelText: "Bodyweight"),
+                initialValue: _diary.bodyweight?.toStringAsFixed(1),
                 style: const TextStyle(height: 1),
                 keyboardType: TextInputType.number,
                 onFieldSubmitted: (bodyweight) =>
@@ -80,6 +81,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
               TextFormField(
                 decoration: const InputDecoration(
                     icon: Icon(Icons.crop), labelText: "Comments"),
+                initialValue: _diary.comments,
                 style: const TextStyle(height: 1),
                 keyboardType: TextInputType.multiline,
                 minLines: 1,

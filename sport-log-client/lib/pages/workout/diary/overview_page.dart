@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
@@ -125,35 +124,44 @@ class DiaryPageState extends State<DiaryPage> {
     );
   }
 
-  Widget _buildDiaryEntry(BuildContext buildContext, int index) {
+  Widget _buildDiaryEntry(BuildContext context, int index) {
     final Diary diary = _diaries[index];
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          formatDate(diary.date),
-          style: const TextStyle(fontSize: 20),
-        ),
-        Defaults.sizedBox.horizontal.big,
-        SizedBox(
-          width: 80,
-          child: diary.bodyweight != null
-              ? ValueUnitDescription(
-                  value: diary.bodyweight!.toStringAsFixed(1),
-                  unit: "kg",
-                  description: null)
-              : null,
-        ),
-        Defaults.sizedBox.horizontal.big,
-        if (diary.comments != null)
-          Flexible(
-              child: Text(
-            diary.comments!,
-            textAlign: TextAlign.start,
-            softWrap: true,
-          ))
-      ],
+    return GestureDetector(
+      onTap: () {
+        showDetails(context, diary);
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            formatDate(diary.date),
+            style: const TextStyle(fontSize: 20),
+          ),
+          Defaults.sizedBox.horizontal.big,
+          SizedBox(
+            width: 80,
+            child: diary.bodyweight != null
+                ? ValueUnitDescription(
+                    value: diary.bodyweight!.toStringAsFixed(1),
+                    unit: "kg",
+                    description: null)
+                : null,
+          ),
+          Defaults.sizedBox.horizontal.big,
+          Expanded(
+            child: Text(
+              diary.comments ?? "",
+              textAlign: TextAlign.start,
+              softWrap: true,
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  void showDetails(BuildContext context, Diary diary) {
+    Navigator.of(context).pushNamed(Routes.diary.edit, arguments: diary);
   }
 }

@@ -168,7 +168,6 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
 
     return GestureDetector(
         onTap: () {
-          _logger.i("click");
           showDetails(context, cardioSession);
         },
         child: Container(
