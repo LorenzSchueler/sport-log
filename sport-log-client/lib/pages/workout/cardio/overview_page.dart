@@ -143,17 +143,43 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
       drawer: MainDrawer(selectedRoute: route),
-      floatingActionButton: fab(context),
+      floatingActionButton: ExpandableFab(
+        icon: const Icon(Icons.add),
+        icons: const [
+          Icon(CustomIcons.stopwatch),
+          Icon(Icons.notes_rounded),
+          Icon(CustomIcons.route),
+        ],
+        onPressed: [
+          () => Navigator.of(context)
+              .pushNamed(Routes.cardio.trackingSettings)
+              .then(_handleNewCardioSession),
+          () => Navigator.of(context)
+              .pushNamed(Routes.cardio.cardioEdit)
+              .then(_handleNewCardioSession),
+          () => Navigator.of(context).pushNamed(Routes.cardio.cardioEdit),
+          () => Navigator.of(context).pushNamed(Routes.cardio.routeEdit),
+        ],
+      ),
     );
   }
 
-  void showDetails(BuildContext context, CardioSession cardioSession) {
+  void _showDetails(BuildContext context, CardioSession cardioSession) {
     Navigator.of(context)
         .pushNamed(Routes.cardio.cardioDetails, arguments: cardioSession);
   }
 
   Widget _buildSessionCard(BuildContext buildContext, int index) {
     final CardioSession cardioSession = _cardioSessions[index];
+
+    return GestureDetector(
+        onTap: () {
+          _showDetails(context, cardioSession);
+        },
+        child: sessionCard(context, cardioSession));
+  }
+
+  static Widget sessionCard(BuildContext context, CardioSession cardioSession) {
     final distance = cardioSession.distance == null
         ? '???'
         : (cardioSession.distance! / 1000).toStringAsFixed(3);
@@ -166,118 +192,89 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
 
     late MapboxMapController _sessionMapController;
 
-    return GestureDetector(
-        onTap: () {
-          showDetails(context, cardioSession);
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: Defaults.borderRadius.normal,
-            color: backgroundColorOf(context),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: Defaults.borderRadius.normal,
+        color: backgroundColorOf(context),
+      ),
+      margin: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.only(bottom: 5),
+      child: Column(children: [
+        Defaults.sizedBox.vertical.small,
+        Row(children: [
+          Expanded(
+            child: Text(
+              formatDatetime(cardioSession.datetime),
+              textAlign: TextAlign.center,
+            ),
           ),
-          margin: const EdgeInsets.symmetric(vertical: 5),
-          padding: const EdgeInsets.only(bottom: 5),
-          child: Column(children: [
-            Defaults.sizedBox.vertical.small,
-            Row(children: [
-              Expanded(
-                child: Text(
-                  formatDatetime(cardioSession.datetime),
-                  textAlign: TextAlign.center,
-                ),
+          const Spacer(),
+          Expanded(
+            child: Text(
+              "movement <${cardioSession.movementId}>", // TODO use movement name
+              textAlign: TextAlign.center,
+            ),
+          )
+        ]),
+        Defaults.sizedBox.vertical.small,
+        cardioSession.track != null
+            ? SizedBox(
+                height: 150,
+                child: MapboxMap(
+                    accessToken: Secrets.mapboxAccessToken,
+                    styleString: Defaults.mapbox.style.outdoor,
+                    initialCameraPosition: CameraPosition(
+                      zoom: 13.0,
+                      target: cardioSession.track!.first.latLng,
+                    ),
+                    onMapCreated: (MapboxMapController controller) =>
+                        _sessionMapController = controller,
+                    onStyleLoadedCallback: () {
+                      _sessionMapController.addLine(LineOptions(
+                          lineColor: "red",
+                          geometry: cardioSession.track!
+                              .map((c) => c.latLng)
+                              .toList()));
+                    },
+                    onMapClick: (_, __) {
+                      // TODO does not work
+                      //_showDetails(context, cardioSession);
+                    },
+                    onMapLongClick: (_, __) {
+                      //_showDetails(context, cardioSession);
+                    }))
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(CustomIcons.route),
+                  Text(" no track available"),
+                ],
               ),
-              const Spacer(),
-              Expanded(
-                child: Text(
-                  "movement <${cardioSession.movementId}>", // TODO use movement name
-                  textAlign: TextAlign.center,
-                ),
-              )
-            ]),
-            Defaults.sizedBox.vertical.small,
-            cardioSession.track != null
-                ? SizedBox(
-                    height: 150,
-                    child: MapboxMap(
-                        accessToken: Secrets.mapboxAccessToken,
-                        styleString: Defaults.mapbox.style.outdoor,
-                        initialCameraPosition: CameraPosition(
-                          zoom: 13.0,
-                          target: cardioSession.track!.first.latLng,
-                        ),
-                        onMapCreated: (MapboxMapController controller) =>
-                            _sessionMapController = controller,
-                        onStyleLoadedCallback: () {
-                          _sessionMapController.addLine(LineOptions(
-                              lineColor: "red",
-                              geometry: cardioSession.track!
-                                  .map((c) => c.latLng)
-                                  .toList()));
-                        },
-                        onMapClick: (_, __) {
-                          // TODO does not work
-                          _logger.i("map click");
-                          showDetails(context, cardioSession);
-                        },
-                        onMapLongClick: (_, __) {
-                          _logger.i("map long click");
-                          showDetails(context, cardioSession);
-                        }))
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(CustomIcons.route),
-                      Text(" no track available"),
-                    ],
-                  ),
-            Defaults.sizedBox.vertical.small,
-            Row(children: [
-              Expanded(
-                child: ValueUnitDescription(
-                  value: duration,
-                  unit: null,
-                  description: null,
-                ),
-              ),
-              Expanded(
-                child: ValueUnitDescription(
-                  value: distance,
-                  unit: "km",
-                  description: null,
-                ),
-              ),
-              Expanded(
-                child: ValueUnitDescription(
-                  value: speed,
-                  unit: "km/h",
-                  description: null,
-                ),
-              ),
-            ]),
-          ]),
-        ));
-  }
-
-  Widget? fab(BuildContext context) {
-    _logger.d('FAB called!');
-
-    return ExpandableFab(
-      icon: const Icon(Icons.add),
-      icons: const [
-        Icon(CustomIcons.stopwatch),
-        Icon(Icons.notes_rounded),
-        Icon(CustomIcons.route),
-      ],
-      onPressed: [
-        () => Navigator.of(context)
-            .pushNamed(Routes.cardio.trackingSettings)
-            .then(_handleNewCardioSession),
-        () => Navigator.of(context)
-            .pushNamed(Routes.cardio.cardioEdit)
-            .then(_handleNewCardioSession),
-        () => Navigator.of(context).pushNamed(Routes.cardio.cardioEdit),
-        () => Navigator.of(context).pushNamed(Routes.cardio.routeEdit),
-      ],
+        Defaults.sizedBox.vertical.small,
+        Row(children: [
+          Expanded(
+            child: ValueUnitDescription(
+              value: duration,
+              unit: null,
+              description: null,
+            ),
+          ),
+          Expanded(
+            child: ValueUnitDescription(
+              value: distance,
+              unit: "km",
+              description: null,
+            ),
+          ),
+          Expanded(
+            child: ValueUnitDescription(
+              value: speed,
+              unit: "km/h",
+              description: null,
+            ),
+          ),
+        ]),
+      ]),
     );
   }
 

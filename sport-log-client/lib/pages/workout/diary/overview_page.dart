@@ -128,40 +128,43 @@ class DiaryPageState extends State<DiaryPage> {
     final Diary diary = _diaries[index];
 
     return GestureDetector(
-      onTap: () {
-        showDetails(context, diary);
-      },
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            formatDate(diary.date),
-            style: const TextStyle(fontSize: 20),
+        onTap: () {
+          _showDetails(context, diary);
+        },
+        child: itemCard(diary));
+  }
+
+  static Widget itemCard(Diary diary) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          formatDate(diary.date),
+          style: const TextStyle(fontSize: 20),
+        ),
+        Defaults.sizedBox.horizontal.big,
+        SizedBox(
+          width: 80,
+          child: diary.bodyweight != null
+              ? ValueUnitDescription(
+                  value: diary.bodyweight!.toStringAsFixed(1),
+                  unit: "kg",
+                  description: null)
+              : null,
+        ),
+        Defaults.sizedBox.horizontal.big,
+        Expanded(
+          child: Text(
+            diary.comments ?? "",
+            textAlign: TextAlign.start,
+            softWrap: true,
           ),
-          Defaults.sizedBox.horizontal.big,
-          SizedBox(
-            width: 80,
-            child: diary.bodyweight != null
-                ? ValueUnitDescription(
-                    value: diary.bodyweight!.toStringAsFixed(1),
-                    unit: "kg",
-                    description: null)
-                : null,
-          ),
-          Defaults.sizedBox.horizontal.big,
-          Expanded(
-            child: Text(
-              diary.comments ?? "",
-              textAlign: TextAlign.start,
-              softWrap: true,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  void showDetails(BuildContext context, Diary diary) {
+  void _showDetails(BuildContext context, Diary diary) {
     Navigator.of(context).pushNamed(Routes.diary.edit, arguments: diary);
   }
 }

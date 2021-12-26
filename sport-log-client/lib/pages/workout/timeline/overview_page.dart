@@ -10,8 +10,10 @@ import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/timeline_union.dart';
+import 'package:sport_log/pages/workout/cardio/overview_page.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
+import 'package:sport_log/pages/workout/diary/overview_page.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -155,20 +157,23 @@ class TimelinePageState extends State<TimelinePage> {
 
     return GestureDetector(
         onTap: () {
-          showDetails(context, item);
+          _showDetails(context, item);
         },
-        child: _itemCard(item));
+        child: _itemCard(context, item));
   }
 
-  Widget _itemCard(TimelineUnion item) {
+  Widget _itemCard(BuildContext context, TimelineUnion item) {
     return item.map(
-        (strengthSession) => Text(formatDate(strengthSession.datetime)),
-        (metconSession) => Text(formatDate(metconSession.datetime)),
-        (cardioSession) => Text(formatDate(cardioSession.datetime)),
-        (diary) => Text(formatDate(diary.date)));
+        (strengthSession) =>
+            Text("StrengthSession: " + formatDate(strengthSession.datetime)),
+        (metconSession) =>
+            Text("MetconSession: " + formatDate(metconSession.datetime)),
+        (cardioSession) =>
+            CardioSessionsPageState.sessionCard(context, cardioSession),
+        (diary) => DiaryPageState.itemCard(diary));
   }
 
-  void showDetails(BuildContext context, TimelineUnion item) {
+  void _showDetails(BuildContext context, TimelineUnion item) {
     item.map(
         (strengthSession) => Navigator.of(context)
             .pushNamed(Routes.diary.edit, arguments: strengthSession),
