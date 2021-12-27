@@ -109,7 +109,7 @@ class DiaryPageState extends State<DiaryPage> {
       ),
       body: Container(
           child: ListView.builder(
-        itemBuilder: _buildDiaryEntry,
+        itemBuilder: (_, index) => DiaryCard(diary: _diaries[index]),
         itemCount: _diaries.length,
       )),
       bottomNavigationBar:
@@ -122,51 +122,48 @@ class DiaryPageState extends State<DiaryPage> {
           }),
     );
   }
+}
 
-  Widget _buildDiaryEntry(BuildContext context, int index) {
-    final Diary diary = _diaries[index];
+class DiaryCard extends StatelessWidget {
+  final Diary diary;
 
+  const DiaryCard({Key? key, required this.diary}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-          _showDetails(context, diary);
+          Navigator.of(context).pushNamed(Routes.diary.edit, arguments: diary);
         },
-        child: diaryCard(diary));
-  }
-
-  static Widget diaryCard(Diary diary) {
-    return Card(
-        child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  formatDate(diary.date),
-                  style: const TextStyle(fontSize: 20),
-                ),
-                Defaults.sizedBox.horizontal.big,
-                SizedBox(
-                  width: 80,
-                  child: diary.bodyweight != null
-                      ? ValueUnitDescription(
-                          value: diary.bodyweight!.toStringAsFixed(1),
-                          unit: "kg",
-                          description: null)
-                      : null,
-                ),
-                Defaults.sizedBox.horizontal.big,
-                Expanded(
-                  child: Text(
-                    diary.comments ?? "",
-                    textAlign: TextAlign.start,
-                    softWrap: true,
-                  ),
-                ),
-              ],
-            )));
-  }
-
-  void _showDetails(BuildContext context, Diary diary) {
-    Navigator.of(context).pushNamed(Routes.diary.edit, arguments: diary);
+        child: Card(
+            child: Padding(
+                padding: const EdgeInsets.all(5),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      formatDate(diary.date),
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    Defaults.sizedBox.horizontal.big,
+                    SizedBox(
+                      width: 80,
+                      child: diary.bodyweight != null
+                          ? ValueUnitDescription(
+                              value: diary.bodyweight!.toStringAsFixed(1),
+                              unit: "kg",
+                              description: null)
+                          : null,
+                    ),
+                    Defaults.sizedBox.horizontal.big,
+                    Expanded(
+                      child: Text(
+                        diary.comments ?? "",
+                        textAlign: TextAlign.start,
+                        softWrap: true,
+                      ),
+                    ),
+                  ],
+                ))));
   }
 }

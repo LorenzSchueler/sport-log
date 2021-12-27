@@ -134,9 +134,8 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
                     ? _sessionCardWithMovement(
                         _sessions[index],
                       )
-                    : sessionCard(
-                        context,
-                        _sessions[index],
+                    : StrengthSessionCard(
+                        strengthSessionWithStats: _sessions[index],
                       ),
                 childCount: _sessions.length,
               )),
@@ -160,16 +159,24 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
           .pushNamed(Routes.strength.details, arguments: s.session.id),
     ));
   }
+}
 
-  static Widget sessionCard(BuildContext context, StrengthSessionWithStats s) {
+class StrengthSessionCard extends StatelessWidget {
+  final StrengthSessionWithStats strengthSessionWithStats;
+
+  const StrengthSessionCard({Key? key, required this.strengthSessionWithStats})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Card(
         child: ListTile(
-      leading: Icon(s.movement.dimension.iconData),
-      title: Text(s.movement.name),
+      leading: Icon(strengthSessionWithStats.movement.dimension.iconData),
+      title: Text(strengthSessionWithStats.movement.name),
       subtitle: Text(
-          '${s.session.datetime.toHumanWithTime()} • ${s.stats.numSets} ${plural('set', 'sets', s.stats.numSets)}'),
-      onTap: () => Navigator.of(context)
-          .pushNamed(Routes.strength.details, arguments: s.session.id),
+          '${strengthSessionWithStats.session.datetime.toHumanWithTime()} • ${strengthSessionWithStats.stats.numSets} ${plural('set', 'sets', strengthSessionWithStats.stats.numSets)}'),
+      onTap: () => Navigator.of(context).pushNamed(Routes.strength.details,
+          arguments: strengthSessionWithStats.session.id),
     ));
   }
 }

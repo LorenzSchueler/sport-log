@@ -136,7 +136,8 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         ),
       ),
       body: ListView.builder(
-        itemBuilder: _buildSessionCard,
+        itemBuilder: (_, index) =>
+            CardioSessionCard(cardioSession: _cardioSessions[index]),
         itemCount: _cardioSessions.length,
       ),
       bottomNavigationBar:
@@ -163,115 +164,6 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
     );
   }
 
-  void _showDetails(BuildContext context, CardioSession cardioSession) {
-    Navigator.of(context)
-        .pushNamed(Routes.cardio.cardioDetails, arguments: cardioSession);
-  }
-
-  Widget _buildSessionCard(BuildContext buildContext, int index) {
-    final CardioSession cardioSession = _cardioSessions[index];
-
-    return GestureDetector(
-        onTap: () {
-          _showDetails(context, cardioSession);
-        },
-        child: sessionCard(context, cardioSession));
-  }
-
-  static Widget sessionCard(BuildContext context, CardioSession cardioSession) {
-    final distance = cardioSession.distance == null
-        ? '???'
-        : (cardioSession.distance! / 1000).toStringAsFixed(3);
-    final speed = cardioSession.distance == null || cardioSession.time == null
-        ? '???'
-        : ((cardioSession.distance! / 1000) / (cardioSession.time! / 3600))
-            .toStringAsFixed(1);
-    final duration =
-        cardioSession.time == null ? "???" : formatTime(cardioSession.time!);
-
-    late MapboxMapController _sessionMapController;
-
-    return Card(
-      child: Column(children: [
-        Defaults.sizedBox.vertical.small,
-        Row(children: [
-          Expanded(
-            child: Text(
-              formatDatetime(cardioSession.datetime),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const Spacer(),
-          Expanded(
-            child: Text(
-              "movement <${cardioSession.movementId}>", // TODO use movement name
-              textAlign: TextAlign.center,
-            ),
-          )
-        ]),
-        Defaults.sizedBox.vertical.small,
-        cardioSession.track != null
-            ? SizedBox(
-                height: 150,
-                child: MapboxMap(
-                    accessToken: Secrets.mapboxAccessToken,
-                    styleString: Defaults.mapbox.style.outdoor,
-                    initialCameraPosition: CameraPosition(
-                      zoom: 13.0,
-                      target: cardioSession.track!.first.latLng,
-                    ),
-                    onMapCreated: (MapboxMapController controller) =>
-                        _sessionMapController = controller,
-                    onStyleLoadedCallback: () {
-                      _sessionMapController.addLine(LineOptions(
-                          lineColor: "red",
-                          geometry: cardioSession.track!
-                              .map((c) => c.latLng)
-                              .toList()));
-                    },
-                    onMapClick: (_, __) {
-                      // TODO does not work
-                      //_showDetails(context, cardioSession);
-                    },
-                    onMapLongClick: (_, __) {
-                      //_showDetails(context, cardioSession);
-                    }))
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(CustomIcons.route),
-                  Text(" no track available"),
-                ],
-              ),
-        Defaults.sizedBox.vertical.small,
-        Row(children: [
-          Expanded(
-            child: ValueUnitDescription(
-              value: duration,
-              unit: null,
-              description: null,
-            ),
-          ),
-          Expanded(
-            child: ValueUnitDescription(
-              value: distance,
-              unit: "km",
-              description: null,
-            ),
-          ),
-          Expanded(
-            child: ValueUnitDescription(
-              value: speed,
-              unit: "km/h",
-              description: null,
-            ),
-          ),
-        ]),
-        Defaults.sizedBox.vertical.small,
-      ]),
-    );
-  }
-
   void _handleNewCardioSession(dynamic object) {
     if (object is ReturnObject<CardioSession>) {
       switch (object.action) {
@@ -294,5 +186,112 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
     } else {
       _logger.i("poped item is not a ReturnObject");
     }
+  }
+}
+
+class CardioSessionCard extends StatelessWidget {
+  final CardioSession cardioSession;
+
+  const CardioSessionCard({Key? key, required this.cardioSession})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final distance = cardioSession.distance == null
+        ? '???'
+        : (cardioSession.distance! / 1000).toStringAsFixed(3);
+    final speed = cardioSession.distance == null || cardioSession.time == null
+        ? '???'
+        : ((cardioSession.distance! / 1000) / (cardioSession.time! / 3600))
+            .toStringAsFixed(1);
+    final duration =
+        cardioSession.time == null ? "???" : formatTime(cardioSession.time!);
+
+    late MapboxMapController _sessionMapController;
+
+    return GestureDetector(
+        onTap: () {
+          Navigator.of(context)
+              .pushNamed(Routes.cardio.cardioDetails, arguments: cardioSession);
+        },
+        child: Card(
+          child: Column(children: [
+            Defaults.sizedBox.vertical.small,
+            Row(children: [
+              Expanded(
+                child: Text(
+                  formatDatetime(cardioSession.datetime),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const Spacer(),
+              Expanded(
+                child: Text(
+                  "movement <${cardioSession.movementId}>", // TODO use movement name
+                  textAlign: TextAlign.center,
+                ),
+              )
+            ]),
+            Defaults.sizedBox.vertical.small,
+            cardioSession.track != null
+                ? SizedBox(
+                    height: 150,
+                    child: MapboxMap(
+                        accessToken: Secrets.mapboxAccessToken,
+                        styleString: Defaults.mapbox.style.outdoor,
+                        initialCameraPosition: CameraPosition(
+                          zoom: 13.0,
+                          target: cardioSession.track!.first.latLng,
+                        ),
+                        onMapCreated: (MapboxMapController controller) =>
+                            _sessionMapController = controller,
+                        onStyleLoadedCallback: () {
+                          _sessionMapController.addLine(LineOptions(
+                              lineColor: "red",
+                              geometry: cardioSession.track!
+                                  .map((c) => c.latLng)
+                                  .toList()));
+                        },
+                        onMapClick: (_, __) {
+                          // TODO does not work
+                          //_showDetails(context, cardioSession);
+                        },
+                        onMapLongClick: (_, __) {
+                          //_showDetails(context, cardioSession);
+                        }))
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(CustomIcons.route),
+                      Text(" no track available"),
+                    ],
+                  ),
+            Defaults.sizedBox.vertical.small,
+            Row(children: [
+              Expanded(
+                child: ValueUnitDescription(
+                  value: duration,
+                  unit: null,
+                  description: null,
+                ),
+              ),
+              Expanded(
+                child: ValueUnitDescription(
+                  value: distance,
+                  unit: "km",
+                  description: null,
+                ),
+              ),
+              Expanded(
+                child: ValueUnitDescription(
+                  value: speed,
+                  unit: "km/h",
+                  description: null,
+                ),
+              ),
+            ]),
+            Defaults.sizedBox.vertical.small,
+          ]),
+        ));
   }
 }

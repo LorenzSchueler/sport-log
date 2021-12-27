@@ -172,34 +172,16 @@ class TimelinePageState extends State<TimelinePage> {
   Widget _buildItemEntry(BuildContext context, int index) {
     final TimelineUnion item = _items[index];
 
-    return GestureDetector(
-        onTap: () {
-          _showDetails(context, item);
-        },
-        child: _itemCard(context, item));
+    return _itemCard(context, item);
   }
 
   Widget _itemCard(BuildContext context, TimelineUnion item) {
     return item.map(
         (strengthSession) =>
-            StrengthSessionsPageState.sessionCard(context, strengthSession),
+            StrengthSessionCard(strengthSessionWithStats: strengthSession),
         (metconSession) =>
             Text("MetconSession: " + formatDate(metconSession.datetime)),
-        (cardioSession) =>
-            CardioSessionsPageState.sessionCard(context, cardioSession),
-        (diary) => DiaryPageState.diaryCard(diary));
-  }
-
-  void _showDetails(BuildContext context, TimelineUnion item) {
-    item.map(
-        (strengthSession) => Navigator.of(context)
-            .pushNamed(Routes.diary.edit, arguments: strengthSession),
-        (metconSession) => Navigator.of(context)
-            .pushNamed(Routes.metcon.edit, arguments: metconSession),
-        (cardioSession) => Navigator.of(context)
-            .pushNamed(Routes.cardio.cardioDetails, arguments: cardioSession),
-        (diary) => Navigator.of(context)
-            .pushNamed(Routes.diary.edit, arguments: diary));
-    ;
+        (cardioSession) => CardioSessionCard(cardioSession: cardioSession),
+        (diary) => DiaryCard(diary: diary));
   }
 }
