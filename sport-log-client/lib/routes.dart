@@ -27,8 +27,10 @@ class _MetconRoutes {
   const _MetconRoutes();
 
   final String overview = '/metcon/overview';
-  final String sessionOverview = '/metcon/session_overview';
   final String edit = '/metcon/edit';
+  final String sessionOverview = '/metcon/session_overview';
+  final String sessionDetails = '/metcon/session_details';
+  final String sessionEdit = '/metcon/session_edit';
 }
 
 class _CardioRoutes {
