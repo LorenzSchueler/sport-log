@@ -9,8 +9,22 @@ String formatDate(DateTime date) {
   return DateFormat('dd.MM.yy').format(date);
 }
 
-String formatTime(int seconds) {
-  return Duration(seconds: seconds).toString().split('.').first.padLeft(8, "0");
+String formatTime(int seconds, {bool short = false}) {
+  if (short && seconds < 3600) {
+    return Duration(seconds: seconds)
+        .toString()
+        .split('.')
+        .first
+        .split(":")
+        .skip(1)
+        .join(":");
+  } else {
+    return Duration(seconds: seconds)
+        .toString()
+        .split('.')
+        .first
+        .padLeft(8, "0");
+  }
 }
 
 String formatDuration(Duration d) {
