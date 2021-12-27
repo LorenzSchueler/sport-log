@@ -131,10 +131,10 @@ class DiaryPageState extends State<DiaryPage> {
         onTap: () {
           _showDetails(context, diary);
         },
-        child: itemCard(diary));
+        child: diaryCard(diary));
   }
 
-  static Widget itemCard(Diary diary) {
+  static Widget diaryCard(Diary diary) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
