@@ -26,6 +26,7 @@ import 'package:sport_log/pages/movements/overview_page.dart';
 import 'package:sport_log/pages/registration/registration_page.dart';
 import 'package:sport_log/pages/workout/diary/diary_edit_page.dart';
 import 'package:sport_log/pages/workout/diary/overview_page.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_edit_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/overview_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/details_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/edit_page.dart';
@@ -83,18 +84,25 @@ class _AppState extends State<App> {
           // metcon
           Routes.metcon.overview: (_) =>
               ProtectedRoute(builder: (_) => const MetconsPage()),
-          // timeline
-          Routes.timeline.overview: (_) =>
-              ProtectedRoute(builder: (_) => const TimelinePage()),
-          // metcon session
-          Routes.metcon.sessionOverview: (_) =>
-              ProtectedRoute(builder: (_) => const MetconSessionsPage()),
           Routes.metcon.edit: (_) => ProtectedRoute(builder: (context) {
                 final arg = ModalRoute.of(context)?.settings.arguments;
                 return EditMetconPage(
                   initialMetcon: (arg is MetconDescription) ? arg : null,
                 );
               }),
+          // timeline
+          Routes.timeline.overview: (_) =>
+              ProtectedRoute(builder: (_) => const TimelinePage()),
+          // metcon session
+          Routes.metcon.sessionOverview: (_) =>
+              ProtectedRoute(builder: (_) => const MetconSessionsPage()),
+          Routes.metcon.sessionEdit: (context) {
+            final metconSessionDescription = ModalRoute.of(context)
+                ?.settings
+                .arguments as MetconSessionDescription?;
+            return MetconSessionEditPage(
+                metconSessionDescription: metconSessionDescription);
+          },
           // strength
           Routes.strength.overview: (_) =>
               ProtectedRoute(builder: (_) => const StrengthSessionsPage()),

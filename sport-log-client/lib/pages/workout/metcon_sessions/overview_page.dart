@@ -266,7 +266,11 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
       drawer: MainDrawer(selectedRoute: route),
-      floatingActionButton: null,
+      floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.of(context).pushNamed(Routes.metcon.sessionEdit);
+          }),
     );
   }
 }
@@ -305,7 +309,7 @@ class MetconSessionCard extends StatelessWidget {
 
     return GestureDetector(
         onTap: () {
-          Navigator.of(context).pushNamed(Routes.metcon.edit,
+          Navigator.of(context).pushNamed(Routes.metcon.sessionEdit,
               arguments: metconSessionDescription);
         },
         child: Card(

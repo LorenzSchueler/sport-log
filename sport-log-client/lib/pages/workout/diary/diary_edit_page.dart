@@ -45,7 +45,11 @@ class DiaryEditPageState extends State<DiaryEditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: const Text("Edit Diary Entry"), actions: [
-          IconButton(onPressed: _saveDiary, icon: const Icon(Icons.save))
+          IconButton(
+              onPressed: _diary.bodyweight != null || _diary.comments != null
+                  ? _saveDiary
+                  : null,
+              icon: const Icon(Icons.save))
         ]),
         body: Container(
           padding: const EdgeInsets.all(10),
@@ -53,7 +57,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
             children: [
               EditTile(
                   leading: const Icon(Icons.crop),
-                  caption: "Start Time",
+                  caption: "Date",
                   child: Text(formatDate(_diary.date)),
                   onTap: () async {
                     DateTime? date = await showDatePicker(
