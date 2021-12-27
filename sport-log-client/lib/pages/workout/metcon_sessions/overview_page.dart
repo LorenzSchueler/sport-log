@@ -111,7 +111,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         ),
       ),
       body: ListView.builder(
-        itemBuilder: (_, index) => MetconCard(
+        itemBuilder: (_, index) => MetconSessionCard(
             metconSessionDescription: _metconSessionDescriptions[index]),
         itemCount: _metconSessionDescriptions.length,
       ),
@@ -123,10 +123,10 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
   }
 }
 
-class MetconCard extends StatelessWidget {
+class MetconSessionCard extends StatelessWidget {
   final MetconSessionDescription metconSessionDescription;
 
-  const MetconCard({Key? key, required this.metconSessionDescription})
+  const MetconSessionCard({Key? key, required this.metconSessionDescription})
       : super(key: key);
 
   @override

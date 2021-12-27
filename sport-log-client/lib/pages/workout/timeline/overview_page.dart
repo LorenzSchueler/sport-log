@@ -7,7 +7,12 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/diary/diary.dart';
+import 'package:sport_log/models/metcon/metcon.dart';
+import 'package:sport_log/models/metcon/metcon_description.dart';
+import 'package:sport_log/models/metcon/metcon_movement.dart';
+import 'package:sport_log/models/metcon/metcon_movement_description.dart';
 import 'package:sport_log/models/metcon/metcon_session.dart';
+import 'package:sport_log/models/metcon/metcon_session_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
@@ -16,6 +21,7 @@ import 'package:sport_log/pages/workout/cardio/overview_page.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/diary/overview_page.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/overview_page.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/pages/workout/strength_sessions/overview_page.dart';
 import 'package:sport_log/routes.dart';
@@ -65,17 +71,49 @@ class TimelinePageState extends State<TimelinePage> {
           ], dateTime: DateTime.now()))),
     ];
     var metconSessions = [
-      TimelineUnion.metconSession(MetconSession(
-          id: randomId(),
-          userId: UserState.instance.currentUser!.id,
-          metconId: Int64(1),
-          datetime: DateTime.now().subtract(const Duration(days: 2)),
-          time: 300,
-          rounds: 3,
-          reps: 0,
-          rx: true,
-          comments: null,
-          deleted: false)),
+      TimelineUnion.metconSession(MetconSessionDescription(
+          metconSession: MetconSession(
+              id: randomId(),
+              userId: UserState.instance.currentUser!.id,
+              metconId: Int64(1),
+              datetime: DateTime.now(),
+              time: 15 * 60,
+              rounds: 3,
+              reps: 0,
+              rx: true,
+              comments: "so comments are here",
+              deleted: false),
+          metconDescription: MetconDescription(
+              metcon: Metcon(
+                  id: randomId(),
+                  userId: UserState.instance.currentUser!.id,
+                  name: "cindy",
+                  metconType: MetconType.amrap,
+                  rounds: 3,
+                  timecap: const Duration(minutes: 30),
+                  description: "my description",
+                  deleted: false),
+              moves: [
+                MetconMovementDescription(
+                    metconMovement: MetconMovement(
+                        id: randomId(),
+                        metconId: Int64(1),
+                        movementId: Int64(1),
+                        movementNumber: 1,
+                        count: 5,
+                        weight: 0,
+                        distanceUnit: null,
+                        deleted: false),
+                    movement: Movement(
+                        id: randomId(),
+                        userId: UserState.instance.currentUser!.id,
+                        name: "pullup",
+                        description: null,
+                        cardio: false,
+                        deleted: false,
+                        dimension: MovementDimension.reps))
+              ],
+              hasReference: true)))
     ];
     var cardioSessions = [
       TimelineUnion.cardioSession(
@@ -178,8 +216,8 @@ class TimelinePageState extends State<TimelinePage> {
     return item.map(
         (strengthSession) =>
             StrengthSessionCard(strengthSessionWithStats: strengthSession),
-        (metconSession) =>
-            Text("MetconSession: " + formatDate(metconSession.datetime)),
+        (metconSessionDescription) => MetconSessionCard(
+            metconSessionDescription: metconSessionDescription),
         (cardioSession) => CardioSessionCard(cardioSession: cardioSession),
         (diary) => DiaryCard(diary: diary));
   }
