@@ -1,7 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/src/provider.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/list_extension.dart';
@@ -10,7 +9,6 @@ import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/secrets.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
@@ -147,20 +145,21 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         icon: const Icon(Icons.add),
         items: [
           ExpandableFabItem(
-            const Icon(CustomIcons.stopwatch),
-            () => Navigator.of(context)
+            icon: const Icon(CustomIcons.stopwatch),
+            onPressed: () => Navigator.of(context)
                 .pushNamed(Routes.cardio.trackingSettings)
                 .then(_handleNewCardioSession),
           ),
           ExpandableFabItem(
-            const Icon(Icons.notes_rounded),
-            () => Navigator.of(context)
+            icon: const Icon(Icons.notes_rounded),
+            onPressed: () => Navigator.of(context)
                 .pushNamed(Routes.cardio.cardioEdit)
                 .then(_handleNewCardioSession),
           ),
           ExpandableFabItem(
-            const Icon(CustomIcons.route),
-            () => Navigator.of(context).pushNamed(Routes.cardio.routeEdit),
+            icon: const Icon(CustomIcons.route),
+            onPressed: () =>
+                Navigator.of(context).pushNamed(Routes.cardio.routeEdit),
           ),
         ],
       ),

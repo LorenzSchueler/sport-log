@@ -20,7 +20,7 @@ class ExpandableFabItem {
   final Icon icon;
   final Function onPressed;
 
-  ExpandableFabItem(this.icon, this.onPressed);
+  ExpandableFabItem({required this.icon, required this.onPressed});
 }
 
 class _ExpandableFabState extends State<ExpandableFab>
