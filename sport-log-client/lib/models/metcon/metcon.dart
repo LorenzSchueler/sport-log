@@ -18,13 +18,13 @@ enum MetconType {
   forTime
 }
 
-extension MetconTypeToIcon on MetconType {
+extension ToIcon on MetconType {
   IconData get icon {
     switch (this) {
       case MetconType.amrap:
         return CustomIcons.timeInterval;
       case MetconType.emom:
-        return CustomIcons.ruler;
+        return Icons.repeat_one_rounded;
       case MetconType.forTime:
         return CustomIcons.stopwatch;
     }
