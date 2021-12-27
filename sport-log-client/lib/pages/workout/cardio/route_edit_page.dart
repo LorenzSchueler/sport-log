@@ -5,7 +5,7 @@ import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/secrets.dart';
+import 'package:sport_log/secrets.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
