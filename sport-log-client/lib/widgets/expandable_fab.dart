@@ -4,18 +4,23 @@ import 'dart:math' as math;
 @immutable
 class ExpandableFab extends StatefulWidget {
   final Icon icon;
-  final List<Icon> icons;
-  final List<Function> onPressed;
+  final List<ExpandableFabItem> items;
 
   const ExpandableFab({
     Key? key,
     required this.icon,
-    required this.icons,
-    required this.onPressed,
+    required this.items,
   }) : super(key: key);
 
   @override
   _ExpandableFabState createState() => _ExpandableFabState();
+}
+
+class ExpandableFabItem {
+  final Icon icon;
+  final Function onPressed;
+
+  ExpandableFabItem(this.icon, this.onPressed);
 }
 
 class _ExpandableFabState extends State<ExpandableFab>
@@ -98,7 +103,7 @@ class _ExpandableFabState extends State<ExpandableFab>
 
   List<Widget> _buildExpandingActionButtons() {
     final children = <Widget>[];
-    final count = widget.icons.length;
+    final count = widget.items.length;
     final step = 90.0 / (count - 1);
     for (var i = 0, angleInDegrees = 0.0;
         i < count;
@@ -109,10 +114,10 @@ class _ExpandableFabState extends State<ExpandableFab>
           maxDistance: 112,
           progress: _expandAnimation,
           child: ActionButton(
-              icon: widget.icons[i],
+              icon: widget.items[i].icon,
               onPressed: () {
                 _toggle();
-                widget.onPressed[i]();
+                widget.items[i].onPressed();
               }),
         ),
       );
