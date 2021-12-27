@@ -9,6 +9,7 @@ import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/models/metcon/metcon_session.dart';
 import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
 import 'package:sport_log/models/timeline_union.dart';
 import 'package:sport_log/pages/workout/cardio/overview_page.dart';
@@ -16,6 +17,7 @@ import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/diary/overview_page.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
+import 'package:sport_log/pages/workout/strength_sessions/overview_page.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/movement_picker.dart';
@@ -36,14 +38,32 @@ class TimelinePageState extends State<TimelinePage> {
     super.initState();
 
     var strengthSessions = [
-      TimelineUnion.strengthSession(StrengthSession(
-          id: randomId(),
-          userId: UserState.instance.currentUser!.id,
-          datetime: DateTime.now(),
-          movementId: Int64(1),
-          interval: const Duration(seconds: 120),
-          comments: null,
-          deleted: false)),
+      TimelineUnion.strengthSession(StrengthSessionWithStats(
+          session: StrengthSession(
+              id: randomId(),
+              userId: UserState.instance.currentUser!.id,
+              datetime: DateTime.now(),
+              movementId: Int64(1),
+              interval: const Duration(seconds: 120),
+              comments: null,
+              deleted: false),
+          movement: Movement(
+              id: randomId(),
+              userId: UserState.instance.currentUser!.id,
+              name: "My Movement",
+              description: null,
+              cardio: true,
+              deleted: false,
+              dimension: MovementDimension.reps),
+          stats: StrengthSessionStats.fromStrengthSets(sets: [
+            StrengthSet(
+                id: randomId(),
+                strengthSessionId: randomId(),
+                setNumber: 1,
+                count: 5,
+                weight: 100,
+                deleted: false)
+          ], dateTime: DateTime.now()))),
     ];
     var metconSessions = [
       TimelineUnion.metconSession(MetconSession(
@@ -128,28 +148,6 @@ class TimelinePageState extends State<TimelinePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_movement?.name ?? defaultTitle),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              final Movement? movement = await showMovementPickerDialog(context,
-                  selectedMovement: _movement);
-              if (movement == null) {
-                return;
-              } else if (movement.id == _movement?.id) {
-                setState(() {
-                  _movement = null;
-                });
-              } else {
-                setState(() {
-                  _movement = movement;
-                });
-              }
-            },
-            icon: Icon(_movement != null
-                ? Icons.filter_alt
-                : Icons.filter_alt_outlined),
-          ),
-        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(40),
           child: DateFilter(
@@ -160,10 +158,10 @@ class TimelinePageState extends State<TimelinePage> {
           ),
         ),
       ),
-      body: ListView.separated(
-          itemBuilder: _buildItemEntry,
-          itemCount: _items.length,
-          separatorBuilder: (_, __) => const Divider()),
+      body: ListView.builder(
+        itemBuilder: _buildItemEntry,
+        itemCount: _items.length,
+      ),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
       drawer: MainDrawer(selectedRoute: route),
@@ -184,7 +182,7 @@ class TimelinePageState extends State<TimelinePage> {
   Widget _itemCard(BuildContext context, TimelineUnion item) {
     return item.map(
         (strengthSession) =>
-            Text("StrengthSession: " + formatDate(strengthSession.datetime)),
+            StrengthSessionsPageState.sessionCard(context, strengthSession),
         (metconSession) =>
             Text("MetconSession: " + formatDate(metconSession.datetime)),
         (cardioSession) =>

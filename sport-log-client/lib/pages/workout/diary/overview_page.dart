@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
@@ -107,12 +108,10 @@ class DiaryPageState extends State<DiaryPage> {
         ),
       ),
       body: Container(
-        padding: const EdgeInsets.all(10),
-        child: ListView.separated(
-            itemBuilder: _buildDiaryEntry,
-            itemCount: _diaries.length,
-            separatorBuilder: (_, __) => const Divider()),
-      ),
+          child: ListView.builder(
+        itemBuilder: _buildDiaryEntry,
+        itemCount: _diaries.length,
+      )),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
       drawer: MainDrawer(selectedRoute: route),
@@ -135,33 +134,36 @@ class DiaryPageState extends State<DiaryPage> {
   }
 
   static Widget diaryCard(Diary diary) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          formatDate(diary.date),
-          style: const TextStyle(fontSize: 20),
-        ),
-        Defaults.sizedBox.horizontal.big,
-        SizedBox(
-          width: 80,
-          child: diary.bodyweight != null
-              ? ValueUnitDescription(
-                  value: diary.bodyweight!.toStringAsFixed(1),
-                  unit: "kg",
-                  description: null)
-              : null,
-        ),
-        Defaults.sizedBox.horizontal.big,
-        Expanded(
-          child: Text(
-            diary.comments ?? "",
-            textAlign: TextAlign.start,
-            softWrap: true,
-          ),
-        ),
-      ],
-    );
+    return Card(
+        child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  formatDate(diary.date),
+                  style: const TextStyle(fontSize: 20),
+                ),
+                Defaults.sizedBox.horizontal.big,
+                SizedBox(
+                  width: 80,
+                  child: diary.bodyweight != null
+                      ? ValueUnitDescription(
+                          value: diary.bodyweight!.toStringAsFixed(1),
+                          unit: "kg",
+                          description: null)
+                      : null,
+                ),
+                Defaults.sizedBox.horizontal.big,
+                Expanded(
+                  child: Text(
+                    diary.comments ?? "",
+                    textAlign: TextAlign.start,
+                    softWrap: true,
+                  ),
+                ),
+              ],
+            )));
   }
 
   void _showDetails(BuildContext context, Diary diary) {

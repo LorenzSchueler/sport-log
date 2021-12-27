@@ -138,7 +138,6 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
       body: ListView.builder(
         itemBuilder: _buildSessionCard,
         itemCount: _cardioSessions.length,
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       ),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
@@ -192,13 +191,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
 
     late MapboxMapController _sessionMapController;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: Defaults.borderRadius.normal,
-        color: backgroundColorOf(context),
-      ),
-      margin: const EdgeInsets.symmetric(vertical: 5),
-      padding: const EdgeInsets.only(bottom: 5),
+    return Card(
       child: Column(children: [
         Defaults.sizedBox.vertical.small,
         Row(children: [
@@ -274,6 +267,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
             ),
           ),
         ]),
+        Defaults.sizedBox.vertical.small,
       ]),
     );
   }

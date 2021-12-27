@@ -129,17 +129,17 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
               ),
             if (_sessions.isNotEmpty)
               SliverList(
-                delegate: _movement != null
-                    ? SliverChildBuilderDelegate(
-                        (context, index) => _sessionToWidgetWithMovement(
-                            _sessions[index], index),
-                        childCount: _sessions.length,
+                  delegate: SliverChildBuilderDelegate(
+                (context, index) => _movement != null
+                    ? _sessionCardWithMovement(
+                        _sessions[index],
                       )
-                    : SliverChildBuilderDelegate(
-                        (context, index) => _sessionToWidgetWithoutMovement(
-                            _sessions[index], index),
-                        childCount: _sessions.length),
-              ),
+                    : sessionCard(
+                        context,
+                        _sessions[index],
+                      ),
+                childCount: _sessions.length,
+              )),
           ],
         ),
       ),
@@ -150,25 +150,26 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
     );
   }
 
-  Widget _sessionToWidgetWithMovement(StrengthSessionWithStats s, int index) {
-    return ListTile(
+  Widget _sessionCardWithMovement(StrengthSessionWithStats s) {
+    return Card(
+        child: ListTile(
       title: Text(
           '${s.session.datetime.toHumanWithTime()} • ${s.stats.numSets} ${plural('set', 'sets', s.stats.numSets)}'),
       subtitle: Text(s.stats.toDisplayName(s.movement.dimension)),
       onTap: () => Navigator.of(context)
           .pushNamed(Routes.strength.details, arguments: s.session.id),
-    );
+    ));
   }
 
-  Widget _sessionToWidgetWithoutMovement(
-      StrengthSessionWithStats s, int index) {
-    return ListTile(
+  static Widget sessionCard(BuildContext context, StrengthSessionWithStats s) {
+    return Card(
+        child: ListTile(
       leading: Icon(s.movement.dimension.iconData),
       title: Text(s.movement.name),
       subtitle: Text(
           '${s.session.datetime.toHumanWithTime()} • ${s.stats.numSets} ${plural('set', 'sets', s.stats.numSets)}'),
       onTap: () => Navigator.of(context)
           .pushNamed(Routes.strength.details, arguments: s.session.id),
-    );
+    ));
   }
 }
