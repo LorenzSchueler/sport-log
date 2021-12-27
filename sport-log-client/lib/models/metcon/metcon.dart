@@ -1,9 +1,11 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
 
 part 'metcon.g.dart';
 
@@ -14,6 +16,19 @@ enum MetconType {
   emom,
   @JsonValue("ForTime")
   forTime
+}
+
+extension MetconTypeToIcon on MetconType {
+  IconData get icon {
+    switch (this) {
+      case MetconType.amrap:
+        return CustomIcons.timeInterval;
+      case MetconType.emom:
+        return CustomIcons.ruler;
+      case MetconType.forTime:
+        return CustomIcons.stopwatch;
+    }
+  }
 }
 
 extension ToDisplayName on MetconType {
