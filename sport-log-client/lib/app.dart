@@ -34,6 +34,7 @@ import 'package:sport_log/pages/workout/strength_sessions/overview_page.dart';
 import 'package:sport_log/pages/workout/timeline/overview_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
 
+import 'pages/workout/metcon_sessions/metcon_sessoin_details_page.dart';
 import 'routes.dart';
 
 class App extends StatefulWidget {
@@ -96,6 +97,13 @@ class _AppState extends State<App> {
           // metcon session
           Routes.metcon.sessionOverview: (_) =>
               ProtectedRoute(builder: (_) => const MetconSessionsPage()),
+          Routes.metcon.sessionDetails: (context) {
+            final metconSessionDescription = ModalRoute.of(context)
+                ?.settings
+                .arguments as MetconSessionDescription;
+            return MetconSessionDetailsPage(
+                metconSessionDescription: metconSessionDescription);
+          },
           Routes.metcon.sessionEdit: (context) {
             final metconSessionDescription = ModalRoute.of(context)
                 ?.settings
