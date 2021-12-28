@@ -5,6 +5,7 @@ import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -283,30 +284,6 @@ class MetconSessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String name =
-        metconSessionDescription.metconDescription.metcon.name ??
-            metconSessionDescription.metconDescription.moves
-                .map((e) => e.movement.name)
-                .join(" & ");
-
-    final String text;
-    switch (metconSessionDescription.metconDescription.metcon.metconType) {
-      case MetconType.amrap:
-        text =
-            "${metconSessionDescription.metconSession.rounds} rounds + ${metconSessionDescription.metconSession.reps} reps";
-        break;
-      case MetconType.emom:
-        text =
-            "${metconSessionDescription.metconDescription.metcon.rounds!} * ${(metconSessionDescription.metconDescription.metcon.timecap!.inMinutes / metconSessionDescription.metconDescription.metcon.rounds!).round()} min";
-        break;
-      case MetconType.forTime:
-        text = metconSessionDescription.metconSession.rounds ==
-                metconSessionDescription.metconDescription.metcon.rounds
-            ? "${formatTime(metconSessionDescription.metconSession.time!, short: true)} min (${formatTime(metconSessionDescription.metconDescription.metcon.timecap!.inSeconds, short: true)} min)"
-            : "${metconSessionDescription.metconSession.rounds} rounds + ${metconSessionDescription.metconSession.reps} reps (${metconSessionDescription.metconDescription.metcon.rounds} rounds)";
-        break;
-    }
-
     return GestureDetector(
         onTap: () {
           Navigator.of(context).pushNamed(Routes.metcon.sessionEdit,
@@ -319,8 +296,8 @@ class MetconSessionCard extends StatelessWidget {
           trailing: metconSessionDescription.metconSession.rx
               ? const Icon(Icons.check_circle_rounded)
               : null,
-          title: Text(name),
-          subtitle: Text(text),
+          title: Text(metconSessionDescription.name),
+          subtitle: Text(metconSessionDescription.shortResultDescription),
           onTap: () => Navigator.of(context).pushNamed(
               Routes.metcon.sessionDetails,
               arguments: metconSessionDescription),
