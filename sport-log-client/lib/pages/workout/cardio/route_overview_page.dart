@@ -5,17 +5,12 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
-import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
-import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/secrets.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
-import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
@@ -78,9 +73,8 @@ class RoutePageState extends State<RoutePage> {
         ),
         body: Scrollbar(
             child: ListView.builder(
-          itemBuilder: _buildSessionCard,
+          itemBuilder: _buildRouteCard,
           itemCount: _routes.length,
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
         )),
         bottomNavigationBar:
             SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
@@ -96,7 +90,7 @@ class RoutePageState extends State<RoutePage> {
     Navigator.of(context).pushNamed(Routes.cardio.routeEdit, arguments: route);
   }
 
-  Widget _buildSessionCard(BuildContext buildContext, int index) {
+  Widget _buildRouteCard(BuildContext buildContext, int index) {
     final Route route = _routes[index];
     final distance = (route.distance / 1000).toStringAsFixed(3);
 
@@ -107,13 +101,7 @@ class RoutePageState extends State<RoutePage> {
           _logger.i("click");
           showDetails(context, route);
         },
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: Defaults.borderRadius.normal,
-            color: backgroundColorOf(context),
-          ),
-          margin: const EdgeInsets.symmetric(vertical: 5),
-          padding: const EdgeInsets.only(bottom: 5),
+        child: Card(
           child: Column(children: [
             Defaults.sizedBox.vertical.small,
             Text(
@@ -170,6 +158,7 @@ class RoutePageState extends State<RoutePage> {
                 ),
               ),
             ]),
+            Defaults.sizedBox.vertical.small,
           ]),
         ));
   }
