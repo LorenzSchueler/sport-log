@@ -103,6 +103,10 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         title: Text(_movement?.name ?? defaultTitle),
         actions: [
           IconButton(
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(Routes.cardio.routeOverview),
+              icon: const Icon(CustomIcons.route)),
+          IconButton(
             onPressed: () async {
               final Movement? movement = await showMovementPickerDialog(context,
                   selectedMovement: _movement);
@@ -155,11 +159,6 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
             onPressed: () => Navigator.of(context)
                 .pushNamed(Routes.cardio.cardioEdit)
                 .then(_handleNewCardioSession),
-          ),
-          ExpandableFabItem(
-            icon: const Icon(CustomIcons.route),
-            onPressed: () =>
-                Navigator.of(context).pushNamed(Routes.cardio.routeEdit),
           ),
         ],
       ),

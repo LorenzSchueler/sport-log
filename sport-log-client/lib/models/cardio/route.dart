@@ -11,7 +11,7 @@ import 'package:sport_log/models/cardio/position.dart';
 part 'route.g.dart';
 
 @JsonSerializable()
-class Route implements DbObject {
+class Route extends DbObject with Comparable<Route> {
   Route({
     required this.id,
     required this.userId,
@@ -47,6 +47,11 @@ class Route implements DbObject {
         validate(descent == null || descent! >= 0, 'Route: descent < 0') &&
         validate(track.isNotEmpty, 'Route: track is empty') &&
         validate(!deleted, 'Route: deleted == true');
+  }
+
+  @override
+  int compareTo(Route other) {
+    return name.compareTo(other.name);
   }
 }
 

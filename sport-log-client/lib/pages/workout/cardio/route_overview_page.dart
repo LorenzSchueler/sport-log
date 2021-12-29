@@ -4,11 +4,18 @@ import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/state/page_return.dart';
+import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
+import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/secrets.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
@@ -21,6 +28,10 @@ class RoutePage extends StatefulWidget {
 
 class RoutePageState extends State<RoutePage> {
   final _logger = Logger('RoutePage');
+
+  final SessionsPageTab sessionsPageTab = SessionsPageTab.cardio;
+  final String route = Routes.cardio.routeOverview;
+  final String defaultTitle = "Routes";
 
   final List<Route> _routes = [
     Route(
@@ -56,17 +67,29 @@ class RoutePageState extends State<RoutePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Routes"),
-      ),
-      body: Scrollbar(
-          child: ListView.builder(
-        itemBuilder: _buildSessionCard,
-        itemCount: _routes.length,
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-      )),
-      drawer: MainDrawer(selectedRoute: Routes.cardio.routeOverview),
-    );
+        appBar: AppBar(
+          title: Text(defaultTitle),
+          actions: [
+            IconButton(
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(Routes.cardio.overview),
+                icon: const Icon(CustomIcons.heartbeat)),
+          ],
+        ),
+        body: Scrollbar(
+            child: ListView.builder(
+          itemBuilder: _buildSessionCard,
+          itemCount: _routes.length,
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+        )),
+        bottomNavigationBar:
+            SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
+        drawer: MainDrawer(selectedRoute: route),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () =>
+              Navigator.of(context).pushNamed(Routes.cardio.routeEdit),
+          child: const Icon(Icons.add),
+        ));
   }
 
   void showDetails(BuildContext context, Route route) {
@@ -149,5 +172,28 @@ class RoutePageState extends State<RoutePage> {
             ]),
           ]),
         ));
+  }
+
+  void _handleNewRoute(dynamic object) {
+    if (object is ReturnObject<Route>) {
+      switch (object.action) {
+        case ReturnAction.created:
+          //setState(() {
+          //_routes.add(object.payload);
+          //_routes.sortBy((c) => c.datetime);
+          //});
+          break;
+        case ReturnAction.updated:
+          //setState(() {
+          //_routes.update(object.payload, by: (o) => o.id);
+          //_routes.sortBy((c) => c.datetime);
+          //});
+          break;
+        case ReturnAction.deleted:
+        //setState(() => _routes.delete(object.payload, by: (c) => c.id));
+      }
+    } else {
+      _logger.i("poped item is not a ReturnObject");
+    }
   }
 }
