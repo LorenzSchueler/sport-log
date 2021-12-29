@@ -75,6 +75,7 @@ struct Workout {
     activity_id: u32,
     #[serde(rename(deserialize = "startTime"))]
     start_time: u64,
+    #[allow(dead_code)]
     #[serde(rename(deserialize = "stopTime"))]
     stop_time: u64,
     #[serde(rename(deserialize = "totalTime"))]
@@ -85,16 +86,22 @@ struct Workout {
     total_ascent: f32,
     #[serde(rename(deserialize = "totalDescent"))]
     total_descent: f32,
+    #[allow(dead_code)]
     #[serde(rename(deserialize = "startPosition"))]
     start_position: StPosition,
+    #[allow(dead_code)]
     #[serde(rename(deserialize = "stopPosition"))]
     stop_position: StPosition,
+    #[allow(dead_code)]
     #[serde(rename(deserialize = "centerPosition"))]
     center_position: StPosition,
+    #[allow(dead_code)]
     #[serde(rename(deserialize = "stepCount"))]
     step_count: u32,
+    #[allow(dead_code)]
     #[serde(rename(deserialize = "minAltitude"))]
     min_altitude: Option<f32>,
+    #[allow(dead_code)]
     #[serde(rename(deserialize = "sessionkey"))]
     max_altitude: Option<f32>,
     #[serde(rename(deserialize = "workoutKey"))]
@@ -107,12 +114,15 @@ struct Workout {
 
 #[derive(Deserialize, Debug)]
 struct StPosition {
+    #[allow(dead_code)]
     x: f64,
+    #[allow(dead_code)]
     y: f64,
 }
 
 #[derive(Deserialize, Debug)]
 struct Cadence {
+    #[allow(dead_code)]
     max: f32,
     avg: f32,
 }
@@ -134,8 +144,10 @@ struct Location {
     ln: f64, // lon
     s: u32,  // meter since start
     h: f32,  // height
-    v: u32,  // ???
-    d: u64,  // timestamp in 1 / 1000 s
+    #[allow(dead_code)]
+    v: u32, // ???
+    #[allow(dead_code)]
+    d: u64, // timestamp in 1 / 1000 s
 }
 
 #[tokio::main]
@@ -185,10 +197,8 @@ async fn setup() -> Result<(), ReqwestError> {
 fn help() {
     println!(
         "Sportstracker Action Provider\n\n\
-
         USAGE:\n\
         sport-log-action-provider-sportstracker [OPTIONS]\n\n\
-
         OPTIONS:\n\
         -h, --help\tprint this help page\n\
         --setup\t\tcreate own actions"

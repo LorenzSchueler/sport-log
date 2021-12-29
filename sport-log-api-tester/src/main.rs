@@ -104,7 +104,6 @@ fn main() {
         _ => {
             println!(
                 "sport-log-api-tester\n\n\
-                
                 OPTIONS:\n\
                 POST <endpoint> <data>\n\
                 POST <endpoint> <username> <password> <data>\n\

@@ -49,7 +49,6 @@ fn main() {
         _ => {
             println!(
                 "sport-log-password-hasher\n\n\
-                
                 OPTIONS:\n\
                 -g <password>\t\tgenerate hash\n\
                 -v <hash> <password>\tverify password"

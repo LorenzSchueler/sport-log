@@ -143,10 +143,8 @@ async fn setup() -> Result<()> {
 fn help() {
     println!(
         "Wodify Wod Action Provider\n\n\
-
         USAGE:\n\
         sport-log-action-provider-wodify-wod [OPTIONS]\n\n\
-
         OPTIONS:\n\
         -h, --help\tprint this help page\n\
         --interactive\tuse interactive webdriver session (with browser window)\n\

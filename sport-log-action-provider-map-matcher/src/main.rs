@@ -164,10 +164,8 @@ async fn setup() -> Result<()> {
 fn help() {
     println!(
         "Map Matcher\n\n\
-
         USAGE:\n\
         sport-log-action-provider-map-matcher [OPTIONS]\n\n\
-
         OPTIONS:\n\
         -h, --help\tprint this help page\n\
         --setup\t\tcreate own actions"
