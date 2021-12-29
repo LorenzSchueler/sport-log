@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/user_state.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -21,6 +22,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
   final _logger = Logger('MetconSessionEditPage');
 
   late MetconSessionDescription _metconSessionDescription;
+  late bool _finished;
 
   @override
   void initState() {
@@ -69,6 +71,8 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                           dimension: MovementDimension.reps))
                 ],
                 hasReference: true));
+    _finished = _metconSessionDescription.metconSession.rounds ==
+        _metconSessionDescription.metconDescription.metcon.rounds;
   }
 
   void _saveMetconSession() {
@@ -93,6 +97,24 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
             children: [
               EditTile(
                   leading: const Icon(Icons.crop),
+                  caption: "Metcon",
+                  child: Text(_metconSessionDescription.name),
+                  onTap: () async {
+                    //Metcon? metcon = await showDatePicker(
+                    //context: context,
+                    //initialDate:
+                    //(_metconSessionDescription.metconDescription.metcon),
+                    //);
+                    //if (metcon != null) {
+                    //setState(() {
+                    //_metconSessionDescription.metconDescription.metcon =
+                    //metcon;
+                    //});
+                    //}
+                    // set time round and reps accordingly to avoid null values
+                  }),
+              EditTile(
+                  leading: const Icon(Icons.crop),
                   caption: "Start Time",
                   child: Text(formatDate(
                       _metconSessionDescription.metconSession.datetime)),
@@ -111,6 +133,84 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                       });
                     }
                   }),
+              if (_metconSessionDescription
+                      .metconDescription.metcon.metconType ==
+                  MetconType.forTime)
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  const Text("finished"),
+                  Switch(
+                      value: _finished,
+                      onChanged: (finished) => setState(() {
+                            _finished = finished;
+                            if (_finished) {
+                              _metconSessionDescription.metconSession.rounds =
+                                  _metconSessionDescription
+                                      .metconDescription.metcon.rounds;
+                              _metconSessionDescription.metconSession.rounds =
+                                  0;
+                            }
+                          })),
+                ]),
+              if (_metconSessionDescription
+                          .metconDescription.metcon.metconType ==
+                      MetconType.forTime &&
+                  _finished)
+                TextFormField(
+                  decoration: const InputDecoration(
+                      icon: Icon(Icons.crop), labelText: "Time"),
+                  initialValue:
+                      _metconSessionDescription.metconSession.comments,
+                  style: const TextStyle(height: 1),
+                  keyboardType: TextInputType.number,
+                  onFieldSubmitted: (time) => setState(() {
+                    _metconSessionDescription.metconSession.time =
+                        int.parse(time);
+                  }),
+                ),
+              if (_metconSessionDescription
+                              .metconDescription.metcon.metconType ==
+                          MetconType.forTime &&
+                      !_finished ||
+                  _metconSessionDescription
+                          .metconDescription.metcon.metconType ==
+                      MetconType.amrap)
+                Row(children: [
+                  Expanded(
+                      child: TextFormField(
+                    decoration: const InputDecoration(
+                        icon: Icon(Icons.crop), labelText: "Rounds"),
+                    initialValue: _metconSessionDescription.metconSession.rounds
+                        .toString(),
+                    style: const TextStyle(height: 1),
+                    keyboardType: TextInputType.number,
+                    onFieldSubmitted: (rounds) => setState(() {
+                      _metconSessionDescription.metconSession.rounds =
+                          int.parse(rounds);
+                    }),
+                  )),
+                  Defaults.sizedBox.horizontal.normal,
+                  Expanded(
+                      child: TextFormField(
+                    decoration: const InputDecoration(labelText: "Reps"),
+                    initialValue:
+                        _metconSessionDescription.metconSession.reps.toString(),
+                    style: const TextStyle(height: 1),
+                    keyboardType: TextInputType.number,
+                    onFieldSubmitted: (reps) => setState(() {
+                      _metconSessionDescription.metconSession.reps =
+                          int.parse(reps);
+                    }),
+                  )),
+                ]),
+              SwitchListTile(
+                  value: _metconSessionDescription.metconSession.rx,
+                  title: const Text("Rx"),
+                  secondary: const Icon(Icons.crop),
+                  onChanged: (rx) {
+                    setState(() {
+                      _metconSessionDescription.metconSession.rx = rx;
+                    });
+                  }),
               TextFormField(
                 decoration: const InputDecoration(
                     icon: Icon(Icons.crop), labelText: "Comments"),
@@ -119,8 +219,9 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                 keyboardType: TextInputType.multiline,
                 minLines: 1,
                 maxLines: 5,
-                onFieldSubmitted: (comments) =>
-                    _metconSessionDescription.metconSession.comments = comments,
+                onFieldSubmitted: (comments) => setState(() {
+                  _metconSessionDescription.metconSession.comments = comments;
+                }),
               )
             ],
           ),
