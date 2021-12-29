@@ -17,13 +17,13 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
 import 'package:sport_log/models/timeline_union.dart';
-import 'package:sport_log/pages/workout/cardio/overview_page.dart';
+import 'package:sport_log/pages/workout/cardio/cardio_overview_page.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
-import 'package:sport_log/pages/workout/diary/overview_page.dart';
-import 'package:sport_log/pages/workout/metcon_sessions/overview_page.dart';
+import 'package:sport_log/pages/workout/diary/diary_overview_page.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_overview_page.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
-import 'package:sport_log/pages/workout/strength_sessions/overview_page.dart';
+import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
