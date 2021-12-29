@@ -39,7 +39,7 @@ extension SessionTabUtils on SessionsPageTab {
       case SessionsPageTab.metcon:
         return const BottomNavigationBarItem(
           icon: Icon(CustomIcons.plan),
-          label: "Metcons",
+          label: "Metcon",
         );
       case SessionsPageTab.cardio:
         return const BottomNavigationBarItem(

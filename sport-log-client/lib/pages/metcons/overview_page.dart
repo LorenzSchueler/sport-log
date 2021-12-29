@@ -3,9 +3,12 @@ import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorder
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/helpers/extensions/list_extension.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/metcon/all.dart';
+import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 class MetconsPage extends StatefulWidget {
@@ -16,8 +19,14 @@ class MetconsPage extends StatefulWidget {
 }
 
 class _MetconsPageState extends State<MetconsPage> {
+  final _logger = Logger('MetconsPage');
+
   final _dataProvider = MetconDataProvider.instance;
   List<MetconDescription> _metconDescriptions = [];
+
+  final SessionsPageTab sessionsPageTab = SessionsPageTab.metcon;
+  final String route = Routes.metcon.overview;
+  final String defaultTitle = "Metcons";
 
   static const _deleteChoice = 1;
   static const _editChoice = 2;
@@ -39,41 +48,24 @@ class _MetconsPageState extends State<MetconsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Metcons'),
+        title: Text(defaultTitle),
+        actions: [
+          IconButton(
+              onPressed: () => Navigator.of(context)
+                  .pushNamed(Routes.metcon.sessionOverview),
+              icon: const Icon(CustomIcons.plan)),
+        ],
       ),
       body: _content,
-      drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
+      bottomNavigationBar:
+          SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
+      drawer: MainDrawer(selectedRoute: route),
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () async {
             final returnObject =
                 await Navigator.of(context).pushNamed(Routes.metcon.edit);
-            if (returnObject is! ReturnObject<MetconDescription>) {
-              return;
-            }
-            switch (returnObject.action) {
-              case ReturnAction.updated:
-                setState(() {
-                  _metconDescriptions.update(returnObject.payload,
-                      by: (md) => md.metcon.id);
-                  _metconDescriptions.sortBy(
-                      (md) => (md.metcon.name ?? 'Unnamed').toUpperCase());
-                });
-                break;
-              case ReturnAction.created:
-                setState(() {
-                  _metconDescriptions.add(returnObject.payload);
-                  _metconDescriptions.sortBy(
-                      (md) => (md.metcon.name ?? 'Unnamed').toUpperCase());
-                });
-                break;
-              case ReturnAction.deleted:
-                setState(() {
-                  _metconDescriptions.delete(returnObject.payload,
-                      by: (md) => md.metcon.id);
-                });
-                break;
-            }
+            _handleNewMetcon(returnObject);
           }),
     );
   }
@@ -146,5 +138,35 @@ class _MetconsPageState extends State<MetconsPage> {
       md.moves.map((mmd) => mmd.movement.name).join(' • '),
       overflow: TextOverflow.ellipsis,
     );
+  }
+
+  void _handleNewMetcon(dynamic object) {
+    if (object is ReturnObject<MetconDescription>) {
+      switch (object.action) {
+        case ReturnAction.updated:
+          setState(() {
+            _metconDescriptions.update(object.payload,
+                by: (md) => md.metcon.id);
+            _metconDescriptions
+                .sortBy((md) => (md.metcon.name ?? 'Unnamed').toUpperCase());
+          });
+          break;
+        case ReturnAction.created:
+          setState(() {
+            _metconDescriptions.add(object.payload);
+            _metconDescriptions
+                .sortBy((md) => (md.metcon.name ?? 'Unnamed').toUpperCase());
+          });
+          break;
+        case ReturnAction.deleted:
+          setState(() {
+            _metconDescriptions.delete(object.payload,
+                by: (md) => md.metcon.id);
+          });
+          break;
+      }
+    } else {
+      _logger.i("poped item is not a ReturnObject");
+    }
   }
 }

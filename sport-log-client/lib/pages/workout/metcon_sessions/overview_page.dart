@@ -10,6 +10,7 @@ import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/movement_picker.dart';
 
@@ -219,7 +220,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
   DateFilterState _dateFilter = MonthFilter.current();
   Movement? _movement;
   final SessionsPageTab sessionsPageTab = SessionsPageTab.metcon;
-  final String route = Routes.metcon.overview;
+  final String route = Routes.metcon.sessionOverview;
   final String defaultTitle = "Metcon Sessions";
 
   @override
@@ -228,6 +229,10 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
       appBar: AppBar(
         title: Text(_movement?.name ?? defaultTitle),
         actions: [
+          IconButton(
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(Routes.metcon.overview),
+              icon: const Icon(CustomIcons.plan)),
           IconButton(
             onPressed: () async {
               final Movement? movement = await showMovementPickerDialog(context,
