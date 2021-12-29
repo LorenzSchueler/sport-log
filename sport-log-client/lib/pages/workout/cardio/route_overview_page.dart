@@ -80,8 +80,9 @@ class RoutePageState extends State<RoutePage> {
             SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
         drawer: MainDrawer(selectedRoute: route),
         floatingActionButton: FloatingActionButton(
-          onPressed: () =>
-              Navigator.of(context).pushNamed(Routes.cardio.routeEdit),
+          onPressed: () => Navigator.of(context)
+              .pushNamed(Routes.cardio.routeEdit)
+              .then(_handleNewRoute),
           child: const Icon(Icons.add),
         ));
   }

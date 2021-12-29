@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';

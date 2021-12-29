@@ -1,6 +1,6 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/models/strength/strength_session_stats.dart';
 
 import 'strength_session.dart';
 

@@ -4,12 +4,6 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/models/cardio/cardio_session.dart';
-import 'package:sport_log/models/cardio/route.dart';
-import 'package:sport_log/models/metcon/metcon_description.dart';
-import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/models/movement/movement_description.dart';
-import 'package:sport_log/models/strength/strength_session_with_sets.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_details_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_overview_page.dart';
@@ -34,7 +28,7 @@ import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page
 import 'package:sport_log/pages/workout/timeline/timeline_page.dart';
 import 'package:sport_log/widgets/protected_route.dart';
 
-import 'pages/workout/metcon_sessions/metcon_sessoin_details_page.dart';
+import 'pages/workout/metcon_sessions/metcon_session_details_page.dart';
 import 'routes.dart';
 
 class App extends StatefulWidget {

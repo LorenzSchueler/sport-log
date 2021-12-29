@@ -2,7 +2,6 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
-import 'package:sport_log/database/defs.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';

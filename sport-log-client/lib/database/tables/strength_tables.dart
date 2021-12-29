@@ -9,7 +9,6 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/models/strength/all.dart';
 
 import 'movement_table.dart';
 

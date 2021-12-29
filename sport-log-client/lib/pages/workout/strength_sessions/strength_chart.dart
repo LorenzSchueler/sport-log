@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/models/all.dart';
-import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
+import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/widgets/form_widgets/selection_bar.dart';
 
 import 'charts/all.dart';

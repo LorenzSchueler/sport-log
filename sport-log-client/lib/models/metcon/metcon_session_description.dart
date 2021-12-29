@@ -30,15 +30,12 @@ class MetconSessionDescription implements Validatable {
     switch (metconDescription.metcon.metconType) {
       case MetconType.amrap:
         return "${metconSession.rounds} rounds + ${metconSession.reps} reps";
-        break;
       case MetconType.emom:
         return "${metconDescription.metcon.rounds!} * ${(metconDescription.metcon.timecap!.inMinutes / metconDescription.metcon.rounds!).round()} min";
-        break;
       case MetconType.forTime:
         return metconSession.rounds == metconDescription.metcon.rounds
             ? "${formatTime(metconSession.time!, short: true)} min (${formatTime(metconDescription.metcon.timecap!.inSeconds, short: true)} min)"
             : "${metconSession.rounds} rounds + ${metconSession.reps} reps (${metconDescription.metcon.rounds} rounds)";
-        break;
     }
   }
 }

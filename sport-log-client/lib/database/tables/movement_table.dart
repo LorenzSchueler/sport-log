@@ -4,7 +4,6 @@ import 'package:sport_log/database/table_creator.dart';
 import 'package:sport_log/database/table_names.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/models/movement/movement.dart';
 
 class MovementTable extends DbAccessor<Movement> {
   @override

@@ -1,7 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/user_state.dart';
-import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
@@ -15,7 +14,6 @@ import 'package:sport_log/models/metcon/metcon_session.dart';
 import 'package:sport_log/models/metcon/metcon_session_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
-import 'package:sport_log/models/strength/strength_session.dart';
 import 'package:sport_log/models/timeline_union.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_overview_page.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';

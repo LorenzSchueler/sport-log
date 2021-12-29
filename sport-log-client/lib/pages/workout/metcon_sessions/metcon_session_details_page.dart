@@ -1,14 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
-import 'package:sport_log/widgets/value_unit_description.dart';
 
 class MetconSessionDetailsPage extends StatefulWidget {
   final MetconSessionDescription metconSessionDescription;
