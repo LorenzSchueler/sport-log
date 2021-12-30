@@ -29,6 +29,30 @@ class TimeFormField extends StatelessWidget {
         onHoursSubmitted = null,
         super(key: key);
 
+  String? hourValidator(String? value) {
+    if (value == null) return null;
+    int? intValue = int.tryParse(value);
+    if (intValue == null) {
+      return "please enter a valid number";
+    } else if (intValue < 0) {
+      return "please enter a positive number";
+    } else {
+      return null;
+    }
+  }
+
+  String? minSecValidator(String? value) {
+    if (value == null) return null;
+    int? intValue = int.tryParse(value);
+    if (intValue == null) {
+      return "please enter a valid number";
+    } else if (intValue < 0 || intValue >= 60) {
+      return "please enter a number between 0 and 59";
+    } else {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const Icon icon = Icon(CustomIcons.timeInterval);
@@ -46,6 +70,7 @@ class TimeFormField extends StatelessWidget {
                 style: const TextStyle(height: 1),
                 textInputAction: TextInputAction.next,
                 initialValue: hours.toString().padLeft(2, "0"),
+                validator: hourValidator,
                 decoration: const InputDecoration(
                   icon: icon,
                 ),
@@ -61,6 +86,7 @@ class TimeFormField extends StatelessWidget {
             style: const TextStyle(height: 1),
             textInputAction: TextInputAction.next,
             initialValue: minutes.toString().padLeft(2, "0"),
+            validator: minSecValidator,
             decoration: hours != null
                 ? null
                 : const InputDecoration(
@@ -78,6 +104,7 @@ class TimeFormField extends StatelessWidget {
                 onSecondsSubmitted(int.parse(seconds)),
             style: const TextStyle(height: 1),
             initialValue: seconds.toString().padLeft(2, "0"),
+            validator: minSecValidator,
           ),
         )
       ],
