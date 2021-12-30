@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/theme.dart';
 
 class CaptionTile extends StatelessWidget {
@@ -8,18 +9,14 @@ class CaptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final captionStyle = Theme.of(context).textTheme.caption;
     return Padding(
-      padding: const EdgeInsets.only(left: leftPadding, top: topPadding),
-      child: SizedBox(
-        width: double.infinity,
-        child: Text(caption, style: captionStyle),
+      padding: const EdgeInsets.only(top: 2, bottom: 2),
+      child: Text(
+        caption,
+        style: TextStyle(color: Colors.grey.shade400),
       ),
     );
   }
-
-  static const double leftPadding = 16;
-  static const double topPadding = 10;
 }
 
 class EditTile extends StatelessWidget {
@@ -40,40 +37,36 @@ class EditTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final widget = Padding(
-      padding: const EdgeInsets.only(bottom: 6, right: 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (caption != null) CaptionTile(caption: caption!),
-          Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 16,
-                  bottom: 16,
-                  right: 32,
-                  left: CaptionTile.leftPadding,
-                ),
-                child: leading,
+    final widget = Row(
+      children: [
+        leading,
+        const SizedBox(
+          width: 13,
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (caption != null)
+              CaptionTile(
+                caption: caption!,
               ),
-              Expanded(
-                child: AnimatedDefaultTextStyle(
-                  child: child,
-                  style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                      color: onTap == null ? null : primaryColorOf(context)),
-                  duration: const Duration(milliseconds: 200),
+            AnimatedDefaultTextStyle(
+              child: child,
+              style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                  color: onTap == null ? null : primaryColorOf(context)),
+              duration: const Duration(milliseconds: 200),
+            ),
+            if (onCancel != null)
+              IconButton(
+                onPressed: onCancel,
+                icon: const Icon(
+                  Icons.close,
                 ),
               ),
-              if (onCancel != null)
-                IconButton(
-                  onPressed: onCancel,
-                  icon: const Icon(Icons.close),
-                ),
-            ],
-          ),
-        ],
-      ),
+            Defaults.sizedBox.vertical.small
+          ],
+        ),
+      ],
     );
 
     if (onTap == null) {
