@@ -13,6 +13,7 @@ import 'package:sport_log/widgets/cardio_type_picker.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
+import 'package:sport_log/widgets/form_widgets/time_form_field.dart';
 import 'package:sport_log/widgets/movement_picker.dart';
 import 'package:sport_log/widgets/route_picker.dart';
 
@@ -68,9 +69,9 @@ class CardioEditPageState extends State<CardioEditPage> {
   @override
   Widget build(BuildContext context) {
     Duration duration = Duration(seconds: _cardioSession.time ?? 0);
-    int hours = duration.inHours;
-    int minutes = duration.inMinutes - 60 * hours;
-    int seconds = duration.inSeconds - 60 * minutes - 3600 * hours;
+    int _hours = duration.inHours;
+    int _minutes = duration.inMinutes - 60 * _hours;
+    int _seconds = duration.inSeconds - 60 * _minutes - 3600 * _hours;
 
     late MapboxMapController _sessionMapController;
 
@@ -216,58 +217,25 @@ class CardioEditPageState extends State<CardioEditPage> {
                     labelText: "Descent (m)",
                   ),
                 ),
-                Row(
-                  children: [
-                    SizedBox(
-                        width: 70,
-                        child: TextFormField(
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          onFieldSubmitted: (newHours) => setState(() {
-                            hours = int.parse(newHours);
-                            _cardioSession.time =
-                                hours * 3600 + minutes * 60 + seconds;
-                          }),
-                          style: const TextStyle(height: 1),
-                          textInputAction: TextInputAction.next,
-                          initialValue: hours.toString().padLeft(2, "0"),
-                          decoration: const InputDecoration(
-                            icon: Icon(CustomIcons.timeInterval),
-                          ),
-                        )),
-                    const Text(":"),
-                    SizedBox(
-                      width: 30,
-                      child: TextFormField(
-                        textAlign: TextAlign.center,
-                        keyboardType: TextInputType.number,
-                        onFieldSubmitted: (newMinutes) => setState(() {
-                          minutes = int.parse(newMinutes);
+                TimeFormField(
+                    hours: _hours,
+                    minutes: _minutes,
+                    seconds: _seconds,
+                    onHoursSubmitted: (hours) => setState(() {
+                          _hours = hours;
                           _cardioSession.time =
-                              hours * 3600 + minutes * 60 + seconds;
+                              _hours * 3600 + _minutes * 60 + _seconds;
                         }),
-                        style: const TextStyle(height: 1),
-                        textInputAction: TextInputAction.next,
-                        initialValue: minutes.toString().padLeft(2, "0"),
-                      ),
-                    ),
-                    const Text(":"),
-                    SizedBox(
-                      width: 30,
-                      child: TextFormField(
-                        textAlign: TextAlign.center,
-                        keyboardType: TextInputType.number,
-                        onFieldSubmitted: (newSeconds) => setState(() {
-                          seconds = int.parse(newSeconds);
+                    onMinutesSubmitted: (minutes) => setState(() {
+                          _minutes = minutes;
                           _cardioSession.time =
-                              hours * 3600 + minutes * 60 + seconds;
+                              _hours * 3600 + _minutes * 60 + _seconds;
                         }),
-                        style: const TextStyle(height: 1),
-                        initialValue: seconds.toString().padLeft(2, "0"),
-                      ),
-                    )
-                  ],
-                ),
+                    onSecondsSubmitted: (seconds) => setState(() {
+                          _seconds = seconds;
+                          _cardioSession.time =
+                              _hours * 3600 + _minutes * 60 + _seconds;
+                        })),
                 TextFormField(
                   keyboardType: TextInputType.number,
                   onFieldSubmitted: (calories) => setState(() {

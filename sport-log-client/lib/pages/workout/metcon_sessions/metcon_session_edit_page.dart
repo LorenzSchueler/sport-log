@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
+import 'package:sport_log/widgets/form_widgets/time_form_field.dart';
 
 class MetconSessionEditPage extends StatefulWidget {
   final MetconSessionDescription? metconSessionDescription;
@@ -148,6 +149,12 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                                       .metconDescription.metcon.rounds;
                               _metconSessionDescription.metconSession.rounds =
                                   0;
+                              _metconSessionDescription.metconSession.time = 0;
+                            } else {
+                              _metconSessionDescription.metconSession.rounds =
+                                  0;
+                              _metconSessionDescription.metconSession.rounds =
+                                  0;
                             }
                           })),
                 ]),
@@ -155,18 +162,28 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                           .metconDescription.metcon.metconType ==
                       MetconType.forTime &&
                   _finished)
-                TextFormField(
-                  decoration: const InputDecoration(
-                      icon: Icon(Icons.crop), labelText: "Time"),
-                  initialValue:
-                      _metconSessionDescription.metconSession.comments,
-                  style: const TextStyle(height: 1),
-                  keyboardType: TextInputType.number,
-                  onFieldSubmitted: (time) => setState(() {
-                    _metconSessionDescription.metconSession.time =
-                        int.parse(time);
-                  }),
-                ),
+                TimeFormField.minSec(
+                    minutes:
+                        _metconSessionDescription.metconSession.time! ~/ 60,
+                    seconds: _metconSessionDescription.metconSession.time! % 60,
+                    onMinutesSubmitted: (minutes) => setState(() {
+                          _metconSessionDescription.metconSession.time =
+                              Duration(
+                                      minutes: minutes,
+                                      seconds: _metconSessionDescription
+                                              .metconSession.time! %
+                                          60)
+                                  .inSeconds;
+                        }),
+                    onSecondsSubmitted: (seconds) => setState(() {
+                          _metconSessionDescription.metconSession.time =
+                              Duration(
+                                      minutes: _metconSessionDescription
+                                              .metconSession.time! ~/
+                                          60,
+                                      seconds: seconds)
+                                  .inSeconds;
+                        })),
               if (_metconSessionDescription
                               .metconDescription.metcon.metconType ==
                           MetconType.forTime &&
