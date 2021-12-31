@@ -191,6 +191,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   decoration: const InputDecoration(
                     icon: Icon(Icons.crop),
                     labelText: "Distance (km)",
+                    contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
                 ),
                 TextFormField(
@@ -203,6 +204,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   decoration: const InputDecoration(
                     icon: Icon(Icons.crop),
                     labelText: "Ascent (m)",
+                    contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
                 ),
                 TextFormField(
@@ -215,6 +217,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   decoration: const InputDecoration(
                     icon: Icon(Icons.crop),
                     labelText: "Descent (m)",
+                    contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
                 ),
                 TimeFormField(
@@ -246,6 +249,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   decoration: const InputDecoration(
                     icon: Icon(Icons.crop),
                     labelText: "Calories",
+                    contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
                 ),
                 TextFormField(
@@ -258,6 +262,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   decoration: const InputDecoration(
                     icon: Icon(Icons.crop),
                     labelText: "Cadence",
+                    contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
                 ),
                 TextFormField(
@@ -270,6 +275,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   decoration: const InputDecoration(
                     icon: Icon(Icons.crop),
                     labelText: "Heart Rate",
+                    contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
                 ),
                 TextFormField(
@@ -281,6 +287,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   decoration: const InputDecoration(
                     icon: Icon(Icons.comment),
                     labelText: "Comments",
+                    contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
                 ),
               ],

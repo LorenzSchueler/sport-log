@@ -139,24 +139,28 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   MetconType.forTime)
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   const Text("finished"),
-                  Switch(
-                      value: _finished,
-                      onChanged: (finished) => setState(() {
-                            _finished = finished;
-                            if (_finished) {
-                              _metconSessionDescription.metconSession.rounds =
+                  SizedBox(
+                      height: 20,
+                      child: Switch(
+                          value: _finished,
+                          onChanged: (finished) => setState(() {
+                                _finished = finished;
+                                if (_finished) {
                                   _metconSessionDescription
-                                      .metconDescription.metcon.rounds;
-                              _metconSessionDescription.metconSession.rounds =
-                                  0;
-                              _metconSessionDescription.metconSession.time = 0;
-                            } else {
-                              _metconSessionDescription.metconSession.rounds =
-                                  0;
-                              _metconSessionDescription.metconSession.rounds =
-                                  0;
-                            }
-                          })),
+                                          .metconSession.rounds =
+                                      _metconSessionDescription
+                                          .metconDescription.metcon.rounds;
+                                  _metconSessionDescription
+                                      .metconSession.rounds = 0;
+                                  _metconSessionDescription.metconSession.time =
+                                      0;
+                                } else {
+                                  _metconSessionDescription
+                                      .metconSession.rounds = 0;
+                                  _metconSessionDescription
+                                      .metconSession.rounds = 0;
+                                }
+                              }))),
                 ]),
               if (_metconSessionDescription
                           .metconDescription.metcon.metconType ==
@@ -195,7 +199,10 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   Expanded(
                       child: TextFormField(
                     decoration: const InputDecoration(
-                        icon: Icon(Icons.crop), labelText: "Rounds"),
+                      icon: Icon(Icons.crop),
+                      labelText: "Rounds",
+                      contentPadding: EdgeInsets.symmetric(vertical: 5),
+                    ),
                     initialValue: _metconSessionDescription.metconSession.rounds
                         .toString(),
                     style: const TextStyle(height: 1),
@@ -208,7 +215,10 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   Defaults.sizedBox.horizontal.normal,
                   Expanded(
                       child: TextFormField(
-                    decoration: const InputDecoration(labelText: "Reps"),
+                    decoration: const InputDecoration(
+                      labelText: "Reps",
+                      contentPadding: EdgeInsets.symmetric(vertical: 5),
+                    ),
                     initialValue:
                         _metconSessionDescription.metconSession.reps.toString(),
                     style: const TextStyle(height: 1),
@@ -219,18 +229,25 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                     }),
                   )),
                 ]),
-              SwitchListTile(
-                  value: _metconSessionDescription.metconSession.rx,
-                  title: const Text("Rx"),
-                  secondary: const Icon(Icons.crop),
-                  onChanged: (rx) {
-                    setState(() {
-                      _metconSessionDescription.metconSession.rx = rx;
-                    });
-                  }),
+              EditTile(
+                  caption: "Rx",
+                  child: SizedBox(
+                      height: 20,
+                      child: Switch(
+                        value: _metconSessionDescription.metconSession.rx,
+                        onChanged: (rx) {
+                          setState(() {
+                            _metconSessionDescription.metconSession.rx = rx;
+                          });
+                        },
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      )),
+                  leading: const Icon(Icons.crop)),
               TextFormField(
                 decoration: const InputDecoration(
-                    icon: Icon(Icons.crop), labelText: "Comments"),
+                    contentPadding: EdgeInsets.symmetric(vertical: 5),
+                    icon: Icon(Icons.crop),
+                    labelText: "Comments"),
                 initialValue: _metconSessionDescription.metconSession.comments,
                 style: const TextStyle(height: 1),
                 keyboardType: TextInputType.multiline,

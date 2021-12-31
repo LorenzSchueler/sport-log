@@ -75,7 +75,10 @@ class DiaryEditPageState extends State<DiaryEditPage> {
                   }),
               TextFormField(
                 decoration: const InputDecoration(
-                    icon: Icon(Icons.crop), labelText: "Bodyweight"),
+                  icon: Icon(Icons.crop),
+                  labelText: "Bodyweight",
+                  contentPadding: EdgeInsets.symmetric(vertical: 5),
+                ),
                 initialValue: _diary.bodyweight?.toStringAsFixed(1),
                 style: const TextStyle(height: 1),
                 keyboardType: TextInputType.number,
@@ -84,7 +87,10 @@ class DiaryEditPageState extends State<DiaryEditPage> {
               ),
               TextFormField(
                 decoration: const InputDecoration(
-                    icon: Icon(Icons.crop), labelText: "Comments"),
+                  icon: Icon(Icons.crop),
+                  labelText: "Comments",
+                  contentPadding: EdgeInsets.symmetric(vertical: 5),
+                ),
                 initialValue: _diary.comments,
                 style: const TextStyle(height: 1),
                 keyboardType: TextInputType.multiline,

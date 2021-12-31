@@ -371,6 +371,7 @@ class RouteEditPageState extends State<RouteEditPage> {
                       labelText: "Name",
                       border: OutlineInputBorder(
                           borderRadius: Defaults.borderRadius.big),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 5),
                     ),
                   )),
                   Defaults.sizedBox.horizontal.normal,

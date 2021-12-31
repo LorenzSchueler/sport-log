@@ -73,6 +73,7 @@ class TimeFormField extends StatelessWidget {
                 validator: hourValidator,
                 decoration: const InputDecoration(
                   icon: icon,
+                  contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
               )),
         if (hours != null) const Text(":"),
@@ -88,9 +89,12 @@ class TimeFormField extends StatelessWidget {
             initialValue: minutes.toString().padLeft(2, "0"),
             validator: minSecValidator,
             decoration: hours != null
-                ? null
+                ? const InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(vertical: 5),
+                  )
                 : const InputDecoration(
                     icon: icon,
+                    contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
           ),
         ),
@@ -105,6 +109,9 @@ class TimeFormField extends StatelessWidget {
             style: const TextStyle(height: 1),
             initialValue: seconds.toString().padLeft(2, "0"),
             validator: minSecValidator,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 5),
+            ),
           ),
         )
       ],

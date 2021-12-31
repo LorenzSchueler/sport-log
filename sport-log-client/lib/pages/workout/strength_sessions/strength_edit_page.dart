@@ -55,55 +55,58 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit session')),
-      body: Column(
-        children: [
-          Expanded(
-            child: Scrollbar(
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                child: Column(
-                  children: [
-                    _movementInput,
-                    _dateTimeInput,
-                    if (_session.session.interval != null) _intervalInput,
-                    if (_session.session.comments != null) _commentInput,
-                    if (_session.session.interval == null ||
-                        _session.session.comments == null)
-                      _buttonBar,
-                    const CaptionTile(caption: 'Sets'),
-                    _setList,
-                  ],
+        appBar: AppBar(title: const Text('Edit session')),
+        body: Container(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: [
+              Expanded(
+                child: Scrollbar(
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _movementInput,
+                        _dateTimeInput,
+                        if (_session.session.interval != null) _intervalInput,
+                        if (_session.session.comments != null) _commentInput,
+                        if (_session.session.interval == null ||
+                            _session.session.comments == null)
+                          _buttonBar,
+                        const CaptionTile(caption: 'Sets'),
+                        _setList,
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
+              NewSetInput(
+                dimension: _session.movement.dimension,
+                onNewSet: (count, [weight]) {
+                  final newSet = StrengthSet(
+                    id: randomId(),
+                    strengthSessionId: _session.session.id,
+                    setNumber: _session.sets.length,
+                    count: count,
+                    weight: weight,
+                    deleted: false,
+                  );
+                  setState(() {
+                    _session.sets.add(newSet);
+                  });
+                  Future.delayed(
+                      const Duration(milliseconds: 100),
+                      () => _scrollController.animateTo(
+                            _scrollController.position.maxScrollExtent,
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.decelerate,
+                          ));
+                },
+              ),
+            ],
           ),
-          NewSetInput(
-            dimension: _session.movement.dimension,
-            onNewSet: (count, [weight]) {
-              final newSet = StrengthSet(
-                id: randomId(),
-                strengthSessionId: _session.session.id,
-                setNumber: _session.sets.length,
-                count: count,
-                weight: weight,
-                deleted: false,
-              );
-              setState(() {
-                _session.sets.add(newSet);
-              });
-              Future.delayed(
-                  const Duration(milliseconds: 100),
-                  () => _scrollController.animateTo(
-                        _scrollController.position.maxScrollExtent,
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.decelerate,
-                      ));
-            },
-          ),
-        ],
-      ),
-    );
+        ));
   }
 
   Widget get _movementInput {
@@ -192,21 +195,18 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
 
   Widget get _commentInput {
     assert(_session.session.comments != null);
-    return EditTile(
-      caption: 'Comment',
-      child: TextField(
-        focusNode: _commentsNode,
-        maxLines: null,
-        onChanged: (text) {
-          setState(() => _session.session.comments = text);
-        },
-        decoration: const InputDecoration(
-          hintText: 'Add comment',
-          enabledBorder: InputBorder.none,
-        ),
+    return TextFormField(
+      focusNode: _commentsNode,
+      maxLines: null,
+      onChanged: (text) {
+        setState(() => _session.session.comments = text);
+      },
+      decoration: const InputDecoration(
+        labelText: 'Comment',
+        icon: Icon(Icons.edit),
+        contentPadding: EdgeInsets.symmetric(vertical: 5),
       ),
-      leading: const Icon(Icons.edit),
-      onCancel: () {
+      onEditingComplete: () {
         _commentsNode.unfocus();
         setState(() => _session.session.comments = null);
       },

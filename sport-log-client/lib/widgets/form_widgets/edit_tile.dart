@@ -41,7 +41,7 @@ class EditTile extends StatelessWidget {
       children: [
         leading,
         const SizedBox(
-          width: 13,
+          width: 15,
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,16 +56,15 @@ class EditTile extends StatelessWidget {
                   color: onTap == null ? null : primaryColorOf(context)),
               duration: const Duration(milliseconds: 200),
             ),
-            if (onCancel != null)
-              IconButton(
-                onPressed: onCancel,
-                icon: const Icon(
-                  Icons.close,
-                ),
-              ),
-            Defaults.sizedBox.vertical.small
           ],
         ),
+        if (onCancel != null) const Spacer(),
+        if (onCancel != null)
+          IconButton(
+              onPressed: onCancel,
+              icon: const Icon(
+                Icons.close,
+              ))
       ],
     );
 
