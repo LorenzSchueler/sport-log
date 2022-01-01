@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/widgets/form_widgets/int_picker.dart';
-import 'package:sport_log/widgets/movement_picker.dart';
+import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 
 class MetconMovementCard extends StatelessWidget {
   const MetconMovementCard({

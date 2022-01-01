@@ -17,7 +17,7 @@ import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/movement_picker.dart';
+import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class CardioSessionsPage extends StatefulWidget {

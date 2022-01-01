@@ -11,7 +11,7 @@ import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
-import 'package:sport_log/widgets/movement_picker.dart';
+import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 
 class StrengthSessionEditPage extends StatefulWidget {

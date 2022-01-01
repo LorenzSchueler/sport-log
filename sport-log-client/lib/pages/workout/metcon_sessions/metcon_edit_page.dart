@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/widgets/form_widgets/int_picker.dart';
-import 'package:sport_log/widgets/movement_picker.dart';
+import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 import 'metcon_movement_card.dart';

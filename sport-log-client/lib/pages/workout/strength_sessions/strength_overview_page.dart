@@ -12,7 +12,7 @@ import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/movement_picker.dart';
+import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 
 import 'strength_chart.dart';
 

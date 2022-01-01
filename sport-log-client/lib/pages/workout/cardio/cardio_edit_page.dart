@@ -9,13 +9,13 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/secrets.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/widgets/cardio_type_picker.dart';
+import 'package:sport_log/widgets/form_widgets/cardio_type_picker.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/form_widgets/time_form_field.dart';
-import 'package:sport_log/widgets/movement_picker.dart';
-import 'package:sport_log/widgets/route_picker.dart';
+import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
+import 'package:sport_log/widgets/form_widgets/route_picker.dart';
 
 class CardioEditPage extends StatefulWidget {
   final CardioSession? cardioSession;

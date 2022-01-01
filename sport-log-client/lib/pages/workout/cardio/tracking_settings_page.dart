@@ -2,9 +2,9 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/widgets/cardio_type_picker.dart';
-import 'package:sport_log/widgets/movement_picker.dart';
-import 'package:sport_log/widgets/route_picker.dart';
+import 'package:sport_log/widgets/form_widgets/cardio_type_picker.dart';
+import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
+import 'package:sport_log/widgets/form_widgets/route_picker.dart';
 
 class CardioTrackingSettingsPage extends StatefulWidget {
   const CardioTrackingSettingsPage({Key? key}) : super(key: key);
