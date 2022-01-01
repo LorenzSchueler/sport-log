@@ -21,11 +21,6 @@ class MetconSessionDescription implements Validatable {
             'MetconSessionDescription: metcon id mismatch');
   }
 
-  String get name {
-    return metconDescription.metcon.name ??
-        metconDescription.moves.map((e) => e.movement.name).join(" & ");
-  }
-
   String _resultDescription(bool short) {
     switch (metconDescription.metcon.metconType) {
       case MetconType.amrap:

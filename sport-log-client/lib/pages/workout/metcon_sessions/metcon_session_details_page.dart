@@ -42,7 +42,7 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text(metconSessionDescription.name),
+          title: Text(metconSessionDescription.metconDescription.name),
           actions: [
             IconButton(
                 onPressed: () => Navigator.of(context)

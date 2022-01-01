@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
+import 'package:sport_log/widgets/form_widgets/metcon_picker.dart';
 import 'package:sport_log/widgets/form_widgets/time_form_field.dart';
 
 class MetconSessionEditPage extends StatefulWidget {
@@ -99,20 +100,19 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
               EditTile(
                   leading: const Icon(Icons.crop),
                   caption: "Metcon",
-                  child: Text(_metconSessionDescription.name),
+                  child: Text(_metconSessionDescription.metconDescription.name),
                   onTap: () async {
-                    //Metcon? metcon = await showDatePicker(
-                    //context: context,
-                    //initialDate:
-                    //(_metconSessionDescription.metconDescription.metcon),
-                    //);
-                    //if (metcon != null) {
-                    //setState(() {
-                    //_metconSessionDescription.metconDescription.metcon =
-                    //metcon;
-                    //});
-                    //}
-                    // set time round and reps accordingly to avoid null values
+                    MetconDescription? metconDescription =
+                        await showMetconPickerDialog(
+                      context: context,
+                    );
+                    if (metconDescription != null) {
+                      setState(() {
+                        _metconSessionDescription.metconDescription =
+                            metconDescription;
+                      });
+                    }
+                    //  set time round and reps accordingly to avoid null values
                   }),
               EditTile(
                   leading: const Icon(Icons.crop),
