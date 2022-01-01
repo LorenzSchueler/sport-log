@@ -157,7 +157,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                       movementId: Int64(1),
                       movementNumber: 1,
                       count: 5,
-                      weight: 0,
+                      weight: null,
                       distanceUnit: null,
                       deleted: false),
                   movement: Movement(
@@ -200,7 +200,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                       movementId: Int64(1),
                       movementNumber: 1,
                       count: 5,
-                      weight: 0,
+                      weight: null,
                       distanceUnit: null,
                       deleted: false),
                   movement: Movement(

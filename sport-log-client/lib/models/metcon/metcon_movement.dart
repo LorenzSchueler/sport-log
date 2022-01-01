@@ -20,6 +20,23 @@ enum DistanceUnit {
   miles,
 }
 
+extension DisplayName on DistanceUnit {
+  String get displayName {
+    switch (this) {
+      case DistanceUnit.m:
+        return 'm';
+      case DistanceUnit.km:
+        return 'km';
+      case DistanceUnit.yards:
+        return 'yard';
+      case DistanceUnit.feet:
+        return 'ft';
+      case DistanceUnit.miles:
+        return 'miles';
+    }
+  }
+}
+
 @JsonSerializable()
 class MetconMovement implements DbObject {
   MetconMovement({

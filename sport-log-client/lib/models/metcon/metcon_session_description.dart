@@ -55,7 +55,7 @@ class MetconSessionDescription implements Validatable {
 
   String get typeLengthDescription {
     return metconDescription.metcon.metconType == MetconType.forTime
-        ? "${metconDescription.metcon.metconType.displayName} (Timecap ${formatTime(metconDescription.metcon.timecap!.inSeconds, short: true)})"
+        ? "${metconDescription.metcon.rounds!} Rounds ${metconDescription.metcon.metconType.displayName} (Timecap ${formatTime(metconDescription.metcon.timecap!.inSeconds, short: true)})"
         : "${metconDescription.metcon.metconType.displayName} ${formatTime(metconDescription.metcon.timecap!.inSeconds, short: true)}";
   }
 }
