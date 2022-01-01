@@ -61,6 +61,12 @@ class MainDrawer extends StatelessWidget {
             ],
           ),
           const Spacer(),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Settings'),
+            onTap: () => Nav.changeNamed(context, Routes.settings),
+            selected: selectedRoute == Routes.settings,
+          ),
           Consumer<Sync>(
             builder: (context, sync, _) {
               String title;
