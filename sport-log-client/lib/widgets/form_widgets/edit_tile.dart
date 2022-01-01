@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/theme.dart';
 
 class CaptionTile extends StatelessWidget {
