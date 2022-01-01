@@ -206,7 +206,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
         return TextButton(
           onPressed: () => _setType(type),
           child: Text(
-            type.toDisplayName(),
+            type.displayName,
             style: style.copyWith(
               color: (type == _md.metcon.metconType)
                   ? primaryColorOf(context)

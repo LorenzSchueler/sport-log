@@ -32,7 +32,7 @@ extension ToIcon on MetconType {
 }
 
 extension ToDisplayName on MetconType {
-  String toDisplayName() {
+  String get displayName {
     switch (this) {
       case MetconType.amrap:
         return "AMRAP";

@@ -26,16 +26,36 @@ class MetconSessionDescription implements Validatable {
         metconDescription.moves.map((e) => e.movement.name).join(" & ");
   }
 
-  String get shortResultDescription {
+  String _resultDescription(bool short) {
     switch (metconDescription.metcon.metconType) {
       case MetconType.amrap:
         return "${metconSession.rounds} rounds + ${metconSession.reps} reps";
       case MetconType.emom:
         return "${metconDescription.metcon.rounds!} * ${(metconDescription.metcon.timecap!.inMinutes / metconDescription.metcon.rounds!).round()} min";
       case MetconType.forTime:
-        return metconSession.rounds == metconDescription.metcon.rounds
-            ? "${formatTime(metconSession.time!, short: true)} min (${formatTime(metconDescription.metcon.timecap!.inSeconds, short: true)} min)"
-            : "${metconSession.rounds} rounds + ${metconSession.reps} reps (${metconDescription.metcon.rounds} rounds)";
+        if (short) {
+          return metconSession.rounds == metconDescription.metcon.rounds
+              ? "${formatTime(metconSession.time!, short: true)} min"
+              : "${metconSession.rounds} rounds + ${metconSession.reps} reps";
+        } else {
+          return metconSession.rounds == metconDescription.metcon.rounds
+              ? "${formatTime(metconSession.time!, short: true)} min (${formatTime(metconDescription.metcon.timecap!.inSeconds, short: true)} min)"
+              : "${metconSession.rounds} rounds + ${metconSession.reps} reps (${metconDescription.metcon.rounds} rounds)";
+        }
     }
+  }
+
+  String get longResultDescription {
+    return _resultDescription(false);
+  }
+
+  String get shortResultDescription {
+    return _resultDescription(true);
+  }
+
+  String get typeLengthDescription {
+    return metconDescription.metcon.metconType == MetconType.forTime
+        ? "${metconDescription.metcon.metconType.displayName} (Timecap ${formatTime(metconDescription.metcon.timecap!.inSeconds, short: true)})"
+        : "${metconDescription.metcon.metconType.displayName} ${formatTime(metconDescription.metcon.timecap!.inSeconds, short: true)}";
   }
 }
