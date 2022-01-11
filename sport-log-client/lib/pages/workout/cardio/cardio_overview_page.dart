@@ -205,8 +205,9 @@ class CardioSessionCard extends StatelessWidget {
         ? '???'
         : ((cardioSession.distance! / 1000) / (cardioSession.time! / 3600))
             .toStringAsFixed(1);
-    final duration =
-        cardioSession.time == null ? "???" : formatTime(cardioSession.time!);
+    final duration = cardioSession.time == null
+        ? "???"
+        : formatTime(Duration(seconds: cardioSession.time!));
 
     late MapboxMapController _sessionMapController;
 

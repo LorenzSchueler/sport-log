@@ -13,7 +13,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class SettingsPageState extends State<SettingsPage> {
-  final _logger = Logger('DiaryPage');
+  final _logger = Logger('SettingsPage');
 
   SharedPreferences? _storage;
 
