@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
@@ -25,6 +26,10 @@ class SettingsPageState extends State<SettingsPage> {
               _storage!.setBool("serverEnabled", true);
           _storage!.getString("serverUrl") ??
               _storage!.setString("serverUrl", "<default URL>"); // TODO
+          _storage!.getInt("syncInterval") ??
+              _storage!.setInt("syncInterval", 300);
+          _storage!.getString("units") ??
+              _storage!.setString("units", "metric");
         }));
     super.initState();
   }
@@ -36,7 +41,7 @@ class SettingsPageState extends State<SettingsPage> {
         title: const Text("Settings"),
       ),
       body: _storage == null
-          ? const CircularProgressIndicator()
+          ? const Center(child: CircularProgressIndicator())
           : Container(
               padding: const EdgeInsets.all(10),
               child: ListView(
@@ -69,7 +74,46 @@ class SettingsPageState extends State<SettingsPage> {
                       onFieldSubmitted: (serverUrl) => setState(() {
                         _storage!.setString("serverUrl", serverUrl);
                       }),
-                    )
+                    ),
+                  if (_storage!.getBool("serverEnabled")!)
+                    TextFormField(
+                      decoration: const InputDecoration(
+                        icon: Icon(CustomIcons.timeInterval),
+                        labelText: "Synchonization Interval (min)",
+                        contentPadding: EdgeInsets.symmetric(vertical: 5),
+                      ),
+                      keyboardType: TextInputType.number,
+                      initialValue:
+                          (_storage!.getInt("syncInterval")! ~/ 60).toString(),
+                      style: const TextStyle(height: 1),
+                      onFieldSubmitted: (syncInterval) => setState(() {
+                        _storage!.setInt(
+                            "syncInterval", int.parse(syncInterval) * 60);
+                      }),
+                    ),
+                  EditTile(
+                      caption: "Units",
+                      child: SizedBox(
+                          height: 24,
+                          child: DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                            value: _storage!.getString("units"),
+                            items: const [
+                              DropdownMenuItem(
+                                  value: "metric", child: Text("metric")),
+                              DropdownMenuItem(
+                                  value: "imperial", child: Text("imperial"))
+                            ],
+                            underline: null,
+                            onChanged: (units) {
+                              if (units != null) {
+                                setState(() {
+                                  _storage!.setString("units", units as String);
+                                });
+                              }
+                            },
+                          ))),
+                      leading: Icons.sync),
                 ],
               )),
       drawer: const MainDrawer(selectedRoute: Routes.settings),
