@@ -48,6 +48,12 @@ class MainDrawer extends StatelessWidget {
                 style: TextStyle(color: disabledColorOf(context))),
             leading: const Icon(Icons.play_circle_fill_sharp),
           ),
+          ListTile(
+            leading: const Icon(CustomIcons.stopwatch),
+            title: const Text('Timer'),
+            onTap: () => Nav.changeNamed(context, Routes.timer),
+            selected: selectedRoute == Routes.timer,
+          ),
           ExpansionTile(
             title: const Text('Primitives'),
             initiallyExpanded: true,

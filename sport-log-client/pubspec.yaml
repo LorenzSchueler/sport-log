@@ -61,6 +61,7 @@ dependencies:
   polyline: ^1.0.2
   location: ^4.3.0
   pedometer: ^3.0.0
+  flutter_beep: ^1.0.0
 
 dev_dependencies:
   flutter_test:

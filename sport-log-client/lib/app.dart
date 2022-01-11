@@ -5,6 +5,7 @@ import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/settings/settings_page.dart';
+import 'package:sport_log/pages/timer/timer_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_details_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_overview_page.dart';
@@ -65,6 +66,7 @@ class _AppState extends State<App> {
           Routes.landing: (_) => const LandingPage(),
           Routes.login: (_) => const LoginPage(),
           Routes.registration: (_) => const RegistrationPage(),
+          Routes.timer: (_) => const TimerPage(),
           Routes.settings: (_) => const SettingsPage(),
           // movement
           Routes.movement.overview: (_) =>

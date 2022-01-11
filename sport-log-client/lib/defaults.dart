@@ -16,6 +16,9 @@ class _SizedBox {
 class _Horizontal {
   const _Horizontal();
 
+  final huge = const SizedBox(
+    width: 40,
+  );
   final big = const SizedBox(
     width: 20,
   );
@@ -30,6 +33,9 @@ class _Horizontal {
 class _Vertical {
   const _Vertical();
 
+  final huge = const SizedBox(
+    height: 40,
+  );
   final big = const SizedBox(
     height: 20,
   );
