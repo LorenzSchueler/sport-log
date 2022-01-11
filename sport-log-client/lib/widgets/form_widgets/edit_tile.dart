@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/helpers/theme.dart';
 
 class CaptionTile extends StatelessWidget {
   const CaptionTile({Key? key, required this.caption}) : super(key: key);
@@ -30,7 +29,7 @@ class EditTile extends StatelessWidget {
 
   final String? caption;
   final Widget child;
-  final IconData leading;
+  final IconData? leading;
   final VoidCallback? onTap;
   final VoidCallback? onCancel;
 
@@ -38,13 +37,15 @@ class EditTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final widget = Row(
       children: [
-        Icon(
-          leading,
-          color: Colors.white60,
-        ),
-        const SizedBox(
-          width: 15,
-        ),
+        if (leading != null)
+          Icon(
+            leading,
+            color: Colors.white60,
+          ),
+        if (leading != null)
+          const SizedBox(
+            width: 15,
+          ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
