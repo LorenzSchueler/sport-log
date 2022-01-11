@@ -114,7 +114,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       caption: 'Movement',
       child: Text(
           '${_session.movement.name} (${_session.movement.dimension.displayName})'),
-      leading: const Icon(CustomIcons.trendingUp),
+      leading: CustomIcons.trendingUp,
       onTap: () async {
         final maybeMovement = await showMovementPickerDialog(context);
         if (maybeMovement != null) {
@@ -158,7 +158,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     return EditTile(
       caption: 'Date',
       child: Text(_session.session.datetime.toHumanWithTime()),
-      leading: const Icon(Icons.calendar_today),
+      leading: Icons.calendar_today,
       onTap: () async {
         final maybeDate = await showRoundedDatePicker(
             context: context, theme: Theme.of(context));
@@ -186,7 +186,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         setDuration: (d) => setState(() => _session.session.interval = d),
         initialDuration: _session.session.interval!,
       ),
-      leading: const Icon(CustomIcons.timeInterval),
+      leading: CustomIcons.timeInterval,
       onCancel: () {
         setState(() => _session.session.interval = null);
       },

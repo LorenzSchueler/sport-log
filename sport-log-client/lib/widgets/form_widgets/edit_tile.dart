@@ -30,7 +30,7 @@ class EditTile extends StatelessWidget {
 
   final String? caption;
   final Widget child;
-  final Widget leading;
+  final IconData leading;
   final VoidCallback? onTap;
   final VoidCallback? onCancel;
 
@@ -38,7 +38,10 @@ class EditTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final widget = Row(
       children: [
-        leading,
+        Icon(
+          leading,
+          color: Colors.white60,
+        ),
         const SizedBox(
           width: 15,
         ),
@@ -51,8 +54,7 @@ class EditTile extends StatelessWidget {
               ),
             AnimatedDefaultTextStyle(
               child: child,
-              style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                  color: onTap == null ? null : primaryColorOf(context)),
+              style: Theme.of(context).textTheme.subtitle1!,
               duration: const Duration(milliseconds: 200),
             ),
           ],

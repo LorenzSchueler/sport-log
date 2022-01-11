@@ -11,7 +11,6 @@ import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/form_widgets/cardio_type_picker.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
-import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/form_widgets/time_form_field.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
@@ -111,7 +110,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                           // TODO also draw route if available
                           )),
                 EditTile(
-                    leading: const Icon(Icons.sports),
+                    leading: Icons.sports,
                     caption: "Movement",
                     child: Text(_cardioSession.movementId.toString()),
                     onTap: () async {
@@ -126,7 +125,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                       }
                     }),
                 EditTile(
-                    leading: const Icon(Icons.sports),
+                    leading: Icons.sports,
                     caption: "Cardio Type",
                     child: Text(_cardioSession.cardioType.name),
                     onTap: () async {
@@ -141,7 +140,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                       }
                     }),
                 EditTile(
-                    leading: const Icon(Icons.crop),
+                    leading: Icons.crop,
                     caption: "Start Time",
                     child: Text(formatDatetime(_cardioSession.datetime)),
                     onTap: () async {
@@ -165,7 +164,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                       }
                     }),
                 EditTile(
-                    leading: const Icon(CustomIcons.route),
+                    leading: CustomIcons.route,
                     caption: "Route",
                     child: Text(_cardioSession.routeId.toString()),
                     onTap: () async {

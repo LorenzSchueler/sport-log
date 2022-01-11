@@ -56,7 +56,7 @@ class SettingsPageState extends State<SettingsPage> {
                             materialTapTargetSize:
                                 MaterialTapTargetSize.shrinkWrap,
                           )),
-                      leading: const Icon(Icons.sync)),
+                      leading: Icons.sync),
                   if (_storage!.getBool("serverEnabled")!)
                     TextFormField(
                       decoration: const InputDecoration(

@@ -98,7 +98,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
           child: ListView(
             children: [
               EditTile(
-                  leading: const Icon(Icons.crop),
+                  leading: Icons.crop,
                   caption: "Metcon",
                   child: Text(_metconSessionDescription.metconDescription.name),
                   onTap: () async {
@@ -115,7 +115,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                     //  set time round and reps accordingly to avoid null values
                   }),
               EditTile(
-                  leading: const Icon(Icons.crop),
+                  leading: Icons.crop,
                   caption: "Start Time",
                   child: Text(formatDate(
                       _metconSessionDescription.metconSession.datetime)),
@@ -242,7 +242,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                         },
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       )),
-                  leading: const Icon(Icons.crop)),
+                  leading: Icons.crop),
               TextFormField(
                 decoration: const InputDecoration(
                     contentPadding: EdgeInsets.symmetric(vertical: 5),

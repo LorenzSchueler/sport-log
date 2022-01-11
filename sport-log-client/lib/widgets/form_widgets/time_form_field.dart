@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 
 class TimeFormField extends StatelessWidget {
   final int? hours;
@@ -8,6 +9,7 @@ class TimeFormField extends StatelessWidget {
   final Function(int)? onHoursSubmitted;
   final Function(int) onMinutesSubmitted;
   final Function(int) onSecondsSubmitted;
+  final String caption;
 
   const TimeFormField(
       {required this.hours,
@@ -16,6 +18,7 @@ class TimeFormField extends StatelessWidget {
       required this.onHoursSubmitted,
       required this.onMinutesSubmitted,
       required this.onSecondsSubmitted,
+      this.caption = "Time",
       Key? key})
       : super(key: key);
 
@@ -24,6 +27,7 @@ class TimeFormField extends StatelessWidget {
       required this.seconds,
       required this.onMinutesSubmitted,
       required this.onSecondsSubmitted,
+      this.caption = "Time",
       Key? key})
       : hours = null,
         onHoursSubmitted = null,
@@ -55,66 +59,62 @@ class TimeFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Icon icon = Icon(CustomIcons.timeInterval);
-
-    return Row(
-      children: [
-        if (hours != null)
-          SizedBox(
-              width: 70,
-              child: TextFormField(
-                textAlign: TextAlign.center,
-                keyboardType: TextInputType.number,
-                onFieldSubmitted: (hours) =>
-                    onHoursSubmitted!(int.parse(hours)),
-                style: const TextStyle(height: 1),
-                textInputAction: TextInputAction.next,
-                initialValue: hours.toString().padLeft(2, "0"),
-                validator: hourValidator,
-                decoration: const InputDecoration(
-                  icon: icon,
-                  contentPadding: EdgeInsets.symmetric(vertical: 5),
-                ),
-              )),
-        if (hours != null) const Text(":"),
-        SizedBox(
-          width: hours != null ? 30 : 70,
-          child: TextFormField(
-            textAlign: TextAlign.center,
-            keyboardType: TextInputType.number,
-            onFieldSubmitted: (minutes) =>
-                onMinutesSubmitted(int.parse(minutes)),
-            style: const TextStyle(height: 1),
-            textInputAction: TextInputAction.next,
-            initialValue: minutes.toString().padLeft(2, "0"),
-            validator: minSecValidator,
-            decoration: hours != null
-                ? const InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(vertical: 5),
-                  )
-                : const InputDecoration(
-                    icon: icon,
+    return EditTile(
+      leading: CustomIcons.timeInterval,
+      caption: caption,
+      child: Row(
+        children: [
+          if (hours != null)
+            SizedBox(
+                width: 30,
+                child: TextFormField(
+                  textAlign: TextAlign.center,
+                  keyboardType: TextInputType.number,
+                  onFieldSubmitted: (hours) =>
+                      onHoursSubmitted!(int.parse(hours)),
+                  style: const TextStyle(height: 1),
+                  textInputAction: TextInputAction.next,
+                  initialValue: hours.toString().padLeft(2, "0"),
+                  validator: hourValidator,
+                  decoration: const InputDecoration(
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
-          ),
-        ),
-        const Text(":"),
-        SizedBox(
-          width: 30,
-          child: TextFormField(
-            textAlign: TextAlign.center,
-            keyboardType: TextInputType.number,
-            onFieldSubmitted: (seconds) =>
-                onSecondsSubmitted(int.parse(seconds)),
-            style: const TextStyle(height: 1),
-            initialValue: seconds.toString().padLeft(2, "0"),
-            validator: minSecValidator,
-            decoration: const InputDecoration(
-              contentPadding: EdgeInsets.symmetric(vertical: 5),
+                )),
+          if (hours != null) const Text(":"),
+          SizedBox(
+            width: 30,
+            child: TextFormField(
+              textAlign: TextAlign.center,
+              keyboardType: TextInputType.number,
+              onFieldSubmitted: (minutes) =>
+                  onMinutesSubmitted(int.parse(minutes)),
+              style: const TextStyle(height: 1),
+              textInputAction: TextInputAction.next,
+              initialValue: minutes.toString().padLeft(2, "0"),
+              validator: minSecValidator,
+              decoration: const InputDecoration(
+                contentPadding: EdgeInsets.symmetric(vertical: 5),
+              ),
             ),
           ),
-        )
-      ],
+          const Text(":"),
+          SizedBox(
+            width: 30,
+            child: TextFormField(
+              textAlign: TextAlign.center,
+              keyboardType: TextInputType.number,
+              onFieldSubmitted: (seconds) =>
+                  onSecondsSubmitted(int.parse(seconds)),
+              style: const TextStyle(height: 1),
+              initialValue: seconds.toString().padLeft(2, "0"),
+              validator: minSecValidator,
+              decoration: const InputDecoration(
+                contentPadding: EdgeInsets.symmetric(vertical: 5),
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }

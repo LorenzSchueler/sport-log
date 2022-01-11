@@ -56,7 +56,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
           child: ListView(
             children: [
               EditTile(
-                  leading: const Icon(Icons.crop),
+                  leading: Icons.crop,
                   caption: "Date",
                   child: Text(formatDate(_diary.date)),
                   onTap: () async {
