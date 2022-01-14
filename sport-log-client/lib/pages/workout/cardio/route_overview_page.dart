@@ -113,28 +113,21 @@ class RoutePageState extends State<RoutePage> {
             SizedBox(
                 height: 150,
                 child: MapboxMap(
-                    accessToken: Secrets.mapboxAccessToken,
-                    styleString: Defaults.mapbox.style.outdoor,
-                    initialCameraPosition: CameraPosition(
-                      zoom: 13.0,
-                      target: route.track.first.latLng,
-                    ),
-                    onMapCreated: (MapboxMapController controller) =>
-                        _sessionMapController = controller,
-                    onStyleLoadedCallback: () {
-                      _sessionMapController.addLine(LineOptions(
-                          lineColor: "red",
-                          geometry: route.track.map((c) => c.latLng).toList()));
-                    },
-                    onMapClick: (_, __) {
-                      // TODO does not work
-                      _logger.i("map click");
-                      showDetails(context, route);
-                    },
-                    onMapLongClick: (_, __) {
-                      _logger.i("map long click");
-                      showDetails(context, route);
-                    })),
+                  accessToken: Secrets.mapboxAccessToken,
+                  styleString: Defaults.mapbox.style.outdoor,
+                  initialCameraPosition: CameraPosition(
+                    zoom: 13.0,
+                    target: route.track.first.latLng,
+                  ),
+                  onMapCreated: (MapboxMapController controller) =>
+                      _sessionMapController = controller,
+                  onStyleLoadedCallback: () {
+                    _sessionMapController.addLine(LineOptions(
+                        lineColor: "red",
+                        geometry: route.track.map((c) => c.latLng).toList()));
+                  },
+                  onMapClick: (_, __) => showDetails(context, route),
+                )),
             Defaults.sizedBox.vertical.small,
             Row(children: [
               Expanded(

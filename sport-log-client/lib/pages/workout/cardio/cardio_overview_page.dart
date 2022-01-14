@@ -196,6 +196,11 @@ class CardioSessionCard extends StatelessWidget {
   const CardioSessionCard({Key? key, required this.cardioSession})
       : super(key: key);
 
+  void showDetails(BuildContext context) {
+    Navigator.of(context)
+        .pushNamed(Routes.cardio.cardioDetails, arguments: cardioSession);
+  }
+
   @override
   Widget build(BuildContext context) {
     final distance = cardioSession.distance == null
@@ -212,10 +217,7 @@ class CardioSessionCard extends StatelessWidget {
     late MapboxMapController _sessionMapController;
 
     return GestureDetector(
-        onTap: () {
-          Navigator.of(context)
-              .pushNamed(Routes.cardio.cardioDetails, arguments: cardioSession);
-        },
+        onTap: () => showDetails(context),
         child: Card(
           child: Column(children: [
             Defaults.sizedBox.vertical.small,
@@ -239,28 +241,23 @@ class CardioSessionCard extends StatelessWidget {
                 ? SizedBox(
                     height: 150,
                     child: MapboxMap(
-                        accessToken: Secrets.mapboxAccessToken,
-                        styleString: Defaults.mapbox.style.outdoor,
-                        initialCameraPosition: CameraPosition(
-                          zoom: 13.0,
-                          target: cardioSession.track!.first.latLng,
-                        ),
-                        onMapCreated: (MapboxMapController controller) =>
-                            _sessionMapController = controller,
-                        onStyleLoadedCallback: () {
-                          _sessionMapController.addLine(LineOptions(
-                              lineColor: "red",
-                              geometry: cardioSession.track!
-                                  .map((c) => c.latLng)
-                                  .toList()));
-                        },
-                        onMapClick: (_, __) {
-                          // TODO does not work
-                          //_showDetails(context, cardioSession);
-                        },
-                        onMapLongClick: (_, __) {
-                          //_showDetails(context, cardioSession);
-                        }))
+                      accessToken: Secrets.mapboxAccessToken,
+                      styleString: Defaults.mapbox.style.outdoor,
+                      initialCameraPosition: CameraPosition(
+                        zoom: 13.0,
+                        target: cardioSession.track!.first.latLng,
+                      ),
+                      onMapCreated: (MapboxMapController controller) =>
+                          _sessionMapController = controller,
+                      onStyleLoadedCallback: () {
+                        _sessionMapController.addLine(LineOptions(
+                            lineColor: "red",
+                            geometry: cardioSession.track!
+                                .map((c) => c.latLng)
+                                .toList()));
+                      },
+                      onMapClick: (_, __) => showDetails(context),
+                    ))
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
