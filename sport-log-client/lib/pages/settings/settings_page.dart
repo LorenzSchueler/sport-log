@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -16,20 +16,12 @@ class SettingsPage extends StatefulWidget {
 class SettingsPageState extends State<SettingsPage> {
   final _logger = Logger('SettingsPage');
 
-  SharedPreferences? _storage;
+  Settings? _settings;
 
   @override
   void initState() {
-    SharedPreferences.getInstance().then((storage) => setState(() {
-          _storage = storage;
-          _storage!.getBool("serverEnabled") ??
-              _storage!.setBool("serverEnabled", true);
-          _storage!.getString("serverUrl") ??
-              _storage!.setString("serverUrl", "<default URL>"); // TODO
-          _storage!.getInt("syncInterval") ??
-              _storage!.setInt("syncInterval", 300);
-          _storage!.getString("units") ??
-              _storage!.setString("units", "metric");
+    Settings.get().then((settings) => setState(() {
+          _settings = settings;
         }));
     super.initState();
   }
@@ -40,7 +32,7 @@ class SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(
         title: const Text("Settings"),
       ),
-      body: _storage == null
+      body: _settings == null
           ? const Center(child: CircularProgressIndicator())
           : Container(
               padding: const EdgeInsets.all(10),
@@ -51,31 +43,30 @@ class SettingsPageState extends State<SettingsPage> {
                       child: SizedBox(
                           height: 20,
                           child: Switch(
-                            value: _storage!.getBool("serverEnabled")!,
+                            value: _settings!.serverEnabled,
                             onChanged: (serverEnabled) {
                               setState(() {
-                                _storage!
-                                    .setBool("serverEnabled", serverEnabled);
+                                _settings!.serverEnabled = serverEnabled;
                               });
                             },
                             materialTapTargetSize:
                                 MaterialTapTargetSize.shrinkWrap,
                           )),
                       leading: Icons.sync),
-                  if (_storage!.getBool("serverEnabled")!)
+                  if (_settings!.serverEnabled)
                     TextFormField(
                       decoration: const InputDecoration(
                         icon: Icon(Icons.computer),
                         labelText: "Server",
                         contentPadding: EdgeInsets.symmetric(vertical: 5),
                       ),
-                      initialValue: _storage!.getString("serverUrl"),
+                      initialValue: _settings!.serverUrl,
                       style: const TextStyle(height: 1),
                       onFieldSubmitted: (serverUrl) => setState(() {
-                        _storage!.setString("serverUrl", serverUrl);
+                        _settings!.serverUrl = serverUrl;
                       }),
                     ),
-                  if (_storage!.getBool("serverEnabled")!)
+                  if (_settings!.serverEnabled)
                     TextFormField(
                       decoration: const InputDecoration(
                         icon: Icon(CustomIcons.timeInterval),
@@ -83,12 +74,10 @@ class SettingsPageState extends State<SettingsPage> {
                         contentPadding: EdgeInsets.symmetric(vertical: 5),
                       ),
                       keyboardType: TextInputType.number,
-                      initialValue:
-                          (_storage!.getInt("syncInterval")! ~/ 60).toString(),
+                      initialValue: (_settings!.syncInterval ~/ 60).toString(),
                       style: const TextStyle(height: 1),
                       onFieldSubmitted: (syncInterval) => setState(() {
-                        _storage!.setInt(
-                            "syncInterval", int.parse(syncInterval) * 60);
+                        _settings!.syncInterval = int.parse(syncInterval) * 60;
                       }),
                     ),
                   EditTile(
@@ -97,7 +86,7 @@ class SettingsPageState extends State<SettingsPage> {
                           height: 24,
                           child: DropdownButtonHideUnderline(
                               child: DropdownButton(
-                            value: _storage!.getString("units"),
+                            value: _settings!.units,
                             items: const [
                               DropdownMenuItem(
                                   value: "metric", child: Text("metric")),
@@ -108,7 +97,7 @@ class SettingsPageState extends State<SettingsPage> {
                             onChanged: (units) {
                               if (units != null) {
                                 setState(() {
-                                  _storage!.setString("units", units as String);
+                                  _settings!.units = units as String;
                                 });
                               }
                             },

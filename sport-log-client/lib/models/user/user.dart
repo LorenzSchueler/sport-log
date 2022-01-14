@@ -34,47 +34,6 @@ class User implements Validatable {
     return 'User(id: $id, username: $username, password: $password, email: $email)';
   }
 
-  static const idKey = 'id';
-  static const usernameKey = 'username';
-  static const passwordKey = 'password';
-  static const emailKey = 'email';
-
-  static const List<String> allKeys = [
-    idKey,
-    usernameKey,
-    passwordKey,
-    emailKey
-  ];
-
-  /// used for storing key value pairs in local storage
-  Map<String, String> toMap() => {
-        idKey: id.toString(),
-        usernameKey: username,
-        passwordKey: password,
-        emailKey: email,
-      };
-
-  /// used for storing key value pairs in local storage
-  static User? fromMap(Map<String, String> map) {
-    if (map.containsKey(idKey) &&
-        map.containsKey(usernameKey) &&
-        map.containsKey(passwordKey) &&
-        map.containsKey(emailKey)) {
-      try {
-        final id = Int64.parseInt(map[idKey]!);
-        return User(
-            id: id,
-            username: map[usernameKey]!,
-            password: map[passwordKey]!,
-            email: map[emailKey]!);
-      } on FormatException catch (e) {
-        _logger.e("Id parsing error: " + e.toString());
-        return null;
-      }
-    }
-    return null;
-  }
-
   @override
   bool isValid() {
     return validate(username.isNotEmpty, 'User: username is empty') &&

@@ -1,6 +1,6 @@
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/user/user.dart';
+import 'package:sport_log/settings.dart';
 
 final _logger = Logger('USER STATE');
 
@@ -9,46 +9,45 @@ class UserState {
   UserState._();
 
   Future<void> init() async {
-    _storage = await SharedPreferences.getInstance();
+    _settings = await Settings.get();
     _user = _getUser();
   }
 
-  late final SharedPreferences _storage;
+  late final Settings _settings;
   User? _user;
 
   User? get currentUser => _user;
 
   Future<void> deleteUser() async {
     _logger.i("deleting user data from storage...");
-    for (final key in User.allKeys) {
-      _storage.remove(key);
-    }
+    _settings.userId = null;
+    _settings.username = null;
+    _settings.password = null;
+    _settings.email = null;
     _user = null;
   }
 
   Future<void> setUser(User user) async {
     _logger.i("saving user data in storage...");
-    for (final entry in user.toMap().entries) {
-      _storage.setString(entry.key, entry.value);
-    }
+    _settings.userId = user.id;
+    _settings.username = user.username;
+    _settings.password = user.password;
+    _settings.email = user.email;
     _user = user;
   }
 
   User? _getUser() {
     _logger.i("reading user data from storage...");
-    final Map<String, String> userMap = {};
-    for (final key in User.allKeys) {
-      final value = _storage.getString(key);
-      if (value != null) {
-        userMap[key] = value;
-      }
-    }
-    final user = User.fromMap(userMap);
-    if (user == null) {
-      _logger.i("no user data found");
-    } else {
+    var id = _settings.userId;
+    var username = _settings.username;
+    var password = _settings.password;
+    var email = _settings.email;
+    if (id != null && username != null && password != null && email != null) {
       _logger.i("user data found");
+      return User(id: id, username: username, password: password, email: email);
+    } else {
+      _logger.i("no user data found");
+      return null;
     }
-    return user;
   }
 }
