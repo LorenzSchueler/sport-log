@@ -73,7 +73,7 @@ class RoutePageState extends State<RoutePage> {
         ),
         body: Scrollbar(
             child: ListView.builder(
-          itemBuilder: _buildRouteCard,
+          itemBuilder: (_, index) => RouteCard(route: _routes[index]),
           itemCount: _routes.length,
         )),
         bottomNavigationBar:
@@ -87,21 +87,47 @@ class RoutePageState extends State<RoutePage> {
         ));
   }
 
-  void showDetails(BuildContext context, Route route) {
+  void _handleNewRoute(dynamic object) {
+    if (object is ReturnObject<Route>) {
+      switch (object.action) {
+        case ReturnAction.created:
+          //setState(() {
+          //_routes.add(object.payload);
+          //_routes.sortBy((c) => c.datetime);
+          //});
+          break;
+        case ReturnAction.updated:
+          //setState(() {
+          //_routes.update(object.payload, by: (o) => o.id);
+          //_routes.sortBy((c) => c.datetime);
+          //});
+          break;
+        case ReturnAction.deleted:
+        //setState(() => _routes.delete(object.payload, by: (c) => c.id));
+      }
+    } else {
+      _logger.i("poped item is not a ReturnObject");
+    }
+  }
+}
+
+class RouteCard extends StatelessWidget {
+  final Route route;
+
+  const RouteCard({required this.route, Key? key}) : super(key: key);
+
+  void showDetails(BuildContext context) {
     Navigator.of(context).pushNamed(Routes.cardio.routeEdit, arguments: route);
   }
 
-  Widget _buildRouteCard(BuildContext buildContext, int index) {
-    final Route route = _routes[index];
+  @override
+  Widget build(BuildContext context) {
     final distance = (route.distance / 1000).toStringAsFixed(3);
 
     late MapboxMapController _sessionMapController;
 
     return GestureDetector(
-        onTap: () {
-          _logger.i("click");
-          showDetails(context, route);
-        },
+        onTap: () => showDetails(context),
         child: Card(
           child: Column(children: [
             Defaults.sizedBox.vertical.small,
@@ -126,7 +152,7 @@ class RoutePageState extends State<RoutePage> {
                         lineColor: "red",
                         geometry: route.track.map((c) => c.latLng).toList()));
                   },
-                  onMapClick: (_, __) => showDetails(context, route),
+                  onMapClick: (_, __) => showDetails(context),
                 )),
             Defaults.sizedBox.vertical.small,
             Row(children: [
@@ -155,28 +181,5 @@ class RoutePageState extends State<RoutePage> {
             Defaults.sizedBox.vertical.small,
           ]),
         ));
-  }
-
-  void _handleNewRoute(dynamic object) {
-    if (object is ReturnObject<Route>) {
-      switch (object.action) {
-        case ReturnAction.created:
-          //setState(() {
-          //_routes.add(object.payload);
-          //_routes.sortBy((c) => c.datetime);
-          //});
-          break;
-        case ReturnAction.updated:
-          //setState(() {
-          //_routes.update(object.payload, by: (o) => o.id);
-          //_routes.sortBy((c) => c.datetime);
-          //});
-          break;
-        case ReturnAction.deleted:
-        //setState(() => _routes.delete(object.payload, by: (c) => c.id));
-      }
-    } else {
-      _logger.i("poped item is not a ReturnObject");
-    }
   }
 }
