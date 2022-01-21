@@ -3,6 +3,8 @@ abstract class Routes {
   static const login = '/login';
   static const registration = '/register';
   static const timer = "/timer";
+  static const map = "/map";
+  static const offlineMaps = "/offline_maps";
   static const settings = "/settings";
   static const timeline = _TimelineRoutes();
   static const metcon = _MetconRoutes();

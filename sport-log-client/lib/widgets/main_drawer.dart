@@ -54,6 +54,18 @@ class MainDrawer extends StatelessWidget {
             onTap: () => Nav.changeNamed(context, Routes.timer),
             selected: selectedRoute == Routes.timer,
           ),
+          ListTile(
+            leading: const Icon(Icons.map),
+            title: const Text('Map'),
+            onTap: () => Nav.changeNamed(context, Routes.map),
+            selected: selectedRoute == Routes.map,
+          ),
+          ListTile(
+            leading: const Icon(Icons.file_download),
+            title: const Text('Offline Maps'),
+            onTap: () => Nav.changeNamed(context, Routes.offlineMaps),
+            selected: selectedRoute == Routes.offlineMaps,
+          ),
           ExpansionTile(
             title: const Text('Primitives'),
             initiallyExpanded: true,
