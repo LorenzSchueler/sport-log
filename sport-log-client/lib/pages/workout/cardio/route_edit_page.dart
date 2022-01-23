@@ -115,7 +115,7 @@ class RouteEditPageState extends State<RouteEditPage> {
     _circles.add(await _mapController.addCircle(
       CircleOptions(
         circleRadius: 8.0,
-        circleColor: '#0060a0',
+        circleColor: Defaults.mapbox.markerColor,
         circleOpacity: 0.5,
         geometry: latLng,
         draggable: false,

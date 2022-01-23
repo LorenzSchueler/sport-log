@@ -59,6 +59,7 @@ class _Mapbox {
   const _Mapbox();
 
   final style = const _Style();
+  final markerColor = "#0060a0";
 }
 
 class _Style {

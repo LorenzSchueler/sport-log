@@ -180,14 +180,14 @@ satelites: ${location.satelliteNumber}""";
     _circles = await _mapController.addCircles([
       CircleOptions(
         circleRadius: 8.0,
-        circleColor: '#0060a0',
+        circleColor: Defaults.mapbox.markerColor,
         circleOpacity: 0.5,
         geometry: latLng,
         draggable: false,
       ),
       CircleOptions(
         circleRadius: 20.0,
-        circleColor: '#0060a0',
+        circleColor: Defaults.mapbox.markerColor,
         circleOpacity: 0.3,
         geometry: latLng,
         draggable: false,
