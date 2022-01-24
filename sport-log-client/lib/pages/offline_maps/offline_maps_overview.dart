@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
@@ -18,15 +20,15 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
 
   late MapboxMapController _mapController;
 
-  LatLng? northeast;
-  LatLng? southwest;
-  Circle? northeastPoint;
-  Circle? southwestPoint;
+  LatLng? point1;
+  LatLng? point2;
+  Circle? point1Marker;
+  Circle? point2Marker;
   Line? boundingBoxLine;
 
   double? progress;
 
-  void onEvent(DownloadRegionStatus status) {
+  void onMapDownload(DownloadRegionStatus status) {
     if (status.runtimeType == Success) {
       // ...
     } else if (status.runtimeType == InProgress) {
@@ -39,18 +41,27 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
   }
 
   void download() {
-    if (northeast != null && southwest != null) {
+    if (point1 != null && point2 != null) {
+      LatLng northeast = LatLng(
+        max(point1!.latitude, point2!.latitude),
+        max(point1!.longitude, point2!.longitude),
+      );
+      LatLng southwest = LatLng(
+        min(point1!.latitude, point2!.latitude),
+        min(point1!.longitude, point2!.longitude),
+      );
+      _logger.i("northwest: $northeast\n southeast: $southwest");
       downloadOfflineRegion(
           OfflineRegionDefinition(
             bounds: LatLngBounds(
-              northeast: northeast!,
-              southwest: southwest!,
+              northeast: northeast,
+              southwest: southwest,
             ),
             minZoom: 6,
             maxZoom: 18,
             mapStyleUrl: Defaults.mapbox.style.outdoor,
           ),
-          onEvent: onEvent,
+          onEvent: onMapDownload,
           accessToken: Secrets.mapboxAccessToken);
     } else {
       showDialog<void>(
@@ -68,41 +79,47 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
     }
   }
 
-  void updateNorthEastPoint() async {
-    if (northeastPoint != null) {
-      _mapController.removeCircle(northeastPoint!);
+  void updatePoint1(LatLng? latLng) async {
+    setState(() {
+      point1 = latLng;
+    });
+    if (point1Marker != null) {
+      _mapController.removeCircle(point1Marker!);
     }
-    if (northeast != null) {
-      northeastPoint = await _mapController.addCircle(CircleOptions(
+    if (point1 != null) {
+      point1Marker = await _mapController.addCircle(CircleOptions(
         circleRadius: 8.0,
         circleColor: Defaults.mapbox.markerColor,
         circleOpacity: 0.5,
-        geometry: northeast,
+        geometry: point1,
       ));
     }
   }
 
-  void updateSouthWestPoint() async {
-    if (southwestPoint != null) {
-      _mapController.removeCircle(southwestPoint!);
+  void updatePoint2(LatLng? latLng) async {
+    setState(() {
+      point2 = latLng;
+    });
+    if (point2Marker != null) {
+      _mapController.removeCircle(point2Marker!);
     }
     if (boundingBoxLine != null) {
       _mapController.removeLine(boundingBoxLine!);
     }
-    if (southwest != null) {
-      southwestPoint = await _mapController.addCircle(CircleOptions(
+    if (point2 != null) {
+      point2Marker = await _mapController.addCircle(CircleOptions(
         circleRadius: 8.0,
         circleColor: Defaults.mapbox.markerColor,
         circleOpacity: 0.5,
-        geometry: southwest,
+        geometry: point2,
       ));
       boundingBoxLine = await _mapController.addLine(
         LineOptions(lineColor: "red", lineWidth: 3, geometry: [
-          LatLng(northeast!.latitude, northeast!.longitude),
-          LatLng(northeast!.latitude, southwest!.longitude),
-          LatLng(southwest!.latitude, southwest!.longitude),
-          LatLng(southwest!.latitude, northeast!.longitude),
-          LatLng(northeast!.latitude, northeast!.longitude)
+          LatLng(point1!.latitude, point1!.longitude),
+          LatLng(point1!.latitude, point2!.longitude),
+          LatLng(point2!.latitude, point2!.longitude),
+          LatLng(point2!.latitude, point1!.longitude),
+          LatLng(point1!.latitude, point1!.longitude)
         ]),
       );
     }
@@ -125,29 +142,14 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
               ),
               onMapCreated: (MapboxMapController controller) =>
                   _mapController = controller,
-              onMapLongClick: (_, latLng) {
-                if (northeast == null) {
-                  northeast = latLng;
-                  updateNorthEastPoint();
-                } else {
-                  southwest = latLng;
-                  updateSouthWestPoint();
-                }
-              },
+              onMapLongClick: (_, latLng) =>
+                  point1 == null ? updatePoint1(latLng) : updatePoint2(latLng),
             ),
           ),
-          const Text("not implemented"),
           ElevatedButton(onPressed: download, child: const Text("download")),
           ElevatedButton(
-              onPressed: () {
-                if (southwest != null) {
-                  southwest = null;
-                  updateSouthWestPoint();
-                } else {
-                  northeast = null;
-                  updateNorthEastPoint();
-                }
-              },
+              onPressed: () =>
+                  point2 != null ? updatePoint2(null) : updatePoint1(null),
               child: const Text("undo")),
           LinearProgressIndicator(
             value: progress ?? 0.3,
