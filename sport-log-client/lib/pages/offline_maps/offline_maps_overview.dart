@@ -20,35 +20,59 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
 
   late MapboxMapController _mapController;
 
-  LatLng? point1;
-  LatLng? point2;
-  Circle? point1Marker;
-  Circle? point2Marker;
-  Line? boundingBoxLine;
+  LatLng? _point1;
+  LatLng? _point2;
+  Circle? _point1Marker;
+  Circle? _point2Marker;
+  Line? _boundingBoxLine;
 
-  double? progress;
+  double? _progress;
 
-  void onMapDownload(DownloadRegionStatus status) {
+  void _onMapDownload(DownloadRegionStatus status) {
     if (status.runtimeType == Success) {
-      // ...
+      setState(() {
+        _progress = null;
+      });
+      showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: const Text("Download Successful"),
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("OK")),
+                ],
+              ));
     } else if (status.runtimeType == InProgress) {
       setState(() {
-        progress = (status as InProgress).progress;
+        _progress = (status as InProgress).progress;
       });
     } else if (status.runtimeType == Error) {
-      // ...
+      setState(() {
+        _progress = null;
+      });
+      showDialog<void>(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: const Text("Download Failed"),
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("OK")),
+                ],
+              ));
     }
   }
 
-  void download() {
-    if (point1 != null && point2 != null) {
+  void _downloadMap() {
+    if (_point1 != null && _point2 != null) {
       LatLng northeast = LatLng(
-        max(point1!.latitude, point2!.latitude),
-        max(point1!.longitude, point2!.longitude),
+        max(_point1!.latitude, _point2!.latitude),
+        max(_point1!.longitude, _point2!.longitude),
       );
       LatLng southwest = LatLng(
-        min(point1!.latitude, point2!.latitude),
-        min(point1!.longitude, point2!.longitude),
+        min(_point1!.latitude, _point2!.latitude),
+        min(_point1!.longitude, _point2!.longitude),
       );
       _logger.i("northwest: $northeast\n southeast: $southwest");
       downloadOfflineRegion(
@@ -61,7 +85,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
             maxZoom: 18,
             mapStyleUrl: Defaults.mapbox.style.outdoor,
           ),
-          onEvent: onMapDownload,
+          onEvent: _onMapDownload,
           accessToken: Secrets.mapboxAccessToken);
     } else {
       showDialog<void>(
@@ -79,47 +103,47 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
     }
   }
 
-  void updatePoint1(LatLng? latLng) async {
+  void _updatePoint1(LatLng? latLng) async {
     setState(() {
-      point1 = latLng;
+      _point1 = latLng;
     });
-    if (point1Marker != null) {
-      _mapController.removeCircle(point1Marker!);
+    if (_point1Marker != null) {
+      _mapController.removeCircle(_point1Marker!);
     }
-    if (point1 != null) {
-      point1Marker = await _mapController.addCircle(CircleOptions(
+    if (_point1 != null) {
+      _point1Marker = await _mapController.addCircle(CircleOptions(
         circleRadius: 8.0,
         circleColor: Defaults.mapbox.markerColor,
         circleOpacity: 0.5,
-        geometry: point1,
+        geometry: _point1,
       ));
     }
   }
 
-  void updatePoint2(LatLng? latLng) async {
+  void _updatePoint2(LatLng? latLng) async {
     setState(() {
-      point2 = latLng;
+      _point2 = latLng;
     });
-    if (point2Marker != null) {
-      _mapController.removeCircle(point2Marker!);
+    if (_point2Marker != null) {
+      _mapController.removeCircle(_point2Marker!);
     }
-    if (boundingBoxLine != null) {
-      _mapController.removeLine(boundingBoxLine!);
+    if (_boundingBoxLine != null) {
+      _mapController.removeLine(_boundingBoxLine!);
     }
-    if (point2 != null) {
-      point2Marker = await _mapController.addCircle(CircleOptions(
+    if (_point2 != null) {
+      _point2Marker = await _mapController.addCircle(CircleOptions(
         circleRadius: 8.0,
         circleColor: Defaults.mapbox.markerColor,
         circleOpacity: 0.5,
-        geometry: point2,
+        geometry: _point2,
       ));
-      boundingBoxLine = await _mapController.addLine(
+      _boundingBoxLine = await _mapController.addLine(
         LineOptions(lineColor: "red", lineWidth: 3, geometry: [
-          LatLng(point1!.latitude, point1!.longitude),
-          LatLng(point1!.latitude, point2!.longitude),
-          LatLng(point2!.latitude, point2!.longitude),
-          LatLng(point2!.latitude, point1!.longitude),
-          LatLng(point1!.latitude, point1!.longitude)
+          LatLng(_point1!.latitude, _point1!.longitude),
+          LatLng(_point1!.latitude, _point2!.longitude),
+          LatLng(_point2!.latitude, _point2!.longitude),
+          LatLng(_point2!.latitude, _point1!.longitude),
+          LatLng(_point1!.latitude, _point1!.longitude)
         ]),
       );
     }
@@ -130,30 +154,54 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
     return Scaffold(
         appBar: AppBar(title: const Text("Offline Maps")),
         drawer: const MainDrawer(selectedRoute: Routes.offlineMaps),
-        body: Column(children: [
-          SizedBox(
-            height: 250,
-            child: MapboxMap(
-              accessToken: Secrets.mapboxAccessToken,
-              styleString: Defaults.mapbox.style.outdoor,
-              initialCameraPosition: const CameraPosition(
-                zoom: 13.0,
-                target: LatLng(47.27, 11.33),
+        body: ListView(children: [
+          Stack(
+            children: [
+              SizedBox(
+                height: 400,
+                child: MapboxMap(
+                  accessToken: Secrets.mapboxAccessToken,
+                  styleString: Defaults.mapbox.style.outdoor,
+                  initialCameraPosition: const CameraPosition(
+                    zoom: 13.0,
+                    target: LatLng(47.27, 11.33),
+                  ),
+                  onMapCreated: (MapboxMapController controller) =>
+                      _mapController = controller,
+                  onMapLongClick: (_, latLng) => _point1 == null
+                      ? _updatePoint1(latLng)
+                      : _updatePoint2(latLng),
+                ),
               ),
-              onMapCreated: (MapboxMapController controller) =>
-                  _mapController = controller,
-              onMapLongClick: (_, latLng) =>
-                  point1 == null ? updatePoint1(latLng) : updatePoint2(latLng),
-            ),
+              Positioned(
+                bottom: 10,
+                right: 5,
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: const CircleBorder(),
+                    ),
+                    onPressed: () => _point2 != null
+                        ? _updatePoint2(null)
+                        : _updatePoint1(null),
+                    child: const Icon(Icons.undo)),
+              )
+            ],
           ),
-          ElevatedButton(onPressed: download, child: const Text("download")),
-          ElevatedButton(
-              onPressed: () =>
-                  point2 != null ? updatePoint2(null) : updatePoint1(null),
-              child: const Text("undo")),
-          LinearProgressIndicator(
-            value: progress ?? 0.3,
-          ),
+          Container(
+            padding: const EdgeInsets.all(10),
+            child: _progress == null
+                ? ElevatedButton(
+                    onPressed: _downloadMap,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.download),
+                          Text("download")
+                        ]))
+                : LinearProgressIndicator(
+                    value: _progress ?? 0.3,
+                  ),
+          )
         ]));
   }
 }
