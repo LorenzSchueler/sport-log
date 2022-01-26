@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:sport_log/data_provider/user_state.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/map/map_page.dart';
@@ -60,6 +61,8 @@ class _AppState extends State<App> {
           const Color(0xffffa896), // for important things that you can click
       brightness: Brightness.light,
     );
+
+    Defaults.mapbox.accessToken; // make sure access token is available
 
     bool isAuthenticated = UserState.instance.currentUser != null;
     return KeyboardDismissOnTap(

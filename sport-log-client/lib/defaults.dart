@@ -58,6 +58,19 @@ class _BorderRadius {
 class _Mapbox {
   const _Mapbox();
 
+  static String? _accessToken;
+  String get accessToken {
+    if (_accessToken == null) {
+      String token = const String.fromEnvironment("ACCESS_TOKEN");
+      if (token.isEmpty) {
+        throw Exception(
+            "please supply mapbox access token using --dart-define ACCESS_TOKEN=<token>");
+      }
+      _accessToken = token;
+    }
+    return _accessToken!;
+  }
+
   final style = const _Style();
   final markerColor = "#0060a0";
 }

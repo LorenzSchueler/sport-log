@@ -4,7 +4,6 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/secrets.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 class MapPage extends StatefulWidget {
@@ -39,7 +38,7 @@ class MapPageState extends State<MapPage> {
       //: null,
       drawer: const MainDrawer(selectedRoute: Routes.map),
       body: MapboxMap(
-        accessToken: Secrets.mapboxAccessToken,
+        accessToken: Defaults.mapbox.accessToken,
         styleString: Defaults.mapbox.style.outdoor,
         initialCameraPosition: const CameraPosition(
           zoom: 13.0,

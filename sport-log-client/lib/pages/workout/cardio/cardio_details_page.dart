@@ -4,7 +4,6 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/secrets.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
@@ -97,7 +96,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                     cardioSession.track != null
                         ? Expanded(
                             child: MapboxMap(
-                                accessToken: Secrets.mapboxAccessToken,
+                                accessToken: Defaults.mapbox.accessToken,
                                 styleString: Defaults.mapbox.style.outdoor,
                                 initialCameraPosition: CameraPosition(
                                   zoom: 14.0,

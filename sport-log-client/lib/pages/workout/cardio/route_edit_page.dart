@@ -5,7 +5,6 @@ import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/secrets.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
@@ -34,7 +33,7 @@ class RouteEditPageState extends State<RouteEditPage> {
 
   late MapboxMapController _mapController;
 
-  MapboxApi mapbox = MapboxApi(accessToken: Secrets.mapboxAccessToken);
+  MapboxApi mapbox = MapboxApi(accessToken: Defaults.mapbox.accessToken);
 
   late Route _route;
 
@@ -303,7 +302,7 @@ class RouteEditPageState extends State<RouteEditPage> {
             child: Column(children: [
               Expanded(
                   child: MapboxMap(
-                accessToken: Secrets.mapboxAccessToken,
+                accessToken: Defaults.mapbox.accessToken,
                 styleString: Defaults.mapbox.style.outdoor,
                 initialCameraPosition: const CameraPosition(
                   zoom: 13.0,

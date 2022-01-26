@@ -7,7 +7,6 @@ import 'package:sport_log/helpers/extensions/list_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/secrets.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
@@ -241,7 +240,7 @@ class CardioSessionCard extends StatelessWidget {
                 ? SizedBox(
                     height: 150,
                     child: MapboxMap(
-                      accessToken: Secrets.mapboxAccessToken,
+                      accessToken: Defaults.mapbox.accessToken,
                       styleString: Defaults.mapbox.style.outdoor,
                       initialCameraPosition: CameraPosition(
                         zoom: 13.0,

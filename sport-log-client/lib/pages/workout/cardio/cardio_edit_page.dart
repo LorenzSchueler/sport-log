@@ -6,7 +6,6 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/secrets.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/form_widgets/cardio_type_picker.dart';
@@ -90,7 +89,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   SizedBox(
                       height: 150,
                       child: MapboxMap(
-                          accessToken: Secrets.mapboxAccessToken,
+                          accessToken: Defaults.mapbox.accessToken,
                           styleString: Defaults.mapbox.style.outdoor,
                           initialCameraPosition: CameraPosition(
                             zoom: 13.0,

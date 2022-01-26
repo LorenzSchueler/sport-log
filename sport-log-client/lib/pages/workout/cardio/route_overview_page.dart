@@ -6,7 +6,6 @@ import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
-import 'package:sport_log/secrets.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/routes.dart';
@@ -139,7 +138,7 @@ class RouteCard extends StatelessWidget {
             SizedBox(
                 height: 150,
                 child: MapboxMap(
-                  accessToken: Secrets.mapboxAccessToken,
+                  accessToken: Defaults.mapbox.accessToken,
                   styleString: Defaults.mapbox.style.outdoor,
                   initialCameraPosition: CameraPosition(
                     zoom: 13.0,

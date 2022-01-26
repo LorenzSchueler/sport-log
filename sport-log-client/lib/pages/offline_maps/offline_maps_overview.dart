@@ -5,7 +5,6 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/secrets.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 class OfflineMapsPage extends StatefulWidget {
@@ -86,7 +85,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
             mapStyleUrl: Defaults.mapbox.style.outdoor,
           ),
           onEvent: _onMapDownload,
-          accessToken: Secrets.mapboxAccessToken);
+          accessToken: Defaults.mapbox.accessToken);
     } else {
       showDialog<void>(
           context: context,
@@ -160,7 +159,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
               SizedBox(
                 height: 400,
                 child: MapboxMap(
-                  accessToken: Secrets.mapboxAccessToken,
+                  accessToken: Defaults.mapbox.accessToken,
                   styleString: Defaults.mapbox.style.outdoor,
                   initialCameraPosition: const CameraPosition(
                     zoom: 13.0,
