@@ -9,6 +9,7 @@ import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
+import 'package:sport_log/settings.dart';
 
 import 'data_providers/all.dart';
 
@@ -57,7 +58,8 @@ class Sync extends ChangeNotifier {
       return;
     }
     _logger.d('Starting sync timer...');
-    _syncTrigger = Timer.periodic(Config.syncInterval, (_) => sync());
+    _syncTrigger =
+        Timer.periodic(Settings.instance.syncInterval, (_) => sync());
   }
 
   void logout() {
