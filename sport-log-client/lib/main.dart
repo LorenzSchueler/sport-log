@@ -10,6 +10,7 @@ import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/test_data/movement_test_data.dart';
 import 'package:sport_log/test_data/strength_test_data.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +23,7 @@ Future<void> initialize({bool doDownSync = true}) async {
   WidgetsFlutterBinding.ensureInitialized(); // TODO: necessary?
   await Hive.initFlutter();
   await Config.init();
+  await Settings.init();
   await UserState.instance.init();
   await AppDatabase.instance?.init();
   await Sync.instance.init();

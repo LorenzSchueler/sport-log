@@ -2,17 +2,16 @@ import 'package:fixnum/fixnum.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings {
-  static final _instance = Settings._();
+  static final instance = Settings._();
   Settings._();
 
   SharedPreferences? _storage;
 
-  static Future<Settings> get() async {
-    await Settings._instance._initStorage();
-    return Settings._instance;
+  static Future<void> init() async {
+    await Settings.instance._setDefaults();
   }
 
-  Future<void> _initStorage() async {
+  Future<void> _setDefaults() async {
     if (_storage == null) {
       _storage = await SharedPreferences.getInstance();
       _storage!.getBool("serverEnabled") ??
@@ -40,12 +39,12 @@ class Settings {
     _storage!.setString("serverUrl", url);
   }
 
-  int get syncInterval {
-    return _storage!.getInt("syncInterval")!;
+  Duration get syncInterval {
+    return Duration(seconds: _storage!.getInt("syncInterval")!);
   }
 
-  set syncInterval(int interval) {
-    _storage!.setInt("syncInterval", interval);
+  set syncInterval(Duration interval) {
+    _storage!.setInt("syncInterval", interval.inSeconds);
   }
 
   String get units {

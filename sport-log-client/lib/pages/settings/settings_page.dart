@@ -16,13 +16,8 @@ class SettingsPage extends StatefulWidget {
 class SettingsPageState extends State<SettingsPage> {
   final _logger = Logger('SettingsPage');
 
-  Settings? _settings;
-
   @override
   void initState() {
-    Settings.get().then((settings) => setState(() {
-          _settings = settings;
-        }));
     super.initState();
   }
 
@@ -32,79 +27,78 @@ class SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(
         title: const Text("Settings"),
       ),
-      body: _settings == null
-          ? const Center(child: CircularProgressIndicator())
-          : Container(
-              padding: const EdgeInsets.all(10),
-              child: ListView(
-                children: [
-                  EditTile(
-                      caption: "Server Synchonization",
-                      child: SizedBox(
-                          height: 20,
-                          child: Switch(
-                            value: _settings!.serverEnabled,
-                            onChanged: (serverEnabled) {
-                              setState(() {
-                                _settings!.serverEnabled = serverEnabled;
-                              });
-                            },
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                          )),
-                      leading: Icons.sync),
-                  if (_settings!.serverEnabled)
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        icon: Icon(Icons.computer),
-                        labelText: "Server",
-                        contentPadding: EdgeInsets.symmetric(vertical: 5),
-                      ),
-                      initialValue: _settings!.serverUrl,
-                      style: const TextStyle(height: 1),
-                      onFieldSubmitted: (serverUrl) => setState(() {
-                        _settings!.serverUrl = serverUrl;
-                      }),
-                    ),
-                  if (_settings!.serverEnabled)
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        icon: Icon(CustomIcons.timeInterval),
-                        labelText: "Synchonization Interval (min)",
-                        contentPadding: EdgeInsets.symmetric(vertical: 5),
-                      ),
-                      keyboardType: TextInputType.number,
-                      initialValue: (_settings!.syncInterval ~/ 60).toString(),
-                      style: const TextStyle(height: 1),
-                      onFieldSubmitted: (syncInterval) => setState(() {
-                        _settings!.syncInterval = int.parse(syncInterval) * 60;
-                      }),
-                    ),
-                  EditTile(
-                      caption: "Units",
-                      child: SizedBox(
-                          height: 24,
-                          child: DropdownButtonHideUnderline(
-                              child: DropdownButton(
-                            value: _settings!.units,
-                            items: const [
-                              DropdownMenuItem(
-                                  value: "metric", child: Text("metric")),
-                              DropdownMenuItem(
-                                  value: "imperial", child: Text("imperial"))
-                            ],
-                            underline: null,
-                            onChanged: (units) {
-                              if (units != null) {
-                                setState(() {
-                                  _settings!.units = units as String;
-                                });
-                              }
-                            },
-                          ))),
-                      leading: Icons.sync),
-                ],
-              )),
+      body: Container(
+          padding: const EdgeInsets.all(10),
+          child: ListView(
+            children: [
+              EditTile(
+                  caption: "Server Synchonization",
+                  child: SizedBox(
+                      height: 20,
+                      child: Switch(
+                        value: Settings.instance.serverEnabled,
+                        onChanged: (serverEnabled) {
+                          setState(() {
+                            Settings.instance.serverEnabled = serverEnabled;
+                          });
+                        },
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      )),
+                  leading: Icons.sync),
+              if (Settings.instance.serverEnabled)
+                TextFormField(
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.computer),
+                    labelText: "Server",
+                    contentPadding: EdgeInsets.symmetric(vertical: 5),
+                  ),
+                  initialValue: Settings.instance.serverUrl,
+                  style: const TextStyle(height: 1),
+                  onFieldSubmitted: (serverUrl) => setState(() {
+                    Settings.instance.serverUrl = serverUrl;
+                  }),
+                ),
+              if (Settings.instance.serverEnabled)
+                TextFormField(
+                  decoration: const InputDecoration(
+                    icon: Icon(CustomIcons.timeInterval),
+                    labelText: "Synchonization Interval (min)",
+                    contentPadding: EdgeInsets.symmetric(vertical: 5),
+                  ),
+                  keyboardType: TextInputType.number,
+                  initialValue:
+                      Settings.instance.syncInterval.inMinutes.toString(),
+                  style: const TextStyle(height: 1),
+                  onFieldSubmitted: (syncInterval) => setState(() {
+                    Settings.instance.syncInterval =
+                        Duration(minutes: int.parse(syncInterval));
+                  }),
+                ),
+              EditTile(
+                  caption: "Units",
+                  child: SizedBox(
+                      height: 24,
+                      child: DropdownButtonHideUnderline(
+                          child: DropdownButton(
+                        value: Settings.instance.units,
+                        items: const [
+                          DropdownMenuItem(
+                              value: "metric", child: Text("metric")),
+                          DropdownMenuItem(
+                              value: "imperial", child: Text("imperial"))
+                        ],
+                        underline: null,
+                        onChanged: (units) {
+                          if (units != null) {
+                            setState(() {
+                              Settings.instance.units = units as String;
+                            });
+                          }
+                        },
+                      ))),
+                  leading: Icons.sync),
+            ],
+          )),
       drawer: const MainDrawer(selectedRoute: Routes.settings),
     );
   }

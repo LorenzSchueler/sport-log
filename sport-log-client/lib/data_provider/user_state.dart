@@ -9,39 +9,37 @@ class UserState {
   UserState._();
 
   Future<void> init() async {
-    _settings = await Settings.get();
     _user = _getUser();
   }
 
-  late final Settings _settings;
   User? _user;
 
   User? get currentUser => _user;
 
   Future<void> deleteUser() async {
     _logger.i("deleting user data from storage...");
-    _settings.userId = null;
-    _settings.username = null;
-    _settings.password = null;
-    _settings.email = null;
+    Settings.instance.userId = null;
+    Settings.instance.username = null;
+    Settings.instance.password = null;
+    Settings.instance.email = null;
     _user = null;
   }
 
   Future<void> setUser(User user) async {
     _logger.i("saving user data in storage...");
-    _settings.userId = user.id;
-    _settings.username = user.username;
-    _settings.password = user.password;
-    _settings.email = user.email;
+    Settings.instance.userId = user.id;
+    Settings.instance.username = user.username;
+    Settings.instance.password = user.password;
+    Settings.instance.email = user.email;
     _user = user;
   }
 
   User? _getUser() {
     _logger.i("reading user data from storage...");
-    var id = _settings.userId;
-    var username = _settings.username;
-    var password = _settings.password;
-    var email = _settings.email;
+    var id = Settings.instance.userId;
+    var username = Settings.instance.username;
+    var password = Settings.instance.password;
+    var email = Settings.instance.email;
     if (id != null && username != null && password != null && email != null) {
       _logger.i("user data found");
       return User(id: id, username: username, password: password, email: email);
