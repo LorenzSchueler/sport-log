@@ -81,17 +81,20 @@ class SettingsPageState extends State<SettingsPage> {
                       child: DropdownButtonHideUnderline(
                           child: DropdownButton(
                         value: Settings.instance.units,
-                        items: const [
+                        items: [
                           DropdownMenuItem(
-                              value: "metric", child: Text("metric")),
+                              value: Units.metric.name,
+                              child: Text(Units.metric.name)),
                           DropdownMenuItem(
-                              value: "imperial", child: Text("imperial"))
+                              value: Units.imperial.name,
+                              child: Text(Units.imperial.name))
                         ],
                         underline: null,
                         onChanged: (units) {
                           if (units != null) {
                             setState(() {
-                              Settings.instance.units = units as String;
+                              Settings.instance.units =
+                                  UnitsFromString.fromString(units as String);
                             });
                           }
                         },

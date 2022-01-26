@@ -1,6 +1,14 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum Units { metric, imperial }
+
+extension UnitsFromString on Units {
+  static Units fromString(String unitString) {
+    return Units.values.firstWhere((value) => value.name == unitString);
+  }
+}
+
 class Settings {
   static final instance = Settings._();
   Settings._();
@@ -47,12 +55,12 @@ class Settings {
     _storage!.setInt("syncInterval", interval.inSeconds);
   }
 
-  String get units {
-    return _storage!.getString("units")!;
+  Units get units {
+    return UnitsFromString.fromString(_storage!.getString("units")!);
   }
 
-  set units(String units) {
-    _storage!.setString("units", units);
+  set units(Units units) {
+    _storage!.setString("units", units.name);
   }
 
   Int64? get userId {
