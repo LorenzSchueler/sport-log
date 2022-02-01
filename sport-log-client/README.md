@@ -25,7 +25,7 @@
 * to copy the database to your computer, use
 ```bash
 adb root  # restart adb daemon as root
-adb pull /data/user/0/com.example.frontend/databases/database.sqlite <folder> # pull file to local storage
+adb pull /data/user/0/org.sport_log.sport_log_client/databases/database.sqlite <folder> # pull file to local storage
 ```
 
 **Making changes to database schema**
