@@ -30,7 +30,7 @@ Future<void> initialize({bool doDownSync = true}) async {
   if (Config.generateTestData) {
     insertTestData();
   }
-  BlocOverrides.runZoned(() {}, blocObserver: SimpleBlocObserver());
+  Bloc.observer = SimpleBlocObserver();
 }
 
 Future<void> insertTestData() async {
