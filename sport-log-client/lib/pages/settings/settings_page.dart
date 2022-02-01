@@ -83,18 +83,18 @@ class SettingsPageState extends State<SettingsPage> {
                         value: Settings.instance.units,
                         items: [
                           DropdownMenuItem(
-                              value: Units.metric.name,
+                              value: Units.metric,
                               child: Text(Units.metric.name)),
                           DropdownMenuItem(
-                              value: Units.imperial.name,
+                              value: Units.imperial,
                               child: Text(Units.imperial.name))
                         ],
                         underline: null,
                         onChanged: (units) {
-                          if (units != null) {
+                          if (units != null && units is Units) {
                             setState(() {
                               Settings.instance.units =
-                                  UnitsFromString.fromString(units as String);
+                                  UnitsFromString.fromString(units.name);
                             });
                           }
                         },
