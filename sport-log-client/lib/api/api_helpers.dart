@@ -48,7 +48,7 @@ mixin ApiLogging {
   void _logResponse(Response response) {
     final body = utf8.decode(response.bodyBytes);
     final successful = response.statusCode >= 200 && response.statusCode < 300;
-    if (body.isNotEmpty && (!successful  || Config.outputRequestJson)) {
+    if (body.isNotEmpty && (!successful || Config.outputRequestJson)) {
       dynamic jsonObject = jsonDecode(body);
       logger.log(successful ? l.Level.debug : l.Level.error,
           'response: ${response.statusCode}\n${_prettyJson(jsonObject)}');
@@ -61,9 +61,8 @@ mixin ApiLogging {
 
 mixin ApiHelpers on ApiLogging, ApiHeaders {
   final _client = Client();
-  final _urlBase = Config.apiUrlBase;
 
-  Uri _uri(String route) => Uri.parse(_urlBase + route);
+  Uri _uri(String route) => Uri.parse(Settings.instance.serverUrl + route);
 
   ApiResult<R> _errorHandling<R>(
       Future<Result<R, ApiError>> Function(Client client) req) async {

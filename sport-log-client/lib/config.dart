@@ -8,26 +8,12 @@ import 'package:logger/logger.dart' as l;
 final _logger = Logger('CONFIG');
 
 abstract class Config {
-  static late final String apiUrlBase;
   static late final bool deleteDatabase;
   static late final bool generateTestData;
   static late final l.Level minLogLevel;
   static late final bool outputRequestJson;
 
   static Future<void> init() async {
-    const String defaultAddress = '127.0.0.1:8000';
-    if (await isAndroidEmulator) {
-      apiUrlBase = 'http://10.0.2.2:8000';
-    } else if (isAndroid || isIOS) {
-      const address = String.fromEnvironment('PHONE_SERVER_ADDRESS',
-          defaultValue: defaultAddress);
-      apiUrlBase = 'http://$address';
-    } else {
-      const address = String.fromEnvironment('LOCAL_SERVER_ADDRESS',
-          defaultValue: defaultAddress);
-      apiUrlBase = 'http://$address';
-    }
-
     const deleteDatabaseEnvVar =
         String.fromEnvironment('DELETE_DATABASE', defaultValue: 'false');
     deleteDatabase = deleteDatabaseEnvVar.toLowerCase() == 'true';
@@ -67,7 +53,6 @@ abstract class Config {
         String.fromEnvironment('OUTPUT_REQUEST_JSON', defaultValue: 'false');
     outputRequestJson = outputRequestJsonStr.toLowerCase() == 'true';
 
-    _logger.i('Server url: $apiUrlBase');
     _logger.i('Delete database: $deleteDatabase');
     _logger.i('Generate test data: $generateTestData');
     _logger.i('Min log level: $minLogLevel');

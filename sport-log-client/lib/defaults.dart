@@ -4,6 +4,16 @@ abstract class Defaults {
   static const sizedBox = _SizedBox();
   static const borderRadius = _BorderRadius();
   static const mapbox = _Mapbox();
+  static const server = _Server();
+}
+
+class _Server {
+  const _Server();
+
+  static const _defaultUrl = "127.0.0.1";
+  final emulatorUrl = 'http://10.0.2.2:8000';
+  final url = "http://" +
+      const String.fromEnvironment('SERVER_ADDRESS', defaultValue: _defaultUrl);
 }
 
 class _SizedBox {

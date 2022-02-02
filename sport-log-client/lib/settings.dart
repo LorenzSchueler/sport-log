@@ -1,5 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sport_log/config.dart';
+import 'package:sport_log/defaults.dart';
 
 enum Units { metric, imperial }
 
@@ -25,7 +27,11 @@ class Settings {
       _storage!.getBool("serverEnabled") ??
           _storage!.setBool("serverEnabled", true);
       _storage!.getString("serverUrl") ??
-          _storage!.setString("serverUrl", "<default URL>"); // TODO
+          _storage!.setString(
+              "serverUrl",
+              await Config.isAndroidEmulator
+                  ? Defaults.server.emulatorUrl
+                  : Defaults.server.url);
       _storage!.getInt("syncInterval") ?? _storage!.setInt("syncInterval", 300);
       _storage!.getString("units") ?? _storage!.setString("units", "metric");
     }

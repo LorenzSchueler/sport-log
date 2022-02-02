@@ -10,6 +10,7 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/settings.dart';
 
 export 'api_error.dart';
 
