@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_beep/flutter_beep.dart';
 import 'package:sport_log/defaults.dart';
@@ -63,7 +62,8 @@ class TimerPageState extends State<TimerPage> {
             padding: const EdgeInsets.all(10),
             child: SizedBox(
                 child: TabBarView(children: [
-              Column(children: [
+              SingleChildScrollView(
+                  child: Column(children: [
                 timeFormField(MetconType.amrap),
                 Defaults.sizedBox.vertical.huge,
                 startStopButton(MetconType.amrap),
@@ -71,8 +71,9 @@ class TimerPageState extends State<TimerPage> {
                   height: 100,
                 ),
                 timeText,
-              ]),
-              Column(children: [
+              ])),
+              SingleChildScrollView(
+                  child: Column(children: [
                 timeFormField(MetconType.emom),
                 TextFormField(
                   keyboardType: TextInputType.number,
@@ -97,8 +98,9 @@ class TimerPageState extends State<TimerPage> {
                   style: const TextStyle(fontSize: 50),
                 ),
                 timeText,
-              ]),
-              Column(children: [
+              ])),
+              SingleChildScrollView(
+                  child: Column(children: [
                 timeFormField(MetconType.forTime),
                 Defaults.sizedBox.vertical.huge,
                 startStopButton(MetconType.forTime),
@@ -106,7 +108,7 @@ class TimerPageState extends State<TimerPage> {
                   height: 100,
                 ),
                 timeText,
-              ]),
+              ])),
             ])),
           ),
           drawer: const MainDrawer(selectedRoute: Routes.settings),
@@ -219,7 +221,7 @@ class TimerPageState extends State<TimerPage> {
 
   void stopTimerCallback() {
     setState(() {
-      timer!.cancel();
+      timer?.cancel();
       timer = null;
     });
   }
