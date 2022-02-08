@@ -5,11 +5,13 @@ import 'dart:math' as math;
 class ExpandableFab extends StatefulWidget {
   final Icon icon;
   final List<ExpandableFabItem> items;
+  final bool horizontal;
 
   const ExpandableFab({
     Key? key,
     required this.icon,
     required this.items,
+    this.horizontal = false,
   }) : super(key: key);
 
   @override
@@ -64,7 +66,9 @@ class _ExpandableFabState extends State<ExpandableFab>
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.expand(
+    return SizedBox(
+      height: 70, // TODO fix size (was exdented)
+      width: 160,
       child: Stack(
         alignment: Alignment.bottomRight,
         clipBehavior: Clip.none,
@@ -104,23 +108,41 @@ class _ExpandableFabState extends State<ExpandableFab>
   List<Widget> _buildExpandingActionButtons() {
     final children = <Widget>[];
     final count = widget.items.length;
-    final step = 90.0 / (count - 1);
-    for (var i = 0, angleInDegrees = 0.0;
-        i < count;
-        i++, angleInDegrees += step) {
-      children.add(
-        _ExpandingActionButton(
-          directionInDegrees: angleInDegrees,
-          maxDistance: 112,
-          progress: _expandAnimation,
-          child: ActionButton(
-              icon: widget.items[i].icon,
-              onPressed: () {
-                _toggle();
-                widget.items[i].onPressed();
-              }),
-        ),
-      );
+    if (widget.horizontal) {
+      for (var i = 0; i < count; i++) {
+        children.add(
+          _ExpandingActionButton(
+            directionInDegrees: 0,
+            maxDistance: 60 * (i + 1),
+            progress: _expandAnimation,
+            child: ActionButton(
+                icon: widget.items[i].icon,
+                onPressed: () {
+                  _toggle();
+                  widget.items[i].onPressed();
+                }),
+          ),
+        );
+      }
+    } else {
+      final step = 90.0 / (count - 1);
+      for (var i = 0, angleInDegrees = 0.0;
+          i < count;
+          i++, angleInDegrees += step) {
+        children.add(
+          _ExpandingActionButton(
+            directionInDegrees: angleInDegrees,
+            maxDistance: 112,
+            progress: _expandAnimation,
+            child: ActionButton(
+                icon: widget.items[i].icon,
+                onPressed: () {
+                  _toggle();
+                  widget.items[i].onPressed();
+                }),
+          ),
+        );
+      }
     }
     return children;
   }
