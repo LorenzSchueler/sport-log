@@ -42,7 +42,7 @@ dependencies:
   http: ^0.13.3
   device_info_plus: ^3.2.1
   implicitly_animated_reorderable_list: ^0.4.0 # ui
-  json_serializable: ^6.1.4
+  json_annotation: ^4.4.0
   fixnum: ^1.0.0 # used for ids (in web ints go only up to 2^53-1)
   result_type: ^0.1.0 # convenience for returning something that can either be a success or failure
   intl: ^0.17.0  # used for date formatting
@@ -73,7 +73,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
-  build_runner: ^2.1.0
+  json_serializable: ^6.1.4 # json
+  build_runner: ^2.1.0 # json
   faker: ^2.0.0
 
 # For information on the generic Dart part of this file, see the

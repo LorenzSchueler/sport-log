@@ -6,17 +6,15 @@ part of 'strength_set.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-StrengthSet _$StrengthSetFromJson(Map<String, dynamic> json) {
-  return StrengthSet(
-    id: const IdConverter().fromJson(json['id'] as String),
-    strengthSessionId:
-        const IdConverter().fromJson(json['strength_session_id'] as String),
-    setNumber: json['set_number'] as int,
-    count: json['count'] as int,
-    weight: (json['weight'] as num?)?.toDouble(),
-    deleted: json['deleted'] as bool,
-  );
-}
+StrengthSet _$StrengthSetFromJson(Map<String, dynamic> json) => StrengthSet(
+      id: const IdConverter().fromJson(json['id'] as String),
+      strengthSessionId:
+          const IdConverter().fromJson(json['strength_session_id'] as String),
+      setNumber: json['set_number'] as int,
+      count: json['count'] as int,
+      weight: (json['weight'] as num?)?.toDouble(),
+      deleted: json['deleted'] as bool,
+    );
 
 Map<String, dynamic> _$StrengthSetToJson(StrengthSet instance) =>
     <String, dynamic>{
