@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:sport_log/config.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -17,36 +15,38 @@ class AppDatabase {
   AppDatabase._();
 
   Future<void> init() async {
-    const fileName = Config.databaseName;
+    const dbFileName = Config.databaseName;
     if (Config.deleteDatabase) {
-      final File databaseFile = File(await getDatabasesPath() + '/' + fileName);
-      if (await databaseFile.exists()) {
-        _logger.i('Clean start on: deleting existing database...');
-        await databaseFile.delete();
-      }
+      deleteDatabase(dbFileName);
+      _logger.i('Deleting existing database...');
+      //final File databaseFile = File(await getDatabasesPath() + '/' + dbFileName);
+      //if (await databaseFile.exists()) {
+      //_logger.i('Clean start on: deleting existing database...');
+      //await databaseFile.delete();
+      //}
     }
-    String version = '';
-    await openDatabase(fileName,
-        version: 1,
-        onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
-        onCreate: (db, version) async {
-          List<String> sql = [];
-          for (final table in allTables) {
-            sql += table.setupSql;
-          }
-          for (final statement in sql) {
+    await openDatabase(
+      dbFileName,
+      version: 1,
+      onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
+      onCreate: (db, version) async {
+        for (final table in allTables) {
+          _logger.d("Creating table: ${table.tableName}");
+          for (final statement in table.setupSql) {
             _logger.d(statement);
             db.execute(statement);
           }
-        },
-        onOpen: (db) async {
-          for (final table in allTables) {
-            table.setDatabase(db);
-          }
-          version = (await db.rawQuery('select sqlite_version() AS version'))
-              .first['version'] as String;
-        });
-    _logger.d("Database initialization done (sqlite version $version).");
+        }
+      },
+      onUpgrade: null, // TODO
+      onDowngrade: null, // TODO
+      onOpen: (db) async {
+        for (final table in allTables) {
+          table.setDatabase(db);
+        }
+        _logger.d("Database initialization done");
+      },
+    );
   }
 
   Future<void> upsertAccountData(AccountData data,
@@ -62,6 +62,9 @@ class AppDatabase {
     routes.upsertMultiple(data.routes, synchronized: synchronized);
     cardioSessions.upsertMultiple(data.cardioSessions,
         synchronized: synchronized);
+    strengthSessions.upsertMultiple(data.strengthSessions,
+        synchronized: synchronized);
+    strengthSets.upsertMultiple(data.strengthSets, synchronized: synchronized);
     platforms.upsertMultiple(data.platforms, synchronized: synchronized);
     platformCredentials.upsertMultiple(data.platformCredentials,
         synchronized: synchronized);
@@ -72,39 +75,39 @@ class AppDatabase {
     actionEvents.upsertMultiple(data.actionEvents, synchronized: synchronized);
   }
 
+  final diaries = DiaryTable();
+  final wods = WodTable();
   final movements = MovementTable();
   final metcons = MetconTable();
   final metconMovements = MetconMovementTable();
   final metconSessions = MetconSessionTable();
   final routes = RouteTable();
   final cardioSessions = CardioSessionTable();
-  final strengthSets = StrengthSetTable();
   final strengthSessions = StrengthSessionTable();
+  final strengthSets = StrengthSetTable();
   final platforms = PlatformTable();
   final platformCredentials = PlatformCredentialTable();
   final actionProviders = ActionProviderTable();
   final actions = ActionTable();
   final actionRules = ActionRuleTable();
   final actionEvents = ActionEventTable();
-  final diaries = DiaryTable();
-  final wods = WodTable();
 
   List<DbAccessor> get allTables => [
+        diaries,
+        wods,
         movements,
         metcons,
         metconMovements,
         metconSessions,
         routes,
         cardioSessions,
-        strengthSets,
         strengthSessions,
+        strengthSets,
         platforms,
         platformCredentials,
         actionProviders,
         actions,
         actionRules,
         actionEvents,
-        diaries,
-        wods,
       ];
 }

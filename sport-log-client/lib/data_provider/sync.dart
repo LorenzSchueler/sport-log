@@ -6,6 +6,7 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/user_state.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
@@ -14,7 +15,18 @@ import 'package:sport_log/settings.dart';
 import 'data_providers/all.dart';
 
 class Sync extends ChangeNotifier {
+  final _logger = Logger('Sync');
+
+  Timer? _syncTimer;
+
+  bool _isSyncing;
+  bool get isSyncing => _isSyncing;
+  DateTime? get lastSync => _box.get(Keys.lastSync);
+
+  late final Box<DateTime> _box;
+
   static final Sync instance = Sync._();
+  Sync._() : _isSyncing = false;
 
   Future<void> init() async {
     _box = await Hive.openBox<DateTime>(Keys.lastSync);
@@ -53,35 +65,22 @@ class Sync extends ChangeNotifier {
       _logger.e('Login, but no user found.');
       return;
     }
-    if (_syncTrigger != null && _syncTrigger!.isActive) {
+    if (_syncTimer != null && _syncTimer!.isActive) {
       _logger.d('Login, but timer is active.');
       return;
     }
     _logger.d('Starting sync timer...');
-    _syncTrigger =
-        Timer.periodic(Settings.instance.syncInterval, (_) => sync());
+    _syncTimer = Timer.periodic(Settings.instance.syncInterval, (_) => sync());
   }
 
   void logout() {
-    if (_syncTrigger != null) {
+    if (_syncTimer != null) {
       // TODO: what if sync is running and database will be deleted?
       _logger.d('Stopping sync timer...');
-      _syncTrigger!.cancel();
-      _syncTrigger = null;
+      _syncTimer?.cancel();
+      _syncTimer = null;
     }
   }
-
-  DateTime? get lastSync => _box.get(Keys.lastSync);
-
-  Timer? _syncTrigger;
-
-  bool get isSyncing => _isSyncing;
-
-  bool _isSyncing;
-
-  final _logger = Logger('Sync');
-  late final Box<DateTime> _box;
-  Sync._() : _isSyncing = false;
 
   void _setLastSync(DateTime dateTime) {
     _logger.i('Setting last sync to $dateTime...');
@@ -126,14 +125,12 @@ class Sync extends ChangeNotifier {
         _logger.e('Tried down sync, but got error.', accountDataResult.failure);
       }
       return false;
+    } else {
+      final accountData = accountDataResult.success;
+      AppDatabase.instance!.upsertAccountData(accountData, synchronized: true);
+
+      // TODO: deal with user updates
+      return true;
     }
-    final accountData = accountDataResult.success;
-    for (final dp in allDataProviders) {
-      // TODO: this can be sped up
-      await dp.upsertPartOfAccountData(accountData);
-    }
-    // TODO: downsync routes, cardio sessions, metcon sessions, movement muscle, training plan, metcon item, strength blueprint, cardio blueprint
-    // TODO: deal with user updates
-    return true;
   }
 }

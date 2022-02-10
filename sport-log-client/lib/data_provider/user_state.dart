@@ -35,7 +35,6 @@ class UserState {
   }
 
   User? _getUser() {
-    _logger.i("reading user data from storage...");
     var id = Settings.instance.userId;
     var username = Settings.instance.username;
     var password = Settings.instance.password;

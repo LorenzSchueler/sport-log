@@ -1,5 +1,4 @@
-export 'action_event_data_provider.dart';
-export 'action_rule_data_provider.dart';
+export 'action_data_provider.dart';
 export 'diary_data_provider.dart';
 export 'metcon_data_provider.dart';
 export 'movement_data_provider.dart';
