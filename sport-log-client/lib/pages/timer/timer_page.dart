@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_beep/flutter_beep.dart';
 import 'package:sport_log/defaults.dart';
@@ -23,9 +24,8 @@ class TimerPageState extends State<TimerPage> {
   int _minutes = 0;
   int _seconds = 0;
   int _rounds = 3;
-  int _currentRound = 0;
   Duration _currentTime = const Duration();
-  Duration _duration = const Duration();
+  int _currentRound = 0;
   Timer? timer;
 
   @override
@@ -140,89 +140,91 @@ class TimerPageState extends State<TimerPage> {
   Widget startStopButton(MetconType metconType) {
     return timer == null
         ? ElevatedButton(
-            onPressed: () => startTimerCallback(metconType),
+            onPressed: () => startTimer(metconType),
             child: const Text(
               "Start",
               style: TextStyle(fontSize: 40),
             ))
         : ElevatedButton(
-            onPressed: stopTimerCallback,
+            onPressed: stopTimer,
             child: const Text(
               "Stop",
               style: TextStyle(fontSize: 40),
             ));
   }
 
-  Widget get timeText {
-    return Text(
-      formatTime(_currentTime, short: true),
-      style: const TextStyle(fontSize: 120),
-    );
+  Text get timeText {
+    return _currentTime.isNegative
+        ? Text(
+            formatTime(_currentTime.abs(), short: true),
+            style: const TextStyle(
+                fontSize: 120, color: Color.fromARGB(255, 150, 150, 150)),
+          )
+        : Text(
+            formatTime(_currentTime, short: true),
+            style: const TextStyle(fontSize: 120),
+          );
   }
 
-  void startTimerCallback(MetconType metconType) {
+  void startTimer(MetconType metconType) {
+    timer?.cancel();
+    Duration time = const Duration(seconds: -10);
     setState(() {
-      _duration = Duration(minutes: _minutes, seconds: _seconds);
-      switch (metconType) {
-        case MetconType.amrap:
-          _currentTime = Duration(minutes: _minutes, seconds: _seconds);
-          break;
-        case MetconType.emom:
-          _currentTime = Duration(minutes: _minutes, seconds: _seconds);
-          _currentRound = 1;
-          break;
-        case MetconType.forTime:
-          _currentTime = const Duration(seconds: 0);
-          break;
-      }
+      _currentTime = time;
+      _currentRound = 0;
     });
     timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      time += const Duration(seconds: 1);
+      tickCallback(time, metconType);
+    });
+  }
+
+  void tickCallback(Duration time, MetconType metconType) {
+    if (time.isNegative) {
+      setState(() {
+        _currentTime = time;
+      });
+    } else {
+      if (time.inSeconds == 0) {
+        FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ABBR_ALERT);
+      }
+      Duration totalTime = Duration(minutes: _minutes, seconds: _seconds);
       setState(() {
         switch (metconType) {
           case MetconType.amrap:
-            _currentTime -= const Duration(seconds: 1);
+            _currentTime = totalTime - time;
             break;
           case MetconType.emom:
-            _currentTime -= const Duration(seconds: 1);
+            Duration roundTime =
+                Duration(seconds: time.inSeconds % totalTime.inSeconds);
+            _currentRound = min(
+                ((time.inSeconds + 1) / totalTime.inSeconds).ceil(), _rounds);
+            _currentTime = time == totalTime * _rounds
+                ? Duration(seconds: totalTime.inSeconds)
+                : roundTime;
+            if (roundTime.inSeconds == 0) {
+              FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ANSWER);
+            }
             break;
           case MetconType.forTime:
-            _currentTime += const Duration(seconds: 1);
+            _currentTime = time;
             break;
         }
       });
-      switch (metconType) {
-        case MetconType.amrap:
-          if (_currentTime <= const Duration(seconds: 0)) {
-            stopTimerCallback();
-            FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ABBR_ALERT);
-          }
-          break;
-        case MetconType.emom:
-          if (_currentTime <= const Duration(seconds: 0)) {
-            if (_currentRound == _rounds) {
-              stopTimerCallback();
-              FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ABBR_ALERT);
-            } else {
-              _currentRound += 1;
-              _currentTime = _duration;
-              FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ANSWER);
-            }
-          }
-          break;
-        case MetconType.forTime:
-          if (_currentTime >= _duration) {
-            stopTimerCallback();
-            FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ABBR_ALERT);
-          }
-          break;
+      if (metconType == MetconType.emom) {
+        totalTime *= _rounds;
       }
-    });
+      if (time >= totalTime) {
+        stopTimer();
+      }
+    }
   }
 
-  void stopTimerCallback() {
+  void stopTimer() {
+    timer?.cancel();
     setState(() {
-      timer?.cancel();
       timer = null;
     });
+    FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ABBR_ALERT);
   }
 }
