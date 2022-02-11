@@ -38,11 +38,6 @@ class MainDrawer extends StatelessWidget {
             selected: selectedRoute == Routes.timeline.overview,
           ),
           ListTile(
-            title: Text('Training Plan',
-                style: TextStyle(color: disabledColorOf(context))),
-            leading: const Icon(CustomIcons.plan),
-          ),
-          ListTile(
             title: Text('Server Actions',
                 style: TextStyle(color: disabledColorOf(context))),
             leading: const Icon(Icons.play_circle_fill_sharp),

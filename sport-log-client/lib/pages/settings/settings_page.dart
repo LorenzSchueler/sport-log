@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
@@ -31,6 +34,8 @@ class SettingsPageState extends State<SettingsPage> {
           padding: const EdgeInsets.all(10),
           child: ListView(
             children: [
+              const CaptionTile(caption: "Server Settings"),
+              Defaults.sizedBox.vertical.small,
               EditTile(
                   caption: "Server Synchonization",
                   child: SizedBox(
@@ -74,6 +79,56 @@ class SettingsPageState extends State<SettingsPage> {
                         Duration(minutes: int.parse(syncInterval));
                   }),
                 ),
+              Defaults.sizedBox.vertical.small,
+              const Divider(),
+              const CaptionTile(caption: "User Settings"),
+              TextFormField(
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.supervised_user_circle),
+                  labelText: "Username",
+                  contentPadding: EdgeInsets.symmetric(vertical: 5),
+                ),
+                initialValue: Settings.instance.username,
+                style: const TextStyle(height: 1),
+                onFieldSubmitted: (username) async {
+                  final validated = Validator.validateUsername(username);
+                  if (validated == null) {
+                    final result = await Account.setUsername(username);
+                    if (result.isFailure) {
+                      await showDialog<void>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Changing Username Failed"),
+                          content: Text(result.failure),
+                          actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("Ok")),
+                          ],
+                        ),
+                      );
+                    }
+                  } else {
+                    await showDialog<void>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text("Changing Username Failed"),
+                        content: Text(validated),
+                        actions: [
+                          TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("Ok")),
+                        ],
+                      ),
+                    );
+                  }
+                  setState(() {});
+                },
+              ),
+              Defaults.sizedBox.vertical.small,
+              const Divider(),
+              const CaptionTile(caption: "Other Settings"),
+              Defaults.sizedBox.vertical.small,
               EditTile(
                   caption: "Units",
                   child: SizedBox(

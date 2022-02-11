@@ -7,6 +7,17 @@ import 'package:sport_log/settings.dart';
 class Account {
   Account._();
 
+  static Future<Result<User, String>> register(User user) async {
+    final result = await Api.instance.user.postSingle(user);
+    if (result.isSuccess) {
+      Settings.instance.user = user;
+      Sync.instance.startSync();
+      return Success(user);
+    } else {
+      return Failure(result.failure.toErrorMessage());
+    }
+  }
+
   static Future<Result<User, String>> login(
       String username, String password) async {
     final result = await Api.instance.user.getSingle(username, password);
@@ -20,11 +31,12 @@ class Account {
     }
   }
 
-  static Future<Result<User, String>> register(User user) async {
-    final result = await Api.instance.user.postSingle(user);
+  static Future<Result<User, String>> setUsername(String username) async {
+    final user = Settings.instance.user!;
+    user.username = username;
+    final result = await Api.instance.user.putSingle(user);
     if (result.isSuccess) {
       Settings.instance.user = user;
-      Sync.instance.startSync();
       return Success(user);
     } else {
       return Failure(result.failure.toErrorMessage());
