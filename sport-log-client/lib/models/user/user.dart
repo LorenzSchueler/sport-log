@@ -1,4 +1,3 @@
-import 'package:email_validator/email_validator.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/defs.dart';
@@ -38,6 +37,7 @@ class User implements Validatable {
   bool isValid() {
     return validate(username.isNotEmpty, 'User: username is empty') &&
         validate(password.isNotEmpty, 'User: password is empty') &&
-        validate(EmailValidator.validate(email), 'User: email is not valid');
+        validate(
+            Validator.validateEmail(email) == null, 'User: email is not valid');
   }
 }

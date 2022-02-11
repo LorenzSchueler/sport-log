@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 
@@ -33,30 +34,6 @@ class TimeFormField extends StatelessWidget {
         onHoursSubmitted = null,
         super(key: key);
 
-  String? hourValidator(String? value) {
-    if (value == null) return null;
-    int? intValue = int.tryParse(value);
-    if (intValue == null) {
-      return "please enter a valid number";
-    } else if (intValue < 0) {
-      return "please enter a positive number";
-    } else {
-      return null;
-    }
-  }
-
-  String? minSecValidator(String? value) {
-    if (value == null) return null;
-    int? intValue = int.tryParse(value);
-    if (intValue == null) {
-      return "please enter a valid number";
-    } else if (intValue < 0 || intValue >= 60) {
-      return "please enter a number between 0 and 59";
-    } else {
-      return null;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return EditTile(
@@ -75,7 +52,7 @@ class TimeFormField extends StatelessWidget {
                   style: const TextStyle(height: 1),
                   textInputAction: TextInputAction.next,
                   initialValue: hours.toString().padLeft(2, "0"),
-                  validator: hourValidator,
+                  validator: Validator.validateHour,
                   decoration: const InputDecoration(
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
@@ -91,7 +68,7 @@ class TimeFormField extends StatelessWidget {
               style: const TextStyle(height: 1),
               textInputAction: TextInputAction.next,
               initialValue: minutes.toString().padLeft(2, "0"),
-              validator: minSecValidator,
+              validator: Validator.validateMinOrSec,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.symmetric(vertical: 5),
               ),
@@ -107,7 +84,7 @@ class TimeFormField extends StatelessWidget {
                   onSecondsSubmitted(int.parse(seconds)),
               style: const TextStyle(height: 1),
               initialValue: seconds.toString().padLeft(2, "0"),
-              validator: minSecValidator,
+              validator: Validator.validateMinOrSec,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.symmetric(vertical: 5),
               ),

@@ -4,6 +4,7 @@ import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
@@ -72,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
         labelText: "Username",
         border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
       ),
-      validator: _usernameValidator,
+      validator: Validator.validateUsername,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
       style: _loginPending
@@ -96,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
         labelText: "Password",
         border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
       ),
-      validator: _passwordValidator,
+      validator: Validator.validatePassword,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
       style: _loginPending
@@ -130,8 +131,8 @@ class _LoginPageState extends State<LoginPage> {
   bool get _formIsValid => _formKey.currentState!.validate();
 
   bool get _inputsAreValid =>
-      _usernameValidator(_username) == null &&
-      _passwordValidator(_password) == null;
+      Validator.validateUsername(_username) == null &&
+      Validator.validatePassword(_password) == null;
 
   void _submit(BuildContext context) async {
     if (_formIsValid) {
@@ -158,21 +159,5 @@ class _LoginPageState extends State<LoginPage> {
       }
       _formKey.currentState!.deactivate();
     }
-  }
-
-  String? _usernameValidator(String? username) {
-    if (username != null && username.isEmpty) {
-      return "Username must not be empty.";
-    } else if (username != null && username.contains(':')) {
-      return "Username must not contain ':'.";
-    } else {
-      return null;
-    }
-  }
-
-  String? _passwordValidator(String? password) {
-    return password != null && password.isEmpty
-        ? "Password must not be empty"
-        : null;
   }
 }

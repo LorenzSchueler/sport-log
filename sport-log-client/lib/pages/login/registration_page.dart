@@ -1,10 +1,10 @@
-import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/id_generation.dart';
+import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
@@ -80,7 +80,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         labelText: "Username",
         border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
       ),
-      validator: _usernameValidator,
+      validator: Validator.validateUsername,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_registrationPending,
       style: _registrationPending
@@ -101,7 +101,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         labelText: "Email",
         border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
       ),
-      validator: _emailValidator,
+      validator: Validator.validateEmail,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_registrationPending,
       style: _registrationPending
@@ -123,7 +123,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         labelText: "Password",
         border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
       ),
-      validator: _password1Validator,
+      validator: Validator.validatePassword,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_registrationPending,
       style: _registrationPending
@@ -145,7 +145,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
         labelText: "Repeat password",
         border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
       ),
-      validator: _password2Validator,
+      validator: (password2) =>
+          Validator.validatePassword2(_password1, password2),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_registrationPending,
       style: _registrationPending
@@ -178,6 +179,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   bool get _formIsValid => _formKey.currentState!.validate();
 
+  bool get _inputsAreValid =>
+      Validator.validateUsername(_username) == null &&
+      Validator.validateEmail(_email) == null &&
+      Validator.validatePassword(_password1) == null &&
+      Validator.validatePassword2(_password1, _password2) == null;
+
   void _submit(BuildContext context) async {
     if (_formIsValid) {
       setState(() {
@@ -209,50 +216,4 @@ class _RegistrationPageState extends State<RegistrationPage> {
       _formKey.currentState!.deactivate();
     }
   }
-
-  String? _usernameValidator(String? username) {
-    if (username != null && username.isEmpty) {
-      return "Username must not be empty.";
-    } else if (username != null && username.contains(':')) {
-      return "Username must not contain ':'.";
-    } else {
-      return null;
-    }
-  }
-
-  String? _emailValidator(String? email) {
-    if (email == null) {
-      return null;
-    } else {
-      if (email.isEmpty) {
-        return "Email must not be empty.";
-      } else if (!EmailValidator.validate(email)) {
-        return "Input is not a valid email.";
-      } else {
-        return null;
-      }
-    }
-  }
-
-  String? _password1Validator(String? password) {
-    if (password != null && password.isEmpty) {
-      return "Password must not be empty";
-    } else {
-      return null;
-    }
-  }
-
-  String? _password2Validator(String? password) {
-    if (password != null && password != _password1) {
-      return "Passwords do not match.";
-    } else {
-      return null;
-    }
-  }
-
-  bool get _inputsAreValid =>
-      _usernameValidator(_username) == null &&
-      _emailValidator(_email) == null &&
-      _password1Validator(_password1) == null &&
-      _password2Validator(_password2) == null;
 }
