@@ -31,9 +31,21 @@ class Account {
     }
   }
 
-  static Future<Result<User, String>> setUsername(String username) async {
+  static Future<Result<User, String>> editUser(
+      {String? username, String? password, String? email}) async {
     final user = Settings.instance.user!;
-    user.username = username;
+    if (username == null && password == null && email == null) {
+      return Success(user);
+    }
+    if (username != null) {
+      user.username = username;
+    }
+    if (password != null) {
+      user.password = password;
+    }
+    if (email != null) {
+      user.email = email;
+    }
     final result = await Api.instance.user.putSingle(user);
     if (result.isSuccess) {
       Settings.instance.user = user;

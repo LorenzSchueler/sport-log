@@ -94,7 +94,7 @@ class SettingsPageState extends State<SettingsPage> {
                 onFieldSubmitted: (username) async {
                   final validated = Validator.validateUsername(username);
                   if (validated == null) {
-                    final result = await Account.setUsername(username);
+                    final result = await Account.editUser(username: username);
                     if (result.isFailure) {
                       await showMessageDialog(
                           context: context,
@@ -105,6 +105,60 @@ class SettingsPageState extends State<SettingsPage> {
                     await showMessageDialog(
                         context: context,
                         title: "Changing Username Failed",
+                        text: validated);
+                  }
+                  setState(() {});
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.key),
+                  labelText: "Password",
+                  contentPadding: EdgeInsets.symmetric(vertical: 5),
+                ),
+                initialValue: Settings.instance.password,
+                style: const TextStyle(height: 1),
+                onFieldSubmitted: (password) async {
+                  final validated = Validator.validatePassword(password);
+                  if (validated == null) {
+                    final result = await Account.editUser(password: password);
+                    if (result.isFailure) {
+                      await showMessageDialog(
+                          context: context,
+                          title: "Changing Password Failed",
+                          text: result.failure);
+                    }
+                  } else {
+                    await showMessageDialog(
+                        context: context,
+                        title: "Changing Password Failed",
+                        text: validated);
+                  }
+                  setState(() {});
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.email),
+                  labelText: "Email",
+                  contentPadding: EdgeInsets.symmetric(vertical: 5),
+                ),
+                initialValue: Settings.instance.email,
+                style: const TextStyle(height: 1),
+                onFieldSubmitted: (email) async {
+                  final validated = Validator.validateEmail(email);
+                  if (validated == null) {
+                    final result = await Account.editUser(email: email);
+                    if (result.isFailure) {
+                      await showMessageDialog(
+                          context: context,
+                          title: "Changing Email Failed",
+                          text: result.failure);
+                    }
+                  } else {
+                    await showMessageDialog(
+                        context: context,
+                        title: "Changing Email Failed",
                         text: validated);
                   }
                   setState(() {});
