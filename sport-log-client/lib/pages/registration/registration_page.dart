@@ -83,9 +83,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
       validator: _usernameValidator,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_registrationPending,
-      style: !_registrationPending
-          ? null
-          : TextStyle(color: Theme.of(context).disabledColor),
+      style: _registrationPending
+          ? TextStyle(color: Theme.of(context).disabledColor)
+          : null,
       textInputAction: TextInputAction.next,
     );
   }
@@ -104,9 +104,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
       validator: _emailValidator,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_registrationPending,
-      style: !_registrationPending
-          ? null
-          : TextStyle(color: Theme.of(context).disabledColor),
+      style: _registrationPending
+          ? TextStyle(color: Theme.of(context).disabledColor)
+          : null,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.emailAddress,
     );
@@ -126,9 +126,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
       validator: _password1Validator,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_registrationPending,
-      style: !_registrationPending
-          ? null
-          : TextStyle(color: Theme.of(context).disabledColor),
+      style: _registrationPending
+          ? TextStyle(color: Theme.of(context).disabledColor)
+          : null,
       textInputAction: TextInputAction.next,
       obscureText: true,
     );
@@ -148,9 +148,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
       validator: _password2Validator,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_registrationPending,
-      style: !_registrationPending
-          ? null
-          : TextStyle(color: Theme.of(context).disabledColor),
+      style: _registrationPending
+          ? TextStyle(color: Theme.of(context).disabledColor)
+          : null,
       textInputAction: TextInputAction.done,
       obscureText: true,
       onFieldSubmitted: (!_registrationPending && _inputsAreValid)
@@ -180,8 +180,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   void _submit(BuildContext context) async {
     if (_formIsValid) {
-      //context.read<RegistrationBloc>().add(SubmitRegistration(
-      //username: _username, email: _email, password: _password1));
       setState(() {
         _registrationPending = true;
       });
@@ -215,19 +213,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
   String? _usernameValidator(String? username) {
     if (username != null && username.isEmpty) {
       return "Username must not be empty.";
-    }
-    if (username != null && username.contains(':')) {
+    } else if (username != null && username.contains(':')) {
       return "Username must not contain ':'.";
+    } else {
+      return null;
     }
   }
 
   String? _emailValidator(String? email) {
-    if (email != null) {
+    if (email == null) {
+      return null;
+    } else {
       if (email.isEmpty) {
         return "Email must not be empty.";
-      }
-      if (!EmailValidator.validate(email)) {
+      } else if (!EmailValidator.validate(email)) {
         return "Input is not a valid email.";
+      } else {
+        return null;
       }
     }
   }
@@ -235,12 +237,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
   String? _password1Validator(String? password) {
     if (password != null && password.isEmpty) {
       return "Password must not be empty";
+    } else {
+      return null;
     }
   }
 
   String? _password2Validator(String? password) {
     if (password != null && password != _password1) {
       return "Passwords do not match.";
+    } else {
+      return null;
     }
   }
 
@@ -249,8 +255,4 @@ class _RegistrationPageState extends State<RegistrationPage> {
       _emailValidator(_email) == null &&
       _password1Validator(_password1) == null &&
       _password2Validator(_password2) == null;
-
-  static const Widget _padding = Padding(
-    padding: EdgeInsets.all(10),
-  );
 }
