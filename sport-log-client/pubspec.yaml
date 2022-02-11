@@ -35,7 +35,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   # cupertino_icons: ^1.0.2
 
-  flutter_bloc: ^7.0.1 # state management library
+  provider: ^6.0.2 # state management
   equatable: ^2.0.0 # makes classes equatable with little boilerplate code
   email_validator: ^2.0.1
   http: ^0.13.3

@@ -1,13 +1,10 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sport_log/app.dart';
-import 'package:sport_log/blocs/authentication_bloc.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/helpers/bloc_observer.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/test_data/movement_test_data.dart';
@@ -28,7 +25,6 @@ Future<void> initialize({bool doDownSync = true}) async {
   if (Config.generateTestData) {
     insertTestData();
   }
-  Bloc.observer = SimpleBlocObserver();
 }
 
 Future<void> insertTestData() async {
@@ -57,14 +53,9 @@ Future<void> insertTestData() async {
 
 void main() async {
   initialize().then((_) {
-    runApp(MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: AuthenticationBloc()),
-      ],
-      child: ChangeNotifierProvider.value(
-        value: Sync.instance,
-        child: const App(),
-      ),
+    runApp(ChangeNotifierProvider.value(
+      value: Sync.instance,
+      child: const App(),
     ));
   });
 }

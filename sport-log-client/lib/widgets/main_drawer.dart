@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sport_log/blocs/authentication_bloc.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
@@ -121,9 +120,8 @@ class MainDrawer extends StatelessWidget {
                 onPressed: sync.isSyncing
                     ? null
                     : () {
-                        context
-                            .read<AuthenticationBloc>()
-                            .add(const LogoutEvent());
+                        Sync.instance.stopSync();
+                        Settings.instance.user = null;
                         Nav.changeNamed(context, Routes.landing);
                       },
               ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/state/page_return.dart';
+import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
