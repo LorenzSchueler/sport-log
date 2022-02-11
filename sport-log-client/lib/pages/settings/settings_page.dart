@@ -8,6 +8,7 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/message_dialog.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -95,32 +96,16 @@ class SettingsPageState extends State<SettingsPage> {
                   if (validated == null) {
                     final result = await Account.setUsername(username);
                     if (result.isFailure) {
-                      await showDialog<void>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text("Changing Username Failed"),
-                          content: Text(result.failure),
-                          actions: [
-                            TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text("Ok")),
-                          ],
-                        ),
-                      );
+                      await showMessageDialog(
+                          context: context,
+                          title: "Changing Username Failed",
+                          text: result.failure);
                     }
                   } else {
-                    await showDialog<void>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("Changing Username Failed"),
-                        content: Text(validated),
-                        actions: [
-                          TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text("Ok")),
-                        ],
-                      ),
-                    );
+                    await showMessageDialog(
+                        context: context,
+                        title: "Changing Username Failed",
+                        text: validated);
                   }
                   setState(() {});
                 },

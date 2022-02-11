@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 Future<void> showMessageDialog({
   required BuildContext context,
-  required String? title,
+  String? title,
   required String text,
 }) async {
   return showDialog<void>(

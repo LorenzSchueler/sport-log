@@ -6,6 +6,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/message_dialog.dart';
 
 class OfflineMapsPage extends StatefulWidget {
   const OfflineMapsPage({Key? key}) : super(key: key);
@@ -32,16 +33,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
       setState(() {
         _progress = null;
       });
-      showDialog<void>(
-          context: context,
-          builder: (context) => AlertDialog(
-                title: const Text("Download Successful"),
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("OK")),
-                ],
-              ));
+      showMessageDialog(context: context, text: "Download Successful");
     } else if (status.runtimeType == InProgress) {
       setState(() {
         _progress = (status as InProgress).progress;
@@ -50,16 +42,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
       setState(() {
         _progress = null;
       });
-      showDialog<void>(
-          context: context,
-          builder: (context) => AlertDialog(
-                title: const Text("Download Failed"),
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("OK")),
-                ],
-              ));
+      showMessageDialog(context: context, text: "Download Failed");
     }
   }
 
@@ -87,18 +70,10 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
           onEvent: _onMapDownload,
           accessToken: Defaults.mapbox.accessToken);
     } else {
-      showDialog<void>(
+      showMessageDialog(
           context: context,
-          builder: (context) => AlertDialog(
-                title: const Text("Unknown BoundingBox"),
-                content:
-                    const Text("Please set northeast and southwest points"),
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("OK")),
-                ],
-              ));
+          text:
+              "Please set two points to form a BoundingBox by long pressing on the map.");
     }
   }
 

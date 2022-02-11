@@ -9,6 +9,7 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:mapbox_api/mapbox_api.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/widgets/message_dialog.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RouteEditPage extends StatefulWidget {
@@ -131,18 +132,10 @@ class RouteEditPageState extends State<RouteEditPage> {
 
   void _extendLine(LatLng location) async {
     if (_locations.length == 25) {
-      await showDialog<void>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Point maximum reached"),
-          content: const Text("You can only set 25 points."),
-          actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("OK"))
-          ],
-        ),
-      );
+      await showMessageDialog(
+          context: context,
+          title: "Point maximum reached",
+          text: "You can only set 25 points.");
       return;
     }
     setState(() {
