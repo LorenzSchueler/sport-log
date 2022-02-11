@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -9,6 +8,7 @@ import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
@@ -30,7 +30,7 @@ class RoutePageState extends State<RoutePage> {
   final List<Route> _routes = [
     Route(
         id: randomId(),
-        userId: UserState.instance.currentUser!.id,
+        userId: Settings.instance.userId!,
         name: "my route 1",
         distance: 10951,
         ascent: 456,

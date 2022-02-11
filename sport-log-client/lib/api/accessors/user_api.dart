@@ -20,7 +20,7 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       final user = User.fromJson(
           jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>)
         ..password = password;
-      UserState.instance.setUser(user);
+      Settings.instance.user = user;
       return Success(user);
     });
   }
@@ -42,13 +42,13 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       if (response.statusCode < 200 && response.statusCode >= 300) {
         return Failure(ApiError.unknown);
       }
-      UserState.instance.setUser(user);
+      Settings.instance.user = user;
       return Success(null);
     });
   }
 
   ApiResult<void> putSingle(User user) async {
-    assert(UserState.instance.currentUser!.id == user.id);
+    assert(Settings.instance.userId! == user.id);
     return _errorHandling((client) async {
       final body = user.toJson();
       _logRequest('PUT', route, body);
@@ -64,7 +64,7 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       if (response.statusCode < 200 && response.statusCode >= 300) {
         return Failure(ApiError.unknown);
       }
-      UserState.instance.setUser(user);
+      Settings.instance.user = user;
       return Success(null);
     });
   }
@@ -80,7 +80,7 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       if (response.statusCode < 200 && response.statusCode >= 300) {
         return Failure(ApiError.unknown);
       }
-      UserState.instance.deleteUser();
+      Settings.instance.user = null;
       return Success(null);
     });
   }

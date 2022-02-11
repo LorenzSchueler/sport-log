@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:polyline/polyline.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -9,6 +8,7 @@ import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:mapbox_api/mapbox_api.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RouteEditPage extends StatefulWidget {
@@ -45,7 +45,7 @@ class RouteEditPageState extends State<RouteEditPage> {
     _route = widget.route ??
         Route(
             id: randomId(),
-            userId: UserState.instance.currentUser!.id,
+            userId: Settings.instance.userId!,
             name: "",
             distance: 0,
             ascent: 0,

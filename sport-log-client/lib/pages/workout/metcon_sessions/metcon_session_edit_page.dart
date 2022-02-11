@@ -1,12 +1,12 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/form_widgets/metcon_picker.dart';
 import 'package:sport_log/widgets/form_widgets/time_form_field.dart';
@@ -33,7 +33,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
         MetconSessionDescription(
             metconSession: MetconSession(
                 id: randomId(),
-                userId: UserState.instance.currentUser!.id,
+                userId: Settings.instance.userId!,
                 metconId: Int64(1),
                 datetime: DateTime.now(),
                 time: null,
@@ -45,7 +45,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
             metconDescription: MetconDescription(
                 metcon: Metcon(
                     id: randomId(),
-                    userId: UserState.instance.currentUser!.id,
+                    userId: Settings.instance.userId!,
                     name: "cindy",
                     metconType: MetconType.forTime,
                     rounds: 3,
@@ -65,7 +65,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                           deleted: false),
                       movement: Movement(
                           id: randomId(),
-                          userId: UserState.instance.currentUser!.id,
+                          userId: Settings.instance.userId!,
                           name: "pullup",
                           description: null,
                           cardio: false,

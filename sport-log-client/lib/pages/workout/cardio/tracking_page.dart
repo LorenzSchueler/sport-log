@@ -2,7 +2,6 @@ import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:flutter/material.dart' hide Route;
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
 import 'dart:async';
 import 'package:sport_log/helpers/id_generation.dart';
@@ -10,6 +9,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 enum TrackingMode { notStarted, tracking, paused, stopped }
@@ -81,7 +81,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   CardioSession _saveCardioSession() {
     CardioSession cardioSession = CardioSession(
       id: randomId(),
-      userId: UserState.instance.currentUser!.id,
+      userId: Settings.instance.userId!,
       movementId: widget._movement.id,
       cardioType: widget._cardioType,
       datetime: _startTime,

@@ -7,7 +7,6 @@ import 'package:logger/logger.dart' as l;
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api_error.dart';
 import 'package:sport_log/config.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/settings.dart';

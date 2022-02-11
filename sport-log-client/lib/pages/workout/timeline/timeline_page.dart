@@ -1,6 +1,5 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
@@ -23,6 +22,7 @@ import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_overview_
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 class TimelinePage extends StatefulWidget {
@@ -44,7 +44,7 @@ class TimelinePageState extends State<TimelinePage> {
       TimelineUnion.strengthSession(StrengthSessionWithStats(
           session: StrengthSession(
               id: randomId(),
-              userId: UserState.instance.currentUser!.id,
+              userId: Settings.instance.userId!,
               datetime: DateTime.now(),
               movementId: Int64(1),
               interval: const Duration(seconds: 120),
@@ -52,7 +52,7 @@ class TimelinePageState extends State<TimelinePage> {
               deleted: false),
           movement: Movement(
               id: randomId(),
-              userId: UserState.instance.currentUser!.id,
+              userId: Settings.instance.userId!,
               name: "My Movement",
               description: null,
               cardio: true,
@@ -72,7 +72,7 @@ class TimelinePageState extends State<TimelinePage> {
       TimelineUnion.metconSession(MetconSessionDescription(
           metconSession: MetconSession(
               id: randomId(),
-              userId: UserState.instance.currentUser!.id,
+              userId: Settings.instance.userId!,
               metconId: Int64(1),
               datetime: DateTime.now(),
               time: 15 * 60,
@@ -84,7 +84,7 @@ class TimelinePageState extends State<TimelinePage> {
           metconDescription: MetconDescription(
               metcon: Metcon(
                   id: randomId(),
-                  userId: UserState.instance.currentUser!.id,
+                  userId: Settings.instance.userId!,
                   name: "cindy",
                   metconType: MetconType.amrap,
                   rounds: 3,
@@ -104,7 +104,7 @@ class TimelinePageState extends State<TimelinePage> {
                         deleted: false),
                     movement: Movement(
                         id: randomId(),
-                        userId: UserState.instance.currentUser!.id,
+                        userId: Settings.instance.userId!,
                         name: "pullup",
                         description: null,
                         cardio: false,
@@ -117,7 +117,7 @@ class TimelinePageState extends State<TimelinePage> {
       TimelineUnion.cardioSession(
         CardioSession(
             id: randomId(),
-            userId: UserState.instance.currentUser!.id,
+            userId: Settings.instance.userId!,
             movementId: Int64(1),
             cardioType: CardioType.training,
             datetime: DateTime.now().subtract(const Duration(days: 1)),
@@ -158,7 +158,7 @@ class TimelinePageState extends State<TimelinePage> {
     var diaries = [
       TimelineUnion.diary(Diary(
           id: randomId(),
-          userId: UserState.instance.currentUser!.id,
+          userId: Settings.instance.userId!,
           date: DateTime.now().subtract(const Duration(days: 3)),
           bodyweight: 80.0,
           comments: "bla",

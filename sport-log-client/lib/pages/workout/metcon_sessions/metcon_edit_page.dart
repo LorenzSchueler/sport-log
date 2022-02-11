@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/form_widgets/int_picker.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
@@ -36,7 +36,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
   void initState() {
     super.initState();
     _md = widget._initialMetcon ??
-        MetconDescription.defaultValue(UserState.instance.currentUser!.id);
+        MetconDescription.defaultValue(Settings.instance.userId!);
   }
 
   void _setName(String name) {

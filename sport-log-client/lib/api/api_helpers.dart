@@ -10,11 +10,9 @@ mixin ApiHeaders {
   }
 
   Map<String, String> get _authorizedHeader {
-    final user = UserState.instance.currentUser;
-    assert(user != null);
-    final username = user!.username;
-    final password = user.password;
-    return _makeAuthorizedHeader(username, password);
+    assert(Settings.instance.userExists());
+    return _makeAuthorizedHeader(
+        Settings.instance.username!, Settings.instance.password!);
   }
 
   Map<String, String> get _jsonContentTypeHeader => {

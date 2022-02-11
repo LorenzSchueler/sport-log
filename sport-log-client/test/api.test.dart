@@ -3,11 +3,11 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/main.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/settings.dart';
 
 final _logger = Logger('TEST');
 
@@ -41,7 +41,7 @@ void testUser(Api api) {
 
 void testAction(Api api) async {
   test('get action providers', () async {
-    UserState.instance.setUser(sampleUser);
+    Settings.instance.user = sampleUser;
     expect(await api.actionProviders.getMultiple(), isA<Success>());
   });
 }
@@ -57,7 +57,7 @@ void testDiary(Api api) async {
       deleted: false,
     );
 
-    UserState.instance.setUser(sampleUser);
+    Settings.instance.user = sampleUser;
     expect(await api.diaries.postSingle(diary), isA<Success>());
     expect(await api.diaries.getMultiple(), isA<Success>());
     final date = faker.date.dateTime();
@@ -82,7 +82,7 @@ void testStrengthSession(Api api) async {
       deleted: false,
     );
 
-    UserState.instance.setUser(sampleUser);
+    Settings.instance.user = sampleUser;
     expect(
         await api.strengthSessions.postSingle(strengthSession), isA<Success>());
     expect(await api.strengthSessions.getMultiple(), isA<Success>());
@@ -115,7 +115,7 @@ void testActionRule(Api api) async {
       enabled: true,
       deleted: false,
     );
-    UserState.instance.setUser(sampleUser);
+    Settings.instance.user = sampleUser;
     expect(await api.actionRules.postSingle(actionRule), isA<Success>());
     expect(await api.actionRules.getMultiple(), isA<Success>());
     actionRule.time = DateTime(

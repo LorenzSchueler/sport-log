@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
+import 'package:sport_log/blocs/authentication_bloc.dart';
 import 'package:sport_log/data_provider/sync.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 
 import 'spinning_sync.dart';
@@ -22,13 +22,12 @@ class MainDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = UserState.instance.currentUser!;
     return Drawer(
       child: Column(
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text(user.username),
-            accountEmail: Text(user.email),
+            accountName: Text(Settings.instance.username!),
+            accountEmail: Text(Settings.instance.email!),
           ),
           ListTile(
             title: const Text('Workout Tracking'),

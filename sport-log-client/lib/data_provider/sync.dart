@@ -5,7 +5,6 @@ import 'package:hive/hive.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -33,9 +32,9 @@ class Sync extends ChangeNotifier {
     if (Config.deleteDatabase) {
       _removeLastSync();
     }
-    if (UserState.instance.currentUser != null) {
+    if (Settings.instance.userExists()) {
       Future(() => sync());
-      login();
+      startSync();
     }
   }
 
@@ -44,7 +43,7 @@ class Sync extends ChangeNotifier {
       _logger.d('Sync is alread running.');
       return;
     }
-    if (UserState.instance.currentUser == null) {
+    if (!Settings.instance.userExists()) {
       _logger.d('Sync cannot be run: no user.');
       return;
     }
@@ -59,21 +58,19 @@ class Sync extends ChangeNotifier {
     notifyListeners();
   }
 
-  void login() {
-    assert(UserState.instance.currentUser != null);
-    if (UserState.instance.currentUser == null) {
-      _logger.e('Login, but no user found.');
-      return;
-    }
+  void startSync() {
+    assert(Settings.instance.userExists());
     if (_syncTimer != null && _syncTimer!.isActive) {
       _logger.d('Login, but timer is active.');
       return;
     }
+    _logger.d('First sync');
+    Future(() => sync());
     _logger.d('Starting sync timer...');
     _syncTimer = Timer.periodic(Settings.instance.syncInterval, (_) => sync());
   }
 
-  void logout() {
+  void stopSync() {
     if (_syncTimer != null) {
       // TODO: what if sync is running and database will be deleted?
       _logger.d('Stopping sync timer...');

@@ -1,6 +1,5 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
@@ -8,6 +7,7 @@ import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
@@ -26,7 +26,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
     MetconSessionDescription(
         metconSession: MetconSession(
             id: randomId(),
-            userId: UserState.instance.currentUser!.id,
+            userId: Settings.instance.userId!,
             metconId: Int64(1),
             datetime: DateTime.now(),
             time: 15 * 60,
@@ -38,7 +38,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         metconDescription: MetconDescription(
             metcon: Metcon(
                 id: randomId(),
-                userId: UserState.instance.currentUser!.id,
+                userId: Settings.instance.userId!,
                 name: "cindy",
                 metconType: MetconType.amrap,
                 rounds: null,
@@ -58,7 +58,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                       deleted: false),
                   movement: Movement(
                       id: randomId(),
-                      userId: UserState.instance.currentUser!.id,
+                      userId: Settings.instance.userId!,
                       name: "pullup",
                       description: null,
                       cardio: false,
@@ -69,7 +69,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
     MetconSessionDescription(
         metconSession: MetconSession(
             id: randomId(),
-            userId: UserState.instance.currentUser!.id,
+            userId: Settings.instance.userId!,
             metconId: Int64(1),
             datetime: DateTime.now(),
             time: null,
@@ -81,7 +81,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         metconDescription: MetconDescription(
             metcon: Metcon(
                 id: randomId(),
-                userId: UserState.instance.currentUser!.id,
+                userId: Settings.instance.userId!,
                 name: null,
                 metconType: MetconType.emom,
                 rounds: 5,
@@ -101,7 +101,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                       deleted: false),
                   movement: Movement(
                       id: randomId(),
-                      userId: UserState.instance.currentUser!.id,
+                      userId: Settings.instance.userId!,
                       name: "pullup",
                       description: null,
                       cardio: false,
@@ -119,7 +119,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                       deleted: false),
                   movement: Movement(
                       id: randomId(),
-                      userId: UserState.instance.currentUser!.id,
+                      userId: Settings.instance.userId!,
                       name: "pushup",
                       description: null,
                       cardio: false,
@@ -130,7 +130,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
     MetconSessionDescription(
         metconSession: MetconSession(
             id: randomId(),
-            userId: UserState.instance.currentUser!.id,
+            userId: Settings.instance.userId!,
             metconId: Int64(1),
             datetime: DateTime.now(),
             time: 15 * 60,
@@ -142,7 +142,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         metconDescription: MetconDescription(
             metcon: Metcon(
                 id: randomId(),
-                userId: UserState.instance.currentUser!.id,
+                userId: Settings.instance.userId!,
                 name: "cindy",
                 metconType: MetconType.forTime,
                 rounds: 3,
@@ -162,7 +162,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                       deleted: false),
                   movement: Movement(
                       id: randomId(),
-                      userId: UserState.instance.currentUser!.id,
+                      userId: Settings.instance.userId!,
                       name: "pullup",
                       description: null,
                       cardio: false,
@@ -173,7 +173,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
     MetconSessionDescription(
         metconSession: MetconSession(
             id: randomId(),
-            userId: UserState.instance.currentUser!.id,
+            userId: Settings.instance.userId!,
             metconId: Int64(1),
             datetime: DateTime.now(),
             time: null,
@@ -185,7 +185,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         metconDescription: MetconDescription(
             metcon: Metcon(
                 id: randomId(),
-                userId: UserState.instance.currentUser!.id,
+                userId: Settings.instance.userId!,
                 name: "cindy",
                 metconType: MetconType.forTime,
                 rounds: 3,
@@ -205,7 +205,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                       deleted: false),
                   movement: Movement(
                       id: randomId(),
-                      userId: UserState.instance.currentUser!.id,
+                      userId: Settings.instance.userId!,
                       name: "pullup",
                       description: null,
                       cardio: false,

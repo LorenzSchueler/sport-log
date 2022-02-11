@@ -1,8 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sport_log/pages/registration/registration_form.dart';
-import 'package:sport_log/blocs/authentication/authentication_bloc.dart';
+import 'package:sport_log/blocs/authentication_bloc.dart';
 
 import 'registration_bloc.dart';
 

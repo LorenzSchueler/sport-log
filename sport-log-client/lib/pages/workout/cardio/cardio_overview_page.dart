@@ -1,7 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/list_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
@@ -13,6 +12,7 @@ import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -38,7 +38,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
   final List<CardioSession> _cardioSessions = [
     CardioSession(
         id: randomId(),
-        userId: UserState.instance.currentUser!.id,
+        userId: Settings.instance.userId!,
         movementId: Int64(1),
         cardioType: CardioType.training,
         datetime: DateTime.now(),
@@ -76,7 +76,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         deleted: false),
     CardioSession(
         id: randomId(),
-        userId: UserState.instance.currentUser!.id,
+        userId: Settings.instance.userId!,
         movementId: Int64(1),
         cardioType: CardioType.activeRecovery,
         datetime: DateTime.now(),

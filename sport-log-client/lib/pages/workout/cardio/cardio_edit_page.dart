@@ -1,13 +1,13 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/form_widgets/cardio_type_picker.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
@@ -35,7 +35,7 @@ class CardioEditPageState extends State<CardioEditPage> {
     _cardioSession = widget.cardioSession ??
         CardioSession(
           id: randomId(),
-          userId: UserState.instance.currentUser!.id,
+          userId: Settings.instance.userId!,
           movementId: Int64(1),
           cardioType: CardioType.training,
           datetime: DateTime.now(),

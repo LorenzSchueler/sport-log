@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/movement/all.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/approve_dialog.dart';
 import 'package:sport_log/widgets/form_widgets/selection_bar.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
@@ -19,15 +19,15 @@ class EditMovementPage extends StatefulWidget {
     Key? key,
     required String initialName,
   })  : _initialMovement =
-            MovementDescription.defaultValue(UserState.instance.currentUser!.id)
+            MovementDescription.defaultValue(Settings.instance.userId!)
               ..movement.name = initialName,
         _isEditing = false,
         super(key: key);
 
   EditMovementPage.newMovement({Key? key})
       : _isEditing = false,
-        _initialMovement = MovementDescription.defaultValue(
-            UserState.instance.currentUser!.id),
+        _initialMovement =
+            MovementDescription.defaultValue(Settings.instance.userId!),
         super(key: key);
 
   final MovementDescription _initialMovement;

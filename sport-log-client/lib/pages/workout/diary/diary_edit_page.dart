@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/state/page_return.dart';
 import 'package:sport_log/models/diary/diary.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 
 class DiaryEditPage extends StatefulWidget {
@@ -26,7 +26,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
     _diary = widget.diary ??
         Diary(
             id: randomId(),
-            userId: UserState.instance.currentUser!.id,
+            userId: Settings.instance.userId!,
             date: DateTime.now(),
             bodyweight: null,
             comments: null,

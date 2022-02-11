@@ -19,11 +19,6 @@ class AppDatabase {
     if (Config.deleteDatabase) {
       deleteDatabase(dbFileName);
       _logger.i('Deleting existing database...');
-      //final File databaseFile = File(await getDatabasesPath() + '/' + dbFileName);
-      //if (await databaseFile.exists()) {
-      //_logger.i('Clean start on: deleting existing database...');
-      //await databaseFile.delete();
-      //}
     }
     await openDatabase(
       dbFileName,

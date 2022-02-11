@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/user_state.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/id_generation.dart';
@@ -10,6 +9,7 @@ import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
@@ -27,35 +27,35 @@ class DiaryPageState extends State<DiaryPage> {
   final List<Diary> _diaries = [
     Diary(
         id: randomId(),
-        userId: UserState.instance.currentUser!.id,
+        userId: Settings.instance.userId!,
         date: DateTime.now(),
         bodyweight: null,
         comments: null,
         deleted: false),
     Diary(
         id: randomId(),
-        userId: UserState.instance.currentUser!.id,
+        userId: Settings.instance.userId!,
         date: DateTime.now().subtract(const Duration(days: 1)),
         bodyweight: 78.3,
         comments: null,
         deleted: false),
     Diary(
         id: randomId(),
-        userId: UserState.instance.currentUser!.id,
+        userId: Settings.instance.userId!,
         date: DateTime.now().subtract(const Duration(days: 2)),
         bodyweight: null,
         comments: "bla bli\nblub\n..la",
         deleted: false),
     Diary(
         id: randomId(),
-        userId: UserState.instance.currentUser!.id,
+        userId: Settings.instance.userId!,
         date: DateTime.now().subtract(const Duration(days: 3)),
         bodyweight: 80.0,
         comments: "bla",
         deleted: false),
     Diary(
         id: randomId(),
-        userId: UserState.instance.currentUser!.id,
+        userId: Settings.instance.userId!,
         date: DateTime.now().subtract(const Duration(days: 5)),
         bodyweight: 180.0,
         comments:
