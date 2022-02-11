@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' hide Route;
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:polyline/polyline.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -68,7 +68,7 @@ class RouteEditPageState extends State<RouteEditPage> {
   Future<void> _matchLocations() async {
     DirectionsApiResponse response = await mapbox.directions.request(
       profile: NavigationProfile.WALKING,
-      geometries: NavigationGeometries.POLYLINE6,
+      geometries: NavigationGeometries.POLYLINE,
       coordinates: _locations.map((e) => [e.latitude, e.longitude]).toList(),
     );
     if (response.error != null) {
@@ -83,15 +83,12 @@ class RouteEditPageState extends State<RouteEditPage> {
         _route.distance = navRoute.distance!.round();
       });
 
-      _route.track = Polyline.Decode(
-        encodedString: navRoute.geometry as String,
-        precision: 6,
-      )
-          .decodedCoords
+      _route.track = PolylinePoints()
+          .decodePolyline(navRoute.geometry as String)
           .map(
             (coordinate) => Position(
-                latitude: coordinate[0],
-                longitude: coordinate[1],
+                latitude: coordinate.latitude,
+                longitude: coordinate.longitude,
                 elevation: 0, // TODO
                 distance: 0, // TODO
                 time: 0), // TODO

@@ -57,7 +57,7 @@ dependencies:
 
   mapbox_gl: ^0.15.0 # mapping lib for osm
   mapbox_api: ^1.0.0
-  polyline: ^1.0.2
+  flutter_polyline_points: ^1.0.0
   location: ^4.3.0
   pedometer: ^3.0.0
   flutter_beep: ^1.0.0
