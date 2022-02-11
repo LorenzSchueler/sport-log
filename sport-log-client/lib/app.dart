@@ -21,7 +21,7 @@ import 'package:sport_log/pages/workout/metcon_sessions/metcon_edit_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_overview_page.dart';
 import 'package:sport_log/pages/movements/edit_page.dart';
 import 'package:sport_log/pages/movements/overview_page.dart';
-import 'package:sport_log/pages/registration/registration_page.dart';
+import 'package:sport_log/pages/login/registration_page.dart';
 import 'package:sport_log/pages/workout/diary/diary_edit_page.dart';
 import 'package:sport_log/pages/workout/diary/diary_overview_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_edit_page.dart';
