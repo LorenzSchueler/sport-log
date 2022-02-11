@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/data_provider/sync.dart';
+import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/snackbar.dart';
@@ -120,8 +121,7 @@ class MainDrawer extends StatelessWidget {
                 onPressed: sync.isSyncing
                     ? null
                     : () {
-                        Sync.instance.stopSync();
-                        Settings.instance.user = null;
+                        Account.logout();
                         Nav.changeNamed(context, Routes.landing);
                       },
               ),

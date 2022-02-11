@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/api/api.dart';
-import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
-import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/settings.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -128,34 +125,25 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  bool get _formIsValid => _formKey.currentState!.validate();
-
   bool get _inputsAreValid =>
       Validator.validateUsername(_username) == null &&
       Validator.validatePassword(_password) == null;
 
   void _submit(BuildContext context) async {
-    if (_formIsValid) {
+    if (_formKey.currentState!.validate()) {
       setState(() {
         _loginPending = true;
       });
-      final result = await Api.instance.user.getSingle(_username, _password);
+      final result = await Account.login(_username, _password);
+      setState(() {
+        _loginPending = false;
+      });
       if (result.isSuccess) {
-        setState(() {
-          _loginPending = false;
-        });
-        User user = result.success;
-        Settings.instance.user = user;
-        Sync.instance.startSync();
         Nav.changeNamed(context, Routes.timeline.overview);
       } else {
-        final snackBar = SnackBar(
-          content: Text(result.failure.toErrorMessage()),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        setState(() {
-          _loginPending = false;
-        });
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(result.failure),
+        ));
       }
       _formKey.currentState!.deactivate();
     }

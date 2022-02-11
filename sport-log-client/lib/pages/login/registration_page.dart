@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/api/api.dart';
-import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/settings.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);
@@ -177,8 +175,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  bool get _formIsValid => _formKey.currentState!.validate();
-
   bool get _inputsAreValid =>
       Validator.validateUsername(_username) == null &&
       Validator.validateEmail(_email) == null &&
@@ -186,7 +182,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       Validator.validatePassword2(_password1, _password2) == null;
 
   void _submit(BuildContext context) async {
-    if (_formIsValid) {
+    if (_formKey.currentState!.validate()) {
       setState(() {
         _registrationPending = true;
       });
@@ -196,22 +192,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
         username: _username,
         password: _password1,
       );
-      final result = await Api.instance.user.postSingle(user);
+      final result = await Account.register(user);
+      setState(() {
+        _registrationPending = false;
+      });
       if (result.isSuccess) {
-        setState(() {
-          _registrationPending = false;
-        });
-        Settings.instance.user = user;
-        Sync.instance.startSync();
         Nav.changeNamed(context, Routes.timeline.overview);
       } else {
-        final snackBar = SnackBar(
-          content: Text(result.failure.toErrorMessage()),
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result.failure)),
         );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        setState(() {
-          _registrationPending = false;
-        });
       }
       _formKey.currentState!.deactivate();
     }
