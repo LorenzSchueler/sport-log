@@ -89,10 +89,11 @@ class MainDrawer extends StatelessWidget {
               String title;
               if (sync.isSyncing) {
                 title = 'Syncing...';
-              } else if (sync.lastSync == null) {
+              } else if (Settings.instance.lastSync == null) {
                 title = 'No syncs yet';
               } else {
-                title = 'Last sync: ' + sync.lastSync!.toHumanWithTime();
+                title = 'Last sync: ' +
+                    Settings.instance.lastSync!.toHumanWithTime();
               }
               return ListTile(
                 title: Text(title),

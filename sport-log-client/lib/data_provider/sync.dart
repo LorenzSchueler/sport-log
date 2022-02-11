@@ -1,12 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart' show ChangeNotifier;
-import 'package:hive/hive.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/settings.dart';
@@ -20,27 +18,23 @@ class Sync extends ChangeNotifier {
 
   bool _isSyncing;
   bool get isSyncing => _isSyncing;
-  DateTime? get lastSync => _box.get(Keys.lastSync);
-
-  late final Box<DateTime> _box;
 
   static final Sync instance = Sync._();
   Sync._() : _isSyncing = false;
 
   Future<void> init() async {
-    _box = await Hive.openBox<DateTime>(Keys.lastSync);
     if (Config.deleteDatabase) {
-      _removeLastSync();
+      _logger.i('Removing last sync...');
+      Settings.instance.lastSync = null;
     }
     if (Settings.instance.userExists()) {
-      Future(() => sync());
       startSync();
     }
   }
 
   Future<void> sync({VoidCallback? onNoInternet}) async {
     if (_isSyncing == true) {
-      _logger.d('Sync is alread running.');
+      _logger.d('Sync job already running.');
       return;
     }
     if (!Settings.instance.userExists()) {
@@ -52,7 +46,8 @@ class Sync extends ChangeNotifier {
     final syncStart = DateTime.now();
     if (await _downSync(onNoInternet: onNoInternet)) {
       await _upSync();
-      _setLastSync(syncStart);
+      _logger.i('Setting last sync to $syncStart.');
+      Settings.instance.lastSync = syncStart;
     }
     _isSyncing = false;
     notifyListeners();
@@ -61,12 +56,11 @@ class Sync extends ChangeNotifier {
   void startSync() {
     assert(Settings.instance.userExists());
     if (_syncTimer != null && _syncTimer!.isActive) {
-      _logger.d('Login, but timer is active.');
+      _logger.d('Sync already enabled.');
       return;
     }
-    _logger.d('First sync');
+    _logger.d('Starting sync timer.');
     Future(() => sync());
-    _logger.d('Starting sync timer...');
     _syncTimer = Timer.periodic(Settings.instance.syncInterval, (_) => sync());
   }
 
@@ -77,16 +71,6 @@ class Sync extends ChangeNotifier {
       _syncTimer?.cancel();
       _syncTimer = null;
     }
-  }
-
-  void _setLastSync(DateTime dateTime) {
-    _logger.i('Setting last sync to $dateTime...');
-    _box.put(Keys.lastSync, dateTime);
-  }
-
-  void _removeLastSync() {
-    _logger.i('Removing last sync...');
-    _box.delete(Keys.lastSync);
   }
 
   List<DataProvider> get allDataProviders => [
@@ -110,7 +94,8 @@ class Sync extends ChangeNotifier {
   }
 
   Future<bool> _downSync({VoidCallback? onNoInternet}) async {
-    final accountDataResult = await Api.instance.accountData.get(lastSync);
+    final accountDataResult =
+        await Api.instance.accountData.get(Settings.instance.lastSync);
     if (accountDataResult.isFailure) {
       if (accountDataResult.failure == ApiError.noInternetConnection) {
         _logger.d('Tried sync but got no Internet connection.',

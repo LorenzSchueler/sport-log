@@ -24,6 +24,7 @@ class Settings {
   static const String _serverEnabled = "serverEnabled";
   static const String _serverUrl = "serverUrl";
   static const String _syncInterval = "syncInterval";
+  static const String _lastSync = "lastSync";
   static const String _units = "units";
   static const String _id = "id";
   static const String _username = "username";
@@ -68,6 +69,10 @@ class Settings {
     return _storage!.get(key)! as String;
   }
 
+  DateTime? _getDateTimeOptional(String key) {
+    return _storage!.get(key) as DateTime?;
+  }
+
   void _put(String key, dynamic value) {
     _storage!.put(key, value);
   }
@@ -94,6 +99,14 @@ class Settings {
 
   set syncInterval(Duration interval) {
     _put(_syncInterval, interval.inSeconds);
+  }
+
+  DateTime? get lastSync {
+    return _getDateTimeOptional(_lastSync);
+  }
+
+  set lastSync(DateTime? lastSync) {
+    _put(_lastSync, lastSync);
   }
 
   Units get units {
