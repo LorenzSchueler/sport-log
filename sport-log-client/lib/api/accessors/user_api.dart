@@ -13,15 +13,15 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       _logResponse(response);
       if (response.statusCode == 401) {
         return Failure(ApiError.loginFailed);
-      }
-      if (response.statusCode < 200 || response.statusCode >= 300) {
+      } else if (response.statusCode < 200 || response.statusCode >= 300) {
         return Failure(ApiError.unknown);
+      } else {
+        final user = User.fromJson(
+            jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>)
+          ..password = password;
+        Settings.instance.user = user;
+        return Success(user);
       }
-      final user = User.fromJson(
-          jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>)
-        ..password = password;
-      Settings.instance.user = user;
-      return Success(user);
     });
   }
 
@@ -36,14 +36,13 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       );
       _logResponse(response);
       if (response.statusCode == 409) {
-        // TODO: this could also be an id conflict
         return Failure(ApiError.usernameTaken);
-      }
-      if (response.statusCode < 200 && response.statusCode >= 300) {
+      } else if (response.statusCode < 200 || response.statusCode >= 300) {
         return Failure(ApiError.unknown);
+      } else {
+        Settings.instance.user = user;
+        return Success(null);
       }
-      Settings.instance.user = user;
-      return Success(null);
     });
   }
 
@@ -60,12 +59,12 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       _logResponse(response);
       if (response.statusCode == 409) {
         return Failure(ApiError.usernameTaken);
-      }
-      if (response.statusCode < 200 && response.statusCode >= 300) {
+      } else if (response.statusCode < 200 || response.statusCode >= 300) {
         return Failure(ApiError.unknown);
+      } else {
+        Settings.instance.user = user;
+        return Success(null);
       }
-      Settings.instance.user = user;
-      return Success(null);
     });
   }
 
@@ -77,11 +76,12 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
         headers: _authorizedHeader,
       );
       _logResponse(response);
-      if (response.statusCode < 200 && response.statusCode >= 300) {
+      if (response.statusCode < 200 || response.statusCode >= 300) {
         return Failure(ApiError.unknown);
+      } else {
+        Settings.instance.user = null;
+        return Success(null);
       }
-      Settings.instance.user = null;
-      return Success(null);
     });
   }
 }
