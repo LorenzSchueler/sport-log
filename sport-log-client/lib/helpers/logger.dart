@@ -12,7 +12,8 @@ class Logger extends l.Logger {
 }
 
 class _Printer extends l.PrettyPrinter {
-  _Printer(this.key) : super(methodCount: 0);
+  _Printer(this.key)
+      : super(methodCount: 0, errorMethodCount: 5, lineLength: 50);
 
   final String key;
 
