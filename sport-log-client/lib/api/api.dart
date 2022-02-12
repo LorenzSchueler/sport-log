@@ -21,7 +21,6 @@ part 'accessors/platform_api.dart';
 part 'accessors/strength_api.dart';
 part 'accessors/user_api.dart';
 part 'accessors/wod_api.dart';
-part 'api_helpers.dart';
 
 const String version = '/v1.0';
 
@@ -64,8 +63,7 @@ extension ToErrorMessage on ApiError {
 
 typedef ApiResult<T> = Future<Result<T, ApiError>>;
 
-abstract class Api<T extends JsonSerializable>
-    with ApiHeaders, ApiLogging, ApiHelpers {
+abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   static final accountData = AccountDataApi();
   static final user = UserApi();
   static final actions = ActionApi();
@@ -112,7 +110,7 @@ abstract class Api<T extends JsonSerializable>
       _logRequest('POST', singularRoute, body);
       final response = await client.post(
         _uri(singularRoute),
-        headers: _defaultHeaders,
+        headers: _ApiHeaders._defaultHeaders,
         body: jsonEncode(body),
       );
       _logResponse(response);
@@ -135,7 +133,7 @@ abstract class Api<T extends JsonSerializable>
       _logRequest('POST', pluralRoute, body);
       final response = await client.post(
         _uri(pluralRoute),
-        headers: _defaultHeaders,
+        headers: _ApiHeaders._defaultHeaders,
         body: jsonEncode(body),
       );
       _logResponse(response);
@@ -155,7 +153,7 @@ abstract class Api<T extends JsonSerializable>
       _logRequest('PUT', singularRoute, body);
       final response = await client.put(
         _uri(singularRoute),
-        headers: _defaultHeaders,
+        headers: _ApiHeaders._defaultHeaders,
         body: jsonEncode(body),
       );
       _logResponse(response);
@@ -175,7 +173,7 @@ abstract class Api<T extends JsonSerializable>
       _logRequest('PUT', pluralRoute, body);
       final response = await client.put(
         _uri(pluralRoute),
-        headers: _defaultHeaders,
+        headers: _ApiHeaders._defaultHeaders,
         body: jsonEncode(body),
       );
       _logResponse(response);
@@ -183,6 +181,92 @@ abstract class Api<T extends JsonSerializable>
         return Failure(ApiError.unknown);
       }
       return Success(null);
+    });
+  }
+}
+
+class _ApiHeaders {
+  static Map<String, String> _makeAuthorizedHeader(
+      String username, String password) {
+    final basicAuth =
+        'Basic ' + base64Encode(utf8.encode('$username:$password'));
+    return {'authorization': basicAuth};
+  }
+
+  static Map<String, String> get _authorizedHeader {
+    assert(Settings.instance.userExists());
+    return _makeAuthorizedHeader(
+        Settings.instance.username!, Settings.instance.password!);
+  }
+
+  static const Map<String, String> _jsonContentTypeHeader = {
+    'Content-Type': 'application/json; charset=UTF-8',
+  };
+
+  static Map<String, String> get _defaultHeaders => {
+        ..._authorizedHeader,
+        ..._jsonContentTypeHeader,
+      };
+}
+
+mixin ApiLogging {
+  static final logger = Logger('API');
+
+  String _prettyJson(dynamic json, {int indent = 2}) {
+    var spaces = ' ' * indent;
+    return JsonEncoder.withIndent(spaces).convert(json);
+  }
+
+  void _logRequest(String httpMethod, String route, [dynamic json]) {
+    json != null && Config.outputRequestJson
+        ? logger.d(
+            'request: $httpMethod ${Settings.instance.serverUrl}$route\n${_prettyJson(json)}')
+        : logger.d('request: $httpMethod ${Settings.instance.serverUrl}$route');
+  }
+
+  void _logResponse(Response response) {
+    final body = utf8.decode(response.bodyBytes);
+    final successful = response.statusCode >= 200 && response.statusCode < 300;
+    body.isNotEmpty && (!successful || Config.outputRequestJson)
+        ? logger.log(successful ? l.Level.debug : l.Level.error,
+            'response: ${response.statusCode}\n${_prettyJson(jsonDecode(body))}')
+        : logger.log(successful ? l.Level.debug : l.Level.error,
+            'response: ${response.statusCode}');
+  }
+}
+
+mixin ApiHelpers on ApiLogging {
+  final _client = Client();
+
+  Uri _uri(String route) => Uri.parse(Settings.instance.serverUrl + route);
+
+  ApiResult<R> _errorHandling<R>(
+      Future<Result<R, ApiError>> Function(Client client) req) async {
+    try {
+      return await req(_client);
+    } on SocketException {
+      return Failure(ApiError.noInternetConnection);
+    } on TypeError {
+      return Failure(ApiError.badJson);
+    } catch (e) {
+      ApiLogging.logger.e("Unhandled error", e);
+      return Failure(ApiError.unhandled);
+    }
+  }
+
+  ApiResult<R> _getRequest<R>(
+      String route, R Function(dynamic) fromJson) async {
+    return _errorHandling<R>((client) async {
+      _logRequest('GET', route);
+      final response = await client.get(
+        _uri(route),
+        headers: _ApiHeaders._authorizedHeader,
+      );
+      _logResponse(response);
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        return Failure(ApiError.unknown);
+      }
+      return Success(fromJson(jsonDecode(utf8.decode(response.bodyBytes))));
     });
   }
 }

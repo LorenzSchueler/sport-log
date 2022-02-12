@@ -1,6 +1,6 @@
 part of '../api.dart';
 
-class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
+class UserApi with ApiLogging, ApiHelpers {
   final String route = version + '/user';
 
   ApiResult<User> getSingle(String username, String password) {
@@ -8,7 +8,7 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       _logRequest('GET', route);
       final response = await client.get(
         _uri(route),
-        headers: _makeAuthorizedHeader(username, password),
+        headers: _ApiHeaders._makeAuthorizedHeader(username, password),
       );
       _logResponse(response);
       if (response.statusCode == 401) {
@@ -30,7 +30,7 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       _logRequest('POST', route, body);
       final response = await client.post(
         _uri(route),
-        headers: _jsonContentTypeHeader,
+        headers: _ApiHeaders._jsonContentTypeHeader,
         body: jsonEncode(body),
       );
       _logResponse(response);
@@ -51,7 +51,7 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       _logRequest('PUT', route, body);
       final response = await client.put(
         _uri(route),
-        headers: _defaultHeaders,
+        headers: _ApiHeaders._defaultHeaders,
         body: jsonEncode(body),
       );
       _logResponse(response);
@@ -70,7 +70,7 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       _logRequest('DELETE', route);
       final response = await client.delete(
         _uri(route),
-        headers: _authorizedHeader,
+        headers: _ApiHeaders._defaultHeaders,
       );
       _logResponse(response);
       if (response.statusCode < 200 || response.statusCode >= 300) {
