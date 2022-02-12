@@ -4,7 +4,7 @@ abstract class ApiAccessor<T> with ApiHeaders, ApiLogging, ApiHelpers {
   // things needed to be overridden
   T fromJson(Map<String, dynamic> json);
   Map<String, dynamic> toJson(T object);
-  String get singularRoute; // everything after url base, e. g. '/v1/user'
+  String get singularRoute; // everything after url base, e. g. '/v1.0/user'
   String get pluralRoute => singularRoute + 's';
 
   // actual methods

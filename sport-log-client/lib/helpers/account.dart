@@ -58,7 +58,19 @@ class Account {
     }
   }
 
-  static void logout() async {
+  static Future<Result<User, String>> setChangedUser(
+      String username, String password) async {
+    final result = await Api.instance.user.getSingle(username, password);
+    if (result.isSuccess) {
+      User user = result.success;
+      Settings.instance.user = user;
+      return Success(user);
+    } else {
+      return Failure(result.failure.toErrorMessage());
+    }
+  }
+
+  static Future<void> logout() async {
     Sync.instance.stopSync();
     Settings.instance.user = null;
     await AppDatabase.instance!.delete();

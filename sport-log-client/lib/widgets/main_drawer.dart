@@ -115,8 +115,8 @@ class MainDrawer extends StatelessWidget {
                 icon: const Icon(Icons.logout_sharp),
                 onPressed: sync.isSyncing
                     ? null
-                    : () {
-                        Account.logout();
+                    : () async {
+                        await Account.logout();
                         Nav.changeNamed(context, Routes.landing);
                       },
               ),
