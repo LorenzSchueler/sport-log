@@ -1,16 +1,16 @@
 part of '../api.dart';
 
-class RouteApi extends ApiAccessor<Route> {
+class RouteApi extends Api<Route> {
   @override
-  Route fromJson(Map<String, dynamic> json) => Route.fromJson(json);
+  Route _fromJson(Map<String, dynamic> json) => Route.fromJson(json);
 
   @override
   String get singularRoute => version + '/route';
 }
 
-class CardioSessionApi extends ApiAccessor<CardioSession> {
+class CardioSessionApi extends Api<CardioSession> {
   @override
-  CardioSession fromJson(Map<String, dynamic> json) =>
+  CardioSession _fromJson(Map<String, dynamic> json) =>
       CardioSession.fromJson(json);
 
   @override

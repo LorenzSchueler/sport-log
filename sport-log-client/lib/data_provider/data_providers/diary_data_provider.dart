@@ -11,7 +11,7 @@ class DiaryDataProvider extends DataProviderImpl<Diary>
   DiaryDataProvider._();
 
   @override
-  final ApiAccessor<Diary> api = Api.instance.diaries;
+  final Api<Diary> api = Api.diaries;
 
   @override
   final DbAccessor<Diary> db = AppDatabase.instance!.diaries;

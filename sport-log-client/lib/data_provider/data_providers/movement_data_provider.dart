@@ -11,7 +11,7 @@ class MovementDataProvider extends DataProviderImpl<Movement>
   MovementDataProvider._();
 
   @override
-  final ApiAccessor<Movement> api = Api.instance.movements;
+  final Api<Movement> api = Api.movements;
 
   @override
   final MovementTable db = AppDatabase.instance!.movements;

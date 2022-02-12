@@ -1,8 +1,8 @@
 part of '../api.dart';
 
-class MovementApi extends ApiAccessor<Movement> {
+class MovementApi extends Api<Movement> {
   @override
-  Movement fromJson(Map<String, dynamic> json) => Movement.fromJson(json);
+  Movement _fromJson(Map<String, dynamic> json) => Movement.fromJson(json);
 
   @override
   String get singularRoute => version + '/movement';

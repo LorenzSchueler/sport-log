@@ -2,7 +2,7 @@ import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
-import 'package:sport_log/api/api_error.dart';
+import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/helpers/extensions/list_extension.dart';
 import 'package:sport_log/helpers/page_return.dart';

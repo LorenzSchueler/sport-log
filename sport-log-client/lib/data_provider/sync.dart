@@ -95,7 +95,7 @@ class Sync extends ChangeNotifier {
 
   Future<bool> _downSync({VoidCallback? onNoInternet}) async {
     final accountDataResult =
-        await Api.instance.accountData.get(Settings.instance.lastSync);
+        await Api.accountData.get(Settings.instance.lastSync);
     if (accountDataResult.isFailure) {
       if (accountDataResult.failure == ApiError.noInternetConnection) {
         _logger.d('Tried sync but got no Internet connection.',

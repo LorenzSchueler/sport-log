@@ -1,8 +1,8 @@
 part of '../api.dart';
 
-class WodApi extends ApiAccessor<Wod> {
+class WodApi extends Api<Wod> {
   @override
-  Wod fromJson(Map<String, dynamic> json) => Wod.fromJson(json);
+  Wod _fromJson(Map<String, dynamic> json) => Wod.fromJson(json);
 
   @override
   String get singularRoute => version + '/wod';

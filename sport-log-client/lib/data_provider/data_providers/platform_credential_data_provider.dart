@@ -12,7 +12,7 @@ class PlatformCredentialDataProvider
   PlatformCredentialDataProvider._();
 
   @override
-  final ApiAccessor<PlatformCredential> api = Api.instance.platformCredentials;
+  final Api<PlatformCredential> api = Api.platformCredentials;
 
   @override
   final DbAccessor<PlatformCredential> db =

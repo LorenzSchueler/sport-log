@@ -1,8 +1,8 @@
 part of '../api.dart';
 
-class PlatformApi extends ApiAccessor<Platform> {
+class PlatformApi extends Api<Platform> {
   @override
-  Platform fromJson(Map<String, dynamic> json) => Platform.fromJson(json);
+  Platform _fromJson(Map<String, dynamic> json) => Platform.fromJson(json);
 
   @override
   String get singularRoute => version + '/platform';
@@ -22,9 +22,9 @@ class PlatformApi extends ApiAccessor<Platform> {
       throw UnimplementedError();
 }
 
-class PlatformCredentialApi extends ApiAccessor<PlatformCredential> {
+class PlatformCredentialApi extends Api<PlatformCredential> {
   @override
-  PlatformCredential fromJson(Map<String, dynamic> json) =>
+  PlatformCredential _fromJson(Map<String, dynamic> json) =>
       PlatformCredential.fromJson(json);
 
   @override

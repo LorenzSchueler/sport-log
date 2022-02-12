@@ -1,17 +1,17 @@
 part of '../api.dart';
 
-class MetconSessionApi extends ApiAccessor<MetconSession> {
+class MetconSessionApi extends Api<MetconSession> {
   @override
-  MetconSession fromJson(Map<String, dynamic> json) =>
+  MetconSession _fromJson(Map<String, dynamic> json) =>
       MetconSession.fromJson(json);
 
   @override
   String get singularRoute => version + '/metcon_session';
 }
 
-class MetconApi extends ApiAccessor<Metcon> {
+class MetconApi extends Api<Metcon> {
   @override
-  Metcon fromJson(Map<String, dynamic> json) => Metcon.fromJson(json);
+  Metcon _fromJson(Map<String, dynamic> json) => Metcon.fromJson(json);
 
   @override
   String get singularRoute => version + '/metcon';
@@ -21,7 +21,7 @@ class MetconApi extends ApiAccessor<Metcon> {
     assert(metconDescription.isValid());
     final result1 = await postSingle(metconDescription.metcon);
     if (result1.isSuccess) {
-      final result2 = await Api.instance.metconMovements.postMultiple(
+      final result2 = await Api.metconMovements.postMultiple(
           metconDescription.moves.map((mmd) => mmd.metconMovement).toList());
       if (result2.isSuccess) {
         return Success(null);
@@ -39,7 +39,7 @@ class MetconApi extends ApiAccessor<Metcon> {
     metconDescription.setDeleted();
     final result1 = await putSingle(metconDescription.metcon);
     if (result1.isSuccess) {
-      final result2 = await Api.instance.metconMovements.putMultiple(
+      final result2 = await Api.metconMovements.putMultiple(
           metconDescription.moves.map((mmd) => mmd.metconMovement).toList());
       if (result2.isSuccess) {
         return Success(null);
@@ -52,9 +52,9 @@ class MetconApi extends ApiAccessor<Metcon> {
   }
 }
 
-class MetconMovementApi extends ApiAccessor<MetconMovement> {
+class MetconMovementApi extends Api<MetconMovement> {
   @override
-  MetconMovement fromJson(Map<String, dynamic> json) =>
+  MetconMovement _fromJson(Map<String, dynamic> json) =>
       MetconMovement.fromJson(json);
 
   @override

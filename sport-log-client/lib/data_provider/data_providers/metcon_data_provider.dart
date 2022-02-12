@@ -11,8 +11,8 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
   static final instance = MetconDataProvider._();
   MetconDataProvider._();
 
-  final metconApi = Api.instance.metcons;
-  final metconMovementApi = Api.instance.metconMovements;
+  final metconApi = Api.metcons;
+  final metconMovementApi = Api.metconMovements;
 
   final metconDb = AppDatabase.instance!.metcons;
   final metconMovementDb = AppDatabase.instance!.metconMovements;

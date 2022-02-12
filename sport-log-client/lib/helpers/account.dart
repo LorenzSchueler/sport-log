@@ -9,7 +9,7 @@ class Account {
   Account._();
 
   static Future<Result<User, String>> register(User user) async {
-    final result = await Api.instance.user.postSingle(user);
+    final result = await Api.user.postSingle(user);
     if (result.isSuccess) {
       Settings.instance.user = user;
       await AppDatabase.instance!.open();
@@ -22,7 +22,7 @@ class Account {
 
   static Future<Result<User, String>> login(
       String username, String password) async {
-    final result = await Api.instance.user.getSingle(username, password);
+    final result = await Api.user.getSingle(username, password);
     if (result.isSuccess) {
       User user = result.success;
       Settings.instance.user = user;
@@ -49,7 +49,7 @@ class Account {
     if (email != null) {
       user.email = email;
     }
-    final result = await Api.instance.user.putSingle(user);
+    final result = await Api.user.putSingle(user);
     if (result.isSuccess) {
       Settings.instance.user = user;
       return Success(user);
@@ -60,7 +60,7 @@ class Account {
 
   static Future<Result<User, String>> setChangedUser(
       String username, String password) async {
-    final result = await Api.instance.user.getSingle(username, password);
+    final result = await Api.user.getSingle(username, password);
     if (result.isSuccess) {
       User user = result.success;
       Settings.instance.user = user;

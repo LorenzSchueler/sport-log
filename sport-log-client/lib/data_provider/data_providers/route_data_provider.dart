@@ -5,7 +5,7 @@ import 'package:sport_log/models/cardio/all.dart';
 class RouteDataProvider {
   final DbAccessor<Route> routeDb = AppDatabase.instance!.routes;
 
-  // final ApiAccessor<Route> routeApi = Api.instance.routes;
+  // final ApiAccessor<Route> routeApi = Api.routes;
 
   @override
   Future<List<Route>> getNonDeleted() async {

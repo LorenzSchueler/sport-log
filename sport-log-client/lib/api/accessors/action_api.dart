@@ -1,8 +1,8 @@
 part of '../api.dart';
 
-class ActionProviderApi extends ApiAccessor<ActionProvider> {
+class ActionProviderApi extends Api<ActionProvider> {
   @override
-  ActionProvider fromJson(Map<String, dynamic> json) =>
+  ActionProvider _fromJson(Map<String, dynamic> json) =>
       ActionProvider.fromJson(json);
 
   @override
@@ -25,9 +25,9 @@ class ActionProviderApi extends ApiAccessor<ActionProvider> {
       throw UnimplementedError();
 }
 
-class ActionApi extends ApiAccessor<Action> {
+class ActionApi extends Api<Action> {
   @override
-  Action fromJson(Map<String, dynamic> json) => Action.fromJson(json);
+  Action _fromJson(Map<String, dynamic> json) => Action.fromJson(json);
 
   @override
   String get singularRoute => version + '/action';
@@ -47,17 +47,18 @@ class ActionApi extends ApiAccessor<Action> {
       throw UnimplementedError();
 }
 
-class ActionRuleApi extends ApiAccessor<ActionRule> {
+class ActionRuleApi extends Api<ActionRule> {
   @override
-  ActionRule fromJson(Map<String, dynamic> json) => ActionRule.fromJson(json);
+  ActionRule _fromJson(Map<String, dynamic> json) => ActionRule.fromJson(json);
 
   @override
   String get singularRoute => version + '/action_rule';
 }
 
-class ActionEventApi extends ApiAccessor<ActionEvent> {
+class ActionEventApi extends Api<ActionEvent> {
   @override
-  ActionEvent fromJson(Map<String, dynamic> json) => ActionEvent.fromJson(json);
+  ActionEvent _fromJson(Map<String, dynamic> json) =>
+      ActionEvent.fromJson(json);
 
   @override
   String get singularRoute => version + '/action_event';

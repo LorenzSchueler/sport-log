@@ -12,7 +12,7 @@ class ActionEventDataProvider extends DataProviderImpl<ActionEvent>
   ActionEventDataProvider._();
 
   @override
-  final ApiAccessor<ActionEvent> api = Api.instance.actionEvents;
+  final Api<ActionEvent> api = Api.actionEvents;
 
   @override
   final DbAccessor<ActionEvent> db = AppDatabase.instance!.actionEvents;
@@ -28,7 +28,7 @@ class ActionRuleDataProvider extends DataProviderImpl<ActionRule>
   ActionRuleDataProvider._();
 
   @override
-  final ApiAccessor<ActionRule> api = Api.instance.actionRules;
+  final Api<ActionRule> api = Api.actionRules;
 
   @override
   final DbAccessor<ActionRule> db = AppDatabase.instance!.actionRules;

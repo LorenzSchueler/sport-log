@@ -12,8 +12,8 @@ class StrengthDataProvider extends DataProvider<StrengthSessionWithSets> {
   final strengthSetDb = AppDatabase.instance!.strengthSets;
   final movementDb = AppDatabase.instance!.movements;
 
-  final strengthSessionApi = Api.instance.strengthSessions;
-  final strengthSetApi = Api.instance.strengthSets;
+  final strengthSessionApi = Api.strengthSessions;
+  final strengthSetApi = Api.strengthSets;
 
   static final instance = StrengthDataProvider._();
   StrengthDataProvider._();

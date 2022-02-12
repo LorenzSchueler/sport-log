@@ -1,7 +1,5 @@
 part of 'api.dart';
 
-typedef ApiResult<T> = Future<Result<T, ApiError>>;
-
 mixin ApiHeaders {
   Map<String, String> _makeAuthorizedHeader(String username, String password) {
     final basicAuth =
