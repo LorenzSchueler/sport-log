@@ -1,6 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
@@ -38,7 +38,7 @@ extension DisplayName on DistanceUnit {
 }
 
 @JsonSerializable()
-class MetconMovement implements DbObject {
+class MetconMovement extends Entity {
   MetconMovement({
     required this.id,
     required this.metconId,
@@ -77,6 +77,7 @@ class MetconMovement implements DbObject {
   factory MetconMovement.fromJson(Map<String, dynamic> json) =>
       _$MetconMovementFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$MetconMovementToJson(this);
 
   @override

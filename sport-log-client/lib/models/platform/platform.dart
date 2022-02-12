@@ -1,13 +1,13 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'platform.g.dart';
 
 @JsonSerializable()
-class Platform implements DbObject {
+class Platform extends Entity {
   Platform({
     required this.id,
     required this.name,
@@ -24,6 +24,7 @@ class Platform implements DbObject {
   factory Platform.fromJson(Map<String, dynamic> json) =>
       _$PlatformFromJson(json);
 
+@override
   Map<String, dynamic> toJson() => _$PlatformToJson(this);
 
   @override

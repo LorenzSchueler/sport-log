@@ -1,4 +1,4 @@
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
 import 'metcon_movement.dart';

@@ -6,9 +6,6 @@ class RouteApi extends ApiAccessor<Route> {
 
   @override
   String get singularRoute => version + '/route';
-
-  @override
-  Map<String, dynamic> toJson(Route object) => object.toJson();
 }
 
 class CardioSessionApi extends ApiAccessor<CardioSession> {
@@ -18,7 +15,4 @@ class CardioSessionApi extends ApiAccessor<CardioSession> {
 
   @override
   String get singularRoute => version + '/cardio_session';
-
-  @override
-  Map<String, dynamic> toJson(CardioSession object) => object.toJson();
 }

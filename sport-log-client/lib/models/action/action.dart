@@ -1,14 +1,13 @@
-
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'action.g.dart';
 
 @JsonSerializable()
-class Action implements DbObject {
+class Action extends Entity {
   Action({
     required this.id,
     required this.name,
@@ -19,26 +18,31 @@ class Action implements DbObject {
     required this.deleted,
   });
 
-  @override @IdConverter() Int64 id;
+  @override
+  @IdConverter()
+  Int64 id;
   String name;
-  @IdConverter() Int64 actionProviderId;
+  @IdConverter()
+  Int64 actionProviderId;
   String? description;
   int createBefore;
   int deleteAfter;
-  @override bool deleted;
+  @override
+  bool deleted;
 
   factory Action.fromJson(Map<String, dynamic> json) => _$ActionFromJson(json);
+
+  @override
   Map<String, dynamic> toJson() => _$ActionToJson(this);
 
   @override
   bool isValid() {
-    return validate(name.isNotEmpty, 'Action: name is empty')
-        && validate(!deleted, 'Action: deleted is true');
+    return validate(name.isNotEmpty, 'Action: name is empty') &&
+        validate(!deleted, 'Action: deleted is true');
   }
 }
 
 class DbActionSerializer implements DbSerializer<Action> {
-
   @override
   Action fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Action(

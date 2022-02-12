@@ -6,7 +6,5 @@ class WodApi extends ApiAccessor<Wod> {
 
   @override
   String get singularRoute => version + '/wod';
-
-  @override
-  Map<String, dynamic> toJson(Wod object) => object.toJson();
+  String get x => (Wod).runtimeType.toString();
 }

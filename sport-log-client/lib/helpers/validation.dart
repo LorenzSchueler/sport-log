@@ -1,8 +1,5 @@
+import 'package:sport_log/helpers/logger.dart';
 import 'package:validators/validators.dart';
-
-import 'logger.dart';
-
-export 'interfaces.dart';
 
 final _logger = Logger('VALIDATION');
 

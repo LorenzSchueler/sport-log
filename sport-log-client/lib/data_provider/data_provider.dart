@@ -53,7 +53,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
   Future<void> upsertPartOfAccountData(AccountData accountData);
 }
 
-abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
+abstract class DataProviderImpl<T extends Entity> extends DataProvider<T> {
   ApiAccessor<T> get api;
 
   DbAccessor<T> get db;
@@ -119,7 +119,7 @@ abstract class DataProviderImpl<T extends DbObject> extends DataProvider<T> {
   }
 }
 
-mixin ConnectedMethods<T extends DbObject> on DataProviderImpl<T> {
+mixin ConnectedMethods<T extends Entity> on DataProviderImpl<T> {
   @override
   Future<void> createSingle(T object) async {
     assert(object.isValid());
@@ -159,7 +159,7 @@ mixin ConnectedMethods<T extends DbObject> on DataProviderImpl<T> {
   }
 }
 
-mixin UnconnectedMethods<T extends DbObject> on DataProviderImpl<T> {
+mixin UnconnectedMethods<T extends Entity> on DataProviderImpl<T> {
   @override
   Future<void> createSingle(T object) async {
     assert(object.isValid());

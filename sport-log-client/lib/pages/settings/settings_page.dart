@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/logger.dart';

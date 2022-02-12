@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/db_serialization.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
@@ -11,7 +11,7 @@ import 'package:sport_log/models/cardio/position.dart';
 part 'route.g.dart';
 
 @JsonSerializable()
-class Route extends DbObject with Comparable<Route> {
+class Route extends Entity with Comparable<Route> {
   Route({
     required this.id,
     required this.userId,
@@ -37,6 +37,8 @@ class Route extends DbObject with Comparable<Route> {
   bool deleted;
 
   factory Route.fromJson(Map<String, dynamic> json) => _$RouteFromJson(json);
+
+  @override
   Map<String, dynamic> toJson() => _$RouteToJson(this);
 
   @override

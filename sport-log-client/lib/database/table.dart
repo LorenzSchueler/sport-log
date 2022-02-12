@@ -3,9 +3,9 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'defs.dart';
+import 'db_interfaces.dart';
 
-export 'defs.dart';
+export 'db_interfaces.dart';
 
 abstract class DbAccessor<T extends DbObject> {
   List<String> get setupSql;

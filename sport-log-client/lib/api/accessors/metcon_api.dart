@@ -7,9 +7,6 @@ class MetconSessionApi extends ApiAccessor<MetconSession> {
 
   @override
   String get singularRoute => version + '/metcon_session';
-
-  @override
-  Map<String, dynamic> toJson(MetconSession object) => object.toJson();
 }
 
 class MetconApi extends ApiAccessor<Metcon> {
@@ -18,9 +15,6 @@ class MetconApi extends ApiAccessor<Metcon> {
 
   @override
   String get singularRoute => version + '/metcon';
-
-  @override
-  Map<String, dynamic> toJson(Metcon object) => object.toJson();
 
   // TODO: put this into data provider?
   ApiResult<void> postFull(MetconDescription metconDescription) async {
@@ -65,7 +59,4 @@ class MetconMovementApi extends ApiAccessor<MetconMovement> {
 
   @override
   String get singularRoute => version + '/metcon_movement';
-
-  @override
-  Map<String, dynamic> toJson(MetconMovement object) => object.toJson();
 }

@@ -1,13 +1,13 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'platform_credential.g.dart';
 
 @JsonSerializable()
-class PlatformCredential implements DbObject {
+class PlatformCredential extends Entity {
   PlatformCredential({
     required this.id,
     required this.userId,
@@ -32,6 +32,7 @@ class PlatformCredential implements DbObject {
   factory PlatformCredential.fromJson(Map<String, dynamic> json) =>
       _$PlatformCredentialFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$PlatformCredentialToJson(this);
 
   @override

@@ -6,7 +6,4 @@ class MovementApi extends ApiAccessor<Movement> {
 
   @override
   String get singularRoute => version + '/movement';
-
-  @override
-  Map<String, dynamic> toJson(Movement object) => object.toJson();
 }

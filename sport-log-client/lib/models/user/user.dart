@@ -1,6 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/helpers/validation.dart';

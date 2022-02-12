@@ -1,13 +1,13 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'wod.g.dart';
 
 @JsonSerializable()
-class Wod implements DbObject {
+class Wod extends Entity {
   Wod({
     required this.id,
     required this.userId,
@@ -29,6 +29,7 @@ class Wod implements DbObject {
 
   factory Wod.fromJson(Map<String, dynamic> json) => _$WodFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$WodToJson(this);
 
   @override

@@ -1,5 +1,5 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 
 import 'movement.dart';
 

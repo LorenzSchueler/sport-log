@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/db_serialization.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
@@ -20,7 +20,7 @@ enum CardioType {
 }
 
 @JsonSerializable()
-class CardioSession implements DbObject {
+class CardioSession extends Entity {
   CardioSession({
     required this.id,
     required this.userId,
@@ -72,6 +72,8 @@ class CardioSession implements DbObject {
 
   factory CardioSession.fromJson(Map<String, dynamic> json) =>
       _$CardioSessionFromJson(json);
+
+  @override
   Map<String, dynamic> toJson() => _$CardioSessionToJson(this);
 
   @override

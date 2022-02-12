@@ -1,13 +1,13 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'action_provider.g.dart';
 
 @JsonSerializable()
-class ActionProvider implements DbObject {
+class ActionProvider extends Entity {
   ActionProvider({
     required this.id,
     required this.name,
@@ -30,6 +30,8 @@ class ActionProvider implements DbObject {
 
   factory ActionProvider.fromJson(Map<String, dynamic> json) =>
       _$ActionProviderFromJson(json);
+
+  @override
   Map<String, dynamic> toJson() => _$ActionProviderToJson(this);
 
   @override

@@ -2,7 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/metcon/all.dart';

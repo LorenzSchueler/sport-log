@@ -1,13 +1,14 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'metcon_session.g.dart';
 
 @JsonSerializable()
-class MetconSession implements DbObject {
+class MetconSession extends Entity {
+  // JsonConvertable<MetconSession> {
   MetconSession({
     required this.id,
     required this.userId,
@@ -41,6 +42,7 @@ class MetconSession implements DbObject {
   factory MetconSession.fromJson(Map<String, dynamic> json) =>
       _$MetconSessionFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$MetconSessionToJson(this);
 
   @override

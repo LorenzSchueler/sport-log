@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
@@ -49,7 +49,7 @@ extension MovementDimensionStrings on MovementDimension {
 }
 
 @JsonSerializable()
-class Movement implements DbObject {
+class Movement extends Entity {
   Movement({
     required this.id,
     required this.userId,
@@ -84,6 +84,7 @@ class Movement implements DbObject {
   factory Movement.fromJson(Map<String, dynamic> json) =>
       _$MovementFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$MovementToJson(this);
 
   @override

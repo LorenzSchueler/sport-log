@@ -10,6 +10,4 @@ class DiaryApi extends ApiAccessor<Diary> {
   @override
   String get pluralRoute => version + '/diaries';
 
-  @override
-  Map<String, dynamic> toJson(Diary object) => object.toJson();
 }

@@ -1,6 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/action/weekday.dart';
@@ -8,7 +8,7 @@ import 'package:sport_log/models/action/weekday.dart';
 part 'action_rule.g.dart';
 
 @JsonSerializable()
-class ActionRule implements DbObject {
+class ActionRule extends Entity {
   ActionRule({
     required this.id,
     required this.userId,
@@ -37,6 +37,8 @@ class ActionRule implements DbObject {
 
   factory ActionRule.fromJson(Map<String, dynamic> json) =>
       _$ActionRuleFromJson(json);
+
+  @override
   Map<String, dynamic> toJson() => _$ActionRuleToJson(this);
 
   @override

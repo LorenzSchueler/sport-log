@@ -1,3 +1,4 @@
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/metcon.dart';

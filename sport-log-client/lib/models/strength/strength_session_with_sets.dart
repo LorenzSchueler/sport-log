@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/id_generation.dart';
-import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
 import 'package:sport_log/models/strength/strength_set.dart';

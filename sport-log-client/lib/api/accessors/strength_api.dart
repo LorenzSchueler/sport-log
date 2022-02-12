@@ -7,9 +7,6 @@ class StrengthSessionApi extends ApiAccessor<StrengthSession> {
 
   @override
   String get singularRoute => version + '/strength_session';
-
-  @override
-  Map<String, dynamic> toJson(StrengthSession object) => object.toJson();
 }
 
 class StrengthSetApi extends ApiAccessor<StrengthSet> {
@@ -18,7 +15,4 @@ class StrengthSetApi extends ApiAccessor<StrengthSet> {
 
   @override
   String get singularRoute => version + '/strength_set';
-
-  @override
-  Map<String, dynamic> toJson(StrengthSet object) => object.toJson();
 }

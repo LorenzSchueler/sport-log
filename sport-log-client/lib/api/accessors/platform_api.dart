@@ -8,9 +8,6 @@ class PlatformApi extends ApiAccessor<Platform> {
   String get singularRoute => version + '/platform';
 
   @override
-  Map<String, dynamic> toJson(Platform object) => object.toJson();
-
-  @override
   ApiResult<void> postSingle(Platform object) => throw UnimplementedError();
 
   @override
@@ -32,7 +29,4 @@ class PlatformCredentialApi extends ApiAccessor<PlatformCredential> {
 
   @override
   String get singularRoute => version + '/platform_credential';
-
-  @override
-  Map<String, dynamic> toJson(PlatformCredential object) => object.toJson();
 }

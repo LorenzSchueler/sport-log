@@ -106,6 +106,7 @@ class Sync extends ChangeNotifier {
       } else {
         _logger.e('Tried down sync, but got error.', accountDataResult.failure);
       }
+      // TODO catch unauthorized / forbidden and show popup to enter new credentials
       return false;
     } else {
       final accountData = accountDataResult.success;

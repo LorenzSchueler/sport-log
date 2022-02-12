@@ -1,11 +1,14 @@
 part of 'api.dart';
 
-abstract class ApiAccessor<T> with ApiHeaders, ApiLogging, ApiHelpers {
+abstract class ApiAccessor<T extends JsonSerializable>
+    with ApiHeaders, ApiLogging, ApiHelpers {
   // things needed to be overridden
   T fromJson(Map<String, dynamic> json);
-  Map<String, dynamic> toJson(T object);
   String get singularRoute; // everything after url base, e. g. '/v1.0/user'
+
+  // default impls
   String get pluralRoute => singularRoute + 's';
+  Map<String, dynamic> toJson(T object) => object.toJson();
 
   // actual methods
   ApiResult<T> getSingle(Int64 id) async {

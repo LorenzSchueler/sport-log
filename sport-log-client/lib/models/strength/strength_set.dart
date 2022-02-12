@@ -1,6 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/eorm.dart';
 import 'package:sport_log/helpers/formatting.dart';
@@ -10,7 +10,7 @@ import 'package:sport_log/models/movement/movement.dart';
 part 'strength_set.g.dart';
 
 @JsonSerializable()
-class StrengthSet implements DbObject {
+class StrengthSet extends Entity {
   StrengthSet({
     required this.id,
     required this.strengthSessionId,
@@ -34,6 +34,7 @@ class StrengthSet implements DbObject {
   factory StrengthSet.fromJson(Map<String, dynamic> json) =>
       _$StrengthSetFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$StrengthSetToJson(this);
 
   @override

@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
@@ -45,7 +45,7 @@ extension ToDisplayName on MetconType {
 }
 
 @JsonSerializable()
-class Metcon implements DbObject {
+class Metcon extends Entity {
   Metcon({
     required this.id,
     required this.userId,
@@ -63,8 +63,6 @@ class Metcon implements DbObject {
   @OptionalIdConverter()
   Int64? userId;
   String? name;
-
-  // TODO: rename type
   MetconType metconType;
   int? rounds;
   @DurationConverter()
@@ -87,6 +85,7 @@ class Metcon implements DbObject {
 
   factory Metcon.fromJson(Map<String, dynamic> json) => _$MetconFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$MetconToJson(this);
 
   bool validateMetconType() {

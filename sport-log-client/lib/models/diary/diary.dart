@@ -1,13 +1,13 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/defs.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'diary.g.dart';
 
 @JsonSerializable()
-class Diary implements DbObject {
+class Diary extends Entity {
   Diary({
     required this.id,
     required this.userId,
@@ -30,6 +30,8 @@ class Diary implements DbObject {
   bool deleted;
 
   factory Diary.fromJson(Map<String, dynamic> json) => _$DiaryFromJson(json);
+
+  @override
   Map<String, dynamic> toJson() => _$DiaryToJson(this);
 
   @override
