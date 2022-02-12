@@ -55,10 +55,12 @@ class SettingsPageState extends State<SettingsPage> {
                 TextFormField(
                   decoration: const InputDecoration(
                     icon: Icon(Icons.computer),
-                    labelText: "Server",
+                    labelText: "Server URL",
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
                   initialValue: Settings.instance.serverUrl,
+                  validator: Validator.validateUrl,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   style: const TextStyle(height: 1),
                   onFieldSubmitted: (serverUrl) => setState(() {
                     Settings.instance.serverUrl = serverUrl;
@@ -66,20 +68,33 @@ class SettingsPageState extends State<SettingsPage> {
                 ),
               if (Settings.instance.serverEnabled)
                 TextFormField(
-                  decoration: const InputDecoration(
-                    icon: Icon(CustomIcons.timeInterval),
-                    labelText: "Synchonization Interval (min)",
-                    contentPadding: EdgeInsets.symmetric(vertical: 5),
-                  ),
-                  keyboardType: TextInputType.number,
-                  initialValue:
-                      Settings.instance.syncInterval.inMinutes.toString(),
-                  style: const TextStyle(height: 1),
-                  onFieldSubmitted: (syncInterval) => setState(() {
-                    Settings.instance.syncInterval =
-                        Duration(minutes: int.parse(syncInterval));
-                  }),
-                ),
+                    decoration: const InputDecoration(
+                      icon: Icon(CustomIcons.timeInterval),
+                      labelText: "Synchonization Interval (min)",
+                      contentPadding: EdgeInsets.symmetric(vertical: 5),
+                    ),
+                    keyboardType: TextInputType.number,
+                    initialValue:
+                        Settings.instance.syncInterval.inMinutes.toString(),
+                    validator: (syncInterval) =>
+                        syncInterval != null && int.parse(syncInterval) <= 0
+                            ? "Interval must be greater than 0"
+                            : null,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    style: const TextStyle(height: 1),
+                    onFieldSubmitted: (syncInterval) async {
+                      final min = int.parse(syncInterval);
+                      if (min > 0) {
+                        setState(() {
+                          Settings.instance.syncInterval =
+                              Duration(minutes: min);
+                        });
+                      } else {
+                        await showMessageDialog(
+                            context: context,
+                            text: "Interval must be greater than 0");
+                      }
+                    }),
               Defaults.sizedBox.vertical.small,
               const Divider(),
               const CaptionTile(caption: "User Settings"),
@@ -90,6 +105,8 @@ class SettingsPageState extends State<SettingsPage> {
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
                 initialValue: Settings.instance.username,
+                validator: Validator.validateUsername,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 style: const TextStyle(height: 1),
                 onFieldSubmitted: (username) async {
                   final validated = Validator.validateUsername(username);
@@ -117,6 +134,8 @@ class SettingsPageState extends State<SettingsPage> {
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
                 initialValue: Settings.instance.password,
+                validator: Validator.validatePassword,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 style: const TextStyle(height: 1),
                 onFieldSubmitted: (password) async {
                   final validated = Validator.validatePassword(password);
@@ -144,6 +163,8 @@ class SettingsPageState extends State<SettingsPage> {
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
                 initialValue: Settings.instance.email,
+                validator: Validator.validateEmail,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 style: const TextStyle(height: 1),
                 onFieldSubmitted: (email) async {
                   final validated = Validator.validateEmail(email);
