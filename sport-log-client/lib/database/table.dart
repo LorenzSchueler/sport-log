@@ -1,4 +1,5 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/keys.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -11,7 +12,9 @@ abstract class DbAccessor<T extends DbObject> {
   String get tableName;
   DbSerializer<T> get serde;
 
-  late Database database;
+  Database get database {
+    return AppDatabase.instance!.database!;
+  }
 
   String get idAndDeletedAndStatus => '''
     id integer primary key,
@@ -25,10 +28,6 @@ abstract class DbAccessor<T extends DbObject> {
       update $tableName set sync_status = 1 where id = new.id and sync_status = 0;
     end;
   ''';
-
-  void setDatabase(Database db) {
-    database = db;
-  }
 
   Future<void> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
     await database.update(

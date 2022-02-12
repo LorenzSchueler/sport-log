@@ -12,16 +12,25 @@ class AppDatabase {
   static final AppDatabase? instance =
       Config.isAndroid || Config.isIOS ? AppDatabase._() : null;
 
+  Database? _database;
+  Database? get database {
+    return _database;
+  }
+
   AppDatabase._();
 
   Future<void> init() async {
-    const dbFileName = Config.databaseName;
     if (Config.deleteDatabase) {
-      deleteDatabase(dbFileName);
-      _logger.i('Deleting existing database...');
+      await delete();
+      await open();
     }
-    await openDatabase(
-      dbFileName,
+    // db is opened in Account.login and Account.register and deleted in Account.logout
+  }
+
+  Future<void> open() async {
+    _logger.i("Opening Database");
+    _database = await openDatabase(
+      Config.databaseName,
       version: 1,
       onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
       onCreate: (db, version) async {
@@ -35,13 +44,16 @@ class AppDatabase {
       },
       onUpgrade: null, // TODO
       onDowngrade: null, // TODO
-      onOpen: (db) async {
-        for (final table in allTables) {
-          table.setDatabase(db);
-        }
-        _logger.d("Database initialization done");
-      },
+      onOpen: (db) => _logger.d("Database initialization done"),
     );
+    _logger.i("Database ready");
+  }
+
+  Future<void> delete() async {
+    _logger.i("Deleting Database");
+    await deleteDatabase(Config.databaseName);
+    _database = null;
+    _logger.i('Database deleted');
   }
 
   Future<void> upsertAccountData(AccountData data,

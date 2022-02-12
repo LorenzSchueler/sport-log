@@ -165,11 +165,11 @@ class Settings {
       email = null;
       _logger.i("user deleted");
     } else {
-      _logger.i("user updated");
       userId = user.id;
       username = user.username;
       password = user.password;
       email = user.email;
+      _logger.i("user updated");
     }
   }
 

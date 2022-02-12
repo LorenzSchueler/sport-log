@@ -19,7 +19,6 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
         final user = User.fromJson(
             jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>)
           ..password = password;
-        Settings.instance.user = user;
         return Success(user);
       }
     });
@@ -40,7 +39,6 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       } else if (response.statusCode < 200 || response.statusCode >= 300) {
         return Failure(ApiError.unknown);
       } else {
-        Settings.instance.user = user;
         return Success(null);
       }
     });
@@ -62,7 +60,6 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       } else if (response.statusCode < 200 || response.statusCode >= 300) {
         return Failure(ApiError.unknown);
       } else {
-        Settings.instance.user = user;
         return Success(null);
       }
     });
@@ -79,7 +76,6 @@ class UserApi with ApiHeaders, ApiLogging, ApiHelpers {
       if (response.statusCode < 200 || response.statusCode >= 300) {
         return Failure(ApiError.unknown);
       } else {
-        Settings.instance.user = null;
         return Success(null);
       }
     });

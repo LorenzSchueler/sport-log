@@ -1,6 +1,7 @@
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/sync.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/settings.dart';
 
@@ -11,6 +12,7 @@ class Account {
     final result = await Api.instance.user.postSingle(user);
     if (result.isSuccess) {
       Settings.instance.user = user;
+      await AppDatabase.instance!.open();
       Sync.instance.startSync();
       return Success(user);
     } else {
@@ -24,6 +26,7 @@ class Account {
     if (result.isSuccess) {
       User user = result.success;
       Settings.instance.user = user;
+      await AppDatabase.instance!.open();
       Sync.instance.startSync();
       return Success(user);
     } else {
@@ -55,8 +58,9 @@ class Account {
     }
   }
 
-  static void logout() {
+  static void logout() async {
     Sync.instance.stopSync();
     Settings.instance.user = null;
+    await AppDatabase.instance!.delete();
   }
 }
