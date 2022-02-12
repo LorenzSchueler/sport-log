@@ -1,4 +1,4 @@
-import 'package:email_validator/email_validator.dart';
+import 'package:validators/validators.dart';
 
 import 'logger.dart';
 
@@ -17,6 +17,16 @@ bool validate(bool val, String message) {
 class Validator {
   Validator._();
 
+  static String? validateUrl(String? url) {
+    if (url != null && url.isEmpty) {
+      return "URL must not be empty.";
+    } else if (url != null && !isURL(url, protocols: ["http", "https"])) {
+      return "URL is not valid.";
+    } else {
+      return null;
+    }
+  }
+
   static String? validateUsername(String? username) {
     if (username != null && username.isEmpty) {
       return "Username must not be empty.";
@@ -34,11 +44,12 @@ class Validator {
   }
 
   static String? validatePassword2(String? password, String? password2) {
-    if (password != null && password2 != null && password == password2) {
-      return null;
-    } else {
-      return "Passwords do not match.";
-    }
+    return password != null &&
+            password2 != null &&
+            password2.isNotEmpty &&
+            password == password2
+        ? null
+        : "Passwords do not match";
   }
 
   static String? validateEmail(String? email) {
@@ -47,7 +58,7 @@ class Validator {
     } else {
       if (email.isEmpty) {
         return "Email must not be empty.";
-      } else if (!EmailValidator.validate(email)) {
+      } else if (!isEmail(email)) {
         return "Input is not a valid email.";
       } else {
         return null;

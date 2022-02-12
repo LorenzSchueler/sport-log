@@ -42,11 +42,7 @@ class Settings {
         _storage!.put(_serverEnabled, true);
       }
       if (!_storage!.containsKey(_serverUrl)) {
-        _storage!.put(
-            _serverUrl,
-            await Config.isAndroidEmulator
-                ? Defaults.server.emulatorUrl
-                : Defaults.server.url);
+        await setDefaultServerUrl();
       }
       if (!_storage!.containsKey(_syncInterval)) {
         _storage!.put(_syncInterval, 300);
@@ -55,6 +51,14 @@ class Settings {
         _storage!.put(_units, "metric");
       }
     }
+  }
+
+  Future<void> setDefaultServerUrl() async {
+    _storage!.put(
+        _serverUrl,
+        await Config.isAndroidEmulator
+            ? Defaults.server.emulatorUrl
+            : Defaults.server.url);
   }
 
   bool _getBool(String key) {

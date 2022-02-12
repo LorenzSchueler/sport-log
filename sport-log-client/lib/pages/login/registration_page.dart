@@ -6,6 +6,7 @@ import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);
@@ -17,54 +18,95 @@ class RegistrationPage extends StatefulWidget {
 class _RegistrationPageState extends State<RegistrationPage> {
   final _formKey = GlobalKey<FormState>();
 
-  // TODO: use User class
+  String _serverUrl = Settings.instance.serverUrl;
   String _username = "";
-  String _email = "";
   String _password1 = "";
   String _password2 = "";
+  String _email = "";
 
   bool _registrationPending = false;
+
+  late TextEditingController _serverUrlInputController;
+
+  @override
+  void initState() {
+    super.initState();
+    _serverUrlInputController = TextEditingController(text: _serverUrl);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Register")),
-      body: Padding(
+      body: Container(
         padding: const EdgeInsets.all(5),
         child: Center(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 500.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _usernameInput(context),
-                  Defaults.sizedBox.vertical.normal,
-                  _emailInput(context),
-                  Defaults.sizedBox.vertical.normal,
-                  _passwordInput1(context),
-                  Defaults.sizedBox.vertical.normal,
-                  _passwordInput2(context),
-                  Defaults.sizedBox.vertical.normal,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      if (_registrationPending)
-                        Container(
-                          child: const CircularProgressIndicator(),
-                          margin: const EdgeInsets.only(right: 20),
-                        ),
-                      _submitButton(context),
-                    ],
-                  )
-                ],
-              ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _serverUrlInput(context),
+                Defaults.sizedBox.vertical.normal,
+                _usernameInput(context),
+                Defaults.sizedBox.vertical.normal,
+                _passwordInput1(context),
+                Defaults.sizedBox.vertical.normal,
+                _passwordInput2(context),
+                Defaults.sizedBox.vertical.normal,
+                _emailInput(context),
+                Defaults.sizedBox.vertical.normal,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (_registrationPending)
+                      Container(
+                        child: const CircularProgressIndicator(),
+                        margin: const EdgeInsets.only(right: 20),
+                      ),
+                    _submitButton(context),
+                  ],
+                )
+              ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _serverUrlInput(BuildContext context) {
+    return Row(children: [
+      Expanded(
+        child: TextFormField(
+          onChanged: (serverUrl) {
+            setState(() {
+              _serverUrl = serverUrl;
+            });
+          },
+          controller: _serverUrlInputController,
+          decoration: InputDecoration(
+            labelText: "Server URL",
+            border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
+          ),
+          validator: Validator.validateUrl,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          enabled: !_registrationPending,
+          style: _registrationPending
+              ? TextStyle(color: Theme.of(context).disabledColor)
+              : null,
+          textInputAction: TextInputAction.next,
+        ),
+      ),
+      IconButton(
+          onPressed: () async {
+            await Settings.instance.setDefaultServerUrl();
+            setState(() {
+              _serverUrlInputController.text = Settings.instance.serverUrl;
+            });
+          },
+          icon: const Icon(Icons.settings_backup_restore))
+    ]);
   }
 
   Widget _usernameInput(BuildContext context) {
@@ -85,28 +127,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
           ? TextStyle(color: Theme.of(context).disabledColor)
           : null,
       textInputAction: TextInputAction.next,
-    );
-  }
-
-  Widget _emailInput(BuildContext context) {
-    return TextFormField(
-      onChanged: (email) {
-        setState(() {
-          _email = email;
-        });
-      },
-      decoration: InputDecoration(
-        labelText: "Email",
-        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
-      ),
-      validator: Validator.validateEmail,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      enabled: !_registrationPending,
-      style: _registrationPending
-          ? TextStyle(color: Theme.of(context).disabledColor)
-          : null,
-      textInputAction: TextInputAction.next,
-      keyboardType: TextInputType.emailAddress,
     );
   }
 
@@ -158,6 +178,28 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
+  Widget _emailInput(BuildContext context) {
+    return TextFormField(
+      onChanged: (email) {
+        setState(() {
+          _email = email;
+        });
+      },
+      decoration: InputDecoration(
+        labelText: "Email",
+        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
+      ),
+      validator: Validator.validateEmail,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      enabled: !_registrationPending,
+      style: _registrationPending
+          ? TextStyle(color: Theme.of(context).disabledColor)
+          : null,
+      textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.emailAddress,
+    );
+  }
+
   Widget _submitButton(BuildContext context) {
     return ElevatedButton(
       child: const Text(
@@ -176,6 +218,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   bool get _inputsAreValid =>
+      Validator.validateUrl(_serverUrl) == null &&
       Validator.validateUsername(_username) == null &&
       Validator.validateEmail(_email) == null &&
       Validator.validatePassword(_password1) == null &&
@@ -186,6 +229,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       setState(() {
         _registrationPending = true;
       });
+      Settings.instance.serverUrl = _serverUrl;
       final user = User(
         id: randomId(),
         email: _email,

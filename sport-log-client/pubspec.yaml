@@ -37,7 +37,7 @@ dependencies:
 
   provider: ^6.0.2 # state management
   equatable: ^2.0.0 # makes classes equatable with little boilerplate code
-  email_validator: ^2.0.1
+  validators: ^3.0.0
   http: ^0.13.3
   device_info_plus: ^3.2.1
   implicitly_animated_reorderable_list: ^0.4.0 # ui
