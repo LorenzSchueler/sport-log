@@ -36,6 +36,9 @@ abstract class DataProvider<T> extends ChangeNotifier {
       if (error == ApiError.noInternetConnection &&
           _onNoInternetNeeded != null) {
         _onNoInternetNeeded!();
+      } else if (error == ApiError.unauthorized) {
+        _logger.w('Tried sync but access unauthorized.', error);
+        //_showNewCredentialsDialog = true; // TODO set back to false
       } else {
         throw error;
       }

@@ -19,6 +19,9 @@ class Sync extends ChangeNotifier {
   bool _isSyncing;
   bool get isSyncing => _isSyncing;
 
+  //bool _showNewCredentialsDialog = false;
+  //bool get showNewCredentialsDialog => _showNewCredentialsDialog;
+
   static final Sync instance = Sync._();
   Sync._() : _isSyncing = false;
 
@@ -90,23 +93,31 @@ class Sync extends ChangeNotifier {
       await dp.pushToServer();
     }
     // TODO: upsync routes, cardio sessions, metcon sessions, movement muscle, training plan, metcon item, strength blueprint, cardio blueprint
-    // TODO: deal with user updates
   }
 
   Future<bool> _downSync({VoidCallback? onNoInternet}) async {
     final accountDataResult =
         await Api.accountData.get(Settings.instance.lastSync);
     if (accountDataResult.isFailure) {
-      if (accountDataResult.failure == ApiError.noInternetConnection) {
-        _logger.d('Tried sync but got no Internet connection.',
-            accountDataResult.failure);
-        if (onNoInternet != null) {
-          onNoInternet();
-        }
-      } else {
-        _logger.e('Tried down sync, but got error.', accountDataResult.failure);
+      switch (accountDataResult.failure) {
+        case ApiError.noInternetConnection:
+          _logger.d('Tried sync but got no Internet connection.',
+              accountDataResult.failure);
+          if (onNoInternet != null) {
+            onNoInternet();
+          }
+          break;
+        case ApiError.unauthorized:
+          _logger.w(
+              'Tried sync but access unauthorized.', accountDataResult.failure);
+          //_showNewCredentialsDialog = true; // TODO set back to false
+          //notifyListeners();
+          break;
+        default:
+          _logger.e(
+              'Tried down sync, but got error.', accountDataResult.failure);
+          break;
       }
-      // TODO catch unauthorized / forbidden and show popup to enter new credentials
       return false;
     } else {
       final accountData = accountDataResult.success;
