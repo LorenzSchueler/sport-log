@@ -258,26 +258,19 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
 }
 
 class _ApiHeaders {
-  static Map<String, String> _makeAuthorizedHeader(
-      String username, String password) {
+  static Map<String, String> _basicAuth(String username, String password) {
     final basicAuth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
     return {'authorization': basicAuth};
   }
 
-  static Map<String, String> get _authorizedHeader {
-    assert(Settings.instance.userExists());
-    return _makeAuthorizedHeader(
-        Settings.instance.username!, Settings.instance.password!);
-  }
-
-  static const Map<String, String> _jsonContentTypeHeader = {
+  static const Map<String, String> _jsonContentType = {
     'Content-Type': 'application/json; charset=UTF-8',
   };
 
   static Map<String, String> get _defaultHeaders => {
-        ..._authorizedHeader,
-        ..._jsonContentTypeHeader,
+        ..._basicAuth(Settings.instance.username!, Settings.instance.password!),
+        ..._jsonContentType,
       };
 }
 
@@ -319,7 +312,8 @@ mixin ApiHelpers on ApiLogging {
       _logRequest('GET', route);
       final response = await client.get(
         UriFromRoute.fromRoute(route),
-        headers: _ApiHeaders._authorizedHeader,
+        headers: _ApiHeaders._basicAuth(
+            Settings.instance.username!, Settings.instance.password!),
       );
       _logResponse(response);
       return response;

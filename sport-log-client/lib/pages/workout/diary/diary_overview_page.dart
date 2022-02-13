@@ -11,7 +11,6 @@ import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class DiaryPage extends StatefulWidget {
@@ -74,28 +73,6 @@ class DiaryPageState extends State<DiaryPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_movement?.name ?? defaultTitle),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              final Movement? movement = await showMovementPickerDialog(context,
-                  selectedMovement: _movement);
-              if (movement == null) {
-                return;
-              } else if (movement.id == _movement?.id) {
-                setState(() {
-                  _movement = null;
-                });
-              } else {
-                setState(() {
-                  _movement = movement;
-                });
-              }
-            },
-            icon: Icon(_movement != null
-                ? Icons.filter_alt
-                : Icons.filter_alt_outlined),
-          ),
-        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(40),
           child: DateFilter(
@@ -106,11 +83,10 @@ class DiaryPageState extends State<DiaryPage> {
           ),
         ),
       ),
-      body: Container(
-          child: ListView.builder(
+      body: ListView.builder(
         itemBuilder: (_, index) => DiaryCard(diary: _diaries[index]),
         itemCount: _diaries.length,
-      )),
+      ),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
       drawer: MainDrawer(selectedRoute: route),

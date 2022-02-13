@@ -1,7 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
-import 'package:sport_log/helpers/validation.dart';
 
 import 'all.dart';
 

@@ -8,7 +8,7 @@ class UserApi with ApiLogging, ApiHelpers {
       _logRequest('GET', route);
       final response = await client.get(
         UriFromRoute.fromRoute(route),
-        headers: _ApiHeaders._makeAuthorizedHeader(username, password),
+        headers: _ApiHeaders._basicAuth(username, password),
       );
       _logResponse(response);
       return response;
@@ -23,7 +23,7 @@ class UserApi with ApiLogging, ApiHelpers {
       _logRequest('POST', route, body);
       final response = await client.post(
         UriFromRoute.fromRoute(route),
-        headers: _ApiHeaders._jsonContentTypeHeader,
+        headers: _ApiHeaders._jsonContentType,
         body: jsonEncode(body),
       );
       _logResponse(response);

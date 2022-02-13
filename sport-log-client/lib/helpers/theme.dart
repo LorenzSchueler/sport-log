@@ -10,16 +10,12 @@ ThemeData themeDataFromColors({
   final cs = brightness == Brightness.dark
       ? ColorScheme.dark(
           primary: primary,
-          primaryVariant: _shadeColor(primary, 0.4),
           secondary: secondary,
-          secondaryVariant: _tintColor(secondary, 0.4),
           brightness: brightness,
         )
       : ColorScheme.light(
           primary: primary,
-          primaryVariant: _tintColor(primary, 0.4),
           secondary: secondary,
-          secondaryVariant: _shadeColor(secondary, 0.4),
           brightness: brightness,
         );
   final appBarBackgroundColor =
@@ -66,7 +62,7 @@ Color primaryColorOf(BuildContext context) {
 }
 
 Color primaryVariantOf(BuildContext context) {
-  return Theme.of(context).colorScheme.primaryVariant;
+  return _shadeColor(Theme.of(context).colorScheme.primary, 0.4);
 }
 
 Color onPrimaryColorOf(BuildContext context) {
@@ -78,7 +74,7 @@ Color secondaryColorOf(BuildContext context) {
 }
 
 Color secondaryVariantOf(BuildContext context) {
-  return Theme.of(context).colorScheme.secondaryVariant;
+  return _shadeColor(Theme.of(context).colorScheme.secondary, 0.4);
 }
 
 Color onSecondaryColorOf(BuildContext context) {

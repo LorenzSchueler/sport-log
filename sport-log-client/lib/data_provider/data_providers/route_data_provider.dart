@@ -7,7 +7,6 @@ class RouteDataProvider {
 
   // final ApiAccessor<Route> routeApi = Api.routes;
 
-  @override
   Future<List<Route>> getNonDeleted() async {
     return (await routeDb.getNonDeleted());
   }

@@ -1,6 +1,5 @@
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/formatting.dart';
-import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/metcon/metcon_session.dart';

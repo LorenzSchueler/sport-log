@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 
-final _logger = Logger('DP');
+final _logger = Logger('DataProvider');
 
 void resultSink(Result<dynamic, dynamic> result) {
   if (result.isFailure) {
