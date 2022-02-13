@@ -12,6 +12,7 @@ abstract class Config {
   static late final bool generateTestData;
   static late final l.Level minLogLevel;
   static late final bool outputRequestJson;
+  static late final bool outputDbStatement;
 
   static Future<void> init() async {
     const deleteDatabaseEnvVar =
@@ -52,6 +53,10 @@ abstract class Config {
     const outputRequestJsonStr =
         String.fromEnvironment('OUTPUT_REQUEST_JSON', defaultValue: 'false');
     outputRequestJson = outputRequestJsonStr.toLowerCase() == 'true';
+
+    const outputDbStatementStr =
+        String.fromEnvironment('OUTPUT_DB_STATEMENT', defaultValue: 'false');
+    outputDbStatement = outputDbStatementStr.toLowerCase() == 'true';
 
     _logger.i('Delete database: $deleteDatabase');
     _logger.i('Generate test data: $generateTestData');

@@ -37,7 +37,9 @@ class AppDatabase {
         for (final table in allTables) {
           _logger.d("Creating table: ${table.tableName}");
           for (final statement in table.setupSql) {
-            _logger.d(statement);
+            if (Config.outputDbStatement) {
+              _logger.d(statement);
+            }
             db.execute(statement);
           }
         }
