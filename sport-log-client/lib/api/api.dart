@@ -7,6 +7,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart' as l;
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
+import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/settings.dart';
@@ -25,43 +26,116 @@ part 'accessors/wod_api.dart';
 const String version = '/v1.0';
 
 enum ApiError {
-  usernameTaken,
+  // http error
+  badRequest, // 400
+  unauthorized, // 401
+  forbidden, // 403
+  notFound, // 404
+  conflict, // 409
+  internalServerError, // 500
+  unknownServerError, // unknown status code != 200, 204, 400, 401, 403, 404, 409, 500
+  //usernameTaken, conflict
+  //loginFailed, unauthorized
+  // request error
   noInternetConnection,
-  loginFailed,
-  notFound,
-  unknown, // unknown status code from server
-  unhandled, // unknown request error
-  conflict,
   badJson,
-  unauthorized,
+  unknownRequestError, // unknown request error
 }
 
 extension ToErrorMessage on ApiError {
   String toErrorMessage() {
     switch (this) {
-      case ApiError.usernameTaken:
-        return "Username is already taken.";
-      case ApiError.unknown:
-        return "An unknown error occurred.";
-      case ApiError.noInternetConnection:
-        return "No Internet connection.";
-      case ApiError.loginFailed:
-        return "Wrong credentials.";
+      case ApiError.badRequest:
+        return "Request was not valid.";
+      case ApiError.unauthorized:
+        return "User unauthorized";
+      case ApiError.forbidden:
+        return "Access to resource is forbidden.";
       case ApiError.notFound:
         return "Resource not found.";
-      case ApiError.unhandled:
-        return "Unhandled error occurred.";
       case ApiError.conflict:
-        return "Conflict creating resource";
+        return "Conflict with resource.";
+      case ApiError.internalServerError:
+        return "Internal server error.";
+      case ApiError.unknownServerError:
+        return "An unknown server error.";
+      case ApiError.noInternetConnection:
+        return "No Internet connection.";
       case ApiError.badJson:
         return "Got bad json from server.";
-      case ApiError.unauthorized:
-        return "Unauthorized.";
+      case ApiError.unknownRequestError:
+        return "Unhandled request error.";
     }
   }
 }
 
 typedef ApiResult<T> = Future<Result<T, ApiError>>;
+
+extension ToApiResult on Response {
+  ApiResult<void> toApiResult() async {
+    switch (statusCode) {
+      case 200:
+        return Success(null);
+      case 204:
+        return Success(null);
+      case 400:
+        return Failure(ApiError.badRequest);
+      case 401:
+        return Failure(ApiError.unauthorized);
+      case 403:
+        return Failure(ApiError.forbidden);
+      case 404:
+        return Failure(ApiError.notFound);
+      case 409:
+        return Failure(ApiError.conflict);
+      case 500:
+        return Failure(ApiError.internalServerError);
+      default:
+        return Failure(ApiError.unknownServerError);
+    }
+  }
+
+  ApiResult<T> toApiResultWithValue<T>(T Function(dynamic) fromJson) async {
+    switch (statusCode) {
+      case 200:
+        return Success(fromJson(jsonDecode(utf8.decode(bodyBytes))));
+      case 204: // this should not happen as a response for a get request
+        return Failure(ApiError.unknownServerError);
+      case 400:
+        return Failure(ApiError.badRequest);
+      case 401:
+        return Failure(ApiError.unauthorized);
+      case 403:
+        return Failure(ApiError.forbidden);
+      case 404:
+        return Failure(ApiError.notFound);
+      case 409:
+        return Failure(ApiError.conflict);
+      case 500:
+        return Failure(ApiError.internalServerError);
+      default:
+        return Failure(ApiError.unknownServerError);
+    }
+  }
+}
+
+extension ApiResultFromRequest on ApiResult {
+  static final _client = Client();
+
+  static ApiResult<T> fromRequest<T>(
+      ApiResult<T> Function(Client client) request) async {
+    try {
+      return await request(_client);
+    } on SocketException {
+      return Failure(ApiError.noInternetConnection);
+    } on TypeError {
+      return Failure(ApiError.badJson);
+    } catch (e) {
+      ApiLogging.logger.e("Unhandled error", e);
+      return Failure(ApiError.unknownRequestError);
+    }
+  }
+}
 
 abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   static final accountData = AccountDataApi();
@@ -105,22 +179,16 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   }
 
   ApiResult<void> postSingle(T object) async {
-    return _errorHandling((client) async {
+    return ApiResultFromRequest.fromRequest((client) async {
       final body = _toJson(object);
       _logRequest('POST', singularRoute, body);
       final response = await client.post(
-        _uri(singularRoute),
+        UriFromRoute.fromRoute(singularRoute),
         headers: _ApiHeaders._defaultHeaders,
         body: jsonEncode(body),
       );
       _logResponse(response);
-      if (response.statusCode == 409) {
-        return Failure(ApiError.conflict);
-      }
-      if (response.statusCode < 200 && response.statusCode >= 300) {
-        return Failure(ApiError.unknown);
-      }
-      return Success(null);
+      return await response.toApiResult();
     });
   }
 
@@ -128,39 +196,30 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     if (objects.isEmpty) {
       return Success(null);
     }
-    return _errorHandling((client) async {
+    return ApiResultFromRequest.fromRequest((client) async {
       final body = objects.map(_toJson).toList();
       _logRequest('POST', pluralRoute, body);
       final response = await client.post(
-        _uri(pluralRoute),
+        UriFromRoute.fromRoute(pluralRoute),
         headers: _ApiHeaders._defaultHeaders,
         body: jsonEncode(body),
       );
       _logResponse(response);
-      if (response.statusCode == 409) {
-        return Failure(ApiError.conflict);
-      }
-      if (response.statusCode < 200 && response.statusCode >= 300) {
-        return Failure(ApiError.unknown);
-      }
-      return Success(null);
+      return await response.toApiResult();
     });
   }
 
   ApiResult<void> putSingle(T object) async {
-    return _errorHandling((client) async {
+    return ApiResultFromRequest.fromRequest((client) async {
       final body = _toJson(object);
       _logRequest('PUT', singularRoute, body);
       final response = await client.put(
-        _uri(singularRoute),
+        UriFromRoute.fromRoute(singularRoute),
         headers: _ApiHeaders._defaultHeaders,
         body: jsonEncode(body),
       );
       _logResponse(response);
-      if (response.statusCode < 200 && response.statusCode >= 300) {
-        return Failure(ApiError.unknown);
-      }
-      return Success(null);
+      return await response.toApiResult();
     });
   }
 
@@ -168,19 +227,16 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     if (objects.isEmpty) {
       return Success(null);
     }
-    return _errorHandling((client) async {
+    return ApiResultFromRequest.fromRequest((client) async {
       final body = objects.map(_toJson).toList();
       _logRequest('PUT', pluralRoute, body);
       final response = await client.put(
-        _uri(pluralRoute),
+        UriFromRoute.fromRoute(pluralRoute),
         headers: _ApiHeaders._defaultHeaders,
         body: jsonEncode(body),
       );
       _logResponse(response);
-      if (response.statusCode < 200 && response.statusCode >= 300) {
-        return Failure(ApiError.unknown);
-      }
-      return Success(null);
+      return await response.toApiResult();
     });
   }
 }
@@ -235,38 +291,22 @@ mixin ApiLogging {
   }
 }
 
+extension UriFromRoute on Uri {
+  static Uri fromRoute(String route) =>
+      Uri.parse(Settings.instance.serverUrl + route);
+}
+
 mixin ApiHelpers on ApiLogging {
-  final _client = Client();
-
-  Uri _uri(String route) => Uri.parse(Settings.instance.serverUrl + route);
-
-  ApiResult<R> _errorHandling<R>(
-      Future<Result<R, ApiError>> Function(Client client) req) async {
-    try {
-      return await req(_client);
-    } on SocketException {
-      return Failure(ApiError.noInternetConnection);
-    } on TypeError {
-      return Failure(ApiError.badJson);
-    } catch (e) {
-      ApiLogging.logger.e("Unhandled error", e);
-      return Failure(ApiError.unhandled);
-    }
-  }
-
-  ApiResult<R> _getRequest<R>(
-      String route, R Function(dynamic) fromJson) async {
-    return _errorHandling<R>((client) async {
+  ApiResult<T> _getRequest<T>(
+      String route, T Function(dynamic) fromJson) async {
+    return ApiResultFromRequest.fromRequest<T>((client) async {
       _logRequest('GET', route);
       final response = await client.get(
-        _uri(route),
+        UriFromRoute.fromRoute(route),
         headers: _ApiHeaders._authorizedHeader,
       );
       _logResponse(response);
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        return Failure(ApiError.unknown);
-      }
-      return Success(fromJson(jsonDecode(utf8.decode(response.bodyBytes))));
+      return await response.toApiResultWithValue(fromJson);
     });
   }
 }
