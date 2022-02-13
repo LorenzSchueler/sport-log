@@ -5,8 +5,8 @@ class DiaryApi extends Api<Diary> {
   Diary _fromJson(Map<String, dynamic> json) => Diary.fromJson(json);
 
   @override
-  String get singularRoute => version + '/diary';
+  String get _singularRoute => version + '/diary';
 
   @override
-  String get pluralRoute => version + '/diaries';
+  String get _pluralRoute => version + '/diaries';
 }

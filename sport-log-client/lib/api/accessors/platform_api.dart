@@ -5,7 +5,7 @@ class PlatformApi extends Api<Platform> {
   Platform _fromJson(Map<String, dynamic> json) => Platform.fromJson(json);
 
   @override
-  String get singularRoute => version + '/platform';
+  String get _singularRoute => version + '/platform';
 
   @override
   ApiResult<void> postSingle(Platform object) => throw UnimplementedError();
@@ -28,5 +28,5 @@ class PlatformCredentialApi extends Api<PlatformCredential> {
       PlatformCredential.fromJson(json);
 
   @override
-  String get singularRoute => version + '/platform_credential';
+  String get _singularRoute => version + '/platform_credential';
 }

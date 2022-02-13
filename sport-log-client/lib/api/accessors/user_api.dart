@@ -32,7 +32,6 @@ class UserApi with ApiLogging, ApiHelpers {
   }
 
   ApiResult<void> putSingle(User user) async {
-    assert(Settings.instance.userId! == user.id);
     return ApiResultFromRequest.fromRequest((client) async {
       final body = user.toJson();
       _logRequest('PUT', route, body);

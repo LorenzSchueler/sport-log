@@ -175,20 +175,20 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
 
   // things needed to be overridden
   T _fromJson(Map<String, dynamic> json);
-  String get singularRoute; // everything after url base, e. g. '/v1.0/user'
+  String get _singularRoute; // everything after url base, e. g. '/v1.0/user'
 
   // default impls
-  String get pluralRoute => singularRoute + 's';
+  String get _pluralRoute => _singularRoute + 's';
   Map<String, dynamic> _toJson(T object) => object.toJson();
 
   ApiResult<T> getSingle(Int64 id) async {
-    return _getRequest(singularRoute + '/$id',
+    return _getRequest(_singularRoute + '/$id',
         (dynamic json) => _fromJson(json as Map<String, dynamic>));
   }
 
   ApiResult<List<T>> getMultiple() async {
     return _getRequest(
-        singularRoute,
+        _singularRoute,
         (dynamic json) => (json as List<dynamic>)
             .map((dynamic json) => _fromJson(json as Map<String, dynamic>))
             .toList());
@@ -197,9 +197,9 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   ApiResult<void> postSingle(T object) async {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = _toJson(object);
-      _logRequest('POST', singularRoute, body);
+      _logRequest('POST', _singularRoute, body);
       final response = await client.post(
-        UriFromRoute.fromRoute(singularRoute),
+        UriFromRoute.fromRoute(_singularRoute),
         headers: _ApiHeaders._defaultHeaders,
         body: jsonEncode(body),
       );
@@ -214,9 +214,9 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     }
     return ApiResultFromRequest.fromRequest((client) async {
       final body = objects.map(_toJson).toList();
-      _logRequest('POST', pluralRoute, body);
+      _logRequest('POST', _pluralRoute, body);
       final response = await client.post(
-        UriFromRoute.fromRoute(pluralRoute),
+        UriFromRoute.fromRoute(_pluralRoute),
         headers: _ApiHeaders._defaultHeaders,
         body: jsonEncode(body),
       );
@@ -228,9 +228,9 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   ApiResult<void> putSingle(T object) async {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = _toJson(object);
-      _logRequest('PUT', singularRoute, body);
+      _logRequest('PUT', _singularRoute, body);
       final response = await client.put(
-        UriFromRoute.fromRoute(singularRoute),
+        UriFromRoute.fromRoute(_singularRoute),
         headers: _ApiHeaders._defaultHeaders,
         body: jsonEncode(body),
       );
@@ -245,9 +245,9 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     }
     return ApiResultFromRequest.fromRequest((client) async {
       final body = objects.map(_toJson).toList();
-      _logRequest('PUT', pluralRoute, body);
+      _logRequest('PUT', _pluralRoute, body);
       final response = await client.put(
-        UriFromRoute.fromRoute(pluralRoute),
+        UriFromRoute.fromRoute(_pluralRoute),
         headers: _ApiHeaders._defaultHeaders,
         body: jsonEncode(body),
       );

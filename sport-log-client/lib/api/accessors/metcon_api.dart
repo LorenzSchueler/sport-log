@@ -6,7 +6,7 @@ class MetconSessionApi extends Api<MetconSession> {
       MetconSession.fromJson(json);
 
   @override
-  String get singularRoute => version + '/metcon_session';
+  String get _singularRoute => version + '/metcon_session';
 }
 
 class MetconApi extends Api<Metcon> {
@@ -14,7 +14,7 @@ class MetconApi extends Api<Metcon> {
   Metcon _fromJson(Map<String, dynamic> json) => Metcon.fromJson(json);
 
   @override
-  String get singularRoute => version + '/metcon';
+  String get _singularRoute => version + '/metcon';
 
   // TODO: put this into data provider?
   ApiResult<void> postFull(MetconDescription metconDescription) async {
@@ -58,5 +58,5 @@ class MetconMovementApi extends Api<MetconMovement> {
       MetconMovement.fromJson(json);
 
   @override
-  String get singularRoute => version + '/metcon_movement';
+  String get _singularRoute => version + '/metcon_movement';
 }

@@ -5,5 +5,5 @@ class MovementApi extends Api<Movement> {
   Movement _fromJson(Map<String, dynamic> json) => Movement.fromJson(json);
 
   @override
-  String get singularRoute => version + '/movement';
+  String get _singularRoute => version + '/movement';
 }
