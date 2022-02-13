@@ -2,11 +2,11 @@ part of '../api.dart';
 
 class AccountDataApi with ApiLogging, ApiHelpers {
   ApiResult<AccountData> get(DateTime? lastSync) async {
-    return _getRequest(route(lastSync),
+    return _getRequest(_route(lastSync),
         (dynamic json) => AccountData.fromJson(json as Map<String, dynamic>));
   }
 
-  String route(DateTime? dateTime) =>
+  String _route(DateTime? dateTime) =>
       version +
       (dateTime == null
           ? '/account_data'

@@ -4,16 +4,17 @@ class UserApi with ApiLogging, ApiHelpers {
   final String route = version + '/user';
 
   ApiResult<User> getSingle(String username, String password) {
-    return ApiResultFromRequest.fromRequest<User>((client) async {
+    return ApiResultFromRequest.fromRequestWithValue<User>((client) async {
       _logRequest('GET', route);
       final response = await client.get(
         UriFromRoute.fromRoute(route),
         headers: _ApiHeaders._makeAuthorizedHeader(username, password),
       );
       _logResponse(response);
-      return await response.toApiResultWithValue((dynamic json) =>
-          User.fromJson(json as Map<String, dynamic>)..password = password);
-    });
+      return response;
+    },
+        (dynamic json) =>
+            User.fromJson(json as Map<String, dynamic>)..password = password);
   }
 
   ApiResult<void> postSingle(User user) async {
@@ -26,7 +27,7 @@ class UserApi with ApiLogging, ApiHelpers {
         body: jsonEncode(body),
       );
       _logResponse(response);
-      return await response.toApiResult();
+      return response;
     });
   }
 
@@ -41,7 +42,7 @@ class UserApi with ApiLogging, ApiHelpers {
         body: jsonEncode(body),
       );
       _logResponse(response);
-      return await response.toApiResult();
+      return response;
     });
   }
 
@@ -53,7 +54,7 @@ class UserApi with ApiLogging, ApiHelpers {
         headers: _ApiHeaders._defaultHeaders,
       );
       _logResponse(response);
-      return await response.toApiResult();
+      return response;
     });
   }
 }

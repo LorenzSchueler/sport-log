@@ -7,7 +7,6 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart' as l;
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
-import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/settings.dart';
@@ -71,7 +70,7 @@ extension ToErrorMessage on ApiError {
 
 typedef ApiResult<T> = Future<Result<T, ApiError>>;
 
-extension ToApiResult on Response {
+extension _ToApiResult on Response {
   ApiResult<void> toApiResult() async {
     switch (statusCode) {
       case 200:
@@ -122,10 +121,27 @@ extension ToApiResult on Response {
 extension ApiResultFromRequest on ApiResult {
   static final _client = Client();
 
-  static ApiResult<T> fromRequest<T>(
-      ApiResult<T> Function(Client client) request) async {
+  static ApiResult<void> fromRequest(
+      Future<Response> Function(Client client) request) async {
     try {
-      return await request(_client);
+      final response = await request(_client);
+      return await response.toApiResult();
+    } on SocketException {
+      return Failure(ApiError.noInternetConnection);
+    } on TypeError {
+      return Failure(ApiError.badJson);
+    } catch (e) {
+      ApiLogging.logger.e("Unhandled error", e);
+      return Failure(ApiError.unknownRequestError);
+    }
+  }
+
+  static ApiResult<T> fromRequestWithValue<T>(
+      Future<Response> Function(Client client) request,
+      T Function(dynamic) fromJson) async {
+    try {
+      final response = await request(_client);
+      return await response.toApiResultWithValue(fromJson);
     } on SocketException {
       return Failure(ApiError.noInternetConnection);
     } on TypeError {
@@ -188,7 +204,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
         body: jsonEncode(body),
       );
       _logResponse(response);
-      return await response.toApiResult();
+      return response;
     });
   }
 
@@ -205,7 +221,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
         body: jsonEncode(body),
       );
       _logResponse(response);
-      return await response.toApiResult();
+      return response;
     });
   }
 
@@ -219,7 +235,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
         body: jsonEncode(body),
       );
       _logResponse(response);
-      return await response.toApiResult();
+      return response;
     });
   }
 
@@ -236,7 +252,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
         body: jsonEncode(body),
       );
       _logResponse(response);
-      return await response.toApiResult();
+      return response;
     });
   }
 }
@@ -299,14 +315,14 @@ extension UriFromRoute on Uri {
 mixin ApiHelpers on ApiLogging {
   ApiResult<T> _getRequest<T>(
       String route, T Function(dynamic) fromJson) async {
-    return ApiResultFromRequest.fromRequest<T>((client) async {
+    return ApiResultFromRequest.fromRequestWithValue<T>((client) async {
       _logRequest('GET', route);
       final response = await client.get(
         UriFromRoute.fromRoute(route),
         headers: _ApiHeaders._authorizedHeader,
       );
       _logResponse(response);
-      return await response.toApiResultWithValue(fromJson);
-    });
+      return response;
+    }, fromJson);
   }
 }
