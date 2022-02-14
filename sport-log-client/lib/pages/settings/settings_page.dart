@@ -75,15 +75,22 @@ class SettingsPageState extends State<SettingsPage> {
                     ),
                     keyboardType: TextInputType.number,
                     initialValue: Settings.syncInterval.inMinutes.toString(),
-                    validator: (syncInterval) =>
-                        syncInterval != null && int.parse(syncInterval) <= 0
-                            ? "Interval must be greater than 0"
-                            : null,
+                    validator: (syncInterval) {
+                      if (syncInterval != null) {
+                        final min = int.tryParse(syncInterval);
+                        if (min == null) {
+                          return "not a valid number";
+                        } else if (min <= 0) {
+                          return "Interval must be greater than 0";
+                        }
+                      }
+                      return null;
+                    },
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     style: const TextStyle(height: 1),
                     onFieldSubmitted: (syncInterval) async {
-                      final min = int.parse(syncInterval);
-                      if (min > 0) {
+                      final min = int.tryParse(syncInterval);
+                      if (min != null && min > 0) {
                         setState(() {
                           Settings.syncInterval = Duration(minutes: min);
                         });
