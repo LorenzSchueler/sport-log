@@ -26,8 +26,8 @@ class MainDrawer extends StatelessWidget {
       child: Column(
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text(Settings.instance.username!),
-            accountEmail: Text(Settings.instance.email!),
+            accountName: Text(Settings.username!),
+            accountEmail: Text(Settings.email!),
           ),
           ListTile(
             title: const Text('Workout Tracking'),
@@ -84,11 +84,10 @@ class MainDrawer extends StatelessWidget {
               String title;
               if (sync.isSyncing) {
                 title = 'Syncing...';
-              } else if (Settings.instance.lastSync == null) {
+              } else if (Settings.lastSync == null) {
                 title = 'No syncs yet';
               } else {
-                title = 'Last sync: ' +
-                    Settings.instance.lastSync!.toHumanWithTime();
+                title = 'Last sync: ' + Settings.lastSync!.toHumanWithTime();
               }
               return ListTile(
                 title: Text(title),

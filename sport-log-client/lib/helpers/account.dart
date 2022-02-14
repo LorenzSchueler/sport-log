@@ -11,7 +11,7 @@ class Account {
   static Future<Result<User, String>> register(User user) async {
     final result = await Api.user.postSingle(user);
     if (result.isSuccess) {
-      Settings.instance.user = user;
+      Settings.user = user;
       await AppDatabase.instance!.open();
       Sync.instance.startSync();
       return Success(user);
@@ -25,7 +25,7 @@ class Account {
     final result = await Api.user.getSingle(username, password);
     if (result.isSuccess) {
       User user = result.success;
-      Settings.instance.user = user;
+      Settings.user = user;
       await AppDatabase.instance!.open();
       Sync.instance.startSync();
       return Success(user);
@@ -36,7 +36,7 @@ class Account {
 
   static Future<Result<User, String>> editUser(
       {String? username, String? password, String? email}) async {
-    final user = Settings.instance.user!;
+    final user = Settings.user!;
     if (username == null && password == null && email == null) {
       return Success(user);
     }
@@ -51,7 +51,7 @@ class Account {
     }
     final result = await Api.user.putSingle(user);
     if (result.isSuccess) {
-      Settings.instance.user = user;
+      Settings.user = user;
       return Success(user);
     } else {
       return Failure(result.failure.toErrorMessage());
@@ -63,7 +63,7 @@ class Account {
     final result = await Api.user.getSingle(username, password);
     if (result.isSuccess) {
       User user = result.success;
-      Settings.instance.user = user;
+      Settings.user = user;
       return Success(user);
     } else {
       return Failure(result.failure.toErrorMessage());
@@ -72,7 +72,7 @@ class Account {
 
   static Future<void> logout() async {
     Sync.instance.stopSync();
-    Settings.instance.user = null;
+    Settings.user = null;
     await AppDatabase.instance!.delete();
   }
 }

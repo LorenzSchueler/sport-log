@@ -18,16 +18,14 @@ class EditMovementPage extends StatefulWidget {
   EditMovementPage.fromName({
     Key? key,
     required String initialName,
-  })  : _initialMovement =
-            MovementDescription.defaultValue(Settings.instance.userId!)
-              ..movement.name = initialName,
+  })  : _initialMovement = MovementDescription.defaultValue(Settings.userId!)
+          ..movement.name = initialName,
         _isEditing = false,
         super(key: key);
 
   EditMovementPage.newMovement({Key? key})
       : _isEditing = false,
-        _initialMovement =
-            MovementDescription.defaultValue(Settings.instance.userId!),
+        _initialMovement = MovementDescription.defaultValue(Settings.userId!),
         super(key: key);
 
   final MovementDescription _initialMovement;

@@ -81,7 +81,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   CardioSession _saveCardioSession() {
     CardioSession cardioSession = CardioSession(
       id: randomId(),
-      userId: Settings.instance.userId!,
+      userId: Settings.userId!,
       movementId: widget._movement.id,
       cardioType: widget._cardioType,
       datetime: _startTime,

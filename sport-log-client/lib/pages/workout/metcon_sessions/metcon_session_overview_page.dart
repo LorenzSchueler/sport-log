@@ -26,7 +26,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
     MetconSessionDescription(
         metconSession: MetconSession(
             id: randomId(),
-            userId: Settings.instance.userId!,
+            userId: Settings.userId!,
             metconId: Int64(1),
             datetime: DateTime.now(),
             time: 15 * 60,
@@ -38,7 +38,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         metconDescription: MetconDescription(
             metcon: Metcon(
                 id: randomId(),
-                userId: Settings.instance.userId!,
+                userId: Settings.userId!,
                 name: "cindy",
                 metconType: MetconType.amrap,
                 rounds: null,
@@ -58,7 +58,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                       deleted: false),
                   movement: Movement(
                       id: randomId(),
-                      userId: Settings.instance.userId!,
+                      userId: Settings.userId!,
                       name: "pullup",
                       description: null,
                       cardio: false,
@@ -69,7 +69,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
     MetconSessionDescription(
         metconSession: MetconSession(
             id: randomId(),
-            userId: Settings.instance.userId!,
+            userId: Settings.userId!,
             metconId: Int64(1),
             datetime: DateTime.now(),
             time: null,
@@ -81,7 +81,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         metconDescription: MetconDescription(
             metcon: Metcon(
                 id: randomId(),
-                userId: Settings.instance.userId!,
+                userId: Settings.userId!,
                 name: null,
                 metconType: MetconType.emom,
                 rounds: 5,
@@ -101,7 +101,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                       deleted: false),
                   movement: Movement(
                       id: randomId(),
-                      userId: Settings.instance.userId!,
+                      userId: Settings.userId!,
                       name: "pullup",
                       description: null,
                       cardio: false,
@@ -119,7 +119,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                       deleted: false),
                   movement: Movement(
                       id: randomId(),
-                      userId: Settings.instance.userId!,
+                      userId: Settings.userId!,
                       name: "pushup",
                       description: null,
                       cardio: false,
@@ -130,7 +130,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
     MetconSessionDescription(
         metconSession: MetconSession(
             id: randomId(),
-            userId: Settings.instance.userId!,
+            userId: Settings.userId!,
             metconId: Int64(1),
             datetime: DateTime.now(),
             time: 15 * 60,
@@ -142,7 +142,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         metconDescription: MetconDescription(
             metcon: Metcon(
                 id: randomId(),
-                userId: Settings.instance.userId!,
+                userId: Settings.userId!,
                 name: "cindy",
                 metconType: MetconType.forTime,
                 rounds: 3,
@@ -162,7 +162,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                       deleted: false),
                   movement: Movement(
                       id: randomId(),
-                      userId: Settings.instance.userId!,
+                      userId: Settings.userId!,
                       name: "pullup",
                       description: null,
                       cardio: false,
@@ -173,7 +173,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
     MetconSessionDescription(
         metconSession: MetconSession(
             id: randomId(),
-            userId: Settings.instance.userId!,
+            userId: Settings.userId!,
             metconId: Int64(1),
             datetime: DateTime.now(),
             time: null,
@@ -185,7 +185,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         metconDescription: MetconDescription(
             metcon: Metcon(
                 id: randomId(),
-                userId: Settings.instance.userId!,
+                userId: Settings.userId!,
                 name: "cindy",
                 metconType: MetconType.forTime,
                 rounds: 3,
@@ -205,7 +205,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                       deleted: false),
                   movement: Movement(
                       id: randomId(),
-                      userId: Settings.instance.userId!,
+                      userId: Settings.userId!,
                       name: "pullup",
                       description: null,
                       cardio: false,

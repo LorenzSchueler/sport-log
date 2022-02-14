@@ -28,7 +28,7 @@ Future<void> initialize({bool doDownSync = true}) async {
 }
 
 Future<void> insertTestData() async {
-  final userId = Settings.instance.userId;
+  final userId = Settings.userId;
   if (userId != null) {
     _logger.i('Generating test data ...');
     List<Movement> movements = [];

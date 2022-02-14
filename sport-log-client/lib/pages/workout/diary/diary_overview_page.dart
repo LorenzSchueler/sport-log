@@ -26,35 +26,35 @@ class DiaryPageState extends State<DiaryPage> {
   final List<Diary> _diaries = [
     Diary(
         id: randomId(),
-        userId: Settings.instance.userId!,
+        userId: Settings.userId!,
         date: DateTime.now(),
         bodyweight: null,
         comments: null,
         deleted: false),
     Diary(
         id: randomId(),
-        userId: Settings.instance.userId!,
+        userId: Settings.userId!,
         date: DateTime.now().subtract(const Duration(days: 1)),
         bodyweight: 78.3,
         comments: null,
         deleted: false),
     Diary(
         id: randomId(),
-        userId: Settings.instance.userId!,
+        userId: Settings.userId!,
         date: DateTime.now().subtract(const Duration(days: 2)),
         bodyweight: null,
         comments: "bla bli\nblub\n..la",
         deleted: false),
     Diary(
         id: randomId(),
-        userId: Settings.instance.userId!,
+        userId: Settings.userId!,
         date: DateTime.now().subtract(const Duration(days: 3)),
         bodyweight: 80.0,
         comments: "bla",
         deleted: false),
     Diary(
         id: randomId(),
-        userId: Settings.instance.userId!,
+        userId: Settings.userId!,
         date: DateTime.now().subtract(const Duration(days: 5)),
         bodyweight: 180.0,
         comments:

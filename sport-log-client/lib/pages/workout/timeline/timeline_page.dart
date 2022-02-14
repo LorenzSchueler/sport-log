@@ -44,7 +44,7 @@ class TimelinePageState extends State<TimelinePage> {
       TimelineUnion.strengthSession(StrengthSessionWithStats(
           session: StrengthSession(
               id: randomId(),
-              userId: Settings.instance.userId!,
+              userId: Settings.userId!,
               datetime: DateTime.now(),
               movementId: Int64(1),
               interval: const Duration(seconds: 120),
@@ -52,7 +52,7 @@ class TimelinePageState extends State<TimelinePage> {
               deleted: false),
           movement: Movement(
               id: randomId(),
-              userId: Settings.instance.userId!,
+              userId: Settings.userId!,
               name: "My Movement",
               description: null,
               cardio: true,
@@ -72,7 +72,7 @@ class TimelinePageState extends State<TimelinePage> {
       TimelineUnion.metconSession(MetconSessionDescription(
           metconSession: MetconSession(
               id: randomId(),
-              userId: Settings.instance.userId!,
+              userId: Settings.userId!,
               metconId: Int64(1),
               datetime: DateTime.now(),
               time: 15 * 60,
@@ -84,7 +84,7 @@ class TimelinePageState extends State<TimelinePage> {
           metconDescription: MetconDescription(
               metcon: Metcon(
                   id: randomId(),
-                  userId: Settings.instance.userId!,
+                  userId: Settings.userId!,
                   name: "cindy",
                   metconType: MetconType.amrap,
                   rounds: 3,
@@ -104,7 +104,7 @@ class TimelinePageState extends State<TimelinePage> {
                         deleted: false),
                     movement: Movement(
                         id: randomId(),
-                        userId: Settings.instance.userId!,
+                        userId: Settings.userId!,
                         name: "pullup",
                         description: null,
                         cardio: false,
@@ -117,7 +117,7 @@ class TimelinePageState extends State<TimelinePage> {
       TimelineUnion.cardioSession(
         CardioSession(
             id: randomId(),
-            userId: Settings.instance.userId!,
+            userId: Settings.userId!,
             movementId: Int64(1),
             cardioType: CardioType.training,
             datetime: DateTime.now().subtract(const Duration(days: 1)),
@@ -158,7 +158,7 @@ class TimelinePageState extends State<TimelinePage> {
     var diaries = [
       TimelineUnion.diary(Diary(
           id: randomId(),
-          userId: Settings.instance.userId!,
+          userId: Settings.userId!,
           date: DateTime.now().subtract(const Duration(days: 3)),
           bodyweight: 80.0,
           comments: "bla",

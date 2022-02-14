@@ -30,7 +30,7 @@ class RoutePageState extends State<RoutePage> {
   final List<Route> _routes = [
     Route(
         id: randomId(),
-        userId: Settings.instance.userId!,
+        userId: Settings.userId!,
         name: "my route 1",
         distance: 10951,
         ascent: 456,

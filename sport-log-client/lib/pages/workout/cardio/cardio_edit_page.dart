@@ -35,7 +35,7 @@ class CardioEditPageState extends State<CardioEditPage> {
     _cardioSession = widget.cardioSession ??
         CardioSession(
           id: randomId(),
-          userId: Settings.instance.userId!,
+          userId: Settings.userId!,
           movementId: Int64(1),
           cardioType: CardioType.training,
           datetime: DateTime.now(),

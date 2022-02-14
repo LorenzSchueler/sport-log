@@ -33,7 +33,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
         MetconSessionDescription(
             metconSession: MetconSession(
                 id: randomId(),
-                userId: Settings.instance.userId!,
+                userId: Settings.userId!,
                 metconId: Int64(1),
                 datetime: DateTime.now(),
                 time: null,
@@ -45,7 +45,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
             metconDescription: MetconDescription(
                 metcon: Metcon(
                     id: randomId(),
-                    userId: Settings.instance.userId!,
+                    userId: Settings.userId!,
                     name: "cindy",
                     metconType: MetconType.forTime,
                     rounds: 3,
@@ -65,7 +65,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                           deleted: false),
                       movement: Movement(
                           id: randomId(),
-                          userId: Settings.instance.userId!,
+                          userId: Settings.userId!,
                           name: "pullup",
                           description: null,
                           cardio: false,

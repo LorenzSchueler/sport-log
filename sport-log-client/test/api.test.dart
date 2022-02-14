@@ -41,7 +41,7 @@ void testUser() {
 
 void testAction() async {
   test('get action providers', () async {
-    Settings.instance.user = sampleUser;
+    Settings.user = sampleUser;
     expect(await Api.actionProviders.getMultiple(), isA<Success>());
   });
 }
@@ -57,7 +57,7 @@ void testDiary() async {
       deleted: false,
     );
 
-    Settings.instance.user = sampleUser;
+    Settings.user = sampleUser;
     expect(await Api.diaries.postSingle(diary), isA<Success>());
     expect(await Api.diaries.getMultiple(), isA<Success>());
     final date = faker.date.dateTime();
@@ -82,7 +82,7 @@ void testStrengthSession() async {
       deleted: false,
     );
 
-    Settings.instance.user = sampleUser;
+    Settings.user = sampleUser;
     expect(
         await Api.strengthSessions.postSingle(strengthSession), isA<Success>());
     expect(await Api.strengthSessions.getMultiple(), isA<Success>());
@@ -115,7 +115,7 @@ void testActionRule() async {
       enabled: true,
       deleted: false,
     );
-    Settings.instance.user = sampleUser;
+    Settings.user = sampleUser;
     expect(await Api.actionRules.postSingle(actionRule), isA<Success>());
     expect(await Api.actionRules.getMultiple(), isA<Success>());
     actionRule.time = DateTime(

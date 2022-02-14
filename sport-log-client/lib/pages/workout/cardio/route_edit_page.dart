@@ -46,7 +46,7 @@ class RouteEditPageState extends State<RouteEditPage> {
     _route = widget.route ??
         Route(
             id: randomId(),
-            userId: Settings.instance.userId!,
+            userId: Settings.userId!,
             name: "",
             distance: 0,
             ascent: 0,

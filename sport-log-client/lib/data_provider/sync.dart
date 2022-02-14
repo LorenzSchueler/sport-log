@@ -28,9 +28,9 @@ class Sync extends ChangeNotifier {
   Future<void> init() async {
     if (Config.deleteDatabase) {
       _logger.i('Removing last sync...');
-      Settings.instance.lastSync = null;
+      Settings.lastSync = null;
     }
-    if (Settings.instance.userExists()) {
+    if (Settings.userExists()) {
       startSync();
     }
   }
@@ -40,7 +40,7 @@ class Sync extends ChangeNotifier {
       _logger.d('Sync job already running.');
       return;
     }
-    if (!Settings.instance.userExists()) {
+    if (!Settings.userExists()) {
       _logger.d('Sync cannot be run: no user.');
       return;
     }
@@ -50,21 +50,21 @@ class Sync extends ChangeNotifier {
     if (await _downSync(onNoInternet: onNoInternet)) {
       await _upSync();
       _logger.i('Setting last sync to $syncStart.');
-      Settings.instance.lastSync = syncStart;
+      Settings.lastSync = syncStart;
     }
     _isSyncing = false;
     notifyListeners();
   }
 
   void startSync() {
-    assert(Settings.instance.userExists());
+    assert(Settings.userExists());
     if (_syncTimer != null && _syncTimer!.isActive) {
       _logger.d('Sync already enabled.');
       return;
     }
     _logger.d('Starting sync timer.');
     Future(() => sync());
-    _syncTimer = Timer.periodic(Settings.instance.syncInterval, (_) => sync());
+    _syncTimer = Timer.periodic(Settings.syncInterval, (_) => sync());
   }
 
   void stopSync() {
@@ -96,8 +96,7 @@ class Sync extends ChangeNotifier {
   }
 
   Future<bool> _downSync({VoidCallback? onNoInternet}) async {
-    final accountDataResult =
-        await Api.accountData.get(Settings.instance.lastSync);
+    final accountDataResult = await Api.accountData.get(Settings.lastSync);
     if (accountDataResult.isFailure) {
       switch (accountDataResult.failure) {
         case ApiError.noInternetConnection:

@@ -269,7 +269,7 @@ class _ApiHeaders {
   };
 
   static Map<String, String> get _defaultHeaders => {
-        ..._basicAuth(Settings.instance.username!, Settings.instance.password!),
+        ..._basicAuth(Settings.username!, Settings.password!),
         ..._jsonContentType,
       };
 }
@@ -285,8 +285,8 @@ mixin ApiLogging {
   void _logRequest(String httpMethod, String route, [dynamic json]) {
     json != null && Config.outputRequestJson
         ? logger.d(
-            'request: $httpMethod ${Settings.instance.serverUrl}$route\n${_prettyJson(json)}')
-        : logger.d('request: $httpMethod ${Settings.instance.serverUrl}$route');
+            'request: $httpMethod ${Settings.serverUrl}$route\n${_prettyJson(json)}')
+        : logger.d('request: $httpMethod ${Settings.serverUrl}$route');
   }
 
   void _logResponse(Response response) {
@@ -301,8 +301,7 @@ mixin ApiLogging {
 }
 
 extension UriFromRoute on Uri {
-  static Uri fromRoute(String route) =>
-      Uri.parse(Settings.instance.serverUrl + route);
+  static Uri fromRoute(String route) => Uri.parse(Settings.serverUrl + route);
 }
 
 mixin ApiHelpers on ApiLogging {
@@ -312,8 +311,7 @@ mixin ApiHelpers on ApiLogging {
       _logRequest('GET', route);
       final response = await client.get(
         UriFromRoute.fromRoute(route),
-        headers: _ApiHeaders._basicAuth(
-            Settings.instance.username!, Settings.instance.password!),
+        headers: _ApiHeaders._basicAuth(Settings.username!, Settings.password!),
       );
       _logResponse(response);
       return response;

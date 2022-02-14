@@ -26,7 +26,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
     _diary = widget.diary ??
         Diary(
             id: randomId(),
-            userId: Settings.instance.userId!,
+            userId: Settings.userId!,
             date: DateTime.now(),
             bodyweight: null,
             comments: null,

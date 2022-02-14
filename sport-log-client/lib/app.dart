@@ -71,15 +71,11 @@ class _AppState extends State<App> {
     Defaults.mapbox.accessToken; // make sure access token is available
 
     Widget checkLogin(Widget Function(BuildContext) builder) {
-      return Settings.instance.userExists()
-          ? builder(context)
-          : const LandingPage();
+      return Settings.userExists() ? builder(context) : const LandingPage();
     }
 
     Widget checkNotLogin(Widget Function(BuildContext) builder) {
-      return Settings.instance.userExists()
-          ? const TimelinePage()
-          : builder(context);
+      return Settings.userExists() ? const TimelinePage() : builder(context);
     }
 
     return KeyboardDismissOnTap(
@@ -191,9 +187,8 @@ class _AppState extends State<App> {
                 return DiaryEditPage(diary: diary);
               })
         },
-        initialRoute: Settings.instance.userExists()
-            ? Routes.timeline.overview
-            : Routes.landing,
+        initialRoute:
+            Settings.userExists() ? Routes.timeline.overview : Routes.landing,
         debugShowCheckedModeBanner: false,
         theme: lightTheme,
         darkTheme: darkTheme,

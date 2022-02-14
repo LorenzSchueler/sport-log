@@ -36,7 +36,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
   void initState() {
     super.initState();
     _md = widget._initialMetcon ??
-        MetconDescription.defaultValue(Settings.instance.userId!);
+        MetconDescription.defaultValue(Settings.userId!);
   }
 
   void _setName(String name) {

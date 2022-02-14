@@ -38,7 +38,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
   final List<CardioSession> _cardioSessions = [
     CardioSession(
         id: randomId(),
-        userId: Settings.instance.userId!,
+        userId: Settings.userId!,
         movementId: Int64(1),
         cardioType: CardioType.training,
         datetime: DateTime.now(),
@@ -76,7 +76,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         deleted: false),
     CardioSession(
         id: randomId(),
-        userId: Settings.instance.userId!,
+        userId: Settings.userId!,
         movementId: Int64(1),
         cardioType: CardioType.activeRecovery,
         datetime: DateTime.now(),

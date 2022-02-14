@@ -42,31 +42,31 @@ class SettingsPageState extends State<SettingsPage> {
                   child: SizedBox(
                       height: 20,
                       child: Switch(
-                        value: Settings.instance.serverEnabled,
+                        value: Settings.serverEnabled,
                         onChanged: (serverEnabled) {
                           setState(() {
-                            Settings.instance.serverEnabled = serverEnabled;
+                            Settings.serverEnabled = serverEnabled;
                           });
                         },
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       )),
                   leading: Icons.sync),
-              if (Settings.instance.serverEnabled)
+              if (Settings.serverEnabled)
                 TextFormField(
                   decoration: const InputDecoration(
                     icon: Icon(Icons.computer),
                     labelText: "Server URL",
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
-                  initialValue: Settings.instance.serverUrl,
+                  initialValue: Settings.serverUrl,
                   validator: Validator.validateUrl,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   style: const TextStyle(height: 1),
                   onFieldSubmitted: (serverUrl) => setState(() {
-                    Settings.instance.serverUrl = serverUrl;
+                    Settings.serverUrl = serverUrl;
                   }),
                 ),
-              if (Settings.instance.serverEnabled)
+              if (Settings.serverEnabled)
                 TextFormField(
                     decoration: const InputDecoration(
                       icon: Icon(CustomIcons.timeInterval),
@@ -74,8 +74,7 @@ class SettingsPageState extends State<SettingsPage> {
                       contentPadding: EdgeInsets.symmetric(vertical: 5),
                     ),
                     keyboardType: TextInputType.number,
-                    initialValue:
-                        Settings.instance.syncInterval.inMinutes.toString(),
+                    initialValue: Settings.syncInterval.inMinutes.toString(),
                     validator: (syncInterval) =>
                         syncInterval != null && int.parse(syncInterval) <= 0
                             ? "Interval must be greater than 0"
@@ -86,8 +85,7 @@ class SettingsPageState extends State<SettingsPage> {
                       final min = int.parse(syncInterval);
                       if (min > 0) {
                         setState(() {
-                          Settings.instance.syncInterval =
-                              Duration(minutes: min);
+                          Settings.syncInterval = Duration(minutes: min);
                         });
                       } else {
                         await showMessageDialog(
@@ -104,7 +102,7 @@ class SettingsPageState extends State<SettingsPage> {
                   labelText: "Username",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
-                initialValue: Settings.instance.username,
+                initialValue: Settings.username,
                 validator: Validator.validateUsername,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 style: const TextStyle(height: 1),
@@ -133,7 +131,7 @@ class SettingsPageState extends State<SettingsPage> {
                   labelText: "Password",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
-                initialValue: Settings.instance.password,
+                initialValue: Settings.password,
                 validator: Validator.validatePassword,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 style: const TextStyle(height: 1),
@@ -162,7 +160,7 @@ class SettingsPageState extends State<SettingsPage> {
                   labelText: "Email",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
-                initialValue: Settings.instance.email,
+                initialValue: Settings.email,
                 validator: Validator.validateEmail,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 style: const TextStyle(height: 1),
@@ -195,7 +193,7 @@ class SettingsPageState extends State<SettingsPage> {
                       height: 24,
                       child: DropdownButtonHideUnderline(
                           child: DropdownButton(
-                        value: Settings.instance.units,
+                        value: Settings.units,
                         items: [
                           DropdownMenuItem(
                               value: Units.metric,
@@ -208,7 +206,7 @@ class SettingsPageState extends State<SettingsPage> {
                         onChanged: (units) {
                           if (units != null && units is Units) {
                             setState(() {
-                              Settings.instance.units =
+                              Settings.units =
                                   UnitsFromString.fromString(units.name);
                             });
                           }

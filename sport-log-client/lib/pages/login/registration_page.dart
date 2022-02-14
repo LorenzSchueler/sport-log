@@ -18,7 +18,7 @@ class RegistrationPage extends StatefulWidget {
 class _RegistrationPageState extends State<RegistrationPage> {
   final _formKey = GlobalKey<FormState>();
 
-  String _serverUrl = Settings.instance.serverUrl;
+  String _serverUrl = Settings.serverUrl;
   String _username = "";
   String _password1 = "";
   String _password2 = "";
@@ -100,9 +100,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
       ),
       IconButton(
           onPressed: () async {
-            await Settings.instance.setDefaultServerUrl();
+            await Settings.setDefaultServerUrl();
             setState(() {
-              _serverUrlInputController.text = Settings.instance.serverUrl;
+              _serverUrlInputController.text = Settings.serverUrl;
             });
           },
           icon: const Icon(Icons.settings_backup_restore))
@@ -229,7 +229,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       setState(() {
         _registrationPending = true;
       });
-      Settings.instance.serverUrl = _serverUrl;
+      Settings.serverUrl = _serverUrl;
       final user = User(
         id: randomId(),
         email: _email,
