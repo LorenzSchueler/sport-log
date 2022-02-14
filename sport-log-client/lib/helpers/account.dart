@@ -72,7 +72,9 @@ class Account {
 
   static Future<void> logout() async {
     Sync.instance.stopSync();
+    Settings.lastSync = null;
     Settings.user = null;
+    Settings.setDefaults(override: true);
     await AppDatabase.instance!.delete();
   }
 }
