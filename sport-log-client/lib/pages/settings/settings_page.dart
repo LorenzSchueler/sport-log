@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
+import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
@@ -220,6 +221,12 @@ class SettingsPageState extends State<SettingsPage> {
                         },
                       ))),
                   leading: Icons.sync),
+              Defaults.sizedBox.vertical.small,
+              const Divider(),
+              const CaptionTile(caption: "About"),
+              ListTile(
+                  title: const Text('About'),
+                  onTap: () => Navigator.of(context).pushNamed(Routes.about)),
             ],
           )),
       drawer: const MainDrawer(selectedRoute: Routes.settings),

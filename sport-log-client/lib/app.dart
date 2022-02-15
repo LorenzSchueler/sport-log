@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/map/map_page.dart';
 import 'package:sport_log/pages/offline_maps/offline_maps_overview.dart';
+import 'package:sport_log/pages/settings/about_page.dart';
 import 'package:sport_log/pages/settings/settings_page.dart';
 import 'package:sport_log/pages/timer/timer_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_details_page.dart';
@@ -89,6 +90,7 @@ class _AppState extends State<App> {
           Routes.map: (_) => checkLogin((_) => const MapPage()),
           Routes.offlineMaps: (_) => checkLogin((_) => const OfflineMapsPage()),
           Routes.settings: (_) => checkLogin((_) => const SettingsPage()),
+          Routes.about: (_) => checkLogin((_) => const AboutPage()),
           // movement
           Routes.movement.overview: (_) =>
               checkLogin((_) => const MovementsPage()),

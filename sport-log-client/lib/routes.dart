@@ -6,6 +6,7 @@ abstract class Routes {
   static const map = "/map";
   static const offlineMaps = "/offline_maps";
   static const settings = "/settings";
+  static const about = "/about";
   static const timeline = _TimelineRoutes();
   static const metcon = _MetconRoutes();
   static const movement = _MovementRoutes();

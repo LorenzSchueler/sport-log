@@ -54,6 +54,7 @@ dependencies:
   hive_flutter: ^1.1.0
   fluttertoast: ^8.0.8
   flutter_keyboard_visibility: ^5.0.3
+  url_launcher: ^6.0.20
 
   mapbox_gl: ^0.15.0 # mapping lib for osm
   mapbox_api: ^1.0.0
