@@ -6,6 +6,7 @@ import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/pages/action/action_overview_page.dart';
 import 'package:sport_log/pages/map/map_page.dart';
 import 'package:sport_log/pages/offline_maps/offline_maps_overview.dart';
 import 'package:sport_log/pages/settings/about_page.dart';
@@ -91,6 +92,9 @@ class _AppState extends State<App> {
           Routes.offlineMaps: (_) => checkLogin((_) => const OfflineMapsPage()),
           Routes.settings: (_) => checkLogin((_) => const SettingsPage()),
           Routes.about: (_) => checkLogin((_) => const AboutPage()),
+          // Action
+          Routes.action.overview: (_) =>
+              checkLogin((_) => const ActionOverviewPage()),
           // movement
           Routes.movement.overview: (_) =>
               checkLogin((_) => const MovementsPage()),

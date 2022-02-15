@@ -38,9 +38,10 @@ class MainDrawer extends StatelessWidget {
             selected: selectedRoute == Routes.timeline.overview,
           ),
           ListTile(
-            title: Text('Server Actions',
-                style: TextStyle(color: disabledColorOf(context))),
-            leading: const Icon(Icons.play_circle_fill_sharp),
+            leading: const Icon(Icons.play_circle_rounded),
+            title: const Text('Server Actions'),
+            onTap: () => Nav.changeNamed(context, Routes.action.overview),
+            selected: selectedRoute == Routes.action.overview,
           ),
           ListTile(
             leading: const Icon(CustomIcons.stopwatch),

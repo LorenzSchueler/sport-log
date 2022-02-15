@@ -7,12 +7,20 @@ abstract class Routes {
   static const offlineMaps = "/offline_maps";
   static const settings = "/settings";
   static const about = "/about";
+  static const action = _ActionRoutes();
   static const timeline = _TimelineRoutes();
   static const metcon = _MetconRoutes();
   static const movement = _MovementRoutes();
   static const cardio = _CardioRoutes();
   static const strength = _StrengthRoutes();
   static const diary = _DiaryRoutes();
+}
+
+class _ActionRoutes {
+  const _ActionRoutes();
+
+  final String overview = '/action/overview';
+  final String edit = '/action/edit';
 }
 
 class _MovementRoutes {
