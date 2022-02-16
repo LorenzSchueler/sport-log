@@ -1,4 +1,3 @@
-
 import 'package:json_annotation/json_annotation.dart';
 import '../all.dart';
 
@@ -26,7 +25,7 @@ class AccountData {
     required this.actionEvents,
   });
 
-  User? user;
+  User user;
   List<Diary> diaries;
   List<Wod> wods;
   List<Movement> movements;
@@ -44,6 +43,7 @@ class AccountData {
   List<ActionRule> actionRules;
   List<ActionEvent> actionEvents;
 
-  factory AccountData.fromJson(Map<String, dynamic> json) => _$AccountDataFromJson(json);
+  factory AccountData.fromJson(Map<String, dynamic> json) =>
+      _$AccountDataFromJson(json);
   Map<String, dynamic> toJson() => _$AccountDataToJson(this);
 }

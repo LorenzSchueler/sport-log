@@ -7,9 +7,7 @@ part of 'account_data.dart';
 // **************************************************************************
 
 AccountData _$AccountDataFromJson(Map<String, dynamic> json) => AccountData(
-      user: json['user'] == null
-          ? null
-          : User.fromJson(json['user'] as Map<String, dynamic>),
+      user: User.fromJson(json['user'] as Map<String, dynamic>),
       diaries: (json['diaries'] as List<dynamic>)
           .map((e) => Diary.fromJson(e as Map<String, dynamic>))
           .toList(),
