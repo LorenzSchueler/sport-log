@@ -5,8 +5,7 @@ import 'package:sport_log/database/tables/all.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/movement/all.dart';
 
-class MovementDataProvider extends EntityDataProvider<Movement>
-    with UnconnectedMethods<Movement> {
+class MovementDataProvider extends EntityDataProvider<Movement> {
   static final instance = MovementDataProvider._();
   MovementDataProvider._();
 

@@ -65,8 +65,9 @@ class _MovementsPageState extends State<MovementsPage> {
             .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
       }
     });
-    _dataProvider.getMovementDescriptions().then((mds) {
-      setState(() => _movementDescriptions = mds);
+    final mds = await _dataProvider.getMovementDescriptions();
+    setState(() {
+      _movementDescriptions = mds;
     });
   }
 

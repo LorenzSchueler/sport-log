@@ -6,8 +6,7 @@ import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/platform/platform_credential.dart';
 
 class PlatformCredentialDataProvider
-    extends EntityDataProvider<PlatformCredential>
-    with ConnectedMethods<PlatformCredential> {
+    extends EntityDataProvider<PlatformCredential> {
   static final instance = PlatformCredentialDataProvider._();
   PlatformCredentialDataProvider._();
 
