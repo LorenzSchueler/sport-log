@@ -5,6 +5,7 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
+import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/settings.dart';
@@ -86,8 +87,8 @@ class Sync extends ChangeNotifier {
       return false;
     } else {
       final accountData = accountDataResult.success;
+      Account.updateUserFromDownSync(accountData.user);
       AppDatabase.instance!.upsertAccountData(accountData, synchronized: true);
-      // TODO: deal with user updates
       return true;
     }
   }
@@ -105,7 +106,6 @@ class Sync extends ChangeNotifier {
 
   void stopSync() {
     if (_syncTimer != null) {
-      // TODO: what if sync is running and database will be deleted?
       _logger.d('Stopping sync timer...');
       _syncTimer?.cancel();
       _syncTimer = null;

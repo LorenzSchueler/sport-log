@@ -58,16 +58,9 @@ class Account {
     }
   }
 
-  static Future<Result<User, String>> setChangedUser(
-      String username, String password) async {
-    final result = await Api.user.getSingle(username, password);
-    if (result.isSuccess) {
-      User user = result.success;
-      Settings.user = user;
-      return Success(user);
-    } else {
-      return Failure(result.failure.toErrorMessage());
-    }
+  static void updateUserFromDownSync(User user) {
+    user.password = Settings.password!;
+    Settings.user = user;
   }
 
   static Future<void> logout() async {
