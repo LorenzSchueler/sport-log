@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
@@ -89,6 +90,8 @@ class SettingsPageState extends State<SettingsPage> {
                         setState(() {
                           Settings.syncInterval = Duration(minutes: min);
                         });
+                        Sync.instance.stopSync();
+                        Sync.instance.startSync();
                       } else {
                         await showMessageDialog(
                             context: context,

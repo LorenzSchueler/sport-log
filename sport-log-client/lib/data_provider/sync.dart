@@ -76,7 +76,7 @@ class Sync extends ChangeNotifier {
         case ApiError.unauthorized:
           _logger.w(
               'Tried sync but access unauthorized.', accountDataResult.failure);
-          showNewCredentialsDialog();
+          await showNewCredentialsDialog();
           break;
         default:
           _logger.e(
