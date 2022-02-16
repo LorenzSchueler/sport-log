@@ -9,17 +9,14 @@ import 'tables/all.dart';
 final _logger = Logger('DB');
 
 class AppDatabase {
-  static final AppDatabase? instance =
-      Config.isAndroid || Config.isIOS ? AppDatabase._() : null;
+  AppDatabase._();
 
-  Database? _database;
-  Database? get database {
+  static Database? _database;
+  static Database? get database {
     return _database;
   }
 
-  AppDatabase._();
-
-  Future<void> init() async {
+  static Future<void> init() async {
     if (Config.deleteDatabase) {
       await delete();
       await open();
@@ -27,7 +24,7 @@ class AppDatabase {
     // db is opened in Account.login and Account.register and deleted in Account.logout
   }
 
-  Future<void> open() async {
+  static Future<void> open() async {
     _logger.i("Opening Database");
     _database = await openDatabase(
       Config.databaseName,
@@ -51,14 +48,14 @@ class AppDatabase {
     _logger.i("Database ready");
   }
 
-  Future<void> delete() async {
+  static Future<void> delete() async {
     _logger.i("Deleting Database");
     await deleteDatabase(Config.databaseName);
     _database = null;
     _logger.i('Database deleted');
   }
 
-  Future<void> upsertAccountData(AccountData data,
+  static Future<void> upsertAccountData(AccountData data,
       {required bool synchronized}) async {
     diaries.upsertMultiple(data.diaries, synchronized: synchronized);
     wods.upsertMultiple(data.wods, synchronized: synchronized);
@@ -84,24 +81,24 @@ class AppDatabase {
     actionEvents.upsertMultiple(data.actionEvents, synchronized: synchronized);
   }
 
-  final diaries = DiaryTable();
-  final wods = WodTable();
-  final movements = MovementTable();
-  final metcons = MetconTable();
-  final metconMovements = MetconMovementTable();
-  final metconSessions = MetconSessionTable();
-  final routes = RouteTable();
-  final cardioSessions = CardioSessionTable();
-  final strengthSessions = StrengthSessionTable();
-  final strengthSets = StrengthSetTable();
-  final platforms = PlatformTable();
-  final platformCredentials = PlatformCredentialTable();
-  final actionProviders = ActionProviderTable();
-  final actions = ActionTable();
-  final actionRules = ActionRuleTable();
-  final actionEvents = ActionEventTable();
+  static final diaries = DiaryTable();
+  static final wods = WodTable();
+  static final movements = MovementTable();
+  static final metcons = MetconTable();
+  static final metconMovements = MetconMovementTable();
+  static final metconSessions = MetconSessionTable();
+  static final routes = RouteTable();
+  static final cardioSessions = CardioSessionTable();
+  static final strengthSessions = StrengthSessionTable();
+  static final strengthSets = StrengthSetTable();
+  static final platforms = PlatformTable();
+  static final platformCredentials = PlatformCredentialTable();
+  static final actionProviders = ActionProviderTable();
+  static final actions = ActionTable();
+  static final actionRules = ActionRuleTable();
+  static final actionEvents = ActionEventTable();
 
-  List<DbAccessor> get allTables => [
+  static List<DbAccessor> get allTables => [
         diaries,
         wods,
         movements,

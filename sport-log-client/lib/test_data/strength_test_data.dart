@@ -11,7 +11,7 @@ final DateTime endDate = DateTime.now();
 final random = faker.randomGenerator;
 
 Future<List<StrengthSession>> generateStrengthSessions(Int64 userId) async {
-  final movements = await AppDatabase.instance!.movements.getNonDeleted();
+  final movements = await AppDatabase.movements.getNonDeleted();
 
   final numberOfDays = endDate.difference(startDate).inDays + 1;
   final allDates = List.generate(
@@ -69,7 +69,7 @@ double? _generateWeight(MovementDimension dim) {
 
 Future<List<StrengthSet>> generateStrengthSets() async {
   final sessions =
-      await AppDatabase.instance!.strengthSessions.getSessionsWithMovements();
+      await AppDatabase.strengthSessions.getSessionsWithMovements();
 
   List<StrengthSet> result = [];
 

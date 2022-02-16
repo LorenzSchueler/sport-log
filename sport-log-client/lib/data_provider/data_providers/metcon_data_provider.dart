@@ -14,10 +14,10 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
   final metconApi = Api.metcons;
   final metconMovementApi = Api.metconMovements;
 
-  final metconDb = AppDatabase.instance!.metcons;
-  final metconMovementDb = AppDatabase.instance!.metconMovements;
-  final movementDb = AppDatabase.instance!.movements;
-  final metconSessionDb = AppDatabase.instance!.metconSessions;
+  final metconDb = AppDatabase.metcons;
+  final metconMovementDb = AppDatabase.metconMovements;
+  final movementDb = AppDatabase.movements;
+  final metconSessionDb = AppDatabase.metconSessions;
 
   @override
   Future<void> createSingle(MetconDescription object) async {

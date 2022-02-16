@@ -81,8 +81,8 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
     Column.text(Keys.comments).nullable(),
   ]);
 
-  MovementTable get _movementTable => AppDatabase.instance!.movements;
-  StrengthSetTable get _strengthSetTable => AppDatabase.instance!.strengthSets;
+  MovementTable get _movementTable => AppDatabase.movements;
+  StrengthSetTable get _strengthSetTable => AppDatabase.strengthSets;
 
   Future<StrengthSessionWithSets?> getSessionWithSets(Int64 idValue) async {
     final records = await database.rawQuery('''

@@ -8,9 +8,9 @@ import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/strength/all.dart';
 
 class StrengthDataProvider extends DataProvider<StrengthSessionWithSets> {
-  final strengthSessionDb = AppDatabase.instance!.strengthSessions;
-  final strengthSetDb = AppDatabase.instance!.strengthSets;
-  final movementDb = AppDatabase.instance!.movements;
+  final strengthSessionDb = AppDatabase.strengthSessions;
+  final strengthSetDb = AppDatabase.strengthSets;
+  final movementDb = AppDatabase.movements;
 
   final strengthSessionApi = Api.strengthSessions;
   final strengthSetApi = Api.strengthSets;

@@ -13,7 +13,7 @@ abstract class DbAccessor<T extends DbObject> {
   DbSerializer<T> get serde;
 
   Database get database {
-    return AppDatabase.instance!.database!;
+    return AppDatabase.database!;
   }
 
   String get idAndDeletedAndStatus => '''

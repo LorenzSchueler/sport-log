@@ -13,7 +13,7 @@ class WodDataProvider extends EntityDataProvider<Wod> {
   final Api<Wod> api = Api.wods;
 
   @override
-  final DbAccessor<Wod> db = AppDatabase.instance!.wods;
+  final DbAccessor<Wod> db = AppDatabase.wods;
 
   @override
   List<Wod> getFromAccountData(AccountData accountData) => accountData.wods;

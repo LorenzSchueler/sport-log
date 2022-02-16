@@ -20,7 +20,8 @@ Future<void> initialize({bool doDownSync = true}) async {
   await Hive.initFlutter();
   await Config.init();
   await Settings.init();
-  await AppDatabase.instance?.init();
+  // if (!Config.isAndroid && !Config.isIOS) no db available
+  await AppDatabase.init();
   await Sync.instance.init();
   if (Config.generateTestData) {
     insertTestData();
@@ -32,9 +33,9 @@ Future<void> insertTestData() async {
   if (userId != null) {
     _logger.i('Generating test data ...');
     List<Movement> movements = [];
-    if ((await AppDatabase.instance!.movements.getNonDeleted()).isEmpty) {
+    if ((await AppDatabase.movements.getNonDeleted()).isEmpty) {
       movements = generateMovements(userId);
-      await AppDatabase.instance!.movements
+      await AppDatabase.movements
           .upsertMultiple(movements, synchronized: false);
     }
     final sessions = await generateStrengthSessions(userId);
@@ -52,10 +53,9 @@ Future<void> insertTestData() async {
 }
 
 void main() async {
-  initialize().then((_) {
-    runApp(ChangeNotifierProvider.value(
-      value: Sync.instance,
-      child: const App(),
-    ));
-  });
+  await initialize();
+  runApp(ChangeNotifierProvider.value(
+    value: Sync.instance,
+    child: const App(),
+  ));
 }

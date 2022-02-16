@@ -91,7 +91,7 @@ class Sync extends ChangeNotifier {
       if (accountData.user != null) {
         Account.updateUserFromDownSync(accountData.user!);
       }
-      AppDatabase.instance!.upsertAccountData(accountData, synchronized: true);
+      AppDatabase.upsertAccountData(accountData, synchronized: true);
       return true;
     }
   }

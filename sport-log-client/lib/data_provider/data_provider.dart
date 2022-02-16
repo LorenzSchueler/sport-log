@@ -26,18 +26,17 @@ abstract class DataProvider<T> extends ChangeNotifier {
 
   /// only called if internet connection is needed
   /// (call [handleApiError] with isCritical = true)
-  VoidCallback? _onNoInternetNeeded;
+  VoidCallback? _onNoInternet;
 
   set onNoInternetConnection(VoidCallback? callback) {
-    _onNoInternetNeeded = callback;
+    _onNoInternet = callback;
   }
 
   void handleApiError(ApiError error, {bool isCritical = false}) async {
     if (isCritical) {
       _logger.e('Api error: ${error.toErrorMessage()}', error);
-      if (error == ApiError.noInternetConnection &&
-          _onNoInternetNeeded != null) {
-        _onNoInternetNeeded!();
+      if (error == ApiError.noInternetConnection && _onNoInternet != null) {
+        _onNoInternet!();
       } else if (error == ApiError.unauthorized) {
         _logger.w('Tried sync but access unauthorized.', error);
         await showNewCredentialsDialog();

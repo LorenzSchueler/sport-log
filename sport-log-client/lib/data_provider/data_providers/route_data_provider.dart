@@ -3,7 +3,7 @@ import 'package:sport_log/database/table.dart';
 import 'package:sport_log/models/cardio/all.dart';
 
 class RouteDataProvider {
-  final DbAccessor<Route> routeDb = AppDatabase.instance!.routes;
+  final DbAccessor<Route> routeDb = AppDatabase.routes;
 
   // final ApiAccessor<Route> routeApi = Api.routes;
 

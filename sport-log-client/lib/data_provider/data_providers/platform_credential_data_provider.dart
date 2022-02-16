@@ -14,8 +14,7 @@ class PlatformCredentialDataProvider
   final Api<PlatformCredential> api = Api.platformCredentials;
 
   @override
-  final DbAccessor<PlatformCredential> db =
-      AppDatabase.instance!.platformCredentials;
+  final DbAccessor<PlatformCredential> db = AppDatabase.platformCredentials;
 
   @override
   List<PlatformCredential> getFromAccountData(AccountData accountData) =>

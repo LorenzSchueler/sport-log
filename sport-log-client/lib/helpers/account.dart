@@ -12,7 +12,7 @@ class Account {
     final result = await Api.user.postSingle(user);
     if (result.isSuccess) {
       Settings.user = user;
-      await AppDatabase.instance!.open();
+      await AppDatabase.open();
       Sync.instance.startSync();
       return Success(user);
     } else {
@@ -26,7 +26,7 @@ class Account {
     if (result.isSuccess) {
       User user = result.success;
       Settings.user = user;
-      await AppDatabase.instance!.open();
+      await AppDatabase.open();
       Sync.instance.startSync();
       return Success(user);
     } else {
@@ -68,6 +68,6 @@ class Account {
     Settings.lastSync = null;
     Settings.user = null;
     Settings.setDefaults(override: true);
-    await AppDatabase.instance!.delete();
+    await AppDatabase.delete();
   }
 }

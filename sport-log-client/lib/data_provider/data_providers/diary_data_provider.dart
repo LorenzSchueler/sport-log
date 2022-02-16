@@ -13,7 +13,7 @@ class DiaryDataProvider extends EntityDataProvider<Diary> {
   final Api<Diary> api = Api.diaries;
 
   @override
-  final DbAccessor<Diary> db = AppDatabase.instance!.diaries;
+  final DbAccessor<Diary> db = AppDatabase.diaries;
 
   @override
   List<Diary> getFromAccountData(AccountData accountData) =>

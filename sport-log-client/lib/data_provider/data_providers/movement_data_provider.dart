@@ -13,7 +13,7 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
   final Api<Movement> api = Api.movements;
 
   @override
-  final MovementTable db = AppDatabase.instance!.movements;
+  final MovementTable db = AppDatabase.movements;
 
   Future<List<MovementDescription>> getMovementDescriptions() async =>
       db.getMovementDescriptions();
