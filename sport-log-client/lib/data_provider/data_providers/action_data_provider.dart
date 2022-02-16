@@ -6,7 +6,7 @@ import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/action/action_event.dart';
 import 'package:sport_log/models/action/action_rule.dart';
 
-class ActionEventDataProvider extends DataProviderImpl<ActionEvent>
+class ActionEventDataProvider extends EntityDataProvider<ActionEvent>
     with ConnectedMethods<ActionEvent> {
   static final instance = ActionEventDataProvider._();
   ActionEventDataProvider._();
@@ -22,7 +22,7 @@ class ActionEventDataProvider extends DataProviderImpl<ActionEvent>
       accountData.actionEvents;
 }
 
-class ActionRuleDataProvider extends DataProviderImpl<ActionRule>
+class ActionRuleDataProvider extends EntityDataProvider<ActionRule>
     with ConnectedMethods<ActionRule> {
   static final instance = ActionRuleDataProvider._();
   ActionRuleDataProvider._();

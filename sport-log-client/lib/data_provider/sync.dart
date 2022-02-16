@@ -49,7 +49,8 @@ class Sync extends ChangeNotifier {
     if (await _downSync(onNoInternet: onNoInternet)) {
       await _upSync();
       _logger.i('Setting last sync to $syncStart.');
-      Settings.lastSync = syncStart;
+      // make sure sync intervals overlap slightly in case client and server clocks differ a little bit
+      Settings.lastSync = syncStart.subtract(const Duration(seconds: 10));
     }
     _isSyncing = false;
     notifyListeners();

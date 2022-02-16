@@ -5,7 +5,7 @@ import 'package:sport_log/database/table.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/diary/diary.dart';
 
-class DiaryDataProvider extends DataProviderImpl<Diary>
+class DiaryDataProvider extends EntityDataProvider<Diary>
     with UnconnectedMethods<Diary> {
   static final instance = DiaryDataProvider._();
   DiaryDataProvider._();

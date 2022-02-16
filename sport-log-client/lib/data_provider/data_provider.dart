@@ -1,19 +1,13 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
-import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
+import 'package:sport_log/widgets/form_widgets/new_credentials_dialog.dart';
 
 final _logger = Logger('DataProvider');
-
-void resultSink(Result<dynamic, dynamic> result) {
-  if (result.isFailure) {
-    _logger.e('Got result with failure.', result.failure, StackTrace.current);
-  }
-}
 
 abstract class DataProvider<T> extends ChangeNotifier {
   Future<void> createSingle(T object);
@@ -26,11 +20,19 @@ abstract class DataProvider<T> extends ChangeNotifier {
 
   Future<void> pushToServer();
 
+  Future<void> doFullUpdate();
+
+  Future<void> upsertFromAccountData(AccountData accountData);
+
   /// only called if internet connection is needed
   /// (call [handleApiError] with isCritical = true)
   VoidCallback? _onNoInternetNeeded;
 
-  void handleApiError(ApiError error, {bool isCritical = false}) {
+  set onNoInternetConnection(VoidCallback? callback) {
+    _onNoInternetNeeded = callback;
+  }
+
+  void handleApiError(ApiError error, {bool isCritical = false}) async {
     if (isCritical) {
       _logger.e('Api error: ${error.toErrorMessage()}', error);
       if (error == ApiError.noInternetConnection &&
@@ -38,25 +40,15 @@ abstract class DataProvider<T> extends ChangeNotifier {
         _onNoInternetNeeded!();
       } else if (error == ApiError.unauthorized) {
         _logger.w('Tried sync but access unauthorized.', error);
-        //_showNewCredentialsDialog = true; // TODO set back to false
-      } else {
-        throw error;
+        await showNewCredentialsDialog();
       }
     } else {
       _logger.i('Api error: ${error.toErrorMessage()}');
     }
   }
-
-  void onNoInternetConnection(VoidCallback? callback) {
-    _onNoInternetNeeded = callback;
-  }
-
-  Future<void> doFullUpdate();
-
-  Future<void> upsertPartOfAccountData(AccountData accountData);
 }
 
-abstract class DataProviderImpl<T extends Entity> extends DataProvider<T> {
+abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
   Api<T> get api;
 
   DbAccessor<T> get db;
@@ -117,12 +109,12 @@ abstract class DataProviderImpl<T extends Entity> extends DataProvider<T> {
   }
 
   @override
-  Future<void> upsertPartOfAccountData(AccountData accountData) async {
+  Future<void> upsertFromAccountData(AccountData accountData) async {
     await upsertMultiple(getFromAccountData(accountData), synchronized: true);
   }
 }
 
-mixin ConnectedMethods<T extends Entity> on DataProviderImpl<T> {
+mixin ConnectedMethods<T extends Entity> on EntityDataProvider<T> {
   @override
   Future<void> createSingle(T object) async {
     assert(object.isValid());
@@ -131,9 +123,8 @@ mixin ConnectedMethods<T extends Entity> on DataProviderImpl<T> {
       handleApiError(result.failure);
       throw result.failure;
     }
-    db
-        .createSingle(object, isSynchronized: true)
-        .then((_) => notifyListeners());
+    await db.createSingle(object, isSynchronized: true);
+    notifyListeners();
   }
 
   @override
@@ -144,9 +135,8 @@ mixin ConnectedMethods<T extends Entity> on DataProviderImpl<T> {
       handleApiError(result.failure);
       throw result.failure;
     }
-    db
-        .updateSingle(object, isSynchronized: true)
-        .then((_) => notifyListeners());
+    await db.updateSingle(object, isSynchronized: true);
+    notifyListeners();
   }
 
   @override
@@ -156,13 +146,12 @@ mixin ConnectedMethods<T extends Entity> on DataProviderImpl<T> {
       handleApiError(result.failure);
       throw result.failure;
     }
-    db
-        .deleteSingle(object.id, isSynchronized: true)
-        .then((_) => notifyListeners());
+    await db.deleteSingle(object.id, isSynchronized: true);
+    notifyListeners();
   }
 }
 
-mixin UnconnectedMethods<T extends Entity> on DataProviderImpl<T> {
+mixin UnconnectedMethods<T extends Entity> on EntityDataProvider<T> {
   @override
   Future<void> createSingle(T object) async {
     assert(object.isValid());

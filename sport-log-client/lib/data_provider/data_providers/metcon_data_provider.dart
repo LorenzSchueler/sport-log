@@ -178,13 +178,12 @@ class MetconDataProvider extends DataProvider<MetconDescription> {
       notifyListeners();
       throw result2.failure;
     }
-    metconMovementDb
-        .upsertMultiple(result2.success, synchronized: true)
-        .then((_) => notifyListeners());
+    await metconMovementDb.upsertMultiple(result2.success, synchronized: true);
+    notifyListeners();
   }
 
   @override
-  Future<void> upsertPartOfAccountData(AccountData accountData) async {
+  Future<void> upsertFromAccountData(AccountData accountData) async {
     await metconDb.upsertMultiple(accountData.metcons, synchronized: true);
     await metconMovementDb.upsertMultiple(accountData.metconMovements,
         synchronized: true);

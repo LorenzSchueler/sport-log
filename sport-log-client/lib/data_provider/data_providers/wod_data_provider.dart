@@ -5,7 +5,7 @@ import 'package:sport_log/database/table.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/wod/wod.dart';
 
-class WodDataProvider extends DataProviderImpl<Wod>
+class WodDataProvider extends EntityDataProvider<Wod>
     with UnconnectedMethods<Wod> {
   static final instance = WodDataProvider._();
   WodDataProvider._();

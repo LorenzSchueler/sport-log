@@ -233,7 +233,7 @@ class StrengthDataProvider extends DataProvider<StrengthSessionWithSets> {
   }
 
   @override
-  Future<void> upsertPartOfAccountData(AccountData accountData) async {
+  Future<void> upsertFromAccountData(AccountData accountData) async {
     await strengthSessionDb.upsertMultiple(accountData.strengthSessions,
         synchronized: true);
     await strengthSetDb.upsertMultiple(accountData.strengthSets,
