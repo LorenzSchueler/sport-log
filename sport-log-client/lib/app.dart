@@ -1,8 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:provider/provider.dart';
-import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
@@ -28,32 +26,28 @@ import 'package:sport_log/pages/movements/overview_page.dart';
 import 'package:sport_log/pages/login/registration_page.dart';
 import 'package:sport_log/pages/workout/diary/diary_edit_page.dart';
 import 'package:sport_log/pages/workout/diary/diary_overview_page.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_details_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_edit_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_overview_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_details_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_edit_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page.dart';
 import 'package:sport_log/pages/workout/timeline/timeline_page.dart';
+import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
-//import 'package:sport_log/widgets/form_widgets/new_credentials_dialog.dart';
-
-import 'pages/workout/metcon_sessions/metcon_session_details_page.dart';
-import 'routes.dart';
 
 class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _AppState();
+  State<StatefulWidget> createState() => AppState();
 }
 
-class _AppState extends State<App> {
+class AppState extends State<App> {
+  static final navigatorKey = GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
-    //if (Provider.of<Sync>(context, listen: true).showNewCredentialsDialog) {
-    //showNewCredentialsDialog(context: context);
-    //}
-
     // use themeDataFromColors to change theme data
     final darkTheme = themeDataFromColors(
       // for selected/clickable things
@@ -195,6 +189,7 @@ class _AppState extends State<App> {
         },
         initialRoute:
             Settings.userExists() ? Routes.timeline.overview : Routes.landing,
+        navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
         theme: lightTheme,
         darkTheme: darkTheme,

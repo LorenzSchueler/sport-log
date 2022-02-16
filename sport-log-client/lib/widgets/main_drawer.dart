@@ -9,8 +9,7 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
-
-import 'spinning_sync.dart';
+import 'package:sport_log/widgets/spinning_sync.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({

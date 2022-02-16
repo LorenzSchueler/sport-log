@@ -8,6 +8,7 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/widgets/form_widgets/new_credentials_dialog.dart';
 
 import 'data_providers/all.dart';
 
@@ -18,9 +19,6 @@ class Sync extends ChangeNotifier {
 
   bool _isSyncing;
   bool get isSyncing => _isSyncing;
-
-  //bool _showNewCredentialsDialog = false;
-  //bool get showNewCredentialsDialog => _showNewCredentialsDialog;
 
   static final Sync instance = Sync._();
   Sync._() : _isSyncing = false;
@@ -56,6 +54,44 @@ class Sync extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> _upSync() async {
+    for (final dp in allDataProviders) {
+      // TODO: this can be sped up
+      await dp.pushToServer();
+    }
+    // TODO: upsync routes, cardio sessions, metcon sessions, movement muscle, training plan, metcon item, strength blueprint, cardio blueprint
+  }
+
+  Future<bool> _downSync({VoidCallback? onNoInternet}) async {
+    final accountDataResult = await Api.accountData.get(Settings.lastSync);
+    if (accountDataResult.isFailure) {
+      switch (accountDataResult.failure) {
+        case ApiError.noInternetConnection:
+          _logger.d('Tried sync but got no Internet connection.',
+              accountDataResult.failure);
+          if (onNoInternet != null) {
+            onNoInternet();
+          }
+          break;
+        case ApiError.unauthorized:
+          _logger.w(
+              'Tried sync but access unauthorized.', accountDataResult.failure);
+          showNewCredentialsDialog();
+          break;
+        default:
+          _logger.e(
+              'Tried down sync, but got error.', accountDataResult.failure);
+          break;
+      }
+      return false;
+    } else {
+      final accountData = accountDataResult.success;
+      AppDatabase.instance!.upsertAccountData(accountData, synchronized: true);
+      // TODO: deal with user updates
+      return true;
+    }
+  }
+
   void startSync() {
     assert(Settings.userExists());
     if (_syncTimer != null && _syncTimer!.isActive) {
@@ -86,44 +122,4 @@ class Sync extends ChangeNotifier {
         ActionRuleDataProvider.instance,
         PlatformCredentialDataProvider.instance,
       ];
-
-  Future<void> _upSync() async {
-    for (final dp in allDataProviders) {
-      // TODO: this can be sped up
-      await dp.pushToServer();
-    }
-    // TODO: upsync routes, cardio sessions, metcon sessions, movement muscle, training plan, metcon item, strength blueprint, cardio blueprint
-  }
-
-  Future<bool> _downSync({VoidCallback? onNoInternet}) async {
-    final accountDataResult = await Api.accountData.get(Settings.lastSync);
-    if (accountDataResult.isFailure) {
-      switch (accountDataResult.failure) {
-        case ApiError.noInternetConnection:
-          _logger.d('Tried sync but got no Internet connection.',
-              accountDataResult.failure);
-          if (onNoInternet != null) {
-            onNoInternet();
-          }
-          break;
-        case ApiError.unauthorized:
-          _logger.w(
-              'Tried sync but access unauthorized.', accountDataResult.failure);
-          //_showNewCredentialsDialog = true; // TODO set back to false
-          //notifyListeners();
-          break;
-        default:
-          _logger.e(
-              'Tried down sync, but got error.', accountDataResult.failure);
-          break;
-      }
-      return false;
-    } else {
-      final accountData = accountDataResult.success;
-      AppDatabase.instance!.upsertAccountData(accountData, synchronized: true);
-
-      // TODO: deal with user updates
-      return true;
-    }
-  }
 }

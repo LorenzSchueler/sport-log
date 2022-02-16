@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart' hide Route;
+import 'package:sport_log/app.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
 
-Future<User?> showNewCredentialsDialog({
-  required BuildContext context,
-  bool dismissable = true,
-}) async {
+Future<User?> showNewCredentialsDialog() async {
   return showDialog<User>(
     builder: (_) => const NewCredentialsDialog(),
     barrierDismissible: false,
-    context: context,
+    context: AppState.navigatorKey.currentContext!,
   );
 }
 
@@ -32,31 +30,34 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
   Widget build(BuildContext context) {
     return Dialog(
         clipBehavior: Clip.antiAlias,
-        child: Column(children: [
-          const Text(
-              "Looks like you changed you credentials on another device.\nPlease update your credentials!"),
-          Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  _usernameInput(context),
-                  Defaults.sizedBox.vertical.normal,
-                  _passwordInput(context),
-                  Defaults.sizedBox.vertical.normal,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+        child: Container(
+            padding: const EdgeInsets.all(10),
+            child: Column(children: [
+              const Text(
+                  "Looks like you changed you credentials on another device.\nPlease update your credentials!"),
+              Defaults.sizedBox.vertical.big,
+              Form(
+                  key: _formKey,
+                  child: Column(
                     children: [
-                      if (_loginPending)
-                        Container(
-                          child: const CircularProgressIndicator(),
-                          margin: const EdgeInsets.only(right: 20),
-                        ),
-                      _submitButton(context),
+                      _usernameInput(context),
+                      Defaults.sizedBox.vertical.normal,
+                      _passwordInput(context),
+                      Defaults.sizedBox.vertical.normal,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if (_loginPending)
+                            Container(
+                              child: const CircularProgressIndicator(),
+                              margin: const EdgeInsets.only(right: 20),
+                            ),
+                          _submitButton(context),
+                        ],
+                      )
                     ],
-                  )
-                ],
-              ))
-        ]));
+                  ))
+            ])));
   }
 
   Widget _usernameInput(
