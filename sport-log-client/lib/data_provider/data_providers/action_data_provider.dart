@@ -3,22 +3,36 @@ import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
-import 'package:sport_log/models/action/action_event.dart';
-import 'package:sport_log/models/action/action_rule.dart';
+import 'package:sport_log/models/action/all.dart';
 
-class ActionEventDataProvider extends EntityDataProvider<ActionEvent> {
-  static final instance = ActionEventDataProvider._();
-  ActionEventDataProvider._();
-
-  @override
-  final Api<ActionEvent> api = Api.actionEvents;
+class ActionProviderDataProvider extends EntityDataProvider<ActionProvider> {
+  static final instance = ActionProviderDataProvider._();
+  ActionProviderDataProvider._();
 
   @override
-  final DbAccessor<ActionEvent> db = AppDatabase.actionEvents;
+  final Api<ActionProvider> api = Api.actionProviders;
 
   @override
-  List<ActionEvent> getFromAccountData(AccountData accountData) =>
-      accountData.actionEvents;
+  final DbAccessor<ActionProvider> db = AppDatabase.actionProviders;
+
+  @override
+  List<ActionProvider> getFromAccountData(AccountData accountData) =>
+      accountData.actionProviders;
+}
+
+class ActionDataProvider extends EntityDataProvider<Action> {
+  static final instance = ActionDataProvider._();
+  ActionDataProvider._();
+
+  @override
+  final Api<Action> api = Api.actions;
+
+  @override
+  final DbAccessor<Action> db = AppDatabase.actions;
+
+  @override
+  List<Action> getFromAccountData(AccountData accountData) =>
+      accountData.actions;
 }
 
 class ActionRuleDataProvider extends EntityDataProvider<ActionRule> {
@@ -34,4 +48,19 @@ class ActionRuleDataProvider extends EntityDataProvider<ActionRule> {
   @override
   List<ActionRule> getFromAccountData(AccountData accountData) =>
       accountData.actionRules;
+}
+
+class ActionEventDataProvider extends EntityDataProvider<ActionEvent> {
+  static final instance = ActionEventDataProvider._();
+  ActionEventDataProvider._();
+
+  @override
+  final Api<ActionEvent> api = Api.actionEvents;
+
+  @override
+  final DbAccessor<ActionEvent> db = AppDatabase.actionEvents;
+
+  @override
+  List<ActionEvent> getFromAccountData(AccountData accountData) =>
+      accountData.actionEvents;
 }

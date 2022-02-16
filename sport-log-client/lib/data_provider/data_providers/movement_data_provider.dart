@@ -15,6 +15,10 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
   @override
   final MovementTable db = AppDatabase.movements;
 
+  @override
+  List<Movement> getFromAccountData(AccountData accountData) =>
+      accountData.movements;
+
   Future<List<MovementDescription>> getMovementDescriptions() async =>
       db.getMovementDescriptions();
 
@@ -26,8 +30,4 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
 
   Future<bool> movementExists(String name, MovementDimension dim) async =>
       db.exists(name, dim);
-
-  @override
-  List<Movement> getFromAccountData(AccountData accountData) =>
-      accountData.movements;
 }

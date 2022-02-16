@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart' hide Route;
-import 'package:sport_log/data_provider/data_providers/route_data_provider.dart';
+import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/models/cardio/route.dart';
 
 Future<Route?> showRoutePickerDialog({
   required BuildContext context,
   bool dismissable = true,
 }) async {
-  final _dataProvider = RouteDataProvider();
+  final _dataProvider = RouteDataProvider.instance;
   final _routes = await _dataProvider.getNonDeleted();
   return showDialog<Route>(
     builder: (_) => RoutePickerDialog(_routes),
