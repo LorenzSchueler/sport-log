@@ -2,15 +2,23 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/app.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
 
-Future<User?> showNewCredentialsDialog() async {
-  return showDialog<User>(
-    builder: (_) => const NewCredentialsDialog(),
-    barrierDismissible: false,
-    context: AppState.navigatorKey.currentContext!,
-  );
+bool _dialogShown = false;
+final _logger = Logger('NewCredentialsDialog');
+
+Future<void> showNewCredentialsDialog() async {
+  if (!_dialogShown) {
+    _dialogShown = true;
+    await showDialog<User>(
+      builder: (_) => const NewCredentialsDialog(),
+      barrierDismissible: false,
+      context: AppState.navigatorKey.currentContext!,
+    );
+    _dialogShown = false;
+  }
 }
 
 class NewCredentialsDialog extends StatefulWidget {
@@ -25,6 +33,7 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
   String _username = "";
   String _password = "";
   bool _loginPending = false;
+  String? _errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +43,7 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
             padding: const EdgeInsets.all(10),
             child: Column(children: [
               const Text(
-                  "Looks like you changed you credentials on another device.\nPlease update your credentials!"),
+                  "Looks like you changed you credentials on another device.\nPlease update your credentials below!"),
               Defaults.sizedBox.vertical.big,
               Form(
                   key: _formKey,
@@ -56,7 +65,9 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
                         ],
                       )
                     ],
-                  ))
+                  )),
+              Defaults.sizedBox.vertical.big,
+              if (_errorMessage != null) Text(_errorMessage!)
             ])));
   }
 
@@ -115,7 +126,7 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
   ) {
     return ElevatedButton(
       child: const Text(
-        "Login",
+        "Update",
         style: TextStyle(fontSize: 18),
       ), // TODO: use theme for this
       onPressed:
@@ -144,9 +155,9 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
       if (result.isSuccess) {
         Navigator.of(context).pop(result.success);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(result.failure),
-        ));
+        setState(() {
+          _errorMessage = result.failure;
+        });
       }
       _formKey.currentState!.deactivate();
     }
