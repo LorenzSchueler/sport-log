@@ -25,7 +25,7 @@ class AccountData {
     required this.actionEvents,
   });
 
-  User user;
+  User? user; // only send if updated
   List<Diary> diaries;
   List<Wod> wods;
   List<Movement> movements;
