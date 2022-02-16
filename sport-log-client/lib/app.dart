@@ -72,33 +72,33 @@ class _AppState extends State<App> {
 
     Defaults.mapbox.accessToken; // make sure access token is available
 
-    Widget checkLogin(Widget Function(BuildContext) builder) {
-      return Settings.userExists() ? builder(context) : const LandingPage();
+    Widget checkLogin(Widget Function() builder) {
+      return Settings.userExists() ? builder() : const LandingPage();
     }
 
-    Widget checkNotLogin(Widget Function(BuildContext) builder) {
-      return Settings.userExists() ? const TimelinePage() : builder(context);
+    Widget checkNotLogin(Widget Function() builder) {
+      return Settings.userExists() ? const TimelinePage() : builder();
     }
 
     return KeyboardDismissOnTap(
       child: MaterialApp(
         routes: {
-          Routes.landing: (_) => checkNotLogin((_) => const LandingPage()),
-          Routes.login: (_) => checkNotLogin((_) => const LoginPage()),
+          Routes.landing: (_) => checkNotLogin(() => const LandingPage()),
+          Routes.login: (_) => checkNotLogin(() => const LoginPage()),
           Routes.registration: (_) =>
-              checkNotLogin((_) => const RegistrationPage()),
-          Routes.timer: (_) => checkLogin((_) => const TimerPage()),
-          Routes.map: (_) => checkLogin((_) => const MapPage()),
-          Routes.offlineMaps: (_) => checkLogin((_) => const OfflineMapsPage()),
-          Routes.settings: (_) => checkLogin((_) => const SettingsPage()),
-          Routes.about: (_) => checkLogin((_) => const AboutPage()),
+              checkNotLogin(() => const RegistrationPage()),
+          Routes.timer: (_) => checkLogin(() => const TimerPage()),
+          Routes.map: (_) => checkLogin(() => const MapPage()),
+          Routes.offlineMaps: (_) => checkLogin(() => const OfflineMapsPage()),
+          Routes.settings: (_) => checkLogin(() => const SettingsPage()),
+          Routes.about: (_) => checkLogin(() => const AboutPage()),
           // Action
           Routes.action.overview: (_) =>
-              checkLogin((_) => const ActionOverviewPage()),
+              checkLogin(() => const ActionOverviewPage()),
           // movement
           Routes.movement.overview: (_) =>
-              checkLogin((_) => const MovementsPage()),
-          Routes.movement.edit: (_) => checkLogin((context) {
+              checkLogin(() => const MovementsPage()),
+          Routes.movement.edit: (_) => checkLogin(() {
                 final arg = ModalRoute.of(context)?.settings.arguments;
                 if (arg is MovementDescription) {
                   return EditMovementPage(initialMovement: arg);
@@ -108,8 +108,8 @@ class _AppState extends State<App> {
                 return EditMovementPage.newMovement();
               }),
           // metcon
-          Routes.metcon.overview: (_) => checkLogin((_) => const MetconsPage()),
-          Routes.metcon.edit: (_) => checkLogin((context) {
+          Routes.metcon.overview: (_) => checkLogin(() => const MetconsPage()),
+          Routes.metcon.edit: (_) => checkLogin(() {
                 final arg = ModalRoute.of(context)?.settings.arguments;
                 return EditMetconPage(
                   initialMetcon: (arg is MetconDescription) ? arg : null,
@@ -117,18 +117,18 @@ class _AppState extends State<App> {
               }),
           // timeline
           Routes.timeline.overview: (_) =>
-              checkLogin((_) => const TimelinePage()),
+              checkLogin(() => const TimelinePage()),
           // metcon session
           Routes.metcon.sessionOverview: (_) =>
-              checkLogin(((_) => const MetconSessionsPage())),
-          Routes.metcon.sessionDetails: (context) => checkLogin((context) {
+              checkLogin((() => const MetconSessionsPage())),
+          Routes.metcon.sessionDetails: (context) => checkLogin(() {
                 final metconSessionDescription = ModalRoute.of(context)
                     ?.settings
                     .arguments as MetconSessionDescription;
                 return MetconSessionDetailsPage(
                     metconSessionDescription: metconSessionDescription);
               }),
-          Routes.metcon.sessionEdit: (context) => checkLogin((context) {
+          Routes.metcon.sessionEdit: (context) => checkLogin(() {
                 final metconSessionDescription = ModalRoute.of(context)
                     ?.settings
                     .arguments as MetconSessionDescription?;
@@ -137,15 +137,15 @@ class _AppState extends State<App> {
               }),
           // strength
           Routes.strength.overview: (_) =>
-              checkLogin((_) => const StrengthSessionsPage()),
-          Routes.strength.details: (_) => checkLogin((context) {
+              checkLogin(() => const StrengthSessionsPage()),
+          Routes.strength.details: (context) => checkLogin(() {
                 final arg = ModalRoute.of(context)?.settings.arguments;
                 if (arg is! Int64) {
                   throw ArgumentError('StrengthSessionDetailsPage without id');
                 }
                 return StrengthSessionDetailsPage(id: arg);
               }),
-          Routes.strength.edit: (_) => checkLogin((context) {
+          Routes.strength.edit: (context) => checkLogin(() {
                 final arg = ModalRoute.of(context)?.settings.arguments;
                 if (arg is! StrengthSessionWithSets) {
                   throw ArgumentError(
@@ -155,30 +155,30 @@ class _AppState extends State<App> {
               }),
           // cardio
           Routes.cardio.overview: (_) =>
-              checkLogin((_) => const CardioSessionsPage()),
+              checkLogin(() => const CardioSessionsPage()),
           Routes.cardio.trackingSettings: (_) =>
-              checkLogin((_) => const CardioTrackingSettingsPage()),
-          Routes.cardio.tracking: (context) => checkLogin((context) {
+              checkLogin(() => const CardioTrackingSettingsPage()),
+          Routes.cardio.tracking: (context) => checkLogin(() {
                 final args =
                     ModalRoute.of(context)?.settings.arguments as List<dynamic>;
                 return CardioTrackingPage(args[0] as Movement,
                     args[1] as CardioType, args[2] as Route?);
               }),
-          Routes.cardio.cardioEdit: (context) => checkLogin((context) {
+          Routes.cardio.cardioEdit: (context) => checkLogin(() {
                 final cardioSession = ModalRoute.of(context)?.settings.arguments
                     as CardioSession?;
                 return CardioEditPage(
                   cardioSession: cardioSession,
                 );
               }),
-          Routes.cardio.cardioDetails: (context) => checkLogin((context) {
+          Routes.cardio.cardioDetails: (context) => checkLogin(() {
                 final cardioSession =
                     ModalRoute.of(context)?.settings.arguments as CardioSession;
                 return CardioDetailsPage(cardioSession: cardioSession);
               }),
           Routes.cardio.routeOverview: (_) =>
-              checkLogin((_) => const RoutePage()),
-          Routes.cardio.routeEdit: (context) => checkLogin((context) {
+              checkLogin(() => const RoutePage()),
+          Routes.cardio.routeEdit: (context) => checkLogin(() {
                 final route =
                     ModalRoute.of(context)?.settings.arguments as Route?;
                 return RouteEditPage(
@@ -186,8 +186,8 @@ class _AppState extends State<App> {
                 );
               }),
           // diary
-          Routes.diary.overview: (_) => checkLogin((_) => const DiaryPage()),
-          Routes.diary.edit: (context) => checkLogin((context) {
+          Routes.diary.overview: (_) => checkLogin(() => const DiaryPage()),
+          Routes.diary.edit: (context) => checkLogin(() {
                 final diary =
                     ModalRoute.of(context)?.settings.arguments as Diary?;
                 return DiaryEditPage(diary: diary);
