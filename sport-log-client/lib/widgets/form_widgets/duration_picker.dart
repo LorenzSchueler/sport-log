@@ -15,7 +15,7 @@ class DurationPicker extends StatefulWidget {
   }) : super(key: key);
 
   final void Function(Duration) setDuration;
-  final Duration initialDuration;
+  final Duration? initialDuration;
 
   @override
   State<DurationPicker> createState() => _DurationPickerState();
@@ -37,7 +37,7 @@ class _DurationPickerState extends State<DurationPicker> {
   @override
   void initState() {
     super.initState();
-    _duration = widget.initialDuration;
+    _duration = widget.initialDuration ?? const Duration();
     _updateTextFieldsWithPadding();
     _keyboardSubscription = KeyboardVisibilityController()
         .onChange
@@ -47,7 +47,8 @@ class _DurationPickerState extends State<DurationPicker> {
   @override
   void didUpdateWidget(covariant DurationPicker oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _setDuration(widget.initialDuration, notifyParent: false, format: true);
+    _setDuration(widget.initialDuration ?? const Duration(),
+        notifyParent: false, format: true);
   }
 
   @override

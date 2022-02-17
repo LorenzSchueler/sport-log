@@ -218,7 +218,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   child: DurationPicker(
                       setDuration: (d) =>
                           setState(() => _cardioSession.time = d),
-                      initialDuration: _cardioSession.time!),
+                      initialDuration: _cardioSession.time),
                   leading: CustomIcons.timeInterval,
                 ),
                 TextFormField(
