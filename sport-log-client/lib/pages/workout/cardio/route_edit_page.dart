@@ -92,7 +92,7 @@ class RouteEditPageState extends State<RouteEditPage> {
                 longitude: coordinate.longitude,
                 elevation: 0, // TODO
                 distance: 0, // TODO
-                time: 0), // TODO
+                time: const Duration(seconds: 0)), // TODO
           )
           .toList();
     }

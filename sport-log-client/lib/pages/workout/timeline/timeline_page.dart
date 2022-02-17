@@ -75,7 +75,7 @@ class TimelinePageState extends State<TimelinePage> {
               userId: Settings.userId!,
               metconId: Int64(1),
               datetime: DateTime.now(),
-              time: 15 * 60,
+              time: const Duration(minutes: 15),
               rounds: 3,
               reps: 0,
               rx: true,
@@ -124,7 +124,7 @@ class TimelinePageState extends State<TimelinePage> {
             distance: 15034,
             ascent: 308,
             descent: 297,
-            time: 4189,
+            time: const Duration(seconds: 4189),
             calories: null,
             track: [
               Position(
@@ -132,19 +132,19 @@ class TimelinePageState extends State<TimelinePage> {
                   latitude: 47.27,
                   elevation: 600,
                   distance: 0,
-                  time: 0),
+                  time: const Duration(seconds: 0)),
               Position(
                   longitude: 11.331,
                   latitude: 47.27,
                   elevation: 650,
                   distance: 1000,
-                  time: 200),
+                  time: const Duration(seconds: 200)),
               Position(
                   longitude: 11.33,
                   latitude: 47.272,
                   elevation: 600,
                   distance: 2000,
-                  time: 500)
+                  time: const Duration(seconds: 500)),
             ],
             avgCadence: 167,
             cadence: null,

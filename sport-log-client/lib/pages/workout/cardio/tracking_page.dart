@@ -41,7 +41,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
   late DateTime _startTime;
   DateTime? _pauseEndTime;
-  int _seconds = 0;
+  Duration _seconds = const Duration(seconds: 0);
   String _time = "00:00:00";
 
   String? _comments;
@@ -61,9 +61,8 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
   void _updateData() {
     Duration duration = _trackingMode == TrackingMode.tracking
-        ? Duration(seconds: _seconds) +
-            DateTime.now().difference(_pauseEndTime!)
-        : Duration(seconds: _seconds);
+        ? _seconds + DateTime.now().difference(_pauseEndTime!)
+        : _seconds;
     setState(() {
       _time = duration.toString().split('.').first.padLeft(8, '0');
 
@@ -89,7 +88,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       time: _seconds,
       calories: null,
       track: _positions,
-      avgCadence: (_stepTimes.length / _seconds * 60).round(),
+      avgCadence: (_stepTimes.length / _seconds.inSeconds * 60).round(),
       cadence: _stepTimes,
       avgHeartRate: null,
       heartRate: null,
@@ -208,10 +207,8 @@ satelites: ${location.satelliteNumber}""";
           longitude: location.longitude!,
           elevation: location.altitude!.toInt(),
           distance: 0,
-          time: DateTime.now()
-              .difference(
-                  DateTime.fromMicrosecondsSinceEpoch(location.time!.toInt()))
-              .inSeconds));
+          time: DateTime.now().difference(
+              DateTime.fromMicrosecondsSinceEpoch(location.time!.toInt()))));
       _extendLine(_mapController, latLng);
     }
   }
@@ -264,8 +261,7 @@ satelites: ${location.satelliteNumber}""";
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
                 onPressed: () {
                   _trackingMode = TrackingMode.paused;
-                  _seconds +=
-                      DateTime.now().difference(_pauseEndTime!).inSeconds;
+                  _seconds += DateTime.now().difference(_pauseEndTime!);
                 },
                 child: const Text("pause"))),
         Defaults.sizedBox.horizontal.normal,
@@ -274,8 +270,7 @@ satelites: ${location.satelliteNumber}""";
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
                 onPressed: () async {
                   _trackingMode = TrackingMode.paused;
-                  _seconds +=
-                      DateTime.now().difference(_pauseEndTime!).inSeconds;
+                  _seconds += DateTime.now().difference(_pauseEndTime!);
                   await _stopDialog();
                 },
                 child: const Text("stop"))),

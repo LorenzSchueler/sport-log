@@ -12,6 +12,7 @@ abstract class Config {
   static late final bool generateTestData;
   static late final l.Level minLogLevel;
   static late final bool outputRequestJson;
+  static late final bool outputResponseJson;
   static late final bool outputDbStatement;
 
   static Future<void> init() async {
@@ -54,6 +55,10 @@ abstract class Config {
         String.fromEnvironment('OUTPUT_REQUEST_JSON', defaultValue: 'false');
     outputRequestJson = outputRequestJsonStr.toLowerCase() == 'true';
 
+    const outputResponseJsonStr =
+        String.fromEnvironment('OUTPUT_RESPONSE_JSON', defaultValue: 'false');
+    outputResponseJson = outputResponseJsonStr.toLowerCase() == 'true';
+
     const outputDbStatementStr =
         String.fromEnvironment('OUTPUT_DB_STATEMENT', defaultValue: 'false');
     outputDbStatement = outputDbStatementStr.toLowerCase() == 'true';
@@ -62,6 +67,8 @@ abstract class Config {
     _logger.i('Generate test data: $generateTestData');
     _logger.i('Min log level: $minLogLevel');
     _logger.i('Output request json: $outputRequestJson');
+    _logger.i('Output response json: $outputResponseJson');
+    _logger.i('Output db statement: $outputDbStatement');
   }
 
   static bool get isWeb => kIsWeb;

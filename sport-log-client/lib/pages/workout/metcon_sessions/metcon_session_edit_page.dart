@@ -7,9 +7,10 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/form_widgets/metcon_picker.dart';
-import 'package:sport_log/widgets/form_widgets/time_form_field.dart';
 
 class MetconSessionEditPage extends StatefulWidget {
   final MetconSessionDescription? metconSessionDescription;
@@ -153,7 +154,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                                   _metconSessionDescription
                                       .metconSession.rounds = 0;
                                   _metconSessionDescription.metconSession.time =
-                                      0;
+                                      const Duration(seconds: 0);
                                 } else {
                                   _metconSessionDescription
                                       .metconSession.rounds = 0;
@@ -166,28 +167,15 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                           .metconDescription.metcon.metconType ==
                       MetconType.forTime &&
                   _finished)
-                TimeFormField.minSec(
-                    minutes:
-                        _metconSessionDescription.metconSession.time! ~/ 60,
-                    seconds: _metconSessionDescription.metconSession.time! % 60,
-                    onMinutesSubmitted: (minutes) => setState(() {
-                          _metconSessionDescription.metconSession.time =
-                              Duration(
-                                      minutes: minutes,
-                                      seconds: _metconSessionDescription
-                                              .metconSession.time! %
-                                          60)
-                                  .inSeconds;
-                        }),
-                    onSecondsSubmitted: (seconds) => setState(() {
-                          _metconSessionDescription.metconSession.time =
-                              Duration(
-                                      minutes: _metconSessionDescription
-                                              .metconSession.time! ~/
-                                          60,
-                                      seconds: seconds)
-                                  .inSeconds;
-                        })),
+                EditTile(
+                  caption: 'Time',
+                  child: DurationPicker(
+                      setDuration: (d) => setState(() =>
+                          _metconSessionDescription.metconSession.time = d),
+                      initialDuration:
+                          _metconSessionDescription.metconSession.time!),
+                  leading: CustomIcons.timeInterval,
+                ),
               if (_metconSessionDescription
                               .metconDescription.metcon.metconType ==
                           MetconType.forTime &&

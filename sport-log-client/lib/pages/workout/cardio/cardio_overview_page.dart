@@ -45,7 +45,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         distance: 15034,
         ascent: 308,
         descent: 297,
-        time: 4189,
+        time: const Duration(seconds: 4189),
         calories: null,
         track: [
           Position(
@@ -53,19 +53,19 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
               latitude: 47.27,
               elevation: 600,
               distance: 0,
-              time: 0),
+              time: const Duration(seconds: 0)),
           Position(
               longitude: 11.331,
               latitude: 47.27,
               elevation: 650,
               distance: 1000,
-              time: 200),
+              time: const Duration(seconds: 200)),
           Position(
               longitude: 11.33,
               latitude: 47.272,
               elevation: 600,
               distance: 2000,
-              time: 500)
+              time: const Duration(seconds: 500)),
         ],
         avgCadence: 167,
         cadence: null,
@@ -83,7 +83,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         distance: 5091,
         ascent: 8,
         descent: 7,
-        time: 489,
+        time: const Duration(seconds: 489),
         calories: null,
         track: null,
         avgCadence: 147,
@@ -207,11 +207,11 @@ class CardioSessionCard extends StatelessWidget {
         : (cardioSession.distance! / 1000).toStringAsFixed(3);
     final speed = cardioSession.distance == null || cardioSession.time == null
         ? '???'
-        : ((cardioSession.distance! / 1000) / (cardioSession.time! / 3600))
+        : ((cardioSession.distance! / 1000) /
+                (cardioSession.time!.inSeconds / 3600))
             .toStringAsFixed(1);
-    final duration = cardioSession.time == null
-        ? "???"
-        : formatTime(Duration(seconds: cardioSession.time!));
+    final duration =
+        cardioSession.time == null ? "???" : formatTime(cardioSession.time!);
 
     late MapboxMapController _sessionMapController;
 

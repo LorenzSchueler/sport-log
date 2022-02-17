@@ -10,8 +10,8 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/form_widgets/cardio_type_picker.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
-import 'package:sport_log/widgets/form_widgets/time_form_field.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 import 'package:sport_log/widgets/form_widgets/route_picker.dart';
 
@@ -66,11 +66,6 @@ class CardioEditPageState extends State<CardioEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    Duration duration = Duration(seconds: _cardioSession.time ?? 0);
-    int _hours = duration.inHours;
-    int _minutes = duration.inMinutes - 60 * _hours;
-    int _seconds = duration.inSeconds - 60 * _minutes - 3600 * _hours;
-
     late MapboxMapController _sessionMapController;
 
     return Scaffold(
@@ -218,25 +213,14 @@ class CardioEditPageState extends State<CardioEditPage> {
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
                 ),
-                TimeFormField(
-                    hours: _hours,
-                    minutes: _minutes,
-                    seconds: _seconds,
-                    onHoursSubmitted: (hours) => setState(() {
-                          _hours = hours;
-                          _cardioSession.time =
-                              _hours * 3600 + _minutes * 60 + _seconds;
-                        }),
-                    onMinutesSubmitted: (minutes) => setState(() {
-                          _minutes = minutes;
-                          _cardioSession.time =
-                              _hours * 3600 + _minutes * 60 + _seconds;
-                        }),
-                    onSecondsSubmitted: (seconds) => setState(() {
-                          _seconds = seconds;
-                          _cardioSession.time =
-                              _hours * 3600 + _minutes * 60 + _seconds;
-                        })),
+                EditTile(
+                  caption: 'Time',
+                  child: DurationPicker(
+                      setDuration: (d) =>
+                          setState(() => _cardioSession.time = d),
+                      initialDuration: _cardioSession.time!),
+                  leading: CustomIcons.timeInterval,
+                ),
                 TextFormField(
                   keyboardType: TextInputType.number,
                   onFieldSubmitted: (calories) => setState(() {

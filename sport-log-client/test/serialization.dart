@@ -10,19 +10,19 @@ void main() {
           latitude: 52.3423,
           elevation: 8849,
           distance: 1034,
-          time: 300),
+          time: const Duration(seconds: 300)),
       Position(
           longitude: 32.632,
           latitude: 52.3564,
           elevation: -56,
           distance: 2303,
-          time: 702),
+          time: const Duration(seconds: 702)),
       Position(
           longitude: 32.653,
           latitude: 52.4330,
           elevation: 0,
           distance: 2934,
-          time: 1100),
+          time: const Duration(seconds: 1100)),
     ];
 
     final blob = const DbPositionListConverter().mapToSql(positions1);

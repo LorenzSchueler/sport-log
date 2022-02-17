@@ -8,7 +8,9 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/widgets/form_widgets/time_form_field.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
+import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 class TimerPage extends StatefulWidget {
@@ -21,9 +23,8 @@ class TimerPage extends StatefulWidget {
 class TimerPageState extends State<TimerPage> {
   final _logger = Logger('TimerPage');
 
-  int _minutes = 0;
-  int _seconds = 0;
   int _rounds = 3;
+  Duration _totalTime = const Duration();
   Duration _currentTime = const Duration();
   int _currentRound = 0;
   Timer? timer;
@@ -128,12 +129,12 @@ class TimerPageState extends State<TimerPage> {
         caption = "Timecap";
         break;
     }
-    return TimeFormField.minSec(
-      minutes: _minutes,
-      seconds: _seconds,
-      onMinutesSubmitted: (minutes) => _minutes = minutes,
-      onSecondsSubmitted: (seconds) => _seconds = seconds,
+    return EditTile(
       caption: caption,
+      child: DurationPicker(
+          setDuration: (d) => setState(() => _totalTime = d),
+          initialDuration: _totalTime),
+      leading: CustomIcons.timeInterval,
     );
   }
 
@@ -188,19 +189,18 @@ class TimerPageState extends State<TimerPage> {
       if (time.inSeconds == 0) {
         FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ABBR_ALERT);
       }
-      Duration totalTime = Duration(minutes: _minutes, seconds: _seconds);
       setState(() {
         switch (metconType) {
           case MetconType.amrap:
-            _currentTime = totalTime - time;
+            _currentTime = _totalTime - time;
             break;
           case MetconType.emom:
             Duration roundTime =
-                Duration(seconds: time.inSeconds % totalTime.inSeconds);
+                Duration(seconds: time.inSeconds % _totalTime.inSeconds);
             _currentRound = min(
-                ((time.inSeconds + 1) / totalTime.inSeconds).ceil(), _rounds);
-            _currentTime = time == totalTime * _rounds
-                ? Duration(seconds: totalTime.inSeconds)
+                ((time.inSeconds + 1) / _totalTime.inSeconds).ceil(), _rounds);
+            _currentTime = time == _totalTime * _rounds
+                ? Duration(seconds: _totalTime.inSeconds)
                 : roundTime;
             if (roundTime.inSeconds == 0) {
               FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ANSWER);
@@ -212,9 +212,9 @@ class TimerPageState extends State<TimerPage> {
         }
       });
       if (metconType == MetconType.emom) {
-        totalTime *= _rounds;
+        _totalTime *= _rounds;
       }
-      if (time >= totalTime) {
+      if (time >= _totalTime) {
         stopTimer();
       }
     }

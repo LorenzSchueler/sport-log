@@ -57,7 +57,8 @@ class CardioSession extends Entity {
   int? distance;
   int? ascent;
   int? descent;
-  int? time;
+  @DurationConverter()
+  Duration? time;
   int? calories;
   List<Position>? track;
   int? avgCadence;
@@ -82,9 +83,10 @@ class CardioSession extends Entity {
         validate([ascent, descent].every((val) => val == null || val >= 0),
             'CardioSession: ascent or descent < 0') &&
         validate(
-            [distance, time, calories, avgCadence, avgHeartRate]
+            [distance, calories, avgCadence, avgHeartRate]
                 .every((val) => val == null || val > 0),
             'CardioSession: distance, time, calories, avgCadence or avgHeartRate <= 0') &&
+        validate(time!.inSeconds > 0, 'CardioSession: time <= 0') &&
         validate((track == null || distance != null),
             'CardioSession: distance == null when track is set') &&
         validate((cadence == null || avgCadence != null),
@@ -106,7 +108,7 @@ class DbCardioSessionSerializer implements DbSerializer<CardioSession> {
       distance: r[Keys.distance] as int?,
       ascent: r[Keys.ascent] as int?,
       descent: r[Keys.descent] as int?,
-      time: r[Keys.time] as int?,
+      time: r[Keys.time] as Duration?,
       calories: r[Keys.calories] as int?,
       track: const DbPositionListConverter()
           .mapToDart(r[Keys.track] as Uint8List?),
@@ -133,7 +135,7 @@ class DbCardioSessionSerializer implements DbSerializer<CardioSession> {
       Keys.distance: o.distance,
       Keys.ascent: o.ascent,
       Keys.descent: o.descent,
-      Keys.time: o.time,
+      Keys.time: o.time?.inSeconds,
       Keys.calories: o.calories,
       Keys.track: const DbPositionListConverter().mapToSql(o.track),
       Keys.avgCadence: o.avgCadence,

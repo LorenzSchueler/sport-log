@@ -31,7 +31,8 @@ class MetconSession extends Entity {
   Int64 metconId;
   @DateTimeConverter()
   DateTime datetime;
-  int? time;
+  @DurationConverter()
+  Duration? time;
   int? rounds;
   int? reps;
   bool rx;
@@ -48,7 +49,8 @@ class MetconSession extends Entity {
   @override
   bool isValid() {
     return validate(deleted != true, 'MetconSession: deleted == true') &&
-        validate(time == null || time! > 0, 'MetconSession: time <= 0') &&
+        validate(
+            time == null || time!.inSeconds > 0, 'MetconSession: time <= 0') &&
         validate(rounds == null || rounds! > 0, 'MetconSession: rounds <= 0') &&
         validate(reps == null || reps! > 0, 'MetconSession: reps <= 0');
   }
@@ -62,7 +64,7 @@ class DbMetconSessionSerializer implements DbSerializer<MetconSession> {
       userId: Int64(r[Keys.userId]! as int),
       metconId: Int64(r[Keys.metconId]! as int),
       datetime: DateTime.parse(r[Keys.datetime]! as String),
-      time: r[Keys.time] as int?,
+      time: r[Keys.time] as Duration?,
       rounds: r[Keys.rounds] as int?,
       reps: r[Keys.reps] as int?,
       rx: r[Keys.rx]! as int == 1,
@@ -78,7 +80,7 @@ class DbMetconSessionSerializer implements DbSerializer<MetconSession> {
       Keys.userId: o.userId.toInt(),
       Keys.metconId: o.metconId.toInt(),
       Keys.datetime: o.datetime.toString(),
-      Keys.time: o.time,
+      Keys.time: o.time?.inSeconds,
       Keys.rounds: o.rounds,
       Keys.reps: o.reps,
       Keys.rx: o.rx ? 1 : 0,

@@ -30,11 +30,11 @@ class MetconSessionDescription implements Validatable {
       case MetconType.forTime:
         if (short) {
           return metconSession.rounds == metconDescription.metcon.rounds
-              ? "${formatTime(Duration(seconds: metconSession.time!), short: true)} min"
+              ? "${formatTime(metconSession.time!, short: true)} min"
               : "${metconSession.rounds} rounds + ${metconSession.reps} reps";
         } else {
           return metconSession.rounds == metconDescription.metcon.rounds
-              ? "${formatTime(Duration(seconds: metconSession.time!), short: true)} min (${formatTime(Duration(seconds: metconDescription.metcon.timecap!.inSeconds), short: true)} min)"
+              ? "${formatTime(metconSession.time!, short: true)} min (${formatTime(Duration(seconds: metconDescription.metcon.timecap!.inSeconds), short: true)} min)"
               : "${metconSession.rounds} rounds + ${metconSession.reps} reps (${metconDescription.metcon.rounds} rounds)";
         }
     }
