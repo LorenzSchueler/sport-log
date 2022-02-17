@@ -72,7 +72,7 @@ class DiaryPageState extends State<DiaryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_movement?.name ?? defaultTitle),
+        title: const Text("Diary"),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(40),
           child: DateFilter(
@@ -88,8 +88,8 @@ class DiaryPageState extends State<DiaryPage> {
         itemCount: _diaries.length,
       ),
       bottomNavigationBar:
-          SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
-      drawer: MainDrawer(selectedRoute: route),
+          SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.diary),
+      drawer: MainDrawer(selectedRoute: Routes.diary.overview),
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {

@@ -174,15 +174,12 @@ class TimelinePageState extends State<TimelinePage> {
 
   DateFilterState _dateFilter = MonthFilter.current();
   Movement? _movement;
-  final SessionsPageTab sessionsPageTab = SessionsPageTab.timeline;
-  final String route = Routes.timeline.overview;
-  final String defaultTitle = "Timeline";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_movement?.name ?? defaultTitle),
+        title: Text(_movement?.name ?? "Timeline"),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(40),
           child: DateFilter(
@@ -197,9 +194,9 @@ class TimelinePageState extends State<TimelinePage> {
         itemBuilder: _buildItemEntry,
         itemCount: _items.length,
       ),
-      bottomNavigationBar:
-          SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
-      drawer: MainDrawer(selectedRoute: route),
+      bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
+          context, SessionsPageTab.timeline),
+      drawer: MainDrawer(selectedRoute: Routes.timeline.overview),
       floatingActionButton: null,
     );
   }

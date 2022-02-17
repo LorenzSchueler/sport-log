@@ -217,15 +217,12 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
 
   DateFilterState _dateFilter = MonthFilter.current();
   Movement? _movement;
-  final SessionsPageTab sessionsPageTab = SessionsPageTab.metcon;
-  final String route = Routes.metcon.sessionOverview;
-  final String defaultTitle = "Metcon Sessions";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_movement?.name ?? defaultTitle),
+        title: Text(_movement?.name ?? "Metcon Sessions"),
         actions: [
           IconButton(
               onPressed: () =>
@@ -268,8 +265,8 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         itemCount: _metconSessionDescriptions.length,
       ),
       bottomNavigationBar:
-          SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
-      drawer: MainDrawer(selectedRoute: route),
+          SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.metcon),
+      drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {

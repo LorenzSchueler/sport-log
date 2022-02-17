@@ -32,9 +32,6 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
 
   DateFilterState _dateFilter = MonthFilter.current();
   Movement? _movement;
-  final SessionsPageTab sessionsPageTab = SessionsPageTab.strength;
-  final String route = Routes.strength.overview;
-  final String defaultTitle = "Strength Sessions";
 
   @override
   void initState() {
@@ -55,14 +52,11 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   Future<void> update() async {
     _logger.d(
         'Updating strength sessions with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
-    _dataProvider
-        .getSessionsWithStats(
-            from: _dateFilter.start,
-            until: _dateFilter.end,
-            movementId: _movement?.id)
-        .then((ssds) async {
-      setState(() => _sessions = ssds);
-    });
+    final ssds = await _dataProvider.getSessionsWithStats(
+        from: _dateFilter.start,
+        until: _dateFilter.end,
+        movementId: _movement?.id);
+    setState(() => _sessions = ssds);
   }
 
   // full update (from server)
@@ -79,7 +73,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_movement?.name ?? defaultTitle),
+        title: Text(_movement?.name ?? "Strength Sessions"),
         actions: [
           IconButton(
             onPressed: () async {
@@ -142,9 +136,9 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
           ],
         ),
       ),
-      bottomNavigationBar:
-          SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
-      drawer: MainDrawer(selectedRoute: route),
+      bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
+          context, SessionsPageTab.strength),
+      drawer: MainDrawer(selectedRoute: Routes.strength.overview),
       floatingActionButton: null,
     );
   }

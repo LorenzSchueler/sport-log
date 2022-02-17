@@ -23,10 +23,6 @@ class RoutePage extends StatefulWidget {
 class RoutePageState extends State<RoutePage> {
   final _logger = Logger('RoutePage');
 
-  final SessionsPageTab sessionsPageTab = SessionsPageTab.cardio;
-  final String route = Routes.cardio.routeOverview;
-  final String defaultTitle = "Routes";
-
   final List<Route> _routes = [
     Route(
         id: randomId(),
@@ -62,7 +58,7 @@ class RoutePageState extends State<RoutePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(defaultTitle),
+          title: const Text("Routes"),
           actions: [
             IconButton(
                 onPressed: () =>
@@ -75,9 +71,9 @@ class RoutePageState extends State<RoutePage> {
           itemBuilder: (_, index) => RouteCard(route: _routes[index]),
           itemCount: _routes.length,
         )),
-        bottomNavigationBar:
-            SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
-        drawer: MainDrawer(selectedRoute: route),
+        bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
+            context, SessionsPageTab.cardio),
+        drawer: MainDrawer(selectedRoute: Routes.cardio.routeOverview),
         floatingActionButton: FloatingActionButton(
           onPressed: () => Navigator.of(context)
               .pushNamed(Routes.cardio.routeEdit)

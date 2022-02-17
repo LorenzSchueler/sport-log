@@ -31,9 +31,6 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
 
   DateFilterState _dateFilter = MonthFilter.current();
   Movement? _movement;
-  final SessionsPageTab sessionsPageTab = SessionsPageTab.cardio;
-  final String route = Routes.cardio.overview;
-  final String defaultTitle = "Cardio Sessions";
 
   final List<CardioSession> _cardioSessions = [
     CardioSession(
@@ -99,7 +96,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_movement?.name ?? defaultTitle),
+        title: Text(_movement?.name ?? "Cardio Sessions"),
         actions: [
           IconButton(
               onPressed: () =>
@@ -142,8 +139,8 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         itemCount: _cardioSessions.length,
       ),
       bottomNavigationBar:
-          SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
-      drawer: MainDrawer(selectedRoute: route),
+          SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.cardio),
+      drawer: MainDrawer(selectedRoute: Routes.cardio.overview),
       floatingActionButton: ExpandableFab(
         icon: const Icon(Icons.add),
         buttons: [

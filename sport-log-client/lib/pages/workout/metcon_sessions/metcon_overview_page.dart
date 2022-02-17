@@ -24,10 +24,6 @@ class _MetconsPageState extends State<MetconsPage> {
   final _dataProvider = MetconDataProvider.instance;
   List<MetconDescription> _metconDescriptions = [];
 
-  final SessionsPageTab sessionsPageTab = SessionsPageTab.metcon;
-  final String route = Routes.metcon.overview;
-  final String defaultTitle = "Metcons";
-
   static const _deleteChoice = 1;
   static const _editChoice = 2;
 
@@ -48,7 +44,7 @@ class _MetconsPageState extends State<MetconsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(defaultTitle),
+        title: const Text("Metcons"),
         actions: [
           IconButton(
               onPressed: () => Navigator.of(context)
@@ -58,8 +54,8 @@ class _MetconsPageState extends State<MetconsPage> {
       ),
       body: _content,
       bottomNavigationBar:
-          SessionTabUtils.bottomNavigationBar(context, sessionsPageTab),
-      drawer: MainDrawer(selectedRoute: route),
+          SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.metcon),
+      drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () async {
