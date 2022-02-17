@@ -19,6 +19,7 @@ class MapPageState extends State<MapPage> {
 
   late MapboxMapController _sessionMapController;
   bool showOverlays = true;
+  //bool showMapSettings = false;
 
   String mapStyle = Defaults.mapbox.style.outdoor;
 
@@ -47,33 +48,70 @@ class MapPageState extends State<MapPage> {
                 _sessionMapController = controller,
             onMapClick: (_, __) => setState(() {
               showOverlays = !showOverlays;
+              //showMapSettings = false;
             }),
           ),
+          //if (showMapSettings)
+          //Positioned(
+          //bottom: 0,
+          //child: SizedBox.expand(
+          //child: Container(
+          //width: double.infinity,
+          //height: 100,
+          //color: Colors.white,
+          //child: Row(children: [
+          //IconButton(
+          //onPressed: () => setState(() {
+          //mapStyle = Defaults.mapbox.style.outdoor;
+          //}),
+          //icon: const Icon(Icons.map),
+          //),
+          //IconButton(
+          //onPressed: () => setState(() {
+          //mapStyle = Defaults.mapbox.style.street;
+          //}),
+          //icon: const Icon(Icons.map),
+          //),
+          //IconButton(
+          //onPressed: () => setState(() {
+          //mapStyle = Defaults.mapbox.style.satellite;
+          //}),
+          //icon: const Icon(Icons.map),
+          //)
+          //])))),
           if (showOverlays)
             Positioned(
                 top: 5,
                 right: 5,
-                child: ExpandableFab(
-                    horizontal: true,
-                    icon: const Icon(Icons.map),
-                    items: [
-                      ExpandableFabItem(
+                child:
+                    //IconButton(
+                    //icon: const Icon(Icons.map),
+                    //color: Theme.of(context).colorScheme.primary,
+                    //onPressed: () => setState(() {
+                    //showMapSettings = !showMapSettings;
+                    //_logger.i("map settings: $showMapSettings");
+                    //}),
+                    //)
+                    ExpandableFab(
+                        horizontal: true,
+                        icon: const Icon(Icons.map),
+                        buttons: [
+                      ActionButton(
                           icon: const Icon(Icons.map),
                           onPressed: () => setState(() {
                                 mapStyle = Defaults.mapbox.style.outdoor;
                               })),
-                      ExpandableFabItem(
+                      ActionButton(
                           icon: const Icon(Icons.map),
                           onPressed: () => setState(() {
                                 mapStyle = Defaults.mapbox.style.street;
                               })),
-                      ExpandableFabItem(
-                          // TODO does not react
+                      ActionButton(
                           icon: const Icon(Icons.map),
                           onPressed: () => setState(() {
                                 mapStyle = Defaults.mapbox.style.satellite;
                               })),
-                    ])),
+                    ]))
         ]));
   }
 

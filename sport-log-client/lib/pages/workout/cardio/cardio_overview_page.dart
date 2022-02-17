@@ -146,14 +146,14 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
       drawer: MainDrawer(selectedRoute: route),
       floatingActionButton: ExpandableFab(
         icon: const Icon(Icons.add),
-        items: [
-          ExpandableFabItem(
+        buttons: [
+          ActionButton(
             icon: const Icon(CustomIcons.stopwatch),
             onPressed: () => Navigator.of(context)
                 .pushNamed(Routes.cardio.trackingSettings)
                 .then(_handleNewCardioSession),
           ),
-          ExpandableFabItem(
+          ActionButton(
             icon: const Icon(Icons.notes_rounded),
             onPressed: () => Navigator.of(context)
                 .pushNamed(Routes.cardio.cardioEdit)

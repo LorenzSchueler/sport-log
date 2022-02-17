@@ -4,25 +4,18 @@ import 'dart:math' as math;
 @immutable
 class ExpandableFab extends StatefulWidget {
   final Icon icon;
-  final List<ExpandableFabItem> items;
+  final List<ActionButton> buttons;
   final bool horizontal;
 
   const ExpandableFab({
     Key? key,
     required this.icon,
-    required this.items,
+    required this.buttons,
     this.horizontal = false,
   }) : super(key: key);
 
   @override
   _ExpandableFabState createState() => _ExpandableFabState();
-}
-
-class ExpandableFabItem {
-  final Icon icon;
-  final Function onPressed;
-
-  ExpandableFabItem({required this.icon, required this.onPressed});
 }
 
 class _ExpandableFabState extends State<ExpandableFab>
@@ -66,19 +59,34 @@ class _ExpandableFabState extends State<ExpandableFab>
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 70, // TODO fix size (was exdented)
-      width: 160,
-      child: Stack(
-        alignment: Alignment.bottomRight,
-        clipBehavior: Clip.none,
-        children: [
-          _buildTapToCloseFab(),
-          ..._buildExpandingActionButtons(),
-          _buildTapToOpenFab(),
-        ],
-      ),
-    );
+    if (!widget.horizontal) {
+      return SizedBox.expand(
+        child: Stack(
+          alignment: Alignment.bottomRight,
+          clipBehavior: Clip.none,
+          children: [
+            _buildTapToCloseFab(),
+            ..._buildExpandingActionButtons(),
+            _buildTapToOpenFab(),
+          ],
+        ),
+      );
+    } else {
+      return Container(
+        //color: Colors.black,
+        height: 86,
+        width: (60 * (widget.buttons.length + 1)).toDouble(),
+        child: Stack(
+          alignment: Alignment.bottomRight,
+          clipBehavior: Clip.none,
+          children: [
+            _buildTapToCloseFab(),
+            ..._buildExpandingActionButtons(),
+            _buildTapToOpenFab(),
+          ],
+        ),
+      );
+    }
   }
 
   Widget _buildTapToCloseFab() {
@@ -107,7 +115,7 @@ class _ExpandableFabState extends State<ExpandableFab>
 
   List<Widget> _buildExpandingActionButtons() {
     final children = <Widget>[];
-    final count = widget.items.length;
+    final count = widget.buttons.length;
     if (widget.horizontal) {
       for (var i = 0; i < count; i++) {
         children.add(
@@ -115,12 +123,7 @@ class _ExpandableFabState extends State<ExpandableFab>
             directionInDegrees: 0,
             maxDistance: 60 * (i + 1),
             progress: _expandAnimation,
-            child: ActionButton(
-                icon: widget.items[i].icon,
-                onPressed: () {
-                  _toggle();
-                  widget.items[i].onPressed();
-                }),
+            child: widget.buttons[i],
           ),
         );
       }
@@ -132,14 +135,9 @@ class _ExpandableFabState extends State<ExpandableFab>
         children.add(
           _ExpandingActionButton(
             directionInDegrees: angleInDegrees,
-            maxDistance: 112,
+            maxDistance: 100,
             progress: _expandAnimation,
-            child: ActionButton(
-                icon: widget.items[i].icon,
-                onPressed: () {
-                  _toggle();
-                  widget.items[i].onPressed();
-                }),
+            child: widget.buttons[i],
           ),
         );
       }
@@ -227,11 +225,10 @@ class ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Material(
       shape: const CircleBorder(),
       clipBehavior: Clip.antiAlias,
-      color: theme.colorScheme.primary,
+      color: Theme.of(context).colorScheme.primary,
       elevation: 4.0,
       child: IconButton(
         onPressed: onPressed,
