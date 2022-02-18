@@ -1,87 +1,86 @@
+import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/database/table_creator.dart';
 import 'package:sport_log/database/table_names.dart';
 import 'package:sport_log/models/action/all.dart';
 
 class ActionTable extends DbAccessor<Action> {
   @override
   DbSerializer<Action> get serde => DbActionSerializer();
+
   @override
-  List<String> get setupSql => [
-        '''
-create table $tableName (
-    name text not null check (length(name) >= 2),
-    action_provider_id integer not null references action_provider(id) on delete cascade,
-    description text,
-    create_before integer not null check (create_before >= 0), -- hours
-    delete_after integer not null check (delete_after >= 0), --hours
-    $idAndDeletedAndStatus
-);
-  ''',
-        updateTrigger,
-      ];
-  @override
-  String get tableName => Tables.action;
+  final Table table = Table(Tables.action, withColumns: [
+    Column.int(Keys.id).primaryKey(),
+    Column.bool(Keys.deleted).withDefault('0'),
+    Column.int(Keys.syncStatus)
+        .withDefault('2')
+        .check('${Keys.syncStatus} IN (0, 1, 2)'),
+    Column.text(Keys.name).check("length(${Keys.name}) >= 2"),
+    Column.int(Keys.actionProviderId)
+        .references(Tables.actionProvider, onDelete: OnAction.cascade),
+    Column.text(Keys.description).nullable(),
+    Column.int(Keys.createBefore).check("${Keys.createBefore} >= 0"),
+    Column.int(Keys.deleteAfter).check("${Keys.deleteAfter} >= 0"),
+  ]);
 }
 
 class ActionEventTable extends DbAccessor<ActionEvent> {
   @override
   DbSerializer<ActionEvent> get serde => DbActionEventSerializer();
+
   @override
-  List<String> get setupSql => [
-        '''
-create table $tableName (
-    user_id integer not null,
-    action_id integer not null references action(id) on delete cascade,
-    datetime text not null,
-    arguments text,
-    enabled integer not null check(enabled in (0, 1)),
-    $idAndDeletedAndStatus
-);
-  ''',
-        updateTrigger,
-      ];
-  @override
-  String get tableName => Tables.actionEvent;
+  final Table table = Table(Tables.actionEvent, withColumns: [
+    Column.int(Keys.id).primaryKey(),
+    Column.bool(Keys.deleted).withDefault('0'),
+    Column.int(Keys.syncStatus)
+        .withDefault('2')
+        .check('${Keys.syncStatus} IN (0, 1, 2)'),
+    Column.int(Keys.userId),
+    Column.int(Keys.actionId)
+        .references(Tables.action, onDelete: OnAction.cascade),
+    Column.text(Keys.datetime),
+    Column.text(Keys.arguments).nullable(),
+    Column.int(Keys.enabled).check("${Keys.enabled} in (0,1)"),
+  ]);
 }
 
 class ActionRuleTable extends DbAccessor<ActionRule> {
   @override
   DbSerializer<ActionRule> get serde => DbActionRuleSerializer();
+
   @override
-  List<String> get setupSql => [
-        '''
-create table $tableName (
-    user_id integer not null,
-    action_id bigint not null references action(id) on delete cascade,
-    weekday integer not null check(weekday between 0 and 6), 
-    time text not null,
-    arguments text,
-    enabled integer not null check(enabled in (0, 1)),
-    $idAndDeletedAndStatus
-);
-  ''',
-        updateTrigger,
-      ];
-  @override
-  String get tableName => Tables.actionRule;
+  final Table table = Table(Tables.actionRule, withColumns: [
+    Column.int(Keys.id).primaryKey(),
+    Column.bool(Keys.deleted).withDefault('0'),
+    Column.int(Keys.syncStatus)
+        .withDefault('2')
+        .check('${Keys.syncStatus} IN (0, 1, 2)'),
+    Column.int(Keys.userId),
+    Column.int(Keys.actionId)
+        .references(Tables.action, onDelete: OnAction.cascade),
+    Column.int(Keys.weekday).check("${Keys.weekday} between 0 and 6"),
+    Column.text(Keys.time),
+    Column.text(Keys.arguments).nullable(),
+    Column.int(Keys.enabled).check("${Keys.enabled} in (0,1)"),
+  ]);
 }
 
 class ActionProviderTable extends DbAccessor<ActionProvider> {
   @override
   DbSerializer<ActionProvider> get serde => DbActionProviderSerializer();
+
   @override
-  List<String> get setupSql => [
-        '''
-create table $tableName (
-    name text not null check(length(name) between 2 and 80),
-    password text not null check(length(password) between 1 and 96),
-    platform_id integer not null references platform(id) on delete cascade,
-    description text,
-    $idAndDeletedAndStatus
-);
-  ''',
-        updateTrigger,
-      ];
-  @override
-  String get tableName => 'action_provider';
+  final Table table = Table(Tables.actionProvider, withColumns: [
+    Column.int(Keys.id).primaryKey(),
+    Column.bool(Keys.deleted).withDefault('0'),
+    Column.int(Keys.syncStatus)
+        .withDefault('2')
+        .check('${Keys.syncStatus} IN (0, 1, 2)'),
+    Column.text(Keys.name).check("length(${Keys.name}) between 2 and 80"),
+    Column.text(Keys.password)
+        .check("length(${Keys.password}) between 2 and 96"),
+    Column.int(Keys.platformId)
+        .references(Tables.platform, onDelete: OnAction.cascade),
+    Column.text(Keys.description).nullable()
+  ]);
 }

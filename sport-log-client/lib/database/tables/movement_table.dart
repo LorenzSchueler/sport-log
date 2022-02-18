@@ -11,16 +11,16 @@ class MovementTable extends DbAccessor<Movement> {
 
   @override
   List<String> get setupSql => [
-        _table.setupSql(),
+        ...super.setupSql,
         '''
       CREATE UNIQUE INDEX unique_movement_idx
       ON $tableName ($name, $dimension, $userId)
       WHERE $deleted = 0;
-      ''',
-        updateTrigger,
+      '''
       ];
 
-  final Table _table = Table(
+  @override
+  final Table table = Table(
     Tables.movement,
     withColumns: [
       Column.int(Keys.id).primaryKey(),
@@ -46,11 +46,6 @@ class MovementTable extends DbAccessor<Movement> {
   static const dimension = Keys.dimension;
   static const userId = Keys.userId;
 
-  @override
-  String get tableName => _table.name;
-
-  Table get table => _table;
-
   final _logger = Logger('MovementTable');
 
   Future<List<MovementDescription>> getMovementDescriptions() async {
@@ -59,7 +54,7 @@ class MovementTable extends DbAccessor<Movement> {
     const hasReference = 'has_reference';
     final records = await database.rawQuery('''
     SELECT
-      ${_table.allColumns},
+      ${table.allColumns},
       (
         EXISTS (
           SELECT * FROM $metconMovement
@@ -89,7 +84,7 @@ class MovementTable extends DbAccessor<Movement> {
         DateTime.now().difference(now).toString());
     return records
         .map((r) => MovementDescription(
-              movement: serde.fromDbRecord(r, prefix: _table.prefix),
+              movement: serde.fromDbRecord(r, prefix: table.prefix),
               hasReference: r[hasReference]! as int == 1,
             ))
         .toList();

@@ -57,7 +57,7 @@ class Column {
 
   bool getIsPrimaryKey() => _isPrimaryKey;
 
-  static String typeToString(DbType type) {
+  static String _typeToString(DbType type) {
     switch (type) {
       case DbType.integer:
         return 'INTEGER';
@@ -72,7 +72,7 @@ class Column {
     }
   }
 
-  static String onActionToString(OnAction action) {
+  static String _onActionToString(OnAction action) {
     switch (action) {
       case OnAction.setNull:
         return 'SET NULL';
@@ -96,10 +96,10 @@ class Column {
         : '${_referenceTable!}(${_referenceColumn!})';
     final onUpdateStr = _onUpdateReference == null
         ? ''
-        : ' ON UPDATE ${onActionToString(_onUpdateReference!)}';
+        : ' ON UPDATE ${_onActionToString(_onUpdateReference!)}';
     final onDeleteStr = _onDeleteReference == null
         ? ''
-        : 'ON DELETE ${onActionToString(_onDeleteReference!)}';
+        : 'ON DELETE ${_onActionToString(_onDeleteReference!)}';
     return 'REFERENCES $referenceName $onDeleteStr'.trimRight() + onUpdateStr;
   }
 
@@ -108,7 +108,7 @@ class Column {
     if (_check == null && type == DbType.bool) {
       _check = '$name in (0, 1)';
     }
-    final typeStr = typeToString(type);
+    final typeStr = _typeToString(type);
     final nonNullStr = _nonNull ? 'NOT NULL' : '';
     final uniqueStr = _isUnique ? 'UNIQUE' : '';
     final defaultValueStr =

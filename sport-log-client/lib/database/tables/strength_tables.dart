@@ -51,8 +51,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
 
   @override
   List<String> get setupSql => [
-        _table.setupSql(),
-        updateTrigger,
+        ...super.setupSql,
         '''
         CREATE TABLE $eorm (
           $eormReps INTEGER PRIMARY KEY CHECK ($eormReps >= 1),
@@ -65,9 +64,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
       ];
 
   @override
-  String get tableName => _table.name;
-
-  final Table _table = Table(Tables.strengthSession, withColumns: [
+  final Table table = Table(Tables.strengthSession, withColumns: [
     Column.int(Keys.id).primaryKey(),
     Column.bool(Keys.deleted).withDefault('0'),
     Column.int(Keys.syncStatus)
@@ -87,7 +84,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
   Future<StrengthSessionWithSets?> getSessionWithSets(Int64 idValue) async {
     final records = await database.rawQuery('''
       SELECT
-        ${_table.allColumns},
+        ${table.allColumns},
         ${_movementTable.table.allColumns}
       FROM $tableName
         JOIN $movement ON $movement.$id = $tableName.$movementId
@@ -99,7 +96,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
       return null;
     }
     return StrengthSessionWithSets(
-      session: serde.fromDbRecord(records.first, prefix: _table.prefix),
+      session: serde.fromDbRecord(records.first, prefix: table.prefix),
       movement: _movementTable.serde
           .fromDbRecord(records.first, prefix: _movementTable.table.prefix),
       sets: await _strengthSetTable.getByStrengthSession(idValue),
@@ -119,7 +116,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
         movementIdValue == null ? '' : 'AND $tableName.$movementId = ?';
     final records = await database.rawQuery('''
       SELECT
-        ${_table.allColumns},
+        ${table.allColumns},
         ${_movementTable.table.allColumns},
         $tableName.$datetime as [$datetime],
         COUNT($strengthSet.$id) AS $numSets,
@@ -149,7 +146,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
       if (movementIdValue != null) movementIdValue.toInt(),
     ]);
     return records.mapToL((record) => StrengthSessionWithStats(
-          session: serde.fromDbRecord(record, prefix: _table.prefix),
+          session: serde.fromDbRecord(record, prefix: table.prefix),
           movement: _movementTable.serde
               .fromDbRecord(record, prefix: _movementTable.table.prefix),
           stats: StrengthSessionStats.fromDbRecord(record),
@@ -161,7 +158,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
     // TODO: ignore strength session that have strength sets
     final records = await database.rawQuery('''
       SELECT
-        ${_table.allColumns},
+        ${table.allColumns},
         ${_movementTable.table.allColumns}
       FROM $tableName
       JOIN $movement ON $movement.id = $tableName.$movementId
@@ -169,7 +166,7 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
         AND $movement.$deleted = 0;
     ''');
     return records.mapToL((r) => StrengthSessionAndMovement(
-          session: serde.fromDbRecord(r, prefix: _table.prefix),
+          session: serde.fromDbRecord(r, prefix: table.prefix),
           movement: _movementTable.serde
               .fromDbRecord(r, prefix: _movementTable.table.prefix),
         ));
@@ -298,14 +295,8 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
 class StrengthSetTable extends DbAccessor<StrengthSet> {
   @override
   DbSerializer<StrengthSet> get serde => DbStrengthSetSerializer();
-  @override
-  List<String> get setupSql => [
-        table.setupSql(),
-        updateTrigger,
-      ];
-  @override
-  String get tableName => table.name;
 
+  @override
   final Table table = Table(
     Tables.strengthSet,
     withColumns: [

@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table_creator.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'db_interfaces.dart';
@@ -8,9 +9,12 @@ import 'db_interfaces.dart';
 export 'db_interfaces.dart';
 
 abstract class DbAccessor<T extends DbObject> {
-  List<String> get setupSql;
-  String get tableName;
   DbSerializer<T> get serde;
+  Table get table;
+
+  List<String> get setupSql => [table.setupSql(), updateTrigger];
+
+  String get tableName => table.name;
 
   Database get database {
     return AppDatabase.database!;

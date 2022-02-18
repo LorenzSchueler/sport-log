@@ -7,26 +7,22 @@ import 'package:sport_log/models/metcon/all.dart';
 
 class MetconTable extends DbAccessor<Metcon> {
   @override
-  List<String> get setupSql => [
-        '''
-create table $tableName (
-    user_id integer,
-    name text check (length(name) <= 80),
-    metcon_type integer not null check (metcon_type between 0 and 2),
-    rounds integer check (rounds >= 1),
-    timecap integer check (timecap > 0), -- seconds
-    description text,
-    $idAndDeletedAndStatus
-);
-  ''',
-        updateTrigger,
-      ];
-
-  @override
   DbSerializer<Metcon> get serde => DbMetconSerializer();
 
   @override
-  String get tableName => Tables.metcon;
+  final Table table = Table(Tables.metcon, withColumns: [
+    Column.int(Keys.id).primaryKey(),
+    Column.bool(Keys.deleted).withDefault('0'),
+    Column.int(Keys.syncStatus)
+        .withDefault('2')
+        .check('${Keys.syncStatus} IN (0, 1, 2)'),
+    Column.int(Keys.userId).nullable(),
+    Column.text(Keys.name).nullable().check("length(${Keys.name}) <= 80"),
+    Column.int(Keys.metconType).check("${Keys.metconType} between 0 and 2"),
+    Column.int(Keys.rounds).nullable().check("${Keys.rounds} >= 1"),
+    Column.int(Keys.timecap).nullable().check("${Keys.timecap} > 0"),
+    Column.text(Keys.description).nullable()
+  ]);
 }
 
 class MetconMovementTable extends DbAccessor<MetconMovement> {
@@ -34,9 +30,7 @@ class MetconMovementTable extends DbAccessor<MetconMovement> {
   DbSerializer<MetconMovement> get serde => DbMetconMovementSerializer();
 
   @override
-  List<String> get setupSql => [_table.setupSql(), updateTrigger];
-
-  final Table _table = Table(
+  final Table table = Table(
     Tables.metconMovement,
     withColumns: [
       Column.int(Keys.id).primaryKey(),
@@ -56,9 +50,6 @@ class MetconMovementTable extends DbAccessor<MetconMovement> {
           .check('${Keys.distanceUnit} BETWEEN 0 AND 4'),
     ],
   );
-
-  @override
-  String get tableName => _table.name;
 
   Future<void> setSynchronizedByMetcon(Int64 id) async {
     database.update(tableName, DbAccessor.synchronized,
@@ -85,25 +76,22 @@ class MetconSessionTable extends DbAccessor<MetconSession> {
   DbSerializer<MetconSession> get serde => DbMetconSessionSerializer();
 
   @override
-  List<String> get setupSql => [
-        '''
-create table $tableName (
-    user_id integer not null,
-    metcon_id integer not null references metcon(id) on delete no action,
-    datetime text not null default (datetime('now')),
-    time integer check (time > 0), -- seconds
-    rounds integer check (rounds >= 0),
-    reps integer check (reps >= 0),
-    rx integer not null default 1 check (rx in (0, 1)),
-    comments text,
-    $idAndDeletedAndStatus
-);
-  ''',
-        updateTrigger,
-      ];
-
-  @override
-  String get tableName => Tables.metconSession;
+  final Table table = Table(Tables.metconSession, withColumns: [
+    Column.int(Keys.id).primaryKey(),
+    Column.bool(Keys.deleted).withDefault('0'),
+    Column.int(Keys.syncStatus)
+        .withDefault('2')
+        .check('${Keys.syncStatus} IN (0, 1, 2)'),
+    Column.int(Keys.userId),
+    Column.text(Keys.metconId)
+        .references(Tables.metcon, onDelete: OnAction.noAction),
+    Column.text(Keys.datetime),
+    Column.int(Keys.time).nullable().check("${Keys.time} > 0"),
+    Column.int(Keys.rounds).nullable().check("${Keys.rounds} >= 0"),
+    Column.int(Keys.reps).nullable().check("${Keys.reps} >= 0"),
+    Column.bool(Keys.rx).check("${Keys.rx} in (0, 1)"),
+    Column.text(Keys.comments).nullable()
+  ]);
 
   Future<bool> existsByMetcon(Int64 id) async {
     return (await database.rawQuery('''select 1 from $tableName
