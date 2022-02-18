@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/db_serialization.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/cardio/position.dart';
@@ -61,29 +61,29 @@ class DbRouteSerializer implements DbSerializer<Route> {
   @override
   Route fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Route(
-      id: Int64(r[Keys.id]! as int),
-      userId: Int64(r[Keys.userId]! as int),
-      name: r[Keys.name]! as String,
-      distance: r[Keys.distance]! as int,
-      ascent: r[Keys.ascent] as int?,
-      descent: r[Keys.descent] as int?,
+      id: Int64(r[Columns.id]! as int),
+      userId: Int64(r[Columns.userId]! as int),
+      name: r[Columns.name]! as String,
+      distance: r[Columns.distance]! as int,
+      ascent: r[Columns.ascent] as int?,
+      descent: r[Columns.descent] as int?,
       track: const DbPositionListConverter()
-          .mapToDart(r[Keys.track]! as Uint8List)!,
-      deleted: r[Keys.deleted] == 1,
+          .mapToDart(r[Columns.track]! as Uint8List)!,
+      deleted: r[Columns.deleted] == 1,
     );
   }
 
   @override
   DbRecord toDbRecord(Route o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.userId: o.userId.toInt(),
-      Keys.name: o.name,
-      Keys.distance: o.distance,
-      Keys.ascent: o.ascent,
-      Keys.descent: o.descent,
-      Keys.track: const DbPositionListConverter().mapToSql(o.track)!,
-      Keys.deleted: o.deleted ? 1 : 0,
+      Columns.id: o.id.toInt(),
+      Columns.userId: o.userId.toInt(),
+      Columns.name: o.name,
+      Columns.distance: o.distance,
+      Columns.ascent: o.ascent,
+      Columns.descent: o.descent,
+      Columns.track: const DbPositionListConverter().mapToSql(o.track)!,
+      Columns.deleted: o.deleted ? 1 : 0,
     };
   }
 }

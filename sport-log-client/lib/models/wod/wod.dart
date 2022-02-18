@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'wod.g.dart';
@@ -42,22 +42,22 @@ class DbWodSerializer implements DbSerializer<Wod> {
   @override
   Wod fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Wod(
-      id: Int64(r[Keys.id]! as int),
-      userId: Int64(r[Keys.userId]! as int),
-      date: DateTime.parse(r[Keys.date]! as String),
-      description: r[Keys.description] as String?,
-      deleted: r[Keys.deleted]! as int == 1,
+      id: Int64(r[Columns.id]! as int),
+      userId: Int64(r[Columns.userId]! as int),
+      date: DateTime.parse(r[Columns.date]! as String),
+      description: r[Columns.description] as String?,
+      deleted: r[Columns.deleted]! as int == 1,
     );
   }
 
   @override
   DbRecord toDbRecord(Wod o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.userId: o.userId.toInt(),
-      Keys.date: o.date.toString(),
-      Keys.description: o.description,
-      Keys.deleted: o.deleted ? 1 : 0,
+      Columns.id: o.id.toInt(),
+      Columns.userId: o.userId.toInt(),
+      Columns.date: o.date.toString(),
+      Columns.description: o.description,
+      Columns.deleted: o.deleted ? 1 : 0,
     };
   }
 }

@@ -2,7 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/id_generation.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'metcon_movement.g.dart';
@@ -93,30 +93,30 @@ class DbMetconMovementSerializer implements DbSerializer<MetconMovement> {
   @override
   MetconMovement fromDbRecord(DbRecord r, {String prefix = ''}) {
     return MetconMovement(
-      id: Int64(r[prefix + Keys.id]! as int),
-      metconId: Int64(r[prefix + Keys.id]! as int),
-      movementId: Int64(r[prefix + Keys.movementId]! as int),
-      movementNumber: r[prefix + Keys.movementNumber]! as int,
-      count: r[prefix + Keys.count]! as int,
-      weight: r[prefix + Keys.weight] as double?,
-      distanceUnit: r[prefix + Keys.distanceUnit] == null
+      id: Int64(r[prefix + Columns.id]! as int),
+      metconId: Int64(r[prefix + Columns.id]! as int),
+      movementId: Int64(r[prefix + Columns.movementId]! as int),
+      movementNumber: r[prefix + Columns.movementNumber]! as int,
+      count: r[prefix + Columns.count]! as int,
+      weight: r[prefix + Columns.weight] as double?,
+      distanceUnit: r[prefix + Columns.distanceUnit] == null
           ? null
-          : DistanceUnit.values[r[prefix + Keys.distanceUnit] as int],
-      deleted: r[prefix + Keys.deleted]! as int == 1,
+          : DistanceUnit.values[r[prefix + Columns.distanceUnit] as int],
+      deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
 
   @override
   DbRecord toDbRecord(MetconMovement o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.metconId: o.metconId.toInt(),
-      Keys.movementId: o.movementId.toInt(),
-      Keys.movementNumber: o.movementNumber,
-      Keys.count: o.count,
-      Keys.weight: o.weight,
-      Keys.distanceUnit: o.distanceUnit?.index,
-      Keys.deleted: o.deleted ? 1 : 0,
+      Columns.id: o.id.toInt(),
+      Columns.metconId: o.metconId.toInt(),
+      Columns.movementId: o.movementId.toInt(),
+      Columns.movementNumber: o.movementNumber,
+      Columns.count: o.count,
+      Columns.weight: o.weight,
+      Columns.distanceUnit: o.distanceUnit?.index,
+      Columns.deleted: o.deleted ? 1 : 0,
     };
   }
 }

@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'platform_credential.g.dart';
@@ -49,24 +49,24 @@ class DbPlatformCredentialSerializer
   @override
   PlatformCredential fromDbRecord(DbRecord r, {String prefix = ''}) {
     return PlatformCredential(
-      id: Int64(r[Keys.id]! as int),
-      userId: Int64(r[Keys.userId]! as int),
-      platformId: Int64(r[Keys.platformId]! as int),
-      username: r[Keys.username]! as String,
-      password: r[Keys.password]! as String,
-      deleted: r[Keys.deleted]! as int == 1,
+      id: Int64(r[Columns.id]! as int),
+      userId: Int64(r[Columns.userId]! as int),
+      platformId: Int64(r[Columns.platformId]! as int),
+      username: r[Columns.username]! as String,
+      password: r[Columns.password]! as String,
+      deleted: r[Columns.deleted]! as int == 1,
     );
   }
 
   @override
   DbRecord toDbRecord(PlatformCredential o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.userId: o.userId.toInt(),
-      Keys.platformId: o.platformId.toInt(),
-      Keys.username: o.username,
-      Keys.password: o.password,
-      Keys.deleted: o.deleted ? 1 : 0,
+      Columns.id: o.id.toInt(),
+      Columns.userId: o.userId.toInt(),
+      Columns.platformId: o.platformId.toInt(),
+      Columns.username: o.username,
+      Columns.password: o.password,
+      Columns.deleted: o.deleted ? 1 : 0,
     };
   }
 }

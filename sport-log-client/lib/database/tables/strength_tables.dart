@@ -1,9 +1,8 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/database/table.dart';
-import 'package:sport_log/database/table_creator.dart';
-import 'package:sport_log/database/table_names.dart';
+import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/eorm.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
@@ -21,33 +20,33 @@ class StrengthSessionAndMovement {
   Movement movement;
 }
 
-class StrengthSessionTable extends DbAccessor<StrengthSession> {
+class StrengthSessionTable extends TableAccessor<StrengthSession> {
   final _logger = Logger('StrengthSessionTable');
 
   @override
   DbSerializer<StrengthSession> get serde => DbStrengthSessionSerializer();
 
-  static const count = Keys.count;
-  static const datetime = Keys.datetime;
-  static const deleted = Keys.deleted;
+  static const count = Columns.count;
+  static const datetime = Columns.datetime;
+  static const deleted = Columns.deleted;
   static const eorm = Tables.eorm;
-  static const eormPercentage = Keys.eormPercentage;
-  static const eormReps = Keys.eormReps;
-  static const id = Keys.id;
-  static const maxCount = Keys.maxCount;
-  static const maxEorm = Keys.maxEorm;
-  static const maxWeight = Keys.maxWeight;
-  static const minCount = Keys.minCount;
+  static const eormPercentage = Columns.eormPercentage;
+  static const eormReps = Columns.eormReps;
+  static const id = Columns.id;
+  static const maxCount = Columns.maxCount;
+  static const maxEorm = Columns.maxEorm;
+  static const maxWeight = Columns.maxWeight;
+  static const minCount = Columns.minCount;
   static const movement = Tables.movement;
-  static const movementId = Keys.movementId;
-  static const name = Keys.name;
-  static const numSets = Keys.numSets;
-  static const setNumber = Keys.setNumber;
-  static const strengthSessionId = Keys.strengthSessionId;
+  static const movementId = Columns.movementId;
+  static const name = Columns.name;
+  static const numSets = Columns.numSets;
+  static const setNumber = Columns.setNumber;
+  static const strengthSessionId = Columns.strengthSessionId;
   static const strengthSet = Tables.strengthSet;
-  static const sumCount = Keys.sumCount;
-  static const sumVolume = Keys.sumVolume;
-  static const weight = Keys.weight;
+  static const sumCount = Columns.sumCount;
+  static const sumVolume = Columns.sumVolume;
+  static const weight = Columns.weight;
 
   @override
   List<String> get setupSql => [
@@ -64,18 +63,18 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
       ];
 
   @override
-  final Table table = Table(Tables.strengthSession, withColumns: [
-    Column.int(Keys.id).primaryKey(),
-    Column.bool(Keys.deleted).withDefault('0'),
-    Column.int(Keys.syncStatus)
+  final Table table = Table(Tables.strengthSession, columns: [
+    Column.int(Columns.id).primaryKey(),
+    Column.bool(Columns.deleted).withDefault('0'),
+    Column.int(Columns.syncStatus)
         .withDefault('2')
-        .check('${Keys.syncStatus} IN (0, 1, 2)'),
-    Column.int(Keys.userId),
-    Column.text(Keys.datetime).withDefault("DATETIME('now')"),
-    Column.int(Keys.movementId)
+        .check('${Columns.syncStatus} IN (0, 1, 2)'),
+    Column.int(Columns.userId),
+    Column.text(Columns.datetime).withDefault("DATETIME('now')"),
+    Column.int(Columns.movementId)
         .references(Tables.movement, onDelete: OnAction.cascade),
-    Column.int(Keys.interval).nullable().check('${Keys.interval} > 0'),
-    Column.text(Keys.comments).nullable(),
+    Column.int(Columns.interval).nullable().check('${Columns.interval} > 0'),
+    Column.text(Columns.comments).nullable(),
   ]);
 
   MovementTable get _movementTable => AppDatabase.movements;
@@ -292,43 +291,43 @@ class StrengthSessionTable extends DbAccessor<StrengthSession> {
   }
 }
 
-class StrengthSetTable extends DbAccessor<StrengthSet> {
+class StrengthSetTable extends TableAccessor<StrengthSet> {
   @override
   DbSerializer<StrengthSet> get serde => DbStrengthSetSerializer();
 
   @override
   final Table table = Table(
     Tables.strengthSet,
-    withColumns: [
-      Column.int(Keys.id).primaryKey(),
-      Column.bool(Keys.deleted).withDefault('0'),
-      Column.int(Keys.syncStatus)
+    columns: [
+      Column.int(Columns.id).primaryKey(),
+      Column.bool(Columns.deleted).withDefault('0'),
+      Column.int(Columns.syncStatus)
           .withDefault('2')
-          .check('${Keys.syncStatus} IN (0, 1, 2)'),
-      Column.int(Keys.strengthSessionId)
+          .check('${Columns.syncStatus} IN (0, 1, 2)'),
+      Column.int(Columns.strengthSessionId)
           .references(Tables.strengthSession, onDelete: OnAction.cascade),
-      Column.int(Keys.setNumber).check('${Keys.setNumber} >= 0'),
-      Column.int(Keys.count).check('${Keys.count} >= 1'),
-      Column.real(Keys.weight).nullable().check('${Keys.weight} > 0'),
+      Column.int(Columns.setNumber).check('${Columns.setNumber} >= 0'),
+      Column.int(Columns.count).check('${Columns.count} >= 1'),
+      Column.real(Columns.weight).nullable().check('${Columns.weight} > 0'),
     ],
   );
 
   Future<void> setSynchronizedByStrengthSession(Int64 id) async {
-    database.update(tableName, DbAccessor.synchronized,
-        where: '${Keys.strengthSessionId} = ?', whereArgs: [id.toInt()]);
+    database.update(tableName, TableAccessor.synchronized,
+        where: '${Columns.strengthSessionId} = ?', whereArgs: [id.toInt()]);
   }
 
   Future<List<StrengthSet>> getByStrengthSession(Int64 id) async {
     final result = await database.query(tableName,
-        where: '${Keys.strengthSessionId} = ? AND ${Keys.deleted} = 0',
+        where: '${Columns.strengthSessionId} = ? AND ${Columns.deleted} = 0',
         whereArgs: [id.toInt()],
-        orderBy: Keys.setNumber);
+        orderBy: Columns.setNumber);
     return result.map(serde.fromDbRecord).toList();
   }
 
   Future<void> deleteByStrengthSession(Int64 id) async {
-    await database.update(tableName, {Keys.deleted: 1},
-        where: '${Keys.strengthSessionId} = ? AND ${Keys.deleted} = 0',
+    await database.update(tableName, {Columns.deleted: 1},
+        where: '${Columns.strengthSessionId} = ? AND ${Columns.deleted} = 0',
         whereArgs: [id.toInt()]);
   }
 }

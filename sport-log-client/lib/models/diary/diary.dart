@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'diary.g.dart';
@@ -46,24 +46,24 @@ class DbDiarySerializer implements DbSerializer<Diary> {
   @override
   Diary fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Diary(
-      id: Int64(r[Keys.id]! as int),
-      userId: Int64(r[Keys.userId]! as int),
-      date: const DateConverter().fromJson(r[Keys.date]! as String),
-      bodyweight: r[Keys.bodyweight] as double?,
-      comments: r[Keys.comments] as String?,
-      deleted: r[Keys.deleted]! as int == 1,
+      id: Int64(r[Columns.id]! as int),
+      userId: Int64(r[Columns.userId]! as int),
+      date: const DateConverter().fromJson(r[Columns.date]! as String),
+      bodyweight: r[Columns.bodyweight] as double?,
+      comments: r[Columns.comments] as String?,
+      deleted: r[Columns.deleted]! as int == 1,
     );
   }
 
   @override
   DbRecord toDbRecord(Diary o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.userId: o.userId.toInt(),
-      Keys.date: const DateConverter().toJson(o.date),
-      Keys.bodyweight: o.bodyweight,
-      Keys.comments: o.comments,
-      Keys.deleted: o.deleted ? 1 : 0,
+      Columns.id: o.id.toInt(),
+      Columns.userId: o.userId.toInt(),
+      Columns.date: const DateConverter().toJson(o.date),
+      Columns.bodyweight: o.bodyweight,
+      Columns.comments: o.comments,
+      Columns.deleted: o.deleted ? 1 : 0,
     };
   }
 }

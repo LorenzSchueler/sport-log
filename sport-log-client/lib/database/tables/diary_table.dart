@@ -1,24 +1,24 @@
-import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/database/table.dart';
-import 'package:sport_log/database/table_creator.dart';
-import 'package:sport_log/database/table_names.dart';
+import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/models/diary/all.dart';
 
-class DiaryTable extends DbAccessor<Diary> {
+class DiaryTable extends TableAccessor<Diary> {
   @override
   DbSerializer<Diary> get serde => DbDiarySerializer();
 
   @override
-  final Table table = Table(Tables.diary, withColumns: [
-    Column.int(Keys.id).primaryKey(),
-    Column.bool(Keys.deleted).withDefault('0'),
-    Column.int(Keys.syncStatus)
+  final Table table = Table(Tables.diary, columns: [
+    Column.int(Columns.id).primaryKey(),
+    Column.bool(Columns.deleted).withDefault('0'),
+    Column.int(Columns.syncStatus)
         .withDefault('2')
-        .check('${Keys.syncStatus} IN (0, 1, 2)'),
-    Column.int(Keys.userId),
-    Column.text(Keys.date).withDefault("datetime('now')"),
-    Column.real(Keys.bodyweight).nullable().check("${Keys.bodyweight} > 0"),
-    Column.text(Keys.comments).nullable()
+        .check('${Columns.syncStatus} IN (0, 1, 2)'),
+    Column.int(Columns.userId),
+    Column.text(Columns.date).withDefault("datetime('now')"),
+    Column.real(Columns.bodyweight)
+        .nullable()
+        .check("${Columns.bodyweight} > 0"),
+    Column.text(Columns.comments).nullable()
   ]);
 
   Future<List<Diary>> getByTimerange({

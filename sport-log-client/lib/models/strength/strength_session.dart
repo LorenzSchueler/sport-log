@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
@@ -66,28 +66,28 @@ class DbStrengthSessionSerializer implements DbSerializer<StrengthSession> {
   @override
   StrengthSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return StrengthSession(
-      id: Int64(r[prefix + Keys.id]! as int),
-      userId: Int64(r[prefix + Keys.userId]! as int),
-      datetime: DateTime.parse(r[prefix + Keys.datetime]! as String),
-      movementId: Int64(r[prefix + Keys.movementId]! as int),
-      interval: r[prefix + Keys.interval] == null
+      id: Int64(r[prefix + Columns.id]! as int),
+      userId: Int64(r[prefix + Columns.userId]! as int),
+      datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
+      movementId: Int64(r[prefix + Columns.movementId]! as int),
+      interval: r[prefix + Columns.interval] == null
           ? null
-          : Duration(seconds: r[prefix + Keys.interval] as int),
-      comments: r[prefix + Keys.comments] as String?,
-      deleted: r[prefix + Keys.deleted]! as int == 1,
+          : Duration(seconds: r[prefix + Columns.interval] as int),
+      comments: r[prefix + Columns.comments] as String?,
+      deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
 
   @override
   DbRecord toDbRecord(StrengthSession o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.userId: o.userId.toInt(),
-      Keys.datetime: o.datetime.toString(),
-      Keys.movementId: o.movementId.toInt(),
-      Keys.interval: o.interval?.inSeconds,
-      Keys.comments: o.comments,
-      Keys.deleted: o.deleted ? 1 : 0,
+      Columns.id: o.id.toInt(),
+      Columns.userId: o.userId.toInt(),
+      Columns.datetime: o.datetime.toString(),
+      Columns.movementId: o.movementId.toInt(),
+      Columns.interval: o.interval?.inSeconds,
+      Columns.comments: o.comments,
+      Columns.deleted: o.deleted ? 1 : 0,
     };
   }
 }

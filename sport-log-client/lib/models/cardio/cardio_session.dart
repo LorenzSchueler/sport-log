@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/db_serialization.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/cardio/position.dart';
@@ -100,51 +100,52 @@ class DbCardioSessionSerializer implements DbSerializer<CardioSession> {
   @override
   CardioSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return CardioSession(
-      id: Int64(r[Keys.id]! as int),
-      userId: Int64(r[Keys.userId]! as int),
-      movementId: Int64(r[Keys.movementId]! as int),
-      cardioType: CardioType.values[r[Keys.cardioType]! as int],
-      datetime: DateTime.parse(r[Keys.datetime]! as String),
-      distance: r[Keys.distance] as int?,
-      ascent: r[Keys.ascent] as int?,
-      descent: r[Keys.descent] as int?,
-      time: r[Keys.time] as Duration?,
-      calories: r[Keys.calories] as int?,
+      id: Int64(r[Columns.id]! as int),
+      userId: Int64(r[Columns.userId]! as int),
+      movementId: Int64(r[Columns.movementId]! as int),
+      cardioType: CardioType.values[r[Columns.cardioType]! as int],
+      datetime: DateTime.parse(r[Columns.datetime]! as String),
+      distance: r[Columns.distance] as int?,
+      ascent: r[Columns.ascent] as int?,
+      descent: r[Columns.descent] as int?,
+      time: r[Columns.time] as Duration?,
+      calories: r[Columns.calories] as int?,
       track: const DbPositionListConverter()
-          .mapToDart(r[Keys.track] as Uint8List?),
-      avgCadence: r[Keys.avgCadence] as int?,
+          .mapToDart(r[Columns.track] as Uint8List?),
+      avgCadence: r[Columns.avgCadence] as int?,
       cadence: const DbDoubleListConverter()
-          .mapToDart(r[Keys.cadence] as Uint8List?),
-      avgHeartRate: r[Keys.avgHeartRate] as int?,
+          .mapToDart(r[Columns.cadence] as Uint8List?),
+      avgHeartRate: r[Columns.avgHeartRate] as int?,
       heartRate: const DbDoubleListConverter()
-          .mapToDart(r[Keys.heartRate] as Uint8List?),
-      routeId: r[Keys.routeId] == null ? null : Int64(r[Keys.routeId]! as int),
-      comments: r[Keys.comments] as String?,
-      deleted: r[Keys.deleted]! as int == 1,
+          .mapToDart(r[Columns.heartRate] as Uint8List?),
+      routeId:
+          r[Columns.routeId] == null ? null : Int64(r[Columns.routeId]! as int),
+      comments: r[Columns.comments] as String?,
+      deleted: r[Columns.deleted]! as int == 1,
     );
   }
 
   @override
   DbRecord toDbRecord(CardioSession o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.userId: o.userId.toInt(),
-      Keys.movementId: o.movementId.toInt(),
-      Keys.cardioType: o.cardioType.index,
-      Keys.datetime: o.datetime.toString(),
-      Keys.distance: o.distance,
-      Keys.ascent: o.ascent,
-      Keys.descent: o.descent,
-      Keys.time: o.time?.inSeconds,
-      Keys.calories: o.calories,
-      Keys.track: const DbPositionListConverter().mapToSql(o.track),
-      Keys.avgCadence: o.avgCadence,
-      Keys.cadence: const DbDoubleListConverter().mapToSql(o.cadence),
-      Keys.avgHeartRate: o.avgHeartRate,
-      Keys.heartRate: const DbDoubleListConverter().mapToSql(o.heartRate),
-      Keys.routeId: o.routeId?.toInt(),
-      Keys.comments: o.comments,
-      Keys.deleted: o.deleted ? 1 : 0,
+      Columns.id: o.id.toInt(),
+      Columns.userId: o.userId.toInt(),
+      Columns.movementId: o.movementId.toInt(),
+      Columns.cardioType: o.cardioType.index,
+      Columns.datetime: o.datetime.toString(),
+      Columns.distance: o.distance,
+      Columns.ascent: o.ascent,
+      Columns.descent: o.descent,
+      Columns.time: o.time?.inSeconds,
+      Columns.calories: o.calories,
+      Columns.track: const DbPositionListConverter().mapToSql(o.track),
+      Columns.avgCadence: o.avgCadence,
+      Columns.cadence: const DbDoubleListConverter().mapToSql(o.cadence),
+      Columns.avgHeartRate: o.avgHeartRate,
+      Columns.heartRate: const DbDoubleListConverter().mapToSql(o.heartRate),
+      Columns.routeId: o.routeId?.toInt(),
+      Columns.comments: o.comments,
+      Columns.deleted: o.deleted ? 1 : 0,
     };
   }
 }

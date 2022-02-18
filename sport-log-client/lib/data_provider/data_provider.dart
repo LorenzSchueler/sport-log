@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:sport_log/api/api.dart';
-import 'package:sport_log/database/table.dart';
+import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
@@ -50,7 +50,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
 abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
   Api<T> get api;
 
-  DbAccessor<T> get db;
+  TableAccessor<T> get db;
 
   List<T> getFromAccountData(AccountData accountData);
 

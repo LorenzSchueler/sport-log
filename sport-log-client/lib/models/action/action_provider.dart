@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'action_provider.g.dart';
@@ -46,24 +46,24 @@ class DbActionProviderSerializer implements DbSerializer<ActionProvider> {
   @override
   ActionProvider fromDbRecord(DbRecord r, {String prefix = ''}) {
     return ActionProvider(
-      id: Int64(r[Keys.id]! as int),
-      name: r[Keys.name]! as String,
-      password: r[Keys.password]! as String,
-      platformId: Int64(r[Keys.platformId]! as int),
-      description: r[Keys.description] as String?,
-      deleted: r[Keys.deleted]! as int == 1,
+      id: Int64(r[Columns.id]! as int),
+      name: r[Columns.name]! as String,
+      password: r[Columns.password]! as String,
+      platformId: Int64(r[Columns.platformId]! as int),
+      description: r[Columns.description] as String?,
+      deleted: r[Columns.deleted]! as int == 1,
     );
   }
 
   @override
   DbRecord toDbRecord(ActionProvider o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.name: o.name,
-      Keys.password: o.password,
-      Keys.platformId: o.platformId.toInt(),
-      Keys.description: o.description,
-      Keys.deleted: o.deleted ? 1 : 0,
+      Columns.id: o.id.toInt(),
+      Columns.name: o.name,
+      Columns.password: o.password,
+      Columns.platformId: o.platformId.toInt(),
+      Columns.description: o.description,
+      Columns.deleted: o.deleted ? 1 : 0,
     };
   }
 }

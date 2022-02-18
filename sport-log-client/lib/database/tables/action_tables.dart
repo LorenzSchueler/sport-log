@@ -1,86 +1,85 @@
-import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/database/table.dart';
-import 'package:sport_log/database/table_creator.dart';
-import 'package:sport_log/database/table_names.dart';
+import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/models/action/all.dart';
 
-class ActionTable extends DbAccessor<Action> {
+class ActionTable extends TableAccessor<Action> {
   @override
   DbSerializer<Action> get serde => DbActionSerializer();
 
   @override
-  final Table table = Table(Tables.action, withColumns: [
-    Column.int(Keys.id).primaryKey(),
-    Column.bool(Keys.deleted).withDefault('0'),
-    Column.int(Keys.syncStatus)
+  final Table table = Table(Tables.action, columns: [
+    Column.int(Columns.id).primaryKey(),
+    Column.bool(Columns.deleted).withDefault('0'),
+    Column.int(Columns.syncStatus)
         .withDefault('2')
-        .check('${Keys.syncStatus} IN (0, 1, 2)'),
-    Column.text(Keys.name).check("length(${Keys.name}) >= 2"),
-    Column.int(Keys.actionProviderId)
+        .check('${Columns.syncStatus} IN (0, 1, 2)'),
+    Column.text(Columns.name).check("length(${Columns.name}) >= 2"),
+    Column.int(Columns.actionProviderId)
         .references(Tables.actionProvider, onDelete: OnAction.cascade),
-    Column.text(Keys.description).nullable(),
-    Column.int(Keys.createBefore).check("${Keys.createBefore} >= 0"),
-    Column.int(Keys.deleteAfter).check("${Keys.deleteAfter} >= 0"),
+    Column.text(Columns.description).nullable(),
+    Column.int(Columns.createBefore).check("${Columns.createBefore} >= 0"),
+    Column.int(Columns.deleteAfter).check("${Columns.deleteAfter} >= 0"),
   ]);
 }
 
-class ActionEventTable extends DbAccessor<ActionEvent> {
+class ActionEventTable extends TableAccessor<ActionEvent> {
   @override
   DbSerializer<ActionEvent> get serde => DbActionEventSerializer();
 
   @override
-  final Table table = Table(Tables.actionEvent, withColumns: [
-    Column.int(Keys.id).primaryKey(),
-    Column.bool(Keys.deleted).withDefault('0'),
-    Column.int(Keys.syncStatus)
+  final Table table = Table(Tables.actionEvent, columns: [
+    Column.int(Columns.id).primaryKey(),
+    Column.bool(Columns.deleted).withDefault('0'),
+    Column.int(Columns.syncStatus)
         .withDefault('2')
-        .check('${Keys.syncStatus} IN (0, 1, 2)'),
-    Column.int(Keys.userId),
-    Column.int(Keys.actionId)
+        .check('${Columns.syncStatus} IN (0, 1, 2)'),
+    Column.int(Columns.userId),
+    Column.int(Columns.actionId)
         .references(Tables.action, onDelete: OnAction.cascade),
-    Column.text(Keys.datetime),
-    Column.text(Keys.arguments).nullable(),
-    Column.int(Keys.enabled).check("${Keys.enabled} in (0,1)"),
+    Column.text(Columns.datetime),
+    Column.text(Columns.arguments).nullable(),
+    Column.int(Columns.enabled).check("${Columns.enabled} in (0,1)"),
   ]);
 }
 
-class ActionRuleTable extends DbAccessor<ActionRule> {
+class ActionRuleTable extends TableAccessor<ActionRule> {
   @override
   DbSerializer<ActionRule> get serde => DbActionRuleSerializer();
 
   @override
-  final Table table = Table(Tables.actionRule, withColumns: [
-    Column.int(Keys.id).primaryKey(),
-    Column.bool(Keys.deleted).withDefault('0'),
-    Column.int(Keys.syncStatus)
+  final Table table = Table(Tables.actionRule, columns: [
+    Column.int(Columns.id).primaryKey(),
+    Column.bool(Columns.deleted).withDefault('0'),
+    Column.int(Columns.syncStatus)
         .withDefault('2')
-        .check('${Keys.syncStatus} IN (0, 1, 2)'),
-    Column.int(Keys.userId),
-    Column.int(Keys.actionId)
+        .check('${Columns.syncStatus} IN (0, 1, 2)'),
+    Column.int(Columns.userId),
+    Column.int(Columns.actionId)
         .references(Tables.action, onDelete: OnAction.cascade),
-    Column.int(Keys.weekday).check("${Keys.weekday} between 0 and 6"),
-    Column.text(Keys.time),
-    Column.text(Keys.arguments).nullable(),
-    Column.int(Keys.enabled).check("${Keys.enabled} in (0,1)"),
+    Column.int(Columns.weekday).check("${Columns.weekday} between 0 and 6"),
+    Column.text(Columns.time),
+    Column.text(Columns.arguments).nullable(),
+    Column.int(Columns.enabled).check("${Columns.enabled} in (0,1)"),
   ]);
 }
 
-class ActionProviderTable extends DbAccessor<ActionProvider> {
+class ActionProviderTable extends TableAccessor<ActionProvider> {
   @override
   DbSerializer<ActionProvider> get serde => DbActionProviderSerializer();
 
   @override
-  final Table table = Table(Tables.actionProvider, withColumns: [
-    Column.int(Keys.id).primaryKey(),
-    Column.bool(Keys.deleted).withDefault('0'),
-    Column.int(Keys.syncStatus)
+  final Table table = Table(Tables.actionProvider, columns: [
+    Column.int(Columns.id).primaryKey(),
+    Column.bool(Columns.deleted).withDefault('0'),
+    Column.int(Columns.syncStatus)
         .withDefault('2')
-        .check('${Keys.syncStatus} IN (0, 1, 2)'),
-    Column.text(Keys.name).check("length(${Keys.name}) between 2 and 80"),
-    Column.text(Keys.password)
-        .check("length(${Keys.password}) between 2 and 96"),
-    Column.int(Keys.platformId)
+        .check('${Columns.syncStatus} IN (0, 1, 2)'),
+    Column.text(Columns.name).check("length(${Columns.name}) between 2 and 80"),
+    Column.text(Columns.password)
+        .check("length(${Columns.password}) between 2 and 96"),
+    Column.int(Columns.platformId)
         .references(Tables.platform, onDelete: OnAction.cascade),
-    Column.text(Keys.description).nullable()
+    Column.text(Columns.description).nullable()
   ]);
 }

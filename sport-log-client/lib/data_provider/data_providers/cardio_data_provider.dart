@@ -1,7 +1,7 @@
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/database/table.dart';
+import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/models/account_data/all.dart';
 import 'package:sport_log/models/cardio/all.dart';
 
@@ -13,7 +13,7 @@ class RouteDataProvider extends EntityDataProvider<Route> {
   final Api<Route> api = Api.routes;
 
   @override
-  final DbAccessor<Route> db = AppDatabase.routes;
+  final TableAccessor<Route> db = AppDatabase.routes;
 
   @override
   List<Route> getFromAccountData(AccountData accountData) => accountData.routes;
@@ -27,7 +27,7 @@ class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
   final Api<CardioSession> api = Api.cardioSessions;
 
   @override
-  final DbAccessor<CardioSession> db = AppDatabase.cardioSessions;
+  final TableAccessor<CardioSession> db = AppDatabase.cardioSessions;
 
   @override
   List<CardioSession> getFromAccountData(AccountData accountData) =>

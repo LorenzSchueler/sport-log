@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/id_generation.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 
@@ -122,28 +122,29 @@ class DbMovementSerializer implements DbSerializer<Movement> {
   @override
   Movement fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Movement(
-      id: Int64(r[prefix + Keys.id]! as int),
-      userId: r[prefix + Keys.userId] == null
+      id: Int64(r[prefix + Columns.id]! as int),
+      userId: r[prefix + Columns.userId] == null
           ? null
-          : Int64(r[prefix + Keys.userId]! as int),
-      name: r[prefix + Keys.name]! as String,
-      description: r[prefix + Keys.description] as String?,
-      cardio: r[prefix + Keys.cardio]! as int == 1,
-      deleted: r[prefix + Keys.deleted]! as int == 1,
-      dimension: MovementDimension.values[r[prefix + Keys.dimension]! as int],
+          : Int64(r[prefix + Columns.userId]! as int),
+      name: r[prefix + Columns.name]! as String,
+      description: r[prefix + Columns.description] as String?,
+      cardio: r[prefix + Columns.cardio]! as int == 1,
+      deleted: r[prefix + Columns.deleted]! as int == 1,
+      dimension:
+          MovementDimension.values[r[prefix + Columns.dimension]! as int],
     );
   }
 
   @override
   DbRecord toDbRecord(Movement o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.userId: o.userId?.toInt(),
-      Keys.name: o.name,
-      Keys.description: o.description,
-      Keys.cardio: o.cardio ? 1 : 0,
-      Keys.deleted: o.deleted ? 1 : 0,
-      Keys.dimension: o.dimension.index,
+      Columns.id: o.id.toInt(),
+      Columns.userId: o.userId?.toInt(),
+      Columns.name: o.name,
+      Columns.description: o.description,
+      Columns.cardio: o.cardio ? 1 : 0,
+      Columns.deleted: o.deleted ? 1 : 0,
+      Columns.dimension: o.dimension.index,
     };
   }
 }

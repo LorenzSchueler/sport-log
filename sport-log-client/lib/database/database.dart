@@ -1,5 +1,5 @@
 import 'package:sport_log/config.dart';
-import 'package:sport_log/database/table.dart';
+import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sqflite/sqflite.dart';
@@ -98,7 +98,7 @@ class AppDatabase {
   static final actionRules = ActionRuleTable();
   static final actionEvents = ActionEventTable();
 
-  static List<DbAccessor> get allTables => [
+  static List<TableAccessor> get allTables => [
         diaries,
         wods,
         movements,

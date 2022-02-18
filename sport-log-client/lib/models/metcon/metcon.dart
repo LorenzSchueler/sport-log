@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/id_generation.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 
@@ -118,30 +118,31 @@ class DbMetconSerializer implements DbSerializer<Metcon> {
   @override
   Metcon fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Metcon(
-      id: Int64(r[Keys.id]! as int),
-      userId: r[Keys.userId] == null ? null : Int64(r[Keys.userId]! as int),
-      name: r[Keys.name] as String?,
-      metconType: MetconType.values[r[Keys.metconType]! as int],
-      rounds: r[Keys.rounds] as int?,
-      timecap: r[Keys.timecap] == null
+      id: Int64(r[Columns.id]! as int),
+      userId:
+          r[Columns.userId] == null ? null : Int64(r[Columns.userId]! as int),
+      name: r[Columns.name] as String?,
+      metconType: MetconType.values[r[Columns.metconType]! as int],
+      rounds: r[Columns.rounds] as int?,
+      timecap: r[Columns.timecap] == null
           ? null
-          : Duration(seconds: r[Keys.timecap]! as int),
-      description: r[Keys.description] as String?,
-      deleted: r[Keys.deleted]! as int == 1,
+          : Duration(seconds: r[Columns.timecap]! as int),
+      description: r[Columns.description] as String?,
+      deleted: r[Columns.deleted]! as int == 1,
     );
   }
 
   @override
   DbRecord toDbRecord(Metcon o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.userId: o.userId?.toInt(),
-      Keys.name: o.name,
-      Keys.metconType: o.metconType.index,
-      Keys.rounds: o.rounds,
-      Keys.timecap: o.timecap?.inSeconds,
-      Keys.description: o.description,
-      Keys.deleted: o.deleted ? 1 : 0,
+      Columns.id: o.id.toInt(),
+      Columns.userId: o.userId?.toInt(),
+      Columns.name: o.name,
+      Columns.metconType: o.metconType.index,
+      Columns.rounds: o.rounds,
+      Columns.timecap: o.timecap?.inSeconds,
+      Columns.description: o.description,
+      Columns.deleted: o.deleted ? 1 : 0,
     };
   }
 }

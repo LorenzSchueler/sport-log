@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'metcon_session.g.dart';
@@ -60,32 +60,32 @@ class DbMetconSessionSerializer implements DbSerializer<MetconSession> {
   @override
   MetconSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return MetconSession(
-      id: Int64(r[Keys.id]! as int),
-      userId: Int64(r[Keys.userId]! as int),
-      metconId: Int64(r[Keys.metconId]! as int),
-      datetime: DateTime.parse(r[Keys.datetime]! as String),
-      time: r[Keys.time] as Duration?,
-      rounds: r[Keys.rounds] as int?,
-      reps: r[Keys.reps] as int?,
-      rx: r[Keys.rx]! as int == 1,
-      comments: r[Keys.comments] as String?,
-      deleted: r[Keys.deleted]! as int == 1,
+      id: Int64(r[Columns.id]! as int),
+      userId: Int64(r[Columns.userId]! as int),
+      metconId: Int64(r[Columns.metconId]! as int),
+      datetime: DateTime.parse(r[Columns.datetime]! as String),
+      time: r[Columns.time] as Duration?,
+      rounds: r[Columns.rounds] as int?,
+      reps: r[Columns.reps] as int?,
+      rx: r[Columns.rx]! as int == 1,
+      comments: r[Columns.comments] as String?,
+      deleted: r[Columns.deleted]! as int == 1,
     );
   }
 
   @override
   DbRecord toDbRecord(MetconSession o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.userId: o.userId.toInt(),
-      Keys.metconId: o.metconId.toInt(),
-      Keys.datetime: o.datetime.toString(),
-      Keys.time: o.time?.inSeconds,
-      Keys.rounds: o.rounds,
-      Keys.reps: o.reps,
-      Keys.rx: o.rx ? 1 : 0,
-      Keys.comments: o.comments,
-      Keys.deleted: o.deleted ? 1 : 0,
+      Columns.id: o.id.toInt(),
+      Columns.userId: o.userId.toInt(),
+      Columns.metconId: o.metconId.toInt(),
+      Columns.datetime: o.datetime.toString(),
+      Columns.time: o.time?.inSeconds,
+      Columns.rounds: o.rounds,
+      Columns.reps: o.reps,
+      Columns.rx: o.rx ? 1 : 0,
+      Columns.comments: o.comments,
+      Columns.deleted: o.deleted ? 1 : 0,
     };
   }
 }

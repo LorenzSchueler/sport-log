@@ -1,58 +1,62 @@
-import 'package:sport_log/database/keys.dart';
 import 'package:sport_log/database/table.dart';
-import 'package:sport_log/database/table_creator.dart';
-import 'package:sport_log/database/table_names.dart';
+import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/models/cardio/all.dart';
 
-class CardioSessionTable extends DbAccessor<CardioSession> {
+class CardioSessionTable extends TableAccessor<CardioSession> {
   @override
   DbSerializer<CardioSession> get serde => DbCardioSessionSerializer();
 
   @override
-  final Table table = Table(Tables.cardioSession, withColumns: [
-    Column.int(Keys.id).primaryKey(),
-    Column.bool(Keys.deleted).withDefault('0'),
-    Column.int(Keys.syncStatus)
+  final Table table = Table(Tables.cardioSession, columns: [
+    Column.int(Columns.id).primaryKey(),
+    Column.bool(Columns.deleted).withDefault('0'),
+    Column.int(Columns.syncStatus)
         .withDefault('2')
-        .check('${Keys.syncStatus} IN (0, 1, 2)'),
-    Column.int(Keys.userId),
-    Column.int(Keys.movementId)
+        .check('${Columns.syncStatus} IN (0, 1, 2)'),
+    Column.int(Columns.userId),
+    Column.int(Columns.movementId)
         .references(Tables.movement, onDelete: OnAction.noAction),
-    Column.int(Keys.cardioType).check("${Keys.cardioType} between 0 and 2"),
-    Column.text(Keys.datetime),
-    Column.int(Keys.distance).nullable().check("${Keys.distance} > 0"),
-    Column.int(Keys.ascent).nullable().check("${Keys.ascent} >= 0"),
-    Column.int(Keys.descent).nullable().check("${Keys.descent} >= 0"),
-    Column.int(Keys.time).nullable().check("${Keys.time} > 0"),
-    Column.int(Keys.calories).nullable().check("${Keys.calories} >= 0"),
-    Column.blob(Keys.track).nullable(),
-    Column.int(Keys.avgCadence).nullable().check("${Keys.avgCadence} > 0"),
-    Column.blob(Keys.cadence).nullable(),
-    Column.int(Keys.avgHeartRate).nullable().check("${Keys.avgHeartRate} > 0"),
-    Column.blob(Keys.heartRate).nullable(),
-    Column.int(Keys.routeId)
+    Column.int(Columns.cardioType)
+        .check("${Columns.cardioType} between 0 and 2"),
+    Column.text(Columns.datetime),
+    Column.int(Columns.distance).nullable().check("${Columns.distance} > 0"),
+    Column.int(Columns.ascent).nullable().check("${Columns.ascent} >= 0"),
+    Column.int(Columns.descent).nullable().check("${Columns.descent} >= 0"),
+    Column.int(Columns.time).nullable().check("${Columns.time} > 0"),
+    Column.int(Columns.calories).nullable().check("${Columns.calories} >= 0"),
+    Column.blob(Columns.track).nullable(),
+    Column.int(Columns.avgCadence)
+        .nullable()
+        .check("${Columns.avgCadence} > 0"),
+    Column.blob(Columns.cadence).nullable(),
+    Column.int(Columns.avgHeartRate)
+        .nullable()
+        .check("${Columns.avgHeartRate} > 0"),
+    Column.blob(Columns.heartRate).nullable(),
+    Column.int(Columns.routeId)
         .nullable()
         .references(Tables.route, onDelete: OnAction.setNull),
-    Column.text(Keys.comments).nullable(),
+    Column.text(Columns.comments).nullable(),
   ]);
 }
 
-class RouteTable extends DbAccessor<Route> {
+class RouteTable extends TableAccessor<Route> {
   @override
   DbSerializer<Route> get serde => DbRouteSerializer();
 
   @override
-  final Table table = Table(Tables.route, withColumns: [
-    Column.int(Keys.id).primaryKey(),
-    Column.bool(Keys.deleted).withDefault('0'),
-    Column.int(Keys.syncStatus)
+  final Table table = Table(Tables.route, columns: [
+    Column.int(Columns.id).primaryKey(),
+    Column.bool(Columns.deleted).withDefault('0'),
+    Column.int(Columns.syncStatus)
         .withDefault('2')
-        .check('${Keys.syncStatus} IN (0, 1, 2)'),
-    Column.int(Keys.userId),
-    Column.text(Keys.name).check("length(${Keys.name}) >= 2"),
-    Column.int(Keys.distance).check("${Keys.distance} > 0"),
-    Column.int(Keys.ascent).nullable().check("${Keys.ascent} >= 0"),
-    Column.int(Keys.descent).nullable().check("${Keys.descent} >= 0"),
-    Column.blob(Keys.track)
+        .check('${Columns.syncStatus} IN (0, 1, 2)'),
+    Column.int(Columns.userId),
+    Column.text(Columns.name).check("length(${Columns.name}) >= 2"),
+    Column.int(Columns.distance).check("${Columns.distance} > 0"),
+    Column.int(Columns.ascent).nullable().check("${Columns.ascent} >= 0"),
+    Column.int(Columns.descent).nullable().check("${Columns.descent} >= 0"),
+    Column.blob(Columns.track)
   ]);
 }

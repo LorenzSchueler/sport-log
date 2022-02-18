@@ -1,9 +1,9 @@
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
 import 'strength_set.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/database/keys.dart';
 
 class StrengthSessionStats {
   /// list of sets cannot be empty
@@ -85,37 +85,37 @@ class StrengthSessionStats {
   double get avgCount => sumCount / numSets;
 
   static const allColumns = [
-    Keys.datetime,
-    Keys.numSets,
-    Keys.minCount,
-    Keys.maxCount,
-    Keys.sumCount,
-    Keys.maxEorm,
-    Keys.maxWeight,
-    Keys.sumVolume
+    Columns.datetime,
+    Columns.numSets,
+    Columns.minCount,
+    Columns.maxCount,
+    Columns.sumCount,
+    Columns.maxEorm,
+    Columns.maxWeight,
+    Columns.sumVolume
   ];
 
   StrengthSessionStats.fromDbRecord(DbRecord r)
-      : dateTime = DateTime.parse(r[Keys.datetime]! as String),
-        numSets = r[Keys.numSets]! as int,
-        minCount = r[Keys.minCount]! as int,
-        maxCount = r[Keys.maxCount]! as int,
-        sumCount = r[Keys.sumCount]! as int,
-        maxEorm = r[Keys.maxEorm] as double?,
-        maxWeight = r[Keys.maxWeight] as double?,
-        sumVolume = r[Keys.sumVolume] as double?;
+      : dateTime = DateTime.parse(r[Columns.datetime]! as String),
+        numSets = r[Columns.numSets]! as int,
+        minCount = r[Columns.minCount]! as int,
+        maxCount = r[Columns.maxCount]! as int,
+        sumCount = r[Columns.sumCount]! as int,
+        maxEorm = r[Columns.maxEorm] as double?,
+        maxWeight = r[Columns.maxWeight] as double?,
+        sumVolume = r[Columns.sumVolume] as double?;
 
   // this is only for debugging/pretty-printing
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      Keys.datetime: dateTime,
-      Keys.numSets: numSets,
-      Keys.minCount: minCount,
-      Keys.maxCount: maxCount,
-      Keys.sumCount: sumCount,
-      Keys.maxEorm: maxEorm,
-      Keys.maxWeight: maxWeight,
-      Keys.sumVolume: sumVolume,
+      Columns.datetime: dateTime,
+      Columns.numSets: numSets,
+      Columns.minCount: minCount,
+      Columns.maxCount: maxCount,
+      Columns.sumCount: sumCount,
+      Columns.maxEorm: maxEorm,
+      Columns.maxWeight: maxWeight,
+      Columns.sumVolume: sumVolume,
     };
   }
 

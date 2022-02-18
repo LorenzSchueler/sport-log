@@ -1,11 +1,10 @@
+import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/table.dart';
-import 'package:sport_log/database/keys.dart';
-import 'package:sport_log/database/table_creator.dart';
-import 'package:sport_log/database/table_names.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 
-class MovementTable extends DbAccessor<Movement> {
+class MovementTable extends TableAccessor<Movement> {
   @override
   DbSerializer<Movement> get serde => DbMovementSerializer();
 
@@ -22,29 +21,29 @@ class MovementTable extends DbAccessor<Movement> {
   @override
   final Table table = Table(
     Tables.movement,
-    withColumns: [
-      Column.int(Keys.id).primaryKey(),
-      Column.bool(Keys.deleted).withDefault('0'),
-      Column.int(Keys.syncStatus)
+    columns: [
+      Column.int(Columns.id).primaryKey(),
+      Column.bool(Columns.deleted).withDefault('0'),
+      Column.int(Columns.syncStatus)
           .withDefault('2')
-          .check('${Keys.syncStatus} IN (0, 1, 2)'),
-      Column.int(Keys.userId).nullable(),
-      Column.text(Keys.name),
-      Column.text(Keys.description).nullable(),
-      Column.bool(Keys.cardio),
-      Column.int(Keys.dimension),
+          .check('${Columns.syncStatus} IN (0, 1, 2)'),
+      Column.int(Columns.userId).nullable(),
+      Column.text(Columns.name),
+      Column.text(Columns.description).nullable(),
+      Column.bool(Columns.cardio),
+      Column.int(Columns.dimension),
     ],
   );
 
   static const cardioSession = Tables.cardioSession;
-  static const deleted = Keys.deleted;
-  static const id = Keys.id;
+  static const deleted = Columns.deleted;
+  static const id = Columns.id;
   static const metconMovement = Tables.metconMovement;
-  static const movementId = Keys.movementId;
-  static const name = Keys.name;
+  static const movementId = Columns.movementId;
+  static const name = Columns.name;
   static const strengthSession = Tables.strengthSession;
-  static const dimension = Keys.dimension;
-  static const userId = Keys.userId;
+  static const dimension = Columns.dimension;
+  static const userId = Columns.userId;
 
   final _logger = Logger('MovementTable');
 

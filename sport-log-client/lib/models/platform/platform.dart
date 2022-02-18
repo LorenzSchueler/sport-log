@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'platform.g.dart';
@@ -24,7 +24,7 @@ class Platform extends Entity {
   factory Platform.fromJson(Map<String, dynamic> json) =>
       _$PlatformFromJson(json);
 
-@override
+  @override
   Map<String, dynamic> toJson() => _$PlatformToJson(this);
 
   @override
@@ -38,17 +38,17 @@ class DbPlatformSerializer implements DbSerializer<Platform> {
   @override
   Platform fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Platform(
-        id: Int64(r[Keys.id]! as int),
-        name: r[Keys.name]! as String,
-        deleted: r[Keys.deleted]! as int == 1);
+        id: Int64(r[Columns.id]! as int),
+        name: r[Columns.name]! as String,
+        deleted: r[Columns.deleted]! as int == 1);
   }
 
   @override
   DbRecord toDbRecord(Platform o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.name: o.name,
-      Keys.deleted: o.deleted ? 1 : 0,
+      Columns.id: o.id.toInt(),
+      Columns.name: o.name,
+      Columns.deleted: o.deleted ? 1 : 0,
     };
   }
 }

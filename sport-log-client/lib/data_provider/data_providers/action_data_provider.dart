@@ -1,7 +1,7 @@
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/database/table.dart';
+import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/action/all.dart';
 
@@ -13,7 +13,7 @@ class ActionProviderDataProvider extends EntityDataProvider<ActionProvider> {
   final Api<ActionProvider> api = Api.actionProviders;
 
   @override
-  final DbAccessor<ActionProvider> db = AppDatabase.actionProviders;
+  final TableAccessor<ActionProvider> db = AppDatabase.actionProviders;
 
   @override
   List<ActionProvider> getFromAccountData(AccountData accountData) =>
@@ -28,7 +28,7 @@ class ActionDataProvider extends EntityDataProvider<Action> {
   final Api<Action> api = Api.actions;
 
   @override
-  final DbAccessor<Action> db = AppDatabase.actions;
+  final TableAccessor<Action> db = AppDatabase.actions;
 
   @override
   List<Action> getFromAccountData(AccountData accountData) =>
@@ -43,7 +43,7 @@ class ActionRuleDataProvider extends EntityDataProvider<ActionRule> {
   final Api<ActionRule> api = Api.actionRules;
 
   @override
-  final DbAccessor<ActionRule> db = AppDatabase.actionRules;
+  final TableAccessor<ActionRule> db = AppDatabase.actionRules;
 
   @override
   List<ActionRule> getFromAccountData(AccountData accountData) =>
@@ -58,7 +58,7 @@ class ActionEventDataProvider extends EntityDataProvider<ActionEvent> {
   final Api<ActionEvent> api = Api.actionEvents;
 
   @override
-  final DbAccessor<ActionEvent> db = AppDatabase.actionEvents;
+  final TableAccessor<ActionEvent> db = AppDatabase.actionEvents;
 
   @override
   List<ActionEvent> getFromAccountData(AccountData accountData) =>

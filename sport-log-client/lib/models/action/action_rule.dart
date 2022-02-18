@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/action/weekday.dart';
 
@@ -51,28 +51,28 @@ class DbActionRuleSerializer implements DbSerializer<ActionRule> {
   @override
   ActionRule fromDbRecord(DbRecord r, {String prefix = ''}) {
     return ActionRule(
-      id: Int64(r[Keys.id]! as int),
-      userId: Int64(r[Keys.userId]! as int),
-      actionId: Int64(r[Keys.actionId]! as int),
-      weekday: Weekday.values[r[Keys.weekday]! as int],
-      time: DateTime.parse(r[Keys.time]! as String),
-      arguments: r[Keys.arguments] as String?,
-      enabled: r[Keys.enabled]! as int == 1,
-      deleted: r[Keys.deleted]! as int == 1,
+      id: Int64(r[Columns.id]! as int),
+      userId: Int64(r[Columns.userId]! as int),
+      actionId: Int64(r[Columns.actionId]! as int),
+      weekday: Weekday.values[r[Columns.weekday]! as int],
+      time: DateTime.parse(r[Columns.time]! as String),
+      arguments: r[Columns.arguments] as String?,
+      enabled: r[Columns.enabled]! as int == 1,
+      deleted: r[Columns.deleted]! as int == 1,
     );
   }
 
   @override
   DbRecord toDbRecord(ActionRule o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.userId: o.userId.toInt(),
-      Keys.actionId: o.actionId.toInt(),
-      Keys.weekday: o.weekday.index,
-      Keys.time: o.time.toString(),
-      Keys.arguments: o.arguments,
-      Keys.enabled: o.enabled ? 1 : 0,
-      Keys.deleted: o.deleted ? 1 : 0,
+      Columns.id: o.id.toInt(),
+      Columns.userId: o.userId.toInt(),
+      Columns.actionId: o.actionId.toInt(),
+      Columns.weekday: o.weekday.index,
+      Columns.time: o.time.toString(),
+      Columns.arguments: o.arguments,
+      Columns.enabled: o.enabled ? 1 : 0,
+      Columns.deleted: o.deleted ? 1 : 0,
     };
   }
 }

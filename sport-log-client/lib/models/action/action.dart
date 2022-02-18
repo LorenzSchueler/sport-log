@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 
 part 'action.g.dart';
@@ -46,26 +46,26 @@ class DbActionSerializer implements DbSerializer<Action> {
   @override
   Action fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Action(
-      id: Int64(r[Keys.id]! as int),
-      name: r[Keys.name]! as String,
-      actionProviderId: Int64(r[Keys.actionProviderId]! as int),
-      description: r[Keys.description] as String?,
-      createBefore: r[Keys.createBefore]! as int,
-      deleteAfter: r[Keys.deleteAfter]! as int,
-      deleted: r[Keys.deleted]! as int == 1,
+      id: Int64(r[Columns.id]! as int),
+      name: r[Columns.name]! as String,
+      actionProviderId: Int64(r[Columns.actionProviderId]! as int),
+      description: r[Columns.description] as String?,
+      createBefore: r[Columns.createBefore]! as int,
+      deleteAfter: r[Columns.deleteAfter]! as int,
+      deleted: r[Columns.deleted]! as int == 1,
     );
   }
 
   @override
   DbRecord toDbRecord(Action o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.name: o.name,
-      Keys.actionProviderId: o.actionProviderId.toInt(),
-      Keys.description: o.description,
-      Keys.createBefore: o.createBefore,
-      Keys.deleteAfter: o.deleteAfter,
-      Keys.deleted: o.deleted ? 1 : 0,
+      Columns.id: o.id.toInt(),
+      Columns.name: o.name,
+      Columns.actionProviderId: o.actionProviderId.toInt(),
+      Columns.description: o.description,
+      Columns.createBefore: o.createBefore,
+      Columns.deleteAfter: o.deleteAfter,
+      Columns.deleted: o.deleted ? 1 : 0,
     };
   }
 }

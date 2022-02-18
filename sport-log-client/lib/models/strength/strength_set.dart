@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/database/keys.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/eorm.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
@@ -70,24 +70,24 @@ class DbStrengthSetSerializer implements DbSerializer<StrengthSet> {
   @override
   StrengthSet fromDbRecord(DbRecord r, {String prefix = ''}) {
     return StrengthSet(
-      id: Int64(r[prefix + Keys.id]! as int),
-      strengthSessionId: Int64(r[prefix + Keys.strengthSessionId]! as int),
-      setNumber: r[prefix + Keys.setNumber]! as int,
-      count: r[prefix + Keys.count]! as int,
-      weight: r[prefix + Keys.weight] as double?,
-      deleted: r[prefix + Keys.deleted]! as int == 1,
+      id: Int64(r[prefix + Columns.id]! as int),
+      strengthSessionId: Int64(r[prefix + Columns.strengthSessionId]! as int),
+      setNumber: r[prefix + Columns.setNumber]! as int,
+      count: r[prefix + Columns.count]! as int,
+      weight: r[prefix + Columns.weight] as double?,
+      deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
 
   @override
   DbRecord toDbRecord(StrengthSet o) {
     return {
-      Keys.id: o.id.toInt(),
-      Keys.strengthSessionId: o.strengthSessionId.toInt(),
-      Keys.setNumber: o.setNumber,
-      Keys.count: o.count,
-      Keys.weight: o.weight,
-      Keys.deleted: o.deleted ? 1 : 0,
+      Columns.id: o.id.toInt(),
+      Columns.strengthSessionId: o.strengthSessionId.toInt(),
+      Columns.setNumber: o.setNumber,
+      Columns.count: o.count,
+      Columns.weight: o.weight,
+      Columns.deleted: o.deleted ? 1 : 0,
     };
   }
 }
