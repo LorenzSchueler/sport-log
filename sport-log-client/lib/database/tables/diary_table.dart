@@ -10,14 +10,10 @@ class DiaryTable extends TableAccessor<Diary> {
   final Table table = Table(Tables.diary, columns: [
     Column.int(Columns.id).primaryKey(),
     Column.bool(Columns.deleted).withDefault('0'),
-    Column.int(Columns.syncStatus)
-        .withDefault('2')
-        .check('${Columns.syncStatus} IN (0, 1, 2)'),
+    Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
     Column.int(Columns.userId),
     Column.text(Columns.date).withDefault("datetime('now')"),
-    Column.real(Columns.bodyweight)
-        .nullable()
-        .check("${Columns.bodyweight} > 0"),
+    Column.real(Columns.bodyweight).nullable().checkGt(0),
     Column.text(Columns.comments).nullable()
   ]);
 

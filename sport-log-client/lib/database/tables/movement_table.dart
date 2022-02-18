@@ -1,6 +1,5 @@
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/table.dart';
-import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 
@@ -24,9 +23,7 @@ class MovementTable extends TableAccessor<Movement> {
     columns: [
       Column.int(Columns.id).primaryKey(),
       Column.bool(Columns.deleted).withDefault('0'),
-      Column.int(Columns.syncStatus)
-          .withDefault('2')
-          .check('${Columns.syncStatus} IN (0, 1, 2)'),
+      Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
       Column.int(Columns.userId).nullable(),
       Column.text(Columns.name),
       Column.text(Columns.description).nullable(),

@@ -2,7 +2,6 @@ import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
-import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/eorm.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
@@ -66,14 +65,12 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
   final Table table = Table(Tables.strengthSession, columns: [
     Column.int(Columns.id).primaryKey(),
     Column.bool(Columns.deleted).withDefault('0'),
-    Column.int(Columns.syncStatus)
-        .withDefault('2')
-        .check('${Columns.syncStatus} IN (0, 1, 2)'),
+    Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
     Column.int(Columns.userId),
     Column.text(Columns.datetime).withDefault("DATETIME('now')"),
     Column.int(Columns.movementId)
         .references(Tables.movement, onDelete: OnAction.cascade),
-    Column.int(Columns.interval).nullable().check('${Columns.interval} > 0'),
+    Column.int(Columns.interval).nullable().checkGt(0),
     Column.text(Columns.comments).nullable(),
   ]);
 
@@ -301,14 +298,12 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
     columns: [
       Column.int(Columns.id).primaryKey(),
       Column.bool(Columns.deleted).withDefault('0'),
-      Column.int(Columns.syncStatus)
-          .withDefault('2')
-          .check('${Columns.syncStatus} IN (0, 1, 2)'),
+      Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
       Column.int(Columns.strengthSessionId)
           .references(Tables.strengthSession, onDelete: OnAction.cascade),
-      Column.int(Columns.setNumber).check('${Columns.setNumber} >= 0'),
-      Column.int(Columns.count).check('${Columns.count} >= 1'),
-      Column.real(Columns.weight).nullable().check('${Columns.weight} > 0'),
+      Column.int(Columns.setNumber).checkGe(0),
+      Column.int(Columns.count).checkGe(1),
+      Column.real(Columns.weight).nullable().checkGt(0),
     ],
   );
 

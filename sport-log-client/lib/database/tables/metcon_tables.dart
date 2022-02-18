@@ -1,7 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/table.dart';
-import 'package:sport_log/database/table.dart';
 import 'package:sport_log/models/metcon/all.dart';
 
 class MetconTable extends TableAccessor<Metcon> {
@@ -12,15 +11,12 @@ class MetconTable extends TableAccessor<Metcon> {
   final Table table = Table(Tables.metcon, columns: [
     Column.int(Columns.id).primaryKey(),
     Column.bool(Columns.deleted).withDefault('0'),
-    Column.int(Columns.syncStatus)
-        .withDefault('2')
-        .check('${Columns.syncStatus} IN (0, 1, 2)'),
+    Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
     Column.int(Columns.userId).nullable(),
-    Column.text(Columns.name).nullable().check("length(${Columns.name}) <= 80"),
-    Column.int(Columns.metconType)
-        .check("${Columns.metconType} between 0 and 2"),
-    Column.int(Columns.rounds).nullable().check("${Columns.rounds} >= 1"),
-    Column.int(Columns.timecap).nullable().check("${Columns.timecap} > 0"),
+    Column.text(Columns.name).nullable().checkLengthLe(80),
+    Column.int(Columns.metconType).checkBetween(0, 2),
+    Column.int(Columns.rounds).nullable().checkGe(1),
+    Column.int(Columns.timecap).nullable().checkGt(0),
     Column.text(Columns.description).nullable()
   ]);
 }
@@ -35,20 +31,15 @@ class MetconMovementTable extends TableAccessor<MetconMovement> {
     columns: [
       Column.int(Columns.id).primaryKey(),
       Column.bool(Columns.deleted).withDefault('0'),
-      Column.int(Columns.syncStatus)
-          .withDefault('2')
-          .check('${Columns.syncStatus} IN (0, 1, 2)'),
+      Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
       Column.int(Columns.metconId)
           .references(Tables.metcon, onDelete: OnAction.cascade),
       Column.int(Columns.movementId)
           .references(Tables.movement, onDelete: OnAction.noAction),
-      Column.int(Columns.movementNumber)
-          .check('${Columns.movementNumber} >= 0'),
-      Column.int(Columns.count).check('${Columns.count} >= 1'),
-      Column.real(Columns.weight).nullable().check('${Columns.weight} > 0'),
-      Column.int(Columns.distanceUnit)
-          .nullable()
-          .check('${Columns.distanceUnit} BETWEEN 0 AND 4'),
+      Column.int(Columns.movementNumber).checkGe(0),
+      Column.int(Columns.count).checkGe(1),
+      Column.real(Columns.weight).nullable().checkGt(0),
+      Column.int(Columns.distanceUnit).nullable().checkBetween(0, 4),
     ],
   );
 
@@ -80,17 +71,15 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
   final Table table = Table(Tables.metconSession, columns: [
     Column.int(Columns.id).primaryKey(),
     Column.bool(Columns.deleted).withDefault('0'),
-    Column.int(Columns.syncStatus)
-        .withDefault('2')
-        .check('${Columns.syncStatus} IN (0, 1, 2)'),
+    Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
     Column.int(Columns.userId),
     Column.text(Columns.metconId)
         .references(Tables.metcon, onDelete: OnAction.noAction),
     Column.text(Columns.datetime),
-    Column.int(Columns.time).nullable().check("${Columns.time} > 0"),
-    Column.int(Columns.rounds).nullable().check("${Columns.rounds} >= 0"),
-    Column.int(Columns.reps).nullable().check("${Columns.reps} >= 0"),
-    Column.bool(Columns.rx).check("${Columns.rx} in (0, 1)"),
+    Column.int(Columns.time).nullable().checkGt(0),
+    Column.int(Columns.rounds).nullable().checkGe(0),
+    Column.int(Columns.reps).nullable().checkGe(0),
+    Column.bool(Columns.rx).checkIn(<int>[0, 1]),
     Column.text(Columns.comments).nullable()
   ]);
 

@@ -50,8 +50,48 @@ class Column {
     return this;
   }
 
-  Column check(String checkValue) {
-    _check = checkValue;
+  Column checkBetween(dynamic start, dynamic end) {
+    _check = "$name between $start and $end";
+    return this;
+  }
+
+  Column checkIn(List<dynamic> values) {
+    _check = "$name in (${values.join(',')})";
+    return this;
+  }
+
+  Column checkGt(dynamic value) {
+    _check = "$name > $value";
+    return this;
+  }
+
+  Column checkGe(dynamic value) {
+    _check = "$name >= $value";
+    return this;
+  }
+
+  Column checkLt(dynamic value) {
+    _check = "$name < $value";
+    return this;
+  }
+
+  Column checkLe(dynamic value) {
+    _check = "$name <= $value";
+    return this;
+  }
+
+  Column checkLengthGe(int value) {
+    _check = "length($name) >= $value";
+    return this;
+  }
+
+  Column checkLengthLe(int value) {
+    _check = "length($name) <= $value";
+    return this;
+  }
+
+  Column checkLengthBetween(int start, int end) {
+    _check = "length($name) between $start and $end";
     return this;
   }
 
