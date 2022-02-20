@@ -7,22 +7,6 @@ class ActionProviderApi extends Api<ActionProvider> {
 
   @override
   String get _singularRoute => version + '/action_provider';
-
-  @override
-  ApiResult<void> postSingle(ActionProvider object) =>
-      throw UnimplementedError();
-
-  @override
-  ApiResult<void> postMultiple(List<ActionProvider> objects) =>
-      throw UnimplementedError();
-
-  @override
-  ApiResult<void> putSingle(ActionProvider object) =>
-      throw UnimplementedError();
-
-  @override
-  ApiResult<void> putMultiple(List<ActionProvider> objects) =>
-      throw UnimplementedError();
 }
 
 class ActionApi extends Api<Action> {
@@ -31,20 +15,6 @@ class ActionApi extends Api<Action> {
 
   @override
   String get _singularRoute => version + '/action';
-
-  @override
-  ApiResult<void> postSingle(Action object) => throw UnimplementedError();
-
-  @override
-  ApiResult<void> postMultiple(List<Action> objects) =>
-      throw UnimplementedError();
-
-  @override
-  ApiResult<void> putSingle(Action object) => throw UnimplementedError();
-
-  @override
-  ApiResult<void> putMultiple(List<Action> objects) =>
-      throw UnimplementedError();
 }
 
 class ActionRuleApi extends Api<ActionRule> {

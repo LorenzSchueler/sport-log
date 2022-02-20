@@ -6,20 +6,6 @@ class PlatformApi extends Api<Platform> {
 
   @override
   String get _singularRoute => version + '/platform';
-
-  @override
-  ApiResult<void> postSingle(Platform object) => throw UnimplementedError();
-
-  @override
-  ApiResult<void> postMultiple(List<Platform> objects) =>
-      throw UnimplementedError();
-
-  @override
-  ApiResult<void> putSingle(Platform object) => throw UnimplementedError();
-
-  @override
-  ApiResult<void> putMultiple(List<Platform> objects) =>
-      throw UnimplementedError();
 }
 
 class PlatformCredentialApi extends Api<PlatformCredential> {
