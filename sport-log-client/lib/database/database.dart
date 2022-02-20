@@ -1,7 +1,6 @@
 import 'package:sport_log/config.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'tables/all.dart';
@@ -53,32 +52,6 @@ class AppDatabase {
     await deleteDatabase(Config.databaseName);
     _database = null;
     _logger.i('Database deleted');
-  }
-
-  static Future<void> upsertAccountData(AccountData data,
-      {required bool synchronized}) async {
-    diaries.upsertMultiple(data.diaries, synchronized: synchronized);
-    wods.upsertMultiple(data.wods, synchronized: synchronized);
-    movements.upsertMultiple(data.movements, synchronized: synchronized);
-    metcons.upsertMultiple(data.metcons, synchronized: synchronized);
-    metconMovements.upsertMultiple(data.metconMovements,
-        synchronized: synchronized);
-    metconSessions.upsertMultiple(data.metconSessions,
-        synchronized: synchronized);
-    routes.upsertMultiple(data.routes, synchronized: synchronized);
-    cardioSessions.upsertMultiple(data.cardioSessions,
-        synchronized: synchronized);
-    strengthSessions.upsertMultiple(data.strengthSessions,
-        synchronized: synchronized);
-    strengthSets.upsertMultiple(data.strengthSets, synchronized: synchronized);
-    platforms.upsertMultiple(data.platforms, synchronized: synchronized);
-    platformCredentials.upsertMultiple(data.platformCredentials,
-        synchronized: synchronized);
-    actionProviders.upsertMultiple(data.actionProviders,
-        synchronized: synchronized);
-    actions.upsertMultiple(data.actions, synchronized: synchronized);
-    actionRules.upsertMultiple(data.actionRules, synchronized: synchronized);
-    actionEvents.upsertMultiple(data.actionEvents, synchronized: synchronized);
   }
 
   static final diaries = DiaryTable();

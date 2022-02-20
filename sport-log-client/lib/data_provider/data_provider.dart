@@ -153,6 +153,21 @@ abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
     notifyListeners();
   }
 
+  static Future<void> pushAllToServer() async {
+    // !!! order matters => no parallel execution possible
+    for (final dp in EntityDataProvider.all) {
+      await dp.pushToServer();
+    }
+  }
+
+  static Future<void> upsertAccountData(AccountData data,
+      {required bool synchronized}) async {
+    // !!! order matters => no parallel execution possible
+    for (final dp in EntityDataProvider.all) {
+      await dp.upsertFromAccountData(data);
+    }
+  }
+
   static List<EntityDataProvider> get all => [
         DiaryDataProvider.instance,
         WodDataProvider.instance,

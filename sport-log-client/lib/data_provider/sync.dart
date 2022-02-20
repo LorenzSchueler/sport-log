@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
-import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
@@ -55,11 +54,7 @@ class Sync extends ChangeNotifier {
   }
 
   Future<void> _upSync() async {
-    for (final dp in EntityDataProvider.all) {
-      // TODO: this can be sped up
-      await dp.pushToServer();
-    }
-    // TODO: upsync routes, cardio sessions, metcon sessions, movement muscle, training plan, metcon item, strength blueprint, cardio blueprint
+    await EntityDataProvider.pushAllToServer();
   }
 
   Future<bool> _downSync({VoidCallback? onNoInternet}) async {
@@ -89,7 +84,7 @@ class Sync extends ChangeNotifier {
       if (accountData.user != null) {
         Account.updateUserFromDownSync(accountData.user!);
       }
-      AppDatabase.upsertAccountData(accountData, synchronized: true);
+      EntityDataProvider.upsertAccountData(accountData, synchronized: true);
       return true;
     }
   }
