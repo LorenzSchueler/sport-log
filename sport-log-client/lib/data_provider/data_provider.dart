@@ -19,11 +19,20 @@ abstract class DataProvider<T> extends ChangeNotifier {
 
   Future<List<T>> getNonDeleted();
 
-  Future<void> pushToServer();
+  Future<void> pushUpdatedToServer();
+
+  Future<void> pushCreatedToServer();
 
   Future<void> doFullUpdate(); // used in page refresh
 
   Future<void> upsertFromAccountData(AccountData accountData);
+
+  Future<void> pushToServer() async {
+    await Future.wait([
+      pushUpdatedToServer(),
+      pushCreatedToServer(),
+    ]);
+  }
 
   /// only called if internet connection is needed
   /// (call [handleApiError] with isCritical = true)
@@ -100,14 +109,6 @@ abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
   Future<List<T>> getNonDeleted() async => db.getNonDeleted();
 
   @override
-  Future<void> pushToServer() async {
-    await Future.wait([
-      _pushUpdatedToServer(),
-      _pushCreatedToServer(),
-    ]);
-  }
-
-  @override
   Future<void> doFullUpdate() async {
     final result = await api.getMultiple();
     if (result.isFailure) {
@@ -122,7 +123,8 @@ abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
     await upsertMultiple(getFromAccountData(accountData), synchronized: true);
   }
 
-  Future<void> _pushUpdatedToServer() async {
+  @override
+  Future<void> pushUpdatedToServer() async {
     final recordsToUpdate = await db.getWithSyncStatus(SyncStatus.updated);
     final result = await api.putMultiple(recordsToUpdate);
     if (result.isFailure) {
@@ -132,7 +134,8 @@ abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
     db.setAllUpdatedSynchronized();
   }
 
-  Future<void> _pushCreatedToServer() async {
+  @override
+  Future<void> pushCreatedToServer() async {
     final recordsToCreate = await db.getWithSyncStatus(SyncStatus.created);
     final result = await api.postMultiple(recordsToCreate);
     if (result.isFailure) {
