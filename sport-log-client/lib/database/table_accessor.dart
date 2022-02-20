@@ -1,14 +1,13 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
-import 'package:sport_log/database/table.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'db_interfaces.dart';
 
 export 'db_interfaces.dart';
 
-abstract class TableAccessor<T extends DbObject> {
+abstract class TableAccessor<T extends Entity> {
   DbSerializer<T> get serde;
   Table get table;
 
@@ -32,6 +31,8 @@ abstract class TableAccessor<T extends DbObject> {
       update $tableName set sync_status = 1 where id = new.id and sync_status = 0;
     end;
   ''';
+
+  String get notDeleted => '${Columns.deleted} = 0';
 
   Future<void> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
     await database.update(
@@ -110,8 +111,7 @@ abstract class TableAccessor<T extends DbObject> {
   }
 
   Future<List<T>> getNonDeleted() async {
-    final result =
-        await database.query(tableName, where: '${Columns.deleted} = 0');
+    final result = await database.query(tableName, where: notDeleted);
     return result.map(serde.fromDbRecord).toList();
   }
 

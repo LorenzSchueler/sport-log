@@ -1,5 +1,6 @@
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/models/diary/all.dart';
 
 class DiaryTable extends TableAccessor<Diary> {
@@ -17,31 +18,21 @@ class DiaryTable extends TableAccessor<Diary> {
     Column.text(Columns.comments).nullable()
   ]);
 
-  Future<List<Diary>> getByTimerange({
+  Future<List<Diary>> getByTimerange(
     DateTime? from,
     DateTime? until,
-  }) async {
-    return []; // TODO implement
-    //final fromFilter = from == null ? '' : 'AND $tableName.$datetime >= ?';
-    //final untilFilter = until == null ? '' : 'AND $tableName.$datetime < ?';
-    //final records = await database.rawQuery('''
-    //SELECT
-    //${_table.allColumns},
-    //FROM $tableName
-    //WHERE $tableName.${Keys.deleted} = 0
-    //$fromFilter
-    //$untilFilter
-    //ORDER BY
-    //datetime($tableName.${Keys.datetime}) DESC;
-    //''', [
-    //if (from != null) from.toString(),
-    //if (until != null) until.toString(),
-    //]);
-    //return records.mapToL((record) => StrengthSessionWithStats(
-    //session: serde.fromDbRecord(record, prefix: _table.prefix),
-    //movement: _movementTable.serde
-    //.fromDbRecord(record, prefix: _movementTable.table.prefix),
-    //stats: StrengthSessionStats.fromDbRecord(record),
-    //));
+  ) async {
+    final records = await database.query(Tables.diary,
+        where: [
+          notDeleted,
+          if (from != null) " AND $tableName.${Columns.date} >= ?",
+          if (until != null) " AND $tableName.${Columns.date} < ?"
+        ].join(),
+        whereArgs: [
+          if (from != null) yyyyMMdd(from),
+          if (until != null) yyyyMMdd(until)
+        ],
+        orderBy: "$tableName.${Columns.date} DESC");
+    return records.map(serde.fromDbRecord).toList();
   }
 }

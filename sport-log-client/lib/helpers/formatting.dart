@@ -9,6 +9,10 @@ String formatDate(DateTime date) {
   return DateFormat('dd.MM.yy').format(date);
 }
 
+String yyyyMMdd(DateTime date) {
+  return DateFormat('yyyy-MM-dd').format(date);
+}
+
 String formatTime(Duration duration, {bool short = false}) {
   if (short && duration.inSeconds < 3600) {
     return duration.toString().split('.').first.split(":").skip(1).join(":");

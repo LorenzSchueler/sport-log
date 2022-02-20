@@ -16,9 +16,7 @@ enum SyncStatus {
   created,
 }
 
-abstract class Entity extends JsonSerializable implements DbObject {}
-
-abstract class DbObject implements Validatable, HasId {
+abstract class Entity extends JsonSerializable implements Validatable, HasId {
   bool get deleted;
   set deleted(bool deleted);
 }

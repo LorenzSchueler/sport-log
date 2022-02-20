@@ -24,43 +24,6 @@ class DiaryPageState extends State<DiaryPage> {
   final _logger = Logger('DiaryPage');
   final _dataProvider = DiaryDataProvider.instance;
   List<Diary> _diaries = [];
-  //Diary(
-  //id: randomId(),
-  //userId: Settings.userId!,
-  //date: DateTime.now(),
-  //bodyweight: null,
-  //comments: null,
-  //deleted: false),
-  //Diary(
-  //id: randomId(),
-  //userId: Settings.userId!,
-  //date: DateTime.now().subtract(const Duration(days: 1)),
-  //bodyweight: 78.3,
-  //comments: null,
-  //deleted: false),
-  //Diary(
-  //id: randomId(),
-  //userId: Settings.userId!,
-  //date: DateTime.now().subtract(const Duration(days: 2)),
-  //bodyweight: null,
-  //comments: "bla bli\nblub\n..la",
-  //deleted: false),
-  //Diary(
-  //id: randomId(),
-  //userId: Settings.userId!,
-  //date: DateTime.now().subtract(const Duration(days: 3)),
-  //bodyweight: 80.0,
-  //comments: "bla",
-  //deleted: false),
-  //Diary(
-  //id: randomId(),
-  //userId: Settings.userId!,
-  //date: DateTime.now().subtract(const Duration(days: 5)),
-  //bodyweight: 180.0,
-  //comments:
-  //"very long line bc abc abc abc abc abc abc abc abc abc abc abc",
-  //deleted: false),
-  //];
 
   DateFilterState _dateFilter = MonthFilter.current();
 
@@ -83,8 +46,8 @@ class DiaryPageState extends State<DiaryPage> {
   Future<void> update() async {
     _logger.d(
         'Updating diary page with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
-    final diaries = await _dataProvider.getByTimerange(
-        from: _dateFilter.start, until: _dateFilter.end);
+    final diaries =
+        await _dataProvider.getByTimerange(_dateFilter.start, _dateFilter.end);
     setState(() => _diaries = diaries);
   }
 
@@ -107,9 +70,10 @@ class DiaryPageState extends State<DiaryPage> {
           preferredSize: const Size.fromHeight(40),
           child: DateFilter(
             initialState: _dateFilter,
-            onFilterChanged: (dateFilter) => setState(() {
-              _dateFilter = dateFilter;
-            }),
+            onFilterChanged: (dateFilter) async {
+              setState(() => _dateFilter = dateFilter);
+              update();
+            },
           ),
         ),
       ),

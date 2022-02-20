@@ -72,8 +72,7 @@ class _ExpandableFabState extends State<ExpandableFab>
         ),
       );
     } else {
-      return Container(
-        //color: Colors.black,
+      return SizedBox(
         height: 86,
         width: (60 * (widget.buttons.length + 1)).toDouble(),
         child: Stack(

@@ -19,10 +19,10 @@ class DiaryDataProvider extends EntityDataProvider<Diary> {
   List<Diary> getFromAccountData(AccountData accountData) =>
       accountData.diaries;
 
-  Future<List<Diary>> getByTimerange({
+  Future<List<Diary>> getByTimerange(
     DateTime? from,
     DateTime? until,
-  }) async {
-    return await db.getByTimerange(from: from, until: until);
+  ) async {
+    return await db.getByTimerange(from, until);
   }
 }
