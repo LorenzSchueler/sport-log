@@ -253,9 +253,10 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
           preferredSize: const Size.fromHeight(40),
           child: DateFilter(
             initialState: _dateFilter,
-            onFilterChanged: (dateFilter) => setState(() {
-              _dateFilter = dateFilter;
-            }),
+            onFilterChanged: (dateFilter) async {
+              setState(() => _dateFilter = dateFilter);
+              //update(); TODO
+            },
           ),
         ),
       ),

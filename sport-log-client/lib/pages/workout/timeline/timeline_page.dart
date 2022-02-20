@@ -1,15 +1,10 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_log/helpers/id_generation.dart';
+import 'package:sport_log/api/api.dart';
+import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/models/cardio/cardio_session.dart';
-import 'package:sport_log/models/cardio/position.dart';
+import 'package:sport_log/helpers/snackbar.dart';
+import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/models/diary/diary.dart';
-import 'package:sport_log/models/metcon/metcon.dart';
-import 'package:sport_log/models/metcon/metcon_description.dart';
-import 'package:sport_log/models/metcon/metcon_movement.dart';
-import 'package:sport_log/models/metcon/metcon_movement_description.dart';
-import 'package:sport_log/models/metcon/metcon_session.dart';
 import 'package:sport_log/models/metcon/metcon_session_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
@@ -22,7 +17,6 @@ import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_overview_
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 class TimelinePage extends StatefulWidget {
@@ -34,146 +28,201 @@ class TimelinePage extends StatefulWidget {
 
 class TimelinePageState extends State<TimelinePage> {
   final _logger = Logger('TimelinePage');
+  final _strengthDataProvider = StrengthSessionWithSetsDataProvider.instance;
+  final _metconDataProvider = MetconDescriptionDataProvider.instance;
+  //final _cardioDataProvider = CardioSessionDescriptionDataProvider.instance;
+  final _diaryDataProvider = DiaryDataProvider.instance;
+  List<StrengthSessionWithStats> _strengthSessions = [];
+  List<MetconSessionDescription> _metconSessions = [];
+  List<CardioSessionDescription> _cardioSessions = [];
+  List<Diary> _diaries = [];
+  List<TimelineUnion> _items = [];
 
-  late List<TimelineUnion> _items;
-  @override
-  void initState() {
-    super.initState();
+  //late List<TimelineUnion> _items;
+  //@override
+  //void initState() {
+  //super.initState();
 
-    var strengthSessions = [
-      TimelineUnion.strengthSession(StrengthSessionWithStats(
-          session: StrengthSession(
-              id: randomId(),
-              userId: Settings.userId!,
-              datetime: DateTime.now(),
-              movementId: Int64(1),
-              interval: const Duration(seconds: 120),
-              comments: null,
-              deleted: false),
-          movement: Movement(
-              id: randomId(),
-              userId: Settings.userId!,
-              name: "My Movement",
-              description: null,
-              cardio: true,
-              deleted: false,
-              dimension: MovementDimension.reps),
-          stats: StrengthSessionStats.fromStrengthSets(sets: [
-            StrengthSet(
-                id: randomId(),
-                strengthSessionId: randomId(),
-                setNumber: 1,
-                count: 5,
-                weight: 100,
-                deleted: false)
-          ], dateTime: DateTime.now()))),
-    ];
-    var metconSessions = [
-      TimelineUnion.metconSession(MetconSessionDescription(
-          metconSession: MetconSession(
-              id: randomId(),
-              userId: Settings.userId!,
-              metconId: Int64(1),
-              datetime: DateTime.now(),
-              time: const Duration(minutes: 15),
-              rounds: 3,
-              reps: 0,
-              rx: true,
-              comments: "so comments are here",
-              deleted: false),
-          metconDescription: MetconDescription(
-              metcon: Metcon(
-                  id: randomId(),
-                  userId: Settings.userId!,
-                  name: "cindy",
-                  metconType: MetconType.amrap,
-                  rounds: 3,
-                  timecap: const Duration(minutes: 30),
-                  description: "my description",
-                  deleted: false),
-              moves: [
-                MetconMovementDescription(
-                    metconMovement: MetconMovement(
-                        id: randomId(),
-                        metconId: Int64(1),
-                        movementId: Int64(1),
-                        movementNumber: 1,
-                        count: 5,
-                        weight: 0,
-                        distanceUnit: null,
-                        deleted: false),
-                    movement: Movement(
-                        id: randomId(),
-                        userId: Settings.userId!,
-                        name: "pullup",
-                        description: null,
-                        cardio: false,
-                        deleted: false,
-                        dimension: MovementDimension.reps))
-              ],
-              hasReference: true)))
-    ];
-    var cardioSessions = [
-      TimelineUnion.cardioSession(
-        CardioSession(
-            id: randomId(),
-            userId: Settings.userId!,
-            movementId: Int64(1),
-            cardioType: CardioType.training,
-            datetime: DateTime.now().subtract(const Duration(days: 1)),
-            distance: 15034,
-            ascent: 308,
-            descent: 297,
-            time: const Duration(seconds: 4189),
-            calories: null,
-            track: [
-              Position(
-                  longitude: 11.33,
-                  latitude: 47.27,
-                  elevation: 600,
-                  distance: 0,
-                  time: const Duration(seconds: 0)),
-              Position(
-                  longitude: 11.331,
-                  latitude: 47.27,
-                  elevation: 650,
-                  distance: 1000,
-                  time: const Duration(seconds: 200)),
-              Position(
-                  longitude: 11.33,
-                  latitude: 47.272,
-                  elevation: 600,
-                  distance: 2000,
-                  time: const Duration(seconds: 500)),
-            ],
-            avgCadence: 167,
-            cadence: null,
-            avgHeartRate: 189,
-            heartRate: null,
-            routeId: null,
-            comments: null,
-            deleted: false),
-      ),
-    ];
-    var diaries = [
-      TimelineUnion.diary(Diary(
-          id: randomId(),
-          userId: Settings.userId!,
-          date: DateTime.now().subtract(const Duration(days: 3)),
-          bodyweight: 80.0,
-          comments: "bla",
-          deleted: false)),
-    ];
-    _items = strengthSessions;
-    _items.addAll(cardioSessions);
-    _items.addAll(metconSessions);
-    _items.addAll(diaries);
+  //var strengthSessions = [
+  //TimelineUnion.strengthSession(StrengthSessionWithStats(
+  //session: StrengthSession(
+  //id: randomId(),
+  //userId: Settings.userId!,
+  //datetime: DateTime.now(),
+  //movementId: Int64(1),
+  //interval: const Duration(seconds: 120),
+  //comments: null,
+  //deleted: false),
+  //movement: Movement(
+  //id: randomId(),
+  //userId: Settings.userId!,
+  //name: "My Movement",
+  //description: null,
+  //cardio: true,
+  //deleted: false,
+  //dimension: MovementDimension.reps),
+  //stats: StrengthSessionStats.fromStrengthSets(sets: [
+  //StrengthSet(
+  //id: randomId(),
+  //strengthSessionId: randomId(),
+  //setNumber: 1,
+  //count: 5,
+  //weight: 100,
+  //deleted: false)
+  //], dateTime: DateTime.now()))),
+  //];
+  //var metconSessions = [
+  //TimelineUnion.metconSession(MetconSessionDescription(
+  //metconSession: MetconSession(
+  //id: randomId(),
+  //userId: Settings.userId!,
+  //metconId: Int64(1),
+  //datetime: DateTime.now(),
+  //time: const Duration(minutes: 15),
+  //rounds: 3,
+  //reps: 0,
+  //rx: true,
+  //comments: "so comments are here",
+  //deleted: false),
+  //metconDescription: MetconDescription(
+  //metcon: Metcon(
+  //id: randomId(),
+  //userId: Settings.userId!,
+  //name: "cindy",
+  //metconType: MetconType.amrap,
+  //rounds: 3,
+  //timecap: const Duration(minutes: 30),
+  //description: "my description",
+  //deleted: false),
+  //moves: [
+  //MetconMovementDescription(
+  //metconMovement: MetconMovement(
+  //id: randomId(),
+  //metconId: Int64(1),
+  //movementId: Int64(1),
+  //movementNumber: 1,
+  //count: 5,
+  //weight: 0,
+  //distanceUnit: null,
+  //deleted: false),
+  //movement: Movement(
+  //id: randomId(),
+  //userId: Settings.userId!,
+  //name: "pullup",
+  //description: null,
+  //cardio: false,
+  //deleted: false,
+  //dimension: MovementDimension.reps))
+  //],
+  //hasReference: true)))
+  //];
+  //var cardioSessions = [
+  //TimelineUnion.cardioSession(
+  //CardioSession(
+  //id: randomId(),
+  //userId: Settings.userId!,
+  //movementId: Int64(1),
+  //cardioType: CardioType.training,
+  //datetime: DateTime.now().subtract(const Duration(days: 1)),
+  //distance: 15034,
+  //ascent: 308,
+  //descent: 297,
+  //time: const Duration(seconds: 4189),
+  //calories: null,
+  //track: [
+  //Position(
+  //longitude: 11.33,
+  //latitude: 47.27,
+  //elevation: 600,
+  //distance: 0,
+  //time: const Duration(seconds: 0)),
+  //Position(
+  //longitude: 11.331,
+  //latitude: 47.27,
+  //elevation: 650,
+  //distance: 1000,
+  //time: const Duration(seconds: 200)),
+  //Position(
+  //longitude: 11.33,
+  //latitude: 47.272,
+  //elevation: 600,
+  //distance: 2000,
+  //time: const Duration(seconds: 500)),
+  //],
+  //avgCadence: 167,
+  //cadence: null,
+  //avgHeartRate: 189,
+  //heartRate: null,
+  //routeId: null,
+  //comments: null,
+  //deleted: false),
+  //),
+  //];
+  //var diaries = [
+  //TimelineUnion.diary(Diary(
+  //id: randomId(),
+  //userId: Settings.userId!,
+  //date: DateTime.now().subtract(const Duration(days: 3)),
+  //bodyweight: 80.0,
+  //comments: "bla",
+  //deleted: false)),
+  //];
+  //_items = strengthSessions;
+  //_items.addAll(cardioSessions);
+  //_items.addAll(metconSessions);
+  //_items.addAll(diaries);
 
-    _items.sort((a, b) => b.compareTo(a));
-  }
+  //_items.sort((a, b) => b.compareTo(a));
+  //}
 
   DateFilterState _dateFilter = MonthFilter.current();
   Movement? _movement;
+
+  @override
+  void initState() {
+    super.initState();
+    _diaryDataProvider.addListener(update);
+    _diaryDataProvider.onNoInternetConnection =
+        () => showSimpleSnackBar(context, 'No Internet connection.');
+    update();
+  }
+
+  @override
+  void dispose() {
+    _diaryDataProvider.removeListener(update);
+    _diaryDataProvider.onNoInternetConnection = null;
+    super.dispose();
+  }
+
+  Future<void> update() async {
+    _logger.d(
+        'Updating timeline with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
+    //final _strengthSessions = await _strengthDataProvider.getByTimerange(
+    //_dateFilter.start, _dateFilter.end);
+    //final _metconSessions = await _metconDataProvider.getByTimerange(
+    //_dateFilter.start, _dateFilter.end);
+    //final _cardioSessions = await _cardioDataProvider.getByTimerange(
+    //_dateFilter.start, _dateFilter.end);
+    final _diaries = await _diaryDataProvider.getByTimerange(
+        _dateFilter.start, _dateFilter.end);
+    final items =
+        _strengthSessions.map((s) => TimelineUnion.strengthSession(s)).toList();
+    items.addAll(_metconSessions.map((m) => TimelineUnion.metconSession(m)));
+    items.addAll(_cardioSessions.map((c) => TimelineUnion.cardioSession(c)));
+    items.addAll(_diaries.map((d) => TimelineUnion.diary(d)));
+    items.sort((a, b) => b.compareTo(a));
+    setState(() => _items = items);
+  }
+
+  // full update (from server)
+  Future<void> _refreshPage() async {
+    await _diaryDataProvider.doFullUpdate().onError((error, stackTrace) {
+      if (error is ApiError) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -184,9 +233,10 @@ class TimelinePageState extends State<TimelinePage> {
           preferredSize: const Size.fromHeight(40),
           child: DateFilter(
             initialState: _dateFilter,
-            onFilterChanged: (dateFilter) => setState(() {
-              _dateFilter = dateFilter;
-            }),
+            onFilterChanged: (dateFilter) async {
+              setState(() => _dateFilter = dateFilter);
+              update();
+            },
           ),
         ),
       ),
@@ -213,7 +263,8 @@ class TimelinePageState extends State<TimelinePage> {
             StrengthSessionCard(strengthSessionWithStats: strengthSession),
         (metconSessionDescription) => MetconSessionCard(
             metconSessionDescription: metconSessionDescription),
-        (cardioSession) => CardioSessionCard(cardioSession: cardioSession),
+        (cardioSession) =>
+            CardioSessionCard(cardioSessionDescription: cardioSession),
         (diary) => DiaryCard(diary: diary));
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/action/action_overview_page.dart';
 import 'package:sport_log/pages/map/map_page.dart';
 import 'package:sport_log/pages/offline_maps/offline_maps_overview.dart';
@@ -159,16 +160,19 @@ class AppState extends State<App> {
                     args[1] as CardioType, args[2] as Route?);
               }),
           Routes.cardio.cardioEdit: (context) => checkLogin(() {
-                final cardioSession = ModalRoute.of(context)?.settings.arguments
-                    as CardioSession?;
+                final cardioSessionDescription = ModalRoute.of(context)
+                    ?.settings
+                    .arguments as CardioSessionDescription?;
                 return CardioEditPage(
-                  cardioSession: cardioSession,
+                  cardioSessionDescription: cardioSessionDescription,
                 );
               }),
           Routes.cardio.cardioDetails: (context) => checkLogin(() {
-                final cardioSession =
-                    ModalRoute.of(context)?.settings.arguments as CardioSession;
-                return CardioDetailsPage(cardioSession: cardioSession);
+                final cardioSessionDescription = ModalRoute.of(context)
+                    ?.settings
+                    .arguments as CardioSessionDescription;
+                return CardioDetailsPage(
+                    cardioSessionDescription: cardioSessionDescription);
               }),
           Routes.cardio.routeOverview: (_) =>
               checkLogin(() => const RoutePage()),
