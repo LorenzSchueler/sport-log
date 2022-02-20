@@ -29,7 +29,7 @@ class WeekChart extends StatefulWidget {
 }
 
 class _WeekChartState extends State<WeekChart> {
-  final _dataProvider = StrengthDataProvider.instance;
+  final _dataProvider = StrengthSessionWithSetsDataProvider.instance;
 
   List<StrengthSessionStats> _stats = [];
 

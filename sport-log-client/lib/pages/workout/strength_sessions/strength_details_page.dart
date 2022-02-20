@@ -25,7 +25,7 @@ class _StrengthSessionDetailsPageState
     extends State<StrengthSessionDetailsPage> {
   late final Future<StrengthSessionWithSets?> _sessionFuture;
 
-  final _dataProvider = StrengthDataProvider.instance;
+  final _dataProvider = StrengthSessionWithSetsDataProvider.instance;
 
   @override
   void initState() {

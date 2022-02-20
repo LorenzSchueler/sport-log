@@ -30,7 +30,7 @@ class DayChart extends StatefulWidget {
 }
 
 class _DayChartState extends State<DayChart> {
-  final _dataProvider = StrengthDataProvider.instance;
+  final _dataProvider = StrengthSessionWithSetsDataProvider.instance;
 
   List<StrengthSet> _sets = [];
 

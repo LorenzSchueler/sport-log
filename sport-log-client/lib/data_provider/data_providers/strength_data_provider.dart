@@ -2,12 +2,43 @@ import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/database/db_interfaces.dart';
+import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/strength/all.dart';
 
-class StrengthDataProvider extends DataProvider<StrengthSessionWithSets> {
+class StrengthSessionDataProvider extends EntityDataProvider<StrengthSession> {
+  static final instance = StrengthSessionDataProvider._();
+  StrengthSessionDataProvider._();
+
+  @override
+  final Api<StrengthSession> api = Api.strengthSessions;
+
+  @override
+  final TableAccessor<StrengthSession> db = AppDatabase.strengthSessions;
+
+  @override
+  List<StrengthSession> getFromAccountData(AccountData accountData) =>
+      accountData.strengthSessions;
+}
+
+class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
+  static final instance = StrengthSetDataProvider._();
+  StrengthSetDataProvider._();
+
+  @override
+  final Api<StrengthSet> api = Api.strengthSets;
+
+  @override
+  final TableAccessor<StrengthSet> db = AppDatabase.strengthSets;
+
+  @override
+  List<StrengthSet> getFromAccountData(AccountData accountData) =>
+      accountData.strengthSets;
+}
+
+class StrengthSessionWithSetsDataProvider
+    extends DataProvider<StrengthSessionWithSets> {
   final strengthSessionDb = AppDatabase.strengthSessions;
   final strengthSetDb = AppDatabase.strengthSets;
   final movementDb = AppDatabase.movements;
@@ -15,8 +46,8 @@ class StrengthDataProvider extends DataProvider<StrengthSessionWithSets> {
   final strengthSessionApi = Api.strengthSessions;
   final strengthSetApi = Api.strengthSets;
 
-  static final instance = StrengthDataProvider._();
-  StrengthDataProvider._();
+  static final instance = StrengthSessionWithSetsDataProvider._();
+  StrengthSessionWithSetsDataProvider._();
 
   @override
   Future<void> createSingle(StrengthSessionWithSets object) async {

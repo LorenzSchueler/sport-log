@@ -30,7 +30,7 @@ class EditMetconPage extends StatefulWidget {
 class _EditMetconPageState extends State<EditMetconPage> {
   late final MetconDescription _md;
   final _descriptionFocusNode = FocusNode();
-  final _dataProvider = MetconDataProvider.instance;
+  final _dataProvider = MetconDescriptionDataProvider.instance;
 
   @override
   void initState() {

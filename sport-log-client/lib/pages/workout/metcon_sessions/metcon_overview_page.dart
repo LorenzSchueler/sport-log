@@ -21,7 +21,7 @@ class MetconsPage extends StatefulWidget {
 class _MetconsPageState extends State<MetconsPage> {
   final _logger = Logger('MetconsPage');
 
-  final _dataProvider = MetconDataProvider.instance;
+  final _dataProvider = MetconDescriptionDataProvider.instance;
   List<MetconDescription> _metconDescriptions = [];
 
   static const _deleteChoice = 1;

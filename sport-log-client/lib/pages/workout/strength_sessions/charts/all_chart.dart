@@ -25,7 +25,7 @@ class AllChart extends StatefulWidget {
 }
 
 class _AllChartState extends State<AllChart> {
-  final _dataProvider = StrengthDataProvider.instance;
+  final _dataProvider = StrengthSessionWithSetsDataProvider.instance;
 
   List<StrengthSessionStats> _stats = [];
 

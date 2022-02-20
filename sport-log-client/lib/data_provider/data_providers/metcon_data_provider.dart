@@ -2,14 +2,59 @@ import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/database/db_interfaces.dart';
+import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/metcon/all.dart';
 
-class MetconDataProvider extends DataProvider<MetconDescription> {
+class MetconDataProvider extends EntityDataProvider<Metcon> {
   static final instance = MetconDataProvider._();
   MetconDataProvider._();
+
+  @override
+  final Api<Metcon> api = Api.metcons;
+
+  @override
+  final TableAccessor<Metcon> db = AppDatabase.metcons;
+
+  @override
+  List<Metcon> getFromAccountData(AccountData accountData) =>
+      accountData.metcons;
+}
+
+class MetconMovementDataProvider extends EntityDataProvider<MetconMovement> {
+  static final instance = MetconMovementDataProvider._();
+  MetconMovementDataProvider._();
+
+  @override
+  final Api<MetconMovement> api = Api.metconMovements;
+
+  @override
+  final TableAccessor<MetconMovement> db = AppDatabase.metconMovements;
+
+  @override
+  List<MetconMovement> getFromAccountData(AccountData accountData) =>
+      accountData.metconMovements;
+}
+
+class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
+  static final instance = MetconSessionDataProvider._();
+  MetconSessionDataProvider._();
+
+  @override
+  final Api<MetconSession> api = Api.metconSessions;
+
+  @override
+  final TableAccessor<MetconSession> db = AppDatabase.metconSessions;
+
+  @override
+  List<MetconSession> getFromAccountData(AccountData accountData) =>
+      accountData.metconSessions;
+}
+
+class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
+  static final instance = MetconDescriptionDataProvider._();
+  MetconDescriptionDataProvider._();
 
   final metconApi = Api.metcons;
   final metconMovementApi = Api.metconMovements;

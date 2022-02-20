@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:sport_log/api/api.dart';
+import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
@@ -151,4 +152,23 @@ abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
     await db.upsertMultiple(objects, synchronized: synchronized);
     notifyListeners();
   }
+
+  static List<EntityDataProvider> get all => [
+        DiaryDataProvider.instance,
+        WodDataProvider.instance,
+        MovementDataProvider.instance,
+        MetconDataProvider.instance,
+        MetconMovementDataProvider.instance,
+        MetconSessionDataProvider.instance,
+        RouteDataProvider.instance,
+        CardioSessionDataProvider.instance,
+        StrengthSessionDataProvider.instance,
+        StrengthSetDataProvider.instance,
+        PlatformDataProvider.instance,
+        PlatformCredentialDataProvider.instance,
+        ActionProviderDataProvider.instance,
+        ActionDataProvider.instance,
+        ActionRuleDataProvider.instance,
+        ActionEventDataProvider.instance,
+      ];
 }

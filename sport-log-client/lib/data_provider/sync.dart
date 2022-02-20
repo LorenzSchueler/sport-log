@@ -11,8 +11,6 @@ import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/form_widgets/new_credentials_dialog.dart';
 
-import 'data_providers/all.dart';
-
 class Sync extends ChangeNotifier {
   final _logger = Logger('Sync');
 
@@ -57,7 +55,7 @@ class Sync extends ChangeNotifier {
   }
 
   Future<void> _upSync() async {
-    for (final dp in allDataProviders) {
+    for (final dp in EntityDataProvider.all) {
       // TODO: this can be sped up
       await dp.pushToServer();
     }
@@ -114,15 +112,4 @@ class Sync extends ChangeNotifier {
       _syncTimer = null;
     }
   }
-
-  List<DataProvider> get allDataProviders => [
-        MovementDataProvider.instance,
-        StrengthDataProvider.instance,
-        MetconDataProvider.instance,
-        DiaryDataProvider.instance,
-        WodDataProvider.instance,
-        ActionEventDataProvider.instance,
-        ActionRuleDataProvider.instance,
-        PlatformCredentialDataProvider.instance,
-      ];
 }
