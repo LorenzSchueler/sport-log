@@ -1,15 +1,18 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/models/cardio/cardio_session.dart';
-import 'package:sport_log/models/cardio/route.dart';
+import 'package:sport_log/models/cardio/all.dart';
+import 'package:sport_log/models/movement/movement.dart';
 
-class CardioSessionDescription implements Validatable {
+class CardioSessionDescription implements Validatable, HasId {
   CardioSessionDescription({
     required this.cardioSession,
     required this.route,
+    required this.movement,
   });
 
   CardioSession cardioSession;
   Route? route;
+  Movement movement;
 
   @override
   bool isValid() {
@@ -22,6 +25,13 @@ class CardioSessionDescription implements Validatable {
                 'CardioSessionDescription: cardio session route id is null')) &&
         (route == null ||
             validate(cardioSession.routeId! == route!.id,
-                'CardioSessionDescription: route id mismatch'));
+                'CardioSessionDescription: route id mismatch')) &&
+        (validate(movement.isValid(),
+            'CardioSessionDescription: movement is not valid')) &&
+        (validate(cardioSession.movementId == movement.id,
+            'CardioSessionDescription: movement id mismatch'));
   }
+
+  @override
+  Int64 get id => cardioSession.id;
 }
