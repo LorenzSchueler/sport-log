@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
@@ -20,7 +21,7 @@ class StrengthSessionEditPage extends StatefulWidget {
     required this.initialSession,
   }) : super(key: key);
 
-  final StrengthSessionDescription initialSession;
+  final StrengthSessionDescription? initialSession;
 
   @override
   _StrengthSessionEditPageState createState() =>
@@ -37,7 +38,25 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   @override
   void initState() {
     super.initState();
-    _session = widget.initialSession.copy();
+    _session = widget.initialSession ??
+        StrengthSessionDescription(
+            session: StrengthSession(
+                id: randomId(),
+                userId: Settings.userId!,
+                datetime: DateTime.now(),
+                movementId: randomId(),
+                interval: null,
+                comments: null,
+                deleted: false),
+            movement: Movement(
+                id: randomId(),
+                userId: Settings.userId,
+                name: "test movement",
+                description: null,
+                cardio: true,
+                deleted: false,
+                dimension: MovementDimension.reps),
+            sets: []);
     _keyboardSubscription =
         KeyboardVisibilityController().onChange.listen((isVisible) {
       if (!isVisible) {

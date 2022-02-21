@@ -141,11 +141,8 @@ class AppState extends State<App> {
                 return StrengthSessionDetailsPage(id: arg);
               }),
           Routes.strength.edit: (context) => checkLogin(() {
-                final arg = ModalRoute.of(context)?.settings.arguments;
-                if (arg is! StrengthSessionDescription) {
-                  throw ArgumentError(
-                      'StrengthSessionEditPage without session');
-                }
+                final arg = ModalRoute.of(context)?.settings.arguments
+                    as StrengthSessionDescription?;
                 return StrengthSessionEditPage(initialSession: arg);
               }),
           // cardio

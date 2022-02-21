@@ -143,7 +143,11 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
       bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
           context, SessionsPageTab.strength),
       drawer: MainDrawer(selectedRoute: Routes.strength.overview),
-      floatingActionButton: null,
+      floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.of(context).pushNamed(Routes.strength.edit);
+          }),
     );
   }
 
