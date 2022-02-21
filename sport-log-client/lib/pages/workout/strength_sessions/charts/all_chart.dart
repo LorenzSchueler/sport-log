@@ -62,6 +62,7 @@ class _AllChartState extends State<AllChart> {
 
     double fromDate(DateTime date) =>
         (date.year * 12 + date.month - 1).toDouble();
+
     DateTime fromValue(double value) {
       final intValue = value.round();
       final remainder = intValue % 12;

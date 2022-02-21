@@ -85,11 +85,14 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
                 setState(() {
                   _movement = null;
                 });
+                await update();
               } else {
                 setState(() {
                   _movement = movement;
                 });
+                await update();
               }
+              _logger.i("selected movement: ${movement.name}");
             },
             icon: Icon(_movement != null
                 ? Icons.filter_alt

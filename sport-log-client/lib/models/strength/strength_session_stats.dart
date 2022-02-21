@@ -67,7 +67,7 @@ class StrengthSessionStats {
         }
       }
     }
-    double avgCount = sumCount / sets.length;
+    double avgCount = sets.isEmpty ? 0 : sumCount / sets.length;
 
     return StrengthSessionStats._(
       datetime: datetime,
@@ -82,25 +82,31 @@ class StrengthSessionStats {
     );
   }
 
-  StrengthSessionStats.fromDbRecord(DbRecord r)
-      : datetime = DateTime.parse(r[Columns.datetime]! as String),
-        numSets = r[Columns.numSets]! as int,
-        minCount = r[Columns.minCount]! as int,
-        maxCount = r[Columns.maxCount]! as int,
-        sumCount = r[Columns.sumCount]! as int,
-        avgCount = (r[Columns.sumCount]! as int).toDouble() /
-            (r[Columns.numSets]! as int).toDouble(),
-        maxEorm = r[Columns.maxEorm] as double?,
-        maxWeight = r[Columns.maxWeight] as double?,
-        sumVolume = r[Columns.sumVolume] as double?;
+  factory StrengthSessionStats.fromDbRecord(DbRecord r) {
+    final numSets = r[Columns.numSets]! as int;
+    final sumCount = r[Columns.sumCount]! as int;
+    double avgCount = numSets == 0 ? 0 : sumCount / numSets;
+    return StrengthSessionStats._(
+        datetime: DateTime.parse(r[Columns.datetime]! as String),
+        numSets: numSets,
+        minCount: r[Columns.minCount]! as int,
+        maxCount: r[Columns.maxCount]! as int,
+        sumCount: sumCount,
+        avgCount: avgCount,
+        maxEorm: r[Columns.maxEorm] as double?,
+        maxWeight: r[Columns.maxWeight] as double?,
+        sumVolume: r[Columns.sumVolume] as double?);
+  }
 
   // this is only for debugging/pretty-printing
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
+      Columns.datetime: datetime,
       Columns.numSets: numSets,
       Columns.minCount: minCount,
       Columns.maxCount: maxCount,
       Columns.sumCount: sumCount,
+      Columns.avgCount: avgCount,
       Columns.maxEorm: maxEorm,
       Columns.maxWeight: maxWeight,
       Columns.sumVolume: sumVolume,

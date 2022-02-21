@@ -22,7 +22,7 @@ class StrengthChart extends StatefulWidget {
 }
 
 class _StrengthChartState extends State<StrengthChart> {
-  final _logger = Logger('RoutePage');
+  final _logger = Logger('StrengthChart');
 
   late SeriesType _activeSeriesType;
 
@@ -30,8 +30,8 @@ class _StrengthChartState extends State<StrengthChart> {
   void initState() {
     super.initState();
     _activeSeriesType = getAvailableSeries(widget.movement.dimension).first;
-    _logger.i(widget.movement);
-    _logger.i(widget.dateFilterState);
+    _logger.i("movement: ${widget.movement.name}");
+    _logger.i("date filter: ${widget.dateFilterState.name}");
   }
 
   @override

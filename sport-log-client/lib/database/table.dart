@@ -243,6 +243,7 @@ abstract class Columns {
   static const arguments = 'arguments';
   static const ascent = 'ascent';
   static const avgCadence = 'avg_cadence';
+  static const avgCount = 'avg_count';
   static const avgHeartRate = 'avg_heart_rate';
   static const bodyweight = 'bodyweight';
   static const cadence = 'cadence';
