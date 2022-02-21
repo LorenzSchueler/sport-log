@@ -181,7 +181,16 @@ class TimelinePageState extends State<TimelinePage> {
   @override
   void initState() {
     super.initState();
-    _diaryDataProvider.addListener(update);
+    _strengthDataProvider.addListener(updateStrengthSessions);
+    _strengthDataProvider.onNoInternetConnection =
+        () => showSimpleSnackBar(context, 'No Internet connection.');
+    _metconDataProvider.addListener(updateMetconSessions);
+    _metconDataProvider.onNoInternetConnection =
+        () => showSimpleSnackBar(context, 'No Internet connection.');
+    // _cardioDataProvider.addListener(updateCardioSessions());
+    // _cardioDataProvider.onNoInternetConnection =
+    () => showSimpleSnackBar(context, 'No Internet connection.');
+    _diaryDataProvider.addListener(updateDiaries);
     _diaryDataProvider.onNoInternetConnection =
         () => showSimpleSnackBar(context, 'No Internet connection.');
     update();
@@ -189,23 +198,42 @@ class TimelinePageState extends State<TimelinePage> {
 
   @override
   void dispose() {
-    _diaryDataProvider.removeListener(update);
+    _strengthDataProvider.removeListener(updateStrengthSessions);
+    _strengthDataProvider.onNoInternetConnection = null;
+    _metconDataProvider.removeListener(updateMetconSessions);
+    _metconDataProvider.onNoInternetConnection = null;
+    //_cardioDataProvider.removeListener(updateCardioSessions());
+    //_cardioDataProvider.onNoInternetConnection = null;
+    _diaryDataProvider.removeListener(updateDiaries);
     _diaryDataProvider.onNoInternetConnection = null;
     super.dispose();
   }
 
-  Future<void> update() async {
-    _logger.d(
-        'Updating timeline with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
-    final _strengthSessions =
-        await _strengthDataProvider.getByTimerangeAndMovement(
-            movementId: null, from: _dateFilter.start, until: _dateFilter.end);
-    //final _metconSessions = await _metconDataProvider.getByTimerange(
+  Future<void> updateStrengthSessions() async {
+    _strengthSessions = await _strengthDataProvider.getByTimerangeAndMovement(
+        movementId: null, from: _dateFilter.start, until: _dateFilter.end);
+    sortItems();
+  }
+
+  Future<void> updateMetconSessions() async {
+    //_metconSessions = await _metconDataProvider.getByTimerange(
     //_dateFilter.start, _dateFilter.end);
-    //final _cardioSessions = await _cardioDataProvider.getByTimerange(
+    sortItems();
+  }
+
+  Future<void> updateCardioSessions() async {
+    //_cardioSessions = await _cardioDataProvider.getByTimerange(
     //_dateFilter.start, _dateFilter.end);
-    final _diaries = await _diaryDataProvider.getByTimerange(
+    sortItems();
+  }
+
+  Future<void> updateDiaries() async {
+    _diaries = await _diaryDataProvider.getByTimerange(
         _dateFilter.start, _dateFilter.end);
+    sortItems();
+  }
+
+  void sortItems() {
     final items =
         _strengthSessions.map((s) => TimelineUnion.strengthSession(s)).toList();
     items.addAll(_metconSessions.map((m) => TimelineUnion.metconSession(m)));
@@ -213,6 +241,15 @@ class TimelinePageState extends State<TimelinePage> {
     items.addAll(_diaries.map((d) => TimelineUnion.diary(d)));
     items.sort((a, b) => b.compareTo(a));
     setState(() => _items = items);
+  }
+
+  Future<void> update() async {
+    _logger.d(
+        'Updating timeline with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
+    await updateStrengthSessions();
+    await updateMetconSessions();
+    await updateCardioSessions();
+    await updateDiaries();
   }
 
   // full update (from server)
