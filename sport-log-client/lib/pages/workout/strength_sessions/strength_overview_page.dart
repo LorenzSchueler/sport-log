@@ -26,9 +26,9 @@ class StrengthSessionsPage extends StatefulWidget {
 }
 
 class StrengthSessionsPageState extends State<StrengthSessionsPage> {
-  final _dataProvider = StrengthSessionWithSetsDataProvider.instance;
+  final _dataProvider = StrengthSessionDescriptionDataProvider.instance;
   final _logger = Logger('StrengthSessionsPage');
-  List<StrengthSessionWithStats> _sessions = [];
+  List<StrengthSessionDescription> _sessions = [];
 
   DateFilterState _dateFilter = MonthFilter.current();
   Movement? _movement;
@@ -52,7 +52,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   Future<void> update() async {
     _logger.d(
         'Updating strength sessions with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
-    final ssds = await _dataProvider.getSessionsWithStats(
+    final ssds = await _dataProvider.getByTimerangeAndMovement(
         from: _dateFilter.start,
         until: _dateFilter.end,
         movementId: _movement?.id);
@@ -144,7 +144,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
     );
   }
 
-  Widget _sessionCardWithMovement(StrengthSessionWithStats s) {
+  Widget _sessionCardWithMovement(StrengthSessionDescription s) {
     return Card(
         child: ListTile(
       title: Text(
@@ -157,7 +157,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
 }
 
 class StrengthSessionCard extends StatelessWidget {
-  final StrengthSessionWithStats strengthSessionWithStats;
+  final StrengthSessionDescription strengthSessionWithStats;
 
   const StrengthSessionCard({Key? key, required this.strengthSessionWithStats})
       : super(key: key);

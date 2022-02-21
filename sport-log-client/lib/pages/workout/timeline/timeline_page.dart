@@ -28,11 +28,11 @@ class TimelinePage extends StatefulWidget {
 
 class TimelinePageState extends State<TimelinePage> {
   final _logger = Logger('TimelinePage');
-  final _strengthDataProvider = StrengthSessionWithSetsDataProvider.instance;
+  final _strengthDataProvider = StrengthSessionDescriptionDataProvider.instance;
   final _metconDataProvider = MetconDescriptionDataProvider.instance;
   //final _cardioDataProvider = CardioSessionDescriptionDataProvider.instance;
   final _diaryDataProvider = DiaryDataProvider.instance;
-  List<StrengthSessionWithStats> _strengthSessions = [];
+  List<StrengthSessionDescription> _strengthSessions = [];
   List<MetconSessionDescription> _metconSessions = [];
   List<CardioSessionDescription> _cardioSessions = [];
   List<Diary> _diaries = [];
@@ -44,7 +44,7 @@ class TimelinePageState extends State<TimelinePage> {
   //super.initState();
 
   //var strengthSessions = [
-  //TimelineUnion.strengthSession(StrengthSessionWithStats(
+  //TimelineUnion.strengthSession(StrengthSessionWithSets(
   //session: StrengthSession(
   //id: randomId(),
   //userId: Settings.userId!,

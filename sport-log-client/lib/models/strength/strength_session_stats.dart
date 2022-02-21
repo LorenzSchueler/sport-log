@@ -1,17 +1,34 @@
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/models/movement/movement.dart';
-
-import 'strength_set.dart';
-import 'package:sport_log/database/db_interfaces.dart';
+import 'package:sport_log/models/strength/all.dart';
 
 class StrengthSessionStats {
-  /// list of sets cannot be empty
-  factory StrengthSessionStats.fromStrengthSets({
-    required List<StrengthSet> sets,
-    required DateTime dateTime,
-  }) {
-    assert(sets.isNotEmpty);
+  DateTime datetime;
+  int numSets;
+  int minCount;
+  int maxCount;
+  int sumCount;
+  double avgCount;
+  double? maxEorm;
+  double? sumVolume;
+  double? maxWeight;
+
+  StrengthSessionStats._({
+    required this.datetime,
+    required this.numSets,
+    required this.minCount,
+    required this.maxCount,
+    required this.sumCount,
+    required this.avgCount,
+    required this.maxEorm,
+    required this.sumVolume,
+    required this.maxWeight,
+  });
+
+  factory StrengthSessionStats.fromStrengthSets(
+      DateTime datetime, List<StrengthSet> sets) {
     int? minCount;
     int? maxCount;
     int sumCount = 0;
@@ -50,57 +67,29 @@ class StrengthSessionStats {
         }
       }
     }
+    double avgCount = sumCount / sets.length;
+
     return StrengthSessionStats._(
-      dateTime: dateTime,
+      datetime: datetime,
       numSets: sets.length,
       minCount: minCount!,
       maxCount: maxCount!,
       sumCount: sumCount,
+      avgCount: avgCount,
       maxEorm: maxEorm,
       sumVolume: sumVolume,
       maxWeight: maxWeight,
     );
   }
 
-  StrengthSessionStats._({
-    required this.dateTime,
-    required this.numSets,
-    required this.minCount,
-    required this.maxCount,
-    required this.sumCount,
-    required this.maxEorm,
-    required this.sumVolume,
-    required this.maxWeight,
-  });
-
-  DateTime dateTime;
-  int numSets;
-  int minCount;
-  int maxCount;
-  int sumCount;
-  double? maxEorm;
-  double? sumVolume;
-  double? maxWeight;
-
-  double get avgCount => sumCount / numSets;
-
-  static const allColumns = [
-    Columns.datetime,
-    Columns.numSets,
-    Columns.minCount,
-    Columns.maxCount,
-    Columns.sumCount,
-    Columns.maxEorm,
-    Columns.maxWeight,
-    Columns.sumVolume
-  ];
-
   StrengthSessionStats.fromDbRecord(DbRecord r)
-      : dateTime = DateTime.parse(r[Columns.datetime]! as String),
+      : datetime = DateTime.parse(r[Columns.datetime]! as String),
         numSets = r[Columns.numSets]! as int,
         minCount = r[Columns.minCount]! as int,
         maxCount = r[Columns.maxCount]! as int,
         sumCount = r[Columns.sumCount]! as int,
+        avgCount = (r[Columns.sumCount]! as int).toDouble() /
+            (r[Columns.numSets]! as int).toDouble(),
         maxEorm = r[Columns.maxEorm] as double?,
         maxWeight = r[Columns.maxWeight] as double?,
         sumVolume = r[Columns.sumVolume] as double?;
@@ -108,7 +97,6 @@ class StrengthSessionStats {
   // this is only for debugging/pretty-printing
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      Columns.datetime: dateTime,
       Columns.numSets: numSets,
       Columns.minCount: minCount,
       Columns.maxCount: maxCount,

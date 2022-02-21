@@ -77,7 +77,7 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
   MovementTable get _movementTable => AppDatabase.movements;
   StrengthSetTable get _strengthSetTable => AppDatabase.strengthSets;
 
-  Future<StrengthSessionWithSets?> getSessionWithSets(Int64 idValue) async {
+  Future<StrengthSessionDescription?> getById(Int64 idValue) async {
     final records = await database.rawQuery('''
       SELECT
         ${table.allColumns},
@@ -91,7 +91,7 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
     if (records.isEmpty) {
       return null;
     }
-    return StrengthSessionWithSets(
+    return StrengthSessionDescription(
       session: serde.fromDbRecord(records.first, prefix: table.prefix),
       movement: _movementTable.serde
           .fromDbRecord(records.first, prefix: _movementTable.table.prefix),
@@ -99,9 +99,7 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
     );
   }
 
-  /// returns strength session descriptions with stats, without sets
-  /// ordered by datetime, leaving out sessions without sets
-  Future<List<StrengthSessionWithStats>> getSessionsWithStats({
+  Future<List<StrengthSessionDescription>> getByTimerangeAndMovement({
     Int64? movementIdValue,
     DateTime? from,
     DateTime? until,
@@ -113,27 +111,15 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
     final records = await database.rawQuery('''
       SELECT
         ${table.allColumns},
-        ${_movementTable.table.allColumns},
-        $tableName.$datetime as [$datetime],
-        COUNT($strengthSet.$id) AS $numSets,
-        MIN($strengthSet.$count) AS $minCount,
-        MAX($strengthSet.$count) AS $maxCount,
-        SUM($strengthSet.$count) AS $sumCount,
-        MAX($strengthSet.$weight) AS $maxWeight,
-        SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
-        MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
+        ${_movementTable.table.allColumns}
       FROM $tableName
-        JOIN $movement ON $movement.$id = $tableName.$movementId
-        JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
-        LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
+      JOIN $movement ON $movement.$id = $tableName.$movementId
       WHERE $movement.$deleted = 0
         AND $tableName.$deleted = 0
-        AND $strengthSet.$deleted = 0
         $fromFilter
         $untilFilter
         $movementIdFilter
       GROUP BY $tableName.$id
-      HAVING $numSets > 0
       ORDER BY
         datetime($tableName.$datetime) DESC;
     ''', [
@@ -141,12 +127,17 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
       if (until != null) until.toString(),
       if (movementIdValue != null) movementIdValue.toInt(),
     ]);
-    return records.mapToL((record) => StrengthSessionWithStats(
-          session: serde.fromDbRecord(record, prefix: table.prefix),
-          movement: _movementTable.serde
-              .fromDbRecord(record, prefix: _movementTable.table.prefix),
-          stats: StrengthSessionStats.fromDbRecord(record),
-        ));
+    List<StrengthSessionDescription> strengthSessionDescriptions = [];
+    for (Map<String, Object?> record in records) {
+      final session = serde.fromDbRecord(record, prefix: table.prefix);
+      strengthSessionDescriptions.add(StrengthSessionDescription(
+        session: session,
+        sets: await _strengthSetTable.getByStrengthSession(session.id),
+        movement: _movementTable.serde
+            .fromDbRecord(record, prefix: _movementTable.table.prefix),
+      ));
+    }
+    return strengthSessionDescriptions;
   }
 
   // this is only needed for test data generation
@@ -161,7 +152,7 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
       WHERE $tableName.$deleted = 0
         AND $movement.$deleted = 0;
     ''');
-    return records.mapToL((r) => StrengthSessionAndMovement(
+    return records.mapToList((r) => StrengthSessionAndMovement(
           session: serde.fromDbRecord(r, prefix: table.prefix),
           movement: _movementTable.serde
               .fromDbRecord(r, prefix: _movementTable.table.prefix),
@@ -186,7 +177,7 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
         AND $tableName.$movementId = ?
       ORDER BY $tableName.$datetime, $tableName.$id, $strengthSet.$setNumber;
     ''', [start.toString(), end.toString(), movementIdValue.toInt()]);
-    return records.mapToL((record) => _strengthSetTable.serde
+    return records.mapToList((record) => _strengthSetTable.serde
         .fromDbRecord(record, prefix: _strengthSetTable.table.prefix));
   }
 

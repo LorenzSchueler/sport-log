@@ -37,8 +37,8 @@ class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
       accountData.strengthSets;
 }
 
-class StrengthSessionWithSetsDataProvider
-    extends DataProvider<StrengthSessionWithSets> {
+class StrengthSessionDescriptionDataProvider
+    extends DataProvider<StrengthSessionDescription> {
   final strengthSessionDb = AppDatabase.strengthSessions;
   final strengthSetDb = AppDatabase.strengthSets;
   final movementDb = AppDatabase.movements;
@@ -46,11 +46,11 @@ class StrengthSessionWithSetsDataProvider
   final strengthSessionApi = Api.strengthSessions;
   final strengthSetApi = Api.strengthSets;
 
-  static final instance = StrengthSessionWithSetsDataProvider._();
-  StrengthSessionWithSetsDataProvider._();
+  static final instance = StrengthSessionDescriptionDataProvider._();
+  StrengthSessionDescriptionDataProvider._();
 
   @override
-  Future<void> createSingle(StrengthSessionWithSets object) async {
+  Future<void> createSingle(StrengthSessionDescription object) async {
     assert(object.isValid());
     // TODO: catch errors
     await strengthSessionDb.createSingle(object.session);
@@ -71,7 +71,7 @@ class StrengthSessionWithSetsDataProvider
   }
 
   @override
-  Future<void> updateSingle(StrengthSessionWithSets object) async {
+  Future<void> updateSingle(StrengthSessionDescription object) async {
     assert(object.isValid());
 
     final oldSets = await strengthSetDb.getByStrengthSession(object.id);
@@ -111,7 +111,7 @@ class StrengthSessionWithSetsDataProvider
   }
 
   @override
-  Future<void> deleteSingle(StrengthSessionWithSets object) async {
+  Future<void> deleteSingle(StrengthSessionDescription object) async {
     object.setDeleted();
     // TODO: catch errors
     await strengthSetDb.deleteByStrengthSession(object.id);
@@ -133,7 +133,7 @@ class StrengthSessionWithSetsDataProvider
   }
 
   @override
-  Future<List<StrengthSessionWithSets>> getNonDeleted() async {
+  Future<List<StrengthSessionDescription>> getNonDeleted() async {
     throw UnimplementedError();
   }
 
@@ -208,15 +208,15 @@ class StrengthSessionWithSetsDataProvider
     notifyListeners();
   }
 
-  Future<StrengthSessionWithSets?> getSessionWithSets(Int64 id) async =>
-      strengthSessionDb.getSessionWithSets(id);
+  Future<StrengthSessionDescription?> getById(Int64 id) async =>
+      strengthSessionDb.getById(id);
 
-  Future<List<StrengthSessionWithStats>> getSessionsWithStats({
+  Future<List<StrengthSessionDescription>> getByTimerangeAndMovement({
     Int64? movementId,
     DateTime? from,
     DateTime? until,
   }) async {
-    return strengthSessionDb.getSessionsWithStats(
+    return strengthSessionDb.getByTimerangeAndMovement(
         from: from, until: until, movementIdValue: movementId);
   }
 
@@ -227,7 +227,7 @@ class StrengthSessionWithSetsDataProvider
       strengthSessionDb.getSetsOnDay(date: date, movementIdValue: movementId);
 
   // weekly/monthly view
-  Future<List<StrengthSessionStats>> getStatsByDay({
+  Future<List<StrengthSessionStats>> getStatsAggregationsByDay({
     required Int64 movementId,
     required DateTime from,
     required DateTime until,
@@ -237,7 +237,7 @@ class StrengthSessionWithSetsDataProvider
   }
 
   // yearly view
-  Future<List<StrengthSessionStats>> getStatsByWeek({
+  Future<List<StrengthSessionStats>> getStatsAggregationsByWeek({
     required Int64 movementId,
     required DateTime from,
     required DateTime until,
@@ -247,7 +247,7 @@ class StrengthSessionWithSetsDataProvider
   }
 
   // all time view
-  Future<List<StrengthSessionStats>> getStatsByMonth(
+  Future<List<StrengthSessionStats>> getStatsAggregationsByMonth(
       {required Int64 movementId}) async {
     return strengthSessionDb.getStatsAggregationsByMonth(
         movementIdValue: movementId);

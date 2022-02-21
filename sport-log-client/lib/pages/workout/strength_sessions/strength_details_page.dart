@@ -23,21 +23,21 @@ class StrengthSessionDetailsPage extends StatefulWidget {
 
 class _StrengthSessionDetailsPageState
     extends State<StrengthSessionDetailsPage> {
-  late final Future<StrengthSessionWithSets?> _sessionFuture;
+  late final Future<StrengthSessionDescription?> _sessionFuture;
 
-  final _dataProvider = StrengthSessionWithSetsDataProvider.instance;
+  final _dataProvider = StrengthSessionDescriptionDataProvider.instance;
 
   @override
   void initState() {
     super.initState();
-    _sessionFuture = _dataProvider.getSessionWithSets(widget.id);
+    _sessionFuture = _dataProvider.getById(widget.id);
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _sessionFuture,
-      builder: (context, AsyncSnapshot<StrengthSessionWithSets?> snapshot) {
+      builder: (context, AsyncSnapshot<StrengthSessionDescription?> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.done:
             if (!snapshot.hasData || snapshot.data == null) {
@@ -53,7 +53,7 @@ class _StrengthSessionDetailsPageState
     );
   }
 
-  Widget _page(StrengthSessionWithSets session) {
+  Widget _page(StrengthSessionDescription session) {
     return Scaffold(
       appBar: AppBar(
         title: Text(session.movement.name),
@@ -81,7 +81,7 @@ class _StrengthSessionDetailsPageState
     );
   }
 
-  Widget _mainInfo(StrengthSessionWithSets session) {
+  Widget _mainInfo(StrengthSessionDescription session) {
     final subtitle = [
       '${session.sets.length} sets',
       if (session.session.interval != null)
@@ -104,11 +104,8 @@ class _StrengthSessionDetailsPageState
     );
   }
 
-  List<Widget> _bestValuesInfo(StrengthSessionWithSets session) {
-    final stats = session.calculateStats();
-    if (stats == null) {
-      return [];
-    }
+  List<Widget> _bestValuesInfo(StrengthSessionDescription session) {
+    final stats = session.stats;
     switch (session.movement.dimension) {
       case MovementDimension.reps:
         final maxEorm = stats.maxEorm;
@@ -159,7 +156,7 @@ class _StrengthSessionDetailsPageState
     }
   }
 
-  Widget _comments(StrengthSessionWithSets session) {
+  Widget _comments(StrengthSessionDescription session) {
     assert(session.session.comments != null);
     return Card(
       child: Container(
@@ -173,14 +170,14 @@ class _StrengthSessionDetailsPageState
     );
   }
 
-  Widget _setsInfo(StrengthSessionWithSets session) {
+  Widget _setsInfo(StrengthSessionDescription session) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListView(
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
-          children: session.sets.mapToLIndexed((set, index) => ListTile(
+          children: session.sets.mapToListIndexed((set, index) => ListTile(
                 title: Text(
                   set.toDisplayName(session.movement.dimension),
                   style: const TextStyle(fontSize: 20),

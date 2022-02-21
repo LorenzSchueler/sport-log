@@ -32,11 +32,11 @@ extension IterableExtension<T> on Iterable<T> {
     }
   }
 
-  List<R> mapToL<R>(R Function(T) mapping) {
+  List<R> mapToList<R>(R Function(T) mapping) {
     return map(mapping).toList();
   }
 
-  List<R> mapToLIndexed<R>(R Function(T element, int index) mapping) {
+  List<R> mapToListIndexed<R>(R Function(T element, int index) mapping) {
     return mapIndexed(mapping).toList();
   }
 }

@@ -29,9 +29,9 @@ class WeekChart extends StatefulWidget {
 }
 
 class _WeekChartState extends State<WeekChart> {
-  final _dataProvider = StrengthSessionWithSetsDataProvider.instance;
+  final _dataProvider = StrengthSessionDescriptionDataProvider.instance;
 
-  List<StrengthSessionStats> _stats = [];
+  List<StrengthSessionStats> _strengthSessionStats = [];
 
   @override
   void initState() {
@@ -42,15 +42,15 @@ class _WeekChartState extends State<WeekChart> {
 
   void update() {
     _dataProvider
-        .getStatsByDay(
+        .getStatsAggregationsByDay(
       movementId: widget.movement.id,
       from: widget.start,
       until: widget.start.weekLater(),
     )
-        .then((stats) {
-      assert(stats.length <= 7);
+        .then((strengthSessionStats) {
+      assert(strengthSessionStats.length <= 7);
       if (mounted) {
-        setState(() => _stats = stats);
+        setState(() => _strengthSessionStats = strengthSessionStats);
       }
     });
   }
@@ -69,19 +69,19 @@ class _WeekChartState extends State<WeekChart> {
     final getValue = statsAccessor(widget.series);
     final result = <BarChartGroupData>[];
 
-    var statIndex = 0;
+    var index = 0;
     for (int i = 0; i < 7; ++i) {
-      if (statIndex < _stats.length &&
-          _stats[statIndex]
-              .dateTime
+      if (index < _strengthSessionStats.length &&
+          _strengthSessionStats[index]
+              .datetime
               .isOnDay(widget.start.add(Duration(days: i)))) {
         result.add(BarChartGroupData(x: i, barRods: [
           BarChartRodData(
-            y: getValue(_stats[statIndex]),
+            y: getValue(_strengthSessionStats[index]),
             colors: [primaryColorOf(context)],
           )
         ]));
-        ++statIndex;
+        ++index;
       } else {
         result.add(BarChartGroupData(x: i, barRods: [BarChartRodData(y: 0)]));
       }

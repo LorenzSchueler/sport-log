@@ -8,8 +8,8 @@ import 'package:sport_log/models/strength/strength_set.dart';
 
 import 'strength_session_stats.dart';
 
-class StrengthSessionWithSets implements Validatable, HasId {
-  StrengthSessionWithSets({
+class StrengthSessionDescription implements Validatable, HasId {
+  StrengthSessionDescription({
     required this.session,
     required this.movement,
     required this.sets,
@@ -18,6 +18,8 @@ class StrengthSessionWithSets implements Validatable, HasId {
   StrengthSession session;
   Movement movement;
   List<StrengthSet> sets;
+  StrengthSessionStats get stats =>
+      StrengthSessionStats.fromStrengthSets(session.datetime, sets);
 
   @override
   bool isValid() {
@@ -47,7 +49,7 @@ class StrengthSessionWithSets implements Validatable, HasId {
     }
   }
 
-  StrengthSessionWithSets.defaultValue(this.movement, Int64 userId)
+  StrengthSessionDescription.defaultValue(this.movement, Int64 userId)
       : session = StrengthSession(
           id: randomId(),
           userId: userId,
@@ -59,19 +61,11 @@ class StrengthSessionWithSets implements Validatable, HasId {
         ),
         sets = [];
 
-  StrengthSessionStats? calculateStats() {
-    if (sets.isEmpty) {
-      return null;
-    }
-    return StrengthSessionStats.fromStrengthSets(
-        sets: sets, dateTime: session.datetime);
-  }
-
-  StrengthSessionWithSets copy() {
-    return StrengthSessionWithSets(
+  StrengthSessionDescription copy() {
+    return StrengthSessionDescription(
       session: session.copy(),
       movement: movement.copy(),
-      sets: sets.mapToL((set) => set.copy()),
+      sets: sets.mapToList((set) => set.copy()),
     );
   }
 }

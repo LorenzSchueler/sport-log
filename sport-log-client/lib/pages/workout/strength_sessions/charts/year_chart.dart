@@ -29,9 +29,9 @@ class YearChart extends StatefulWidget {
 }
 
 class _YearChartState extends State<YearChart> {
-  final _dataProvider = StrengthSessionWithSetsDataProvider.instance;
+  final _dataProvider = StrengthSessionDescriptionDataProvider.instance;
 
-  List<StrengthSessionStats> _stats = [];
+  List<StrengthSessionStats> _strengthSessionStats = [];
 
   @override
   void initState() {
@@ -42,15 +42,15 @@ class _YearChartState extends State<YearChart> {
 
   void update() {
     _dataProvider
-        .getStatsByWeek(
+        .getStatsAggregationsByWeek(
       movementId: widget.movement.id,
       from: widget.start,
       until: widget.start.yearLater(),
     )
-        .then((stats) {
-      assert(stats.length <= 54);
+        .then((strengthSessionStats) {
+      assert(strengthSessionStats.length <= 54);
       if (mounted) {
-        setState(() => _stats = stats);
+        setState(() => _strengthSessionStats = strengthSessionStats);
       }
     });
   }
@@ -73,9 +73,9 @@ class _YearChartState extends State<YearChart> {
       LineChartData(
         lineBarsData: [
           LineChartBarData(
-            spots: _stats.map((s) {
+            spots: _strengthSessionStats.map((s) {
               return FlSpot(
-                  (s.dateTime.difference(widget.start).inDays + 1).toDouble(),
+                  (s.datetime.difference(widget.start).inDays + 1).toDouble(),
                   getValue(s));
             }).toList(),
             colors: [primaryColorOf(context)],

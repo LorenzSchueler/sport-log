@@ -25,9 +25,9 @@ class AllChart extends StatefulWidget {
 }
 
 class _AllChartState extends State<AllChart> {
-  final _dataProvider = StrengthSessionWithSetsDataProvider.instance;
+  final _dataProvider = StrengthSessionDescriptionDataProvider.instance;
 
-  List<StrengthSessionStats> _stats = [];
+  List<StrengthSessionStats> _strengthSessionStats = [];
 
   @override
   void initState() {
@@ -37,9 +37,11 @@ class _AllChartState extends State<AllChart> {
   }
 
   void update() {
-    _dataProvider.getStatsByMonth(movementId: widget.movement.id).then((stats) {
+    _dataProvider
+        .getStatsAggregationsByMonth(movementId: widget.movement.id)
+        .then((strengthSessionStats) {
       if (mounted) {
-        setState(() => _stats = stats);
+        setState(() => _strengthSessionStats = strengthSessionStats);
       }
     });
   }
@@ -71,8 +73,8 @@ class _AllChartState extends State<AllChart> {
       LineChartData(
         lineBarsData: [
           LineChartBarData(
-            spots: _stats.map((s) {
-              return FlSpot(fromDate(s.dateTime), getValue(s));
+            spots: _strengthSessionStats.map((s) {
+              return FlSpot(fromDate(s.datetime), getValue(s));
             }).toList(),
             colors: [primaryColorOf(context)],
             dotData: FlDotData(show: false),

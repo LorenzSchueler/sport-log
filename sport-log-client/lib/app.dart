@@ -142,7 +142,7 @@ class AppState extends State<App> {
               }),
           Routes.strength.edit: (context) => checkLogin(() {
                 final arg = ModalRoute.of(context)?.settings.arguments;
-                if (arg is! StrengthSessionWithSets) {
+                if (arg is! StrengthSessionDescription) {
                   throw ArgumentError(
                       'StrengthSessionEditPage without session');
                 }

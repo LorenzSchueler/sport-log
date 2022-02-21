@@ -2,13 +2,13 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 
 class TimelineUnion extends Comparable<TimelineUnion> {
-  final StrengthSessionWithStats? _strengthSessionWithStats;
+  final StrengthSessionDescription? _strengthSessionWithStats;
   final MetconSessionDescription? _metconSessionDescription;
   final CardioSessionDescription? _cardioSessionDescription;
   final Diary? _diary;
 
   TimelineUnion.strengthSession(
-      StrengthSessionWithStats this._strengthSessionWithStats)
+      StrengthSessionDescription this._strengthSessionWithStats)
       : _metconSessionDescription = null,
         _cardioSessionDescription = null,
         _diary = null;
@@ -40,7 +40,7 @@ class TimelineUnion extends Comparable<TimelineUnion> {
   }
 
   T map<T>(
-    T Function(StrengthSessionWithStats) strengthFunction,
+    T Function(StrengthSessionDescription) strengthFunction,
     T Function(MetconSessionDescription) metconFunction,
     T Function(CardioSessionDescription) cardioFunction,
     T Function(Diary) diaryFunction,

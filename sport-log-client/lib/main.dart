@@ -39,10 +39,10 @@ Future<void> insertTestData() async {
           .upsertMultiple(movements, synchronized: false);
     }
     final sessions = await generateStrengthSessions(userId);
-    await StrengthSessionWithSetsDataProvider.instance
+    await StrengthSessionDescriptionDataProvider.instance
         .upsertMultipleSessions(sessions, synchronized: false);
     final sets = await generateStrengthSets();
-    await StrengthSessionWithSetsDataProvider.instance
+    await StrengthSessionDescriptionDataProvider.instance
         .upsertMultipleSets(sets, synchronized: false);
     _logger.i('''
         Generated

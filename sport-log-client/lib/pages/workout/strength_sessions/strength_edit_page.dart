@@ -20,7 +20,7 @@ class StrengthSessionEditPage extends StatefulWidget {
     required this.initialSession,
   }) : super(key: key);
 
-  final StrengthSessionWithSets initialSession;
+  final StrengthSessionDescription initialSession;
 
   @override
   _StrengthSessionEditPageState createState() =>
@@ -28,7 +28,7 @@ class StrengthSessionEditPage extends StatefulWidget {
 }
 
 class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
-  late final StrengthSessionWithSets _session;
+  late final StrengthSessionDescription _session;
 
   final _commentsNode = FocusNode();
   final _scrollController = ScrollController();
@@ -218,7 +218,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       buildDefaultDragHandles: false,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      children: _session.sets.mapToLIndexed(_setToWidget),
+      children: _session.sets.mapToListIndexed(_setToWidget),
       onReorder: (oldIndex, newIndex) {
         setState(() {
           if (newIndex > oldIndex) {
