@@ -197,8 +197,9 @@ class TimelinePageState extends State<TimelinePage> {
   Future<void> update() async {
     _logger.d(
         'Updating timeline with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
-    //final _strengthSessions = await _strengthDataProvider.getByTimerange(
-    //_dateFilter.start, _dateFilter.end);
+    final _strengthSessions =
+        await _strengthDataProvider.getByTimerangeAndMovement(
+            movementId: null, from: _dateFilter.start, until: _dateFilter.end);
     //final _metconSessions = await _metconDataProvider.getByTimerange(
     //_dateFilter.start, _dateFilter.end);
     //final _cardioSessions = await _cardioDataProvider.getByTimerange(
@@ -240,10 +241,12 @@ class TimelinePageState extends State<TimelinePage> {
           ),
         ),
       ),
-      body: ListView.builder(
-        itemBuilder: _buildItemEntry,
-        itemCount: _items.length,
-      ),
+      body: RefreshIndicator(
+          onRefresh: _refreshPage,
+          child: ListView.builder(
+            itemBuilder: _buildItemEntry,
+            itemCount: _items.length,
+          )),
       bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
           context, SessionsPageTab.timeline),
       drawer: MainDrawer(selectedRoute: Routes.timeline.overview),
