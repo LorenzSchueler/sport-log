@@ -87,13 +87,19 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     await metconMovementDb
         .createMultiple(object.moves.map((mmd) => mmd.metconMovement).toList());
     notifyListeners();
-    final result = await metconApi.postFull(object);
-    if (result.isFailure) {
-      handleApiError(result.failure);
-    } else {
-      metconDb.setSynchronized(object.metcon.id);
-      metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
+    final result1 = await metconApi.postSingle(object.metcon);
+    if (result1.isFailure) {
+      handleApiError(result1.failure);
+      return;
     }
+    metconDb.setSynchronized(object.metcon.id);
+    final result2 = await Api.metconMovements
+        .postMultiple(object.moves.map((mmd) => mmd.metconMovement).toList());
+    if (result2.isFailure) {
+      handleApiError(result2.failure);
+      return;
+    }
+    metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
   }
 
   @override
@@ -137,18 +143,25 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
 
   @override
   Future<void> deleteSingle(MetconDescription object) async {
+    object.setDeleted();
     // TODO: catch errors
     await metconMovementDb.deleteByMetcon(object.metcon.id);
     await metconDb.deleteSingle(object.metcon.id);
     notifyListeners();
     // TODO: server deletes metcon movements automatically
-    final result = await metconApi.deleteFull(object);
-    if (result.isFailure) {
-      handleApiError(result.failure);
-    } else {
-      metconDb.setSynchronized(object.metcon.id);
-      metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
+    final result1 = await metconApi.putSingle(object.metcon);
+    if (result1.isFailure) {
+      handleApiError(result1.failure);
+      return;
     }
+    metconDb.setSynchronized(object.metcon.id);
+    final result2 = await metconMovementApi
+        .putMultiple(object.moves.map((mmd) => mmd.metconMovement).toList());
+    if (result2.isFailure) {
+      handleApiError(result2.failure);
+      return;
+    }
+    metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
   }
 
   @override
