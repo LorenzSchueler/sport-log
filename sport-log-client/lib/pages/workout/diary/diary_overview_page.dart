@@ -51,8 +51,7 @@ class DiaryPageState extends State<DiaryPage> {
     setState(() => _diaries = diaries);
   }
 
-  // full update (from server)
-  Future<void> _refreshPage() async {
+  Future<void> _pullFromServer() async {
     await _dataProvider.pullFromServer().onError((error, stackTrace) {
       if (error is ApiError) {
         ScaffoldMessenger.of(context)
@@ -78,7 +77,7 @@ class DiaryPageState extends State<DiaryPage> {
         ),
       ),
       body: RefreshIndicator(
-          onRefresh: _refreshPage,
+          onRefresh: _pullFromServer,
           child: ListView.builder(
             itemBuilder: (_, index) => DiaryCard(diary: _diaries[index]),
             itemCount: _diaries.length,

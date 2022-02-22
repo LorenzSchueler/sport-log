@@ -119,8 +119,7 @@ class TimelinePageState extends State<TimelinePage> {
     await updateDiaries();
   }
 
-  // full update (from server)
-  Future<void> _refreshPage() async {
+  Future<void> _pullFromServer() async {
     await _diaryDataProvider.pullFromServer().onError((error, stackTrace) {
       if (error is ApiError) {
         ScaffoldMessenger.of(context)
@@ -146,7 +145,7 @@ class TimelinePageState extends State<TimelinePage> {
         ),
       ),
       body: RefreshIndicator(
-          onRefresh: _refreshPage,
+          onRefresh: _pullFromServer,
           child: ListView.builder(
             itemBuilder: _buildItemEntry,
             itemCount: _items.length,

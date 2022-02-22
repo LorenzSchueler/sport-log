@@ -58,7 +58,7 @@ class _MovementsPageState extends State<MovementsPage> {
     }
   }
 
-  Future<void> _refreshPage() async {
+  Future<void> _pullFromServer() async {
     await _dataProvider.pullFromServer().onError((error, stackTrace) {
       if (error is ApiError) {
         ScaffoldMessenger.of(context)
@@ -79,7 +79,7 @@ class _MovementsPageState extends State<MovementsPage> {
       ),
       drawer: MainDrawer(selectedRoute: Routes.movement.overview),
       body: RefreshIndicator(
-        onRefresh: _refreshPage,
+        onRefresh: _pullFromServer,
         child: _body(context),
       ),
       floatingActionButton: FloatingActionButton(

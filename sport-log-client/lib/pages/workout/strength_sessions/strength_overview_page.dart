@@ -59,8 +59,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
     setState(() => _sessions = ssds);
   }
 
-  // full update (from server)
-  Future<void> _refreshPage() async {
+  Future<void> _pullFromServer() async {
     await _dataProvider.pullFromServer().onError((error, stackTrace) {
       if (error is ApiError) {
         ScaffoldMessenger.of(context)
@@ -111,7 +110,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: _refreshPage,
+        onRefresh: _pullFromServer,
         child: CustomScrollView(
           slivers: [
             if (_sessions.isEmpty)

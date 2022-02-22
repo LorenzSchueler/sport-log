@@ -62,8 +62,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
     setState(() => _cardioSessionDescriptions = cardioSessionDescriptions);
   }
 
-  // full update (from server)
-  Future<void> _refreshPage() async {
+  Future<void> _pullFromServer() async {
     await _dataProvider.pullFromServer().onError((error, stackTrace) {
       if (error is ApiError) {
         ScaffoldMessenger.of(context)
@@ -115,7 +114,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         ),
       ),
       body: RefreshIndicator(
-          onRefresh: _refreshPage,
+          onRefresh: _pullFromServer,
           child: ListView.builder(
             itemBuilder: (_, index) => CardioSessionCard(
                 cardioSessionDescription: _cardioSessionDescriptions[index]),
