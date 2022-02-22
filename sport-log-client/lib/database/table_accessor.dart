@@ -33,6 +33,13 @@ abstract class TableAccessor<T extends Entity> {
   ''';
 
   String get notDeleted => '${Columns.deleted} = 0';
+  String fromFilter(DateTime? from) =>
+      from == null ? '' : 'AND $tableName.${Columns.datetime} >= ?';
+  String untilFilter(DateTime? until) =>
+      until == null ? '' : 'AND $tableName.${Columns.datetime} < ?';
+  String get groupById => "GROUP BY $tableName.${Columns.id}";
+  String get orderByDatetime =>
+      "ORDER BY datetime($tableName.${Columns.datetime}) DESC";
 
   Future<void> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
     await database.update(

@@ -105,8 +105,6 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
     DateTime? from,
     DateTime? until,
   }) async {
-    final fromFilter = from == null ? '' : 'AND $tableName.$datetime >= ?';
-    final untilFilter = until == null ? '' : 'AND $tableName.$datetime < ?';
     final movementIdFilter =
         movementIdValue == null ? '' : 'AND $tableName.$movementId = ?';
     final records = await database.rawQuery('''
@@ -117,12 +115,12 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
       JOIN $movement ON $movement.$id = $tableName.$movementId
       WHERE $movement.$deleted = 0
         AND $tableName.$deleted = 0
-        $fromFilter
-        $untilFilter
+        ${fromFilter(from)}
+        ${untilFilter(until)}
         $movementIdFilter
-      GROUP BY $tableName.$id
-      ORDER BY
-        datetime($tableName.$datetime) DESC;
+      $groupById
+      $orderByDatetime
+      ;
     ''', [
       if (from != null) from.toString(),
       if (until != null) until.toString(),

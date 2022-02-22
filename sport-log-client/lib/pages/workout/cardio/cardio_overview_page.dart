@@ -59,7 +59,6 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
             movementId: _movement?.id,
             from: _dateFilter.start,
             until: _dateFilter.end);
-    _logger.i("got: $cardioSessionDescriptions");
     setState(() => _cardioSessionDescriptions = cardioSessionDescriptions);
   }
 
