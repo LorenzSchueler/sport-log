@@ -61,15 +61,15 @@ class DbRouteSerializer implements DbSerializer<Route> {
   @override
   Route fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Route(
-      id: Int64(r[Columns.id]! as int),
-      userId: Int64(r[Columns.userId]! as int),
-      name: r[Columns.name]! as String,
-      distance: r[Columns.distance]! as int,
-      ascent: r[Columns.ascent] as int?,
-      descent: r[Columns.descent] as int?,
+      id: Int64(r[prefix + Columns.id]! as int),
+      userId: Int64(r[prefix + Columns.userId]! as int),
+      name: r[prefix + Columns.name]! as String,
+      distance: r[prefix + Columns.distance]! as int,
+      ascent: r[prefix + Columns.ascent] as int?,
+      descent: r[prefix + Columns.descent] as int?,
       track: const DbPositionListConverter()
-          .mapToDart(r[Columns.track]! as Uint8List)!,
-      deleted: r[Columns.deleted] == 1,
+          .mapToDart(r[prefix + Columns.track]! as Uint8List)!,
+      deleted: r[prefix + Columns.deleted] == 1,
     );
   }
 

@@ -48,13 +48,13 @@ class DbActionEventSerializer implements DbSerializer<ActionEvent> {
   @override
   ActionEvent fromDbRecord(DbRecord r, {String prefix = ''}) {
     return ActionEvent(
-      id: Int64(r[Columns.id]! as int),
-      userId: Int64(r[Columns.userId]! as int),
-      actionId: Int64(r[Columns.actionId]! as int),
-      datetime: DateTime.parse(r[Columns.datetime]! as String),
-      arguments: r[Columns.arguments] as String?,
-      enabled: r[Columns.enabled]! as int == 1,
-      deleted: r[Columns.deleted]! as int == 1,
+      id: Int64(r[prefix + Columns.id]! as int),
+      userId: Int64(r[prefix + Columns.userId]! as int),
+      actionId: Int64(r[prefix + Columns.actionId]! as int),
+      datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
+      arguments: r[prefix + Columns.arguments] as String?,
+      enabled: r[prefix + Columns.enabled]! as int == 1,
+      deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
 

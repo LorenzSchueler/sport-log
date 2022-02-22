@@ -42,11 +42,11 @@ class DbWodSerializer implements DbSerializer<Wod> {
   @override
   Wod fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Wod(
-      id: Int64(r[Columns.id]! as int),
-      userId: Int64(r[Columns.userId]! as int),
-      date: DateTime.parse(r[Columns.date]! as String),
-      description: r[Columns.description] as String?,
-      deleted: r[Columns.deleted]! as int == 1,
+      id: Int64(r[prefix + Columns.id]! as int),
+      userId: Int64(r[prefix + Columns.userId]! as int),
+      date: DateTime.parse(r[prefix + Columns.date]! as String),
+      description: r[prefix + Columns.description] as String?,
+      deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
 

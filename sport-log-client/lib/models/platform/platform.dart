@@ -38,9 +38,9 @@ class DbPlatformSerializer implements DbSerializer<Platform> {
   @override
   Platform fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Platform(
-        id: Int64(r[Columns.id]! as int),
-        name: r[Columns.name]! as String,
-        deleted: r[Columns.deleted]! as int == 1);
+        id: Int64(r[prefix + Columns.id]! as int),
+        name: r[prefix + Columns.name]! as String,
+        deleted: r[prefix + Columns.deleted]! as int == 1);
   }
 
   @override

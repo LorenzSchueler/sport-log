@@ -51,20 +51,20 @@ class StrengthSessionStats {
     );
   }
 
-  factory StrengthSessionStats.fromDbRecord(DbRecord r) {
-    final numSets = r[Columns.numSets]! as int;
-    final sumCount = r[Columns.sumCount]! as int;
+  factory StrengthSessionStats.fromDbRecord(DbRecord r, {String prefix = ''}) {
+    final numSets = r[prefix + Columns.numSets]! as int;
+    final sumCount = r[prefix + Columns.sumCount]! as int;
     double avgCount = numSets == 0 ? 0 : sumCount / numSets;
     return StrengthSessionStats._(
-        datetime: DateTime.parse(r[Columns.datetime]! as String),
+        datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
         numSets: numSets,
-        minCount: r[Columns.minCount]! as int,
-        maxCount: r[Columns.maxCount]! as int,
+        minCount: r[prefix + Columns.minCount]! as int,
+        maxCount: r[prefix + Columns.maxCount]! as int,
         sumCount: sumCount,
         avgCount: avgCount,
-        maxEorm: r[Columns.maxEorm] as double?,
-        maxWeight: r[Columns.maxWeight] as double?,
-        sumVolume: r[Columns.sumVolume] as double?);
+        maxEorm: r[prefix + Columns.maxEorm] as double?,
+        maxWeight: r[prefix + Columns.maxWeight] as double?,
+        sumVolume: r[prefix + Columns.sumVolume] as double?);
   }
 
   // this is only for debugging/pretty-printing

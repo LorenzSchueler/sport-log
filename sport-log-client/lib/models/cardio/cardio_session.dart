@@ -100,28 +100,29 @@ class DbCardioSessionSerializer implements DbSerializer<CardioSession> {
   @override
   CardioSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return CardioSession(
-      id: Int64(r[Columns.id]! as int),
-      userId: Int64(r[Columns.userId]! as int),
-      movementId: Int64(r[Columns.movementId]! as int),
-      cardioType: CardioType.values[r[Columns.cardioType]! as int],
-      datetime: DateTime.parse(r[Columns.datetime]! as String),
-      distance: r[Columns.distance] as int?,
-      ascent: r[Columns.ascent] as int?,
-      descent: r[Columns.descent] as int?,
-      time: r[Columns.time] as Duration?,
-      calories: r[Columns.calories] as int?,
+      id: Int64(r[prefix + Columns.id]! as int),
+      userId: Int64(r[prefix + Columns.userId]! as int),
+      movementId: Int64(r[prefix + Columns.movementId]! as int),
+      cardioType: CardioType.values[r[prefix + Columns.cardioType]! as int],
+      datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
+      distance: r[prefix + Columns.distance] as int?,
+      ascent: r[prefix + Columns.ascent] as int?,
+      descent: r[prefix + Columns.descent] as int?,
+      time: r[prefix + Columns.time] as Duration?,
+      calories: r[prefix + Columns.calories] as int?,
       track: const DbPositionListConverter()
-          .mapToDart(r[Columns.track] as Uint8List?),
-      avgCadence: r[Columns.avgCadence] as int?,
+          .mapToDart(r[prefix + Columns.track] as Uint8List?),
+      avgCadence: r[prefix + Columns.avgCadence] as int?,
       cadence: const DbDoubleListConverter()
-          .mapToDart(r[Columns.cadence] as Uint8List?),
-      avgHeartRate: r[Columns.avgHeartRate] as int?,
+          .mapToDart(r[prefix + Columns.cadence] as Uint8List?),
+      avgHeartRate: r[prefix + Columns.avgHeartRate] as int?,
       heartRate: const DbDoubleListConverter()
-          .mapToDart(r[Columns.heartRate] as Uint8List?),
-      routeId:
-          r[Columns.routeId] == null ? null : Int64(r[Columns.routeId]! as int),
-      comments: r[Columns.comments] as String?,
-      deleted: r[Columns.deleted]! as int == 1,
+          .mapToDart(r[prefix + Columns.heartRate] as Uint8List?),
+      routeId: r[prefix + Columns.routeId] == null
+          ? null
+          : Int64(r[prefix + Columns.routeId]! as int),
+      comments: r[prefix + Columns.comments] as String?,
+      deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
 

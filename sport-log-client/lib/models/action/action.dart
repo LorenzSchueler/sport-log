@@ -46,13 +46,13 @@ class DbActionSerializer implements DbSerializer<Action> {
   @override
   Action fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Action(
-      id: Int64(r[Columns.id]! as int),
-      name: r[Columns.name]! as String,
-      actionProviderId: Int64(r[Columns.actionProviderId]! as int),
-      description: r[Columns.description] as String?,
-      createBefore: r[Columns.createBefore]! as int,
-      deleteAfter: r[Columns.deleteAfter]! as int,
-      deleted: r[Columns.deleted]! as int == 1,
+      id: Int64(r[prefix + Columns.id]! as int),
+      name: r[prefix + Columns.name]! as String,
+      actionProviderId: Int64(r[prefix + Columns.actionProviderId]! as int),
+      description: r[prefix + Columns.description] as String?,
+      createBefore: r[prefix + Columns.createBefore]! as int,
+      deleteAfter: r[prefix + Columns.deleteAfter]! as int,
+      deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
 

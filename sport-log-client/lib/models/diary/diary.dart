@@ -46,12 +46,12 @@ class DbDiarySerializer implements DbSerializer<Diary> {
   @override
   Diary fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Diary(
-      id: Int64(r[Columns.id]! as int),
-      userId: Int64(r[Columns.userId]! as int),
-      date: const DateConverter().fromJson(r[Columns.date]! as String),
-      bodyweight: r[Columns.bodyweight] as double?,
-      comments: r[Columns.comments] as String?,
-      deleted: r[Columns.deleted]! as int == 1,
+      id: Int64(r[prefix + Columns.id]! as int),
+      userId: Int64(r[prefix + Columns.userId]! as int),
+      date: const DateConverter().fromJson(r[prefix + Columns.date]! as String),
+      bodyweight: r[prefix + Columns.bodyweight] as double?,
+      comments: r[prefix + Columns.comments] as String?,
+      deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
 

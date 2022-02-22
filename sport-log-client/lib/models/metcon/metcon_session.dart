@@ -60,16 +60,16 @@ class DbMetconSessionSerializer implements DbSerializer<MetconSession> {
   @override
   MetconSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return MetconSession(
-      id: Int64(r[Columns.id]! as int),
-      userId: Int64(r[Columns.userId]! as int),
-      metconId: Int64(r[Columns.metconId]! as int),
-      datetime: DateTime.parse(r[Columns.datetime]! as String),
-      time: r[Columns.time] as Duration?,
-      rounds: r[Columns.rounds] as int?,
-      reps: r[Columns.reps] as int?,
-      rx: r[Columns.rx]! as int == 1,
-      comments: r[Columns.comments] as String?,
-      deleted: r[Columns.deleted]! as int == 1,
+      id: Int64(r[prefix + Columns.id]! as int),
+      userId: Int64(r[prefix + Columns.userId]! as int),
+      metconId: Int64(r[prefix + Columns.metconId]! as int),
+      datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
+      time: r[prefix + Columns.time] as Duration?,
+      rounds: r[prefix + Columns.rounds] as int?,
+      reps: r[prefix + Columns.reps] as int?,
+      rx: r[prefix + Columns.rx]! as int == 1,
+      comments: r[prefix + Columns.comments] as String?,
+      deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
 

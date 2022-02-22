@@ -51,14 +51,14 @@ class DbActionRuleSerializer implements DbSerializer<ActionRule> {
   @override
   ActionRule fromDbRecord(DbRecord r, {String prefix = ''}) {
     return ActionRule(
-      id: Int64(r[Columns.id]! as int),
-      userId: Int64(r[Columns.userId]! as int),
-      actionId: Int64(r[Columns.actionId]! as int),
-      weekday: Weekday.values[r[Columns.weekday]! as int],
-      time: DateTime.parse(r[Columns.time]! as String),
-      arguments: r[Columns.arguments] as String?,
-      enabled: r[Columns.enabled]! as int == 1,
-      deleted: r[Columns.deleted]! as int == 1,
+      id: Int64(r[prefix + Columns.id]! as int),
+      userId: Int64(r[prefix + Columns.userId]! as int),
+      actionId: Int64(r[prefix + Columns.actionId]! as int),
+      weekday: Weekday.values[r[prefix + Columns.weekday]! as int],
+      time: DateTime.parse(r[prefix + Columns.time]! as String),
+      arguments: r[prefix + Columns.arguments] as String?,
+      enabled: r[prefix + Columns.enabled]! as int == 1,
+      deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
 

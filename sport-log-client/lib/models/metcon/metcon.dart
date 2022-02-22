@@ -118,17 +118,18 @@ class DbMetconSerializer implements DbSerializer<Metcon> {
   @override
   Metcon fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Metcon(
-      id: Int64(r[Columns.id]! as int),
-      userId:
-          r[Columns.userId] == null ? null : Int64(r[Columns.userId]! as int),
-      name: r[Columns.name] as String?,
-      metconType: MetconType.values[r[Columns.metconType]! as int],
-      rounds: r[Columns.rounds] as int?,
-      timecap: r[Columns.timecap] == null
+      id: Int64(r[prefix + Columns.id]! as int),
+      userId: r[prefix + Columns.userId] == null
           ? null
-          : Duration(seconds: r[Columns.timecap]! as int),
-      description: r[Columns.description] as String?,
-      deleted: r[Columns.deleted]! as int == 1,
+          : Int64(r[prefix + Columns.userId]! as int),
+      name: r[prefix + Columns.name] as String?,
+      metconType: MetconType.values[r[prefix + Columns.metconType]! as int],
+      rounds: r[prefix + Columns.rounds] as int?,
+      timecap: r[prefix + Columns.timecap] == null
+          ? null
+          : Duration(seconds: r[prefix + Columns.timecap]! as int),
+      description: r[prefix + Columns.description] as String?,
+      deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
 

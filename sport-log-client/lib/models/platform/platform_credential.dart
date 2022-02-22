@@ -49,12 +49,12 @@ class DbPlatformCredentialSerializer
   @override
   PlatformCredential fromDbRecord(DbRecord r, {String prefix = ''}) {
     return PlatformCredential(
-      id: Int64(r[Columns.id]! as int),
-      userId: Int64(r[Columns.userId]! as int),
-      platformId: Int64(r[Columns.platformId]! as int),
-      username: r[Columns.username]! as String,
-      password: r[Columns.password]! as String,
-      deleted: r[Columns.deleted]! as int == 1,
+      id: Int64(r[prefix + Columns.id]! as int),
+      userId: Int64(r[prefix + Columns.userId]! as int),
+      platformId: Int64(r[prefix + Columns.platformId]! as int),
+      username: r[prefix + Columns.username]! as String,
+      password: r[prefix + Columns.password]! as String,
+      deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
 
