@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
+import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
@@ -53,9 +54,6 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
 }
 
 class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
-  static final instance = MetconDescriptionDataProvider._();
-  MetconDescriptionDataProvider._();
-
   final metconApi = Api.metcons;
   final metconMovementApi = Api.metconMovements;
 
@@ -63,6 +61,23 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   final metconMovementDb = AppDatabase.metconMovements;
   final movementDb = AppDatabase.movements;
   final metconSessionDb = AppDatabase.metconSessions;
+
+  final _metconDataProvider = MetconDataProvider.instance;
+  final _metconMovementDataProvider = MetconMovementDataProvider.instance;
+  final _movementDataProvider = MovementDataProvider.instance;
+
+  MetconDescriptionDataProvider._();
+  static MetconDescriptionDataProvider? _instance;
+  static MetconDescriptionDataProvider get instance {
+    if (_instance == null) {
+      _instance = MetconDescriptionDataProvider._();
+      _instance!._metconDataProvider.addListener(_instance!.notifyListeners);
+      _instance!._metconMovementDataProvider
+          .addListener(_instance!.notifyListeners);
+      _instance!._movementDataProvider.addListener(_instance!.notifyListeners);
+    }
+    return _instance!;
+  }
 
   @override
   Future<void> createSingle(MetconDescription object) async {
