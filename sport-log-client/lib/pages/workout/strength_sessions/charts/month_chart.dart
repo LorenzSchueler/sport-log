@@ -36,11 +36,11 @@ class _MonthChartState extends State<MonthChart> {
   @override
   void initState() {
     super.initState();
-    _dataProvider.addListener(update);
-    update();
+    _dataProvider.addListener(_update);
+    _update();
   }
 
-  Future<void> update() async {
+  Future<void> _update() async {
     final strengthSessionStats = await _dataProvider.getStatsAggregationsByDay(
       movementId: widget.movement.id,
       from: widget.start,
@@ -58,7 +58,7 @@ class _MonthChartState extends State<MonthChart> {
     // ignore a change in series type
     if (oldWidget.movement != widget.movement ||
         oldWidget.start != widget.start) {
-      update();
+      _update();
     }
   }
 
@@ -106,7 +106,7 @@ class _MonthChartState extends State<MonthChart> {
 
   @override
   void dispose() {
-    _dataProvider.removeListener(update);
+    _dataProvider.removeListener(_update);
     super.dispose();
   }
 }

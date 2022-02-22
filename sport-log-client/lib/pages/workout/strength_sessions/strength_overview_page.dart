@@ -36,20 +36,20 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   @override
   void initState() {
     super.initState();
-    _dataProvider.addListener(update);
+    _dataProvider.addListener(_update);
     _dataProvider.onNoInternetConnection =
         () => showSimpleSnackBar(context, 'No Internet connection.');
-    update();
+    _update();
   }
 
   @override
   void dispose() {
-    _dataProvider.removeListener(update);
+    _dataProvider.removeListener(_update);
     _dataProvider.onNoInternetConnection = null;
     super.dispose();
   }
 
-  Future<void> update() async {
+  Future<void> _update() async {
     _logger.d(
         'Updating strength sessions with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
     final ssds = await _dataProvider.getByTimerangeAndMovement(
@@ -85,12 +85,12 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
                 setState(() {
                   _movement = null;
                 });
-                await update();
+                await _update();
               } else {
                 setState(() {
                   _movement = movement;
                 });
-                await update();
+                await _update();
               }
               _logger.i("selected movement: ${movement.name}");
             },
@@ -105,7 +105,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
             initialState: _dateFilter,
             onFilterChanged: (dateFilter) async {
               setState(() => _dateFilter = dateFilter);
-              update();
+              _update();
             },
           ),
         ),

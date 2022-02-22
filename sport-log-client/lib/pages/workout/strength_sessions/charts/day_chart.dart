@@ -37,11 +37,11 @@ class _DayChartState extends State<DayChart> {
   @override
   void initState() {
     super.initState();
-    _dataProvider.addListener(update);
-    update();
+    _dataProvider.addListener(_update);
+    _update();
   }
 
-  Future<void> update() async {
+  Future<void> _update() async {
     final sets = await _dataProvider.getSetsOnDay(
       movementId: widget.movement.id,
       date: widget.date,
@@ -57,7 +57,7 @@ class _DayChartState extends State<DayChart> {
     // ignore a change in series type
     if (oldWidget.movement != widget.movement ||
         oldWidget.date != widget.date) {
-      update();
+      _update();
     }
   }
 
@@ -99,7 +99,7 @@ class _DayChartState extends State<DayChart> {
 
   @override
   void dispose() {
-    _dataProvider.removeListener(update);
+    _dataProvider.removeListener(_update);
     super.dispose();
   }
 }

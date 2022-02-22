@@ -56,7 +56,7 @@ class TimelinePageState extends State<TimelinePage> {
     _diaryDataProvider.addListener(updateDiaries);
     _diaryDataProvider.onNoInternetConnection =
         () => showSimpleSnackBar(context, 'No Internet connection.');
-    update();
+    _update();
   }
 
   @override
@@ -110,7 +110,7 @@ class TimelinePageState extends State<TimelinePage> {
     }
   }
 
-  Future<void> update() async {
+  Future<void> _update() async {
     _logger.d(
         'Updating timeline with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
     await updateStrengthSessions();
@@ -140,7 +140,7 @@ class TimelinePageState extends State<TimelinePage> {
             initialState: _dateFilter,
             onFilterChanged: (dateFilter) async {
               setState(() => _dateFilter = dateFilter);
-              update();
+              await _update();
             },
           ),
         ),

@@ -32,11 +32,11 @@ class _AllChartState extends State<AllChart> {
   @override
   void initState() {
     super.initState();
-    _dataProvider.addListener(update);
-    update();
+    _dataProvider.addListener(_update);
+    _update();
   }
 
-  Future<void> update() async {
+  Future<void> _update() async {
     final strengthSessionStats = await _dataProvider
         .getStatsAggregationsByMonth(movementId: widget.movement.id);
     if (mounted) {
@@ -49,7 +49,7 @@ class _AllChartState extends State<AllChart> {
     super.didUpdateWidget(oldWidget);
     // ignore a change in series type
     if (oldWidget.movement != widget.movement) {
-      update();
+      _update();
     }
   }
 
@@ -113,7 +113,7 @@ class _AllChartState extends State<AllChart> {
 
   @override
   void dispose() {
-    _dataProvider.removeListener(update);
+    _dataProvider.removeListener(_update);
     super.dispose();
   }
 }
