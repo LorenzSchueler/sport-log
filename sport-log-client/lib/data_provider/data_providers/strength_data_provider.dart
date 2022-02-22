@@ -66,7 +66,7 @@ class StrengthSessionDescriptionDataProvider
   }
 
   @override
-  Future<void> createSingle(StrengthSessionDescription object) async {
+  Future<bool> createSingle(StrengthSessionDescription object) async {
     assert(object.isValid());
     // TODO: catch errors
     await strengthSessionDb.createSingle(object.session);
@@ -75,19 +75,20 @@ class StrengthSessionDescriptionDataProvider
     final result1 = await strengthSessionApi.postSingle(object.session);
     if (result1.isFailure) {
       handleApiError(result1.failure);
-      return;
+      return false;
     }
     strengthSessionDb.setSynchronized(object.id);
     final result2 = await strengthSetApi.postMultiple(object.sets);
     if (result2.isFailure) {
       handleApiError(result2.failure);
-      return;
+      return false;
     }
     strengthSetDb.setSynchronizedByStrengthSession(object.id);
+    return true;
   }
 
   @override
-  Future<void> updateSingle(StrengthSessionDescription object) async {
+  Future<bool> updateSingle(StrengthSessionDescription object) async {
     assert(object.isValid());
 
     final oldSets = await strengthSetDb.getByStrengthSession(object.id);
@@ -104,7 +105,7 @@ class StrengthSessionDescriptionDataProvider
     final result1 = await strengthSessionApi.putSingle(object.session);
     if (result1.isFailure) {
       handleApiError(result1.failure);
-      return;
+      return false;
     }
     strengthSessionDb.setSynchronized(object.id);
 
@@ -115,19 +116,20 @@ class StrengthSessionDescriptionDataProvider
         await strengthSetApi.putMultiple(diffing.toDelete + diffing.toUpdate);
     if (result2.isFailure) {
       handleApiError(result2.failure);
-      return;
+      return false;
     }
 
     final result3 = await strengthSetApi.postMultiple(diffing.toCreate);
     if (result3.isFailure) {
       handleApiError(result3.failure);
-      return;
+      return false;
     }
     strengthSetDb.setSynchronizedByStrengthSession(object.id);
+    return true;
   }
 
   @override
-  Future<void> deleteSingle(StrengthSessionDescription object) async {
+  Future<bool> deleteSingle(StrengthSessionDescription object) async {
     object.setDeleted();
     // TODO: catch errors
     await strengthSetDb.deleteByStrengthSession(object.id);
@@ -137,15 +139,16 @@ class StrengthSessionDescriptionDataProvider
     final result1 = await strengthSetApi.putMultiple(object.sets);
     if (result1.isFailure) {
       handleApiError(result1.failure);
-      return;
+      return false;
     }
     strengthSetDb.setSynchronizedByStrengthSession(object.id);
     final result2 = await strengthSessionApi.putSingle(object.session);
     if (result2.isFailure) {
       handleApiError(result2.failure);
-      return;
+      return false;
     }
     strengthSessionDb.setSynchronized(object.id);
+    return true;
   }
 
   @override

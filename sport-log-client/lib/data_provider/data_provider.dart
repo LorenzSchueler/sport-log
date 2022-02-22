@@ -11,11 +11,11 @@ import 'package:sport_log/widgets/form_widgets/new_credentials_dialog.dart';
 final _logger = Logger('DataProvider');
 
 abstract class DataProvider<T> extends ChangeNotifier {
-  Future<void> createSingle(T object);
+  Future<bool> createSingle(T object);
 
-  Future<void> updateSingle(T object);
+  Future<bool> updateSingle(T object);
 
-  Future<void> deleteSingle(T object);
+  Future<bool> deleteSingle(T object);
 
   Future<List<T>> getNonDeleted();
 
@@ -65,7 +65,7 @@ abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
   List<T> getFromAccountData(AccountData accountData);
 
   @override
-  Future<void> createSingle(T object) async {
+  Future<bool> createSingle(T object) async {
     assert(object.isValid());
     // TODO: catch errors
     await db.createSingle(object);
@@ -73,13 +73,15 @@ abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
     final result = await api.postSingle(object);
     if (result.isFailure) {
       handleApiError(result.failure);
+      return false;
     } else {
       db.setSynchronized(object.id);
+      return true;
     }
   }
 
   @override
-  Future<void> updateSingle(T object) async {
+  Future<bool> updateSingle(T object) async {
     assert(object.isValid());
     // TODO: catch errors
     await db.updateSingle(object);
@@ -87,21 +89,25 @@ abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
     final result = await api.putSingle(object);
     if (result.isFailure) {
       handleApiError(result.failure);
+      return false;
     } else {
       db.setSynchronized(object.id);
+      return true;
     }
   }
 
   @override
-  Future<void> deleteSingle(T object) async {
+  Future<bool> deleteSingle(T object) async {
     // TODO: catch errors
     await db.deleteSingle(object.id);
     notifyListeners();
     final result = await api.putSingle(object..deleted = true);
     if (result.isFailure) {
       handleApiError(result.failure);
+      return false;
     } else {
       db.setSynchronized(object.id);
+      return true;
     }
   }
 
