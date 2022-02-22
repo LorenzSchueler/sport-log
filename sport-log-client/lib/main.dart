@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sport_log/app.dart';
@@ -15,17 +18,23 @@ import 'models/movement/movement.dart';
 
 final _logger = Logger('MAIN');
 
-Future<void> initialize({bool doDownSync = true}) async {
+Stream<double> initialize({bool doDownSync = true}) async* {
   WidgetsFlutterBinding.ensureInitialized(); // TODO: necessary?
+  yield 0.1;
   await Hive.initFlutter();
+  yield 0.2;
   await Config.init();
+  yield 0.3;
   await Settings.init();
-  // if (!Config.isAndroid && !Config.isIOS) no db available
+  yield 0.4;
   await AppDatabase.init();
+  yield 0.8;
   await Sync.instance.init();
+  yield 0.9;
   if (Config.generateTestData) {
     insertTestData();
   }
+  yield 1.0;
 }
 
 Future<void> insertTestData() async {
@@ -53,9 +62,41 @@ Future<void> insertTestData() async {
 }
 
 void main() async {
-  await initialize();
-  runApp(ChangeNotifierProvider.value(
-    value: Sync.instance,
-    child: const App(),
-  ));
+  runApp(const InitAppWrapper());
+}
+
+class InitAppWrapper extends StatefulWidget {
+  const InitAppWrapper({Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => InitAppWrapperState();
+}
+
+class InitAppWrapperState extends State<InitAppWrapper> {
+  double? _progress = 0.0;
+
+  @override
+  void initState() {
+    _initialize();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _progress == null
+        ? ChangeNotifierProvider.value(
+            value: Sync.instance,
+            child: const App(),
+          )
+        : Directionality(
+            textDirection: TextDirection.ltr,
+            child: Center(child: LinearProgressIndicator(value: _progress)));
+  }
+
+  Future<void> _initialize({bool doDownSync = true}) async {
+    await for (double progress in initialize()) {
+      setState(() => _progress = progress);
+    }
+    setState(() => _progress = null);
+  }
 }

@@ -40,10 +40,6 @@ class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
 class CardioSessionDescriptionDataProvider
     extends DataProvider<CardioSessionDescription> {
   final _cardioDb = AppDatabase.cardioSessions;
-  final _routeDb = AppDatabase.routes;
-  final _movementDb = AppDatabase.movements;
-
-  final _api = Api.cardioSessions;
 
   final _cardioDataProvider = CardioSessionDataProvider.instance;
   final _routeDataProvider = RouteDataProvider.instance;
