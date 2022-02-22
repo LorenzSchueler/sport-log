@@ -1,6 +1,11 @@
+import 'package:fixnum/fixnum.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/database/tables/movement_table.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/cardio/all.dart';
+import 'package:sport_log/models/cardio/cardio_session_description.dart';
 
 class CardioSessionTable extends TableAccessor<CardioSession> {
   @override
@@ -31,6 +36,63 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
         .references(Tables.route, onDelete: OnAction.setNull),
     Column.text(Columns.comments).nullable(),
   ]);
+
+  static const datetime = Columns.datetime;
+  static const deleted = Columns.deleted;
+  static const id = Columns.id;
+  static const routeId = Columns.routeId;
+  static const movementId = Columns.movementId;
+
+  static const route = Tables.route;
+  static const movement = Tables.movement;
+
+  static RouteTable get _routeTable => AppDatabase.routes;
+  static MovementTable get _movementTable => AppDatabase.movements;
+
+  Future<List<CardioSessionDescription>> getByTimerangeAndMovement({
+    Int64? movementIdValue,
+    DateTime? from,
+    DateTime? until,
+  }) async {
+    final fromFilter = from == null ? '' : 'AND $tableName.$datetime >= ?';
+    final untilFilter = until == null ? '' : 'AND $tableName.$datetime < ?';
+    final movementIdFilter =
+        movementIdValue == null ? '' : 'AND $tableName.$movementId = ?';
+    final records = await database.rawQuery('''
+      SELECT
+        ${table.allColumns},
+        ${_routeTable.table.allColumns},
+        ${_movementTable.table.allColumns}
+      FROM $tableName
+      LEFT JOIN 
+        (SELECT * FROM $route WHERE $route.$deleted = false) AS $route ON $route.$id = $tableName.$routeId
+      JOIN $movement ON $movement.$id = $tableName.$movementId
+      WHERE $movement.$deleted = 0
+        AND $tableName.$deleted = 0
+        $fromFilter
+        $untilFilter
+        $movementIdFilter
+      GROUP BY $tableName.$id
+      ORDER BY
+        datetime($tableName.$datetime) DESC;
+    ''', [
+      if (from != null) from.toString(),
+      if (until != null) until.toString(),
+      if (movementIdValue != null) movementIdValue.toInt(),
+    ]);
+    Logger('CardioTables').i("records: ${records.length}");
+    List<CardioSessionDescription> cardioSessionDescriptions = [];
+    for (Map<String, Object?> record in records) {
+      cardioSessionDescriptions.add(CardioSessionDescription(
+        cardioSession: serde.fromDbRecord(record, prefix: table.prefix),
+        route: _routeTable.serde
+            .fromDbRecordNullable(record, prefix: _routeTable.table.prefix),
+        movement: _movementTable.serde
+            .fromDbRecord(record, prefix: _movementTable.table.prefix),
+      ));
+    }
+    return cardioSessionDescriptions;
+  }
 }
 
 class RouteTable extends TableAccessor<Route> {
