@@ -182,17 +182,19 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         icon: const Icon(Icons.add),
         buttons: [
           ActionButton(
-            icon: const Icon(CustomIcons.stopwatch),
-            onPressed: () => Navigator.of(context)
-                .pushNamed(Routes.cardio.trackingSettings)
-                .then(_handleNewCardioSession),
-          ),
+              icon: const Icon(CustomIcons.stopwatch),
+              onPressed: () async {
+                final returnObj = await Navigator.of(context)
+                    .pushNamed(Routes.cardio.trackingSettings);
+                _handleNewCardioSession(returnObj);
+              }),
           ActionButton(
-            icon: const Icon(Icons.notes_rounded),
-            onPressed: () => Navigator.of(context)
-                .pushNamed(Routes.cardio.cardioEdit)
-                .then(_handleNewCardioSession),
-          ),
+              icon: const Icon(Icons.notes_rounded),
+              onPressed: () async {
+                final returnObj = await Navigator.of(context)
+                    .pushNamed(Routes.cardio.cardioEdit);
+                _handleNewCardioSession(returnObj);
+              }),
         ],
       ),
     );

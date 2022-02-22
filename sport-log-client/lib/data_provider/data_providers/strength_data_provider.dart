@@ -194,9 +194,8 @@ class StrengthSessionDescriptionDataProvider
       handleApiError(result2.failure, isCritical: true);
       return;
     }
-    strengthSetDb
-        .upsertMultiple(result2.success, synchronized: true)
-        .then((_) => notifyListeners());
+    await strengthSetDb.upsertMultiple(result2.success, synchronized: true);
+    notifyListeners();
   }
 
   @override

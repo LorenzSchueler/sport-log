@@ -72,14 +72,13 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     await metconMovementDb
         .createMultiple(object.moves.map((mmd) => mmd.metconMovement).toList());
     notifyListeners();
-    metconApi.postFull(object).then((result) {
-      if (result.isFailure) {
-        handleApiError(result.failure);
-      } else {
-        metconDb.setSynchronized(object.metcon.id);
-        metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
-      }
-    });
+    final result = await metconApi.postFull(object);
+    if (result.isFailure) {
+      handleApiError(result.failure);
+    } else {
+      metconDb.setSynchronized(object.metcon.id);
+      metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
+    }
   }
 
   @override
@@ -128,14 +127,13 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     await metconDb.deleteSingle(object.metcon.id);
     notifyListeners();
     // TODO: server deletes metcon movements automatically
-    metconApi.deleteFull(object).then((result) {
-      if (result.isFailure) {
-        handleApiError(result.failure);
-      } else {
-        metconDb.setSynchronized(object.metcon.id);
-        metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
-      }
-    });
+    final result = await metconApi.deleteFull(object);
+    if (result.isFailure) {
+      handleApiError(result.failure);
+    } else {
+      metconDb.setSynchronized(object.metcon.id);
+      metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
+    }
   }
 
   @override

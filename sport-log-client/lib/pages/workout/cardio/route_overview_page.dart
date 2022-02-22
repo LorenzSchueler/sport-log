@@ -75,9 +75,11 @@ class RoutePageState extends State<RoutePage> {
             context, SessionsPageTab.cardio),
         drawer: MainDrawer(selectedRoute: Routes.cardio.routeOverview),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => Navigator.of(context)
-              .pushNamed(Routes.cardio.routeEdit)
-              .then(_handleNewRoute),
+          onPressed: () async {
+            final returnObj =
+                await Navigator.of(context).pushNamed(Routes.cardio.routeEdit);
+            _handleNewRoute(returnObj);
+          },
           child: const Icon(Icons.add),
         ));
   }

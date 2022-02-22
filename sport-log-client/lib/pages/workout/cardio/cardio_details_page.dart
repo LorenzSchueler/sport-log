@@ -82,16 +82,16 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
           ])),
           actions: [
             IconButton(
-                onPressed: () => Navigator.of(context)
-                        .pushNamed(Routes.cardio.cardioEdit,
-                            arguments: cardioSessionDescription)
-                        .then((returnObj) {
-                      if (returnObj is ReturnObject<CardioSessionDescription>) {
-                        setState(() {
-                          cardioSessionDescription = returnObj.payload;
-                        });
-                      }
-                    }),
+                onPressed: () async {
+                  final returnObj = await Navigator.of(context).pushNamed(
+                      Routes.cardio.cardioEdit,
+                      arguments: cardioSessionDescription);
+                  if (returnObj is ReturnObject<CardioSessionDescription>) {
+                    setState(() {
+                      cardioSessionDescription = returnObj.payload;
+                    });
+                  }
+                },
                 icon: const Icon(Icons.edit))
           ],
         ),

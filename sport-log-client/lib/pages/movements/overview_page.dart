@@ -84,10 +84,10 @@ class _MovementsPageState extends State<MovementsPage> {
       ),
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
-          onPressed: () {
-            Navigator.of(context)
-                .pushNamed(Routes.movement.edit)
-                .then(_handlePageReturn);
+          onPressed: () async {
+            final returnObj =
+                await Navigator.of(context).pushNamed(Routes.movement.edit);
+            _handlePageReturn(returnObj);
           }),
     );
   }
@@ -150,12 +150,11 @@ class _MovementsPageState extends State<MovementsPage> {
                             'Changes will be reflected in existing workouts.');
                         if (approved == null || !approved) return;
                       }
-                      Navigator.of(context)
-                          .pushNamed(
-                            Routes.movement.edit,
-                            arguments: md.copy(),
-                          )
-                          .then(_handlePageReturn);
+                      final returnObj = await Navigator.of(context).pushNamed(
+                        Routes.movement.edit,
+                        arguments: md.copy(),
+                      );
+                      _handlePageReturn(returnObj);
                     },
                     icon: const Icon(Icons.edit),
                   ),

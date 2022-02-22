@@ -113,7 +113,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
     });
   }
 
-  void _submit() {
+  void _submit() async {
     if (!_md.isValid()) {
       return;
     }
@@ -121,24 +121,21 @@ class _EditMetconPageState extends State<EditMetconPage> {
       setState(() => _md.metcon.description = null);
     }
     if (widget._isEditing) {
-      _dataProvider.updateSingle(_md).then((_) {
-        Navigator.of(context)
-            .pop(ReturnObject(action: ReturnAction.updated, payload: _md));
-      });
+      await _dataProvider.updateSingle(_md);
+      Navigator.of(context)
+          .pop(ReturnObject(action: ReturnAction.updated, payload: _md));
     } else {
-      _dataProvider.createSingle(_md).then((_) {
-        Navigator.of(context)
-            .pop(ReturnObject(action: ReturnAction.created, payload: _md));
-      });
+      await _dataProvider.createSingle(_md);
+      Navigator.of(context)
+          .pop(ReturnObject(action: ReturnAction.created, payload: _md));
     }
   }
 
-  void _delete() {
+  void _delete() async {
     if (widget._isEditing) {
-      _dataProvider.deleteSingle(_md).then((_) {
-        Navigator.of(context)
-            .pop(ReturnObject(action: ReturnAction.deleted, payload: _md));
-      });
+      await _dataProvider.deleteSingle(_md);
+      Navigator.of(context)
+          .pop(ReturnObject(action: ReturnAction.deleted, payload: _md));
     } else {
       Navigator.of(context).pop();
     }

@@ -45,16 +45,16 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
           title: Text(metconSessionDescription.metconDescription.name),
           actions: [
             IconButton(
-                onPressed: () => Navigator.of(context)
-                        .pushNamed(Routes.metcon.sessionEdit,
-                            arguments: metconSessionDescription)
-                        .then((returnObj) {
-                      if (returnObj is ReturnObject<MetconSessionDescription>) {
-                        setState(() {
-                          metconSessionDescription = returnObj.payload;
-                        });
-                      }
-                    }),
+                onPressed: () async {
+                  final returnObj = await Navigator.of(context).pushNamed(
+                      Routes.metcon.sessionEdit,
+                      arguments: metconSessionDescription);
+                  if (returnObj is ReturnObject<MetconSessionDescription>) {
+                    setState(() {
+                      metconSessionDescription = returnObj.payload;
+                    });
+                  }
+                },
                 icon: const Icon(Icons.edit))
           ],
         ),

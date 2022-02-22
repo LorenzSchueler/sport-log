@@ -40,19 +40,16 @@ class _MonthChartState extends State<MonthChart> {
     update();
   }
 
-  void update() {
-    _dataProvider
-        .getStatsAggregationsByDay(
+  Future<void> update() async {
+    final strengthSessionStats = await _dataProvider.getStatsAggregationsByDay(
       movementId: widget.movement.id,
       from: widget.start,
       until: widget.start.monthLater(),
-    )
-        .then((strengthSessionStats) {
-      assert(strengthSessionStats.length <= 31);
-      if (mounted) {
-        setState(() => _strengthSessionStats = strengthSessionStats);
-      }
-    });
+    );
+    assert(strengthSessionStats.length <= 31);
+    if (mounted) {
+      setState(() => _strengthSessionStats = strengthSessionStats);
+    }
   }
 
   @override

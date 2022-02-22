@@ -40,19 +40,16 @@ class _YearChartState extends State<YearChart> {
     update();
   }
 
-  void update() {
-    _dataProvider
-        .getStatsAggregationsByWeek(
+  Future<void> update() async {
+    final strengthSessionStats = await _dataProvider.getStatsAggregationsByWeek(
       movementId: widget.movement.id,
       from: widget.start,
       until: widget.start.yearLater(),
-    )
-        .then((strengthSessionStats) {
-      assert(strengthSessionStats.length <= 54);
-      if (mounted) {
-        setState(() => _strengthSessionStats = strengthSessionStats);
-      }
-    });
+    );
+    assert(strengthSessionStats.length <= 54);
+    if (mounted) {
+      setState(() => _strengthSessionStats = strengthSessionStats);
+    }
   }
 
   @override

@@ -36,14 +36,12 @@ class _AllChartState extends State<AllChart> {
     update();
   }
 
-  void update() {
-    _dataProvider
-        .getStatsAggregationsByMonth(movementId: widget.movement.id)
-        .then((strengthSessionStats) {
-      if (mounted) {
-        setState(() => _strengthSessionStats = strengthSessionStats);
-      }
-    });
+  Future<void> update() async {
+    final strengthSessionStats = await _dataProvider
+        .getStatsAggregationsByMonth(movementId: widget.movement.id);
+    if (mounted) {
+      setState(() => _strengthSessionStats = strengthSessionStats);
+    }
   }
 
   @override

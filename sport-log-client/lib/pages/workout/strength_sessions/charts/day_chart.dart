@@ -41,17 +41,14 @@ class _DayChartState extends State<DayChart> {
     update();
   }
 
-  void update() {
-    _dataProvider
-        .getSetsOnDay(
+  Future<void> update() async {
+    final sets = await _dataProvider.getSetsOnDay(
       movementId: widget.movement.id,
       date: widget.date,
-    )
-        .then((sets) {
-      if (mounted) {
-        setState(() => _sets = sets);
-      }
-    });
+    );
+    if (mounted) {
+      setState(() => _sets = sets);
+    }
   }
 
   @override

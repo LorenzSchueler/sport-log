@@ -47,21 +47,19 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
     _update('');
   }
 
-  void _update(String newSearch) {
-    _dataProvider
-        .getMovements(byName: newSearch.trim(), cardioOnly: widget.cardioOnly)
-        .then((movements) {
-      if (widget.selectedMovement != null) {
-        final index = movements.indexWhere(
-            (movement) => movement.id == widget.selectedMovement!.id);
-        if (index >= 0) {
-          movements.insert(0, movements.removeAt(index));
-        }
+  Future<void> _update(String newSearch) async {
+    final movements = await _dataProvider.getMovements(
+        byName: newSearch.trim(), cardioOnly: widget.cardioOnly);
+    if (widget.selectedMovement != null) {
+      final index = movements
+          .indexWhere((movement) => movement.id == widget.selectedMovement!.id);
+      if (index >= 0) {
+        movements.insert(0, movements.removeAt(index));
       }
-      setState(() {
-        _movements = movements;
-        _search = newSearch;
-      });
+    }
+    setState(() {
+      _movements = movements;
+      _search = newSearch;
     });
   }
 

@@ -40,19 +40,16 @@ class _WeekChartState extends State<WeekChart> {
     update();
   }
 
-  void update() {
-    _dataProvider
-        .getStatsAggregationsByDay(
+  Future<void> update() async {
+    final strengthSessionStats = await _dataProvider.getStatsAggregationsByDay(
       movementId: widget.movement.id,
       from: widget.start,
       until: widget.start.weekLater(),
-    )
-        .then((strengthSessionStats) {
-      assert(strengthSessionStats.length <= 7);
-      if (mounted) {
-        setState(() => _strengthSessionStats = strengthSessionStats);
-      }
-    });
+    );
+    assert(strengthSessionStats.length <= 7);
+    if (mounted) {
+      setState(() => _strengthSessionStats = strengthSessionStats);
+    }
   }
 
   @override

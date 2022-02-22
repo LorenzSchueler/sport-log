@@ -104,22 +104,16 @@ class _MetconsPageState extends State<MetconsPage> {
               switch (choice) {
                 case _deleteChoice:
                   assert(!md.hasReference && md.metcon.userId != null);
-                  _dataProvider.deleteSingle(md).then((_) {
-                    setState(() {
-                      _metconDescriptions.removeWhere(
-                          (m) => MetconDescription.areTheSame(m, md));
-                    });
+                  await _dataProvider.deleteSingle(md);
+                  setState(() {
+                    _metconDescriptions.removeWhere(
+                        (m) => MetconDescription.areTheSame(m, md));
                   });
                   break;
                 case _editChoice:
-                  final dynamic updatedMd = await Navigator.of(context)
-                      .pushNamed(Routes.metcon.edit, arguments: md)
-                      .then((_) {
-                    _update();
-                  });
-                  if (updatedMd is MetconDescription) {
-                    setState(() {});
-                  }
+                  await Navigator.of(context)
+                      .pushNamed(Routes.metcon.edit, arguments: md);
+                  _update();
                   break;
               }
             },
