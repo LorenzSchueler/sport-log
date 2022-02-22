@@ -25,28 +25,6 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
   @override
   DbSerializer<StrengthSession> get serde => DbStrengthSessionSerializer();
 
-  static const count = Columns.count;
-  static const datetime = Columns.datetime;
-  static const deleted = Columns.deleted;
-  static const eorm = Tables.eorm;
-  static const eormPercentage = Columns.eormPercentage;
-  static const eormReps = Columns.eormReps;
-  static const id = Columns.id;
-  static const maxCount = Columns.maxCount;
-  static const maxEorm = Columns.maxEorm;
-  static const maxWeight = Columns.maxWeight;
-  static const minCount = Columns.minCount;
-  static const movement = Tables.movement;
-  static const movementId = Columns.movementId;
-  static const name = Columns.name;
-  static const numSets = Columns.numSets;
-  static const setNumber = Columns.setNumber;
-  static const strengthSessionId = Columns.strengthSessionId;
-  static const strengthSet = Tables.strengthSet;
-  static const sumCount = Columns.sumCount;
-  static const sumVolume = Columns.sumVolume;
-  static const weight = Columns.weight;
-
   @override
   List<String> get setupSql => [
         ...super.setupSql,
@@ -74,8 +52,31 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
     Column.text(Columns.comments).nullable(),
   ]);
 
-  MovementTable get _movementTable => AppDatabase.movements;
-  StrengthSetTable get _strengthSetTable => AppDatabase.strengthSets;
+  static const count = Columns.count;
+  static const datetime = Columns.datetime;
+  static const deleted = Columns.deleted;
+  static const eormPercentage = Columns.eormPercentage;
+  static const eormReps = Columns.eormReps;
+  static const id = Columns.id;
+  static const maxCount = Columns.maxCount;
+  static const maxEorm = Columns.maxEorm;
+  static const maxWeight = Columns.maxWeight;
+  static const minCount = Columns.minCount;
+  static const movementId = Columns.movementId;
+  static const name = Columns.name;
+  static const numSets = Columns.numSets;
+  static const setNumber = Columns.setNumber;
+  static const strengthSessionId = Columns.strengthSessionId;
+  static const sumCount = Columns.sumCount;
+  static const sumVolume = Columns.sumVolume;
+  static const weight = Columns.weight;
+
+  static const strengthSet = Tables.strengthSet;
+  static const movement = Tables.movement;
+  static const eorm = Tables.eorm;
+
+  static MovementTable get _movementTable => AppDatabase.movements;
+  static StrengthSetTable get _strengthSetTable => AppDatabase.strengthSets;
 
   Future<StrengthSessionDescription?> getById(Int64 idValue) async {
     final records = await database.rawQuery('''

@@ -25,8 +25,6 @@ abstract class DataProvider<T> extends ChangeNotifier {
 
   Future<void> pullFromServer(); // used in page refresh
 
-  Future<void> upsertFromAccountData(AccountData accountData);
-
   Future<void> pushToServer() async {
     await Future.wait([
       pushUpdatedToServer(),
@@ -124,11 +122,6 @@ abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
   }
 
   @override
-  Future<void> upsertFromAccountData(AccountData accountData) async {
-    await upsertMultiple(getFromAccountData(accountData), synchronized: true);
-  }
-
-  @override
   Future<void> pushUpdatedToServer() async {
     final recordsToUpdate = await db.getWithSyncStatus(SyncStatus.updated);
     final result = await api.putMultiple(recordsToUpdate);
@@ -151,6 +144,10 @@ abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
   }
 
   Future<T?> getById(Int64 id) async => db.getSingle(id);
+
+  Future<void> upsertFromAccountData(AccountData accountData) async {
+    await upsertMultiple(getFromAccountData(accountData), synchronized: true);
+  }
 
   Future<void> upsertMultiple(List<T> objects,
       {required bool synchronized}) async {

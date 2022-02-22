@@ -54,13 +54,13 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
 }
 
 class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
-  final metconApi = Api.metcons;
-  final metconMovementApi = Api.metconMovements;
+  final _metconApi = Api.metcons;
+  final _metconMovementApi = Api.metconMovements;
 
-  final metconDb = AppDatabase.metcons;
-  final metconMovementDb = AppDatabase.metconMovements;
-  final movementDb = AppDatabase.movements;
-  final metconSessionDb = AppDatabase.metconSessions;
+  final _metconDb = AppDatabase.metcons;
+  final _metconMovementDb = AppDatabase.metconMovements;
+  final _movementDb = AppDatabase.movements;
+  final _metconSessionDb = AppDatabase.metconSessions;
 
   final _metconDataProvider = MetconDataProvider.instance;
   final _metconMovementDataProvider = MetconMovementDataProvider.instance;
@@ -83,23 +83,23 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   Future<bool> createSingle(MetconDescription object) async {
     assert(object.isValid());
     // TODO: catch errors
-    await metconDb.createSingle(object.metcon);
-    await metconMovementDb
+    await _metconDb.createSingle(object.metcon);
+    await _metconMovementDb
         .createMultiple(object.moves.map((mmd) => mmd.metconMovement).toList());
     notifyListeners();
-    final result1 = await metconApi.postSingle(object.metcon);
+    final result1 = await _metconApi.postSingle(object.metcon);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return false;
     }
-    metconDb.setSynchronized(object.metcon.id);
+    _metconDb.setSynchronized(object.metcon.id);
     final result2 = await Api.metconMovements
         .postMultiple(object.moves.map((mmd) => mmd.metconMovement).toList());
     if (result2.isFailure) {
       handleApiError(result2.failure);
       return false;
     }
-    metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
+    _metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
     return true;
   }
 
@@ -107,30 +107,30 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   Future<bool> updateSingle(MetconDescription object) async {
     assert(object.isValid());
 
-    final oldMMovements = await metconMovementDb.getByMetcon(object.id);
+    final oldMMovements = await _metconMovementDb.getByMetcon(object.id);
     final newMMovements = [...object.moves.map((m) => m.metconMovement)];
 
     final diffing = diff(oldMMovements, newMMovements);
 
-    await metconDb.updateSingle(object.metcon);
-    await metconMovementDb.deleteMultiple(diffing.toDelete);
-    await metconMovementDb.updateMultiple(diffing.toUpdate);
-    await metconMovementDb.createMultiple(diffing.toCreate);
+    await _metconDb.updateSingle(object.metcon);
+    await _metconMovementDb.deleteMultiple(diffing.toDelete);
+    await _metconMovementDb.updateMultiple(diffing.toUpdate);
+    await _metconMovementDb.createMultiple(diffing.toCreate);
     notifyListeners();
 
-    final result1 = await metconApi.putSingle(object.metcon);
+    final result1 = await _metconApi.putSingle(object.metcon);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return false;
     }
-    metconDb.setSynchronized(object.id);
+    _metconDb.setSynchronized(object.id);
 
     for (final mm in diffing.toDelete) {
       mm.deleted = true;
     }
-    final result2 = await metconMovementApi
+    final result2 = await _metconMovementApi
         .putMultiple(diffing.toDelete + diffing.toUpdate);
-    final result3 = await metconMovementApi.postMultiple(diffing.toCreate);
+    final result3 = await _metconMovementApi.postMultiple(diffing.toCreate);
     if (result2.isFailure) {
       handleApiError(result2.failure);
       return false;
@@ -139,7 +139,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
       handleApiError(result3.failure);
       return false;
     }
-    metconMovementDb.setSynchronizedByMetcon(object.id);
+    _metconMovementDb.setSynchronizedByMetcon(object.id);
     return true;
   }
 
@@ -147,114 +147,106 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   Future<bool> deleteSingle(MetconDescription object) async {
     object.setDeleted();
     // TODO: catch errors
-    await metconMovementDb.deleteByMetcon(object.metcon.id);
-    await metconDb.deleteSingle(object.metcon.id);
+    await _metconMovementDb.deleteByMetcon(object.metcon.id);
+    await _metconDb.deleteSingle(object.metcon.id);
     notifyListeners();
     // TODO: server deletes metcon movements automatically
-    final result1 = await metconApi.putSingle(object.metcon);
+    final result1 = await _metconApi.putSingle(object.metcon);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return false;
     }
-    metconDb.setSynchronized(object.metcon.id);
-    final result2 = await metconMovementApi
+    _metconDb.setSynchronized(object.metcon.id);
+    final result2 = await _metconMovementApi
         .putMultiple(object.moves.map((mmd) => mmd.metconMovement).toList());
     if (result2.isFailure) {
       handleApiError(result2.failure);
       return false;
     }
-    metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
+    _metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
     return true;
   }
 
   @override
   Future<List<MetconDescription>> getNonDeleted() async {
-    final metcons = await metconDb.getNonDeleted();
+    final metcons = await _metconDb.getNonDeleted();
     return Future.wait(metcons
         .map((metcon) async => MetconDescription(
             metcon: metcon,
             moves: await _getMmdByMetcon(metcon.id),
-            hasReference: await metconSessionDb.existsByMetcon(metcon.id)))
+            hasReference: await _metconSessionDb.existsByMetcon(metcon.id)))
         .toList());
   }
 
   @override
   Future<void> pushUpdatedToServer() async {
     final metconsToUpdate =
-        await metconDb.getWithSyncStatus(SyncStatus.updated);
-    final apiResult1 = await metconApi.putMultiple(metconsToUpdate);
+        await _metconDb.getWithSyncStatus(SyncStatus.updated);
+    final apiResult1 = await _metconApi.putMultiple(metconsToUpdate);
     if (apiResult1.isFailure) {
       handleApiError(apiResult1.failure);
       return;
     }
-    metconDb.setAllUpdatedSynchronized();
+    _metconDb.setAllUpdatedSynchronized();
 
     final metconMovementsToUpdate =
-        await metconMovementDb.getWithSyncStatus(SyncStatus.updated);
+        await _metconMovementDb.getWithSyncStatus(SyncStatus.updated);
     final apiResult2 =
-        await metconMovementApi.putMultiple(metconMovementsToUpdate);
+        await _metconMovementApi.putMultiple(metconMovementsToUpdate);
     if (apiResult2.isFailure) {
       handleApiError(apiResult2.failure);
       return;
     }
-    metconMovementDb.setAllUpdatedSynchronized();
+    _metconMovementDb.setAllUpdatedSynchronized();
   }
 
   @override
   Future<void> pushCreatedToServer() async {
     final metconsToCreate =
-        await metconDb.getWithSyncStatus(SyncStatus.created);
-    final apiResult1 = await metconApi.postMultiple(metconsToCreate);
+        await _metconDb.getWithSyncStatus(SyncStatus.created);
+    final apiResult1 = await _metconApi.postMultiple(metconsToCreate);
     if (apiResult1.isFailure) {
       handleApiError(apiResult1.failure);
       return;
     }
-    metconDb.setAllCreatedSynchronized();
+    _metconDb.setAllCreatedSynchronized();
 
     final metconMovementsToCreate =
-        await metconMovementDb.getWithSyncStatus(SyncStatus.created);
+        await _metconMovementDb.getWithSyncStatus(SyncStatus.created);
     final apiResult2 =
-        await metconMovementApi.postMultiple(metconMovementsToCreate);
+        await _metconMovementApi.postMultiple(metconMovementsToCreate);
     if (apiResult2.isFailure) {
       handleApiError(apiResult2.failure);
       return;
     }
-    metconMovementDb.setAllCreatedSynchronized();
+    _metconMovementDb.setAllCreatedSynchronized();
   }
 
   @override
   Future<void> pullFromServer() async {
-    final result1 = await metconApi.getMultiple();
+    final result1 = await _metconApi.getMultiple();
     if (result1.isFailure) {
       handleApiError(result1.failure);
       throw result1.failure;
     }
-    await metconDb.upsertMultiple(result1.success, synchronized: true);
+    await _metconDb.upsertMultiple(result1.success, synchronized: true);
 
-    final result2 = await metconMovementApi.getMultiple();
+    final result2 = await _metconMovementApi.getMultiple();
     if (result2.isFailure) {
       handleApiError(result2.failure);
       notifyListeners();
       throw result2.failure;
     }
-    await metconMovementDb.upsertMultiple(result2.success, synchronized: true);
-    notifyListeners();
-  }
-
-  @override
-  Future<void> upsertFromAccountData(AccountData accountData) async {
-    await metconDb.upsertMultiple(accountData.metcons, synchronized: true);
-    await metconMovementDb.upsertMultiple(accountData.metconMovements,
-        synchronized: true);
+    await _metconMovementDb.upsertMultiple(result2.success, synchronized: true);
     notifyListeners();
   }
 
   Future<List<MetconMovementDescription>> _getMmdByMetcon(Int64 id) async {
-    final metconMovements = await metconMovementDb.getByMetcon(id);
+    final metconMovements = await _metconMovementDb.getByMetcon(id);
     return Future.wait(metconMovements
         .map((mm) async => MetconMovementDescription(
             metconMovement: mm,
-            movement: (await movementDb.getSingle(mm.movementId))!))
+            movement: (await _movementDb.getSingle(mm.movementId))!))
         .toList());
   }
 }

@@ -40,12 +40,12 @@ class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
 
 class StrengthSessionDescriptionDataProvider
     extends DataProvider<StrengthSessionDescription> {
-  final strengthSessionDb = AppDatabase.strengthSessions;
-  final strengthSetDb = AppDatabase.strengthSets;
-  final movementDb = AppDatabase.movements;
+  final _strengthSessionDb = AppDatabase.strengthSessions;
+  final _strengthSetDb = AppDatabase.strengthSets;
+  final _movementDb = AppDatabase.movements;
 
-  final strengthSessionApi = Api.strengthSessions;
-  final strengthSetApi = Api.strengthSets;
+  final _strengthSessionApi = Api.strengthSessions;
+  final _strengthSetApi = Api.strengthSets;
 
   final _strengthSessionDataProvider = StrengthSessionDataProvider.instance;
   final _strengthSetDataProvider = StrengthSetDataProvider.instance;
@@ -69,21 +69,21 @@ class StrengthSessionDescriptionDataProvider
   Future<bool> createSingle(StrengthSessionDescription object) async {
     assert(object.isValid());
     // TODO: catch errors
-    await strengthSessionDb.createSingle(object.session);
-    await strengthSetDb.createMultiple(object.sets);
+    await _strengthSessionDb.createSingle(object.session);
+    await _strengthSetDb.createMultiple(object.sets);
     notifyListeners();
-    final result1 = await strengthSessionApi.postSingle(object.session);
+    final result1 = await _strengthSessionApi.postSingle(object.session);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return false;
     }
-    strengthSessionDb.setSynchronized(object.id);
-    final result2 = await strengthSetApi.postMultiple(object.sets);
+    _strengthSessionDb.setSynchronized(object.id);
+    final result2 = await _strengthSetApi.postMultiple(object.sets);
     if (result2.isFailure) {
       handleApiError(result2.failure);
       return false;
     }
-    strengthSetDb.setSynchronizedByStrengthSession(object.id);
+    _strengthSetDb.setSynchronizedByStrengthSession(object.id);
     return true;
   }
 
@@ -91,40 +91,40 @@ class StrengthSessionDescriptionDataProvider
   Future<bool> updateSingle(StrengthSessionDescription object) async {
     assert(object.isValid());
 
-    final oldSets = await strengthSetDb.getByStrengthSession(object.id);
+    final oldSets = await _strengthSetDb.getByStrengthSession(object.id);
     final newSets = [...object.sets];
 
     final diffing = diff(oldSets, newSets);
 
-    await strengthSessionDb.updateSingle(object.session);
-    await strengthSetDb.deleteMultiple(diffing.toDelete);
-    await strengthSetDb.updateMultiple(diffing.toUpdate);
-    await strengthSetDb.createMultiple(diffing.toCreate);
+    await _strengthSessionDb.updateSingle(object.session);
+    await _strengthSetDb.deleteMultiple(diffing.toDelete);
+    await _strengthSetDb.updateMultiple(diffing.toUpdate);
+    await _strengthSetDb.createMultiple(diffing.toCreate);
     notifyListeners();
 
-    final result1 = await strengthSessionApi.putSingle(object.session);
+    final result1 = await _strengthSessionApi.putSingle(object.session);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return false;
     }
-    strengthSessionDb.setSynchronized(object.id);
+    _strengthSessionDb.setSynchronized(object.id);
 
     for (final ss in diffing.toDelete) {
       ss.deleted = true;
     }
     final result2 =
-        await strengthSetApi.putMultiple(diffing.toDelete + diffing.toUpdate);
+        await _strengthSetApi.putMultiple(diffing.toDelete + diffing.toUpdate);
     if (result2.isFailure) {
       handleApiError(result2.failure);
       return false;
     }
 
-    final result3 = await strengthSetApi.postMultiple(diffing.toCreate);
+    final result3 = await _strengthSetApi.postMultiple(diffing.toCreate);
     if (result3.isFailure) {
       handleApiError(result3.failure);
       return false;
     }
-    strengthSetDb.setSynchronizedByStrengthSession(object.id);
+    _strengthSetDb.setSynchronizedByStrengthSession(object.id);
     return true;
   }
 
@@ -132,114 +132,106 @@ class StrengthSessionDescriptionDataProvider
   Future<bool> deleteSingle(StrengthSessionDescription object) async {
     object.setDeleted();
     // TODO: catch errors
-    await strengthSetDb.deleteByStrengthSession(object.id);
-    await strengthSessionDb.deleteSingle(object.id);
+    await _strengthSetDb.deleteByStrengthSession(object.id);
+    await _strengthSessionDb.deleteSingle(object.id);
     notifyListeners();
     // TODO: server deletes strength sets automatically
-    final result1 = await strengthSetApi.putMultiple(object.sets);
+    final result1 = await _strengthSetApi.putMultiple(object.sets);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return false;
     }
-    strengthSetDb.setSynchronizedByStrengthSession(object.id);
-    final result2 = await strengthSessionApi.putSingle(object.session);
+    _strengthSetDb.setSynchronizedByStrengthSession(object.id);
+    final result2 = await _strengthSessionApi.putSingle(object.session);
     if (result2.isFailure) {
       handleApiError(result2.failure);
       return false;
     }
-    strengthSessionDb.setSynchronized(object.id);
+    _strengthSessionDb.setSynchronized(object.id);
     return true;
   }
 
   @override
   Future<List<StrengthSessionDescription>> getNonDeleted() async {
-    return Future.wait((await strengthSessionDb.getNonDeleted())
+    return Future.wait((await _strengthSessionDb.getNonDeleted())
         .map((session) async => StrengthSessionDescription(
             session: session,
-            movement: (await movementDb.getSingle(session.movementId))!,
-            sets: await strengthSetDb.getByStrengthSession(session.id)))
+            movement: (await _movementDb.getSingle(session.movementId))!,
+            sets: await _strengthSetDb.getByStrengthSession(session.id)))
         .toList());
   }
 
   @override
   Future<void> pushUpdatedToServer() async {
     final sessionsToUpdate =
-        await strengthSessionDb.getWithSyncStatus(SyncStatus.updated);
-    final result1 = await strengthSessionApi.putMultiple(sessionsToUpdate);
+        await _strengthSessionDb.getWithSyncStatus(SyncStatus.updated);
+    final result1 = await _strengthSessionApi.putMultiple(sessionsToUpdate);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return;
     }
-    strengthSessionDb.setAllUpdatedSynchronized();
+    _strengthSessionDb.setAllUpdatedSynchronized();
 
     final setsToUpdate =
-        await strengthSetDb.getWithSyncStatus(SyncStatus.updated);
-    final result2 = await strengthSetApi.putMultiple(setsToUpdate);
+        await _strengthSetDb.getWithSyncStatus(SyncStatus.updated);
+    final result2 = await _strengthSetApi.putMultiple(setsToUpdate);
     if (result2.isFailure) {
       handleApiError(result2.failure);
       return;
     }
-    strengthSetDb.setAllUpdatedSynchronized();
+    _strengthSetDb.setAllUpdatedSynchronized();
   }
 
   @override
   Future<void> pushCreatedToServer() async {
     final sessionsToCreate =
-        await strengthSessionDb.getWithSyncStatus(SyncStatus.created);
-    final result1 = await strengthSessionApi.postMultiple(sessionsToCreate);
+        await _strengthSessionDb.getWithSyncStatus(SyncStatus.created);
+    final result1 = await _strengthSessionApi.postMultiple(sessionsToCreate);
     if (result1.isFailure) {
       handleApiError(result1.failure);
       return;
     }
-    strengthSessionDb.setAllCreatedSynchronized();
+    _strengthSessionDb.setAllCreatedSynchronized();
 
     final setsToCreate =
-        await strengthSetDb.getWithSyncStatus(SyncStatus.created);
-    final result2 = await strengthSetApi.postMultiple(setsToCreate);
+        await _strengthSetDb.getWithSyncStatus(SyncStatus.created);
+    final result2 = await _strengthSetApi.postMultiple(setsToCreate);
     if (result2.isFailure) {
       handleApiError(result2.failure);
       return;
     }
-    strengthSetDb.setAllCreatedSynchronized();
+    _strengthSetDb.setAllCreatedSynchronized();
   }
 
   @override
   Future<void> pullFromServer() async {
-    final result1 = await strengthSessionApi.getMultiple();
+    final result1 = await _strengthSessionApi.getMultiple();
     if (result1.isFailure) {
       handleApiError(result1.failure, isCritical: true);
       return;
     }
-    await strengthSessionDb.upsertMultiple(result1.success, synchronized: true);
+    await _strengthSessionDb.upsertMultiple(result1.success,
+        synchronized: true);
 
-    final result2 = await strengthSetApi.getMultiple();
+    final result2 = await _strengthSetApi.getMultiple();
     if (result2.isFailure) {
       notifyListeners();
       handleApiError(result2.failure, isCritical: true);
       return;
     }
-    await strengthSetDb.upsertMultiple(result2.success, synchronized: true);
-    notifyListeners();
-  }
-
-  @override
-  Future<void> upsertFromAccountData(AccountData accountData) async {
-    await strengthSessionDb.upsertMultiple(accountData.strengthSessions,
-        synchronized: true);
-    await strengthSetDb.upsertMultiple(accountData.strengthSets,
-        synchronized: true);
+    await _strengthSetDb.upsertMultiple(result2.success, synchronized: true);
     notifyListeners();
   }
 
   Future<StrengthSessionDescription?> getById(Int64 id) async =>
-      strengthSessionDb.getById(id);
+      _strengthSessionDb.getById(id);
 
   Future<List<StrengthSessionDescription>> getByTimerangeAndMovement({
     Int64? movementId,
     DateTime? from,
     DateTime? until,
   }) async {
-    return strengthSessionDb.getByTimerangeAndMovement(
+    return _strengthSessionDb.getByTimerangeAndMovement(
         from: from, until: until, movementIdValue: movementId);
   }
 
@@ -247,7 +239,7 @@ class StrengthSessionDescriptionDataProvider
     required DateTime date,
     required Int64 movementId,
   }) async =>
-      strengthSessionDb.getSetsOnDay(date: date, movementIdValue: movementId);
+      _strengthSessionDb.getSetsOnDay(date: date, movementIdValue: movementId);
 
   // weekly/monthly view
   Future<List<StrengthSessionStats>> getStatsAggregationsByDay({
@@ -255,7 +247,7 @@ class StrengthSessionDescriptionDataProvider
     required DateTime from,
     required DateTime until,
   }) async {
-    return strengthSessionDb.getStatsAggregationsByDay(
+    return _strengthSessionDb.getStatsAggregationsByDay(
         movementIdValue: movementId, from: from, until: until);
   }
 
@@ -265,27 +257,27 @@ class StrengthSessionDescriptionDataProvider
     required DateTime from,
     required DateTime until,
   }) async {
-    return strengthSessionDb.getStatsAggregationsByWeek(
+    return _strengthSessionDb.getStatsAggregationsByWeek(
         from: from, until: until, movementIdValue: movementId);
   }
 
   // all time view
   Future<List<StrengthSessionStats>> getStatsAggregationsByMonth(
       {required Int64 movementId}) async {
-    return strengthSessionDb.getStatsAggregationsByMonth(
+    return _strengthSessionDb.getStatsAggregationsByMonth(
         movementIdValue: movementId);
   }
 
   Future<void> upsertMultipleSessions(List<StrengthSession> sessions,
       {required bool synchronized}) async {
-    await strengthSessionDb.upsertMultiple(sessions,
+    await _strengthSessionDb.upsertMultiple(sessions,
         synchronized: synchronized);
     notifyListeners();
   }
 
   Future<void> upsertMultipleSets(List<StrengthSet> sets,
       {required bool synchronized}) async {
-    await strengthSetDb.upsertMultiple(sets, synchronized: synchronized);
+    await _strengthSetDb.upsertMultiple(sets, synchronized: synchronized);
     notifyListeners();
   }
 }
