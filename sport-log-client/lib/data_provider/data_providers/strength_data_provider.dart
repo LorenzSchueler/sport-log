@@ -204,7 +204,7 @@ class StrengthSessionDescriptionDataProvider
   }
 
   @override
-  Future<void> doFullUpdate() async {
+  Future<void> pullFromServer() async {
     final result1 = await strengthSessionApi.getMultiple();
     if (result1.isFailure) {
       handleApiError(result1.failure, isCritical: true);

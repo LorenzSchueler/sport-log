@@ -254,7 +254,7 @@ class TimelinePageState extends State<TimelinePage> {
 
   // full update (from server)
   Future<void> _refreshPage() async {
-    await _diaryDataProvider.doFullUpdate().onError((error, stackTrace) {
+    await _diaryDataProvider.pullFromServer().onError((error, stackTrace) {
       if (error is ApiError) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));

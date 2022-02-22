@@ -61,7 +61,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
 
   // full update (from server)
   Future<void> _refreshPage() async {
-    await _dataProvider.doFullUpdate().onError((error, stackTrace) {
+    await _dataProvider.pullFromServer().onError((error, stackTrace) {
       if (error is ApiError) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));

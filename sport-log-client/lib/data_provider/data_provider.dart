@@ -23,7 +23,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
 
   Future<void> pushCreatedToServer();
 
-  Future<void> doFullUpdate(); // used in page refresh
+  Future<void> pullFromServer(); // used in page refresh
 
   Future<void> upsertFromAccountData(AccountData accountData);
 
@@ -115,11 +115,10 @@ abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
   Future<List<T>> getNonDeleted() async => db.getNonDeleted();
 
   @override
-  Future<void> doFullUpdate() async {
+  Future<void> pullFromServer() async {
     final result = await api.getMultiple();
     if (result.isFailure) {
       handleApiError(result.failure);
-      throw result.failure;
     }
     await upsertMultiple(result.success, synchronized: true);
   }
