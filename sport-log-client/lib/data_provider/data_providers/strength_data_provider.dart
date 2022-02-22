@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
+import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
@@ -46,8 +47,23 @@ class StrengthSessionDescriptionDataProvider
   final strengthSessionApi = Api.strengthSessions;
   final strengthSetApi = Api.strengthSets;
 
-  static final instance = StrengthSessionDescriptionDataProvider._();
+  final _strengthSessionDataProvider = StrengthSessionDataProvider.instance;
+  final _strengthSetDataProvider = StrengthSetDataProvider.instance;
+  final _movementDataProvider = MovementDataProvider.instance;
+
   StrengthSessionDescriptionDataProvider._();
+  static StrengthSessionDescriptionDataProvider? _instance;
+  static StrengthSessionDescriptionDataProvider get instance {
+    if (_instance == null) {
+      _instance = StrengthSessionDescriptionDataProvider._();
+      _instance!._strengthSessionDataProvider
+          .addListener(_instance!.notifyListeners);
+      _instance!._strengthSetDataProvider
+          .addListener(_instance!.notifyListeners);
+      _instance!._movementDataProvider.addListener(_instance!.notifyListeners);
+    }
+    return _instance!;
+  }
 
   @override
   Future<void> createSingle(StrengthSessionDescription object) async {
