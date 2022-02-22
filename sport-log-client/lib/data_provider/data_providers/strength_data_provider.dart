@@ -150,7 +150,12 @@ class StrengthSessionDescriptionDataProvider
 
   @override
   Future<List<StrengthSessionDescription>> getNonDeleted() async {
-    throw UnimplementedError();
+    return Future.wait((await strengthSessionDb.getNonDeleted())
+        .map((session) async => StrengthSessionDescription(
+            session: session,
+            movement: (await movementDb.getSingle(session.movementId))!,
+            sets: await strengthSetDb.getByStrengthSession(session.id)))
+        .toList());
   }
 
   @override
