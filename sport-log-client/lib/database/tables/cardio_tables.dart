@@ -54,8 +54,6 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
     DateTime? from,
     DateTime? until,
   }) async {
-    final movementIdFilter =
-        movementIdValue == null ? '' : 'AND $tableName.$movementId = ?';
     final records = await database.rawQuery('''
       SELECT
         ${table.allColumns},
@@ -69,7 +67,7 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
         AND $tableName.$deleted = 0
         ${fromFilter(from)}
         ${untilFilter(until)}
-        $movementIdFilter
+        ${movementIdFilter(movementIdValue)}
       $groupById
       $orderByDatetime
       ;

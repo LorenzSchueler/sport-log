@@ -37,6 +37,8 @@ abstract class TableAccessor<T extends Entity> {
       from == null ? '' : 'AND $tableName.${Columns.datetime} >= ?';
   String untilFilter(DateTime? until) =>
       until == null ? '' : 'AND $tableName.${Columns.datetime} < ?';
+  String movementIdFilter(Int64? movementId) =>
+      movementId == null ? '' : 'AND $tableName.${Columns.movementId} = ?';
   String get groupById => "GROUP BY $tableName.${Columns.id}";
   String get orderByDatetime =>
       "ORDER BY datetime($tableName.${Columns.datetime}) DESC";
