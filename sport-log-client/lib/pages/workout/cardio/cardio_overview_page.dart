@@ -29,103 +29,48 @@ class CardioSessionsPage extends StatefulWidget {
 
 class CardioSessionsPageState extends State<CardioSessionsPage> {
   final _logger = Logger('CardioSessionsPage');
-  //final _dataProvider = CardioSessionDescriptionDataProvider.instance;
-  final List<CardioSessionDescription> _cardioSessionDescriptions = [];
+  final _dataProvider = CardioSessionDescriptionDataProvider.instance;
+  List<CardioSessionDescription> _cardioSessionDescriptions = [];
 
   DateFilterState _dateFilter = MonthFilter.current();
   Movement? _movement;
 
-  //CardioSession(
-  //id: randomId(),
-  //userId: Settings.userId!,
-  //movementId: Int64(1),
-  //cardioType: CardioType.training,
-  //datetime: DateTime.now(),
-  //distance: 15034,
-  //ascent: 308,
-  //descent: 297,
-  //time: const Duration(seconds: 4189),
-  //calories: null,
-  //track: [
-  //Position(
-  //longitude: 11.33,
-  //latitude: 47.27,
-  //elevation: 600,
-  //distance: 0,
-  //time: const Duration(seconds: 0)),
-  //Position(
-  //longitude: 11.331,
-  //latitude: 47.27,
-  //elevation: 650,
-  //distance: 1000,
-  //time: const Duration(seconds: 200)),
-  //Position(
-  //longitude: 11.33,
-  //latitude: 47.272,
-  //elevation: 600,
-  //distance: 2000,
-  //time: const Duration(seconds: 500)),
-  //],
-  //avgCadence: 167,
-  //cadence: null,
-  //avgHeartRate: 189,
-  //heartRate: null,
-  //routeId: null,
-  //comments: null,
-  //deleted: false),
-  //CardioSession(
-  //id: randomId(),
-  //userId: Settings.userId!,
-  //movementId: Int64(1),
-  //cardioType: CardioType.activeRecovery,
-  //datetime: DateTime.now(),
-  //distance: 5091,
-  //ascent: 8,
-  //descent: 7,
-  //time: const Duration(seconds: 489),
-  //calories: null,
-  //track: null,
-  //avgCadence: 147,
-  //cadence: null,
-  //avgHeartRate: 169,
-  //heartRate: null,
-  //routeId: null,
-  //comments: "some comments here",
-  //deleted: false)
-  //];
-
   @override
   void initState() {
     super.initState();
-    //_dataProvider.addListener(update);
-    //_dataProvider.onNoInternetConnection =
-    //() => showSimpleSnackBar(context, 'No Internet connection.');
+    _dataProvider.addListener(update);
+    _dataProvider.onNoInternetConnection =
+        () => showSimpleSnackBar(context, 'No Internet connection.');
     update();
   }
 
   @override
   void dispose() {
-    //_dataProvider.removeListener(update);
-    //_dataProvider.onNoInternetConnection = null;
+    _dataProvider.removeListener(update);
+    _dataProvider.onNoInternetConnection = null;
     super.dispose();
   }
 
   Future<void> update() async {
     _logger.d(
         'Updating diary page with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
-    // final cardioSessions =
-    // await _dataProvider.getByTimerange(_dateFilter.start, _dateFilter.end);
-    // setState(() => _cardioSessions = cardioSessions);
+    final cardioSessionDescriptions =
+        await _dataProvider.getByTimerangeAndMovement(
+            movementId: _movement?.id,
+            from: _dateFilter.start,
+            until: _dateFilter.end);
+    _logger.i("got: $cardioSessionDescriptions");
+    setState(() => _cardioSessionDescriptions = cardioSessionDescriptions);
   }
 
   // full update (from server)
   Future<void> _refreshPage() async {
-    //await _dataProvider.doFullUpdate().onError((error, stackTrace) {
-    //if (error is ApiError) {
-    //ScaffoldMessenger.of(context)
-    //.showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
-    //}
-    //});
+    await _dataProvider.pullFromServer().onError((error, stackTrace) {
+      if (error is ApiError) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
+      }
+    });
   }
 
   @override
@@ -170,11 +115,13 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
           ),
         ),
       ),
-      body: ListView.builder(
-        itemBuilder: (_, index) => CardioSessionCard(
-            cardioSessionDescription: _cardioSessionDescriptions[index]),
-        itemCount: _cardioSessionDescriptions.length,
-      ),
+      body: RefreshIndicator(
+          onRefresh: _refreshPage,
+          child: ListView.builder(
+            itemBuilder: (_, index) => CardioSessionCard(
+                cardioSessionDescription: _cardioSessionDescriptions[index]),
+            itemCount: _cardioSessionDescriptions.length,
+          )),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.cardio),
       drawer: MainDrawer(selectedRoute: Routes.cardio.overview),
