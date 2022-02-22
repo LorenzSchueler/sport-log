@@ -29,12 +29,12 @@ class TimelinePage extends StatefulWidget {
 class TimelinePageState extends State<TimelinePage> {
   final _logger = Logger('TimelinePage');
   final _strengthDataProvider = StrengthSessionDescriptionDataProvider.instance;
-  final _metconDataProvider = MetconDescriptionDataProvider.instance;
+  final _metconDataProvider = MetconSessionDescriptionDataProvider.instance;
   final _cardioDataProvider = CardioSessionDescriptionDataProvider.instance;
   final _diaryDataProvider = DiaryDataProvider.instance;
-  List<StrengthSessionDescription> _strengthSessions = [];
-  List<MetconSessionDescription> _metconSessions = [];
-  List<CardioSessionDescription> _cardioSessions = [];
+  List<StrengthSessionDescription> _strengthSessionsDescriptions = [];
+  List<MetconSessionDescription> _metconSessionsDescriptions = [];
+  List<CardioSessionDescription> _cardioSessionsDescriptions = [];
   List<Diary> _diaries = [];
   List<TimelineUnion> _items = [];
 
@@ -73,22 +73,27 @@ class TimelinePageState extends State<TimelinePage> {
   }
 
   Future<void> updateStrengthSessions() async {
-    _strengthSessions = await _strengthDataProvider.getByTimerangeAndMovement(
-        movementId: null, from: _dateFilter.start, until: _dateFilter.end);
+    _strengthSessionsDescriptions =
+        await _strengthDataProvider.getByTimerangeAndMovement(
+            movementId: null, from: _dateFilter.start, until: _dateFilter.end);
     sortItems();
   }
 
   Future<void> updateMetconSessions() async {
-    //_metconSessions = await _metconDataProvider.getByTimerange(
-    //_dateFilter.start, _dateFilter.end);
+    _metconSessionsDescriptions =
+        await _metconDataProvider.getByTimerangeAndMovement(
+            movementId: _movement?.id,
+            from: _dateFilter.start,
+            until: _dateFilter.end);
     sortItems();
   }
 
   Future<void> updateCardioSessions() async {
-    _cardioSessions = await _cardioDataProvider.getByTimerangeAndMovement(
-        movementId: _movement?.id,
-        from: _dateFilter.start,
-        until: _dateFilter.end);
+    _cardioSessionsDescriptions =
+        await _cardioDataProvider.getByTimerangeAndMovement(
+            movementId: _movement?.id,
+            from: _dateFilter.start,
+            until: _dateFilter.end);
     sortItems();
   }
 
@@ -99,10 +104,13 @@ class TimelinePageState extends State<TimelinePage> {
   }
 
   void sortItems() {
-    final items =
-        _strengthSessions.map((s) => TimelineUnion.strengthSession(s)).toList();
-    items.addAll(_metconSessions.map((m) => TimelineUnion.metconSession(m)));
-    items.addAll(_cardioSessions.map((c) => TimelineUnion.cardioSession(c)));
+    final items = _strengthSessionsDescriptions
+        .map((s) => TimelineUnion.strengthSession(s))
+        .toList();
+    items.addAll(
+        _metconSessionsDescriptions.map((m) => TimelineUnion.metconSession(m)));
+    items.addAll(
+        _cardioSessionsDescriptions.map((c) => TimelineUnion.cardioSession(c)));
     items.addAll(_diaries.map((d) => TimelineUnion.diary(d)));
     items.sort((a, b) => b.compareTo(a));
     if (mounted) {

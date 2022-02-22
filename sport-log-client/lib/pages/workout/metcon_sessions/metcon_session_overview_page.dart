@@ -1,13 +1,13 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_log/helpers/id_generation.dart';
+import 'package:sport_log/api/api.dart';
+import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
@@ -21,202 +21,47 @@ class MetconSessionsPage extends StatefulWidget {
 
 class MetconSessionsPageState extends State<MetconSessionsPage> {
   final _logger = Logger('MetconSessionsPage');
-
-  final List<MetconSessionDescription> _metconSessionDescriptions = [
-    MetconSessionDescription(
-        metconSession: MetconSession(
-            id: randomId(),
-            userId: Settings.userId!,
-            metconId: Int64(1),
-            datetime: DateTime.now(),
-            time: const Duration(minutes: 15),
-            rounds: 3,
-            reps: 0,
-            rx: true,
-            comments: "so comments are here",
-            deleted: false),
-        metconDescription: MetconDescription(
-            metcon: Metcon(
-                id: randomId(),
-                userId: Settings.userId!,
-                name: "cindy",
-                metconType: MetconType.amrap,
-                rounds: null,
-                timecap: const Duration(minutes: 30),
-                description: "my description",
-                deleted: false),
-            moves: [
-              MetconMovementDescription(
-                  metconMovement: MetconMovement(
-                      id: randomId(),
-                      metconId: Int64(1),
-                      movementId: Int64(1),
-                      movementNumber: 1,
-                      count: 5,
-                      weight: 0,
-                      distanceUnit: null,
-                      deleted: false),
-                  movement: Movement(
-                      id: randomId(),
-                      userId: Settings.userId!,
-                      name: "pullup",
-                      description: null,
-                      cardio: false,
-                      deleted: false,
-                      dimension: MovementDimension.reps))
-            ],
-            hasReference: true)),
-    MetconSessionDescription(
-        metconSession: MetconSession(
-            id: randomId(),
-            userId: Settings.userId!,
-            metconId: Int64(1),
-            datetime: DateTime.now(),
-            time: null,
-            rounds: null,
-            reps: null,
-            rx: false,
-            comments: "so comments are here",
-            deleted: false),
-        metconDescription: MetconDescription(
-            metcon: Metcon(
-                id: randomId(),
-                userId: Settings.userId!,
-                name: null,
-                metconType: MetconType.emom,
-                rounds: 5,
-                timecap: const Duration(minutes: 10),
-                description: "my description",
-                deleted: false),
-            moves: [
-              MetconMovementDescription(
-                  metconMovement: MetconMovement(
-                      id: randomId(),
-                      metconId: Int64(1),
-                      movementId: Int64(1),
-                      movementNumber: 1,
-                      count: 5,
-                      weight: 10,
-                      distanceUnit: null,
-                      deleted: false),
-                  movement: Movement(
-                      id: randomId(),
-                      userId: Settings.userId!,
-                      name: "pullup",
-                      description: null,
-                      cardio: false,
-                      deleted: false,
-                      dimension: MovementDimension.reps)),
-              MetconMovementDescription(
-                  metconMovement: MetconMovement(
-                      id: randomId(),
-                      metconId: Int64(1),
-                      movementId: Int64(1),
-                      movementNumber: 1,
-                      count: 10,
-                      weight: null,
-                      distanceUnit: null,
-                      deleted: false),
-                  movement: Movement(
-                      id: randomId(),
-                      userId: Settings.userId!,
-                      name: "pushup",
-                      description: null,
-                      cardio: false,
-                      deleted: false,
-                      dimension: MovementDimension.reps))
-            ],
-            hasReference: true)),
-    MetconSessionDescription(
-        metconSession: MetconSession(
-            id: randomId(),
-            userId: Settings.userId!,
-            metconId: Int64(1),
-            datetime: DateTime.now(),
-            time: const Duration(minutes: 15),
-            rounds: 3,
-            reps: 0,
-            rx: true,
-            comments: "so comments are here",
-            deleted: false),
-        metconDescription: MetconDescription(
-            metcon: Metcon(
-                id: randomId(),
-                userId: Settings.userId!,
-                name: "cindy",
-                metconType: MetconType.forTime,
-                rounds: 3,
-                timecap: const Duration(minutes: 30),
-                description: "my description",
-                deleted: false),
-            moves: [
-              MetconMovementDescription(
-                  metconMovement: MetconMovement(
-                      id: randomId(),
-                      metconId: Int64(1),
-                      movementId: Int64(1),
-                      movementNumber: 1,
-                      count: 5,
-                      weight: null,
-                      distanceUnit: null,
-                      deleted: false),
-                  movement: Movement(
-                      id: randomId(),
-                      userId: Settings.userId!,
-                      name: "pullup",
-                      description: null,
-                      cardio: false,
-                      deleted: false,
-                      dimension: MovementDimension.reps))
-            ],
-            hasReference: true)),
-    MetconSessionDescription(
-        metconSession: MetconSession(
-            id: randomId(),
-            userId: Settings.userId!,
-            metconId: Int64(1),
-            datetime: DateTime.now(),
-            time: null,
-            rounds: 2,
-            reps: 13,
-            rx: true,
-            comments: "so comments are here",
-            deleted: false),
-        metconDescription: MetconDescription(
-            metcon: Metcon(
-                id: randomId(),
-                userId: Settings.userId!,
-                name: "cindy",
-                metconType: MetconType.forTime,
-                rounds: 3,
-                timecap: const Duration(minutes: 30),
-                description: "my description",
-                deleted: false),
-            moves: [
-              MetconMovementDescription(
-                  metconMovement: MetconMovement(
-                      id: randomId(),
-                      metconId: Int64(1),
-                      movementId: Int64(1),
-                      movementNumber: 1,
-                      count: 5,
-                      weight: null,
-                      distanceUnit: null,
-                      deleted: false),
-                  movement: Movement(
-                      id: randomId(),
-                      userId: Settings.userId!,
-                      name: "pullup",
-                      description: null,
-                      cardio: false,
-                      deleted: false,
-                      dimension: MovementDimension.reps))
-            ],
-            hasReference: true))
-  ];
+  final _dataProvider = MetconSessionDescriptionDataProvider.instance;
+  List<MetconSessionDescription> _metconSessionDescriptions = [];
 
   DateFilterState _dateFilter = MonthFilter.current();
   Movement? _movement;
+
+  @override
+  void initState() {
+    super.initState();
+    _dataProvider.addListener(_update);
+    _dataProvider.onNoInternetConnection =
+        () => showSimpleSnackBar(context, 'No Internet connection.');
+    _update();
+  }
+
+  @override
+  void dispose() {
+    _dataProvider.removeListener(_update);
+    _dataProvider.onNoInternetConnection = null;
+    super.dispose();
+  }
+
+  Future<void> _update() async {
+    _logger.d(
+        'Updating metcon session page with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
+    final metconSessionDescriptions =
+        await _dataProvider.getByTimerangeAndMovement(
+            movementId: _movement?.id,
+            from: _dateFilter.start,
+            until: _dateFilter.end);
+    setState(() => _metconSessionDescriptions = metconSessionDescriptions);
+  }
+
+  Future<void> _pullFromServer() async {
+    await _dataProvider.pullFromServer().onError((error, stackTrace) {
+      if (error is ApiError) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -255,16 +100,18 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
             initialState: _dateFilter,
             onFilterChanged: (dateFilter) async {
               setState(() => _dateFilter = dateFilter);
-              //update(); TODO
+              await _update();
             },
           ),
         ),
       ),
-      body: ListView.builder(
-        itemBuilder: (_, index) => MetconSessionCard(
-            metconSessionDescription: _metconSessionDescriptions[index]),
-        itemCount: _metconSessionDescriptions.length,
-      ),
+      body: RefreshIndicator(
+          onRefresh: _pullFromServer,
+          child: ListView.builder(
+            itemBuilder: (_, index) => MetconSessionCard(
+                metconSessionDescription: _metconSessionDescriptions[index]),
+            itemCount: _metconSessionDescriptions.length,
+          )),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.metcon),
       drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
