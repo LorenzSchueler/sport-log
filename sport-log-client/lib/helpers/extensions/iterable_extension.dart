@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 extension IterableExtension<T> on Iterable<T> {
   Iterable<R> mapIndexed<R>(R Function(T element, int index) convert) sync* {
     var index = 0;
@@ -39,4 +41,40 @@ extension IterableExtension<T> on Iterable<T> {
   List<R> mapToListIndexed<R>(R Function(T element, int index) mapping) {
     return mapIndexed(mapping).toList();
   }
+}
+
+extension IterableNum<T extends num> on Iterable<T> {
+  T get max => isEmpty ? 0 as T : reduce(math.max);
+  T get min => isEmpty ? 0 as T : reduce(math.min);
+  T get sum => isEmpty ? 0 as T : reduce((a, b) => a + b as T);
+}
+
+extension IterableNumNullable<T extends num> on Iterable<T?> {
+  T? get max => isEmpty
+      ? null
+      : reduce((a, b) {
+          if (a != null && b != null) {
+            return math.max(a, b);
+          } else {
+            return a ?? b;
+          }
+        });
+  T? get min => isEmpty
+      ? null
+      : reduce((a, b) {
+          if (a != null && b != null) {
+            return math.min(a, b);
+          } else {
+            return a ?? b;
+          }
+        });
+  T? get sum => isEmpty
+      ? null
+      : reduce((a, b) {
+          if (a != null && b != null) {
+            return a + b as T;
+          } else {
+            return a ?? b;
+          }
+        });
 }

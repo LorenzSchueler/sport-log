@@ -1,5 +1,6 @@
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
@@ -29,51 +30,19 @@ class StrengthSessionStats {
 
   factory StrengthSessionStats.fromStrengthSets(
       DateTime datetime, List<StrengthSet> sets) {
-    int? minCount;
-    int? maxCount;
-    int sumCount = 0;
-    double? maxEorm;
-    double? maxWeight;
-    double? sumVolume;
-
-    for (final set in sets) {
-      if (minCount == null || set.count < minCount) {
-        minCount = set.count;
-      }
-      if (maxCount == null || set.count > maxCount) {
-        maxCount = set.count;
-      }
-      sumCount += set.count;
-      final eorm = set.eorm;
-      if (eorm != null) {
-        if (maxEorm == null || eorm > maxEorm) {
-          maxEorm = eorm;
-        }
-      }
-      final volume = set.volume;
-      if (volume != null) {
-        if (sumVolume == null) {
-          sumVolume = volume;
-        } else {
-          sumVolume += volume;
-        }
-      }
-      final weight = set.weight;
-      if (weight != null) {
-        if (maxWeight == null) {
-          maxWeight = weight;
-        } else {
-          maxWeight += weight;
-        }
-      }
-    }
+    int minCount = sets.map((s) => s.count).min;
+    int maxCount = sets.map((s) => s.count).max;
+    int sumCount = sets.map((s) => s.count).sum;
+    double? maxWeight = sets.map((s) => s.weight).max;
+    double? maxEorm = sets.map((s) => s.eorm).max;
+    double? sumVolume = sets.map((s) => s.volume).sum;
     double avgCount = sets.isEmpty ? 0 : sumCount / sets.length;
 
     return StrengthSessionStats._(
       datetime: datetime,
       numSets: sets.length,
-      minCount: minCount!,
-      maxCount: maxCount!,
+      minCount: minCount,
+      maxCount: maxCount,
       sumCount: sumCount,
       avgCount: avgCount,
       maxEorm: maxEorm,
