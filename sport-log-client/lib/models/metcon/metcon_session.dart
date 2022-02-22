@@ -64,7 +64,9 @@ class DbMetconSessionSerializer implements DbSerializer<MetconSession> {
       userId: Int64(r[prefix + Columns.userId]! as int),
       metconId: Int64(r[prefix + Columns.metconId]! as int),
       datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
-      time: r[prefix + Columns.time] as Duration?,
+      time: r[prefix + Columns.time] == null
+          ? null
+          : Duration(seconds: r[prefix + Columns.time]! as int),
       rounds: r[prefix + Columns.rounds] as int?,
       reps: r[prefix + Columns.reps] as int?,
       rx: r[prefix + Columns.rx]! as int == 1,

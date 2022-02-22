@@ -108,7 +108,9 @@ class DbCardioSessionSerializer implements DbSerializer<CardioSession> {
       distance: r[prefix + Columns.distance] as int?,
       ascent: r[prefix + Columns.ascent] as int?,
       descent: r[prefix + Columns.descent] as int?,
-      time: r[prefix + Columns.time] as Duration?,
+      time: r[prefix + Columns.time] == null
+          ? null
+          : Duration(seconds: r[prefix + Columns.time]! as int),
       calories: r[prefix + Columns.calories] as int?,
       track: const DbPositionListConverter()
           .mapToDart(r[prefix + Columns.track] as Uint8List?),
