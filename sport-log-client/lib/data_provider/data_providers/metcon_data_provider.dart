@@ -169,8 +169,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
 
   @override
   Future<List<MetconDescription>> getNonDeleted() async {
-    final metcons = await _metconDb.getNonDeleted();
-    return Future.wait(metcons
+    return Future.wait((await _metconDb.getNonDeleted())
         .map((metcon) async => MetconDescription(
             metcon: metcon,
             moves: await _getMmdByMetcon(metcon.id),
@@ -247,6 +246,104 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
         .map((mm) async => MetconMovementDescription(
             metconMovement: mm,
             movement: (await _movementDb.getSingle(mm.movementId))!))
+        .toList());
+  }
+
+  Future<MetconDescription?> getById(Int64 id) async {
+    final metcon = await _metconDataProvider.getById(id);
+    if (metcon == null) {
+      return null;
+    }
+    return MetconDescription(
+        metcon: metcon,
+        moves: await _getMmdByMetcon(metcon.id),
+        hasReference: await _metconSessionDb.existsByMetcon(metcon.id));
+  }
+}
+
+class MetconSessionDescriptionDataProvider
+    extends DataProvider<MetconSessionDescription> {
+  final _metconSessionDb = AppDatabase.metconSessions;
+
+  final _metconSessionDataProvider = MetconSessionDataProvider.instance;
+  final _metconDataProvider = MetconDataProvider.instance;
+  final _metconMovementDataProvider = MetconMovementDataProvider.instance;
+  final _movementDataProvider = MovementDataProvider.instance;
+  final _metconDescriptionDataProvider =
+      MetconDescriptionDataProvider.instance; // don't forward notifications
+
+  MetconSessionDescriptionDataProvider._();
+  static MetconSessionDescriptionDataProvider? _instance;
+  static MetconSessionDescriptionDataProvider get instance {
+    if (_instance == null) {
+      _instance = MetconSessionDescriptionDataProvider._();
+      _instance!._metconSessionDataProvider
+          .addListener(_instance!.notifyListeners);
+      _instance!._metconDataProvider.addListener(_instance!.notifyListeners);
+      _instance!._metconMovementDataProvider
+          .addListener(_instance!.notifyListeners);
+      _instance!._movementDataProvider.addListener(_instance!.notifyListeners);
+    }
+    return _instance!;
+  }
+
+  @override
+  Future<bool> createSingle(MetconSessionDescription object) async {
+    return await _metconSessionDataProvider.createSingle(object.metconSession);
+  }
+
+  @override
+  Future<bool> updateSingle(MetconSessionDescription object) async {
+    return await _metconSessionDataProvider.updateSingle(object.metconSession);
+  }
+
+  @override
+  Future<bool> deleteSingle(MetconSessionDescription object) async {
+    return await _metconSessionDataProvider.deleteSingle(object.metconSession);
+  }
+
+  @override
+  Future<List<MetconSessionDescription>> getNonDeleted() async {
+    return await _mapToDescription(
+        await _metconSessionDataProvider.getNonDeleted());
+  }
+
+  @override
+  Future<void> pullFromServer() async {
+    await _movementDataProvider.pullFromServer();
+    await _metconDataProvider.pullFromServer();
+    await _metconMovementDataProvider.pullFromServer();
+    await _metconSessionDataProvider.pullFromServer();
+  }
+
+  @override
+  Future<void> pushCreatedToServer() async {
+    await _metconSessionDataProvider.pushCreatedToServer();
+  }
+
+  @override
+  Future<void> pushUpdatedToServer() async {
+    await _metconSessionDataProvider.pushUpdatedToServer();
+  }
+
+  Future<List<MetconSessionDescription>> getByTimerangeAndMovement({
+    Int64? movementId,
+    DateTime? from,
+    DateTime? until,
+  }) async {
+    return await _mapToDescription(
+        await _metconSessionDb.getByTimerangeAndMovement(
+            from: from, until: until, movementIdValue: movementId));
+  }
+
+  Future<List<MetconSessionDescription>> _mapToDescription(
+      List<MetconSession> metconSessions) async {
+    return Future.wait(metconSessions
+        .map((session) async => MetconSessionDescription(
+              metconSession: session,
+              metconDescription:
+                  (await _metconDescriptionDataProvider.getById(session.id))!,
+            ))
         .toList());
   }
 }

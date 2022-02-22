@@ -1,4 +1,5 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/models/metcon/all.dart';
@@ -73,7 +74,7 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
     Column.bool(Columns.deleted).withDefault('0'),
     Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
     Column.int(Columns.userId),
-    Column.text(Columns.metconId)
+    Column.int(Columns.metconId)
         .references(Tables.metcon, onDelete: OnAction.noAction),
     Column.text(Columns.datetime),
     Column.int(Columns.time).nullable().checkGt(0),
@@ -87,5 +88,31 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
     return (await database.rawQuery('''select 1 from $tableName
             where ${Columns.metconId} = ${id.toInt()}
               and ${Columns.deleted} = 0''')).isNotEmpty;
+  }
+
+  Future<List<MetconSession>> getByTimerangeAndMovement({
+    Int64? movementIdValue,
+    DateTime? from,
+    DateTime? until,
+  }) async {
+    final records = await database.rawQuery('''
+      SELECT
+        ${table.allColumns}
+      FROM $tableName
+      WHERE $tableName.${Columns.deleted} = 0
+        ${fromFilter(from)}
+        ${untilFilter(until)}
+        ${movementIdFilter(movementIdValue)}
+      $groupById
+      $orderByDatetime
+      ;
+    ''', [
+      if (from != null) from.toString(),
+      if (until != null) until.toString(),
+      if (movementIdValue != null) movementIdValue.toInt(),
+    ]);
+    return records
+        .map((e) => serde.fromDbRecord(e, prefix: table.prefix))
+        .toList();
   }
 }
