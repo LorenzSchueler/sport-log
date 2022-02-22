@@ -66,7 +66,7 @@ class StrengthSet extends Entity {
   }
 }
 
-class DbStrengthSetSerializer implements DbSerializer<StrengthSet> {
+class DbStrengthSetSerializer extends DbSerializer<StrengthSet> {
   @override
   StrengthSet fromDbRecord(DbRecord r, {String prefix = ''}) {
     return StrengthSet(

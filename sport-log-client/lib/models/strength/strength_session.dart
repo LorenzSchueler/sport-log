@@ -62,7 +62,7 @@ class StrengthSession extends Entity {
   }
 }
 
-class DbStrengthSessionSerializer implements DbSerializer<StrengthSession> {
+class DbStrengthSessionSerializer extends DbSerializer<StrengthSession> {
   @override
   StrengthSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return StrengthSession(

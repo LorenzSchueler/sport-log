@@ -42,7 +42,7 @@ class Action extends Entity {
   }
 }
 
-class DbActionSerializer implements DbSerializer<Action> {
+class DbActionSerializer extends DbSerializer<Action> {
   @override
   Action fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Action(

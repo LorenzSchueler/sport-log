@@ -114,7 +114,7 @@ class Metcon extends Entity {
   }
 }
 
-class DbMetconSerializer implements DbSerializer<Metcon> {
+class DbMetconSerializer extends DbSerializer<Metcon> {
   @override
   Metcon fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Metcon(

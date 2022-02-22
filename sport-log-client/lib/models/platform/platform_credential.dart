@@ -44,8 +44,7 @@ class PlatformCredential extends Entity {
   }
 }
 
-class DbPlatformCredentialSerializer
-    implements DbSerializer<PlatformCredential> {
+class DbPlatformCredentialSerializer extends DbSerializer<PlatformCredential> {
   @override
   PlatformCredential fromDbRecord(DbRecord r, {String prefix = ''}) {
     return PlatformCredential(

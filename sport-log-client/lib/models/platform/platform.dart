@@ -34,7 +34,7 @@ class Platform extends Entity {
   }
 }
 
-class DbPlatformSerializer implements DbSerializer<Platform> {
+class DbPlatformSerializer extends DbSerializer<Platform> {
   @override
   Platform fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Platform(

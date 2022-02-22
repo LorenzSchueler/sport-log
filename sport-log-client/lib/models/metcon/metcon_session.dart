@@ -56,7 +56,7 @@ class MetconSession extends Entity {
   }
 }
 
-class DbMetconSessionSerializer implements DbSerializer<MetconSession> {
+class DbMetconSessionSerializer extends DbSerializer<MetconSession> {
   @override
   MetconSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return MetconSession(

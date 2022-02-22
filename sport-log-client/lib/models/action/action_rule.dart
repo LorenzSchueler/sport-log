@@ -47,7 +47,7 @@ class ActionRule extends Entity {
   }
 }
 
-class DbActionRuleSerializer implements DbSerializer<ActionRule> {
+class DbActionRuleSerializer extends DbSerializer<ActionRule> {
   @override
   ActionRule fromDbRecord(DbRecord r, {String prefix = ''}) {
     return ActionRule(

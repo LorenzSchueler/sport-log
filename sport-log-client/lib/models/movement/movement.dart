@@ -118,7 +118,7 @@ class Movement extends Entity {
       Object.hash(id, userId, name, description, cardio, deleted, dimension);
 }
 
-class DbMovementSerializer implements DbSerializer<Movement> {
+class DbMovementSerializer extends DbSerializer<Movement> {
   @override
   Movement fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Movement(

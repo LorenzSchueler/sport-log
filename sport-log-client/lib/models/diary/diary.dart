@@ -42,7 +42,7 @@ class Diary extends Entity {
   }
 }
 
-class DbDiarySerializer implements DbSerializer<Diary> {
+class DbDiarySerializer extends DbSerializer<Diary> {
   @override
   Diary fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Diary(

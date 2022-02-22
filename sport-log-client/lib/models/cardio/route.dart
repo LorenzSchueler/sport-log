@@ -57,7 +57,7 @@ class Route extends Entity with Comparable<Route> {
   }
 }
 
-class DbRouteSerializer implements DbSerializer<Route> {
+class DbRouteSerializer extends DbSerializer<Route> {
   @override
   Route fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Route(

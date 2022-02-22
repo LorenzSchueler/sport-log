@@ -89,7 +89,7 @@ class MetconMovement extends Entity {
   }
 }
 
-class DbMetconMovementSerializer implements DbSerializer<MetconMovement> {
+class DbMetconMovementSerializer extends DbSerializer<MetconMovement> {
   @override
   MetconMovement fromDbRecord(DbRecord r, {String prefix = ''}) {
     return MetconMovement(

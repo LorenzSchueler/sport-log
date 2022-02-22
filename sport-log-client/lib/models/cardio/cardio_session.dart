@@ -96,7 +96,7 @@ class CardioSession extends Entity {
   }
 }
 
-class DbCardioSessionSerializer implements DbSerializer<CardioSession> {
+class DbCardioSessionSerializer extends DbSerializer<CardioSession> {
   @override
   CardioSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return CardioSession(

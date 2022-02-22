@@ -38,7 +38,7 @@ class Wod extends Entity {
   }
 }
 
-class DbWodSerializer implements DbSerializer<Wod> {
+class DbWodSerializer extends DbSerializer<Wod> {
   @override
   Wod fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Wod(

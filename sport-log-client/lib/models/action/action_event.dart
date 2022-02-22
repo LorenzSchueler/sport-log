@@ -44,7 +44,7 @@ class ActionEvent extends Entity {
   }
 }
 
-class DbActionEventSerializer implements DbSerializer<ActionEvent> {
+class DbActionEventSerializer extends DbSerializer<ActionEvent> {
   @override
   ActionEvent fromDbRecord(DbRecord r, {String prefix = ''}) {
     return ActionEvent(

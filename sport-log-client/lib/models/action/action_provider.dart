@@ -42,7 +42,7 @@ class ActionProvider extends Entity {
   }
 }
 
-class DbActionProviderSerializer implements DbSerializer<ActionProvider> {
+class DbActionProviderSerializer extends DbSerializer<ActionProvider> {
   @override
   ActionProvider fromDbRecord(DbRecord r, {String prefix = ''}) {
     return ActionProvider(
