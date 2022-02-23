@@ -32,32 +32,32 @@ class MainDrawer extends StatelessWidget {
             title: const Text('Workout Tracking'),
             leading: const Icon(CustomIcons.dumbbellRotated),
             onTap: () {
-              Nav.changeNamed(context, Routes.timeline.overview);
+              Nav.newBase(context, Routes.timeline.overview);
             },
             selected: selectedRoute == Routes.timeline.overview,
           ),
           ListTile(
             leading: const Icon(Icons.play_circle_rounded),
             title: const Text('Server Actions'),
-            onTap: () => Nav.changeNamed(context, Routes.action.overview),
+            onTap: () => Nav.newBase(context, Routes.action.overview),
             selected: selectedRoute == Routes.action.overview,
           ),
           ListTile(
             leading: const Icon(CustomIcons.stopwatch),
             title: const Text('Timer'),
-            onTap: () => Nav.changeNamed(context, Routes.timer),
+            onTap: () => Nav.newBase(context, Routes.timer),
             selected: selectedRoute == Routes.timer,
           ),
           ListTile(
             leading: const Icon(Icons.map),
             title: const Text('Map'),
-            onTap: () => Nav.changeNamed(context, Routes.map),
+            onTap: () => Nav.newBase(context, Routes.map),
             selected: selectedRoute == Routes.map,
           ),
           ListTile(
             leading: const Icon(Icons.file_download),
             title: const Text('Offline Maps'),
-            onTap: () => Nav.changeNamed(context, Routes.offlineMaps),
+            onTap: () => Nav.newBase(context, Routes.offlineMaps),
             selected: selectedRoute == Routes.offlineMaps,
           ),
           ExpansionTile(
@@ -67,7 +67,7 @@ class MainDrawer extends StatelessWidget {
               ListTile(
                 title: const Text('Movements'),
                 leading: const Icon(CustomIcons.trendingUp),
-                onTap: () => Nav.changeNamed(context, Routes.movement.overview),
+                onTap: () => Nav.newBase(context, Routes.movement.overview),
                 selected: selectedRoute == Routes.movement.overview,
               ),
             ],
@@ -76,7 +76,7 @@ class MainDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.settings),
             title: const Text('Settings'),
-            onTap: () => Nav.changeNamed(context, Routes.settings),
+            onTap: () => Nav.newBase(context, Routes.settings),
             selected: selectedRoute == Routes.settings,
           ),
           Consumer<Sync>(
@@ -116,7 +116,7 @@ class MainDrawer extends StatelessWidget {
                     ? null
                     : () async {
                         await Account.logout();
-                        Nav.changeNamed(context, Routes.landing);
+                        Nav.newBase(context, Routes.landing);
                       },
               ),
             ),

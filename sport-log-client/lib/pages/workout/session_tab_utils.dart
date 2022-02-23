@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
+import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 
@@ -17,7 +18,7 @@ extension SessionTabUtils on SessionsPageTab {
       Routes.cardio.overview,
       Routes.diary.overview,
     ];
-    Navigator.pushReplacementNamed(context, sessionRoutes[index]);
+    Nav.newBase(context, sessionRoutes[index]);
   }
 
   static List<BottomNavigationBarItem> get bottomNavItems {

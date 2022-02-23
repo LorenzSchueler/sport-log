@@ -238,7 +238,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       _registrationPending = false;
     });
     if (result.isSuccess) {
-      Nav.changeNamed(context, Routes.timeline.overview);
+      Nav.newBase(context, Routes.timeline.overview);
     } else {
       await showMessageDialog(context: context, text: result.failure);
     }

@@ -138,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
       _loginPending = false;
     });
     if (result.isSuccess) {
-      Nav.changeNamed(context, Routes.timeline.overview);
+      Nav.newBase(context, Routes.timeline.overview);
     } else {
       await showMessageDialog(context: context, text: result.failure);
     }
