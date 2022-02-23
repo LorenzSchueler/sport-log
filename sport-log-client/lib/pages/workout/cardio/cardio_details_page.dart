@@ -109,7 +109,13 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                                 initialCameraPosition: CameraPosition(
                                   zoom: 14.0,
                                   target: cardioSessionDescription
-                                      .cardioSession.track!.first.latLng,
+                                                  .cardioSession.track ==
+                                              null ||
+                                          cardioSessionDescription
+                                              .cardioSession.track!.isEmpty
+                                      ? Defaults.mapbox.cameraPosition
+                                      : cardioSessionDescription
+                                          .cardioSession.track!.first.latLng,
                                 ),
                                 onMapCreated:
                                     (MapboxMapController controller) =>

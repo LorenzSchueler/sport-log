@@ -126,7 +126,8 @@ class RouteCard extends StatelessWidget {
     return GestureDetector(
         onTap: () => showDetails(context),
         child: Card(
-          child: Column(children: [
+        child: Column(
+          children: [
             Defaults.sizedBox.vertical.small,
             Text(
               route.name,
@@ -140,7 +141,9 @@ class RouteCard extends StatelessWidget {
                   styleString: Defaults.mapbox.style.outdoor,
                   initialCameraPosition: CameraPosition(
                     zoom: 13.0,
-                    target: route.track.first.latLng,
+                  target: route.track.isEmpty
+                      ? Defaults.mapbox.cameraPosition
+                      : route.track.first.latLng,
                   ),
                   onMapCreated: (MapboxMapController controller) =>
                       _sessionMapController = controller,
@@ -150,7 +153,8 @@ class RouteCard extends StatelessWidget {
                         geometry: route.track.map((c) => c.latLng).toList()));
                   },
                   onMapClick: (_, __) => showDetails(context),
-                )),
+              ),
+            ),
             Defaults.sizedBox.vertical.small,
             Row(children: [
               Expanded(

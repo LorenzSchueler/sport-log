@@ -294,9 +294,9 @@ class RouteEditPageState extends State<RouteEditPage> {
                   child: MapboxMap(
                 accessToken: Defaults.mapbox.accessToken,
                 styleString: Defaults.mapbox.style.outdoor,
-                initialCameraPosition: const CameraPosition(
+                initialCameraPosition: CameraPosition(
                   zoom: 13.0,
-                  target: LatLng(47.27, 11.33),
+                  target: Defaults.mapbox.cameraPosition,
                 ),
                 compassEnabled: true,
                 compassViewPosition: CompassViewPosition.TopRight,
@@ -329,13 +329,13 @@ class RouteEditPageState extends State<RouteEditPage> {
                   rowSpacer,
                   TableRow(children: [
                     ValueUnitDescription(
-                      value: 231.toString(),
+                      value: "???",
                       unit: "m",
                       description: "ascent",
                       scale: 1.3,
                     ),
                     ValueUnitDescription(
-                      value: 51.toString(),
+                      value: "???",
                       unit: "m",
                       description: "descent",
                       scale: 1.3,

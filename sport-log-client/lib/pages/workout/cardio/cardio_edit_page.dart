@@ -100,8 +100,14 @@ class CardioEditPageState extends State<CardioEditPage> {
                           styleString: Defaults.mapbox.style.outdoor,
                           initialCameraPosition: CameraPosition(
                             zoom: 13.0,
-                            target: _cardioSessionDescription
-                                .cardioSession.track!.first.latLng,
+                            target:
+                                _cardioSessionDescription.cardioSession.track ==
+                                            null ||
+                                        _cardioSessionDescription
+                                            .cardioSession.track!.isEmpty
+                                    ? Defaults.mapbox.cameraPosition
+                                    : _cardioSessionDescription
+                                        .cardioSession.track!.first.latLng,
                           ),
                           onMapCreated: (MapboxMapController controller) =>
                               _sessionMapController = controller,

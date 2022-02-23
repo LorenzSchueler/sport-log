@@ -86,10 +86,11 @@ class DiaryPageState extends State<DiaryPage> {
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.diary),
       drawer: MainDrawer(selectedRoute: Routes.diary.overview),
       floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: () {
-            Navigator.of(context).pushNamed(Routes.diary.edit);
-          }),
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.of(context).pushNamed(Routes.diary.edit);
+        },
+      ),
     );
   }
 }
@@ -102,38 +103,41 @@ class DiaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () {
-          Navigator.of(context).pushNamed(Routes.diary.edit, arguments: diary);
-        },
-        child: Card(
-            child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      formatDate(diary.date),
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                    Defaults.sizedBox.horizontal.big,
-                    SizedBox(
-                      width: 80,
-                      child: diary.bodyweight != null
-                          ? ValueUnitDescription(
-                              value: diary.bodyweight!.toStringAsFixed(1),
-                              unit: "kg",
-                              description: null)
-                          : null,
-                    ),
-                    Defaults.sizedBox.horizontal.big,
-                    Expanded(
-                      child: Text(
-                        diary.comments ?? "",
-                        textAlign: TextAlign.start,
-                        softWrap: true,
-                      ),
-                    ),
-                  ],
-                ))));
+      onTap: () {
+        Navigator.of(context).pushNamed(Routes.diary.edit, arguments: diary);
+      },
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                formatDate(diary.date),
+                style: const TextStyle(fontSize: 20),
+              ),
+              Defaults.sizedBox.horizontal.big,
+              SizedBox(
+                width: 80,
+                child: diary.bodyweight != null
+                    ? ValueUnitDescription(
+                        value: diary.bodyweight!.toStringAsFixed(1),
+                        unit: "kg",
+                        description: null)
+                    : null,
+              ),
+              Defaults.sizedBox.horizontal.big,
+              Expanded(
+                child: Text(
+                  diary.comments ?? "",
+                  textAlign: TextAlign.start,
+                  softWrap: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -339,9 +339,9 @@ satelites: ${location.satelliteNumber}""";
               child: MapboxMap(
             accessToken: Defaults.mapbox.accessToken,
             styleString: Defaults.mapbox.style.outdoor,
-            initialCameraPosition: const CameraPosition(
+            initialCameraPosition: CameraPosition(
               zoom: 15.0,
-              target: LatLng(47.27, 11.33),
+              target: Defaults.mapbox.cameraPosition,
             ),
             compassEnabled: true,
             compassViewPosition: CompassViewPosition.TopRight,

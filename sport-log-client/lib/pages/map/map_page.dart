@@ -40,9 +40,9 @@ class MapPageState extends State<MapPage> {
           MapboxMap(
             accessToken: Defaults.mapbox.accessToken,
             styleString: mapStyle,
-            initialCameraPosition: const CameraPosition(
+            initialCameraPosition: CameraPosition(
               zoom: 13.0,
-              target: LatLng(47.27, 11.33),
+              target: Defaults.mapbox.cameraPosition,
             ),
             onMapCreated: (MapboxMapController controller) =>
                 _sessionMapController = controller,

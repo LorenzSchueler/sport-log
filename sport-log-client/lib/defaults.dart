@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
 
 abstract class Defaults {
   static const sizedBox = _SizedBox();
@@ -83,6 +84,7 @@ class _Mapbox {
 
   final style = const _Style();
   final markerColor = "#0060a0";
+  final cameraPosition = const LatLng(47.27, 11.33);
 }
 
 class _Style {

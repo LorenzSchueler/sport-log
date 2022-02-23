@@ -229,8 +229,13 @@ class CardioSessionCard extends StatelessWidget {
                       styleString: Defaults.mapbox.style.outdoor,
                       initialCameraPosition: CameraPosition(
                         zoom: 13.0,
-                        target: cardioSessionDescription
-                            .cardioSession.track!.first.latLng,
+                        target: cardioSessionDescription.cardioSession.track ==
+                                    null ||
+                                cardioSessionDescription
+                                    .cardioSession.track!.isEmpty
+                            ? Defaults.mapbox.cameraPosition
+                            : cardioSessionDescription
+                                .cardioSession.track!.first.latLng,
                       ),
                       onMapCreated: (MapboxMapController controller) =>
                           _sessionMapController = controller,
