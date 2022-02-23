@@ -309,7 +309,7 @@ satelites: ${location.satelliteNumber}""";
         Expanded(
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(primary: Colors.red[400]),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Navigator.pop(context),
                 child: const Text("cancel"))),
       ];
     }

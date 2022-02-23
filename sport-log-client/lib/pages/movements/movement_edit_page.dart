@@ -80,13 +80,13 @@ class _EditMovementPageState extends State<EditMovementPage> {
       assert(_md.movement.userId != null && _hasChanges);
       // TODO: do error handling
       await _dataProvider.updateSingle(_md.movement);
-      Navigator.of(context)
-          .pop(ReturnObject(action: ReturnAction.updated, payload: _md));
+      Navigator.pop(
+          context, ReturnObject(action: ReturnAction.updated, payload: _md));
     } else {
       // TODO: do error handling
       await _dataProvider.createSingle(_md.movement);
-      Navigator.of(context)
-          .pop(ReturnObject(action: ReturnAction.created, payload: _md));
+      Navigator.pop(
+          context, ReturnObject(action: ReturnAction.created, payload: _md));
     }
   }
 
@@ -94,10 +94,10 @@ class _EditMovementPageState extends State<EditMovementPage> {
     if (widget._isEditing) {
       assert(_md.movement.userId != null);
       _dataProvider.deleteSingle(_md.movement);
-      Navigator.of(context)
-          .pop(ReturnObject(action: ReturnAction.deleted, payload: _md));
+      Navigator.pop(
+          context, ReturnObject(action: ReturnAction.deleted, payload: _md));
     } else {
-      Navigator.of(context).pop();
+      Navigator.pop(context);
     }
   }
 
@@ -115,7 +115,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
                 final bool? approved = await showDiscardWarningDialog(context);
                 if (approved == null || !approved) return;
               }
-              Navigator.of(context).pop();
+              Navigator.pop(context);
             },
             icon: const Icon(Icons.arrow_back),
           ),

@@ -103,7 +103,7 @@ class _DateFilterState extends State<DateFilter> {
               onTap: () {
                 setState(() => _state = filter);
                 widget.onFilterChanged(_state);
-                Navigator.of(context).pop();
+                Navigator.pop(context);
               },
               selected: selected,
             );

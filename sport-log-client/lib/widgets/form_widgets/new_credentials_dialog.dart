@@ -149,7 +149,7 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
       _loginPending = false;
     });
     if (result.isSuccess) {
-      Navigator.of(context).pop(result.success);
+      Navigator.pop(context, result.success);
     } else {
       setState(() {
         _errorMessage = result.failure;

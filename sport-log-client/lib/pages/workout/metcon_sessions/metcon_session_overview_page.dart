@@ -71,7 +71,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         actions: [
           IconButton(
               onPressed: () =>
-                  Navigator.of(context).pushNamed(Routes.metcon.overview),
+                  Navigator.pushNamed(context, Routes.metcon.overview),
               icon: const Icon(CustomIcons.plan)),
           IconButton(
             onPressed: () async {
@@ -118,7 +118,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
-            Navigator.of(context).pushNamed(Routes.metcon.sessionEdit);
+            Navigator.pushNamed(context, Routes.metcon.sessionEdit);
           }),
     );
   }
@@ -134,7 +134,7 @@ class MetconSessionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-          Navigator.of(context).pushNamed(Routes.metcon.sessionEdit,
+          Navigator.pushNamed(context, Routes.metcon.sessionEdit,
               arguments: metconSessionDescription);
         },
         child: Card(
@@ -146,8 +146,8 @@ class MetconSessionCard extends StatelessWidget {
               : null,
           title: Text(metconSessionDescription.metconDescription.name),
           subtitle: Text(metconSessionDescription.longResultDescription),
-          onTap: () => Navigator.of(context).pushNamed(
-              Routes.metcon.sessionDetails,
+          onTap: () => Navigator.pushNamed(
+              context, Routes.metcon.sessionDetails,
               arguments: metconSessionDescription),
         )));
   }

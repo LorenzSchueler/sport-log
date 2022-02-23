@@ -46,8 +46,8 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
           actions: [
             IconButton(
                 onPressed: () async {
-                  final returnObj = await Navigator.of(context).pushNamed(
-                      Routes.metcon.sessionEdit,
+                  final returnObj = await Navigator.pushNamed(
+                      context, Routes.metcon.sessionEdit,
                       arguments: metconSessionDescription);
                   if (returnObj is ReturnObject<MetconSessionDescription>) {
                     setState(() {

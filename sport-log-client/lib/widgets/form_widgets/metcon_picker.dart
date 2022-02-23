@@ -46,7 +46,7 @@ class MetconPickerDialog extends StatelessWidget {
     return ListTile(
       title: Text(metconDescription.name),
       onTap: () {
-        Navigator.of(context).pop(metconDescription);
+        Navigator.pop(context, metconDescription);
       },
     );
   }

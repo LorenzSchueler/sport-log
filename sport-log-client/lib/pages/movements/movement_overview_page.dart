@@ -86,7 +86,7 @@ class _MovementsPageState extends State<MovementsPage> {
           child: const Icon(Icons.add),
           onPressed: () async {
             final returnObj =
-                await Navigator.of(context).pushNamed(Routes.movement.edit);
+                await Navigator.pushNamed(context, Routes.movement.edit);
             _handlePageReturn(returnObj);
           }),
     );
@@ -150,7 +150,8 @@ class _MovementsPageState extends State<MovementsPage> {
                             'Changes will be reflected in existing workouts.');
                         if (approved == null || !approved) return;
                       }
-                      final returnObj = await Navigator.of(context).pushNamed(
+                      final returnObj = await Navigator.pushNamed(
+                        context,
                         Routes.movement.edit,
                         arguments: md.copy(),
                       );

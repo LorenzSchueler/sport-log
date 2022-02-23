@@ -79,7 +79,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         actions: [
           IconButton(
               onPressed: () =>
-                  Navigator.of(context).pushNamed(Routes.cardio.routeOverview),
+                  Navigator.pushNamed(context, Routes.cardio.routeOverview),
               icon: const Icon(CustomIcons.route)),
           IconButton(
             onPressed: () async {
@@ -129,15 +129,15 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
           ActionButton(
               icon: const Icon(CustomIcons.stopwatch),
               onPressed: () async {
-                final returnObj = await Navigator.of(context)
-                    .pushNamed(Routes.cardio.trackingSettings);
+                final returnObj = await Navigator.pushNamed(
+                    context, Routes.cardio.trackingSettings);
                 _handleNewCardioSession(returnObj);
               }),
           ActionButton(
               icon: const Icon(Icons.notes_rounded),
               onPressed: () async {
-                final returnObj = await Navigator.of(context)
-                    .pushNamed(Routes.cardio.cardioEdit);
+                final returnObj = await Navigator.pushNamed(
+                    context, Routes.cardio.cardioEdit);
                 _handleNewCardioSession(returnObj);
               }),
         ],
@@ -177,7 +177,7 @@ class CardioSessionCard extends StatelessWidget {
       : super(key: key);
 
   void showDetails(BuildContext context) {
-    Navigator.of(context).pushNamed(Routes.cardio.cardioDetails,
+    Navigator.pushNamed(context, Routes.cardio.cardioDetails,
         arguments: cardioSessionDescription);
   }
 

@@ -69,11 +69,13 @@ class CardioEditPageState extends State<CardioEditPage> {
 
   void _saveCardioSession() {
     // TODO save in Db
-    Navigator.of(context).pop(ReturnObject(
-        action: widget.cardioSessionDescription != null
-            ? ReturnAction.updated
-            : ReturnAction.created,
-        payload: _cardioSessionDescription));
+    Navigator.pop(
+        context,
+        ReturnObject(
+            action: widget.cardioSessionDescription != null
+                ? ReturnAction.updated
+                : ReturnAction.created,
+            payload: _cardioSessionDescription));
   }
 
   @override

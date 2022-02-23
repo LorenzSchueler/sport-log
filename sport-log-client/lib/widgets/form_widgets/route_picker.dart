@@ -44,7 +44,7 @@ class RoutePickerDialog extends StatelessWidget {
     return ListTile(
       title: Text(route.name),
       onTap: () {
-        Navigator.of(context).pop(route);
+        Navigator.pop(context, route);
       },
     );
   }

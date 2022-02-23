@@ -47,8 +47,8 @@ class _MetconsPageState extends State<MetconsPage> {
         title: const Text("Metcons"),
         actions: [
           IconButton(
-              onPressed: () => Navigator.of(context)
-                  .pushNamed(Routes.metcon.sessionOverview),
+              onPressed: () =>
+                  Navigator.pushNamed(context, Routes.metcon.sessionOverview),
               icon: const Icon(CustomIcons.plan)),
         ],
       ),
@@ -60,7 +60,7 @@ class _MetconsPageState extends State<MetconsPage> {
           child: const Icon(Icons.add),
           onPressed: () async {
             final returnObject =
-                await Navigator.of(context).pushNamed(Routes.metcon.edit);
+                await Navigator.pushNamed(context, Routes.metcon.edit);
             _handleNewMetcon(returnObject);
           }),
     );
@@ -111,8 +111,8 @@ class _MetconsPageState extends State<MetconsPage> {
                   });
                   break;
                 case _editChoice:
-                  await Navigator.of(context)
-                      .pushNamed(Routes.metcon.edit, arguments: md);
+                  await Navigator.pushNamed(context, Routes.metcon.edit,
+                      arguments: md);
                   _update();
                   break;
               }

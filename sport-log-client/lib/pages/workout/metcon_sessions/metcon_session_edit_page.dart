@@ -80,11 +80,13 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
 
   void _saveMetconSession() {
     // TODO save in Db
-    Navigator.of(context).pop(ReturnObject(
-        action: widget.metconSessionDescription != null
-            ? ReturnAction.updated
-            : ReturnAction.created,
-        payload: _metconSessionDescription));
+    Navigator.pop(
+        context,
+        ReturnObject(
+            action: widget.metconSessionDescription != null
+                ? ReturnAction.updated
+                : ReturnAction.created,
+            payload: _metconSessionDescription));
   }
 
   @override

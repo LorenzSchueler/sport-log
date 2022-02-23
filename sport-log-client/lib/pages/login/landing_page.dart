@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:sport_log/routes.dart';
 
@@ -12,24 +11,23 @@ class LandingPage extends StatelessWidget {
         title: const Text("Landing"),
       ),
       body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(Routes.login);
-              },
-              child: const Text("Login"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(Routes.registration);
-              },
-              child: const Text("Register"),
-            ),
-          ],
-        )
-      ),
+          child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushNamed(context, Routes.login);
+            },
+            child: const Text("Login"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushNamed(context, Routes.registration);
+            },
+            child: const Text("Register"),
+          ),
+        ],
+      )),
     );
   }
 }

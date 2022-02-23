@@ -122,22 +122,22 @@ class _EditMetconPageState extends State<EditMetconPage> {
     }
     if (widget._isEditing) {
       await _dataProvider.updateSingle(_md);
-      Navigator.of(context)
-          .pop(ReturnObject(action: ReturnAction.updated, payload: _md));
+      Navigator.pop(
+          context, ReturnObject(action: ReturnAction.updated, payload: _md));
     } else {
       await _dataProvider.createSingle(_md);
-      Navigator.of(context)
-          .pop(ReturnObject(action: ReturnAction.created, payload: _md));
+      Navigator.pop(
+          context, ReturnObject(action: ReturnAction.created, payload: _md));
     }
   }
 
   void _delete() async {
     if (widget._isEditing) {
       await _dataProvider.deleteSingle(_md);
-      Navigator.of(context)
-          .pop(ReturnObject(action: ReturnAction.deleted, payload: _md));
+      Navigator.pop(
+          context, ReturnObject(action: ReturnAction.deleted, payload: _md));
     } else {
-      Navigator.of(context).pop();
+      Navigator.pop(context);
     }
   }
 

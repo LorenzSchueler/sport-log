@@ -211,7 +211,7 @@ class SettingsPageState extends State<SettingsPage> {
               const CaptionTile(caption: "About"),
               ListTile(
                   title: const Text('About'),
-                  onTap: () => Navigator.of(context).pushNamed(Routes.about)),
+                  onTap: () => Navigator.pushNamed(context, Routes.about)),
             ],
           )),
       drawer: const MainDrawer(selectedRoute: Routes.settings),

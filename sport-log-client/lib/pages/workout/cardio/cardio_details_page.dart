@@ -83,8 +83,8 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
           actions: [
             IconButton(
                 onPressed: () async {
-                  final returnObj = await Navigator.of(context).pushNamed(
-                      Routes.cardio.cardioEdit,
+                  final returnObj = await Navigator.pushNamed(
+                      context, Routes.cardio.cardioEdit,
                       arguments: cardioSessionDescription);
                   if (returnObj is ReturnObject<CardioSessionDescription>) {
                     setState(() {

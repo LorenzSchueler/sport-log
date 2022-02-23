@@ -60,8 +60,8 @@ class _StrengthSessionDetailsPageState
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.of(context)
-                  .pushNamed(Routes.strength.edit, arguments: session);
+              Navigator.pushNamed(context, Routes.strength.edit,
+                  arguments: session);
             },
             icon: const Icon(Icons.edit_sharp),
           ),

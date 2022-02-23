@@ -54,7 +54,7 @@ class RouteEditPageState extends State<RouteEditPage> {
         : await _dataProvider.createSingle(_route);
     if (result) {
       _formKey.currentState!.deactivate();
-      Navigator.of(context).pop();
+      Navigator.pop(context);
     } else {
       await showMessageDialog(
           context: context, text: 'Creating Route Entry failed.');
@@ -66,7 +66,7 @@ class RouteEditPageState extends State<RouteEditPage> {
       await _dataProvider.deleteSingle(_route);
     }
     _formKey.currentState!.deactivate();
-    Navigator.of(context).pop();
+    Navigator.pop(context);
   }
 
   Future<void> _matchLocations() async {

@@ -63,7 +63,7 @@ class RoutePageState extends State<RoutePage> {
         actions: [
           IconButton(
               onPressed: () =>
-                  Navigator.of(context).pushNamed(Routes.cardio.overview),
+                  Navigator.pushNamed(context, Routes.cardio.overview),
               icon: const Icon(CustomIcons.heartbeat)),
         ],
       ),
@@ -79,7 +79,7 @@ class RoutePageState extends State<RoutePage> {
       drawer: MainDrawer(selectedRoute: Routes.cardio.routeOverview),
       floatingActionButton: FloatingActionButton(
         onPressed: () async =>
-            await Navigator.of(context).pushNamed(Routes.cardio.routeEdit),
+            await Navigator.pushNamed(context, Routes.cardio.routeEdit),
         child: const Icon(Icons.add),
       ),
     );
@@ -92,7 +92,7 @@ class RouteCard extends StatelessWidget {
   const RouteCard({required this.route, Key? key}) : super(key: key);
 
   void showDetails(BuildContext context) {
-    Navigator.of(context).pushNamed(Routes.cardio.routeEdit, arguments: route);
+    Navigator.pushNamed(context, Routes.cardio.routeEdit, arguments: route);
   }
 
   @override

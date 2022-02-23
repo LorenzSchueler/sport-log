@@ -9,11 +9,11 @@ Future<bool?> showApproveDialog(
       content: Text(description),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
+          onPressed: () => Navigator.pop(context, false),
           child: const Text('Cancel'),
         ),
         TextButton(
-          onPressed: () => Navigator.of(context).pop(true),
+          onPressed: () => Navigator.pop(context, true),
           child: const Text('Approve'),
         )
       ],
@@ -34,7 +34,7 @@ Future<void> showWarning(
       content: Text(description),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.pop(context),
           child: const Text('Ok'),
         ),
       ],

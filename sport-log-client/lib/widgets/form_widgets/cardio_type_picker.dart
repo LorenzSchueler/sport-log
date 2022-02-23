@@ -24,21 +24,21 @@ class CardioTypePickerDialog extends StatelessWidget {
             ListTile(
               title: Text(CardioType.training.name),
               onTap: () {
-                Navigator.of(context).pop(CardioType.training);
+                Navigator.pop(context, CardioType.training);
               },
             ),
             const Divider(),
             ListTile(
               title: Text(CardioType.activeRecovery.name),
               onTap: () {
-                Navigator.of(context).pop(CardioType.activeRecovery);
+                Navigator.pop(context, CardioType.activeRecovery);
               },
             ),
             const Divider(),
             ListTile(
               title: Text(CardioType.freetime.name),
               onTap: () {
-                Navigator.of(context).pop(CardioType.freetime);
+                Navigator.pop(context, CardioType.freetime);
               },
             ),
           ],

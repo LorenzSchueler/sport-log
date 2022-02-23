@@ -145,7 +145,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
-            Navigator.of(context).pushNamed(Routes.strength.edit);
+            Navigator.pushNamed(context, Routes.strength.edit);
           }),
     );
   }
@@ -156,8 +156,8 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
       title: Text(
           '${s.session.datetime.toHumanWithTime()} • ${s.stats.numSets} ${plural('set', 'sets', s.stats.numSets)}'),
       subtitle: Text(s.stats.toDisplayName(s.movement.dimension)),
-      onTap: () => Navigator.of(context)
-          .pushNamed(Routes.strength.details, arguments: s.session.id),
+      onTap: () => Navigator.pushNamed(context, Routes.strength.details,
+          arguments: s.session.id),
     ));
   }
 }
@@ -176,7 +176,7 @@ class StrengthSessionCard extends StatelessWidget {
       title: Text(strengthSessionWithStats.movement.name),
       subtitle: Text(
           '${strengthSessionWithStats.session.datetime.toHumanWithTime()} • ${strengthSessionWithStats.stats.numSets} ${plural('set', 'sets', strengthSessionWithStats.stats.numSets)}'),
-      onTap: () => Navigator.of(context).pushNamed(Routes.strength.details,
+      onTap: () => Navigator.pushNamed(context, Routes.strength.details,
           arguments: strengthSessionWithStats.session.id),
     ));
   }

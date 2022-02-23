@@ -88,7 +88,7 @@ class DiaryPageState extends State<DiaryPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () {
-          Navigator.of(context).pushNamed(Routes.diary.edit);
+          Navigator.pushNamed(context, Routes.diary.edit);
         },
       ),
     );
@@ -104,7 +104,7 @@ class DiaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).pushNamed(Routes.diary.edit, arguments: diary);
+        Navigator.pushNamed(context, Routes.diary.edit, arguments: diary);
       },
       child: Card(
         child: Padding(

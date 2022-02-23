@@ -97,7 +97,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
                       return;
                     }
                     assert(returnObject.action == ReturnAction.created);
-                    Navigator.of(context).pop(returnObject.payload.movement);
+                    Navigator.pop(context, returnObject.payload.movement);
                   },
                   icon: const Icon(Icons.add),
                 )
@@ -128,7 +128,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
       title: Text(movement.name),
       subtitle: Text(movement.dimension.displayName),
       onTap: () {
-        Navigator.of(context).pop(movement);
+        Navigator.pop(context, movement);
       },
       selected: selected,
       trailing: selected ? const Icon(Icons.check_sharp) : null,
