@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/widgets/message_dialog.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);
@@ -79,10 +80,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return Row(children: [
       Expanded(
         child: TextFormField(
-          onChanged: (serverUrl) {
-            setState(() {
-              _serverUrl = serverUrl;
-            });
+          onFieldSubmitted: (serverUrl) async {
+            final validated = Validator.validateUrl(serverUrl);
+            if (validated == null) {
+              setState(() => _serverUrl = serverUrl);
+            } else {
+              await showMessageDialog(context: context, text: validated);
+            }
           },
           controller: _serverUrlInputController,
           decoration: InputDecoration(
@@ -111,10 +115,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   Widget _usernameInput(BuildContext context) {
     return TextFormField(
-      onChanged: (username) {
-        setState(() {
-          _username = username;
-        });
+      onFieldSubmitted: (username) async {
+        final validated = Validator.validateUsername(username);
+        if (validated == null) {
+          setState(() => _username = username);
+        } else {
+          await showMessageDialog(context: context, text: validated);
+        }
       },
       decoration: InputDecoration(
         labelText: "Username",
@@ -132,10 +139,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   Widget _passwordInput1(BuildContext context) {
     return TextFormField(
-      onChanged: (password) {
-        setState(() {
-          _password1 = password;
-        });
+      onFieldSubmitted: (password) async {
+        final validated = Validator.validatePassword(password);
+        if (validated == null) {
+          setState(() => _password1 = password);
+        } else {
+          await showMessageDialog(context: context, text: validated);
+        }
       },
       decoration: InputDecoration(
         labelText: "Password",
@@ -154,10 +164,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   Widget _passwordInput2(BuildContext context) {
     return TextFormField(
-      onChanged: (password) {
-        setState(() {
-          _password2 = password;
-        });
+      onFieldSubmitted: (password2) async {
+        final validated = Validator.validatePassword2(_password1, password2);
+        if (validated == null) {
+          setState(() => _password2 = password2);
+        } else {
+          await showMessageDialog(context: context, text: validated);
+        }
       },
       decoration: InputDecoration(
         labelText: "Repeat password",
@@ -172,18 +185,18 @@ class _RegistrationPageState extends State<RegistrationPage> {
           : null,
       textInputAction: TextInputAction.done,
       obscureText: true,
-      onFieldSubmitted: (!_registrationPending && _inputsAreValid)
-          ? (_) => _submit(context)
-          : null,
     );
   }
 
   Widget _emailInput(BuildContext context) {
     return TextFormField(
-      onChanged: (email) {
-        setState(() {
-          _email = email;
-        });
+      onFieldSubmitted: (email) async {
+        final validated = Validator.validateEmail(email);
+        if (validated == null) {
+          setState(() => _email = email);
+        } else {
+          await showMessageDialog(context: context, text: validated);
+        }
       },
       decoration: InputDecoration(
         labelText: "Email",
@@ -243,9 +256,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       if (result.isSuccess) {
         Nav.changeNamed(context, Routes.timeline.overview);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result.failure)),
-        );
+        await showMessageDialog(context: context, text: result.failure);
       }
       _formKey.currentState!.deactivate();
     }
