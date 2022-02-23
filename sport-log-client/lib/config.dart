@@ -12,6 +12,7 @@ abstract class Config {
   static late final bool generateTestData;
   static late final l.Level minLogLevel;
   static late final bool outputRequestJson;
+  static late final bool outputRequestHeaders;
   static late final bool outputResponseJson;
   static late final bool outputDbStatement;
 
@@ -51,13 +52,17 @@ abstract class Config {
         minLogLevel = l.Level.debug;
     }
 
-    const outputRequestJsonStr =
+    const _outputRequestJsonStr =
         String.fromEnvironment('OUTPUT_REQUEST_JSON', defaultValue: 'false');
-    outputRequestJson = outputRequestJsonStr.toLowerCase() == 'true';
+    outputRequestJson = _outputRequestJsonStr.toLowerCase() == 'true';
 
-    const outputResponseJsonStr =
+    const _outputRequestHeadersStr =
+        String.fromEnvironment('OUTPUT_REQUEST_HEADERS', defaultValue: 'false');
+    outputRequestHeaders = _outputRequestHeadersStr.toLowerCase() == 'true';
+
+    const _outputResponseJsonStr =
         String.fromEnvironment('OUTPUT_RESPONSE_JSON', defaultValue: 'false');
-    outputResponseJson = outputResponseJsonStr.toLowerCase() == 'true';
+    outputResponseJson = _outputResponseJsonStr.toLowerCase() == 'true';
 
     const outputDbStatementStr =
         String.fromEnvironment('OUTPUT_DB_STATEMENT', defaultValue: 'false');
@@ -67,6 +72,7 @@ abstract class Config {
     _logger.i('Generate test data: $generateTestData');
     _logger.i('Min log level: $minLogLevel');
     _logger.i('Output request json: $outputRequestJson');
+    _logger.i('Output request headers: $outputRequestHeaders');
     _logger.i('Output response json: $outputResponseJson');
     _logger.i('Output db statement: $outputDbStatement');
   }

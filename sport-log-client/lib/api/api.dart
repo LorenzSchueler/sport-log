@@ -197,10 +197,11 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   ApiResult<void> postSingle(T object) async {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = _toJson(object);
-      _logRequest('POST', _singularRoute, body);
+      final headers = _ApiHeaders._defaultHeaders;
+      _logRequest('POST', _singularRoute, headers, body);
       final response = await client.post(
         UriFromRoute.fromRoute(_singularRoute),
-        headers: _ApiHeaders._defaultHeaders,
+        headers: headers,
         body: jsonEncode(body),
       );
       _logResponse(response);
@@ -214,10 +215,11 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     }
     return ApiResultFromRequest.fromRequest((client) async {
       final body = objects.map(_toJson).toList();
-      _logRequest('POST', _pluralRoute, body);
+      final headers = _ApiHeaders._defaultHeaders;
+      _logRequest('POST', _pluralRoute, headers, body);
       final response = await client.post(
         UriFromRoute.fromRoute(_pluralRoute),
-        headers: _ApiHeaders._defaultHeaders,
+        headers: headers,
         body: jsonEncode(body),
       );
       _logResponse(response);
@@ -228,10 +230,11 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   ApiResult<void> putSingle(T object) async {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = _toJson(object);
-      _logRequest('PUT', _singularRoute, body);
+      final headers = _ApiHeaders._defaultHeaders;
+      _logRequest('PUT', _singularRoute, headers, body);
       final response = await client.put(
         UriFromRoute.fromRoute(_singularRoute),
-        headers: _ApiHeaders._defaultHeaders,
+        headers: headers,
         body: jsonEncode(body),
       );
       _logResponse(response);
@@ -245,10 +248,11 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     }
     return ApiResultFromRequest.fromRequest((client) async {
       final body = objects.map(_toJson).toList();
-      _logRequest('PUT', _pluralRoute, body);
+      final headers = _ApiHeaders._defaultHeaders;
+      _logRequest('PUT', _pluralRoute, headers, body);
       final response = await client.put(
         UriFromRoute.fromRoute(_pluralRoute),
-        headers: _ApiHeaders._defaultHeaders,
+        headers: headers,
         body: jsonEncode(body),
       );
       _logResponse(response);
@@ -282,11 +286,16 @@ mixin ApiLogging {
     return JsonEncoder.withIndent(spaces).convert(json);
   }
 
-  void _logRequest(String httpMethod, String route, [dynamic json]) {
+  void _logRequest(String httpMethod, String route, Map<String, String> headers,
+      [dynamic json]) {
+    final headersStr = Config.outputRequestHeaders
+        ? "\n${headers.entries.map((e) => '${e.key}:${e.value}').join('\n')}"
+        : "";
     json != null && Config.outputRequestJson
         ? logger.d(
-            'request: $httpMethod ${Settings.serverUrl}$route\n${_prettyJson(json)}')
-        : logger.d('request: $httpMethod ${Settings.serverUrl}$route');
+            'request: $httpMethod ${Settings.serverUrl}$route$headersStr\n${_prettyJson(json)}')
+        : logger
+            .d('request: $httpMethod ${Settings.serverUrl}$route$headersStr');
   }
 
   void _logResponse(Response response) {
@@ -308,10 +317,12 @@ mixin ApiHelpers on ApiLogging {
   ApiResult<T> _getRequest<T>(
       String route, T Function(dynamic) fromJson) async {
     return ApiResultFromRequest.fromRequestWithValue<T>((client) async {
-      _logRequest('GET', route);
+      final headers =
+          _ApiHeaders._basicAuth(Settings.username!, Settings.password!);
+      _logRequest('GET', route, headers);
       final response = await client.get(
         UriFromRoute.fromRoute(route),
-        headers: _ApiHeaders._basicAuth(Settings.username!, Settings.password!),
+        headers: headers,
       );
       _logResponse(response);
       return response;
