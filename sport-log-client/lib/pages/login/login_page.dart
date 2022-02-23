@@ -5,6 +5,7 @@ import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/message_dialog.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -61,10 +62,13 @@ class _LoginPageState extends State<LoginPage> {
     BuildContext context,
   ) {
     return TextFormField(
-      onChanged: (username) {
-        setState(() {
-          _username = username;
-        });
+      onFieldSubmitted: (username) async {
+        final validated = Validator.validateUsername(username);
+        if (validated == null) {
+          setState(() => _username = username);
+        } else {
+          await showMessageDialog(context: context, text: validated);
+        }
       },
       decoration: InputDecoration(
         labelText: "Username",
@@ -85,10 +89,13 @@ class _LoginPageState extends State<LoginPage> {
     BuildContext context,
   ) {
     return TextFormField(
-      onChanged: (password) {
-        setState(() {
-          _password = password;
-        });
+      onFieldSubmitted: (password) async {
+        final validated = Validator.validatePassword(password);
+        if (validated == null) {
+          setState(() => _password = password);
+        } else {
+          await showMessageDialog(context: context, text: validated);
+        }
       },
       decoration: InputDecoration(
         labelText: "Password",
@@ -102,8 +109,6 @@ class _LoginPageState extends State<LoginPage> {
           : null,
       textInputAction: TextInputAction.done,
       obscureText: true,
-      onFieldSubmitted:
-          (!_loginPending && _inputsAreValid) ? (_) => _submit(context) : null,
     );
   }
 
