@@ -134,8 +134,11 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
         "Update",
         style: TextStyle(fontSize: 18),
       ), // TODO: use theme for this
-      onPressed:
-          (!_loginPending && _inputsAreValid) ? () => _submit(context) : null,
+      onPressed: (!_loginPending &&
+              _formKey.currentContext != null &&
+              _formKey.currentState!.validate())
+          ? () => _submit(context)
+          : null,
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: Defaults.borderRadius.big,
@@ -144,27 +147,21 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
     );
   }
 
-  bool get _inputsAreValid =>
-      Validator.validateUsername(_username) == null &&
-      Validator.validatePassword(_password) == null;
-
   void _submit(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
+    setState(() {
+      _loginPending = true;
+    });
+    final result = await Account.login(_username, _password);
+    setState(() {
+      _loginPending = false;
+    });
+    if (result.isSuccess) {
+      Navigator.of(context).pop(result.success);
+    } else {
       setState(() {
-        _loginPending = true;
+        _errorMessage = result.failure;
       });
-      final result = await Account.login(_username, _password);
-      setState(() {
-        _loginPending = false;
-      });
-      if (result.isSuccess) {
-        Navigator.of(context).pop(result.success);
-      } else {
-        setState(() {
-          _errorMessage = result.failure;
-        });
-      }
-      _formKey.currentState!.deactivate();
     }
+    _formKey.currentState!.deactivate();
   }
 }

@@ -120,8 +120,11 @@ class _LoginPageState extends State<LoginPage> {
         "Login",
         style: TextStyle(fontSize: 18),
       ), // TODO: use theme for this
-      onPressed:
-          (!_loginPending && _inputsAreValid) ? () => _submit(context) : null,
+      onPressed: (!_loginPending &&
+              _formKey.currentContext != null &&
+              _formKey.currentState!.validate())
+          ? () => _submit(context)
+          : null,
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: Defaults.borderRadius.big,
@@ -130,27 +133,21 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  bool get _inputsAreValid =>
-      Validator.validateUsername(_username) == null &&
-      Validator.validatePassword(_password) == null;
-
   void _submit(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _loginPending = true;
-      });
-      final result = await Account.login(_username, _password);
-      setState(() {
-        _loginPending = false;
-      });
-      if (result.isSuccess) {
-        Nav.changeNamed(context, Routes.timeline.overview);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(result.failure),
-        ));
-      }
-      _formKey.currentState!.deactivate();
+    setState(() {
+      _loginPending = true;
+    });
+    final result = await Account.login(_username, _password);
+    setState(() {
+      _loginPending = false;
+    });
+    if (result.isSuccess) {
+      Nav.changeNamed(context, Routes.timeline.overview);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(result.failure),
+      ));
     }
+    _formKey.currentState!.deactivate();
   }
 }

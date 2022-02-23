@@ -219,7 +219,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
         "Register",
         style: TextStyle(fontSize: 18),
       ), // TODO: use theme for this
-      onPressed: (!_registrationPending && _inputsAreValid)
+      onPressed: (!_registrationPending &&
+              _formKey.currentContext != null &&
+              _formKey.currentState!.validate())
           ? () => _submit(context)
           : null,
       style: ElevatedButton.styleFrom(
@@ -230,35 +232,26 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  bool get _inputsAreValid =>
-      Validator.validateUrl(_serverUrl) == null &&
-      Validator.validateUsername(_username) == null &&
-      Validator.validateEmail(_email) == null &&
-      Validator.validatePassword(_password1) == null &&
-      Validator.validatePassword2(_password1, _password2) == null;
-
   void _submit(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _registrationPending = true;
-      });
-      Settings.serverUrl = _serverUrl;
-      final user = User(
-        id: randomId(),
-        email: _email,
-        username: _username,
-        password: _password1,
-      );
-      final result = await Account.register(user);
-      setState(() {
-        _registrationPending = false;
-      });
-      if (result.isSuccess) {
-        Nav.changeNamed(context, Routes.timeline.overview);
-      } else {
-        await showMessageDialog(context: context, text: result.failure);
-      }
-      _formKey.currentState!.deactivate();
+    setState(() {
+      _registrationPending = true;
+    });
+    Settings.serverUrl = _serverUrl;
+    final user = User(
+      id: randomId(),
+      email: _email,
+      username: _username,
+      password: _password1,
+    );
+    final result = await Account.register(user);
+    setState(() {
+      _registrationPending = false;
+    });
+    if (result.isSuccess) {
+      Nav.changeNamed(context, Routes.timeline.overview);
+    } else {
+      await showMessageDialog(context: context, text: result.failure);
     }
+    _formKey.currentState!.deactivate();
   }
 }
