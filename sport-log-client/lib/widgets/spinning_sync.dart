@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
 
 class SpinningSync extends StatefulWidget {
   const SpinningSync({
@@ -65,7 +66,7 @@ class _SpinningSyncState extends State<SpinningSync>
       turns: _controller,
       child: IconButton(
         onPressed: widget.onPressed,
-        icon: const Icon(Icons.sync_sharp),
+        icon: const Icon(CustomIcons.arrows_cw),
         color: widget.color,
       ),
     );

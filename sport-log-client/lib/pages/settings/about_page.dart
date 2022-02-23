@@ -1,5 +1,6 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/form_widgets/text_tile.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutPage extends StatelessWidget {
@@ -8,35 +9,35 @@ class AboutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text("About")),
-        body: Container(
-            padding: const EdgeInsets.all(10),
-            child: Column(children: [
-              RichText(
-                  text: TextSpan(children: [
-                const TextSpan(
-                    text:
-                        "This App and the whole Sport-Log project is licensed unter the "),
-                TextSpan(
-                    text: "GPLv3 license",
-                    style:
-                        const TextStyle(decoration: TextDecoration.underline),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () =>
-                          launch("https://www.gnu.org/licenses/gpl-3.0.html")),
-                const TextSpan(text: "."),
-              ])),
-              RichText(
-                  text: TextSpan(children: [
-                const TextSpan(text: "Contributions are always welcome: "),
-                TextSpan(
-                    text: "GitHub",
-                    style:
-                        const TextStyle(decoration: TextDecoration.underline),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () => launch(
-                          "https://github.com/LorenzSchueler/sport-log")),
-              ]))
-            ])));
+      appBar: AppBar(title: const Text("About")),
+      body: Container(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            TextTile(
+              leading: CustomIcons.github,
+              caption: "GitHub",
+              child: GestureDetector(
+                  child: const Icon(Icons.open_in_browser),
+                  onTap: () =>
+                      launch("https://github.com/LorenzSchueler/sport-log")),
+            ),
+            TextTile(
+              leading: Icons.copyright_outlined,
+              caption: "Copyright & License",
+              child: GestureDetector(
+                  child: const Text(
+                    "GPLv3 license",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                  onTap: () =>
+                      launch("https://www.gnu.org/licenses/gpl-3.0.html")),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

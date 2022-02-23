@@ -89,7 +89,7 @@ class TimerPageState extends State<TimerPage> {
                   validator: Validator.validateIntGtZero,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: const InputDecoration(
-                    icon: Icon(Icons.crop),
+                    icon: Icon(CustomIcons.cw),
                     labelText: "Rounds",
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
@@ -139,7 +139,7 @@ class TimerPageState extends State<TimerPage> {
       child: DurationPicker(
           setDuration: (d) => setState(() => _totalTime = d),
           initialDuration: _totalTime),
-      leading: CustomIcons.timeInterval,
+      leading: CustomIcons.time_interval,
     );
   }
 

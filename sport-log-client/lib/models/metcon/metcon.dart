@@ -22,11 +22,11 @@ extension ToIcon on MetconType {
   IconData get icon {
     switch (this) {
       case MetconType.amrap:
-        return CustomIcons.timeInterval;
+        return CustomIcons.time_interval;
       case MetconType.emom:
         return Icons.repeat_one_rounded;
       case MetconType.forTime:
-        return CustomIcons.stopwatch;
+        return Icons.timer_outlined;
     }
   }
 }

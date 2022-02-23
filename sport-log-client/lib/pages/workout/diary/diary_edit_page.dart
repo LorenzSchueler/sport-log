@@ -4,6 +4,7 @@ import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/diary/diary.dart';
+import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/message_dialog.dart';
 
@@ -75,7 +76,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
           child: ListView(
             children: [
               EditTile(
-                leading: Icons.crop,
+                leading: Icons.calendar_today,
                 caption: "Date",
                 child: Text(formatDate(_diary.date)),
                 onTap: () async {
@@ -95,7 +96,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
               ),
               TextFormField(
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.crop),
+                  icon: Icon(CustomIcons.weight),
                   labelText: "Bodyweight",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
@@ -113,7 +114,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
               ),
               TextFormField(
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.comment),
+                  icon: Icon(Icons.comment_outlined),
                   labelText: "Comments",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),

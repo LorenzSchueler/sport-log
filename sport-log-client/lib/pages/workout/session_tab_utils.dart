@@ -34,7 +34,7 @@ extension SessionTabUtils on SessionsPageTab {
         );
       case SessionsPageTab.strength:
         return const BottomNavigationBarItem(
-          icon: Icon(CustomIcons.dumbbellNotRotated),
+          icon: Icon(CustomIcons.dumbbell_not_rotated),
           label: "Strength",
         );
       case SessionsPageTab.metcon:

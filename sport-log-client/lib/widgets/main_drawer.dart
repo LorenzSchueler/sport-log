@@ -30,20 +30,20 @@ class MainDrawer extends StatelessWidget {
           ),
           ListTile(
             title: const Text('Workout Tracking'),
-            leading: const Icon(CustomIcons.dumbbellRotated),
+            leading: const Icon(CustomIcons.dumbbell_rotated),
             onTap: () {
               Nav.newBase(context, Routes.timeline.overview);
             },
             selected: selectedRoute == Routes.timeline.overview,
           ),
           ListTile(
-            leading: const Icon(Icons.play_circle_rounded),
+            leading: const Icon(Icons.play_circle_outline),
             title: const Text('Server Actions'),
             onTap: () => Nav.newBase(context, Routes.action.overview),
             selected: selectedRoute == Routes.action.overview,
           ),
           ListTile(
-            leading: const Icon(CustomIcons.stopwatch),
+            leading: const Icon(Icons.timer_outlined),
             title: const Text('Timer'),
             onTap: () => Nav.newBase(context, Routes.timer),
             selected: selectedRoute == Routes.timer,
@@ -66,7 +66,7 @@ class MainDrawer extends StatelessWidget {
             children: [
               ListTile(
                 title: const Text('Movements'),
-                leading: const Icon(CustomIcons.trendingUp),
+                leading: const Icon(Icons.directions_run_rounded),
                 onTap: () => Nav.newBase(context, Routes.movement.overview),
                 selected: selectedRoute == Routes.movement.overview,
               ),

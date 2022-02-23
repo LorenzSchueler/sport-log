@@ -50,7 +50,7 @@ class SettingsPageState extends State<SettingsPage> {
               if (Settings.serverEnabled)
                 TextFormField(
                   decoration: const InputDecoration(
-                    icon: Icon(Icons.computer),
+                    icon: Icon(Icons.cloud_upload_outlined),
                     labelText: "Server URL",
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
@@ -71,7 +71,7 @@ class SettingsPageState extends State<SettingsPage> {
               if (Settings.serverEnabled)
                 TextFormField(
                     decoration: const InputDecoration(
-                      icon: Icon(CustomIcons.timeInterval),
+                      icon: Icon(CustomIcons.time_interval),
                       labelText: "Synchonization Interval (min)",
                       contentPadding: EdgeInsets.symmetric(vertical: 5),
                     ),
@@ -100,7 +100,7 @@ class SettingsPageState extends State<SettingsPage> {
               const CaptionTile(caption: "User Settings"),
               TextFormField(
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.supervised_user_circle),
+                  icon: Icon(Icons.account_circle_outlined),
                   labelText: "Username",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
@@ -126,7 +126,7 @@ class SettingsPageState extends State<SettingsPage> {
               ),
               TextFormField(
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.key),
+                  icon: Icon(Icons.key_outlined),
                   labelText: "Password",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
@@ -152,7 +152,7 @@ class SettingsPageState extends State<SettingsPage> {
               ),
               TextFormField(
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.email),
+                  icon: Icon(Icons.email_outlined),
                   labelText: "Email",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),

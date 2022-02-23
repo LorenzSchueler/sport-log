@@ -72,7 +72,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
           IconButton(
               onPressed: () =>
                   Navigator.pushNamed(context, Routes.metcon.overview),
-              icon: const Icon(CustomIcons.plan)),
+              icon: const Icon(Icons.notes_rounded)),
           IconButton(
             onPressed: () async {
               final Movement? movement = await showMovementPickerDialog(context,

@@ -37,13 +37,13 @@ extension MovementDimensionStrings on MovementDimension {
   IconData get iconData {
     switch (this) {
       case MovementDimension.reps:
-        return CustomIcons.cwAlt;
+        return CustomIcons.cw;
       case MovementDimension.time:
-        return CustomIcons.stopwatch;
+        return Icons.timer_outlined;
       case MovementDimension.distance:
-        return CustomIcons.ruler;
+        return CustomIcons.ruler_horizontal;
       case MovementDimension.energy:
-        return CustomIcons.fire;
+        return CustomIcons.gauge;
     }
   }
 }

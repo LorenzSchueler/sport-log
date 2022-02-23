@@ -49,7 +49,7 @@ class _MetconsPageState extends State<MetconsPage> {
           IconButton(
               onPressed: () =>
                   Navigator.pushNamed(context, Routes.metcon.sessionOverview),
-              icon: const Icon(CustomIcons.plan)),
+              icon: const Icon(Icons.notes_rounded)),
         ],
       ),
       body: _content,

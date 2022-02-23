@@ -101,7 +101,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
           child: ListView(
             children: [
               EditTile(
-                  leading: Icons.crop,
+                  leading: Icons.notes_rounded,
                   caption: "Metcon",
                   child: Text(_metconSessionDescription.metconDescription.name),
                   onTap: () async {
@@ -118,7 +118,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                     //  set time round and reps accordingly to avoid null values
                   }),
               EditTile(
-                  leading: Icons.crop,
+                  leading: Icons.calendar_today,
                   caption: "Start Time",
                   child: Text(formatDate(
                       _metconSessionDescription.metconSession.datetime)),
@@ -176,7 +176,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                           _metconSessionDescription.metconSession.time = d),
                       initialDuration:
                           _metconSessionDescription.metconSession.time!),
-                  leading: CustomIcons.timeInterval,
+                  leading: CustomIcons.time_interval,
                 ),
               if (_metconSessionDescription
                               .metconDescription.metcon.metconType ==
@@ -189,7 +189,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   Expanded(
                       child: TextFormField(
                     decoration: const InputDecoration(
-                      icon: Icon(Icons.crop),
+                      icon: Icon(CustomIcons.cw),
                       labelText: "Rounds",
                       contentPadding: EdgeInsets.symmetric(vertical: 5),
                     ),
@@ -232,11 +232,11 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                         },
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       )),
-                  leading: Icons.crop),
+                  leading: Icons.check_box_outlined),
               TextFormField(
                 decoration: const InputDecoration(
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
-                    icon: Icon(Icons.crop),
+                    icon: Icon(Icons.comment_outlined),
                     labelText: "Comments"),
                 initialValue: _metconSessionDescription.metconSession.comments,
                 style: const TextStyle(height: 1),

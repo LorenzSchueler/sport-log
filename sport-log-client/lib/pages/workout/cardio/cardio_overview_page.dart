@@ -127,7 +127,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         icon: const Icon(Icons.add),
         buttons: [
           ActionButton(
-              icon: const Icon(CustomIcons.stopwatch),
+              icon: const Icon(Icons.timer_outlined),
               onPressed: () async {
                 final returnObj = await Navigator.pushNamed(
                     context, Routes.cardio.trackingSettings);
