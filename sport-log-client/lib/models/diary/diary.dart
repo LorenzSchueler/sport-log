@@ -2,7 +2,9 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/settings.dart';
 
 part 'diary.g.dart';
 
@@ -29,6 +31,14 @@ class Diary extends Entity {
   @override
   bool deleted;
 
+  Diary.defaultValue()
+      : id = randomId(),
+        userId = Settings.userId!,
+        date = DateTime.now(),
+        bodyweight = null,
+        comments = null,
+        deleted = false;
+
   factory Diary.fromJson(Map<String, dynamic> json) => _$DiaryFromJson(json);
 
   @override
@@ -38,7 +48,8 @@ class Diary extends Entity {
   bool isValid() {
     return validate(
             bodyweight == null || bodyweight! > 0, 'Diary: bodyweight <= 0') &&
-        validate(!deleted, 'Diary: deleted == true');
+        validate(bodyweight != null || comments != null,
+            'Diary: bodyweight and comments are null');
   }
 }
 
