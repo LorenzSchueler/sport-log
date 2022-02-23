@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:sport_log/api/api.dart';
+import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/page_return.dart';
+import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
-import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
@@ -22,89 +21,68 @@ class RoutePage extends StatefulWidget {
 
 class RoutePageState extends State<RoutePage> {
   final _logger = Logger('RoutePage');
+  final _dataProvider = RouteDataProvider.instance;
+  List<Route> _routes = [];
 
-  final List<Route> _routes = [
-    Route(
-        id: randomId(),
-        userId: Settings.userId!,
-        name: "my route 1",
-        distance: 10951,
-        ascent: 456,
-        descent: 476,
-        track: [
-          Position(
-              longitude: 11.33,
-              latitude: 47.27,
-              elevation: 600,
-              distance: 0,
-              time: const Duration(seconds: 0)),
-          Position(
-              longitude: 11.331,
-              latitude: 47.27,
-              elevation: 650,
-              distance: 1000,
-              time: const Duration(seconds: 200)),
-          Position(
-              longitude: 11.33,
-              latitude: 47.272,
-              elevation: 600,
-              distance: 2000,
-              time: const Duration(seconds: 500))
-        ],
-        deleted: false)
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _dataProvider.addListener(_update);
+    _dataProvider.onNoInternetConnection =
+        () => showSimpleSnackBar(context, 'No Internet connection.');
+    _update();
+  }
+
+  @override
+  void dispose() {
+    _dataProvider.removeListener(_update);
+    _dataProvider.onNoInternetConnection = null;
+    super.dispose();
+  }
+
+  Future<void> _update() async {
+    _logger.d('Updating route page');
+    final routes = await _dataProvider.getNonDeleted();
+    setState(() => _routes = routes);
+  }
+
+  Future<void> _pullFromServer() async {
+    await _dataProvider.pullFromServer().onError((error, stackTrace) {
+      if (error is ApiError) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("Routes"),
-          actions: [
-            IconButton(
-                onPressed: () =>
-                    Navigator.of(context).pushNamed(Routes.cardio.overview),
-                icon: const Icon(CustomIcons.heartbeat)),
-          ],
-        ),
-        body: Scrollbar(
-            child: ListView.builder(
+      appBar: AppBar(
+        title: const Text("Routes"),
+        actions: [
+          IconButton(
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(Routes.cardio.overview),
+              icon: const Icon(CustomIcons.heartbeat)),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: _pullFromServer,
+        child: ListView.builder(
           itemBuilder: (_, index) => RouteCard(route: _routes[index]),
           itemCount: _routes.length,
-        )),
-        bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
-            context, SessionsPageTab.cardio),
-        drawer: MainDrawer(selectedRoute: Routes.cardio.routeOverview),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            final returnObj =
-                await Navigator.of(context).pushNamed(Routes.cardio.routeEdit);
-            _handleNewRoute(returnObj);
-          },
-          child: const Icon(Icons.add),
-        ));
-  }
-
-  void _handleNewRoute(dynamic object) {
-    if (object is ReturnObject<Route>) {
-      switch (object.action) {
-        case ReturnAction.created:
-          //setState(() {
-          //_routes.add(object.payload);
-          //_routes.sortBy((c) => c.datetime);
-          //});
-          break;
-        case ReturnAction.updated:
-          //setState(() {
-          //_routes.update(object.payload, by: (o) => o.id);
-          //_routes.sortBy((c) => c.datetime);
-          //});
-          break;
-        case ReturnAction.deleted:
-        //setState(() => _routes.delete(object.payload, by: (c) => c.id));
-      }
-    } else {
-      _logger.i("poped item is not a ReturnObject");
-    }
+        ),
+      ),
+      bottomNavigationBar:
+          SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.cardio),
+      drawer: MainDrawer(selectedRoute: Routes.cardio.routeOverview),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async =>
+            await Navigator.of(context).pushNamed(Routes.cardio.routeEdit),
+        child: const Icon(Icons.add),
+      ),
+    );
   }
 }
 
@@ -124,8 +102,8 @@ class RouteCard extends StatelessWidget {
     late MapboxMapController _sessionMapController;
 
     return GestureDetector(
-        onTap: () => showDetails(context),
-        child: Card(
+      onTap: () => showDetails(context),
+      child: Card(
         child: Column(
           children: [
             Defaults.sizedBox.vertical.small,
@@ -134,53 +112,66 @@ class RouteCard extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             Defaults.sizedBox.vertical.small,
-            SizedBox(
-                height: 150,
-                child: MapboxMap(
-                  accessToken: Defaults.mapbox.accessToken,
-                  styleString: Defaults.mapbox.style.outdoor,
-                  initialCameraPosition: CameraPosition(
-                    zoom: 13.0,
-                  target: route.track.isEmpty
-                      ? Defaults.mapbox.cameraPosition
-                      : route.track.first.latLng,
+            route.track.isNotEmpty
+                ? SizedBox(
+                    height: 150,
+                    child: MapboxMap(
+                      accessToken: Defaults.mapbox.accessToken,
+                      styleString: Defaults.mapbox.style.outdoor,
+                      initialCameraPosition: CameraPosition(
+                        zoom: 13.0,
+                        target: route.track.isEmpty
+                            ? Defaults.mapbox.cameraPosition
+                            : route.track.first.latLng,
+                      ),
+                      onMapCreated: (MapboxMapController controller) =>
+                          _sessionMapController = controller,
+                      onStyleLoadedCallback: () {
+                        _sessionMapController.addLine(LineOptions(
+                            lineColor: "red",
+                            geometry:
+                                route.track.map((c) => c.latLng).toList()));
+                      },
+                      onMapClick: (_, __) => showDetails(context),
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(CustomIcons.route),
+                      Text(" no track available"),
+                    ],
                   ),
-                  onMapCreated: (MapboxMapController controller) =>
-                      _sessionMapController = controller,
-                  onStyleLoadedCallback: () {
-                    _sessionMapController.addLine(LineOptions(
-                        lineColor: "red",
-                        geometry: route.track.map((c) => c.latLng).toList()));
-                  },
-                  onMapClick: (_, __) => showDetails(context),
-              ),
+            Defaults.sizedBox.vertical.small,
+            Row(
+              children: [
+                Expanded(
+                  child: ValueUnitDescription(
+                    value: distance,
+                    unit: "km",
+                    description: null,
+                  ),
+                ),
+                Expanded(
+                  child: ValueUnitDescription(
+                    value: route.ascent.toString(),
+                    unit: "m",
+                    description: null,
+                  ),
+                ),
+                Expanded(
+                  child: ValueUnitDescription(
+                    value: route.descent.toString(),
+                    unit: "m",
+                    description: null,
+                  ),
+                ),
+              ],
             ),
             Defaults.sizedBox.vertical.small,
-            Row(children: [
-              Expanded(
-                child: ValueUnitDescription(
-                  value: distance,
-                  unit: "km",
-                  description: null,
-                ),
-              ),
-              Expanded(
-                child: ValueUnitDescription(
-                  value: route.ascent.toString(),
-                  unit: "m",
-                  description: null,
-                ),
-              ),
-              Expanded(
-                child: ValueUnitDescription(
-                  value: route.descent.toString(),
-                  unit: "m",
-                  description: null,
-                ),
-              ),
-            ]),
-            Defaults.sizedBox.vertical.small,
-          ]),
-        ));
+          ],
+        ),
+      ),
+    );
   }
 }
