@@ -62,12 +62,10 @@ class _LoginPageState extends State<LoginPage> {
     BuildContext context,
   ) {
     return TextFormField(
-      onFieldSubmitted: (username) async {
+      onChanged: (username) async {
         final validated = Validator.validateUsername(username);
         if (validated == null) {
           setState(() => _username = username);
-        } else {
-          await showMessageDialog(context: context, text: validated);
         }
       },
       decoration: InputDecoration(
@@ -89,12 +87,10 @@ class _LoginPageState extends State<LoginPage> {
     BuildContext context,
   ) {
     return TextFormField(
-      onFieldSubmitted: (password) async {
+      onChanged: (password) async {
         final validated = Validator.validatePassword(password);
         if (validated == null) {
           setState(() => _password = password);
-        } else {
-          await showMessageDialog(context: context, text: validated);
         }
       },
       decoration: InputDecoration(
@@ -108,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
           ? TextStyle(color: Theme.of(context).disabledColor)
           : null,
       textInputAction: TextInputAction.done,
-      obscureText: true,
+      obscureText: false,
     );
   }
 
@@ -144,9 +140,7 @@ class _LoginPageState extends State<LoginPage> {
     if (result.isSuccess) {
       Nav.changeNamed(context, Routes.timeline.overview);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(result.failure),
-      ));
+      await showMessageDialog(context: context, text: result.failure);
     }
     _formKey.currentState!.deactivate();
   }

@@ -82,7 +82,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
                 initialValue: _diary.bodyweight?.toStringAsFixed(1),
                 style: const TextStyle(height: 1),
                 keyboardType: TextInputType.number,
-                onFieldSubmitted: (bodyweight) =>
+                onChanged: (bodyweight) =>
                     _diary.bodyweight = double.parse(bodyweight),
               ),
               TextFormField(
@@ -96,8 +96,8 @@ class DiaryEditPageState extends State<DiaryEditPage> {
                 keyboardType: TextInputType.multiline,
                 minLines: 1,
                 maxLines: 5,
-                onFieldSubmitted: (comments) => _diary.comments = comments,
-              )
+                onChanged: (comments) => _diary.comments = comments,
+              ),
             ],
           ),
         ));

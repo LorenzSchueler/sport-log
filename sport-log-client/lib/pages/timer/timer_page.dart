@@ -6,6 +6,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/theme.dart';
+import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
@@ -78,11 +79,15 @@ class TimerPageState extends State<TimerPage> {
                 timeFormField(MetconType.emom),
                 TextFormField(
                   keyboardType: TextInputType.number,
-                  onFieldSubmitted: (rounds) => setState(() {
-                    _rounds = (int.parse(rounds));
-                  }),
+                  onChanged: (rounds) {
+                    if (Validator.validateIntGtZero(rounds) == null) {
+                      setState(() => _rounds = int.parse(rounds));
+                    }
+                  },
                   style: const TextStyle(height: 1),
                   initialValue: _rounds.toString(),
+                  validator: Validator.validateIntGtZero,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: const InputDecoration(
                     icon: Icon(Icons.crop),
                     labelText: "Rounds",

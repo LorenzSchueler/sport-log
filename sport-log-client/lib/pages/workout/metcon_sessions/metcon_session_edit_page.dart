@@ -195,7 +195,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                         .toString(),
                     style: const TextStyle(height: 1),
                     keyboardType: TextInputType.number,
-                    onFieldSubmitted: (rounds) => setState(() {
+                    onChanged: (rounds) => setState(() {
                       _metconSessionDescription.metconSession.rounds =
                           int.parse(rounds);
                     }),
@@ -211,7 +211,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                         _metconSessionDescription.metconSession.reps.toString(),
                     style: const TextStyle(height: 1),
                     keyboardType: TextInputType.number,
-                    onFieldSubmitted: (reps) => setState(() {
+                    onChanged: (reps) => setState(() {
                       _metconSessionDescription.metconSession.reps =
                           int.parse(reps);
                     }),
@@ -241,7 +241,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                 keyboardType: TextInputType.multiline,
                 minLines: 1,
                 maxLines: 5,
-                onFieldSubmitted: (comments) => setState(() {
+                onChanged: (comments) => setState(() {
                   _metconSessionDescription.metconSession.comments = comments;
                 }),
               )

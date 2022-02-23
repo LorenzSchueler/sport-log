@@ -199,7 +199,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                 // TODO add GPX/ GeoJson upload option for track
                 TextFormField(
                   keyboardType: TextInputType.number,
-                  onFieldSubmitted: (distance) => setState(() {
+                  onChanged: (distance) => setState(() {
                     _cardioSessionDescription.cardioSession.distance =
                         (double.parse(distance) * 1000).round();
                   }),
@@ -218,7 +218,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                 ),
                 TextFormField(
                   keyboardType: TextInputType.number,
-                  onFieldSubmitted: (ascent) => setState(() {
+                  onChanged: (ascent) => setState(() {
                     _cardioSessionDescription.cardioSession.ascent =
                         int.parse(ascent);
                   }),
@@ -233,7 +233,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                 ),
                 TextFormField(
                   keyboardType: TextInputType.number,
-                  onFieldSubmitted: (descent) => setState(() {
+                  onChanged: (descent) => setState(() {
                     _cardioSessionDescription.cardioSession.descent =
                         int.parse(descent);
                   }),
@@ -257,7 +257,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                 ),
                 TextFormField(
                   keyboardType: TextInputType.number,
-                  onFieldSubmitted: (calories) => setState(() {
+                  onChanged: (calories) => setState(() {
                     _cardioSessionDescription.cardioSession.calories =
                         int.parse(calories);
                   }),
@@ -272,7 +272,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                 ),
                 TextFormField(
                   keyboardType: TextInputType.number,
-                  onFieldSubmitted: (avgCadence) => setState(() {
+                  onChanged: (avgCadence) => setState(() {
                     _cardioSessionDescription.cardioSession.avgCadence =
                         int.parse(avgCadence);
                   }),
@@ -288,7 +288,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                 ),
                 TextFormField(
                   keyboardType: TextInputType.number,
-                  onFieldSubmitted: (avgHeartRate) => setState(() {
+                  onChanged: (avgHeartRate) => setState(() {
                     _cardioSessionDescription.cardioSession.avgHeartRate =
                         int.parse(avgHeartRate);
                   }),
@@ -303,7 +303,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   ),
                 ),
                 TextFormField(
-                  onFieldSubmitted: (comments) => setState(() {
+                  onChanged: (comments) => setState(() {
                     _cardioSessionDescription.cardioSession.comments = comments;
                   }),
                   style: const TextStyle(height: 1),

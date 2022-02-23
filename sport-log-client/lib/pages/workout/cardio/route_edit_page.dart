@@ -352,9 +352,7 @@ class RouteEditPageState extends State<RouteEditPage> {
                     onTap: () => setState(() {
                       _listExpanded = false;
                     }),
-                    onFieldSubmitted: (name) => setState(() {
-                      _route.name = name;
-                    }),
+                    onChanged: (name) => setState(() => _route.name = name),
                     style: const TextStyle(height: 1),
                     decoration: InputDecoration(
                       labelText: "Name",

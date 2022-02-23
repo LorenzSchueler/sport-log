@@ -2,13 +2,10 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/app.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
-import 'package:sport_log/widgets/message_dialog.dart';
 
 bool _dialogShown = false;
-final _logger = Logger('NewCredentialsDialog');
 
 Future<void> showNewCredentialsDialog() async {
   if (!_dialogShown) {
@@ -76,12 +73,10 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
     BuildContext context,
   ) {
     return TextFormField(
-      onFieldSubmitted: (username) async {
+      onChanged: (username) async {
         final validated = Validator.validateUsername(username);
         if (validated == null) {
           setState(() => _username = username);
-        } else {
-          await showMessageDialog(context: context, text: validated);
         }
       },
       decoration: InputDecoration(
@@ -103,12 +98,10 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
     BuildContext context,
   ) {
     return TextFormField(
-      onFieldSubmitted: (password) async {
+      onChanged: (password) async {
         final validated = Validator.validatePassword(password);
         if (validated == null) {
           setState(() => _password = password);
-        } else {
-          await showMessageDialog(context: context, text: validated);
         }
       },
       decoration: InputDecoration(
