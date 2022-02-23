@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/theme.dart';
+import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:mapbox_api/mapbox_api.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/message_dialog.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
@@ -23,6 +22,8 @@ class RouteEditPage extends StatefulWidget {
 
 class RouteEditPageState extends State<RouteEditPage> {
   final _logger = Logger('RouteEditPage');
+  final _formKey = GlobalKey<FormState>();
+  final _dataProvider = RouteDataProvider.instance;
 
   List<LatLng> _locations = [];
 
@@ -40,30 +41,32 @@ class RouteEditPageState extends State<RouteEditPage> {
 
   @override
   void initState() {
-    super.initState();
-    _logger.i("route");
-    _logger.i(widget.route);
-    _route = widget.route ??
-        Route(
-            id: randomId(),
-            userId: Settings.userId!,
-            name: "",
-            distance: 0,
-            ascent: 0,
-            descent: 0,
-            track: [],
-            deleted: false);
+    _route = widget.route ?? Route.defaultValue();
+    // TODO dont map every point to marked location
     _locations =
         _route.track.map((e) => LatLng(e.latitude, e.longitude)).toList();
-    // TODO dont map every point to marked location
+    super.initState();
   }
 
-  void _saveRoute() {
-    // TODO save in DB
-    Navigator.of(context).pop(ReturnObject(
-        action:
-            widget.route != null ? ReturnAction.updated : ReturnAction.created,
-        payload: _route));
+  Future<void> _saveRoute() async {
+    final result = _route.id == widget.route?.id
+        ? await _dataProvider.updateSingle(_route)
+        : await _dataProvider.createSingle(_route);
+    if (result) {
+      _formKey.currentState!.deactivate();
+      Navigator.of(context).pop();
+    } else {
+      await showMessageDialog(
+          context: context, text: 'Creating Route Entry failed.');
+    }
+  }
+
+  Future<void> _deleteRoute() async {
+    if (_route.id == widget.route?.id) {
+      await _dataProvider.deleteSingle(_route);
+    }
+    _formKey.currentState!.deactivate();
+    Navigator.of(context).pop();
   }
 
   Future<void> _matchLocations() async {
@@ -177,28 +180,29 @@ class RouteEditPageState extends State<RouteEditPage> {
 
     Widget _buildDragTarget(int index) {
       return DragTarget(
-          onWillAccept: (value) => true,
-          onAccept: (value) => _switchPoints(value as int, index),
-          builder: (context, candidates, reject) {
-            if (candidates.isNotEmpty) {
-              int index = candidates[0] as int;
-              return ListTile(
-                leading: Container(
-                  margin: const EdgeInsets.only(left: 12),
-                  child: const Icon(
-                    Icons.add_rounded,
-                  ),
+        onWillAccept: (value) => true,
+        onAccept: (value) => _switchPoints(value as int, index),
+        builder: (context, candidates, reject) {
+          if (candidates.isNotEmpty) {
+            int index = candidates[0] as int;
+            return ListTile(
+              leading: Container(
+                margin: const EdgeInsets.only(left: 12),
+                child: const Icon(
+                  Icons.add_rounded,
                 ),
-                title: Text(
-                  "${index + 1}",
-                  style: const TextStyle(fontSize: 20),
-                ),
-                dense: true,
-              );
-            } else {
-              return const Divider();
-            }
-          });
+              ),
+              title: Text(
+                "${index + 1}",
+                style: const TextStyle(fontSize: 20),
+              ),
+              dense: true,
+            );
+          } else {
+            return const Divider();
+          }
+        },
+      );
     }
 
     for (int index = 0; index < _locations.length; index++) {
@@ -211,23 +215,25 @@ class RouteEditPageState extends State<RouteEditPage> {
         "${index + 1}",
         style: const TextStyle(fontSize: 20),
       );
-      listElements.add(ListTile(
-        leading: IconButton(
-            onPressed: () => _removePoint(index),
-            icon: const Icon(Icons.delete_rounded)),
-        trailing: Draggable(
-          axis: Axis.vertical,
-          data: index,
-          child: icon,
-          childWhenDragging: Opacity(
-            opacity: 0.4,
+      listElements.add(
+        ListTile(
+          leading: IconButton(
+              onPressed: () => _removePoint(index),
+              icon: const Icon(Icons.delete_rounded)),
+          trailing: Draggable(
+            axis: Axis.vertical,
+            data: index,
             child: icon,
+            childWhenDragging: Opacity(
+              opacity: 0.4,
+              child: icon,
+            ),
+            feedback: icon,
           ),
-          feedback: icon,
+          title: title,
+          dense: true,
         ),
-        title: title,
-        dense: true,
-      ));
+      );
     }
 
     listElements.add(_buildDragTarget(_locations.length));
@@ -238,24 +244,25 @@ class RouteEditPageState extends State<RouteEditPage> {
   Widget _buildExpandableListContainer() {
     if (_listExpanded) {
       return Container(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-          height: 350,
-          child: Column(
-            children: [
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => setState(() {
-                    _listExpanded = false;
-                  }),
-                  child: const Text("hide List"),
-                ),
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+        height: 350,
+        child: Column(
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => setState(() {
+                  _listExpanded = false;
+                }),
+                child: const Text("hide List"),
               ),
-              Expanded(
-                child: _buildDraggableList(),
-              ),
-            ],
-          ));
+            ),
+            Expanded(
+              child: _buildDraggableList(),
+            ),
+          ],
+        ),
+      );
     } else {
       return Container(
         width: double.infinity,
@@ -279,19 +286,29 @@ class RouteEditPageState extends State<RouteEditPage> {
     ]);
 
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("Cardio Edit"),
-          actions: [
-            IconButton(
-                onPressed: _route.name.isNotEmpty ? () => _saveRoute() : null,
-                icon: const Icon(Icons.save))
-          ],
-        ),
-        body: Container(
-            color: backgroundColorOf(context),
-            child: Column(children: [
-              Expanded(
-                  child: MapboxMap(
+      appBar: AppBar(
+        title: const Text("Cardio Edit"),
+        actions: [
+          IconButton(
+            onPressed: _deleteRoute,
+            icon: const Icon(Icons.delete),
+          ),
+          IconButton(
+            onPressed: _formKey.currentContext != null &&
+                    _formKey.currentState!.validate() &&
+                    _route.track.isNotEmpty
+                ? _saveRoute
+                : null,
+            icon: const Icon(Icons.save),
+          )
+        ],
+      ),
+      body: Container(
+        color: backgroundColorOf(context),
+        child: Column(
+          children: [
+            Expanded(
+              child: MapboxMap(
                 accessToken: Defaults.mapbox.accessToken,
                 styleString: Defaults.mapbox.style.outdoor,
                 initialCameraPosition: CameraPosition(
@@ -308,11 +325,13 @@ class RouteEditPageState extends State<RouteEditPage> {
                   _updateLine();
                 },
                 onMapLongClick: (point, LatLng latLng) => _extendLine(latLng),
-              )),
-              _buildExpandableListContainer(),
-              Table(
-                children: [
-                  TableRow(children: [
+              ),
+            ),
+            _buildExpandableListContainer(),
+            Table(
+              children: [
+                TableRow(
+                  children: [
                     ValueUnitDescription(
                       value: (_route.distance / 1000).toString(),
                       unit: "km",
@@ -325,46 +344,52 @@ class RouteEditPageState extends State<RouteEditPage> {
                       description: "Name",
                       scale: 1.3,
                     )
-                  ]),
-                  rowSpacer,
-                  TableRow(children: [
+                  ],
+                ),
+                rowSpacer,
+                TableRow(
+                  children: [
                     ValueUnitDescription(
-                      value: "???",
+                      value: _route.ascent?.toString() ?? "--",
                       unit: "m",
                       description: "ascent",
                       scale: 1.3,
                     ),
                     ValueUnitDescription(
-                      value: "???",
+                      value: _route.descent?.toString() ?? "--",
                       unit: "m",
                       description: "descent",
                       scale: 1.3,
                     ),
-                  ]),
-                ],
+                  ],
+                ),
+              ],
+            ),
+            Defaults.sizedBox.vertical.normal,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Form(
+                key: _formKey,
+                child: TextFormField(
+                  onTap: () => setState(() {
+                    _listExpanded = false;
+                  }),
+                  onChanged: (name) => setState(() => _route.name = name),
+                  initialValue: _route.name,
+                  validator: Validator.validateStringNotEmpty,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  style: const TextStyle(height: 1),
+                  decoration: const InputDecoration(
+                    labelText: "Name",
+                    contentPadding: EdgeInsets.symmetric(vertical: 5),
+                  ),
+                ),
               ),
-              Defaults.sizedBox.vertical.normal,
-              Row(
-                children: [
-                  Defaults.sizedBox.horizontal.normal,
-                  Expanded(
-                      child: TextFormField(
-                    onTap: () => setState(() {
-                      _listExpanded = false;
-                    }),
-                    onChanged: (name) => setState(() => _route.name = name),
-                    style: const TextStyle(height: 1),
-                    decoration: InputDecoration(
-                      labelText: "Name",
-                      border: OutlineInputBorder(
-                          borderRadius: Defaults.borderRadius.big),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 5),
-                    ),
-                  )),
-                  Defaults.sizedBox.horizontal.normal,
-                ],
-              ),
-              Defaults.sizedBox.vertical.normal,
-            ])));
+            ),
+            Defaults.sizedBox.vertical.normal,
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/diary_data_provider.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
@@ -29,8 +28,11 @@ class DiaryEditPageState extends State<DiaryEditPage> {
     super.initState();
   }
 
-  void _saveDiary() async {
-    if (await _dataProvider.createSingle(_diary)) {
+  Future<void> _saveDiary() async {
+    final result = _diary.id == widget.diary?.id
+        ? await _dataProvider.updateSingle(_diary)
+        : await _dataProvider.createSingle(_diary);
+    if (result) {
       _formKey.currentState!.deactivate();
       Navigator.of(context).pop();
     } else {
@@ -39,8 +41,8 @@ class DiaryEditPageState extends State<DiaryEditPage> {
     }
   }
 
-  void _deleteDiary() async {
-    if (_diary.id != widget.diary?.id) {
+  Future<void> _deleteDiary() async {
+    if (_diary.id == widget.diary?.id) {
       await _dataProvider.deleteSingle(_diary);
     }
     _formKey.currentState!.deactivate();
@@ -54,7 +56,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
         title: const Text("Edit Diary Entry"),
         actions: [
           IconButton(
-            onPressed: () => _deleteDiary(),
+            onPressed: _deleteDiary,
             icon: const Icon(Icons.delete),
           ),
           IconButton(

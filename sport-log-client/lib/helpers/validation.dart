@@ -87,6 +87,14 @@ class Validator {
     }
   }
 
+  static String? validateStringNotEmpty(String? value) {
+    if (value != null && value.isEmpty) {
+      return "the field must not be empty";
+    } else {
+      return null;
+    }
+  }
+
   static String? validateIntGtZero(String? value) {
     if (value == null) return null;
     int? intValue = int.tryParse(value);

@@ -4,9 +4,11 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/db_serialization.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/cardio/position.dart';
+import 'package:sport_log/settings.dart';
 
 part 'route.g.dart';
 
@@ -35,6 +37,16 @@ class Route extends Entity with Comparable<Route> {
   List<Position> track;
   @override
   bool deleted;
+
+  Route.defaultValue()
+      : id = randomId(),
+        userId = Settings.userId!,
+        name = "",
+        distance = 0,
+        ascent = null,
+        descent = null,
+        track = [],
+        deleted = false;
 
   factory Route.fromJson(Map<String, dynamic> json) => _$RouteFromJson(json);
 
