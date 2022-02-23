@@ -58,9 +58,15 @@ class SettingsPageState extends State<SettingsPage> {
                   validator: Validator.validateUrl,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   style: const TextStyle(height: 1),
-                  onFieldSubmitted: (serverUrl) => setState(() {
-                    Settings.serverUrl = serverUrl;
-                  }),
+                  onFieldSubmitted: (serverUrl) async {
+                    final validated = Validator.validateUrl(serverUrl);
+                    if (validated == null) {
+                      setState(() => Settings.serverUrl = serverUrl);
+                    } else {
+                      await showMessageDialog(
+                          context: context, text: validated);
+                    }
+                  },
                 ),
               if (Settings.serverEnabled)
                 TextFormField(
@@ -71,22 +77,14 @@ class SettingsPageState extends State<SettingsPage> {
                     ),
                     keyboardType: TextInputType.number,
                     initialValue: Settings.syncInterval.inMinutes.toString(),
-                    validator: (syncInterval) {
-                      if (syncInterval != null) {
-                        final min = int.tryParse(syncInterval);
-                        if (min == null) {
-                          return "not a valid number";
-                        } else if (min <= 0) {
-                          return "Interval must be greater than 0";
-                        }
-                      }
-                      return null;
-                    },
+                    validator: Validator.validateIntGtZero,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     style: const TextStyle(height: 1),
                     onFieldSubmitted: (syncInterval) async {
-                      final min = int.tryParse(syncInterval);
-                      if (min != null && min > 0) {
+                      final validated =
+                          Validator.validateIntGtZero(syncInterval);
+                      if (validated == null) {
+                        final min = int.parse(syncInterval);
                         setState(() {
                           Settings.syncInterval = Duration(minutes: min);
                         });
@@ -94,8 +92,7 @@ class SettingsPageState extends State<SettingsPage> {
                         Sync.instance.startSync();
                       } else {
                         await showMessageDialog(
-                            context: context,
-                            text: "Interval must be greater than 0");
+                            context: context, text: validated);
                       }
                     }),
               Defaults.sizedBox.vertical.small,
@@ -122,10 +119,7 @@ class SettingsPageState extends State<SettingsPage> {
                           text: result.failure);
                     }
                   } else {
-                    await showMessageDialog(
-                        context: context,
-                        title: "Changing Username Failed",
-                        text: validated);
+                    await showMessageDialog(context: context, text: validated);
                   }
                   setState(() {});
                 },
@@ -151,10 +145,7 @@ class SettingsPageState extends State<SettingsPage> {
                           text: result.failure);
                     }
                   } else {
-                    await showMessageDialog(
-                        context: context,
-                        title: "Changing Password Failed",
-                        text: validated);
+                    await showMessageDialog(context: context, text: validated);
                   }
                   setState(() {});
                 },
@@ -180,10 +171,7 @@ class SettingsPageState extends State<SettingsPage> {
                           text: result.failure);
                     }
                   } else {
-                    await showMessageDialog(
-                        context: context,
-                        title: "Changing Email Failed",
-                        text: validated);
+                    await showMessageDialog(context: context, text: validated);
                   }
                   setState(() {});
                 },

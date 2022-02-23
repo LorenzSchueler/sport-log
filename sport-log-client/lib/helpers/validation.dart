@@ -86,4 +86,16 @@ class Validator {
       return null;
     }
   }
+
+  static String? validateIntGtZero(String? value) {
+    if (value == null) return null;
+    int? intValue = int.tryParse(value);
+    if (intValue == null) {
+      return "please enter a valid number";
+    } else if (intValue <= 0) {
+      return "please enter a number greater than 0";
+    } else {
+      return null;
+    }
+  }
 }
