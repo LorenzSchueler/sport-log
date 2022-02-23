@@ -12,10 +12,6 @@
 ///       - asset: fonts/CustomIcons.ttf
 ///
 ///
-/// * Elusive, Copyright (C) 2013 by Aristeides Stathopoulos
-///         Author:    Aristeides Stathopoulos
-///         License:   SIL (http://scripts.sil.org/OFL)
-///         Homepage:  http://aristeides.com/
 /// * Entypo, Copyright (C) 2012 by Daniel Bruce
 ///         Author:    Daniel Bruce
 ///         License:   SIL (http://scripts.sil.org/OFL)
@@ -39,8 +35,6 @@ class CustomIcons {
 
   static const IconData dumbbell_not_rotated =
       IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData fire =
-      IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData dumbbell_rotated =
       IconData(0xe804, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData plan =
