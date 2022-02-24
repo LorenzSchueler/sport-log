@@ -50,7 +50,9 @@ class MetconSession extends Entity {
   bool isValid() {
     return validate(deleted != true, 'MetconSession: deleted == true') &&
         validate(
-            time == null || time!.inSeconds > 0, 'MetconSession: time <= 0') &&
+          time == null || time!.inSeconds > 0,
+          'MetconSession: time <= 0',
+        ) &&
         validate(rounds == null || rounds! > 0, 'MetconSession: rounds <= 0') &&
         validate(reps == null || reps! > 0, 'MetconSession: reps <= 0');
   }

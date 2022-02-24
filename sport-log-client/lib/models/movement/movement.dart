@@ -94,13 +94,14 @@ class Movement extends Entity {
   }
 
   Movement copy() => Movement(
-      id: id,
-      userId: userId,
-      name: name,
-      description: description,
-      cardio: cardio,
-      deleted: deleted,
-      dimension: dimension);
+        id: id,
+        userId: userId,
+        name: name,
+        description: description,
+        cardio: cardio,
+        deleted: deleted,
+        dimension: dimension,
+      );
 
   @override
   bool operator ==(other) =>

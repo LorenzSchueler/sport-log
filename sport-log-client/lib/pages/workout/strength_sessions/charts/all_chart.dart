@@ -5,9 +5,8 @@ import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
-
-import 'helpers.dart';
-import 'series_type.dart';
+import 'package:sport_log/pages/workout/strength_sessions/charts/helpers.dart';
+import 'package:sport_log/pages/workout/strength_sessions/charts/series_type.dart';
 
 /// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
 class AllChart extends StatefulWidget {
@@ -86,11 +85,12 @@ class _AllChartState extends State<AllChart> {
           topTitles: SideTitles(showTitles: false),
           rightTitles: SideTitles(showTitles: false),
           bottomTitles: SideTitles(
-              showTitles: true,
-              getTitles: (value) {
-                final date = fromValue(value);
-                return shortMonthName(date.month) + '\n' + '${date.year}';
-              }),
+            showTitles: true,
+            getTitles: (value) {
+              final date = fromValue(value);
+              return shortMonthName(date.month) + '\n' + '${date.year}';
+            },
+          ),
           leftTitles: SideTitles(
             showTitles: true,
             reservedSize: isTime ? 60 : 40,

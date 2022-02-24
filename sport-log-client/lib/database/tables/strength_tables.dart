@@ -2,13 +2,12 @@ import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/database/tables/movement_table.dart';
 import 'package:sport_log/helpers/eorm.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
-
-import 'movement_table.dart';
 
 class StrengthSessionAndMovement {
   StrengthSessionAndMovement({
@@ -40,17 +39,24 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
       ];
 
   @override
-  final Table table = Table(Tables.strengthSession, columns: [
-    Column.int(Columns.id).primaryKey(),
-    Column.bool(Columns.deleted).withDefault('0'),
-    Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
-    Column.int(Columns.userId),
-    Column.text(Columns.datetime).withDefault("DATETIME('now')"),
-    Column.int(Columns.movementId)
-        .references(Tables.movement, onDelete: OnAction.cascade),
-    Column.int(Columns.interval).nullable().checkGt(0),
-    Column.text(Columns.comments).nullable(),
-  ]);
+  final Table table = Table(
+    Tables.strengthSession,
+    columns: [
+      Column.int(Columns.id)..primaryKey(),
+      Column.bool(Columns.deleted)..withDefault('0'),
+      Column.int(Columns.syncStatus)
+        ..withDefault('2')
+        ..checkIn(<int>[0, 1, 2]),
+      Column.int(Columns.userId),
+      Column.text(Columns.datetime)..withDefault("DATETIME('now')"),
+      Column.int(Columns.movementId)
+        ..references(Tables.movement, onDelete: OnAction.cascade),
+      Column.int(Columns.interval)
+        ..nullable()
+        ..checkGt(0),
+      Column.text(Columns.comments)..nullable(),
+    ],
+  );
 
   static const count = Columns.count;
   static const datetime = Columns.datetime;
@@ -79,7 +85,8 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
   static StrengthSetTable get _strengthSetTable => AppDatabase.strengthSets;
 
   Future<StrengthSessionDescription?> getById(Int64 idValue) async {
-    final records = await database.rawQuery('''
+    final records = await database.rawQuery(
+      '''
       SELECT
         ${table.allColumns},
         ${_movementTable.table.allColumns}
@@ -88,7 +95,9 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
       WHERE $tableName.$deleted = 0
         AND $movement.$deleted = 0
         AND $tableName.$id = ?;
-    ''', [idValue.toInt()]);
+    ''',
+      [idValue.toInt()],
+    );
     if (records.isEmpty) {
       return null;
     }
@@ -127,12 +136,14 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
     List<StrengthSessionDescription> strengthSessionDescriptions = [];
     for (Map<String, Object?> record in records) {
       final session = serde.fromDbRecord(record, prefix: table.prefix);
-      strengthSessionDescriptions.add(StrengthSessionDescription(
-        session: session,
-        sets: await _strengthSetTable.getByStrengthSession(session.id),
-        movement: _movementTable.serde
-            .fromDbRecord(record, prefix: _movementTable.table.prefix),
-      ));
+      strengthSessionDescriptions.add(
+        StrengthSessionDescription(
+          session: session,
+          sets: await _strengthSetTable.getByStrengthSession(session.id),
+          movement: _movementTable.serde
+              .fromDbRecord(record, prefix: _movementTable.table.prefix),
+        ),
+      );
     }
     return strengthSessionDescriptions;
   }
@@ -140,7 +151,8 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
   // this is only needed for test data generation
   Future<List<StrengthSessionAndMovement>> getSessionsWithMovements() async {
     // TODO: ignore strength session that have strength sets
-    final records = await database.rawQuery('''
+    final records = await database.rawQuery(
+      '''
       SELECT
         ${table.allColumns},
         ${_movementTable.table.allColumns}
@@ -148,12 +160,15 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
       JOIN $movement ON $movement.id = $tableName.$movementId
       WHERE $tableName.$deleted = 0
         AND $movement.$deleted = 0;
-    ''');
-    return records.mapToList((r) => StrengthSessionAndMovement(
-          session: serde.fromDbRecord(r, prefix: table.prefix),
-          movement: _movementTable.serde
-              .fromDbRecord(r, prefix: _movementTable.table.prefix),
-        ));
+    ''',
+    );
+    return records.mapToList(
+      (r) => StrengthSessionAndMovement(
+        session: serde.fromDbRecord(r, prefix: table.prefix),
+        movement: _movementTable.serde
+            .fromDbRecord(r, prefix: _movementTable.table.prefix),
+      ),
+    );
   }
 
   Future<List<StrengthSet>> getSetsOnDay({
@@ -162,7 +177,8 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
   }) async {
     final start = date.beginningOfDay();
     final end = date.endOfDay();
-    final records = await database.rawQuery('''
+    final records = await database.rawQuery(
+      '''
       SELECT
         ${_strengthSetTable.table.allColumns}
       FROM $tableName
@@ -173,9 +189,13 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
         AND $tableName.$datetime < ?
         AND $tableName.$movementId = ?
       ORDER BY $tableName.$datetime, $tableName.$id, $strengthSet.$setNumber;
-    ''', [start.toString(), end.toString(), movementIdValue.toInt()]);
-    return records.mapToList((record) => _strengthSetTable.serde
-        .fromDbRecord(record, prefix: _strengthSetTable.table.prefix));
+    ''',
+      [start.toString(), end.toString(), movementIdValue.toInt()],
+    );
+    return records.mapToList(
+      (record) => _strengthSetTable.serde
+          .fromDbRecord(record, prefix: _strengthSetTable.table.prefix),
+    );
   }
 
   Future<List<StrengthSessionStats>> getStatsAggregationsByDay({
@@ -183,7 +203,8 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
     required DateTime from,
     required DateTime until,
   }) async {
-    final records = await database.rawQuery('''
+    final records = await database.rawQuery(
+      '''
       SELECT
         $tableName.$datetime AS [$datetime],
         date($tableName.$datetime) AS [date],
@@ -204,7 +225,9 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
         AND $tableName.$datetime < ?
       GROUP BY [date]
       ORDER BY [date];
-     ''', [movementIdValue.toInt(), from.toString(), until.toString()]);
+     ''',
+      [movementIdValue.toInt(), from.toString(), until.toString()],
+    );
     _logger.d(records);
     return records
         .map((record) => StrengthSessionStats.fromDbRecord(record))
@@ -217,8 +240,10 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
     required DateTime until,
   }) async {
     assert(
-        from.year == until.year || from.beginningOfYear().yearLater() == until);
-    final records = await database.rawQuery('''
+      from.year == until.year || from.beginningOfYear().yearLater() == until,
+    );
+    final records = await database.rawQuery(
+      '''
       SELECT
         $tableName.$datetime AS [$datetime],
         strftime('%W', $tableName.$datetime) AS week,
@@ -239,7 +264,9 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
         AND $tableName.$datetime < ?
       GROUP BY week
       ORDER BY week;
-    ''', [movementIdValue.toInt(), from.toString(), until.toString()]);
+    ''',
+      [movementIdValue.toInt(), from.toString(), until.toString()],
+    );
     _logger.d(records);
     return records
         .map((record) => StrengthSessionStats.fromDbRecord(record))
@@ -249,7 +276,8 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
   Future<List<StrengthSessionStats>> getStatsAggregationsByMonth({
     required Int64 movementIdValue,
   }) async {
-    final records = await database.rawQuery('''
+    final records = await database.rawQuery(
+      '''
       SELECT
         $tableName.$datetime AS [$datetime],
         strftime('%Y_%m', $tableName.$datetime) AS month,
@@ -268,7 +296,9 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
         AND $tableName.$movementId = ?
       GROUP BY month
       ORDER BY month;
-    ''', [movementIdValue.toInt()]);
+    ''',
+      [movementIdValue.toInt()],
+    );
     _logger.d(records);
     return records
         .map((record) => StrengthSessionStats.fromDbRecord(record))
@@ -284,33 +314,46 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
   final Table table = Table(
     Tables.strengthSet,
     columns: [
-      Column.int(Columns.id).primaryKey(),
-      Column.bool(Columns.deleted).withDefault('0'),
-      Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
+      Column.int(Columns.id)..primaryKey(),
+      Column.bool(Columns.deleted)..withDefault('0'),
+      Column.int(Columns.syncStatus)
+        ..withDefault('2')
+        ..checkIn(<int>[0, 1, 2]),
       Column.int(Columns.strengthSessionId)
-          .references(Tables.strengthSession, onDelete: OnAction.cascade),
-      Column.int(Columns.setNumber).checkGe(0),
-      Column.int(Columns.count).checkGe(1),
-      Column.real(Columns.weight).nullable().checkGt(0),
+        ..references(Tables.strengthSession, onDelete: OnAction.cascade),
+      Column.int(Columns.setNumber)..checkGe(0),
+      Column.int(Columns.count)..checkGe(1),
+      Column.real(Columns.weight)
+        ..nullable()
+        ..checkGt(0),
     ],
   );
 
   Future<void> setSynchronizedByStrengthSession(Int64 id) async {
-    database.update(tableName, TableAccessor.synchronized,
-        where: '${Columns.strengthSessionId} = ?', whereArgs: [id.toInt()]);
+    database.update(
+      tableName,
+      TableAccessor.synchronized,
+      where: '${Columns.strengthSessionId} = ?',
+      whereArgs: [id.toInt()],
+    );
   }
 
   Future<List<StrengthSet>> getByStrengthSession(Int64 id) async {
-    final result = await database.query(tableName,
-        where: '${Columns.strengthSessionId} = ? AND ${Columns.deleted} = 0',
-        whereArgs: [id.toInt()],
-        orderBy: Columns.setNumber);
+    final result = await database.query(
+      tableName,
+      where: '${Columns.strengthSessionId} = ? AND ${Columns.deleted} = 0',
+      whereArgs: [id.toInt()],
+      orderBy: Columns.setNumber,
+    );
     return result.map(serde.fromDbRecord).toList();
   }
 
   Future<void> deleteByStrengthSession(Int64 id) async {
-    await database.update(tableName, {Columns.deleted: 1},
-        where: '${Columns.strengthSessionId} = ? AND ${Columns.deleted} = 0',
-        whereArgs: [id.toInt()]);
+    await database.update(
+      tableName,
+      {Columns.deleted: 1},
+      where: '${Columns.strengthSessionId} = ? AND ${Columns.deleted} = 0',
+      whereArgs: [id.toInt()],
+    );
   }
 }

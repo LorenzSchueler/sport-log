@@ -153,12 +153,17 @@ class StrengthSessionDescriptionDataProvider
 
   @override
   Future<List<StrengthSessionDescription>> getNonDeleted() async {
-    return Future.wait((await _strengthSessionDb.getNonDeleted())
-        .map((session) async => StrengthSessionDescription(
-            session: session,
-            movement: (await _movementDb.getSingle(session.movementId))!,
-            sets: await _strengthSetDb.getByStrengthSession(session.id)))
-        .toList());
+    return Future.wait(
+      (await _strengthSessionDb.getNonDeleted())
+          .map(
+            (session) async => StrengthSessionDescription(
+              session: session,
+              movement: (await _movementDb.getSingle(session.movementId))!,
+              sets: await _strengthSetDb.getByStrengthSession(session.id),
+            ),
+          )
+          .toList(),
+    );
   }
 
   @override
@@ -210,8 +215,10 @@ class StrengthSessionDescriptionDataProvider
       handleApiError(result1.failure, isCritical: true);
       return;
     }
-    await _strengthSessionDb.upsertMultiple(result1.success,
-        synchronized: true);
+    await _strengthSessionDb.upsertMultiple(
+      result1.success,
+      synchronized: true,
+    );
 
     final result2 = await _strengthSetApi.getMultiple();
     if (result2.isFailure) {
@@ -232,7 +239,10 @@ class StrengthSessionDescriptionDataProvider
     DateTime? until,
   }) async {
     return _strengthSessionDb.getByTimerangeAndMovement(
-        from: from, until: until, movementIdValue: movementId);
+      from: from,
+      until: until,
+      movementIdValue: movementId,
+    );
   }
 
   Future<List<StrengthSet>> getSetsOnDay({
@@ -248,7 +258,10 @@ class StrengthSessionDescriptionDataProvider
     required DateTime until,
   }) async {
     return _strengthSessionDb.getStatsAggregationsByDay(
-        movementIdValue: movementId, from: from, until: until);
+      movementIdValue: movementId,
+      from: from,
+      until: until,
+    );
   }
 
   // yearly view
@@ -258,25 +271,36 @@ class StrengthSessionDescriptionDataProvider
     required DateTime until,
   }) async {
     return _strengthSessionDb.getStatsAggregationsByWeek(
-        from: from, until: until, movementIdValue: movementId);
+      from: from,
+      until: until,
+      movementIdValue: movementId,
+    );
   }
 
   // all time view
-  Future<List<StrengthSessionStats>> getStatsAggregationsByMonth(
-      {required Int64 movementId}) async {
+  Future<List<StrengthSessionStats>> getStatsAggregationsByMonth({
+    required Int64 movementId,
+  }) async {
     return _strengthSessionDb.getStatsAggregationsByMonth(
-        movementIdValue: movementId);
+      movementIdValue: movementId,
+    );
   }
 
-  Future<void> upsertMultipleSessions(List<StrengthSession> sessions,
-      {required bool synchronized}) async {
-    await _strengthSessionDb.upsertMultiple(sessions,
-        synchronized: synchronized);
+  Future<void> upsertMultipleSessions(
+    List<StrengthSession> sessions, {
+    required bool synchronized,
+  }) async {
+    await _strengthSessionDb.upsertMultiple(
+      sessions,
+      synchronized: synchronized,
+    );
     notifyListeners();
   }
 
-  Future<void> upsertMultipleSets(List<StrengthSet> sets,
-      {required bool synchronized}) async {
+  Future<void> upsertMultipleSets(
+    List<StrengthSet> sets, {
+    required bool synchronized,
+  }) async {
     await _strengthSetDb.upsertMultiple(sets, synchronized: synchronized);
     notifyListeners();
   }

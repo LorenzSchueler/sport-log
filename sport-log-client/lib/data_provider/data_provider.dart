@@ -40,7 +40,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
     _onNoInternet = callback;
   }
 
-  void handleApiError(ApiError error, {bool isCritical = false}) async {
+  Future<void> handleApiError(ApiError error, {bool isCritical = false}) async {
     if (isCritical) {
       _logger.e('Api error: ${error.toErrorMessage()}', error);
       if (error == ApiError.noInternetConnection && _onNoInternet != null) {
@@ -149,8 +149,10 @@ abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
     await upsertMultiple(getFromAccountData(accountData), synchronized: true);
   }
 
-  Future<void> upsertMultiple(List<T> objects,
-      {required bool synchronized}) async {
+  Future<void> upsertMultiple(
+    List<T> objects, {
+    required bool synchronized,
+  }) async {
     if (objects.isEmpty) {
       return;
     }
@@ -165,8 +167,10 @@ abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
     }
   }
 
-  static Future<void> upsertAccountData(AccountData data,
-      {required bool synchronized}) async {
+  static Future<void> upsertAccountData(
+    AccountData data, {
+    required bool synchronized,
+  }) async {
     // !!! order matters => no parallel execution possible
     for (final dp in EntityDataProvider.all) {
       await dp.upsertFromAccountData(data);

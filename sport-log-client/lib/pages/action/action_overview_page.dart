@@ -20,10 +20,11 @@ class ActionOverviewPageState extends State<ActionOverviewPage> {
         title: const Text("Server Actions"),
       ),
       body: Container(
-          padding: const EdgeInsets.all(10),
-          child: ListView(
-            children: const [Text("not implemented")],
-          )),
+        padding: const EdgeInsets.all(10),
+        child: ListView(
+          children: const [Text("not implemented")],
+        ),
+      ),
       drawer: MainDrawer(selectedRoute: Routes.action.overview),
     );
   }

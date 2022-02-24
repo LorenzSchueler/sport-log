@@ -41,7 +41,8 @@ class DbPositionListConverter {
     final List<Position> positions = [];
     for (int i = 0; i < fromDb.length; i += Position.byteSize) {
       positions.add(
-          Position.fromBytesList(fromDb.sublist(i, i + Position.byteSize)));
+        Position.fromBytesList(fromDb.sublist(i, i + Position.byteSize)),
+      );
     }
     return positions;
   }

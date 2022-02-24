@@ -40,9 +40,10 @@ ThemeData _themeDataFromColors({
       brightness == Brightness.light ? cs.primary : cs.surface;
   return ThemeData(
     appBarTheme: AppBarTheme(
-        foregroundColor:
-            brightness == Brightness.light ? cs.onPrimary : cs.onSurface,
-        backgroundColor: appBarBackgroundColor),
+      foregroundColor:
+          brightness == Brightness.light ? cs.onPrimary : cs.onSurface,
+      backgroundColor: appBarBackgroundColor,
+    ),
     bottomAppBarTheme: BottomAppBarTheme(color: appBarBackgroundColor),
     bottomAppBarColor: appBarBackgroundColor,
     colorScheme: cs,
@@ -138,16 +139,18 @@ int _tintValue(int value, double factor) =>
     max(0, min((value + ((255 - value) * factor)).round(), 255));
 
 Color _tintColor(Color color, double factor) => Color.fromRGBO(
-    _tintValue(color.red, factor),
-    _tintValue(color.green, factor),
-    _tintValue(color.blue, factor),
-    1);
+      _tintValue(color.red, factor),
+      _tintValue(color.green, factor),
+      _tintValue(color.blue, factor),
+      1,
+    );
 
 int _shadeValue(int value, double factor) =>
     max(0, min(value - (value * factor).round(), 255));
 
 Color _shadeColor(Color color, double factor) => Color.fromRGBO(
-    _shadeValue(color.red, factor),
-    _shadeValue(color.green, factor),
-    _shadeValue(color.blue, factor),
-    1);
+      _shadeValue(color.red, factor),
+      _shadeValue(color.green, factor),
+      _shadeValue(color.blue, factor),
+      1,
+    );

@@ -45,12 +45,14 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
 
   Future<void> _update() async {
     _logger.d(
-        'Updating metcon session page with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
+      'Updating metcon session page with start = ${_dateFilter.start}, end = ${_dateFilter.end}',
+    );
     final metconSessionDescriptions =
         await _dataProvider.getByTimerangeAndMovement(
-            movementId: _movement?.id,
-            from: _dateFilter.start,
-            until: _dateFilter.end);
+      movementId: _movement?.id,
+      from: _dateFilter.start,
+      until: _dateFilter.end,
+    );
     setState(() => _metconSessionDescriptions = metconSessionDescriptions);
   }
 
@@ -70,13 +72,16 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         title: Text(_movement?.name ?? "Metcon Sessions"),
         actions: [
           IconButton(
-              onPressed: () =>
-                  Navigator.pushNamed(context, Routes.metcon.overview),
-              icon: const Icon(AppIcons.notes)),
+            onPressed: () =>
+                Navigator.pushNamed(context, Routes.metcon.overview),
+            icon: const Icon(AppIcons.notes),
+          ),
           IconButton(
             onPressed: () async {
-              final Movement? movement = await showMovementPickerDialog(context,
-                  selectedMovement: _movement);
+              final Movement? movement = await showMovementPickerDialog(
+                context,
+                selectedMovement: _movement,
+              );
               if (movement == null) {
                 return;
               } else if (movement.id == _movement?.id) {
@@ -90,7 +95,8 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
               }
             },
             icon: Icon(
-                _movement != null ? AppIcons.filterFilled : AppIcons.filter),
+              _movement != null ? AppIcons.filterFilled : AppIcons.filter,
+            ),
           ),
         ],
         bottom: PreferredSize(
@@ -105,20 +111,23 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         ),
       ),
       body: RefreshIndicator(
-          onRefresh: _pullFromServer,
-          child: ListView.builder(
-            itemBuilder: (_, index) => MetconSessionCard(
-                metconSessionDescription: _metconSessionDescriptions[index]),
-            itemCount: _metconSessionDescriptions.length,
-          )),
+        onRefresh: _pullFromServer,
+        child: ListView.builder(
+          itemBuilder: (_, index) => MetconSessionCard(
+            metconSessionDescription: _metconSessionDescriptions[index],
+          ),
+          itemCount: _metconSessionDescriptions.length,
+        ),
+      ),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.metcon),
       drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
       floatingActionButton: FloatingActionButton(
-          child: const Icon(AppIcons.add),
-          onPressed: () {
-            Navigator.pushNamed(context, Routes.metcon.sessionEdit);
-          }),
+        child: const Icon(AppIcons.add),
+        onPressed: () {
+          Navigator.pushNamed(context, Routes.metcon.sessionEdit);
+        },
+      ),
     );
   }
 }
@@ -132,22 +141,30 @@ class MetconSessionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () {
-          Navigator.pushNamed(context, Routes.metcon.sessionEdit,
-              arguments: metconSessionDescription);
-        },
-        child: Card(
-            child: ListTile(
-          leading: Icon(metconSessionDescription
-              .metconDescription.metcon.metconType.icon),
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          Routes.metcon.sessionEdit,
+          arguments: metconSessionDescription,
+        );
+      },
+      child: Card(
+        child: ListTile(
+          leading: Icon(
+            metconSessionDescription.metconDescription.metcon.metconType.icon,
+          ),
           trailing: metconSessionDescription.metconSession.rx
               ? const Icon(AppIcons.checkCircle)
               : null,
           title: Text(metconSessionDescription.metconDescription.name),
           subtitle: Text(metconSessionDescription.longResultDescription),
           onTap: () => Navigator.pushNamed(
-              context, Routes.metcon.sessionDetails,
-              arguments: metconSessionDescription),
-        )));
+            context,
+            Routes.metcon.sessionDetails,
+            arguments: metconSessionDescription,
+          ),
+        ),
+      ),
+    );
   }
 }

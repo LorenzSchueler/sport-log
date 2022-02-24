@@ -12,7 +12,11 @@ import 'package:sport_log/settings.dart';
 final _logger = Logger('TEST');
 
 final User sampleUser = User(
-    id: Int64(1), username: "user1", password: "user1-passwd", email: "email1");
+  id: Int64(1),
+  username: "user1",
+  password: "user1-passwd",
+  email: "email1",
+);
 
 void testUser() {
   test('user test', () async {
@@ -25,7 +29,9 @@ void testUser() {
 
     expect(await Api.user.postSingle(user), isA<Success>());
     expect(
-        await Api.user.getSingle(user.username, user.password), isA<Success>());
+      await Api.user.getSingle(user.username, user.password),
+      isA<Success>(),
+    );
 
     final updatedUser = User(
       id: user.id,
@@ -39,14 +45,14 @@ void testUser() {
   });
 }
 
-void testAction() async {
+Future<void> testAction() async {
   test('get action providers', () async {
     Settings.user = sampleUser;
     expect(await Api.actionProviders.getMultiple(), isA<Success>());
   });
 }
 
-void testDiary() async {
+Future<void> testDiary() async {
   test('test diary', () async {
     final diary = Diary(
       id: randomId(),
@@ -70,7 +76,7 @@ void testDiary() async {
   });
 }
 
-void testStrengthSession() async {
+Future<void> testStrengthSession() async {
   test('test strength session', () async {
     final strengthSession = StrengthSession(
       id: randomId(),
@@ -84,19 +90,23 @@ void testStrengthSession() async {
 
     Settings.user = sampleUser;
     expect(
-        await Api.strengthSessions.postSingle(strengthSession), isA<Success>());
+      await Api.strengthSessions.postSingle(strengthSession),
+      isA<Success>(),
+    );
     expect(await Api.strengthSessions.getMultiple(), isA<Success>());
     expect(
-        await Api.strengthSessions
-            .putSingle(strengthSession..comments = 'comments'),
-        isA<Success>());
+      await Api.strengthSessions
+          .putSingle(strengthSession..comments = 'comments'),
+      isA<Success>(),
+    );
     expect(
-        await Api.strengthSessions.putSingle(strengthSession..deleted = true),
-        isA<Success>());
+      await Api.strengthSessions.putSingle(strengthSession..deleted = true),
+      isA<Success>(),
+    );
   });
 }
 
-void testActionRule() async {
+Future<void> testActionRule() async {
   test('test action rule', () async {
     final actionRule = ActionRule(
       id: randomId(),
@@ -132,12 +142,14 @@ void testActionRule() async {
     expect(result, isA<Success>());
     _logger.i(result.success.time.toString());
     // expect(result.success.time, actionRule.time);
-    expect(await Api.actionRules.putSingle(actionRule..deleted = true),
-        isA<Success>());
+    expect(
+      await Api.actionRules.putSingle(actionRule..deleted = true),
+      isA<Success>(),
+    );
   });
 }
 
-void main() async {
+Future<void> main() async {
   await for (double _ in initialize()) {}
 
   testUser();

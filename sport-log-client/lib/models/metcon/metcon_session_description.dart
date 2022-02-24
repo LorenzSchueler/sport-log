@@ -15,10 +15,14 @@ class MetconSessionDescription implements Validatable {
 
   @override
   bool isValid() {
-    return validate(metconDescription.isValid(),
-            'MetconSessionDescription: metcon description not valid') &&
-        validate(metconSession.metconId == metconDescription.metcon.id,
-            'MetconSessionDescription: metcon id mismatch');
+    return validate(
+          metconDescription.isValid(),
+          'MetconSessionDescription: metcon description not valid',
+        ) &&
+        validate(
+          metconSession.metconId == metconDescription.metcon.id,
+          'MetconSessionDescription: metcon id mismatch',
+        );
   }
 
   String _resultDescription(bool short) {

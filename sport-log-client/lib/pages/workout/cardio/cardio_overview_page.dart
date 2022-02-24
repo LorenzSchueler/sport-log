@@ -53,12 +53,14 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
 
   Future<void> _update() async {
     _logger.d(
-        'Updating diary page with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
+      'Updating diary page with start = ${_dateFilter.start}, end = ${_dateFilter.end}',
+    );
     final cardioSessionDescriptions =
         await _dataProvider.getByTimerangeAndMovement(
-            movementId: _movement?.id,
-            from: _dateFilter.start,
-            until: _dateFilter.end);
+      movementId: _movement?.id,
+      from: _dateFilter.start,
+      until: _dateFilter.end,
+    );
     setState(() => _cardioSessionDescriptions = cardioSessionDescriptions);
   }
 
@@ -78,13 +80,16 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         title: Text(_movement?.name ?? "Cardio Sessions"),
         actions: [
           IconButton(
-              onPressed: () =>
-                  Navigator.pushNamed(context, Routes.cardio.routeOverview),
-              icon: const Icon(AppIcons.route)),
+            onPressed: () =>
+                Navigator.pushNamed(context, Routes.cardio.routeOverview),
+            icon: const Icon(AppIcons.route),
+          ),
           IconButton(
             onPressed: () async {
-              final Movement? movement = await showMovementPickerDialog(context,
-                  selectedMovement: _movement);
+              final Movement? movement = await showMovementPickerDialog(
+                context,
+                selectedMovement: _movement,
+              );
               if (movement == null) {
                 return;
               } else if (movement.id == _movement?.id) {
@@ -98,7 +103,8 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
               }
             },
             icon: Icon(
-                _movement != null ? AppIcons.filterFilled : AppIcons.filter),
+              _movement != null ? AppIcons.filterFilled : AppIcons.filter,
+            ),
           ),
         ],
         bottom: PreferredSize(
@@ -113,12 +119,14 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         ),
       ),
       body: RefreshIndicator(
-          onRefresh: _pullFromServer,
-          child: ListView.builder(
-            itemBuilder: (_, index) => CardioSessionCard(
-                cardioSessionDescription: _cardioSessionDescriptions[index]),
-            itemCount: _cardioSessionDescriptions.length,
-          )),
+        onRefresh: _pullFromServer,
+        child: ListView.builder(
+          itemBuilder: (_, index) => CardioSessionCard(
+            cardioSessionDescription: _cardioSessionDescriptions[index],
+          ),
+          itemCount: _cardioSessionDescriptions.length,
+        ),
+      ),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.cardio),
       drawer: MainDrawer(selectedRoute: Routes.cardio.overview),
@@ -126,19 +134,25 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         icon: const Icon(AppIcons.add),
         buttons: [
           ActionButton(
-              icon: const Icon(AppIcons.timer),
-              onPressed: () async {
-                final returnObj = await Navigator.pushNamed(
-                    context, Routes.cardio.trackingSettings);
-                _handleNewCardioSession(returnObj);
-              }),
+            icon: const Icon(AppIcons.timer),
+            onPressed: () async {
+              final returnObj = await Navigator.pushNamed(
+                context,
+                Routes.cardio.trackingSettings,
+              );
+              _handleNewCardioSession(returnObj);
+            },
+          ),
           ActionButton(
-              icon: const Icon(AppIcons.notes),
-              onPressed: () async {
-                final returnObj = await Navigator.pushNamed(
-                    context, Routes.cardio.cardioEdit);
-                _handleNewCardioSession(returnObj);
-              }),
+            icon: const Icon(AppIcons.notes),
+            onPressed: () async {
+              final returnObj = await Navigator.pushNamed(
+                context,
+                Routes.cardio.cardioEdit,
+              );
+              _handleNewCardioSession(returnObj);
+            },
+          ),
         ],
       ),
     );
@@ -160,8 +174,12 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
           });
           break;
         case ReturnAction.deleted:
-          setState(() => _cardioSessionDescriptions.delete(object.payload,
-              by: (c) => c.id));
+          setState(
+            () => _cardioSessionDescriptions.delete(
+              object.payload,
+              by: (c) => c.id,
+            ),
+          );
       }
     } else {
       _logger.i("poped item is not a ReturnObject");
@@ -176,8 +194,11 @@ class CardioSessionCard extends StatelessWidget {
       : super(key: key);
 
   void showDetails(BuildContext context) {
-    Navigator.pushNamed(context, Routes.cardio.cardioDetails,
-        arguments: cardioSessionDescription);
+    Navigator.pushNamed(
+      context,
+      Routes.cardio.cardioDetails,
+      arguments: cardioSessionDescription,
+    );
   }
 
   @override
@@ -199,26 +220,30 @@ class CardioSessionCard extends StatelessWidget {
     late MapboxMapController _sessionMapController;
 
     return GestureDetector(
-        onTap: () => showDetails(context),
-        child: Card(
-          child: Column(children: [
+      onTap: () => showDetails(context),
+      child: Card(
+        child: Column(
+          children: [
             Defaults.sizedBox.vertical.small,
-            Row(children: [
-              Expanded(
-                child: Text(
-                  formatDatetime(
-                      cardioSessionDescription.cardioSession.datetime),
-                  textAlign: TextAlign.center,
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    formatDatetime(
+                      cardioSessionDescription.cardioSession.datetime,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
-              const Spacer(),
-              Expanded(
-                child: Text(
-                  cardioSessionDescription.movement.name,
-                  textAlign: TextAlign.center,
-                ),
-              )
-            ]),
+                const Spacer(),
+                Expanded(
+                  child: Text(
+                    cardioSessionDescription.movement.name,
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              ],
+            ),
             Defaults.sizedBox.vertical.small,
             cardioSessionDescription.cardioSession.track != null
                 ? SizedBox(
@@ -239,15 +264,19 @@ class CardioSessionCard extends StatelessWidget {
                       onMapCreated: (MapboxMapController controller) =>
                           _sessionMapController = controller,
                       onStyleLoadedCallback: () {
-                        _sessionMapController.addLine(LineOptions(
+                        _sessionMapController.addLine(
+                          LineOptions(
                             lineColor: "red",
                             geometry: cardioSessionDescription
                                 .cardioSession.track!
                                 .map((c) => c.latLng)
-                                .toList()));
+                                .toList(),
+                          ),
+                        );
                       },
                       onMapClick: (_, __) => showDetails(context),
-                    ))
+                    ),
+                  )
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
@@ -256,31 +285,35 @@ class CardioSessionCard extends StatelessWidget {
                     ],
                   ),
             Defaults.sizedBox.vertical.small,
-            Row(children: [
-              Expanded(
-                child: ValueUnitDescription(
-                  value: duration,
-                  unit: null,
-                  description: null,
+            Row(
+              children: [
+                Expanded(
+                  child: ValueUnitDescription(
+                    value: duration,
+                    unit: null,
+                    description: null,
+                  ),
                 ),
-              ),
-              Expanded(
-                child: ValueUnitDescription(
-                  value: distance,
-                  unit: "km",
-                  description: null,
+                Expanded(
+                  child: ValueUnitDescription(
+                    value: distance,
+                    unit: "km",
+                    description: null,
+                  ),
                 ),
-              ),
-              Expanded(
-                child: ValueUnitDescription(
-                  value: speed,
-                  unit: "km/h",
-                  description: null,
+                Expanded(
+                  child: ValueUnitDescription(
+                    value: speed,
+                    unit: "km/h",
+                    description: null,
+                  ),
                 ),
-              ),
-            ]),
+              ],
+            ),
             Defaults.sizedBox.vertical.small,
-          ]),
-        ));
+          ],
+        ),
+      ),
+    );
   }
 }

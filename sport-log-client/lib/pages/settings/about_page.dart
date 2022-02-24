@@ -18,22 +18,24 @@ class AboutPage extends StatelessWidget {
               leading: AppIcons.github,
               caption: "GitHub",
               child: GestureDetector(
-                  child: const Icon(AppIcons.openInBrowser),
-                  onTap: () =>
-                      launch("https://github.com/LorenzSchueler/sport-log")),
+                child: const Icon(AppIcons.openInBrowser),
+                onTap: () =>
+                    launch("https://github.com/LorenzSchueler/sport-log"),
+              ),
             ),
             TextTile(
               leading: AppIcons.copyright,
               caption: "Copyright & License",
               child: GestureDetector(
-                  child: const Text(
-                    "GPLv3 license",
-                    style: TextStyle(
-                      decoration: TextDecoration.underline,
-                    ),
+                child: const Text(
+                  "GPLv3 license",
+                  style: TextStyle(
+                    decoration: TextDecoration.underline,
                   ),
-                  onTap: () =>
-                      launch("https://www.gnu.org/licenses/gpl-3.0.html")),
+                ),
+                onTap: () =>
+                    launch("https://www.gnu.org/licenses/gpl-3.0.html"),
+              ),
             ),
           ],
         ),

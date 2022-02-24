@@ -1,9 +1,8 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/database/table_accessor.dart';
 import 'package:sqflite/sqflite.dart';
-
-import 'db_interfaces.dart';
 
 export 'db_interfaces.dart';
 
@@ -45,28 +44,31 @@ abstract class TableAccessor<T extends Entity> {
 
   Future<void> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
     await database.update(
+      tableName,
+      {
+        Columns.deleted: 1,
+        if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
+      },
+      where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
+      whereArgs: [id.toInt()],
+    );
+  }
+
+  Future<void> deleteMultiple(
+    List<T> objects, {
+    bool isSynchronized = false,
+  }) async {
+    final batch = database.batch();
+    for (final object in objects) {
+      batch.update(
         tableName,
         {
           Columns.deleted: 1,
           if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
         },
         where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
-        whereArgs: [id.toInt()]);
-  }
-
-  Future<void> deleteMultiple(List<T> objects,
-      {bool isSynchronized = false}) async {
-    final batch = database.batch();
-    for (final object in objects) {
-      batch.update(
-          tableName,
-          {
-            Columns.deleted: 1,
-            if (isSynchronized)
-              Columns.syncStatus: SyncStatus.synchronized.index,
-          },
-          where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
-          whereArgs: [object.id.toInt()]);
+        whereArgs: [object.id.toInt()],
+      );
     }
     await batch.commit(noResult: true, continueOnError: false);
   }
@@ -83,8 +85,10 @@ abstract class TableAccessor<T extends Entity> {
     );
   }
 
-  Future<void> updateMultiple(List<T> objects,
-      {bool isSynchronized = false}) async {
+  Future<void> updateMultiple(
+    List<T> objects, {
+    bool isSynchronized = false,
+  }) async {
     final batch = database.batch();
     for (final object in objects) {
       batch.update(
@@ -107,8 +111,10 @@ abstract class TableAccessor<T extends Entity> {
     });
   }
 
-  Future<void> createMultiple(List<T> objects,
-      {bool isSynchronized = false}) async {
+  Future<void> createMultiple(
+    List<T> objects, {
+    bool isSynchronized = false,
+  }) async {
     final batch = database.batch();
     for (final object in objects) {
       batch.insert(tableName, {
@@ -125,8 +131,11 @@ abstract class TableAccessor<T extends Entity> {
   }
 
   Future<List<T>> getWithSyncStatus(SyncStatus syncStatus) async {
-    final result = await database.query(tableName,
-        where: '${Columns.syncStatus} = ?', whereArgs: [syncStatus.index]);
+    final result = await database.query(
+      tableName,
+      where: '${Columns.syncStatus} = ?',
+      whereArgs: [syncStatus.index],
+    );
     return result.map(serde.fromDbRecord).toList();
   }
 
@@ -141,32 +150,45 @@ abstract class TableAccessor<T extends Entity> {
   };
 
   Future<void> setSynchronized(Int64 id) async {
-    await database.update(tableName, synchronized,
-        where: '${Columns.id} = ?', whereArgs: [id.toInt()]);
+    await database.update(
+      tableName,
+      synchronized,
+      where: '${Columns.id} = ?',
+      whereArgs: [id.toInt()],
+    );
   }
 
   Future<void> setAllUpdatedSynchronized() async {
-    await database.update(tableName, synchronized,
-        where: '${Columns.syncStatus} = ${SyncStatus.updated.index}');
+    await database.update(
+      tableName,
+      synchronized,
+      where: '${Columns.syncStatus} = ${SyncStatus.updated.index}',
+    );
   }
 
   Future<void> setAllCreatedSynchronized() async {
-    await database.update(tableName, synchronized,
-        where: '${Columns.syncStatus} = ${SyncStatus.created.index}');
+    await database.update(
+      tableName,
+      synchronized,
+      where: '${Columns.syncStatus} = ${SyncStatus.created.index}',
+    );
   }
 
-  Future<void> upsertMultiple(List<T> objects,
-      {required bool synchronized}) async {
+  Future<void> upsertMultiple(
+    List<T> objects, {
+    required bool synchronized,
+  }) async {
     final batch = database.batch();
     for (final object in objects) {
       // TODO: what it sync_status == 1 or sync_status == 2?
       batch.insert(
-          tableName,
-          {
-            ...serde.toDbRecord(object),
-            if (synchronized) Columns.syncStatus: SyncStatus.synchronized.index,
-          },
-          conflictAlgorithm: ConflictAlgorithm.replace);
+        tableName,
+        {
+          ...serde.toDbRecord(object),
+          if (synchronized) Columns.syncStatus: SyncStatus.synchronized.index,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
     await batch.commit(noResult: true, continueOnError: false);
   }

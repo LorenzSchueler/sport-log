@@ -46,7 +46,8 @@ class DiaryPageState extends State<DiaryPage> {
 
   Future<void> _update() async {
     _logger.d(
-        'Updating diary page with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
+      'Updating diary page with start = ${_dateFilter.start}, end = ${_dateFilter.end}',
+    );
     final diaries =
         await _dataProvider.getByTimerange(_dateFilter.start, _dateFilter.end);
     setState(() => _diaries = diaries);
@@ -78,11 +79,12 @@ class DiaryPageState extends State<DiaryPage> {
         ),
       ),
       body: RefreshIndicator(
-          onRefresh: _pullFromServer,
-          child: ListView.builder(
-            itemBuilder: (_, index) => DiaryCard(diary: _diaries[index]),
-            itemCount: _diaries.length,
-          )),
+        onRefresh: _pullFromServer,
+        child: ListView.builder(
+          itemBuilder: (_, index) => DiaryCard(diary: _diaries[index]),
+          itemCount: _diaries.length,
+        ),
+      ),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.diary),
       drawer: MainDrawer(selectedRoute: Routes.diary.overview),
@@ -124,7 +126,8 @@ class DiaryCard extends StatelessWidget {
                     ? ValueUnitDescription(
                         value: diary.bodyweight!.toStringAsFixed(1),
                         unit: "kg",
-                        description: null)
+                        description: null,
+                      )
                     : null,
               ),
               Defaults.sizedBox.horizontal.big,

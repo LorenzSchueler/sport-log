@@ -8,13 +8,12 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/theme.dart';
+import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/login/landing_page.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/test_data/movement_test_data.dart';
 import 'package:sport_log/test_data/strength_test_data.dart';
 import 'package:provider/provider.dart';
-
-import 'models/movement/movement.dart';
 
 final _logger = Logger('MAIN');
 
@@ -55,15 +54,17 @@ Future<void> insertTestData() async {
     final sets = await generateStrengthSets();
     await StrengthSessionDescriptionDataProvider.instance
         .upsertMultipleSets(sets, synchronized: false);
-    _logger.i('''
+    _logger.i(
+      '''
         Generated
         ${movements.length} movements,
         ${sessions.length} strength sessions,
-        ${sets.length} strength sets''');
+        ${sets.length} strength sets''',
+    );
   }
 }
 
-void main() async {
+Future<void> main() async {
   runApp(const InitAppWrapper());
 }
 

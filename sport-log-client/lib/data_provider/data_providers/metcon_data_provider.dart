@@ -169,12 +169,17 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
 
   @override
   Future<List<MetconDescription>> getNonDeleted() async {
-    return Future.wait((await _metconDb.getNonDeleted())
-        .map((metcon) async => MetconDescription(
-            metcon: metcon,
-            moves: await _getMmdByMetcon(metcon.id),
-            hasReference: await _metconSessionDb.existsByMetcon(metcon.id)))
-        .toList());
+    return Future.wait(
+      (await _metconDb.getNonDeleted())
+          .map(
+            (metcon) async => MetconDescription(
+              metcon: metcon,
+              moves: await _getMmdByMetcon(metcon.id),
+              hasReference: await _metconSessionDb.existsByMetcon(metcon.id),
+            ),
+          )
+          .toList(),
+    );
   }
 
   @override
@@ -242,11 +247,16 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
 
   Future<List<MetconMovementDescription>> _getMmdByMetcon(Int64 id) async {
     final metconMovements = await _metconMovementDb.getByMetcon(id);
-    return Future.wait(metconMovements
-        .map((mm) async => MetconMovementDescription(
-            metconMovement: mm,
-            movement: (await _movementDb.getSingle(mm.movementId))!))
-        .toList());
+    return Future.wait(
+      metconMovements
+          .map(
+            (mm) async => MetconMovementDescription(
+              metconMovement: mm,
+              movement: (await _movementDb.getSingle(mm.movementId))!,
+            ),
+          )
+          .toList(),
+    );
   }
 
   Future<MetconDescription?> getById(Int64 id) async {
@@ -255,9 +265,10 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
       return null;
     }
     return MetconDescription(
-        metcon: metcon,
-        moves: await _getMmdByMetcon(metcon.id),
-        hasReference: await _metconSessionDb.existsByMetcon(metcon.id));
+      metcon: metcon,
+      moves: await _getMmdByMetcon(metcon.id),
+      hasReference: await _metconSessionDb.existsByMetcon(metcon.id),
+    );
   }
 }
 
@@ -305,7 +316,8 @@ class MetconSessionDescriptionDataProvider
   @override
   Future<List<MetconSessionDescription>> getNonDeleted() async {
     return await _mapToDescription(
-        await _metconSessionDataProvider.getNonDeleted());
+      await _metconSessionDataProvider.getNonDeleted(),
+    );
   }
 
   @override
@@ -332,18 +344,27 @@ class MetconSessionDescriptionDataProvider
     DateTime? until,
   }) async {
     return await _mapToDescription(
-        await _metconSessionDb.getByTimerangeAndMovement(
-            from: from, until: until, movementIdValue: movementId));
+      await _metconSessionDb.getByTimerangeAndMovement(
+        from: from,
+        until: until,
+        movementIdValue: movementId,
+      ),
+    );
   }
 
   Future<List<MetconSessionDescription>> _mapToDescription(
-      List<MetconSession> metconSessions) async {
-    return Future.wait(metconSessions
-        .map((session) async => MetconSessionDescription(
+    List<MetconSession> metconSessions,
+  ) async {
+    return Future.wait(
+      metconSessions
+          .map(
+            (session) async => MetconSessionDescription(
               metconSession: session,
               metconDescription:
                   (await _metconDescriptionDataProvider.getById(session.id))!,
-            ))
-        .toList());
+            ),
+          )
+          .toList(),
+    );
   }
 }

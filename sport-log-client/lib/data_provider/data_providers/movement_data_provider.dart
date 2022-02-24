@@ -22,11 +22,14 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
   Future<List<MovementDescription>> getMovementDescriptions() async =>
       db.getMovementDescriptions();
 
-  Future<List<Movement>> getMovements(
-          {String? byName, bool cardioOnly = false}) async =>
+  Future<List<Movement>> getMovements({
+    String? byName,
+    bool cardioOnly = false,
+  }) async =>
       db.getMovements(
-          byName: byName != null && byName.isNotEmpty ? byName : null,
-          cardioOnly: cardioOnly);
+        byName: byName != null && byName.isNotEmpty ? byName : null,
+        cardioOnly: cardioOnly,
+      );
 
   Future<bool> movementExists(String name, MovementDimension dim) async =>
       db.exists(name, dim);

@@ -17,12 +17,15 @@ List<Movement> generateMovements(Int64 userId) {
       dimension: faker.randomGenerator.element(MovementDimension.values),
       deleted: false,
     ),
-  )..add(Movement(
-      id: randomId(),
-      userId: userId,
-      name: 'RepsMovement',
-      description: null,
-      cardio: false,
-      deleted: false,
-      dimension: MovementDimension.reps));
+  )..add(
+      Movement(
+        id: randomId(),
+        userId: userId,
+        name: 'RepsMovement',
+        description: null,
+        cardio: false,
+        deleted: false,
+        dimension: MovementDimension.reps,
+      ),
+    );
 }

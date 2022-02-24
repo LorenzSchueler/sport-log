@@ -24,6 +24,12 @@ linter:
   rules:
     # avoid_print: false  # Uncomment to disable the `avoid_print` rule
     # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+    always_use_package_imports: true
+    avoid_returning_this: true
+    avoid_void_async: true
+    # prefer_double_quotes: true
+    require_trailing_commas: true
+    unnecessary_parenthesis: true
 
 analyzer:
   exclude:

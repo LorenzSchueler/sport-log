@@ -21,7 +21,9 @@ class Account {
   }
 
   static Future<Result<User, String>> login(
-      String username, String password) async {
+    String username,
+    String password,
+  ) async {
     final result = await Api.user.getSingle(username, password);
     if (result.isSuccess) {
       User user = result.success;
@@ -34,8 +36,11 @@ class Account {
     }
   }
 
-  static Future<Result<User, String>> editUser(
-      {String? username, String? password, String? email}) async {
+  static Future<Result<User, String>> editUser({
+    String? username,
+    String? password,
+    String? email,
+  }) async {
     final user = Settings.user!;
     if (username == null && password == null && email == null) {
       return Success(user);

@@ -7,8 +7,7 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/strength_sessions/charts/helpers.dart';
-
-import 'series_type.dart';
+import 'package:sport_log/pages/workout/strength_sessions/charts/series_type.dart';
 
 /// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
 class MonthChart extends StatefulWidget {

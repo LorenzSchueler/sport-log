@@ -21,78 +21,68 @@ class Column {
   OnAction? _onDeleteReference;
   String? _check;
 
-  Column nullable() {
+  void nullable() {
     _nonNull = false;
-    return this;
   }
 
-  Column primaryKey() {
+  void primaryKey() {
     _isPrimaryKey = true;
-    return this;
   }
 
-  Column unique() {
+  void unique() {
     _isUnique = true;
-    return this;
   }
 
-  Column withDefault(String value) {
+  void withDefault(String value) {
     _defaultValue = value;
-    return this;
   }
 
-  Column references(String table,
-      {String? column, OnAction? onDelete, OnAction? onUpdate}) {
+  void references(
+    String table, {
+    String? column,
+    OnAction? onDelete,
+    OnAction? onUpdate,
+  }) {
     _referenceTable = table;
     _referenceColumn = column;
     _onDeleteReference = onDelete;
     _onUpdateReference = onUpdate;
-    return this;
   }
 
-  Column checkBetween(dynamic start, dynamic end) {
+  void checkBetween(dynamic start, dynamic end) {
     _check = "$name between $start and $end";
-    return this;
   }
 
-  Column checkIn(List<dynamic> values) {
+  void checkIn(List<dynamic> values) {
     _check = "$name in (${values.join(',')})";
-    return this;
   }
 
-  Column checkGt(dynamic value) {
+  void checkGt(dynamic value) {
     _check = "$name > $value";
-    return this;
   }
 
-  Column checkGe(dynamic value) {
+  void checkGe(dynamic value) {
     _check = "$name >= $value";
-    return this;
   }
 
-  Column checkLt(dynamic value) {
+  void checkLt(dynamic value) {
     _check = "$name < $value";
-    return this;
   }
 
-  Column checkLe(dynamic value) {
+  void checkLe(dynamic value) {
     _check = "$name <= $value";
-    return this;
   }
 
-  Column checkLengthGe(int value) {
+  void checkLengthGe(int value) {
     _check = "length($name) >= $value";
-    return this;
   }
 
-  Column checkLengthLe(int value) {
+  void checkLengthLe(int value) {
     _check = "length($name) <= $value";
-    return this;
   }
 
-  Column checkLengthBetween(int start, int end) {
+  void checkLengthBetween(int start, int end) {
     _check = "length($name) between $start and $end";
-    return this;
   }
 
   bool getIsPrimaryKey() => _isPrimaryKey;

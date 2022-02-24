@@ -7,8 +7,7 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/strength_sessions/charts/helpers.dart';
-
-import 'series_type.dart';
+import 'package:sport_log/pages/workout/strength_sessions/charts/series_type.dart';
 
 /// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
 class YearChart extends StatefulWidget {
@@ -72,8 +71,9 @@ class _YearChartState extends State<YearChart> {
           LineChartBarData(
             spots: _strengthSessionStats.map((s) {
               return FlSpot(
-                  (s.datetime.difference(widget.start).inDays + 1).toDouble(),
-                  getValue(s));
+                (s.datetime.difference(widget.start).inDays + 1).toDouble(),
+                getValue(s),
+              );
             }).toList(),
             colors: [primaryColorOf(context)],
             dotData: FlDotData(show: false),
@@ -93,7 +93,8 @@ class _YearChartState extends State<YearChart> {
               return date.day == 15;
             },
             getTitles: (value) => shortMonthName(
-                DateTime(widget.start.year, 1, value.round()).month),
+              DateTime(widget.start.year, 1, value.round()).month,
+            ),
           ),
           leftTitles: SideTitles(
             showTitles: true,

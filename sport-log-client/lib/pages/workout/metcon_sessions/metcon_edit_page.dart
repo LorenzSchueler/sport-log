@@ -5,13 +5,12 @@ import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_movement_card.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/int_picker.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
-
-import 'metcon_movement_card.dart';
 
 class EditMetconPage extends StatefulWidget {
   const EditMetconPage({
@@ -105,16 +104,20 @@ class _EditMetconPageState extends State<EditMetconPage> {
   void _addMetconMovementWithMovement(Movement movement) {
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() {
-      _md.moves.add(MetconMovementDescription(
+      _md.moves.add(
+        MetconMovementDescription(
           metconMovement: MetconMovement.defaultValue(
-              metconId: _md.metcon.id,
-              movementId: movement.id,
-              movementNumber: _md.moves.length),
-          movement: movement));
+            metconId: _md.metcon.id,
+            movementId: movement.id,
+            movementNumber: _md.moves.length,
+          ),
+          movement: movement,
+        ),
+      );
     });
   }
 
-  void _submit() async {
+  Future<void> _submit() async {
     if (!_md.isValid()) {
       return;
     }
@@ -124,19 +127,25 @@ class _EditMetconPageState extends State<EditMetconPage> {
     if (widget._isEditing) {
       await _dataProvider.updateSingle(_md);
       Navigator.pop(
-          context, ReturnObject(action: ReturnAction.updated, payload: _md));
+        context,
+        ReturnObject(action: ReturnAction.updated, payload: _md),
+      );
     } else {
       await _dataProvider.createSingle(_md);
       Navigator.pop(
-          context, ReturnObject(action: ReturnAction.created, payload: _md));
+        context,
+        ReturnObject(action: ReturnAction.created, payload: _md),
+      );
     }
   }
 
-  void _delete() async {
+  Future<void> _delete() async {
     if (widget._isEditing) {
       await _dataProvider.deleteSingle(_md);
       Navigator.pop(
-          context, ReturnObject(action: ReturnAction.deleted, payload: _md));
+        context,
+        ReturnObject(action: ReturnAction.deleted, payload: _md),
+      );
     } else {
       Navigator.pop(context);
     }
@@ -232,8 +241,10 @@ class _EditMetconPageState extends State<EditMetconPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _timecapInput(context),
-        Text(plural("min", "mins", _md.metcon.timecap?.inMinutes ?? 0) +
-            " in total"),
+        Text(
+          plural("min", "mins", _md.metcon.timecap?.inMinutes ?? 0) +
+              " in total",
+        ),
       ],
     );
   }
@@ -336,20 +347,23 @@ class _EditMetconPageState extends State<EditMetconPage> {
       );
     } else {
       // _metcon.timecap != null
-      return Stack(alignment: Alignment.centerRight, children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("in"),
-            _timecapInput(context),
-            Text(plural("min", "mins", _md.metcon.timecap!.inMinutes)),
-          ],
-        ),
-        IconButton(
-          icon: const Icon(AppIcons.cancel),
-          onPressed: () => _setTimecap(null),
-        ),
-      ]);
+      return Stack(
+        alignment: Alignment.centerRight,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text("in"),
+              _timecapInput(context),
+              Text(plural("min", "mins", _md.metcon.timecap!.inMinutes)),
+            ],
+          ),
+          IconButton(
+            icon: const Icon(AppIcons.cancel),
+            onPressed: () => _setTimecap(null),
+          ),
+        ],
+      );
     }
   }
 

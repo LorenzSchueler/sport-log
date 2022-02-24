@@ -74,14 +74,18 @@ class CardioSessionDescriptionDataProvider
 
   @override
   Future<List<CardioSessionDescription>> getNonDeleted() async {
-    return Future.wait((await _cardioDataProvider.getNonDeleted())
-        .map((session) async => CardioSessionDescription(
+    return Future.wait(
+      (await _cardioDataProvider.getNonDeleted())
+          .map(
+            (session) async => CardioSessionDescription(
               cardioSession: session,
               route: await _routeDataProvider.getById(session.id),
               movement:
                   (await _movementDataProvider.getById(session.movementId))!,
-            ))
-        .toList());
+            ),
+          )
+          .toList(),
+    );
   }
 
   @override
@@ -107,6 +111,9 @@ class CardioSessionDescriptionDataProvider
     DateTime? until,
   }) async {
     return _cardioDb.getByTimerangeAndMovement(
-        from: from, until: until, movementIdValue: movementId);
+      from: from,
+      until: until,
+      movementIdValue: movementId,
+    );
   }
 }

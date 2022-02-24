@@ -45,8 +45,9 @@ class MetconMovementCard extends StatelessWidget {
                   },
                 ),
                 ReorderableDragStartListener(
-                    child: const Icon(AppIcons.dragHandle),
-                    index: move.movementNumber),
+                  child: const Icon(AppIcons.dragHandle),
+                  index: move.movementNumber,
+                ),
               ],
             ),
           ),
@@ -55,11 +56,12 @@ class MetconMovementCard extends StatelessWidget {
             children: [
               // use different inputs for different MovementDimensions
               IntPicker(
-                  initialValue: move.count,
-                  setValue: (count) {
-                    mmd.metconMovement.count = count;
-                    editMetconMovementDescription(mmd);
-                  }),
+                initialValue: move.count,
+                setValue: (count) {
+                  mmd.metconMovement.count = count;
+                  editMetconMovementDescription(mmd);
+                },
+              ),
               const Padding(padding: EdgeInsets.all(8)),
               // Text(mmd.movement.dimension.toDisplayName()),
               const Padding(padding: EdgeInsets.all(8)),

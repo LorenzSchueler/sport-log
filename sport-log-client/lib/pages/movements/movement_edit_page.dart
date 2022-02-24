@@ -65,15 +65,20 @@ class _EditMovementPageState extends State<EditMovementPage> {
   bool get _inputIsValid => _md.isValid();
   bool get _hasChanges => _md != widget._initialMovement;
 
-  void _submit() async {
+  Future<void> _submit() async {
     FocusManager.instance.primaryFocus?.unfocus();
     if (!_inputIsValid) {
       return;
     }
     if (await _dataProvider.movementExists(
-        _md.movement.name, _md.movement.dimension)) {
+      _md.movement.name,
+      _md.movement.dimension,
+    )) {
       await showWarning(
-          context, 'Movement exists!', 'Please use the existing movement.');
+        context,
+        'Movement exists!',
+        'Please use the existing movement.',
+      );
 
       return;
     }
@@ -82,12 +87,16 @@ class _EditMovementPageState extends State<EditMovementPage> {
       // TODO: do error handling
       await _dataProvider.updateSingle(_md.movement);
       Navigator.pop(
-          context, ReturnObject(action: ReturnAction.updated, payload: _md));
+        context,
+        ReturnObject(action: ReturnAction.updated, payload: _md),
+      );
     } else {
       // TODO: do error handling
       await _dataProvider.createSingle(_md.movement);
       Navigator.pop(
-          context, ReturnObject(action: ReturnAction.created, payload: _md));
+        context,
+        ReturnObject(action: ReturnAction.created, payload: _md),
+      );
     }
   }
 
@@ -96,7 +105,9 @@ class _EditMovementPageState extends State<EditMovementPage> {
       assert(_md.movement.userId != null);
       _dataProvider.deleteSingle(_md.movement);
       Navigator.pop(
-          context, ReturnObject(action: ReturnAction.deleted, payload: _md));
+        context,
+        ReturnObject(action: ReturnAction.deleted, payload: _md),
+      );
     } else {
       Navigator.pop(context);
     }
@@ -127,10 +138,11 @@ class _EditMovementPageState extends State<EditMovementPage> {
                 icon: const Icon(AppIcons.delete),
               ),
             IconButton(
-                onPressed: _inputIsValid && (!widget._isEditing || _hasChanges)
-                    ? () => _submit()
-                    : null,
-                icon: const Icon(AppIcons.save))
+              onPressed: _inputIsValid && (!widget._isEditing || _hasChanges)
+                  ? () => _submit()
+                  : null,
+              icon: const Icon(AppIcons.save),
+            )
           ],
         ),
         body: WideScreenFrame(

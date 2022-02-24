@@ -64,10 +64,11 @@ class EditTile extends StatelessWidget {
         if (onCancel != null) const Spacer(),
         if (onCancel != null)
           IconButton(
-              onPressed: onCancel,
-              icon: const Icon(
-                AppIcons.close,
-              ))
+            onPressed: onCancel,
+            icon: const Icon(
+              AppIcons.close,
+            ),
+          )
       ],
     );
 

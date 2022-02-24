@@ -4,9 +4,8 @@ import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
+import 'package:sport_log/models/strength/strength_session_stats.dart';
 import 'package:sport_log/models/strength/strength_set.dart';
-
-import 'strength_session_stats.dart';
 
 class StrengthSessionDescription implements Validatable, HasId {
   StrengthSessionDescription({
@@ -23,20 +22,34 @@ class StrengthSessionDescription implements Validatable, HasId {
 
   @override
   bool isValid() {
-    return validate(session.isValid(),
-            'StrengthSessionDescription: strength session not valid') &&
-        validate(sets.isNotEmpty,
-            'StrengthSessionDescription: strength sets empty') &&
-        validate(sets.every((ss) => ss.strengthSessionId == session.id),
-            'StrengthSessionDescription: strengthSessionId != strengthSession.id') &&
-        validate(sets.everyIndexed((ss, index) => ss.setNumber == index),
-            'StrengthSessionDescription: strengthSets indices wrong') &&
-        validate(sets.every((ss) => ss.isValid()),
-            'StrengthSessionDescription: strengthSets not valid') &&
-        validate(session.movementId == movement.id,
-            'StrengthSessionDescription: movement id mismatch') &&
-        validate(!movement.deleted,
-            'StrengthSessionDescription: movement is deleted');
+    return validate(
+          session.isValid(),
+          'StrengthSessionDescription: strength session not valid',
+        ) &&
+        validate(
+          sets.isNotEmpty,
+          'StrengthSessionDescription: strength sets empty',
+        ) &&
+        validate(
+          sets.every((ss) => ss.strengthSessionId == session.id),
+          'StrengthSessionDescription: strengthSessionId != strengthSession.id',
+        ) &&
+        validate(
+          sets.everyIndexed((ss, index) => ss.setNumber == index),
+          'StrengthSessionDescription: strengthSets indices wrong',
+        ) &&
+        validate(
+          sets.every((ss) => ss.isValid()),
+          'StrengthSessionDescription: strengthSets not valid',
+        ) &&
+        validate(
+          session.movementId == movement.id,
+          'StrengthSessionDescription: movement id mismatch',
+        ) &&
+        validate(
+          !movement.deleted,
+          'StrengthSessionDescription: movement is deleted',
+        );
   }
 
   @override

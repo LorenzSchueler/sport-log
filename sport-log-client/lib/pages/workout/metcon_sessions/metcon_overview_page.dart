@@ -33,7 +33,7 @@ class _MetconsPageState extends State<MetconsPage> {
     _update();
   }
 
-  void _update() async {
+  Future<void> _update() async {
     final mds = await _dataProvider.getNonDeleted();
     setState(() {
       _metconDescriptions = mds;
@@ -47,9 +47,10 @@ class _MetconsPageState extends State<MetconsPage> {
         title: const Text("Metcons"),
         actions: [
           IconButton(
-              onPressed: () =>
-                  Navigator.pushNamed(context, Routes.metcon.sessionOverview),
-              icon: const Icon(AppIcons.notes)),
+            onPressed: () =>
+                Navigator.pushNamed(context, Routes.metcon.sessionOverview),
+            icon: const Icon(AppIcons.notes),
+          ),
         ],
       ),
       body: _content,
@@ -57,12 +58,13 @@ class _MetconsPageState extends State<MetconsPage> {
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.metcon),
       drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
       floatingActionButton: FloatingActionButton(
-          child: const Icon(AppIcons.add),
-          onPressed: () async {
-            final returnObject =
-                await Navigator.pushNamed(context, Routes.metcon.edit);
-            _handleNewMetcon(returnObject);
-          }),
+        child: const Icon(AppIcons.add),
+        onPressed: () async {
+          final returnObject =
+              await Navigator.pushNamed(context, Routes.metcon.edit);
+          _handleNewMetcon(returnObject);
+        },
+      ),
     );
   }
 
@@ -77,8 +79,12 @@ class _MetconsPageState extends State<MetconsPage> {
     );
   }
 
-  Widget _metconToWidget(BuildContext context, Animation<double> animation,
-      MetconDescription md, int index) {
+  Widget _metconToWidget(
+    BuildContext context,
+    Animation<double> animation,
+    MetconDescription md,
+    int index,
+  ) {
     return SizeFadeTransition(
       key: ValueKey(md.metcon.id),
       animation: animation,
@@ -107,12 +113,16 @@ class _MetconsPageState extends State<MetconsPage> {
                   await _dataProvider.deleteSingle(md);
                   setState(() {
                     _metconDescriptions.removeWhere(
-                        (m) => MetconDescription.areTheSame(m, md));
+                      (m) => MetconDescription.areTheSame(m, md),
+                    );
                   });
                   break;
                 case _editChoice:
-                  await Navigator.pushNamed(context, Routes.metcon.edit,
-                      arguments: md);
+                  await Navigator.pushNamed(
+                    context,
+                    Routes.metcon.edit,
+                    arguments: md,
+                  );
                   _update();
                   break;
               }
@@ -135,8 +145,10 @@ class _MetconsPageState extends State<MetconsPage> {
       switch (object.action) {
         case ReturnAction.updated:
           setState(() {
-            _metconDescriptions.update(object.payload,
-                by: (md) => md.metcon.id);
+            _metconDescriptions.update(
+              object.payload,
+              by: (md) => md.metcon.id,
+            );
             _metconDescriptions
                 .sortBy((md) => (md.metcon.name ?? 'Unnamed').toUpperCase());
           });
@@ -150,8 +162,10 @@ class _MetconsPageState extends State<MetconsPage> {
           break;
         case ReturnAction.deleted:
           setState(() {
-            _metconDescriptions.delete(object.payload,
-                by: (md) => md.metcon.id);
+            _metconDescriptions.delete(
+              object.payload,
+              by: (md) => md.metcon.id,
+            );
           });
           break;
       }

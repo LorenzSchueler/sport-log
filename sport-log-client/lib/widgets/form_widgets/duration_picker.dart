@@ -48,8 +48,11 @@ class _DurationPickerState extends State<DurationPicker> {
   @override
   void didUpdateWidget(covariant DurationPicker oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _setDuration(widget.initialDuration ?? const Duration(),
-        notifyParent: false, format: true);
+    _setDuration(
+      widget.initialDuration ?? const Duration(),
+      notifyParent: false,
+      format: true,
+    );
   }
 
   @override
@@ -58,8 +61,11 @@ class _DurationPickerState extends State<DurationPicker> {
     super.dispose();
   }
 
-  void _setDuration(Duration d,
-      {required bool notifyParent, required bool format}) {
+  void _setDuration(
+    Duration d, {
+    required bool notifyParent,
+    required bool format,
+  }) {
     if (d != _duration) {
       setState(() {
         _duration = d;
@@ -82,11 +88,17 @@ class _DurationPickerState extends State<DurationPicker> {
   void _increaseDuration({required bool notifyParent}) {
     final seconds = _duration.inSeconds;
     if (seconds <= _maxSeconds - _timeStep) {
-      _setDuration(Duration(seconds: seconds + _timeStep),
-          notifyParent: notifyParent, format: true);
+      _setDuration(
+        Duration(seconds: seconds + _timeStep),
+        notifyParent: notifyParent,
+        format: true,
+      );
     } else if (seconds < _maxSeconds) {
-      _setDuration(Duration(seconds: seconds + 1),
-          notifyParent: notifyParent, format: true);
+      _setDuration(
+        Duration(seconds: seconds + 1),
+        notifyParent: notifyParent,
+        format: true,
+      );
     }
     FocusScope.of(context).unfocus();
   }
@@ -94,11 +106,17 @@ class _DurationPickerState extends State<DurationPicker> {
   void _decreaseDuration({required bool notifyParent}) {
     final seconds = _duration.inSeconds;
     if (seconds >= _timeStep) {
-      _setDuration(Duration(seconds: seconds - _timeStep),
-          notifyParent: notifyParent, format: true);
+      _setDuration(
+        Duration(seconds: seconds - _timeStep),
+        notifyParent: notifyParent,
+        format: true,
+      );
     } else if (seconds > 0) {
-      _setDuration(Duration(seconds: seconds - 1),
-          notifyParent: notifyParent, format: true);
+      _setDuration(
+        Duration(seconds: seconds - 1),
+        notifyParent: notifyParent,
+        format: true,
+      );
     }
     FocusScope.of(context).unfocus();
   }
@@ -169,7 +187,9 @@ class _DurationPickerState extends State<DurationPicker> {
             return;
           }
           final newDuration = Duration(
-              minutes: maybeMinutes, seconds: _duration.inSeconds % 60);
+            minutes: maybeMinutes,
+            seconds: _duration.inSeconds % 60,
+          );
           _setDuration(newDuration, notifyParent: true, format: false);
         },
         style: const TextStyle(fontSize: _fontSize),

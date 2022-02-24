@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 Future<bool?> showApproveDialog(
-    BuildContext context, String title, String description) {
+  BuildContext context,
+  String title,
+  String description,
+) {
   return showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
@@ -26,7 +29,10 @@ Future<bool?> showDiscardWarningDialog(BuildContext context) {
 }
 
 Future<void> showWarning(
-    BuildContext context, String title, String description) {
+  BuildContext context,
+  String title,
+  String description,
+) {
   return showDialog(
     context: context,
     builder: (context) => AlertDialog(

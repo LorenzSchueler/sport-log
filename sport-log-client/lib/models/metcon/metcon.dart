@@ -108,8 +108,10 @@ class Metcon extends Entity {
         validate(name!.isNotEmpty, 'Metcon: name is empty') &&
         validate(deleted != true, 'Metcon: deleted == true') &&
         validate(rounds == null || rounds! >= 1, 'Metcon: rounds < 1') &&
-        validate(timecap == null || timecap! >= const Duration(seconds: 1),
-            'Metcon: timecap < 1s') &&
+        validate(
+          timecap == null || timecap! >= const Duration(seconds: 1),
+          'Metcon: timecap < 1s',
+        ) &&
         validate(validateMetconType(), 'Metcon: metcon type validation failed');
   }
 }

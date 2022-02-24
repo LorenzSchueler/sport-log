@@ -45,8 +45,10 @@ class StrengthSession extends Entity {
   @override
   bool isValid() {
     return validate(!deleted, 'StrengthSession: deleted is true') &&
-        validate(interval == null || interval!.inSeconds > 0,
-            'StrengthSession: interval <= 0');
+        validate(
+          interval == null || interval!.inSeconds > 0,
+          'StrengthSession: interval <= 0',
+        );
   }
 
   StrengthSession copy() {

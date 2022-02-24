@@ -61,180 +61,208 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
         ? "-"
         : cardioSessionDescription.cardioSession.descent.toString();
 
-    TableRow rowSpacer = TableRow(children: [
-      Defaults.sizedBox.vertical.normal,
-      Defaults.sizedBox.vertical.normal,
-    ]);
+    TableRow rowSpacer = TableRow(
+      children: [
+        Defaults.sizedBox.vertical.normal,
+        Defaults.sizedBox.vertical.normal,
+      ],
+    );
 
     return Scaffold(
-        appBar: AppBar(
-          title: RichText(
-              text: TextSpan(children: [
-            TextSpan(
-              text: "${cardioSessionDescription.cardioSession.movementId} ",
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            TextSpan(
-              text: describeEnum(
-                  cardioSessionDescription.cardioSession.cardioType),
-              style: const TextStyle(fontSize: 14),
-            )
-          ])),
-          actions: [
-            IconButton(
-                onPressed: () async {
-                  final returnObj = await Navigator.pushNamed(
-                      context, Routes.cardio.cardioEdit,
-                      arguments: cardioSessionDescription);
-                  if (returnObj is ReturnObject<CardioSessionDescription>) {
-                    setState(() {
-                      cardioSessionDescription = returnObj.payload;
-                    });
-                  }
-                },
-                icon: const Icon(AppIcons.edit))
-          ],
+      appBar: AppBar(
+        title: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: "${cardioSessionDescription.cardioSession.movementId} ",
+                style:
+                    const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              TextSpan(
+                text: describeEnum(
+                  cardioSessionDescription.cardioSession.cardioType,
+                ),
+                style: const TextStyle(fontSize: 14),
+              )
+            ],
+          ),
         ),
-        body: Stack(
-          children: [
-            Container(
-                color: backgroundColorOf(context),
-                child: Column(
-                  children: [
-                    cardioSessionDescription.cardioSession.track != null
-                        ? Expanded(
-                            child: MapboxMap(
-                                accessToken: Defaults.mapbox.accessToken,
-                                styleString: Defaults.mapbox.style.outdoor,
-                                initialCameraPosition: CameraPosition(
-                                  zoom: 14.0,
-                                  target: cardioSessionDescription
-                                                  .cardioSession.track ==
-                                              null ||
-                                          cardioSessionDescription
-                                              .cardioSession.track!.isEmpty
-                                      ? Defaults.mapbox.cameraPosition
-                                      : cardioSessionDescription
-                                          .cardioSession.track!.first.latLng,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final returnObj = await Navigator.pushNamed(
+                context,
+                Routes.cardio.cardioEdit,
+                arguments: cardioSessionDescription,
+              );
+              if (returnObj is ReturnObject<CardioSessionDescription>) {
+                setState(() {
+                  cardioSessionDescription = returnObj.payload;
+                });
+              }
+            },
+            icon: const Icon(AppIcons.edit),
+          )
+        ],
+      ),
+      body: Stack(
+        children: [
+          Container(
+            color: backgroundColorOf(context),
+            child: Column(
+              children: [
+                cardioSessionDescription.cardioSession.track != null
+                    ? Expanded(
+                        child: MapboxMap(
+                          accessToken: Defaults.mapbox.accessToken,
+                          styleString: Defaults.mapbox.style.outdoor,
+                          initialCameraPosition: CameraPosition(
+                            zoom: 14.0,
+                            target:
+                                cardioSessionDescription.cardioSession.track ==
+                                            null ||
+                                        cardioSessionDescription
+                                            .cardioSession.track!.isEmpty
+                                    ? Defaults.mapbox.cameraPosition
+                                    : cardioSessionDescription
+                                        .cardioSession.track!.first.latLng,
+                          ),
+                          onMapCreated: (MapboxMapController controller) =>
+                              _mapController = controller,
+                          onStyleLoadedCallback: () {
+                            if (cardioSessionDescription.cardioSession.track !=
+                                null) {
+                              _mapController.addLine(
+                                LineOptions(
+                                  lineColor: "red",
+                                  geometry: cardioSessionDescription
+                                      .cardioSession.track!
+                                      .map((c) => c.latLng)
+                                      .toList(),
                                 ),
-                                onMapCreated:
-                                    (MapboxMapController controller) =>
-                                        _mapController = controller,
-                                onStyleLoadedCallback: () {
-                                  if (cardioSessionDescription
-                                          .cardioSession.track !=
-                                      null) {
-                                    _mapController.addLine(LineOptions(
-                                        lineColor: "red",
-                                        geometry: cardioSessionDescription
-                                            .cardioSession.track!
-                                            .map((c) => c.latLng)
-                                            .toList()));
-                                  }
-                                  _mapController.addLine(LineOptions(
-                                      lineColor: "blue",
-                                      geometry: cardioSessionDescription
-                                          .route?.track
-                                          .map((route) => route.latLng)
-                                          .toList()));
-                                }))
-                        : Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(AppIcons.route),
-                                Text(" no track available"),
-                              ],
-                            ),
-                          ),
-                    Defaults.sizedBox.vertical.normal,
-                    Table(
+                              );
+                            }
+                            _mapController.addLine(
+                              LineOptions(
+                                lineColor: "blue",
+                                geometry: cardioSessionDescription.route?.track
+                                    .map((route) => route.latLng)
+                                    .toList(),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    : Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(AppIcons.route),
+                            Text(" no track available"),
+                          ],
+                        ),
+                      ),
+                Defaults.sizedBox.vertical.normal,
+                Table(
+                  children: [
+                    TableRow(
                       children: [
-                        TableRow(children: [
-                          ValueUnitDescription(
-                            value: distance,
-                            unit: "km",
-                            description: "Distance",
-                            scale: 1.3,
-                          ),
-                          ValueUnitDescription(
-                            value: duration,
-                            unit: null,
-                            description: "Duration",
-                            scale: 1.3,
-                          ),
-                        ]),
-                        rowSpacer,
-                        TableRow(children: [
-                          ValueUnitDescription(
-                            value: speed,
-                            unit: "km/h",
-                            description: "Speed",
-                            scale: 1.3,
-                          ),
-                          ValueUnitDescription(
-                            value: calories,
-                            unit: "cal",
-                            description: "Energy",
-                            scale: 1.3,
-                          ),
-                        ]),
-                        rowSpacer,
-                        TableRow(children: [
-                          ValueUnitDescription(
-                            value: ascent,
-                            unit: "m",
-                            description: "Ascent",
-                            scale: 1.3,
-                          ),
-                          ValueUnitDescription(
-                            value: descent,
-                            unit: "m",
-                            description: "Descent",
-                            scale: 1.3,
-                          ),
-                        ]),
-                        rowSpacer,
-                        TableRow(children: [
-                          ValueUnitDescription(
-                            value: avgCadence,
-                            unit: "rpm",
-                            description: "Cadence",
-                            scale: 1.3,
-                          ),
-                          ValueUnitDescription(
-                            value: avgHeartRate,
-                            unit: "bpm",
-                            description: "Heart Rate",
-                            scale: 1.3,
-                          ),
-                        ]),
+                        ValueUnitDescription(
+                          value: distance,
+                          unit: "km",
+                          description: "Distance",
+                          scale: 1.3,
+                        ),
+                        ValueUnitDescription(
+                          value: duration,
+                          unit: null,
+                          description: "Duration",
+                          scale: 1.3,
+                        ),
                       ],
                     ),
-                    Defaults.sizedBox.vertical.normal,
-                    if (cardioSessionDescription.cardioSession.comments != null)
-                      Text(cardioSessionDescription.cardioSession.comments!),
-                    if (cardioSessionDescription.cardioSession.comments != null)
-                      Defaults.sizedBox.vertical.normal,
+                    rowSpacer,
+                    TableRow(
+                      children: [
+                        ValueUnitDescription(
+                          value: speed,
+                          unit: "km/h",
+                          description: "Speed",
+                          scale: 1.3,
+                        ),
+                        ValueUnitDescription(
+                          value: calories,
+                          unit: "cal",
+                          description: "Energy",
+                          scale: 1.3,
+                        ),
+                      ],
+                    ),
+                    rowSpacer,
+                    TableRow(
+                      children: [
+                        ValueUnitDescription(
+                          value: ascent,
+                          unit: "m",
+                          description: "Ascent",
+                          scale: 1.3,
+                        ),
+                        ValueUnitDescription(
+                          value: descent,
+                          unit: "m",
+                          description: "Descent",
+                          scale: 1.3,
+                        ),
+                      ],
+                    ),
+                    rowSpacer,
+                    TableRow(
+                      children: [
+                        ValueUnitDescription(
+                          value: avgCadence,
+                          unit: "rpm",
+                          description: "Cadence",
+                          scale: 1.3,
+                        ),
+                        ValueUnitDescription(
+                          value: avgHeartRate,
+                          unit: "bpm",
+                          description: "Heart Rate",
+                          scale: 1.3,
+                        ),
+                      ],
+                    ),
                   ],
-                )),
-            Container(
-                width: double.infinity,
-                padding: const EdgeInsets.only(
-                  top: 5,
                 ),
-                child: Text(
-                    formatDatetime(
-                        cardioSessionDescription.cardioSession.datetime),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color:
-                            cardioSessionDescription.cardioSession.track != null
-                                ? backgroundColorOf(context)
-                                : Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold))),
-          ],
-        ));
+                Defaults.sizedBox.vertical.normal,
+                if (cardioSessionDescription.cardioSession.comments != null)
+                  Text(cardioSessionDescription.cardioSession.comments!),
+                if (cardioSessionDescription.cardioSession.comments != null)
+                  Defaults.sizedBox.vertical.normal,
+              ],
+            ),
+          ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.only(
+              top: 5,
+            ),
+            child: Text(
+              formatDatetime(
+                cardioSessionDescription.cardioSession.datetime,
+              ),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: cardioSessionDescription.cardioSession.track != null
+                    ? backgroundColorOf(context)
+                    : Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

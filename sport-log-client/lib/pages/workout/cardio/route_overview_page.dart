@@ -62,9 +62,10 @@ class RoutePageState extends State<RoutePage> {
         title: const Text("Routes"),
         actions: [
           IconButton(
-              onPressed: () =>
-                  Navigator.pushNamed(context, Routes.cardio.overview),
-              icon: const Icon(AppIcons.heartbeat)),
+            onPressed: () =>
+                Navigator.pushNamed(context, Routes.cardio.overview),
+            icon: const Icon(AppIcons.heartbeat),
+          ),
         ],
       ),
       body: RefreshIndicator(
@@ -127,10 +128,12 @@ class RouteCard extends StatelessWidget {
                       onMapCreated: (MapboxMapController controller) =>
                           _sessionMapController = controller,
                       onStyleLoadedCallback: () {
-                        _sessionMapController.addLine(LineOptions(
+                        _sessionMapController.addLine(
+                          LineOptions(
                             lineColor: "red",
-                            geometry:
-                                route.track.map((c) => c.latLng).toList()));
+                            geometry: route.track.map((c) => c.latLng).toList(),
+                          ),
+                        );
                       },
                       onMapClick: (_, __) => showDetails(context),
                     ),

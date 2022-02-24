@@ -29,7 +29,9 @@ class StrengthSessionStats {
   });
 
   factory StrengthSessionStats.fromStrengthSets(
-      DateTime datetime, List<StrengthSet> sets) {
+    DateTime datetime,
+    List<StrengthSet> sets,
+  ) {
     int minCount = sets.map((s) => s.count).min;
     int maxCount = sets.map((s) => s.count).max;
     int sumCount = sets.map((s) => s.count).sum;
@@ -56,15 +58,16 @@ class StrengthSessionStats {
     final sumCount = r[prefix + Columns.sumCount]! as int;
     double avgCount = numSets == 0 ? 0 : sumCount / numSets;
     return StrengthSessionStats._(
-        datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
-        numSets: numSets,
-        minCount: r[prefix + Columns.minCount]! as int,
-        maxCount: r[prefix + Columns.maxCount]! as int,
-        sumCount: sumCount,
-        avgCount: avgCount,
-        maxEorm: r[prefix + Columns.maxEorm] as double?,
-        maxWeight: r[prefix + Columns.maxWeight] as double?,
-        sumVolume: r[prefix + Columns.sumVolume] as double?);
+      datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
+      numSets: numSets,
+      minCount: r[prefix + Columns.minCount]! as int,
+      maxCount: r[prefix + Columns.maxCount]! as int,
+      sumCount: sumCount,
+      avgCount: avgCount,
+      maxEorm: r[prefix + Columns.maxEorm] as double?,
+      maxWeight: r[prefix + Columns.maxWeight] as double?,
+      sumVolume: r[prefix + Columns.sumVolume] as double?,
+    );
   }
 
   // this is only for debugging/pretty-printing

@@ -12,20 +12,22 @@ class LandingPage extends StatelessWidget {
       content: Row(
         children: [
           Expanded(
-              child: ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, Routes.login);
-            },
-            child: const Text("Login"),
-          )),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, Routes.login);
+              },
+              child: const Text("Login"),
+            ),
+          ),
           Defaults.sizedBox.horizontal.big,
           Expanded(
-              child: ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, Routes.registration);
-            },
-            child: const Text("Register"),
-          )),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, Routes.registration);
+              },
+              child: const Text("Register"),
+            ),
+          ),
         ],
       ),
     );

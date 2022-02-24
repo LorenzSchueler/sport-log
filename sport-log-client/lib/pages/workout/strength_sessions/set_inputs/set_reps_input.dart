@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/theme.dart';
+import 'package:sport_log/pages/workout/strength_sessions/set_inputs/box_int_input.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-
-import 'box_int_input.dart';
 
 class SetRepsInput extends StatefulWidget {
   const SetRepsInput({

@@ -8,18 +8,18 @@ class TimelineUnion extends Comparable<TimelineUnion> {
   final Diary? _diary;
 
   TimelineUnion.strengthSession(
-      StrengthSessionDescription this._strengthSessionWithStats)
-      : _metconSessionDescription = null,
+    StrengthSessionDescription this._strengthSessionWithStats,
+  )   : _metconSessionDescription = null,
         _cardioSessionDescription = null,
         _diary = null;
   TimelineUnion.metconSession(
-      MetconSessionDescription this._metconSessionDescription)
-      : _strengthSessionWithStats = null,
+    MetconSessionDescription this._metconSessionDescription,
+  )   : _strengthSessionWithStats = null,
         _cardioSessionDescription = null,
         _diary = null;
   TimelineUnion.cardioSession(
-      CardioSessionDescription this._cardioSessionDescription)
-      : _strengthSessionWithStats = null,
+    CardioSessionDescription this._cardioSessionDescription,
+  )   : _strengthSessionWithStats = null,
         _metconSessionDescription = null,
         _diary = null;
   TimelineUnion.diary(Diary this._diary)

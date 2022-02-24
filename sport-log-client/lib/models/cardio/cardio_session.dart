@@ -80,19 +80,28 @@ class CardioSession extends Entity {
   @override
   bool isValid() {
     return validate(!deleted, 'CardioSession: deleted is true') &&
-        validate([ascent, descent].every((val) => val == null || val >= 0),
-            'CardioSession: ascent or descent < 0') &&
         validate(
-            [distance, calories, avgCadence, avgHeartRate]
-                .every((val) => val == null || val > 0),
-            'CardioSession: distance, time, calories, avgCadence or avgHeartRate <= 0') &&
+          [ascent, descent].every((val) => val == null || val >= 0),
+          'CardioSession: ascent or descent < 0',
+        ) &&
+        validate(
+          [distance, calories, avgCadence, avgHeartRate]
+              .every((val) => val == null || val > 0),
+          'CardioSession: distance, time, calories, avgCadence or avgHeartRate <= 0',
+        ) &&
         validate(time!.inSeconds > 0, 'CardioSession: time <= 0') &&
-        validate((track == null || distance != null),
-            'CardioSession: distance == null when track is set') &&
-        validate((cadence == null || avgCadence != null),
-            'CardioSession: avgCadence == null when cadence is set') &&
-        validate((heartRate == null || avgHeartRate != null),
-            'CardioSession: avgHeartRate == null when heartRate is set');
+        validate(
+          track == null || distance != null,
+          'CardioSession: distance == null when track is set',
+        ) &&
+        validate(
+          cadence == null || avgCadence != null,
+          'CardioSession: avgCadence == null when cadence is set',
+        ) &&
+        validate(
+          heartRate == null || avgHeartRate != null,
+          'CardioSession: avgHeartRate == null when heartRate is set',
+        );
   }
 }
 

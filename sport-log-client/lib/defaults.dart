@@ -75,7 +75,8 @@ class _Mapbox {
       String token = const String.fromEnvironment("ACCESS_TOKEN");
       if (token.isEmpty) {
         throw Exception(
-            "please supply mapbox access token using --dart-define ACCESS_TOKEN=<token>");
+          "please supply mapbox access token using --dart-define ACCESS_TOKEN=<token>",
+        );
       }
       _accessToken = token;
     }

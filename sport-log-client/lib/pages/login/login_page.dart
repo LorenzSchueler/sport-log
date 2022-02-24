@@ -32,27 +32,28 @@ class _LoginPageState extends State<LoginPage> {
           child: Container(
             constraints: const BoxConstraints(maxWidth: 500.0),
             child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _usernameInput(context),
-                    Defaults.sizedBox.vertical.normal,
-                    _passwordInput(context),
-                    Defaults.sizedBox.vertical.normal,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        if (_loginPending)
-                          Container(
-                            child: const CircularProgressIndicator(),
-                            margin: const EdgeInsets.only(right: 20),
-                          ),
-                        _submitButton(context),
-                      ],
-                    )
-                  ],
-                )),
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _usernameInput(context),
+                  Defaults.sizedBox.vertical.normal,
+                  _passwordInput(context),
+                  Defaults.sizedBox.vertical.normal,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (_loginPending)
+                        Container(
+                          child: const CircularProgressIndicator(),
+                          margin: const EdgeInsets.only(right: 20),
+                        ),
+                      _submitButton(context),
+                    ],
+                  )
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -131,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _submit(BuildContext context) async {
+  Future<void> _submit(BuildContext context) async {
     setState(() {
       _loginPending = true;
     });

@@ -45,15 +45,21 @@ class _MovementsPageState extends State<MovementsPage> {
           break;
         case ReturnAction.updated:
           setState(() {
-            _movementDescriptions.update(object.payload,
-                by: (o) => o.movement.id);
+            _movementDescriptions.update(
+              object.payload,
+              by: (o) => o.movement.id,
+            );
             _movementDescriptions.sortBy((m) => m.movement.name.toUpperCase());
             // TODO: "hide" server defined movements with same name/dimension
           });
           break;
         case ReturnAction.deleted:
-          setState(() => _movementDescriptions.delete(object.payload,
-              by: (m) => m.movement.id));
+          setState(
+            () => _movementDescriptions.delete(
+              object.payload,
+              by: (m) => m.movement.id,
+            ),
+          );
         // TODO: "unhide" server defined movements with same name/dimension
       }
     }
@@ -84,12 +90,13 @@ class _MovementsPageState extends State<MovementsPage> {
         child: _body(context),
       ),
       floatingActionButton: FloatingActionButton(
-          child: const Icon(AppIcons.add),
-          onPressed: () async {
-            final returnObj =
-                await Navigator.pushNamed(context, Routes.movement.edit);
-            _handlePageReturn(returnObj);
-          }),
+        child: const Icon(AppIcons.add),
+        onPressed: () async {
+          final returnObj =
+              await Navigator.pushNamed(context, Routes.movement.edit);
+          _handlePageReturn(returnObj);
+        },
+      ),
     );
   }
 
@@ -115,54 +122,59 @@ class _MovementsPageState extends State<MovementsPage> {
       key: ValueKey(movement.id),
       animation: animation,
       child: ExpansionTileCard(
-          leading: CircleAvatar(child: Text(movement.name[0])),
-          title: Text(movement.name),
-          subtitle: Text(movement.dimension.displayName),
-          children: [
-            if (movement.description != null) const Divider(),
-            if (movement.description != null)
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                child: Text(movement.description!),
-              ),
-            if (movement.userId != null) const Divider(),
-            if (movement.userId != null)
-              ButtonBar(
-                alignment: MainAxisAlignment.spaceAround,
-                children: [
-                  if (!md.hasReference)
-                    IconButton(
-                      onPressed: () {
-                        assert(movement.userId != null && !md.hasReference);
-                        _dataProvider.deleteSingle(movement);
-                        setState(() => _movementDescriptions.delete(md,
-                            by: (m) => m.movement.id));
-                      },
-                      icon: const Icon(AppIcons.delete),
-                    ),
+        leading: CircleAvatar(child: Text(movement.name[0])),
+        title: Text(movement.name),
+        subtitle: Text(movement.dimension.displayName),
+        children: [
+          if (movement.description != null) const Divider(),
+          if (movement.description != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Text(movement.description!),
+            ),
+          if (movement.userId != null) const Divider(),
+          if (movement.userId != null)
+            ButtonBar(
+              alignment: MainAxisAlignment.spaceAround,
+              children: [
+                if (!md.hasReference)
                   IconButton(
-                    onPressed: () async {
-                      assert(movement.userId != null);
-                      if (md.hasReference) {
-                        final bool? approved = await showApproveDialog(
-                            context,
-                            'Warning',
-                            'Changes will be reflected in existing workouts.');
-                        if (approved == null || !approved) return;
-                      }
-                      final returnObj = await Navigator.pushNamed(
-                        context,
-                        Routes.movement.edit,
-                        arguments: md.copy(),
+                    onPressed: () {
+                      assert(movement.userId != null && !md.hasReference);
+                      _dataProvider.deleteSingle(movement);
+                      setState(
+                        () => _movementDescriptions.delete(
+                          md,
+                          by: (m) => m.movement.id,
+                        ),
                       );
-                      _handlePageReturn(returnObj);
                     },
-                    icon: const Icon(AppIcons.edit),
+                    icon: const Icon(AppIcons.delete),
                   ),
-                ],
-              ),
-          ]),
+                IconButton(
+                  onPressed: () async {
+                    assert(movement.userId != null);
+                    if (md.hasReference) {
+                      final bool? approved = await showApproveDialog(
+                        context,
+                        'Warning',
+                        'Changes will be reflected in existing workouts.',
+                      );
+                      if (approved == null || !approved) return;
+                    }
+                    final returnObj = await Navigator.pushNamed(
+                      context,
+                      Routes.movement.edit,
+                      arguments: md.copy(),
+                    );
+                    _handlePageReturn(returnObj);
+                  },
+                  icon: const Icon(AppIcons.edit),
+                ),
+              ],
+            ),
+        ],
+      ),
     );
   }
 }

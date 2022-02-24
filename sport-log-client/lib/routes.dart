@@ -93,20 +93,22 @@ abstract class Routes {
     Routes.timeline.overview: (_) => _checkLogin(() => const TimelinePage()),
     // metcon session
     Routes.metcon.sessionOverview: (_) =>
-        _checkLogin((() => const MetconSessionsPage())),
+        _checkLogin(() => const MetconSessionsPage()),
     Routes.metcon.sessionDetails: (context) => _checkLogin(() {
           final metconSessionDescription = ModalRoute.of(context)
               ?.settings
               .arguments as MetconSessionDescription;
           return MetconSessionDetailsPage(
-              metconSessionDescription: metconSessionDescription);
+            metconSessionDescription: metconSessionDescription,
+          );
         }),
     Routes.metcon.sessionEdit: (context) => _checkLogin(() {
           final metconSessionDescription = ModalRoute.of(context)
               ?.settings
               .arguments as MetconSessionDescription?;
           return MetconSessionEditPage(
-              metconSessionDescription: metconSessionDescription);
+            metconSessionDescription: metconSessionDescription,
+          );
         }),
     // strength
     Routes.strength.overview: (_) =>
@@ -132,7 +134,10 @@ abstract class Routes {
           final args =
               ModalRoute.of(context)?.settings.arguments as List<dynamic>;
           return CardioTrackingPage(
-              args[0] as Movement, args[1] as CardioType, args[2] as Route?);
+            args[0] as Movement,
+            args[1] as CardioType,
+            args[2] as Route?,
+          );
         }),
     Routes.cardio.cardioEdit: (context) => _checkLogin(() {
           final cardioSessionDescription = ModalRoute.of(context)
@@ -147,7 +152,8 @@ abstract class Routes {
               ?.settings
               .arguments as CardioSessionDescription;
           return CardioDetailsPage(
-              cardioSessionDescription: cardioSessionDescription);
+            cardioSessionDescription: cardioSessionDescription,
+          );
         }),
     Routes.cardio.routeOverview: (_) => _checkLogin(() => const RoutePage()),
     Routes.cardio.routeEdit: (context) => _checkLogin(() {

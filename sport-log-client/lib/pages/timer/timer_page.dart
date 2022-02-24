@@ -33,92 +33,107 @@ class TimerPageState extends State<TimerPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text("Timer"),
-            bottom: TabBar(
-                indicatorColor: primaryColorOf(context),
-                labelColor: Colors.white,
-                tabs: [
-                  Tab(
-                      text: "AMRAP",
-                      icon: Icon(
-                        MetconType.amrap.icon,
-                      )),
-                  Tab(
-                    text: "EMOM",
-                    icon: Icon(
-                      MetconType.emom.icon,
-                    ),
-                  ),
-                  Tab(
-                    text: "FOR TIME",
-                    icon: Icon(
-                      MetconType.forTime.icon,
-                    ),
-                  )
-                ]),
-          ),
-          body: Container(
-            padding: const EdgeInsets.all(10),
-            child: SizedBox(
-                child: TabBarView(children: [
-              SingleChildScrollView(
-                  child: Column(children: [
-                timeFormField(MetconType.amrap),
-                Defaults.sizedBox.vertical.huge,
-                startStopButton(MetconType.amrap),
-                const SizedBox(
-                  height: 100,
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Timer"),
+          bottom: TabBar(
+            indicatorColor: primaryColorOf(context),
+            labelColor: Colors.white,
+            tabs: [
+              Tab(
+                text: "AMRAP",
+                icon: Icon(
+                  MetconType.amrap.icon,
                 ),
-                timeText,
-              ])),
-              SingleChildScrollView(
-                  child: Column(children: [
-                timeFormField(MetconType.emom),
-                TextFormField(
-                  keyboardType: TextInputType.number,
-                  onChanged: (rounds) {
-                    if (Validator.validateIntGtZero(rounds) == null) {
-                      setState(() => _rounds = int.parse(rounds));
-                    }
-                  },
-                  style: const TextStyle(height: 1),
-                  initialValue: _rounds.toString(),
-                  validator: Validator.validateIntGtZero,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  decoration: const InputDecoration(
-                    icon: Icon(AppIcons.repeat),
-                    labelText: "Rounds",
-                    contentPadding: EdgeInsets.symmetric(vertical: 5),
+              ),
+              Tab(
+                text: "EMOM",
+                icon: Icon(
+                  MetconType.emom.icon,
+                ),
+              ),
+              Tab(
+                text: "FOR TIME",
+                icon: Icon(
+                  MetconType.forTime.icon,
+                ),
+              )
+            ],
+          ),
+        ),
+        body: Container(
+          padding: const EdgeInsets.all(10),
+          child: SizedBox(
+            child: TabBarView(
+              children: [
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      timeFormField(MetconType.amrap),
+                      Defaults.sizedBox.vertical.huge,
+                      startStopButton(MetconType.amrap),
+                      const SizedBox(
+                        height: 100,
+                      ),
+                      timeText,
+                    ],
                   ),
                 ),
-                Defaults.sizedBox.vertical.huge,
-                startStopButton(MetconType.emom),
-                const SizedBox(
-                  height: 100,
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      timeFormField(MetconType.emom),
+                      TextFormField(
+                        keyboardType: TextInputType.number,
+                        onChanged: (rounds) {
+                          if (Validator.validateIntGtZero(rounds) == null) {
+                            setState(() => _rounds = int.parse(rounds));
+                          }
+                        },
+                        style: const TextStyle(height: 1),
+                        initialValue: _rounds.toString(),
+                        validator: Validator.validateIntGtZero,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration: const InputDecoration(
+                          icon: Icon(AppIcons.repeat),
+                          labelText: "Rounds",
+                          contentPadding: EdgeInsets.symmetric(vertical: 5),
+                        ),
+                      ),
+                      Defaults.sizedBox.vertical.huge,
+                      startStopButton(MetconType.emom),
+                      const SizedBox(
+                        height: 100,
+                      ),
+                      Text(
+                        "Round $_currentRound",
+                        style: const TextStyle(fontSize: 50),
+                      ),
+                      timeText,
+                    ],
+                  ),
                 ),
-                Text(
-                  "Round $_currentRound",
-                  style: const TextStyle(fontSize: 50),
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      timeFormField(MetconType.forTime),
+                      Defaults.sizedBox.vertical.huge,
+                      startStopButton(MetconType.forTime),
+                      const SizedBox(
+                        height: 100,
+                      ),
+                      timeText,
+                    ],
+                  ),
                 ),
-                timeText,
-              ])),
-              SingleChildScrollView(
-                  child: Column(children: [
-                timeFormField(MetconType.forTime),
-                Defaults.sizedBox.vertical.huge,
-                startStopButton(MetconType.forTime),
-                const SizedBox(
-                  height: 100,
-                ),
-                timeText,
-              ])),
-            ])),
+              ],
+            ),
           ),
-          drawer: const MainDrawer(selectedRoute: Routes.settings),
-        ));
+        ),
+        drawer: const MainDrawer(selectedRoute: Routes.settings),
+      ),
+    );
   }
 
   Widget timeFormField(MetconType metconType) {
@@ -137,8 +152,9 @@ class TimerPageState extends State<TimerPage> {
     return EditTile(
       caption: caption,
       child: DurationPicker(
-          setDuration: (d) => setState(() => _totalTime = d),
-          initialDuration: _totalTime),
+        setDuration: (d) => setState(() => _totalTime = d),
+        initialDuration: _totalTime,
+      ),
       leading: AppIcons.timeInterval,
     );
   }
@@ -150,13 +166,15 @@ class TimerPageState extends State<TimerPage> {
             child: const Text(
               "Start",
               style: TextStyle(fontSize: 40),
-            ))
+            ),
+          )
         : ElevatedButton(
             onPressed: stopTimer,
             child: const Text(
               "Stop",
               style: TextStyle(fontSize: 40),
-            ));
+            ),
+          );
   }
 
   Text get timeText {
@@ -164,7 +182,9 @@ class TimerPageState extends State<TimerPage> {
         ? Text(
             formatTime(_currentTime.abs(), short: true),
             style: const TextStyle(
-                fontSize: 120, color: Color.fromARGB(255, 150, 150, 150)),
+              fontSize: 120,
+              color: Color.fromARGB(255, 150, 150, 150),
+            ),
           )
         : Text(
             formatTime(_currentTime, short: true),
@@ -203,7 +223,9 @@ class TimerPageState extends State<TimerPage> {
             Duration roundTime =
                 Duration(seconds: time.inSeconds % _totalTime.inSeconds);
             _currentRound = min(
-                ((time.inSeconds + 1) / _totalTime.inSeconds).ceil(), _rounds);
+              ((time.inSeconds + 1) / _totalTime.inSeconds).ceil(),
+              _rounds,
+            );
             _currentTime = time == _totalTime * _rounds
                 ? Duration(seconds: _totalTime.inSeconds)
                 : roundTime;

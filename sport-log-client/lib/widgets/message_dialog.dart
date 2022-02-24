@@ -31,7 +31,9 @@ class MessageDialog extends StatelessWidget {
       content: Text(text),
       actions: [
         TextButton(
-            onPressed: () => Navigator.pop(context), child: const Text("Ok")),
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Ok"),
+        ),
       ],
     );
   }

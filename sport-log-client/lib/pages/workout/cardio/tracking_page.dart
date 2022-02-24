@@ -19,9 +19,12 @@ class CardioTrackingPage extends StatefulWidget {
   final CardioType _cardioType;
   final Route? _route;
 
-  const CardioTrackingPage(this._movement, this._cardioType, this._route,
-      {Key? key})
-      : super(key: key);
+  const CardioTrackingPage(
+    this._movement,
+    this._cardioType,
+    this._route, {
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<CardioTrackingPage> createState() => CardioTrackingPageState();
@@ -129,7 +132,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     _stepCountSubscription.onError(_onStepCountError);
   }
 
-  void _startLocationStream() async {
+  Future<void> _startLocationStream() async {
     Location location = Location();
 
     bool serviceEnabled = await location.serviceEnabled();
@@ -154,7 +157,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
         location.onLocationChanged.listen(_onLocationUpdate);
   }
 
-  void _onLocationUpdate(LocationData location) async {
+  Future<void> _onLocationUpdate(LocationData location) async {
     setState(() {
       _locationInfo = """location provider: ${location.provider}
 accuracy: ${location.accuracy?.toInt()} m
@@ -202,26 +205,35 @@ satelites: ${location.satelliteNumber}""";
       });
       _lastElevation = location.altitude;
 
-      _positions.add(Position(
+      _positions.add(
+        Position(
           latitude: location.latitude!,
           longitude: location.longitude!,
           elevation: location.altitude!.toInt(),
           distance: 0,
           time: DateTime.now().difference(
-              DateTime.fromMicrosecondsSinceEpoch(location.time!.toInt()))));
+            DateTime.fromMicrosecondsSinceEpoch(location.time!.toInt()),
+          ),
+        ),
+      );
       _extendLine(_mapController, latLng);
     }
   }
 
-  void _extendLine(MapboxMapController controller, LatLng location) async {
+  Future<void> _extendLine(
+    MapboxMapController controller,
+    LatLng location,
+  ) async {
     _line ??= await controller.addLine(
-        const LineOptions(lineColor: "red", lineWidth: 3, geometry: []));
+      const LineOptions(lineColor: "red", lineWidth: 3, geometry: []),
+    );
     await controller.updateLine(
-        _line!,
-        LineOptions(
-            geometry: _positions
-                .map((e) => LatLng(e.latitude, e.longitude))
-                .toList()));
+      _line!,
+      LineOptions(
+        geometry:
+            _positions.map((e) => LatLng(e.latitude, e.longitude)).toList(),
+      ),
+    );
   }
 
   Future<void> _stopDialog() async {
@@ -235,19 +247,24 @@ satelites: ${location.satelliteNumber}""";
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Back")),
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Back"),
+          ),
           TextButton(
-              onPressed: () {
-                _trackingMode = TrackingMode.stopped;
-                CardioSession cardioSession = _saveCardioSession();
-                Navigator.pop(context);
-                Navigator.pop(
-                    context,
-                    ReturnObject(
-                        action: ReturnAction.created, payload: cardioSession));
-              },
-              child: const Text("Save"))
+            onPressed: () {
+              _trackingMode = TrackingMode.stopped;
+              CardioSession cardioSession = _saveCardioSession();
+              Navigator.pop(context);
+              Navigator.pop(
+                context,
+                ReturnObject(
+                  action: ReturnAction.created,
+                  payload: cardioSession,
+                ),
+              );
+            },
+            child: const Text("Save"),
+          )
         ],
       ),
     );
@@ -257,106 +274,125 @@ satelites: ${location.satelliteNumber}""";
     if (_trackingMode == TrackingMode.tracking) {
       return [
         Expanded(
-            child: ElevatedButton(
-                style: ElevatedButton.styleFrom(primary: Colors.red[400]),
-                onPressed: () {
-                  _trackingMode = TrackingMode.paused;
-                  _seconds += DateTime.now().difference(_pauseEndTime!);
-                },
-                child: const Text("pause"))),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(primary: Colors.red[400]),
+            onPressed: () {
+              _trackingMode = TrackingMode.paused;
+              _seconds += DateTime.now().difference(_pauseEndTime!);
+            },
+            child: const Text("pause"),
+          ),
+        ),
         Defaults.sizedBox.horizontal.normal,
         Expanded(
-            child: ElevatedButton(
-                style: ElevatedButton.styleFrom(primary: Colors.red[400]),
-                onPressed: () async {
-                  _trackingMode = TrackingMode.paused;
-                  _seconds += DateTime.now().difference(_pauseEndTime!);
-                  await _stopDialog();
-                },
-                child: const Text("stop"))),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(primary: Colors.red[400]),
+            onPressed: () async {
+              _trackingMode = TrackingMode.paused;
+              _seconds += DateTime.now().difference(_pauseEndTime!);
+              await _stopDialog();
+            },
+            child: const Text("stop"),
+          ),
+        ),
       ];
     } else if (_trackingMode == TrackingMode.paused) {
       return [
         Expanded(
-            child: ElevatedButton(
-                style: ElevatedButton.styleFrom(primary: Colors.green[400]),
-                onPressed: () {
-                  _trackingMode = TrackingMode.tracking;
-                  _pauseEndTime = DateTime.now();
-                },
-                child: const Text("continue"))),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(primary: Colors.green[400]),
+            onPressed: () {
+              _trackingMode = TrackingMode.tracking;
+              _pauseEndTime = DateTime.now();
+            },
+            child: const Text("continue"),
+          ),
+        ),
         Defaults.sizedBox.horizontal.normal,
         Expanded(
-            child: ElevatedButton(
-                style: ElevatedButton.styleFrom(primary: Colors.red[400]),
-                onPressed: () async {
-                  await _stopDialog();
-                },
-                child: const Text("stop"))),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(primary: Colors.red[400]),
+            onPressed: () async {
+              await _stopDialog();
+            },
+            child: const Text("stop"),
+          ),
+        ),
       ];
     } else {
       return [
         Expanded(
-            child: ElevatedButton(
-                style: ElevatedButton.styleFrom(primary: Colors.green[400]),
-                onPressed: () {
-                  _trackingMode = TrackingMode.tracking;
-                  _startTime = DateTime.now();
-                  _pauseEndTime = DateTime.now();
-                },
-                child: const Text("start"))),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(primary: Colors.green[400]),
+            onPressed: () {
+              _trackingMode = TrackingMode.tracking;
+              _startTime = DateTime.now();
+              _pauseEndTime = DateTime.now();
+            },
+            child: const Text("start"),
+          ),
+        ),
         Defaults.sizedBox.horizontal.normal,
         Expanded(
-            child: ElevatedButton(
-                style: ElevatedButton.styleFrom(primary: Colors.red[400]),
-                onPressed: () => Navigator.pop(context),
-                child: const Text("cancel"))),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(primary: Colors.red[400]),
+            onPressed: () => Navigator.pop(context),
+            child: const Text("cancel"),
+          ),
+        ),
       ];
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    TableRow rowSpacer = TableRow(children: [
-      Defaults.sizedBox.vertical.normal,
-      Defaults.sizedBox.vertical.normal,
-    ]);
+    TableRow rowSpacer = TableRow(
+      children: [
+        Defaults.sizedBox.vertical.normal,
+        Defaults.sizedBox.vertical.normal,
+      ],
+    );
 
     return Container(
-        color: backgroundColorOf(context),
-        child: Column(children: [
+      color: backgroundColorOf(context),
+      child: Column(
+        children: [
           Row(
             children: [
               Card(
-                  margin: const EdgeInsets.only(top: 25, bottom: 5),
-                  child: Text(_locationInfo)),
+                margin: const EdgeInsets.only(top: 25, bottom: 5),
+                child: Text(_locationInfo),
+              ),
               Card(
-                  margin: const EdgeInsets.only(top: 25, bottom: 5),
-                  child: Text(_stepInfo)),
+                margin: const EdgeInsets.only(top: 25, bottom: 5),
+                child: Text(_stepInfo),
+              ),
             ],
           ),
           Expanded(
-              child: MapboxMap(
-            accessToken: Defaults.mapbox.accessToken,
-            styleString: Defaults.mapbox.style.outdoor,
-            initialCameraPosition: CameraPosition(
-              zoom: 15.0,
-              target: Defaults.mapbox.cameraPosition,
+            child: MapboxMap(
+              accessToken: Defaults.mapbox.accessToken,
+              styleString: Defaults.mapbox.style.outdoor,
+              initialCameraPosition: CameraPosition(
+                zoom: 15.0,
+                target: Defaults.mapbox.cameraPosition,
+              ),
+              compassEnabled: true,
+              compassViewPosition: CompassViewPosition.TopRight,
+              onMapCreated: (MapboxMapController controller) =>
+                  _mapController = controller,
+              onStyleLoadedCallback: () {
+                _startLocationStream();
+                _startStepCountStream();
+              },
             ),
-            compassEnabled: true,
-            compassViewPosition: CompassViewPosition.TopRight,
-            onMapCreated: (MapboxMapController controller) =>
-                _mapController = controller,
-            onStyleLoadedCallback: () {
-              _startLocationStream();
-              _startStepCountStream();
-            },
-          )),
+          ),
           Container(
-              padding: const EdgeInsets.only(top: 10),
-              child: Table(
-                children: [
-                  TableRow(children: [
+            padding: const EdgeInsets.only(top: 10),
+            child: Table(
+              children: [
+                TableRow(
+                  children: [
                     ValueUnitDescription(
                       value: _time,
                       unit: null,
@@ -369,9 +405,11 @@ satelites: ${location.satelliteNumber}""";
                       description: "distance",
                       scale: 1.3,
                     ),
-                  ]),
-                  rowSpacer,
-                  TableRow(children: [
+                  ],
+                ),
+                rowSpacer,
+                TableRow(
+                  children: [
                     ValueUnitDescription(
                       value: 10.7.toString(),
                       unit: "km/h",
@@ -384,9 +422,11 @@ satelites: ${location.satelliteNumber}""";
                       description: "cadence",
                       scale: 1.3,
                     ),
-                  ]),
-                  rowSpacer,
-                  TableRow(children: [
+                  ],
+                ),
+                rowSpacer,
+                TableRow(
+                  children: [
                     ValueUnitDescription(
                       value: _ascent.round().toString(),
                       unit: "m",
@@ -399,15 +439,20 @@ satelites: ${location.satelliteNumber}""";
                       description: "descent",
                       scale: 1.3,
                     ),
-                  ]),
-                ],
-              )),
+                  ],
+                ),
+              ],
+            ),
+          ),
           Container(
-              padding: const EdgeInsets.all(10),
-              child: Row(
-                children: _buildButtons(),
-              ))
-        ]));
+            padding: const EdgeInsets.all(10),
+            child: Row(
+              children: _buildButtons(),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   @override

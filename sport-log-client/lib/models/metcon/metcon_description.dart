@@ -1,8 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
-
-import 'all.dart';
+import 'package:sport_log/models/metcon/all.dart';
 
 class MetconDescription implements Validatable {
   MetconDescription({
@@ -28,14 +27,20 @@ class MetconDescription implements Validatable {
   bool isValid() {
     return validate(metcon.isValid(), 'MetconDescription: metcon not valid') &&
         validate(moves.isNotEmpty, 'MetconDescription: moves empty') &&
-        validate(moves.every((mmd) => mmd.metconMovement.metconId == metcon.id),
-            'MetconDescription: metcon id mismatch') &&
         validate(
-            moves.everyIndexed(
-                (mmd, index) => mmd.metconMovement.movementNumber == index),
-            'MetconDescription: moves indices wrong') &&
-        validate(moves.every((mm) => mm.isValid()),
-            'MetconDescription: moves not valid');
+          moves.every((mmd) => mmd.metconMovement.metconId == metcon.id),
+          'MetconDescription: metcon id mismatch',
+        ) &&
+        validate(
+          moves.everyIndexed(
+            (mmd, index) => mmd.metconMovement.movementNumber == index,
+          ),
+          'MetconDescription: moves indices wrong',
+        ) &&
+        validate(
+          moves.every((mm) => mm.isValid()),
+          'MetconDescription: moves not valid',
+        );
   }
 
   static bool areTheSame(MetconDescription m1, MetconDescription m2) =>

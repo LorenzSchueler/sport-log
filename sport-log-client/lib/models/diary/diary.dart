@@ -47,9 +47,13 @@ class Diary extends Entity {
   @override
   bool isValid() {
     return validate(
-            bodyweight == null || bodyweight! > 0, 'Diary: bodyweight <= 0') &&
-        validate(bodyweight != null || comments != null,
-            'Diary: bodyweight and comments are null');
+          bodyweight == null || bodyweight! > 0,
+          'Diary: bodyweight <= 0',
+        ) &&
+        validate(
+          bodyweight != null || comments != null,
+          'Diary: bodyweight and comments are null',
+        );
   }
 }
 

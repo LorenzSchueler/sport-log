@@ -122,7 +122,8 @@ extension ApiResultFromRequest on ApiResult {
   static final _client = Client();
 
   static ApiResult<void> fromRequest(
-      Future<Response> Function(Client client) request) async {
+    Future<Response> Function(Client client) request,
+  ) async {
     try {
       final response = await request(_client);
       return await response.toApiResult();
@@ -137,8 +138,9 @@ extension ApiResultFromRequest on ApiResult {
   }
 
   static ApiResult<T> fromRequestWithValue<T>(
-      Future<Response> Function(Client client) request,
-      T Function(dynamic) fromJson) async {
+    Future<Response> Function(Client client) request,
+    T Function(dynamic) fromJson,
+  ) async {
     try {
       final response = await request(_client);
       return await response.toApiResultWithValue(fromJson);
@@ -182,16 +184,19 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   Map<String, dynamic> _toJson(T object) => object.toJson();
 
   ApiResult<T> getSingle(Int64 id) async {
-    return _getRequest(_singularRoute + '/$id',
-        (dynamic json) => _fromJson(json as Map<String, dynamic>));
+    return _getRequest(
+      _singularRoute + '/$id',
+      (dynamic json) => _fromJson(json as Map<String, dynamic>),
+    );
   }
 
   ApiResult<List<T>> getMultiple() async {
     return _getRequest(
-        _singularRoute,
-        (dynamic json) => (json as List<dynamic>)
-            .map((dynamic json) => _fromJson(json as Map<String, dynamic>))
-            .toList());
+      _singularRoute,
+      (dynamic json) => (json as List<dynamic>)
+          .map((dynamic json) => _fromJson(json as Map<String, dynamic>))
+          .toList(),
+    );
   }
 
   ApiResult<void> postSingle(T object) async {
@@ -286,14 +291,19 @@ mixin ApiLogging {
     return JsonEncoder.withIndent(spaces).convert(json);
   }
 
-  void _logRequest(String httpMethod, String route, Map<String, String> headers,
-      [dynamic json]) {
+  void _logRequest(
+    String httpMethod,
+    String route,
+    Map<String, String> headers, [
+    dynamic json,
+  ]) {
     final headersStr = Config.outputRequestHeaders
         ? "\n${headers.entries.map((e) => '${e.key}:${e.value}').join('\n')}"
         : "";
     json != null && Config.outputRequestJson
         ? logger.d(
-            'request: $httpMethod ${Settings.serverUrl}$route$headersStr\n${_prettyJson(json)}')
+            'request: $httpMethod ${Settings.serverUrl}$route$headersStr\n${_prettyJson(json)}',
+          )
         : logger
             .d('request: $httpMethod ${Settings.serverUrl}$route$headersStr');
   }
@@ -302,10 +312,14 @@ mixin ApiLogging {
     final body = utf8.decode(response.bodyBytes);
     final successful = response.statusCode >= 200 && response.statusCode < 300;
     body.isNotEmpty && (!successful || Config.outputResponseJson)
-        ? logger.log(successful ? l.Level.debug : l.Level.error,
-            'response: ${response.statusCode}\n${_prettyJson(jsonDecode(body))}')
-        : logger.log(successful ? l.Level.debug : l.Level.error,
-            'response: ${response.statusCode}');
+        ? logger.log(
+            successful ? l.Level.debug : l.Level.error,
+            'response: ${response.statusCode}\n${_prettyJson(jsonDecode(body))}',
+          )
+        : logger.log(
+            successful ? l.Level.debug : l.Level.error,
+            'response: ${response.statusCode}',
+          );
   }
 }
 
@@ -315,17 +329,22 @@ extension UriFromRoute on Uri {
 
 mixin ApiHelpers on ApiLogging {
   ApiResult<T> _getRequest<T>(
-      String route, T Function(dynamic) fromJson) async {
-    return ApiResultFromRequest.fromRequestWithValue<T>((client) async {
-      final headers =
-          _ApiHeaders._basicAuth(Settings.username!, Settings.password!);
-      _logRequest('GET', route, headers);
-      final response = await client.get(
-        UriFromRoute.fromRoute(route),
-        headers: headers,
-      );
-      _logResponse(response);
-      return response;
-    }, fromJson);
+    String route,
+    T Function(dynamic) fromJson,
+  ) async {
+    return ApiResultFromRequest.fromRequestWithValue<T>(
+      (client) async {
+        final headers =
+            _ApiHeaders._basicAuth(Settings.username!, Settings.password!);
+        _logRequest('GET', route, headers);
+        final response = await client.get(
+          UriFromRoute.fromRoute(route),
+          headers: headers,
+        );
+        _logResponse(response);
+        return response;
+      },
+      fromJson,
+    );
   }
 }

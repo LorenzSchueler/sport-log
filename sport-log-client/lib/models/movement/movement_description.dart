@@ -1,7 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-
-import 'movement.dart';
+import 'package:sport_log/models/movement/movement.dart';
 
 class MovementDescription implements Validatable, HasId {
   MovementDescription({
@@ -22,14 +21,18 @@ class MovementDescription implements Validatable, HasId {
   @override
   bool isValid() {
     return validate(
-        movement.isValid(), 'MovementDescription: movement is not valid');
+      movement.isValid(),
+      'MovementDescription: movement is not valid',
+    );
   }
 
   @override
   Int64 get id => movement.id;
 
   MovementDescription copy() => MovementDescription(
-      movement: movement.copy(), hasReference: hasReference);
+        movement: movement.copy(),
+        hasReference: hasReference,
+      );
 
   @override
   bool operator ==(other) =>

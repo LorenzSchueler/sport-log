@@ -40,23 +40,26 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     super.initState();
     _session = widget.initialSession ??
         StrengthSessionDescription(
-            session: StrengthSession(
-                id: randomId(),
-                userId: Settings.userId!,
-                datetime: DateTime.now(),
-                movementId: randomId(),
-                interval: null,
-                comments: null,
-                deleted: false),
-            movement: Movement(
-                id: randomId(),
-                userId: Settings.userId,
-                name: "test movement",
-                description: null,
-                cardio: true,
-                deleted: false,
-                dimension: MovementDimension.reps),
-            sets: []);
+          session: StrengthSession(
+            id: randomId(),
+            userId: Settings.userId!,
+            datetime: DateTime.now(),
+            movementId: randomId(),
+            interval: null,
+            comments: null,
+            deleted: false,
+          ),
+          movement: Movement(
+            id: randomId(),
+            userId: Settings.userId,
+            name: "test movement",
+            description: null,
+            cardio: true,
+            deleted: false,
+            dimension: MovementDimension.reps,
+          ),
+          sets: [],
+        );
     _keyboardSubscription =
         KeyboardVisibilityController().onChange.listen((isVisible) {
       if (!isVisible) {
@@ -74,65 +77,68 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Edit session')),
-        body: Container(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            children: [
-              Expanded(
-                child: Scrollbar(
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _movementInput,
-                        _dateTimeInput,
-                        if (_session.session.interval != null) _intervalInput,
-                        if (_session.session.comments != null) _commentInput,
-                        if (_session.session.interval == null ||
-                            _session.session.comments == null)
-                          _buttonBar,
-                        const CaptionTile(caption: 'Sets'),
-                        _setList,
-                      ],
-                    ),
+      appBar: AppBar(title: const Text('Edit session')),
+      body: Container(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Expanded(
+              child: Scrollbar(
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _movementInput,
+                      _dateTimeInput,
+                      if (_session.session.interval != null) _intervalInput,
+                      if (_session.session.comments != null) _commentInput,
+                      if (_session.session.interval == null ||
+                          _session.session.comments == null)
+                        _buttonBar,
+                      const CaptionTile(caption: 'Sets'),
+                      _setList,
+                    ],
                   ),
                 ),
               ),
-              NewSetInput(
-                dimension: _session.movement.dimension,
-                onNewSet: (count, [weight]) {
-                  final newSet = StrengthSet(
-                    id: randomId(),
-                    strengthSessionId: _session.session.id,
-                    setNumber: _session.sets.length,
-                    count: count,
-                    weight: weight,
-                    deleted: false,
-                  );
-                  setState(() {
-                    _session.sets.add(newSet);
-                  });
-                  Future.delayed(
-                      const Duration(milliseconds: 100),
-                      () => _scrollController.animateTo(
-                            _scrollController.position.maxScrollExtent,
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.decelerate,
-                          ));
-                },
-              ),
-            ],
-          ),
-        ));
+            ),
+            NewSetInput(
+              dimension: _session.movement.dimension,
+              onNewSet: (count, [weight]) {
+                final newSet = StrengthSet(
+                  id: randomId(),
+                  strengthSessionId: _session.session.id,
+                  setNumber: _session.sets.length,
+                  count: count,
+                  weight: weight,
+                  deleted: false,
+                );
+                setState(() {
+                  _session.sets.add(newSet);
+                });
+                Future.delayed(
+                  const Duration(milliseconds: 100),
+                  () => _scrollController.animateTo(
+                    _scrollController.position.maxScrollExtent,
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.decelerate,
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget get _movementInput {
     return EditTile(
       caption: 'Movement',
       child: Text(
-          '${_session.movement.name} (${_session.movement.dimension.displayName})'),
+        '${_session.movement.name} (${_session.movement.dimension.displayName})',
+      ),
       leading: AppIcons.exercise,
       onTap: () async {
         final maybeMovement = await showMovementPickerDialog(context);
@@ -180,7 +186,9 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       leading: AppIcons.calendar,
       onTap: () async {
         final maybeDate = await showRoundedDatePicker(
-            context: context, theme: Theme.of(context));
+          context: context,
+          theme: Theme.of(context),
+        );
         if (maybeDate != null) {
           final defaultTime = TimeOfDay.fromDateTime(_session.session.datetime);
           final maybeTime = await showRoundedTimePicker(

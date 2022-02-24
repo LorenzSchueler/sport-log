@@ -56,7 +56,9 @@ extension SessionTabUtils on SessionsPageTab {
   }
 
   static BottomNavigationBar bottomNavigationBar(
-      BuildContext context, SessionsPageTab sessionsPageTab) {
+    BuildContext context,
+    SessionsPageTab sessionsPageTab,
+  ) {
     return BottomNavigationBar(
       items: SessionTabUtils.bottomNavItems,
       currentIndex: sessionsPageTab.indexOf(),

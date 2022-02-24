@@ -21,12 +21,14 @@ class MovementTable extends TableAccessor<Movement> {
   final Table table = Table(
     Tables.movement,
     columns: [
-      Column.int(Columns.id).primaryKey(),
-      Column.bool(Columns.deleted).withDefault('0'),
-      Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
-      Column.int(Columns.userId).nullable(),
+      Column.int(Columns.id)..primaryKey(),
+      Column.bool(Columns.deleted)..withDefault('0'),
+      Column.int(Columns.syncStatus)
+        ..withDefault('2')
+        ..checkIn(<int>[0, 1, 2]),
+      Column.int(Columns.userId)..nullable(),
       Column.text(Columns.name),
-      Column.text(Columns.description).nullable(),
+      Column.text(Columns.description)..nullable(),
       Column.bool(Columns.cardio),
       Column.int(Columns.dimension),
     ],
@@ -48,7 +50,8 @@ class MovementTable extends TableAccessor<Movement> {
     // TODO: check for references to cardio blueprint, strength blueprint
     final now = DateTime.now();
     const hasReference = 'has_reference';
-    final records = await database.rawQuery('''
+    final records = await database.rawQuery(
+      '''
     SELECT
       ${table.allColumns},
       (
@@ -75,14 +78,19 @@ class MovementTable extends TableAccessor<Movement> {
         )
       )
     ORDER BY $name COLLATE NOCASE
-    ''');
-    _logger.d('Select movement descriptions: ' +
-        DateTime.now().difference(now).toString());
+    ''',
+    );
+    _logger.d(
+      'Select movement descriptions: ' +
+          DateTime.now().difference(now).toString(),
+    );
     return records
-        .map((r) => MovementDescription(
-              movement: serde.fromDbRecord(r, prefix: table.prefix),
-              hasReference: r[hasReference]! as int == 1,
-            ))
+        .map(
+          (r) => MovementDescription(
+            movement: serde.fromDbRecord(r, prefix: table.prefix),
+            hasReference: r[hasReference]! as int == 1,
+          ),
+        )
         .toList();
   }
 
@@ -92,7 +100,8 @@ class MovementTable extends TableAccessor<Movement> {
   }) async {
     final nameFilter = byName != null ? 'AND $name LIKE ?' : '';
     final cardioFilter = cardioOnly == true ? 'AND cardio = true' : '';
-    final records = await database.rawQuery('''
+    final records = await database.rawQuery(
+      '''
       SELECT * FROM $tableName m1
       WHERE $deleted = 0
         $nameFilter
@@ -107,17 +116,22 @@ class MovementTable extends TableAccessor<Movement> {
           )
         )
       ORDER BY $name COLLATE NOCASE
-    ''', [if (byName != null) '%$byName%']);
+    ''',
+      [if (byName != null) '%$byName%'],
+    );
     return records.map((r) => serde.fromDbRecord(r)).toList();
   }
 
   Future<bool> exists(String nameValue, MovementDimension dimValue) async {
-    final result = await database.rawQuery('''
+    final result = await database.rawQuery(
+      '''
       SELECT 1 FROM $tableName
       WHERE $deleted = 0
         AND $name = ?
         AND $dimension = ?
-    ''', [nameValue, dimValue.index]);
+    ''',
+      [nameValue, dimValue.index],
+    );
     return result.isNotEmpty;
   }
 }

@@ -91,13 +91,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
         labelText: "Server URL",
         contentPadding: const EdgeInsets.symmetric(vertical: 5),
         suffixIcon: IconButton(
-            onPressed: () async {
-              await Settings.setDefaultServerUrl();
-              setState(() {
-                _serverUrlInputController.text = Settings.serverUrl;
-              });
-            },
-            icon: const Icon(AppIcons.restore)),
+          onPressed: () async {
+            await Settings.setDefaultServerUrl();
+            setState(() {
+              _serverUrlInputController.text = Settings.serverUrl;
+            });
+          },
+          icon: const Icon(AppIcons.restore),
+        ),
       ),
       validator: Validator.validateUrl,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -224,7 +225,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  void _submit(BuildContext context) async {
+  Future<void> _submit(BuildContext context) async {
     setState(() {
       _registrationPending = true;
     });

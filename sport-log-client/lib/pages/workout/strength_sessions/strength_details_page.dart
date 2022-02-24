@@ -43,12 +43,14 @@ class _StrengthSessionDetailsPageState
           case ConnectionState.done:
             if (!snapshot.hasData || snapshot.data == null) {
               return const Scaffold(
-                  body: Center(child: Text('Something went wrong.')));
+                body: Center(child: Text('Something went wrong.')),
+              );
             }
             return _page(snapshot.data!);
           default:
             return const Scaffold(
-                body: Center(child: CircularProgressIndicator()));
+              body: Center(child: CircularProgressIndicator()),
+            );
         }
       },
     );
@@ -61,8 +63,11 @@ class _StrengthSessionDetailsPageState
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, Routes.strength.edit,
-                  arguments: session);
+              Navigator.pushNamed(
+                context,
+                Routes.strength.edit,
+                arguments: session,
+              );
             },
             icon: const Icon(AppIcons.edit),
           ),
@@ -178,13 +183,15 @@ class _StrengthSessionDetailsPageState
         child: ListView(
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
-          children: session.sets.mapToListIndexed((set, index) => ListTile(
-                title: Text(
-                  set.toDisplayName(session.movement.dimension),
-                  style: const TextStyle(fontSize: 20),
-                ),
-                leading: CircleAvatar(child: Text('${index + 1}')),
-              )),
+          children: session.sets.mapToListIndexed(
+            (set, index) => ListTile(
+              title: Text(
+                set.toDisplayName(session.movement.dimension),
+                style: const TextStyle(fontSize: 20),
+              ),
+              leading: CircleAvatar(child: Text('${index + 1}')),
+            ),
+          ),
         ),
       ),
     );

@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+void defaultCallback() {}
+
 class RepeatIconButton extends StatefulWidget {
-  RepeatIconButton({
+  const RepeatIconButton({
     Key? key,
     required this.icon,
     VoidCallback? onClick,
@@ -15,8 +17,6 @@ class RepeatIconButton extends StatefulWidget {
         onRepeat = onRepeat ?? defaultCallback,
         onRepeatEnd = onRepeatEnd ?? defaultCallback,
         super(key: key);
-
-  static final defaultCallback = (() {});
 
   final Icon icon;
   final VoidCallback onClick;

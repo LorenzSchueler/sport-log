@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import '../all.dart';
+import 'package:sport_log/models/all.dart';
 
 part 'account_data.g.dart';
 

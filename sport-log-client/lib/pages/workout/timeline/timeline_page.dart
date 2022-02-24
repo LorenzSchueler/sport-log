@@ -75,31 +75,38 @@ class TimelinePageState extends State<TimelinePage> {
   Future<void> updateStrengthSessions() async {
     _strengthSessionsDescriptions =
         await _strengthDataProvider.getByTimerangeAndMovement(
-            movementId: null, from: _dateFilter.start, until: _dateFilter.end);
+      movementId: null,
+      from: _dateFilter.start,
+      until: _dateFilter.end,
+    );
     sortItems();
   }
 
   Future<void> updateMetconSessions() async {
     _metconSessionsDescriptions =
         await _metconDataProvider.getByTimerangeAndMovement(
-            movementId: _movement?.id,
-            from: _dateFilter.start,
-            until: _dateFilter.end);
+      movementId: _movement?.id,
+      from: _dateFilter.start,
+      until: _dateFilter.end,
+    );
     sortItems();
   }
 
   Future<void> updateCardioSessions() async {
     _cardioSessionsDescriptions =
         await _cardioDataProvider.getByTimerangeAndMovement(
-            movementId: _movement?.id,
-            from: _dateFilter.start,
-            until: _dateFilter.end);
+      movementId: _movement?.id,
+      from: _dateFilter.start,
+      until: _dateFilter.end,
+    );
     sortItems();
   }
 
   Future<void> updateDiaries() async {
     _diaries = await _diaryDataProvider.getByTimerange(
-        _dateFilter.start, _dateFilter.end);
+      _dateFilter.start,
+      _dateFilter.end,
+    );
     sortItems();
   }
 
@@ -108,9 +115,11 @@ class TimelinePageState extends State<TimelinePage> {
         .map((s) => TimelineUnion.strengthSession(s))
         .toList();
     items.addAll(
-        _metconSessionsDescriptions.map((m) => TimelineUnion.metconSession(m)));
+      _metconSessionsDescriptions.map((m) => TimelineUnion.metconSession(m)),
+    );
     items.addAll(
-        _cardioSessionsDescriptions.map((c) => TimelineUnion.cardioSession(c)));
+      _cardioSessionsDescriptions.map((c) => TimelineUnion.cardioSession(c)),
+    );
     items.addAll(_diaries.map((d) => TimelineUnion.diary(d)));
     items.sort((a, b) => b.compareTo(a));
     if (mounted) {
@@ -120,7 +129,8 @@ class TimelinePageState extends State<TimelinePage> {
 
   Future<void> _update() async {
     _logger.d(
-        'Updating timeline with start = ${_dateFilter.start}, end = ${_dateFilter.end}');
+      'Updating timeline with start = ${_dateFilter.start}, end = ${_dateFilter.end}',
+    );
     await updateStrengthSessions();
     await updateMetconSessions();
     await updateCardioSessions();
@@ -153,13 +163,16 @@ class TimelinePageState extends State<TimelinePage> {
         ),
       ),
       body: RefreshIndicator(
-          onRefresh: _pullFromServer,
-          child: ListView.builder(
-            itemBuilder: _buildItemEntry,
-            itemCount: _items.length,
-          )),
+        onRefresh: _pullFromServer,
+        child: ListView.builder(
+          itemBuilder: _buildItemEntry,
+          itemCount: _items.length,
+        ),
+      ),
       bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
-          context, SessionsPageTab.timeline),
+        context,
+        SessionsPageTab.timeline,
+      ),
       drawer: MainDrawer(selectedRoute: Routes.timeline.overview),
       floatingActionButton: null,
     );
@@ -173,12 +186,14 @@ class TimelinePageState extends State<TimelinePage> {
 
   Widget _itemCard(BuildContext context, TimelineUnion item) {
     return item.map(
-        (strengthSession) =>
-            StrengthSessionCard(strengthSessionWithStats: strengthSession),
-        (metconSessionDescription) => MetconSessionCard(
-            metconSessionDescription: metconSessionDescription),
-        (cardioSession) =>
-            CardioSessionCard(cardioSessionDescription: cardioSession),
-        (diary) => DiaryCard(diary: diary));
+      (strengthSession) =>
+          StrengthSessionCard(strengthSessionWithStats: strengthSession),
+      (metconSessionDescription) => MetconSessionCard(
+        metconSessionDescription: metconSessionDescription,
+      ),
+      (cardioSession) =>
+          CardioSessionCard(cardioSessionDescription: cardioSession),
+      (diary) => DiaryCard(diary: diary),
+    );
   }
 }

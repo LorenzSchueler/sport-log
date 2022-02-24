@@ -1,9 +1,8 @@
 import 'package:sport_log/config.dart';
 import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/database/tables/all.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sqflite/sqflite.dart';
-
-import 'tables/all.dart';
 
 final _logger = Logger('DB');
 

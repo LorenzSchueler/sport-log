@@ -50,7 +50,9 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
 
   Future<void> _update(String newSearch) async {
     final movements = await _dataProvider.getMovements(
-        byName: newSearch.trim(), cardioOnly: widget.cardioOnly);
+      byName: newSearch.trim(),
+      cardioOnly: widget.cardioOnly,
+    );
     if (widget.selectedMovement != null) {
       final index = movements
           .indexWhere((movement) => movement.id == widget.selectedMovement!.id);
@@ -92,8 +94,10 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
               ? IconButton(
                   onPressed: () async {
                     final returnObject = await Navigator.pushNamed(
-                        context, Routes.movement.edit,
-                        arguments: _search);
+                      context,
+                      Routes.movement.edit,
+                      arguments: _search,
+                    );
                     if (returnObject is! ReturnObject<MovementDescription>) {
                       return;
                     }

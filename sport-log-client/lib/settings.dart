@@ -50,10 +50,11 @@ class Settings {
 
   static Future<void> setDefaultServerUrl() async {
     _storage!.put(
-        _serverUrl,
-        await Config.isAndroidEmulator
-            ? Defaults.server.emulatorUrl
-            : Defaults.server.url);
+      _serverUrl,
+      await Config.isAndroidEmulator
+          ? Defaults.server.emulatorUrl
+          : Defaults.server.url,
+    );
   }
 
   static bool _getBool(String key) {
@@ -172,7 +173,11 @@ class Settings {
     if (userExists()) {
       _logger.i("user data found");
       return User(
-          id: userId!, username: username!, password: password!, email: email!);
+        id: userId!,
+        username: username!,
+        password: password!,
+        email: email!,
+      );
     } else {
       _logger.i("no user data found");
       return null;

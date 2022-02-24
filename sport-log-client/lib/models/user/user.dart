@@ -34,6 +34,8 @@ class User implements Validatable {
     return validate(username.isNotEmpty, 'User: username is empty') &&
         validate(password.isNotEmpty, 'User: password is empty') &&
         validate(
-            Validator.validateEmail(email) == null, 'User: email is not valid');
+          Validator.validateEmail(email) == null,
+          'User: email is not valid',
+        );
   }
 }

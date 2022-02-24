@@ -171,7 +171,9 @@ class PaddedIntInputState extends State<PaddedIntInput> {
   }
 
   TextEditingValue _inputFormatter(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     if (oldValue.text == newValue.text || newValue.text.isEmpty) {
       return newValue;
     }
@@ -256,7 +258,9 @@ class _UnrestrictedIntInputState extends State<UnrestrictedIntInput> {
   }
 
   TextEditingValue _inputFormatter(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     if (newValue.text.isEmpty || oldValue.text == newValue.text) {
       return newValue;
     }

@@ -18,30 +18,31 @@ class CardioTypePickerDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-        clipBehavior: Clip.antiAlias,
-        child: ListView(
-          children: [
-            ListTile(
-              title: Text(CardioType.training.name),
-              onTap: () {
-                Navigator.pop(context, CardioType.training);
-              },
-            ),
-            const Divider(),
-            ListTile(
-              title: Text(CardioType.activeRecovery.name),
-              onTap: () {
-                Navigator.pop(context, CardioType.activeRecovery);
-              },
-            ),
-            const Divider(),
-            ListTile(
-              title: Text(CardioType.freetime.name),
-              onTap: () {
-                Navigator.pop(context, CardioType.freetime);
-              },
-            ),
-          ],
-        ));
+      clipBehavior: Clip.antiAlias,
+      child: ListView(
+        children: [
+          ListTile(
+            title: Text(CardioType.training.name),
+            onTap: () {
+              Navigator.pop(context, CardioType.training);
+            },
+          ),
+          const Divider(),
+          ListTile(
+            title: Text(CardioType.activeRecovery.name),
+            onTap: () {
+              Navigator.pop(context, CardioType.activeRecovery);
+            },
+          ),
+          const Divider(),
+          ListTile(
+            title: Text(CardioType.freetime.name),
+            onTap: () {
+              Navigator.pop(context, CardioType.freetime);
+            },
+          ),
+        ],
+      ),
+    );
   }
 }

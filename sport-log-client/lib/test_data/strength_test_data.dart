@@ -25,18 +25,26 @@ Future<List<StrengthSession>> generateStrengthSessions(Int64 userId) async {
     for (final movement in movements) {
       for (int i = 0; i < 3; ++i) {
         if (random.integer(9) == 0) {
-          result.add(StrengthSession(
-            id: randomId(),
-            userId: userId,
-            datetime: DateTime(date.year, date.month, date.day,
-                random.integer(24), random.integer(60), random.integer(60)),
-            movementId: movement.id,
-            interval: random.integer(2) == 0
-                ? Duration(minutes: random.integer(90, min: 10))
-                : null,
-            comments: random.integer(2) == 0 ? faker.lorem.sentence() : null,
-            deleted: false,
-          ));
+          result.add(
+            StrengthSession(
+              id: randomId(),
+              userId: userId,
+              datetime: DateTime(
+                date.year,
+                date.month,
+                date.day,
+                random.integer(24),
+                random.integer(60),
+                random.integer(60),
+              ),
+              movementId: movement.id,
+              interval: random.integer(2) == 0
+                  ? Duration(minutes: random.integer(90, min: 10))
+                  : null,
+              comments: random.integer(2) == 0 ? faker.lorem.sentence() : null,
+              deleted: false,
+            ),
+          );
         }
       }
     }
@@ -76,14 +84,16 @@ Future<List<StrengthSet>> generateStrengthSets() async {
   for (final session in sessions) {
     final int numberOfSets = random.integer(9, min: 1);
     for (int i = 0; i < numberOfSets; ++i) {
-      result.add(StrengthSet(
-        id: randomId(),
-        strengthSessionId: session.session.id,
-        setNumber: i,
-        count: _generateCount(session.movement.dimension),
-        weight: _generateWeight(session.movement.dimension),
-        deleted: false,
-      ));
+      result.add(
+        StrengthSet(
+          id: randomId(),
+          strengthSessionId: session.session.id,
+          setNumber: i,
+          count: _generateCount(session.movement.dimension),
+          weight: _generateWeight(session.movement.dimension),
+          deleted: false,
+        ),
+      );
     }
   }
   return result;

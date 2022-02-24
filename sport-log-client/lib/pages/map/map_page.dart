@@ -29,15 +29,16 @@ class MapPageState extends State<MapPage> {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     return Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: showOverlays
-            ? AppBar(
-                backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-                elevation: 0,
-              )
-            : null,
-        drawer: const MainDrawer(selectedRoute: Routes.map),
-        body: Stack(children: [
+      extendBodyBehindAppBar: true,
+      appBar: showOverlays
+          ? AppBar(
+              backgroundColor: const Color.fromARGB(0, 0, 0, 0),
+              elevation: 0,
+            )
+          : null,
+      drawer: const MainDrawer(selectedRoute: Routes.map),
+      body: Stack(
+        children: [
           MapboxMap(
             accessToken: Defaults.mapbox.accessToken,
             styleString: mapStyle,
@@ -82,38 +83,45 @@ class MapPageState extends State<MapPage> {
           //])))),
           if (showOverlays)
             Positioned(
-                top: 5,
-                right: 5,
-                child:
-                    //IconButton(
-                    //icon: const Icon(AppIcons.map),
-                    //color: Theme.of(context).colorScheme.primary,
-                    //onPressed: () => setState(() {
-                    //showMapSettings = !showMapSettings;
-                    //_logger.i("map settings: $showMapSettings");
-                    //}),
-                    //)
-                    ExpandableFab(
-                        horizontal: true,
-                        icon: const Icon(AppIcons.map),
-                        buttons: [
-                      ActionButton(
-                          icon: const Icon(AppIcons.map),
-                          onPressed: () => setState(() {
-                                mapStyle = Defaults.mapbox.style.outdoor;
-                              })),
-                      ActionButton(
-                          icon: const Icon(AppIcons.map),
-                          onPressed: () => setState(() {
-                                mapStyle = Defaults.mapbox.style.street;
-                              })),
-                      ActionButton(
-                          icon: const Icon(AppIcons.map),
-                          onPressed: () => setState(() {
-                                mapStyle = Defaults.mapbox.style.satellite;
-                              })),
-                    ]))
-        ]));
+              top: 5,
+              right: 5,
+              child:
+                  //IconButton(
+                  //icon: const Icon(AppIcons.map),
+                  //color: Theme.of(context).colorScheme.primary,
+                  //onPressed: () => setState(() {
+                  //showMapSettings = !showMapSettings;
+                  //_logger.i("map settings: $showMapSettings");
+                  //}),
+                  //)
+                  ExpandableFab(
+                horizontal: true,
+                icon: const Icon(AppIcons.map),
+                buttons: [
+                  ActionButton(
+                    icon: const Icon(AppIcons.map),
+                    onPressed: () => setState(() {
+                      mapStyle = Defaults.mapbox.style.outdoor;
+                    }),
+                  ),
+                  ActionButton(
+                    icon: const Icon(AppIcons.map),
+                    onPressed: () => setState(() {
+                      mapStyle = Defaults.mapbox.style.street;
+                    }),
+                  ),
+                  ActionButton(
+                    icon: const Icon(AppIcons.map),
+                    onPressed: () => setState(() {
+                      mapStyle = Defaults.mapbox.style.satellite;
+                    }),
+                  ),
+                ],
+              ),
+            )
+        ],
+      ),
+    );
   }
 
   @override

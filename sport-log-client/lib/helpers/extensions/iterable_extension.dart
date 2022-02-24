@@ -17,7 +17,8 @@ extension IterableExtension<T> on Iterable<T> {
   }
 
   Iterable<R> mapFilteredIndexed<R>(
-      R? Function(T element, int index) convert) sync* {
+    R? Function(T element, int index) convert,
+  ) sync* {
     var index = 0;
     for (final element in this) {
       final r = convert(element, index++);

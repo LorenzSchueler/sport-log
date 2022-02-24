@@ -38,7 +38,9 @@ class DiaryEditPageState extends State<DiaryEditPage> {
       Navigator.pop(context);
     } else {
       await showMessageDialog(
-          context: context, text: 'Creating Diary Entry failed.');
+        context: context,
+        text: 'Creating Diary Entry failed.',
+      );
     }
   }
 
@@ -108,7 +110,8 @@ class DiaryEditPageState extends State<DiaryEditPage> {
                 onChanged: (bodyweight) {
                   if (Validator.validateDoubleGtZero(bodyweight) == null) {
                     setState(
-                        () => _diary.bodyweight = double.parse(bodyweight));
+                      () => _diary.bodyweight = double.parse(bodyweight),
+                    );
                   }
                 },
               ),

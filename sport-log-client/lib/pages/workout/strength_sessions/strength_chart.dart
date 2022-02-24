@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
+import 'package:sport_log/pages/workout/strength_sessions/charts/all.dart';
+import 'package:sport_log/pages/workout/strength_sessions/charts/series_type.dart';
 import 'package:sport_log/widgets/form_widgets/selection_bar.dart';
-
-import 'charts/all.dart';
-import 'charts/series_type.dart';
-import '../date_filter/date_filter_state.dart';
 
 class StrengthChart extends StatefulWidget {
   final Movement movement;
@@ -64,9 +63,10 @@ class _StrengthChartState extends State<StrengthChart> {
     }
     if (widget.dateFilterState is WeekFilter) {
       return WeekChart(
-          series: _activeSeriesType,
-          start: (widget.dateFilterState as WeekFilter).start,
-          movement: widget.movement);
+        series: _activeSeriesType,
+        start: (widget.dateFilterState as WeekFilter).start,
+        movement: widget.movement,
+      );
     }
     if (widget.dateFilterState is MonthFilter) {
       return MonthChart(

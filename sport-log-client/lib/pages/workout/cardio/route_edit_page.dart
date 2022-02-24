@@ -58,7 +58,9 @@ class RouteEditPageState extends State<RouteEditPage> {
       Navigator.pop(context);
     } else {
       await showMessageDialog(
-          context: context, text: 'Creating Route Entry failed.');
+        context: context,
+        text: 'Creating Route Entry failed.',
+      );
     }
   }
 
@@ -92,11 +94,12 @@ class RouteEditPageState extends State<RouteEditPage> {
           .decodePolyline(navRoute.geometry as String)
           .map(
             (coordinate) => Position(
-                latitude: coordinate.latitude,
-                longitude: coordinate.longitude,
-                elevation: 0, // TODO
-                distance: 0, // TODO
-                time: const Duration(seconds: 0)), // TODO
+              latitude: coordinate.latitude,
+              longitude: coordinate.longitude,
+              elevation: 0, // TODO
+              distance: 0, // TODO
+              time: const Duration(seconds: 0),
+            ), // TODO
           )
           .toList();
     }
@@ -104,24 +107,33 @@ class RouteEditPageState extends State<RouteEditPage> {
 
   Future<void> _updateLine() async {
     await _matchLocations();
-    await _mapController.updateLine(_line!,
-        LineOptions(geometry: _route.track.map((e) => e.latLng).toList()));
+    await _mapController.updateLine(
+      _line!,
+      LineOptions(geometry: _route.track.map((e) => e.latLng).toList()),
+    );
   }
 
-  void _addPoint(LatLng latLng, int number) async {
-    _symbols.add(await _mapController.addSymbol(SymbolOptions(
-        textField: "$number",
-        textOffset: const Offset(0, 1),
-        geometry: latLng)));
-    _circles.add(await _mapController.addCircle(
-      CircleOptions(
-        circleRadius: 8.0,
-        circleColor: Defaults.mapbox.markerColor,
-        circleOpacity: 0.5,
-        geometry: latLng,
-        draggable: false,
+  Future<void> _addPoint(LatLng latLng, int number) async {
+    _symbols.add(
+      await _mapController.addSymbol(
+        SymbolOptions(
+          textField: "$number",
+          textOffset: const Offset(0, 1),
+          geometry: latLng,
+        ),
       ),
-    ));
+    );
+    _circles.add(
+      await _mapController.addCircle(
+        CircleOptions(
+          circleRadius: 8.0,
+          circleColor: Defaults.mapbox.markerColor,
+          circleOpacity: 0.5,
+          geometry: latLng,
+          draggable: false,
+        ),
+      ),
+    );
   }
 
   Future<void> _updatePoints() async {
@@ -134,12 +146,13 @@ class RouteEditPageState extends State<RouteEditPage> {
     });
   }
 
-  void _extendLine(LatLng location) async {
+  Future<void> _extendLine(LatLng location) async {
     if (_locations.length == 25) {
       await showMessageDialog(
-          context: context,
-          title: "Point maximum reached",
-          text: "You can only set 25 points.");
+        context: context,
+        title: "Point maximum reached",
+        text: "You can only set 25 points.",
+      );
       return;
     }
     setState(() {
@@ -149,7 +162,7 @@ class RouteEditPageState extends State<RouteEditPage> {
     await _updateLine();
   }
 
-  void _removePoint(int index) async {
+  Future<void> _removePoint(int index) async {
     setState(() {
       _locations.removeAt(index);
     });
@@ -157,7 +170,7 @@ class RouteEditPageState extends State<RouteEditPage> {
     await _updateLine();
   }
 
-  void _switchPoints(int oldIndex, int newIndex) async {
+  Future<void> _switchPoints(int oldIndex, int newIndex) async {
     setState(() {
       _logger.i("old: $oldIndex, new: $newIndex");
       if (oldIndex < newIndex - 1) {
@@ -219,8 +232,9 @@ class RouteEditPageState extends State<RouteEditPage> {
       listElements.add(
         ListTile(
           leading: IconButton(
-              onPressed: () => _removePoint(index),
-              icon: const Icon(AppIcons.delete)),
+            onPressed: () => _removePoint(index),
+            icon: const Icon(AppIcons.delete),
+          ),
           trailing: Draggable(
             axis: Axis.vertical,
             data: index,
@@ -281,10 +295,12 @@ class RouteEditPageState extends State<RouteEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    TableRow rowSpacer = TableRow(children: [
-      Defaults.sizedBox.vertical.normal,
-      Defaults.sizedBox.vertical.normal,
-    ]);
+    TableRow rowSpacer = TableRow(
+      children: [
+        Defaults.sizedBox.vertical.normal,
+        Defaults.sizedBox.vertical.normal,
+      ],
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -320,8 +336,13 @@ class RouteEditPageState extends State<RouteEditPage> {
                 compassViewPosition: CompassViewPosition.TopRight,
                 onMapCreated: (MapboxMapController controller) async {
                   _mapController = controller;
-                  _line ??= await _mapController.addLine(const LineOptions(
-                      lineColor: "red", lineWidth: 3, geometry: []));
+                  _line ??= await _mapController.addLine(
+                    const LineOptions(
+                      lineColor: "red",
+                      lineWidth: 3,
+                      geometry: [],
+                    ),
+                  );
                   _updatePoints();
                   _updateLine();
                 },

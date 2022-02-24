@@ -98,7 +98,9 @@ class MainDrawer extends StatelessWidget {
                       : () => Sync.instance.sync(
                             onNoInternet: () {
                               showSimpleToast(
-                                  context, 'No Internet connection.');
+                                context,
+                                'No Internet connection.',
+                              );
                             },
                           ),
                   isSpinning: sync.isSyncing,

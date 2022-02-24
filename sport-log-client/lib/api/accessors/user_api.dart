@@ -4,18 +4,20 @@ class UserApi with ApiLogging, ApiHelpers {
   final String route = version + '/user';
 
   ApiResult<User> getSingle(String username, String password) {
-    return ApiResultFromRequest.fromRequestWithValue<User>((client) async {
-      final headers = _ApiHeaders._basicAuth(username, password);
-      _logRequest('GET', route, headers);
-      final response = await client.get(
-        UriFromRoute.fromRoute(route),
-        headers: headers,
-      );
-      _logResponse(response);
-      return response;
-    },
-        (dynamic json) =>
-            User.fromJson(json as Map<String, dynamic>)..password = password);
+    return ApiResultFromRequest.fromRequestWithValue<User>(
+      (client) async {
+        final headers = _ApiHeaders._basicAuth(username, password);
+        _logRequest('GET', route, headers);
+        final response = await client.get(
+          UriFromRoute.fromRoute(route),
+          headers: headers,
+        );
+        _logResponse(response);
+        return response;
+      },
+      (dynamic json) =>
+          User.fromJson(json as Map<String, dynamic>)..password = password,
+    );
   }
 
   ApiResult<void> postSingle(User user) async {

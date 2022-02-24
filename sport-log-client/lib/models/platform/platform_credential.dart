@@ -39,7 +39,9 @@ class PlatformCredential extends Entity {
   bool isValid() {
     return validate(!deleted, 'PlatformCredential: deleted == true') &&
         validate(
-            username.isNotEmpty, 'PlatformCredential: username is empty') &&
+          username.isNotEmpty,
+          'PlatformCredential: username is empty',
+        ) &&
         validate(password.isNotEmpty, 'PlatformCredential: password is empty');
   }
 }

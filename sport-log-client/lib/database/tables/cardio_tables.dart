@@ -11,30 +11,49 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
   DbSerializer<CardioSession> get serde => DbCardioSessionSerializer();
 
   @override
-  final Table table = Table(Tables.cardioSession, columns: [
-    Column.int(Columns.id).primaryKey(),
-    Column.bool(Columns.deleted).withDefault('0'),
-    Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
-    Column.int(Columns.userId),
-    Column.int(Columns.movementId)
-        .references(Tables.movement, onDelete: OnAction.noAction),
-    Column.int(Columns.cardioType).checkIn(<int>[0, 1, 2]),
-    Column.text(Columns.datetime),
-    Column.int(Columns.distance).nullable().checkGt(0),
-    Column.int(Columns.ascent).nullable().checkGe(0),
-    Column.int(Columns.descent).nullable().checkGe(0),
-    Column.int(Columns.time).nullable().checkGt(0),
-    Column.int(Columns.calories).nullable().checkGe(0),
-    Column.blob(Columns.track).nullable(),
-    Column.int(Columns.avgCadence).nullable().checkGt(0),
-    Column.blob(Columns.cadence).nullable(),
-    Column.int(Columns.avgHeartRate).nullable().checkGt(0),
-    Column.blob(Columns.heartRate).nullable(),
-    Column.int(Columns.routeId)
-        .nullable()
-        .references(Tables.route, onDelete: OnAction.setNull),
-    Column.text(Columns.comments).nullable(),
-  ]);
+  final Table table = Table(
+    Tables.cardioSession,
+    columns: [
+      Column.int(Columns.id)..primaryKey(),
+      Column.bool(Columns.deleted)..withDefault('0'),
+      Column.int(Columns.syncStatus)
+        ..withDefault('2')
+        ..checkIn(<int>[0, 1, 2]),
+      Column.int(Columns.userId),
+      Column.int(Columns.movementId)
+        ..references(Tables.movement, onDelete: OnAction.noAction),
+      Column.int(Columns.cardioType)..checkIn(<int>[0, 1, 2]),
+      Column.text(Columns.datetime),
+      Column.int(Columns.distance)
+        ..nullable()
+        ..checkGt(0),
+      Column.int(Columns.ascent)
+        ..nullable()
+        ..checkGe(0),
+      Column.int(Columns.descent)
+        ..nullable()
+        ..checkGe(0),
+      Column.int(Columns.time)
+        ..nullable()
+        ..checkGt(0),
+      Column.int(Columns.calories)
+        ..nullable()
+        ..checkGe(0),
+      Column.blob(Columns.track)..nullable(),
+      Column.int(Columns.avgCadence)
+        ..nullable()
+        ..checkGt(0),
+      Column.blob(Columns.cadence)..nullable(),
+      Column.int(Columns.avgHeartRate)
+        ..nullable()
+        ..checkGt(0),
+      Column.blob(Columns.heartRate)..nullable(),
+      Column.int(Columns.routeId)
+        ..nullable()
+        ..references(Tables.route, onDelete: OnAction.setNull),
+      Column.text(Columns.comments)..nullable(),
+    ],
+  );
 
   static const datetime = Columns.datetime;
   static const deleted = Columns.deleted;
@@ -77,13 +96,15 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
     ]);
     List<CardioSessionDescription> cardioSessionDescriptions = [];
     for (Map<String, Object?> record in records) {
-      cardioSessionDescriptions.add(CardioSessionDescription(
-        cardioSession: serde.fromDbRecord(record, prefix: table.prefix),
-        route: _routeTable.serde
-            .fromDbRecordNullable(record, prefix: _routeTable.table.prefix),
-        movement: _movementTable.serde
-            .fromDbRecord(record, prefix: _movementTable.table.prefix),
-      ));
+      cardioSessionDescriptions.add(
+        CardioSessionDescription(
+          cardioSession: serde.fromDbRecord(record, prefix: table.prefix),
+          route: _routeTable.serde
+              .fromDbRecordNullable(record, prefix: _routeTable.table.prefix),
+          movement: _movementTable.serde
+              .fromDbRecord(record, prefix: _movementTable.table.prefix),
+        ),
+      );
     }
     return cardioSessionDescriptions;
   }
@@ -94,15 +115,24 @@ class RouteTable extends TableAccessor<Route> {
   DbSerializer<Route> get serde => DbRouteSerializer();
 
   @override
-  final Table table = Table(Tables.route, columns: [
-    Column.int(Columns.id).primaryKey(),
-    Column.bool(Columns.deleted).withDefault('0'),
-    Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
-    Column.int(Columns.userId),
-    Column.text(Columns.name).checkLengthGe(2),
-    Column.int(Columns.distance).checkGt(0),
-    Column.int(Columns.ascent).nullable().checkGe(0),
-    Column.int(Columns.descent).nullable().checkGe(0),
-    Column.blob(Columns.track)
-  ]);
+  final Table table = Table(
+    Tables.route,
+    columns: [
+      Column.int(Columns.id)..primaryKey(),
+      Column.bool(Columns.deleted)..withDefault('0'),
+      Column.int(Columns.syncStatus)
+        ..withDefault('2')
+        ..checkIn(<int>[0, 1, 2]),
+      Column.int(Columns.userId),
+      Column.text(Columns.name)..checkLengthGe(2),
+      Column.int(Columns.distance)..checkGt(0),
+      Column.int(Columns.ascent)
+        ..nullable()
+        ..checkGe(0),
+      Column.int(Columns.descent)
+        ..nullable()
+        ..checkGe(0),
+      Column.blob(Columns.track)
+    ],
+  );
 }

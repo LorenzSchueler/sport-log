@@ -59,26 +59,28 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
       );
       _logger.i("northwest: $northeast\n southeast: $southwest");
       downloadOfflineRegion(
-          OfflineRegionDefinition(
-            bounds: LatLngBounds(
-              northeast: northeast,
-              southwest: southwest,
-            ),
-            minZoom: 6,
-            maxZoom: 18,
-            mapStyleUrl: Defaults.mapbox.style.outdoor,
+        OfflineRegionDefinition(
+          bounds: LatLngBounds(
+            northeast: northeast,
+            southwest: southwest,
           ),
-          onEvent: _onMapDownload,
-          accessToken: Defaults.mapbox.accessToken);
+          minZoom: 6,
+          maxZoom: 18,
+          mapStyleUrl: Defaults.mapbox.style.outdoor,
+        ),
+        onEvent: _onMapDownload,
+        accessToken: Defaults.mapbox.accessToken,
+      );
     } else {
       showMessageDialog(
-          context: context,
-          text:
-              "Please set two points to form a BoundingBox by long pressing on the map.");
+        context: context,
+        text:
+            "Please set two points to form a BoundingBox by long pressing on the map.",
+      );
     }
   }
 
-  void _updatePoint1(LatLng? latLng) async {
+  Future<void> _updatePoint1(LatLng? latLng) async {
     setState(() {
       _point1 = latLng;
     });
@@ -86,16 +88,18 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
       _mapController.removeCircle(_point1Marker!);
     }
     if (_point1 != null) {
-      _point1Marker = await _mapController.addCircle(CircleOptions(
-        circleRadius: 8.0,
-        circleColor: Defaults.mapbox.markerColor,
-        circleOpacity: 0.5,
-        geometry: _point1,
-      ));
+      _point1Marker = await _mapController.addCircle(
+        CircleOptions(
+          circleRadius: 8.0,
+          circleColor: Defaults.mapbox.markerColor,
+          circleOpacity: 0.5,
+          geometry: _point1,
+        ),
+      );
     }
   }
 
-  void _updatePoint2(LatLng? latLng) async {
+  Future<void> _updatePoint2(LatLng? latLng) async {
     setState(() {
       _point2 = latLng;
     });
@@ -106,20 +110,26 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
       _mapController.removeLine(_boundingBoxLine!);
     }
     if (_point2 != null) {
-      _point2Marker = await _mapController.addCircle(CircleOptions(
-        circleRadius: 8.0,
-        circleColor: Defaults.mapbox.markerColor,
-        circleOpacity: 0.5,
-        geometry: _point2,
-      ));
+      _point2Marker = await _mapController.addCircle(
+        CircleOptions(
+          circleRadius: 8.0,
+          circleColor: Defaults.mapbox.markerColor,
+          circleOpacity: 0.5,
+          geometry: _point2,
+        ),
+      );
       _boundingBoxLine = await _mapController.addLine(
-        LineOptions(lineColor: "red", lineWidth: 3, geometry: [
-          LatLng(_point1!.latitude, _point1!.longitude),
-          LatLng(_point1!.latitude, _point2!.longitude),
-          LatLng(_point2!.latitude, _point2!.longitude),
-          LatLng(_point2!.latitude, _point1!.longitude),
-          LatLng(_point1!.latitude, _point1!.longitude)
-        ]),
+        LineOptions(
+          lineColor: "red",
+          lineWidth: 3,
+          geometry: [
+            LatLng(_point1!.latitude, _point1!.longitude),
+            LatLng(_point1!.latitude, _point2!.longitude),
+            LatLng(_point2!.latitude, _point2!.longitude),
+            LatLng(_point2!.latitude, _point1!.longitude),
+            LatLng(_point1!.latitude, _point1!.longitude)
+          ],
+        ),
       );
     }
   }
@@ -127,9 +137,10 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text("Offline Maps")),
-        drawer: const MainDrawer(selectedRoute: Routes.offlineMaps),
-        body: ListView(children: [
+      appBar: AppBar(title: const Text("Offline Maps")),
+      drawer: const MainDrawer(selectedRoute: Routes.offlineMaps),
+      body: ListView(
+        children: [
           Stack(
             children: [
               SizedBox(
@@ -152,13 +163,14 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
                 bottom: 10,
                 right: 5,
                 child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: const CircleBorder(),
-                    ),
-                    onPressed: () => _point2 != null
-                        ? _updatePoint2(null)
-                        : _updatePoint1(null),
-                    child: const Icon(AppIcons.undo)),
+                  style: ElevatedButton.styleFrom(
+                    shape: const CircleBorder(),
+                  ),
+                  onPressed: () => _point2 != null
+                      ? _updatePoint2(null)
+                      : _updatePoint1(null),
+                  child: const Icon(AppIcons.undo),
+                ),
               )
             ],
           ),
@@ -168,15 +180,19 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
                 ? ElevatedButton(
                     onPressed: _downloadMap,
                     child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(AppIcons.download),
-                          Text("download")
-                        ]))
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(AppIcons.download),
+                        Text("download")
+                      ],
+                    ),
+                  )
                 : LinearProgressIndicator(
                     value: _progress ?? 0.3,
                   ),
           )
-        ]));
+        ],
+      ),
+    );
   }
 }

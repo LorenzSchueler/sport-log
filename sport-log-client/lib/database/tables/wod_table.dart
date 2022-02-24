@@ -7,12 +7,17 @@ class WodTable extends TableAccessor<Wod> {
   DbSerializer<Wod> get serde => DbWodSerializer();
 
   @override
-  final Table table = Table(Tables.wod, columns: [
-    Column.int(Columns.id).primaryKey(),
-    Column.bool(Columns.deleted).withDefault('0'),
-    Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
-    Column.int(Columns.userId),
-    Column.text(Columns.date).withDefault("datetime('now')"),
-    Column.text(Columns.description).nullable()
-  ]);
+  final Table table = Table(
+    Tables.wod,
+    columns: [
+      Column.int(Columns.id)..primaryKey(),
+      Column.bool(Columns.deleted)..withDefault('0'),
+      Column.int(Columns.syncStatus)
+        ..withDefault('2')
+        ..checkIn(<int>[0, 1, 2]),
+      Column.int(Columns.userId),
+      Column.text(Columns.date)..withDefault("datetime('now')"),
+      Column.text(Columns.description)..nullable()
+    ],
+  );
 }

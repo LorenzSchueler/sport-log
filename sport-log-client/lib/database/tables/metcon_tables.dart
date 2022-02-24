@@ -8,17 +8,28 @@ class MetconTable extends TableAccessor<Metcon> {
   DbSerializer<Metcon> get serde => DbMetconSerializer();
 
   @override
-  final Table table = Table(Tables.metcon, columns: [
-    Column.int(Columns.id).primaryKey(),
-    Column.bool(Columns.deleted).withDefault('0'),
-    Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
-    Column.int(Columns.userId).nullable(),
-    Column.text(Columns.name).nullable().checkLengthLe(80),
-    Column.int(Columns.metconType).checkBetween(0, 2),
-    Column.int(Columns.rounds).nullable().checkGe(1),
-    Column.int(Columns.timecap).nullable().checkGt(0),
-    Column.text(Columns.description).nullable()
-  ]);
+  final Table table = Table(
+    Tables.metcon,
+    columns: [
+      Column.int(Columns.id)..primaryKey(),
+      Column.bool(Columns.deleted)..withDefault('0'),
+      Column.int(Columns.syncStatus)
+        ..withDefault('2')
+        ..checkIn(<int>[0, 1, 2]),
+      Column.int(Columns.userId)..nullable(),
+      Column.text(Columns.name)
+        ..nullable()
+        ..checkLengthLe(80),
+      Column.int(Columns.metconType)..checkBetween(0, 2),
+      Column.int(Columns.rounds)
+        ..nullable()
+        ..checkGe(1),
+      Column.int(Columns.timecap)
+        ..nullable()
+        ..checkGt(0),
+      Column.text(Columns.description)..nullable()
+    ],
+  );
 }
 
 class MetconMovementTable extends TableAccessor<MetconMovement> {
@@ -29,37 +40,52 @@ class MetconMovementTable extends TableAccessor<MetconMovement> {
   final Table table = Table(
     Tables.metconMovement,
     columns: [
-      Column.int(Columns.id).primaryKey(),
-      Column.bool(Columns.deleted).withDefault('0'),
-      Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
+      Column.int(Columns.id)..primaryKey(),
+      Column.bool(Columns.deleted)..withDefault('0'),
+      Column.int(Columns.syncStatus)
+        ..withDefault('2')
+        ..checkIn(<int>[0, 1, 2]),
       Column.int(Columns.metconId)
-          .references(Tables.metcon, onDelete: OnAction.cascade),
+        ..references(Tables.metcon, onDelete: OnAction.cascade),
       Column.int(Columns.movementId)
-          .references(Tables.movement, onDelete: OnAction.noAction),
-      Column.int(Columns.movementNumber).checkGe(0),
-      Column.int(Columns.count).checkGe(1),
-      Column.real(Columns.weight).nullable().checkGt(0),
-      Column.int(Columns.distanceUnit).nullable().checkBetween(0, 4),
+        ..references(Tables.movement, onDelete: OnAction.noAction),
+      Column.int(Columns.movementNumber)..checkGe(0),
+      Column.int(Columns.count)..checkGe(1),
+      Column.real(Columns.weight)
+        ..nullable()
+        ..checkGt(0),
+      Column.int(Columns.distanceUnit)
+        ..nullable()
+        ..checkBetween(0, 4),
     ],
   );
 
   Future<void> setSynchronizedByMetcon(Int64 id) async {
-    database.update(tableName, TableAccessor.synchronized,
-        where: '${Columns.metconId} = ?', whereArgs: [id.toInt()]);
+    database.update(
+      tableName,
+      TableAccessor.synchronized,
+      where: '${Columns.metconId} = ?',
+      whereArgs: [id.toInt()],
+    );
   }
 
   Future<List<MetconMovement>> getByMetcon(Int64 id) async {
-    final result = await database.query(tableName,
-        where: '${Columns.metconId} = ? AND ${Columns.deleted} = 0',
-        whereArgs: [id.toInt()],
-        orderBy: Columns.movementNumber);
+    final result = await database.query(
+      tableName,
+      where: '${Columns.metconId} = ? AND ${Columns.deleted} = 0',
+      whereArgs: [id.toInt()],
+      orderBy: Columns.movementNumber,
+    );
     return result.map(serde.fromDbRecord).toList();
   }
 
   Future<void> deleteByMetcon(Int64 id) async {
-    await database.update(tableName, {Columns.deleted: 1},
-        where: '${Columns.deleted} = 0 AND ${Columns.metconId} = ?',
-        whereArgs: [id.toInt()]);
+    await database.update(
+      tableName,
+      {Columns.deleted: 1},
+      where: '${Columns.deleted} = 0 AND ${Columns.metconId} = ?',
+      whereArgs: [id.toInt()],
+    );
   }
 }
 
@@ -68,25 +94,39 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
   DbSerializer<MetconSession> get serde => DbMetconSessionSerializer();
 
   @override
-  final Table table = Table(Tables.metconSession, columns: [
-    Column.int(Columns.id).primaryKey(),
-    Column.bool(Columns.deleted).withDefault('0'),
-    Column.int(Columns.syncStatus).withDefault('2').checkIn(<int>[0, 1, 2]),
-    Column.int(Columns.userId),
-    Column.int(Columns.metconId)
-        .references(Tables.metcon, onDelete: OnAction.noAction),
-    Column.text(Columns.datetime),
-    Column.int(Columns.time).nullable().checkGt(0),
-    Column.int(Columns.rounds).nullable().checkGe(0),
-    Column.int(Columns.reps).nullable().checkGe(0),
-    Column.bool(Columns.rx).checkIn(<int>[0, 1]),
-    Column.text(Columns.comments).nullable()
-  ]);
+  final Table table = Table(
+    Tables.metconSession,
+    columns: [
+      Column.int(Columns.id)..primaryKey(),
+      Column.bool(Columns.deleted)..withDefault('0'),
+      Column.int(Columns.syncStatus)
+        ..withDefault('2')
+        ..checkIn(<int>[0, 1, 2]),
+      Column.int(Columns.userId),
+      Column.int(Columns.metconId)
+        ..references(Tables.metcon, onDelete: OnAction.noAction),
+      Column.text(Columns.datetime),
+      Column.int(Columns.time)
+        ..nullable()
+        ..checkGt(0),
+      Column.int(Columns.rounds)
+        ..nullable()
+        ..checkGe(0),
+      Column.int(Columns.reps)
+        ..nullable()
+        ..checkGe(0),
+      Column.bool(Columns.rx)..checkIn(<int>[0, 1]),
+      Column.text(Columns.comments)..nullable()
+    ],
+  );
 
   Future<bool> existsByMetcon(Int64 id) async {
-    return (await database.rawQuery('''select 1 from $tableName
+    return (await database.rawQuery(
+      '''select 1 from $tableName
             where ${Columns.metconId} = ${id.toInt()}
-              and ${Columns.deleted} = 0''')).isNotEmpty;
+              and ${Columns.deleted} = 0''',
+    ))
+        .isNotEmpty;
   }
 
   Future<List<MetconSession>> getByTimerangeAndMovement({

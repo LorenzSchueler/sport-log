@@ -62,20 +62,26 @@ class Sync extends ChangeNotifier {
     if (accountDataResult.isFailure) {
       switch (accountDataResult.failure) {
         case ApiError.noInternetConnection:
-          _logger.d('Tried sync but got no Internet connection.',
-              accountDataResult.failure);
+          _logger.d(
+            'Tried sync but got no Internet connection.',
+            accountDataResult.failure,
+          );
           if (onNoInternet != null) {
             onNoInternet();
           }
           break;
         case ApiError.unauthorized:
           _logger.w(
-              'Tried sync but access unauthorized.', accountDataResult.failure);
+            'Tried sync but access unauthorized.',
+            accountDataResult.failure,
+          );
           await showNewCredentialsDialog();
           break;
         default:
           _logger.e(
-              'Tried down sync, but got error.', accountDataResult.failure);
+            'Tried down sync, but got error.',
+            accountDataResult.failure,
+          );
           break;
       }
       return false;
