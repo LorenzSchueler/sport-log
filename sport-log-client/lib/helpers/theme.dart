@@ -2,7 +2,25 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
 
-ThemeData themeDataFromColors({
+class AppTheme {
+  // use themeDataFromColors to change theme data
+  static final darkTheme = _themeDataFromColors(
+    // for selected/clickable things
+    primary: const Color(0xffa8d8ff),
+    // only for small accents
+    secondary: const Color(0xffba2f2f),
+    brightness: Brightness.dark,
+  );
+
+  static final lightTheme = _themeDataFromColors(
+    primary: const Color(0xff1f67a3), // for selected things
+    secondary:
+        const Color(0xffffa896), // for important things that you can click
+    brightness: Brightness.light,
+  );
+}
+
+ThemeData _themeDataFromColors({
   required Color primary,
   required Color secondary,
   required Brightness brightness,
