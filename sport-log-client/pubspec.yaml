@@ -76,6 +76,13 @@ dev_dependencies:
   json_serializable: ^6.1.4 # json
   build_runner: ^2.1.0 # json
   faker: ^2.0.0
+  flutter_launcher_icons: ^0.9.2 
+
+flutter_icons: # run: flutter pub run flutter_launcher_icons:main
+  image_path: "launcher_icon.png"
+  android: true
+  ios: true
+  remove_alpha_ios: true
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
