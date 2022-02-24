@@ -78,38 +78,35 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   Widget _serverUrlInput(BuildContext context) {
-    return Row(children: [
-      Expanded(
-        child: TextFormField(
-          onChanged: (serverUrl) async {
-            final validated = Validator.validateUrl(serverUrl);
-            if (validated == null) {
-              setState(() => _serverUrl = serverUrl);
-            }
-          },
-          controller: _serverUrlInputController,
-          decoration: InputDecoration(
-            labelText: "Server URL",
-            border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
-          ),
-          validator: Validator.validateUrl,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          enabled: !_registrationPending,
-          style: _registrationPending
-              ? TextStyle(color: Theme.of(context).disabledColor)
-              : null,
-          textInputAction: TextInputAction.next,
-        ),
+    return TextFormField(
+      onChanged: (serverUrl) async {
+        final validated = Validator.validateUrl(serverUrl);
+        if (validated == null) {
+          setState(() => _serverUrl = serverUrl);
+        }
+      },
+      controller: _serverUrlInputController,
+      decoration: InputDecoration(
+        icon: const Icon(AppIcons.cloudUpload),
+        labelText: "Server URL",
+        contentPadding: const EdgeInsets.symmetric(vertical: 5),
+        suffixIcon: IconButton(
+            onPressed: () async {
+              await Settings.setDefaultServerUrl();
+              setState(() {
+                _serverUrlInputController.text = Settings.serverUrl;
+              });
+            },
+            icon: const Icon(AppIcons.restore)),
       ),
-      IconButton(
-          onPressed: () async {
-            await Settings.setDefaultServerUrl();
-            setState(() {
-              _serverUrlInputController.text = Settings.serverUrl;
-            });
-          },
-          icon: const Icon(AppIcons.restore))
-    ]);
+      validator: Validator.validateUrl,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      enabled: !_registrationPending,
+      style: _registrationPending
+          ? TextStyle(color: Theme.of(context).disabledColor)
+          : null,
+      textInputAction: TextInputAction.next,
+    );
   }
 
   Widget _usernameInput(BuildContext context) {
@@ -120,9 +117,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
           setState(() => _username = username);
         }
       },
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
+        icon: Icon(AppIcons.account),
         labelText: "Username",
-        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
+        contentPadding: EdgeInsets.symmetric(vertical: 5),
       ),
       validator: Validator.validateUsername,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -142,9 +140,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
           setState(() => _password1 = password);
         }
       },
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
+        icon: Icon(AppIcons.key),
         labelText: "Password",
-        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
+        contentPadding: EdgeInsets.symmetric(vertical: 5),
       ),
       validator: Validator.validatePassword,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -165,9 +164,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
           setState(() => _password2 = password2);
         }
       },
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
+        icon: Icon(AppIcons.key),
         labelText: "Repeat password",
-        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
+        contentPadding: EdgeInsets.symmetric(vertical: 5),
       ),
       validator: (password2) =>
           Validator.validatePassword2(_password1, password2),
@@ -176,7 +176,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       style: _registrationPending
           ? TextStyle(color: Theme.of(context).disabledColor)
           : null,
-      textInputAction: TextInputAction.done,
+      textInputAction: TextInputAction.next,
       obscureText: true,
     );
   }
@@ -189,9 +189,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
           setState(() => _email = email);
         }
       },
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
+        icon: Icon(AppIcons.email),
         labelText: "Email",
-        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
+        contentPadding: EdgeInsets.symmetric(vertical: 5),
       ),
       validator: Validator.validateEmail,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -199,7 +200,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       style: _registrationPending
           ? TextStyle(color: Theme.of(context).disabledColor)
           : null,
-      textInputAction: TextInputAction.next,
+      textInputAction: TextInputAction.done,
       keyboardType: TextInputType.emailAddress,
     );
   }

@@ -5,6 +5,7 @@ import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/message_dialog.dart';
 
 class LoginPage extends StatefulWidget {
@@ -68,9 +69,10 @@ class _LoginPageState extends State<LoginPage> {
           setState(() => _username = username);
         }
       },
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
+        icon: Icon(AppIcons.account),
         labelText: "Username",
-        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
+        contentPadding: EdgeInsets.symmetric(vertical: 5),
       ),
       validator: Validator.validateUsername,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -79,7 +81,6 @@ class _LoginPageState extends State<LoginPage> {
           ? TextStyle(color: Theme.of(context).disabledColor)
           : null,
       textInputAction: TextInputAction.next,
-      keyboardType: TextInputType.emailAddress,
     );
   }
 
@@ -93,9 +94,10 @@ class _LoginPageState extends State<LoginPage> {
           setState(() => _password = password);
         }
       },
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
+        icon: Icon(AppIcons.key),
         labelText: "Password",
-        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
+        contentPadding: EdgeInsets.symmetric(vertical: 5),
       ),
       validator: Validator.validatePassword,
       autovalidateMode: AutovalidateMode.onUserInteraction,

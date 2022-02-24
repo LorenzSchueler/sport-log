@@ -4,6 +4,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 
 bool _dialogShown = false;
 
@@ -79,9 +80,10 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
           setState(() => _username = username);
         }
       },
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
+        icon: Icon(AppIcons.account),
         labelText: "Username",
-        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
+        contentPadding: EdgeInsets.symmetric(vertical: 5),
       ),
       validator: Validator.validateUsername,
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -104,9 +106,10 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
           setState(() => _password = password);
         }
       },
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
+        icon: Icon(AppIcons.key),
         labelText: "Password",
-        border: OutlineInputBorder(borderRadius: Defaults.borderRadius.big),
+        contentPadding: EdgeInsets.symmetric(vertical: 5),
       ),
       validator: Validator.validatePassword,
       autovalidateMode: AutovalidateMode.onUserInteraction,

@@ -161,6 +161,7 @@ class SettingsPageState extends State<SettingsPage> {
                 validator: Validator.validateEmail,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 style: const TextStyle(height: 1),
+                keyboardType: TextInputType.emailAddress,
                 onFieldSubmitted: (email) async {
                   final validated = Validator.validateEmail(email);
                   if (validated == null) {

@@ -191,7 +191,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
       keyboardType: TextInputType.text,
       decoration: const InputDecoration(
         labelText: "Name",
-        border: OutlineInputBorder(),
+        contentPadding: EdgeInsets.symmetric(vertical: 5),
       ),
     );
   }
@@ -286,7 +286,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
         maxLines: null,
         onChanged: _setDescription,
         decoration: InputDecoration(
-          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.symmetric(vertical: 5),
           labelText: "Description",
           suffixIcon: IconButton(
             icon: const Icon(AppIcons.cancel),
