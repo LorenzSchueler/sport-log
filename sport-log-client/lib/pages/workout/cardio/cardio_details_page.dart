@@ -8,7 +8,7 @@ import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class CardioDetailsPage extends StatefulWidget {
@@ -92,7 +92,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                     });
                   }
                 },
-                icon: const Icon(Icons.edit))
+                icon: const Icon(AppIcons.edit))
           ],
         ),
         body: Stack(
@@ -142,7 +142,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: const [
-                                Icon(CustomIcons.route),
+                                Icon(AppIcons.route),
                                 Text(" no track available"),
                               ],
                             ),

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sport_log/helpers/theme.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 
 class IntPicker extends StatefulWidget {
   const IntPicker({
@@ -43,7 +44,7 @@ class _IntPickerState extends State<IntPicker> {
       children: [
         GestureDetector(
           child: IconButton(
-            icon: const Icon(Icons.indeterminate_check_box_rounded),
+            icon: const Icon(AppIcons.subtractBox),
             color: primaryColorOf(context),
             onPressed: (_isValidNumber(_value - 1))
                 ? () {
@@ -112,7 +113,7 @@ class _IntPickerState extends State<IntPicker> {
         ),
         GestureDetector(
           child: IconButton(
-            icon: const Icon(Icons.add_box_rounded),
+            icon: const Icon(AppIcons.addBox),
             color: primaryColorOf(context),
             onPressed: (_isValidNumber(_value + 1))
                 ? () {

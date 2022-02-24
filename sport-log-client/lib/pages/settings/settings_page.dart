@@ -6,8 +6,9 @@ import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
+import 'package:sport_log/widgets/form_widgets/text_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/message_dialog.dart';
 
@@ -46,11 +47,11 @@ class SettingsPageState extends State<SettingsPage> {
                         },
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       )),
-                  leading: Icons.sync),
+                  leading: AppIcons.sync),
               if (Settings.serverEnabled)
                 TextFormField(
                   decoration: const InputDecoration(
-                    icon: Icon(Icons.cloud_upload_outlined),
+                    icon: Icon(AppIcons.cloudUpload),
                     labelText: "Server URL",
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
@@ -71,7 +72,7 @@ class SettingsPageState extends State<SettingsPage> {
               if (Settings.serverEnabled)
                 TextFormField(
                     decoration: const InputDecoration(
-                      icon: Icon(CustomIcons.time_interval),
+                      icon: Icon(AppIcons.timeInterval),
                       labelText: "Synchonization Interval (min)",
                       contentPadding: EdgeInsets.symmetric(vertical: 5),
                     ),
@@ -100,7 +101,7 @@ class SettingsPageState extends State<SettingsPage> {
               const CaptionTile(caption: "User Settings"),
               TextFormField(
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.account_circle_outlined),
+                  icon: Icon(AppIcons.account),
                   labelText: "Username",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
@@ -126,7 +127,7 @@ class SettingsPageState extends State<SettingsPage> {
               ),
               TextFormField(
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.key_outlined),
+                  icon: Icon(AppIcons.key),
                   labelText: "Password",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
@@ -152,7 +153,7 @@ class SettingsPageState extends State<SettingsPage> {
               ),
               TextFormField(
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.email_outlined),
+                  icon: Icon(AppIcons.email),
                   labelText: "Email",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
@@ -205,13 +206,16 @@ class SettingsPageState extends State<SettingsPage> {
                           }
                         },
                       ))),
-                  leading: Icons.sync),
+                  leading: AppIcons.sync),
               Defaults.sizedBox.vertical.small,
               const Divider(),
               const CaptionTile(caption: "About"),
-              ListTile(
-                  title: const Text('About'),
-                  onTap: () => Navigator.pushNamed(context, Routes.about)),
+              GestureDetector(
+                  child: const TextTile(
+                    leading: AppIcons.questionmark,
+                    child: Text('About'),
+                  ),
+                  onTap: () => Navigator.pushNamed(context, Routes.about))
             ],
           )),
       drawer: const MainDrawer(selectedRoute: Routes.settings),

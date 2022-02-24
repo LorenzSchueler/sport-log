@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/typedefs.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/repeat_icon_button.dart';
 
 import 'date_filter_state.dart';
@@ -43,7 +44,7 @@ class _DateFilterState extends State<DateFilter> {
       children: [
         if (_state is! NoFilter)
           RepeatIconButton(
-            icon: const Icon(Icons.arrow_back_ios_sharp),
+            icon: const Icon(AppIcons.arrowBackOpen),
             onClick: () {
               _state = _state.earlier;
               widget.onFilterChanged(_state);
@@ -60,7 +61,7 @@ class _DateFilterState extends State<DateFilter> {
             ),
           ),
           label: Icon(
-            Icons.arrow_drop_down_sharp,
+            AppIcons.arrowDropDown,
             color: onAppBar,
           ),
           onPressed: () {
@@ -69,7 +70,7 @@ class _DateFilterState extends State<DateFilter> {
         ),
         if (_state is! NoFilter)
           RepeatIconButton(
-            icon: const Icon(Icons.arrow_forward_ios_sharp),
+            icon: const Icon(AppIcons.arrowForwardOpen),
             onClick: () {
               _state = _state.later;
               widget.onFilterChanged(_state);

@@ -4,6 +4,7 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
@@ -64,19 +65,19 @@ class MapPageState extends State<MapPage> {
           //onPressed: () => setState(() {
           //mapStyle = Defaults.mapbox.style.outdoor;
           //}),
-          //icon: const Icon(Icons.map),
+          //icon: const Icon(AppIcons.map),
           //),
           //IconButton(
           //onPressed: () => setState(() {
           //mapStyle = Defaults.mapbox.style.street;
           //}),
-          //icon: const Icon(Icons.map),
+          //icon: const Icon(AppIcons.map),
           //),
           //IconButton(
           //onPressed: () => setState(() {
           //mapStyle = Defaults.mapbox.style.satellite;
           //}),
-          //icon: const Icon(Icons.map),
+          //icon: const Icon(AppIcons.map),
           //)
           //])))),
           if (showOverlays)
@@ -85,7 +86,7 @@ class MapPageState extends State<MapPage> {
                 right: 5,
                 child:
                     //IconButton(
-                    //icon: const Icon(Icons.map),
+                    //icon: const Icon(AppIcons.map),
                     //color: Theme.of(context).colorScheme.primary,
                     //onPressed: () => setState(() {
                     //showMapSettings = !showMapSettings;
@@ -94,20 +95,20 @@ class MapPageState extends State<MapPage> {
                     //)
                     ExpandableFab(
                         horizontal: true,
-                        icon: const Icon(Icons.map),
+                        icon: const Icon(AppIcons.map),
                         buttons: [
                       ActionButton(
-                          icon: const Icon(Icons.map),
+                          icon: const Icon(AppIcons.map),
                           onPressed: () => setState(() {
                                 mapStyle = Defaults.mapbox.style.outdoor;
                               })),
                       ActionButton(
-                          icon: const Icon(Icons.map),
+                          icon: const Icon(AppIcons.map),
                           onPressed: () => setState(() {
                                 mapStyle = Defaults.mapbox.style.street;
                               })),
                       ActionButton(
-                          icon: const Icon(Icons.map),
+                          icon: const Icon(AppIcons.map),
                           onPressed: () => setState(() {
                                 mapStyle = Defaults.mapbox.style.satellite;
                               })),

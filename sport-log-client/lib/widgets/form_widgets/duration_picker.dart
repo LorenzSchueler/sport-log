@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/theme.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/repeat_icon_button.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
@@ -129,7 +130,7 @@ class _DurationPickerState extends State<DurationPicker> {
     return RepeatIconButton(
       color: primaryColorOf(context),
       icon: const Icon(
-        Icons.indeterminate_check_box,
+        AppIcons.subtractBox,
         size: _iconSize,
       ),
       enabled: _duration.inSeconds > 0,
@@ -143,7 +144,7 @@ class _DurationPickerState extends State<DurationPicker> {
     return RepeatIconButton(
       color: primaryColorOf(context),
       icon: const Icon(
-        Icons.add_box_rounded,
+        AppIcons.addBox,
         size: _iconSize,
       ),
       enabled: _duration.inSeconds < _maxSeconds,

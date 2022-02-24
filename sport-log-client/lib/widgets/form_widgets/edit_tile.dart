@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 
 class CaptionTile extends StatelessWidget {
   const CaptionTile({Key? key, required this.caption}) : super(key: key);
@@ -65,7 +66,7 @@ class EditTile extends StatelessWidget {
           IconButton(
               onPressed: onCancel,
               icon: const Icon(
-                Icons.close,
+                AppIcons.close,
               ))
       ],
     );

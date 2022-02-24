@@ -4,7 +4,7 @@ import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/diary/diary.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/message_dialog.dart';
 
@@ -58,14 +58,14 @@ class DiaryEditPageState extends State<DiaryEditPage> {
         actions: [
           IconButton(
             onPressed: _deleteDiary,
-            icon: const Icon(Icons.delete),
+            icon: const Icon(AppIcons.delete),
           ),
           IconButton(
             onPressed: _formKey.currentContext != null &&
                     _formKey.currentState!.validate()
                 ? _saveDiary
                 : null,
-            icon: const Icon(Icons.save),
+            icon: const Icon(AppIcons.save),
           ),
         ],
       ),
@@ -76,7 +76,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
           child: ListView(
             children: [
               EditTile(
-                leading: Icons.calendar_today,
+                leading: AppIcons.calendar,
                 caption: "Date",
                 child: Text(formatDate(_diary.date)),
                 onTap: () async {
@@ -96,7 +96,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
               ),
               TextFormField(
                 decoration: const InputDecoration(
-                  icon: Icon(CustomIcons.weight),
+                  icon: Icon(AppIcons.weight),
                   labelText: "Bodyweight",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
@@ -114,7 +114,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
               ),
               TextFormField(
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.comment_outlined),
+                  icon: Icon(AppIcons.comment),
                   labelText: "Comments",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),

@@ -11,6 +11,7 @@ import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 
@@ -93,9 +94,8 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
               }
               _logger.i("selected movement: ${movement.name}");
             },
-            icon: Icon(_movement != null
-                ? Icons.filter_alt
-                : Icons.filter_alt_outlined),
+            icon: Icon(
+                _movement != null ? AppIcons.filterFilled : AppIcons.filter),
           ),
         ],
         bottom: PreferredSize(
@@ -143,7 +143,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
           context, SessionsPageTab.strength),
       drawer: MainDrawer(selectedRoute: Routes.strength.overview),
       floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
+          child: const Icon(AppIcons.add),
           onPressed: () {
             Navigator.pushNamed(context, Routes.strength.edit);
           }),

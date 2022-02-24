@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'package:sport_log/widgets/app_icons.dart';
+
 @immutable
 class ExpandableFab extends StatefulWidget {
   final Icon icon;
@@ -102,7 +104,7 @@ class _ExpandableFabState extends State<ExpandableFab>
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Icon(
-                Icons.close,
+                AppIcons.close,
                 color: Theme.of(context).primaryColor,
               ),
             ),

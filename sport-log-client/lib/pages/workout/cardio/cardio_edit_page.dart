@@ -10,7 +10,7 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/form_widgets/cardio_type_picker.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
@@ -87,7 +87,7 @@ class CardioEditPageState extends State<CardioEditPage> {
           title: const Text("Cardio Edit"),
           actions: [
             IconButton(
-                onPressed: _saveCardioSession, icon: const Icon(Icons.save))
+                onPressed: _saveCardioSession, icon: const Icon(AppIcons.save))
           ],
         ),
         body: Container(
@@ -127,7 +127,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                           // TODO also draw route if available
                           )),
                 EditTile(
-                    leading: Icons.directions_run_rounded,
+                    leading: AppIcons.exercise,
                     caption: "Movement",
                     child: Text(_cardioSessionDescription
                         .cardioSession.movementId
@@ -145,7 +145,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                       }
                     }),
                 EditTile(
-                    leading: Icons.sports,
+                    leading: AppIcons.sports,
                     caption: "Cardio Type",
                     child: Text(_cardioSessionDescription
                         .cardioSession.cardioType.name),
@@ -162,7 +162,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                       }
                     }),
                 EditTile(
-                    leading: Icons.calendar_today,
+                    leading: AppIcons.calendar,
                     caption: "Start Time",
                     child: Text(formatDatetime(
                         _cardioSessionDescription.cardioSession.datetime)),
@@ -190,7 +190,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                       }
                     }),
                 EditTile(
-                    leading: CustomIcons.route,
+                    leading: AppIcons.route,
                     caption: "Route",
                     child: Text(_cardioSessionDescription.cardioSession.routeId
                         .toString()),
@@ -219,7 +219,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                                   1000)
                               .toString(),
                   decoration: const InputDecoration(
-                    icon: Icon(CustomIcons.ruler_horizontal),
+                    icon: Icon(AppIcons.ruler),
                     labelText: "Distance (km)",
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
@@ -234,7 +234,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   initialValue: _cardioSessionDescription.cardioSession.ascent
                       ?.toString(),
                   decoration: const InputDecoration(
-                    icon: Icon(Icons.trending_up_rounded),
+                    icon: Icon(AppIcons.trendingUp),
                     labelText: "Ascent (m)",
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
@@ -249,7 +249,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   initialValue: _cardioSessionDescription.cardioSession.descent
                       ?.toString(),
                   decoration: const InputDecoration(
-                    icon: Icon(Icons.trending_down_rounded),
+                    icon: Icon(AppIcons.trendingDown),
                     labelText: "Descent (m)",
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
@@ -261,7 +261,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                           _cardioSessionDescription.cardioSession.time = d),
                       initialDuration:
                           _cardioSessionDescription.cardioSession.time),
-                  leading: CustomIcons.time_interval,
+                  leading: AppIcons.timeInterval,
                 ),
                 TextFormField(
                   keyboardType: TextInputType.number,
@@ -273,7 +273,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   initialValue: _cardioSessionDescription.cardioSession.calories
                       ?.toString(),
                   decoration: const InputDecoration(
-                    icon: Icon(CustomIcons.food),
+                    icon: Icon(AppIcons.food),
                     labelText: "Calories",
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
@@ -289,7 +289,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                       .cardioSession.avgCadence
                       ?.toString(),
                   decoration: const InputDecoration(
-                    icon: Icon(CustomIcons.gauge),
+                    icon: Icon(AppIcons.gauge),
                     labelText: "Cadence",
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
@@ -305,7 +305,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                       .cardioSession.avgHeartRate
                       ?.toString(),
                   decoration: const InputDecoration(
-                    icon: Icon(Icons.monitor_heart),
+                    icon: Icon(AppIcons.heartbeat),
                     labelText: "Heart Rate",
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
@@ -318,7 +318,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   initialValue:
                       _cardioSessionDescription.cardioSession.comments,
                   decoration: const InputDecoration(
-                    icon: Icon(Icons.comment_outlined),
+                    icon: Icon(AppIcons.comment),
                     labelText: "Comments",
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),

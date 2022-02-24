@@ -8,7 +8,7 @@ import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
@@ -64,7 +64,7 @@ class RoutePageState extends State<RoutePage> {
           IconButton(
               onPressed: () =>
                   Navigator.pushNamed(context, Routes.cardio.overview),
-              icon: const Icon(CustomIcons.heartbeat)),
+              icon: const Icon(AppIcons.heartbeat)),
         ],
       ),
       body: RefreshIndicator(
@@ -80,7 +80,7 @@ class RoutePageState extends State<RoutePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async =>
             await Navigator.pushNamed(context, Routes.cardio.routeEdit),
-        child: const Icon(Icons.add),
+        child: const Icon(AppIcons.add),
       ),
     );
   }
@@ -138,7 +138,7 @@ class RouteCard extends StatelessWidget {
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      Icon(CustomIcons.route),
+                      Icon(AppIcons.route),
                       Text(" no track available"),
                     ],
                   ),

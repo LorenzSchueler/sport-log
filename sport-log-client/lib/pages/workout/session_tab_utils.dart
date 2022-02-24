@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 
 enum SessionsPageTab { timeline, strength, metcon, cardio, diary }
 
@@ -29,27 +29,27 @@ extension SessionTabUtils on SessionsPageTab {
     switch (page) {
       case SessionsPageTab.timeline:
         return const BottomNavigationBarItem(
-          icon: Icon(Icons.timeline),
+          icon: Icon(AppIcons.timeline),
           label: "Timeline",
         );
       case SessionsPageTab.strength:
         return const BottomNavigationBarItem(
-          icon: Icon(CustomIcons.dumbbell_not_rotated),
+          icon: Icon(AppIcons.dumbbell),
           label: "Strength",
         );
       case SessionsPageTab.metcon:
         return const BottomNavigationBarItem(
-          icon: Icon(CustomIcons.plan),
+          icon: Icon(AppIcons.plan),
           label: "Metcon",
         );
       case SessionsPageTab.cardio:
         return const BottomNavigationBarItem(
-          icon: Icon(CustomIcons.heartbeat),
+          icon: Icon(AppIcons.heartbeat),
           label: "Cardio",
         );
       case SessionsPageTab.diary:
         return const BottomNavigationBarItem(
-          icon: Icon(Icons.calendar_today),
+          icon: Icon(AppIcons.calendar),
           label: "Diary",
         );
     }

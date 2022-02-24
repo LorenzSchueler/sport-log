@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/metcon/all.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/int_picker.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 
@@ -38,13 +39,13 @@ class MetconMovementCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.delete),
+                  icon: const Icon(AppIcons.delete),
                   onPressed: () {
                     deleteMetconMovement();
                   },
                 ),
                 ReorderableDragStartListener(
-                    child: const Icon(Icons.drag_handle),
+                    child: const Icon(AppIcons.dragHandle),
                     index: move.movementNumber),
               ],
             ),
@@ -73,7 +74,7 @@ class MetconMovementCard extends StatelessWidget {
                     mmd.metconMovement.weight = _weightDefaultValue;
                     editMetconMovementDescription(mmd);
                   },
-                  icon: const Icon(Icons.add),
+                  icon: const Icon(AppIcons.add),
                   label: const Text("Add weight..."),
                 ),
               if (move.weight != null) const Text("Float picker to come"),

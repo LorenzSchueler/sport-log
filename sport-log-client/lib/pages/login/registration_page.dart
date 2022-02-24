@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/message_dialog.dart';
 
 class RegistrationPage extends StatefulWidget {
@@ -107,7 +108,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               _serverUrlInputController.text = Settings.serverUrl;
             });
           },
-          icon: const Icon(Icons.settings_backup_restore))
+          icon: const Icon(AppIcons.restore))
     ]);
   }
 

@@ -138,7 +138,7 @@ void testActionRule() async {
 }
 
 void main() async {
-  await initialize(doDownSync: false);
+  await for (double _ in initialize()) {}
 
   testUser();
   testAction();

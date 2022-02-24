@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/settings.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/form_widgets/metcon_picker.dart';
@@ -94,14 +94,14 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
     return Scaffold(
         appBar: AppBar(title: const Text("Edit Metcon Session"), actions: [
           IconButton(
-              onPressed: _saveMetconSession, icon: const Icon(Icons.save))
+              onPressed: _saveMetconSession, icon: const Icon(AppIcons.save))
         ]),
         body: Container(
           padding: const EdgeInsets.all(10),
           child: ListView(
             children: [
               EditTile(
-                  leading: Icons.notes_rounded,
+                  leading: AppIcons.notes,
                   caption: "Metcon",
                   child: Text(_metconSessionDescription.metconDescription.name),
                   onTap: () async {
@@ -118,7 +118,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                     //  set time round and reps accordingly to avoid null values
                   }),
               EditTile(
-                  leading: Icons.calendar_today,
+                  leading: AppIcons.calendar,
                   caption: "Start Time",
                   child: Text(formatDate(
                       _metconSessionDescription.metconSession.datetime)),
@@ -176,7 +176,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                           _metconSessionDescription.metconSession.time = d),
                       initialDuration:
                           _metconSessionDescription.metconSession.time!),
-                  leading: CustomIcons.time_interval,
+                  leading: AppIcons.timeInterval,
                 ),
               if (_metconSessionDescription
                               .metconDescription.metcon.metconType ==
@@ -189,7 +189,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   Expanded(
                       child: TextFormField(
                     decoration: const InputDecoration(
-                      icon: Icon(CustomIcons.cw),
+                      icon: Icon(AppIcons.repeat),
                       labelText: "Rounds",
                       contentPadding: EdgeInsets.symmetric(vertical: 5),
                     ),
@@ -232,11 +232,11 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                         },
                         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       )),
-                  leading: Icons.check_box_outlined),
+                  leading: AppIcons.checkBox),
               TextFormField(
                 decoration: const InputDecoration(
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
-                    icon: Icon(Icons.comment_outlined),
+                    icon: Icon(AppIcons.comment),
                     labelText: "Comments"),
                 initialValue: _metconSessionDescription.metconSession.comments,
                 style: const TextStyle(height: 1),

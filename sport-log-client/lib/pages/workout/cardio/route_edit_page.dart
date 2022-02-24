@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:mapbox_api/mapbox_api.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/message_dialog.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
@@ -189,7 +190,7 @@ class RouteEditPageState extends State<RouteEditPage> {
               leading: Container(
                 margin: const EdgeInsets.only(left: 12),
                 child: const Icon(
-                  Icons.add_rounded,
+                  AppIcons.add,
                 ),
               ),
               title: Text(
@@ -209,7 +210,7 @@ class RouteEditPageState extends State<RouteEditPage> {
       listElements.add(_buildDragTarget(index));
 
       var icon = const Icon(
-        Icons.drag_handle,
+        AppIcons.dragHandle,
       );
       Text title = Text(
         "${index + 1}",
@@ -219,7 +220,7 @@ class RouteEditPageState extends State<RouteEditPage> {
         ListTile(
           leading: IconButton(
               onPressed: () => _removePoint(index),
-              icon: const Icon(Icons.delete_rounded)),
+              icon: const Icon(AppIcons.delete)),
           trailing: Draggable(
             axis: Axis.vertical,
             data: index,
@@ -291,7 +292,7 @@ class RouteEditPageState extends State<RouteEditPage> {
         actions: [
           IconButton(
             onPressed: _deleteRoute,
-            icon: const Icon(Icons.delete),
+            icon: const Icon(AppIcons.delete),
           ),
           IconButton(
             onPressed: _formKey.currentContext != null &&
@@ -299,7 +300,7 @@ class RouteEditPageState extends State<RouteEditPage> {
                     _route.track.isNotEmpty
                 ? _saveRoute
                 : null,
-            icon: const Icon(Icons.save),
+            icon: const Icon(AppIcons.save),
           )
         ],
       ),

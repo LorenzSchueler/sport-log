@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/theme.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 
 import 'box_int_input.dart';
 
@@ -32,7 +33,7 @@ class _SetRepsInputState extends State<SetRepsInput> {
   Widget get _addButton {
     final isSubmittable = reps != 0;
     return IconButton(
-      icon: const Icon(Icons.check),
+      icon: const Icon(AppIcons.check),
       color: isSubmittable ? primaryColorOf(context) : null,
       iconSize: UnrestrictedIntInput.fontSize,
       onPressed: isSubmittable ? _submit : null,

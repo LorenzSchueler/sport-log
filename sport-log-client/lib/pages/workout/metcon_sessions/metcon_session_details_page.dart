@@ -5,6 +5,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/text_tile.dart';
 
 class MetconSessionDetailsPage extends StatefulWidget {
@@ -55,7 +56,7 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
                     });
                   }
                 },
-                icon: const Icon(Icons.edit))
+                icon: const Icon(AppIcons.edit))
           ],
         ),
         body: Container(

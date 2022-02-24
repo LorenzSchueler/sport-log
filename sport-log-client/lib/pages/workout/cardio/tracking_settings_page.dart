@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/cardio_type_picker.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 import 'package:sport_log/widgets/form_widgets/route_picker.dart';
@@ -31,10 +32,10 @@ class CardioTrackingSettingsPageState
         body: Column(
           children: [
             ListTile(
-                leading: const Icon(Icons.sports),
+                leading: const Icon(AppIcons.sports),
                 title: Text(_movement?.name ?? ""),
                 subtitle: const Text("Movement"),
-                trailing: const Icon(Icons.edit),
+                trailing: const Icon(AppIcons.edit),
                 onTap: () async {
                   Movement? movement = await showMovementPickerDialog(context,
                       dismissable: false, cardioOnly: true);
@@ -45,10 +46,10 @@ class CardioTrackingSettingsPageState
                 }),
             const Divider(),
             ListTile(
-                leading: const Icon(Icons.sports),
+                leading: const Icon(AppIcons.sports),
                 title: Text(_cardioType?.name ?? ""),
                 subtitle: const Text("Cardio Type"),
-                trailing: const Icon(Icons.edit),
+                trailing: const Icon(AppIcons.edit),
                 onTap: () async {
                   CardioType? cardioType = await showCardioTypePickerDialog(
                     context,
@@ -61,10 +62,10 @@ class CardioTrackingSettingsPageState
                 }),
             const Divider(),
             ListTile(
-                leading: const Icon(Icons.map),
+                leading: const Icon(AppIcons.map),
                 title: Text(_route?.name ?? ""),
                 subtitle: const Text("Route to follow"),
-                trailing: const Icon(Icons.edit),
+                trailing: const Icon(AppIcons.edit),
                 onTap: () async {
                   Route? route = await showRoutePickerDialog(
                     context: context,

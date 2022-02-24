@@ -3,6 +3,7 @@ import 'package:sport_log/data_provider/data_providers/movement_data_provider.da
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/approve_dialog.dart';
 import 'package:sport_log/widgets/form_widgets/selection_bar.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
@@ -117,19 +118,19 @@ class _EditMovementPageState extends State<EditMovementPage> {
               }
               Navigator.pop(context);
             },
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(AppIcons.arrowBack),
           ),
           actions: [
             if (widget._isEditing)
               IconButton(
                 onPressed: () => _delete(),
-                icon: const Icon(Icons.delete),
+                icon: const Icon(AppIcons.delete),
               ),
             IconButton(
                 onPressed: _inputIsValid && (!widget._isEditing || _hasChanges)
                     ? () => _submit()
                     : null,
-                icon: const Icon(Icons.save))
+                icon: const Icon(AppIcons.save))
           ],
         ),
         body: WideScreenFrame(
@@ -172,7 +173,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
           _setDescription("");
           _descriptionFocusNode.requestFocus();
         },
-        icon: const Icon(Icons.add),
+        icon: const Icon(AppIcons.add),
         label: const Text("Add description..."),
       );
     } else {
@@ -194,7 +195,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
           border: const OutlineInputBorder(),
           labelText: "Description",
           suffixIcon: IconButton(
-            icon: const Icon(Icons.cancel),
+            icon: const Icon(AppIcons.cancel),
             onPressed: () => _setDescription(null),
           ),
         ),

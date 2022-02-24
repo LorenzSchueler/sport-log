@@ -5,7 +5,7 @@ import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 
 part 'metcon.g.dart';
 
@@ -22,11 +22,11 @@ extension ToIcon on MetconType {
   IconData get icon {
     switch (this) {
       case MetconType.amrap:
-        return CustomIcons.time_interval;
+        return AppIcons.timeInterval;
       case MetconType.emom:
-        return Icons.repeat_one_rounded;
+        return AppIcons.repeat;
       case MetconType.forTime:
-        return Icons.timer_outlined;
+        return AppIcons.timer;
     }
   }
 }

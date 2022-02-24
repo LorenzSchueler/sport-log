@@ -15,7 +15,7 @@ import 'models/movement/movement.dart';
 
 final _logger = Logger('MAIN');
 
-Stream<double> initialize({bool doDownSync = true}) async* {
+Stream<double> initialize() async* {
   WidgetsFlutterBinding.ensureInitialized(); // TODO: necessary?
   yield 0.1;
   await Hive.initFlutter();
@@ -90,7 +90,7 @@ class InitAppWrapperState extends State<InitAppWrapper> {
             child: Center(child: LinearProgressIndicator(value: _progress)));
   }
 
-  Future<void> _initialize({bool doDownSync = true}) async {
+  Future<void> _initialize() async {
     await for (double progress in initialize()) {
       setState(() => _progress = progress);
     }

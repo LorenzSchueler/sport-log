@@ -8,7 +8,7 @@ import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 class MetconsPage extends StatefulWidget {
@@ -49,7 +49,7 @@ class _MetconsPageState extends State<MetconsPage> {
           IconButton(
               onPressed: () =>
                   Navigator.pushNamed(context, Routes.metcon.sessionOverview),
-              icon: const Icon(Icons.notes_rounded)),
+              icon: const Icon(AppIcons.notes)),
         ],
       ),
       body: _content,
@@ -57,7 +57,7 @@ class _MetconsPageState extends State<MetconsPage> {
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.metcon),
       drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
       floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
+          child: const Icon(AppIcons.add),
           onPressed: () async {
             final returnObject =
                 await Navigator.pushNamed(context, Routes.metcon.edit);

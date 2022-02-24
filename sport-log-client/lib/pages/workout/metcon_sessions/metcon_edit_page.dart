@@ -6,6 +6,7 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/int_picker.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
@@ -150,12 +151,12 @@ class _EditMetconPageState extends State<EditMetconPage> {
           title: Text(widget._isEditing ? "Edit Metcon" : "New Metcon"),
           leading: IconButton(
             onPressed: _md.isValid() ? _submit : null,
-            icon: const Icon(Icons.save),
+            icon: const Icon(AppIcons.save),
           ),
           actions: [
             IconButton(
               onPressed: _md.hasReference ? null : _delete,
-              icon: const Icon(Icons.delete),
+              icon: const Icon(AppIcons.delete),
             )
           ],
         ),
@@ -288,7 +289,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
           border: const OutlineInputBorder(),
           labelText: "Description",
           suffixIcon: IconButton(
-            icon: const Icon(Icons.cancel),
+            icon: const Icon(AppIcons.cancel),
             onPressed: () => _setDescription(null),
           ),
         ),
@@ -303,7 +304,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
           _setDescription("");
           _descriptionFocusNode.requestFocus();
         },
-        icon: const Icon(Icons.add),
+        icon: const Icon(AppIcons.add),
         label: const Text("Add description..."),
       );
     } else {
@@ -330,7 +331,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
     if (_md.metcon.timecap == null) {
       return OutlinedButton.icon(
         onPressed: () => _setTimecap(Metcon.timecapDefaultValue),
-        icon: const Icon(Icons.add),
+        icon: const Icon(AppIcons.add),
         label: const Text("Add timecap..."),
       );
     } else {
@@ -345,7 +346,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
           ],
         ),
         IconButton(
-          icon: const Icon(Icons.cancel),
+          icon: const Icon(AppIcons.cancel),
           onPressed: () => _setTimecap(null),
         ),
       ]);
@@ -380,7 +381,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
           _addMetconMovementWithMovement(movement);
         }
       },
-      icon: const Icon(Icons.add),
+      icon: const Icon(AppIcons.add),
       label: const Text("Add movement..."),
     );
   }

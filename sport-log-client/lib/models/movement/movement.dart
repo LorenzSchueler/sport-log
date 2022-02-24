@@ -5,7 +5,7 @@ import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 
 part 'movement.g.dart';
 
@@ -37,13 +37,13 @@ extension MovementDimensionStrings on MovementDimension {
   IconData get iconData {
     switch (this) {
       case MovementDimension.reps:
-        return CustomIcons.cw;
+        return AppIcons.repeat;
       case MovementDimension.time:
-        return Icons.timer_outlined;
+        return AppIcons.timer;
       case MovementDimension.distance:
-        return CustomIcons.ruler_horizontal;
+        return AppIcons.ruler;
       case MovementDimension.energy:
-        return CustomIcons.gauge;
+        return AppIcons.gauge;
     }
   }
 }

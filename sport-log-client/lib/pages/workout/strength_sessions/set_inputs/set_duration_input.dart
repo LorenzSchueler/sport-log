@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/pages/workout/strength_sessions/set_inputs/box_int_input.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 
 class SetDurationInput extends StatefulWidget {
   const SetDurationInput({Key? key, required this.onNewSet}) : super(key: key);
@@ -69,7 +70,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
     final isSubmittable =
         _hours != 0 || _minutes != 0 || _seconds != 0 || _milliseconds != 0;
     return IconButton(
-      icon: const Icon(Icons.check),
+      icon: const Icon(AppIcons.check),
       color: isSubmittable ? primaryColorOf(context) : null,
       iconSize: PaddedIntInput.fontSize,
       onPressed: isSubmittable ? _submit : null,

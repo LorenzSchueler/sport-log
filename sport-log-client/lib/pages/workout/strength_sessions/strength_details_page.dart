@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 
 class StrengthSessionDetailsPage extends StatefulWidget {
   const StrengthSessionDetailsPage({
@@ -63,7 +64,7 @@ class _StrengthSessionDetailsPageState
               Navigator.pushNamed(context, Routes.strength.edit,
                   arguments: session);
             },
-            icon: const Icon(Icons.edit_sharp),
+            icon: const Icon(AppIcons.edit),
           ),
         ],
       ),

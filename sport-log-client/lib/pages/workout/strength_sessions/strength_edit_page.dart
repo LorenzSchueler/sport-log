@@ -9,7 +9,7 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/settings.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
@@ -133,7 +133,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       caption: 'Movement',
       child: Text(
           '${_session.movement.name} (${_session.movement.dimension.displayName})'),
-      leading: Icons.directions_run_rounded,
+      leading: AppIcons.exercise,
       onTap: () async {
         final maybeMovement = await showMovementPickerDialog(context);
         if (maybeMovement != null) {
@@ -151,7 +151,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         if (_session.session.interval == null)
           ActionChip(
             label: const Text('Interval'),
-            avatar: const Icon(Icons.add),
+            avatar: const Icon(AppIcons.add),
             onPressed: () {
               setState(() {
                 _session.session.interval = const Duration(seconds: 90);
@@ -161,7 +161,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         if (_session.session.comments == null)
           ActionChip(
             label: const Text('Comment'),
-            avatar: const Icon(Icons.add),
+            avatar: const Icon(AppIcons.add),
             onPressed: () {
               setState(() {
                 _session.session.comments = '';
@@ -177,7 +177,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     return EditTile(
       caption: 'Date',
       child: Text(_session.session.datetime.toHumanWithTime()),
-      leading: Icons.calendar_today,
+      leading: AppIcons.calendar,
       onTap: () async {
         final maybeDate = await showRoundedDatePicker(
             context: context, theme: Theme.of(context));
@@ -205,7 +205,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         setDuration: (d) => setState(() => _session.session.interval = d),
         initialDuration: _session.session.interval!,
       ),
-      leading: CustomIcons.time_interval,
+      leading: AppIcons.timeInterval,
       onCancel: () {
         setState(() => _session.session.interval = null);
       },
@@ -222,7 +222,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       },
       decoration: const InputDecoration(
         labelText: 'Comment',
-        icon: Icon(Icons.edit),
+        icon: Icon(AppIcons.edit),
         contentPadding: EdgeInsets.symmetric(vertical: 5),
       ),
       onEditingComplete: () {
@@ -266,7 +266,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
               onPressed: () {
                 _session.sets[index].weight = 20;
               },
-              avatar: const Icon(Icons.add),
+              avatar: const Icon(AppIcons.add),
             ),
           if (set.weight != null) Text(set.weight.toString()),
         ],

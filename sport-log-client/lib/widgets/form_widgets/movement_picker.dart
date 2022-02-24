@@ -4,6 +4,7 @@ import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/movement/movement_description.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 
 Future<Movement?> showMovementPickerDialog(
   BuildContext context, {
@@ -85,7 +86,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
         onChanged: _update,
         decoration: InputDecoration(
           labelText: 'Search',
-          prefixIcon: const Icon(Icons.search),
+          prefixIcon: const Icon(AppIcons.search),
           border: InputBorder.none,
           suffixIcon: _search.isNotEmpty
               ? IconButton(
@@ -99,7 +100,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
                     assert(returnObject.action == ReturnAction.created);
                     Navigator.pop(context, returnObject.payload.movement);
                   },
-                  icon: const Icon(Icons.add),
+                  icon: const Icon(AppIcons.add),
                 )
               : null,
         ),
@@ -131,7 +132,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
         Navigator.pop(context, movement);
       },
       selected: selected,
-      trailing: selected ? const Icon(Icons.check_sharp) : null,
+      trailing: selected ? const Icon(AppIcons.check) : null,
     );
   }
 }

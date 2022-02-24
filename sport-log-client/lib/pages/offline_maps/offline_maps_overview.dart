@@ -5,6 +5,7 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/message_dialog.dart';
 
@@ -157,7 +158,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
                     onPressed: () => _point2 != null
                         ? _updatePoint2(null)
                         : _updatePoint1(null),
-                    child: const Icon(Icons.undo)),
+                    child: const Icon(AppIcons.undo)),
               )
             ],
           ),
@@ -169,7 +170,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
-                          Icon(Icons.download),
+                          Icon(AppIcons.download),
                           Text("download")
                         ]))
                 : LinearProgressIndicator(

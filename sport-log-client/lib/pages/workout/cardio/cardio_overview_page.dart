@@ -14,7 +14,7 @@ import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
@@ -80,7 +80,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
           IconButton(
               onPressed: () =>
                   Navigator.pushNamed(context, Routes.cardio.routeOverview),
-              icon: const Icon(CustomIcons.route)),
+              icon: const Icon(AppIcons.route)),
           IconButton(
             onPressed: () async {
               final Movement? movement = await showMovementPickerDialog(context,
@@ -97,9 +97,8 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
                 });
               }
             },
-            icon: Icon(_movement != null
-                ? Icons.filter_alt
-                : Icons.filter_alt_outlined),
+            icon: Icon(
+                _movement != null ? AppIcons.filterFilled : AppIcons.filter),
           ),
         ],
         bottom: PreferredSize(
@@ -124,17 +123,17 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.cardio),
       drawer: MainDrawer(selectedRoute: Routes.cardio.overview),
       floatingActionButton: ExpandableFab(
-        icon: const Icon(Icons.add),
+        icon: const Icon(AppIcons.add),
         buttons: [
           ActionButton(
-              icon: const Icon(Icons.timer_outlined),
+              icon: const Icon(AppIcons.timer),
               onPressed: () async {
                 final returnObj = await Navigator.pushNamed(
                     context, Routes.cardio.trackingSettings);
                 _handleNewCardioSession(returnObj);
               }),
           ActionButton(
-              icon: const Icon(Icons.notes_rounded),
+              icon: const Icon(AppIcons.notes),
               onPressed: () async {
                 final returnObj = await Navigator.pushNamed(
                     context, Routes.cardio.cardioEdit);
@@ -252,7 +251,7 @@ class CardioSessionCard extends StatelessWidget {
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      Icon(CustomIcons.route),
+                      Icon(AppIcons.route),
                       Text(" no track available"),
                     ],
                   ),

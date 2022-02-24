@@ -8,7 +8,7 @@ import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
 
@@ -72,7 +72,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
           IconButton(
               onPressed: () =>
                   Navigator.pushNamed(context, Routes.metcon.overview),
-              icon: const Icon(Icons.notes_rounded)),
+              icon: const Icon(AppIcons.notes)),
           IconButton(
             onPressed: () async {
               final Movement? movement = await showMovementPickerDialog(context,
@@ -89,9 +89,8 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                 });
               }
             },
-            icon: Icon(_movement != null
-                ? Icons.filter_alt
-                : Icons.filter_alt_outlined),
+            icon: Icon(
+                _movement != null ? AppIcons.filterFilled : AppIcons.filter),
           ),
         ],
         bottom: PreferredSize(
@@ -116,7 +115,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.metcon),
       drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
       floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
+          child: const Icon(AppIcons.add),
           onPressed: () {
             Navigator.pushNamed(context, Routes.metcon.sessionEdit);
           }),
@@ -142,7 +141,7 @@ class MetconSessionCard extends StatelessWidget {
           leading: Icon(metconSessionDescription
               .metconDescription.metcon.metconType.icon),
           trailing: metconSessionDescription.metconSession.rx
-              ? const Icon(Icons.check_circle_rounded)
+              ? const Icon(AppIcons.checkCircle)
               : null,
           title: Text(metconSessionDescription.metconDescription.name),
           subtitle: Text(metconSessionDescription.longResultDescription),

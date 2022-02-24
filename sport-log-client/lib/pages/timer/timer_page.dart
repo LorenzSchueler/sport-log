@@ -9,7 +9,7 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/widgets/custom_icons.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -89,7 +89,7 @@ class TimerPageState extends State<TimerPage> {
                   validator: Validator.validateIntGtZero,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: const InputDecoration(
-                    icon: Icon(CustomIcons.cw),
+                    icon: Icon(AppIcons.repeat),
                     labelText: "Rounds",
                     contentPadding: EdgeInsets.symmetric(vertical: 5),
                   ),
@@ -139,7 +139,7 @@ class TimerPageState extends State<TimerPage> {
       child: DurationPicker(
           setDuration: (d) => setState(() => _totalTime = d),
           initialDuration: _totalTime),
-      leading: CustomIcons.time_interval,
+      leading: AppIcons.timeInterval,
     );
   }
 
