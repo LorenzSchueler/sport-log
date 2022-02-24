@@ -70,6 +70,7 @@ class AppIcons {
   static const IconData notes = Icons.notes_rounded;
   static const IconData cloudUpload = Icons.cloud_upload_outlined;
   static const IconData account = Icons.account_circle_outlined;
+  static const IconData contributors = Icons.supervised_user_circle_outlined;
   static const IconData copyright = Icons.copyright_outlined;
   static const IconData playCircle = Icons.play_circle_outline;
   static const IconData timeline = Icons.timeline;
