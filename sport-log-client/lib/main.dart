@@ -5,7 +5,10 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/theme.dart';
+import 'package:sport_log/pages/login/landing_page.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/test_data/movement_test_data.dart';
 import 'package:sport_log/test_data/strength_test_data.dart';
@@ -18,12 +21,14 @@ final _logger = Logger('MAIN');
 Stream<double> initialize() async* {
   WidgetsFlutterBinding.ensureInitialized(); // TODO: necessary?
   yield 0.1;
-  await Hive.initFlutter();
+  Defaults.mapbox.accessToken; // make sure access token is available
   yield 0.2;
-  await Config.init();
+  await Hive.initFlutter();
   yield 0.3;
-  await Settings.init();
+  await Config.init();
   yield 0.4;
+  await Settings.init();
+  yield 0.5;
   await AppDatabase.init();
   yield 0.8;
   await Sync.instance.init();
@@ -85,9 +90,17 @@ class InitAppWrapperState extends State<InitAppWrapper> {
             value: Sync.instance,
             child: const App(),
           )
-        : Directionality(
-            textDirection: TextDirection.ltr,
-            child: Center(child: LinearProgressIndicator(value: _progress)));
+        : MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: ThemeMode.dark,
+            home: WelcomeScreen(
+              content: Center(
+                child: LinearProgressIndicator(value: _progress),
+              ),
+            ),
+          );
   }
 
   Future<void> _initialize() async {
