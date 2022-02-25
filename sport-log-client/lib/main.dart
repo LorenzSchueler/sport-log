@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
+import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
@@ -29,11 +30,22 @@ Stream<double> initialize() async* {
   await Settings.init();
   yield 0.5;
   await AppDatabase.init();
-  yield 0.8;
+  yield 0.7;
   await Sync.instance.init();
-  yield 0.9;
+  yield 0.8;
   if (Config.generateTestData) {
     insertTestData();
+  }
+  yield 0.9;
+  // TODO solve this in another way if no movements in db
+  final movements = await MovementDataProvider.instance.getMovements();
+  if (movements.isEmpty) {
+    final Movement movement = Movement.defaultValue()
+      ..name = "Default Movement";
+    await MovementDataProvider.instance.createSingle(movement);
+    Movement.defaultMovement = movement;
+  } else {
+    Movement.defaultMovement = movements.first;
   }
   yield 1.0;
 }

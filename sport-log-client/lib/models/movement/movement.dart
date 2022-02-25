@@ -5,6 +5,7 @@ import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 part 'movement.g.dart';
@@ -73,13 +74,17 @@ class Movement extends Entity {
   @JsonKey(name: 'movement_dimension')
   MovementDimension dimension;
 
-  Movement.defaultValue(this.userId)
+  Movement.defaultValue()
       : id = randomId(),
+        userId = Settings.userId,
         name = '',
         description = null,
         cardio = true,
         deleted = false,
         dimension = MovementDimension.reps;
+
+  static late Movement
+      defaultMovement; // must be initialized in main::initialize
 
   factory Movement.fromJson(Map<String, dynamic> json) =>
       _$MovementFromJson(json);

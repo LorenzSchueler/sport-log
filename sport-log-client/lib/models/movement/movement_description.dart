@@ -8,8 +8,8 @@ class MovementDescription implements Validatable, HasId {
     required this.hasReference,
   });
 
-  MovementDescription.defaultValue(Int64 userId)
-      : movement = Movement.defaultValue(userId),
+  MovementDescription.defaultValue()
+      : movement = Movement.defaultValue(),
         hasReference = false;
 
   Movement movement;
