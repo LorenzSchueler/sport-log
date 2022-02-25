@@ -10,7 +10,10 @@ class _Contributor {
   _Contributor(this.name, this.github);
 
   static List<_Contributor> all = [
-    _Contributor("Lorenz Schüler", "https://github.com/LorenzSchueler"),
+    _Contributor(
+      "Lorenz Schüler",
+      "https://github.com/LorenzSchueler",
+    ),
     _Contributor(
       "Oliver Portee",
       "https://github.com/OliverPortee",

@@ -132,11 +132,11 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) => _movement != null
-                      ? _sessionCardWithMovement(
-                          _sessions[index],
+                      ? StrengthSessionCardWithMovement(
+                          strengthSessionDescription: _sessions[index],
                         )
                       : StrengthSessionCard(
-                          strengthSessionWithStats: _sessions[index],
+                          strengthSessionDescription: _sessions[index],
                         ),
                   childCount: _sessions.length,
                 ),
@@ -157,43 +157,56 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
       ),
     );
   }
+}
 
-  Widget _sessionCardWithMovement(StrengthSessionDescription s) {
+class StrengthSessionCard extends StatelessWidget {
+  final StrengthSessionDescription strengthSessionDescription;
+
+  const StrengthSessionCard({
+    Key? key,
+    required this.strengthSessionDescription,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        title: Text(
-          '${s.session.datetime.toHumanWithTime()} • ${s.stats.numSets} ${plural('set', 'sets', s.stats.numSets)}',
+        leading: Icon(strengthSessionDescription.movement.dimension.iconData),
+        title: Text(strengthSessionDescription.movement.name),
+        subtitle: Text(
+          '${strengthSessionDescription.session.datetime.toHumanWithTime()} • ${strengthSessionDescription.stats.numSets} ${plural('set', 'sets', strengthSessionDescription.stats.numSets)}',
         ),
-        subtitle: Text(s.stats.toDisplayName(s.movement.dimension)),
         onTap: () => Navigator.pushNamed(
           context,
           Routes.strength.details,
-          arguments: s.session.id,
+          arguments: strengthSessionDescription.session.id,
         ),
       ),
     );
   }
 }
 
-class StrengthSessionCard extends StatelessWidget {
-  final StrengthSessionDescription strengthSessionWithStats;
+class StrengthSessionCardWithMovement extends StatelessWidget {
+  final StrengthSessionDescription strengthSessionDescription;
 
-  const StrengthSessionCard({Key? key, required this.strengthSessionWithStats})
-      : super(key: key);
+  const StrengthSessionCardWithMovement({
+    Key? key,
+    required this.strengthSessionDescription,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        leading: Icon(strengthSessionWithStats.movement.dimension.iconData),
-        title: Text(strengthSessionWithStats.movement.name),
-        subtitle: Text(
-          '${strengthSessionWithStats.session.datetime.toHumanWithTime()} • ${strengthSessionWithStats.stats.numSets} ${plural('set', 'sets', strengthSessionWithStats.stats.numSets)}',
+        title: Text(
+          '${strengthSessionDescription.session.datetime.toHumanWithTime()} • ${strengthSessionDescription.stats.numSets} ${plural('set', 'sets', strengthSessionDescription.stats.numSets)}',
         ),
+        subtitle: Text(strengthSessionDescription.stats
+            .toDisplayName(strengthSessionDescription.movement.dimension)),
         onTap: () => Navigator.pushNamed(
           context,
           Routes.strength.details,
-          arguments: strengthSessionWithStats.session.id,
+          arguments: strengthSessionDescription.session.id,
         ),
       ),
     );

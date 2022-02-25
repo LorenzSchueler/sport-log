@@ -2,34 +2,34 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 
 class TimelineUnion extends Comparable<TimelineUnion> {
-  final StrengthSessionDescription? _strengthSessionWithStats;
+  final StrengthSessionDescription? _strengthSessionDescription;
   final MetconSessionDescription? _metconSessionDescription;
   final CardioSessionDescription? _cardioSessionDescription;
   final Diary? _diary;
 
   TimelineUnion.strengthSession(
-    StrengthSessionDescription this._strengthSessionWithStats,
+    StrengthSessionDescription this._strengthSessionDescription,
   )   : _metconSessionDescription = null,
         _cardioSessionDescription = null,
         _diary = null;
   TimelineUnion.metconSession(
     MetconSessionDescription this._metconSessionDescription,
-  )   : _strengthSessionWithStats = null,
+  )   : _strengthSessionDescription = null,
         _cardioSessionDescription = null,
         _diary = null;
   TimelineUnion.cardioSession(
     CardioSessionDescription this._cardioSessionDescription,
-  )   : _strengthSessionWithStats = null,
+  )   : _strengthSessionDescription = null,
         _metconSessionDescription = null,
         _diary = null;
   TimelineUnion.diary(Diary this._diary)
-      : _strengthSessionWithStats = null,
+      : _strengthSessionDescription = null,
         _metconSessionDescription = null,
         _cardioSessionDescription = null;
 
   DateTime get datetime {
-    if (_strengthSessionWithStats != null) {
-      return _strengthSessionWithStats!.session.datetime;
+    if (_strengthSessionDescription != null) {
+      return _strengthSessionDescription!.session.datetime;
     } else if (_metconSessionDescription != null) {
       return _metconSessionDescription!.metconSession.datetime;
     } else if (_cardioSessionDescription != null) {
@@ -45,8 +45,8 @@ class TimelineUnion extends Comparable<TimelineUnion> {
     T Function(CardioSessionDescription) cardioFunction,
     T Function(Diary) diaryFunction,
   ) {
-    if (_strengthSessionWithStats != null) {
-      return strengthFunction(_strengthSessionWithStats!);
+    if (_strengthSessionDescription != null) {
+      return strengthFunction(_strengthSessionDescription!);
     } else if (_metconSessionDescription != null) {
       return metconFunction(_metconSessionDescription!);
     } else if (_cardioSessionDescription != null) {

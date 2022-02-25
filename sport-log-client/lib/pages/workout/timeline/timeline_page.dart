@@ -187,7 +187,7 @@ class TimelinePageState extends State<TimelinePage> {
   Widget _itemCard(BuildContext context, TimelineUnion item) {
     return item.map(
       (strengthSession) =>
-          StrengthSessionCard(strengthSessionWithStats: strengthSession),
+          StrengthSessionCard(strengthSessionDescription: strengthSession),
       (metconSessionDescription) => MetconSessionCard(
         metconSessionDescription: metconSessionDescription,
       ),
