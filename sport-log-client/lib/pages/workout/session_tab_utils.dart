@@ -10,6 +10,28 @@ extension SessionTabUtils on SessionsPageTab {
     return SessionsPageTab.values.indexOf(this);
   }
 
+  String get _entryName {
+    switch (this) {
+      case SessionsPageTab.timeline:
+        return "entries";
+      case SessionsPageTab.strength:
+        return "strength sessions";
+      case SessionsPageTab.metcon:
+        return "metcon sessions";
+      case SessionsPageTab.cardio:
+        return "cardio sessions";
+      case SessionsPageTab.diary:
+        return "diary entries";
+    }
+  }
+
+  Widget get noEntriesText => Center(
+        child: Text(
+          "looks like there are no $_entryName there yet 😔 \nselect a different time range above ↑\nor press ＋ to create a new one",
+          textAlign: TextAlign.center,
+        ),
+      );
+
   static void onBottomNavItemTapped(BuildContext context, int index) {
     var sessionRoutes = [
       Routes.timeline.overview,

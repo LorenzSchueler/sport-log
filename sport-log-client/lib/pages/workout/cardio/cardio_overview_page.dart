@@ -120,12 +120,14 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
       ),
       body: RefreshIndicator(
         onRefresh: _pullFromServer,
-        child: ListView.builder(
-          itemBuilder: (_, index) => CardioSessionCard(
-            cardioSessionDescription: _cardioSessionDescriptions[index],
-          ),
-          itemCount: _cardioSessionDescriptions.length,
-        ),
+        child: _cardioSessionDescriptions.isEmpty
+            ? SessionsPageTab.cardio.noEntriesText
+            : ListView.builder(
+                itemBuilder: (_, index) => CardioSessionCard(
+                  cardioSessionDescription: _cardioSessionDescriptions[index],
+                ),
+                itemCount: _cardioSessionDescriptions.length,
+              ),
       ),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.cardio),

@@ -112,12 +112,14 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
       ),
       body: RefreshIndicator(
         onRefresh: _pullFromServer,
-        child: ListView.builder(
-          itemBuilder: (_, index) => MetconSessionCard(
-            metconSessionDescription: _metconSessionDescriptions[index],
-          ),
-          itemCount: _metconSessionDescriptions.length,
-        ),
+        child: _metconSessionDescriptions.isEmpty
+            ? SessionsPageTab.metcon.noEntriesText
+            : ListView.builder(
+                itemBuilder: (_, index) => MetconSessionCard(
+                  metconSessionDescription: _metconSessionDescriptions[index],
+                ),
+                itemCount: _metconSessionDescriptions.length,
+              ),
       ),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.metcon),

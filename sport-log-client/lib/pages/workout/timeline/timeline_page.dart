@@ -164,10 +164,12 @@ class TimelinePageState extends State<TimelinePage> {
       ),
       body: RefreshIndicator(
         onRefresh: _pullFromServer,
-        child: ListView.builder(
-          itemBuilder: _buildItemEntry,
-          itemCount: _items.length,
-        ),
+        child: _items.isEmpty
+            ? SessionsPageTab.timeline.noEntriesText
+            : ListView.builder(
+                itemBuilder: _buildItemEntry,
+                itemCount: _items.length,
+              ),
       ),
       bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
         context,

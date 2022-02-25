@@ -80,10 +80,12 @@ class DiaryPageState extends State<DiaryPage> {
       ),
       body: RefreshIndicator(
         onRefresh: _pullFromServer,
-        child: ListView.builder(
-          itemBuilder: (_, index) => DiaryCard(diary: _diaries[index]),
-          itemCount: _diaries.length,
-        ),
+        child: _diaries.isEmpty
+            ? SessionsPageTab.diary.noEntriesText
+            : ListView.builder(
+                itemBuilder: (_, index) => DiaryCard(diary: _diaries[index]),
+                itemCount: _diaries.length,
+              ),
       ),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.diary),

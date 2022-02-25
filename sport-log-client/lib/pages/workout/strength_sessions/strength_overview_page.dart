@@ -118,8 +118,8 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
         child: CustomScrollView(
           slivers: [
             if (_sessions.isEmpty)
-              const SliverFillRemaining(
-                child: Center(child: Text('No data :(')),
+              SliverFillRemaining(
+                child: SessionsPageTab.strength.noEntriesText,
               ),
             if (_sessions.isNotEmpty && _movement != null)
               SliverToBoxAdapter(
