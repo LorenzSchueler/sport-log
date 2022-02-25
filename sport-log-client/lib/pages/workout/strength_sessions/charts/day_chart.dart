@@ -88,7 +88,7 @@ class _DayChartState extends State<DayChart> {
             reservedSize: isTime ? 60 : 40,
             getTitles: isTime
                 ? (value) =>
-                    formatDurationShort(Duration(milliseconds: value.round()))
+                    Duration(milliseconds: value.round()).formatTimeWithMillis
                 : null,
           ),
           bottomTitles: SideTitles(showTitles: false),

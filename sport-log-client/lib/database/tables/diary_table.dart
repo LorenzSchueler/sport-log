@@ -37,8 +37,8 @@ class DiaryTable extends TableAccessor<Diary> {
         if (until != null) " AND $tableName.${Columns.date} < ?"
       ].join(),
       whereArgs: [
-        if (from != null) yyyyMMdd(from),
-        if (until != null) yyyyMMdd(until)
+        if (from != null) from.yyyyMMdd,
+        if (until != null) until.yyyyMMdd
       ],
       orderBy: "$tableName.${Columns.date} DESC",
     );

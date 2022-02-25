@@ -104,7 +104,7 @@ class _WeekChartState extends State<WeekChart> {
             reservedSize: isTime ? 60 : 40,
             getTitles: isTime
                 ? (value) =>
-                    formatDurationShort(Duration(milliseconds: value.round()))
+                    Duration(milliseconds: value.round()).formatTimeWithMillis
                 : null,
           ),
           bottomTitles: SideTitles(

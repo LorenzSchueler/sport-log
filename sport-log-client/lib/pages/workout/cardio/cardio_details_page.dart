@@ -41,9 +41,6 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
         : ((cardioSessionDescription.cardioSession.distance! / 1000) /
                 (cardioSessionDescription.cardioSession.time!.inSeconds / 3600))
             .toStringAsFixed(1);
-    final duration = cardioSessionDescription.cardioSession.time == null
-        ? "???"
-        : formatTime(cardioSessionDescription.cardioSession.time!);
     final calories = cardioSessionDescription.cardioSession.calories == null
         ? "-"
         : cardioSessionDescription.cardioSession.calories.toString();
@@ -174,7 +171,9 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                           scale: 1.3,
                         ),
                         ValueUnitDescription(
-                          value: duration,
+                          value: cardioSessionDescription
+                                  .cardioSession.time?.formatTime ??
+                              "",
                           unit: null,
                           description: "Duration",
                           scale: 1.3,
@@ -248,9 +247,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
               top: 5,
             ),
             child: Text(
-              formatDatetime(
-                cardioSessionDescription.cardioSession.datetime,
-              ),
+              cardioSessionDescription.cardioSession.datetime.formatDatetime,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: cardioSessionDescription.cardioSession.track != null

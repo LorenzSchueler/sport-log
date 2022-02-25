@@ -80,7 +80,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
               EditTile(
                 leading: AppIcons.calendar,
                 caption: "Date",
-                child: Text(formatDate(_diary.date)),
+                child: Text(_diary.date.formatDate),
                 onTap: () async {
                   DateTime? date = await showDatePicker(
                     context: context,

@@ -34,11 +34,11 @@ class MetconSessionDescription implements Validatable {
       case MetconType.forTime:
         if (short) {
           return metconSession.rounds == metconDescription.metcon.rounds
-              ? "${formatTime(metconSession.time!, short: true)} min"
+              ? "${metconSession.time?.formatTimeShort} min"
               : "${metconSession.rounds} rounds + ${metconSession.reps} reps";
         } else {
           return metconSession.rounds == metconDescription.metcon.rounds
-              ? "${formatTime(metconSession.time!, short: true)} min (${formatTime(Duration(seconds: metconDescription.metcon.timecap!.inSeconds), short: true)} min)"
+              ? "${metconSession.time?.formatTimeShort} min (${Duration(seconds: metconDescription.metcon.timecap!.inSeconds).formatTimeShort} min)"
               : "${metconSession.rounds} rounds + ${metconSession.reps} reps (${metconDescription.metcon.rounds} rounds)";
         }
     }
@@ -54,7 +54,7 @@ class MetconSessionDescription implements Validatable {
 
   String get typeLengthDescription {
     return metconDescription.metcon.metconType == MetconType.forTime
-        ? "${metconDescription.metcon.rounds!} Rounds ${metconDescription.metcon.metconType.displayName} (Timecap ${formatTime(metconDescription.metcon.timecap!, short: true)})"
-        : "${metconDescription.metcon.metconType.displayName} ${formatTime(metconDescription.metcon.timecap!, short: true)}";
+        ? "${metconDescription.metcon.rounds!} Rounds ${metconDescription.metcon.metconType.displayName} (Timecap ${metconDescription.metcon.timecap?.formatTimeShort})"
+        : "${metconDescription.metcon.metconType.displayName} ${metconDescription.metcon.timecap?.formatTimeShort}";
   }
 }

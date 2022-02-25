@@ -118,7 +118,7 @@ class DiaryCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                formatDate(diary.date),
+                diary.date.formatDate,
                 style: const TextStyle(fontSize: 20),
               ),
               Defaults.sizedBox.horizontal.big,

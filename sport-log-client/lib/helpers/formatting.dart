@@ -1,81 +1,22 @@
 import 'package:intl/intl.dart';
 import 'package:sport_log/models/all.dart';
 
-String formatDatetime(DateTime dateTime) {
-  return DateFormat('dd.MM.yy kk:mm').format(dateTime);
+extension FormatDateTime on DateTime {
+  String get formatDatetime => DateFormat('dd.MM.yy kk:mm').format(this);
+
+  String get formatDate => DateFormat('dd.MM.yy').format(this);
+
+  String get yyyyMMdd => DateFormat('yyyy-MM-dd').format(this);
 }
 
-String formatDate(DateTime date) {
-  return DateFormat('dd.MM.yy').format(date);
-}
+extension FormatDuration on Duration {
+  String get formatTime => toString().split('.').first.padLeft(8, "0");
 
-String yyyyMMdd(DateTime date) {
-  return DateFormat('yyyy-MM-dd').format(date);
-}
+  String get formatTimeShort => inSeconds < 3600
+      ? toString().split('.').first.split(":").skip(1).join(":")
+      : toString().split('.').first.padLeft(8, "0");
 
-String formatTime(Duration duration, {bool short = false}) {
-  if (short && duration.inSeconds < 3600) {
-    return duration.toString().split('.').first.split(":").skip(1).join(":");
-  } else {
-    return duration.toString().split('.').first.padLeft(8, "0");
-  }
-}
-
-String formatDuration(Duration d) {
-  String result = '';
-  final int days = d.inDays;
-  if (days >= 1) {
-    result += '${days}d';
-  }
-  final int hours = d.inHours % 24;
-  if (hours != 0) {
-    result += '${hours}h';
-  }
-  final int minutes = d.inMinutes % 60;
-  if (minutes != 0) {
-    result += '${minutes}m';
-  }
-  final int seconds = d.inSeconds % 60;
-  if (seconds != 0) {
-    result += '${seconds}s';
-  }
-  final int milliseconds = d.inMilliseconds % 1000;
-  if (milliseconds != 0) {
-    result += '${milliseconds}ms';
-  }
-  return result;
-}
-
-String formatDurationShort(Duration d) {
-  String result = '';
-  final int hours = d.inHours;
-  if (hours != 0) {
-    final int minutes = d.inMinutes % 60;
-    result += '$hours:$minutes';
-    final int seconds = d.inSeconds % 60;
-    if (seconds != 0) {
-      result += ':$seconds';
-    }
-    return result;
-  }
-  final int minutes = d.inMinutes;
-  if (minutes != 0) {
-    final int seconds = d.inSeconds % 60;
-    result += '$minutes:$seconds';
-    final int milliSeconds = d.inMilliseconds % 1000;
-    if (milliSeconds != 0) {
-      result += '.$milliSeconds';
-    }
-    return result;
-  }
-  final int seconds = d.inSeconds;
-  if (seconds != 0) {
-    final int milliSeconds = d.inMilliseconds % 1000;
-    result += '$seconds.$milliSeconds';
-    return result;
-  }
-  final int milliSeconds = d.inMilliseconds;
-  return '$milliSeconds';
+  String get formatTimeWithMillis => toString().split(":").skip(1).join(":");
 }
 
 String plural(String singular, String plural, int count) {
@@ -154,13 +95,13 @@ String formatCountWeight(MovementDimension dim, int count, double? weight) {
           ? '$count x ${roundedWeight(weight)}'
           : '${count}reps';
     case MovementDimension.time:
-      var result = formatDuration(Duration(milliseconds: count));
+      final result = Duration(milliseconds: count).formatTimeWithMillis;
       return weight != null ? result + ' (${roundedWeight(weight)})' : result;
     case MovementDimension.energy:
-      var result = '${count}cals';
+      final result = '${count}cals';
       return weight != null ? result + ' (${roundedWeight(weight)})' : result;
     case MovementDimension.distance:
-      var result = formatDistance(count);
+      final result = formatDistance(count);
       return weight != null ? result + ' (${roundedWeight(weight)})' : result;
   }
 }

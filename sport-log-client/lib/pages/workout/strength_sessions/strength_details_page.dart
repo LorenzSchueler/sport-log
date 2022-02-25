@@ -91,7 +91,7 @@ class _StrengthSessionDetailsPageState
     final subtitle = [
       '${session.sets.length} sets',
       if (session.session.interval != null)
-        formatDuration(session.session.interval!),
+        session.session.interval!.formatTimeWithMillis,
     ].join(' • ');
     return Card(
       child: Padding(
@@ -141,7 +141,7 @@ class _StrengthSessionDetailsPageState
       case MovementDimension.time:
         return [
           ListTile(
-            title: Text(formatDuration(Duration(milliseconds: stats.minCount))),
+            title: Text(Duration(milliseconds: stats.minCount).formatTime),
             subtitle: const Text('Best Time'),
           ),
         ];

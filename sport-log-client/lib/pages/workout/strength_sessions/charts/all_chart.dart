@@ -96,7 +96,7 @@ class _AllChartState extends State<AllChart> {
             reservedSize: isTime ? 60 : 40,
             getTitles: isTime
                 ? (value) =>
-                    formatDurationShort(Duration(milliseconds: value.round()))
+                    Duration(milliseconds: value.round()).formatTimeWithMillis
                 : null,
           ),
         ),

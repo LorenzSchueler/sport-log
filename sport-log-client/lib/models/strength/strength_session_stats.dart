@@ -95,7 +95,7 @@ class StrengthSessionStats {
           'Avg Reps: ${roundedValue(avgCount)}',
         ].join(' • ');
       case MovementDimension.time:
-        return 'Best time: ${formatDuration(Duration(milliseconds: minCount))}';
+        return 'Best time: ${Duration(milliseconds: minCount).formatTimeWithMillis}';
       case MovementDimension.distance:
         return 'Best distance: ${formatDistance(maxCount)}';
       case MovementDimension.energy:

@@ -103,7 +103,7 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
             TextTile(
               caption: "Score",
               child: Text(
-                "${metconSessionDescription.shortResultDescription} (${formatDate(metconSessionDescription.metconSession.datetime)})",
+                "${metconSessionDescription.shortResultDescription} (${metconSessionDescription.metconSession.datetime.formatDate})",
               ),
             ),
             const TextTile(

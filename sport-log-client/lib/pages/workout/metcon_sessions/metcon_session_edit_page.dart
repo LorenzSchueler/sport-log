@@ -136,9 +136,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
               leading: AppIcons.calendar,
               caption: "Start Time",
               child: Text(
-                formatDate(
-                  _metconSessionDescription.metconSession.datetime,
-                ),
+                _metconSessionDescription.metconSession.datetime.formatDate,
               ),
               onTap: () async {
                 DateTime? date = await showDatePicker(

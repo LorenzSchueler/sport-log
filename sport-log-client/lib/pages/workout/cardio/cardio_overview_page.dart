@@ -215,9 +215,6 @@ class CardioSessionCard extends StatelessWidget {
         : ((cardioSessionDescription.cardioSession.distance! / 1000) /
                 (cardioSessionDescription.cardioSession.time!.inSeconds / 3600))
             .toStringAsFixed(1);
-    final duration = cardioSessionDescription.cardioSession.time == null
-        ? "???"
-        : formatTime(cardioSessionDescription.cardioSession.time!);
 
     late MapboxMapController _sessionMapController;
 
@@ -231,9 +228,8 @@ class CardioSessionCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    formatDatetime(
-                      cardioSessionDescription.cardioSession.datetime,
-                    ),
+                    cardioSessionDescription
+                        .cardioSession.datetime.formatDatetime,
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -291,7 +287,9 @@ class CardioSessionCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: ValueUnitDescription(
-                    value: duration,
+                    value: cardioSessionDescription
+                            .cardioSession.time?.formatTime ??
+                        "",
                     unit: null,
                     description: null,
                   ),

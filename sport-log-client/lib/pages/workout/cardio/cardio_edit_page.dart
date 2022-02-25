@@ -177,9 +177,7 @@ class CardioEditPageState extends State<CardioEditPage> {
               leading: AppIcons.calendar,
               caption: "Start Time",
               child: Text(
-                formatDatetime(
-                  _cardioSessionDescription.cardioSession.datetime,
-                ),
+                _cardioSessionDescription.cardioSession.datetime.formatDatetime,
               ),
               onTap: () async {
                 DateTime? datetime = await showDatePicker(

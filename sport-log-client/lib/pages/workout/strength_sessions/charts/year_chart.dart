@@ -101,7 +101,7 @@ class _YearChartState extends State<YearChart> {
             reservedSize: isTime ? 60 : 40,
             getTitles: isTime
                 ? (value) =>
-                    formatDurationShort(Duration(milliseconds: value.round()))
+                    Duration(milliseconds: value.round()).formatTimeWithMillis
                 : null,
           ),
         ),

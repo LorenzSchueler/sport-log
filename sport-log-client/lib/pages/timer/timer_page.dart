@@ -180,14 +180,14 @@ class TimerPageState extends State<TimerPage> {
   Text get timeText {
     return _currentTime.isNegative
         ? Text(
-            formatTime(_currentTime.abs(), short: true),
+            _currentTime.abs().formatTimeShort,
             style: const TextStyle(
               fontSize: 120,
               color: Color.fromARGB(255, 150, 150, 150),
             ),
           )
         : Text(
-            formatTime(_currentTime, short: true),
+            _currentTime.formatTimeShort,
             style: const TextStyle(fontSize: 120),
           );
   }
