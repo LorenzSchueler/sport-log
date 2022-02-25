@@ -14,6 +14,15 @@ class CardioSessionDescription implements Validatable, HasId {
   Route? route;
   Movement movement;
 
+  static CardioSessionDescription defaultValue() {
+    final movement = Movement.defaultMovement;
+    return CardioSessionDescription(
+      cardioSession: CardioSession.defaultValue(movement.id),
+      route: null,
+      movement: movement,
+    );
+  }
+
   @override
   bool isValid() {
     return cardioSession.isValid() &&

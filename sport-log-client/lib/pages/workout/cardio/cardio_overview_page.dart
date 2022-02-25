@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/list_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -137,55 +135,21 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         buttons: [
           ActionButton(
             icon: const Icon(AppIcons.timer),
-            onPressed: () async {
-              final returnObj = await Navigator.pushNamed(
-                context,
-                Routes.cardio.trackingSettings,
-              );
-              _handleNewCardioSession(returnObj);
-            },
+            onPressed: () => Navigator.pushNamed(
+              context,
+              Routes.cardio.trackingSettings,
+            ),
           ),
           ActionButton(
             icon: const Icon(AppIcons.notes),
-            onPressed: () async {
-              final returnObj = await Navigator.pushNamed(
-                context,
-                Routes.cardio.cardioEdit,
-              );
-              _handleNewCardioSession(returnObj);
-            },
+            onPressed: () => Navigator.pushNamed(
+              context,
+              Routes.cardio.cardioEdit,
+            ),
           ),
         ],
       ),
     );
-  }
-
-  void _handleNewCardioSession(dynamic object) {
-    if (object is ReturnObject<CardioSessionDescription>) {
-      switch (object.action) {
-        case ReturnAction.created:
-          setState(() {
-            _cardioSessionDescriptions.add(object.payload);
-            _cardioSessionDescriptions.sortBy((c) => c.cardioSession.datetime);
-          });
-          break;
-        case ReturnAction.updated:
-          setState(() {
-            _cardioSessionDescriptions.update(object.payload, by: (o) => o.id);
-            _cardioSessionDescriptions.sortBy((c) => c.cardioSession.datetime);
-          });
-          break;
-        case ReturnAction.deleted:
-          setState(
-            () => _cardioSessionDescriptions.delete(
-              object.payload,
-              by: (c) => c.id,
-            ),
-          );
-      }
-    } else {
-      _logger.i("poped item is not a ReturnObject");
-    }
   }
 }
 
@@ -289,7 +253,7 @@ class CardioSessionCard extends StatelessWidget {
                   child: ValueUnitDescription(
                     value: cardioSessionDescription
                             .cardioSession.time?.formatTime ??
-                        "",
+                        "--:--:--",
                     unit: null,
                     description: null,
                   ),

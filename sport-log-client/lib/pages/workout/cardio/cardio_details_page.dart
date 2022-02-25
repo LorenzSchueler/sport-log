@@ -71,7 +71,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
           text: TextSpan(
             children: [
               TextSpan(
-                text: "${cardioSessionDescription.cardioSession.movementId} ",
+                text: cardioSessionDescription.movement.name + "  ",
                 style:
                     const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
@@ -93,9 +93,13 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                 arguments: cardioSessionDescription,
               );
               if (returnObj is ReturnObject<CardioSessionDescription>) {
-                setState(() {
-                  cardioSessionDescription = returnObj.payload;
-                });
+                if (returnObj.action == ReturnAction.deleted) {
+                  Navigator.pop(context);
+                } else {
+                  setState(() {
+                    cardioSessionDescription = returnObj.payload;
+                  });
+                }
               }
             },
             icon: const Icon(AppIcons.edit),

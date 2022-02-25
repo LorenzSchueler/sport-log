@@ -50,7 +50,7 @@ class RouteEditPageState extends State<RouteEditPage> {
   }
 
   Future<void> _saveRoute() async {
-    final result = _route.id == widget.route?.id
+    final result = widget.route != null
         ? await _dataProvider.updateSingle(_route)
         : await _dataProvider.createSingle(_route);
     if (result) {
@@ -65,7 +65,7 @@ class RouteEditPageState extends State<RouteEditPage> {
   }
 
   Future<void> _deleteRoute() async {
-    if (_route.id == widget.route?.id) {
+    if (widget.route != null) {
       await _dataProvider.deleteSingle(_route);
     }
     _formKey.currentState!.deactivate();

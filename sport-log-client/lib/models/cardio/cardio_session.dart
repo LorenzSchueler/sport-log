@@ -4,9 +4,11 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/db_serialization.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/cardio/position.dart';
+import 'package:sport_log/settings.dart';
 
 part 'cardio_session.g.dart';
 
@@ -71,6 +73,13 @@ class CardioSession extends Entity {
   @override
   bool deleted;
 
+  CardioSession.defaultValue(this.movementId)
+      : id = randomId(),
+        userId = Settings.userId!,
+        cardioType = CardioType.training,
+        datetime = DateTime.now(),
+        deleted = false;
+
   factory CardioSession.fromJson(Map<String, dynamic> json) =>
       _$CardioSessionFromJson(json);
 
@@ -89,7 +98,10 @@ class CardioSession extends Entity {
               .every((val) => val == null || val > 0),
           'CardioSession: distance, time, calories, avgCadence or avgHeartRate <= 0',
         ) &&
-        validate(time!.inSeconds > 0, 'CardioSession: time <= 0') &&
+        validate(
+          time == null || time!.inSeconds > 0,
+          'CardioSession: time <= 0',
+        ) &&
         validate(
           track == null || distance != null,
           'CardioSession: distance == null when track is set',

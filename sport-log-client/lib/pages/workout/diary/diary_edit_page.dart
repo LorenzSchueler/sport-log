@@ -30,7 +30,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
   }
 
   Future<void> _saveDiary() async {
-    final result = _diary.id == widget.diary?.id
+    final result = widget.diary != null
         ? await _dataProvider.updateSingle(_diary)
         : await _dataProvider.createSingle(_diary);
     if (result) {
@@ -45,7 +45,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
   }
 
   Future<void> _deleteDiary() async {
-    if (_diary.id == widget.diary?.id) {
+    if (widget.diary != null) {
       await _dataProvider.deleteSingle(_diary);
     }
     _formKey.currentState!.deactivate();
