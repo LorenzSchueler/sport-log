@@ -60,17 +60,11 @@ class MainDrawer extends StatelessWidget {
             onTap: () => Nav.newBase(context, Routes.offlineMaps),
             selected: selectedRoute == Routes.offlineMaps,
           ),
-          ExpansionTile(
-            title: const Text('Primitives'),
-            initiallyExpanded: true,
-            children: [
-              ListTile(
-                title: const Text('Movements'),
-                leading: const Icon(AppIcons.exercise),
-                onTap: () => Nav.newBase(context, Routes.movement.overview),
-                selected: selectedRoute == Routes.movement.overview,
-              ),
-            ],
+          ListTile(
+            title: const Text('Movements'),
+            leading: const Icon(AppIcons.exercise),
+            onTap: () => Nav.newBase(context, Routes.movement.overview),
+            selected: selectedRoute == Routes.movement.overview,
           ),
           const Spacer(),
           ListTile(
