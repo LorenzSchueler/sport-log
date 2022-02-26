@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
+import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/data_provider/sync.dart';
@@ -9,7 +10,7 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/theme.dart';
-import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/login/landing_page.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/test_data/movement_test_data.dart';
@@ -38,7 +39,7 @@ Stream<double> initialize() async* {
   }
   yield 0.9;
   // TODO solve this in another way if no movements in db
-  final movements = await MovementDataProvider.instance.getMovements();
+  final movements = await MovementDataProvider.instance.getNonDeleted();
   if (movements.isEmpty) {
     final Movement movement = Movement.defaultValue()
       ..name = "Default Movement";
@@ -46,6 +47,17 @@ Stream<double> initialize() async* {
     Movement.defaultMovement = movement;
   } else {
     Movement.defaultMovement = movements.first;
+  }
+  final metconDescriptions =
+      await MetconDescriptionDataProvider.instance.getNonDeleted();
+  if (metconDescriptions.isEmpty) {
+    final MetconDescription metconDescription = MetconDescription.defaultValue()
+      ..metcon.name = "Default Movement";
+    await MetconDescriptionDataProvider.instance
+        .createSingle(metconDescription);
+    MetconDescription.defaultMetconDescription = metconDescription;
+  } else {
+    MetconDescription.defaultMetconDescription = metconDescriptions.first;
   }
   yield 1.0;
 }

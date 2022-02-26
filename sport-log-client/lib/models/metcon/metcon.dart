@@ -6,6 +6,7 @@ import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 part 'metcon.g.dart';
@@ -75,8 +76,9 @@ class Metcon extends AtomicEntity {
   static const Duration timecapDefaultValue = Duration(minutes: 30);
   static const int roundsDefaultValue = 3;
 
-  Metcon.defaultValue(this.userId)
+  Metcon.defaultValue()
       : id = randomId(),
+        userId = Settings.userId,
         name = "",
         metconType = MetconType.amrap,
         rounds = null,

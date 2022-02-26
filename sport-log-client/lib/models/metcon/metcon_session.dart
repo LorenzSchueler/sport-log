@@ -2,8 +2,11 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
+import 'package:sport_log/models/metcon/metcon.dart';
+import 'package:sport_log/settings.dart';
 
 part 'metcon_session.g.dart';
 
@@ -40,6 +43,35 @@ class MetconSession extends AtomicEntity {
   String? comments;
   @override
   bool deleted;
+
+  static MetconSession defaultValue(Metcon metcon) {
+    Duration? time;
+    int? rounds;
+    int? reps;
+    switch (metcon.metconType) {
+      case MetconType.amrap:
+        rounds = 0;
+        reps = 0;
+        break;
+      case MetconType.emom:
+        break;
+      case MetconType.forTime:
+        time = const Duration();
+        break;
+    }
+    return MetconSession(
+      id: randomId(),
+      userId: Settings.userId!,
+      metconId: metcon.id,
+      datetime: DateTime.now(),
+      time: time,
+      rounds: rounds,
+      reps: reps,
+      rx: true,
+      comments: null,
+      deleted: false,
+    );
+  }
 
   factory MetconSession.fromJson(Map<String, dynamic> json) =>
       _$MetconSessionFromJson(json);

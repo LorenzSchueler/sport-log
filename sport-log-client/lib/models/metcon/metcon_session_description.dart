@@ -18,6 +18,14 @@ class MetconSessionDescription extends CompoundEntity {
   MetconSession metconSession;
   MetconDescription metconDescription;
 
+  static MetconSessionDescription defaultValue() {
+    final metconDescription = MetconDescription.defaultMetconDescription;
+    return MetconSessionDescription(
+      metconSession: MetconSession.defaultValue(metconDescription.metcon),
+      metconDescription: metconDescription,
+    );
+  }
+
   factory MetconSessionDescription.fromJson(Map<String, dynamic> json) =>
       _$MetconSessionDescriptionFromJson(json);
 

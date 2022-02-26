@@ -6,7 +6,6 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_movement_card.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/int_picker.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
@@ -35,8 +34,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
   @override
   void initState() {
     super.initState();
-    _md = widget._initialMetcon ??
-        MetconDescription.defaultValue(Settings.userId!);
+    _md = widget._initialMetcon ?? MetconDescription.defaultValue();
   }
 
   void _setName(String name) {

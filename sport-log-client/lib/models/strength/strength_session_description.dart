@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
@@ -8,6 +7,7 @@ import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
 import 'package:sport_log/models/strength/strength_session_stats.dart';
 import 'package:sport_log/models/strength/strength_set.dart';
+import 'package:sport_log/settings.dart';
 
 part 'strength_session_description.g.dart';
 
@@ -70,10 +70,10 @@ class StrengthSessionDescription extends CompoundEntity {
     }
   }
 
-  StrengthSessionDescription.defaultValue(this.movement, Int64 userId)
+  StrengthSessionDescription.defaultValue(this.movement)
       : session = StrengthSession(
           id: randomId(),
-          userId: userId,
+          userId: Settings.userId!,
           datetime: DateTime.now(),
           movementId: movement.id,
           interval: null,
