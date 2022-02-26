@@ -54,9 +54,13 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
                 arguments: metconSessionDescription,
               );
               if (returnObj is ReturnObject<MetconSessionDescription>) {
-                setState(() {
-                  metconSessionDescription = returnObj.payload;
-                });
+                if (returnObj.action == ReturnAction.deleted) {
+                  Navigator.pop(context);
+                } else {
+                  setState(() {
+                    metconSessionDescription = returnObj.payload;
+                  });
+                }
               }
             },
             icon: const Icon(AppIcons.edit),
