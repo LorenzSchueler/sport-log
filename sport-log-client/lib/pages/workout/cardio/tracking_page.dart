@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pedometer/pedometer.dart';
@@ -5,7 +6,6 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
-import 'dart:async';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
@@ -46,6 +46,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   String _stepInfo = "null";
 
   late Timer _timer;
+  Location _location = Location();
   StreamSubscription? _locationSubscription;
 
   late StreamSubscription _stepCountSubscription;
@@ -75,8 +76,9 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   @override
   void dispose() {
     _timer.cancel();
-    _locationSubscription?.cancel();
     _stepCountSubscription.cancel();
+    _locationSubscription?.cancel();
+    _location.enableBackgroundMode(enable: false);
     super.dispose();
   }
 
@@ -116,6 +118,12 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     });
   }
 
+  void _startStepCountStream() {
+    Stream<StepCount> _stepCountStream = Pedometer.stepCountStream;
+    _stepCountSubscription = _stepCountStream.listen(_onStepCountUpdate);
+    _stepCountSubscription.onError((dynamic error) => _logger.i(error));
+  }
+
   void _onStepCountUpdate(StepCount stepCountEvent) {
     if (_trackingMode == TrackingMode.tracking) {
       if (_cardioSessionDescription.cardioSession.cadence!.isEmpty) {
@@ -139,39 +147,27 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     _lastStepCount = stepCountEvent;
   }
 
-  void _onStepCountError(Object error) {
-    _logger.i(error);
-  }
-
-  void _startStepCountStream() {
-    Stream<StepCount> _stepCountStream = Pedometer.stepCountStream;
-    _stepCountSubscription = _stepCountStream.listen(_onStepCountUpdate);
-    _stepCountSubscription.onError(_onStepCountError);
-  }
-
   Future<void> _startLocationStream() async {
-    Location location = Location();
-
-    bool serviceEnabled = await location.serviceEnabled();
+    bool serviceEnabled = await _location.serviceEnabled();
     if (!serviceEnabled) {
-      serviceEnabled = await location.requestService();
+      serviceEnabled = await _location.requestService();
       if (!serviceEnabled) {
         return;
       }
     }
 
-    PermissionStatus permissionGranted = await location.hasPermission();
+    PermissionStatus permissionGranted = await _location.hasPermission();
     if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await location.requestPermission();
+      permissionGranted = await _location.requestPermission();
       if (permissionGranted != PermissionStatus.granted) {
         return;
       }
     }
 
-    location.changeSettings(accuracy: LocationAccuracy.high);
-    location.enableBackgroundMode(enable: true);
+    _location.changeSettings(accuracy: LocationAccuracy.high);
+    _location.enableBackgroundMode(enable: true);
     _locationSubscription =
-        location.onLocationChanged.listen(_onLocationUpdate);
+        _location.onLocationChanged.listen(_onLocationUpdate);
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
