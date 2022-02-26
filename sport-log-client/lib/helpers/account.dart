@@ -13,7 +13,7 @@ class Account {
     if (result.isSuccess) {
       Settings.user = user;
       await AppDatabase.open();
-      Sync.instance.startSync();
+      await Sync.instance.startSync();
       return Success(user);
     } else {
       return Failure(result.failure.toErrorMessage());
@@ -29,7 +29,7 @@ class Account {
       User user = result.success;
       Settings.user = user;
       await AppDatabase.open();
-      Sync.instance.startSync();
+      await Sync.instance.startSync();
       return Success(user);
     } else {
       return Failure(result.failure.toErrorMessage());

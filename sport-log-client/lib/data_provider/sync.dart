@@ -27,7 +27,7 @@ class Sync extends ChangeNotifier {
       Settings.lastSync = null;
     }
     if (Settings.userExists()) {
-      startSync();
+      await startSync();
     }
   }
 
@@ -95,14 +95,14 @@ class Sync extends ChangeNotifier {
     }
   }
 
-  void startSync() {
+  Future<void> startSync() async {
     assert(Settings.userExists());
     if (_syncTimer != null && _syncTimer!.isActive) {
       _logger.d('Sync already enabled.');
       return;
     }
     _logger.d('Starting sync timer.');
-    Future(() => sync());
+    await sync();
     _syncTimer = Timer.periodic(Settings.syncInterval, (_) => sync());
   }
 
