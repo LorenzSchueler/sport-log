@@ -107,7 +107,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   Future<bool> updateSingle(MetconDescription object) async {
     assert(object.isValid());
 
-    final oldMMovements = await _metconMovementDb.getByMetcon(object.id);
+    final oldMMovements = await _metconMovementDb.getByMetcon(object.metcon.id);
     final newMMovements = [...object.moves.map((m) => m.metconMovement)];
 
     final diffing = diff(oldMMovements, newMMovements);
@@ -123,7 +123,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
       handleApiError(result1.failure);
       return false;
     }
-    _metconDb.setSynchronized(object.id);
+    _metconDb.setSynchronized(object.metcon.id);
 
     for (final mm in diffing.toDelete) {
       mm.deleted = true;
@@ -139,7 +139,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
       handleApiError(result3.failure);
       return false;
     }
-    _metconMovementDb.setSynchronizedByMetcon(object.id);
+    _metconMovementDb.setSynchronizedByMetcon(object.metcon.id);
     return true;
   }
 

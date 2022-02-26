@@ -77,13 +77,13 @@ class StrengthSessionDescriptionDataProvider
       handleApiError(result1.failure);
       return false;
     }
-    _strengthSessionDb.setSynchronized(object.id);
+    _strengthSessionDb.setSynchronized(object.session.id);
     final result2 = await _strengthSetApi.postMultiple(object.sets);
     if (result2.isFailure) {
       handleApiError(result2.failure);
       return false;
     }
-    _strengthSetDb.setSynchronizedByStrengthSession(object.id);
+    _strengthSetDb.setSynchronizedByStrengthSession(object.session.id);
     return true;
   }
 
@@ -91,7 +91,8 @@ class StrengthSessionDescriptionDataProvider
   Future<bool> updateSingle(StrengthSessionDescription object) async {
     assert(object.isValid());
 
-    final oldSets = await _strengthSetDb.getByStrengthSession(object.id);
+    final oldSets =
+        await _strengthSetDb.getByStrengthSession(object.session.id);
     final newSets = [...object.sets];
 
     final diffing = diff(oldSets, newSets);
@@ -107,7 +108,7 @@ class StrengthSessionDescriptionDataProvider
       handleApiError(result1.failure);
       return false;
     }
-    _strengthSessionDb.setSynchronized(object.id);
+    _strengthSessionDb.setSynchronized(object.session.id);
 
     for (final ss in diffing.toDelete) {
       ss.deleted = true;
@@ -124,7 +125,7 @@ class StrengthSessionDescriptionDataProvider
       handleApiError(result3.failure);
       return false;
     }
-    _strengthSetDb.setSynchronizedByStrengthSession(object.id);
+    _strengthSetDb.setSynchronizedByStrengthSession(object.session.id);
     return true;
   }
 
@@ -132,8 +133,8 @@ class StrengthSessionDescriptionDataProvider
   Future<bool> deleteSingle(StrengthSessionDescription object) async {
     object.setDeleted();
     // TODO: catch errors
-    await _strengthSetDb.deleteByStrengthSession(object.id);
-    await _strengthSessionDb.deleteSingle(object.id);
+    await _strengthSetDb.deleteByStrengthSession(object.session.id);
+    await _strengthSessionDb.deleteSingle(object.session.id);
     notifyListeners();
     // TODO: server deletes strength sets automatically
     final result1 = await _strengthSetApi.putMultiple(object.sets);
@@ -141,13 +142,13 @@ class StrengthSessionDescriptionDataProvider
       handleApiError(result1.failure);
       return false;
     }
-    _strengthSetDb.setSynchronizedByStrengthSession(object.id);
+    _strengthSetDb.setSynchronizedByStrengthSession(object.session.id);
     final result2 = await _strengthSessionApi.putSingle(object.session);
     if (result2.isFailure) {
       handleApiError(result2.failure);
       return false;
     }
-    _strengthSessionDb.setSynchronized(object.id);
+    _strengthSessionDb.setSynchronized(object.session.id);
     return true;
   }
 

@@ -1,10 +1,14 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/metcon/metcon_session.dart';
 
-class MetconSessionDescription implements Validatable {
+part 'metcon_session_description.g.dart';
+
+@JsonSerializable()
+class MetconSessionDescription extends CompoundEntity {
   MetconSessionDescription({
     required this.metconSession,
     required this.metconDescription,
@@ -12,6 +16,12 @@ class MetconSessionDescription implements Validatable {
 
   MetconSession metconSession;
   MetconDescription metconDescription;
+
+  factory MetconSessionDescription.fromJson(Map<String, dynamic> json) =>
+      _$MetconSessionDescriptionFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$MetconSessionDescriptionToJson(this);
 
   @override
   bool isValid() {

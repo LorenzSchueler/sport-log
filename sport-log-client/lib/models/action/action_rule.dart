@@ -8,7 +8,7 @@ import 'package:sport_log/models/action/weekday.dart';
 part 'action_rule.g.dart';
 
 @JsonSerializable()
-class ActionRule extends Entity {
+class ActionRule extends AtomicEntity {
   ActionRule({
     required this.id,
     required this.userId,

@@ -10,7 +10,7 @@ import 'package:sport_log/models/movement/movement.dart';
 part 'strength_set.g.dart';
 
 @JsonSerializable()
-class StrengthSet extends Entity {
+class StrengthSet extends AtomicEntity {
   StrengthSet({
     required this.id,
     required this.strengthSessionId,

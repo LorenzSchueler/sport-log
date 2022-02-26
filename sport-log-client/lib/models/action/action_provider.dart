@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 part 'action_provider.g.dart';
 
 @JsonSerializable()
-class ActionProvider extends Entity {
+class ActionProvider extends AtomicEntity {
   ActionProvider({
     required this.id,
     required this.name,

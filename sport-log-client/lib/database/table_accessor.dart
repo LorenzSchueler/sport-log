@@ -6,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 
 export 'db_interfaces.dart';
 
-abstract class TableAccessor<T extends Entity> {
+abstract class TableAccessor<T extends AtomicEntity> {
   DbSerializer<T> get serde;
   Table get table;
 

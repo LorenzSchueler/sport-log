@@ -1,4 +1,5 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/id_generation.dart';
@@ -7,7 +8,10 @@ import 'package:sport_log/models/strength/strength_session.dart';
 import 'package:sport_log/models/strength/strength_session_stats.dart';
 import 'package:sport_log/models/strength/strength_set.dart';
 
-class StrengthSessionDescription implements Validatable, HasId {
+part 'strength_session_description.g.dart';
+
+@JsonSerializable()
+class StrengthSessionDescription extends CompoundEntity {
   StrengthSessionDescription({
     required this.session,
     required this.movement,
@@ -19,6 +23,12 @@ class StrengthSessionDescription implements Validatable, HasId {
   List<StrengthSet> sets;
   StrengthSessionStats get stats =>
       StrengthSessionStats.fromStrengthSets(session.datetime, sets);
+
+  factory StrengthSessionDescription.fromJson(Map<String, dynamic> json) =>
+      _$StrengthSessionDescriptionFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$StrengthSessionDescriptionToJson(this);
 
   @override
   bool isValid() {
@@ -51,9 +61,6 @@ class StrengthSessionDescription implements Validatable, HasId {
           'StrengthSessionDescription: movement is deleted',
         );
   }
-
-  @override
-  Int64 get id => session.id;
 
   void setDeleted() {
     session.deleted = true;

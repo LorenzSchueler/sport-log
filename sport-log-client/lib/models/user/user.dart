@@ -6,7 +6,7 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 part 'user.g.dart';
 
 @JsonSerializable()
-class User implements Validatable {
+class User extends NonDeletableAtomicEntity {
   User({
     required this.id,
     required this.username,
@@ -14,6 +14,7 @@ class User implements Validatable {
     required this.email,
   });
 
+  @override
   @IdConverter()
   Int64 id;
   String username;
@@ -22,6 +23,7 @@ class User implements Validatable {
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$UserToJson(this);
 
   @override

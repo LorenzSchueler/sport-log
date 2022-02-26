@@ -45,7 +45,7 @@ extension ToDisplayName on MetconType {
 }
 
 @JsonSerializable()
-class Metcon extends Entity {
+class Metcon extends AtomicEntity {
   Metcon({
     required this.id,
     required this.userId,

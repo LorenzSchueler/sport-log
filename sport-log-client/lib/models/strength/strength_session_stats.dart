@@ -1,3 +1,4 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
@@ -5,7 +6,10 @@ import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 
-class StrengthSessionStats {
+part 'strength_session_stats.g.dart';
+
+@JsonSerializable()
+class StrengthSessionStats extends JsonSerializable {
   DateTime datetime;
   int numSets;
   int minCount;
@@ -16,7 +20,7 @@ class StrengthSessionStats {
   double? sumVolume;
   double? maxWeight;
 
-  StrengthSessionStats._({
+  StrengthSessionStats({
     required this.datetime,
     required this.numSets,
     required this.minCount,
@@ -40,7 +44,7 @@ class StrengthSessionStats {
     double? sumVolume = sets.map((s) => s.volume).sum;
     double avgCount = sets.isEmpty ? 0 : sumCount / sets.length;
 
-    return StrengthSessionStats._(
+    return StrengthSessionStats(
       datetime: datetime,
       numSets: sets.length,
       minCount: minCount,
@@ -57,7 +61,7 @@ class StrengthSessionStats {
     final numSets = r[prefix + Columns.numSets]! as int;
     final sumCount = r[prefix + Columns.sumCount]! as int;
     double avgCount = numSets == 0 ? 0 : sumCount / numSets;
-    return StrengthSessionStats._(
+    return StrengthSessionStats(
       datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
       numSets: numSets,
       minCount: r[prefix + Columns.minCount]! as int,
@@ -70,20 +74,11 @@ class StrengthSessionStats {
     );
   }
 
-  // this is only for debugging/pretty-printing
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      Columns.datetime: datetime,
-      Columns.numSets: numSets,
-      Columns.minCount: minCount,
-      Columns.maxCount: maxCount,
-      Columns.sumCount: sumCount,
-      Columns.avgCount: avgCount,
-      Columns.maxEorm: maxEorm,
-      Columns.maxWeight: maxWeight,
-      Columns.sumVolume: sumVolume,
-    };
-  }
+  factory StrengthSessionStats.fromJson(Map<String, dynamic> json) =>
+      _$StrengthSessionStatsFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$StrengthSessionStatsToJson(this);
 
   String toDisplayName(MovementDimension dimension) {
     switch (dimension) {

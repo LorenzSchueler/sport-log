@@ -1,22 +1,28 @@
-import 'package:fixnum/fixnum.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
-class MovementDescription implements Validatable, HasId {
+part 'movement_description.g.dart';
+
+@JsonSerializable()
+class MovementDescription extends CompoundEntity {
   MovementDescription({
     required this.movement,
     required this.hasReference,
   });
 
+  Movement movement;
+  bool hasReference;
+
   MovementDescription.defaultValue()
       : movement = Movement.defaultValue(),
         hasReference = false;
 
-  Movement movement;
-  bool hasReference;
+  factory MovementDescription.fromJson(Map<String, dynamic> json) =>
+      _$MovementDescriptionFromJson(json);
 
-  static bool areTheSame(MovementDescription m1, MovementDescription m2) =>
-      m1.movement.id == m2.movement.id;
+  @override
+  Map<String, dynamic> toJson() => _$MovementDescriptionToJson(this);
 
   @override
   bool isValid() {
@@ -25,9 +31,6 @@ class MovementDescription implements Validatable, HasId {
       'MovementDescription: movement is not valid',
     );
   }
-
-  @override
-  Int64 get id => movement.id;
 
   MovementDescription copy() => MovementDescription(
         movement: movement.copy(),
@@ -42,4 +45,7 @@ class MovementDescription implements Validatable, HasId {
 
   @override
   int get hashCode => Object.hash(hasReference, movement);
+
+  static bool areTheSame(MovementDescription m1, MovementDescription m2) =>
+      m1.movement.id == m2.movement.id;
 }

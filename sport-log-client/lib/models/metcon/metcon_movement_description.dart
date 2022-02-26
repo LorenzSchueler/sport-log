@@ -1,8 +1,12 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
-class MetconMovementDescription implements Validatable {
+part 'metcon_movement_description.g.dart';
+
+@JsonSerializable()
+class MetconMovementDescription extends CompoundEntity {
   MetconMovementDescription({
     required this.metconMovement,
     required this.movement,
@@ -10,6 +14,12 @@ class MetconMovementDescription implements Validatable {
 
   MetconMovement metconMovement;
   Movement movement;
+
+  factory MetconMovementDescription.fromJson(Map<String, dynamic> json) =>
+      _$MetconMovementDescriptionFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$MetconMovementDescriptionToJson(this);
 
   @override
   bool isValid() {

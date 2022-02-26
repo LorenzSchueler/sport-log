@@ -8,7 +8,7 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 part 'strength_session.g.dart';
 
 @JsonSerializable()
-class StrengthSession extends Entity {
+class StrengthSession extends AtomicEntity {
   StrengthSession({
     required this.id,
     required this.userId,

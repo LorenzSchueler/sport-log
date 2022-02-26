@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 part 'platform_credential.g.dart';
 
 @JsonSerializable()
-class PlatformCredential extends Entity {
+class PlatformCredential extends AtomicEntity {
   PlatformCredential({
     required this.id,
     required this.userId,

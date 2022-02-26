@@ -201,8 +201,10 @@ class StrengthSessionCardWithMovement extends StatelessWidget {
         title: Text(
           '${strengthSessionDescription.session.datetime.toHumanWithTime()} • ${strengthSessionDescription.stats.numSets} ${plural('set', 'sets', strengthSessionDescription.stats.numSets)}',
         ),
-        subtitle: Text(strengthSessionDescription.stats
-            .toDisplayName(strengthSessionDescription.movement.dimension)),
+        subtitle: Text(
+          strengthSessionDescription.stats
+              .toDisplayName(strengthSessionDescription.movement.dimension),
+        ),
         onTap: () => Navigator.pushNamed(
           context,
           Routes.strength.details,

@@ -6,5 +6,5 @@ export 'metcon/all.dart';
 export 'movement/all.dart';
 export 'platform/all.dart';
 export 'strength/all.dart';
-export 'user/all.dart';
-export 'wod/all.dart';
+export 'user/user.dart';
+export 'wod/wod.dart';

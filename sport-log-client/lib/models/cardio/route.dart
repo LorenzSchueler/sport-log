@@ -13,7 +13,7 @@ import 'package:sport_log/settings.dart';
 part 'route.g.dart';
 
 @JsonSerializable()
-class Route extends Entity with Comparable<Route> {
+class Route extends AtomicEntity with Comparable<Route> {
   Route({
     required this.id,
     required this.userId,

@@ -56,24 +56,25 @@ class AboutPage extends StatelessWidget {
               ),
             ),
             TextTile(
-                leading: AppIcons.contributors,
-                caption: "Contributors",
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ..._Contributor.all.map(
-                      (c) => GestureDetector(
-                        child: Text(
-                          c.name,
-                          style: const TextStyle(
-                            decoration: TextDecoration.underline,
-                          ),
+              leading: AppIcons.contributors,
+              caption: "Contributors",
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ..._Contributor.all.map(
+                    (c) => GestureDetector(
+                      child: Text(
+                        c.name,
+                        style: const TextStyle(
+                          decoration: TextDecoration.underline,
                         ),
-                        onTap: () => launch(c.github),
                       ),
-                    )
-                  ],
-                )),
+                      onTap: () => launch(c.github),
+                    ),
+                  )
+                ],
+              ),
+            ),
           ],
         ),
       ),

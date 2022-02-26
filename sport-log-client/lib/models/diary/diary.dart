@@ -9,7 +9,7 @@ import 'package:sport_log/settings.dart';
 part 'diary.g.dart';
 
 @JsonSerializable()
-class Diary extends Entity {
+class Diary extends AtomicEntity {
   Diary({
     required this.id,
     required this.userId,

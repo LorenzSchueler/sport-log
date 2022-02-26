@@ -1,9 +1,13 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/models/metcon/all.dart';
 
-class MetconDescription implements Validatable {
+part 'metcon_description.g.dart';
+
+@JsonSerializable()
+class MetconDescription extends CompoundEntity {
   MetconDescription({
     required this.metcon,
     required this.moves,
@@ -22,6 +26,12 @@ class MetconDescription implements Validatable {
       : metcon = Metcon.defaultValue(userId),
         moves = [],
         hasReference = false;
+
+  factory MetconDescription.fromJson(Map<String, dynamic> json) =>
+      _$MetconDescriptionFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$MetconDescriptionToJson(this);
 
   @override
   bool isValid() {
@@ -52,6 +62,4 @@ class MetconDescription implements Validatable {
       move.metconMovement.deleted = true;
     }
   }
-
-  Int64 get id => metcon.id;
 }

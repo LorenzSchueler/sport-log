@@ -38,7 +38,7 @@ extension DisplayName on DistanceUnit {
 }
 
 @JsonSerializable()
-class MetconMovement extends Entity {
+class MetconMovement extends AtomicEntity {
   MetconMovement({
     required this.id,
     required this.metconId,

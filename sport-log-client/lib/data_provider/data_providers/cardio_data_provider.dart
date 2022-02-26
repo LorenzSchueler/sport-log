@@ -4,7 +4,7 @@ import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
-import 'package:sport_log/models/account_data/all.dart';
+import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 

@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 part 'metcon_session.g.dart';
 
 @JsonSerializable()
-class MetconSession extends Entity {
+class MetconSession extends AtomicEntity {
   // JsonConvertable<MetconSession> {
   MetconSession({
     required this.id,

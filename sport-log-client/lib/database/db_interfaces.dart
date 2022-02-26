@@ -17,7 +17,21 @@ enum SyncStatus {
   created,
 }
 
-abstract class Entity extends JsonSerializable implements Validatable, HasId {
+abstract class HasId {
+  Int64 get id;
+}
+
+abstract class Validatable {
+  bool isValid();
+}
+
+abstract class Entity extends JsonSerializable implements Validatable {}
+
+abstract class CompoundEntity extends Entity {}
+
+abstract class NonDeletableAtomicEntity extends Entity implements HasId {}
+
+abstract class AtomicEntity extends NonDeletableAtomicEntity {
   bool get deleted;
 
   set deleted(bool deleted);
@@ -33,12 +47,4 @@ abstract class DbSerializer<T> {
         ? null
         : fromDbRecord(r, prefix: prefix);
   }
-}
-
-abstract class HasId {
-  Int64 get id;
-}
-
-abstract class Validatable {
-  bool isValid();
 }

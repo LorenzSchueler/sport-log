@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 part 'wod.g.dart';
 
 @JsonSerializable()
-class Wod extends Entity {
+class Wod extends AtomicEntity {
   Wod({
     required this.id,
     required this.userId,

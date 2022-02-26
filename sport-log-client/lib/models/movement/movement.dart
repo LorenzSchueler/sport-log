@@ -50,7 +50,7 @@ extension MovementDimensionStrings on MovementDimension {
 }
 
 @JsonSerializable()
-class Movement extends Entity {
+class Movement extends AtomicEntity {
   Movement({
     required this.id,
     required this.userId,

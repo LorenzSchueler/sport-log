@@ -1,6 +1,6 @@
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
-import 'package:sport_log/models/wod/all.dart';
+import 'package:sport_log/models/wod/wod.dart';
 
 class WodTable extends TableAccessor<Wod> {
   @override

@@ -22,7 +22,7 @@ enum CardioType {
 }
 
 @JsonSerializable()
-class CardioSession extends Entity {
+class CardioSession extends AtomicEntity {
   CardioSession({
     required this.id,
     required this.userId,
@@ -79,6 +79,12 @@ class CardioSession extends Entity {
         cardioType = CardioType.training,
         datetime = DateTime.now(),
         deleted = false;
+
+  void setAvgCadenceFromCadenceAndTime() {
+    avgCadence = time!.inSeconds == 0
+        ? 0
+        : (cadence!.length / time!.inSeconds * 60).round();
+  }
 
   factory CardioSession.fromJson(Map<String, dynamic> json) =>
       _$CardioSessionFromJson(json);

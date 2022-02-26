@@ -55,7 +55,8 @@ abstract class DataProvider<T> extends ChangeNotifier {
   }
 }
 
-abstract class EntityDataProvider<T extends Entity> extends DataProvider<T> {
+abstract class EntityDataProvider<T extends AtomicEntity>
+    extends DataProvider<T> {
   Api<T> get api;
 
   TableAccessor<T> get db;

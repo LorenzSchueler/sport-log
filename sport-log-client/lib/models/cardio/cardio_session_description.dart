@@ -1,9 +1,12 @@
-import 'package:fixnum/fixnum.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
-class CardioSessionDescription implements Validatable, HasId {
+part 'cardio_session_description.g.dart';
+
+@JsonSerializable()
+class CardioSessionDescription extends CompoundEntity {
   CardioSessionDescription({
     required this.cardioSession,
     required this.route,
@@ -22,6 +25,12 @@ class CardioSessionDescription implements Validatable, HasId {
       movement: movement,
     );
   }
+
+  factory CardioSessionDescription.fromJson(Map<String, dynamic> json) =>
+      _$CardioSessionDescriptionFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$CardioSessionDescriptionToJson(this);
 
   @override
   bool isValid() {
@@ -50,7 +59,4 @@ class CardioSessionDescription implements Validatable, HasId {
           'CardioSessionDescription: movement id mismatch',
         );
   }
-
-  @override
-  Int64 get id => cardioSession.id;
 }
