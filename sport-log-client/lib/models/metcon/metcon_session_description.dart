@@ -88,14 +88,14 @@ class MetconSessionDescription extends CompoundEntity {
       case MetconType.amrap:
         return "${metconSession.rounds} rounds + ${metconSession.reps} reps";
       case MetconType.emom:
-        return "${metconDescription.metcon.rounds!} * ${(metconDescription.metcon.timecap!.inMinutes / metconDescription.metcon.rounds!).round()} min";
+        return "${metconDescription.metcon.rounds!} * ${metconDescription.metcon.timecap!.inSeconds / metconDescription.metcon.rounds!}s";
       case MetconType.forTime:
         if (short) {
-          return metconSession.rounds == metconDescription.metcon.rounds
+          return metconSession.time != null
               ? "${metconSession.time?.formatTimeShort} min"
               : "${metconSession.rounds} rounds + ${metconSession.reps} reps";
         } else {
-          return metconSession.rounds == metconDescription.metcon.rounds
+          return metconSession.time != null
               ? "${metconSession.time?.formatTimeShort} min (${Duration(seconds: metconDescription.metcon.timecap!.inSeconds).formatTimeShort} min)"
               : "${metconSession.rounds} rounds + ${metconSession.reps} reps (${metconDescription.metcon.rounds} rounds)";
         }
