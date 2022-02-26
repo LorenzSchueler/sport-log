@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:logger/logger.dart' as l;
 
@@ -17,15 +19,13 @@ abstract class Config {
   static late final bool outputDbStatement;
 
   static Future<void> init() async {
-    const deleteDatabaseEnvVar =
-        String.fromEnvironment('DELETE_DATABASE', defaultValue: 'false');
-    deleteDatabase = deleteDatabaseEnvVar.toLowerCase() == 'true';
+    deleteDatabase =
+        (dotenv.env['DELETE_DATABASE'] ?? "").parseBool(defaultValue: false);
 
-    const generateTestDataEnvVar =
-        String.fromEnvironment('GENERATE_TEST_DATA', defaultValue: 'false');
-    generateTestData = generateTestDataEnvVar.toLowerCase() == 'true';
+    generateTestData =
+        (dotenv.env['GENERATE_TEST_DATA'] ?? "").parseBool(defaultValue: false);
 
-    const logLevelStr = String.fromEnvironment('LOG_LEVEL', defaultValue: '');
+    final logLevelStr = dotenv.env['LOG_LEVEL'] ?? '';
     switch (logLevelStr.toUpperCase()) {
       case 'VERBOSE':
         minLogLevel = l.Level.verbose;
@@ -52,21 +52,17 @@ abstract class Config {
         minLogLevel = l.Level.debug;
     }
 
-    const _outputRequestJsonStr =
-        String.fromEnvironment('OUTPUT_REQUEST_JSON', defaultValue: 'false');
-    outputRequestJson = _outputRequestJsonStr.toLowerCase() == 'true';
+    outputRequestJson = (dotenv.env['OUTPUT_REQUEST_JSON'] ?? "")
+        .parseBool(defaultValue: false);
 
-    const _outputRequestHeadersStr =
-        String.fromEnvironment('OUTPUT_REQUEST_HEADERS', defaultValue: 'false');
-    outputRequestHeaders = _outputRequestHeadersStr.toLowerCase() == 'true';
+    outputRequestHeaders = (dotenv.env['OUTPUT_REQUEST_HEADERS'] ?? "")
+        .parseBool(defaultValue: false);
 
-    const _outputResponseJsonStr =
-        String.fromEnvironment('OUTPUT_RESPONSE_JSON', defaultValue: 'false');
-    outputResponseJson = _outputResponseJsonStr.toLowerCase() == 'true';
+    outputResponseJson = (dotenv.env['OUTPUT_RESPONSE_JSON'] ?? "")
+        .parseBool(defaultValue: false);
 
-    const outputDbStatementStr =
-        String.fromEnvironment('OUTPUT_DB_STATEMENT', defaultValue: 'false');
-    outputDbStatement = outputDbStatementStr.toLowerCase() == 'true';
+    outputDbStatement = (dotenv.env['OUTPUT_DB_STATEMENT'] ?? "")
+        .parseBool(defaultValue: false);
 
     _logger.i('Delete database: $deleteDatabase');
     _logger.i('Generate test data: $generateTestData');

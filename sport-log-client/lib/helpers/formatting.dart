@@ -105,3 +105,16 @@ String formatCountWeight(MovementDimension dim, int count, double? weight) {
       return weight != null ? result + ' (${roundedWeight(weight)})' : result;
   }
 }
+
+extension BoolParsing on String {
+  bool parseBool({required bool defaultValue}) {
+    switch (toLowerCase()) {
+      case "true":
+        return true;
+      case "false":
+        return false;
+      default:
+        return defaultValue;
+    }
+  }
+}

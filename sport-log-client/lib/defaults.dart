@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 
 abstract class Defaults {
   static const sizedBox = _SizedBox();
   static const borderRadius = _BorderRadius();
   static const mapbox = _Mapbox();
-  static const server = _Server();
+  static final server = _Server();
 }
 
 class _Server {
-  const _Server();
+  _Server();
 
   static const _defaultUrl = "127.0.0.1";
   final emulatorUrl = 'http://10.0.2.2:8000';
-  final url = "http://" +
-      const String.fromEnvironment('SERVER_ADDRESS', defaultValue: _defaultUrl);
+  final url = "http://" + (dotenv.env['SERVER_ADDRESS'] ?? _defaultUrl);
 }
 
 class _SizedBox {
@@ -72,8 +72,8 @@ class _Mapbox {
   static String? _accessToken;
   String get accessToken {
     if (_accessToken == null) {
-      String token = const String.fromEnvironment("ACCESS_TOKEN");
-      if (token.isEmpty) {
+      String? token = dotenv.env['ACCESS_TOKEN'];
+      if (token == null) {
         throw Exception(
           "please supply mapbox access token using --dart-define ACCESS_TOKEN=<token>",
         );

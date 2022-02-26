@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
@@ -20,6 +21,7 @@ import 'package:provider/provider.dart';
 final _logger = Logger('Main');
 
 Stream<double> initialize() async* {
+  await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized(); // TODO: necessary?
   yield 0.1;
   Defaults.mapbox.accessToken; // make sure access token is available
