@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -11,7 +14,8 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/theme.dart';
-import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/metcon/all.dart';
+import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/login/landing_page.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/test_data/movement_test_data.dart';
@@ -21,8 +25,12 @@ import 'package:provider/provider.dart';
 final _logger = Logger('Main');
 
 Stream<double> initialize() async* {
-  await dotenv.load();
-  WidgetsFlutterBinding.ensureInitialized(); // TODO: necessary?
+  WidgetsFlutterBinding.ensureInitialized();
+  if (Config.isTest) {
+    dotenv.testLoad(fileInput: File("./.env").readAsStringSync());
+  } else {
+    await dotenv.load();
+  }
   yield 0.1;
   Defaults.mapbox.accessToken; // make sure access token is available
   yield 0.2;
@@ -45,7 +53,8 @@ Stream<double> initialize() async* {
   if (movements.isEmpty) {
     _logger.w("creating new default movement");
     final Movement movement = Movement.defaultValue()
-      ..name = "Default Movement";
+      ..name = "Default Movement"
+      ..userId = Int64(1); // FIXME
     await MovementDataProvider.instance.createSingle(movement);
     Movement.defaultMovement = movement;
   } else {
@@ -56,7 +65,8 @@ Stream<double> initialize() async* {
   if (metconDescriptions.isEmpty) {
     _logger.w("creating new default metcon description");
     final MetconDescription metconDescription = MetconDescription.defaultValue()
-      ..metcon.name = "Default Metcon Description";
+      ..metcon.name = "Default Metcon Description"
+      ..metcon.userId = Int64(1); // FIXME
     await MetconDescriptionDataProvider.instance
         .createSingle(metconDescription);
     MetconDescription.defaultMetconDescription = metconDescription;

@@ -1,8 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
-import 'package:sport_log/models/entity_interfaces.dart';
-import 'package:sport_log/models/metcon/all.dart';
+import 'package:sport_log/models/all.dart';
 
 part 'metcon_description.g.dart';
 
@@ -22,10 +21,24 @@ class MetconDescription extends CompoundEntity {
     return metcon.name ?? moves.map((e) => e.movement.name).join(" & ");
   }
 
-  MetconDescription.defaultValue()
-      : metcon = Metcon.defaultValue(),
-        moves = [],
-        hasReference = false;
+  static MetconDescription defaultValue() {
+    final metcon = Metcon.defaultValue();
+    final movement = Movement.defaultMovement;
+    return MetconDescription(
+      metcon: metcon,
+      moves: [
+        MetconMovementDescription(
+          metconMovement: MetconMovement.defaultValue(
+            metconId: metcon.id,
+            movementId: movement.id,
+            movementNumber: 0,
+          ),
+          movement: movement,
+        )
+      ],
+      hasReference: false,
+    );
+  }
 
   static late MetconDescription
       defaultMetconDescription; // must be initialized in main::initialize

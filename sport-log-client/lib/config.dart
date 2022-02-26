@@ -73,6 +73,8 @@ abstract class Config {
     _logger.i('Output db statement: $outputDbStatement');
   }
 
+  static bool get isTest => Platform.environment.containsKey('FLUTTER_TEST');
+
   static bool get isWeb => kIsWeb;
   // Workaround for Platform.XXX not being supported on web
   static bool get isAndroid => !isWeb && Platform.isAndroid;
