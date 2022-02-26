@@ -12,7 +12,8 @@ StrengthSession _$StrengthSessionFromJson(Map<String, dynamic> json) =>
       userId: const IdConverter().fromJson(json['user_id'] as String),
       datetime: const DateTimeConverter().fromJson(json['datetime'] as String),
       movementId: const IdConverter().fromJson(json['movement_id'] as String),
-      interval: const DurationConverter().fromJson(json['interval'] as int?),
+      interval:
+          const OptionalDurationConverter().fromJson(json['interval'] as int?),
       comments: json['comments'] as String?,
       deleted: json['deleted'] as bool,
     )..strengthBlueprintId = const OptionalIdConverter()
@@ -26,7 +27,7 @@ Map<String, dynamic> _$StrengthSessionToJson(StrengthSession instance) =>
       'user_id': const IdConverter().toJson(instance.userId),
       'datetime': const DateTimeConverter().toJson(instance.datetime),
       'movement_id': const IdConverter().toJson(instance.movementId),
-      'interval': const DurationConverter().toJson(instance.interval),
+      'interval': const OptionalDurationConverter().toJson(instance.interval),
       'comments': instance.comments,
       'deleted': instance.deleted,
     };

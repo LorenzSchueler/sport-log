@@ -31,7 +31,7 @@ class StrengthSession extends AtomicEntity {
   DateTime datetime;
   @IdConverter()
   Int64 movementId;
-  @DurationConverter()
+  @OptionalDurationConverter()
   Duration? interval;
   String? comments;
   @override

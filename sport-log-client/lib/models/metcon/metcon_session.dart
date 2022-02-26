@@ -32,7 +32,7 @@ class MetconSession extends AtomicEntity {
   Int64 metconId;
   @DateTimeConverter()
   DateTime datetime;
-  @DurationConverter()
+  @OptionalDurationConverter()
   Duration? time;
   int? rounds;
   int? reps;

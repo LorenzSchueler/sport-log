@@ -66,7 +66,7 @@ class Metcon extends AtomicEntity {
   String? name;
   MetconType metconType;
   int? rounds;
-  @DurationConverter()
+  @OptionalDurationConverter()
   Duration? timecap;
   String? description;
   @override

@@ -60,7 +60,7 @@ class CardioSession extends AtomicEntity {
   int? distance;
   int? ascent;
   int? descent;
-  @DurationConverter()
+  @OptionalDurationConverter()
   Duration? time;
   int? calories;
   List<Position>? track;

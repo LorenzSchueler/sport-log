@@ -16,7 +16,7 @@ CardioSession _$CardioSessionFromJson(Map<String, dynamic> json) =>
       distance: json['distance'] as int?,
       ascent: json['ascent'] as int?,
       descent: json['descent'] as int?,
-      time: const DurationConverter().fromJson(json['time'] as int?),
+      time: const OptionalDurationConverter().fromJson(json['time'] as int?),
       calories: json['calories'] as int?,
       track: (json['track'] as List<dynamic>?)
           ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
@@ -48,7 +48,7 @@ Map<String, dynamic> _$CardioSessionToJson(CardioSession instance) =>
       'distance': instance.distance,
       'ascent': instance.ascent,
       'descent': instance.descent,
-      'time': const DurationConverter().toJson(instance.time),
+      'time': const OptionalDurationConverter().toJson(instance.time),
       'calories': instance.calories,
       'track': instance.track,
       'avg_cadence': instance.avgCadence,

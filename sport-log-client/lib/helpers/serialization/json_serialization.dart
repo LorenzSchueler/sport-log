@@ -59,8 +59,22 @@ class DateTimeConverter extends JsonConverter<DateTime, String> {
   }
 }
 
-class DurationConverter extends JsonConverter<Duration?, int?> {
+class DurationConverter extends JsonConverter<Duration, int> {
   const DurationConverter() : super();
+
+  @override
+  Duration fromJson(int json) {
+    return Duration(seconds: json);
+  }
+
+  @override
+  int toJson(Duration object) {
+    return object.inSeconds;
+  }
+}
+
+class OptionalDurationConverter extends JsonConverter<Duration?, int?> {
+  const OptionalDurationConverter() : super();
 
   @override
   Duration? fromJson(int? json) {
