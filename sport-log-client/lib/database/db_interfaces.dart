@@ -1,7 +1,4 @@
-import 'package:fixnum/fixnum.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/table.dart';
-
 export 'package:sport_log/helpers/validation.dart';
 
 typedef DbRecord = Map<String, Object?>;
@@ -15,26 +12,6 @@ enum SyncStatus {
   synchronized,
   updated,
   created,
-}
-
-abstract class HasId {
-  Int64 get id;
-}
-
-abstract class Validatable {
-  bool isValid();
-}
-
-abstract class Entity extends JsonSerializable implements Validatable {}
-
-abstract class CompoundEntity extends Entity {}
-
-abstract class NonDeletableAtomicEntity extends Entity implements HasId {}
-
-abstract class AtomicEntity extends NonDeletableAtomicEntity {
-  bool get deleted;
-
-  set deleted(bool deleted);
 }
 
 abstract class DbSerializer<T> {

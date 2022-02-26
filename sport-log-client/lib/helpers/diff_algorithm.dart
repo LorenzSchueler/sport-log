@@ -1,4 +1,4 @@
-import 'package:sport_log/database/db_interfaces.dart';
+import 'package:sport_log/models/entity_interfaces.dart';
 
 class Diffing<T> {
   List<T> toDelete = [];

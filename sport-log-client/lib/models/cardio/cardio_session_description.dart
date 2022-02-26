@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/models/cardio/all.dart';
+import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
 part 'cardio_session_description.g.dart';

@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/metcon/metcon_session.dart';

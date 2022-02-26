@@ -4,6 +4,7 @@ import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/models/entity_interfaces.dart';
 
 part 'strength_session.g.dart';
 

@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
+import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/models/metcon/all.dart';
 
 part 'metcon_description.g.dart';
