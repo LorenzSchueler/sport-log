@@ -50,7 +50,7 @@ extension IterableNum<T extends num> on Iterable<T> {
   T get sum => isEmpty ? 0 as T : reduce((a, b) => a + b as T);
 }
 
-extension IterableNumNullable<T extends num> on Iterable<T?> {
+extension IterableNumOptional<T extends num> on Iterable<T?> {
   T? get max => isEmpty
       ? null
       : reduce((a, b) {

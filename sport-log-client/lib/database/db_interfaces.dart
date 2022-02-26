@@ -19,7 +19,7 @@ abstract class DbSerializer<T> {
 
   T fromDbRecord(DbRecord r, {String prefix = ''});
 
-  T? fromDbRecordNullable(DbRecord r, {String prefix = ''}) {
+  T? fromOptionalDbRecord(DbRecord r, {String prefix = ''}) {
     return r[prefix + Columns.id] == null
         ? null
         : fromDbRecord(r, prefix: prefix);

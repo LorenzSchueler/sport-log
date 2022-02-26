@@ -100,7 +100,7 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
         CardioSessionDescription(
           cardioSession: serde.fromDbRecord(record, prefix: table.prefix),
           route: _routeTable.serde
-              .fromDbRecordNullable(record, prefix: _routeTable.table.prefix),
+              .fromOptionalDbRecord(record, prefix: _routeTable.table.prefix),
           movement: _movementTable.serde
               .fromDbRecord(record, prefix: _movementTable.table.prefix),
         ),
