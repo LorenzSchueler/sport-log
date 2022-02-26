@@ -17,7 +17,7 @@ import 'package:sport_log/test_data/movement_test_data.dart';
 import 'package:sport_log/test_data/strength_test_data.dart';
 import 'package:provider/provider.dart';
 
-final _logger = Logger('MAIN');
+final _logger = Logger('Main');
 
 Stream<double> initialize() async* {
   WidgetsFlutterBinding.ensureInitialized(); // TODO: necessary?
@@ -41,6 +41,7 @@ Stream<double> initialize() async* {
   // TODO solve this in another way if no movements in db
   final movements = await MovementDataProvider.instance.getNonDeleted();
   if (movements.isEmpty) {
+    _logger.w("creating new default movement");
     final Movement movement = Movement.defaultValue()
       ..name = "Default Movement";
     await MovementDataProvider.instance.createSingle(movement);
@@ -51,8 +52,9 @@ Stream<double> initialize() async* {
   final metconDescriptions =
       await MetconDescriptionDataProvider.instance.getNonDeleted();
   if (metconDescriptions.isEmpty) {
+    _logger.w("creating new default metcon description");
     final MetconDescription metconDescription = MetconDescription.defaultValue()
-      ..metcon.name = "Default Movement";
+      ..metcon.name = "Default Metcon Description";
     await MetconDescriptionDataProvider.instance
         .createSingle(metconDescription);
     MetconDescription.defaultMetconDescription = metconDescription;

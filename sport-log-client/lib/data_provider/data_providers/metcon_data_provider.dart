@@ -5,6 +5,7 @@ import 'package:sport_log/data_provider/data_providers/movement_data_provider.da
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/metcon/all.dart';
 
@@ -360,8 +361,8 @@ class MetconSessionDescriptionDataProvider
           .map(
             (session) async => MetconSessionDescription(
               metconSession: session,
-              metconDescription:
-                  (await _metconDescriptionDataProvider.getById(session.id))!,
+              metconDescription: (await _metconDescriptionDataProvider
+                  .getById(session.metconId))!,
             ),
           )
           .toList(),
