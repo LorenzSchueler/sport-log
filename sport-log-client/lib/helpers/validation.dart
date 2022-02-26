@@ -89,7 +89,7 @@ class Validator {
 
   static String? validateStringNotEmpty(String? value) {
     if (value != null && value.isEmpty) {
-      return "the field must not be empty";
+      return "please fill out the field";
     } else {
       return null;
     }
@@ -102,6 +102,42 @@ class Validator {
       return "please enter a valid number";
     } else if (intValue <= 0) {
       return "please enter a number greater than 0";
+    } else {
+      return null;
+    }
+  }
+
+  static String? validateIntGeZero(String? value) {
+    if (value == null) return null;
+    int? intValue = int.tryParse(value);
+    if (intValue == null) {
+      return "please enter a valid number";
+    } else if (intValue < 0) {
+      return "please enter a number greater or equal than 0";
+    } else {
+      return null;
+    }
+  }
+
+  static String? validateIntGeZeroLtValue(String? value, int upperBound) {
+    if (value == null) return null;
+    final validated = Validator.validateIntGeZero(value);
+    if (validated != null) return validated;
+    final intValue = int.parse(value);
+    if (intValue >= upperBound) {
+      return "please enter a number between 0 and $upperBound";
+    } else {
+      return null;
+    }
+  }
+
+  static String? validateIntGeZeroLeValue(String? value, int upperBound) {
+    if (value == null) return null;
+    final validated = Validator.validateIntGeZero(value);
+    if (validated != null) return validated;
+    final intValue = int.parse(value);
+    if (intValue > upperBound) {
+      return "please enter a number between 0 and $upperBound";
     } else {
       return null;
     }

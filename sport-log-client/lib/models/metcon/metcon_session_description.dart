@@ -34,6 +34,44 @@ class MetconSessionDescription extends CompoundEntity {
 
   @override
   bool isValid() {
+    bool metconMetconDescriptionChecks;
+    switch (metconDescription.metcon.metconType) {
+      case MetconType.amrap:
+        metconMetconDescriptionChecks = validate(
+              metconSession.time == null,
+              'MetconSessionDescription: time != null although amrap',
+            ) &&
+            validate(
+              metconSession.rounds != null,
+              'MetconSessionDescription: rounds != null although amrap',
+            ) &&
+            validate(
+              metconSession.reps != null,
+              'MetconSessionDescription: reps != null although amrap',
+            );
+        break;
+      case MetconType.emom:
+        metconMetconDescriptionChecks = validate(
+              metconSession.time == null,
+              'MetconSessionDescription: time != null although amrap',
+            ) &&
+            validate(
+              metconSession.rounds == null,
+              'MetconSessionDescription: rounds != null although amrap',
+            ) &&
+            validate(
+              metconSession.reps == null,
+              'MetconSessionDescription: reps != null although amrap',
+            );
+        break;
+      case MetconType.forTime:
+        metconMetconDescriptionChecks = validate(
+          metconSession.time == null ||
+              metconSession.rounds == null && metconSession.reps == null,
+          'MetconSessionDescription: for "for time" either time or rounds and reps must be null',
+        );
+        break;
+    }
     return validate(
           metconDescription.isValid(),
           'MetconSessionDescription: metcon description not valid',
@@ -41,7 +79,8 @@ class MetconSessionDescription extends CompoundEntity {
         validate(
           metconSession.metconId == metconDescription.metcon.id,
           'MetconSessionDescription: metcon id mismatch',
-        );
+        ) &&
+        metconMetconDescriptionChecks;
   }
 
   String _resultDescription(bool short) {
