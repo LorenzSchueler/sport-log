@@ -54,8 +54,7 @@ class DateTimeConverter extends JsonConverter<DateTime, String> {
 
   @override
   String toJson(DateTime object) {
-    // FIXME
-    return object.toIso8601String() + '+00:00';
+    return object.toUtc().toIso8601String();
   }
 }
 
