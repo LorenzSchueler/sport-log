@@ -30,6 +30,7 @@ linter:
     # prefer_double_quotes: true
     require_trailing_commas: true
     unnecessary_parenthesis: true
+    cancel_subscriptions: true
 
 analyzer:
   exclude:
