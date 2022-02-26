@@ -222,9 +222,7 @@ satelites:  ${location.satelliteNumber}""";
           longitude: location.longitude!,
           elevation: location.altitude!.toInt(),
           distance: 0,
-          time: DateTime.now().difference(
-            DateTime.fromMicrosecondsSinceEpoch(location.time!.toInt()),
-          ),
+          time: _cardioSessionDescription.cardioSession.time!,
         ),
       );
       _extendLine(_mapController, latLng);
