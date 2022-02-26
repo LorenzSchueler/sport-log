@@ -57,16 +57,16 @@ create unique index metcon_movement_idx on metcon_movement (metcon_id, movement_
 create trigger set_timestamp before update on metcon_movement
     for each row execute procedure trigger_set_timestamp();
 
-insert into metcon_movement (id, metcon_id, movement_id, movement_number, count, weight) values
-    (1, 1, 10, 1, 5, null),
-    (2, 1, 11, 2, 10, null),
-    (3, 1, 12, 3, 15, null),
-    (4, 2, 5, 1, 1, 9),
-    (5, 2, 10, 2, 100, 9),
-    (6, 2, 11, 3, 200, 9),
-    (7, 2, 12, 4, 300, 9),
-    (8, 2, 5, 5, 1, 9),
-    (9, 3, 8, 5, 1, null);
+insert into metcon_movement (id, metcon_id, movement_id, distance_unit, movement_number, count, weight) values
+    (1, 1, 10, null, 1, 5, null),
+    (2, 1, 11, null, 2, 10, null),
+    (3, 1, 12, null, 3, 15, null),
+    (4, 2, 5, null, 1, 1, 9),
+    (5, 2, 10, null, 2, 100, 9),
+    (6, 2, 11, null, 3, 200, 9),
+    (7, 2, 12, null, 4, 300, 9),
+    (8, 2, 5, null, 5, 1, 9),
+    (9, 3, 8, null, 1, 5, null);
 
 create table metcon_movement_archive (
     primary key (id),
