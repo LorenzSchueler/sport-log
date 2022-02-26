@@ -203,8 +203,7 @@ async fn map_match() -> Result<()> {
 
             let cardio_session_id: CardioSessionId = exec_action_event
                 .arguments
-                .map(|arg| arg.parse().ok())
-                .flatten()
+                .and_then(|arg| arg.parse().ok())
                 .map(CardioSessionId)
                 .ok_or(Error::CardioSessionIdMissing(
                     exec_action_event.action_event_id,

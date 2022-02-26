@@ -238,6 +238,8 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                               _metconSessionDescription
                                   .metconDescription.metcon.rounds!,
                             );
+                          } else {
+                            return null;
                           }
                         },
                         autovalidateMode: AutovalidateMode.onUserInteraction,

@@ -21,28 +21,17 @@ class _SpinningSyncState extends State<SpinningSync>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
-  static const _duration = Duration(milliseconds: 1000);
-
   @override
   void initState() {
     _controller = AnimationController(
       vsync: this,
-      duration: _duration,
+      duration: const Duration(seconds: 1),
     )..addStatusListener((status) {
-        switch (status) {
-          case AnimationStatus.dismissed:
-            break;
-          case AnimationStatus.forward:
-            // TODO: Handle this case.
-            break;
-          case AnimationStatus.reverse:
-            // TODO: Handle this case.
-            break;
-          case AnimationStatus.completed:
-            if (widget.isSpinning) {
-              _controller.forward(from: 0);
-            }
-            break;
+        if (status == AnimationStatus.completed) {
+          // repeat animation
+          if (widget.isSpinning) {
+            _controller.forward(from: 0);
+          }
         }
       });
 

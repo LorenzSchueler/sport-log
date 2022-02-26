@@ -46,7 +46,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   String _stepInfo = "null";
 
   late Timer _timer;
-  Location _location = Location();
+  final Location _location = Location();
   StreamSubscription? _locationSubscription;
 
   late StreamSubscription _stepCountSubscription;
