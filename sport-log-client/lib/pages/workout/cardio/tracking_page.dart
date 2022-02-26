@@ -2,27 +2,28 @@ import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:flutter/material.dart' hide Route;
+import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/formatting.dart';
 import 'dart:async';
-import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/settings.dart';
+import 'package:sport_log/models/cardio/cardio_session_description.dart';
+import 'package:sport_log/widgets/message_dialog.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 enum TrackingMode { notStarted, tracking, paused, stopped }
 
 class CardioTrackingPage extends StatefulWidget {
-  final Movement _movement;
-  final CardioType _cardioType;
-  final Route? _route;
+  final Movement movement;
+  final CardioType cardioType;
+  final Route? route;
 
-  const CardioTrackingPage(
-    this._movement,
-    this._cardioType,
-    this._route, {
+  const CardioTrackingPage({
+    required this.route,
+    required this.movement,
+    required this.cardioType,
     Key? key,
   }) : super(key: key);
 
@@ -32,82 +33,94 @@ class CardioTrackingPage extends StatefulWidget {
 
 class CardioTrackingPageState extends State<CardioTrackingPage> {
   final _logger = Logger('CardioTrackingPage');
+  final _dataProvider = CardioSessionDescriptionDataProvider.instance;
 
-  final List<Position> _positions = [];
+  late CardioSessionDescription _cardioSessionDescription;
+
+  TrackingMode _trackingMode = TrackingMode.notStarted;
   double _ascent = 0;
   double _descent = 0;
   double? _lastElevation;
-
-  final List<double> _stepTimes = [];
-  late StepCount _lastStepCount;
-  int _stepRate = 0;
-
-  late DateTime _startTime;
-  DateTime? _pauseEndTime;
-  Duration _seconds = const Duration(seconds: 0);
-  String _time = "00:00:00";
-
-  String? _comments;
-
-  Line? _line;
-  List<Circle>? _circles;
-
-  TrackingMode _trackingMode = TrackingMode.notStarted;
 
   String _locationInfo = "null";
   String _stepInfo = "null";
 
   late Timer _timer;
   StreamSubscription? _locationSubscription;
+
   late StreamSubscription _stepCountSubscription;
+  late StepCount _lastStepCount;
+
   late MapboxMapController _mapController;
+  Line? _line;
+  List<Circle>? _circles;
 
-  void _updateData() {
-    Duration duration = _trackingMode == TrackingMode.tracking
-        ? _seconds + DateTime.now().difference(_pauseEndTime!)
-        : _seconds;
-    setState(() {
-      _time = duration.toString().split('.').first.padLeft(8, '0');
-
-      _stepRate = duration.inSeconds > 0 && _stepTimes.isNotEmpty
-          ? (_stepTimes.length / duration.inSeconds * 60).round()
-          : 0;
-      _stepInfo =
-          "steps: ${_stepTimes.length}\ntime: ${_stepTimes.isNotEmpty ? _stepTimes.last : 0}\nstep rate: $_stepRate";
-    });
-    _logger.i(_stepInfo);
+  @override
+  void initState() {
+    _cardioSessionDescription = CardioSessionDescription(
+      cardioSession: CardioSession.defaultValue(widget.movement.id)
+        ..cardioType = widget.cardioType
+        ..time = const Duration()
+        ..track = []
+        ..cadence = []
+        ..routeId = widget.route?.id,
+      movement: widget.movement,
+      route: widget.route,
+    );
+    _timer =
+        Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateData());
+    super.initState();
   }
 
-  CardioSession _saveCardioSession() {
-    CardioSession cardioSession = CardioSession(
-      id: randomId(),
-      userId: Settings.userId!,
-      movementId: widget._movement.id,
-      cardioType: widget._cardioType,
-      datetime: _startTime,
-      distance: 0, //TODO
-      ascent: _ascent.round(),
-      descent: _descent.round(),
-      time: _seconds,
-      calories: null,
-      track: _positions,
-      avgCadence: (_stepTimes.length / _seconds.inSeconds * 60).round(),
-      cadence: _stepTimes,
-      avgHeartRate: null,
-      heartRate: null,
-      routeId: widget._route?.id,
-      comments: _comments,
-      deleted: false,
-    );
-    // TODO save in db
-    // await _dataProvider.createSingle(cardioSession);
-    return cardioSession;
+  @override
+  void dispose() {
+    _timer.cancel();
+    _locationSubscription?.cancel();
+    _stepCountSubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> _saveCardioSession() async {
+    _cardioSessionDescription.cardioSession.ascent = _ascent.round();
+    _cardioSessionDescription.cardioSession.descent = _descent.round();
+    _cardioSessionDescription.cardioSession.setAvgCadenceFromCadenceAndTime();
+    _cardioSessionDescription.cardioSession.avgCadence =
+        1000; // TODO remove and make sure avgCadende is > 0 if cadence != null
+    _cardioSessionDescription.cardioSession.distance =
+        1000; // TODO remove and make sure distance is set if track != null
+    _logger.i("saving: $_cardioSessionDescription");
+    final result = await _dataProvider.createSingle(_cardioSessionDescription);
+    if (result) {
+      Navigator.pop(context);
+      Navigator.pop(context);
+    } else {
+      await showMessageDialog(
+        context: context,
+        text: 'Creating Cardio Session failed.',
+      );
+    }
+  }
+
+  void _updateData() {
+    // called every second
+    setState(() {
+      if (_trackingMode == TrackingMode.tracking) {
+        _cardioSessionDescription.cardioSession.time =
+            _cardioSessionDescription.cardioSession.time! +
+                const Duration(seconds: 1);
+      }
+      _cardioSessionDescription.cardioSession.setAvgCadenceFromCadenceAndTime();
+
+      _stepInfo =
+          "steps: ${_cardioSessionDescription.cardioSession.cadence!.length}\ntime: ${_cardioSessionDescription.cardioSession.cadence!.isNotEmpty ? _cardioSessionDescription.cardioSession.cadence!.last : 0}";
+    });
   }
 
   void _onStepCountUpdate(StepCount stepCountEvent) {
     if (_trackingMode == TrackingMode.tracking) {
-      if (_stepTimes.isEmpty) {
-        _stepTimes.add(stepCountEvent.timeStamp.millisecondsSinceEpoch / 1000);
+      if (_cardioSessionDescription.cardioSession.cadence!.isEmpty) {
+        _cardioSessionDescription.cardioSession.cadence!
+            .add(stepCountEvent.timeStamp.millisecondsSinceEpoch / 1000);
       } else {
         /// interpolate steps since last stepCount update
         int newSteps = stepCountEvent.steps - _lastStepCount.steps;
@@ -115,10 +128,14 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
                 _lastStepCount.timeStamp.millisecondsSinceEpoch) /
             newSteps;
         for (int i = 1; i <= newSteps; i++) {
-          _stepTimes.add(_stepTimes.last + avgTimeDiff * i / 1000);
+          _cardioSessionDescription.cardioSession.cadence!.add(
+            _cardioSessionDescription.cardioSession.cadence!.last +
+                avgTimeDiff * i / 1000,
+          );
         }
       }
     }
+    _cardioSessionDescription.cardioSession.setAvgCadenceFromCadenceAndTime();
     _lastStepCount = stepCountEvent;
   }
 
@@ -159,13 +176,11 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
   Future<void> _onLocationUpdate(LocationData location) async {
     setState(() {
-      _locationInfo = """location provider: ${location.provider}
+      _locationInfo = """provider:  ${location.provider}
 accuracy: ${location.accuracy?.toInt()} m
 time: ${location.time! ~/ 1000} s
-satelites: ${location.satelliteNumber}""";
+satelites:  ${location.satelliteNumber}""";
     });
-
-    _logger.i(_locationInfo);
 
     LatLng latLng = LatLng(location.latitude!, location.longitude!);
 
@@ -205,7 +220,7 @@ satelites: ${location.satelliteNumber}""";
       });
       _lastElevation = location.altitude;
 
-      _positions.add(
+      _cardioSessionDescription.cardioSession.track!.add(
         Position(
           latitude: location.latitude!,
           longitude: location.longitude!,
@@ -230,8 +245,9 @@ satelites: ${location.satelliteNumber}""";
     await controller.updateLine(
       _line!,
       LineOptions(
-        geometry:
-            _positions.map((e) => LatLng(e.latitude, e.longitude)).toList(),
+        geometry: _cardioSessionDescription.cardioSession.track!
+            .map((e) => LatLng(e.latitude, e.longitude))
+            .toList(),
       ),
     );
   }
@@ -242,7 +258,9 @@ satelites: ${location.satelliteNumber}""";
       builder: (context) => AlertDialog(
         title: const Text("Save Recording"),
         content: TextField(
-          onSubmitted: (comments) => _comments = comments,
+          onSubmitted: (comments) => setState(
+            () => _cardioSessionDescription.cardioSession.comments = comments,
+          ),
           decoration: const InputDecoration(hintText: "Comments"),
         ),
         actions: [
@@ -251,19 +269,12 @@ satelites: ${location.satelliteNumber}""";
             child: const Text("Back"),
           ),
           TextButton(
-            onPressed: () {
-              _trackingMode = TrackingMode.stopped;
-              CardioSession cardioSession = _saveCardioSession();
-              Navigator.pop(context);
-              Navigator.pop(
-                context,
-                ReturnObject(
-                  action: ReturnAction.created,
-                  payload: cardioSession,
-                ),
-              );
-            },
             child: const Text("Save"),
+            onPressed: () async {
+              _trackingMode = TrackingMode.stopped;
+              Navigator.pop(context);
+              await _saveCardioSession();
+            },
           )
         ],
       ),
@@ -278,7 +289,6 @@ satelites: ${location.satelliteNumber}""";
             style: ElevatedButton.styleFrom(primary: Colors.red[400]),
             onPressed: () {
               _trackingMode = TrackingMode.paused;
-              _seconds += DateTime.now().difference(_pauseEndTime!);
             },
             child: const Text("pause"),
           ),
@@ -289,7 +299,6 @@ satelites: ${location.satelliteNumber}""";
             style: ElevatedButton.styleFrom(primary: Colors.red[400]),
             onPressed: () async {
               _trackingMode = TrackingMode.paused;
-              _seconds += DateTime.now().difference(_pauseEndTime!);
               await _stopDialog();
             },
             child: const Text("stop"),
@@ -303,7 +312,6 @@ satelites: ${location.satelliteNumber}""";
             style: ElevatedButton.styleFrom(primary: Colors.green[400]),
             onPressed: () {
               _trackingMode = TrackingMode.tracking;
-              _pauseEndTime = DateTime.now();
             },
             child: const Text("continue"),
           ),
@@ -326,8 +334,7 @@ satelites: ${location.satelliteNumber}""";
             style: ElevatedButton.styleFrom(primary: Colors.green[400]),
             onPressed: () {
               _trackingMode = TrackingMode.tracking;
-              _startTime = DateTime.now();
-              _pauseEndTime = DateTime.now();
+              _cardioSessionDescription.cardioSession.datetime = DateTime.now();
             },
             child: const Text("start"),
           ),
@@ -358,6 +365,7 @@ satelites: ${location.satelliteNumber}""";
       child: Column(
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Card(
                 margin: const EdgeInsets.only(top: 25, bottom: 5),
@@ -394,13 +402,14 @@ satelites: ${location.satelliteNumber}""";
                 TableRow(
                   children: [
                     ValueUnitDescription(
-                      value: _time,
+                      value: _cardioSessionDescription
+                          .cardioSession.time!.formatTime,
                       unit: null,
                       description: "time",
                       scale: 1.3,
                     ),
-                    ValueUnitDescription(
-                      value: 6.17.toString(),
+                    const ValueUnitDescription(
+                      value: "--",
                       unit: "km",
                       description: "distance",
                       scale: 1.3,
@@ -410,14 +419,15 @@ satelites: ${location.satelliteNumber}""";
                 rowSpacer,
                 TableRow(
                   children: [
-                    ValueUnitDescription(
-                      value: 10.7.toString(),
+                    const ValueUnitDescription(
+                      value: "--",
                       unit: "km/h",
                       description: "speed",
                       scale: 1.3,
                     ),
                     ValueUnitDescription(
-                      value: _stepRate.toString(),
+                      value:
+                          "${_cardioSessionDescription.cardioSession.avgCadence}",
                       unit: "rpm",
                       description: "cadence",
                       scale: 1.3,
@@ -453,20 +463,5 @@ satelites: ${location.satelliteNumber}""";
         ],
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _timer =
-        Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateData());
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    _locationSubscription?.cancel();
-    _stepCountSubscription.cancel();
-    super.dispose();
   }
 }

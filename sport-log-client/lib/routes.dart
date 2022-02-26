@@ -134,9 +134,9 @@ abstract class Routes {
           final args =
               ModalRoute.of(context)?.settings.arguments as List<dynamic>;
           return CardioTrackingPage(
-            args[0] as Movement,
-            args[1] as CardioType,
-            args[2] as Route?,
+            movement: args[0] as Movement,
+            cardioType: args[1] as CardioType,
+            route: args[2] as Route?,
           );
         }),
     Routes.cardio.cardioEdit: (context) => _checkLogin(() {
