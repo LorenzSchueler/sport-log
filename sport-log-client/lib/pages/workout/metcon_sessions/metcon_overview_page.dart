@@ -3,6 +3,7 @@ import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorder
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/helpers/extensions/list_extension.dart';
+import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/metcon/all.dart';
@@ -48,7 +49,7 @@ class _MetconsPageState extends State<MetconsPage> {
         actions: [
           IconButton(
             onPressed: () =>
-                Navigator.pushNamed(context, Routes.metcon.sessionOverview),
+                Nav.newBase(context, Routes.metcon.sessionOverview),
             icon: const Icon(AppIcons.notes),
           ),
         ],

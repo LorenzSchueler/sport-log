@@ -3,6 +3,7 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -62,8 +63,7 @@ class RoutePageState extends State<RoutePage> {
         title: const Text("Routes"),
         actions: [
           IconButton(
-            onPressed: () =>
-                Navigator.pushNamed(context, Routes.cardio.overview),
+            onPressed: () => Nav.newBase(context, Routes.cardio.overview),
             icon: const Icon(AppIcons.heartbeat),
           ),
         ],

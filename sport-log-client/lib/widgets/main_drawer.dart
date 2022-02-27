@@ -37,10 +37,10 @@ class MainDrawer extends StatelessWidget {
             selected: selectedRoute == Routes.timeline.overview,
           ),
           ListTile(
-            leading: const Icon(AppIcons.playCircle),
-            title: const Text('Server Actions'),
-            onTap: () => Nav.newBase(context, Routes.action.overview),
-            selected: selectedRoute == Routes.action.overview,
+            title: const Text('Movements'),
+            leading: const Icon(AppIcons.exercise),
+            onTap: () => Nav.newBase(context, Routes.movement.overview),
+            selected: selectedRoute == Routes.movement.overview,
           ),
           ListTile(
             leading: const Icon(AppIcons.timer),
@@ -61,10 +61,10 @@ class MainDrawer extends StatelessWidget {
             selected: selectedRoute == Routes.offlineMaps,
           ),
           ListTile(
-            title: const Text('Movements'),
-            leading: const Icon(AppIcons.exercise),
-            onTap: () => Nav.newBase(context, Routes.movement.overview),
-            selected: selectedRoute == Routes.movement.overview,
+            leading: const Icon(AppIcons.playCircle),
+            title: const Text('Server Actions'),
+            onTap: () => Nav.newBase(context, Routes.action.overview),
+            selected: selectedRoute == Routes.action.overview,
           ),
           const Spacer(),
           ListTile(

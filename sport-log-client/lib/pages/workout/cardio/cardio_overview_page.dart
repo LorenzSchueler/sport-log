@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/snackbar.dart';
@@ -78,8 +79,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         title: Text(_movement?.name ?? "Cardio Sessions"),
         actions: [
           IconButton(
-            onPressed: () =>
-                Navigator.pushNamed(context, Routes.cardio.routeOverview),
+            onPressed: () => Nav.newBase(context, Routes.cardio.routeOverview),
             icon: const Icon(AppIcons.route),
           ),
           IconButton(

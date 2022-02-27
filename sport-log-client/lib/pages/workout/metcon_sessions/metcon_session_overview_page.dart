@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
+import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/all.dart';
@@ -72,8 +73,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         title: Text(_movement?.name ?? "Metcon Sessions"),
         actions: [
           IconButton(
-            onPressed: () =>
-                Navigator.pushNamed(context, Routes.metcon.overview),
+            onPressed: () => Nav.newBase(context, Routes.metcon.overview),
             icon: const Icon(AppIcons.notes),
           ),
           IconButton(
