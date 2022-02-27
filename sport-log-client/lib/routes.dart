@@ -75,11 +75,11 @@ abstract class Routes {
     Routes.movement.edit: (context) => _checkLogin(() {
           final arg = ModalRoute.of(context)?.settings.arguments;
           if (arg is MovementDescription) {
-            return EditMovementPage(initialMovement: arg);
+            return EditMovementPage(movementDescription: arg);
           } else if (arg is String) {
-            return EditMovementPage.fromName(initialName: arg);
+            return EditMovementPage.fromName(name: arg);
           }
-          return EditMovementPage.newMovement();
+          return const EditMovementPage(movementDescription: null);
         }),
     // metcon
     Routes.metcon.overview: (_) => _checkLogin(() => const MetconsPage()),
