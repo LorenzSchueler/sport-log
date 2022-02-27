@@ -37,4 +37,15 @@ class MetconMovementDescription extends CompoundEntity {
           'MetconMovementDescription: id mismatch',
         );
   }
+
+  String get movementText {
+    String text = "${movement.name} ${metconMovement.count} ";
+    text += movement.dimension == MovementDimension.distance
+        ? metconMovement.distanceUnit!.displayName
+        : movement.dimension.displayName;
+    if (metconMovement.weight != null) {
+      text += " @ ${metconMovement.weight} kg";
+    }
+    return text;
+  }
 }

@@ -22,6 +22,7 @@ class AppIcons {
   static const IconData weight = CustomIcons.weight;
   static const IconData route = CustomIcons.route;
   static const IconData ruler = CustomIcons.ruler_horizontal;
+  //static const IconData medal = CustomIcons.medal;
 
   // actions
   static const IconData add = Icons.add_rounded;

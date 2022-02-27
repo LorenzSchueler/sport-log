@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
+import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/models/all.dart';
 
@@ -77,5 +78,11 @@ class MetconDescription extends CompoundEntity {
     for (final move in moves) {
       move.metconMovement.deleted = true;
     }
+  }
+
+  String get typeLengthDescription {
+    return metcon.metconType == MetconType.forTime
+        ? "${metcon.rounds!} Rounds ${metcon.metconType.displayName} (Timecap ${metcon.timecap?.formatTimeShort})"
+        : "${metcon.metconType.displayName} ${metcon.timecap?.formatTimeShort}";
   }
 }

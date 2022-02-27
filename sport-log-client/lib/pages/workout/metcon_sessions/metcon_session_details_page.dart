@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
+import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -23,18 +24,11 @@ class MetconSessionDetailsPage extends StatefulWidget {
 
 class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
   final _logger = Logger('MetconSessionDetailsPage');
+  final _dataProvider = MetconSessionDescriptionDataProvider.instance;
 
-  String movementText(MetconMovementDescription metconSessionDescription) {
-    String text =
-        "${metconSessionDescription.movement.name} ${metconSessionDescription.metconMovement.count} ";
-    text += metconSessionDescription.movement.dimension ==
-            MovementDimension.distance
-        ? metconSessionDescription.metconMovement.distanceUnit!.displayName
-        : metconSessionDescription.movement.dimension.displayName;
-    if (metconSessionDescription.metconMovement.weight != null) {
-      text += " @ ${metconSessionDescription.metconMovement.weight} kg";
-    }
-    return text;
+  Future<void> _deleteMetconSession() async {
+    await _dataProvider.deleteSingle(widget.metconSessionDescription);
+    Navigator.pop(context);
   }
 
   @override
@@ -46,6 +40,10 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
       appBar: AppBar(
         title: Text(metconSessionDescription.metconDescription.name),
         actions: [
+          IconButton(
+            onPressed: _deleteMetconSession,
+            icon: const Icon(AppIcons.delete),
+          ),
           IconButton(
             onPressed: () async {
               final returnObj = await Navigator.pushNamed(
@@ -86,7 +84,7 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
                 children: [
                   for (var metconMovementDescription
                       in metconSessionDescription.metconDescription.moves)
-                    Text(movementText(metconMovementDescription)),
+                    Text(metconMovementDescription.movementText),
                 ],
               ),
             ),

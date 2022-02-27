@@ -95,8 +95,11 @@ class MetconSessionDescription extends CompoundEntity {
               ? "${metconSession.time?.formatTimeShort} min"
               : "${metconSession.rounds} rounds + ${metconSession.reps} reps";
         } else {
+          final timecap = metconDescription.metcon.timecap == null
+              ? ""
+              : "(${Duration(seconds: metconDescription.metcon.timecap!.inSeconds).formatTimeShort} min)";
           return metconSession.time != null
-              ? "${metconSession.time?.formatTimeShort} min (${Duration(seconds: metconDescription.metcon.timecap!.inSeconds).formatTimeShort} min)"
+              ? "${metconSession.time?.formatTimeShort} min $timecap"
               : "${metconSession.rounds} rounds + ${metconSession.reps} reps (${metconDescription.metcon.rounds} rounds)";
         }
     }
@@ -110,9 +113,5 @@ class MetconSessionDescription extends CompoundEntity {
     return _resultDescription(true);
   }
 
-  String get typeLengthDescription {
-    return metconDescription.metcon.metconType == MetconType.forTime
-        ? "${metconDescription.metcon.rounds!} Rounds ${metconDescription.metcon.metconType.displayName} (Timecap ${metconDescription.metcon.timecap?.formatTimeShort})"
-        : "${metconDescription.metcon.metconType.displayName} ${metconDescription.metcon.timecap?.formatTimeShort}";
-  }
+  String get typeLengthDescription => metconDescription.typeLengthDescription;
 }
