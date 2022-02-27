@@ -46,8 +46,7 @@ class MovementTable extends TableAccessor<Movement> {
 
   final _logger = Logger('MovementTable');
 
-  Future<List<MovementDescription>> getMovementDescriptions() async {
-    // TODO: check for references to cardio blueprint, strength blueprint
+  Future<List<MovementDescription>> getNonDeletedMovementDescriptions() async {
     final now = DateTime.now();
     const hasReference = 'has_reference';
     final records = await database.rawQuery(
@@ -94,8 +93,62 @@ class MovementTable extends TableAccessor<Movement> {
         .toList();
   }
 
-  Future<List<Movement>> getMovements({
-    String? byName,
+  Future<List<MovementDescription>> getMovementDescriptionsByName(
+    String? byName, {
+    bool cardioOnly = false,
+  }) async {
+    final now = DateTime.now();
+    const hasReference = 'has_reference';
+    final nameFilter = byName != null ? 'AND $name LIKE ?' : '';
+    final cardioFilter = cardioOnly == true ? 'AND cardio = true' : '';
+    final records = await database.rawQuery(
+      '''
+    SELECT
+      ${table.allColumns},
+      (
+        EXISTS (
+          SELECT * FROM $metconMovement
+          WHERE $metconMovement.$movementId = $tableName.$id
+        ) OR EXISTS (
+          SELECT * FROM $cardioSession
+          WHERE $cardioSession.$movementId = $tableName.$id
+        ) OR EXISTS (
+          SELECT * FROM $strengthSession
+          WHERE $strengthSession.$movementId = $tableName.$id
+        )
+      ) AS $hasReference
+    FROM $tableName
+    WHERE $tableName.$deleted = 0
+      $nameFilter
+      $cardioFilter
+      AND ($userId IS NOT NULL
+        OR NOT EXISTS (
+          SELECT * FROM $tableName m2
+          WHERE $tableName.$id <> m2.$id
+            AND $tableName.$name = m2.$name
+            AND $tableName.$dimension = m2.$dimension
+            AND m2.$userId IS NOT NULL
+        )
+      )
+    ORDER BY $name COLLATE NOCASE
+    ''',
+    );
+    _logger.d(
+      'Select movement descriptions: ' +
+          DateTime.now().difference(now).toString(),
+    );
+    return records
+        .map(
+          (r) => MovementDescription(
+            movement: serde.fromDbRecord(r, prefix: table.prefix),
+            hasReference: r[hasReference]! as int == 1,
+          ),
+        )
+        .toList();
+  }
+
+  Future<List<Movement>> getByName(
+    String? byName, {
     bool cardioOnly = false,
   }) async {
     final nameFilter = byName != null ? 'AND $name LIKE ?' : '';

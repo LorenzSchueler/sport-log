@@ -49,8 +49,8 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
   }
 
   Future<void> _update(String newSearch) async {
-    final movements = await _dataProvider.getMovements(
-      byName: newSearch.trim(),
+    final movements = await _dataProvider.getByName(
+      newSearch.trim(),
       cardioOnly: widget.cardioOnly,
     );
     if (widget.selectedMovement != null) {
