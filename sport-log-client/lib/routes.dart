@@ -17,6 +17,7 @@ import 'package:sport_log/pages/workout/cardio/tracking_page.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings_page.dart';
 import 'package:sport_log/pages/login/landing_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_details_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_edit_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_overview_page.dart';
 import 'package:sport_log/pages/movements/movement_edit_page.dart';
@@ -83,11 +84,15 @@ abstract class Routes {
         }),
     // metcon
     Routes.metcon.overview: (_) => _checkLogin(() => const MetconsPage()),
+    Routes.metcon.details: (context) => _checkLogin(() {
+          final metconDescription =
+              ModalRoute.of(context)?.settings.arguments as MetconDescription;
+          return MetconDetailsPage(metconDescription: metconDescription);
+        }),
     Routes.metcon.edit: (context) => _checkLogin(() {
-          final arg = ModalRoute.of(context)?.settings.arguments;
-          return EditMetconPage(
-            initialMetcon: (arg is MetconDescription) ? arg : null,
-          );
+          final metconDescription =
+              ModalRoute.of(context)?.settings.arguments as MetconDescription?;
+          return EditMetconPage(metconDescription: metconDescription);
         }),
     // timeline
     Routes.timeline.overview: (_) => _checkLogin(() => const TimelinePage()),
@@ -199,6 +204,7 @@ class _MetconRoutes {
   const _MetconRoutes();
 
   final String overview = '/metcon/overview';
+  final String details = '/metcon/details';
   final String edit = '/metcon/edit';
   final String sessionOverview = '/metcon/session_overview';
   final String sessionDetails = '/metcon/session_details';
