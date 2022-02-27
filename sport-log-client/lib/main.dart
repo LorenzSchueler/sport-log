@@ -1,20 +1,16 @@
 import 'dart:io';
 
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
-import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
-import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/theme.dart';
-import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/login/landing_page.dart';
 import 'package:sport_log/settings.dart';
@@ -43,35 +39,9 @@ Stream<double> initialize() async* {
   await AppDatabase.init();
   yield 0.7;
   await Sync.instance.init();
-  yield 0.8;
+  yield 0.9;
   if (Config.generateTestData) {
     insertTestData();
-  }
-  yield 0.9;
-  // TODO solve this in another way if no movements in db
-  final movements = await MovementDataProvider.instance.getNonDeleted();
-  if (movements.isEmpty) {
-    _logger.w("creating new default movement");
-    final Movement movement = Movement.defaultValue()
-      ..name = "Default Movement"
-      ..userId = Int64(1); // FIXME
-    await MovementDataProvider.instance.createSingle(movement);
-    Movement.defaultMovement = movement;
-  } else {
-    Movement.defaultMovement = movements.first;
-  }
-  final metconDescriptions =
-      await MetconDescriptionDataProvider.instance.getNonDeleted();
-  if (metconDescriptions.isEmpty) {
-    _logger.w("creating new default metcon description");
-    final MetconDescription metconDescription = MetconDescription.defaultValue()
-      ..metcon.name = "Default Metcon Description"
-      ..metcon.userId = Int64(1); // FIXME
-    await MetconDescriptionDataProvider.instance
-        .createSingle(metconDescription);
-    MetconDescription.defaultMetconDescription = metconDescription;
-  } else {
-    MetconDescription.defaultMetconDescription = metconDescriptions.first;
   }
   yield 1.0;
 }

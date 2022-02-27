@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/table.dart';
@@ -85,7 +86,7 @@ class Movement extends AtomicEntity {
         dimension = MovementDimension.reps;
 
   static late Movement
-      defaultMovement; // must be initialized in main::initialize
+      defaultMovement; // must be initialized in sync::startSync
 
   factory Movement.fromJson(Map<String, dynamic> json) =>
       _$MovementFromJson(json);

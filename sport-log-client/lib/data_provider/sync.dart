@@ -1,12 +1,17 @@
 import 'dart:async';
 
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
+import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
+import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
+import 'package:sport_log/models/metcon/metcon_description.dart';
+import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/form_widgets/new_credentials_dialog.dart';
 
@@ -103,6 +108,10 @@ class Sync extends ChangeNotifier {
     }
     _logger.d('Starting sync timer.');
     await sync();
+    Movement.defaultMovement =
+        (await MovementDataProvider.instance.getById(Int64(1)))!;
+    MetconDescription.defaultMetconDescription =
+        (await MetconDescriptionDataProvider.instance.getById(Int64(1)))!;
     _syncTimer = Timer.periodic(Settings.syncInterval, (_) => sync());
   }
 

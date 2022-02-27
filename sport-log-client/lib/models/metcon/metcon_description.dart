@@ -41,7 +41,7 @@ class MetconDescription extends CompoundEntity {
   }
 
   static late MetconDescription
-      defaultMetconDescription; // must be initialized in main::initialize
+      defaultMetconDescription; // must be initialized in sync::startSync
 
   factory MetconDescription.fromJson(Map<String, dynamic> json) =>
       _$MetconDescriptionFromJson(json);
