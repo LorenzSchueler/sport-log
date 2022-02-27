@@ -95,7 +95,7 @@ class DbMetconMovementSerializer extends DbSerializer<MetconMovement> {
   MetconMovement fromDbRecord(DbRecord r, {String prefix = ''}) {
     return MetconMovement(
       id: Int64(r[prefix + Columns.id]! as int),
-      metconId: Int64(r[prefix + Columns.id]! as int),
+      metconId: Int64(r[prefix + Columns.metconId]! as int),
       movementId: Int64(r[prefix + Columns.movementId]! as int),
       movementNumber: r[prefix + Columns.movementNumber]! as int,
       count: r[prefix + Columns.count]! as int,
