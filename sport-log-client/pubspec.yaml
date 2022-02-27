@@ -40,7 +40,6 @@ dependencies:
   validators: ^3.0.0
   http: ^0.13.3
   device_info_plus: ^3.2.1
-  implicitly_animated_reorderable_list: ^0.4.0 # ui
   json_annotation: ^4.4.0
   fixnum: ^1.0.0 # used for ids (in web ints go only up to 2^53-1)
   result_type: ^0.1.0 # convenience for returning something that can either be a success or failure
