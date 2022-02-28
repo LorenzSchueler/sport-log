@@ -96,9 +96,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
                       _formKey.currentState!.validate() &&
                       _metconDescription.isValid()
                   ? _saveMetcon
-                  : () => _logger.i("""${_formKey.currentContext != null}
-                      ${_formKey.currentState!.validate()}
-                      ${_metconDescription.isValid()}"""), //TODO null
+                  : null,
               icon: const Icon(AppIcons.save),
             ),
           ],
@@ -201,8 +199,11 @@ class _EditMetconPageState extends State<EditMetconPage> {
       children: [
         _timecapInput(context),
         Text(
-          plural("min", "mins",
-                  _metconDescription.metcon.timecap?.inMinutes ?? 0) +
+          plural(
+                "min",
+                "mins",
+                _metconDescription.metcon.timecap?.inMinutes ?? 0,
+              ) +
               " in total",
         ),
       ],
@@ -216,8 +217,13 @@ class _EditMetconPageState extends State<EditMetconPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _roundsInput(context),
-            Text(plural(
-                "round", "rounds", _metconDescription.metcon.rounds ?? 0)),
+            Text(
+              plural(
+                "round",
+                "rounds",
+                _metconDescription.metcon.rounds ?? 0,
+              ),
+            ),
           ],
         ),
         Row(
@@ -225,8 +231,13 @@ class _EditMetconPageState extends State<EditMetconPage> {
           children: [
             const Text("in"),
             _timecapInput(context),
-            Text(plural("min", "mins",
-                _metconDescription.metcon.timecap?.inMinutes ?? 0)),
+            Text(
+              plural(
+                "min",
+                "mins",
+                _metconDescription.metcon.timecap?.inMinutes ?? 0,
+              ),
+            ),
           ],
         )
       ],
@@ -240,8 +251,13 @@ class _EditMetconPageState extends State<EditMetconPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _roundsInput(context),
-            Text(plural(
-                "round", "rounds", _metconDescription.metcon.rounds ?? 0)),
+            Text(
+              plural(
+                "round",
+                "rounds",
+                _metconDescription.metcon.rounds ?? 0,
+              ),
+            ),
           ],
         ),
         _maybeTimecapInput(context),
@@ -290,12 +306,13 @@ class _EditMetconPageState extends State<EditMetconPage> {
 
   Widget _roundsInput(BuildContext context) {
     return IntPicker(
-        initialValue:
-            _metconDescription.metcon.rounds ?? Metcon.roundsDefaultValue,
-        setValue: (rounds) {
-          FocusManager.instance.primaryFocus?.unfocus();
-          setState(() => _metconDescription.metcon.rounds = rounds);
-        });
+      initialValue:
+          _metconDescription.metcon.rounds ?? Metcon.roundsDefaultValue,
+      setValue: (rounds) {
+        FocusManager.instance.primaryFocus?.unfocus();
+        setState(() => _metconDescription.metcon.rounds = rounds);
+      },
+    );
   }
 
   Widget _timecapInput(BuildContext context) {
@@ -335,8 +352,13 @@ class _EditMetconPageState extends State<EditMetconPage> {
             children: [
               const Text("in"),
               _timecapInput(context),
-              Text(plural(
-                  "min", "mins", _metconDescription.metcon.timecap!.inMinutes)),
+              Text(
+                plural(
+                  "min",
+                  "mins",
+                  _metconDescription.metcon.timecap!.inMinutes,
+                ),
+              ),
             ],
           ),
           IconButton(

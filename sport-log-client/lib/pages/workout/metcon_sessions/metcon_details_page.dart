@@ -62,37 +62,35 @@ class MetconDetailsPageState extends State<MetconDetailsPage> {
             )
         ],
       ),
-      body: Container(
+      body: ListView(
         padding: const EdgeInsets.all(10),
-        child: ListView(
-          children: [
-            const Text(
-              "Metcon",
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+        children: [
+          const Text(
+            "Metcon",
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+          ),
+          TextTile(
+            caption: "Type",
+            child: Text(metconDescription.typeLengthDescription),
+          ),
+          TextTile(
+            caption: "Movements",
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var metconMovementDescription in metconDescription.moves)
+                  Text(metconMovementDescription.movementText),
+              ],
             ),
+          ),
+          if (metconDescription.metcon.description != null)
             TextTile(
-              caption: "Type",
-              child: Text(metconDescription.typeLengthDescription),
-            ),
-            TextTile(
-              caption: "Movements",
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (var metconMovementDescription in metconDescription.moves)
-                    Text(metconMovementDescription.movementText),
-                ],
+              caption: "Description",
+              child: Text(
+                metconDescription.metcon.description!,
               ),
             ),
-            if (metconDescription.metcon.description != null)
-              TextTile(
-                caption: "Description",
-                child: Text(
-                  metconDescription.metcon.description!,
-                ),
-              ),
-          ],
-        ),
+        ],
       ),
     );
   }

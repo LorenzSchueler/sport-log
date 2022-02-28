@@ -164,7 +164,8 @@ class _EditMovementPageState extends State<EditMovementPage> {
                                 suffixIcon: IconButton(
                                   icon: const Icon(AppIcons.cancel),
                                   onPressed: () => setState(
-                                      () => _md.movement.description = null),
+                                    () => _md.movement.description = null,
+                                  ),
                                 ),
                               ),
                             ),

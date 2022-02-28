@@ -72,7 +72,8 @@ class _MovementsPageState extends State<MovementsPage> {
               )
             : ListView.builder(
                 itemBuilder: (_, index) => MovementCard(
-                    movementDescription: _movementDescriptions[index]),
+                  movementDescription: _movementDescriptions[index],
+                ),
                 itemCount: _movementDescriptions.length,
               ),
       ),

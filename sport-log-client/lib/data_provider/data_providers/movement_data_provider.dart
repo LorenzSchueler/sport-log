@@ -89,8 +89,10 @@ class MovementDescriptionDataProvider
     String? name, {
     bool cardioOnly = false,
   }) async {
-    return await _db.getMovementDescriptionsByName(name,
-        cardioOnly: cardioOnly);
+    return await _db.getMovementDescriptionsByName(
+      name,
+      cardioOnly: cardioOnly,
+    );
   }
 
   Future<bool> exists(String name, MovementDimension dim) async {

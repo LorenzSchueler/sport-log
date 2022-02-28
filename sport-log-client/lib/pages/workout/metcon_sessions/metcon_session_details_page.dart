@@ -65,60 +65,57 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
           )
         ],
       ),
-      body: Container(
+      body: ListView(
         padding: const EdgeInsets.all(10),
-        child: ListView(
-          children: [
-            const Text(
-              "Metcon",
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+        children: [
+          const Text(
+            "Metcon",
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+          ),
+          TextTile(
+            caption: "Type",
+            child: Text(metconSessionDescription.typeLengthDescription),
+          ),
+          TextTile(
+            caption: "Movements",
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var metconMovementDescription
+                    in metconSessionDescription.metconDescription.moves)
+                  Text(metconMovementDescription.movementText),
+              ],
             ),
+          ),
+          if (metconSessionDescription.metconDescription.metcon.description !=
+              null)
             TextTile(
-              caption: "Type",
-              child: Text(metconSessionDescription.typeLengthDescription),
-            ),
-            TextTile(
-              caption: "Movements",
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (var metconMovementDescription
-                      in metconSessionDescription.metconDescription.moves)
-                    Text(metconMovementDescription.movementText),
-                ],
-              ),
-            ),
-            if (metconSessionDescription.metconDescription.metcon.description !=
-                null)
-              TextTile(
-                caption: "Description",
-                child: Text(
-                  metconSessionDescription
-                      .metconDescription.metcon.description!,
-                ),
-              ),
-            Defaults.sizedBox.vertical.big,
-            const Text(
-              "Results",
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-            ),
-            TextTile(
-              caption: "Score",
+              caption: "Description",
               child: Text(
-                "${metconSessionDescription.shortResultDescription} (${metconSessionDescription.metconSession.datetime.formatDate})",
+                metconSessionDescription.metconDescription.metcon.description!,
               ),
             ),
-            const TextTile(
-              caption: "Best Score",
-              child: Text("<my best score> <date>"),
+          Defaults.sizedBox.vertical.big,
+          const Text(
+            "Results",
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+          ),
+          TextTile(
+            caption: "Score",
+            child: Text(
+              "${metconSessionDescription.shortResultDescription} (${metconSessionDescription.metconSession.datetime.formatDate})",
             ),
-            if (metconSessionDescription.metconSession.comments != null)
-              TextTile(
-                caption: "Comments",
-                child: Text(metconSessionDescription.metconSession.comments!),
-              ),
-          ],
-        ),
+          ),
+          const TextTile(
+            caption: "Best Score",
+            child: Text("<my best score> <date>"),
+          ),
+          if (metconSessionDescription.metconSession.comments != null)
+            TextTile(
+              caption: "Comments",
+              child: Text(metconSessionDescription.metconSession.comments!),
+            ),
+        ],
       ),
     );
   }
