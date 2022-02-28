@@ -303,10 +303,6 @@ impl VerifyForUserOrAPWithDb for Unverified<MetconMovement> {
         let metcon_movement = self.0.into_inner();
         if MetconMovement::check_user_id(metcon_movement.id, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
-            && Metcon::check_user_id(metcon_movement.metcon_id, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
-            && Movement::check_optional_user_id(metcon_movement.movement_id, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
         {
             Ok(metcon_movement)
         } else {
@@ -329,20 +325,8 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
             .iter()
             .map(|metcon_movement| metcon_movement.id)
             .collect();
-        let metcon_ids: Vec<_> = metcon_movements
-            .iter()
-            .map(|metcon_movement| metcon_movement.metcon_id)
-            .collect();
-        let movement_ids: Vec<_> = metcon_movements
-            .iter()
-            .map(|metcon_movement| metcon_movement.movement_id)
-            .collect();
         if MetconMovement::check_user_ids(&metcon_movement_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
-            && Metcon::check_user_ids(&metcon_ids, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
-            && Movement::check_optional_user_ids(&movement_ids, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
         {
             Ok(metcon_movements)
         } else {
@@ -363,8 +347,6 @@ impl VerifyForUserOrAPCreate for Unverified<MetconMovement> {
         let metcon_movement = self.0.into_inner();
         if Metcon::check_user_id(metcon_movement.metcon_id, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
-            && Movement::check_optional_user_id(metcon_movement.movement_id, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
         {
             Ok(metcon_movement)
         } else {
@@ -387,14 +369,8 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconMovement>> {
             .iter()
             .map(|metcon_movement| metcon_movement.metcon_id)
             .collect();
-        let movement_ids: Vec<_> = metcon_movements
-            .iter()
-            .map(|metcon_movement| metcon_movement.movement_id)
-            .collect();
         if Metcon::check_user_ids(&metcon_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
-            && Movement::check_optional_user_ids(&movement_ids, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
         {
             Ok(metcon_movements)
         } else {
@@ -518,10 +494,6 @@ impl VerifyForUserOrAPWithDb for Unverified<MetconItem> {
         let metcon_item = self.0.into_inner();
         if MetconItem::check_user_id(metcon_item.id, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
-            && Metcon::check_optional_user_id(metcon_item.metcon_id, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
-            && TrainingPlan::check_user_id(metcon_item.training_plan_id, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
         {
             Ok(metcon_item)
         } else {
@@ -544,20 +516,8 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconItem>> {
             .iter()
             .map(|metcon_item| metcon_item.id)
             .collect();
-        let metcon_ids: Vec<_> = metcon_items
-            .iter()
-            .map(|metcon_item| metcon_item.metcon_id)
-            .collect();
-        let training_plan_ids: Vec<_> = metcon_items
-            .iter()
-            .map(|metcon_item| metcon_item.training_plan_id)
-            .collect();
         if MetconItem::check_user_ids(&metcon_item_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
-            && Metcon::check_optional_user_ids(&metcon_ids, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
-            && TrainingPlan::check_user_ids(&training_plan_ids, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
         {
             Ok(metcon_items)
         } else {
@@ -578,8 +538,6 @@ impl VerifyForUserOrAPCreate for Unverified<MetconItem> {
         let metcon_item = self.0.into_inner();
         if Metcon::check_optional_user_id(metcon_item.metcon_id, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
-            && TrainingPlan::check_user_id(metcon_item.training_plan_id, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
         {
             Ok(metcon_item)
         } else {
@@ -602,14 +560,8 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconItem>> {
             .iter()
             .map(|metcon_item| metcon_item.metcon_id)
             .collect();
-        let training_plan_ids: Vec<_> = metcon_items
-            .iter()
-            .map(|metcon_item| metcon_item.training_plan_id)
-            .collect();
         if Metcon::check_optional_user_ids(&metcon_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
-            && TrainingPlan::check_user_ids(&training_plan_ids, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
         {
             Ok(metcon_items)
         } else {
