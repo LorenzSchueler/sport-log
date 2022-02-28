@@ -137,13 +137,13 @@ class _EditMovementPageState extends State<EditMovementPage> {
                   ..._md.movement.description == null
                       ? [
                           Defaults.sizedBox.vertical.small,
-                          ElevatedButton.icon(
+                          ActionChip(
+                            avatar: const Icon(AppIcons.add),
+                            label: const Text("Add description"),
                             onPressed: () {
                               setState(() => _md.movement.description = "");
                               _descriptionFocusNode.requestFocus();
                             },
-                            icon: const Icon(AppIcons.add),
-                            label: const Text("Add description"),
                           ),
                         ]
                       : [

@@ -71,13 +71,13 @@ class MetconMovementCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (move.weight == null)
-                OutlinedButton.icon(
+                ActionChip(
+                  avatar: const Icon(AppIcons.add),
+                  label: const Text("Add weight"),
                   onPressed: () {
                     mmd.metconMovement.weight = _weightDefaultValue;
                     editMetconMovementDescription(mmd);
                   },
-                  icon: const Icon(AppIcons.add),
-                  label: const Text("Add weight..."),
                 ),
               if (move.weight != null) const Text("Float picker to come"),
             ],

@@ -291,13 +291,13 @@ class _EditMetconPageState extends State<EditMetconPage> {
 
   Widget _maybeDescriptionInput(BuildContext context) {
     if (_metconDescription.metcon.description == null) {
-      return OutlinedButton.icon(
+      return ActionChip(
+        avatar: const Icon(AppIcons.add),
+        label: const Text("Add description"),
         onPressed: () {
           setState(() => _metconDescription.metcon.description = "");
           _descriptionFocusNode.requestFocus();
         },
-        icon: const Icon(AppIcons.add),
-        label: const Text("Add description..."),
       );
     } else {
       return _descriptionInput(context);
@@ -331,7 +331,9 @@ class _EditMetconPageState extends State<EditMetconPage> {
 
   Widget _maybeTimecapInput(BuildContext context) {
     if (_metconDescription.metcon.timecap == null) {
-      return OutlinedButton.icon(
+      return ActionChip(
+        avatar: const Icon(AppIcons.add),
+        label: const Text("Add timecap"),
         onPressed: () {
           FocusManager.instance.primaryFocus?.unfocus();
           setState(
@@ -339,8 +341,6 @@ class _EditMetconPageState extends State<EditMetconPage> {
                 _metconDescription.metcon.timecap = Metcon.timecapDefaultValue,
           );
         },
-        icon: const Icon(AppIcons.add),
-        label: const Text("Add timecap..."),
       );
     } else {
       // _metcon.timecap != null
@@ -350,12 +350,12 @@ class _EditMetconPageState extends State<EditMetconPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text("in"),
+              const Text("timecap"),
               _timecapInput(context),
               Text(
                 plural(
-                  "min",
-                  "mins",
+                  "minute",
+                  "minutes",
                   _metconDescription.metcon.timecap!.inMinutes,
                 ),
               ),
@@ -408,15 +408,15 @@ class _EditMetconPageState extends State<EditMetconPage> {
   }
 
   Widget _addMetconMovementButton(BuildContext context) {
-    return OutlinedButton.icon(
+    return ActionChip(
+      avatar: const Icon(AppIcons.add),
+      label: const Text("Add movement"),
       onPressed: () async {
         final movement = await showMovementPickerDialog(context);
         if (movement != null) {
           _addMetconMovementWithMovement(movement);
         }
       },
-      icon: const Icon(AppIcons.add),
-      label: const Text("Add movement..."),
     );
   }
 
