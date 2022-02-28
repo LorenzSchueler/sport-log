@@ -179,7 +179,7 @@ class StrengthSessionCard extends StatelessWidget {
         onTap: () => Navigator.pushNamed(
           context,
           Routes.strength.details,
-          arguments: strengthSessionDescription.session.id,
+          arguments: strengthSessionDescription,
         ),
       ),
     );
@@ -208,7 +208,7 @@ class StrengthSessionCardWithMovement extends StatelessWidget {
         onTap: () => Navigator.pushNamed(
           context,
           Routes.strength.details,
-          arguments: strengthSessionDescription.session.id,
+          arguments: strengthSessionDescription,
         ),
       ),
     );

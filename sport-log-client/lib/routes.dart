@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart' hide Route;
-import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/action/action_overview_page.dart';
@@ -119,11 +118,12 @@ abstract class Routes {
     Routes.strength.overview: (_) =>
         _checkLogin(() => const StrengthSessionsPage()),
     Routes.strength.details: (context) => _checkLogin(() {
-          final arg = ModalRoute.of(context)?.settings.arguments;
-          if (arg is! Int64) {
-            throw ArgumentError('StrengthSessionDetailsPage without id');
-          }
-          return StrengthSessionDetailsPage(id: arg);
+          final strengthSessionDescription = ModalRoute.of(context)
+              ?.settings
+              .arguments as StrengthSessionDescription;
+          return StrengthSessionDetailsPage(
+            strengthSessionDescription: strengthSessionDescription,
+          );
         }),
     Routes.strength.edit: (context) => _checkLogin(() {
           final arg = ModalRoute.of(context)?.settings.arguments
