@@ -70,6 +70,10 @@ class StrengthSessionDescription extends CompoundEntity {
     }
   }
 
+  void orderSets() {
+    sets.forEachIndexed((set, index) => set.setNumber = index);
+  }
+
   static StrengthSessionDescription defaultValue() {
     final movement = Movement.defaultMovement;
     return StrengthSessionDescription(

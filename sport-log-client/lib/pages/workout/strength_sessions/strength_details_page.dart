@@ -154,7 +154,7 @@ class _StrengthSessionDetailsPageState
             ),
           TextTile(
             caption: 'Avg Reps',
-            child: Text(roundedValue(stats.avgCount)),
+            child: Text(stats.avgCount.toStringAsFixed(1)),
           )
         ];
       case MovementDimension.time:
