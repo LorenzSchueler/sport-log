@@ -115,15 +115,15 @@ create trigger set_timestamp before update on strength_set
     for each row execute procedure trigger_set_timestamp();
 
 insert into strength_set (id, strength_session_id, set_number, count, weight) values
-    (1, 1, 1, 5, 110),
-    (2, 1, 2, 5, 115),
-    (3, 1, 3, 5, 120),
-    (4, 1, 4, 5, 122.5),
-    (5, 1, 5, 5, 125),
-    (6, 2, 1, 3, 125),
-    (7, 2, 2, 3, 130),
-    (8, 2, 3, 3, 135),
-    (9, 2, 4, 3, 130);
+    (1, 1, 0, 5, 110),
+    (2, 1, 1, 5, 115),
+    (3, 1, 2, 5, 120),
+    (4, 1, 3, 5, 122.5),
+    (5, 1, 4, 5, 125),
+    (6, 2, 0, 3, 125),
+    (7, 2, 1, 3, 130),
+    (8, 2, 2, 3, 135),
+    (9, 2, 3, 3, 130);
 
 create table strength_set_archive (
     primary key (id),
