@@ -7,14 +7,21 @@ class TextTile extends StatelessWidget {
     required this.child,
     this.leading,
     this.caption,
+    this.onCancel,
   }) : super(key: key);
 
   final String? caption;
   final Widget child;
   final IconData? leading;
+  final VoidCallback? onCancel;
 
   @override
   Widget build(BuildContext context) {
-    return EditTile(child: child, leading: leading, caption: caption);
+    return EditTile(
+      child: child,
+      leading: leading,
+      caption: caption,
+      onCancel: onCancel,
+    );
   }
 }
