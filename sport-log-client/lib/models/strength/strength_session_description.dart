@@ -70,17 +70,22 @@ class StrengthSessionDescription extends CompoundEntity {
     }
   }
 
-  StrengthSessionDescription.defaultValue(this.movement)
-      : session = StrengthSession(
-          id: randomId(),
-          userId: Settings.userId!,
-          datetime: DateTime.now(),
-          movementId: movement.id,
-          interval: null,
-          comments: null,
-          deleted: false,
-        ),
-        sets = [];
+  static StrengthSessionDescription defaultValue() {
+    final movement = Movement.defaultMovement;
+    return StrengthSessionDescription(
+      session: StrengthSession(
+        id: randomId(),
+        userId: Settings.userId!,
+        datetime: DateTime.now(),
+        movementId: movement.id,
+        interval: null,
+        comments: null,
+        deleted: false,
+      ),
+      movement: movement,
+      sets: [],
+    );
+  }
 
   StrengthSessionDescription copy() {
     return StrengthSessionDescription(

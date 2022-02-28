@@ -87,7 +87,7 @@ class StrengthSessionStats extends JsonSerializable {
           if (maxEorm != null) '1RM: ${roundedWeight(maxEorm!)}',
           if (sumVolume != null) 'Vol: ${roundedWeight(sumVolume!)}',
           if (maxWeight != null) 'Max Weight: ${roundedWeight(maxWeight!)}',
-          'Avg Reps: ${roundedValue(avgCount)}',
+          'Avg Reps: ${avgCount.toStringAsFixed(1)}',
         ].join(' • ');
       case MovementDimension.time:
         return 'Best time: ${Duration(milliseconds: minCount).formatTimeWithMillis}';

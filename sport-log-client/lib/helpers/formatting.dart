@@ -76,16 +76,8 @@ String formatDistance(int meters) {
   return '${meters}m';
 }
 
-String roundedValue(double value) {
-  // TODO: not quite right
-  if (value % 1 == 0) {
-    return value.toString();
-  }
-  return value.toStringAsFixed(1);
-}
-
 String roundedWeight(double weight) {
-  return roundedValue(weight) + 'kg';
+  return weight.toStringAsFixed(1) + ' kg';
 }
 
 String formatCountWeight(MovementDimension dim, int count, double? weight) {
@@ -93,12 +85,12 @@ String formatCountWeight(MovementDimension dim, int count, double? weight) {
     case MovementDimension.reps:
       return weight != null
           ? '$count x ${roundedWeight(weight)}'
-          : '${count}reps';
+          : '$count reps';
     case MovementDimension.time:
       final result = Duration(milliseconds: count).formatTimeWithMillis;
       return weight != null ? result + ' (${roundedWeight(weight)})' : result;
     case MovementDimension.energy:
-      final result = '${count}cals';
+      final result = '$count cals';
       return weight != null ? result + ' (${roundedWeight(weight)})' : result;
     case MovementDimension.distance:
       final result = formatDistance(count);
