@@ -162,7 +162,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
                                     const EdgeInsets.symmetric(vertical: 5),
                                 labelText: "Description",
                                 suffixIcon: IconButton(
-                                  icon: const Icon(AppIcons.cancel),
+                                  icon: const Icon(AppIcons.close),
                                   onPressed: () => setState(
                                     () => _md.movement.description = null,
                                   ),

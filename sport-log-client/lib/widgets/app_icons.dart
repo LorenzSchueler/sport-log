@@ -31,8 +31,7 @@ class AppIcons {
   static const IconData delete = Icons.delete_rounded;
   static const IconData edit = Icons.edit_rounded;
   static const IconData save = Icons.save_rounded;
-  static const IconData cancel = Icons.cancel_rounded;
-  static const IconData close = Icons.close;
+  static const IconData close = Icons.close_rounded;
   static const IconData check = Icons.check_rounded;
   static const IconData checkBox = Icons.check_box_outlined;
   static const IconData checkCircle = Icons.check_circle_outline_rounded;
@@ -41,10 +40,10 @@ class AppIcons {
   static const IconData search = Icons.search_rounded;
   static const IconData logout = Icons.logout_rounded;
   static const IconData download = Icons.download_rounded;
-  static const IconData sync = Icons.sync;
+  static const IconData sync = Icons.sync_rounded;
   static const IconData openInBrowser = Icons.open_in_browser_outlined;
-  static const IconData fileDownload = Icons.file_download;
-  static const IconData dragHandle = Icons.drag_handle;
+  static const IconData fileDownload = Icons.file_download_rounded;
+  static const IconData dragHandle = Icons.drag_handle_rounded;
 
   // arrows
   static const IconData arrowBack = Icons.arrow_back_rounded;
@@ -54,7 +53,7 @@ class AppIcons {
   static const IconData trendingUp = Icons.trending_up_rounded;
   static const IconData trendingDown = Icons.trending_down_rounded;
 
-  static const IconData filterFilled = Icons.filter_alt;
+  static const IconData filterFilled = Icons.filter_alt_rounded;
   static const IconData filter = Icons.filter_alt_outlined;
 
   // fiels
@@ -62,17 +61,17 @@ class AppIcons {
   static const IconData questionmark = Icons.question_mark_rounded;
   static const IconData email = Icons.email_outlined;
   static const IconData key = Icons.key_outlined;
-  static const IconData map = Icons.map;
+  static const IconData map = Icons.map_rounded;
   static const IconData timer = Icons.timer_outlined;
-  static const IconData sports = Icons.sports;
+  static const IconData sports = Icons.sports_rounded;
   static const IconData comment = Icons.comment_outlined;
   static const IconData exercise = Icons.directions_run_rounded;
-  static const IconData calendar = Icons.calendar_today;
+  static const IconData calendar = Icons.calendar_today_rounded;
   static const IconData notes = Icons.notes_rounded;
   static const IconData cloudUpload = Icons.cloud_upload_outlined;
   static const IconData account = Icons.account_circle_outlined;
   static const IconData contributors = Icons.supervised_user_circle_outlined;
   static const IconData copyright = Icons.copyright_outlined;
   static const IconData playCircle = Icons.play_circle_outline;
-  static const IconData timeline = Icons.timeline;
+  static const IconData timeline = Icons.timeline_rounded;
 }

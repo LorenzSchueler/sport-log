@@ -280,7 +280,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
           contentPadding: const EdgeInsets.symmetric(vertical: 5),
           labelText: "Description",
           suffixIcon: IconButton(
-            icon: const Icon(AppIcons.cancel),
+            icon: const Icon(AppIcons.close),
             onPressed: () =>
                 setState(() => _metconDescription.metcon.description = null),
           ),
@@ -362,7 +362,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
             ],
           ),
           IconButton(
-            icon: const Icon(AppIcons.cancel),
+            icon: const Icon(AppIcons.close),
             onPressed: () {
               FocusManager.instance.primaryFocus?.unfocus();
               setState(() => _metconDescription.metcon.timecap = null);
