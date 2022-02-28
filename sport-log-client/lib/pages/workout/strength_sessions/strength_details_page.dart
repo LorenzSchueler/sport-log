@@ -4,6 +4,8 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/page_return.dart';
+import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/routes.dart';
@@ -34,6 +36,9 @@ class _StrengthSessionDetailsPageState
 
   @override
   Widget build(BuildContext context) {
+    StrengthSessionDescription strengthSessionDescription =
+        widget.strengthSessionDescription;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.strengthSessionDescription.movement.name),
@@ -43,12 +48,21 @@ class _StrengthSessionDetailsPageState
             icon: const Icon(AppIcons.delete),
           ),
           IconButton(
-            onPressed: () {
-              Navigator.pushNamed(
+            onPressed: () async {
+              final returnObj = await Navigator.pushNamed(
                 context,
                 Routes.strength.edit,
                 arguments: widget.strengthSessionDescription,
               );
+              if (returnObj is ReturnObject<StrengthSessionDescription>) {
+                if (returnObj.action == ReturnAction.deleted) {
+                  Navigator.pop(context);
+                } else {
+                  setState(() {
+                    strengthSessionDescription = returnObj.payload;
+                  });
+                }
+              }
             },
             icon: const Icon(AppIcons.edit),
           ),

@@ -128,7 +128,7 @@ abstract class Routes {
     Routes.strength.edit: (context) => _checkLogin(() {
           final arg = ModalRoute.of(context)?.settings.arguments
               as StrengthSessionDescription?;
-          return StrengthSessionEditPage(initialSession: arg);
+          return StrengthSessionEditPage(strengthSessionDescription: arg);
         }),
     // cardio
     Routes.cardio.overview: (_) =>
