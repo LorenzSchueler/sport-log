@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/set_inputs/set_duration_input.dart';
+import 'package:sport_log/widgets/form_widgets/double_picker.dart';
 import 'package:sport_log/widgets/form_widgets/int_picker.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
@@ -19,7 +21,7 @@ class NewSetInput extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (dimension) {
       case MovementDimension.reps:
-        return RepsPicker(setValue: onNewSet); // TODO and weight picker
+        return RepWeightPicker(setValue: onNewSet);
       case MovementDimension.time:
         return SetDurationInput(onNewSet: onNewSet);
       case MovementDimension.distance:
@@ -37,24 +39,21 @@ class NewSetInput extends StatelessWidget {
   }
 }
 
-class RepsPicker extends StatefulWidget {
-  const RepsPicker({
+class RepWeightPicker extends StatefulWidget {
+  const RepWeightPicker({
     required this.setValue,
-    this.initReps = 0,
-    this.stepSize = 1,
     Key? key,
   }) : super(key: key);
 
-  final int initReps;
-  final int stepSize;
   final void Function(int count, [double? weight]) setValue;
 
   @override
-  _RepsPickerState createState() => _RepsPickerState();
+  _RepWeightPickerState createState() => _RepWeightPickerState();
 }
 
-class _RepsPickerState extends State<RepsPicker> {
+class _RepWeightPickerState extends State<RepWeightPicker> {
   int _reps = 0;
+  double? _weight;
 
   @override
   void initState() {
@@ -64,20 +63,71 @@ class _RepsPickerState extends State<RepsPicker> {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          "Reps ",
-          style: Theme.of(context).textTheme.headline5,
+        Table(
+          columnWidths: const {
+            0: FixedColumnWidth(30),
+            1: FixedColumnWidth(85),
+            2: FixedColumnWidth(166),
+          },
+          children: [
+            TableRow(
+              children: [
+                Container(),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Text(
+                    "Reps ",
+                    style: Theme.of(context).textTheme.headline5,
+                  ),
+                ),
+                IntPicker(
+                  setValue: (reps) => setState(() => _reps = reps),
+                ),
+              ],
+            ),
+            TableRow(
+              children: _weight == null
+                  ? [
+                      IconButton(
+                        icon: const Icon(AppIcons.add),
+                        onPressed: () => setState(() => _weight = 0),
+                        padding: EdgeInsets.zero,
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Text(
+                          "Weight ",
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                      ),
+                      Container(),
+                    ]
+                  : [
+                      IconButton(
+                        icon: const Icon(AppIcons.close),
+                        onPressed: () => setState(() => _weight = null),
+                        padding: EdgeInsets.zero,
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Text(
+                          "Weight ",
+                          style: Theme.of(context).textTheme.headline5,
+                        ),
+                      ),
+                      DoublePicker(
+                        setValue: (weight) => setState(() => _weight = weight),
+                      )
+                    ],
+            )
+          ],
         ),
-        IntPicker(
-          setValue: (reps) => setState(() => _reps = reps),
-        ), // TODO init reps
-        const Text("<Weight picker to come>"), // TODO
+        Defaults.sizedBox.horizontal.big,
         IconButton(
           icon: const Icon(AppIcons.check),
           color: _reps > 0 ? primaryColorOf(context) : null,
-          onPressed: _reps > 0 ? () => widget.setValue(_reps) : null,
+          onPressed: _reps > 0 ? () => widget.setValue(_reps, _weight) : null,
         ),
       ],
     );
