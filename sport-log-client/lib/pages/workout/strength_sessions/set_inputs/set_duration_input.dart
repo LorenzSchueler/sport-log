@@ -9,9 +9,14 @@ import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 class SetDurationInput extends StatefulWidget {
-  const SetDurationInput({Key? key, required this.onNewSet}) : super(key: key);
+  const SetDurationInput({
+    Key? key,
+    required this.onNewSet,
+    required this.confirmChanges,
+  }) : super(key: key);
 
   final void Function(int count, double? weight) onNewSet;
+  final bool confirmChanges;
 
   @override
   _SetDurationInputState createState() => _SetDurationInputState();
@@ -65,8 +70,10 @@ class _SetDurationInputState extends State<SetDurationInput> {
     return Row(
       children: [
         _timeInput,
-        Defaults.sizedBox.horizontal.normal,
-        _addButton,
+        if (widget.confirmChanges) ...[
+          Defaults.sizedBox.horizontal.normal,
+          _addButton,
+        ]
       ],
     );
   }
@@ -107,7 +114,12 @@ class _SetDurationInputState extends State<SetDurationInput> {
       placeholder: 0,
       caption: 'h',
       numberOfDigits: 2,
-      onChanged: (value) => setState(() => _hours = value),
+      onChanged: (value) {
+        setState(() => _hours = value);
+        if (!widget.confirmChanges) {
+          _submit();
+        }
+      },
       onSubmitted: () => _minutesKey.currentState?.requestFocus(),
       submitOnDigitsReached: true,
     );
@@ -120,7 +132,12 @@ class _SetDurationInputState extends State<SetDurationInput> {
       caption: 'm',
       numberOfDigits: 2,
       maxValue: 59,
-      onChanged: (value) => setState(() => _minutes = value),
+      onChanged: (value) {
+        setState(() => _minutes = value);
+        if (!widget.confirmChanges) {
+          _submit();
+        }
+      },
       onSubmitted: () => _secondsKey.currentState?.requestFocus(),
       submitOnDigitsReached: true,
     );
@@ -132,7 +149,12 @@ class _SetDurationInputState extends State<SetDurationInput> {
       placeholder: 0,
       caption: 's',
       numberOfDigits: 2,
-      onChanged: (value) => setState(() => _seconds = value),
+      onChanged: (value) {
+        setState(() => _seconds = value);
+        if (!widget.confirmChanges) {
+          _submit();
+        }
+      },
       onSubmitted: () => _millisecondsKey.currentState?.requestFocus(),
       submitOnDigitsReached: true,
     );
@@ -144,7 +166,12 @@ class _SetDurationInputState extends State<SetDurationInput> {
       placeholder: 0,
       caption: 'ms',
       numberOfDigits: 3,
-      onChanged: (value) => setState(() => _milliseconds = value),
+      onChanged: (value) {
+        setState(() => _milliseconds = value);
+        if (!widget.confirmChanges) {
+          _submit();
+        }
+      },
     );
   }
 }

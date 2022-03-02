@@ -483,13 +483,14 @@ class MetconMovementCard extends StatelessWidget {
             ),
           ),
           NewSetInput(
-            dimension: mmd.movement.dimension,
-            distanceUnit: move.distanceUnit,
             onNewSet: (count, weight) {
               mmd.metconMovement.count = count;
               mmd.metconMovement.weight = weight;
               editMetconMovementDescription(mmd);
             },
+            confirmChanges: false,
+            dimension: mmd.movement.dimension,
+            distanceUnit: move.distanceUnit,
             initialCount: move.count,
             initialWeight: move.weight,
           ),

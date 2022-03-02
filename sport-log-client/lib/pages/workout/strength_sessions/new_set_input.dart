@@ -7,42 +7,50 @@ class NewSetInput extends StatelessWidget {
   const NewSetInput({
     Key? key,
     required this.onNewSet,
+    required this.confirmChanges,
     required this.dimension,
     this.distanceUnit,
     this.initialCount = 0,
     this.initialWeight,
   }) : super(key: key);
 
-  final int initialCount;
-  final double? initialWeight;
+  final void Function(int count, double? weight) onNewSet;
+  final bool confirmChanges;
   final MovementDimension dimension;
   final DistanceUnit? distanceUnit;
-  final void Function(int count, double? weight) onNewSet;
+  final int initialCount;
+  final double? initialWeight;
 
   @override
   Widget build(BuildContext context) {
     switch (dimension) {
       case MovementDimension.reps:
         return CountWeightPicker(
-          countLabel: dimension.displayName,
           setValue: onNewSet,
+          confirmChanges: confirmChanges,
+          countLabel: dimension.displayName,
           initialCount: initialCount,
           initialWeight: initialWeight,
         );
       case MovementDimension.time:
-        return SetDurationInput(onNewSet: onNewSet);
+        return SetDurationInput(
+          onNewSet: onNewSet,
+          confirmChanges: confirmChanges,
+        );
       case MovementDimension.distance:
         return CountWeightPicker(
+          setValue: onNewSet,
+          confirmChanges: confirmChanges,
           countLabel: dimension.displayName,
           countUnit: (distanceUnit ?? DistanceUnit.m).displayName,
-          setValue: onNewSet,
           initialCount: initialCount,
           initialWeight: initialWeight,
         );
       case MovementDimension.energy:
         return CountWeightPicker(
-          countLabel: dimension.displayName,
           setValue: onNewSet,
+          confirmChanges: confirmChanges,
+          countLabel: dimension.displayName,
           initialCount: initialCount,
           initialWeight: initialWeight,
         );

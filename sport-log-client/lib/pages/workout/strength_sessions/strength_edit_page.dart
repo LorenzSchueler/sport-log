@@ -122,7 +122,6 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
                 _strengthSessionDescription.session.comments == null)
               _buttonBar,
             NewSetInput(
-              dimension: _strengthSessionDescription.movement.dimension,
               onNewSet: (count, weight) {
                 final newSet = StrengthSet(
                   id: randomId(),
@@ -144,6 +143,8 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
                   ),
                 );
               },
+              confirmChanges: true,
+              dimension: _strengthSessionDescription.movement.dimension,
             ),
             const Divider(),
             Expanded(

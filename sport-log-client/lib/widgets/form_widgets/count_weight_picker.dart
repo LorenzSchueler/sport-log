@@ -8,6 +8,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 class CountWeightPicker extends StatefulWidget {
   const CountWeightPicker({
     required this.setValue,
+    required this.confirmChanges,
     required this.countLabel,
     this.countUnit,
     this.initialCount = 0,
@@ -15,11 +16,12 @@ class CountWeightPicker extends StatefulWidget {
     Key? key,
   }) : super(key: key);
 
-  final int initialCount;
-  final double? initialWeight;
+  final void Function(int count, double? weight) setValue;
+  final bool confirmChanges;
   final String countLabel;
   final String? countUnit;
-  final void Function(int count, double? weight) setValue;
+  final int initialCount;
+  final double? initialWeight;
 
   @override
   _CountWeightPickerState createState() => _CountWeightPickerState();
@@ -61,7 +63,14 @@ class _CountWeightPickerState extends State<CountWeightPicker> {
                 ),
                 IntPicker(
                   initialValue: _count,
-                  setValue: (count) => setState(() => _count = count),
+                  setValue: (count) {
+                    if (count > 0) {
+                      setState(() => _count = count);
+                      if (!widget.confirmChanges) {
+                        widget.setValue(_count, _weight);
+                      }
+                    }
+                  },
                 ),
               ],
             ),
@@ -70,7 +79,12 @@ class _CountWeightPickerState extends State<CountWeightPicker> {
                   ? [
                       IconButton(
                         icon: const Icon(AppIcons.add),
-                        onPressed: () => setState(() => _weight = 0),
+                        onPressed: () {
+                          setState(() => _weight = 0);
+                          if (!widget.confirmChanges) {
+                            widget.setValue(_count, _weight);
+                          }
+                        },
                         padding: EdgeInsets.zero,
                       ),
                       TableCell(
@@ -85,7 +99,12 @@ class _CountWeightPickerState extends State<CountWeightPicker> {
                   : [
                       IconButton(
                         icon: const Icon(AppIcons.close),
-                        onPressed: () => setState(() => _weight = null),
+                        onPressed: () {
+                          setState(() => _weight = null);
+                          if (!widget.confirmChanges) {
+                            widget.setValue(_count, _weight);
+                          }
+                        },
                         padding: EdgeInsets.zero,
                       ),
                       TableCell(
@@ -97,19 +116,27 @@ class _CountWeightPickerState extends State<CountWeightPicker> {
                       ),
                       DoublePicker(
                         initialValue: _weight!,
-                        setValue: (weight) => setState(() => _weight = weight),
+                        setValue: (weight) {
+                          setState(() => _weight = weight);
+                          if (!widget.confirmChanges) {
+                            widget.setValue(_count, _weight);
+                          }
+                        },
                       )
                     ],
             )
           ],
         ),
-        Defaults.sizedBox.horizontal.normal,
-        IconButton(
-          icon: const Icon(AppIcons.check),
-          iconSize: 40,
-          color: _count > 0 ? primaryColorOf(context) : null,
-          onPressed: _count > 0 ? () => widget.setValue(_count, _weight) : null,
-        ),
+        if (widget.confirmChanges) ...[
+          Defaults.sizedBox.horizontal.normal,
+          IconButton(
+            icon: const Icon(AppIcons.check),
+            iconSize: 40,
+            color: _count > 0 ? primaryColorOf(context) : null,
+            onPressed:
+                _count > 0 ? () => widget.setValue(_count, _weight) : null,
+          ),
+        ]
       ],
     );
   }
