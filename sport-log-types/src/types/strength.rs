@@ -205,10 +205,12 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthBlueprintSet>> {
         conn: &PgConnection,
     ) -> Result<Vec<Self::Entity>, Status> {
         let strength_blueprint_sets = self.0.into_inner();
-        let strength_blueprint_ids: Vec<_> = strength_blueprint_sets
+        let mut strength_blueprint_ids: Vec<_> = strength_blueprint_sets
             .iter()
             .map(|strength_set| strength_set.strength_blueprint_id)
             .collect();
+        strength_blueprint_ids.sort_unstable();
+        strength_blueprint_ids.dedup();
         if StrengthBlueprint::check_user_ids(&strength_blueprint_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
         {
@@ -399,10 +401,12 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthSet>> {
         conn: &PgConnection,
     ) -> Result<Vec<Self::Entity>, Status> {
         let strength_sets = self.0.into_inner();
-        let strength_session_ids: Vec<_> = strength_sets
+        let mut strength_session_ids: Vec<StrengthSessionId> = strength_sets
             .iter()
             .map(|strength_set| strength_set.strength_session_id)
             .collect();
+        strength_session_ids.sort_unstable();
+        strength_session_ids.dedup();
         if StrengthSession::check_user_ids(&strength_session_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
         {

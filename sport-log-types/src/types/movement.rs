@@ -391,10 +391,12 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MovementMuscle>> {
         conn: &PgConnection,
     ) -> Result<Vec<Self::Entity>, Status> {
         let movement_muscle = self.0.into_inner();
-        let movement_ids: Vec<_> = movement_muscle
+        let mut movement_ids: Vec<_> = movement_muscle
             .iter()
             .map(|metcon_movement| metcon_movement.movement_id)
             .collect();
+        movement_ids.sort_unstable();
+        movement_ids.dedup();
         if Movement::check_user_ids(&movement_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
         {

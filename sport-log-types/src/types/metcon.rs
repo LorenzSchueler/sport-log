@@ -369,10 +369,12 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconMovement>> {
         conn: &PgConnection,
     ) -> Result<Vec<Self::Entity>, Status> {
         let metcon_movements = self.0.into_inner();
-        let metcon_ids: Vec<_> = metcon_movements
+        let mut metcon_ids: Vec<_> = metcon_movements
             .iter()
             .map(|metcon_movement| metcon_movement.metcon_id)
             .collect();
+        metcon_ids.sort_unstable();
+        metcon_ids.dedup();
         if Metcon::check_user_ids(&metcon_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
         {
@@ -564,10 +566,12 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconItem>> {
         conn: &PgConnection,
     ) -> Result<Vec<Self::Entity>, Status> {
         let metcon_items = self.0.into_inner();
-        let metcon_ids: Vec<_> = metcon_items
+        let mut metcon_ids: Vec<_> = metcon_items
             .iter()
             .map(|metcon_item| metcon_item.metcon_id)
             .collect();
+        metcon_ids.sort_unstable();
+        metcon_ids.dedup();
         if Metcon::check_optional_user_ids(&metcon_ids, **auth, conn)
             .map_err(|_| Status::InternalServerError)?
         {
