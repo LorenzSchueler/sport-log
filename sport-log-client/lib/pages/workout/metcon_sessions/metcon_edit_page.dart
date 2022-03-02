@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/pages/workout/metcon_sessions/metcon_movement_card.dart';
+import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/form_widgets/int_picker.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
@@ -434,5 +434,67 @@ class _EditMetconPageState extends State<EditMetconPage> {
         ),
       );
     });
+  }
+}
+
+class MetconMovementCard extends StatelessWidget {
+  const MetconMovementCard({
+    required this.deleteMetconMovement,
+    required this.editMetconMovementDescription,
+    required this.mmd,
+    Key? key,
+  }) : super(key: key);
+
+  final MetconMovementDescription mmd;
+  final Function(MetconMovementDescription) editMetconMovementDescription;
+  final Function() deleteMetconMovement;
+
+  @override
+  Widget build(BuildContext context) {
+    final move = mmd.metconMovement;
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
+      child: Column(
+        children: [
+          ListTile(
+            title: Text(mmd.movement.name),
+            onTap: () async {
+              final movement = await showMovementPickerDialog(context);
+              if (movement != null) {
+                mmd.movement = movement;
+                mmd.metconMovement.movementId = movement.id;
+                editMetconMovementDescription(mmd);
+              }
+            },
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(AppIcons.delete),
+                  onPressed: () {
+                    deleteMetconMovement();
+                  },
+                ),
+                ReorderableDragStartListener(
+                  child: const Icon(AppIcons.dragHandle),
+                  index: move.movementNumber,
+                ),
+              ],
+            ),
+          ),
+          NewSetInput(
+            dimension: mmd.movement.dimension,
+            distanceUnit: move.distanceUnit,
+            onNewSet: (count, weight) {
+              mmd.metconMovement.count = count;
+              mmd.metconMovement.weight = weight;
+              editMetconMovementDescription(mmd);
+            },
+            initialCount: move.count,
+            initialWeight: move.weight,
+          ),
+        ],
+      ),
+    );
   }
 }
