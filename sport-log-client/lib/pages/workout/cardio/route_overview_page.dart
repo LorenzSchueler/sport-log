@@ -70,10 +70,17 @@ class RoutePageState extends State<RoutePage> {
       ),
       body: RefreshIndicator(
         onRefresh: _pullFromServer,
-        child: ListView.builder(
-          itemBuilder: (_, index) => RouteCard(route: _routes[index]),
-          itemCount: _routes.length,
-        ),
+        child: _routes.isEmpty
+            ? const Center(
+                child: Text(
+                  "looks like there are no routes there yet 😔 \npress ＋ to create a new one",
+                  textAlign: TextAlign.center,
+                ),
+              )
+            : ListView.builder(
+                itemBuilder: (_, index) => RouteCard(route: _routes[index]),
+                itemCount: _routes.length,
+              ),
       ),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.cardio),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
@@ -17,20 +19,37 @@ class MetconsPage extends StatefulWidget {
 
 class _MetconsPageState extends State<MetconsPage> {
   final _logger = Logger('MetconsPage');
-
   final _dataProvider = MetconDescriptionDataProvider.instance;
   List<MetconDescription> _metconDescriptions = [];
 
   @override
   void initState() {
     super.initState();
+    _dataProvider.addListener(_update);
+    _dataProvider.onNoInternetConnection =
+        () => showSimpleSnackBar(context, 'No Internet connection.');
     _update();
   }
 
+  @override
+  void dispose() {
+    _dataProvider.removeListener(_update);
+    _dataProvider.onNoInternetConnection = null;
+    super.dispose();
+  }
+
   Future<void> _update() async {
-    final mds = await _dataProvider.getNonDeleted();
-    setState(() {
-      _metconDescriptions = mds;
+    _logger.d('Updating route page');
+    final metconDescriptions = await _dataProvider.getNonDeleted();
+    setState(() => _metconDescriptions = metconDescriptions);
+  }
+
+  Future<void> _pullFromServer() async {
+    await _dataProvider.pullFromServer().onError((error, stackTrace) {
+      if (error is ApiError) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
+      }
     });
   }
 
@@ -47,7 +66,21 @@ class _MetconsPageState extends State<MetconsPage> {
           ),
         ],
       ),
-      body: _content,
+      body: RefreshIndicator(
+        onRefresh: _pullFromServer,
+        child: _metconDescriptions.isEmpty
+            ? const Center(
+                child: Text(
+                  "looks like there are no metcons there yet 😔 \npress ＋ to create a new one",
+                  textAlign: TextAlign.center,
+                ),
+              )
+            : ListView.builder(
+                itemBuilder: (_, index) =>
+                    MetconCard(metconDescription: _metconDescriptions[index]),
+                itemCount: _metconDescriptions.length,
+              ),
+      ),
       bottomNavigationBar:
           SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.metcon),
       drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
@@ -55,17 +88,6 @@ class _MetconsPageState extends State<MetconsPage> {
         child: const Icon(AppIcons.add),
         onPressed: () => Navigator.pushNamed(context, Routes.metcon.edit),
       ),
-    );
-  }
-
-  Widget get _content {
-    if (_metconDescriptions.isEmpty) {
-      return const Center(child: Text('No metcons there.'));
-    }
-    return ListView.builder(
-      itemBuilder: (_, index) =>
-          MetconCard(metconDescription: _metconDescriptions[index]),
-      itemCount: _metconDescriptions.length,
     );
   }
 }
