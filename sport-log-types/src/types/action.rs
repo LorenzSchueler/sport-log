@@ -20,7 +20,9 @@ use crate::{
     Platform, User,
 };
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
+#[derive(
+    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
+)]
 #[cfg_attr(
     feature = "server",
     derive(
@@ -73,7 +75,9 @@ pub struct ActionProvider {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
+#[derive(
+    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
+)]
 #[cfg_attr(
     feature = "server",
     derive(
@@ -155,7 +159,9 @@ impl Weekday {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
+#[derive(
+    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
+)]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUser)
@@ -209,7 +215,9 @@ pub struct ActionRule {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
+#[derive(
+    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
+)]
 #[cfg_attr(
     feature = "server",
     derive(

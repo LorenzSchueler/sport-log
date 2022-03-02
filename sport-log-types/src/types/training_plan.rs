@@ -13,7 +13,9 @@ use crate::{from_str, to_str, UserId, Weekday};
 #[cfg(feature = "server")]
 use crate::{schema::training_plan, User};
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
+#[derive(
+    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
+)]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)

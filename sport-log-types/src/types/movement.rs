@@ -32,7 +32,9 @@ pub enum MovementDimension {
     Distance,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
+#[derive(
+    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
+)]
 #[cfg_attr(
     feature = "server",
     derive(
@@ -203,7 +205,9 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
+#[derive(
+    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
+)]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForAdmin)
@@ -233,7 +237,9 @@ pub struct MuscleGroup {
     pub description: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
+#[derive(
+    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
+)]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
@@ -399,7 +405,9 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MovementMuscle>> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
+#[derive(
+    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
+)]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForAdmin)

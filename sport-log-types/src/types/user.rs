@@ -11,7 +11,9 @@ use crate::{from_str, to_str};
 #[cfg(feature = "server")]
 use crate::{schema::user, AuthUser, CheckUserId, Unverified, VerifyForUserWithDb};
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, FromI64, ToI64)]
+#[derive(
+    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
+)]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
