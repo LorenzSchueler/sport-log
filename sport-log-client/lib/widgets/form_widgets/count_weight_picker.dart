@@ -10,23 +10,29 @@ class CountWeightPicker extends StatefulWidget {
     required this.setValue,
     required this.countLabel,
     this.countUnit,
+    this.initialCount = 0,
+    this.initialWeight,
     Key? key,
   }) : super(key: key);
 
+  final int initialCount;
+  final double? initialWeight;
   final String countLabel;
   final String? countUnit;
-  final void Function(int count, [double? weight]) setValue;
+  final void Function(int count, double? weight) setValue;
 
   @override
   _CountWeightPickerState createState() => _CountWeightPickerState();
 }
 
 class _CountWeightPickerState extends State<CountWeightPicker> {
-  int _count = 0;
-  double? _weight;
+  late int _count;
+  late double? _weight;
 
   @override
   void initState() {
+    _count = widget.initialCount;
+    _weight = widget.initialWeight;
     super.initState();
   }
 
@@ -50,10 +56,11 @@ class _CountWeightPickerState extends State<CountWeightPicker> {
                     widget.countUnit == null
                         ? widget.countLabel
                         : "${widget.countLabel} (${widget.countUnit!})",
-                    style: Theme.of(context).textTheme.headline5,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
                 IntPicker(
+                  initialValue: _count,
                   setValue: (count) => setState(() => _count = count),
                 ),
               ],
@@ -70,7 +77,7 @@ class _CountWeightPickerState extends State<CountWeightPicker> {
                         verticalAlignment: TableCellVerticalAlignment.middle,
                         child: Text(
                           "Weight ",
-                          style: Theme.of(context).textTheme.headline5,
+                          style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ),
                       Container(),
@@ -85,10 +92,11 @@ class _CountWeightPickerState extends State<CountWeightPicker> {
                         verticalAlignment: TableCellVerticalAlignment.middle,
                         child: Text(
                           "Weight ",
-                          style: Theme.of(context).textTheme.headline5,
+                          style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ),
                       DoublePicker(
+                        initialValue: _weight!,
                         setValue: (weight) => setState(() => _weight = weight),
                       )
                     ],

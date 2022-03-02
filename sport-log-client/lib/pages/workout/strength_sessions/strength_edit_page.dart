@@ -123,7 +123,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
               _buttonBar,
             NewSetInput(
               dimension: _strengthSessionDescription.movement.dimension,
-              onNewSet: (count, [weight]) {
+              onNewSet: (count, weight) {
                 final newSet = StrengthSet(
                   id: randomId(),
                   strengthSessionId: _strengthSessionDescription.session.id,

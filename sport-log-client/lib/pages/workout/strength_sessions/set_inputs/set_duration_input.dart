@@ -11,7 +11,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 class SetDurationInput extends StatefulWidget {
   const SetDurationInput({Key? key, required this.onNewSet}) : super(key: key);
 
-  final void Function(int count, [double? weight]) onNewSet;
+  final void Function(int count, double? weight) onNewSet;
 
   @override
   _SetDurationInputState createState() => _SetDurationInputState();
@@ -35,7 +35,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
       seconds: _seconds,
       milliseconds: _milliseconds,
     );
-    widget.onNewSet(duration.inMilliseconds);
+    widget.onNewSet(duration.inMilliseconds, null);
 
     // clear all inputs
     _hoursKey.currentState?.clear();
