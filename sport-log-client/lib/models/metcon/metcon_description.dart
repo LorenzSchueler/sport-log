@@ -22,24 +22,10 @@ class MetconDescription extends CompoundEntity {
     return metcon.name ?? moves.map((e) => e.movement.name).join(" & ");
   }
 
-  static MetconDescription defaultValue() {
-    final metcon = Metcon.defaultValue();
-    final movement = Movement.defaultMovement;
-    return MetconDescription(
-      metcon: metcon,
-      moves: [
-        MetconMovementDescription(
-          metconMovement: MetconMovement.defaultValue(
-            metconId: metcon.id,
-            movementId: movement.id,
-            movementNumber: 0,
-          ),
-          movement: movement,
-        )
-      ],
-      hasReference: false,
-    );
-  }
+  MetconDescription.defaultValue()
+      : metcon = Metcon.defaultValue(),
+        moves = [],
+        hasReference = false;
 
   static late MetconDescription
       defaultMetconDescription; // must be initialized in sync::startSync

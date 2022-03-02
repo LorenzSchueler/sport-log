@@ -28,7 +28,7 @@ extension MovementDimensionStrings on MovementDimension {
       case MovementDimension.reps:
         return 'Reps';
       case MovementDimension.energy:
-        return 'Energy';
+        return 'Calories';
       case MovementDimension.distance:
         return 'Distance';
       case MovementDimension.time:
