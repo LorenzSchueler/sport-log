@@ -25,6 +25,13 @@ class MetconSessionDetailsPage extends StatefulWidget {
 class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
   final _logger = Logger('MetconSessionDetailsPage');
   final _dataProvider = MetconSessionDescriptionDataProvider.instance;
+  late MetconSessionDescription _metconSessionDescription;
+
+  @override
+  void initState() {
+    _metconSessionDescription = widget.metconSessionDescription;
+    super.initState();
+  }
 
   Future<void> _deleteMetconSession() async {
     await _dataProvider.deleteSingle(widget.metconSessionDescription);
@@ -33,12 +40,9 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    MetconSessionDescription metconSessionDescription =
-        widget.metconSessionDescription;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(metconSessionDescription.metconDescription.name),
+        title: Text(_metconSessionDescription.metconDescription.name),
         actions: [
           IconButton(
             onPressed: _deleteMetconSession,
@@ -49,14 +53,14 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
               final returnObj = await Navigator.pushNamed(
                 context,
                 Routes.metcon.sessionEdit,
-                arguments: metconSessionDescription,
+                arguments: _metconSessionDescription,
               );
               if (returnObj is ReturnObject<MetconSessionDescription>) {
                 if (returnObj.action == ReturnAction.deleted) {
                   Navigator.pop(context);
                 } else {
                   setState(() {
-                    metconSessionDescription = returnObj.payload;
+                    _metconSessionDescription = returnObj.payload;
                   });
                 }
               }
@@ -74,7 +78,7 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
           ),
           TextTile(
             caption: "Type",
-            child: Text(metconSessionDescription.typeLengthDescription),
+            child: Text(_metconSessionDescription.typeLengthDescription),
           ),
           TextTile(
             caption: "Movements",
@@ -82,17 +86,17 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 for (var metconMovementDescription
-                    in metconSessionDescription.metconDescription.moves)
+                    in _metconSessionDescription.metconDescription.moves)
                   Text(metconMovementDescription.movementText),
               ],
             ),
           ),
-          if (metconSessionDescription.metconDescription.metcon.description !=
+          if (_metconSessionDescription.metconDescription.metcon.description !=
               null)
             TextTile(
               caption: "Description",
               child: Text(
-                metconSessionDescription.metconDescription.metcon.description!,
+                _metconSessionDescription.metconDescription.metcon.description!,
               ),
             ),
           Defaults.sizedBox.vertical.big,
@@ -103,17 +107,17 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
           TextTile(
             caption: "Score",
             child: Text(
-              "${metconSessionDescription.shortResultDescription} (${metconSessionDescription.metconSession.datetime.formatDate})",
+              "${_metconSessionDescription.shortResultDescription} (${_metconSessionDescription.metconSession.datetime.formatDate})",
             ),
           ),
           const TextTile(
             caption: "Best Score",
             child: Text("<my best score> <date>"),
           ),
-          if (metconSessionDescription.metconSession.comments != null)
+          if (_metconSessionDescription.metconSession.comments != null)
             TextTile(
               caption: "Comments",
-              child: Text(metconSessionDescription.metconSession.comments!),
+              child: Text(_metconSessionDescription.metconSession.comments!),
             ),
         ],
       ),

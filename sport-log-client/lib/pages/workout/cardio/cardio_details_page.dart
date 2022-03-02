@@ -23,40 +23,46 @@ class CardioDetailsPage extends StatefulWidget {
 
 class CardioDetailsPageState extends State<CardioDetailsPage> {
   final _logger = Logger('CardioDetailsPage');
+  late CardioSessionDescription _cardioSessionDescription;
+
+  @override
+  void initState() {
+    _cardioSessionDescription = widget.cardioSessionDescription;
+    super.initState();
+  }
 
   late MapboxMapController _mapController;
 
   @override
   Widget build(BuildContext context) {
-    CardioSessionDescription cardioSessionDescription =
-        widget.cardioSessionDescription;
-
-    final distance = cardioSessionDescription.cardioSession.distance == null
+    final distance = _cardioSessionDescription.cardioSession.distance == null
         ? '???'
-        : (cardioSessionDescription.cardioSession.distance! / 1000)
+        : (_cardioSessionDescription.cardioSession.distance! / 1000)
             .toStringAsFixed(3);
-    final speed = cardioSessionDescription.cardioSession.distance == null ||
-            cardioSessionDescription.cardioSession.time == null
+    final speed = _cardioSessionDescription.cardioSession.distance == null ||
+            _cardioSessionDescription.cardioSession.time == null
         ? '???'
-        : ((cardioSessionDescription.cardioSession.distance! / 1000) /
-                (cardioSessionDescription.cardioSession.time!.inSeconds / 3600))
+        : ((_cardioSessionDescription.cardioSession.distance! / 1000) /
+                (_cardioSessionDescription.cardioSession.time!.inSeconds /
+                    3600))
             .toStringAsFixed(1);
-    final calories = cardioSessionDescription.cardioSession.calories == null
+    final calories = _cardioSessionDescription.cardioSession.calories == null
         ? "-"
-        : cardioSessionDescription.cardioSession.calories.toString();
-    final avgCadence = cardioSessionDescription.cardioSession.avgCadence == null
-        ? "-"
-        : cardioSessionDescription.cardioSession.avgCadence.toString();
-    final avgHeartRate =
-        cardioSessionDescription.cardioSession.avgHeartRate == null
+        : _cardioSessionDescription.cardioSession.calories.toString();
+    final avgCadence =
+        _cardioSessionDescription.cardioSession.avgCadence == null
             ? "-"
-            : cardioSessionDescription.cardioSession.avgHeartRate.toString();
-    final ascent = cardioSessionDescription.cardioSession.ascent == null
+            : _cardioSessionDescription.cardioSession.avgCadence.toString();
+    final avgHeartRate =
+        _cardioSessionDescription.cardioSession.avgHeartRate == null
+            ? "-"
+            : _cardioSessionDescription.cardioSession.avgHeartRate.toString();
+    final ascent = _cardioSessionDescription.cardioSession.ascent == null
         ? "-"
-        : cardioSessionDescription.cardioSession.ascent.toString();
-    final descent = cardioSessionDescription.cardioSession.descent == null
+        : _cardioSessionDescription.cardioSession.ascent.toString();
+    final descent = _cardioSessionDescription.cardioSession.descent == null
         ? "-"
-        : cardioSessionDescription.cardioSession.descent.toString();
+        : _cardioSessionDescription.cardioSession.descent.toString();
 
     TableRow rowSpacer = TableRow(
       children: [
@@ -71,13 +77,13 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
           text: TextSpan(
             children: [
               TextSpan(
-                text: cardioSessionDescription.movement.name + "  ",
+                text: _cardioSessionDescription.movement.name + "  ",
                 style:
                     const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               TextSpan(
                 text: describeEnum(
-                  cardioSessionDescription.cardioSession.cardioType,
+                  _cardioSessionDescription.cardioSession.cardioType,
                 ),
                 style: const TextStyle(fontSize: 14),
               )
@@ -90,14 +96,14 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
               final returnObj = await Navigator.pushNamed(
                 context,
                 Routes.cardio.cardioEdit,
-                arguments: cardioSessionDescription,
+                arguments: _cardioSessionDescription,
               );
               if (returnObj is ReturnObject<CardioSessionDescription>) {
                 if (returnObj.action == ReturnAction.deleted) {
                   Navigator.pop(context);
                 } else {
                   setState(() {
-                    cardioSessionDescription = returnObj.payload;
+                    _cardioSessionDescription = returnObj.payload;
                   });
                 }
               }
@@ -112,7 +118,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
             color: backgroundColorOf(context),
             child: Column(
               children: [
-                cardioSessionDescription.cardioSession.track != null
+                _cardioSessionDescription.cardioSession.track != null
                     ? Expanded(
                         child: MapboxMap(
                           accessToken: Defaults.mapbox.accessToken,
@@ -120,23 +126,23 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                           initialCameraPosition: CameraPosition(
                             zoom: 14.0,
                             target:
-                                cardioSessionDescription.cardioSession.track ==
+                                _cardioSessionDescription.cardioSession.track ==
                                             null ||
-                                        cardioSessionDescription
+                                        _cardioSessionDescription
                                             .cardioSession.track!.isEmpty
                                     ? Defaults.mapbox.cameraPosition
-                                    : cardioSessionDescription
+                                    : _cardioSessionDescription
                                         .cardioSession.track!.first.latLng,
                           ),
                           onMapCreated: (MapboxMapController controller) =>
                               _mapController = controller,
                           onStyleLoadedCallback: () {
-                            if (cardioSessionDescription.cardioSession.track !=
+                            if (_cardioSessionDescription.cardioSession.track !=
                                 null) {
                               _mapController.addLine(
                                 LineOptions(
                                   lineColor: "red",
-                                  geometry: cardioSessionDescription
+                                  geometry: _cardioSessionDescription
                                       .cardioSession.track!
                                       .map((c) => c.latLng)
                                       .toList(),
@@ -146,7 +152,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                             _mapController.addLine(
                               LineOptions(
                                 lineColor: "blue",
-                                geometry: cardioSessionDescription.route?.track
+                                geometry: _cardioSessionDescription.route?.track
                                     .map((route) => route.latLng)
                                     .toList(),
                               ),
@@ -175,7 +181,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                           scale: 1.3,
                         ),
                         ValueUnitDescription(
-                          value: cardioSessionDescription
+                          value: _cardioSessionDescription
                                   .cardioSession.time?.formatTime ??
                               "",
                           unit: null,
@@ -238,9 +244,9 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                   ],
                 ),
                 Defaults.sizedBox.vertical.normal,
-                if (cardioSessionDescription.cardioSession.comments != null)
-                  Text(cardioSessionDescription.cardioSession.comments!),
-                if (cardioSessionDescription.cardioSession.comments != null)
+                if (_cardioSessionDescription.cardioSession.comments != null)
+                  Text(_cardioSessionDescription.cardioSession.comments!),
+                if (_cardioSessionDescription.cardioSession.comments != null)
                   Defaults.sizedBox.vertical.normal,
               ],
             ),
@@ -251,10 +257,10 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
               top: 5,
             ),
             child: Text(
-              cardioSessionDescription.cardioSession.datetime.formatDatetime,
+              _cardioSessionDescription.cardioSession.datetime.formatDatetime,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: cardioSessionDescription.cardioSession.track != null
+                color: _cardioSessionDescription.cardioSession.track != null
                     ? backgroundColorOf(context)
                     : Colors.white,
                 fontSize: 16,

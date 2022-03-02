@@ -22,6 +22,13 @@ class MetconDetailsPage extends StatefulWidget {
 class MetconDetailsPageState extends State<MetconDetailsPage> {
   final _logger = Logger('MetconSessionDetailsPage');
   final _dataProvider = MetconDescriptionDataProvider.instance;
+  late MetconDescription _metconDescription;
+
+  @override
+  void initState() {
+    _metconDescription = widget.metconDescription;
+    super.initState();
+  }
 
   Future<void> _deleteMetcon() async {
     await _dataProvider.deleteSingle(widget.metconDescription);
@@ -30,11 +37,9 @@ class MetconDetailsPageState extends State<MetconDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    MetconDescription metconDescription = widget.metconDescription;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(metconDescription.name),
+        title: Text(_metconDescription.name),
         actions: [
           IconButton(
             onPressed: _deleteMetcon,
@@ -46,14 +51,14 @@ class MetconDetailsPageState extends State<MetconDetailsPage> {
                 final returnObj = await Navigator.pushNamed(
                   context,
                   Routes.metcon.edit,
-                  arguments: metconDescription,
+                  arguments: _metconDescription,
                 );
                 if (returnObj is ReturnObject<MetconDescription>) {
                   if (returnObj.action == ReturnAction.deleted) {
                     Navigator.pop(context);
                   } else {
                     setState(() {
-                      metconDescription = returnObj.payload;
+                      _metconDescription = returnObj.payload;
                     });
                   }
                 }
@@ -71,23 +76,23 @@ class MetconDetailsPageState extends State<MetconDetailsPage> {
           ),
           TextTile(
             caption: "Type",
-            child: Text(metconDescription.typeLengthDescription),
+            child: Text(_metconDescription.typeLengthDescription),
           ),
           TextTile(
             caption: "Movements",
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (var metconMovementDescription in metconDescription.moves)
+                for (var metconMovementDescription in _metconDescription.moves)
                   Text(metconMovementDescription.movementText),
               ],
             ),
           ),
-          if (metconDescription.metcon.description != null)
+          if (_metconDescription.metcon.description != null)
             TextTile(
               caption: "Description",
               child: Text(
-                metconDescription.metcon.description!,
+                _metconDescription.metcon.description!,
               ),
             ),
         ],

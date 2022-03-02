@@ -5,7 +5,6 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/page_return.dart';
-import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/routes.dart';
@@ -28,20 +27,24 @@ class StrengthSessionDetailsPage extends StatefulWidget {
 class _StrengthSessionDetailsPageState
     extends State<StrengthSessionDetailsPage> {
   final _dataProvider = StrengthSessionDescriptionDataProvider.instance;
+  late StrengthSessionDescription _strengthSessionDescription;
+
+  @override
+  void initState() {
+    _strengthSessionDescription = widget.strengthSessionDescription;
+    super.initState();
+  }
 
   Future<void> _deleteStrengthSession() async {
-    await _dataProvider.deleteSingle(widget.strengthSessionDescription);
+    await _dataProvider.deleteSingle(_strengthSessionDescription);
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    StrengthSessionDescription strengthSessionDescription =
-        widget.strengthSessionDescription;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.strengthSessionDescription.movement.name),
+        title: Text(_strengthSessionDescription.movement.name),
         actions: [
           IconButton(
             onPressed: _deleteStrengthSession,
@@ -52,14 +55,14 @@ class _StrengthSessionDetailsPageState
               final returnObj = await Navigator.pushNamed(
                 context,
                 Routes.strength.edit,
-                arguments: widget.strengthSessionDescription,
+                arguments: _strengthSessionDescription,
               );
               if (returnObj is ReturnObject<StrengthSessionDescription>) {
                 if (returnObj.action == ReturnAction.deleted) {
                   Navigator.pop(context);
                 } else {
                   setState(() {
-                    strengthSessionDescription = returnObj.payload;
+                    _strengthSessionDescription = returnObj.payload;
                   });
                 }
               }
