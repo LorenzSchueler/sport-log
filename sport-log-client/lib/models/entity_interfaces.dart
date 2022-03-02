@@ -12,6 +12,8 @@ abstract class Validatable {
 abstract class Entity extends JsonSerializable implements Validatable {
   @override
   String toString() => toJson().toString();
+
+  Entity clone();
 }
 
 abstract class CompoundEntity extends Entity {}

@@ -37,6 +37,9 @@ class Action extends AtomicEntity {
   Map<String, dynamic> toJson() => _$ActionToJson(this);
 
   @override
+  Action clone() => Action.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(name.isNotEmpty, 'Action: name is empty') &&
         validate(!deleted, 'Action: deleted is true');

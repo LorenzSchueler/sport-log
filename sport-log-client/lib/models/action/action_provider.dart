@@ -36,6 +36,9 @@ class ActionProvider extends AtomicEntity {
   Map<String, dynamic> toJson() => _$ActionProviderToJson(this);
 
   @override
+  ActionProvider clone() => ActionProvider.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(name.isNotEmpty, 'ActionProvider: name is empty') &&
         validate(password.isNotEmpty, 'ActionProvider: password is empty') &&

@@ -40,6 +40,9 @@ class ActionEvent extends AtomicEntity {
   Map<String, dynamic> toJson() => _$ActionEventToJson(this);
 
   @override
+  ActionEvent clone() => ActionEvent.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(!deleted, 'ActionEvent: deleted is true');
   }

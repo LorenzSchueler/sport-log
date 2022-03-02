@@ -37,6 +37,9 @@ class PlatformCredential extends AtomicEntity {
   Map<String, dynamic> toJson() => _$PlatformCredentialToJson(this);
 
   @override
+  PlatformCredential clone() => PlatformCredential.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(!deleted, 'PlatformCredential: deleted == true') &&
         validate(

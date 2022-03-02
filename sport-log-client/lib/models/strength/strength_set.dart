@@ -39,6 +39,9 @@ class StrengthSet extends AtomicEntity {
   Map<String, dynamic> toJson() => _$StrengthSetToJson(this);
 
   @override
+  StrengthSet clone() => StrengthSet.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(!deleted, 'StrengthSet: deleted == true') &&
         validate(setNumber >= 0, 'StrengthSet: setNumber < 0') &&
@@ -53,17 +56,6 @@ class StrengthSet extends AtomicEntity {
 
   double? get eorm {
     return weight == null ? null : getEorm(count, weight!);
-  }
-
-  StrengthSet copy() {
-    return StrengthSet(
-      id: id,
-      strengthSessionId: strengthSessionId,
-      setNumber: setNumber,
-      count: count,
-      weight: weight,
-      deleted: deleted,
-    );
   }
 }
 

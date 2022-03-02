@@ -82,6 +82,9 @@ class MetconMovement extends AtomicEntity {
   Map<String, dynamic> toJson() => _$MetconMovementToJson(this);
 
   @override
+  MetconMovement clone() => MetconMovement.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(deleted != true, 'MetconMovement: deleted == true') &&
         validate(movementNumber >= 0, 'MetconMovement: movement number < 0') &&

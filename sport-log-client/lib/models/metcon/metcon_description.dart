@@ -37,6 +37,9 @@ class MetconDescription extends CompoundEntity {
   Map<String, dynamic> toJson() => _$MetconDescriptionToJson(this);
 
   @override
+  MetconDescription clone() => MetconDescription.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(metcon.isValid(), 'MetconDescription: metcon not valid') &&
         validate(moves.isNotEmpty, 'MetconDescription: moves empty') &&

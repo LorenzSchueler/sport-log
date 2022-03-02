@@ -28,6 +28,9 @@ class User extends NonDeletableAtomicEntity {
   Map<String, dynamic> toJson() => _$UserToJson(this);
 
   @override
+  User clone() => User.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(username.isNotEmpty, 'User: username is empty') &&
         validate(password.isNotEmpty, 'User: password is empty') &&

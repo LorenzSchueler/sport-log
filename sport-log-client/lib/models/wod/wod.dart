@@ -34,6 +34,9 @@ class Wod extends AtomicEntity {
   Map<String, dynamic> toJson() => _$WodToJson(this);
 
   @override
+  Wod clone() => Wod.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(!deleted, 'Wod: deleted == true');
   }

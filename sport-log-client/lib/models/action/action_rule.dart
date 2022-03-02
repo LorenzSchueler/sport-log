@@ -43,6 +43,9 @@ class ActionRule extends AtomicEntity {
   Map<String, dynamic> toJson() => _$ActionRuleToJson(this);
 
   @override
+  ActionRule clone() => ActionRule.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(!deleted, 'ActionRule: deleted is true');
   }

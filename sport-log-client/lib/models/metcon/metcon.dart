@@ -91,6 +91,9 @@ class Metcon extends AtomicEntity {
   @override
   Map<String, dynamic> toJson() => _$MetconToJson(this);
 
+  @override
+  Metcon clone() => Metcon.fromJson(toJson());
+
   bool validateMetconType() {
     switch (metconType) {
       case MetconType.amrap:

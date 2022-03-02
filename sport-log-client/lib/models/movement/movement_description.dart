@@ -26,17 +26,15 @@ class MovementDescription extends CompoundEntity {
   Map<String, dynamic> toJson() => _$MovementDescriptionToJson(this);
 
   @override
+  MovementDescription clone() => MovementDescription.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(
       movement.isValid(),
       'MovementDescription: movement is not valid',
     );
   }
-
-  MovementDescription copy() => MovementDescription(
-        movement: movement.copy(),
-        hasReference: hasReference,
-      );
 
   @override
   bool operator ==(other) =>

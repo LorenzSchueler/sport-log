@@ -52,17 +52,8 @@ class StrengthSession extends AtomicEntity {
         );
   }
 
-  StrengthSession copy() {
-    return StrengthSession(
-      id: id,
-      userId: userId,
-      datetime: datetime.copy(),
-      movementId: movementId,
-      interval: interval,
-      comments: comments,
-      deleted: deleted,
-    );
-  }
+  @override
+  StrengthSession clone() => StrengthSession.fromJson(toJson());
 }
 
 class DbStrengthSessionSerializer extends DbSerializer<StrengthSession> {

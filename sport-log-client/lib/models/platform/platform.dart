@@ -29,6 +29,9 @@ class Platform extends AtomicEntity {
   Map<String, dynamic> toJson() => _$PlatformToJson(this);
 
   @override
+  Platform clone() => Platform.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(name.isNotEmpty, 'Platform: name is empty') &&
         validate(!deleted, 'Platform: deleted == true');

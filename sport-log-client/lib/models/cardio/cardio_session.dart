@@ -94,6 +94,9 @@ class CardioSession extends AtomicEntity {
   Map<String, dynamic> toJson() => _$CardioSessionToJson(this);
 
   @override
+  CardioSession clone() => CardioSession.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(!deleted, 'CardioSession: deleted is true') &&
         validate(

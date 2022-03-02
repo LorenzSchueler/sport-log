@@ -46,6 +46,9 @@ class Diary extends AtomicEntity {
   Map<String, dynamic> toJson() => _$DiaryToJson(this);
 
   @override
+  Diary clone() => Diary.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(
           bodyweight == null || bodyweight! > 0,

@@ -55,6 +55,9 @@ class Route extends AtomicEntity with Comparable<Route> {
   Map<String, dynamic> toJson() => _$RouteToJson(this);
 
   @override
+  Route clone() => Route.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(name.isNotEmpty, 'Route: name is empty') &&
         validate(distance > 0, 'Route: distance <= 0') &&

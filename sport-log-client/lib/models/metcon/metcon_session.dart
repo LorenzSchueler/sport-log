@@ -80,6 +80,9 @@ class MetconSession extends AtomicEntity {
   Map<String, dynamic> toJson() => _$MetconSessionToJson(this);
 
   @override
+  MetconSession clone() => MetconSession.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(deleted != true, 'MetconSession: deleted == true') &&
         validate(

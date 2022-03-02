@@ -94,20 +94,13 @@ class Movement extends AtomicEntity {
   Map<String, dynamic> toJson() => _$MovementToJson(this);
 
   @override
+  Movement clone() => Movement.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(name.isNotEmpty, 'Movement: name is empty') &&
         validate(deleted == false, 'Movement: deleted == true');
   }
-
-  Movement copy() => Movement(
-        id: id,
-        userId: userId,
-        name: name,
-        description: description,
-        cardio: cardio,
-        deleted: deleted,
-        dimension: dimension,
-      );
 
   @override
   bool operator ==(other) =>

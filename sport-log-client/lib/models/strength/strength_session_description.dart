@@ -32,6 +32,10 @@ class StrengthSessionDescription extends CompoundEntity {
   Map<String, dynamic> toJson() => _$StrengthSessionDescriptionToJson(this);
 
   @override
+  StrengthSessionDescription clone() =>
+      StrengthSessionDescription.fromJson(toJson());
+
+  @override
   bool isValid() {
     return validate(
           session.isValid(),
@@ -88,14 +92,6 @@ class StrengthSessionDescription extends CompoundEntity {
       ),
       movement: movement,
       sets: [],
-    );
-  }
-
-  StrengthSessionDescription copy() {
-    return StrengthSessionDescription(
-      session: session.copy(),
-      movement: movement.copy(),
-      sets: sets.mapToList((set) => set.copy()),
     );
   }
 }
