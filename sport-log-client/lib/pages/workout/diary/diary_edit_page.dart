@@ -56,7 +56,9 @@ class DiaryEditPageState extends State<DiaryEditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Diary Entry"),
+        title: Text(
+          widget.diary != null ? "Edit Diary Entry" : "Create Diary Entry",
+        ),
         actions: [
           IconButton(
             onPressed: _deleteDiary,

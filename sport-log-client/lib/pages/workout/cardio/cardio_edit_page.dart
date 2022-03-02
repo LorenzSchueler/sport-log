@@ -82,7 +82,11 @@ class CardioEditPageState extends State<CardioEditPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Cardio Edit"),
+        title: Text(
+          widget.cardioSessionDescription != null
+              ? "Edit Cardio Session"
+              : "Create Cardio Session",
+        ),
         actions: [
           IconButton(
             onPressed: _deleteCardioSession,

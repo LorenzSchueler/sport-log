@@ -94,7 +94,11 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit session'),
+        title: Text(
+          widget.strengthSessionDescription != null
+              ? "Edit Strength Session"
+              : "Create Strength Session",
+        ),
         actions: [
           IconButton(
             onPressed: _deleteStrengthSession,

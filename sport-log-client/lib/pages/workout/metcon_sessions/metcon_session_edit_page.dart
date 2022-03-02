@@ -82,7 +82,11 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Metcon Session"),
+        title: Text(
+          widget.metconSessionDescription != null
+              ? "Edit Metcon Session"
+              : "Create Metcon Session",
+        ),
         actions: [
           IconButton(
             onPressed: _deleteMetconSession,

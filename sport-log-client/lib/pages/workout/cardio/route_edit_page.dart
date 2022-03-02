@@ -304,7 +304,7 @@ class RouteEditPageState extends State<RouteEditPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Cardio Edit"),
+        title: Text(widget.route != null ? "Edit Route" : "Create Route"),
         actions: [
           IconButton(
             onPressed: _deleteRoute,
