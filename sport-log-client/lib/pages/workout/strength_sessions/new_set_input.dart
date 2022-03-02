@@ -21,38 +21,43 @@ class NewSetInput extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (dimension) {
       case MovementDimension.reps:
-        return RepWeightPicker(setValue: onNewSet);
+        return CountWeightPicker(countLabel: "Reps", setValue: onNewSet);
       case MovementDimension.time:
         return SetDurationInput(onNewSet: onNewSet);
       case MovementDimension.distance:
-        // TODO: Handle this case.
-        break;
+        return CountWeightPicker(
+          countLabel: "Distance",
+          countUnit: "m",
+          setValue: onNewSet,
+        );
       case MovementDimension.energy:
-        // TODO: Handle this case.
-        break;
+        return CountWeightPicker(
+          countLabel: "Energy",
+          countUnit: "cal",
+          setValue: onNewSet,
+        );
     }
-    return Container(
-      color: Colors.red,
-      width: double.infinity,
-      height: 70,
-    );
   }
 }
 
-class RepWeightPicker extends StatefulWidget {
-  const RepWeightPicker({
+class CountWeightPicker extends StatefulWidget {
+  const CountWeightPicker({
     required this.setValue,
+    required this.countLabel,
+    this.countUnit,
     Key? key,
   }) : super(key: key);
 
+  final String countLabel;
+  final String? countUnit;
   final void Function(int count, [double? weight]) setValue;
 
   @override
-  _RepWeightPickerState createState() => _RepWeightPickerState();
+  _CountWeightPickerState createState() => _CountWeightPickerState();
 }
 
-class _RepWeightPickerState extends State<RepWeightPicker> {
-  int _reps = 0;
+class _CountWeightPickerState extends State<CountWeightPicker> {
+  int _count = 0;
   double? _weight;
 
   @override
@@ -67,7 +72,7 @@ class _RepWeightPickerState extends State<RepWeightPicker> {
         Table(
           columnWidths: const {
             0: FixedColumnWidth(30),
-            1: FixedColumnWidth(85),
+            1: FixedColumnWidth(140),
             2: FixedColumnWidth(166),
           },
           children: [
@@ -77,12 +82,14 @@ class _RepWeightPickerState extends State<RepWeightPicker> {
                 TableCell(
                   verticalAlignment: TableCellVerticalAlignment.middle,
                   child: Text(
-                    "Reps ",
+                    widget.countUnit == null
+                        ? widget.countLabel
+                        : "${widget.countLabel} (${widget.countUnit!})",
                     style: Theme.of(context).textTheme.headline5,
                   ),
                 ),
                 IntPicker(
-                  setValue: (reps) => setState(() => _reps = reps),
+                  setValue: (count) => setState(() => _count = count),
                 ),
               ],
             ),
@@ -123,11 +130,12 @@ class _RepWeightPickerState extends State<RepWeightPicker> {
             )
           ],
         ),
-        Defaults.sizedBox.horizontal.big,
+        Defaults.sizedBox.horizontal.normal,
         IconButton(
           icon: const Icon(AppIcons.check),
-          color: _reps > 0 ? primaryColorOf(context) : null,
-          onPressed: _reps > 0 ? () => widget.setValue(_reps, _weight) : null,
+          iconSize: 40,
+          color: _count > 0 ? primaryColorOf(context) : null,
+          onPressed: _count > 0 ? () => widget.setValue(_count, _weight) : null,
         ),
       ],
     );
