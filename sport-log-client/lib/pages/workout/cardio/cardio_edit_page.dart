@@ -34,7 +34,7 @@ class CardioEditPageState extends State<CardioEditPage> {
 
   @override
   void initState() {
-    _cardioSessionDescription = widget.cardioSessionDescription ??
+    _cardioSessionDescription = widget.cardioSessionDescription?.clone() ??
         CardioSessionDescription.defaultValue();
     super.initState();
   }
@@ -94,7 +94,8 @@ class CardioEditPageState extends State<CardioEditPage> {
           ),
           IconButton(
             onPressed: _formKey.currentContext != null &&
-                    _formKey.currentState!.validate()
+                    _formKey.currentState!.validate() &&
+                    _cardioSessionDescription.isValid()
                 ? _saveCardioSession
                 : null,
             icon: const Icon(AppIcons.save),

@@ -264,11 +264,13 @@ satelites:  ${location.satelliteNumber}""";
           ),
           TextButton(
             child: const Text("Save"),
-            onPressed: () async {
-              _trackingMode = TrackingMode.stopped;
-              Navigator.pop(context);
-              await _saveCardioSession();
-            },
+            onPressed: _cardioSessionDescription.isValid()
+                ? () async {
+                    _trackingMode = TrackingMode.stopped;
+                    Navigator.pop(context);
+                    await _saveCardioSession();
+                  }
+                : null,
           )
         ],
       ),

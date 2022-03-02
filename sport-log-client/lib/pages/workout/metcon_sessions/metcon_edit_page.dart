@@ -38,7 +38,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
     _logger.i("got ${widget.metconDescription}");
     super.initState();
     _metconDescription =
-        widget.metconDescription ?? MetconDescription.defaultValue();
+        widget.metconDescription?.clone() ?? MetconDescription.defaultValue();
   }
 
   Future<void> _saveMetcon() async {

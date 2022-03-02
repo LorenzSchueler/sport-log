@@ -25,7 +25,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
 
   @override
   void initState() {
-    _diary = widget.diary ?? Diary.defaultValue();
+    _diary = widget.diary?.clone() ?? Diary.defaultValue();
     super.initState();
   }
 
@@ -66,7 +66,8 @@ class DiaryEditPageState extends State<DiaryEditPage> {
           ),
           IconButton(
             onPressed: _formKey.currentContext != null &&
-                    _formKey.currentState!.validate()
+                    _formKey.currentState!.validate() &&
+                    _diary.isValid()
                 ? _saveDiary
                 : null,
             icon: const Icon(AppIcons.save),

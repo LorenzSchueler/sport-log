@@ -35,16 +35,16 @@ class _EditMovementPageState extends State<EditMovementPage> {
   final _dataProvider = MovementDataProvider.instance;
   final _formKey = GlobalKey<FormState>();
   final _descriptionFocusNode = FocusNode();
-  late MovementDescription _md;
+  late MovementDescription _movementDescription;
 
   @override
   void initState() {
     if (widget.movementDescription != null) {
-      _md = widget.movementDescription!;
+      _movementDescription = widget.movementDescription!.clone();
     } else {
-      _md = MovementDescription.defaultValue();
+      _movementDescription = MovementDescription.defaultValue();
       if (widget.name != null) {
-        _md.movement.name = widget.name!;
+        _movementDescription.movement.name = widget.name!;
       }
     }
     super.initState();
@@ -54,8 +54,8 @@ class _EditMovementPageState extends State<EditMovementPage> {
     FocusManager.instance.primaryFocus?.unfocus();
     if (widget.movementDescription == null &&
         await _dataProvider.exists(
-          _md.movement.name,
-          _md.movement.dimension,
+          _movementDescription.movement.name,
+          _movementDescription.movement.dimension,
         )) {
       await showMessageDialog(
         context: context,
@@ -67,8 +67,8 @@ class _EditMovementPageState extends State<EditMovementPage> {
 
     // TODO: do error handling
     final result = widget.movementDescription != null
-        ? await _dataProvider.updateSingle(_md.movement)
-        : await _dataProvider.createSingle(_md.movement);
+        ? await _dataProvider.updateSingle(_movementDescription.movement)
+        : await _dataProvider.createSingle(_movementDescription.movement);
     if (result) {
       _formKey.currentState!.deactivate();
       Navigator.pop(context);
@@ -82,13 +82,11 @@ class _EditMovementPageState extends State<EditMovementPage> {
 
   void _deleteMovement() {
     if (widget.movementDescription != null) {
-      assert(_md.movement.userId != null);
-      _dataProvider.deleteSingle(_md.movement);
+      assert(_movementDescription.movement.userId != null);
+      _dataProvider.deleteSingle(_movementDescription.movement);
     }
     Navigator.pop(context);
   }
-
-  bool get _inputIsValid => _md.isValid();
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +117,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
             IconButton(
               onPressed: _formKey.currentContext != null &&
                       _formKey.currentState!.validate() &&
-                      _inputIsValid
+                      _movementDescription.isValid()
                   ? () => _saveMovement()
                   : null,
               icon: const Icon(AppIcons.save),
@@ -134,14 +132,15 @@ class _EditMovementPageState extends State<EditMovementPage> {
               child: ListView(
                 children: [
                   _nameInput(context),
-                  ..._md.movement.description == null
+                  ..._movementDescription.movement.description == null
                       ? [
                           Defaults.sizedBox.vertical.small,
                           ActionChip(
                             avatar: const Icon(AppIcons.add),
                             label: const Text("Add description"),
                             onPressed: () {
-                              setState(() => _md.movement.description = "");
+                              setState(() => _movementDescription
+                                  .movement.description = "");
                               _descriptionFocusNode.requestFocus();
                             },
                           ),
@@ -150,13 +149,16 @@ class _EditMovementPageState extends State<EditMovementPage> {
                           Padding(
                             padding: const EdgeInsets.only(top: 8),
                             child: TextFormField(
-                              initialValue: _md.movement.description ?? "",
+                              initialValue:
+                                  _movementDescription.movement.description ??
+                                      "",
                               focusNode: _descriptionFocusNode,
                               keyboardType: TextInputType.multiline,
                               minLines: 1,
                               maxLines: null,
-                              onChanged: (description) =>
-                                  setState(() => _md.movement.description = ""),
+                              onChanged: (description) => setState(() =>
+                                  _movementDescription.movement.description =
+                                      ""),
                               decoration: InputDecoration(
                                 contentPadding:
                                     const EdgeInsets.symmetric(vertical: 5),
@@ -164,7 +166,8 @@ class _EditMovementPageState extends State<EditMovementPage> {
                                 suffixIcon: IconButton(
                                   icon: const Icon(AppIcons.close),
                                   onPressed: () => setState(
-                                    () => _md.movement.description = null,
+                                    () => _movementDescription
+                                        .movement.description = null,
                                   ),
                                 ),
                               ),
@@ -185,10 +188,10 @@ class _EditMovementPageState extends State<EditMovementPage> {
 
   Widget _nameInput(BuildContext context) {
     return TextFormField(
-      initialValue: _md.movement.name,
+      initialValue: _movementDescription.movement.name,
       onChanged: (name) {
         if (Validator.validateStringNotEmpty(name) == null) {
-          setState(() => _md.movement.name = name);
+          setState(() => _movementDescription.movement.name = name);
         }
       },
       validator: Validator.validateStringNotEmpty,
@@ -205,7 +208,8 @@ class _EditMovementPageState extends State<EditMovementPage> {
 
   Widget get _dimInput {
     return SelectionBar<MovementDimension>(
-      onChange: (dim) => setState(() => _md.movement.dimension = dim),
+      onChange: (dim) =>
+          setState(() => _movementDescription.movement.dimension = dim),
       items: const [
         MovementDimension.reps,
         MovementDimension.time,
@@ -213,18 +217,18 @@ class _EditMovementPageState extends State<EditMovementPage> {
         MovementDimension.energy
       ],
       getLabel: (dim) => dim.displayName,
-      selectedItem: _md.movement.dimension,
+      selectedItem: _movementDescription.movement.dimension,
     );
   }
 
   Widget _categoryInput(BuildContext context) {
     return CheckboxListTile(
-      value: _md.movement.cardio,
+      value: _movementDescription.movement.cardio,
       checkColor: Theme.of(context).colorScheme.onPrimary,
       onChanged: (bool? isCardio) {
         FocusManager.instance.primaryFocus?.unfocus();
         if (isCardio != null) {
-          setState(() => _md.movement.cardio = isCardio);
+          setState(() => _movementDescription.movement.cardio = isCardio);
         }
       },
       title: const Text('Is suitable for cardio sessions'),

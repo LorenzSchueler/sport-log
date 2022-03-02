@@ -33,7 +33,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
   @override
   void initState() {
     super.initState();
-    _metconSessionDescription = widget.metconSessionDescription ??
+    _metconSessionDescription = widget.metconSessionDescription?.clone() ??
         MetconSessionDescription.defaultValue();
     _finished = _metconSessionDescription.metconSession.time != null;
   }
@@ -94,7 +94,8 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
           ),
           IconButton(
             onPressed: _formKey.currentContext != null &&
-                    _formKey.currentState!.validate()
+                    _formKey.currentState!.validate() &&
+                    _metconSessionDescription.isValid()
                 ? _saveMetconSession
                 : null,
             icon: const Icon(AppIcons.save),

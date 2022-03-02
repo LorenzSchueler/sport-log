@@ -45,7 +45,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   @override
   void initState() {
     super.initState();
-    _strengthSessionDescription = widget.strengthSessionDescription ??
+    _strengthSessionDescription = widget.strengthSessionDescription?.clone() ??
         StrengthSessionDescription.defaultValue();
     _keyboardSubscription =
         KeyboardVisibilityController().onChange.listen((isVisible) {

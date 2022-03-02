@@ -42,7 +42,7 @@ class RouteEditPageState extends State<RouteEditPage> {
 
   @override
   void initState() {
-    _route = widget.route ?? Route.defaultValue();
+    _route = widget.route?.clone() ?? Route.defaultValue();
     // TODO dont map every point to marked location
     _locations =
         _route.track.map((e) => LatLng(e.latitude, e.longitude)).toList();
@@ -313,7 +313,7 @@ class RouteEditPageState extends State<RouteEditPage> {
           IconButton(
             onPressed: _formKey.currentContext != null &&
                     _formKey.currentState!.validate() &&
-                    _route.track.isNotEmpty
+                    _route.isValid()
                 ? _saveRoute
                 : null,
             icon: const Icon(AppIcons.save),
