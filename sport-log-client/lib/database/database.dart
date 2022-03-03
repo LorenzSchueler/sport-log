@@ -16,10 +16,9 @@ class AppDatabase {
 
   static Future<void> init() async {
     if (Config.deleteDatabase) {
-      await delete();
-      await open();
+      await reset();
     }
-    // db is opened in Account.login and Account.register and deleted in Account.logout
+    await open();
   }
 
   static Future<void> open() async {
@@ -46,11 +45,12 @@ class AppDatabase {
     _logger.i("Database ready");
   }
 
-  static Future<void> delete() async {
+  static Future<void> reset() async {
     _logger.i("Deleting Database");
     await deleteDatabase(Config.databaseName);
     _database = null;
     _logger.i('Database deleted');
+    await open();
   }
 
   static final diaries = DiaryTable();
