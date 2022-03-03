@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/db_serialization.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/cardio/position.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/settings.dart';
 
@@ -94,7 +95,26 @@ class CardioSession extends AtomicEntity {
   Map<String, dynamic> toJson() => _$CardioSessionToJson(this);
 
   @override
-  CardioSession clone() => CardioSession.fromJson(toJson());
+  CardioSession clone() => CardioSession(
+        id: id.clone(),
+        userId: userId.clone(),
+        movementId: movementId.clone(),
+        cardioType: cardioType,
+        datetime: datetime.clone(),
+        distance: distance,
+        ascent: ascent,
+        descent: descent,
+        time: time?.clone(),
+        calories: calories,
+        track: track?.map((p) => p.clone()).toList(),
+        avgCadence: avgCadence,
+        cadence: cadence == null ? null : [...cadence!],
+        avgHeartRate: avgHeartRate,
+        heartRate: heartRate == null ? null : [...heartRate!],
+        routeId: routeId?.clone(),
+        comments: comments,
+        deleted: deleted,
+      );
 
   @override
   bool isValid() {

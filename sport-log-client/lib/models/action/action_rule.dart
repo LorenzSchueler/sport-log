@@ -4,6 +4,7 @@ import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/action/weekday.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 
 part 'action_rule.g.dart';
@@ -43,7 +44,16 @@ class ActionRule extends AtomicEntity {
   Map<String, dynamic> toJson() => _$ActionRuleToJson(this);
 
   @override
-  ActionRule clone() => ActionRule.fromJson(toJson());
+  ActionRule clone() => ActionRule(
+        id: id.clone(),
+        userId: userId.clone(),
+        actionId: actionId.clone(),
+        weekday: weekday,
+        time: time.clone(),
+        arguments: arguments,
+        enabled: enabled,
+        deleted: deleted,
+      );
 
   @override
   bool isValid() {

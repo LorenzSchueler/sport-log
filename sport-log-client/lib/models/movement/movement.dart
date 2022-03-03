@@ -5,6 +5,7 @@ import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -94,7 +95,15 @@ class Movement extends AtomicEntity {
   Map<String, dynamic> toJson() => _$MovementToJson(this);
 
   @override
-  Movement clone() => Movement.fromJson(toJson());
+  Movement clone() => Movement(
+        id: id.clone(),
+        userId: userId?.clone(),
+        name: name,
+        description: description,
+        cardio: cardio,
+        deleted: deleted,
+        dimension: dimension,
+      );
 
   @override
   bool isValid() {

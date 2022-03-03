@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 
 part 'platform.g.dart';
@@ -29,7 +30,7 @@ class Platform extends AtomicEntity {
   Map<String, dynamic> toJson() => _$PlatformToJson(this);
 
   @override
-  Platform clone() => Platform.fromJson(toJson());
+  Platform clone() => Platform(id: id.clone(), name: name, deleted: deleted);
 
   @override
   bool isValid() {

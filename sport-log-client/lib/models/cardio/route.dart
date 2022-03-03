@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/db_serialization.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/cardio/position.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/settings.dart';
 
@@ -55,7 +56,16 @@ class Route extends AtomicEntity with Comparable<Route> {
   Map<String, dynamic> toJson() => _$RouteToJson(this);
 
   @override
-  Route clone() => Route.fromJson(toJson());
+  Route clone() => Route(
+        id: id.clone(),
+        userId: userId.clone(),
+        name: name,
+        distance: distance,
+        ascent: ascent,
+        descent: descent,
+        track: track.map((p) => p.clone()).toList(),
+        deleted: deleted,
+      );
 
   @override
   bool isValid() {

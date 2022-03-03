@@ -4,6 +4,7 @@ import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/settings.dart';
@@ -12,7 +13,6 @@ part 'metcon_session.g.dart';
 
 @JsonSerializable()
 class MetconSession extends AtomicEntity {
-  // JsonConvertable<MetconSession> {
   MetconSession({
     required this.id,
     required this.userId,
@@ -80,7 +80,18 @@ class MetconSession extends AtomicEntity {
   Map<String, dynamic> toJson() => _$MetconSessionToJson(this);
 
   @override
-  MetconSession clone() => MetconSession.fromJson(toJson());
+  MetconSession clone() => MetconSession(
+        id: id.clone(),
+        userId: userId.clone(),
+        metconId: metconId.clone(),
+        datetime: datetime.clone(),
+        time: time?.clone(),
+        rounds: rounds,
+        reps: reps,
+        rx: rx,
+        comments: comments,
+        deleted: deleted,
+      );
 
   @override
   bool isValid() {

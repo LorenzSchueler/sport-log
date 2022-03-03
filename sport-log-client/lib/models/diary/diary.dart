@@ -4,6 +4,7 @@ import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/settings.dart';
 
@@ -46,7 +47,14 @@ class Diary extends AtomicEntity {
   Map<String, dynamic> toJson() => _$DiaryToJson(this);
 
   @override
-  Diary clone() => Diary.fromJson(toJson());
+  Diary clone() => Diary(
+        id: id.clone(),
+        userId: userId.clone(),
+        date: date.clone(),
+        bodyweight: bodyweight,
+        comments: comments,
+        deleted: deleted,
+      );
 
   @override
   bool isValid() {

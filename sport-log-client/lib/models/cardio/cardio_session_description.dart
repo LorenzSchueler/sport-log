@@ -34,8 +34,11 @@ class CardioSessionDescription extends CompoundEntity {
   Map<String, dynamic> toJson() => _$CardioSessionDescriptionToJson(this);
 
   @override
-  CardioSessionDescription clone() =>
-      CardioSessionDescription.fromJson(toJson());
+  CardioSessionDescription clone() => CardioSessionDescription(
+        cardioSession: cardioSession.clone(),
+        route: route?.clone(),
+        movement: movement.clone(),
+      );
 
   @override
   bool isValid() {

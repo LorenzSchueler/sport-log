@@ -5,6 +5,7 @@ import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -92,7 +93,16 @@ class Metcon extends AtomicEntity {
   Map<String, dynamic> toJson() => _$MetconToJson(this);
 
   @override
-  Metcon clone() => Metcon.fromJson(toJson());
+  Metcon clone() => Metcon(
+        id: id.clone(),
+        userId: userId?.clone(),
+        name: name,
+        metconType: metconType,
+        rounds: rounds,
+        timecap: timecap?.clone(),
+        description: description,
+        deleted: deleted,
+      );
 
   bool validateMetconType() {
     switch (metconType) {

@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 
 part 'action_provider.g.dart';
@@ -36,7 +37,14 @@ class ActionProvider extends AtomicEntity {
   Map<String, dynamic> toJson() => _$ActionProviderToJson(this);
 
   @override
-  ActionProvider clone() => ActionProvider.fromJson(toJson());
+  ActionProvider clone() => ActionProvider(
+        id: id.clone(),
+        name: name,
+        password: password,
+        platformId: platformId.clone(),
+        description: description,
+        deleted: deleted,
+      );
 
   @override
   bool isValid() {

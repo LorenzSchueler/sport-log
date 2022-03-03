@@ -4,6 +4,7 @@ import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 
 part 'metcon_movement.g.dart';
@@ -82,7 +83,16 @@ class MetconMovement extends AtomicEntity {
   Map<String, dynamic> toJson() => _$MetconMovementToJson(this);
 
   @override
-  MetconMovement clone() => MetconMovement.fromJson(toJson());
+  MetconMovement clone() => MetconMovement(
+        id: id.clone(),
+        metconId: metconId.clone(),
+        movementId: movementId.clone(),
+        movementNumber: movementNumber,
+        count: count,
+        weight: weight,
+        distanceUnit: distanceUnit,
+        deleted: deleted,
+      );
 
   @override
   bool isValid() {

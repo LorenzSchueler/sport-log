@@ -2,9 +2,10 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
-import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 
 part 'strength_session.g.dart';
 
@@ -53,7 +54,15 @@ class StrengthSession extends AtomicEntity {
   }
 
   @override
-  StrengthSession clone() => StrengthSession.fromJson(toJson());
+  StrengthSession clone() => StrengthSession(
+        id: id.clone(),
+        userId: userId.clone(),
+        datetime: datetime.clone(),
+        movementId: movementId.clone(),
+        interval: interval?.clone(),
+        comments: comments,
+        deleted: deleted,
+      );
 }
 
 class DbStrengthSessionSerializer extends DbSerializer<StrengthSession> {

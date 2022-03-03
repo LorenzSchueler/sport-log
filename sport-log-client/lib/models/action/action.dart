@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 
 part 'action.g.dart';
@@ -37,7 +38,15 @@ class Action extends AtomicEntity {
   Map<String, dynamic> toJson() => _$ActionToJson(this);
 
   @override
-  Action clone() => Action.fromJson(toJson());
+  Action clone() => Action(
+        id: id.clone(),
+        name: name,
+        actionProviderId: actionProviderId.clone(),
+        description: description,
+        createBefore: createBefore,
+        deleteAfter: deleteAfter,
+        deleted: deleted,
+      );
 
   @override
   bool isValid() {

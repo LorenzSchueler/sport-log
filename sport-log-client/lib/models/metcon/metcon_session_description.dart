@@ -33,8 +33,10 @@ class MetconSessionDescription extends CompoundEntity {
   Map<String, dynamic> toJson() => _$MetconSessionDescriptionToJson(this);
 
   @override
-  MetconSessionDescription clone() =>
-      MetconSessionDescription.fromJson(toJson());
+  MetconSessionDescription clone() => MetconSessionDescription(
+        metconSession: metconSession.clone(),
+        metconDescription: metconDescription.clone(),
+      );
 
   @override
   bool isValid() {

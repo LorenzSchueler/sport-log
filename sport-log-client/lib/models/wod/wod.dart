@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 
 part 'wod.g.dart';
@@ -34,7 +35,13 @@ class Wod extends AtomicEntity {
   Map<String, dynamic> toJson() => _$WodToJson(this);
 
   @override
-  Wod clone() => Wod.fromJson(toJson());
+  Wod clone() => Wod(
+        id: id.clone(),
+        userId: userId.clone(),
+        date: date.clone(),
+        description: description,
+        deleted: deleted,
+      );
 
   @override
   bool isValid() {

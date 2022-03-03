@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 
 part 'position.g.dart';
 
@@ -31,7 +32,16 @@ class Position {
 
   factory Position.fromJson(Map<String, dynamic> json) =>
       _$PositionFromJson(json);
+
   Map<String, dynamic> toJson() => _$PositionToJson(this);
+
+  Position clone() => Position(
+        longitude: longitude,
+        latitude: latitude,
+        elevation: elevation,
+        distance: distance,
+        time: time.clone(),
+      );
 
   static const int byteSize = 40;
 

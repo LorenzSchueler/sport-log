@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 
 part 'user.g.dart';
@@ -28,7 +29,12 @@ class User extends NonDeletableAtomicEntity {
   Map<String, dynamic> toJson() => _$UserToJson(this);
 
   @override
-  User clone() => User.fromJson(toJson());
+  User clone() => User(
+        id: id.clone(),
+        username: username,
+        password: password,
+        email: email,
+      );
 
   @override
   bool isValid() {
