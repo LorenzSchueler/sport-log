@@ -27,8 +27,10 @@ class Action extends AtomicEntity {
   @IdConverter()
   Int64 actionProviderId;
   String? description;
-  int createBefore;
-  int deleteAfter;
+  @DurationConverter()
+  Duration createBefore;
+  @DurationConverter()
+  Duration deleteAfter;
   @override
   bool deleted;
 
@@ -43,8 +45,8 @@ class Action extends AtomicEntity {
         name: name,
         actionProviderId: actionProviderId.clone(),
         description: description,
-        createBefore: createBefore,
-        deleteAfter: deleteAfter,
+        createBefore: createBefore.clone(),
+        deleteAfter: deleteAfter.clone(),
         deleted: deleted,
       );
 
@@ -63,8 +65,8 @@ class DbActionSerializer extends DbSerializer<Action> {
       name: r[prefix + Columns.name]! as String,
       actionProviderId: Int64(r[prefix + Columns.actionProviderId]! as int),
       description: r[prefix + Columns.description] as String?,
-      createBefore: r[prefix + Columns.createBefore]! as int,
-      deleteAfter: r[prefix + Columns.deleteAfter]! as int,
+      createBefore: Duration(seconds: r[prefix + Columns.createBefore]! as int),
+      deleteAfter: Duration(seconds: r[prefix + Columns.deleteAfter]! as int),
       deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
@@ -76,8 +78,8 @@ class DbActionSerializer extends DbSerializer<Action> {
       Columns.name: o.name,
       Columns.actionProviderId: o.actionProviderId.toInt(),
       Columns.description: o.description,
-      Columns.createBefore: o.createBefore,
-      Columns.deleteAfter: o.deleteAfter,
+      Columns.createBefore: o.createBefore.inSeconds,
+      Columns.deleteAfter: o.deleteAfter.inSeconds,
       Columns.deleted: o.deleted ? 1 : 0,
     };
   }

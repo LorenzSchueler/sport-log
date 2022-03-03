@@ -12,8 +12,10 @@ Action _$ActionFromJson(Map<String, dynamic> json) => Action(
       actionProviderId:
           const IdConverter().fromJson(json['action_provider_id'] as String),
       description: json['description'] as String?,
-      createBefore: json['create_before'] as int,
-      deleteAfter: json['delete_after'] as int,
+      createBefore:
+          const DurationConverter().fromJson(json['create_before'] as int),
+      deleteAfter:
+          const DurationConverter().fromJson(json['delete_after'] as int),
       deleted: json['deleted'] as bool,
     );
 
@@ -23,7 +25,7 @@ Map<String, dynamic> _$ActionToJson(Action instance) => <String, dynamic>{
       'action_provider_id':
           const IdConverter().toJson(instance.actionProviderId),
       'description': instance.description,
-      'create_before': instance.createBefore,
-      'delete_after': instance.deleteAfter,
+      'create_before': const DurationConverter().toJson(instance.createBefore),
+      'delete_after': const DurationConverter().toJson(instance.deleteAfter),
       'deleted': instance.deleted,
     };
