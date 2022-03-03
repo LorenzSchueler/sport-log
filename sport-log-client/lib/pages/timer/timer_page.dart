@@ -10,8 +10,8 @@ import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
-import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
+import 'package:sport_log/widgets/input_fields/duration_input.dart';
+import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 class TimerPage extends StatefulWidget {
@@ -151,7 +151,7 @@ class TimerPageState extends State<TimerPage> {
     }
     return EditTile(
       caption: caption,
-      child: DurationPicker(
+      child: DurationInput(
         setDuration: (d) => setState(() => _totalTime = d),
         initialDuration: _totalTime,
       ),

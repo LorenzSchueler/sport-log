@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
+import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 
 class TextTile extends StatelessWidget {
   const TextTile({

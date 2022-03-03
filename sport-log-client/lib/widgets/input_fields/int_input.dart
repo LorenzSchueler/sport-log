@@ -2,28 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/form_widgets/repeat_icon_button.dart';
+import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
 
-class DoublePicker extends StatefulWidget {
-  const DoublePicker({
+class IntInput extends StatefulWidget {
+  const IntInput({
     required this.setValue,
     this.initialValue = 0,
-    this.stepSize = 2.5,
+    this.stepSize = 1,
     Key? key,
   }) : super(key: key);
 
-  final double initialValue;
-  final double stepSize;
-  final void Function(double value) setValue;
+  final int initialValue;
+  final int stepSize;
+  final void Function(int value) setValue;
 
   @override
-  _DoublePickerState createState() => _DoublePickerState();
+  _IntInputState createState() => _IntInputState();
 }
 
-class _DoublePickerState extends State<DoublePicker> {
+class _IntInputState extends State<IntInput> {
   static const double _iconSize = 30;
 
-  late double _value;
+  late int _value;
 
   bool showFormField = false;
 
@@ -65,15 +65,15 @@ class _DoublePickerState extends State<DoublePicker> {
               child: showFormField
                   ? Focus(
                       child: TextFormField(
-                        initialValue: _value.toStringAsFixed(1),
+                        initialValue: "$_value",
                         autofocus: true,
                         keyboardType: TextInputType.number,
                         textAlign: TextAlign.center,
                         onChanged: (value) {
                           final validated =
-                              Validator.validateDoubleGtZero(value);
+                              Validator.validateIntGeZeroLtValue(value, 1000);
                           if (validated == null) {
-                            final v = double.parse(value);
+                            final v = int.parse(value);
                             setState(() => _value = v);
                             widget.setValue(_value);
                           }

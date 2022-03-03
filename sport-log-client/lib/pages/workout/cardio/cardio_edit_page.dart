@@ -7,14 +7,14 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
-import 'package:sport_log/widgets/form_widgets/cardio_type_picker.dart';
+import 'package:sport_log/widgets/picker/cardio_type_picker.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/form_widgets/date_picker.dart';
-import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
-import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
-import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
-import 'package:sport_log/widgets/form_widgets/route_picker.dart';
-import 'package:sport_log/widgets/message_dialog.dart';
+import 'package:sport_log/widgets/picker/date_picker.dart';
+import 'package:sport_log/widgets/input_fields/duration_input.dart';
+import 'package:sport_log/widgets/input_fields/edit_tile.dart';
+import 'package:sport_log/widgets/picker/movement_picker.dart';
+import 'package:sport_log/widgets/picker/route_picker.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 class CardioEditPage extends StatefulWidget {
   final CardioSessionDescription? cardioSessionDescription;
@@ -295,7 +295,7 @@ class CardioEditPageState extends State<CardioEditPage> {
               ),
               EditTile(
                 caption: 'Time',
-                child: DurationPicker(
+                child: DurationInput(
                   setDuration: (d) => setState(
                     () => _cardioSessionDescription.cardioSession.time = d,
                   ),

@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/approve_dialog.dart';
+import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 final _dataProvider = MovementDescriptionDataProvider.instance;

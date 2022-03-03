@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
-import 'package:sport_log/widgets/form_widgets/new_credentials_dialog.dart';
+import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
 
 final _logger = Logger('DataProvider');
 

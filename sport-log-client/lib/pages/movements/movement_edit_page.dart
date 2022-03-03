@@ -5,9 +5,9 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/approve_dialog.dart';
-import 'package:sport_log/widgets/form_widgets/selection_bar.dart';
-import 'package:sport_log/widgets/message_dialog.dart';
+import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
+import 'package:sport_log/widgets/input_fields/selection_bar.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 class EditMovementPage extends StatefulWidget {

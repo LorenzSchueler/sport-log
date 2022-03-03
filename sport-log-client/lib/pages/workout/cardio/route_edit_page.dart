@@ -9,7 +9,7 @@ import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:mapbox_api/mapbox_api.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/message_dialog.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RouteEditPage extends StatefulWidget {

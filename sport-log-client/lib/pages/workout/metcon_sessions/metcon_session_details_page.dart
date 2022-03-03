@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/form_widgets/text_tile.dart';
+import 'package:sport_log/widgets/input_fields/text_tile.dart';
 
 class MetconSessionDetailsPage extends StatefulWidget {
   final MetconSessionDescription metconSessionDescription;

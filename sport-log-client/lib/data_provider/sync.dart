@@ -13,7 +13,7 @@ import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/settings.dart';
-import 'package:sport_log/widgets/form_widgets/new_credentials_dialog.dart';
+import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
 
 class Sync extends ChangeNotifier {
   final _logger = Logger('Sync');

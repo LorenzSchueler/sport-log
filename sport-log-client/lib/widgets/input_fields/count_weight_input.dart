@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/theme.dart';
-import 'package:sport_log/widgets/form_widgets/double_picker.dart';
-import 'package:sport_log/widgets/form_widgets/int_picker.dart';
+import 'package:sport_log/widgets/input_fields/double_input.dart';
+import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
-class CountWeightPicker extends StatefulWidget {
-  const CountWeightPicker({
+class CountWeightInput extends StatefulWidget {
+  const CountWeightInput({
     required this.setValue,
     required this.confirmChanges,
     required this.countLabel,
@@ -24,10 +24,10 @@ class CountWeightPicker extends StatefulWidget {
   final double? initialWeight;
 
   @override
-  _CountWeightPickerState createState() => _CountWeightPickerState();
+  _CountWeightInputState createState() => _CountWeightInputState();
 }
 
-class _CountWeightPickerState extends State<CountWeightPicker> {
+class _CountWeightInputState extends State<CountWeightInput> {
   late int _count;
   late double? _weight;
 
@@ -61,7 +61,7 @@ class _CountWeightPickerState extends State<CountWeightPicker> {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
-                IntPicker(
+                IntInput(
                   initialValue: _count,
                   setValue: (count) {
                     if (count > 0) {
@@ -114,7 +114,7 @@ class _CountWeightPickerState extends State<CountWeightPicker> {
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ),
-                      DoublePicker(
+                      DoubleInput(
                         initialValue: _weight!,
                         setValue: (weight) {
                           setState(() => _weight = weight);

@@ -4,7 +4,7 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/strength_sessions/charts/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/charts/series_type.dart';
-import 'package:sport_log/widgets/form_widgets/selection_bar.dart';
+import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 
 class StrengthChart extends StatefulWidget {
   final Movement movement;

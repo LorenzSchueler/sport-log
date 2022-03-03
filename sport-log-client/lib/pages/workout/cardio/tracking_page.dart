@@ -10,7 +10,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
-import 'package:sport_log/widgets/message_dialog.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 enum TrackingMode { notStarted, tracking, paused, stopped }

@@ -8,7 +8,7 @@ import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/message_dialog.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);

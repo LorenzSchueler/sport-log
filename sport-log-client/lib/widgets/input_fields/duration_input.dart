@@ -5,11 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/form_widgets/repeat_icon_button.dart';
+import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
-class DurationPicker extends StatefulWidget {
-  const DurationPicker({
+class DurationInput extends StatefulWidget {
+  const DurationInput({
     Key? key,
     required this.setDuration,
     required this.initialDuration,
@@ -19,17 +19,17 @@ class DurationPicker extends StatefulWidget {
   final Duration? initialDuration;
 
   @override
-  State<DurationPicker> createState() => _DurationPickerState();
+  State<DurationInput> createState() => _DurationInputState();
 }
 
-class _DurationPickerState extends State<DurationPicker> {
+class _DurationInputState extends State<DurationInput> {
   late Duration _duration;
 
   final _minutesController = TextEditingController();
   final _secondsController = TextEditingController();
   late final StreamSubscription<bool> _keyboardSubscription;
 
-  static const double _iconSize = 40;
+  static const double _iconSize = 30;
   static const double _textWidth = 33;
   static const double _fontSize = 25;
   static const int _timeStep = 30; // seconds
@@ -46,7 +46,7 @@ class _DurationPickerState extends State<DurationPicker> {
   }
 
   @override
-  void didUpdateWidget(covariant DurationPicker oldWidget) {
+  void didUpdateWidget(covariant DurationInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     _setDuration(
       widget.initialDuration ?? const Duration(),

@@ -12,12 +12,12 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
-import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
-import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
+import 'package:sport_log/widgets/input_fields/duration_input.dart';
+import 'package:sport_log/widgets/input_fields/edit_tile.dart';
+import 'package:sport_log/widgets/picker/movement_picker.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/widgets/form_widgets/text_tile.dart';
-import 'package:sport_log/widgets/message_dialog.dart';
+import 'package:sport_log/widgets/input_fields/text_tile.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 class StrengthSessionEditPage extends StatefulWidget {
   const StrengthSessionEditPage({
@@ -245,7 +245,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     assert(_strengthSessionDescription.session.interval != null);
     return EditTile(
       caption: 'Interval',
-      child: DurationPicker(
+      child: DurationInput(
         setDuration: (d) =>
             setState(() => _strengthSessionDescription.session.interval = d),
         initialDuration: _strengthSessionDescription.session.interval!,

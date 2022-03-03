@@ -8,11 +8,11 @@ import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/form_widgets/date_picker.dart';
-import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
-import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
-import 'package:sport_log/widgets/form_widgets/metcon_picker.dart';
-import 'package:sport_log/widgets/message_dialog.dart';
+import 'package:sport_log/widgets/picker/date_picker.dart';
+import 'package:sport_log/widgets/input_fields/duration_input.dart';
+import 'package:sport_log/widgets/input_fields/edit_tile.dart';
+import 'package:sport_log/widgets/picker/metcon_picker.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 class MetconSessionEditPage extends StatefulWidget {
   final MetconSessionDescription? metconSessionDescription;
@@ -203,7 +203,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   _finished)
                 EditTile(
                   caption: 'Time',
-                  child: DurationPicker(
+                  child: DurationInput(
                     setDuration: (d) => setState(
                       () => _metconSessionDescription.metconSession.time = d,
                     ),

@@ -9,9 +9,9 @@ import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/form_widgets/int_picker.dart';
-import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
-import 'package:sport_log/widgets/message_dialog.dart';
+import 'package:sport_log/widgets/input_fields/int_input.dart';
+import 'package:sport_log/widgets/picker/movement_picker.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 class EditMetconPage extends StatefulWidget {
@@ -305,7 +305,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
   }
 
   Widget _roundsInput(BuildContext context) {
-    return IntPicker(
+    return IntInput(
       initialValue:
           _metconDescription.metcon.rounds ?? Metcon.roundsDefaultValue,
       setValue: (rounds) {
@@ -316,7 +316,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
   }
 
   Widget _timecapInput(BuildContext context) {
-    return IntPicker(
+    return IntInput(
       initialValue: (_metconDescription.metcon.timecap ??=
               Metcon.timecapDefaultValue)
           .inMinutes,
