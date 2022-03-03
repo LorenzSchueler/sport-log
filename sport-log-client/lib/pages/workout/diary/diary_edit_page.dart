@@ -5,6 +5,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/form_widgets/date_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/message_dialog.dart';
 
@@ -85,12 +86,9 @@ class DiaryEditPageState extends State<DiaryEditPage> {
                 caption: "Date",
                 child: Text(_diary.date.formatDate),
                 onTap: () async {
-                  DateTime? date = await showDatePicker(
+                  DateTime? date = await showDatePickerWithDefaults(
                     context: context,
                     initialDate: _diary.date,
-                    firstDate:
-                        DateTime.now().subtract(const Duration(days: 365)),
-                    lastDate: DateTime.now(),
                   );
                   if (date != null) {
                     setState(() {

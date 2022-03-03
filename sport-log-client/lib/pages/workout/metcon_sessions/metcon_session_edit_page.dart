@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/form_widgets/date_picker.dart';
 import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/form_widgets/metcon_picker.dart';
@@ -154,13 +155,10 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   _metconSessionDescription.metconSession.datetime.formatDate,
                 ),
                 onTap: () async {
-                  DateTime? date = await showDatePicker(
+                  DateTime? date = await showDatePickerWithDefaults(
                     context: context,
                     initialDate:
                         _metconSessionDescription.metconSession.datetime,
-                    firstDate:
-                        DateTime.now().subtract(const Duration(days: 365)),
-                    lastDate: DateTime.now(),
                   );
                   if (date != null) {
                     setState(() {

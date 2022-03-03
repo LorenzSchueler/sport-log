@@ -9,6 +9,7 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/widgets/form_widgets/cardio_type_picker.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/form_widgets/date_picker.dart';
 import 'package:sport_log/widgets/form_widgets/duration_picker.dart';
 import 'package:sport_log/widgets/form_widgets/edit_tile.dart';
 import 'package:sport_log/widgets/form_widgets/movement_picker.dart';
@@ -199,13 +200,10 @@ class CardioEditPageState extends State<CardioEditPage> {
                       .cardioSession.datetime.formatDatetime,
                 ),
                 onTap: () async {
-                  DateTime? datetime = await showDatePicker(
+                  DateTime? datetime = await showDatePickerWithDefaults(
                     context: context,
                     initialDate:
                         _cardioSessionDescription.cardioSession.datetime,
-                    firstDate:
-                        DateTime.now().subtract(const Duration(days: 365)),
-                    lastDate: DateTime.now(),
                   );
                   TimeOfDay? time = await showTimePicker(
                     context: context,
