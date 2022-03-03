@@ -173,9 +173,10 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       ),
       leading: AppIcons.exercise,
       onTap: () async {
-        final movement = await showMovementPickerDialog(context);
+        final movement = await showMovementPicker(context);
         if (movement != null) {
           setState(() {
+            _strengthSessionDescription.session.movementId = movement.id;
             _strengthSessionDescription.movement = movement;
           });
         }

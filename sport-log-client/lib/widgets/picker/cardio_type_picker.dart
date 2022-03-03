@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
 
-Future<CardioType?> showCardioTypePickerDialog(
+Future<CardioType?> showCardioTypePicker(
   BuildContext context, {
   bool dismissable = true,
 }) async {

@@ -37,7 +37,7 @@ class CardioTrackingSettingsPageState
             subtitle: const Text("Movement"),
             trailing: const Icon(AppIcons.edit),
             onTap: () async {
-              Movement? movement = await showMovementPickerDialog(
+              Movement? movement = await showMovementPicker(
                 context,
                 dismissable: false,
                 cardioOnly: true,
@@ -55,7 +55,7 @@ class CardioTrackingSettingsPageState
             subtitle: const Text("Cardio Type"),
             trailing: const Icon(AppIcons.edit),
             onTap: () async {
-              CardioType? cardioType = await showCardioTypePickerDialog(
+              CardioType? cardioType = await showCardioTypePicker(
                 context,
                 dismissable: false,
               );
@@ -72,7 +72,7 @@ class CardioTrackingSettingsPageState
             subtitle: const Text("Route to follow"),
             trailing: const Icon(AppIcons.edit),
             onTap: () async {
-              Route? route = await showRoutePickerDialog(
+              Route? route = await showRoutePicker(
                 context: context,
                 dismissable: false,
               );

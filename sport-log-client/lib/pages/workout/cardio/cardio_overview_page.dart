@@ -84,7 +84,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
           ),
           IconButton(
             onPressed: () async {
-              final Movement? movement = await showMovementPickerDialog(
+              final Movement? movement = await showMovementPicker(
                 context,
                 selectedMovement: _movement,
               );

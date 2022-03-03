@@ -114,8 +114,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                 caption: "Metcon",
                 child: Text(_metconSessionDescription.metconDescription.name),
                 onTap: () async {
-                  MetconDescription? metconDescription =
-                      await showMetconPickerDialog(
+                  MetconDescription? metconDescription = await showMetconPicker(
                     context: context,
                   );
                   if (metconDescription != null) {

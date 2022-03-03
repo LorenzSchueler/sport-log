@@ -2,7 +2,7 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/models/cardio/route.dart';
 
-Future<Route?> showRoutePickerDialog({
+Future<Route?> showRoutePicker({
   required BuildContext context,
   bool dismissable = true,
 }) async {

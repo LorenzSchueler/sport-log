@@ -160,7 +160,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   _cardioSessionDescription.movement.name,
                 ),
                 onTap: () async {
-                  Movement? movement = await showMovementPickerDialog(
+                  Movement? movement = await showMovementPicker(
                     context,
                     dismissable: true,
                     cardioOnly: true,
@@ -169,6 +169,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                     setState(() {
                       _cardioSessionDescription.cardioSession.movementId =
                           movement.id;
+                      _cardioSessionDescription.movement = movement;
                     });
                   }
                 },
@@ -180,7 +181,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   _cardioSessionDescription.cardioSession.cardioType.name,
                 ),
                 onTap: () async {
-                  CardioType? cardioType = await showCardioTypePickerDialog(
+                  CardioType? cardioType = await showCardioTypePicker(
                     context,
                     dismissable: false,
                   );
@@ -231,7 +232,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                       : "none",
                 ),
                 onTap: () async {
-                  Route? route = await showRoutePickerDialog(
+                  Route? route = await showRoutePicker(
                     context: context,
                     dismissable: true,
                   );
@@ -239,6 +240,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                     setState(() {
                       _cardioSessionDescription.cardioSession.routeId =
                           route.id;
+                      _cardioSessionDescription.route = route;
                     });
                   }
                 },

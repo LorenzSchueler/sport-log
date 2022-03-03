@@ -6,7 +6,7 @@ import 'package:sport_log/models/movement/movement_description.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
-Future<Movement?> showMovementPickerDialog(
+Future<Movement?> showMovementPicker(
   BuildContext context, {
   Movement? selectedMovement,
   bool dismissable = true,

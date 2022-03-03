@@ -2,7 +2,7 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/models/all.dart';
 
-Future<MetconDescription?> showMetconPickerDialog({
+Future<MetconDescription?> showMetconPicker({
   required BuildContext context,
   bool dismissable = true,
 }) async {
