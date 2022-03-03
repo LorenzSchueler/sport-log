@@ -30,6 +30,16 @@ class MetconTable extends TableAccessor<Metcon> {
       Column.text(Columns.description)..nullable()
     ],
   );
+
+  @override
+  Future<List<Metcon>> getNonDeleted() async {
+    final result = await database.query(
+      tableName,
+      where: notDeleted,
+      orderBy: "$tableName.${Columns.name} COLLATE NOCASE",
+    );
+    return result.map(serde.fromDbRecord).toList();
+  }
 }
 
 class MetconMovementTable extends TableAccessor<MetconMovement> {

@@ -135,4 +135,14 @@ class RouteTable extends TableAccessor<Route> {
       Column.blob(Columns.track)
     ],
   );
+
+  @override
+  Future<List<Route>> getNonDeleted() async {
+    final result = await database.query(
+      tableName,
+      where: notDeleted,
+      orderBy: "$tableName.${Columns.name} COLLATE NOCASE",
+    );
+    return result.map(serde.fromDbRecord).toList();
+  }
 }

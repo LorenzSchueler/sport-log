@@ -20,4 +20,14 @@ class WodTable extends TableAccessor<Wod> {
       Column.text(Columns.description)..nullable()
     ],
   );
+
+  @override
+  Future<List<Wod>> getNonDeleted() async {
+    final result = await database.query(
+      tableName,
+      where: notDeleted,
+      orderBy: "$tableName.${Columns.date} DESC",
+    );
+    return result.map(serde.fromDbRecord).toList();
+  }
 }
