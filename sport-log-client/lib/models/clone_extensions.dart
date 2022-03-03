@@ -10,5 +10,5 @@ extension CloneDuration on Duration {
 }
 
 extension CloneInt64 on Int64 {
-  Int64 clone() => Int64(toInt()); // TODO
+  Int64 clone() => Int64.parseInt(toString());
 }

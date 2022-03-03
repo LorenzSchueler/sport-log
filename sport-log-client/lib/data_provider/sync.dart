@@ -109,9 +109,10 @@ class Sync extends ChangeNotifier {
     _logger.d('Starting sync timer.');
     await sync();
     Movement.defaultMovement =
-        (await MovementDataProvider.instance.getById(Int64(1)))!;
+        (await MovementDataProvider.instance.getById(Int64(1)))!; // FIXME
     MetconDescription.defaultMetconDescription =
-        (await MetconDescriptionDataProvider.instance.getById(Int64(1)))!;
+        (await MetconDescriptionDataProvider.instance
+            .getById(Int64(1)))!; // FIXME
     _syncTimer = Timer.periodic(Settings.syncInterval, (_) => sync());
   }
 

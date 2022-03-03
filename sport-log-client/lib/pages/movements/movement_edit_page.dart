@@ -139,8 +139,10 @@ class _EditMovementPageState extends State<EditMovementPage> {
                             avatar: const Icon(AppIcons.add),
                             label: const Text("Add description"),
                             onPressed: () {
-                              setState(() => _movementDescription
-                                  .movement.description = "");
+                              setState(
+                                () => _movementDescription
+                                    .movement.description = "",
+                              );
                               _descriptionFocusNode.requestFocus();
                             },
                           ),
@@ -156,9 +158,10 @@ class _EditMovementPageState extends State<EditMovementPage> {
                               keyboardType: TextInputType.multiline,
                               minLines: 1,
                               maxLines: null,
-                              onChanged: (description) => setState(() =>
-                                  _movementDescription.movement.description =
-                                      ""),
+                              onChanged: (description) => setState(
+                                () => _movementDescription
+                                    .movement.description = "",
+                              ),
                               decoration: InputDecoration(
                                 contentPadding:
                                     const EdgeInsets.symmetric(vertical: 5),
