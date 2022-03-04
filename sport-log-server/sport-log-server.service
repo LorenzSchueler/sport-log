@@ -6,7 +6,7 @@ StartLimitIntervalSec=3600
 
 [Service]
 Type=simple
-User=<user>
+User=sport-admin
 WorkingDirectory=/etc/sport-log-server
 ExecStart=/usr/local/bin/sport-log-server
 Restart=on-failure
