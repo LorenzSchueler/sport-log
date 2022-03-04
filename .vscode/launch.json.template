@@ -1,0 +1,38 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "sport-log-client (debug)",
+            "program": "sport-log-client/lib/main.dart",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": [],
+            "env": {
+                "SDK_REGISTRY_TOKEN": "<token>"
+            }
+        },
+        {
+            "name": "sport-log-client (profile)",
+            "program": "sport-log-client/lib/main.dart",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [],
+            "env": {
+                "SDK_REGISTRY_TOKEN": "<token>"
+            }
+        },
+        {
+            "name": "sport-log-client (release)",
+            "program": "sport-log-client/lib/main.dart",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "args": [],
+            "env": {
+                "SDK_REGISTRY_TOKEN": "<token>"
+            }
+        }
+    ]
+}

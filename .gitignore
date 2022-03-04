@@ -1,10 +1,8 @@
 /target
-/.vscode
-/sport-log-client/.vscode/*
-!sport-log-client/.vscode/launch.json.template
+/.vscode/*
+!/.vscode/launch.json.template
 .idea/
 /sport-log-action-provider-map-matching/map-matching
 /sport-log-server/sport-log-server.toml
 .env
 private_data.sh
-/sport-log-client/lib/secrets.dart
