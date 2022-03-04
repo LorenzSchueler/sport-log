@@ -12,9 +12,9 @@ abstract class Defaults {
 class _Server {
   _Server();
 
-  static const _defaultUrl = "127.0.0.1";
+  static const _defaultUrl = "http://127.0.0.1";
   final emulatorUrl = 'http://10.0.2.2:8000';
-  final url = "http://" + (dotenv.env['SERVER_ADDRESS'] ?? _defaultUrl);
+  final url = dotenv.env['SERVER_ADDRESS'] ?? _defaultUrl;
 }
 
 class _SizedBox {
