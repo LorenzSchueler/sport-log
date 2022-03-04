@@ -65,8 +65,6 @@ postgres=# \password sport_admin
 
 ## SystemD Setup for deployment
 
-*!!! replace ```<user>``` with the user you want to run the server with*
-
 1. install executable at: */usr/local/bin/sport-log-server*
     ```bash
     cargo build --release

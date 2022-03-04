@@ -3,18 +3,20 @@
 Sport Log is a sports tracking app written in Flutter together with a server backend written in Rust.
 Additionally, there are action providers which are intended to do scheduled repetitive actions like map matching, fetching and inserting data from other sources, exporting data or providing automated reservations for other platforms.
 The client and action providers communicate with the server via a REST API.
-The client has an own database that synchronizes with the server when connectivity is available in order to allow offline use while still allowing synchronization between multiple devices.
+The client has an own database in order to allow offline use that synchronizes with the server when connectivity is available.
 
 ## Goals
 
-The goal of this project is to provide an open source and add free sports tracking app that combines functionality from traditional running or biking apps (focused on GPS tracking) with gym apps (focused on input of sets and reps) together with CrossFit apps (focused on metcons) so that you have all your data in one place.
-A key aspect is the self-hosted server backend that also supports multiple users and sharing of data between them.
+The goal of this project is to provide an open source and add free sports tracking app that combines functionality from:
+- traditional outdoor apps (map download, outdoor and satellite map styles, route planning, slope inclination, ...)
+- running or biking apps (GPS tracking)
+- gym apps (input of sets and reps)
+- functional training apps (metcons) 
+This way you have all your data in one place.
+It also provides some basic utility functions like custom timers for different styles of workouts.
+A key aspect is the self-hosted server backend that also supports multiple users.
 This way you own your data, and we can provide functionality to export it easily in well established formats.
 Additionally, the concept of action provides tries to make this project easily extensible.
-
-## Roadmap and supported features
-
-see [#1](https://github.com/LorenzSchueler/sport-log/issues/1)
 
 ## Project Structure
 
@@ -36,11 +38,11 @@ The flutter app lives in [**sport-log-client**](sport-log-client)
 
 ## Setup
 
-refer to [server setup](sport-log-server/README.md)
+refer to [server setup](sport-log-server/README.md) and [client setup](sport-log-client/README.md)
 
 ## Contributing
 
-We would be grateful for any Issues and PRs. Please file your PRs against `server`, `client` or `action-provider` respectively.
+We would be grateful for any Issues and PRs.
 
 For Questions please use the [discussions](https://github.com/LorenzSchueler/sport-log/discussions)
 
