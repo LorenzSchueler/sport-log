@@ -61,7 +61,7 @@ dependencies:
   flutter_polyline_points: ^1.0.0
   location: ^4.3.0
   pedometer: ^3.0.0
-  flutter_beep: ^1.0.0
+  audioplayers: ^0.20.1
 
 dev_dependencies:
   flutter_test:
@@ -91,6 +91,8 @@ flutter_icons: # run: flutter pub run flutter_launcher_icons:main
 flutter:
   assets:
     - .env
+    - assets/audio/beep_long.mp3
+    - assets/audio/beep_short.mp3
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -130,4 +132,4 @@ flutter:
   fonts:
    - family:  CustomIcons
      fonts:
-      - asset: resources/fonts/CustomIcons.ttf
+      - asset: assets/fonts/CustomIcons.ttf

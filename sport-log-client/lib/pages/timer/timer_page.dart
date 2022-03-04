@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_beep/flutter_beep.dart';
+import 'package:audioplayers/audioplayers.dart' hide Logger;
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -24,11 +24,19 @@ class TimerPage extends StatefulWidget {
 class TimerPageState extends State<TimerPage> {
   final _logger = Logger('TimerPage');
 
-  int _rounds = 3;
   Duration _totalTime = const Duration();
   Duration _currentTime = const Duration();
-  int _currentRound = 0;
-  Timer? timer;
+  int _totalRounds = 3;
+  Timer? _timer;
+
+  late AudioCache _player;
+
+  @override
+  void initState() {
+    _player = AudioCache(prefix: "assets/audio/");
+    _player.loadAll(['beep_long.mp3', 'beep_short.mp3']);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +46,12 @@ class TimerPageState extends State<TimerPage> {
         appBar: AppBar(
           title: const Text("Timer"),
           bottom: TabBar(
+            onTap: (index) {
+              setState(() {
+                _logger.i("ontap");
+                _currentTime = const Duration();
+              });
+            },
             indicatorColor: primaryColorOf(context),
             labelColor: Colors.white,
             tabs: [
@@ -64,71 +78,66 @@ class TimerPageState extends State<TimerPage> {
         ),
         body: Container(
           padding: const EdgeInsets.all(10),
-          child: SizedBox(
-            child: TabBarView(
-              children: [
-                SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      timeFormField(MetconType.amrap),
-                      Defaults.sizedBox.vertical.huge,
-                      startStopButton(MetconType.amrap),
-                      const SizedBox(
-                        height: 100,
-                      ),
-                      timeText,
-                    ],
-                  ),
+          child: TabBarView(
+            children: [
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _timeFormField(MetconType.amrap),
+                    Defaults.sizedBox.vertical.huge,
+                    _startStopButton(MetconType.amrap),
+                    const SizedBox(
+                      height: 100,
+                    ),
+                    _timeText(MetconType.amrap),
+                  ],
                 ),
-                SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      timeFormField(MetconType.emom),
-                      TextFormField(
-                        keyboardType: TextInputType.number,
-                        onChanged: (rounds) {
-                          if (Validator.validateIntGtZero(rounds) == null) {
-                            setState(() => _rounds = int.parse(rounds));
-                          }
-                        },
-                        style: const TextStyle(height: 1),
-                        initialValue: _rounds.toString(),
-                        validator: Validator.validateIntGtZero,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        decoration: const InputDecoration(
-                          icon: Icon(AppIcons.repeat),
-                          labelText: "Rounds",
-                          contentPadding: EdgeInsets.symmetric(vertical: 5),
-                        ),
+              ),
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _timeFormField(MetconType.emom),
+                    TextFormField(
+                      keyboardType: TextInputType.number,
+                      onChanged: (rounds) {
+                        if (Validator.validateIntGtZero(rounds) == null) {
+                          setState(() => _totalRounds = int.parse(rounds));
+                        }
+                      },
+                      style: const TextStyle(height: 1),
+                      initialValue: _totalRounds.toString(),
+                      validator: Validator.validateIntGtZero,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      decoration: const InputDecoration(
+                        icon: Icon(AppIcons.repeat),
+                        labelText: "Rounds",
+                        contentPadding: EdgeInsets.symmetric(vertical: 5),
                       ),
-                      Defaults.sizedBox.vertical.huge,
-                      startStopButton(MetconType.emom),
-                      const SizedBox(
-                        height: 100,
-                      ),
-                      Text(
-                        "Round $_currentRound",
-                        style: const TextStyle(fontSize: 50),
-                      ),
-                      timeText,
-                    ],
-                  ),
+                    ),
+                    Defaults.sizedBox.vertical.huge,
+                    _startStopButton(MetconType.emom),
+                    const SizedBox(
+                      height: 100,
+                    ),
+                    _roundText(),
+                    _timeText(MetconType.emom),
+                  ],
                 ),
-                SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      timeFormField(MetconType.forTime),
-                      Defaults.sizedBox.vertical.huge,
-                      startStopButton(MetconType.forTime),
-                      const SizedBox(
-                        height: 100,
-                      ),
-                      timeText,
-                    ],
-                  ),
+              ),
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _timeFormField(MetconType.forTime),
+                    Defaults.sizedBox.vertical.huge,
+                    _startStopButton(MetconType.forTime),
+                    const SizedBox(
+                      height: 100,
+                    ),
+                    _timeText(MetconType.forTime),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         drawer: const MainDrawer(selectedRoute: Routes.settings),
@@ -136,7 +145,7 @@ class TimerPageState extends State<TimerPage> {
     );
   }
 
-  Widget timeFormField(MetconType metconType) {
+  Widget _timeFormField(MetconType metconType) {
     String caption;
     switch (metconType) {
       case MetconType.amrap:
@@ -159,17 +168,17 @@ class TimerPageState extends State<TimerPage> {
     );
   }
 
-  Widget startStopButton(MetconType metconType) {
-    return timer == null
+  Widget _startStopButton(MetconType metconType) {
+    return _timer == null
         ? ElevatedButton(
-            onPressed: () => startTimer(metconType),
+            onPressed: () => _startTimer(metconType),
             child: const Text(
               "Start",
               style: TextStyle(fontSize: 40),
             ),
           )
         : ElevatedButton(
-            onPressed: stopTimer,
+            onPressed: _stopTimer,
             child: const Text(
               "Stop",
               style: TextStyle(fontSize: 40),
@@ -177,81 +186,83 @@ class TimerPageState extends State<TimerPage> {
           );
   }
 
-  Text get timeText {
-    return _currentTime.isNegative
+  Text _roundText() {
+    int currentRound = _currentTime.isNegative || _totalTime.inSeconds == 0
+        ? 0
+        : min(
+            ((_currentTime.inSeconds + 1) / _totalTime.inSeconds).ceil(),
+            _totalRounds,
+          );
+    return Text(
+      "Round $currentRound",
+      style: const TextStyle(fontSize: 50),
+    );
+  }
+
+  Text _timeText(MetconType metconType) {
+    Duration displayTime;
+    if (_currentTime.isNegative) {
+      displayTime = _currentTime;
+    } else {
+      switch (metconType) {
+        case MetconType.amrap:
+          displayTime = _totalTime - _currentTime;
+          break;
+        case MetconType.emom:
+          displayTime = _currentTime == _totalTime * _totalRounds
+              ? Duration(seconds: _totalTime.inSeconds)
+              : Duration(
+                  seconds: _currentTime.inSeconds % _totalTime.inSeconds,
+                );
+          break;
+        case MetconType.forTime:
+          displayTime = _currentTime;
+          break;
+      }
+    }
+    return displayTime.isNegative
         ? Text(
-            _currentTime.abs().formatTimeShort,
+            displayTime.abs().formatTimeShort,
             style: const TextStyle(
               fontSize: 120,
               color: Color.fromARGB(255, 150, 150, 150),
             ),
           )
         : Text(
-            _currentTime.formatTimeShort,
+            displayTime.formatTimeShort,
             style: const TextStyle(fontSize: 120),
           );
   }
 
-  void startTimer(MetconType metconType) {
-    timer?.cancel();
-    Duration time = const Duration(seconds: -10);
-    setState(() {
-      _currentTime = time;
-      _currentRound = 0;
-    });
-    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
-      time += const Duration(seconds: 1);
-      tickCallback(time, metconType);
+  void _startTimer(MetconType metconType) {
+    _timer?.cancel();
+    setState(() => _currentTime = const Duration(seconds: -10));
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      setState(() => _currentTime += const Duration(seconds: 1));
+      _tickCallback(metconType);
     });
   }
 
-  void tickCallback(Duration time, MetconType metconType) {
-    if (time.isNegative) {
-      setState(() {
-        _currentTime = time;
-      });
-    } else {
-      if (time.inSeconds == 0) {
-        FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ABBR_ALERT);
-      }
-      setState(() {
-        switch (metconType) {
-          case MetconType.amrap:
-            _currentTime = _totalTime - time;
-            break;
-          case MetconType.emom:
-            Duration roundTime =
-                Duration(seconds: time.inSeconds % _totalTime.inSeconds);
-            _currentRound = min(
-              ((time.inSeconds + 1) / _totalTime.inSeconds).ceil(),
-              _rounds,
-            );
-            _currentTime = time == _totalTime * _rounds
-                ? Duration(seconds: _totalTime.inSeconds)
-                : roundTime;
-            if (roundTime.inSeconds == 0) {
-              FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ANSWER);
-            }
-            break;
-          case MetconType.forTime:
-            _currentTime = time;
-            break;
-        }
-      });
-      if (metconType == MetconType.emom) {
-        _totalTime *= _rounds;
-      }
-      if (time >= _totalTime) {
-        stopTimer();
+  void _tickCallback(MetconType metconType) {
+    if (_currentTime.inSeconds == 0) {
+      _player.play('beep_long.mp3');
+    } else if (_currentTime >=
+        _totalTime * (metconType == MetconType.emom ? _totalRounds : 1)) {
+      _stopTimer();
+      _player.play('beep_long.mp3');
+    } else if (_currentTime.inSeconds > 0 && metconType == MetconType.emom) {
+      final roundTime =
+          Duration(seconds: _currentTime.inSeconds % _totalTime.inSeconds);
+      if (roundTime.inSeconds == 0) {
+        _player.play('beep_short.mp3');
       }
     }
   }
 
-  void stopTimer() {
-    timer?.cancel();
+  void _stopTimer() {
+    _timer?.cancel();
     setState(() {
-      timer = null;
+      _timer = null;
     });
-    FlutterBeep.playSysSound(AndroidSoundIDs.TONE_CDMA_ABBR_ALERT);
   }
 }
