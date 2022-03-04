@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/action/action_overview_page.dart';
+import 'package:sport_log/pages/login/login_page.dart';
 import 'package:sport_log/pages/map/map_page.dart';
 import 'package:sport_log/pages/offline_maps/offline_maps_overview.dart';
 import 'package:sport_log/pages/settings/about_page.dart';
@@ -15,13 +16,11 @@ import 'package:sport_log/pages/workout/cardio/route_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_page.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings_page.dart';
 import 'package:sport_log/pages/login/landing_page.dart';
-import 'package:sport_log/pages/login/login_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_details_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_edit_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_overview_page.dart';
 import 'package:sport_log/pages/movements/movement_edit_page.dart';
 import 'package:sport_log/pages/movements/movement_overview_page.dart';
-import 'package:sport_log/pages/login/registration_page.dart';
 import 'package:sport_log/pages/workout/diary/diary_edit_page.dart';
 import 'package:sport_log/pages/workout/diary/diary_overview_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_details_page.dart';
@@ -60,8 +59,13 @@ abstract class Routes {
 
   static final Map<String, Widget Function(BuildContext)> _routeList = {
     Routes.landing: (_) => _checkNotLogin(() => const LandingPage()),
-    Routes.login: (_) => _checkNotLogin(() => const LoginPage()),
-    Routes.registration: (_) => _checkNotLogin(() => const RegistrationPage()),
+    Routes.login: (_) => _checkNotLogin(
+          () => const LoginPage(
+            register: false,
+          ),
+        ),
+    Routes.registration: (_) =>
+        _checkNotLogin(() => const LoginPage(register: true)),
     Routes.timer: (_) => _checkLogin(() => const TimerPage()),
     Routes.map: (_) => _checkLogin(() => const MapPage()),
     Routes.offlineMaps: (_) => _checkLogin(() => const OfflineMapsPage()),
