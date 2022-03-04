@@ -105,13 +105,13 @@ class MapPageState extends State<MapPage> {
                     }),
                   ),
                   ActionButton(
-                    icon: const Icon(AppIcons.map),
+                    icon: const Icon(AppIcons.car),
                     onPressed: () => setState(() {
                       mapStyle = Defaults.mapbox.style.street;
                     }),
                   ),
                   ActionButton(
-                    icon: const Icon(AppIcons.map),
+                    icon: const Icon(AppIcons.satellite),
                     onPressed: () => setState(() {
                       mapStyle = Defaults.mapbox.style.satellite;
                     }),
