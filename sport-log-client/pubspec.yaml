@@ -74,7 +74,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
   json_serializable: ^6.1.4 # json
-  build_runner: ^2.1.0 # json
+  build_runner: ^2.1.0 # json - run: flutter pub run build_runner build --delete-conflicting-outputs
   faker: ^2.0.0
   flutter_launcher_icons: ^0.9.2 
 
@@ -84,10 +84,6 @@ flutter_icons: # run: flutter pub run flutter_launcher_icons:main
   ios: true
   remove_alpha_ios: true
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter.
 flutter:
   assets:
     - .env

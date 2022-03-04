@@ -9,8 +9,7 @@ class AppIcons {
   // - make sure that always the same kind of icon (outlined, rounded, ...) is used
 
   // custom icons
-  static const IconData dumbbell = CustomIcons.dumbbell_not_rotated;
-  static const IconData dumbbellRotated = CustomIcons.dumbbell_rotated;
+  static const IconData dumbbell = CustomIcons.dumbbell;
   static const IconData plan = CustomIcons.plan;
   static const IconData repeat = CustomIcons.cw;
   static const IconData syncClockwise = CustomIcons.arrows_cw;
@@ -22,7 +21,7 @@ class AppIcons {
   static const IconData weight = CustomIcons.weight;
   static const IconData route = CustomIcons.route;
   static const IconData ruler = CustomIcons.ruler_horizontal;
-  //static const IconData medal = CustomIcons.medal;
+  static const IconData medal = CustomIcons.medal;
 
   // actions
   static const IconData add = Icons.add_rounded;

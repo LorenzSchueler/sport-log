@@ -33,20 +33,14 @@ class CustomIcons {
   static const _kFontFam = 'CustomIcons';
   static const String? _kFontPkg = null;
 
-  // ignore: constant_identifier_names
-  static const IconData dumbbell_not_rotated =
+  static const IconData dumbbell =
       IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  // ignore: constant_identifier_names
-  static const IconData dumbbell_rotated =
-      IconData(0xe804, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData plan =
       IconData(0xe805, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData cw =
       IconData(0xe806, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  // ignore: constant_identifier_names
   static const IconData arrows_cw =
       IconData(0xe809, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  // ignore: constant_identifier_names
   static const IconData time_interval =
       IconData(0xe80a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData github =
@@ -61,7 +55,8 @@ class CustomIcons {
       IconData(0xf496, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData route =
       IconData(0xf4d7, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  // ignore: constant_identifier_names
   static const IconData ruler_horizontal =
       IconData(0xf547, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData medal =
+      IconData(0xf5a2, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

@@ -30,7 +30,7 @@ class MainDrawer extends StatelessWidget {
           ),
           ListTile(
             title: const Text('Workout Tracking'),
-            leading: const Icon(AppIcons.dumbbellRotated),
+            leading: const Icon(AppIcons.dumbbell),
             onTap: () {
               Nav.newBase(context, Routes.timeline.overview);
             },
