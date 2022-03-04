@@ -383,8 +383,9 @@ satelites:  ${location.satelliteNumber}""";
               ),
               compassEnabled: true,
               compassViewPosition: CompassViewPosition.TopRight,
-              onMapCreated: (MapboxMapController controller) {
-                _mapController = controller;
+              onMapCreated: (MapboxMapController controller) =>
+                  _mapController = controller,
+              onStyleLoadedCallback: () {
                 if (_cardioSessionDescription.route != null) {
                   _mapController.addLine(
                     LineOptions(
@@ -396,8 +397,6 @@ satelites:  ${location.satelliteNumber}""";
                     ),
                   );
                 }
-              },
-              onStyleLoadedCallback: () {
                 _startLocationStream();
                 _startStepCountStream();
               },

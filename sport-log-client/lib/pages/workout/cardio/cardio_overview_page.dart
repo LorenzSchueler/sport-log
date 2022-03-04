@@ -235,6 +235,17 @@ class CardioSessionCard extends StatelessWidget {
                                 .toList(),
                           ),
                         );
+                        if (cardioSessionDescription.route != null) {
+                          _sessionMapController.addLine(
+                            LineOptions(
+                              lineColor: "blue",
+                              lineWidth: 3,
+                              geometry: cardioSessionDescription.route!.track
+                                  .map((e) => LatLng(e.latitude, e.longitude))
+                                  .toList(),
+                            ),
+                          );
+                        }
                       },
                       onMapClick: (_, __) => showDetails(context),
                     ),
