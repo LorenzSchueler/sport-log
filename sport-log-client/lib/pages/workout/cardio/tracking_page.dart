@@ -264,13 +264,13 @@ satelites:  ${location.satelliteNumber}""";
           ),
           TextButton(
             child: const Text("Save"),
-            onPressed: _cardioSessionDescription.isValid()
-                ? () async {
-                    _trackingMode = TrackingMode.stopped;
-                    Navigator.pop(context);
-                    await _saveCardioSession();
-                  }
-                : null,
+            onPressed: // _cardioSessionDescription.isValid() ? // TODO enable if session is no longer changed in save method
+                () async {
+              _trackingMode = TrackingMode.stopped;
+              Navigator.pop(context);
+              await _saveCardioSession();
+            },
+            // : null,
           )
         ],
       ),
@@ -383,8 +383,20 @@ satelites:  ${location.satelliteNumber}""";
               ),
               compassEnabled: true,
               compassViewPosition: CompassViewPosition.TopRight,
-              onMapCreated: (MapboxMapController controller) =>
-                  _mapController = controller,
+              onMapCreated: (MapboxMapController controller) {
+                _mapController = controller;
+                if (_cardioSessionDescription.route != null) {
+                  _mapController.addLine(
+                    LineOptions(
+                      lineColor: "blue",
+                      lineWidth: 3,
+                      geometry: _cardioSessionDescription.route!.track
+                          .map((e) => LatLng(e.latitude, e.longitude))
+                          .toList(),
+                    ),
+                  );
+                }
+              },
               onStyleLoadedCallback: () {
                 _startLocationStream();
                 _startStepCountStream();
