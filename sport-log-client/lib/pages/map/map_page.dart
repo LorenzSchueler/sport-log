@@ -5,7 +5,6 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 class MapPage extends StatefulWidget {
@@ -20,7 +19,7 @@ class MapPageState extends State<MapPage> {
 
   late MapboxMapController _sessionMapController;
   bool showOverlays = true;
-  //bool showMapSettings = false;
+  bool showMapSettings = false;
 
   String mapStyle = Defaults.mapbox.style.outdoor;
 
@@ -50,73 +49,62 @@ class MapPageState extends State<MapPage> {
                 _sessionMapController = controller,
             onMapClick: (_, __) => setState(() {
               showOverlays = !showOverlays;
-              //showMapSettings = false;
+              showMapSettings = false;
             }),
           ),
-          //if (showMapSettings)
-          //Positioned(
-          //bottom: 0,
-          //child: SizedBox.expand(
-          //child: Container(
-          //width: double.infinity,
-          //height: 100,
-          //color: Colors.white,
-          //child: Row(children: [
-          //IconButton(
-          //onPressed: () => setState(() {
-          //mapStyle = Defaults.mapbox.style.outdoor;
-          //}),
-          //icon: const Icon(AppIcons.map),
-          //),
-          //IconButton(
-          //onPressed: () => setState(() {
-          //mapStyle = Defaults.mapbox.style.street;
-          //}),
-          //icon: const Icon(AppIcons.map),
-          //),
-          //IconButton(
-          //onPressed: () => setState(() {
-          //mapStyle = Defaults.mapbox.style.satellite;
-          //}),
-          //icon: const Icon(AppIcons.map),
-          //)
-          //])))),
+          if (showMapSettings)
+            Positioned(
+              bottom: 0,
+              left: 10,
+              child: Container(
+                width: MediaQuery.of(context).size.width - 20,
+                height: 150,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                      icon: const Icon(AppIcons.map),
+                      color: Theme.of(context).colorScheme.primary,
+                      onPressed: () => setState(() {
+                        mapStyle = Defaults.mapbox.style.outdoor;
+                      }),
+                    ),
+                    IconButton(
+                      icon: const Icon(AppIcons.car),
+                      color: Theme.of(context).colorScheme.primary,
+                      onPressed: () => setState(() {
+                        mapStyle = Defaults.mapbox.style.street;
+                      }),
+                    ),
+                    IconButton(
+                      icon: const Icon(AppIcons.satellite),
+                      color: Theme.of(context).colorScheme.primary,
+                      onPressed: () => setState(() {
+                        mapStyle = Defaults.mapbox.style.satellite;
+                      }),
+                    )
+                  ],
+                ),
+              ),
+            ),
           if (showOverlays)
             Positioned(
-              top: 5,
-              right: 5,
-              child:
-                  //IconButton(
-                  //icon: const Icon(AppIcons.map),
-                  //color: Theme.of(context).colorScheme.primary,
-                  //onPressed: () => setState(() {
-                  //showMapSettings = !showMapSettings;
-                  //_logger.i("map settings: $showMapSettings");
-                  //}),
-                  //)
-                  ExpandableFab(
-                horizontal: true,
+              top: 25,
+              right: 25,
+              child: IconButton(
                 icon: const Icon(AppIcons.map),
-                buttons: [
-                  ActionButton(
-                    icon: const Icon(AppIcons.map),
-                    onPressed: () => setState(() {
-                      mapStyle = Defaults.mapbox.style.outdoor;
-                    }),
-                  ),
-                  ActionButton(
-                    icon: const Icon(AppIcons.car),
-                    onPressed: () => setState(() {
-                      mapStyle = Defaults.mapbox.style.street;
-                    }),
-                  ),
-                  ActionButton(
-                    icon: const Icon(AppIcons.satellite),
-                    onPressed: () => setState(() {
-                      mapStyle = Defaults.mapbox.style.satellite;
-                    }),
-                  ),
-                ],
+                color: Theme.of(context).colorScheme.primary,
+                onPressed: () => setState(() {
+                  showMapSettings = !showMapSettings;
+                  _logger.i("map settings: $showMapSettings");
+                }),
               ),
             )
         ],
