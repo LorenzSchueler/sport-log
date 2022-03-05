@@ -46,19 +46,14 @@ class _IntInputState extends State<IntInput> {
                 AppIcons.subtractBox,
                 size: _iconSize,
               ),
-              enabled: _value > 1,
-              onClick: () {
-                setState(() {
-                  _value -= widget.stepSize;
-                });
-                widget.setValue(_value);
-              },
-              onRepeat: () {
-                setState(() {
-                  _value -= widget.stepSize;
-                });
-                widget.setValue(_value);
-              },
+              onClick: _value > 1
+                  ? () {
+                      setState(() {
+                        _value -= widget.stepSize;
+                      });
+                      widget.setValue(_value);
+                    }
+                  : null,
             ),
             SizedBox(
               width: 70,
@@ -104,12 +99,6 @@ class _IntInputState extends State<IntInput> {
                 size: _iconSize,
               ),
               onClick: () {
-                setState(() {
-                  _value += widget.stepSize;
-                });
-                widget.setValue(_value);
-              },
-              onRepeat: () {
                 setState(() {
                   _value += widget.stepSize;
                 });

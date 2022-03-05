@@ -45,11 +45,10 @@ class _DateFilterState extends State<DateFilter> {
           RepeatIconButton(
             icon: const Icon(AppIcons.arrowBackOpen),
             onClick: () {
-              _state = _state.earlier;
+              setState(() => _state = _state.earlier);
+
               widget.onFilterChanged(_state);
             },
-            onRepeat: () => setState(() => _state = _state.earlier),
-            onRepeatEnd: () => widget.onFilterChanged(_state),
             color: onAppBar,
           ),
         TextButton.icon(
@@ -70,14 +69,13 @@ class _DateFilterState extends State<DateFilter> {
         if (_state is! NoFilter)
           RepeatIconButton(
             icon: const Icon(AppIcons.arrowForwardOpen),
-            onClick: () {
-              _state = _state.later;
-              widget.onFilterChanged(_state);
-            },
-            onRepeat: () => setState(() => _state = _state.later),
-            onRepeatEnd: () => widget.onFilterChanged(_state),
+            onClick: _state.goingForwardPossible
+                ? () {
+                    setState(() => _state = _state.later);
+                    widget.onFilterChanged(_state);
+                  }
+                : null,
             color: onAppBar,
-            enabled: _state.goingForwardPossible,
           ),
       ],
     );

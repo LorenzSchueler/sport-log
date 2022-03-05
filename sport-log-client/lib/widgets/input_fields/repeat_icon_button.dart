@@ -2,28 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-void defaultCallback() {}
-
 class RepeatIconButton extends StatefulWidget {
   const RepeatIconButton({
     Key? key,
     required this.icon,
-    VoidCallback? onClick,
-    VoidCallback? onRepeat,
-    VoidCallback? onRepeatEnd,
+    required this.onClick,
     this.color,
-    this.enabled = true,
-  })  : onClick = onClick ?? defaultCallback,
-        onRepeat = onRepeat ?? defaultCallback,
-        onRepeatEnd = onRepeatEnd ?? defaultCallback,
-        super(key: key);
+  }) : super(key: key);
 
   final Icon icon;
-  final VoidCallback onClick;
-  final VoidCallback onRepeat;
-  final VoidCallback onRepeatEnd;
+  final VoidCallback? onClick;
   final Color? color;
-  final bool enabled;
 
   @override
   State<RepeatIconButton> createState() => _RepeatIconButtonState();
@@ -33,38 +22,23 @@ class _RepeatIconButtonState extends State<RepeatIconButton> {
   Timer? _timer;
 
   @override
-  void didUpdateWidget(covariant RepeatIconButton oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (!widget.enabled) {
-      _timer?.cancel();
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       child: IconButton(
         padding: EdgeInsets.zero,
+        constraints: BoxConstraints(
+          minWidth: widget.icon.size ?? 24,
+          minHeight: widget.icon.size ?? 24,
+        ),
         icon: widget.icon,
-        onPressed: widget.enabled
-            ? () {
-                widget.onClick();
-              }
-            : null,
         color: widget.color,
+        onPressed: widget.onClick,
       ),
-      onLongPress: widget.enabled
-          ? () {
-              _timer =
-                  Timer.periodic(const Duration(milliseconds: 80), (timer) {
-                widget.onRepeat();
-              });
-            }
-          : null,
-      onLongPressEnd: (_) {
-        _timer?.cancel();
-        widget.onRepeatEnd();
-      },
+      onLongPress: () => _timer = Timer.periodic(
+        const Duration(milliseconds: 80),
+        (_) => widget.onClick?.call(),
+      ),
+      onLongPressEnd: (_) => _timer?.cancel(),
     );
   }
 }

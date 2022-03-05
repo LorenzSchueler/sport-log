@@ -161,7 +161,8 @@ class TimerPageState extends State<TimerPage> {
     return EditTile(
       caption: _caption(metconType),
       child: DurationInput(
-        setDuration: (d) => setState(() => _totalTime = d),
+        setDuration:
+            _timer != null ? null : (d) => setState(() => _totalTime = d),
         initialDuration: _totalTime,
       ),
       leading: AppIcons.timeInterval,
@@ -192,7 +193,9 @@ class TimerPageState extends State<TimerPage> {
   }
 
   Text _roundText() {
-    int currentRound = _currentTime.isNegative || _totalTime.inSeconds == 0
+    int currentRound = _currentTime.isNegative ||
+            _totalTime.inSeconds == 0 ||
+            _timer == null && _currentTime.inSeconds == 0
         ? 0
         : min(
             ((_currentTime.inSeconds + 1) / _totalTime.inSeconds).ceil(),
