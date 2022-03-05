@@ -26,17 +26,6 @@ class AppState extends State<App> {
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.dark,
-        builder: (context, child) {
-          if (child != null) {
-            return MediaQuery(
-              data:
-                  MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-              child: child,
-            );
-          } else {
-            return Container();
-          }
-        },
       ),
     );
   }
