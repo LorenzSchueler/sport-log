@@ -10,6 +10,7 @@ import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -145,21 +146,20 @@ class TimerPageState extends State<TimerPage> {
     );
   }
 
-  Widget _timeFormField(MetconType metconType) {
-    String caption;
+  String _caption(MetconType metconType) {
     switch (metconType) {
       case MetconType.amrap:
-        caption = "Time";
-        break;
+        return "Time";
       case MetconType.emom:
-        caption = "Round Time";
-        break;
+        return "Round Time";
       case MetconType.forTime:
-        caption = "Timecap";
-        break;
+        return "Timecap";
     }
+  }
+
+  Widget _timeFormField(MetconType metconType) {
     return EditTile(
-      caption: caption,
+      caption: _caption(metconType),
       child: DurationInput(
         setDuration: (d) => setState(() => _totalTime = d),
         initialDuration: _totalTime,
@@ -171,7 +171,12 @@ class TimerPageState extends State<TimerPage> {
   Widget _startStopButton(MetconType metconType) {
     return _timer == null
         ? ElevatedButton(
-            onPressed: () => _startTimer(metconType),
+            onPressed: () => _totalTime.inSeconds > 0
+                ? _startTimer(metconType)
+                : showMessageDialog(
+                    context: context,
+                    text:
+                        "The ${_caption(metconType)} must be greater than 0."),
             child: const Text(
               "Start",
               style: TextStyle(fontSize: 40),
