@@ -17,8 +17,6 @@ class SelectionBar<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final background = Theme.of(context).colorScheme.primary;
-    final primary = Theme.of(context).colorScheme.primary;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: items.map((item) {
@@ -28,8 +26,8 @@ class SelectionBar<T> extends StatelessWidget {
           child: Text(getLabel(item)),
           style: isSelected
               ? OutlinedButton.styleFrom(
-                  backgroundColor: background,
-                  primary: primary,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  primary: Theme.of(context).colorScheme.onPrimary,
                 )
               : OutlinedButton.styleFrom(
                   side: BorderSide.none,

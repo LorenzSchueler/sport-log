@@ -36,7 +36,10 @@ class AboutPage extends StatelessWidget {
               leading: AppIcons.github,
               caption: "GitHub",
               child: GestureDetector(
-                child: const Icon(AppIcons.openInBrowser),
+                child: Icon(
+                  AppIcons.openInBrowser,
+                  color: Theme.of(context).colorScheme.onBackground,
+                ),
                 onTap: () =>
                     launch("https://github.com/LorenzSchueler/sport-log"),
               ),
