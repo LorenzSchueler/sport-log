@@ -16,14 +16,18 @@
 ///         Author:    Daniel Bruce
 ///         License:   SIL (http://scripts.sil.org/OFL)
 ///         Homepage:  http://www.entypo.com
-/// * Font Awesome 4, Copyright (C) 2016 by Dave Gandy
-///         Author:    Dave Gandy
-///         License:   SIL ()
-///         Homepage:  http://fortawesome.github.com/Font-Awesome/
 /// * Font Awesome 5, Copyright (C) 2016 by Dave Gandy
 ///         Author:    Dave Gandy
 ///         License:   SIL (https://github.com/FortAwesome/Font-Awesome/blob/master/LICENSE.txt)
 ///         Homepage:  http://fortawesome.github.com/Font-Awesome/
+/// * Font Awesome 4, Copyright (C) 2016 by Dave Gandy
+///         Author:    Dave Gandy
+///         License:   SIL ()
+///         Homepage:  http://fortawesome.github.com/Font-Awesome/
+/// * Octicons, Copyright (C) 2020 by GitHub Inc.
+///         Author:    GitHub
+///         License:   MIT (http://opensource.org/licenses/mit-license.php)
+///         Homepage:  https://primer.style/octicons/
 ///
 import 'package:flutter/widgets.dart';
 
@@ -39,8 +43,6 @@ class CustomIcons {
       IconData(0xe805, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData cw =
       IconData(0xe806, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData arrows_cw =
-      IconData(0xe809, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData time_interval =
       IconData(0xe80a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData github =
@@ -51,6 +53,8 @@ class CustomIcons {
       IconData(0xf0f5, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData heartbeat =
       IconData(0xf21e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData sync_icon =
+      IconData(0xf328, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData weight =
       IconData(0xf496, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData route =
