@@ -46,16 +46,16 @@ class TimelinePageState extends State<TimelinePage> {
     super.initState();
     _strengthDataProvider.addListener(updateStrengthSessions);
     _strengthDataProvider.onNoInternetConnection =
-        () => showSimpleSnackBar(context, 'No Internet connection.');
+        () => showSimpleToast(context, 'No Internet connection.');
     _metconDataProvider.addListener(updateMetconSessions);
     _metconDataProvider.onNoInternetConnection =
-        () => showSimpleSnackBar(context, 'No Internet connection.');
+        () => showSimpleToast(context, 'No Internet connection.');
     _cardioDataProvider.addListener(updateCardioSessions);
     _cardioDataProvider.onNoInternetConnection =
-        () => showSimpleSnackBar(context, 'No Internet connection.');
+        () => showSimpleToast(context, 'No Internet connection.');
     _diaryDataProvider.addListener(updateDiaries);
     _diaryDataProvider.onNoInternetConnection =
-        () => showSimpleSnackBar(context, 'No Internet connection.');
+        () => showSimpleToast(context, 'No Internet connection.');
     _update();
   }
 

@@ -28,7 +28,7 @@ class _MovementsPageState extends State<MovementsPage> {
     super.initState();
     _dataProvider.addListener(_update);
     _dataProvider.onNoInternetConnection =
-        () => showSimpleSnackBar(context, 'No Internet connection.');
+        () => showSimpleToast(context, 'No Internet connection.');
     _update();
   }
 

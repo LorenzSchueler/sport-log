@@ -34,24 +34,24 @@ abstract class DataProvider<T> extends ChangeNotifier {
   }
 
   /// only called if internet connection is needed
-  /// (call [handleApiError] with isCritical = true)
+  /// (call [handleApiError] with internetRequired = true)
   VoidCallback? _onNoInternet;
 
   set onNoInternetConnection(VoidCallback? callback) {
     _onNoInternet = callback;
   }
 
-  Future<void> handleApiError(ApiError error, {bool isCritical = false}) async {
-    if (isCritical) {
-      _logger.e('Api error: ${error.toErrorMessage()}', error);
-      if (error == ApiError.noInternetConnection && _onNoInternet != null) {
-        _onNoInternet!();
-      } else if (error == ApiError.unauthorized) {
-        _logger.w('Tried sync but access unauthorized.', error);
-        await showNewCredentialsDialog();
-      }
-    } else {
-      _logger.i('Api error: ${error.toErrorMessage()}');
+  Future<void> handleApiError(
+    ApiError error, {
+    bool internetRequired = false,
+  }) async {
+    _logger.e('Api error: ${error.toErrorMessage()}', error);
+    if (error == ApiError.noInternetConnection && internetRequired) {
+      _logger.i("on no internet: $_onNoInternet");
+      _onNoInternet?.call();
+    } else if (error == ApiError.unauthorized) {
+      _logger.w('Tried sync but access unauthorized.', error);
+      await showNewCredentialsDialog();
     }
   }
 }
@@ -118,7 +118,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   Future<void> pullFromServer() async {
     final result = await api.getMultiple();
     if (result.isFailure) {
-      handleApiError(result.failure);
+      handleApiError(result.failure, internetRequired: true);
     } else {
       await upsertMultiple(result.success, synchronized: true);
     }

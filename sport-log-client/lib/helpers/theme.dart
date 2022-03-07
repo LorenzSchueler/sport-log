@@ -9,6 +9,8 @@ class AppTheme {
       secondary: Color(0xffba2f2f), // only for small accents
       background: Color.fromRGBO(15, 15, 15, 1),
       surface: Color.fromRGBO(30, 30, 30, 1),
+      surfaceVariant: Color.fromRGBO(45, 45, 45, 1),
+      onSurfaceVariant: Colors.white,
       brightness: Brightness.dark,
     ),
   );
@@ -17,6 +19,10 @@ class AppTheme {
     const ColorScheme.light(
       primary: Color(0xff1f67a3), // for selected things
       secondary: Color(0xffffa896), // for important things that you can click
+      background: Colors.white,
+      surface: Color.fromRGBO(230, 230, 230, 1),
+      surfaceVariant: Color.fromRGBO(215, 215, 215, 1),
+      onSurfaceVariant: Colors.black,
       brightness: Brightness.light,
     ),
   );

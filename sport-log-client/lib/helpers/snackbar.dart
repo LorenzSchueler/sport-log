@@ -8,7 +8,7 @@ void showSimpleSnackBar(BuildContext context, String text) {
 void showSimpleToast(BuildContext context, String text) {
   Fluttertoast.showToast(
     msg: text,
-    backgroundColor: Theme.of(context).colorScheme.surface,
-    textColor: Theme.of(context).colorScheme.onSurface,
+    backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+    textColor: Theme.of(context).colorScheme.onSurfaceVariant,
   );
 }

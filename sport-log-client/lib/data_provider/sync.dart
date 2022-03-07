@@ -71,9 +71,7 @@ class Sync extends ChangeNotifier {
             'Tried sync but got no Internet connection.',
             accountDataResult.failure,
           );
-          if (onNoInternet != null) {
-            onNoInternet();
-          }
+          onNoInternet?.call();
           break;
         case ApiError.unauthorized:
           _logger.w(

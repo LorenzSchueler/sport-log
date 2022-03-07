@@ -213,7 +213,7 @@ class StrengthSessionDescriptionDataProvider
   Future<void> pullFromServer() async {
     final result1 = await _strengthSessionApi.getMultiple();
     if (result1.isFailure) {
-      handleApiError(result1.failure, isCritical: true);
+      handleApiError(result1.failure, internetRequired: true);
       return;
     }
     await _strengthSessionDb.upsertMultiple(
@@ -224,7 +224,7 @@ class StrengthSessionDescriptionDataProvider
     final result2 = await _strengthSetApi.getMultiple();
     if (result2.isFailure) {
       notifyListeners();
-      handleApiError(result2.failure, isCritical: true);
+      handleApiError(result2.failure, internetRequired: true);
       return;
     }
     await _strengthSetDb.upsertMultiple(result2.success, synchronized: true);

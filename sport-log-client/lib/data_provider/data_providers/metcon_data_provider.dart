@@ -230,14 +230,14 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   Future<void> pullFromServer() async {
     final result1 = await _metconApi.getMultiple();
     if (result1.isFailure) {
-      handleApiError(result1.failure);
+      handleApiError(result1.failure, internetRequired: true);
       throw result1.failure;
     }
     await _metconDb.upsertMultiple(result1.success, synchronized: true);
 
     final result2 = await _metconMovementApi.getMultiple();
     if (result2.isFailure) {
-      handleApiError(result2.failure);
+      handleApiError(result2.failure, internetRequired: true);
       notifyListeners();
       throw result2.failure;
     }

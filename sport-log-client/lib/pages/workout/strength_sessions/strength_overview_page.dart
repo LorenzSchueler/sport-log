@@ -38,7 +38,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
     super.initState();
     _dataProvider.addListener(_update);
     _dataProvider.onNoInternetConnection =
-        () => showSimpleSnackBar(context, 'No Internet connection.');
+        () => showSimpleToast(context, 'No Internet connection.');
     _update();
   }
 
