@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/snackbar.dart';
@@ -75,10 +76,15 @@ class _MetconsPageState extends State<MetconsPage> {
                   textAlign: TextAlign.center,
                 ),
               )
-            : ListView.builder(
-                itemBuilder: (_, index) =>
-                    MetconCard(metconDescription: _metconDescriptions[index]),
-                itemCount: _metconDescriptions.length,
+            : Container(
+                padding: const EdgeInsets.all(10),
+                child: ListView.separated(
+                  itemBuilder: (_, index) =>
+                      MetconCard(metconDescription: _metconDescriptions[index]),
+                  separatorBuilder: (_, __) =>
+                      Defaults.sizedBox.vertical.normal,
+                  itemCount: _metconDescriptions.length,
+                ),
               ),
       ),
       bottomNavigationBar:
@@ -107,6 +113,7 @@ class MetconCard extends StatelessWidget {
         arguments: metconDescription,
       ),
       child: Card(
+        margin: EdgeInsets.zero,
         child: ListTile(
           title: Text(metconDescription.metcon.name ?? 'Unnamed'),
           subtitle: Text(

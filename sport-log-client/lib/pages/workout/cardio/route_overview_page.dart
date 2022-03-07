@@ -77,9 +77,14 @@ class RoutePageState extends State<RoutePage> {
                   textAlign: TextAlign.center,
                 ),
               )
-            : ListView.builder(
-                itemBuilder: (_, index) => RouteCard(route: _routes[index]),
-                itemCount: _routes.length,
+            : Container(
+                padding: const EdgeInsets.all(10),
+                child: ListView.separated(
+                  itemBuilder: (_, index) => RouteCard(route: _routes[index]),
+                  separatorBuilder: (_, __) =>
+                      Defaults.sizedBox.vertical.normal,
+                  itemCount: _routes.length,
+                ),
               ),
       ),
       bottomNavigationBar:
@@ -112,6 +117,7 @@ class RouteCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => showDetails(context),
       child: Card(
+        margin: EdgeInsets.zero,
         child: Column(
           children: [
             Defaults.sizedBox.vertical.small,

@@ -120,11 +120,16 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         onRefresh: _pullFromServer,
         child: _cardioSessionDescriptions.isEmpty
             ? SessionsPageTab.cardio.noEntriesText
-            : ListView.builder(
-                itemBuilder: (_, index) => CardioSessionCard(
-                  cardioSessionDescription: _cardioSessionDescriptions[index],
+            : Container(
+                padding: const EdgeInsets.all(10),
+                child: ListView.separated(
+                  itemBuilder: (_, index) => CardioSessionCard(
+                    cardioSessionDescription: _cardioSessionDescriptions[index],
+                  ),
+                  separatorBuilder: (_, __) =>
+                      Defaults.sizedBox.vertical.normal,
+                  itemCount: _cardioSessionDescriptions.length,
                 ),
-                itemCount: _cardioSessionDescriptions.length,
               ),
       ),
       bottomNavigationBar:
@@ -185,6 +190,7 @@ class CardioSessionCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => showDetails(context),
       child: Card(
+        margin: EdgeInsets.zero,
         child: Column(
           children: [
             Defaults.sizedBox.vertical.small,

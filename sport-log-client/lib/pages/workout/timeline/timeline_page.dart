@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -166,9 +167,15 @@ class TimelinePageState extends State<TimelinePage> {
         onRefresh: _pullFromServer,
         child: _items.isEmpty
             ? SessionsPageTab.timeline.noEntriesText
-            : ListView.builder(
-                itemBuilder: _buildItemEntry,
-                itemCount: _items.length,
+            : Container(
+                padding: const EdgeInsets.all(10),
+                child: ListView.separated(
+                  itemBuilder: (context, index) =>
+                      _itemCard(context, _items[index]),
+                  separatorBuilder: (_, __) =>
+                      Defaults.sizedBox.vertical.normal,
+                  itemCount: _items.length,
+                ),
               ),
       ),
       bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
@@ -178,12 +185,6 @@ class TimelinePageState extends State<TimelinePage> {
       drawer: MainDrawer(selectedRoute: Routes.timeline.overview),
       floatingActionButton: null,
     );
-  }
-
-  Widget _buildItemEntry(BuildContext context, int index) {
-    final TimelineUnion item = _items[index];
-
-    return _itemCard(context, item);
   }
 
   Widget _itemCard(BuildContext context, TimelineUnion item) {

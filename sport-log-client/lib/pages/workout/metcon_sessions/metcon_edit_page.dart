@@ -452,7 +452,7 @@ class MetconMovementCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final move = mmd.metconMovement;
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
+      margin: EdgeInsets.zero,
       child: Column(
         children: [
           ListTile(

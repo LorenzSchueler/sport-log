@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/snackbar.dart';
@@ -114,11 +115,16 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         onRefresh: _pullFromServer,
         child: _metconSessionDescriptions.isEmpty
             ? SessionsPageTab.metcon.noEntriesText
-            : ListView.builder(
-                itemBuilder: (_, index) => MetconSessionCard(
-                  metconSessionDescription: _metconSessionDescriptions[index],
+            : Container(
+                padding: const EdgeInsets.all(10),
+                child: ListView.separated(
+                  itemBuilder: (_, index) => MetconSessionCard(
+                    metconSessionDescription: _metconSessionDescriptions[index],
+                  ),
+                  separatorBuilder: (_, __) =>
+                      Defaults.sizedBox.vertical.normal,
+                  itemCount: _metconSessionDescriptions.length,
                 ),
-                itemCount: _metconSessionDescriptions.length,
               ),
       ),
       bottomNavigationBar:
@@ -151,6 +157,7 @@ class MetconSessionCard extends StatelessWidget {
         );
       },
       child: Card(
+        margin: EdgeInsets.zero,
         child: ListTile(
           leading: Icon(
             metconSessionDescription.metconDescription.metcon.metconType.icon,

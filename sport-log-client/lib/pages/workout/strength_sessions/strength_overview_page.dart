@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/snackbar.dart';
@@ -115,33 +116,38 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
       ),
       body: RefreshIndicator(
         onRefresh: _pullFromServer,
-        child: CustomScrollView(
-          slivers: [
-            if (_sessions.isEmpty)
-              SliverFillRemaining(
-                child: SessionsPageTab.strength.noEntriesText,
-              ),
-            if (_sessions.isNotEmpty && _movement != null)
-              SliverToBoxAdapter(
-                child: StrengthChart(
-                  movement: _movement!,
-                  dateFilterState: _dateFilter,
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          child: CustomScrollView(
+            slivers: [
+              if (_sessions.isEmpty)
+                SliverFillRemaining(
+                  child: SessionsPageTab.strength.noEntriesText,
                 ),
-              ),
-            if (_sessions.isNotEmpty)
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) => _movement != null
-                      ? StrengthSessionCardWithMovement(
-                          strengthSessionDescription: _sessions[index],
-                        )
-                      : StrengthSessionCard(
-                          strengthSessionDescription: _sessions[index],
-                        ),
-                  childCount: _sessions.length,
+              if (_sessions.isNotEmpty && _movement != null)
+                SliverToBoxAdapter(
+                  child: StrengthChart(
+                    movement: _movement!,
+                    dateFilterState: _dateFilter,
+                  ),
                 ),
-              ),
-          ],
+              if (_sessions.isNotEmpty)
+                SliverFillRemaining(
+                  child: ListView.separated(
+                    itemBuilder: (context, index) => _movement != null
+                        ? StrengthSessionCardWithMovement(
+                            strengthSessionDescription: _sessions[index],
+                          )
+                        : StrengthSessionCard(
+                            strengthSessionDescription: _sessions[index],
+                          ),
+                    separatorBuilder: (_, __) =>
+                        Defaults.sizedBox.vertical.normal,
+                    itemCount: _sessions.length,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
@@ -170,6 +176,7 @@ class StrengthSessionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: EdgeInsets.zero,
       child: ListTile(
         leading: Icon(strengthSessionDescription.movement.dimension.iconData),
         title: Text(strengthSessionDescription.movement.name),
@@ -197,6 +204,7 @@ class StrengthSessionCardWithMovement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: EdgeInsets.zero,
       child: ListTile(
         title: Text(
           '${strengthSessionDescription.session.datetime.toHumanWithTime()} • ${strengthSessionDescription.stats.numSets} ${plural('set', 'sets', strengthSessionDescription.stats.numSets)}',

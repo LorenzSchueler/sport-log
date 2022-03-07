@@ -82,9 +82,14 @@ class DiaryPageState extends State<DiaryPage> {
         onRefresh: _pullFromServer,
         child: _diaries.isEmpty
             ? SessionsPageTab.diary.noEntriesText
-            : ListView.builder(
-                itemBuilder: (_, index) => DiaryCard(diary: _diaries[index]),
-                itemCount: _diaries.length,
+            : Container(
+                padding: const EdgeInsets.all(10),
+                child: ListView.separated(
+                  itemBuilder: (_, index) => DiaryCard(diary: _diaries[index]),
+                  separatorBuilder: (_, __) =>
+                      Defaults.sizedBox.vertical.normal,
+                  itemCount: _diaries.length,
+                ),
               ),
       ),
       bottomNavigationBar:
@@ -112,6 +117,7 @@ class DiaryCard extends StatelessWidget {
         Navigator.pushNamed(context, Routes.diary.edit, arguments: diary);
       },
       child: Card(
+        margin: EdgeInsets.zero,
         child: Padding(
           padding: const EdgeInsets.all(5),
           child: Row(
