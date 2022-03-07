@@ -29,7 +29,10 @@ class MainDrawer extends StatelessWidget {
           ),
           ListTile(
             title: const Text('Workout Tracking'),
-            leading: const Icon(AppIcons.dumbbell),
+            leading: Icon(
+              AppIcons.dumbbell,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
             onTap: () {
               Nav.newBase(context, Routes.timeline.overview);
             },
@@ -37,37 +40,55 @@ class MainDrawer extends StatelessWidget {
           ),
           ListTile(
             title: const Text('Movements'),
-            leading: const Icon(AppIcons.exercise),
+            leading: Icon(
+              AppIcons.exercise,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
             onTap: () => Nav.newBase(context, Routes.movement.overview),
             selected: selectedRoute == Routes.movement.overview,
           ),
           ListTile(
-            leading: const Icon(AppIcons.timer),
+            leading: Icon(
+              AppIcons.timer,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
             title: const Text('Timer'),
             onTap: () => Nav.newBase(context, Routes.timer),
             selected: selectedRoute == Routes.timer,
           ),
           ListTile(
-            leading: const Icon(AppIcons.map),
+            leading: Icon(
+              AppIcons.map,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
             title: const Text('Map'),
             onTap: () => Nav.newBase(context, Routes.map),
             selected: selectedRoute == Routes.map,
           ),
           ListTile(
-            leading: const Icon(AppIcons.fileDownload),
+            leading: Icon(
+              AppIcons.fileDownload,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
             title: const Text('Offline Maps'),
             onTap: () => Nav.newBase(context, Routes.offlineMaps),
             selected: selectedRoute == Routes.offlineMaps,
           ),
           ListTile(
-            leading: const Icon(AppIcons.playCircle),
+            leading: Icon(
+              AppIcons.playCircle,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
             title: const Text('Server Actions'),
             onTap: () => Nav.newBase(context, Routes.action.overview),
             selected: selectedRoute == Routes.action.overview,
           ),
           const Spacer(),
           ListTile(
-            leading: const Icon(AppIcons.settings),
+            leading: Icon(
+              AppIcons.settings,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
             title: const Text('Settings'),
             onTap: () => Nav.newBase(context, Routes.settings),
             selected: selectedRoute == Routes.settings,
@@ -85,7 +106,7 @@ class MainDrawer extends StatelessWidget {
               return ListTile(
                 title: Text(title),
                 trailing: SpinningSync(
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: Theme.of(context).colorScheme.errorContainer,
                   onPressed: sync.isSyncing
                       ? null
                       : () => Sync.instance.sync(
@@ -105,7 +126,7 @@ class MainDrawer extends StatelessWidget {
             builder: (context, sync, _) => ListTile(
               title: const Text('Logout'),
               trailing: IconButton(
-                color: Theme.of(context).colorScheme.secondary,
+                color: Theme.of(context).colorScheme.error,
                 icon: const Icon(AppIcons.logout),
                 onPressed: sync.isSyncing
                     ? null

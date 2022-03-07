@@ -3,26 +3,31 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
 
 class AppTheme {
+  static const Color _warning = Colors.redAccent;
+  static const Color _ok = Colors.lightGreen;
+
   static final darkTheme = _themeDataFromColors(
     const ColorScheme.dark(
-      primary: Color(0xffa8d8ff), // for selected/clickable things
-      secondary: Color(0xffba2f2f), // only for small accents
+      primary: Color(0xffa8d8ff),
       background: Color.fromRGBO(15, 15, 15, 1),
       surface: Color.fromRGBO(30, 30, 30, 1),
       surfaceVariant: Color.fromRGBO(45, 45, 45, 1),
       onSurfaceVariant: Colors.white,
+      error: _warning,
+      errorContainer: _ok, // used for opposite of error like ok, start, ...
       brightness: Brightness.dark,
     ),
   );
 
   static final lightTheme = _themeDataFromColors(
     const ColorScheme.light(
-      primary: Color(0xff1f67a3), // for selected things
-      secondary: Color(0xffffa896), // for important things that you can click
+      primary: Color(0xff1f67a3),
       background: Colors.white,
       surface: Color.fromRGBO(230, 230, 230, 1),
       surfaceVariant: Color.fromRGBO(215, 215, 215, 1),
       onSurfaceVariant: Colors.black,
+      error: _warning,
+      errorContainer: _ok, // used for opposite of error like ok, start, ...
       brightness: Brightness.light,
     ),
   );

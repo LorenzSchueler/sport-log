@@ -263,7 +263,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
               style: TextStyle(
                 color: _cardioSessionDescription.cardioSession.track != null
                     ? Theme.of(context).colorScheme.background
-                    : Colors.white,
+                    : Theme.of(context).colorScheme.onBackground,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),

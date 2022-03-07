@@ -12,7 +12,7 @@ class CaptionTile extends StatelessWidget {
       padding: const EdgeInsets.only(top: 2, bottom: 2),
       child: Text(
         caption,
-        style: const TextStyle(color: Colors.white70),
+        style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
       ),
     );
   }
@@ -41,7 +41,7 @@ class EditTile extends StatelessWidget {
         if (leading != null)
           Icon(
             leading,
-            color: Colors.white70,
+            color: Theme.of(context).colorScheme.onBackground,
           ),
         if (leading != null)
           const SizedBox(

@@ -53,7 +53,6 @@ class TimerPageState extends State<TimerPage> {
               });
             },
             indicatorColor: Theme.of(context).colorScheme.primary,
-            labelColor: Colors.white,
             tabs: [
               Tab(
                 text: "AMRAP",

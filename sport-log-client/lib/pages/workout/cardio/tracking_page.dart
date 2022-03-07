@@ -281,7 +281,9 @@ satelites:  ${location.satelliteNumber}""";
       return [
         Expanded(
           child: ElevatedButton(
-            style: ElevatedButton.styleFrom(primary: Colors.red[400]),
+            style: ElevatedButton.styleFrom(
+              primary: Theme.of(context).colorScheme.error,
+            ),
             onPressed: () {
               _trackingMode = TrackingMode.paused;
             },
@@ -291,7 +293,9 @@ satelites:  ${location.satelliteNumber}""";
         Defaults.sizedBox.horizontal.normal,
         Expanded(
           child: ElevatedButton(
-            style: ElevatedButton.styleFrom(primary: Colors.red[400]),
+            style: ElevatedButton.styleFrom(
+              primary: Theme.of(context).colorScheme.error,
+            ),
             onPressed: () async {
               _trackingMode = TrackingMode.paused;
               await _stopDialog();
@@ -304,7 +308,9 @@ satelites:  ${location.satelliteNumber}""";
       return [
         Expanded(
           child: ElevatedButton(
-            style: ElevatedButton.styleFrom(primary: Colors.green[400]),
+            style: ElevatedButton.styleFrom(
+              primary: Theme.of(context).colorScheme.errorContainer,
+            ),
             onPressed: () {
               _trackingMode = TrackingMode.tracking;
             },
@@ -314,7 +320,9 @@ satelites:  ${location.satelliteNumber}""";
         Defaults.sizedBox.horizontal.normal,
         Expanded(
           child: ElevatedButton(
-            style: ElevatedButton.styleFrom(primary: Colors.red[400]),
+            style: ElevatedButton.styleFrom(
+              primary: Theme.of(context).colorScheme.error,
+            ),
             onPressed: () async {
               await _stopDialog();
             },
@@ -326,7 +334,9 @@ satelites:  ${location.satelliteNumber}""";
       return [
         Expanded(
           child: ElevatedButton(
-            style: ElevatedButton.styleFrom(primary: Colors.green[400]),
+            style: ElevatedButton.styleFrom(
+              primary: Theme.of(context).colorScheme.errorContainer,
+            ),
             onPressed: () {
               _trackingMode = TrackingMode.tracking;
               _cardioSessionDescription.cardioSession.datetime = DateTime.now();
@@ -337,7 +347,9 @@ satelites:  ${location.satelliteNumber}""";
         Defaults.sizedBox.horizontal.normal,
         Expanded(
           child: ElevatedButton(
-            style: ElevatedButton.styleFrom(primary: Colors.red[400]),
+            style: ElevatedButton.styleFrom(
+              primary: Theme.of(context).colorScheme.error,
+            ),
             onPressed: () => Navigator.pop(context),
             child: const Text("cancel"),
           ),

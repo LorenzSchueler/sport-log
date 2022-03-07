@@ -252,9 +252,12 @@ class CardioSessionCard extends StatelessWidget {
                   )
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(AppIcons.route),
-                      Text(" no track available"),
+                    children: [
+                      Icon(
+                        AppIcons.route,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      const Text(" no track available"),
                     ],
                   ),
             Defaults.sizedBox.vertical.small,
