@@ -4,7 +4,6 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:mapbox_api/mapbox_api.dart';
@@ -281,7 +280,6 @@ class RouteEditPageState extends State<RouteEditPage> {
     } else {
       return Container(
         width: double.infinity,
-        color: onPrimaryColorOf(context),
         padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
         child: ElevatedButton(
           onPressed: () => setState(() {
@@ -320,97 +318,94 @@ class RouteEditPageState extends State<RouteEditPage> {
           )
         ],
       ),
-      body: Container(
-        color: backgroundColorOf(context),
-        child: Column(
-          children: [
-            Expanded(
-              child: MapboxMap(
-                accessToken: Defaults.mapbox.accessToken,
-                styleString: Defaults.mapbox.style.outdoor,
-                initialCameraPosition: CameraPosition(
-                  zoom: 13.0,
-                  target: Defaults.mapbox.cameraPosition,
-                ),
-                compassEnabled: true,
-                compassViewPosition: CompassViewPosition.TopRight,
-                onMapCreated: (MapboxMapController controller) async {
-                  _mapController = controller;
-                  _line ??= await _mapController.addLine(
-                    const LineOptions(
-                      lineColor: "red",
-                      lineWidth: 3,
-                      geometry: [],
-                    ),
-                  );
-                  _updatePoints();
-                  _updateLine();
-                },
-                onMapLongClick: (point, LatLng latLng) => _extendLine(latLng),
+      body: Column(
+        children: [
+          Expanded(
+            child: MapboxMap(
+              accessToken: Defaults.mapbox.accessToken,
+              styleString: Defaults.mapbox.style.outdoor,
+              initialCameraPosition: CameraPosition(
+                zoom: 13.0,
+                target: Defaults.mapbox.cameraPosition,
               ),
-            ),
-            _buildExpandableListContainer(),
-            Table(
-              children: [
-                TableRow(
-                  children: [
-                    ValueUnitDescription(
-                      value: (_route.distance / 1000).toString(),
-                      unit: "km",
-                      description: "distance",
-                      scale: 1.3,
-                    ),
-                    ValueUnitDescription(
-                      value: _route.name,
-                      unit: null,
-                      description: "Name",
-                      scale: 1.3,
-                    )
-                  ],
-                ),
-                rowSpacer,
-                TableRow(
-                  children: [
-                    ValueUnitDescription(
-                      value: _route.ascent?.toString() ?? "--",
-                      unit: "m",
-                      description: "ascent",
-                      scale: 1.3,
-                    ),
-                    ValueUnitDescription(
-                      value: _route.descent?.toString() ?? "--",
-                      unit: "m",
-                      description: "descent",
-                      scale: 1.3,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Defaults.sizedBox.vertical.normal,
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Form(
-                key: _formKey,
-                child: TextFormField(
-                  onTap: () => setState(() {
-                    _listExpanded = false;
-                  }),
-                  onChanged: (name) => setState(() => _route.name = name),
-                  initialValue: _route.name,
-                  validator: Validator.validateStringNotEmpty,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  style: const TextStyle(height: 1),
-                  decoration: const InputDecoration(
-                    labelText: "Name",
-                    contentPadding: EdgeInsets.symmetric(vertical: 5),
+              compassEnabled: true,
+              compassViewPosition: CompassViewPosition.TopRight,
+              onMapCreated: (MapboxMapController controller) async {
+                _mapController = controller;
+                _line ??= await _mapController.addLine(
+                  const LineOptions(
+                    lineColor: "red",
+                    lineWidth: 3,
+                    geometry: [],
                   ),
+                );
+                _updatePoints();
+                _updateLine();
+              },
+              onMapLongClick: (point, LatLng latLng) => _extendLine(latLng),
+            ),
+          ),
+          _buildExpandableListContainer(),
+          Table(
+            children: [
+              TableRow(
+                children: [
+                  ValueUnitDescription(
+                    value: (_route.distance / 1000).toString(),
+                    unit: "km",
+                    description: "distance",
+                    scale: 1.3,
+                  ),
+                  ValueUnitDescription(
+                    value: _route.name,
+                    unit: null,
+                    description: "Name",
+                    scale: 1.3,
+                  )
+                ],
+              ),
+              rowSpacer,
+              TableRow(
+                children: [
+                  ValueUnitDescription(
+                    value: _route.ascent?.toString() ?? "--",
+                    unit: "m",
+                    description: "ascent",
+                    scale: 1.3,
+                  ),
+                  ValueUnitDescription(
+                    value: _route.descent?.toString() ?? "--",
+                    unit: "m",
+                    description: "descent",
+                    scale: 1.3,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Defaults.sizedBox.vertical.normal,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Form(
+              key: _formKey,
+              child: TextFormField(
+                onTap: () => setState(() {
+                  _listExpanded = false;
+                }),
+                onChanged: (name) => setState(() => _route.name = name),
+                initialValue: _route.name,
+                validator: Validator.validateStringNotEmpty,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                style: const TextStyle(height: 1),
+                decoration: const InputDecoration(
+                  labelText: "Name",
+                  contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
               ),
             ),
-            Defaults.sizedBox.vertical.normal,
-          ],
-        ),
+          ),
+          Defaults.sizedBox.vertical.normal,
+        ],
       ),
     );
   }

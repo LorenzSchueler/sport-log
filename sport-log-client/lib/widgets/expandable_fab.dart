@@ -101,11 +101,10 @@ class _ExpandableFabState extends State<ExpandableFab>
           elevation: 4.0,
           child: InkWell(
             onTap: _toggle,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
               child: Icon(
                 AppIcons.close,
-                color: Theme.of(context).primaryColor,
               ),
             ),
           ),
@@ -226,15 +225,10 @@ class ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      shape: const CircleBorder(),
-      clipBehavior: Clip.antiAlias,
-      color: Theme.of(context).colorScheme.primary,
-      elevation: 4.0,
-      child: IconButton(
-        onPressed: onPressed,
-        icon: icon,
-      ),
+    return FloatingActionButton.small(
+      heroTag: null,
+      onPressed: onPressed,
+      child: icon,
     );
   }
 }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -64,7 +63,7 @@ class _DayChartState extends State<DayChart> {
   Widget build(BuildContext context) {
     final isTime = widget.movement.dimension == MovementDimension.time;
     final getValue = setAccessor(widget.series);
-    final color = primaryColorOf(context);
+    final color = Theme.of(context).colorScheme.primary;
     return BarChart(
       BarChartData(
         barGroups: _sets

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
 
@@ -41,7 +40,6 @@ class _DoubleInputState extends State<DoubleInput> {
         Row(
           children: [
             RepeatIconButton(
-              color: primaryColorOf(context),
               icon: const Icon(
                 AppIcons.subtractBox,
                 size: _iconSize,
@@ -91,7 +89,6 @@ class _DoubleInputState extends State<DoubleInput> {
                     ),
             ),
             RepeatIconButton(
-              color: primaryColorOf(context),
               icon: const Icon(
                 AppIcons.addBox,
                 size: _iconSize,

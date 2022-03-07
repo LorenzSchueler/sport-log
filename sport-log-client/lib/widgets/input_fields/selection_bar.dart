@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/helpers/typedefs.dart';
 
 class SelectionBar<T> extends StatelessWidget {
@@ -18,8 +17,8 @@ class SelectionBar<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final background = primaryColorOf(context);
-    final primary = onPrimaryColorOf(context);
+    final background = Theme.of(context).colorScheme.primary;
+    final primary = Theme.of(context).colorScheme.primary;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: items.map((item) {

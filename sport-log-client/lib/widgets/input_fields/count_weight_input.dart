@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/widgets/input_fields/double_input.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -132,7 +131,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
           IconButton(
             icon: const Icon(AppIcons.check),
             iconSize: 40,
-            color: _count > 0 ? primaryColorOf(context) : null,
+            color: _count > 0 ? Theme.of(context).colorScheme.primary : null,
             onPressed:
                 _count > 0 ? () => widget.setValue(_count, _weight) : null,
           ),

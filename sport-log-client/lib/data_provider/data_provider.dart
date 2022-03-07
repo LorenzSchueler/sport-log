@@ -119,8 +119,9 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     final result = await api.getMultiple();
     if (result.isFailure) {
       handleApiError(result.failure);
+    } else {
+      await upsertMultiple(result.success, synchronized: true);
     }
-    await upsertMultiple(result.success, synchronized: true);
   }
 
   @override

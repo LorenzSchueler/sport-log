@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
@@ -100,7 +99,6 @@ class _DurationInputState extends State<DurationInput> {
 
   Widget get _minusButton {
     return RepeatIconButton(
-      color: primaryColorOf(context),
       icon: const Icon(
         AppIcons.subtractBox,
         size: _iconSize,
@@ -119,7 +117,6 @@ class _DurationInputState extends State<DurationInput> {
 
   Widget get _plusButton {
     return RepeatIconButton(
-      color: primaryColorOf(context),
       icon: const Icon(
         AppIcons.addBox,
         size: _iconSize,

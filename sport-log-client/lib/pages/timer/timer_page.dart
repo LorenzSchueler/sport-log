@@ -5,7 +5,6 @@ import 'package:audioplayers/audioplayers.dart' hide Logger;
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/routes.dart';
@@ -53,7 +52,7 @@ class TimerPageState extends State<TimerPage> {
                 _currentTime = const Duration();
               });
             },
-            indicatorColor: primaryColorOf(context),
+            indicatorColor: Theme.of(context).colorScheme.primary,
             labelColor: Colors.white,
             tabs: [
               Tab(

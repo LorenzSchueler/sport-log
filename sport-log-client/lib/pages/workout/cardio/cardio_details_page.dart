@@ -5,7 +5,6 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -115,7 +114,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
       body: Stack(
         children: [
           Container(
-            color: backgroundColorOf(context),
+            color: Theme.of(context).colorScheme.background,
             child: Column(
               children: [
                 _cardioSessionDescription.cardioSession.track != null
@@ -263,7 +262,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: _cardioSessionDescription.cardioSession.track != null
-                    ? backgroundColorOf(context)
+                    ? Theme.of(context).colorScheme.background
                     : Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

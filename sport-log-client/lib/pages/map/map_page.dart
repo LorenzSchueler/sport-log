@@ -59,9 +59,9 @@ class MapPageState extends State<MapPage> {
               child: Container(
                 width: MediaQuery.of(context).size.width - 20,
                 height: 150,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.background,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(10),
                     topRight: Radius.circular(10),
                   ),
@@ -71,21 +71,18 @@ class MapPageState extends State<MapPage> {
                   children: [
                     IconButton(
                       icon: const Icon(AppIcons.map),
-                      color: Theme.of(context).colorScheme.primary,
                       onPressed: () => setState(() {
                         mapStyle = Defaults.mapbox.style.outdoor;
                       }),
                     ),
                     IconButton(
                       icon: const Icon(AppIcons.car),
-                      color: Theme.of(context).colorScheme.primary,
                       onPressed: () => setState(() {
                         mapStyle = Defaults.mapbox.style.street;
                       }),
                     ),
                     IconButton(
                       icon: const Icon(AppIcons.satellite),
-                      color: Theme.of(context).colorScheme.primary,
                       onPressed: () => setState(() {
                         mapStyle = Defaults.mapbox.style.satellite;
                       }),
@@ -96,11 +93,11 @@ class MapPageState extends State<MapPage> {
             ),
           if (showOverlays)
             Positioned(
-              top: 25,
-              right: 25,
-              child: IconButton(
-                icon: const Icon(AppIcons.map),
-                color: Theme.of(context).colorScheme.primary,
+              top: 100,
+              right: 15,
+              child: FloatingActionButton.small(
+                heroTag: null,
+                child: const Icon(AppIcons.map),
                 onPressed: () => setState(() {
                   showMapSettings = !showMapSettings;
                   _logger.i("map settings: $showMapSettings");

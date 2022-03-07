@@ -7,7 +7,6 @@ import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -356,9 +355,8 @@ satelites:  ${location.satelliteNumber}""";
       ],
     );
 
-    return Container(
-      color: backgroundColorOf(context),
-      child: Column(
+    return Scaffold(
+      body: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

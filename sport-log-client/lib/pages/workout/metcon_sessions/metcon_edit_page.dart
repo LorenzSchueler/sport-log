@@ -3,7 +3,6 @@ import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/formatting.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -152,7 +151,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
             type.displayName,
             style: style.copyWith(
               color: (type == _metconDescription.metcon.metconType)
-                  ? primaryColorOf(context)
+                  ? Theme.of(context).colorScheme.primary
                   : Theme.of(context).disabledColor,
             ),
           ),

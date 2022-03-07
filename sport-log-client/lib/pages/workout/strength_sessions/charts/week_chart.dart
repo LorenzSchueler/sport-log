@@ -2,7 +2,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/helpers/formatting.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -77,7 +76,7 @@ class _WeekChartState extends State<WeekChart> {
             barRods: [
               BarChartRodData(
                 y: getValue(_strengthSessionStats[index]),
-                colors: [primaryColorOf(context)],
+                colors: [Theme.of(context).colorScheme.primary],
               )
             ],
           ),

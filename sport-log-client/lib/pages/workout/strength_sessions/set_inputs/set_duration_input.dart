@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/text_editing_controller_extension.dart';
-import 'package:sport_log/helpers/theme.dart';
 import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
@@ -83,7 +82,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
         _hours != 0 || _minutes != 0 || _seconds != 0 || _milliseconds != 0;
     return IconButton(
       icon: const Icon(AppIcons.check),
-      color: isSubmittable ? primaryColorOf(context) : null,
+      color: isSubmittable ? Theme.of(context).colorScheme.primary : null,
       iconSize: PaddedIntInput.fontSize,
       onPressed: isSubmittable ? _submit : null,
     );
