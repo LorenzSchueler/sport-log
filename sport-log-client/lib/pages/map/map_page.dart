@@ -42,10 +42,7 @@ class MapPageState extends State<MapPage> {
           MapboxMap(
             accessToken: Defaults.mapbox.accessToken,
             styleString: mapStyle,
-            initialCameraPosition: CameraPosition(
-              zoom: 13.0,
-              target: Settings.lastMapPosition,
-            ),
+            initialCameraPosition: Settings.lastMapPosition,
             trackCameraPosition: true,
             onMapCreated: (MapboxMapController controller) =>
                 _mapController = controller,
@@ -114,7 +111,7 @@ class MapPageState extends State<MapPage> {
   @override
   void dispose() {
     if (_mapController.cameraPosition != null) {
-      Settings.lastMapPosition = _mapController.cameraPosition!.target;
+      Settings.lastMapPosition = _mapController.cameraPosition!;
     }
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();

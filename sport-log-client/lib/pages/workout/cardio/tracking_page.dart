@@ -76,10 +76,10 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   @override
   void dispose() {
     if (_mapController.cameraPosition != null) {
-      Settings.lastMapPosition = _mapController.cameraPosition!.target;
+      Settings.lastMapPosition = _mapController.cameraPosition!;
     }
     if (_cardioSessionDescription.cardioSession.track != null) {
-      Settings.lastGpsPosition =
+      Settings.lastGpsLatLng =
           _cardioSessionDescription.cardioSession.track!.last.latLng;
     }
     _timer.cancel();
@@ -394,7 +394,7 @@ satelites:  ${location.satelliteNumber}""";
               styleString: Defaults.mapbox.style.outdoor,
               initialCameraPosition: CameraPosition(
                 zoom: 15.0,
-                target: Settings.lastGpsPosition,
+                target: Settings.lastGpsLatLng,
               ),
               trackCameraPosition: true,
               compassEnabled: true,

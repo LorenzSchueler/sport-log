@@ -29,11 +29,12 @@ class Settings {
   static const String _password = "password";
   static const String _email = "email";
   static const String _lastMapPosition = "lastMapPosition";
-  static const String _lastGpsPosition = "lastGpsPosition";
+  static const String _lastGpsLatLng = "lastGpsLatLng";
 
   static Future<void> init() async {
     Hive.registerAdapter(DurationAdapter());
     Hive.registerAdapter(LatLngAdapter());
+    Hive.registerAdapter(CameraPositionAdapter());
     _storage ??= await Hive.openBox<dynamic>("settings");
     await setDefaults();
   }
@@ -52,10 +53,13 @@ class Settings {
       _storage!.put(_units, "metric");
     }
     if (!_storage!.containsKey(_lastMapPosition) || override) {
-      _storage!.put(_lastMapPosition, Defaults.mapbox.cameraPosition);
+      _storage!.put(
+        _lastMapPosition,
+        CameraPosition(target: Defaults.mapbox.cameraPosition),
+      );
     }
-    if (!_storage!.containsKey(_lastGpsPosition) || override) {
-      _storage!.put(_lastGpsPosition, Defaults.mapbox.cameraPosition);
+    if (!_storage!.containsKey(_lastGpsLatLng) || override) {
+      _storage!.put(_lastGpsLatLng, Defaults.mapbox.cameraPosition);
     }
   }
 
@@ -92,6 +96,10 @@ class Settings {
 
   static LatLng _getLatLng(String key) {
     return _storage!.get(key) as LatLng;
+  }
+
+  static CameraPosition _getCameraPosition(String key) {
+    return _storage!.get(key) as CameraPosition;
   }
 
   static void _put(String key, dynamic value) {
@@ -205,20 +213,20 @@ class Settings {
     }
   }
 
-  static LatLng get lastMapPosition {
-    return _getLatLng(_lastMapPosition);
+  static CameraPosition get lastMapPosition {
+    return _getCameraPosition(_lastMapPosition);
   }
 
-  static set lastMapPosition(LatLng latLng) {
+  static set lastMapPosition(CameraPosition latLng) {
     _put(_lastMapPosition, latLng);
   }
 
-  static LatLng get lastGpsPosition {
-    return _getLatLng(_lastGpsPosition);
+  static LatLng get lastGpsLatLng {
+    return _getLatLng(_lastGpsLatLng);
   }
 
-  static set lastGpsPosition(LatLng latLng) {
-    _put(_lastGpsPosition, latLng);
+  static set lastGpsLatLng(LatLng latLng) {
+    _put(_lastGpsLatLng, latLng);
   }
 }
 
@@ -250,5 +258,27 @@ class LatLngAdapter extends TypeAdapter<LatLng> {
   @override
   void write(BinaryWriter writer, LatLng obj) {
     writer.writeDoubleList([obj.latitude, obj.longitude], writeLength: true);
+  }
+}
+
+class CameraPositionAdapter extends TypeAdapter<CameraPosition> {
+  @override
+  final typeId = 2;
+
+  @override
+  CameraPosition read(BinaryReader reader) {
+    final values = reader.readDoubleList(3);
+    return CameraPosition(
+      zoom: values[0],
+      target: LatLng(values[1], values[2]),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, CameraPosition obj) {
+    writer.writeDoubleList(
+      [obj.zoom, obj.target.latitude, obj.target.longitude],
+      writeLength: true,
+    );
   }
 }

@@ -115,10 +115,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   child: MapboxMap(
                     accessToken: Defaults.mapbox.accessToken,
                     styleString: Defaults.mapbox.style.outdoor,
-                    initialCameraPosition: CameraPosition(
-                      zoom: 13.0,
-                      target: Settings.lastMapPosition,
-                    ),
+                    initialCameraPosition: Settings.lastMapPosition,
                     onMapCreated: (MapboxMapController controller) =>
                         _mapController = controller,
                     onStyleLoadedCallback: () {

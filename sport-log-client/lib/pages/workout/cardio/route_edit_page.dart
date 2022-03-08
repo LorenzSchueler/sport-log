@@ -52,7 +52,7 @@ class RouteEditPageState extends State<RouteEditPage> {
   @override
   void dispose() {
     if (_mapController.cameraPosition != null) {
-      Settings.lastMapPosition = _mapController.cameraPosition!.target;
+      Settings.lastMapPosition = _mapController.cameraPosition!;
     }
     super.dispose();
   }
@@ -336,10 +336,7 @@ class RouteEditPageState extends State<RouteEditPage> {
             child: MapboxMap(
               accessToken: Defaults.mapbox.accessToken,
               styleString: Defaults.mapbox.style.outdoor,
-              initialCameraPosition: CameraPosition(
-                zoom: 13.0,
-                target: Settings.lastMapPosition,
-              ),
+              initialCameraPosition: Settings.lastMapPosition,
               trackCameraPosition: true,
               compassEnabled: true,
               compassViewPosition: CompassViewPosition.TopRight,
