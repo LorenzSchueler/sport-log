@@ -72,12 +72,12 @@ class _StrengthSessionDetailsPageState
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(5),
+        padding: Defaults.edgeInsets.normal,
         children: [
           Card(
             margin: EdgeInsets.zero,
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: Defaults.edgeInsets.normal,
               child: Column(
                 children: [
                   TextTile(
@@ -110,7 +110,7 @@ class _StrengthSessionDetailsPageState
             Card(
               margin: EdgeInsets.zero,
               child: Padding(
-                padding: const EdgeInsets.all(10),
+                padding: Defaults.edgeInsets.normal,
                 child: TextTile(
                   caption: 'Comments',
                   child: Text(
@@ -124,7 +124,7 @@ class _StrengthSessionDetailsPageState
           Card(
             margin: EdgeInsets.zero,
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: Defaults.edgeInsets.normal,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children:

@@ -168,7 +168,7 @@ class TimelinePageState extends State<TimelinePage> {
         child: _items.isEmpty
             ? SessionsPageTab.timeline.noEntriesText
             : Container(
-                padding: const EdgeInsets.all(10),
+                padding: Defaults.edgeInsets.normal,
                 child: ListView.separated(
                   itemBuilder: (context, index) =>
                       _itemCard(context, _items[index]),

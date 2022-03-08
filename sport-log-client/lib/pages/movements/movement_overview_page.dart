@@ -2,6 +2,7 @@ import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/movement/all.dart';
@@ -70,11 +71,16 @@ class _MovementsPageState extends State<MovementsPage> {
                   textAlign: TextAlign.center,
                 ),
               )
-            : ListView.builder(
-                itemBuilder: (_, index) => MovementCard(
-                  movementDescription: _movementDescriptions[index],
+            : Container(
+                padding: Defaults.edgeInsets.normal,
+                child: ListView.separated(
+                  itemBuilder: (_, index) => MovementCard(
+                    movementDescription: _movementDescriptions[index],
+                  ),
+                  separatorBuilder: (_, __) =>
+                      Defaults.sizedBox.vertical.normal,
+                  itemCount: _movementDescriptions.length,
                 ),
-                itemCount: _movementDescriptions.length,
               ),
       ),
       floatingActionButton: FloatingActionButton(

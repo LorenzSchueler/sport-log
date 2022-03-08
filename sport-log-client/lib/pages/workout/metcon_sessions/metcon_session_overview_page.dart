@@ -116,7 +116,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         child: _metconSessionDescriptions.isEmpty
             ? SessionsPageTab.metcon.noEntriesText
             : Container(
-                padding: const EdgeInsets.all(10),
+                padding: Defaults.edgeInsets.normal,
                 child: ListView.separated(
                   itemBuilder: (_, index) => MetconSessionCard(
                     metconSessionDescription: _metconSessionDescriptions[index],

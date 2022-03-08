@@ -79,7 +79,7 @@ class RoutePageState extends State<RoutePage> {
                 ),
               )
             : Container(
-                padding: const EdgeInsets.all(10),
+                padding: Defaults.edgeInsets.normal,
                 child: ListView.separated(
                   itemBuilder: (_, index) => RouteCard(route: _routes[index]),
                   separatorBuilder: (_, __) =>

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -113,7 +114,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         ],
       ),
       body: Container(
-        padding: const EdgeInsets.all(10),
+        padding: Defaults.edgeInsets.normal,
         child: Column(
           children: [
             _movementInput,

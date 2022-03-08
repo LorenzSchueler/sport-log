@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -20,7 +21,7 @@ class ActionOverviewPageState extends State<ActionOverviewPage> {
         title: const Text("Server Actions"),
       ),
       body: Container(
-        padding: const EdgeInsets.all(10),
+        padding: Defaults.edgeInsets.normal,
         child: ListView(
           children: const [Text("not implemented")],
         ),

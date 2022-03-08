@@ -270,7 +270,7 @@ class RouteEditPageState extends State<RouteEditPage> {
   Widget _buildExpandableListContainer() {
     if (_listExpanded) {
       return Container(
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+        padding: Defaults.edgeInsets.normal,
         height: 350,
         child: Column(
           children: [
@@ -292,7 +292,7 @@ class RouteEditPageState extends State<RouteEditPage> {
     } else {
       return Container(
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+        padding: Defaults.edgeInsets.normal,
         child: ElevatedButton(
           onPressed: () => setState(() {
             _listExpanded = true;

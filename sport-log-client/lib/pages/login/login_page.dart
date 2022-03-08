@@ -44,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.register ? "Register" : "Login")),
       body: Container(
-        padding: const EdgeInsets.all(5),
+        padding: Defaults.edgeInsets.normal,
         child: Center(
           child: Form(
             key: _formKey,
@@ -66,12 +66,9 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    if (_loginPending)
-                      Container(
-                        child: const CircularProgressIndicator(),
-                        margin: const EdgeInsets.only(right: 20),
-                      ),
-                    _submitButton(context),
+                    _loginPending
+                        ? const CircularProgressIndicator()
+                        : _submitButton(context),
                   ],
                 )
               ],

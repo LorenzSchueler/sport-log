@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/formatting.dart';
@@ -11,7 +12,6 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
-import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 class EditMetconPage extends StatefulWidget {
   const EditMetconPage({
@@ -100,22 +100,20 @@ class _EditMetconPageState extends State<EditMetconPage> {
             ),
           ],
         ),
-        body: WideScreenFrame(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                children: [
-                  _nameInput(context),
-                  _maybeDescriptionInput(context),
-                  _typeInput(context),
-                  _additionalFieldsInput(context),
-                  const Divider(thickness: 2),
-                  _metconMovementsList(context),
-                  _addMetconMovementButton(context),
-                ],
-              ),
+        body: Container(
+          padding: Defaults.edgeInsets.normal,
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                _nameInput(context),
+                _maybeDescriptionInput(context),
+                _typeInput(context),
+                _additionalFieldsInput(context),
+                const Divider(thickness: 2),
+                _metconMovementsList(context),
+                _addMetconMovementButton(context),
+              ],
             ),
           ),
         ),

@@ -29,7 +29,7 @@ class SettingsPageState extends State<SettingsPage> {
         title: const Text("Settings"),
       ),
       body: Container(
-        padding: const EdgeInsets.all(10),
+        padding: Defaults.edgeInsets.normal,
         child: ListView(
           children: [
             const CaptionTile(caption: "Server Settings"),

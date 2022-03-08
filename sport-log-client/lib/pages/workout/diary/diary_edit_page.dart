@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/diary_data_provider.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
@@ -76,7 +77,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
         ],
       ),
       body: Container(
-        padding: const EdgeInsets.all(10),
+        padding: Defaults.edgeInsets.normal,
         child: Form(
           key: _formKey,
           child: ListView(

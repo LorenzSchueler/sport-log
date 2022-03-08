@@ -8,7 +8,6 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
-import 'package:sport_log/widgets/wide_screen_frame.dart';
 
 class EditMovementPage extends StatefulWidget {
   const EditMovementPage({
@@ -124,64 +123,61 @@ class _EditMovementPageState extends State<EditMovementPage> {
             )
           ],
         ),
-        body: WideScreenFrame(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                children: [
-                  _nameInput(context),
-                  ..._movementDescription.movement.description == null
-                      ? [
-                          Defaults.sizedBox.vertical.small,
-                          ActionChip(
-                            avatar: const Icon(AppIcons.add),
-                            label: const Text("Add description"),
-                            onPressed: () {
-                              setState(
-                                () => _movementDescription
-                                    .movement.description = "",
-                              );
-                              _descriptionFocusNode.requestFocus();
-                            },
-                          ),
-                        ]
-                      : [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: TextFormField(
-                              initialValue:
-                                  _movementDescription.movement.description ??
-                                      "",
-                              focusNode: _descriptionFocusNode,
-                              keyboardType: TextInputType.multiline,
-                              minLines: 1,
-                              maxLines: null,
-                              onChanged: (description) => setState(
-                                () => _movementDescription
-                                    .movement.description = "",
-                              ),
-                              decoration: InputDecoration(
-                                contentPadding:
-                                    const EdgeInsets.symmetric(vertical: 5),
-                                labelText: "Description",
-                                suffixIcon: IconButton(
-                                  icon: const Icon(AppIcons.close),
-                                  onPressed: () => setState(
-                                    () => _movementDescription
-                                        .movement.description = null,
-                                  ),
+        body: Container(
+          padding: Defaults.edgeInsets.normal,
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                _nameInput(context),
+                ..._movementDescription.movement.description == null
+                    ? [
+                        Defaults.sizedBox.vertical.small,
+                        ActionChip(
+                          avatar: const Icon(AppIcons.add),
+                          label: const Text("Add description"),
+                          onPressed: () {
+                            setState(
+                              () => _movementDescription.movement.description =
+                                  "",
+                            );
+                            _descriptionFocusNode.requestFocus();
+                          },
+                        ),
+                      ]
+                    : [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: TextFormField(
+                            initialValue:
+                                _movementDescription.movement.description ?? "",
+                            focusNode: _descriptionFocusNode,
+                            keyboardType: TextInputType.multiline,
+                            minLines: 1,
+                            maxLines: null,
+                            onChanged: (description) => setState(
+                              () => _movementDescription.movement.description =
+                                  "",
+                            ),
+                            decoration: InputDecoration(
+                              contentPadding:
+                                  const EdgeInsets.symmetric(vertical: 5),
+                              labelText: "Description",
+                              suffixIcon: IconButton(
+                                icon: const Icon(AppIcons.close),
+                                onPressed: () => setState(
+                                  () => _movementDescription
+                                      .movement.description = null,
                                 ),
                               ),
                             ),
                           ),
-                        ],
-                  Defaults.sizedBox.vertical.small,
-                  _dimInput,
-                  _categoryInput(context),
-                ],
-              ),
+                        ),
+                      ],
+                Defaults.sizedBox.vertical.small,
+                _dimInput,
+                _categoryInput(context),
+              ],
             ),
           ),
         ),

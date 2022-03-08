@@ -76,7 +76,7 @@ class TimerPageState extends State<TimerPage> {
           ),
         ),
         body: Container(
-          padding: const EdgeInsets.all(10),
+          padding: Defaults.edgeInsets.normal,
           child: TabBarView(
             children: [
               SingleChildScrollView(

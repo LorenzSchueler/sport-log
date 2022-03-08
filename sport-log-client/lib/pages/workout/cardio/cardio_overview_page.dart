@@ -122,7 +122,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         child: _cardioSessionDescriptions.isEmpty
             ? SessionsPageTab.cardio.noEntriesText
             : Container(
-                padding: const EdgeInsets.all(10),
+                padding: Defaults.edgeInsets.normal,
                 child: ListView.separated(
                   itemBuilder: (_, index) => CardioSessionCard(
                     cardioSessionDescription: _cardioSessionDescriptions[index],

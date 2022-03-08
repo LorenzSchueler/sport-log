@@ -70,7 +70,7 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(10),
+        padding: Defaults.edgeInsets.normal,
         children: [
           const Text(
             "Metcon",

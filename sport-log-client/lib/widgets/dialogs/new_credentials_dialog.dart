@@ -39,7 +39,7 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
     return Dialog(
       clipBehavior: Clip.antiAlias,
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: Defaults.edgeInsets.normal,
         child: Column(
           children: [
             const Text(

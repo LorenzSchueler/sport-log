@@ -173,7 +173,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
             ],
           ),
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: Defaults.edgeInsets.normal,
             child: _progress == null
                 ? ElevatedButton(
                     onPressed: _downloadMap,

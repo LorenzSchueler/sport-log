@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
@@ -31,7 +32,7 @@ class CardioTrackingSettingsPageState
         title: const Text("Tracking Settings"),
       ),
       body: Container(
-        padding: const EdgeInsets.all(10),
+        padding: Defaults.edgeInsets.normal,
         child: Column(
           children: [
             EditTile(

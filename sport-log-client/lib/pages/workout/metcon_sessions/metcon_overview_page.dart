@@ -77,7 +77,7 @@ class _MetconsPageState extends State<MetconsPage> {
                 ),
               )
             : Container(
-                padding: const EdgeInsets.all(10),
+                padding: Defaults.edgeInsets.normal,
                 child: ListView.separated(
                   itemBuilder: (_, index) =>
                       MetconCard(metconDescription: _metconDescriptions[index]),

@@ -4,6 +4,7 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 
 abstract class Defaults {
   static const sizedBox = _SizedBox();
+  static const edgeInsets = _EdgeInsets();
   static const borderRadius = _BorderRadius();
   static const mapbox = _Mapbox();
   static final server = _Server();
@@ -15,6 +16,12 @@ class _Server {
   static const _defaultUrl = "http://127.0.0.1";
   final emulatorUrl = 'http://10.0.2.2:8000';
   final url = dotenv.env['SERVER_ADDRESS'] ?? _defaultUrl;
+}
+
+class _EdgeInsets {
+  const _EdgeInsets();
+
+  final normal = const EdgeInsets.all(10);
 }
 
 class _SizedBox {

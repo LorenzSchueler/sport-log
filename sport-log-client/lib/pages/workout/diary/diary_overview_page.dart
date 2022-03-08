@@ -83,7 +83,7 @@ class DiaryPageState extends State<DiaryPage> {
         child: _diaries.isEmpty
             ? SessionsPageTab.diary.noEntriesText
             : Container(
-                padding: const EdgeInsets.all(10),
+                padding: Defaults.edgeInsets.normal,
                 child: ListView.separated(
                   itemBuilder: (_, index) => DiaryCard(diary: _diaries[index]),
                   separatorBuilder: (_, __) =>
@@ -119,7 +119,7 @@ class DiaryCard extends StatelessWidget {
       child: Card(
         margin: EdgeInsets.zero,
         child: Padding(
-          padding: const EdgeInsets.all(5),
+          padding: Defaults.edgeInsets.normal,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

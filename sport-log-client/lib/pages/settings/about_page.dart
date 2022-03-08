@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/text_tile.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -29,7 +30,7 @@ class AboutPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text("About")),
       body: Container(
-        padding: const EdgeInsets.all(10),
+        padding: Defaults.edgeInsets.normal,
         child: Column(
           children: [
             TextTile(

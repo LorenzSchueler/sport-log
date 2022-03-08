@@ -480,7 +480,7 @@ satelites:  ${location.satelliteNumber}""";
             ),
           ),
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: Defaults.edgeInsets.normal,
             child: Row(
               children: _buildButtons(),
             ),

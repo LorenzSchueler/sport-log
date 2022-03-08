@@ -117,7 +117,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
       body: RefreshIndicator(
         onRefresh: _pullFromServer,
         child: Container(
-          padding: const EdgeInsets.all(10),
+          padding: Defaults.edgeInsets.normal,
           child: CustomScrollView(
             slivers: [
               if (_sessions.isEmpty)

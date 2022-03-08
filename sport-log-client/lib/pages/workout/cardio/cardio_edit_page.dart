@@ -104,7 +104,7 @@ class CardioEditPageState extends State<CardioEditPage> {
         ],
       ),
       body: Container(
-        padding: const EdgeInsets.all(10),
+        padding: Defaults.edgeInsets.normal,
         child: Form(
           key: _formKey,
           child: ListView(
