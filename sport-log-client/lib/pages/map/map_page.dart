@@ -4,6 +4,7 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
@@ -17,7 +18,7 @@ class MapPage extends StatefulWidget {
 class MapPageState extends State<MapPage> {
   final _logger = Logger('MapPage');
 
-  late MapboxMapController _sessionMapController;
+  late MapboxMapController _mapController;
   bool showOverlays = true;
   bool showMapSettings = false;
 
@@ -43,10 +44,11 @@ class MapPageState extends State<MapPage> {
             styleString: mapStyle,
             initialCameraPosition: CameraPosition(
               zoom: 13.0,
-              target: Defaults.mapbox.cameraPosition,
+              target: Settings.lastMapPosition,
             ),
+            trackCameraPosition: true,
             onMapCreated: (MapboxMapController controller) =>
-                _sessionMapController = controller,
+                _mapController = controller,
             onMapClick: (_, __) => setState(() {
               showOverlays = !showOverlays;
               showMapSettings = false;
@@ -111,6 +113,9 @@ class MapPageState extends State<MapPage> {
 
   @override
   void dispose() {
+    if (_mapController.cameraPosition != null) {
+      Settings.lastMapPosition = _mapController.cameraPosition!.target;
+    }
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }

@@ -13,6 +13,7 @@ import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -222,13 +223,7 @@ class CardioSessionCard extends StatelessWidget {
                       styleString: Defaults.mapbox.style.outdoor,
                       initialCameraPosition: CameraPosition(
                         zoom: 13.0,
-                        target: cardioSessionDescription.cardioSession.track ==
-                                    null ||
-                                cardioSessionDescription
-                                    .cardioSession.track!.isEmpty
-                            ? Defaults.mapbox.cameraPosition
-                            : cardioSessionDescription
-                                .cardioSession.track!.first.latLng,
+                        target: Settings.lastMapPosition,
                       ),
                       onMapCreated: (MapboxMapController controller) =>
                           _sessionMapController = controller,

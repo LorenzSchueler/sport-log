@@ -5,6 +5,7 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -150,7 +151,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
                   styleString: Defaults.mapbox.style.outdoor,
                   initialCameraPosition: CameraPosition(
                     zoom: 13.0,
-                    target: Defaults.mapbox.cameraPosition,
+                    target: Settings.lastMapPosition,
                   ),
                   onMapCreated: (MapboxMapController controller) =>
                       _mapController = controller,

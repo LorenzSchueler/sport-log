@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:mapbox_api/mapbox_api.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
@@ -46,6 +47,14 @@ class RouteEditPageState extends State<RouteEditPage> {
     _locations =
         _route.track.map((e) => LatLng(e.latitude, e.longitude)).toList();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    if (_mapController.cameraPosition != null) {
+      Settings.lastMapPosition = _mapController.cameraPosition!.target;
+    }
+    super.dispose();
   }
 
   Future<void> _saveRoute() async {
@@ -329,12 +338,17 @@ class RouteEditPageState extends State<RouteEditPage> {
               styleString: Defaults.mapbox.style.outdoor,
               initialCameraPosition: CameraPosition(
                 zoom: 13.0,
-                target: Defaults.mapbox.cameraPosition,
+                target: Settings.lastMapPosition,
               ),
+              trackCameraPosition: true,
               compassEnabled: true,
               compassViewPosition: CompassViewPosition.TopRight,
               onMapCreated: (MapboxMapController controller) async {
                 _mapController = controller;
+              },
+              onStyleLoadedCallback: () async {
+                final bounds = _route.track.latLngBounds;
+                _mapController.moveCamera(CameraUpdate.newLatLngBounds(bounds));
                 _line ??= await _mapController.addLine(
                   const LineOptions(
                     lineColor: "red",

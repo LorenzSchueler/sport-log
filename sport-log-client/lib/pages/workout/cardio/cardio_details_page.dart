@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
@@ -125,18 +126,20 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                           styleString: Defaults.mapbox.style.outdoor,
                           initialCameraPosition: CameraPosition(
                             zoom: 14.0,
-                            target:
-                                _cardioSessionDescription.cardioSession.track ==
-                                            null ||
-                                        _cardioSessionDescription
-                                            .cardioSession.track!.isEmpty
-                                    ? Defaults.mapbox.cameraPosition
-                                    : _cardioSessionDescription
-                                        .cardioSession.track!.first.latLng,
+                            target: Settings.lastMapPosition,
                           ),
                           onMapCreated: (MapboxMapController controller) =>
                               _mapController = controller,
                           onStyleLoadedCallback: () {
+                            final bounds = LatLngBoundsCombine.combinedBounds(
+                              _cardioSessionDescription.cardioSession.track,
+                              _cardioSessionDescription.route?.track,
+                            );
+                            if (bounds != null) {
+                              _mapController.moveCamera(
+                                CameraUpdate.newLatLngBounds(bounds),
+                              );
+                            }
                             if (_cardioSessionDescription.cardioSession.track !=
                                 null) {
                               _mapController.addLine(
@@ -148,14 +151,16 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                                 ),
                               );
                             }
-                            _mapController.addLine(
-                              LineOptions(
-                                lineColor: "blue",
-                                lineWidth: 2,
-                                geometry: _cardioSessionDescription
-                                    .route?.track.latLngs,
-                              ),
-                            );
+                            if (_cardioSessionDescription.route != null) {
+                              _mapController.addLine(
+                                LineOptions(
+                                  lineColor: "blue",
+                                  lineWidth: 2,
+                                  geometry: _cardioSessionDescription
+                                      .route!.track.latLngs,
+                                ),
+                              );
+                            }
                           },
                         ),
                       )

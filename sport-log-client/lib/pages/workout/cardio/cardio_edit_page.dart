@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/picker/cardio_type_picker.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/picker/date_picker.dart';
@@ -31,6 +32,7 @@ class CardioEditPageState extends State<CardioEditPage> {
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = CardioSessionDescriptionDataProvider.instance;
 
+  late MapboxMapController _mapController;
   late CardioSessionDescription _cardioSessionDescription;
 
   @override
@@ -79,8 +81,6 @@ class CardioEditPageState extends State<CardioEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    late MapboxMapController _sessionMapController;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -117,30 +117,32 @@ class CardioEditPageState extends State<CardioEditPage> {
                     styleString: Defaults.mapbox.style.outdoor,
                     initialCameraPosition: CameraPosition(
                       zoom: 13.0,
-                      target: _cardioSessionDescription.cardioSession.track ==
-                                  null ||
-                              _cardioSessionDescription
-                                  .cardioSession.track!.isEmpty
-                          ? Defaults.mapbox.cameraPosition
-                          : _cardioSessionDescription
-                              .cardioSession.track!.first.latLng,
+                      target: Settings.lastMapPosition,
                     ),
                     onMapCreated: (MapboxMapController controller) =>
-                        _sessionMapController = controller,
+                        _mapController = controller,
                     onStyleLoadedCallback: () {
+                      final bounds = LatLngBoundsCombine.combinedBounds(
+                        _cardioSessionDescription.cardioSession.track,
+                        _cardioSessionDescription.route?.track,
+                      );
+                      if (bounds != null) {
+                        _mapController
+                            .moveCamera(CameraUpdate.newLatLngBounds(bounds));
+                      }
                       if (_cardioSessionDescription.cardioSession.track !=
                           null) {
-                        _sessionMapController.addLine(
+                        _mapController.addLine(
                           LineOptions(
                             lineColor: "red",
                             lineWidth: 2,
                             geometry: _cardioSessionDescription
-                                .cardioSession.track?.latLngs,
+                                .cardioSession.track!.latLngs,
                           ),
                         );
                       }
                       if (_cardioSessionDescription.route != null) {
-                        _sessionMapController.addLine(
+                        _mapController.addLine(
                           LineOptions(
                             lineColor: "blue",
                             lineWidth: 2,

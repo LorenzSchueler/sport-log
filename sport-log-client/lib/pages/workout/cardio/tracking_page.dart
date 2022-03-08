@@ -9,6 +9,7 @@ import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
@@ -74,6 +75,13 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
   @override
   void dispose() {
+    if (_mapController.cameraPosition != null) {
+      Settings.lastMapPosition = _mapController.cameraPosition!.target;
+    }
+    if (_cardioSessionDescription.cardioSession.track != null) {
+      Settings.lastGpsPosition =
+          _cardioSessionDescription.cardioSession.track!.last.latLng;
+    }
     _timer.cancel();
     _stepCountSubscription.cancel();
     _locationSubscription?.cancel();
@@ -386,8 +394,9 @@ satelites:  ${location.satelliteNumber}""";
               styleString: Defaults.mapbox.style.outdoor,
               initialCameraPosition: CameraPosition(
                 zoom: 15.0,
-                target: Defaults.mapbox.cameraPosition,
+                target: Settings.lastGpsPosition,
               ),
+              trackCameraPosition: true,
               compassEnabled: true,
               compassViewPosition: CompassViewPosition.TopRight,
               onMapCreated: (MapboxMapController controller) =>

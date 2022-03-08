@@ -9,6 +9,7 @@ import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
@@ -134,13 +135,14 @@ class RouteCard extends StatelessWidget {
                       styleString: Defaults.mapbox.style.outdoor,
                       initialCameraPosition: CameraPosition(
                         zoom: 13.0,
-                        target: route.track.isEmpty
-                            ? Defaults.mapbox.cameraPosition
-                            : route.track.first.latLng,
+                        target: Settings.lastMapPosition,
                       ),
                       onMapCreated: (MapboxMapController controller) =>
                           _sessionMapController = controller,
                       onStyleLoadedCallback: () {
+                        final bounds = route.track.latLngBounds;
+                        _sessionMapController
+                            .moveCamera(CameraUpdate.newLatLngBounds(bounds));
                         _sessionMapController.addLine(
                           LineOptions(
                             lineColor: "red",

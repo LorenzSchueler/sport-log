@@ -249,6 +249,6 @@ class LatLngAdapter extends TypeAdapter<LatLng> {
 
   @override
   void write(BinaryWriter writer, LatLng obj) {
-    writer.writeDoubleList([obj.latitude, obj.longitude]);
+    writer.writeDoubleList([obj.latitude, obj.longitude], writeLength: true);
   }
 }
