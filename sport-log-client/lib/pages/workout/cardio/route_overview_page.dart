@@ -6,8 +6,8 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/snackbar.dart';
+import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
-import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -144,7 +144,8 @@ class RouteCard extends StatelessWidget {
                         _sessionMapController.addLine(
                           LineOptions(
                             lineColor: "red",
-                            geometry: route.track.map((c) => c.latLng).toList(),
+                            lineWidth: 2,
+                            geometry: route.track.latLngs,
                           ),
                         );
                       },

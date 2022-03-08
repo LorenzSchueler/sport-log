@@ -97,8 +97,8 @@ class RouteEditPageState extends State<RouteEditPage> {
               longitude: coordinate.longitude,
               elevation: 0, // TODO
               distance: 0, // TODO
-              time: const Duration(seconds: 0),
-            ), // TODO
+              time: const Duration(seconds: 0), // TODO
+            ),
           )
           .toList();
     }
@@ -108,7 +108,10 @@ class RouteEditPageState extends State<RouteEditPage> {
     await _matchLocations();
     await _mapController.updateLine(
       _line!,
-      LineOptions(geometry: _route.track.map((e) => e.latLng).toList()),
+      LineOptions(
+        lineWidth: 2,
+        geometry: _route.track.latLngs,
+      ),
     );
   }
 
@@ -335,7 +338,7 @@ class RouteEditPageState extends State<RouteEditPage> {
                 _line ??= await _mapController.addLine(
                   const LineOptions(
                     lineColor: "red",
-                    lineWidth: 3,
+                    lineWidth: 2,
                     geometry: [],
                   ),
                 );

@@ -233,14 +233,13 @@ satelites:  ${location.satelliteNumber}""";
     LatLng location,
   ) async {
     _line ??= await controller.addLine(
-      const LineOptions(lineColor: "red", lineWidth: 3, geometry: []),
+      const LineOptions(lineColor: "red", lineWidth: 2, geometry: []),
     );
     await controller.updateLine(
       _line!,
       LineOptions(
-        geometry: _cardioSessionDescription.cardioSession.track!
-            .map((e) => LatLng(e.latitude, e.longitude))
-            .toList(),
+        lineWidth: 2,
+        geometry: _cardioSessionDescription.cardioSession.track!.latLngs,
       ),
     );
   }
@@ -400,10 +399,8 @@ satelites:  ${location.satelliteNumber}""";
                   _mapController.addLine(
                     LineOptions(
                       lineColor: "blue",
-                      lineWidth: 3,
-                      geometry: _cardioSessionDescription.route!.track
-                          .map((e) => LatLng(e.latitude, e.longitude))
-                          .toList(),
+                      lineWidth: 2,
+                      geometry: _cardioSessionDescription.route!.track.latLngs,
                     ),
                   );
                 }

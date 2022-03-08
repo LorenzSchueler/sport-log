@@ -133,10 +133,9 @@ class CardioEditPageState extends State<CardioEditPage> {
                         _sessionMapController.addLine(
                           LineOptions(
                             lineColor: "red",
+                            lineWidth: 2,
                             geometry: _cardioSessionDescription
-                                .cardioSession.track
-                                ?.map((c) => c.latLng)
-                                .toList(),
+                                .cardioSession.track?.latLngs,
                           ),
                         );
                       }
@@ -144,9 +143,9 @@ class CardioEditPageState extends State<CardioEditPage> {
                         _sessionMapController.addLine(
                           LineOptions(
                             lineColor: "blue",
-                            geometry: _cardioSessionDescription.route!.track
-                                .map((c) => c.latLng)
-                                .toList(),
+                            lineWidth: 2,
+                            geometry:
+                                _cardioSessionDescription.route!.track.latLngs,
                           ),
                         );
                       }

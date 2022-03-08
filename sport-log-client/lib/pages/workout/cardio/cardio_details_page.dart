@@ -5,6 +5,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
+import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -141,21 +142,18 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                               _mapController.addLine(
                                 LineOptions(
                                   lineColor: "red",
-                                  lineWidth: 3,
+                                  lineWidth: 2,
                                   geometry: _cardioSessionDescription
-                                      .cardioSession.track!
-                                      .map((c) => c.latLng)
-                                      .toList(),
+                                      .cardioSession.track!.latLngs,
                                 ),
                               );
                             }
                             _mapController.addLine(
                               LineOptions(
                                 lineColor: "blue",
-                                lineWidth: 3,
-                                geometry: _cardioSessionDescription.route?.track
-                                    .map((route) => route.latLng)
-                                    .toList(),
+                                lineWidth: 2,
+                                geometry: _cardioSessionDescription
+                                    .route?.track.latLngs,
                               ),
                             );
                           },
