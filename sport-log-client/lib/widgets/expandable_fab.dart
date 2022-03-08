@@ -7,13 +7,11 @@ import 'package:sport_log/widgets/app_icons.dart';
 class ExpandableFab extends StatefulWidget {
   final Icon icon;
   final List<ActionButton> buttons;
-  final bool horizontal;
 
   const ExpandableFab({
     Key? key,
     required this.icon,
     required this.buttons,
-    this.horizontal = false,
   }) : super(key: key);
 
   @override
@@ -61,33 +59,17 @@ class _ExpandableFabState extends State<ExpandableFab>
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.horizontal) {
-      return SizedBox.expand(
-        child: Stack(
-          alignment: Alignment.bottomRight,
-          clipBehavior: Clip.none,
-          children: [
-            _buildTapToCloseFab(),
-            ..._buildExpandingActionButtons(),
-            _buildTapToOpenFab(),
-          ],
-        ),
-      );
-    } else {
-      return SizedBox(
-        height: 86,
-        width: (60 * (widget.buttons.length + 1)).toDouble(),
-        child: Stack(
-          alignment: Alignment.bottomRight,
-          clipBehavior: Clip.none,
-          children: [
-            _buildTapToCloseFab(),
-            ..._buildExpandingActionButtons(),
-            _buildTapToOpenFab(),
-          ],
-        ),
-      );
-    }
+    return SizedBox.expand(
+      child: Stack(
+        alignment: Alignment.bottomRight,
+        clipBehavior: Clip.none,
+        children: [
+          _buildTapToCloseFab(),
+          ..._buildExpandingActionButtons(),
+          _buildTapToOpenFab(),
+        ],
+      ),
+    );
   }
 
   Widget _buildTapToCloseFab() {
@@ -95,18 +77,13 @@ class _ExpandableFabState extends State<ExpandableFab>
       width: 56.0,
       height: 56.0,
       child: Center(
-        child: Material(
-          shape: const CircleBorder(),
-          clipBehavior: Clip.antiAlias,
-          elevation: 4.0,
-          child: InkWell(
-            onTap: _toggle,
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Icon(
-                AppIcons.close,
-              ),
-            ),
+        child: FloatingActionButton.small(
+          heroTag: null,
+          onPressed: _toggle,
+          backgroundColor: Theme.of(context).colorScheme.background,
+          foregroundColor: Theme.of(context).colorScheme.primary,
+          child: const Icon(
+            AppIcons.close,
           ),
         ),
       ),
@@ -116,31 +93,18 @@ class _ExpandableFabState extends State<ExpandableFab>
   List<Widget> _buildExpandingActionButtons() {
     final children = <Widget>[];
     final count = widget.buttons.length;
-    if (widget.horizontal) {
-      for (var i = 0; i < count; i++) {
-        children.add(
-          _ExpandingActionButton(
-            directionInDegrees: 0,
-            maxDistance: 60 * (i + 1),
-            progress: _expandAnimation,
-            child: widget.buttons[i],
-          ),
-        );
-      }
-    } else {
-      final step = 90.0 / (count - 1);
-      for (var i = 0, angleInDegrees = 0.0;
-          i < count;
-          i++, angleInDegrees += step) {
-        children.add(
-          _ExpandingActionButton(
-            directionInDegrees: angleInDegrees,
-            maxDistance: 100,
-            progress: _expandAnimation,
-            child: widget.buttons[i],
-          ),
-        );
-      }
+    final step = 90.0 / (count - 1);
+    for (var i = 0, angleInDegrees = 0.0;
+        i < count;
+        i++, angleInDegrees += step) {
+      children.add(
+        _ExpandingActionButton(
+          directionInDegrees: angleInDegrees,
+          maxDistance: 100,
+          progress: _expandAnimation,
+          child: widget.buttons[i],
+        ),
+      );
     }
     return children;
   }
