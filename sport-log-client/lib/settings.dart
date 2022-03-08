@@ -1,5 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:hive/hive.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -27,8 +28,12 @@ class Settings {
   static const String _username = "username";
   static const String _password = "password";
   static const String _email = "email";
+  static const String _lastMapPosition = "lastMapPosition";
+  static const String _lastGpsPosition = "lastGpsPosition";
 
   static Future<void> init() async {
+    //Hive.registerAdapter(DurationAdapter()); // TODO
+    Hive.registerAdapter(LatLngAdapter());
     _storage ??= await Hive.openBox<dynamic>("settings");
     await setDefaults();
   }
@@ -46,6 +51,12 @@ class Settings {
     if (!_storage!.containsKey(_units) || override) {
       _storage!.put(_units, "metric");
     }
+    if (!_storage!.containsKey(_lastMapPosition) || override) {
+      _storage!.put(_lastMapPosition, Defaults.mapbox.cameraPosition);
+    }
+    if (!_storage!.containsKey(_lastGpsPosition) || override) {
+      _storage!.put(_lastGpsPosition, Defaults.mapbox.cameraPosition);
+    }
   }
 
   static Future<void> setDefaultServerUrl() async {
@@ -56,6 +67,8 @@ class Settings {
           : Defaults.server.url,
     );
   }
+
+  // Hive supports all primitive types, List, Map, DateTime and Uint8List
 
   static bool _getBool(String key) {
     return _storage!.get(key)! as bool;
@@ -71,6 +84,10 @@ class Settings {
 
   static DateTime? _getDateTimeOptional(String key) {
     return _storage!.get(key) as DateTime?;
+  }
+
+  static LatLng _getLatLng(String key) {
+    return _storage!.get(key) as LatLng;
   }
 
   static void _put(String key, dynamic value) {
@@ -94,7 +111,7 @@ class Settings {
   }
 
   static Duration get syncInterval {
-    return Duration(seconds: _getInt(_syncInterval));
+    return Duration(seconds: _getInt(_syncInterval)); // use adapter
   }
 
   static set syncInterval(Duration interval) {
@@ -182,5 +199,52 @@ class Settings {
       _logger.i("no user data found");
       return null;
     }
+  }
+
+  static LatLng get lastMapPosition {
+    return _getLatLng(_lastMapPosition);
+  }
+
+  static set lastMapPosition(LatLng latLng) {
+    _put(_lastMapPosition, latLng);
+  }
+
+  static LatLng get lastGpsPosition {
+    return _getLatLng(_lastGpsPosition);
+  }
+
+  static set lastGpsPosition(LatLng latLng) {
+    _put(_lastGpsPosition, latLng);
+  }
+}
+
+class DurationAdapter extends TypeAdapter<Duration> {
+  @override
+  final typeId = 0;
+
+  @override
+  Duration read(BinaryReader reader) {
+    return Duration(milliseconds: reader.readInt());
+  }
+
+  @override
+  void write(BinaryWriter writer, Duration obj) {
+    writer.writeInt(obj.inMilliseconds);
+  }
+}
+
+class LatLngAdapter extends TypeAdapter<LatLng> {
+  @override
+  final typeId = 1;
+
+  @override
+  LatLng read(BinaryReader reader) {
+    final values = reader.readDoubleList(2);
+    return LatLng(values[0], values[1]);
+  }
+
+  @override
+  void write(BinaryWriter writer, LatLng obj) {
+    writer.writeDoubleList([obj.latitude, obj.longitude]);
   }
 }
