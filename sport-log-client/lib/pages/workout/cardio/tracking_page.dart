@@ -77,7 +77,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     _timer.cancel();
     _stepCountSubscription.cancel();
     _locationSubscription?.cancel();
-    _location.enableBackgroundMode(enable: false);
     super.dispose();
   }
 
@@ -164,7 +163,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     }
 
     _location.changeSettings(accuracy: LocationAccuracy.high);
-    _location.enableBackgroundMode(enable: true);
     _locationSubscription =
         _location.onLocationChanged.listen(_onLocationUpdate);
   }
