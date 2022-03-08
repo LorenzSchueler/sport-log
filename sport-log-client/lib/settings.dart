@@ -32,7 +32,7 @@ class Settings {
   static const String _lastGpsPosition = "lastGpsPosition";
 
   static Future<void> init() async {
-    //Hive.registerAdapter(DurationAdapter()); // TODO
+    Hive.registerAdapter(DurationAdapter());
     Hive.registerAdapter(LatLngAdapter());
     _storage ??= await Hive.openBox<dynamic>("settings");
     await setDefaults();
@@ -46,7 +46,7 @@ class Settings {
       await setDefaultServerUrl();
     }
     if (!_storage!.containsKey(_syncInterval) || override) {
-      _storage!.put(_syncInterval, 300);
+      _storage!.put(_syncInterval, const Duration(minutes: 300));
     }
     if (!_storage!.containsKey(_units) || override) {
       _storage!.put(_units, "metric");
@@ -86,6 +86,10 @@ class Settings {
     return _storage!.get(key) as DateTime?;
   }
 
+  static Duration _getDuration(String key) {
+    return _storage!.get(key) as Duration;
+  }
+
   static LatLng _getLatLng(String key) {
     return _storage!.get(key) as LatLng;
   }
@@ -111,11 +115,11 @@ class Settings {
   }
 
   static Duration get syncInterval {
-    return Duration(seconds: _getInt(_syncInterval)); // use adapter
+    return _getDuration(_syncInterval);
   }
 
   static set syncInterval(Duration interval) {
-    _put(_syncInterval, interval.inSeconds);
+    _put(_syncInterval, interval);
   }
 
   static DateTime? get lastSync {
