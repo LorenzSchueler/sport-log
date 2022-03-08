@@ -174,8 +174,8 @@ class TimerPageState extends State<TimerPage> {
                 ? _startTimer(metconType)
                 : showMessageDialog(
                     context: context,
-                    text:
-                        "The ${_caption(metconType)} must be greater than 0."),
+                    text: "The ${_caption(metconType)} must be greater than 0.",
+                  ),
             child: const Text(
               "Start",
               style: TextStyle(fontSize: 40),

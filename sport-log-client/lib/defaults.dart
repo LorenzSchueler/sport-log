@@ -85,6 +85,8 @@ class _Mapbox {
 
   final style = const _Style();
   final markerColor = "#0060a0";
+  final trackLineColor = "red";
+  final routeLineColor = "blue";
   final cameraPosition = const LatLng(47.27, 11.33);
 }
 

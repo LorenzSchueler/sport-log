@@ -121,7 +121,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
       );
       _boundingBoxLine = await _mapController.addLine(
         LineOptions(
-          lineColor: "red",
+          lineColor: Defaults.mapbox.trackLineColor,
           lineWidth: 2,
           geometry: [
             LatLng(_point1!.latitude, _point1!.longitude),

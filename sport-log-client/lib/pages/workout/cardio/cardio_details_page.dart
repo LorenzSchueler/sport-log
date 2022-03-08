@@ -141,7 +141,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                                 null) {
                               _mapController.addLine(
                                 LineOptions(
-                                  lineColor: "red",
+                                  lineColor: Defaults.mapbox.trackLineColor,
                                   lineWidth: 2,
                                   geometry: _cardioSessionDescription
                                       .cardioSession.track!.latLngs,
@@ -151,7 +151,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                             if (_cardioSessionDescription.route != null) {
                               _mapController.addLine(
                                 LineOptions(
-                                  lineColor: "blue",
+                                  lineColor: Defaults.mapbox.routeLineColor,
                                   lineWidth: 2,
                                   geometry: _cardioSessionDescription
                                       .route!.track.latLngs,

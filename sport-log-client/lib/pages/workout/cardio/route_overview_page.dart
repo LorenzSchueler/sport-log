@@ -142,7 +142,7 @@ class RouteCard extends StatelessWidget {
                             .moveCamera(CameraUpdate.newLatLngBounds(bounds));
                         _sessionMapController.addLine(
                           LineOptions(
-                            lineColor: "red",
+                            lineColor: Defaults.mapbox.routeLineColor,
                             lineWidth: 2,
                             geometry: route.track.latLngs,
                           ),

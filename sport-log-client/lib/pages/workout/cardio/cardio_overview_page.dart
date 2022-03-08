@@ -237,7 +237,7 @@ class CardioSessionCard extends StatelessWidget {
                             null) {
                           _sessionMapController.addLine(
                             LineOptions(
-                              lineColor: "red",
+                              lineColor: Defaults.mapbox.trackLineColor,
                               lineWidth: 2,
                               geometry: cardioSessionDescription
                                   .cardioSession.track!.latLngs,
@@ -247,7 +247,7 @@ class CardioSessionCard extends StatelessWidget {
                         if (cardioSessionDescription.route != null) {
                           _sessionMapController.addLine(
                             LineOptions(
-                              lineColor: "blue",
+                              lineColor: Defaults.mapbox.routeLineColor,
                               lineWidth: 2,
                               geometry:
                                   cardioSessionDescription.route!.track.latLngs,

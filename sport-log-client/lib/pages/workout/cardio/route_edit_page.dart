@@ -347,8 +347,8 @@ class RouteEditPageState extends State<RouteEditPage> {
                 final bounds = _route.track.latLngBounds;
                 _mapController.moveCamera(CameraUpdate.newLatLngBounds(bounds));
                 _line ??= await _mapController.addLine(
-                  const LineOptions(
-                    lineColor: "red",
+                  LineOptions(
+                    lineColor: Defaults.mapbox.routeLineColor,
                     lineWidth: 2,
                     geometry: [],
                   ),

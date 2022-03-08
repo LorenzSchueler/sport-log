@@ -239,7 +239,11 @@ satelites:  ${location.satelliteNumber}""";
     LatLng location,
   ) async {
     _line ??= await controller.addLine(
-      const LineOptions(lineColor: "red", lineWidth: 2, geometry: []),
+      LineOptions(
+        lineColor: Defaults.mapbox.trackLineColor,
+        lineWidth: 2,
+        geometry: [],
+      ),
     );
     await controller.updateLine(
       _line!,
@@ -405,7 +409,7 @@ satelites:  ${location.satelliteNumber}""";
                 if (_cardioSessionDescription.route != null) {
                   _mapController.addLine(
                     LineOptions(
-                      lineColor: "blue",
+                      lineColor: Defaults.mapbox.routeLineColor,
                       lineWidth: 2,
                       geometry: _cardioSessionDescription.route!.track.latLngs,
                     ),
