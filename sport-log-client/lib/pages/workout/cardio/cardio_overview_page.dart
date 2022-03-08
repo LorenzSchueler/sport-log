@@ -213,7 +213,8 @@ class CardioSessionCard extends StatelessWidget {
               ],
             ),
             Defaults.sizedBox.vertical.small,
-            cardioSessionDescription.cardioSession.track != null
+            cardioSessionDescription.cardioSession.track != null ||
+                    cardioSessionDescription.route != null
                 ? SizedBox(
                     height: 150,
                     child: MapboxMap(
@@ -232,23 +233,32 @@ class CardioSessionCard extends StatelessWidget {
                       onMapCreated: (MapboxMapController controller) =>
                           _sessionMapController = controller,
                       onStyleLoadedCallback: () {
-                        _sessionMapController.addLine(
-                          LineOptions(
-                            lineColor: "red",
-                            geometry: cardioSessionDescription
-                                .cardioSession.track!
-                                .map((c) => c.latLng)
-                                .toList(),
-                          ),
+                        final bounds = LatLngBoundsCombine.combinedBounds(
+                          cardioSessionDescription.cardioSession.track,
+                          cardioSessionDescription.route?.track,
                         );
+                        if (bounds != null) {
+                          _sessionMapController
+                              .moveCamera(CameraUpdate.newLatLngBounds(bounds));
+                        }
+                        if (cardioSessionDescription.cardioSession.track !=
+                            null) {
+                          _sessionMapController.addLine(
+                            LineOptions(
+                              lineColor: "red",
+                              lineWidth: 2,
+                              geometry: cardioSessionDescription
+                                  .cardioSession.track!.latLngs,
+                            ),
+                          );
+                        }
                         if (cardioSessionDescription.route != null) {
                           _sessionMapController.addLine(
                             LineOptions(
                               lineColor: "blue",
-                              lineWidth: 3,
-                              geometry: cardioSessionDescription.route!.track
-                                  .map((e) => LatLng(e.latitude, e.longitude))
-                                  .toList(),
+                              lineWidth: 2,
+                              geometry:
+                                  cardioSessionDescription.route!.track.latLngs,
                             ),
                           );
                         }

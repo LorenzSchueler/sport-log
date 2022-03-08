@@ -1,8 +1,10 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/clone_extensions.dart';
 
@@ -86,4 +88,51 @@ class Position {
       hashValues(longitude, latitude, elevation, distance, time);
 
   LatLng get latLng => LatLng(latitude, longitude);
+}
+
+extension TrackLatLngBounds on List<Position> {
+  LatLngBounds get latLngBounds {
+    double north = map((p) => p.latitude).max;
+    double south = map((p) => p.latitude).min;
+    double latDiff = north - south;
+    north += 0.1 * latDiff;
+    south -= 0.1 * latDiff;
+
+    double east = map((p) => p.longitude).max;
+    double west = map((p) => p.longitude).min;
+    double longDiff = east - west;
+    east += 0.1 * longDiff;
+    west -= 0.1 * longDiff;
+
+    return LatLngBounds(
+      northeast: LatLng(north, east),
+      southwest: LatLng(south, west),
+    );
+  }
+}
+
+extension TrackToLatLngs on List<Position> {
+  List<LatLng> get latLngs {
+    return map((pos) => pos.latLng).toList();
+  }
+}
+
+extension LatLngBoundsCombine on LatLngBounds {
+  static LatLngBounds? combinedBounds(
+      List<Position>? track1, List<Position>? track2) {
+    final bounds1 = track1?.latLngBounds;
+    final bounds2 = track2?.latLngBounds;
+    if (bounds1 == null || bounds2 == null) {
+      return bounds1 ?? bounds2;
+    }
+    final north = max(bounds1.northeast.latitude, bounds2.northeast.latitude);
+    final south = min(bounds1.northeast.latitude, bounds2.northeast.latitude);
+    final east = max(bounds1.northeast.longitude, bounds2.northeast.longitude);
+    final west = min(bounds1.northeast.longitude, bounds2.northeast.longitude);
+
+    return LatLngBounds(
+      southwest: LatLng(north, east),
+      northeast: LatLng(south, west),
+    );
+  }
 }
