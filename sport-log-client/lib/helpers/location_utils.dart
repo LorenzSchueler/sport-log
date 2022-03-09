@@ -32,7 +32,10 @@ class LocationUtils {
         _location.onLocationChanged.listen(onLocationUpdate);
   }
 
-  Future<void>? stopLocationStream() {
-    return _locationSubscription?.cancel();
+  void stopLocationStream() {
+    _locationSubscription?.cancel();
+    _locationSubscription = null;
   }
+
+  bool get enabled => _locationSubscription != null;
 }

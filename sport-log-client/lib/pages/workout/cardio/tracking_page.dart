@@ -76,6 +76,9 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
   @override
   void dispose() {
+    _timer.cancel();
+    _stepCountSubscription.cancel();
+    _locationUtils.stopLocationStream();
     if (_mapController.cameraPosition != null) {
       Settings.lastMapPosition = _mapController.cameraPosition!;
     }
@@ -83,9 +86,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       Settings.lastGpsLatLng =
           _cardioSessionDescription.cardioSession.track!.last.latLng;
     }
-    _timer.cancel();
-    _stepCountSubscription.cancel();
-    _locationUtils.stopLocationStream();
     super.dispose();
   }
 

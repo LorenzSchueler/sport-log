@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
@@ -18,11 +20,61 @@ class MapPage extends StatefulWidget {
 class MapPageState extends State<MapPage> {
   final _logger = Logger('MapPage');
 
+  late LocationUtils _locationUtils;
   late MapboxMapController _mapController;
   bool showOverlays = true;
   bool showMapSettings = false;
 
+  List<Circle>? _circles;
+  LatLng? _lastLatLng;
+
   String mapStyle = Defaults.mapbox.style.outdoor;
+
+  @override
+  void initState() {
+    _locationUtils = LocationUtils(_onLocationUpdate);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _locationUtils.stopLocationStream();
+    if (_mapController.cameraPosition != null) {
+      Settings.lastMapPosition = _mapController.cameraPosition!;
+    }
+    if (_lastLatLng != null) {
+      Settings.lastGpsLatLng = _lastLatLng!;
+    }
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    super.dispose();
+  }
+
+  Future<void> _onLocationUpdate(LocationData location) async {
+    LatLng latLng = LatLng(location.latitude!, location.longitude!);
+
+    await _mapController.animateCamera(
+      CameraUpdate.newLatLng(latLng),
+    );
+    if (_circles != null) {
+      await _mapController.removeCircles(_circles!);
+    }
+    _circles = await _mapController.addCircles([
+      CircleOptions(
+        circleRadius: 8.0,
+        circleColor: Defaults.mapbox.markerColor,
+        circleOpacity: 0.5,
+        geometry: latLng,
+        draggable: false,
+      ),
+      CircleOptions(
+        circleRadius: 20.0,
+        circleColor: Defaults.mapbox.markerColor,
+        circleOpacity: 0.3,
+        geometry: latLng,
+        draggable: false,
+      ),
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +142,7 @@ class MapPageState extends State<MapPage> {
                 ),
               ),
             ),
-          if (showOverlays)
+          if (showOverlays) ...[
             Positioned(
               top: 100,
               right: 15,
@@ -99,21 +151,35 @@ class MapPageState extends State<MapPage> {
                 child: const Icon(AppIcons.map),
                 onPressed: () => setState(() {
                   showMapSettings = !showMapSettings;
-                  _logger.i("map settings: $showMapSettings");
                 }),
               ),
-            )
+            ),
+            Positioned(
+              top: 150,
+              right: 15,
+              child: FloatingActionButton.small(
+                heroTag: null,
+                foregroundColor: _locationUtils.enabled
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).disabledColor,
+                child: const Icon(AppIcons.location),
+                onPressed: () async {
+                  if (_locationUtils.enabled) {
+                    _locationUtils.stopLocationStream();
+                    if (_circles != null) {
+                      await _mapController.removeCircles(_circles!);
+                    }
+                    _circles = null;
+                  } else {
+                    _locationUtils.startLocationStream();
+                  }
+                  setState(() {});
+                },
+              ),
+            ),
+          ],
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    if (_mapController.cameraPosition != null) {
-      Settings.lastMapPosition = _mapController.cameraPosition!;
-    }
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    super.dispose();
   }
 }
