@@ -133,8 +133,8 @@ extension LatLngBoundsCombine on LatLngBounds {
     final west = min(bounds1.southwest.longitude, bounds2.southwest.longitude);
 
     return LatLngBounds(
-      southwest: LatLng(north, east),
-      northeast: LatLng(south, west),
+      northeast: LatLng(north, east),
+      southwest: LatLng(south, west),
     );
   }
 }
