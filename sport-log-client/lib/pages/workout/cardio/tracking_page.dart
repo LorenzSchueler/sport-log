@@ -6,6 +6,7 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -46,8 +47,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   String _stepInfo = "null";
 
   late Timer _timer;
-  final Location _location = Location();
-  StreamSubscription? _locationSubscription;
+  late LocationUtils _locationUtils;
 
   late StreamSubscription _stepCountSubscription;
   late StepCount _lastStepCount;
@@ -68,6 +68,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       movement: widget.movement,
       route: widget.route,
     );
+    _locationUtils = LocationUtils(_onLocationUpdate);
     _timer =
         Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateData());
     super.initState();
@@ -84,7 +85,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     }
     _timer.cancel();
     _stepCountSubscription.cancel();
-    _locationSubscription?.cancel();
+    _locationUtils.stopLocationStream();
     super.dispose();
   }
 
@@ -151,28 +152,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     }
     _cardioSessionDescription.cardioSession.setAvgCadenceFromCadenceAndTime();
     _lastStepCount = stepCountEvent;
-  }
-
-  Future<void> _startLocationStream() async {
-    bool serviceEnabled = await _location.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await _location.requestService();
-      if (!serviceEnabled) {
-        return;
-      }
-    }
-
-    PermissionStatus permissionGranted = await _location.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await _location.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    _location.changeSettings(accuracy: LocationAccuracy.high);
-    _locationSubscription =
-        _location.onLocationChanged.listen(_onLocationUpdate);
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
@@ -415,7 +394,7 @@ satelites:  ${location.satelliteNumber}""";
                     ),
                   );
                 }
-                _startLocationStream();
+                _locationUtils.startLocationStream();
                 _startStepCountStream();
               },
             ),
