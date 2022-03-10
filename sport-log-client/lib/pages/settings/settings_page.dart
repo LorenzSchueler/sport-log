@@ -25,9 +25,10 @@ class SettingsPageState extends State<SettingsPage> {
   Future<void> checkSync() async {
     await Sync.instance.sync(
       onNoInternet: () => showMessageDialog(
-          context: context,
-          text:
-              "The server could not be reached.\nPlease make sure you are connected to the internet and the server URL is right."),
+        context: context,
+        text:
+            "The server could not be reached.\nPlease make sure you are connected to the internet and the server URL is right.",
+      ),
     );
   }
 
@@ -47,6 +48,7 @@ class SettingsPageState extends State<SettingsPage> {
               caption: "Server Synchonization",
               child: SizedBox(
                 height: 20,
+                width: 34,
                 child: Switch(
                   value: Settings.syncEnabled,
                   onChanged: (syncEnabled) async {

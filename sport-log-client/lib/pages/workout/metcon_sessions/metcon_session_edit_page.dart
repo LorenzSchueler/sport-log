@@ -175,6 +175,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                     const Text("finished"),
                     SizedBox(
                       height: 20,
+                      width: 34 ,
                       child: Switch(
                         value: _finished,
                         onChanged: (finished) => setState(() {
@@ -310,6 +311,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                 caption: "Rx",
                 child: SizedBox(
                   height: 20,
+                  width: 34,
                   child: Switch(
                     value: _metconSessionDescription.metconSession.rx,
                     onChanged: (rx) {

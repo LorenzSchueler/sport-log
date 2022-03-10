@@ -68,8 +68,10 @@ class Sync extends ChangeNotifier {
   Future<bool> _downSync({VoidCallback? onNoInternet}) async {
     final accountDataResult = await Api.accountData.get(Settings.lastSync);
     if (accountDataResult.isFailure) {
-      await DataProvider.handleApiError(accountDataResult.failure,
-          onNoInternet: onNoInternet);
+      await DataProvider.handleApiError(
+        accountDataResult.failure,
+        onNoInternet: onNoInternet,
+      );
       return false;
     } else {
       final accountData = accountDataResult.success;
