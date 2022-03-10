@@ -5,7 +5,6 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
@@ -138,6 +137,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
                 );
                 setState(() {
                   _strengthSessionDescription.sets.add(newSet);
+                  _strengthSessionDescription.orderSets();
                 });
                 Future.delayed(
                   const Duration(milliseconds: 100),
@@ -152,14 +152,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
               dimension: _strengthSessionDescription.movement.dimension,
             ),
             const Divider(),
-            Expanded(
-              child: ListView(
-                controller: _scrollController,
-                children: [
-                  _setList,
-                ],
-              ),
-            ),
+            Expanded(child: _setList),
           ],
         ),
       ),
@@ -287,28 +280,18 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   }
 
   Widget get _setList {
-    return ReorderableListView(
-      buildDefaultDragHandles: false,
+    return ListView.builder(
+      controller: _scrollController,
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      children: _strengthSessionDescription.sets.mapToListIndexed(_setToWidget),
-      onReorder: (oldIndex, newIndex) {
-        setState(() {
-          if (newIndex > oldIndex) {
-            newIndex -= 1;
-          }
-          final set = _strengthSessionDescription.sets.removeAt(oldIndex);
-          _strengthSessionDescription.sets.insert(newIndex, set);
-          _strengthSessionDescription.orderSets();
-        });
-      },
+      itemBuilder: (context, index) =>
+          _setWidget(_strengthSessionDescription.sets[index]),
+      itemCount: _strengthSessionDescription.sets.length,
     );
   }
 
-  Widget _setToWidget(StrengthSet strengthSet, int index) {
+  Widget _setWidget(StrengthSet strengthSet) {
     return TextTile(
-      key: ValueKey(strengthSet.id),
-      caption: "Set ${index + 1}",
+      caption: "Set ${strengthSet.setNumber + 1}",
       onCancel: () => setState(() {
         _strengthSessionDescription.sets.remove(strengthSet);
         _strengthSessionDescription.orderSets();
