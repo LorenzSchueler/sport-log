@@ -30,6 +30,14 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
 
   double? _progress;
 
+  @override
+  void dispose() {
+    if (_mapController.cameraPosition != null) {
+      Settings.lastMapPosition = _mapController.cameraPosition!;
+    }
+    super.dispose();
+  }
+
   void _onMapDownload(DownloadRegionStatus status) {
     if (status.runtimeType == Success) {
       setState(() {
@@ -153,6 +161,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
                   accessToken: Defaults.mapbox.accessToken,
                   styleString: Defaults.mapbox.style.outdoor,
                   initialCameraPosition: Settings.lastMapPosition,
+                  trackCameraPosition: true,
                   onMapCreated: (MapboxMapController controller) =>
                       _mapController = controller,
                   onMapLongClick: (_, latLng) => _point1 == null
