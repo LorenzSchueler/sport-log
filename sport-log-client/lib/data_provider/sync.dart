@@ -65,15 +65,15 @@ class Sync extends ChangeNotifier {
   Future<bool> _downSync({VoidCallback? onNoInternet}) async {
     final accountDataResult = await Api.accountData.get(Settings.lastSync);
     if (accountDataResult.isFailure) {
-      switch (accountDataResult.failure) {
-        case ApiError.noInternetConnection:
+      switch (accountDataResult.failure.errorCode) {
+        case ApiErrorCode.noInternetConnection:
           _logger.d(
             'Tried sync but got no Internet connection.',
             accountDataResult.failure,
           );
           onNoInternet?.call();
           break;
-        case ApiError.unauthorized:
+        case ApiErrorCode.unauthorized:
           _logger.w(
             'Tried sync but access unauthorized.',
             accountDataResult.failure,

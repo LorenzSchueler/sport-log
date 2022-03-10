@@ -161,7 +161,7 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
       Navigator.pop(context, result.success);
     } else {
       setState(() {
-        _errorMessage = result.failure;
+        _errorMessage = result.failure.toString();
       });
     }
     _formKey.currentState!.deactivate();

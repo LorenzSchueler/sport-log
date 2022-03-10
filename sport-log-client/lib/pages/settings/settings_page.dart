@@ -123,7 +123,7 @@ class SettingsPageState extends State<SettingsPage> {
                     await showMessageDialog(
                       context: context,
                       title: "Changing Username Failed",
-                      text: result.failure,
+                      text: result.failure.toString(),
                     );
                   }
                 } else {
@@ -150,7 +150,7 @@ class SettingsPageState extends State<SettingsPage> {
                     await showMessageDialog(
                       context: context,
                       title: "Changing Password Failed",
-                      text: result.failure,
+                      text: result.failure.toString(),
                     );
                   }
                 } else {
@@ -178,7 +178,7 @@ class SettingsPageState extends State<SettingsPage> {
                     await showMessageDialog(
                       context: context,
                       title: "Changing Email Failed",
-                      text: result.failure,
+                      text: result.failure.toString(),
                     );
                   }
                 } else {

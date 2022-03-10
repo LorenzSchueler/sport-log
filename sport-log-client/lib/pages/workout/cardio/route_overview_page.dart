@@ -52,7 +52,7 @@ class RoutePageState extends State<RoutePage> {
     await _dataProvider.pullFromServer().onError((error, stackTrace) {
       if (error is ApiError) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
+            .showSnackBar(SnackBar(content: Text(error.toString())));
       }
     });
   }

@@ -9,6 +9,7 @@ import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/error_message.dart';
 import 'package:sport_log/settings.dart';
 
 part 'accessors/account_data_api.dart';
@@ -24,7 +25,7 @@ part 'accessors/wod_api.dart';
 
 const String version = '/v1.0';
 
-enum ApiError {
+enum ApiErrorCode {
   // http error
   badRequest, // 400
   unauthorized, // 401
@@ -33,37 +34,51 @@ enum ApiError {
   conflict, // 409
   internalServerError, // 500
   unknownServerError, // unknown status code != 200, 204, 400, 401, 403, 404, 409, 500
-  //usernameTaken, conflict
-  //loginFailed, unauthorized
   // request error
   noInternetConnection,
   badJson,
   unknownRequestError, // unknown request error
 }
 
-extension ToErrorMessage on ApiError {
-  String toErrorMessage() {
+extension ToErrorMessage on ApiErrorCode {
+  String get description {
     switch (this) {
-      case ApiError.badRequest:
+      case ApiErrorCode.badRequest:
         return "Request was not valid.";
-      case ApiError.unauthorized:
+      case ApiErrorCode.unauthorized:
         return "User unauthorized";
-      case ApiError.forbidden:
+      case ApiErrorCode.forbidden:
         return "Access to resource is forbidden.";
-      case ApiError.notFound:
+      case ApiErrorCode.notFound:
         return "Resource not found.";
-      case ApiError.conflict:
+      case ApiErrorCode.conflict:
         return "Conflict with resource.";
-      case ApiError.internalServerError:
+      case ApiErrorCode.internalServerError:
         return "Internal server error.";
-      case ApiError.unknownServerError:
+      case ApiErrorCode.unknownServerError:
         return "An unknown server error.";
-      case ApiError.noInternetConnection:
+      case ApiErrorCode.noInternetConnection:
         return "No Internet connection.";
-      case ApiError.badJson:
+      case ApiErrorCode.badJson:
         return "Got bad json from server.";
-      case ApiError.unknownRequestError:
+      case ApiErrorCode.unknownRequestError:
         return "Unhandled request error.";
+    }
+  }
+}
+
+class ApiError {
+  final ApiErrorCode errorCode;
+  final String? message;
+
+  ApiError(this.errorCode, [this.message]);
+
+  @override
+  String toString() {
+    if (message != null) {
+      return "${errorCode.description}\n$message";
+    } else {
+      return errorCode.description;
     }
   }
 }
@@ -71,6 +86,10 @@ extension ToErrorMessage on ApiError {
 typedef ApiResult<T> = Future<Result<T, ApiError>>;
 
 extension _ToApiResult on Response {
+  String? get _message => ErrorMessage.fromJson(
+        jsonDecode(utf8.decode(bodyBytes)) as Map<String, dynamic>,
+      ).message;
+
   ApiResult<void> toApiResult() async {
     switch (statusCode) {
       case 200:
@@ -78,19 +97,19 @@ extension _ToApiResult on Response {
       case 204:
         return Success(null);
       case 400:
-        return Failure(ApiError.badRequest);
+        return Failure(ApiError(ApiErrorCode.badRequest, _message));
       case 401:
-        return Failure(ApiError.unauthorized);
+        return Failure(ApiError(ApiErrorCode.unauthorized, _message));
       case 403:
-        return Failure(ApiError.forbidden);
+        return Failure(ApiError(ApiErrorCode.forbidden, _message));
       case 404:
-        return Failure(ApiError.notFound);
+        return Failure(ApiError(ApiErrorCode.notFound, _message));
       case 409:
-        return Failure(ApiError.conflict);
+        return Failure(ApiError(ApiErrorCode.conflict, _message));
       case 500:
-        return Failure(ApiError.internalServerError);
+        return Failure(ApiError(ApiErrorCode.internalServerError, _message));
       default:
-        return Failure(ApiError.unknownServerError);
+        return Failure(ApiError(ApiErrorCode.unknownServerError, _message));
     }
   }
 
@@ -99,21 +118,21 @@ extension _ToApiResult on Response {
       case 200:
         return Success(fromJson(jsonDecode(utf8.decode(bodyBytes))));
       case 204: // this should not happen as a response for a get request
-        return Failure(ApiError.unknownServerError);
+        return Failure(ApiError(ApiErrorCode.unknownServerError));
       case 400:
-        return Failure(ApiError.badRequest);
+        return Failure(ApiError(ApiErrorCode.badRequest, _message));
       case 401:
-        return Failure(ApiError.unauthorized);
+        return Failure(ApiError(ApiErrorCode.unauthorized, _message));
       case 403:
-        return Failure(ApiError.forbidden);
+        return Failure(ApiError(ApiErrorCode.forbidden, _message));
       case 404:
-        return Failure(ApiError.notFound);
+        return Failure(ApiError(ApiErrorCode.notFound, _message));
       case 409:
-        return Failure(ApiError.conflict);
+        return Failure(ApiError(ApiErrorCode.conflict, _message));
       case 500:
-        return Failure(ApiError.internalServerError);
+        return Failure(ApiError(ApiErrorCode.internalServerError, _message));
       default:
-        return Failure(ApiError.unknownServerError);
+        return Failure(ApiError(ApiErrorCode.unknownServerError, _message));
     }
   }
 }
@@ -128,12 +147,12 @@ extension ApiResultFromRequest on ApiResult {
       final response = await request(_client);
       return await response.toApiResult();
     } on SocketException {
-      return Failure(ApiError.noInternetConnection);
+      return Failure(ApiError(ApiErrorCode.noInternetConnection));
     } on TypeError {
-      return Failure(ApiError.badJson);
+      return Failure(ApiError(ApiErrorCode.badJson));
     } catch (e) {
       ApiLogging.logger.e("Unhandled error", e);
-      return Failure(ApiError.unknownRequestError);
+      return Failure(ApiError(ApiErrorCode.unknownRequestError));
     }
   }
 
@@ -145,12 +164,12 @@ extension ApiResultFromRequest on ApiResult {
       final response = await request(_client);
       return await response.toApiResultWithValue(fromJson);
     } on SocketException {
-      return Failure(ApiError.noInternetConnection);
+      return Failure(ApiError(ApiErrorCode.noInternetConnection));
     } on TypeError {
-      return Failure(ApiError.badJson);
+      return Failure(ApiError(ApiErrorCode.badJson));
     } catch (e) {
       ApiLogging.logger.e("Unhandled error", e);
-      return Failure(ApiError.unknownRequestError);
+      return Failure(ApiError(ApiErrorCode.unknownRequestError));
     }
   }
 }

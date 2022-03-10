@@ -142,7 +142,7 @@ class TimelinePageState extends State<TimelinePage> {
     await _diaryDataProvider.pullFromServer().onError((error, stackTrace) {
       if (error is ApiError) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(error.toErrorMessage())));
+            .showSnackBar(SnackBar(content: Text(error.toString())));
       }
     });
   }

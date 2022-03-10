@@ -45,11 +45,12 @@ abstract class DataProvider<T> extends ChangeNotifier {
     ApiError error, {
     bool internetRequired = false,
   }) async {
-    _logger.e('Api error: ${error.toErrorMessage()}', error);
-    if (error == ApiError.noInternetConnection && internetRequired) {
+    _logger.e('Api error: $error', error.errorCode);
+    if (error.errorCode == ApiErrorCode.noInternetConnection &&
+        internetRequired) {
       _logger.i("on no internet: $_onNoInternet");
       _onNoInternet?.call();
-    } else if (error == ApiError.unauthorized) {
+    } else if (error.errorCode == ApiErrorCode.unauthorized) {
       _logger.w('Tried sync but access unauthorized.', error);
       await showNewCredentialsDialog();
     }

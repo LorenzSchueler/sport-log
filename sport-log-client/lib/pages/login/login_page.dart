@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:result_type/result_type.dart';
+import 'package:sport_log/api/api.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
@@ -233,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
       _loginPending = true;
     });
     Settings.serverUrl = _serverUrl;
-    final Result<User, String> result;
+    final Result<User, ApiError> result;
     if (widget.register) {
       final user = User(
         id: randomId(),
@@ -251,7 +252,10 @@ class _LoginPageState extends State<LoginPage> {
     if (result.isSuccess) {
       Nav.newBase(context, Routes.timeline.overview);
     } else {
-      await showMessageDialog(context: context, text: result.failure);
+      await showMessageDialog(
+        context: context,
+        text: result.failure.toString(),
+      );
     }
     _formKey.currentState!.deactivate();
   }
