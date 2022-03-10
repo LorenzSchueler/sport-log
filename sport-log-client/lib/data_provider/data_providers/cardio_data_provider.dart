@@ -89,20 +89,24 @@ class CardioSessionDescriptionDataProvider
   }
 
   @override
-  Future<void> pullFromServer() async {
-    await _movementDataProvider.pullFromServer();
-    await _routeDataProvider.pullFromServer();
-    await _cardioDataProvider.pullFromServer();
+  Future<bool> pullFromServer() async {
+    if (!await _movementDataProvider.pullFromServer()) {
+      return false;
+    }
+    if (!await _routeDataProvider.pullFromServer()) {
+      return false;
+    }
+    return await _cardioDataProvider.pullFromServer();
   }
 
   @override
-  Future<void> pushCreatedToServer() async {
-    await _cardioDataProvider.pushCreatedToServer();
+  Future<bool> pushCreatedToServer() async {
+    return await _cardioDataProvider.pushCreatedToServer();
   }
 
   @override
-  Future<void> pushUpdatedToServer() async {
-    await _cardioDataProvider.pushUpdatedToServer();
+  Future<bool> pushUpdatedToServer() async {
+    return await _cardioDataProvider.pushUpdatedToServer();
   }
 
   Future<List<CardioSessionDescription>> getByTimerangeAndMovement({

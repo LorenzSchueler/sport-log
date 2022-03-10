@@ -1,12 +1,14 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:sport_log/api/api.dart';
+import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
 
 final _logger = Logger('DataProvider');
@@ -20,17 +22,18 @@ abstract class DataProvider<T> extends ChangeNotifier {
 
   Future<List<T>> getNonDeleted();
 
-  Future<void> pushUpdatedToServer();
+  Future<bool> pushUpdatedToServer();
 
-  Future<void> pushCreatedToServer();
+  Future<bool> pushCreatedToServer();
 
-  Future<void> pullFromServer(); // used in page refresh
+  Future<bool> pullFromServer(); // used in page refresh
 
-  Future<void> pushToServer() async {
-    await Future.wait([
+  Future<bool> pushToServer() async {
+    return (await Future.wait([
       pushUpdatedToServer(),
       pushCreatedToServer(),
-    ]);
+    ]))
+        .every((result) => result == true);
   }
 
   /// only called if internet connection is needed
@@ -74,100 +77,115 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   @override
   Future<bool> createSingle(T object) async {
     assert(object.isValid());
-    // TODO: catch errors
-    await db.createSingle(object);
-    notifyListeners();
-    final result = await api.postSingle(object);
-    if (result.isFailure) {
-      handleApiError(result.failure);
+    if (!await db.createSingle(object)) {
       return false;
-    } else {
-      db.setSynchronized(object.id);
-      return true;
     }
+    notifyListeners();
+    return true;
+    //final result = await api.postSingle(object);
+    //if (result.isFailure) {
+    //handleApiError(result.failure);
+    //return false;
+    //} else {
+    //db.setSynchronized(object.id);
+    //return true;
+    //}
   }
 
   @override
   Future<bool> updateSingle(T object) async {
     assert(object.isValid());
-    // TODO: catch errors
-    await db.updateSingle(object);
-    notifyListeners();
-    final result = await api.putSingle(object);
-    if (result.isFailure) {
-      handleApiError(result.failure);
+    if (!await db.updateSingle(object)) {
       return false;
-    } else {
-      db.setSynchronized(object.id);
-      return true;
     }
+    notifyListeners();
+    return true;
+    //final result = await api.putSingle(object);
+    //if (result.isFailure) {
+    //handleApiError(result.failure);
+    //return false;
+    //} else {
+    //db.setSynchronized(object.id);
+    //return true;
+    //}
   }
 
   @override
   Future<bool> deleteSingle(T object) async {
-    // TODO: catch errors
-    await db.deleteSingle(object.id);
-    notifyListeners();
-    final result = await api.putSingle(object..deleted = true);
-    if (result.isFailure) {
-      handleApiError(result.failure);
+    if (!await db.deleteSingle(object.id)) {
       return false;
-    } else {
-      db.setSynchronized(object.id);
-      return true;
     }
+    notifyListeners();
+    return true;
+    //final result = await api.putSingle(object..deleted = true);
+    //if (result.isFailure) {
+    //handleApiError(result.failure);
+    //return false;
+    //} else {
+    //db.setSynchronized(object.id);
+    //return true;
+    //}
   }
 
   @override
   Future<List<T>> getNonDeleted() async => db.getNonDeleted();
 
   @override
-  Future<void> pullFromServer() async {
+  Future<bool> pullFromServer() async {
     final result = await api.getMultiple();
     if (result.isFailure) {
       handleApiError(result.failure, internetRequired: true);
+      return false;
     } else {
-      await upsertMultiple(result.success, synchronized: true);
+      return await upsertMultiple(result.success, synchronized: true);
     }
   }
 
   @override
-  Future<void> pushUpdatedToServer() async {
+  Future<bool> pushUpdatedToServer() async {
     final recordsToUpdate = await db.getWithSyncStatus(SyncStatus.updated);
     final result = await api.putMultiple(recordsToUpdate);
     if (result.isFailure) {
       handleApiError(result.failure);
-      return;
+      return false;
     }
     db.setAllUpdatedSynchronized();
+    return true;
   }
 
   @override
-  Future<void> pushCreatedToServer() async {
+  Future<bool> pushCreatedToServer() async {
     final recordsToCreate = await db.getWithSyncStatus(SyncStatus.created);
     final result = await api.postMultiple(recordsToCreate);
     if (result.isFailure) {
       handleApiError(result.failure);
-      return;
+      return false;
     }
     db.setAllCreatedSynchronized();
+    return true;
   }
 
   Future<T?> getById(Int64 id) async => db.getSingle(id);
 
-  Future<void> upsertFromAccountData(AccountData accountData) async {
-    await upsertMultiple(getFromAccountData(accountData), synchronized: true);
+  Future<bool> upsertFromAccountData(AccountData accountData) async {
+    return await upsertMultiple(
+      getFromAccountData(accountData),
+      synchronized: true,
+    );
   }
 
-  Future<void> upsertMultiple(
+  Future<bool> upsertMultiple(
     List<T> objects, {
     required bool synchronized,
   }) async {
     if (objects.isEmpty) {
-      return;
+      return true;
     }
-    await db.upsertMultiple(objects, synchronized: synchronized);
+    if (!await db.upsertMultiple(objects, synchronized: synchronized)) {
+      return false;
+    }
     notifyListeners();
+    return true;
   }
 
   static Future<void> pushAllToServer() async {

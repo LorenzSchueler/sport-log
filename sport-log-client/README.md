@@ -44,13 +44,8 @@ adb pull /data/user/0/org.sport_log.sport_log_client/databases/database.sqlite <
 
 ## Syncing Strategy
 
-**making changes**
-
 * every object has the field `sync_status` (0 - no changes, synchronized with server, 1 - dirty flag, update not on server, 2 - created flag, not created on server)
-* when an object is created or updated (including deleted), it will be written to the database with `sync_status` = 1 (update) or `sync_status` = 2 (creation); directly afterwards it will be pushed to the server; if and only if the request was successful (connected to Internet), the `sync_status` is set to 0
-
-**syncing**
-
+* when an object is created or updated (including deleted), it will be written to the database with `sync_status` = 1 (update) or `sync_status` = 2 (creation)
 * on user request or every couple of minutes (acconding to `sync interval` set in settings) the syncing endpoint will be used to fetch changes; every object from server will be upserted into the database
 * after successfully fetching the latest changes from the server the client will push its changes to the server
 * after successfully syncing, the global `last_sync` date time will be updated

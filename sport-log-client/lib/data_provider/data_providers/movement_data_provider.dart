@@ -71,18 +71,18 @@ class MovementDescriptionDataProvider
   }
 
   @override
-  Future<void> pullFromServer() async {
-    await _dataProvider.pullFromServer();
+  Future<bool> pullFromServer() async {
+    return await _dataProvider.pullFromServer();
   }
 
   @override
-  Future<void> pushCreatedToServer() async {
-    await _dataProvider.pushCreatedToServer();
+  Future<bool> pushCreatedToServer() async {
+    return await _dataProvider.pushCreatedToServer();
   }
 
   @override
-  Future<void> pushUpdatedToServer() async {
-    await _dataProvider.pushUpdatedToServer();
+  Future<bool> pushUpdatedToServer() async {
+    return await _dataProvider.pushUpdatedToServer();
   }
 
   Future<List<MovementDescription>> getByName(
