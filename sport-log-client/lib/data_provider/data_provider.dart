@@ -49,7 +49,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
   }) async {
     _logger.e('Api error: $error', error.errorCode);
     switch (error.errorCode) {
-      case ApiErrorCode.noInternetConnection:
+      case ApiErrorCode.serverUnreachable:
         _logger.i("on no internet: $onNoInternet");
         onNoInternet?.call();
         break;

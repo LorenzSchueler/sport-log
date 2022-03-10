@@ -22,6 +22,15 @@ class SettingsPage extends StatefulWidget {
 class SettingsPageState extends State<SettingsPage> {
   final _logger = Logger('SettingsPage');
 
+  Future<void> checkSync() async {
+    await Sync.instance.sync(
+      onNoInternet: () => showMessageDialog(
+          context: context,
+          text:
+              "The server could not be reached.\nPlease make sure you are connected to the internet and the server URL is right."),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,10 +49,11 @@ class SettingsPageState extends State<SettingsPage> {
                 height: 20,
                 child: Switch(
                   value: Settings.syncEnabled,
-                  onChanged: (syncEnabled) {
+                  onChanged: (syncEnabled) async {
                     setState(() => Settings.syncEnabled = syncEnabled);
                     if (syncEnabled) {
-                      Sync.instance.startSync();
+                      await checkSync();
+                      await Sync.instance.startSync();
                     } else {
                       Sync.instance.stopSync();
                     }
@@ -69,7 +79,8 @@ class SettingsPageState extends State<SettingsPage> {
                   if (validated == null) {
                     setState(() => Settings.serverUrl = serverUrl);
                     Sync.instance.stopSync();
-                    Sync.instance.startSync();
+                    await checkSync();
+                    await Sync.instance.startSync();
                   } else {
                     await showMessageDialog(
                       context: context,
@@ -98,7 +109,7 @@ class SettingsPageState extends State<SettingsPage> {
                       Settings.syncInterval = Duration(minutes: min);
                     });
                     Sync.instance.stopSync();
-                    Sync.instance.startSync();
+                    await Sync.instance.startSync();
                   } else {
                     await showMessageDialog(
                       context: context,

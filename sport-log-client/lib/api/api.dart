@@ -35,7 +35,7 @@ enum ApiErrorCode {
   internalServerError, // 500
   unknownServerError, // unknown status code != 200, 204, 400, 401, 403, 404, 409, 500
   // request error
-  noInternetConnection,
+  serverUnreachable,
   badJson,
   unknownRequestError, // unknown request error
 }
@@ -57,8 +57,8 @@ extension ToErrorMessage on ApiErrorCode {
         return "Internal server error.";
       case ApiErrorCode.unknownServerError:
         return "An unknown server error.";
-      case ApiErrorCode.noInternetConnection:
-        return "No Internet connection.";
+      case ApiErrorCode.serverUnreachable:
+        return "It was not possible to etablish a connection with the server.";
       case ApiErrorCode.badJson:
         return "Got bad json from server.";
       case ApiErrorCode.unknownRequestError:
@@ -147,7 +147,7 @@ extension ApiResultFromRequest on ApiResult {
       final response = await request(_client);
       return await response.toApiResult();
     } on SocketException {
-      return Failure(ApiError(ApiErrorCode.noInternetConnection));
+      return Failure(ApiError(ApiErrorCode.serverUnreachable));
     } on TypeError {
       return Failure(ApiError(ApiErrorCode.badJson));
     } catch (e) {
@@ -164,7 +164,7 @@ extension ApiResultFromRequest on ApiResult {
       final response = await request(_client);
       return await response.toApiResultWithValue(fromJson);
     } on SocketException {
-      return Failure(ApiError(ApiErrorCode.noInternetConnection));
+      return Failure(ApiError(ApiErrorCode.serverUnreachable));
     } on TypeError {
       return Failure(ApiError(ApiErrorCode.badJson));
     } catch (e) {
