@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
@@ -6,6 +8,8 @@ import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sqflite/sqflite.dart';
 
 export 'db_interfaces.dart';
+
+bool Function(List<int> l1, List<int> l2) eq = const ListEquality<int>().equals;
 
 abstract class TableAccessor<T extends AtomicEntity> {
   DbSerializer<T> get serde;
@@ -43,8 +47,8 @@ abstract class TableAccessor<T extends AtomicEntity> {
   String get orderByDatetime =>
       "ORDER BY datetime($tableName.${Columns.datetime}) DESC";
 
-  Future<void> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
-    await database.update(
+  Future<bool> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
+    final changes = await database.update(
       tableName,
       {
         Columns.deleted: 1,
@@ -53,9 +57,10 @@ abstract class TableAccessor<T extends AtomicEntity> {
       where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
       whereArgs: [id.toInt()],
     );
+    return changes == 1;
   }
 
-  Future<void> deleteMultiple(
+  Future<bool> deleteMultiple(
     List<T> objects, {
     bool isSynchronized = false,
   }) async {
@@ -71,11 +76,13 @@ abstract class TableAccessor<T extends AtomicEntity> {
         whereArgs: [object.id.toInt()],
       );
     }
-    await batch.commit(noResult: true, continueOnError: false);
+    final changesList =
+        (await batch.commit(continueOnError: false)).cast<int>();
+    return eq(changesList, List.filled(objects.length, 1));
   }
 
-  Future<void> updateSingle(T object, {bool isSynchronized = false}) async {
-    await database.update(
+  Future<bool> updateSingle(T object, {bool isSynchronized = false}) async {
+    final changes = await database.update(
       tableName,
       {
         ...serde.toDbRecord(object),
@@ -84,9 +91,10 @@ abstract class TableAccessor<T extends AtomicEntity> {
       where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
       whereArgs: [object.id.toInt()],
     );
+    return changes == 1;
   }
 
-  Future<void> updateMultiple(
+  Future<bool> updateMultiple(
     List<T> objects, {
     bool isSynchronized = false,
   }) async {
@@ -102,17 +110,20 @@ abstract class TableAccessor<T extends AtomicEntity> {
         whereArgs: [object.id.toInt()],
       );
     }
-    await batch.commit(noResult: true, continueOnError: false);
+    final changesList =
+        (await batch.commit(continueOnError: false)).cast<int>();
+    return eq(changesList, List.filled(objects.length, 1));
   }
 
-  Future<void> createSingle(T object, {bool isSynchronized = false}) async {
-    await database.insert(tableName, {
+  Future<bool> createSingle(T object, {bool isSynchronized = false}) async {
+    final id = await database.insert(tableName, {
       ...serde.toDbRecord(object),
       if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
     });
+    return id == object.id.toInt();
   }
 
-  Future<void> createMultiple(
+  Future<bool> createMultiple(
     List<T> objects, {
     bool isSynchronized = false,
   }) async {
@@ -123,7 +134,8 @@ abstract class TableAccessor<T extends AtomicEntity> {
         if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
       });
     }
-    await batch.commit(noResult: true, continueOnError: false);
+    final idList = (await batch.commit(continueOnError: false)).cast<int>();
+    return eq(idList, objects.map((e) => e.id.toInt()).toList());
   }
 
   Future<List<T>> getNonDeleted() async {
@@ -175,7 +187,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
     );
   }
 
-  Future<void> upsertMultiple(
+  Future<bool> upsertMultiple(
     List<T> objects, {
     required bool synchronized,
   }) async {
@@ -191,6 +203,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     }
-    await batch.commit(noResult: true, continueOnError: false);
+    final idList = (await batch.commit(continueOnError: false)).cast<int>();
+    return eq(idList, objects.map((e) => e.id.toInt()).toList());
   }
 }
