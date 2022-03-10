@@ -39,18 +39,21 @@ class SettingsPageState extends State<SettingsPage> {
               child: SizedBox(
                 height: 20,
                 child: Switch(
-                  value: Settings.serverEnabled,
-                  onChanged: (serverEnabled) {
-                    setState(() {
-                      Settings.serverEnabled = serverEnabled;
-                    });
+                  value: Settings.syncEnabled,
+                  onChanged: (syncEnabled) {
+                    setState(() => Settings.syncEnabled = syncEnabled);
+                    if (syncEnabled) {
+                      Sync.instance.startSync();
+                    } else {
+                      Sync.instance.stopSync();
+                    }
                   },
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
               ),
               leading: AppIcons.sync,
             ),
-            if (Settings.serverEnabled)
+            if (Settings.syncEnabled)
               TextFormField(
                 decoration: const InputDecoration(
                   icon: Icon(AppIcons.cloudUpload),
@@ -65,6 +68,8 @@ class SettingsPageState extends State<SettingsPage> {
                   final validated = Validator.validateUrl(serverUrl);
                   if (validated == null) {
                     setState(() => Settings.serverUrl = serverUrl);
+                    Sync.instance.stopSync();
+                    Sync.instance.startSync();
                   } else {
                     await showMessageDialog(
                       context: context,
@@ -73,7 +78,7 @@ class SettingsPageState extends State<SettingsPage> {
                   }
                 },
               ),
-            if (Settings.serverEnabled)
+            if (Settings.syncEnabled)
               TextFormField(
                 decoration: const InputDecoration(
                   icon: Icon(AppIcons.timeInterval),

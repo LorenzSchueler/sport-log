@@ -13,7 +13,6 @@ import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/settings.dart';
-import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
 
 class Sync extends ChangeNotifier {
   final _logger = Logger('Sync');
@@ -37,6 +36,10 @@ class Sync extends ChangeNotifier {
   }
 
   Future<void> sync({VoidCallback? onNoInternet}) async {
+    if (!Settings.syncEnabled) {
+      _logger.i("sync disabled.");
+      return;
+    }
     if (_isSyncing == true) {
       _logger.d('Sync job already running.');
       return;
@@ -80,6 +83,10 @@ class Sync extends ChangeNotifier {
 
   Future<void> startSync() async {
     assert(Settings.userExists());
+    if (!Settings.syncEnabled) {
+      _logger.i("sync disabled.");
+      return;
+    }
     if (_syncTimer != null && _syncTimer!.isActive) {
       _logger.d('Sync already enabled.');
       return;

@@ -19,7 +19,7 @@ class Settings {
 
   static Box? _storage;
 
-  static const String _serverEnabled = "serverEnabled";
+  static const String _syncEnabled = "syncEnabled";
   static const String _serverUrl = "serverUrl";
   static const String _syncInterval = "syncInterval";
   static const String _lastSync = "lastSync";
@@ -40,14 +40,14 @@ class Settings {
   }
 
   static Future<void> setDefaults({bool override = false}) async {
-    if (!_storage!.containsKey(_serverEnabled) || override) {
-      _storage!.put(_serverEnabled, true);
+    if (!_storage!.containsKey(_syncEnabled) || override) {
+      _storage!.put(_syncEnabled, true);
     }
     if (!_storage!.containsKey(_serverUrl) || override) {
       await setDefaultServerUrl();
     }
     if (!_storage!.containsKey(_syncInterval) || override) {
-      _storage!.put(_syncInterval, const Duration(minutes: 300));
+      _storage!.put(_syncInterval, const Duration(minutes: 5));
     }
     if (!_storage!.containsKey(_units) || override) {
       _storage!.put(_units, "metric");
@@ -106,12 +106,12 @@ class Settings {
     _storage!.put(key, value);
   }
 
-  static bool get serverEnabled {
-    return _getBool(_serverEnabled);
+  static bool get syncEnabled {
+    return _getBool(_syncEnabled);
   }
 
-  static set serverEnabled(bool enabled) {
-    _put(_serverEnabled, enabled);
+  static set syncEnabled(bool enabled) {
+    _put(_syncEnabled, enabled);
   }
 
   static String get serverUrl {

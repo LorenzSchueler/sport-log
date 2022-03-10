@@ -107,16 +107,16 @@ class MainDrawer extends StatelessWidget {
                 title: Text(title),
                 trailing: SpinningSync(
                   color: Theme.of(context).colorScheme.errorContainer,
-                  onPressed: sync.isSyncing
-                      ? null
-                      : () => Sync.instance.sync(
+                  onPressed: Settings.syncEnabled && !sync.isSyncing
+                      ? () => Sync.instance.sync(
                             onNoInternet: () {
                               showSimpleToast(
                                 context,
                                 'No Internet connection.',
                               );
                             },
-                          ),
+                          )
+                      : null,
                   isSpinning: sync.isSyncing,
                 ),
               );
