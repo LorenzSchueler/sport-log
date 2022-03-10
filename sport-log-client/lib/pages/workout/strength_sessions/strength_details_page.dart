@@ -83,7 +83,7 @@ class _StrengthSessionDetailsPageState
                   TextTile(
                     caption: "Date",
                     child: Text(
-                      widget.strengthSessionDescription.session.datetime
+                      _strengthSessionDescription.session.datetime
                           .toHumanWithTime(),
                     ),
                   ),
@@ -91,21 +91,21 @@ class _StrengthSessionDetailsPageState
                     caption: "Sets",
                     child: Text(
                       [
-                        '${widget.strengthSessionDescription.sets.length} sets',
+                        '${_strengthSessionDescription.sets.length} sets',
                         if (widget
                                 .strengthSessionDescription.session.interval !=
                             null)
-                          widget.strengthSessionDescription.session.interval!
-                              .formatTimeShort,
+                          _strengthSessionDescription
+                              .session.interval!.formatTimeShort,
                       ].join(' • '),
                     ),
                   ),
-                  ..._bestValuesInfo(widget.strengthSessionDescription),
+                  ..._bestValuesInfo(_strengthSessionDescription),
                 ],
               ),
             ),
           ),
-          if (widget.strengthSessionDescription.session.comments != null) ...[
+          if (_strengthSessionDescription.session.comments != null) ...[
             Defaults.sizedBox.vertical.small,
             Card(
               margin: EdgeInsets.zero,
@@ -114,7 +114,7 @@ class _StrengthSessionDetailsPageState
                 child: TextTile(
                   caption: 'Comments',
                   child: Text(
-                    widget.strengthSessionDescription.session.comments!,
+                    _strengthSessionDescription.session.comments!,
                   ),
                 ),
               ),
@@ -127,13 +127,12 @@ class _StrengthSessionDetailsPageState
               padding: Defaults.edgeInsets.normal,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children:
-                    widget.strengthSessionDescription.sets.mapToListIndexed(
+                children: _strengthSessionDescription.sets.mapToListIndexed(
                   (set, index) => TextTile(
                     caption: "Set ${index + 1}",
                     child: Text(
                       set.toDisplayName(
-                        widget.strengthSessionDescription.movement.dimension,
+                        _strengthSessionDescription.movement.dimension,
                       ),
                     ),
                   ),
