@@ -1,6 +1,5 @@
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -46,15 +45,6 @@ class _MovementsPageState extends State<MovementsPage> {
     setState(() => _movementDescriptions = movementDescriptions);
   }
 
-  Future<void> _pullFromServer() async {
-    await _dataProvider.pullFromServer().onError((error, stackTrace) {
-      if (error is ApiError) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(error.toString())));
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,7 +53,7 @@ class _MovementsPageState extends State<MovementsPage> {
       ),
       drawer: MainDrawer(selectedRoute: Routes.movement.overview),
       body: RefreshIndicator(
-        onRefresh: _pullFromServer,
+        onRefresh: _dataProvider.pullFromServer,
         child: _movementDescriptions.isEmpty
             ? const Center(
                 child: Text(

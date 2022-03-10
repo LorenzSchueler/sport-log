@@ -64,15 +64,6 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
     setState(() => _cardioSessionDescriptions = cardioSessionDescriptions);
   }
 
-  Future<void> _pullFromServer() async {
-    await _dataProvider.pullFromServer().onError((error, stackTrace) {
-      if (error is ApiError) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(error.toString())));
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,7 +109,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: _pullFromServer,
+        onRefresh: _dataProvider.pullFromServer,
         child: _cardioSessionDescriptions.isEmpty
             ? SessionsPageTab.cardio.noEntriesText
             : Container(

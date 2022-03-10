@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
@@ -62,15 +61,6 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
     setState(() => _sessions = ssds);
   }
 
-  Future<void> _pullFromServer() async {
-    await _dataProvider.pullFromServer().onError((error, stackTrace) {
-      if (error is ApiError) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(error.toString())));
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,7 +105,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: _pullFromServer,
+        onRefresh: _dataProvider.pullFromServer,
         child: Container(
           padding: Defaults.edgeInsets.normal,
           child: CustomScrollView(

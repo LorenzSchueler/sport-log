@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -139,12 +138,12 @@ class TimelinePageState extends State<TimelinePage> {
   }
 
   Future<void> _pullFromServer() async {
-    await _diaryDataProvider.pullFromServer().onError((error, stackTrace) {
-      if (error is ApiError) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(error.toString())));
-      }
-    });
+    Future.wait([
+      _strengthDataProvider.pullFromServer(),
+      _metconDataProvider.pullFromServer(),
+      _cardioDataProvider.pullFromServer(),
+      _diaryDataProvider.pullFromServer(),
+    ]);
   }
 
   @override

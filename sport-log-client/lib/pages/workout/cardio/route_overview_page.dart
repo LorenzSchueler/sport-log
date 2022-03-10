@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
@@ -48,15 +47,6 @@ class RoutePageState extends State<RoutePage> {
     setState(() => _routes = routes);
   }
 
-  Future<void> _pullFromServer() async {
-    await _dataProvider.pullFromServer().onError((error, stackTrace) {
-      if (error is ApiError) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(error.toString())));
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,7 +60,7 @@ class RoutePageState extends State<RoutePage> {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: _pullFromServer,
+        onRefresh: _dataProvider.pullFromServer,
         child: _routes.isEmpty
             ? const Center(
                 child: Text(

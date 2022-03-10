@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
@@ -58,15 +57,6 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
     setState(() => _metconSessionDescriptions = metconSessionDescriptions);
   }
 
-  Future<void> _pullFromServer() async {
-    await _dataProvider.pullFromServer().onError((error, stackTrace) {
-      if (error is ApiError) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(error.toString())));
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,7 +102,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: _pullFromServer,
+        onRefresh: _dataProvider.pullFromServer,
         child: _metconSessionDescriptions.isEmpty
             ? SessionsPageTab.metcon.noEntriesText
             : Container(
