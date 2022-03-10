@@ -53,6 +53,12 @@ abstract class DataProvider<T> extends ChangeNotifier {
     } else if (error.errorCode == ApiErrorCode.unauthorized) {
       _logger.w('Tried sync but access unauthorized.', error);
       await showNewCredentialsDialog();
+    } else {
+      await showMessageDialog(
+        context: AppState.navigatorKey.currentContext!,
+        title: "An error occured.",
+        text: error.toString(),
+      );
     }
   }
 }
