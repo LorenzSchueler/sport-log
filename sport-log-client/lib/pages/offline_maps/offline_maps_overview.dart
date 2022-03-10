@@ -87,6 +87,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
     });
     if (_point1Marker != null) {
       _mapController.removeCircle(_point1Marker!);
+      _point1Marker = null;
     }
     if (_point1 != null) {
       _point1Marker = await _mapController.addCircle(
@@ -106,9 +107,11 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
     });
     if (_point2Marker != null) {
       _mapController.removeCircle(_point2Marker!);
+      _point2Marker = null;
     }
     if (_boundingBoxLine != null) {
       _mapController.removeLine(_boundingBoxLine!);
+      _boundingBoxLine = null;
     }
     if (_point2 != null) {
       _point2Marker = await _mapController.addCircle(
@@ -140,7 +143,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
     return Scaffold(
       appBar: AppBar(title: const Text("Offline Maps")),
       drawer: const MainDrawer(selectedRoute: Routes.offlineMaps),
-      body: ListView(
+      body: Column(
         children: [
           Stack(
             children: [
