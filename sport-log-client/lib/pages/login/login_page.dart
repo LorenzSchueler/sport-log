@@ -49,8 +49,8 @@ class _LoginPageState extends State<LoginPage> {
         child: Center(
           child: Form(
             key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: ListView(
+              shrinkWrap: true,
               children: [
                 _serverUrlInput(context),
                 Defaults.sizedBox.vertical.normal,
