@@ -251,13 +251,13 @@ class LatLngAdapter extends TypeAdapter<LatLng> {
 
   @override
   LatLng read(BinaryReader reader) {
-    final values = reader.readDoubleList(2);
+    final values = reader.readDoubleList();
     return LatLng(values[0], values[1]);
   }
 
   @override
   void write(BinaryWriter writer, LatLng obj) {
-    writer.writeDoubleList([obj.latitude, obj.longitude], writeLength: true);
+    writer.writeDoubleList([obj.latitude, obj.longitude]);
   }
 }
 
@@ -267,7 +267,7 @@ class CameraPositionAdapter extends TypeAdapter<CameraPosition> {
 
   @override
   CameraPosition read(BinaryReader reader) {
-    final values = reader.readDoubleList(3);
+    final values = reader.readDoubleList();
     return CameraPosition(
       zoom: values[0],
       target: LatLng(values[1], values[2]),
@@ -278,7 +278,6 @@ class CameraPositionAdapter extends TypeAdapter<CameraPosition> {
   void write(BinaryWriter writer, CameraPosition obj) {
     writer.writeDoubleList(
       [obj.zoom, obj.target.latitude, obj.target.longitude],
-      writeLength: true,
     );
   }
 }

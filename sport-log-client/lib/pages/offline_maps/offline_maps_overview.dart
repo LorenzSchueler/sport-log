@@ -159,15 +159,13 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
               ),
               Positioned(
                 bottom: 10,
-                right: 5,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                  ),
+                right: 10,
+                child: FloatingActionButton.small(
+                  heroTag: null,
+                  child: const Icon(AppIcons.undo),
                   onPressed: () => _point2 != null
                       ? _updatePoint2(null)
                       : _updatePoint1(null),
-                  child: const Icon(AppIcons.undo),
                 ),
               )
             ],
