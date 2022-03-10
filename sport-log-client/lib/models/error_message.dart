@@ -7,7 +7,7 @@ class ErrorMessage extends JsonSerializable {
   ErrorMessage({required this.status, required this.message});
 
   int status;
-  String? message;
+  Map<String, String>? message;
 
   factory ErrorMessage.fromJson(Map<String, dynamic> json) =>
       _$ErrorMessageFromJson(json);

@@ -8,7 +8,9 @@ part of 'error_message.dart';
 
 ErrorMessage _$ErrorMessageFromJson(Map<String, dynamic> json) => ErrorMessage(
       status: json['status'] as int,
-      message: json['message'] as String?,
+      message: (json['message'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ),
     );
 
 Map<String, dynamic> _$ErrorMessageToJson(ErrorMessage instance) =>

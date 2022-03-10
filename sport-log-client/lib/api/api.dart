@@ -69,14 +69,16 @@ extension ToErrorMessage on ApiErrorCode {
 
 class ApiError {
   final ApiErrorCode errorCode;
-  final String? message;
+
+  /// contains always only one entry
+  final Map<String, String>? message;
 
   ApiError(this.errorCode, [this.message]);
 
   @override
   String toString() {
     if (message != null) {
-      return "${errorCode.description}\n$message";
+      return "${errorCode.description}\n${message!.keys.first}: ${message!.values.first}";
     } else {
       return errorCode.description;
     }
@@ -86,7 +88,7 @@ class ApiError {
 typedef ApiResult<T> = Future<Result<T, ApiError>>;
 
 extension _ToApiResult on Response {
-  String? get _message => ErrorMessage.fromJson(
+  Map<String, String>? get _message => ErrorMessage.fromJson(
         jsonDecode(utf8.decode(bodyBytes)) as Map<String, dynamic>,
       ).message;
 
