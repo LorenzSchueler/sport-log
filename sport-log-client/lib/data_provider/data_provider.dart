@@ -37,31 +37,32 @@ abstract class DataProvider<T> extends ChangeNotifier {
   }
 
   /// only called if internet connection is needed
-  /// (call [handleApiError] with internetRequired = true)
   VoidCallback? _onNoInternet;
 
   set onNoInternetConnection(VoidCallback? callback) {
     _onNoInternet = callback;
   }
 
-  Future<void> handleApiError(
+  static Future<void> handleApiError(
     ApiError error, {
-    bool internetRequired = false,
+    VoidCallback? onNoInternet,
   }) async {
     _logger.e('Api error: $error', error.errorCode);
-    if (error.errorCode == ApiErrorCode.noInternetConnection &&
-        internetRequired) {
-      _logger.i("on no internet: $_onNoInternet");
-      _onNoInternet?.call();
-    } else if (error.errorCode == ApiErrorCode.unauthorized) {
-      _logger.w('Tried sync but access unauthorized.', error);
-      await showNewCredentialsDialog();
-    } else {
-      await showMessageDialog(
-        context: AppState.navigatorKey.currentContext!,
-        title: "An error occured.",
-        text: error.toString(),
-      );
+    switch (error.errorCode) {
+      case ApiErrorCode.noInternetConnection:
+        _logger.i("on no internet: $onNoInternet");
+        onNoInternet?.call();
+        break;
+      case ApiErrorCode.unauthorized:
+        _logger.w('Tried sync but access unauthorized.', error);
+        await showNewCredentialsDialog();
+        break;
+      default:
+        await showMessageDialog(
+          context: AppState.navigatorKey.currentContext!,
+          title: "An error occured.",
+          text: error.toString(),
+        );
     }
   }
 }
@@ -82,14 +83,6 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
     notifyListeners();
     return true;
-    //final result = await api.postSingle(object);
-    //if (result.isFailure) {
-    //handleApiError(result.failure);
-    //return false;
-    //} else {
-    //db.setSynchronized(object.id);
-    //return true;
-    //}
   }
 
   @override
@@ -100,14 +93,6 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
     notifyListeners();
     return true;
-    //final result = await api.putSingle(object);
-    //if (result.isFailure) {
-    //handleApiError(result.failure);
-    //return false;
-    //} else {
-    //db.setSynchronized(object.id);
-    //return true;
-    //}
   }
 
   @override
@@ -117,14 +102,6 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
     notifyListeners();
     return true;
-    //final result = await api.putSingle(object..deleted = true);
-    //if (result.isFailure) {
-    //handleApiError(result.failure);
-    //return false;
-    //} else {
-    //db.setSynchronized(object.id);
-    //return true;
-    //}
   }
 
   @override
@@ -134,7 +111,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   Future<bool> pullFromServer() async {
     final result = await api.getMultiple();
     if (result.isFailure) {
-      handleApiError(result.failure, internetRequired: true);
+      DataProvider.handleApiError(result.failure, onNoInternet: _onNoInternet);
       return false;
     } else {
       return await upsertMultiple(result.success, synchronized: true);
@@ -146,7 +123,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     final recordsToUpdate = await db.getWithSyncStatus(SyncStatus.updated);
     final result = await api.putMultiple(recordsToUpdate);
     if (result.isFailure) {
-      handleApiError(result.failure);
+      DataProvider.handleApiError(result.failure);
       return false;
     }
     db.setAllUpdatedSynchronized();
@@ -158,7 +135,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     final recordsToCreate = await db.getWithSyncStatus(SyncStatus.created);
     final result = await api.postMultiple(recordsToCreate);
     if (result.isFailure) {
-      handleApiError(result.failure);
+      DataProvider.handleApiError(result.failure);
       return false;
     }
     db.setAllCreatedSynchronized();
