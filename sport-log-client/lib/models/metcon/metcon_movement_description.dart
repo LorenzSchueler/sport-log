@@ -49,8 +49,10 @@ class MetconMovementDescription extends CompoundEntity {
     text += movement.dimension == MovementDimension.distance
         ? metconMovement.distanceUnit!.displayName
         : movement.dimension.displayName;
-    if (metconMovement.weight != null) {
-      text += " @ ${metconMovement.weight} kg";
+    if (metconMovement.maleWeight != null &&
+        metconMovement.femaleWeight != null) {
+      text +=
+          " @ ${metconMovement.maleWeight}/${metconMovement.femaleWeight} kg";
     }
     return text;
   }

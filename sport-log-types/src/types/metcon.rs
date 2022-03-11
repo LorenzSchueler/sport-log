@@ -288,7 +288,9 @@ pub struct MetconMovement {
     pub movement_number: i32,
     pub count: i32,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
-    pub weight: Option<f32>,
+    pub male_weight: Option<f32>,
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    pub female_weight: Option<f32>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,

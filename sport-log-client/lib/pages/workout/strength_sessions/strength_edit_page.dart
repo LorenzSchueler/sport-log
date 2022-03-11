@@ -126,7 +126,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
                 _strengthSessionDescription.session.comments == null)
               _buttonBar,
             NewSetInput(
-              onNewSet: (count, weight) {
+              onNewSet: (count, weight, _) {
                 final newSet = StrengthSet(
                   id: randomId(),
                   strengthSessionId: _strengthSessionDescription.session.id,

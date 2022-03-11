@@ -46,7 +46,8 @@ create table metcon_movement (
     distance_unit distance_unit,
     movement_number integer not null check (movement_number >= 0),
     count integer not null check (count >= 1),
-    weight real check (weight > 0),
+    male_weight real check (male_weight > 0),
+    female_weight real check (female_weight > 0),
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
@@ -57,16 +58,16 @@ create unique index metcon_movement_idx on metcon_movement (metcon_id, movement_
 create trigger set_timestamp before update on metcon_movement
     for each row execute procedure trigger_set_timestamp();
 
-insert into metcon_movement (id, metcon_id, movement_id, distance_unit, movement_number, count, weight) values
-    (1, 1, 10, null, 0, 5, null),
-    (2, 1, 11, null, 1, 10, null),
-    (3, 1, 12, null, 2, 15, null),
-    (4, 2, 5, null, 0, 1, 9),
-    (5, 2, 10, null, 1, 100, 9),
-    (6, 2, 11, null, 2, 200, 9),
-    (7, 2, 12, null, 3, 300, 9),
-    (8, 2, 5, null, 4, 1, 9),
-    (9, 3, 8, 'km', 0, 5, null);
+insert into metcon_movement (id, metcon_id, movement_id, distance_unit, movement_number, count, male_weight, female_weight) values
+    (1, 1, 10, null, 0, 5, null, null),
+    (2, 1, 11, null, 1, 10, null, null),
+    (3, 1, 12, null, 2, 15, null, null),
+    (4, 2, 5, null, 0, 1, 9, 6),
+    (5, 2, 10, null, 1, 100, 9, 6),
+    (6, 2, 11, null, 2, 200, 9, 6),
+    (7, 2, 12, null, 3, 300, 9, 6),
+    (8, 2, 5, null, 4, 1, 9, 6),
+    (9, 3, 8, 'km', 0, 5, null, null);
 
 create table metcon_movement_archive (
     primary key (id),

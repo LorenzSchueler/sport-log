@@ -12,14 +12,18 @@ class NewSetInput extends StatelessWidget {
     this.distanceUnit,
     this.initialCount = 0,
     this.initialWeight,
+    this.secondWeight = false,
+    this.initialSecondWeight,
   }) : super(key: key);
 
-  final void Function(int count, double? weight) onNewSet;
+  final void Function(int count, double? weight, double? secondWeight) onNewSet;
   final bool confirmChanges;
   final MovementDimension dimension;
   final DistanceUnit? distanceUnit;
   final int initialCount;
   final double? initialWeight;
+  final bool secondWeight;
+  final double? initialSecondWeight;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +35,8 @@ class NewSetInput extends StatelessWidget {
           countLabel: dimension.displayName,
           initialCount: initialCount,
           initialWeight: initialWeight,
+          secondWeight: secondWeight,
+          initialSecondWeight: initialSecondWeight,
         );
       case MovementDimension.time:
         return SetDurationInput(
@@ -45,6 +51,8 @@ class NewSetInput extends StatelessWidget {
           countUnit: (distanceUnit ?? DistanceUnit.m).displayName,
           initialCount: initialCount,
           initialWeight: initialWeight,
+          secondWeight: secondWeight,
+          initialSecondWeight: initialSecondWeight,
         );
       case MovementDimension.energy:
         return CountWeightInput(
@@ -53,6 +61,8 @@ class NewSetInput extends StatelessWidget {
           countLabel: dimension.displayName,
           initialCount: initialCount,
           initialWeight: initialWeight,
+          secondWeight: secondWeight,
+          initialSecondWeight: initialSecondWeight,
         );
     }
   }

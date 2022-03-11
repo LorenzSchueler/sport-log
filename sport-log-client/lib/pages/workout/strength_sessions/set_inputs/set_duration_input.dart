@@ -14,7 +14,7 @@ class SetDurationInput extends StatefulWidget {
     required this.confirmChanges,
   }) : super(key: key);
 
-  final void Function(int count, double? weight) onNewSet;
+  final void Function(int count, double? weight, double? secondWeight) onNewSet;
   final bool confirmChanges;
 
   @override
@@ -39,7 +39,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
       seconds: _seconds,
       milliseconds: _milliseconds,
     );
-    widget.onNewSet(duration.inMilliseconds, null);
+    widget.onNewSet(duration.inMilliseconds, null, null);
 
     // clear all inputs
     _hoursKey.currentState?.clear();

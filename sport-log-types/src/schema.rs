@@ -207,7 +207,8 @@ table! {
         distance_unit -> Nullable<DistanceUnitMapping>,
         movement_number -> Int4,
         count -> Int4,
-        weight -> Nullable<Float4>,
+        male_weight -> Nullable<Float4>,
+        female_weight -> Nullable<Float4>,
         last_change -> Timestamptz,
         deleted -> Bool,
     }

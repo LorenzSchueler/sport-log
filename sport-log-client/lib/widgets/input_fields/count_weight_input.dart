@@ -12,15 +12,19 @@ class CountWeightInput extends StatefulWidget {
     this.countUnit,
     this.initialCount = 0,
     this.initialWeight,
+    this.secondWeight = false,
+    this.initialSecondWeight,
     Key? key,
   }) : super(key: key);
 
-  final void Function(int count, double? weight) setValue;
+  final void Function(int count, double? weight, double? secondWeight) setValue;
   final bool confirmChanges;
   final String countLabel;
   final String? countUnit;
   final int initialCount;
   final double? initialWeight;
+  final bool secondWeight;
+  final double? initialSecondWeight;
 
   @override
   _CountWeightInputState createState() => _CountWeightInputState();
@@ -29,11 +33,13 @@ class CountWeightInput extends StatefulWidget {
 class _CountWeightInputState extends State<CountWeightInput> {
   late int _count;
   late double? _weight;
+  late double? _secondWeight;
 
   @override
   void initState() {
     _count = widget.initialCount;
     _weight = widget.initialWeight;
+    _secondWeight = widget.initialSecondWeight;
     super.initState();
   }
 
@@ -60,70 +66,119 @@ class _CountWeightInputState extends State<CountWeightInput> {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
-                IntInput(
-                  initialValue: _count,
-                  setValue: (count) {
-                    if (count > 0) {
-                      setState(() => _count = count);
-                      if (!widget.confirmChanges) {
-                        widget.setValue(_count, _weight);
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: IntInput(
+                    initialValue: _count,
+                    setValue: (count) {
+                      if (count > 0) {
+                        setState(() => _count = count);
+                        if (!widget.confirmChanges) {
+                          widget.setValue(_count, _weight, _secondWeight);
+                        }
                       }
-                    }
-                  },
+                    },
+                  ),
                 ),
               ],
             ),
             TableRow(
               children: _weight == null
                   ? [
-                      IconButton(
-                        icon: const Icon(AppIcons.add),
-                        onPressed: () {
-                          setState(() => _weight = 0);
-                          if (!widget.confirmChanges) {
-                            widget.setValue(_count, _weight);
-                          }
-                        },
-                        padding: EdgeInsets.zero,
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: IconButton(
+                          icon: const Icon(AppIcons.add),
+                          onPressed: () {
+                            setState(() => _weight = 0);
+                            if (!widget.confirmChanges) {
+                              widget.setValue(_count, _weight, _secondWeight);
+                            }
+                          },
+                          padding: EdgeInsets.zero,
+                        ),
                       ),
                       TableCell(
                         verticalAlignment: TableCellVerticalAlignment.middle,
                         child: Text(
-                          "Weight ",
+                          "Weight",
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ),
                       Container(),
                     ]
                   : [
-                      IconButton(
-                        icon: const Icon(AppIcons.close),
-                        onPressed: () {
-                          setState(() => _weight = null);
-                          if (!widget.confirmChanges) {
-                            widget.setValue(_count, _weight);
-                          }
-                        },
-                        padding: EdgeInsets.zero,
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: IconButton(
+                          icon: const Icon(AppIcons.close),
+                          onPressed: () {
+                            setState(() => _weight = null);
+                            if (!widget.confirmChanges) {
+                              widget.setValue(_count, _weight, _secondWeight);
+                            }
+                          },
+                          padding: EdgeInsets.zero,
+                        ),
                       ),
                       TableCell(
                         verticalAlignment: TableCellVerticalAlignment.middle,
                         child: Text(
-                          "Weight ",
+                          "Weight",
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ),
-                      DoubleInput(
-                        initialValue: _weight!,
-                        setValue: (weight) {
-                          setState(() => _weight = weight);
-                          if (!widget.confirmChanges) {
-                            widget.setValue(_count, _weight);
-                          }
-                        },
-                      )
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: DoubleInput(
+                          initialValue: _weight!,
+                          setValue: (weight) {
+                            setState(() => _weight = weight);
+                            if (!widget.confirmChanges) {
+                              widget.setValue(_count, _weight, _secondWeight);
+                            }
+                          },
+                        ),
+                      ),
                     ],
-            )
+            ),
+            if (widget.secondWeight)
+              TableRow(
+                children: _secondWeight == null
+                    ? [
+                        Container(),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Text(
+                            "Female Weight",
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                        ),
+                        Container(),
+                      ]
+                    : [
+                        Container(),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Text(
+                            "Female Weight",
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: DoubleInput(
+                            initialValue: _secondWeight!,
+                            setValue: (weight) {
+                              setState(() => _secondWeight = weight);
+                              if (!widget.confirmChanges) {
+                                widget.setValue(_count, _weight, _secondWeight);
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+              )
           ],
         ),
         if (widget.confirmChanges) ...[
@@ -132,8 +187,9 @@ class _CountWeightInputState extends State<CountWeightInput> {
             icon: const Icon(AppIcons.check),
             iconSize: 40,
             color: _count > 0 ? Theme.of(context).colorScheme.primary : null,
-            onPressed:
-                _count > 0 ? () => widget.setValue(_count, _weight) : null,
+            onPressed: _count > 0
+                ? () => widget.setValue(_count, _weight, _secondWeight)
+                : null,
           ),
         ]
       ],

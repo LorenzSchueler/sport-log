@@ -13,7 +13,8 @@ MetconMovement _$MetconMovementFromJson(Map<String, dynamic> json) =>
       movementId: const IdConverter().fromJson(json['movement_id'] as String),
       movementNumber: json['movement_number'] as int,
       count: json['count'] as int,
-      weight: (json['weight'] as num?)?.toDouble(),
+      maleWeight: (json['male_weight'] as num?)?.toDouble(),
+      femaleWeight: (json['female_weight'] as num?)?.toDouble(),
       distanceUnit:
           $enumDecodeNullable(_$DistanceUnitEnumMap, json['distance_unit']),
       deleted: json['deleted'] as bool,
@@ -26,7 +27,8 @@ Map<String, dynamic> _$MetconMovementToJson(MetconMovement instance) =>
       'movement_id': const IdConverter().toJson(instance.movementId),
       'movement_number': instance.movementNumber,
       'count': instance.count,
-      'weight': instance.weight,
+      'male_weight': instance.maleWeight,
+      'female_weight': instance.femaleWeight,
       'distance_unit': _$DistanceUnitEnumMap[instance.distanceUnit],
       'deleted': instance.deleted,
     };

@@ -61,7 +61,10 @@ class MetconMovementTable extends TableAccessor<MetconMovement> {
         ..references(Tables.movement, onDelete: OnAction.noAction),
       Column.int(Columns.movementNumber)..checkGe(0),
       Column.int(Columns.count)..checkGe(1),
-      Column.real(Columns.weight)
+      Column.real(Columns.maleWeight)
+        ..nullable()
+        ..checkGt(0),
+      Column.real(Columns.femaleWeight)
         ..nullable()
         ..checkGt(0),
       Column.int(Columns.distanceUnit)

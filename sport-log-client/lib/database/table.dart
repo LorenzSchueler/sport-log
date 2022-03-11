@@ -255,9 +255,11 @@ abstract class Columns {
   static const enabled = 'enabled';
   static const eormPercentage = 'eorm_percentage';
   static const eormReps = 'eorm_reps';
+  static const femaleWeight = 'female_weight';
   static const heartRate = 'heart_rate';
   static const id = 'id';
   static const interval = 'interval';
+  static const maleWeight = 'male_weight';
   static const markedPositions = 'marked_positions';
   static const maxCount = 'max_count';
   static const maxEorm = 'max_eorm';

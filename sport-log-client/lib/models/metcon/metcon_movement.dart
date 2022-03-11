@@ -47,7 +47,8 @@ class MetconMovement extends AtomicEntity {
     required this.movementId,
     required this.movementNumber,
     required this.count,
-    required this.weight,
+    required this.maleWeight,
+    required this.femaleWeight,
     required this.distanceUnit,
     required this.deleted,
   });
@@ -61,7 +62,8 @@ class MetconMovement extends AtomicEntity {
   Int64 movementId;
   int movementNumber;
   int count;
-  double? weight;
+  double? maleWeight;
+  double? femaleWeight;
   DistanceUnit? distanceUnit;
   @override
   bool deleted;
@@ -72,7 +74,6 @@ class MetconMovement extends AtomicEntity {
     required this.movementNumber,
   })  : id = randomId(),
         count = 1,
-        weight = null,
         distanceUnit = DistanceUnit.m,
         deleted = false;
 
@@ -89,7 +90,8 @@ class MetconMovement extends AtomicEntity {
         movementId: movementId.clone(),
         movementNumber: movementNumber,
         count: count,
-        weight: weight,
+        maleWeight: maleWeight,
+        femaleWeight: femaleWeight,
         distanceUnit: distanceUnit,
         deleted: deleted,
       );
@@ -99,7 +101,14 @@ class MetconMovement extends AtomicEntity {
     return validate(deleted != true, 'MetconMovement: deleted == true') &&
         validate(movementNumber >= 0, 'MetconMovement: movement number < 0') &&
         validate(count > 0, 'MetconMovement: count <= 0') &&
-        validate(weight == null || weight! > 0, 'MetconMovement: weight <= 0');
+        validate(
+          maleWeight == null || maleWeight! > 0,
+          'MetconMovement: maleWeight <= 0',
+        ) &&
+        validate(
+          femaleWeight == null || femaleWeight! > 0,
+          'MetconMovement: femaleWeight <= 0',
+        );
   }
 }
 
@@ -112,7 +121,8 @@ class DbMetconMovementSerializer extends DbSerializer<MetconMovement> {
       movementId: Int64(r[prefix + Columns.movementId]! as int),
       movementNumber: r[prefix + Columns.movementNumber]! as int,
       count: r[prefix + Columns.count]! as int,
-      weight: r[prefix + Columns.weight] as double?,
+      maleWeight: r[prefix + Columns.maleWeight] as double?,
+      femaleWeight: r[prefix + Columns.femaleWeight] as double?,
       distanceUnit: r[prefix + Columns.distanceUnit] == null
           ? null
           : DistanceUnit.values[r[prefix + Columns.distanceUnit] as int],
@@ -128,7 +138,8 @@ class DbMetconMovementSerializer extends DbSerializer<MetconMovement> {
       Columns.movementId: o.movementId.toInt(),
       Columns.movementNumber: o.movementNumber,
       Columns.count: o.count,
-      Columns.weight: o.weight,
+      Columns.maleWeight: o.maleWeight,
+      Columns.femaleWeight: o.femaleWeight,
       Columns.distanceUnit: o.distanceUnit?.index,
       Columns.deleted: o.deleted ? 1 : 0,
     };
