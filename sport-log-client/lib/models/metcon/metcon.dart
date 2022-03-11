@@ -144,7 +144,7 @@ class DbMetconSerializer extends DbSerializer<Metcon> {
       rounds: r[prefix + Columns.rounds] as int?,
       timecap: r[prefix + Columns.timecap] == null
           ? null
-          : Duration(seconds: r[prefix + Columns.timecap]! as int),
+          : Duration(milliseconds: r[prefix + Columns.timecap]! as int),
       description: r[prefix + Columns.description] as String?,
       deleted: r[prefix + Columns.deleted]! as int == 1,
     );
@@ -158,7 +158,7 @@ class DbMetconSerializer extends DbSerializer<Metcon> {
       Columns.name: o.name,
       Columns.metconType: o.metconType.index,
       Columns.rounds: o.rounds,
-      Columns.timecap: o.timecap?.inSeconds,
+      Columns.timecap: o.timecap?.inMilliseconds,
       Columns.description: o.description,
       Columns.deleted: o.deleted ? 1 : 0,
     };

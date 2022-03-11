@@ -7,7 +7,7 @@ create table metcon (
     name varchar(80) not null,
     metcon_type metcon_type not null,
     rounds integer check (rounds >= 1),
-    timecap integer check (timecap > 0), -- seconds
+    timecap integer check (timecap > 0), -- milliseconds
     description text,
     last_change timestamptz not null default now(),
     deleted boolean not null default false
@@ -19,9 +19,9 @@ create trigger set_timestamp before update on metcon
     for each row execute procedure trigger_set_timestamp();
 
 insert into metcon (id, user_id, name, metcon_type, rounds, timecap, description) values
-    (1, null, 'Cindy', 'amrap', null, 1200, null),
+    (1, null, 'Cindy', 'amrap', null, 1200000, null),
     (2, null, 'Murph', 'for_time', 1, null, 'wear a weight vest (20/14) lbs'),
-    (3, 1, '5k Row', 'for_time', 1, 1800, null);
+    (3, 1, '5k Row', 'for_time', 1, 1800000, null);
 
 create table metcon_archive (
     primary key (id),
@@ -89,7 +89,7 @@ create table metcon_session (
     user_id bigint not null references "user" on delete cascade,
     metcon_id bigint not null references metcon on delete cascade,
     datetime timestamptz not null default now(),
-    time integer check (time > 0), -- seconds
+    time integer check (time > 0), -- milliseconds
     rounds integer check (rounds >= 0),
     reps integer check (reps >= 0),
     rx boolean not null default true,
@@ -106,7 +106,7 @@ create trigger set_timestamp before update on metcon_session
 
 insert into metcon_session (id, user_id, metcon_id, datetime, time, rounds, reps, rx, comments) values
     (1, 1, 1, '2020-08-20 16:00:00', null, 17, 8, true, null),
-    (2, 1, 2, '2020-08-23 18:00:00', 1800, null, null, false, 'without vest');
+    (2, 1, 2, '2020-08-23 18:00:00', 1800000, null, null, false, 'without vest');
 
 create table metcon_session_archive (
     primary key (id),

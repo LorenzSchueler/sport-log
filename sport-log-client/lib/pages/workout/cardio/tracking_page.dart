@@ -94,7 +94,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     _cardioSessionDescription.cardioSession.descent = _descent.round();
     _cardioSessionDescription.cardioSession.setAvgCadenceFromCadenceAndTime();
     _cardioSessionDescription.cardioSession.avgCadence =
-        1000; // TODO remove and make sure avgCadende is > 0 if cadence != null
+        100; // TODO remove and make sure avgCadende is > 0 if cadence != null
     _cardioSessionDescription.cardioSession.distance =
         1000; // TODO remove and make sure distance is set if track != null
     _logger.i("saving: $_cardioSessionDescription");
@@ -134,18 +134,21 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   void _onStepCountUpdate(StepCount stepCountEvent) {
     if (_trackingMode == TrackingMode.tracking) {
       if (_cardioSessionDescription.cardioSession.cadence!.isEmpty) {
-        _cardioSessionDescription.cardioSession.cadence!
-            .add(stepCountEvent.timeStamp.millisecondsSinceEpoch / 1000);
+        _cardioSessionDescription.cardioSession.cadence!.add(
+          stepCountEvent.timeStamp
+              .difference(_cardioSessionDescription.cardioSession.datetime),
+        );
       } else {
         /// interpolate steps since last stepCount update
         int newSteps = stepCountEvent.steps - _lastStepCount.steps;
-        double avgTimeDiff = (stepCountEvent.timeStamp.millisecondsSinceEpoch -
-                _lastStepCount.timeStamp.millisecondsSinceEpoch) /
+        double avgTimeDiff = stepCountEvent.timeStamp
+                .difference(_lastStepCount.timeStamp)
+                .inMilliseconds /
             newSteps;
         for (int i = 1; i <= newSteps; i++) {
           _cardioSessionDescription.cardioSession.cadence!.add(
             _cardioSessionDescription.cardioSession.cadence!.last +
-                avgTimeDiff * i / 1000,
+                Duration(milliseconds: (avgTimeDiff * i).round()),
           );
         }
       }

@@ -65,8 +65,10 @@ class DbActionSerializer extends DbSerializer<Action> {
       name: r[prefix + Columns.name]! as String,
       actionProviderId: Int64(r[prefix + Columns.actionProviderId]! as int),
       description: r[prefix + Columns.description] as String?,
-      createBefore: Duration(seconds: r[prefix + Columns.createBefore]! as int),
-      deleteAfter: Duration(seconds: r[prefix + Columns.deleteAfter]! as int),
+      createBefore:
+          Duration(milliseconds: r[prefix + Columns.createBefore]! as int),
+      deleteAfter:
+          Duration(milliseconds: r[prefix + Columns.deleteAfter]! as int),
       deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
@@ -78,8 +80,8 @@ class DbActionSerializer extends DbSerializer<Action> {
       Columns.name: o.name,
       Columns.actionProviderId: o.actionProviderId.toInt(),
       Columns.description: o.description,
-      Columns.createBefore: o.createBefore.inSeconds,
-      Columns.deleteAfter: o.deleteAfter.inSeconds,
+      Columns.createBefore: o.createBefore.inMilliseconds,
+      Columns.deleteAfter: o.deleteAfter.inMilliseconds,
       Columns.deleted: o.deleted ? 1 : 0,
     };
   }

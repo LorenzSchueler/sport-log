@@ -63,12 +63,12 @@ class DurationConverter extends JsonConverter<Duration, int> {
 
   @override
   Duration fromJson(int json) {
-    return Duration(seconds: json);
+    return Duration(milliseconds: json);
   }
 
   @override
   int toJson(Duration object) {
-    return object.inSeconds;
+    return object.inMilliseconds;
   }
 }
 
@@ -77,11 +77,26 @@ class OptionalDurationConverter extends JsonConverter<Duration?, int?> {
 
   @override
   Duration? fromJson(int? json) {
-    return json == null ? null : Duration(seconds: json);
+    return json == null ? null : Duration(milliseconds: json);
   }
 
   @override
   int? toJson(Duration? object) {
-    return object?.inSeconds;
+    return object?.inMilliseconds;
+  }
+}
+
+class OptionalDurationListConverter
+    extends JsonConverter<List<Duration>?, List<int>?> {
+  const OptionalDurationListConverter() : super();
+
+  @override
+  List<Duration>? fromJson(List<int>? json) {
+    return json?.map((e) => Duration(milliseconds: e)).toList();
+  }
+
+  @override
+  List<int>? toJson(List<Duration>? object) {
+    return object?.map((e) => e.inMilliseconds).toList();
   }
 }

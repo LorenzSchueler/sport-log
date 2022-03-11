@@ -75,7 +75,7 @@ class DbStrengthSessionSerializer extends DbSerializer<StrengthSession> {
       movementId: Int64(r[prefix + Columns.movementId]! as int),
       interval: r[prefix + Columns.interval] == null
           ? null
-          : Duration(seconds: r[prefix + Columns.interval] as int),
+          : Duration(milliseconds: r[prefix + Columns.interval] as int),
       comments: r[prefix + Columns.comments] as String?,
       deleted: r[prefix + Columns.deleted]! as int == 1,
     );
@@ -88,7 +88,7 @@ class DbStrengthSessionSerializer extends DbSerializer<StrengthSession> {
       Columns.userId: o.userId.toInt(),
       Columns.datetime: o.datetime.toString(),
       Columns.movementId: o.movementId.toInt(),
-      Columns.interval: o.interval?.inSeconds,
+      Columns.interval: o.interval?.inMilliseconds,
       Columns.comments: o.comments,
       Columns.deleted: o.deleted ? 1 : 0,
     };

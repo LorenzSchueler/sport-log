@@ -115,7 +115,7 @@ class DbMetconSessionSerializer extends DbSerializer<MetconSession> {
       datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
       time: r[prefix + Columns.time] == null
           ? null
-          : Duration(seconds: r[prefix + Columns.time]! as int),
+          : Duration(milliseconds: r[prefix + Columns.time]! as int),
       rounds: r[prefix + Columns.rounds] as int?,
       reps: r[prefix + Columns.reps] as int?,
       rx: r[prefix + Columns.rx]! as int == 1,
@@ -131,7 +131,7 @@ class DbMetconSessionSerializer extends DbSerializer<MetconSession> {
       Columns.userId: o.userId.toInt(),
       Columns.metconId: o.metconId.toInt(),
       Columns.datetime: o.datetime.toString(),
-      Columns.time: o.time?.inSeconds,
+      Columns.time: o.time?.inMilliseconds,
       Columns.rounds: o.rounds,
       Columns.reps: o.reps,
       Columns.rx: o.rx ? 1 : 0,

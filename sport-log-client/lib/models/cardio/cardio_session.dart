@@ -66,9 +66,11 @@ class CardioSession extends AtomicEntity {
   int? calories;
   List<Position>? track;
   int? avgCadence;
-  List<double>? cadence;
+  @OptionalDurationListConverter()
+  List<Duration>? cadence;
   int? avgHeartRate;
-  List<double>? heartRate;
+  @OptionalDurationListConverter()
+  List<Duration>? heartRate;
   @OptionalIdConverter()
   Int64? routeId;
   String? comments;
@@ -161,15 +163,15 @@ class DbCardioSessionSerializer extends DbSerializer<CardioSession> {
       descent: r[prefix + Columns.descent] as int?,
       time: r[prefix + Columns.time] == null
           ? null
-          : Duration(seconds: r[prefix + Columns.time]! as int),
+          : Duration(milliseconds: r[prefix + Columns.time]! as int),
       calories: r[prefix + Columns.calories] as int?,
       track: const DbPositionListConverter()
           .mapToDart(r[prefix + Columns.track] as Uint8List?),
       avgCadence: r[prefix + Columns.avgCadence] as int?,
-      cadence: const DbDoubleListConverter()
+      cadence: const DbDurationListConverter()
           .mapToDart(r[prefix + Columns.cadence] as Uint8List?),
       avgHeartRate: r[prefix + Columns.avgHeartRate] as int?,
-      heartRate: const DbDoubleListConverter()
+      heartRate: const DbDurationListConverter()
           .mapToDart(r[prefix + Columns.heartRate] as Uint8List?),
       routeId: r[prefix + Columns.routeId] == null
           ? null
@@ -190,13 +192,13 @@ class DbCardioSessionSerializer extends DbSerializer<CardioSession> {
       Columns.distance: o.distance,
       Columns.ascent: o.ascent,
       Columns.descent: o.descent,
-      Columns.time: o.time?.inSeconds,
+      Columns.time: o.time?.inMilliseconds,
       Columns.calories: o.calories,
       Columns.track: const DbPositionListConverter().mapToSql(o.track),
       Columns.avgCadence: o.avgCadence,
-      Columns.cadence: const DbDoubleListConverter().mapToSql(o.cadence),
+      Columns.cadence: const DbDurationListConverter().mapToSql(o.cadence),
       Columns.avgHeartRate: o.avgHeartRate,
-      Columns.heartRate: const DbDoubleListConverter().mapToSql(o.heartRate),
+      Columns.heartRate: const DbDurationListConverter().mapToSql(o.heartRate),
       Columns.routeId: o.routeId?.toInt(),
       Columns.comments: o.comments,
       Columns.deleted: o.deleted ? 1 : 0,

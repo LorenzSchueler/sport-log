@@ -5,7 +5,7 @@ create type "position" as (
     latitude double precision,
     elevation double precision, -- meter above sea level
     distance double precision, -- meter since start
-    time integer -- seconds since start
+    time integer -- milliseconds since start
 );
 
 create table route (
@@ -51,7 +51,7 @@ create table cardio_blueprint (
     distance integer check (distance > 0),
     ascent integer check (ascent >= 0),
     descent integer check (descent >= 0),
-    time integer check (time > 0), -- seconds
+    time integer check (time > 0), -- milliseconds
     calories integer check (calories >= 0),
     avg_heart_rate integer check (avg_heart_rate > 0),
     route_id bigint references route on delete set null,
@@ -83,13 +83,13 @@ create table cardio_session (
     distance integer check (distance > 0),
     ascent integer check (ascent >= 0),
     descent integer check (descent >= 0),
-    time integer check (time > 0), -- seconds
+    time integer check (time > 0), -- milliseconds
     calories integer check (calories >= 0),
     track "position"[],
     avg_cadence integer check (avg_cadence > 0), 
-    cadence real[], -- = secs since start
+    cadence real[], -- = millisecs since start
     avg_heart_rate integer check (avg_heart_rate > 0),
-    heart_rate real[], -- = secs since start
+    heart_rate real[], -- = millisecs since start
     route_id bigint references route on delete set null,
     comments text,
     last_change timestamptz not null default now(),
@@ -106,7 +106,7 @@ insert into cardio_session (id, user_id, movement_id, cardio_type, datetime,
         distance, ascent, descent, time, calories, track, avg_cadence, 
         cadence, avg_heart_rate, heart_rate, route_id, comments) values
     (1, 1, 5, 'training', '2021-08-22 10:25:34', 
-        26742, 35, 43, 9134, null, null, 167, 
+        26742, 35, 43, 9134000, null, null, 167, 
         null, 156, null, null, null);
 
 create table cardio_session_archive (

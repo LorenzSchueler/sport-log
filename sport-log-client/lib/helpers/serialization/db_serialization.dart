@@ -15,18 +15,24 @@ class DbIdConverter {
   }
 }
 
-class DbDoubleListConverter {
-  const DbDoubleListConverter() : super();
+class DbDurationListConverter {
+  const DbDurationListConverter() : super();
 
-  List<double>? mapToDart(Uint8List? fromDb) {
+  List<Duration>? mapToDart(Uint8List? fromDb) {
     assert(fromDb == null || fromDb.length % 8 == 0);
-    return fromDb?.buffer.asFloat64List().toList();
+    return fromDb?.buffer
+        .asInt64List()
+        .toList()
+        .map((e) => Duration(milliseconds: e))
+        .toList();
   }
 
-  Uint8List? mapToSql(List<double>? value) {
+  Uint8List? mapToSql(List<Duration>? value) {
     return value == null
         ? null
-        : Float64List.fromList(value).buffer.asUint8List();
+        : Int64List.fromList(value.map((e) => e.inMilliseconds).toList())
+            .buffer
+            .asUint8List();
   }
 }
 

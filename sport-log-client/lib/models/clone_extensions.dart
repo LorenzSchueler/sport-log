@@ -6,7 +6,7 @@ extension CloneDateTime on DateTime {
 }
 
 extension CloneDuration on Duration {
-  Duration clone() => Duration(seconds: inSeconds);
+  Duration clone() => Duration(milliseconds: inMilliseconds);
 }
 
 extension CloneInt64 on Int64 {

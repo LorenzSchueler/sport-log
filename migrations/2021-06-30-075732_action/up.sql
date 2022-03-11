@@ -38,8 +38,8 @@ create table action (
     name varchar(80) not null check (length(name) >= 2),
     action_provider_id bigint not null references action_provider on delete cascade,
     description text,
-    create_before integer not null check (create_before >= 0), -- hours
-    delete_after integer not null check (delete_after >= 0), --hours
+    create_before integer not null check (create_before >= 0), -- milliseconds
+    delete_after integer not null check (delete_after >= 0), --milliseconds
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
@@ -50,13 +50,13 @@ create trigger set_timestamp before update on action
     for each row execute procedure trigger_set_timestamp();
 
 insert into action (id, name, action_provider_id, description, create_before, delete_after) values 
-    (1, 'CrossFit', 1, 'Reserve a spot in a CrossFit class.', 168, 0), 
-    (2, 'Weightlifting', 1, 'Reserve a spot in a Weightlifting class.', 168, 0), 
-    (3, 'Open Fridge', 1, 'Reserve a spot in a Open Fridge class.', 168, 0),
-    (4, 'CrossFit', 2, 'Fetch and save the CrossFit wod for the current day.', 168, 0), 
-    (5, 'Weightlifting', 2, 'Fetch and save the Weightlifting wod for the current day.', 168, 0), 
-    (6, 'Open Fridge', 2, 'Fetch and save the Open Fridge wod for the current day.', 168, 0), 
-    (7, 'fetch', 3, 'Fetch and save new workouts.', 168, 0);
+    (1, 'CrossFit', 1, 'Reserve a spot in a CrossFit class.', 604800000, 0), 
+    (2, 'Weightlifting', 1, 'Reserve a spot in a Weightlifting class.', 604800000, 0), 
+    (3, 'Open Fridge', 1, 'Reserve a spot in a Open Fridge class.', 604800000, 0),
+    (4, 'CrossFit', 2, 'Fetch and save the CrossFit wod for the current day.', 604800000, 0), 
+    (5, 'Weightlifting', 2, 'Fetch and save the Weightlifting wod for the current day.', 604800000, 0), 
+    (6, 'Open Fridge', 2, 'Fetch and save the Open Fridge wod for the current day.', 604800000, 0), 
+    (7, 'fetch', 3, 'Fetch and save new workouts.', 604800000, 0);
 
 create table action_archive (
     primary key (id),

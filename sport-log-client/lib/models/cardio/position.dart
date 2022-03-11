@@ -53,7 +53,7 @@ class Position {
       ..setFloat64(8, latitude)
       ..setFloat64(16, elevation)
       ..setFloat64(24, distance)
-      ..setInt64(32, time.inSeconds);
+      ..setInt64(32, time.inMilliseconds);
     final list = bytes.buffer.asUint8List();
     assert(list.length == byteSize);
     return list;
@@ -67,7 +67,7 @@ class Position {
       latitude: bytes.getFloat64(8),
       elevation: bytes.getFloat64(16),
       distance: bytes.getFloat64(24),
-      time: Duration(seconds: bytes.getInt64(32)),
+      time: Duration(milliseconds: bytes.getInt64(32)),
     );
   }
 
