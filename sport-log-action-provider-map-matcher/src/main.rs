@@ -393,18 +393,18 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Result<Route> {
             Position {
                 longitude: point.longitude,
                 latitude: point.latitude,
-                elevation: point.elevation,
-                distance: distance as i32,
+                elevation: point.elevation as f64,
+                distance: distance,
                 time: 0,
             }
         })
         .collect();
 
     let (ascent, descent, _) = positions.iter().fold(
-        (0, 0, &positions[0]),
+        (0.0, 0.0, &positions[0]),
         |(mut ascent, mut descent, prev), next| {
             let diff = prev.elevation - next.elevation;
-            if diff > 0 {
+            if diff > 0.0 {
                 descent += diff;
             } else {
                 ascent += -diff;
@@ -420,9 +420,10 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Result<Route> {
         distance: positions
             .last()
             .map(|position| position.distance)
-            .unwrap_or(0),
-        ascent: Some(ascent as i32),
-        descent: Some(descent as i32),
+            .unwrap_or(0.0)
+            .round() as i32,
+        ascent: Some(ascent.round() as i32),
+        descent: Some(descent.round() as i32),
         track: Some(positions),
         marked_positions: None,
         last_change: Utc::now(),

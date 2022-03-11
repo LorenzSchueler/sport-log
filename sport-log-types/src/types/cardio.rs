@@ -58,9 +58,9 @@ pub struct Position {
     #[serde(rename(serialize = "la", deserialize = "la"))]
     pub latitude: f64,
     #[serde(rename(serialize = "e", deserialize = "e"))]
-    pub elevation: i32,
+    pub elevation: f64,
     #[serde(rename(serialize = "d", deserialize = "d"))]
-    pub distance: i32,
+    pub distance: f64,
     #[serde(rename(serialize = "t", deserialize = "t"))]
     pub time: i32,
 }
@@ -68,7 +68,7 @@ pub struct Position {
 #[cfg(feature = "server")]
 impl ToSql<Position, Pg> for Position {
     fn to_sql<W: Write>(&self, out: &mut Output<W, Pg>) -> serialize::Result {
-        WriteTuple::<(Double, Double, Integer, Integer, Integer)>::write_tuple(
+        WriteTuple::<(Double, Double, Double, Double, Integer)>::write_tuple(
             &(
                 self.longitude,
                 self.latitude,
@@ -85,7 +85,7 @@ impl ToSql<Position, Pg> for Position {
 impl FromSql<Position, Pg> for Position {
     fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
         let (longitude, latitude, elevation, distance, time) =
-            FromSql::<Record<(Double, Double, Integer, Integer, Integer)>, Pg>::from_sql(bytes)?;
+            FromSql::<Record<(Double, Double, Double, Double, Integer)>, Pg>::from_sql(bytes)?;
         Ok(Position {
             longitude,
             latitude,

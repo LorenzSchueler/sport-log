@@ -308,8 +308,8 @@ async fn fetch() -> Result<(), ReqwestError> {
                                     .map(|location| Position {
                                         latitude: location.la,
                                         longitude: location.ln,
-                                        elevation: location.h as i32,
-                                        distance: location.s as i32,
+                                        elevation: location.h as f64,
+                                        distance: location.s as f64,
                                         time: location.t as i32,
                                     })
                                     .collect(),

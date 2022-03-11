@@ -204,7 +204,7 @@ satelites:  ${location.satelliteNumber}""";
         Position(
           latitude: location.latitude!,
           longitude: location.longitude!,
-          elevation: location.altitude!.toInt(),
+          elevation: location.altitude!,
           distance: 0,
           time: _cardioSessionDescription.cardioSession.time!,
         ),

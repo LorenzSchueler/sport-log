@@ -3,8 +3,8 @@ create type cardio_type as enum('training', 'active_recovery', 'freetime');
 create type "position" as (
     longitude double precision,
     latitude double precision,
-    elevation integer, -- meter above sea level
-    distance integer, -- meter since start
+    elevation double precision, -- meter above sea level
+    distance double precision, -- meter since start
     time integer -- seconds since start
 );
 

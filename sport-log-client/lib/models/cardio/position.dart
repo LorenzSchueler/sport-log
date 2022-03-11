@@ -25,9 +25,9 @@ class Position {
   @JsonKey(name: "la")
   double latitude;
   @JsonKey(name: "e")
-  int elevation;
+  double elevation;
   @JsonKey(name: "d")
-  int distance;
+  double distance;
   @JsonKey(name: "t")
   @DurationConverter()
   Duration time;
@@ -51,8 +51,8 @@ class Position {
     final bytes = ByteData(byteSize)
       ..setFloat64(0, longitude)
       ..setFloat64(8, latitude)
-      ..setInt64(16, elevation)
-      ..setInt64(24, distance)
+      ..setFloat64(16, elevation)
+      ..setFloat64(24, distance)
       ..setInt64(32, time.inSeconds);
     final list = bytes.buffer.asUint8List();
     assert(list.length == byteSize);
@@ -65,8 +65,8 @@ class Position {
     return Position(
       longitude: bytes.getFloat64(0),
       latitude: bytes.getFloat64(8),
-      elevation: bytes.getInt64(16),
-      distance: bytes.getInt64(24),
+      elevation: bytes.getFloat64(16),
+      distance: bytes.getFloat64(24),
       time: Duration(seconds: bytes.getInt64(32)),
     );
   }
