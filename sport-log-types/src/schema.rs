@@ -311,7 +311,8 @@ table! {
         distance -> Int4,
         ascent -> Nullable<Int4>,
         descent -> Nullable<Int4>,
-        track -> Array<Position>,
+        track -> Nullable<Array<Position>>,
+        marked_positions -> Nullable<Array<Position>>,
         last_change -> Timestamptz,
         deleted -> Bool,
     }

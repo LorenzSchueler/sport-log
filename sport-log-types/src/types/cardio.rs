@@ -144,7 +144,9 @@ pub struct Route {
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub descent: Option<i32>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
-    pub track: Vec<Position>,
+    pub track: Option<Vec<Position>>,
+    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    pub marked_positions: Option<Vec<Position>>,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
     pub last_change: DateTime<Utc>,

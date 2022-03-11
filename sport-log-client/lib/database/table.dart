@@ -258,6 +258,7 @@ abstract class Columns {
   static const heartRate = 'heart_rate';
   static const id = 'id';
   static const interval = 'interval';
+  static const markedPositions = 'marked_positions';
   static const maxCount = 'max_count';
   static const maxEorm = 'max_eorm';
   static const maxWeight = 'max_weight';

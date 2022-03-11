@@ -13,8 +13,11 @@ Route _$RouteFromJson(Map<String, dynamic> json) => Route(
       distance: json['distance'] as int,
       ascent: json['ascent'] as int?,
       descent: json['descent'] as int?,
-      track: (json['track'] as List<dynamic>)
-          .map((e) => Position.fromJson(e as Map<String, dynamic>))
+      track: (json['track'] as List<dynamic>?)
+          ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      markedPositions: (json['marked_positions'] as List<dynamic>?)
+          ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
           .toList(),
       deleted: json['deleted'] as bool,
     );
@@ -27,5 +30,6 @@ Map<String, dynamic> _$RouteToJson(Route instance) => <String, dynamic>{
       'ascent': instance.ascent,
       'descent': instance.descent,
       'track': instance.track,
+      'marked_positions': instance.markedPositions,
       'deleted': instance.deleted,
     };

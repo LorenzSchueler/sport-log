@@ -132,7 +132,8 @@ class RouteTable extends TableAccessor<Route> {
       Column.int(Columns.descent)
         ..nullable()
         ..checkGe(0),
-      Column.blob(Columns.track)
+      Column.blob(Columns.track)..nullable(),
+      Column.blob(Columns.markedPositions)..nullable(),
     ],
   );
 

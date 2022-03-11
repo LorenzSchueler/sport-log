@@ -24,6 +24,7 @@ class Route extends AtomicEntity with Comparable<Route> {
     required this.ascent,
     required this.descent,
     required this.track,
+    required this.markedPositions,
     required this.deleted,
   });
 
@@ -36,7 +37,8 @@ class Route extends AtomicEntity with Comparable<Route> {
   int distance;
   int? ascent;
   int? descent;
-  List<Position> track;
+  List<Position>? track;
+  List<Position>? markedPositions;
   @override
   bool deleted;
 
@@ -47,7 +49,6 @@ class Route extends AtomicEntity with Comparable<Route> {
         distance = 0,
         ascent = null,
         descent = null,
-        track = [],
         deleted = false;
 
   factory Route.fromJson(Map<String, dynamic> json) => _$RouteFromJson(json);
@@ -63,7 +64,8 @@ class Route extends AtomicEntity with Comparable<Route> {
         distance: distance,
         ascent: ascent,
         descent: descent,
-        track: track.map((p) => p.clone()).toList(),
+        track: track?.map((p) => p.clone()).toList(),
+        markedPositions: markedPositions?.map((p) => p.clone()).toList(),
         deleted: deleted,
       );
 
@@ -73,7 +75,11 @@ class Route extends AtomicEntity with Comparable<Route> {
         validate(distance > 0, 'Route: distance <= 0') &&
         validate(ascent == null || ascent! >= 0, 'Route: ascent < 0') &&
         validate(descent == null || descent! >= 0, 'Route: descent < 0') &&
-        validate(track.isNotEmpty, 'Route: track is empty') &&
+        validate(track == null || track!.isNotEmpty, 'Route: track is empty') &&
+        validate(
+          markedPositions == null || markedPositions!.isNotEmpty,
+          'Route: markedPositions is empty',
+        ) &&
         validate(!deleted, 'Route: deleted == true');
   }
 
@@ -94,7 +100,9 @@ class DbRouteSerializer extends DbSerializer<Route> {
       ascent: r[prefix + Columns.ascent] as int?,
       descent: r[prefix + Columns.descent] as int?,
       track: const DbPositionListConverter()
-          .mapToDart(r[prefix + Columns.track]! as Uint8List)!,
+          .mapToDart(r[prefix + Columns.track]! as Uint8List),
+      markedPositions: const DbPositionListConverter()
+          .mapToDart(r[prefix + Columns.markedPositions]! as Uint8List),
       deleted: r[prefix + Columns.deleted] == 1,
     );
   }
@@ -108,7 +116,9 @@ class DbRouteSerializer extends DbSerializer<Route> {
       Columns.distance: o.distance,
       Columns.ascent: o.ascent,
       Columns.descent: o.descent,
-      Columns.track: const DbPositionListConverter().mapToSql(o.track)!,
+      Columns.track: const DbPositionListConverter().mapToSql(o.track),
+      Columns.markedPositions:
+          const DbPositionListConverter().mapToSql(o.markedPositions),
       Columns.deleted: o.deleted ? 1 : 0,
     };
   }

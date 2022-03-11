@@ -15,7 +15,8 @@ create table route (
     distance integer not null check (distance > 0),
     ascent integer check (ascent >= 0),
     descent integer check (descent >= 0),
-    track "position"[] not null,
+    track "position"[],
+    marked_positions "position"[],
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
@@ -25,8 +26,8 @@ create unique index route_idx on route (user_id, name) where deleted = false;
 create trigger set_timestamp before update on route
     for each row execute procedure trigger_set_timestamp();
 
-insert into route (id, user_id, name, distance, ascent, descent, track) values
-    (1, 1, 'route 1X', 12456, 156, 149, '{}');
+insert into route (id, user_id, name, distance, ascent, descent, track, marked_positions) values
+    (1, 1, 'route 1X', 12456, 156, 149, null, null);
 
 create table route_archive (
     primary key (id),
