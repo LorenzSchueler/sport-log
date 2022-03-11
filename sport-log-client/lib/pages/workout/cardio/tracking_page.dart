@@ -385,12 +385,12 @@ satelites:  ${location.satelliteNumber}""";
               onMapCreated: (MapboxMapController controller) =>
                   _mapController = controller,
               onStyleLoadedCallback: () {
-                if (_cardioSessionDescription.route != null) {
+                if (_cardioSessionDescription.route?.track != null) {
                   _mapController.addLine(
                     LineOptions(
                       lineColor: Defaults.mapbox.routeLineColor,
                       lineWidth: 2,
-                      geometry: _cardioSessionDescription.route!.track.latLngs,
+                      geometry: _cardioSessionDescription.route!.track!.latLngs,
                     ),
                   );
                 }

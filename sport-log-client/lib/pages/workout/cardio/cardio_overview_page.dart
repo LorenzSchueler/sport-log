@@ -234,13 +234,13 @@ class CardioSessionCard extends StatelessWidget {
                             ),
                           );
                         }
-                        if (cardioSessionDescription.route != null) {
+                        if (cardioSessionDescription.route?.track != null) {
                           _sessionMapController.addLine(
                             LineOptions(
                               lineColor: Defaults.mapbox.routeLineColor,
                               lineWidth: 2,
-                              geometry:
-                                  cardioSessionDescription.route!.track.latLngs,
+                              geometry: cardioSessionDescription
+                                  .route!.track!.latLngs,
                             ),
                           );
                         }

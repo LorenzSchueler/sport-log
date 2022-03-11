@@ -138,13 +138,13 @@ class CardioEditPageState extends State<CardioEditPage> {
                           ),
                         );
                       }
-                      if (_cardioSessionDescription.route != null) {
+                      if (_cardioSessionDescription.route?.track != null) {
                         _mapController.addLine(
                           LineOptions(
                             lineColor: Defaults.mapbox.routeLineColor,
                             lineWidth: 2,
                             geometry:
-                                _cardioSessionDescription.route!.track.latLngs,
+                                _cardioSessionDescription.route!.track!.latLngs,
                           ),
                         );
                       }

@@ -117,7 +117,7 @@ class RouteCard extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             Defaults.sizedBox.vertical.small,
-            route.track.isNotEmpty
+            route.track != null && route.track!.isNotEmpty
                 ? SizedBox(
                     height: 150,
                     child: MapboxMap(
@@ -127,16 +127,18 @@ class RouteCard extends StatelessWidget {
                       onMapCreated: (MapboxMapController controller) =>
                           _sessionMapController = controller,
                       onStyleLoadedCallback: () {
-                        final bounds = route.track.latLngBounds;
-                        _sessionMapController
-                            .moveCamera(CameraUpdate.newLatLngBounds(bounds));
-                        _sessionMapController.addLine(
-                          LineOptions(
-                            lineColor: Defaults.mapbox.routeLineColor,
-                            lineWidth: 2,
-                            geometry: route.track.latLngs,
-                          ),
-                        );
+                        if (route.track != null) {
+                          final bounds = route.track!.latLngBounds;
+                          _sessionMapController
+                              .moveCamera(CameraUpdate.newLatLngBounds(bounds));
+                          _sessionMapController.addLine(
+                            LineOptions(
+                              lineColor: Defaults.mapbox.routeLineColor,
+                              lineWidth: 2,
+                              geometry: route.track?.latLngs,
+                            ),
+                          );
+                        }
                       },
                       onMapClick: (_, __) => showDetails(context),
                     ),

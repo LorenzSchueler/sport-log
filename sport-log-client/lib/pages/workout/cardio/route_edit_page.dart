@@ -26,8 +26,6 @@ class RouteEditPageState extends State<RouteEditPage> {
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = RouteDataProvider.instance;
 
-  List<LatLng> _locations = [];
-
   Line? _line;
   List<Circle> _circles = [];
   List<Symbol> _symbols = [];
@@ -43,9 +41,8 @@ class RouteEditPageState extends State<RouteEditPage> {
   @override
   void initState() {
     _route = widget.route?.clone() ?? Route.defaultValue();
-    // TODO dont map every point to marked location
-    _locations =
-        _route.track.map((e) => LatLng(e.latitude, e.longitude)).toList();
+    _route.track ??= [];
+    _route.markedPositions ??= [];
     super.initState();
   }
 
@@ -58,6 +55,12 @@ class RouteEditPageState extends State<RouteEditPage> {
   }
 
   Future<void> _saveRoute() async {
+    if (_route.track != null && _route.track!.isEmpty) {
+      _route.track = null;
+    }
+    if (_route.markedPositions != null && _route.markedPositions!.isEmpty) {
+      _route.markedPositions = null;
+    }
     final result = widget.route != null
         ? await _dataProvider.updateSingle(_route)
         : await _dataProvider.createSingle(_route);
@@ -84,7 +87,9 @@ class RouteEditPageState extends State<RouteEditPage> {
     DirectionsApiResponse response = await mapbox.directions.request(
       profile: NavigationProfile.WALKING,
       geometries: NavigationGeometries.POLYLINE,
-      coordinates: _locations.map((e) => [e.latitude, e.longitude]).toList(),
+      coordinates: _route.markedPositions!
+          .map((e) => [e.latitude, e.longitude])
+          .toList(),
     );
     if (response.error != null) {
       if (response.error is NavigationNoRouteError) {
@@ -96,20 +101,19 @@ class RouteEditPageState extends State<RouteEditPage> {
       NavigationRoute navRoute = response.routes![0];
       setState(() {
         _route.distance = navRoute.distance!.round();
+        _route.track = PolylinePoints()
+            .decodePolyline(navRoute.geometry as String)
+            .map(
+              (coordinate) => Position(
+                latitude: coordinate.latitude,
+                longitude: coordinate.longitude,
+                elevation: 0, // TODO
+                distance: 0, // TODO
+                time: const Duration(seconds: 0), // TODO
+              ),
+            )
+            .toList();
       });
-
-      _route.track = PolylinePoints()
-          .decodePolyline(navRoute.geometry as String)
-          .map(
-            (coordinate) => Position(
-              latitude: coordinate.latitude,
-              longitude: coordinate.longitude,
-              elevation: 0, // TODO
-              distance: 0, // TODO
-              time: const Duration(seconds: 0), // TODO
-            ),
-          )
-          .toList();
     }
   }
 
@@ -119,7 +123,7 @@ class RouteEditPageState extends State<RouteEditPage> {
       _line!,
       LineOptions(
         lineWidth: 2,
-        geometry: _route.track.latLngs,
+        geometry: _route.track?.latLngs,
       ),
     );
   }
@@ -152,13 +156,13 @@ class RouteEditPageState extends State<RouteEditPage> {
     _circles = [];
     await _mapController.removeSymbols(_symbols);
     _symbols = [];
-    _locations.asMap().forEach((index, latLng) {
-      _addPoint(latLng, index + 1);
+    _route.markedPositions!.asMap().forEach((index, pos) {
+      _addPoint(pos.latLng, index + 1);
     });
   }
 
   Future<void> _extendLine(LatLng location) async {
-    if (_locations.length == 25) {
+    if (_route.markedPositions!.length == 25) {
       await showMessageDialog(
         context: context,
         title: "Point maximum reached",
@@ -167,15 +171,23 @@ class RouteEditPageState extends State<RouteEditPage> {
       return;
     }
     setState(() {
-      _locations.add(location);
+      _route.markedPositions!.add(
+        Position(
+          latitude: location.latitude,
+          longitude: location.longitude,
+          elevation: 0, // TODO
+          distance: 0, // TODO
+          time: const Duration(seconds: 0),
+        ),
+      );
     });
-    _addPoint(location, _locations.length);
+    _addPoint(location, _route.markedPositions!.length);
     await _updateLine();
   }
 
   Future<void> _removePoint(int index) async {
     setState(() {
-      _locations.removeAt(index);
+      _route.markedPositions!.removeAt(index);
     });
     await _updatePoints();
     await _updateLine();
@@ -185,14 +197,15 @@ class RouteEditPageState extends State<RouteEditPage> {
     setState(() {
       _logger.i("old: $oldIndex, new: $newIndex");
       if (oldIndex < newIndex - 1) {
-        LatLng location = _locations.removeAt(oldIndex);
-        if (newIndex - 1 == _locations.length) {
-          _locations.add(location);
+        Position location = _route.markedPositions!.removeAt(oldIndex);
+        if (newIndex - 1 == _route.markedPositions!.length) {
+          _route.markedPositions!.add(location);
         } else {
-          _locations.insert(newIndex - 1, location);
+          _route.markedPositions!.insert(newIndex - 1, location);
         }
       } else if (oldIndex > newIndex) {
-        _locations.insert(newIndex, _locations.removeAt(oldIndex));
+        _route.markedPositions!
+            .insert(newIndex, _route.markedPositions!.removeAt(oldIndex));
       }
     });
 
@@ -230,7 +243,7 @@ class RouteEditPageState extends State<RouteEditPage> {
       );
     }
 
-    for (int index = 0; index < _locations.length; index++) {
+    for (int index = 0; index < _route.markedPositions!.length; index++) {
       listElements.add(_buildDragTarget(index));
 
       var icon = const Icon(
@@ -262,7 +275,7 @@ class RouteEditPageState extends State<RouteEditPage> {
       );
     }
 
-    listElements.add(_buildDragTarget(_locations.length));
+    listElements.add(_buildDragTarget(_route.markedPositions!.length));
 
     return ListView(children: listElements);
   }
@@ -344,7 +357,7 @@ class RouteEditPageState extends State<RouteEditPage> {
                 _mapController = controller;
               },
               onStyleLoadedCallback: () async {
-                final bounds = _route.track.latLngBounds;
+                final bounds = _route.track!.latLngBounds;
                 _mapController.moveCamera(CameraUpdate.newLatLngBounds(bounds));
                 _line ??= await _mapController.addLine(
                   LineOptions(
