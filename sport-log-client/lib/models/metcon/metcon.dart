@@ -65,7 +65,7 @@ class Metcon extends AtomicEntity {
   Int64 id;
   @OptionalIdConverter()
   Int64? userId;
-  String? name;
+  String name;
   MetconType metconType;
   int? rounds;
   @OptionalDurationConverter()
@@ -120,8 +120,7 @@ class Metcon extends AtomicEntity {
   @override
   bool isValid() {
     return validate(userId != null, 'Metcon: userId == null') &&
-        validate(name != null, 'Metcon: name == null') &&
-        validate(name!.isNotEmpty, 'Metcon: name is empty') &&
+        validate(name.isNotEmpty, 'Metcon: name is empty') &&
         validate(deleted != true, 'Metcon: deleted == true') &&
         validate(rounds == null || rounds! >= 1, 'Metcon: rounds < 1') &&
         validate(
@@ -140,7 +139,7 @@ class DbMetconSerializer extends DbSerializer<Metcon> {
       userId: r[prefix + Columns.userId] == null
           ? null
           : Int64(r[prefix + Columns.userId]! as int),
-      name: r[prefix + Columns.name] as String?,
+      name: r[prefix + Columns.name] as String,
       metconType: MetconType.values[r[prefix + Columns.metconType]! as int],
       rounds: r[prefix + Columns.rounds] as int?,
       timecap: r[prefix + Columns.timecap] == null

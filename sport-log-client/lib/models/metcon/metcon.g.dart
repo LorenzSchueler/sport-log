@@ -9,7 +9,7 @@ part of 'metcon.dart';
 Metcon _$MetconFromJson(Map<String, dynamic> json) => Metcon(
       id: const IdConverter().fromJson(json['id'] as String),
       userId: const OptionalIdConverter().fromJson(json['user_id'] as String?),
-      name: json['name'] as String?,
+      name: json['name'] as String,
       metconType: $enumDecode(_$MetconTypeEnumMap, json['metcon_type']),
       rounds: json['rounds'] as int?,
       timecap:

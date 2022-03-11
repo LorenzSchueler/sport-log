@@ -124,8 +124,7 @@ pub struct Metcon {
     #[serde(serialize_with = "to_str_optional")]
     #[serde(deserialize_with = "from_str_optional")]
     pub user_id: Option<UserId>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
-    pub name: Option<String>,
+    pub name: String,
     pub metcon_type: MetconType,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub rounds: Option<i32>,

@@ -112,7 +112,9 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
               EditTile(
                 leading: AppIcons.notes,
                 caption: "Metcon",
-                child: Text(_metconSessionDescription.metconDescription.name),
+                child: Text(
+                  _metconSessionDescription.metconDescription.metcon.name,
+                ),
                 onTap: () async {
                   MetconDescription? metconDescription = await showMetconPicker(
                     context: context,

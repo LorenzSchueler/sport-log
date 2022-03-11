@@ -105,7 +105,7 @@ class MetconCard extends StatelessWidget {
       child: Card(
         margin: EdgeInsets.zero,
         child: ListTile(
-          title: Text(metconDescription.metcon.name ?? 'Unnamed'),
+          title: Text(metconDescription.metcon.name),
           subtitle: Text(
             metconDescription.moves.map((mmd) => mmd.movement.name).join(' • '),
             overflow: TextOverflow.ellipsis,

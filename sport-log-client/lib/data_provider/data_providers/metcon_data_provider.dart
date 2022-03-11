@@ -54,9 +54,6 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
 }
 
 class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
-  final _metconApi = Api.metcons;
-  final _metconMovementApi = Api.metconMovements;
-
   final _metconDb = AppDatabase.metcons;
   final _metconMovementDb = AppDatabase.metconMovements;
   final _movementDb = AppDatabase.movements;

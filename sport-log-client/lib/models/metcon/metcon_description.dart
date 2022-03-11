@@ -18,10 +18,6 @@ class MetconDescription extends CompoundEntity {
   List<MetconMovementDescription> moves;
   bool hasReference; // whether there is a MetconSession referencing this metcon
 
-  String get name {
-    return metcon.name ?? moves.map((e) => e.movement.name).join(" & ");
-  }
-
   MetconDescription.defaultValue()
       : metcon = Metcon.defaultValue(),
         moves = [],

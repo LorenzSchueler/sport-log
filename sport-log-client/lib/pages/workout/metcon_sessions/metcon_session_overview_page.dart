@@ -155,7 +155,7 @@ class MetconSessionCard extends StatelessWidget {
           trailing: metconSessionDescription.metconSession.rx
               ? const Icon(AppIcons.checkCircle)
               : null,
-          title: Text(metconSessionDescription.metconDescription.name),
+          title: Text(metconSessionDescription.metconDescription.metcon.name),
           subtitle: Text(metconSessionDescription.longResultDescription),
           onTap: () => Navigator.pushNamed(
             context,

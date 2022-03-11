@@ -42,7 +42,7 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_metconSessionDescription.metconDescription.name),
+        title: Text(_metconSessionDescription.metconDescription.metcon.name),
         actions: [
           IconButton(
             onPressed: _deleteMetconSession,

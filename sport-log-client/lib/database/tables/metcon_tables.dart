@@ -17,9 +17,7 @@ class MetconTable extends TableAccessor<Metcon> {
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
       Column.int(Columns.userId)..nullable(),
-      Column.text(Columns.name)
-        ..nullable()
-        ..checkLengthLe(80),
+      Column.text(Columns.name)..checkLengthLe(80),
       Column.int(Columns.metconType)..checkBetween(0, 2),
       Column.int(Columns.rounds)
         ..nullable()

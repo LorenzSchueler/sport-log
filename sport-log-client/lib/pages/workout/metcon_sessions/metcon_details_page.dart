@@ -40,7 +40,7 @@ class MetconDetailsPageState extends State<MetconDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_metconDescription.name),
+        title: Text(_metconDescription.metcon.name),
         actions: [
           IconButton(
             onPressed: _deleteMetcon,

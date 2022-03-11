@@ -123,7 +123,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
 
   Widget _nameInput(BuildContext context) {
     return TextFormField(
-      initialValue: _metconDescription.metcon.name ?? "",
+      initialValue: _metconDescription.metcon.name,
       onChanged: (name) =>
           setState(() => _metconDescription.metcon.name = name),
       validator: Validator.validateStringNotEmpty,

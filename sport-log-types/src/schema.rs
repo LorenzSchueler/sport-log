@@ -173,7 +173,7 @@ table! {
     metcon (id) {
         id -> Int8,
         user_id -> Nullable<Int8>,
-        name -> Nullable<Varchar>,
+        name -> Varchar,
         metcon_type -> MetconTypeMapping,
         rounds -> Nullable<Int4>,
         timecap -> Nullable<Int4>,
