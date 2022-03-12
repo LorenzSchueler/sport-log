@@ -1,4 +1,4 @@
-# Syncing Strategy
+# Synchronization Strategy
 
 ## Server DB
 All tables (which can be modified by users) have the fields `last_change timestamptz` and `deleted boolean`.
@@ -9,10 +9,15 @@ All tables (which can be modified by users) have the fields `sync_status integer
 * `sync_status` = 1 means dirty (update not on server)
 * `sync_status` = 2 means created (created not on server)
 
-## General synchronization logic
-* Objects are only created and updated but not deleted.
+## Deletes
+* In general objects are only created and updated but not deleted.
 * Deletions are implemented as soft deletes and can therefore be treated as updates.
-* For every (modifiable) table there exists and corresponding archive table which inherits all fields from the normal table. Every entry that gets soft deleted is moved into the archive table using triggers. All unique indices are only implemented on the normal table. Thus, it is possible to create entries that would otherwise clash with deleted entries.
+* The exception to this is that if a user account gets deleted all data from this user is hard-deleted, thus making sure the user can erase all of its data from the server permanently.
+* Soft and hard deletes are cascading (with few exceptions where they are set null).
+* In order to get cascading soft deletes on the server, every (modifiable) table has a corresponding archive table which inherits all fields from this table. Every entry that gets soft deleted is moved into the archive table using triggers. Because soft deleted entries are moved to the inherited archive table, they are technically hard deleted from the normal table causing cascading deletes. All unique indices are only implemented on the normal table, in order to make it possible to create entries that would otherwise clash with deleted entries.
+* On the client side there are no hard deletes at all since the only reason for hard deletes is deleting a user account in which case the whole database gets dropped anyway. Soft deletes are not cascading, but the data providers delete all related entries.
+
+## General synchronization logic
 * The server has to be able to provide clients with all changes since their last synchronization without sending everything. In order to be able to do so it saves the timestamp of the last change of every entry in the field `last_change` and can then send all entries that have changed since a given point in time.
 * Clients save the timestamp of their last synchronization and can thus request all changes from the server since this point in time.
 * Clients only use one server. This means they only have to keep track of what the server already knows and what was created or updated. Every modifiable entry has therefore the field `sync_status`.
@@ -23,7 +28,7 @@ All tables (which can be modified by users) have the fields `sync_status integer
 * After successfully fetching the latest changes from the server, the client will push its changes to the server and set `sync_status` of the corresponding entries to 0.
 * After successfully synchronizing with the server, the timestamp is saved in the settings variable `last_sync`.
 
-## Which update wins?
+## Which change wins?
 The system supports multiple clients for the same user account. 
 It is unlikely that entries are created or changed simultaneously on multiple devices but since it is possible it must be dealt with.
 Creations should in general not influence each other as long as they do not clash on unique indices.
