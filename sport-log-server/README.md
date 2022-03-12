@@ -122,3 +122,7 @@ service template
     ```bash
     journalctl -o cat -e -u sport-log-server
     ```
+
+## Client Server Synchronization
+
+refer to [synchronization](SYNCHRONIZATION.md)

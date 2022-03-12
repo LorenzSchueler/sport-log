@@ -5,4 +5,4 @@
 /sport-log-action-provider-map-matching/map-matching
 /sport-log-server/sport-log-server.toml
 .env
-private_data.sh
+geckodriver

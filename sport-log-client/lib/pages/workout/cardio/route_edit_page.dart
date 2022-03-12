@@ -175,8 +175,8 @@ class RouteEditPageState extends State<RouteEditPage> {
         Position(
           latitude: location.latitude,
           longitude: location.longitude,
-          elevation: 0, // TODO
-          distance: 0, // TODO
+          elevation: 0,
+          distance: 0,
           time: const Duration(seconds: 0),
         ),
       );

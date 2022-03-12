@@ -193,7 +193,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
   }) async {
     final batch = database.batch();
     for (final object in objects) {
-      // TODO: what it sync_status == 1 or sync_status == 2?
+      // changes comming from server win over local changes
       batch.insert(
         tableName,
         {
