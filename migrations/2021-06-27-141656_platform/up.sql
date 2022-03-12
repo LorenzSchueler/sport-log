@@ -11,10 +11,6 @@ create unique index platform_idx on platform (name) where deleted = false;
 create trigger set_timestamp before update on platform
     for each row execute procedure trigger_set_timestamp();
 
-insert into platform (id, name, credential) values 
-    (1, 'wodify', true),
-    (2, 'sportstracker', true);
-
 create table platform_archive (
     primary key (id),
     check (deleted = true)
@@ -39,11 +35,6 @@ create unique index platform_credential_idx on platform_credential (user_id, pla
 
 create trigger set_timestamp before update on platform_credential
     for each row execute procedure trigger_set_timestamp();
-
-insert into platform_credential (id, user_id, platform_id, username, password) values
-    (1, 1, 1, 'woduser1', 'wodpasswd1'),
-    (2, 2, 1, 'woduser2', 'wodpasswd2'),
-    (3, 3, 2, 'stuser3', 'stpasswd3');
 
 create table platform_credential_archive (
     primary key (id),

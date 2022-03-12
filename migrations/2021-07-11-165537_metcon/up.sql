@@ -18,11 +18,6 @@ create unique index metcon_idx on metcon (user_id, name) where deleted = false;
 create trigger set_timestamp before update on metcon
     for each row execute procedure trigger_set_timestamp();
 
-insert into metcon (id, user_id, name, metcon_type, rounds, timecap, description) values
-    (1, null, 'Cindy', 'amrap', null, 1200000, null),
-    (2, null, 'Murph', 'for_time', 1, null, 'wear a weight vest (20/14) lbs'),
-    (3, 1, '5k Row', 'for_time', 1, 1800000, null);
-
 create table metcon_archive (
     primary key (id),
     foreign key (user_id) references "user" on delete cascade,
@@ -58,17 +53,6 @@ create unique index metcon_movement_idx on metcon_movement (metcon_id, movement_
 create trigger set_timestamp before update on metcon_movement
     for each row execute procedure trigger_set_timestamp();
 
-insert into metcon_movement (id, metcon_id, movement_id, distance_unit, movement_number, count, male_weight, female_weight) values
-    (1, 1, 10, null, 0, 5, null, null),
-    (2, 1, 11, null, 1, 10, null, null),
-    (3, 1, 12, null, 2, 15, null, null),
-    (4, 2, 5, null, 0, 1, 9, 6),
-    (5, 2, 10, null, 1, 100, 9, 6),
-    (6, 2, 11, null, 2, 200, 9, 6),
-    (7, 2, 12, null, 3, 300, 9, 6),
-    (8, 2, 5, null, 4, 1, 9, 6),
-    (9, 3, 8, 'km', 0, 5, null, null);
-
 create table metcon_movement_archive (
     primary key (id),
     check (deleted = true)
@@ -103,10 +87,6 @@ create unique index metcon_session_idx on metcon_session (user_id, metcon_id, da
 
 create trigger set_timestamp before update on metcon_session
     for each row execute procedure trigger_set_timestamp();
-
-insert into metcon_session (id, user_id, metcon_id, datetime, time, rounds, reps, rx, comments) values
-    (1, 1, 1, '2020-08-20 16:00:00', null, 17, 8, true, null),
-    (2, 1, 2, '2020-08-23 18:00:00', 1800000, null, null, false, 'without vest');
 
 create table metcon_session_archive (
     primary key (id),

@@ -13,13 +13,6 @@ create unique index diary_idx on diary (user_id, date) where deleted = false;
 create trigger set_timestamp before update on diary
     for each row execute procedure trigger_set_timestamp();
 
-insert into diary (id, user_id, date, bodyweight, comments) values
-    (1, 1, '2021-08-20', 78.3, null),
-    (2, 1, '2021-08-21', 78.8, null),
-    (3, 1, '2021-08-22', 78.2, null),
-    (4, 1, '2021-08-23', 77.9, null),
-    (5, 1, '2021-08-24', 78.3, null);
-
 create table diary_archive (
     primary key (id),
     foreign key (user_id) references "user" on delete cascade,
@@ -45,13 +38,6 @@ create unique index wod_idx on wod (user_id, date) where deleted = false;
 
 create trigger set_timestamp before update on wod
     for each row execute procedure trigger_set_timestamp();
-
-insert into wod (id, user_id, date, description) values
-    (1, 1, '2021-08-20', E'Strength:\nBack Squat 5*5\n\nFor Time (5 rounds):\n15 cal Ski Erg\n15 Dumbbell Snatch (45/30)'),
-    (2, 1, '2021-08-21', E'Murph'),
-    (3, 1, '2021-08-22', E'Cindy\n20 min AMRAP:\n5 Pull-Ups\n10 Push-Ups\n15 Air Squats'),
-    (4, 1, '2021-08-23', E''),
-    (5, 1, '2021-08-24', E'Deadlift 8x2\nSkill: Clean & Jerk');
 
 create table wod_archive (
     primary key (id),

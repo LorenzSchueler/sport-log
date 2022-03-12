@@ -26,9 +26,6 @@ create unique index route_idx on route (user_id, name) where deleted = false;
 create trigger set_timestamp before update on route
     for each row execute procedure trigger_set_timestamp();
 
-insert into route (id, user_id, name, distance, ascent, descent, track, marked_positions) values
-    (1, 1, 'route 1X', 12456, 156, 149, null, null);
-
 create table route_archive (
     primary key (id),
     foreign key (user_id) references "user" on delete cascade,
@@ -101,13 +98,6 @@ create unique index cardio_session_idx on cardio_session (user_id, movement_id, 
 
 create trigger set_timestamp before update on cardio_session
     for each row execute procedure trigger_set_timestamp();
-
-insert into cardio_session (id, user_id, movement_id, cardio_type, datetime, 
-        distance, ascent, descent, time, calories, track, avg_cadence, 
-        cadence, avg_heart_rate, heart_rate, route_id, comments) values
-    (1, 1, 5, 'training', '2021-08-22 10:25:34', 
-        26742, 35, 43, 9134000, null, null, 167, 
-        null, 156, null, null, null);
 
 create table cardio_session_archive (
     primary key (id),
