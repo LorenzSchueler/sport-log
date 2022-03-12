@@ -22,6 +22,9 @@ create table group_user (
 create unique index group_user__group_id__user_id__key
     on group_user (group_id, user_id) where deleted = false;
 
+create index group_user__user_id__last_change__idx
+    on group_user (user_id, last_change) where deleted = false;
+
 create trigger set_timestamp before update on group_user
     for each row execute procedure trigger_set_timestamp();
 

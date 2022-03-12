@@ -34,6 +34,9 @@ create table platform_credential (
 create unique index platform_credential__user_id__platform_id__key
     on platform_credential (user_id, platform_id) where deleted = false;
 
+create index platform_credential__user_id__last_change__idx
+    on platform_credential (user_id, last_change) where deleted = false;
+
 create trigger set_timestamp before update on platform_credential
     for each row execute procedure trigger_set_timestamp();
 

@@ -10,6 +10,9 @@ create table strength_blueprint (
     deleted boolean not null default false
 );
 
+create index strength_blueprint__user_id__last_change__idx
+    on strength_blueprint (user_id, last_change) where deleted = false;
+
 create trigger set_timestamp before update on strength_blueprint
     for each row execute procedure trigger_set_timestamp();
 
@@ -75,6 +78,10 @@ create table strength_session (
 
 create unique index strength_session__user_id__datetime__movement_id__key
     on strength_session (user_id, datetime, movement_id) 
+    where deleted = false;
+
+create index strength_session__user_id__last_change__idx
+    on strength_session (user_id, last_change) 
     where deleted = false;
 
 create trigger set_timestamp before update on strength_session

@@ -9,6 +9,9 @@ create table training_plan (
     deleted boolean not null default false
 );
 
+create index training_plan__user_id__last_change__idx
+    on training_plan (user_id, last_change) where deleted = false;
+
 create trigger set_timestamp before update on training_plan
     for each row execute procedure trigger_set_timestamp();
 

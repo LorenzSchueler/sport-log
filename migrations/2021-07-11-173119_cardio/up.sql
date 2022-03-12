@@ -24,6 +24,9 @@ create table route (
 create unique index route__user_id__name__key
     on route (user_id, name) where deleted = false;
 
+create index route__user_id__last_change__idx
+    on route (user_id, last_change) where deleted = false;
+
 create trigger set_timestamp before update on route
     for each row execute procedure trigger_set_timestamp();
 
@@ -56,6 +59,9 @@ create table cardio_blueprint (
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );
+
+create index cardio_blueprint__user_id__last_change__idx
+    on cardio_blueprint (user_id, last_change) where deleted = false;
 
 create trigger set_timestamp before update on cardio_blueprint
     for each row execute procedure trigger_set_timestamp();
@@ -96,6 +102,10 @@ create table cardio_session (
 
 create unique index cardio_session__user_id__movement_id__datetime__key
     on cardio_session (user_id, movement_id, datetime) 
+    where deleted = false;
+
+create index cardio_session__user_id__last_change__idx
+    on cardio_session (user_id, last_change) 
     where deleted = false;
 
 create trigger set_timestamp before update on cardio_session

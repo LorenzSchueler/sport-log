@@ -16,6 +16,9 @@ create table metcon (
 create unique index metcon__user_id__name__key
     on metcon (user_id, name) where deleted = false;
 
+create index metcon__user_id__last_change__idx
+    on metcon (user_id, last_change) where deleted = false;
+
 create trigger set_timestamp before update on metcon
     for each row execute procedure trigger_set_timestamp();
 
@@ -86,6 +89,10 @@ create table metcon_session (
 
 create unique index metcon_session__user_id__metcon_id__datetime__key
     on metcon_session (user_id, metcon_id, datetime)     
+    where deleted = false;
+
+create index metcon_session__user_id__last_change__idx
+    on metcon_session (user_id, last_change)     
     where deleted = false;
 
 create trigger set_timestamp before update on metcon_session

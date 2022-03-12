@@ -68,6 +68,10 @@ create unique index action_rule__user_id__action_id__weekday__time__key
     on action_rule (user_id, action_id, weekday, time) 
     where deleted = false;
 
+create index action_rule__user_id__last_change__idx
+    on action_rule (user_id, last_change) 
+    where deleted = false;
+
 create trigger set_timestamp before update on action_rule
     for each row execute procedure trigger_set_timestamp();
 
@@ -95,6 +99,10 @@ create table action_event (
 
 create unique index action_event__user_id__action_id__datetime__key
     on action_event (user_id, action_id, datetime)
+    where deleted = false;
+
+create index action_event__user_id__last_change__idx
+    on action_event (user_id, last_change)
     where deleted = false;
 
 create trigger set_timestamp before update on action_event

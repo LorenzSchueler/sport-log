@@ -8,7 +8,11 @@ create table diary (
     deleted boolean not null default false
 );
 
-create unique index diary__user_id__date__key on diary (user_id, date) where deleted = false;
+create unique index diary__user_id__date__key
+    on diary (user_id, date) where deleted = false;
+
+create index diary__user_id__last_change__idx
+    on diary (user_id, last_change) where deleted = false;
 
 create trigger set_timestamp before update on diary
     for each row execute procedure trigger_set_timestamp();
@@ -33,7 +37,11 @@ create table wod (
     deleted boolean not null default false
 );
 
-create unique index wod__user_id__date__key on wod (user_id, date) where deleted = false;
+create unique index wod__user_id__date__key
+    on wod (user_id, date) where deleted = false;
+
+create index wod__user_id__last_change__idx
+    on wod (user_id, last_change) where deleted = false;
 
 create trigger set_timestamp before update on wod
     for each row execute procedure trigger_set_timestamp();

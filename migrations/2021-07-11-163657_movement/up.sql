@@ -14,6 +14,9 @@ create table movement (
 create unique index movement__user_id__name__movement_dimension__key
     on movement (user_id, name, movement_dimension) where deleted = false;
 
+create index movement__user_id__last_change__idx
+    on movement (user_id, last_change) where deleted = false;
+
 create trigger set_timestamp before update on movement
     for each row execute procedure trigger_set_timestamp();
 
