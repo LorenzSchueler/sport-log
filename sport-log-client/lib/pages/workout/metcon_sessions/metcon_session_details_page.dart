@@ -2,7 +2,6 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
@@ -23,7 +22,6 @@ class MetconSessionDetailsPage extends StatefulWidget {
 }
 
 class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
-  final _logger = Logger('MetconSessionDetailsPage');
   final _dataProvider = MetconSessionDescriptionDataProvider.instance;
   late MetconSessionDescription _metconSessionDescription;
 

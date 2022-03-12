@@ -27,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   String _serverUrl = Settings.serverUrl;
   String _username = "";
   String _password = "";
+  // ignore: unused_field
   String _password2 = "";
   String _email = "";
 

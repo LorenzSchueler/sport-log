@@ -3,7 +3,6 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -28,7 +27,6 @@ class CardioEditPage extends StatefulWidget {
 }
 
 class CardioEditPageState extends State<CardioEditPage> {
-  final _logger = Logger('CardioEditPage');
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = CardioSessionDescriptionDataProvider.instance;
 

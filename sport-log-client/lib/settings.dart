@@ -78,9 +78,9 @@ class Settings {
     return _storage!.get(key)! as bool;
   }
 
-  static int _getInt(String key) {
-    return _storage!.get(key)! as int;
-  }
+  //static int _getInt(String key) {
+  //return _storage!.get(key)! as int;
+  //}
 
   static String _getString(String key) {
     return _storage!.get(key)! as String;

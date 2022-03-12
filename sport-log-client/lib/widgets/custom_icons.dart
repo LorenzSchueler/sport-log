@@ -43,6 +43,7 @@ class CustomIcons {
       IconData(0xe805, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData cw =
       IconData(0xe806, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  // ignore: constant_identifier_names
   static const IconData time_interval =
       IconData(0xe80a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData github =
@@ -53,12 +54,14 @@ class CustomIcons {
       IconData(0xf0f5, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData heartbeat =
       IconData(0xf21e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  // ignore: constant_identifier_names
   static const IconData sync_icon =
       IconData(0xf328, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData weight =
       IconData(0xf496, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData route =
       IconData(0xf4d7, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  // ignore: constant_identifier_names
   static const IconData ruler_horizontal =
       IconData(0xf547, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData medal =

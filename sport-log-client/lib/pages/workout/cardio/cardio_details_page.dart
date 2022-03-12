@@ -3,7 +3,6 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -23,7 +22,6 @@ class CardioDetailsPage extends StatefulWidget {
 }
 
 class CardioDetailsPageState extends State<CardioDetailsPage> {
-  final _logger = Logger('CardioDetailsPage');
   late CardioSessionDescription _cardioSessionDescription;
 
   @override

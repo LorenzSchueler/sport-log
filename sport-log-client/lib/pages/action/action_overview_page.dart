@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
@@ -12,8 +11,6 @@ class ActionOverviewPage extends StatefulWidget {
 }
 
 class ActionOverviewPageState extends State<ActionOverviewPage> {
-  final _logger = Logger('ActionOverviewPage');
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

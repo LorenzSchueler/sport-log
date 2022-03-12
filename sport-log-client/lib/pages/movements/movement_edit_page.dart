@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -30,7 +29,6 @@ class EditMovementPage extends StatefulWidget {
 }
 
 class _EditMovementPageState extends State<EditMovementPage> {
-  final _logger = Logger('EditMovementPage');
   final _dataProvider = MovementDataProvider.instance;
   final _formKey = GlobalKey<FormState>();
   final _descriptionFocusNode = FocusNode();

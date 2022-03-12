@@ -3,7 +3,6 @@ import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -20,8 +19,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class SettingsPageState extends State<SettingsPage> {
-  final _logger = Logger('SettingsPage');
-
   Future<void> checkSync() async {
     await Sync.instance.sync(
       onNoInternet: () => showMessageDialog(
