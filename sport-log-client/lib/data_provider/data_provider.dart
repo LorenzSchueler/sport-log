@@ -59,7 +59,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
         break;
       default:
         await showMessageDialog(
-          context: AppState.navigatorKey.currentContext!,
+          context: AppState.globalContext,
           title: "An error occured.",
           text: error.toString(),
         );

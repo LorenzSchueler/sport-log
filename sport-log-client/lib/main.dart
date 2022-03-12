@@ -84,6 +84,8 @@ class InitAppWrapper extends StatefulWidget {
 }
 
 class InitAppWrapperState extends State<InitAppWrapper> {
+  static final navigatorKey = GlobalKey<NavigatorState>();
+
   double? _progress = 0.0;
 
   @override
@@ -104,6 +106,7 @@ class InitAppWrapperState extends State<InitAppWrapper> {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: ThemeMode.dark,
+            navigatorKey: navigatorKey,
             home: WelcomeScreen(
               content: Center(
                 child: LinearProgressIndicator(value: _progress),

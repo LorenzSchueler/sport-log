@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:sport_log/helpers/theme.dart';
+import 'package:sport_log/main.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 
@@ -13,6 +14,9 @@ class App extends StatefulWidget {
 
 class AppState extends State<App> {
   static final navigatorKey = GlobalKey<NavigatorState>();
+  static BuildContext get globalContext =>
+      navigatorKey.currentContext ??
+      InitAppWrapperState.navigatorKey.currentContext!;
 
   @override
   Widget build(BuildContext context) {
