@@ -39,7 +39,8 @@ create table strength_blueprint_set (
     deleted boolean not null default false
 );
 
-create unique index strength_blueprint_set_idx on strength_blueprint_set (strength_blueprint_id, set_number) 
+create unique index strength_blueprint_set__strength_blueprint_id__set_number__key
+    on strength_blueprint_set (strength_blueprint_id, set_number) 
     where deleted = false;
 
 create trigger set_timestamp before update on strength_blueprint_set
@@ -72,7 +73,8 @@ create table strength_session (
     deleted boolean not null default false
 );
 
-create unique index strength_session_idx on strength_session (user_id, datetime, movement_id) 
+create unique index strength_session__user_id__datetime__movement_id__key
+    on strength_session (user_id, datetime, movement_id) 
     where deleted = false;
 
 create trigger set_timestamp before update on strength_session

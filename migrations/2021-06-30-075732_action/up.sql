@@ -10,7 +10,7 @@ create table action_provider (
     deleted boolean not null default false
 );
 
-create unique index action_provider_idx on action_provider (name) where deleted = false;
+create unique index action_provider__name__key on action_provider (name) where deleted = false;
 
 create trigger set_timestamp before update on action_provider
     for each row execute procedure trigger_set_timestamp();
@@ -36,7 +36,8 @@ create table action (
     deleted boolean not null default false
 );
 
-create unique index action_idx on action (action_provider_id, name) where deleted = false;
+create unique index action__action_provider_id__key
+    on action (action_provider_id, name) where deleted = false;
 
 create trigger set_timestamp before update on action
     for each row execute procedure trigger_set_timestamp();
@@ -63,7 +64,8 @@ create table action_rule (
     deleted boolean not null default false
 );
 
-create unique index action_rule_idx on action_rule (user_id, action_id, weekday, time) 
+create unique index action_rule__user_id__action_id__weekday__time__key
+    on action_rule (user_id, action_id, weekday, time) 
     where deleted = false;
 
 create trigger set_timestamp before update on action_rule
@@ -91,7 +93,8 @@ create table action_event (
     deleted boolean not null default false
 );
 
-create unique index action_event_idx on action_event (user_id, action_id, datetime)
+create unique index action_event__user_id__action_id__datetime__key
+    on action_event (user_id, action_id, datetime)
     where deleted = false;
 
 create trigger set_timestamp before update on action_event

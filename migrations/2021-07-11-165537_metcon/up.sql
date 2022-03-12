@@ -13,7 +13,8 @@ create table metcon (
     deleted boolean not null default false
 );
 
-create unique index metcon_idx on metcon (user_id, name) where deleted = false;
+create unique index metcon__user_id__name__key
+    on metcon (user_id, name) where deleted = false;
 
 create trigger set_timestamp before update on metcon
     for each row execute procedure trigger_set_timestamp();
@@ -47,7 +48,8 @@ create table metcon_movement (
     deleted boolean not null default false
 );
 
-create unique index metcon_movement_idx on metcon_movement (metcon_id, movement_number)     
+create unique index metcon_movement__metcon_id__movement_number__key
+    on metcon_movement (metcon_id, movement_number)     
     where deleted = false;
 
 create trigger set_timestamp before update on metcon_movement
@@ -82,7 +84,8 @@ create table metcon_session (
     deleted boolean not null default false
 );
 
-create unique index metcon_session_idx on metcon_session (user_id, metcon_id, datetime)     
+create unique index metcon_session__user_id__metcon_id__datetime__key
+    on metcon_session (user_id, metcon_id, datetime)     
     where deleted = false;
 
 create trigger set_timestamp before update on metcon_session

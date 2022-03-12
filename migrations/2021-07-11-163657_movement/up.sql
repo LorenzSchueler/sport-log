@@ -11,7 +11,8 @@ create table movement (
     deleted boolean not null default false
 );
 
-create unique index movement_idx on movement (user_id, name, movement_dimension) where deleted = false;
+create unique index movement__user_id__name__movement_dimension__key
+    on movement (user_id, name, movement_dimension) where deleted = false;
 
 create trigger set_timestamp before update on movement
     for each row execute procedure trigger_set_timestamp();
@@ -67,6 +68,7 @@ create trigger check_movement_exists_trigger
 create table eorm (
     id bigserial primary key,
     reps integer not null check (reps >= 1),
-    percentage real not null check (percentage > 0),
-    unique (reps)
+    percentage real not null check (percentage > 0)
 );
+
+create unique index eorm__reps__key on eorm (reps);

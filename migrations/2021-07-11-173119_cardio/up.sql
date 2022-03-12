@@ -21,7 +21,8 @@ create table route (
     deleted boolean not null default false
 );
 
-create unique index route_idx on route (user_id, name) where deleted = false;
+create unique index route__user_id__name__key
+    on route (user_id, name) where deleted = false;
 
 create trigger set_timestamp before update on route
     for each row execute procedure trigger_set_timestamp();
@@ -93,7 +94,8 @@ create table cardio_session (
     deleted boolean not null default false
 );
 
-create unique index cardio_session_idx on cardio_session (user_id, movement_id, datetime) 
+create unique index cardio_session__user_id__movement_id__datetime__key
+    on cardio_session (user_id, movement_id, datetime) 
     where deleted = false;
 
 create trigger set_timestamp before update on cardio_session
