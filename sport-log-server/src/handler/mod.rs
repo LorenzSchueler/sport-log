@@ -12,7 +12,7 @@ use rocket::{
     serde::json::Json,
     Request, Response,
 };
-use sport_log_types::{Error, ErrorMessage};
+use sport_log_types::{ConflictDescriptor, Error, ErrorMessage};
 use tracing::warn;
 
 pub mod account;
@@ -34,11 +34,25 @@ fn parse_db_error(error: &(dyn DatabaseErrorInformation + Sync + Send)) -> Error
     if let (Some(left), Some(right)) = (error.rfind('»'), error.rfind('«')) {
         if left < right {
             if error[left..right].ends_with("_pkey") {
-                return ErrorMessage::PrimaryKeyViolation(error[left + 2..right - 5].to_owned());
+                // {tablename}_pkey
+                return ErrorMessage::PrimaryKeyViolation(ConflictDescriptor {
+                    table: error[left + 2..right - 5].to_owned(),
+                    columns: vec!["id".to_owned()],
+                });
             } else if error[left..right].ends_with("_fkey") {
-                return ErrorMessage::ForeignKeyViolation(error[left + 2..right - 5].to_owned());
+                // {tablename}_{column}_fkey
+                let table_column: Vec<_> = error[left + 2..right - 5].split('_').collect();
+                return ErrorMessage::ForeignKeyViolation(ConflictDescriptor {
+                    table: table_column[0].to_owned(),
+                    columns: vec![table_column[1].to_owned()],
+                });
             } else if error[left..right].ends_with("_key") {
-                return ErrorMessage::UniqueViolation(error[left + 2..right - 4].to_owned());
+                // {tablename}__{column1__column2...}__key
+                let mut table_column = error[left + 2..right - 5].split("__").map(|x| x.to_owned());
+                return ErrorMessage::UniqueViolation(ConflictDescriptor {
+                    table: table_column.next().unwrap(),
+                    columns: table_column.collect(),
+                });
             }
         }
     }

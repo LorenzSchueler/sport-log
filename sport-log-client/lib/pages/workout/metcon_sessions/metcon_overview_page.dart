@@ -39,7 +39,7 @@ class _MetconsPageState extends State<MetconsPage> {
   }
 
   Future<void> _update() async {
-    _logger.d('Updating route page');
+    _logger.d('Updating metcon page');
     final metconDescriptions = await _dataProvider.getNonDeleted();
     setState(() => _metconDescriptions = metconDescriptions);
   }

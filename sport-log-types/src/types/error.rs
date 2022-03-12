@@ -1,10 +1,16 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct ConflictDescriptor {
+    pub table: String,
+    pub columns: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub enum ErrorMessage {
-    UniqueViolation(String),
-    ForeignKeyViolation(String),
-    PrimaryKeyViolation(String),
+    UniqueViolation(ConflictDescriptor),
+    ForeignKeyViolation(ConflictDescriptor),
+    PrimaryKeyViolation(ConflictDescriptor),
     Other(String),
 }
 
