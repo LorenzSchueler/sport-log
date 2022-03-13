@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
+import 'package:sport_log/widgets/dialogs/conflict_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
 
@@ -43,7 +44,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
     _onNoInternet = callback;
   }
 
-  static Future<void> handleApiError(
+  static Future<ConflictResolution?> handleApiError(
     ApiError error, {
     VoidCallback? onNoInternet,
   }) async {
@@ -52,17 +53,29 @@ abstract class DataProvider<T> extends ChangeNotifier {
       case ApiErrorCode.serverUnreachable:
         _logger.i("on no internet: $onNoInternet");
         onNoInternet?.call();
-        break;
+        return null;
       case ApiErrorCode.unauthorized:
         _logger.w('Tried sync but access unauthorized.', error);
         await showNewCredentialsDialog();
-        break;
+        return null;
+      // create something that refereces non existing object
+      case ApiErrorCode.forbidden:
+      // primary foreign or unique key violation
+      case ApiErrorCode.conflict:
+        final conflicResolution = await showConflictDialog(
+          context: AppState.globalContext,
+          title: "An error occured.",
+          text: error.toString(),
+        );
+        _logger.i(conflicResolution);
+        return conflicResolution;
       default:
         await showMessageDialog(
           context: AppState.globalContext,
           title: "An error occured.",
           text: error.toString(),
         );
+        return null;
     }
   }
 }
@@ -137,35 +150,71 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   Future<bool> pullFromServer() async {
     final result = await api.getMultiple();
     if (result.isFailure) {
-      DataProvider.handleApiError(result.failure, onNoInternet: _onNoInternet);
+      await DataProvider.handleApiError(
+        result.failure,
+        onNoInternet: _onNoInternet,
+      );
       return false;
     } else {
       return await upsertMultiple(result.success, synchronized: true);
     }
   }
 
+  Future<void> _resolveConflict(
+      ConflictResolution conflictResolution, List<T> records) async {
+    switch (conflictResolution) {
+      case ConflictResolution.automatic:
+        _logger.w("solving conflict automatically");
+        for (final record in records) {
+          // check if this record causes a conflict
+          final result = await api.putSingle(record);
+          // if record causes conflict delete it
+          if (result.isFailure) {
+            _logger.w("hard deleting record $record");
+            db.hardDeleteSingle(record.id);
+          }
+        }
+        break;
+      case ConflictResolution.manual:
+        _logger.w("solving conflict manually");
+        break;
+    }
+  }
+
+  Future<bool> _pushEntriesToServer(List<T> records) async {
+    final result = await api.putMultiple(records);
+    if (result.isFailure) {
+      final conflictResolution =
+          await DataProvider.handleApiError(result.failure);
+      if (conflictResolution != null) {
+        await _resolveConflict(conflictResolution, records);
+        return true;
+      }
+      return false;
+    }
+    return true;
+  }
+
   @override
   Future<bool> pushUpdatedToServer() async {
     final recordsToUpdate = await db.getWithSyncStatus(SyncStatus.updated);
-    final result = await api.putMultiple(recordsToUpdate);
-    if (result.isFailure) {
-      DataProvider.handleApiError(result.failure);
+    if (await _pushEntriesToServer(recordsToUpdate)) {
+      db.setAllUpdatedSynchronized();
+      return true;
+    } else {
       return false;
     }
-    db.setAllUpdatedSynchronized();
-    return true;
   }
 
   @override
   Future<bool> pushCreatedToServer() async {
     final recordsToCreate = await db.getWithSyncStatus(SyncStatus.created);
-    final result = await api.postMultiple(recordsToCreate);
-    if (result.isFailure) {
-      DataProvider.handleApiError(result.failure);
+    if (await _pushEntriesToServer(recordsToCreate)) {
+      db.setAllCreatedSynchronized();
+      return true;
+    } else {
       return false;
     }
-    db.setAllCreatedSynchronized();
-    return true;
   }
 
   Future<T?> getById(Int64 id) async => db.getById(id);

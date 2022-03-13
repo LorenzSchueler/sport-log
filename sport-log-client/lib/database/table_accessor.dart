@@ -58,6 +58,15 @@ abstract class TableAccessor<T extends AtomicEntity> {
       "ORDER BY datetime($tableName.${Columns.datetime}) DESC";
   String get orderByDatetime => orderByDatetimeOfTable(tableName);
 
+  Future<bool> hardDeleteSingle(Int64 id) async {
+    final changes = await database.delete(
+      tableName,
+      where: '${Columns.id} = ?',
+      whereArgs: [id.toInt()],
+    );
+    return changes == 1;
+  }
+
   Future<bool> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
     final changes = await database.update(
       tableName,

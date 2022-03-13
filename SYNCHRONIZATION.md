@@ -31,9 +31,13 @@ All tables (which can be modified by users) have the fields `sync_status integer
 ## Which change wins?
 The system supports multiple clients for the same user account. 
 It is unlikely that entries are created or changed simultaneously on multiple devices but since it is possible it must be dealt with.
+
 Creations should in general not influence each other as long as they do not clash on unique indices.
 If they do clash the entry that reaches the server first wins, regardless of the order in which they are made.
-The same is true for changes.
-This means that a later made changed of an entry will be overridden by an earlier one (w.r.t. arrival on the server).
+Changes of different entries should also not influence each other as log as they do not clash on unique indices.
+If they do clash the same logic as for creations applies.
+For both conflicts on creations and changes of different entries the client will show a dialog in which the user can choose to fix the conflict by hand or let all conflicting entries be hard deleted automatically.
 
-Bug: During downsync incoming creations that clash with local ones currently fail instead of overriding the local ones.
+TODO: Currently this only works for upsync; during downsync incoming changes that clash with local ones currently fail instead of overriding the local ones.
+
+If the user changes the same entry on different devices, the change which reaches the server first wins and the entry on the other device will silently be overridden during the next down sync.
