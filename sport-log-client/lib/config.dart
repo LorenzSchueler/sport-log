@@ -11,7 +11,6 @@ final _logger = Logger('CONFIG');
 
 abstract class Config {
   static late final bool deleteDatabase;
-  static late final bool generateTestData;
   static late final l.Level minLogLevel;
   static late final bool outputRequestJson;
   static late final bool outputRequestHeaders;
@@ -21,9 +20,6 @@ abstract class Config {
   static Future<void> init() async {
     deleteDatabase =
         (dotenv.env['DELETE_DATABASE'] ?? "").parseBool(defaultValue: false);
-
-    generateTestData =
-        (dotenv.env['GENERATE_TEST_DATA'] ?? "").parseBool(defaultValue: false);
 
     final logLevelStr = dotenv.env['LOG_LEVEL'] ?? '';
     switch (logLevelStr.toUpperCase()) {
@@ -65,7 +61,6 @@ abstract class Config {
         .parseBool(defaultValue: false);
 
     _logger.i('Delete database: $deleteDatabase');
-    _logger.i('Generate test data: $generateTestData');
     _logger.i('Min log level: $minLogLevel');
     _logger.i('Output request json: $outputRequestJson');
     _logger.i('Output request headers: $outputRequestHeaders');

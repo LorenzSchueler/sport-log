@@ -9,7 +9,6 @@
 * `ACCESS_TOKEN` (String) maxbox access token needed to create map instances
 * `LOG_LEVEL` (String) set log level (values are `VERBOSE`, `DEBUG`, `INFO`, `WARNING`, `ERROR`, `WTF`, `NOTHING`)
 * `DELETE_DATABASE` (bool) make a clean start – removes and recreates database and removes last sync datetime (default: `false`)
-* `GENERATE_TEST_DATA` (bool) generate test data
 * `OUTPUT_REQUEST_JSON` (bool) log request json
 * `OUTPUT_REQUEST_HEADERS` (bool) log request headers
 * `OUTPUT_RESPONSE_JSON` (bool) log response json

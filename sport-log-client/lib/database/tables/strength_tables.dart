@@ -54,34 +54,6 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
       Column.text(Columns.comments)..nullable(),
     ],
   );
-
-  static MovementTable get _movementTable => AppDatabase.movements;
-  static const movement = Tables.movement;
-  static const deleted = Columns.deleted;
-  static const movementId = Columns.movementId;
-  // TODO remove
-  // this is only needed for test data generation
-  Future<List<StrengthSessionAndMovement>> getSessionsWithMovements() async {
-    // TODO: ignore strength session that have strength sets
-    final records = await AppDatabase.database!.rawQuery(
-      '''
-      SELECT
-        ${table.allColumns},
-        ${_movementTable.table.allColumns}
-      FROM $tableName
-      JOIN $movement ON $movement.id = $tableName.$movementId
-      WHERE $tableName.$deleted = 0
-        AND $movement.$deleted = 0;
-    ''',
-    );
-    return records.mapToList(
-      (r) => StrengthSessionAndMovement(
-        session: serde.fromDbRecord(r, prefix: table.prefix),
-        movement: _movementTable.serde
-            .fromDbRecord(r, prefix: _movementTable.table.prefix),
-      ),
-    );
-  }
 }
 
 class StrengthSetTable extends TableAccessor<StrengthSet> {

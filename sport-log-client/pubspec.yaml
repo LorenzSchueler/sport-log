@@ -45,7 +45,7 @@ dependencies:
   result_type: ^0.1.0 # convenience for returning something that can either be a success or failure
   intl: ^0.17.0  # used for date formatting
   sqflite: ^2.0.0+3 # sqlite database
-  expansion_tile_card: ^2.0.0 # ui
+  expansion_tile_card: ^2.0.0 # ui movement overview
   flutter_rounded_date_picker: ^2.0.2 # ui (standard time picker has a weird clock division)
   logger: ^1.0.0
   fl_chart: ^0.45.0
@@ -55,7 +55,6 @@ dependencies:
   flutter_keyboard_visibility: ^5.0.3
   url_launcher: ^6.0.20
   flutter_dotenv: ^5.0.2
-
   mapbox_gl: ^0.15.0 # mapping lib for osm
   mapbox_api: ^1.0.0
   flutter_polyline_points: ^1.0.0
