@@ -27,23 +27,3 @@ Future<bool?> showApproveDialog(
 Future<bool?> showDiscardWarningDialog(BuildContext context) {
   return showApproveDialog(context, 'Discard changes', 'Changes will be lost.');
 }
-
-Future<void> showWarning(
-  BuildContext context,
-  String title,
-  String description,
-) {
-  return showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text(title),
-      content: Text(description),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Ok'),
-        ),
-      ],
-    ),
-  );
-}

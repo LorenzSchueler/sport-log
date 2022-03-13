@@ -42,7 +42,7 @@ class SettingsPageState extends State<SettingsPage> {
             const CaptionTile(caption: "Server Settings"),
             Defaults.sizedBox.vertical.small,
             EditTile(
-              caption: "Server Synchonization",
+              caption: "Server Synchronization",
               child: SizedBox(
                 height: 20,
                 width: 34,
@@ -92,7 +92,7 @@ class SettingsPageState extends State<SettingsPage> {
               TextFormField(
                 decoration: const InputDecoration(
                   icon: Icon(AppIcons.timeInterval),
-                  labelText: "Synchonization Interval (min)",
+                  labelText: "Synchronization Interval (min)",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
                 keyboardType: TextInputType.number,
