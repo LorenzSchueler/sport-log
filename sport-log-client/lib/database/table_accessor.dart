@@ -19,9 +19,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
 
   String get tableName => table.name;
 
-  Database get database {
-    return AppDatabase.database!;
-  }
+  Database get database => AppDatabase.database!;
 
   String get idAndDeletedAndStatus => '''
     id integer primary key,
@@ -36,16 +34,29 @@ abstract class TableAccessor<T extends AtomicEntity> {
     end;
   ''';
 
-  String get notDeleted => '${Columns.deleted} = 0';
-  String fromFilter(DateTime? from) =>
+  static String get notDeletedOfTable => '${Columns.deleted} = 0';
+  String get notDeleted => notDeletedOfTable;
+
+  static String fromFilterOfTable(String tableName, DateTime? from) =>
       from == null ? '' : 'AND $tableName.${Columns.datetime} >= ?';
-  String untilFilter(DateTime? until) =>
+  String fromFilter(DateTime? from) => fromFilterOfTable(tableName, from);
+
+  static String untilFilterOfTable(String tableName, DateTime? until) =>
       until == null ? '' : 'AND $tableName.${Columns.datetime} < ?';
-  String movementIdFilter(Int64? movementId) =>
+  String untilFilter(DateTime? until) => untilFilterOfTable(tableName, until);
+
+  static String movementIdFilterOfTable(String tableName, Int64? movementId) =>
       movementId == null ? '' : 'AND $tableName.${Columns.movementId} = ?';
-  String get groupById => "GROUP BY $tableName.${Columns.id}";
-  String get orderByDatetime =>
+  String movementIdFilter(Int64? movementId) =>
+      movementIdFilterOfTable(tableName, movementId);
+
+  static String groupByIdOfTable(String tableName) =>
+      "GROUP BY $tableName.${Columns.id}";
+  String get groupById => groupByIdOfTable(tableName);
+
+  static String orderByDatetimeOfTable(String tableName) =>
       "ORDER BY datetime($tableName.${Columns.datetime}) DESC";
+  String get orderByDatetime => orderByDatetimeOfTable(tableName);
 
   Future<bool> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
     final changes = await database.update(
@@ -152,7 +163,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
     return result.map(serde.fromDbRecord).toList();
   }
 
-  Future<T?> getSingle(Int64 id) async {
+  Future<T?> getById(Int64 id) async {
     final result = await database
         .query(tableName, where: "${Columns.id} = ?", whereArgs: [id.toInt()]);
     return result.isEmpty ? null : serde.fromDbRecord(result.first);

@@ -36,7 +36,7 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
 
 class MovementDescriptionDataProvider
     extends DataProvider<MovementDescription> {
-  final _db = AppDatabase.movements;
+  final _movementDescriptionDb = AppDatabase.movementDescriptions;
 
   final _dataProvider = MovementDataProvider.instance;
 
@@ -67,7 +67,7 @@ class MovementDescriptionDataProvider
 
   @override
   Future<List<MovementDescription>> getNonDeleted() async {
-    return await _db.getNonDeletedMovementDescriptions();
+    return await _movementDescriptionDb.getNonDeleted();
   }
 
   @override
@@ -89,7 +89,7 @@ class MovementDescriptionDataProvider
     String? name, {
     bool cardioOnly = false,
   }) async {
-    return await _db.getMovementDescriptionsByName(
+    return await _movementDescriptionDb.getByName(
       name,
       cardioOnly: cardioOnly,
     );

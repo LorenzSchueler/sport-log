@@ -104,6 +104,32 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     return true;
   }
 
+  Future<bool> createMultiple(List<T> objects) async {
+    assert(objects.every((element) => element.isValid()));
+    if (!await db.createMultiple(objects)) {
+      return false;
+    }
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> updateMultiple(List<T> objects) async {
+    assert(objects.every((element) => element.isValid()));
+    if (!await db.updateMultiple(objects)) {
+      return false;
+    }
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> deleteMultiple(List<T> objects) async {
+    if (!await db.deleteMultiple(objects)) {
+      return false;
+    }
+    notifyListeners();
+    return true;
+  }
+
   @override
   Future<List<T>> getNonDeleted() async => db.getNonDeleted();
 
@@ -142,7 +168,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     return true;
   }
 
-  Future<T?> getById(Int64 id) async => db.getSingle(id);
+  Future<T?> getById(Int64 id) async => db.getById(id);
 
   Future<bool> upsertFromAccountData(AccountData accountData) async {
     return await upsertMultiple(

@@ -28,7 +28,7 @@ class AppDatabase {
       version: 1,
       onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
       onCreate: (db, version) async {
-        for (final table in allTables) {
+        for (final table in allAtomicEntityTables) {
           _logger.d("Creating table: ${table.tableName}");
           for (final statement in table.setupSql) {
             if (Config.outputDbStatement) {
@@ -70,7 +70,7 @@ class AppDatabase {
   static final actionRules = ActionRuleTable();
   static final actionEvents = ActionEventTable();
 
-  static List<TableAccessor> get allTables => [
+  static List<TableAccessor> get allAtomicEntityTables => [
         diaries,
         wods,
         movements,
@@ -88,4 +88,8 @@ class AppDatabase {
         actionRules,
         actionEvents,
       ];
+
+  static final cardioSessionDescriptions = CardioSessionDescriptionTable();
+  static final strengthSessionDescriptions = StrengthSessionDescriptionTable();
+  static final movementDescriptions = MovementDescriptionTable();
 }

@@ -4,6 +4,7 @@ import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/database/tables/metcon_tables.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/metcon/all.dart';
@@ -31,11 +32,16 @@ class MetconMovementDataProvider extends EntityDataProvider<MetconMovement> {
   final Api<MetconMovement> api = Api.metconMovements;
 
   @override
-  final TableAccessor<MetconMovement> db = AppDatabase.metconMovements;
+  final MetconMovementTable db = AppDatabase.metconMovements;
 
   @override
   List<MetconMovement> getFromAccountData(AccountData accountData) =>
       accountData.metconMovements;
+
+  Future<List<MetconMovement>> getByMetcon(Int64 metconId) =>
+      db.getByMetcon(metconId);
+
+  Future<void> deleteByMetcon(Int64 metconId) => db.deleteByMetcon(metconId);
 }
 
 class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
@@ -46,22 +52,32 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
   final Api<MetconSession> api = Api.metconSessions;
 
   @override
-  final TableAccessor<MetconSession> db = AppDatabase.metconSessions;
+  final MetconSessionTable db = AppDatabase.metconSessions;
 
   @override
   List<MetconSession> getFromAccountData(AccountData accountData) =>
       accountData.metconSessions;
+
+  Future<bool> existsByMetcon(Int64 metconId) => db.existsByMetcon(metconId);
+
+  Future<List<MetconSession>> getByTimerangeAndMovement({
+    Int64? movementIdValue,
+    DateTime? from,
+    DateTime? until,
+  }) =>
+      db.getByTimerangeAndMovement(
+        movementIdValue: movementIdValue,
+        from: from,
+        until: until,
+      );
 }
 
 class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
-  final _metconDb = AppDatabase.metcons;
-  final _metconMovementDb = AppDatabase.metconMovements;
-  final _movementDb = AppDatabase.movements;
-  final _metconSessionDb = AppDatabase.metconSessions;
-
   final _metconDataProvider = MetconDataProvider.instance;
   final _metconMovementDataProvider = MetconMovementDataProvider.instance;
   final _movementDataProvider = MovementDataProvider.instance;
+  final _metconSessionDataProvider =
+      MetconSessionDataProvider.instance; // don't forward notifications
 
   MetconDescriptionDataProvider._();
   static MetconDescriptionDataProvider? _instance;
@@ -79,10 +95,10 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   @override
   Future<bool> createSingle(MetconDescription object) async {
     assert(object.isValid());
-    if (!await _metconDb.createSingle(object.metcon)) {
+    if (!await _metconDataProvider.createSingle(object.metcon)) {
       return false;
     }
-    return await _metconMovementDb.createMultiple(
+    return await _metconMovementDataProvider.createMultiple(
       object.moves.map((mmd) => mmd.metconMovement).toList(),
     );
   }
@@ -91,39 +107,41 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   Future<bool> updateSingle(MetconDescription object) async {
     assert(object.isValid());
 
-    final oldMMovements = await _metconMovementDb.getByMetcon(object.metcon.id);
+    final oldMMovements =
+        await _metconMovementDataProvider.getByMetcon(object.metcon.id);
     final newMMovements = [...object.moves.map((m) => m.metconMovement)];
 
     final diffing = diff(oldMMovements, newMMovements);
 
-    if (!await _metconDb.updateSingle(object.metcon)) {
+    if (!await _metconDataProvider.updateSingle(object.metcon)) {
       return false;
     }
-    if (!await _metconMovementDb.deleteMultiple(diffing.toDelete)) {
+    if (!await _metconMovementDataProvider.deleteMultiple(diffing.toDelete)) {
       return false;
     }
-    if (!await _metconMovementDb.updateMultiple(diffing.toUpdate)) {
+    if (!await _metconMovementDataProvider.updateMultiple(diffing.toUpdate)) {
       return false;
     }
-    return await _metconMovementDb.createMultiple(diffing.toCreate);
+    return await _metconMovementDataProvider.createMultiple(diffing.toCreate);
   }
 
   @override
   Future<bool> deleteSingle(MetconDescription object) async {
     object.setDeleted();
-    await _metconMovementDb.deleteByMetcon(object.metcon.id);
-    return await _metconDb.deleteSingle(object.metcon.id);
+    await _metconMovementDataProvider.deleteByMetcon(object.metcon.id);
+    return await _metconDataProvider.deleteSingle(object.metcon);
   }
 
   @override
   Future<List<MetconDescription>> getNonDeleted() async {
     return Future.wait(
-      (await _metconDb.getNonDeleted())
+      (await _metconDataProvider.getNonDeleted())
           .map(
             (metcon) async => MetconDescription(
               metcon: metcon,
               moves: await _getMmdByMetcon(metcon.id),
-              hasReference: await _metconSessionDb.existsByMetcon(metcon.id),
+              hasReference:
+                  await _metconSessionDataProvider.existsByMetcon(metcon.id),
             ),
           )
           .toList(),
@@ -155,13 +173,13 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   }
 
   Future<List<MetconMovementDescription>> _getMmdByMetcon(Int64 id) async {
-    final metconMovements = await _metconMovementDb.getByMetcon(id);
+    final metconMovements = await _metconMovementDataProvider.getByMetcon(id);
     return Future.wait(
       metconMovements
           .map(
             (mm) async => MetconMovementDescription(
               metconMovement: mm,
-              movement: (await _movementDb.getSingle(mm.movementId))!,
+              movement: (await _movementDataProvider.getById(mm.movementId))!,
             ),
           )
           .toList(),
@@ -176,15 +194,13 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     return MetconDescription(
       metcon: metcon,
       moves: await _getMmdByMetcon(metcon.id),
-      hasReference: await _metconSessionDb.existsByMetcon(metcon.id),
+      hasReference: await _metconSessionDataProvider.existsByMetcon(metcon.id),
     );
   }
 }
 
 class MetconSessionDescriptionDataProvider
     extends DataProvider<MetconSessionDescription> {
-  final _metconSessionDb = AppDatabase.metconSessions;
-
   final _metconSessionDataProvider = MetconSessionDataProvider.instance;
   final _metconDataProvider = MetconDataProvider.instance;
   final _metconMovementDataProvider = MetconMovementDataProvider.instance;
@@ -259,7 +275,7 @@ class MetconSessionDescriptionDataProvider
     DateTime? until,
   }) async {
     return await _mapToDescription(
-      await _metconSessionDb.getByTimerangeAndMovement(
+      await _metconSessionDataProvider.getByTimerangeAndMovement(
         from: from,
         until: until,
         movementIdValue: movementId,

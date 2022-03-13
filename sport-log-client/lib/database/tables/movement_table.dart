@@ -1,6 +1,6 @@
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/table.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 
 class MovementTable extends TableAccessor<Movement> {
@@ -35,117 +35,14 @@ class MovementTable extends TableAccessor<Movement> {
   );
 
   static const cardioSession = Tables.cardioSession;
+  static const metconMovement = Tables.metconMovement;
+  static const strengthSession = Tables.strengthSession;
+
   static const deleted = Columns.deleted;
   static const id = Columns.id;
-  static const metconMovement = Tables.metconMovement;
-  static const movementId = Columns.movementId;
   static const name = Columns.name;
-  static const strengthSession = Tables.strengthSession;
   static const dimension = Columns.dimension;
   static const userId = Columns.userId;
-
-  final _logger = Logger('MovementTable');
-
-  Future<List<MovementDescription>> getNonDeletedMovementDescriptions() async {
-    final now = DateTime.now();
-    const hasReference = 'has_reference';
-    final records = await database.rawQuery(
-      '''
-    SELECT
-      ${table.allColumns},
-      (
-        EXISTS (
-          SELECT * FROM $metconMovement
-          WHERE $metconMovement.$movementId = $tableName.$id
-        ) OR EXISTS (
-          SELECT * FROM $cardioSession
-          WHERE $cardioSession.$movementId = $tableName.$id
-        ) OR EXISTS (
-          SELECT * FROM $strengthSession
-          WHERE $strengthSession.$movementId = $tableName.$id
-        )
-      ) AS $hasReference
-    FROM $tableName
-    WHERE $tableName.$deleted = 0
-      AND ($userId IS NOT NULL
-        OR NOT EXISTS (
-          SELECT * FROM $tableName m2
-          WHERE $tableName.$id <> m2.$id
-            AND $tableName.$name = m2.$name
-            AND $tableName.$dimension = m2.$dimension
-            AND m2.$userId IS NOT NULL
-        )
-      )
-    ORDER BY $name COLLATE NOCASE
-    ''',
-    );
-    _logger.d(
-      'Select movement descriptions: ' +
-          DateTime.now().difference(now).toString(),
-    );
-    return records
-        .map(
-          (r) => MovementDescription(
-            movement: serde.fromDbRecord(r, prefix: table.prefix),
-            hasReference: r[hasReference]! as int == 1,
-          ),
-        )
-        .toList();
-  }
-
-  Future<List<MovementDescription>> getMovementDescriptionsByName(
-    String? byName, {
-    bool cardioOnly = false,
-  }) async {
-    final now = DateTime.now();
-    const hasReference = 'has_reference';
-    final nameFilter = byName != null ? 'AND $name LIKE ?' : '';
-    final cardioFilter = cardioOnly == true ? 'AND cardio = true' : '';
-    final records = await database.rawQuery(
-      '''
-    SELECT
-      ${table.allColumns},
-      (
-        EXISTS (
-          SELECT * FROM $metconMovement
-          WHERE $metconMovement.$movementId = $tableName.$id
-        ) OR EXISTS (
-          SELECT * FROM $cardioSession
-          WHERE $cardioSession.$movementId = $tableName.$id
-        ) OR EXISTS (
-          SELECT * FROM $strengthSession
-          WHERE $strengthSession.$movementId = $tableName.$id
-        )
-      ) AS $hasReference
-    FROM $tableName
-    WHERE $tableName.$deleted = 0
-      $nameFilter
-      $cardioFilter
-      AND ($userId IS NOT NULL
-        OR NOT EXISTS (
-          SELECT * FROM $tableName m2
-          WHERE $tableName.$id <> m2.$id
-            AND $tableName.$name = m2.$name
-            AND $tableName.$dimension = m2.$dimension
-            AND m2.$userId IS NOT NULL
-        )
-      )
-    ORDER BY $name COLLATE NOCASE
-    ''',
-    );
-    _logger.d(
-      'Select movement descriptions: ' +
-          DateTime.now().difference(now).toString(),
-    );
-    return records
-        .map(
-          (r) => MovementDescription(
-            movement: serde.fromDbRecord(r, prefix: table.prefix),
-            hasReference: r[hasReference]! as int == 1,
-          ),
-        )
-        .toList();
-  }
 
   Future<List<Movement>> getByName(
     String? byName, {
@@ -186,5 +83,114 @@ class MovementTable extends TableAccessor<Movement> {
       [nameValue, dimValue.index],
     );
     return result.isNotEmpty;
+  }
+}
+
+class MovementDescriptionTable {
+  static const cardioSession = Tables.cardioSession;
+  static const strengthSession = Tables.strengthSession;
+  static const metconMovement = Tables.metconMovement;
+  static const movement = Tables.movement;
+
+  static const deleted = Columns.deleted;
+  static const id = Columns.id;
+  static const movementId = Columns.movementId;
+  static const name = Columns.name;
+  static const dimension = Columns.dimension;
+  static const userId = Columns.userId;
+
+  static MovementTable get _movementTable => AppDatabase.movements;
+
+  Future<List<MovementDescription>> getNonDeleted() async {
+    const hasReference = 'has_reference';
+    final records = await AppDatabase.database!.rawQuery(
+      '''
+    SELECT
+      ${_movementTable.table.allColumns},
+      (
+        EXISTS (
+          SELECT * FROM $metconMovement
+          WHERE $metconMovement.$movementId = $movement.$id
+        ) OR EXISTS (
+          SELECT * FROM $cardioSession
+          WHERE $cardioSession.$movementId = $movement.$id
+        ) OR EXISTS (
+          SELECT * FROM $strengthSession
+          WHERE $strengthSession.$movementId = $movement.$id
+        )
+      ) AS $hasReference
+    FROM $movement
+    WHERE $movement.$deleted = 0
+      AND ($userId IS NOT NULL
+        OR NOT EXISTS (
+          SELECT * FROM $movement m2
+          WHERE $movement.$id <> m2.$id
+            AND $movement.$name = m2.$name
+            AND $movement.$dimension = m2.$dimension
+            AND m2.$userId IS NOT NULL
+        )
+      )
+    ORDER BY $name COLLATE NOCASE
+    ''',
+    );
+    return records
+        .map(
+          (r) => MovementDescription(
+            movement: _movementTable.serde
+                .fromDbRecord(r, prefix: _movementTable.table.prefix),
+            hasReference: r[hasReference]! as int == 1,
+          ),
+        )
+        .toList();
+  }
+
+  Future<List<MovementDescription>> getByName(
+    String? byName, {
+    bool cardioOnly = false,
+  }) async {
+    const hasReference = 'has_reference';
+    final nameFilter = byName != null ? 'AND $name LIKE ?' : '';
+    final cardioFilter = cardioOnly == true ? 'AND cardio = true' : '';
+    final records = await AppDatabase.database!.rawQuery(
+      '''
+    SELECT
+      ${_movementTable.table.allColumns},
+      (
+        EXISTS (
+          SELECT * FROM $metconMovement
+          WHERE $metconMovement.$movementId = $movement.$id
+        ) OR EXISTS (
+          SELECT * FROM $cardioSession
+          WHERE $cardioSession.$movementId = $movement.$id
+        ) OR EXISTS (
+          SELECT * FROM $strengthSession
+          WHERE $strengthSession.$movementId = $movement.$id
+        )
+      ) AS $hasReference
+    FROM $movement
+    WHERE $movement.$deleted = 0
+      $nameFilter
+      $cardioFilter
+      AND ($userId IS NOT NULL
+        OR NOT EXISTS (
+          SELECT * FROM $movement m2
+          WHERE $movement.$id <> m2.$id
+            AND $movement.$name = m2.$name
+            AND $movement.$dimension = m2.$dimension
+            AND m2.$userId IS NOT NULL
+        )
+      )
+    ORDER BY $name COLLATE NOCASE
+    ''',
+    );
+    return records
+        .map(
+          (r) => MovementDescription(
+            movement: _movementTable.serde
+                .fromDbRecord(r, prefix: _movementTable.table.prefix),
+            hasReference: r[hasReference]! as int == 1,
+          ),
+        )
+        .toList();
   }
 }

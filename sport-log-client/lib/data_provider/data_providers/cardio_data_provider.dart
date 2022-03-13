@@ -39,7 +39,7 @@ class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
 
 class CardioSessionDescriptionDataProvider
     extends DataProvider<CardioSessionDescription> {
-  final _cardioDb = AppDatabase.cardioSessions;
+  final _cardioSessionDescriptionDb = AppDatabase.cardioSessionDescriptions;
 
   final _cardioDataProvider = CardioSessionDataProvider.instance;
   final _routeDataProvider = RouteDataProvider.instance;
@@ -114,7 +114,7 @@ class CardioSessionDescriptionDataProvider
     DateTime? from,
     DateTime? until,
   }) async {
-    return _cardioDb.getByTimerangeAndMovement(
+    return _cardioSessionDescriptionDb.getByTimerangeAndMovement(
       from: from,
       until: until,
       movementIdValue: movementId,

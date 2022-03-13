@@ -6,7 +6,6 @@ import 'package:sport_log/database/tables/movement_table.dart';
 import 'package:sport_log/helpers/eorm.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 
 class StrengthSessionAndMovement {
@@ -19,8 +18,6 @@ class StrengthSessionAndMovement {
 }
 
 class StrengthSessionTable extends TableAccessor<StrengthSession> {
-  final _logger = Logger('StrengthSessionTable');
-
   @override
   DbSerializer<StrengthSession> get serde => DbStrengthSessionSerializer();
 
@@ -28,13 +25,13 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
   List<String> get setupSql => [
         ...super.setupSql,
         '''
-        CREATE TABLE $eorm (
-          $eormReps INTEGER PRIMARY KEY CHECK ($eormReps >= 1),
-          $eormPercentage REAL NOT NULL CHECK ($eormPercentage > 0)
+        CREATE TABLE ${Tables.eorm} (
+          ${Columns.eormReps} INTEGER PRIMARY KEY CHECK (${Columns.eormReps} >= 1),
+          ${Columns.eormPercentage} REAL NOT NULL CHECK (${Columns.eormPercentage} > 0)
         );
         ''',
         '''
-        INSERT INTO $eorm ($eormReps, $eormPercentage) VALUES $eormValuesSql;
+        INSERT INTO ${Tables.eorm} (${Columns.eormReps}, ${Columns.eormPercentage}) VALUES $eormValuesSql;
         ''',
       ];
 
@@ -58,100 +55,15 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
     ],
   );
 
-  static const count = Columns.count;
-  static const datetime = Columns.datetime;
-  static const deleted = Columns.deleted;
-  static const eormPercentage = Columns.eormPercentage;
-  static const eormReps = Columns.eormReps;
-  static const id = Columns.id;
-  static const maxCount = Columns.maxCount;
-  static const maxEorm = Columns.maxEorm;
-  static const maxWeight = Columns.maxWeight;
-  static const minCount = Columns.minCount;
-  static const movementId = Columns.movementId;
-  static const name = Columns.name;
-  static const numSets = Columns.numSets;
-  static const setNumber = Columns.setNumber;
-  static const strengthSessionId = Columns.strengthSessionId;
-  static const sumCount = Columns.sumCount;
-  static const sumVolume = Columns.sumVolume;
-  static const weight = Columns.weight;
-
-  static const strengthSet = Tables.strengthSet;
-  static const movement = Tables.movement;
-  static const eorm = Tables.eorm;
-
   static MovementTable get _movementTable => AppDatabase.movements;
-  static StrengthSetTable get _strengthSetTable => AppDatabase.strengthSets;
-
-  Future<StrengthSessionDescription?> getById(Int64 idValue) async {
-    final records = await database.rawQuery(
-      '''
-      SELECT
-        ${table.allColumns},
-        ${_movementTable.table.allColumns}
-      FROM $tableName
-        JOIN $movement ON $movement.$id = $tableName.$movementId
-      WHERE $tableName.$deleted = 0
-        AND $movement.$deleted = 0
-        AND $tableName.$id = ?;
-    ''',
-      [idValue.toInt()],
-    );
-    if (records.isEmpty) {
-      return null;
-    }
-    return StrengthSessionDescription(
-      session: serde.fromDbRecord(records.first, prefix: table.prefix),
-      movement: _movementTable.serde
-          .fromDbRecord(records.first, prefix: _movementTable.table.prefix),
-      sets: await _strengthSetTable.getByStrengthSession(idValue),
-    );
-  }
-
-  Future<List<StrengthSessionDescription>> getByTimerangeAndMovement({
-    Int64? movementIdValue,
-    DateTime? from,
-    DateTime? until,
-  }) async {
-    final records = await database.rawQuery('''
-      SELECT
-        ${table.allColumns},
-        ${_movementTable.table.allColumns}
-      FROM $tableName
-      JOIN $movement ON $movement.$id = $tableName.$movementId
-      WHERE $movement.$deleted = 0
-        AND $tableName.$deleted = 0
-        ${fromFilter(from)}
-        ${untilFilter(until)}
-        ${movementIdFilter(movementIdValue)}
-      $groupById
-      $orderByDatetime
-      ;
-    ''', [
-      if (from != null) from.toString(),
-      if (until != null) until.toString(),
-      if (movementIdValue != null) movementIdValue.toInt(),
-    ]);
-    List<StrengthSessionDescription> strengthSessionDescriptions = [];
-    for (Map<String, Object?> record in records) {
-      final session = serde.fromDbRecord(record, prefix: table.prefix);
-      strengthSessionDescriptions.add(
-        StrengthSessionDescription(
-          session: session,
-          sets: await _strengthSetTable.getByStrengthSession(session.id),
-          movement: _movementTable.serde
-              .fromDbRecord(record, prefix: _movementTable.table.prefix),
-        ),
-      );
-    }
-    return strengthSessionDescriptions;
-  }
-
+  static const movement = Tables.movement;
+  static const deleted = Columns.deleted;
+  static const movementId = Columns.movementId;
+  // TODO remove
   // this is only needed for test data generation
   Future<List<StrengthSessionAndMovement>> getSessionsWithMovements() async {
     // TODO: ignore strength session that have strength sets
-    final records = await database.rawQuery(
+    final records = await AppDatabase.database!.rawQuery(
       '''
       SELECT
         ${table.allColumns},
@@ -169,140 +81,6 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
             .fromDbRecord(r, prefix: _movementTable.table.prefix),
       ),
     );
-  }
-
-  Future<List<StrengthSet>> getSetsOnDay({
-    required DateTime date,
-    required Int64 movementIdValue,
-  }) async {
-    final start = date.beginningOfDay();
-    final end = date.endOfDay();
-    final records = await database.rawQuery(
-      '''
-      SELECT
-        ${_strengthSetTable.table.allColumns}
-      FROM $tableName
-        JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
-      WHERE $strengthSet.$deleted = 0
-        AND $tableName.$deleted = 0
-        AND $tableName.$datetime >= ?
-        AND $tableName.$datetime < ?
-        AND $tableName.$movementId = ?
-      ORDER BY $tableName.$datetime, $tableName.$id, $strengthSet.$setNumber;
-    ''',
-      [start.toString(), end.toString(), movementIdValue.toInt()],
-    );
-    return records.mapToList(
-      (record) => _strengthSetTable.serde
-          .fromDbRecord(record, prefix: _strengthSetTable.table.prefix),
-    );
-  }
-
-  Future<List<StrengthSessionStats>> getStatsAggregationsByDay({
-    required Int64 movementIdValue,
-    required DateTime from,
-    required DateTime until,
-  }) async {
-    final records = await database.rawQuery(
-      '''
-      SELECT
-        $tableName.$datetime AS [$datetime],
-        date($tableName.$datetime) AS [date],
-        COUNT($strengthSet.$id) AS $numSets,
-        MIN($strengthSet.$count) AS $minCount,
-        MAX($strengthSet.$count) AS $maxCount,
-        SUM($strengthSet.$count) AS $sumCount,
-        MAX($strengthSet.$weight) AS $maxWeight,
-        SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
-        MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
-      FROM $tableName
-        JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
-        LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
-      WHERE $strengthSet.$deleted = 0
-        AND $tableName.$deleted = 0
-        AND $tableName.$movementId = ?
-        AND $tableName.$datetime >= ?
-        AND $tableName.$datetime < ?
-      GROUP BY [date]
-      ORDER BY [date];
-     ''',
-      [movementIdValue.toInt(), from.toString(), until.toString()],
-    );
-    _logger.d(records);
-    return records
-        .map((record) => StrengthSessionStats.fromDbRecord(record))
-        .toList();
-  }
-
-  Future<List<StrengthSessionStats>> getStatsAggregationsByWeek({
-    required Int64 movementIdValue,
-    required DateTime from,
-    required DateTime until,
-  }) async {
-    assert(
-      from.year == until.year || from.beginningOfYear().yearLater() == until,
-    );
-    final records = await database.rawQuery(
-      '''
-      SELECT
-        $tableName.$datetime AS [$datetime],
-        strftime('%W', $tableName.$datetime) AS week,
-        COUNT($strengthSet.$id) AS $numSets,
-        MIN($strengthSet.$count) AS $minCount,
-        MAX($strengthSet.$count) AS $maxCount,
-        SUM($strengthSet.$count) AS $sumCount,
-        MAX($strengthSet.$weight) AS $maxWeight,
-        SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
-        MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
-      FROM $tableName
-        JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
-        LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
-      WHERE $strengthSet.$deleted = 0
-        AND $tableName.$deleted = 0
-        AND $tableName.$movementId = ?
-        AND $tableName.$datetime >= ?
-        AND $tableName.$datetime < ?
-      GROUP BY week
-      ORDER BY week;
-    ''',
-      [movementIdValue.toInt(), from.toString(), until.toString()],
-    );
-    _logger.d(records);
-    return records
-        .map((record) => StrengthSessionStats.fromDbRecord(record))
-        .toList();
-  }
-
-  Future<List<StrengthSessionStats>> getStatsAggregationsByMonth({
-    required Int64 movementIdValue,
-  }) async {
-    final records = await database.rawQuery(
-      '''
-      SELECT
-        $tableName.$datetime AS [$datetime],
-        strftime('%Y_%m', $tableName.$datetime) AS month,
-        COUNT($strengthSet.$id) AS $numSets,
-        MIN($strengthSet.$count) AS $minCount,
-        MAX($strengthSet.$count) AS $maxCount,
-        SUM($strengthSet.$count) AS $sumCount,
-        MAX($strengthSet.$weight) AS $maxWeight,
-        SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
-        MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
-      FROM $tableName
-        JOIN $strengthSet ON $strengthSet.$strengthSessionId = $tableName.$id
-        LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
-      WHERE $strengthSet.$deleted = 0
-        AND $tableName.$deleted = 0
-        AND $tableName.$movementId = ?
-      GROUP BY month
-      ORDER BY month;
-    ''',
-      [movementIdValue.toInt()],
-    );
-    _logger.d(records);
-    return records
-        .map((record) => StrengthSessionStats.fromDbRecord(record))
-        .toList();
   }
 }
 
@@ -355,5 +133,236 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
       where: '${Columns.strengthSessionId} = ? AND ${Columns.deleted} = 0',
       whereArgs: [id.toInt()],
     );
+  }
+}
+
+class StrengthSessionDescriptionTable {
+  static const count = Columns.count;
+  static const datetime = Columns.datetime;
+  static const deleted = Columns.deleted;
+  static const eormPercentage = Columns.eormPercentage;
+  static const eormReps = Columns.eormReps;
+  static const id = Columns.id;
+  static const maxCount = Columns.maxCount;
+  static const maxEorm = Columns.maxEorm;
+  static const maxWeight = Columns.maxWeight;
+  static const minCount = Columns.minCount;
+  static const movementId = Columns.movementId;
+  static const name = Columns.name;
+  static const numSets = Columns.numSets;
+  static const setNumber = Columns.setNumber;
+  static const strengthSessionId = Columns.strengthSessionId;
+  static const sumCount = Columns.sumCount;
+  static const sumVolume = Columns.sumVolume;
+  static const weight = Columns.weight;
+
+  static const strengthSession = Tables.strengthSession;
+  static const strengthSet = Tables.strengthSet;
+  static const movement = Tables.movement;
+  static const eorm = Tables.eorm;
+
+  static StrengthSessionTable get _strengthSessionTable =>
+      AppDatabase.strengthSessions;
+
+  static MovementTable get _movementTable => AppDatabase.movements;
+  static StrengthSetTable get _strengthSetTable => AppDatabase.strengthSets;
+
+  Future<StrengthSessionDescription?> getById(Int64 idValue) async {
+    final records = await AppDatabase.database!.rawQuery(
+      '''
+      SELECT
+        ${_strengthSessionTable.table.allColumns},
+        ${_movementTable.table.allColumns}
+      FROM $strengthSession
+        JOIN $movement ON $movement.$id = $strengthSession.$movementId
+      WHERE $strengthSession.$deleted = 0
+        AND $movement.$deleted = 0
+        AND $strengthSession.$id = ?;
+    ''',
+      [idValue.toInt()],
+    );
+    if (records.isEmpty) {
+      return null;
+    }
+    return StrengthSessionDescription(
+      session: _strengthSessionTable.serde.fromDbRecord(
+        records.first,
+        prefix: _strengthSessionTable.table.prefix,
+      ),
+      movement: _movementTable.serde
+          .fromDbRecord(records.first, prefix: _movementTable.table.prefix),
+      sets: await _strengthSetTable.getByStrengthSession(idValue),
+    );
+  }
+
+  Future<List<StrengthSessionDescription>> getByTimerangeAndMovement({
+    Int64? movementIdValue,
+    DateTime? from,
+    DateTime? until,
+  }) async {
+    final records = await AppDatabase.database!.rawQuery('''
+      SELECT
+        ${_strengthSessionTable.table.allColumns},
+        ${_movementTable.table.allColumns}
+      FROM $strengthSession
+      JOIN $movement ON $movement.$id = $strengthSession.$movementId
+      WHERE $movement.$deleted = 0
+        AND $strengthSession.$deleted = 0
+        ${TableAccessor.fromFilterOfTable(strengthSession, from)}
+        ${TableAccessor.untilFilterOfTable(strengthSession, until)}
+        ${TableAccessor.movementIdFilterOfTable(strengthSession, movementIdValue)}
+      ${TableAccessor.groupByIdOfTable(strengthSession)}
+      ${TableAccessor.orderByDatetimeOfTable(strengthSession)}
+      ;
+    ''', [
+      if (from != null) from.toString(),
+      if (until != null) until.toString(),
+      if (movementIdValue != null) movementIdValue.toInt(),
+    ]);
+    List<StrengthSessionDescription> strengthSessionDescriptions = [];
+    for (Map<String, Object?> record in records) {
+      final session = _strengthSessionTable.serde
+          .fromDbRecord(record, prefix: _strengthSessionTable.table.prefix);
+      strengthSessionDescriptions.add(
+        StrengthSessionDescription(
+          session: session,
+          sets: await _strengthSetTable.getByStrengthSession(session.id),
+          movement: _movementTable.serde
+              .fromDbRecord(record, prefix: _movementTable.table.prefix),
+        ),
+      );
+    }
+    return strengthSessionDescriptions;
+  }
+
+  Future<List<StrengthSet>> getSetsOnDay({
+    required DateTime date,
+    required Int64 movementIdValue,
+  }) async {
+    final start = date.beginningOfDay();
+    final end = date.endOfDay();
+    final records = await AppDatabase.database!.rawQuery(
+      '''
+      SELECT
+        ${_strengthSetTable.table.allColumns}
+      FROM $strengthSession
+        JOIN $strengthSet ON $strengthSet.$strengthSessionId = $strengthSession.$id
+      WHERE $strengthSet.$deleted = 0
+        AND $strengthSession.$deleted = 0
+        AND $strengthSession.$datetime >= ?
+        AND $strengthSession.$datetime < ?
+        AND $strengthSession.$movementId = ?
+      ORDER BY $strengthSession.$datetime, $strengthSession.$id, $strengthSet.$setNumber;
+    ''',
+      [start.toString(), end.toString(), movementIdValue.toInt()],
+    );
+    return records.mapToList(
+      (record) => _strengthSetTable.serde
+          .fromDbRecord(record, prefix: _strengthSetTable.table.prefix),
+    );
+  }
+
+  Future<List<StrengthSessionStats>> getStatsAggregationsByDay({
+    required Int64 movementIdValue,
+    required DateTime from,
+    required DateTime until,
+  }) async {
+    final records = await AppDatabase.database!.rawQuery(
+      '''
+      SELECT
+        $strengthSession.$datetime AS [$datetime],
+        date($strengthSession.$datetime) AS [date],
+        COUNT($strengthSet.$id) AS $numSets,
+        MIN($strengthSet.$count) AS $minCount,
+        MAX($strengthSet.$count) AS $maxCount,
+        SUM($strengthSet.$count) AS $sumCount,
+        MAX($strengthSet.$weight) AS $maxWeight,
+        SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
+        MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
+      FROM $strengthSession
+        JOIN $strengthSet ON $strengthSet.$strengthSessionId = $strengthSession.$id
+        LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
+      WHERE $strengthSet.$deleted = 0
+        AND $strengthSession.$deleted = 0
+        AND $strengthSession.$movementId = ?
+        AND $strengthSession.$datetime >= ?
+        AND $strengthSession.$datetime < ?
+      GROUP BY [date]
+      ORDER BY [date];
+     ''',
+      [movementIdValue.toInt(), from.toString(), until.toString()],
+    );
+    return records
+        .map((record) => StrengthSessionStats.fromDbRecord(record))
+        .toList();
+  }
+
+  Future<List<StrengthSessionStats>> getStatsAggregationsByWeek({
+    required Int64 movementIdValue,
+    required DateTime from,
+    required DateTime until,
+  }) async {
+    assert(
+      from.year == until.year || from.beginningOfYear().yearLater() == until,
+    );
+    final records = await AppDatabase.database!.rawQuery(
+      '''
+      SELECT
+        $strengthSession.$datetime AS [$datetime],
+        strftime('%W', $strengthSession.$datetime) AS week,
+        COUNT($strengthSet.$id) AS $numSets,
+        MIN($strengthSet.$count) AS $minCount,
+        MAX($strengthSet.$count) AS $maxCount,
+        SUM($strengthSet.$count) AS $sumCount,
+        MAX($strengthSet.$weight) AS $maxWeight,
+        SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
+        MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
+      FROM $strengthSession
+        JOIN $strengthSet ON $strengthSet.$strengthSessionId = $strengthSession.$id
+        LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
+      WHERE $strengthSet.$deleted = 0
+        AND $strengthSession.$deleted = 0
+        AND $strengthSession.$movementId = ?
+        AND $strengthSession.$datetime >= ?
+        AND $strengthSession.$datetime < ?
+      GROUP BY week
+      ORDER BY week;
+    ''',
+      [movementIdValue.toInt(), from.toString(), until.toString()],
+    );
+    return records
+        .map((record) => StrengthSessionStats.fromDbRecord(record))
+        .toList();
+  }
+
+  Future<List<StrengthSessionStats>> getStatsAggregationsByMonth({
+    required Int64 movementIdValue,
+  }) async {
+    final records = await AppDatabase.database!.rawQuery(
+      '''
+      SELECT
+        $strengthSession.$datetime AS [$datetime],
+        strftime('%Y_%m', $strengthSession.$datetime) AS month,
+        COUNT($strengthSet.$id) AS $numSets,
+        MIN($strengthSet.$count) AS $minCount,
+        MAX($strengthSet.$count) AS $maxCount,
+        SUM($strengthSet.$count) AS $sumCount,
+        MAX($strengthSet.$weight) AS $maxWeight,
+        SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
+        MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
+      FROM $strengthSession
+        JOIN $strengthSet ON $strengthSet.$strengthSessionId = $strengthSession.$id
+        LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
+      WHERE $strengthSet.$deleted = 0
+        AND $strengthSession.$deleted = 0
+        AND $strengthSession.$movementId = ?
+      GROUP BY month
+      ORDER BY month;
+    ''',
+      [movementIdValue.toInt()],
+    );
+    return records
+        .map((record) => StrengthSessionStats.fromDbRecord(record))
+        .toList();
   }
 }
