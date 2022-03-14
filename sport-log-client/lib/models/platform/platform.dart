@@ -34,8 +34,11 @@ class Platform extends AtomicEntity {
 
   @override
   bool isValid() {
-    return validate(name.isNotEmpty, 'Platform: name is empty') &&
-        validate(!deleted, 'Platform: deleted == true');
+    return validate(!deleted, 'Platform: deleted == true') &&
+        validate(
+          name.length >= 2 && name.length <= 80,
+          'Platform: name.length is < 2 or > 80',
+        );
   }
 }
 

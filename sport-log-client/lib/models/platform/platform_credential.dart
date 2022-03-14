@@ -51,10 +51,13 @@ class PlatformCredential extends AtomicEntity {
   bool isValid() {
     return validate(!deleted, 'PlatformCredential: deleted == true') &&
         validate(
-          username.isNotEmpty,
-          'PlatformCredential: username is empty',
+          username.length <= 80,
+          'PlatformCredential: username.length > 80',
         ) &&
-        validate(password.isNotEmpty, 'PlatformCredential: password is empty');
+        validate(
+          password.length <= 80,
+          'PlatformCredential: password.length > 80',
+        );
   }
 }
 

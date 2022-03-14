@@ -107,8 +107,15 @@ class Movement extends AtomicEntity {
 
   @override
   bool isValid() {
-    return validate(name.isNotEmpty, 'Movement: name is empty') &&
-        validate(deleted == false, 'Movement: deleted == true');
+    return validate(!deleted, 'Movement: deleted == true') &&
+        validate(
+          name.length >= 2 && name.length <= 80,
+          'Movement: name.length is < 2 or > 80',
+        ) &&
+        validate(
+          description == null || description!.isNotEmpty,
+          'Movement: desciption is empty but not null',
+        );
   }
 
   @override

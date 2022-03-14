@@ -58,9 +58,14 @@ class Diary extends AtomicEntity {
 
   @override
   bool isValid() {
-    return validate(
+    return validate(!deleted, "Diary: deleted == true") &&
+        validate(
           bodyweight == null || bodyweight! > 0,
           'Diary: bodyweight <= 0',
+        ) &&
+        validate(
+          comments == null || comments!.isNotEmpty,
+          'Diary: comments are empty but not null',
         ) &&
         validate(
           bodyweight != null || comments != null,

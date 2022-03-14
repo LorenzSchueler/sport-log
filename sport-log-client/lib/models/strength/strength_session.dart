@@ -46,10 +46,14 @@ class StrengthSession extends AtomicEntity {
 
   @override
   bool isValid() {
-    return validate(!deleted, 'StrengthSession: deleted is true') &&
+    return validate(!deleted, 'StrengthSession: deleted == true') &&
         validate(
           interval == null || interval!.inSeconds > 0,
           'StrengthSession: interval <= 0',
+        ) &&
+        validate(
+          comments == null || comments!.isNotEmpty,
+          'StrengthSession: comments are empty but not null',
         );
   }
 

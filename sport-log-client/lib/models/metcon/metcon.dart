@@ -119,13 +119,20 @@ class Metcon extends AtomicEntity {
 
   @override
   bool isValid() {
-    return validate(userId != null, 'Metcon: userId == null') &&
-        validate(name.isNotEmpty, 'Metcon: name is empty') &&
-        validate(deleted != true, 'Metcon: deleted == true') &&
+    return validate(!deleted, 'Metcon: deleted == true') &&
+        validate(userId != null, 'Metcon: userId == null') &&
+        validate(
+          name.length >= 2 && name.length <= 80,
+          'Metcon: name.length is < 2 or > 80',
+        ) &&
         validate(rounds == null || rounds! >= 1, 'Metcon: rounds < 1') &&
         validate(
-          timecap == null || timecap! >= const Duration(seconds: 1),
-          'Metcon: timecap < 1s',
+          timecap == null || timecap! >= const Duration(milliseconds: 1),
+          'Metcon: timecap < 1ms',
+        ) &&
+        validate(
+          description == null || description!.isNotEmpty,
+          'Metcon: description is empty but not null',
         ) &&
         validate(validateMetconType(), 'Metcon: metcon type validation failed');
   }

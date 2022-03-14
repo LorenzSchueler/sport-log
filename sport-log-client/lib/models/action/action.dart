@@ -52,8 +52,23 @@ class Action extends AtomicEntity {
 
   @override
   bool isValid() {
-    return validate(name.isNotEmpty, 'Action: name is empty') &&
-        validate(!deleted, 'Action: deleted is true');
+    return validate(!deleted, 'Action: deleted is true') &&
+        validate(
+          name.length >= 2 && name.length <= 80,
+          'Action: name.length < 2 or > 80',
+        ) &&
+        validate(
+          description == null || description!.isNotEmpty,
+          'Action: description is empty but not null',
+        ) &&
+        validate(
+          createBefore > const Duration(),
+          'Action: createBefore < 0',
+        ) &&
+        validate(
+          deleteAfter > const Duration(),
+          'Action: deleteAfter < 0',
+        );
   }
 }
 

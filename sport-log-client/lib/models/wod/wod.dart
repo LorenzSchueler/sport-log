@@ -45,7 +45,11 @@ class Wod extends AtomicEntity {
 
   @override
   bool isValid() {
-    return validate(!deleted, 'Wod: deleted == true');
+    return validate(!deleted, 'Wod: deleted == true') &&
+        validate(
+          description == null || description!.isNotEmpty,
+          "Wod: description is empty but not null",
+        );
   }
 }
 
