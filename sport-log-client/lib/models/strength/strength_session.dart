@@ -58,6 +58,13 @@ class StrengthSession extends AtomicEntity {
   }
 
   @override
+  void setEmptyToNull() {
+    if (comments != null && comments!.isEmpty) {
+      comments = null;
+    }
+  }
+
+  @override
   StrengthSession clone() => StrengthSession(
         id: id.clone(),
         userId: userId.clone(),

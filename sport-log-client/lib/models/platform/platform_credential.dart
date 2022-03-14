@@ -59,6 +59,9 @@ class PlatformCredential extends AtomicEntity {
           'PlatformCredential: password.length > 80',
         );
   }
+
+  @override
+  void setEmptyToNull() {}
 }
 
 class DbPlatformCredentialSerializer extends DbSerializer<PlatformCredential> {

@@ -45,4 +45,7 @@ class User extends NonDeletableAtomicEntity {
           'User: email is not valid',
         );
   }
+
+  @override
+  void setEmptyToNull() {}
 }

@@ -59,6 +59,14 @@ class MetconDescription extends CompoundEntity {
         );
   }
 
+  @override
+  void setEmptyToNull() {
+    metcon.setEmptyToNull();
+    for (final move in moves) {
+      move.setEmptyToNull();
+    }
+  }
+
   static bool areTheSame(MetconDescription m1, MetconDescription m2) =>
       m1.metcon.id == m2.metcon.id;
 

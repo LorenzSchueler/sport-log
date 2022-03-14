@@ -67,4 +67,10 @@ class CardioSessionDescription extends CompoundEntity {
           'CardioSessionDescription: movement id mismatch',
         );
   }
+
+  @override
+  void setEmptyToNull() {
+    cardioSession.setEmptyToNull();
+    route?.setEmptyToNull();
+  }
 }

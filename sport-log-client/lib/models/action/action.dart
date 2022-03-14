@@ -70,6 +70,13 @@ class Action extends AtomicEntity {
           'Action: deleteAfter < 0',
         );
   }
+
+  @override
+  void setEmptyToNull() {
+    if (description != null && description!.isEmpty) {
+      description = null;
+    }
+  }
 }
 
 class DbActionSerializer extends DbSerializer<Action> {

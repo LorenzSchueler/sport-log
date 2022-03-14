@@ -119,6 +119,13 @@ class Movement extends AtomicEntity {
   }
 
   @override
+  void setEmptyToNull() {
+    if (description != null && description!.isEmpty) {
+      description = null;
+    }
+  }
+
+  @override
   bool operator ==(other) =>
       other is Movement &&
       other.id == id &&

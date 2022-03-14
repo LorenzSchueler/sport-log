@@ -51,6 +51,13 @@ class Wod extends AtomicEntity {
           "Wod: description is empty but not null",
         );
   }
+
+  @override
+  void setEmptyToNull() {
+    if (description != null && description!.isEmpty) {
+      description = null;
+    }
+  }
 }
 
 class DbWodSerializer extends DbSerializer<Wod> {

@@ -71,6 +71,14 @@ class StrengthSessionDescription extends CompoundEntity {
         );
   }
 
+  @override
+  void setEmptyToNull() {
+    session.setEmptyToNull();
+    for (StrengthSet set in sets) {
+      set.setEmptyToNull();
+    }
+  }
+
   void setDeleted() {
     session.deleted = true;
     for (final set in sets) {

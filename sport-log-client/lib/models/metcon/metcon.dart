@@ -136,6 +136,13 @@ class Metcon extends AtomicEntity {
         ) &&
         validate(validateMetconType(), 'Metcon: metcon type validation failed');
   }
+
+  @override
+  void setEmptyToNull() {
+    if (description != null && description!.isEmpty) {
+      description = null;
+    }
+  }
 }
 
 class DbMetconSerializer extends DbSerializer<Metcon> {

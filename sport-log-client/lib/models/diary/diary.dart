@@ -72,6 +72,13 @@ class Diary extends AtomicEntity {
           'Diary: bodyweight and comments are null',
         );
   }
+
+  @override
+  void setEmptyToNull() {
+    if (comments != null && comments!.isEmpty) {
+      comments = null;
+    }
+  }
 }
 
 class DbDiarySerializer extends DbSerializer<Diary> {

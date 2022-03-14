@@ -63,6 +63,13 @@ class ActionRule extends AtomicEntity {
           'ActionRule: arguments is empty but not null',
         );
   }
+
+  @override
+  void setEmptyToNull() {
+    if (arguments != null && arguments!.isEmpty) {
+      arguments = null;
+    }
+  }
 }
 
 class DbActionRuleSerializer extends DbSerializer<ActionRule> {

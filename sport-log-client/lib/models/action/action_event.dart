@@ -59,6 +59,13 @@ class ActionEvent extends AtomicEntity {
           'ActionEvent: arguments are empty but not null',
         );
   }
+
+  @override
+  void setEmptyToNull() {
+    if (arguments != null && arguments!.isEmpty) {
+      arguments = null;
+    }
+  }
 }
 
 class DbActionEventSerializer extends DbSerializer<ActionEvent> {

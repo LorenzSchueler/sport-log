@@ -110,6 +110,9 @@ class MetconMovement extends AtomicEntity {
           'MetconMovement: femaleWeight <= 0',
         );
   }
+
+  @override
+  void setEmptyToNull() {}
 }
 
 class DbMetconMovementSerializer extends DbSerializer<MetconMovement> {

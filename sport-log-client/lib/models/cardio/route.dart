@@ -90,6 +90,16 @@ class Route extends AtomicEntity with Comparable<Route> {
   }
 
   @override
+  void setEmptyToNull() {
+    if (track != null && track!.isEmpty) {
+      track = null;
+    }
+    if (markedPositions != null && markedPositions!.isEmpty) {
+      markedPositions = null;
+    }
+  }
+
+  @override
   int compareTo(Route other) {
     return name.compareTo(other.name);
   }

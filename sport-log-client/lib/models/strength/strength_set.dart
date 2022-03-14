@@ -57,6 +57,9 @@ class StrengthSet extends AtomicEntity {
         validate(weight == null || weight! > 0, 'StrengthSet: weight <= 0');
   }
 
+  @override
+  void setEmptyToNull() {}
+
   String toDisplayName(MovementDimension dim) =>
       formatCountWeight(dim, count, weight);
 

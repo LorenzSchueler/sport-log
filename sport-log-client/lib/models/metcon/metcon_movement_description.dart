@@ -44,6 +44,12 @@ class MetconMovementDescription extends CompoundEntity {
         );
   }
 
+  @override
+  void setEmptyToNull() {
+    metconMovement.setEmptyToNull();
+    movement.setEmptyToNull();
+  }
+
   String get movementText {
     String text = "${movement.name} ${metconMovement.count} ";
     text += movement.dimension == MovementDimension.distance

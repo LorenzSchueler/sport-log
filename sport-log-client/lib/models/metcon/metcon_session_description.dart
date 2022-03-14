@@ -89,6 +89,12 @@ class MetconSessionDescription extends CompoundEntity {
         metconMetconDescriptionChecks;
   }
 
+  @override
+  void setEmptyToNull() {
+    metconSession.setEmptyToNull();
+    metconDescription.setEmptyToNull();
+  }
+
   String _resultDescription(bool short) {
     switch (metconDescription.metcon.metconType) {
       case MetconType.amrap:

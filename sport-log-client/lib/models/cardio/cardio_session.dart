@@ -135,12 +135,16 @@ class CardioSession extends AtomicEntity {
           'CardioSession: time <= 0',
         ) &&
         validate(
+          track == null || track!.isNotEmpty,
+          'CardioSession: track is empty but not null',
+        ) &&
+        validate(
           track == null || distance != null,
           'CardioSession: distance == null when track is set',
         ) &&
         validate(
           cadence == null || cadence!.isNotEmpty,
-          'CardioSession: avgCadence is empty but not null',
+          'CardioSession: cadence is empty but not null',
         ) &&
         validate(
           cadence == null || avgCadence != null,
@@ -158,6 +162,22 @@ class CardioSession extends AtomicEntity {
           comments == null || comments!.isNotEmpty,
           'CardioSession: comments is empty but not null',
         );
+  }
+
+  @override
+  void setEmptyToNull() {
+    if (track != null && track!.isEmpty) {
+      track = null;
+    }
+    if (cadence != null && cadence!.isEmpty) {
+      cadence = null;
+    }
+    if (heartRate != null && heartRate!.isEmpty) {
+      heartRate = null;
+    }
+    if (comments != null && comments!.isEmpty) {
+      comments = null;
+    }
   }
 }
 

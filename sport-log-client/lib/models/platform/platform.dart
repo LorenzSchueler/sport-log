@@ -40,6 +40,9 @@ class Platform extends AtomicEntity {
           'Platform: name.length is < 2 or > 80',
         );
   }
+
+  @override
+  void setEmptyToNull() {}
 }
 
 class DbPlatformSerializer extends DbSerializer<Platform> {

@@ -62,6 +62,13 @@ class ActionProvider extends AtomicEntity {
           'ActionProvider: desciption is empty but not null',
         );
   }
+
+  @override
+  void setEmptyToNull() {
+    if (description != null && description!.isEmpty) {
+      description = null;
+    }
+  }
 }
 
 class DbActionProviderSerializer extends DbSerializer<ActionProvider> {

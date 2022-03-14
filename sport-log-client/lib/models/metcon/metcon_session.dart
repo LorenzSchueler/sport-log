@@ -107,6 +107,13 @@ class MetconSession extends AtomicEntity {
           'MetconSession: comments are empty but not null',
         );
   }
+
+  @override
+  void setEmptyToNull() {
+    if (comments != null && comments!.isEmpty) {
+      comments = null;
+    }
+  }
 }
 
 class DbMetconSessionSerializer extends DbSerializer<MetconSession> {

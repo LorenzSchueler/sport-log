@@ -40,6 +40,11 @@ class MovementDescription extends CompoundEntity {
   }
 
   @override
+  void setEmptyToNull() {
+    movement.setEmptyToNull();
+  }
+
+  @override
   bool operator ==(other) =>
       other is MovementDescription &&
       other.hasReference == hasReference &&
