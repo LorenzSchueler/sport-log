@@ -44,7 +44,7 @@ class Column {
     _onUpdateReference = onUpdate;
   }
 
-  void checkBetween(dynamic start, dynamic end) {
+  void checkBetween(num start, num end) {
     _check = "$name between $start and $end";
   }
 
@@ -52,19 +52,19 @@ class Column {
     _check = "$name in (${values.join(',')})";
   }
 
-  void checkGt(dynamic value) {
+  void checkGt(num value) {
     _check = "$name > $value";
   }
 
-  void checkGe(dynamic value) {
+  void checkGe(num value) {
     _check = "$name >= $value";
   }
 
-  void checkLt(dynamic value) {
+  void checkLt(num value) {
     _check = "$name < $value";
   }
 
-  void checkLe(dynamic value) {
+  void checkLe(num value) {
     _check = "$name <= $value";
   }
 
