@@ -22,22 +22,8 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
   DbSerializer<StrengthSession> get serde => DbStrengthSessionSerializer();
 
   @override
-  List<String> get setupSql => [
-        ...super.setupSql,
-        '''
-        CREATE TABLE ${Tables.eorm} (
-          ${Columns.eormReps} INTEGER PRIMARY KEY CHECK (${Columns.eormReps} >= 1),
-          ${Columns.eormPercentage} REAL NOT NULL CHECK (${Columns.eormPercentage} > 0)
-        );
-        ''',
-        '''
-        INSERT INTO ${Tables.eorm} (${Columns.eormReps}, ${Columns.eormPercentage}) VALUES $eormValuesSql;
-        ''',
-      ];
-
-  @override
   final Table table = Table(
-    Tables.strengthSession,
+    name: Tables.strengthSession,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -53,6 +39,20 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
         ..checkGt(0),
       Column.text(Columns.comments)..nullable(),
     ],
+    uniqueColumns: [
+      [Columns.datetime, Columns.movementId]
+    ],
+    rawSql: [
+      '''
+        create table ${Tables.eorm} (
+          ${Columns.eormReps} integer primary key check (${Columns.eormReps} >= 1),
+          ${Columns.eormPercentage} real not null check (${Columns.eormPercentage} > 0)
+        );
+        ''',
+      '''
+        insert into ${Tables.eorm} (${Columns.eormReps}, ${Columns.eormPercentage}) values $eormValuesSql;
+        ''',
+    ],
   );
 }
 
@@ -62,7 +62,7 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
 
   @override
   final Table table = Table(
-    Tables.strengthSet,
+    name: Tables.strengthSet,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -76,6 +76,9 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
       Column.real(Columns.weight)
         ..nullable()
         ..checkGt(0),
+    ],
+    uniqueColumns: [
+      [Columns.strengthSessionId, Columns.setNumber]
     ],
   );
 

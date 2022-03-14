@@ -15,47 +15,32 @@ abstract class TableAccessor<T extends AtomicEntity> {
   DbSerializer<T> get serde;
   Table get table;
 
-  List<String> get setupSql => [table.setupSql(), updateTrigger];
-
   String get tableName => table.name;
 
   Database get database => AppDatabase.database!;
-
-  String get idAndDeletedAndStatus => '''
-    id integer primary key,
-    deleted integer not null default 0 check (deleted in (0, 1)),
-    sync_status integer not null default 2 check (sync_status in (0, 1, 2))
-  ''';
-
-  String get updateTrigger => '''
-    create trigger ${tableName}_update before update on $tableName
-    begin
-      update $tableName set sync_status = 1 where id = new.id and sync_status = 0;
-    end;
-  ''';
 
   static String get notDeletedOfTable => '${Columns.deleted} = 0';
   String get notDeleted => notDeletedOfTable;
 
   static String fromFilterOfTable(String tableName, DateTime? from) =>
-      from == null ? '' : 'AND $tableName.${Columns.datetime} >= ?';
+      from == null ? '' : 'and $tableName.${Columns.datetime} >= ?';
   String fromFilter(DateTime? from) => fromFilterOfTable(tableName, from);
 
   static String untilFilterOfTable(String tableName, DateTime? until) =>
-      until == null ? '' : 'AND $tableName.${Columns.datetime} < ?';
+      until == null ? '' : 'and $tableName.${Columns.datetime} < ?';
   String untilFilter(DateTime? until) => untilFilterOfTable(tableName, until);
 
   static String movementIdFilterOfTable(String tableName, Int64? movementId) =>
-      movementId == null ? '' : 'AND $tableName.${Columns.movementId} = ?';
+      movementId == null ? '' : 'and $tableName.${Columns.movementId} = ?';
   String movementIdFilter(Int64? movementId) =>
       movementIdFilterOfTable(tableName, movementId);
 
   static String groupByIdOfTable(String tableName) =>
-      "GROUP BY $tableName.${Columns.id}";
+      "group by $tableName.${Columns.id}";
   String get groupById => groupByIdOfTable(tableName);
 
   static String orderByDatetimeOfTable(String tableName) =>
-      "ORDER BY datetime($tableName.${Columns.datetime}) DESC";
+      "order by datetime($tableName.${Columns.datetime}) desc";
   String get orderByDatetime => orderByDatetimeOfTable(tableName);
 
   Future<bool> hardDeleteSingle(Int64 id) async {

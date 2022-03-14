@@ -8,18 +8,8 @@ class MovementTable extends TableAccessor<Movement> {
   DbSerializer<Movement> get serde => DbMovementSerializer();
 
   @override
-  List<String> get setupSql => [
-        ...super.setupSql,
-        '''
-      CREATE UNIQUE INDEX unique_movement_idx
-      ON $tableName ($name, $dimension, $userId)
-      WHERE $deleted = 0;
-      '''
-      ];
-
-  @override
   final Table table = Table(
-    Tables.movement,
+    name: Tables.movement,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -31,6 +21,9 @@ class MovementTable extends TableAccessor<Movement> {
       Column.text(Columns.description)..nullable(),
       Column.bool(Columns.cardio),
       Column.int(Columns.dimension),
+    ],
+    uniqueColumns: [
+      [Columns.name, Columns.dimension]
     ],
   );
 

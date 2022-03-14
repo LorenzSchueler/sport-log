@@ -9,7 +9,7 @@ class MetconTable extends TableAccessor<Metcon> {
 
   @override
   final Table table = Table(
-    Tables.metcon,
+    name: Tables.metcon,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -26,6 +26,9 @@ class MetconTable extends TableAccessor<Metcon> {
         ..nullable()
         ..checkGt(0),
       Column.text(Columns.description)..nullable()
+    ],
+    uniqueColumns: [
+      [Columns.name]
     ],
   );
 
@@ -46,7 +49,7 @@ class MetconMovementTable extends TableAccessor<MetconMovement> {
 
   @override
   final Table table = Table(
-    Tables.metconMovement,
+    name: Tables.metconMovement,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -68,6 +71,9 @@ class MetconMovementTable extends TableAccessor<MetconMovement> {
       Column.int(Columns.distanceUnit)
         ..nullable()
         ..checkBetween(0, 4),
+    ],
+    uniqueColumns: [
+      [Columns.metconId, Columns.movementNumber]
     ],
   );
 
@@ -106,7 +112,7 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
 
   @override
   final Table table = Table(
-    Tables.metconSession,
+    name: Tables.metconSession,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -128,6 +134,9 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
         ..checkGe(0),
       Column.bool(Columns.rx)..checkIn(<int>[0, 1]),
       Column.text(Columns.comments)..nullable()
+    ],
+    uniqueColumns: [
+      [Columns.metconId, Columns.datetime]
     ],
   );
 

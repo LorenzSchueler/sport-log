@@ -8,7 +8,7 @@ class PlatformTable extends TableAccessor<Platform> {
 
   @override
   final Table table = Table(
-    Tables.platform,
+    name: Tables.platform,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -16,6 +16,9 @@ class PlatformTable extends TableAccessor<Platform> {
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
       Column.text(Columns.name)..checkLengthBetween(3, 80),
+    ],
+    uniqueColumns: [
+      [Columns.name]
     ],
   );
 }
@@ -27,7 +30,7 @@ class PlatformCredentialTable extends TableAccessor<PlatformCredential> {
 
   @override
   final Table table = Table(
-    Tables.platformCredential,
+    name: Tables.platformCredential,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -39,6 +42,9 @@ class PlatformCredentialTable extends TableAccessor<PlatformCredential> {
         ..references(Tables.platform, onDelete: OnAction.cascade),
       Column.text(Columns.username)..checkLengthBetween(1, 80),
       Column.text(Columns.password)..checkLengthBetween(1, 80),
+    ],
+    uniqueColumns: [
+      [Columns.platformId]
     ],
   );
 }

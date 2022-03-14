@@ -8,7 +8,7 @@ class WodTable extends TableAccessor<Wod> {
 
   @override
   final Table table = Table(
-    Tables.wod,
+    name: Tables.wod,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -18,6 +18,9 @@ class WodTable extends TableAccessor<Wod> {
       Column.int(Columns.userId),
       Column.text(Columns.date)..withDefault("datetime('now')"),
       Column.text(Columns.description)..nullable()
+    ],
+    uniqueColumns: [
+      [Columns.date]
     ],
   );
 

@@ -12,7 +12,7 @@ class RouteTable extends TableAccessor<Route> {
 
   @override
   final Table table = Table(
-    Tables.route,
+    name: Tables.route,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -30,6 +30,9 @@ class RouteTable extends TableAccessor<Route> {
         ..checkGe(0),
       Column.blob(Columns.track)..nullable(),
       Column.blob(Columns.markedPositions)..nullable(),
+    ],
+    uniqueColumns: [
+      [Columns.name]
     ],
   );
 
@@ -50,7 +53,7 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
 
   @override
   final Table table = Table(
-    Tables.cardioSession,
+    name: Tables.cardioSession,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -90,6 +93,9 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
         ..nullable()
         ..references(Tables.route, onDelete: OnAction.setNull),
       Column.text(Columns.comments)..nullable(),
+    ],
+    uniqueColumns: [
+      [Columns.movementId, Columns.datetime]
     ],
   );
 }

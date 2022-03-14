@@ -8,7 +8,7 @@ class ActionTable extends TableAccessor<Action> {
 
   @override
   final Table table = Table(
-    Tables.action,
+    name: Tables.action,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -22,6 +22,9 @@ class ActionTable extends TableAccessor<Action> {
       Column.int(Columns.createBefore)..checkGe(0),
       Column.int(Columns.deleteAfter)..checkGe(0),
     ],
+    uniqueColumns: [
+      [Columns.actionProviderId, Columns.name]
+    ],
   );
 }
 
@@ -31,7 +34,7 @@ class ActionEventTable extends TableAccessor<ActionEvent> {
 
   @override
   final Table table = Table(
-    Tables.actionEvent,
+    name: Tables.actionEvent,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -45,6 +48,9 @@ class ActionEventTable extends TableAccessor<ActionEvent> {
       Column.text(Columns.arguments)..nullable(),
       Column.int(Columns.enabled)..checkIn(<int>[0, 1]),
     ],
+    uniqueColumns: [
+      [Columns.actionId, Columns.datetime]
+    ],
   );
 }
 
@@ -54,7 +60,7 @@ class ActionRuleTable extends TableAccessor<ActionRule> {
 
   @override
   final Table table = Table(
-    Tables.actionRule,
+    name: Tables.actionRule,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -69,6 +75,9 @@ class ActionRuleTable extends TableAccessor<ActionRule> {
       Column.text(Columns.arguments)..nullable(),
       Column.int(Columns.enabled)..checkIn(<int>[0, 1]),
     ],
+    uniqueColumns: [
+      [Columns.actionId, Columns.weekday, Columns.time]
+    ],
   );
 }
 
@@ -78,7 +87,7 @@ class ActionProviderTable extends TableAccessor<ActionProvider> {
 
   @override
   final Table table = Table(
-    Tables.actionProvider,
+    name: Tables.actionProvider,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -90,6 +99,9 @@ class ActionProviderTable extends TableAccessor<ActionProvider> {
       Column.int(Columns.platformId)
         ..references(Tables.platform, onDelete: OnAction.cascade),
       Column.text(Columns.description)..nullable()
+    ],
+    uniqueColumns: [
+      [Columns.name]
     ],
   );
 }

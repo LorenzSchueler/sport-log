@@ -161,7 +161,9 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   }
 
   Future<void> _resolveConflict(
-      ConflictResolution conflictResolution, List<T> records) async {
+    ConflictResolution conflictResolution,
+    List<T> records,
+  ) async {
     switch (conflictResolution) {
       case ConflictResolution.automatic:
         _logger.w("solving conflict automatically");

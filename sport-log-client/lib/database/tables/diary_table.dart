@@ -9,7 +9,7 @@ class DiaryTable extends TableAccessor<Diary> {
 
   @override
   final Table table = Table(
-    Tables.diary,
+    name: Tables.diary,
     columns: [
       Column.int(Columns.id)..primaryKey(),
       Column.bool(Columns.deleted)..withDefault('0'),
@@ -22,6 +22,9 @@ class DiaryTable extends TableAccessor<Diary> {
         ..nullable()
         ..checkGt(0),
       Column.text(Columns.comments)..nullable()
+    ],
+    uniqueColumns: [
+      [Columns.date]
     ],
   );
 

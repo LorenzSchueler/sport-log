@@ -13,7 +13,6 @@ class Column {
   final DbType type;
   bool _nonNull = true;
   bool _isPrimaryKey = false;
-  bool _isUnique = false;
   String? _defaultValue;
   String? _referenceTable;
   String? _referenceColumn;
@@ -27,10 +26,6 @@ class Column {
 
   void primaryKey() {
     _isPrimaryKey = true;
-  }
-
-  void unique() {
-    _isUnique = true;
   }
 
   void withDefault(String value) {
@@ -90,30 +85,30 @@ class Column {
   static String _typeToString(DbType type) {
     switch (type) {
       case DbType.integer:
-        return 'INTEGER';
+        return 'integer';
       case DbType.text:
-        return 'TEXT';
+        return 'text';
       case DbType.real:
-        return 'REAL';
+        return 'real';
       case DbType.blob:
-        return 'BLOB';
+        return 'blob';
       case DbType.bool:
-        return 'INTEGER';
+        return 'integer';
     }
   }
 
   static String _onActionToString(OnAction action) {
     switch (action) {
       case OnAction.setNull:
-        return 'SET NULL';
+        return 'set null';
       case OnAction.setDefault:
-        return 'SET DEFAULT';
+        return 'set default';
       case OnAction.cascade:
-        return 'CASCADE';
+        return 'cascade';
       case OnAction.restrict:
-        return 'RESTRICT';
+        return 'restrict';
       case OnAction.noAction:
-        return 'NO ACTION';
+        return 'no action';
     }
   }
 
@@ -126,11 +121,11 @@ class Column {
         : '${_referenceTable!}(${_referenceColumn!})';
     final onUpdateStr = _onUpdateReference == null
         ? ''
-        : ' ON UPDATE ${_onActionToString(_onUpdateReference!)}';
+        : ' on update ${_onActionToString(_onUpdateReference!)}';
     final onDeleteStr = _onDeleteReference == null
         ? ''
-        : 'ON DELETE ${_onActionToString(_onDeleteReference!)}';
-    return 'REFERENCES $referenceName $onDeleteStr'.trimRight() + onUpdateStr;
+        : 'on delete ${_onActionToString(_onDeleteReference!)}';
+    return 'references $referenceName $onDeleteStr'.trimRight() + onUpdateStr;
   }
 
   String setUpSql() {
@@ -139,16 +134,14 @@ class Column {
       _check = '$name in (0, 1)';
     }
     final typeStr = _typeToString(type);
-    final nonNullStr = _nonNull ? 'NOT NULL' : '';
-    final uniqueStr = _isUnique ? 'UNIQUE' : '';
+    final nonNullStr = _nonNull ? 'not null' : '';
     final defaultValueStr =
-        _defaultValue == null ? '' : 'DEFAULT(${_defaultValue!})';
-    final checkStr = _check == null ? '' : 'CHECK(${_check!})';
+        _defaultValue == null ? '' : 'default(${_defaultValue!})';
+    final checkStr = _check == null ? '' : 'check(${_check!})';
     return [
       name,
       typeStr,
       nonNullStr,
-      uniqueStr,
       defaultValueStr,
       _referenceString,
       checkStr
@@ -156,49 +149,54 @@ class Column {
   }
 }
 
-abstract class Constraint {
-  const Constraint();
-
-  String setupSql();
-}
-
-class Unique extends Constraint {
-  const Unique(this.columns) : super();
+class UniqueIndex {
+  final String tableName;
   final List<String> columns;
 
-  @override
-  String setupSql() {
-    return 'UNIQUE (${columns.join(', ')})';
+  const UniqueIndex(this.tableName, this.columns) : super();
+
+  String get setupSql {
+    return 'create unique index ${tableName}__${columns.join('__')}__idx '
+        'on $tableName (${columns.join(', ')}) where deleted = 0;';
   }
 }
 
 class Table {
-  Table(
-    this.name, {
+  Table({
+    required this.name,
     required this.columns,
-    List<Constraint>? withConstraints,
-  })  : constraints = withConstraints ?? [],
+    required List<List<String>> uniqueColumns,
+    this.rawSql = const [],
+  })  : uniqueIndices = uniqueColumns.map((c) => UniqueIndex(name, c)).toList(),
         prefix = name + '__';
 
-  final List<Column> columns;
-  final String name;
   final String prefix;
-  final List<Constraint> constraints;
+  final String name;
+  final List<Column> columns;
+  final List<UniqueIndex> uniqueIndices;
+  final List<String> rawSql;
 
-  String setupSql() {
+  List<String> get setupSql {
     final primaryKey =
         columns.where((c) => c.getIsPrimaryKey()).map((c) => c.name).toList();
     final primaryKeyStr =
-        primaryKey.isEmpty ? '' : 'PRIMARY KEY(${primaryKey.join(', ')})';
-    return '''
-    CREATE TABLE $name (
+        primaryKey.isEmpty ? '' : 'primary key(${primaryKey.join(', ')})';
+    final tableSetup = '''create table $name (
       ${[
       ...columns.map((c) => c.setUpSql()),
       primaryKeyStr,
-      ...constraints.map((c) => c.setupSql()),
     ].map((s) => '\t' + s).join(',\n')}
     );
     ''';
+    final uniqueIndicesSetup = uniqueIndices.map((u) => u.setupSql);
+    final updateTrigger =
+        '''create trigger ${name}_update before update on $name
+    begin
+      update $name set sync_status = 1 where id = new.id and sync_status = 0;
+    end;
+    ''';
+
+    return [tableSetup, ...uniqueIndicesSetup, updateTrigger, ...rawSql];
   }
 
   // used for select statement
