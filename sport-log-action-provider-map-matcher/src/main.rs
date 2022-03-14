@@ -394,7 +394,7 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Result<Route> {
                 longitude: point.longitude,
                 latitude: point.latitude,
                 elevation: point.elevation as f64,
-                distance: distance,
+                distance,
                 time: 0,
             }
         })
