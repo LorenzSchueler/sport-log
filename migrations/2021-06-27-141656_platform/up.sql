@@ -1,6 +1,6 @@
 create table platform (
     id bigint primary key,
-    name varchar(80) not null check (length(name) > 2),
+    name varchar(80) not null check (length(name) >= 2),
     credential boolean not null,
     last_change timestamptz not null default now(),
     deleted boolean not null default false

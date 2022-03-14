@@ -15,7 +15,7 @@ class ActionTable extends TableAccessor<Action> {
       Column.int(Columns.syncStatus)
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
-      Column.text(Columns.name)..checkLengthGe(2),
+      Column.text(Columns.name)..checkLengthBetween(2, 80),
       Column.int(Columns.actionProviderId)
         ..references(Tables.actionProvider, onDelete: OnAction.cascade),
       Column.text(Columns.description)..nullable(),

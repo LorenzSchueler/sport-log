@@ -17,7 +17,7 @@ class MovementTable extends TableAccessor<Movement> {
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
       Column.int(Columns.userId)..nullable(),
-      Column.text(Columns.name),
+      Column.text(Columns.name)..checkLengthBetween(2, 80),
       Column.text(Columns.description)..nullable(),
       Column.bool(Columns.cardio),
       Column.int(Columns.dimension),

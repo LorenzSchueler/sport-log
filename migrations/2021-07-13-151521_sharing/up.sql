@@ -1,6 +1,6 @@
 create table "group" (
     id bigint primary key,
-    name varchar(80) not null,
+    name varchar(80) not null check (length(name) >= 2),
     last_change timestamptz not null default now(),
     deleted boolean not null default false
 );

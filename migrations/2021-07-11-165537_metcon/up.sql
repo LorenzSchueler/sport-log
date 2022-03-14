@@ -4,7 +4,7 @@ create type distance_unit as enum('meter', 'km', 'yard', 'foot', 'mile');
 create table metcon (
     id bigint primary key,
     user_id bigint references "user" on delete cascade,
-    name varchar(80) not null,
+    name varchar(80) not null check (length(name) >= 2),
     metcon_type metcon_type not null,
     rounds integer check (rounds >= 1),
     timecap integer check (timecap > 0), -- milliseconds

@@ -20,7 +20,7 @@ class RouteTable extends TableAccessor<Route> {
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
       Column.int(Columns.userId),
-      Column.text(Columns.name)..checkLengthGe(2),
+      Column.text(Columns.name)..checkLengthBetween(2, 80),
       Column.int(Columns.distance)..checkGt(0),
       Column.int(Columns.ascent)
         ..nullable()

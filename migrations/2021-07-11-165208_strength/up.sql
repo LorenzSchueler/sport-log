@@ -2,7 +2,7 @@ create table strength_blueprint (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
     training_plan_id bigint not null references training_plan on delete cascade,
-    name varchar(80),
+    name varchar(80) not null check (length(name) >= 2),
     description text,
     movement_id bigint not null references movement on delete cascade,
     interval integer check (interval > 0), -- milliseconds

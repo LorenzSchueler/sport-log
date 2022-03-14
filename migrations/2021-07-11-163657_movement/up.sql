@@ -3,7 +3,7 @@ create type movement_dimension as enum('reps', 'time', 'energy', 'distance');
 create table movement (
     id bigint primary key,
     user_id bigint references "user" on delete cascade,
-    name varchar(80) not null,
+    name varchar(80) not null check (length(name) >= 2),
     description text,
     movement_dimension movement_dimension not null,
     cardio boolean not null,
@@ -38,7 +38,7 @@ create trigger delete_movement_archive
 
 create table muscle_group (
     id bigint primary key,
-    name varchar(80) not null,
+    name varchar(80) not null check (length(name) >= 2),
     description text
 );
 

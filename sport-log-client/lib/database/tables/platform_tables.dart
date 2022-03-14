@@ -15,7 +15,7 @@ class PlatformTable extends TableAccessor<Platform> {
       Column.int(Columns.syncStatus)
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
-      Column.text(Columns.name)..checkLengthBetween(3, 80),
+      Column.text(Columns.name)..checkLengthBetween(2, 80),
     ],
     uniqueColumns: [
       [Columns.name]
@@ -40,8 +40,8 @@ class PlatformCredentialTable extends TableAccessor<PlatformCredential> {
       Column.int(Columns.userId),
       Column.int(Columns.platformId)
         ..references(Tables.platform, onDelete: OnAction.cascade),
-      Column.text(Columns.username)..checkLengthBetween(1, 80),
-      Column.text(Columns.password)..checkLengthBetween(1, 80),
+      Column.text(Columns.username)..checkLe(80),
+      Column.text(Columns.password)..checkLe(80),
     ],
     uniqueColumns: [
       [Columns.platformId]
