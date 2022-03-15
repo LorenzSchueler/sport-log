@@ -51,15 +51,11 @@ class Action extends AtomicEntity {
       );
 
   @override
-  bool isValid() {
+  bool isValidIgnoreEmptyNotNull() {
     return validate(!deleted, 'Action: deleted is true') &&
         validate(
           name.length >= 2 && name.length <= 80,
           'Action: name.length < 2 or > 80',
-        ) &&
-        validate(
-          description == null || description!.isNotEmpty,
-          'Action: description is empty but not null',
         ) &&
         validate(
           createBefore > const Duration(),
@@ -68,6 +64,15 @@ class Action extends AtomicEntity {
         validate(
           deleteAfter > const Duration(),
           'Action: deleteAfter < 0',
+        );
+  }
+
+  @override
+  bool isValid() {
+    return isValidIgnoreEmptyNotNull() &&
+        validate(
+          description == null || description!.isNotEmpty,
+          'Action: description is empty but not null',
         );
   }
 

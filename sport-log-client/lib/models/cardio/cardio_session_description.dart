@@ -41,7 +41,7 @@ class CardioSessionDescription extends CompoundEntity {
       );
 
   @override
-  bool isValid() {
+  bool isValidIgnoreEmptyNotNull() {
     return cardioSession.isValid() &&
         (route == null ||
             validate(
@@ -66,6 +66,11 @@ class CardioSessionDescription extends CompoundEntity {
           cardioSession.movementId == movement.id,
           'CardioSessionDescription: movement id mismatch',
         );
+  }
+
+  @override
+  bool isValid() {
+    return isValidIgnoreEmptyNotNull();
   }
 
   @override

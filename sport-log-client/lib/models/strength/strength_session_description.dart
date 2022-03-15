@@ -40,7 +40,7 @@ class StrengthSessionDescription extends CompoundEntity {
       );
 
   @override
-  bool isValid() {
+  bool isValidIgnoreEmptyNotNull() {
     return validate(
           session.isValid(),
           'StrengthSessionDescription: strength session not valid',
@@ -69,6 +69,11 @@ class StrengthSessionDescription extends CompoundEntity {
           !movement.deleted,
           'StrengthSessionDescription: movement is deleted',
         );
+  }
+
+  @override
+  bool isValid() {
+    return isValidIgnoreEmptyNotNull();
   }
 
   @override

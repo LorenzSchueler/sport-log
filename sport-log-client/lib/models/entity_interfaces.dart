@@ -7,6 +7,8 @@ abstract class HasId {
 
 abstract class Validatable {
   bool isValid();
+
+  bool isValidIgnoreEmptyNotNull();
 }
 
 abstract class Entity extends JsonSerializable implements Validatable {

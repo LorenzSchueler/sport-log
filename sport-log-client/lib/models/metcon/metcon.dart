@@ -118,7 +118,7 @@ class Metcon extends AtomicEntity {
   }
 
   @override
-  bool isValid() {
+  bool isValidIgnoreEmptyNotNull() {
     return validate(!deleted, 'Metcon: deleted == true') &&
         validate(userId != null, 'Metcon: userId == null') &&
         validate(
@@ -130,11 +130,16 @@ class Metcon extends AtomicEntity {
           timecap == null || timecap! >= const Duration(milliseconds: 1),
           'Metcon: timecap < 1ms',
         ) &&
+        validate(validateMetconType(), 'Metcon: metcon type validation failed');
+  }
+
+  @override
+  bool isValid() {
+    return isValidIgnoreEmptyNotNull() &&
         validate(
           description == null || description!.isNotEmpty,
           'Metcon: description is empty but not null',
-        ) &&
-        validate(validateMetconType(), 'Metcon: metcon type validation failed');
+        );
   }
 
   @override

@@ -32,11 +32,16 @@ class MovementDescription extends CompoundEntity {
       );
 
   @override
-  bool isValid() {
+  bool isValidIgnoreEmptyNotNull() {
     return validate(
       movement.isValid(),
       'MovementDescription: movement is not valid',
     );
+  }
+
+  @override
+  bool isValid() {
+    return isValidIgnoreEmptyNotNull();
   }
 
   @override

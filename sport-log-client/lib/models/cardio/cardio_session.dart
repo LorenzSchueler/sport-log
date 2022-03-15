@@ -119,7 +119,7 @@ class CardioSession extends AtomicEntity {
       );
 
   @override
-  bool isValid() {
+  bool isValidIgnoreEmptyNotNull() {
     return validate(!deleted, 'CardioSession: deleted is true') &&
         validate(
           [ascent, descent, calories].every((val) => val == null || val >= 0),
@@ -135,28 +135,33 @@ class CardioSession extends AtomicEntity {
           'CardioSession: time <= 0',
         ) &&
         validate(
-          track == null || track!.isNotEmpty,
-          'CardioSession: track is empty but not null',
+          track == null || track!.isEmpty || distance != null,
+          'CardioSession: distance == null when track is set',
         ) &&
         validate(
-          track == null || distance != null,
-          'CardioSession: distance == null when track is set',
+          cadence == null || cadence!.isEmpty || avgCadence != null,
+          'CardioSession: avgCadence == null when cadence is set',
+        ) &&
+        validate(
+          heartRate == null || heartRate!.isEmpty || avgHeartRate != null,
+          'CardioSession: avgHeartRate == null when heartRate is set',
+        );
+  }
+
+  @override
+  bool isValid() {
+    return isValidIgnoreEmptyNotNull() &&
+        validate(
+          track == null || track!.isNotEmpty,
+          'CardioSession: track is empty but not null',
         ) &&
         validate(
           cadence == null || cadence!.isNotEmpty,
           'CardioSession: cadence is empty but not null',
         ) &&
         validate(
-          cadence == null || avgCadence != null,
-          'CardioSession: avgCadence == null when cadence is set',
-        ) &&
-        validate(
           heartRate == null || heartRate!.isNotEmpty,
           'CardioSession: heartRate is empty but not null',
-        ) &&
-        validate(
-          heartRate == null || avgHeartRate != null,
-          'CardioSession: avgHeartRate == null when heartRate is set',
         ) &&
         validate(
           comments == null || comments!.isNotEmpty,

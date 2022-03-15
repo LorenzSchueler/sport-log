@@ -48,7 +48,7 @@ class PlatformCredential extends AtomicEntity {
       );
 
   @override
-  bool isValid() {
+  bool isValidIgnoreEmptyNotNull() {
     return validate(!deleted, 'PlatformCredential: deleted == true') &&
         validate(
           username.length <= 80,
@@ -58,6 +58,11 @@ class PlatformCredential extends AtomicEntity {
           password.length <= 80,
           'PlatformCredential: password.length > 80',
         );
+  }
+
+  @override
+  bool isValid() {
+    return isValidIgnoreEmptyNotNull();
   }
 
   @override

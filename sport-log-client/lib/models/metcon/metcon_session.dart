@@ -94,14 +94,19 @@ class MetconSession extends AtomicEntity {
       );
 
   @override
-  bool isValid() {
+  bool isValidIgnoreEmptyNotNull() {
     return validate(!deleted, 'MetconSession: deleted == true') &&
         validate(
           time == null || time! > const Duration(),
           'MetconSession: time <= 0',
         ) &&
         validate(rounds == null || rounds! >= 0, 'MetconSession: rounds < 0') &&
-        validate(reps == null || reps! >= 0, 'MetconSession: reps < 0') &&
+        validate(reps == null || reps! >= 0, 'MetconSession: reps < 0');
+  }
+
+  @override
+  bool isValid() {
+    return isValidIgnoreEmptyNotNull() &&
         validate(
           comments == null || comments!.isNotEmpty,
           'MetconSession: comments are empty but not null',

@@ -33,12 +33,17 @@ class Platform extends AtomicEntity {
   Platform clone() => Platform(id: id.clone(), name: name, deleted: deleted);
 
   @override
-  bool isValid() {
+  bool isValidIgnoreEmptyNotNull() {
     return validate(!deleted, 'Platform: deleted == true') &&
         validate(
           name.length >= 2 && name.length <= 80,
           'Platform: name.length is < 2 or > 80',
         );
+  }
+
+  @override
+  bool isValid() {
+    return isValidIgnoreEmptyNotNull();
   }
 
   @override

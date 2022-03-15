@@ -52,8 +52,13 @@ class ActionEvent extends AtomicEntity {
       );
 
   @override
+  bool isValidIgnoreEmptyNotNull() {
+    return validate(!deleted, 'ActionEvent: deleted is true');
+  }
+
+  @override
   bool isValid() {
-    return validate(!deleted, 'ActionEvent: deleted is true') &&
+    return isValidIgnoreEmptyNotNull() &&
         validate(
           arguments == null || arguments!.isNotEmpty,
           'ActionEvent: arguments are empty but not null',

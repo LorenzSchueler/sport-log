@@ -39,7 +39,7 @@ class MetconSessionDescription extends CompoundEntity {
       );
 
   @override
-  bool isValid() {
+  bool isValidIgnoreEmptyNotNull() {
     bool metconMetconDescriptionChecks;
     switch (metconDescription.metcon.metconType) {
       case MetconType.amrap:
@@ -87,6 +87,11 @@ class MetconSessionDescription extends CompoundEntity {
           'MetconSessionDescription: metcon id mismatch',
         ) &&
         metconMetconDescriptionChecks;
+  }
+
+  @override
+  bool isValid() {
+    return isValidIgnoreEmptyNotNull();
   }
 
   @override

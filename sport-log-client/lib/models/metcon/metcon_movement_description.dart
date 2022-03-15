@@ -29,7 +29,7 @@ class MetconMovementDescription extends CompoundEntity {
       );
 
   @override
-  bool isValid() {
+  bool isValidIgnoreEmptyNotNull() {
     return validate(
           metconMovement.isValid(),
           'MetconMovementDescription: metcon movement not valid',
@@ -42,6 +42,11 @@ class MetconMovementDescription extends CompoundEntity {
           movement.id == metconMovement.movementId,
           'MetconMovementDescription: id mismatch',
         );
+  }
+
+  @override
+  bool isValid() {
+    return isValidIgnoreEmptyNotNull();
   }
 
   @override

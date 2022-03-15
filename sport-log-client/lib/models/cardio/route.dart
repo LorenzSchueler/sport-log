@@ -70,7 +70,7 @@ class Route extends AtomicEntity with Comparable<Route> {
       );
 
   @override
-  bool isValid() {
+  bool isValidIgnoreEmptyNotNull() {
     return validate(!deleted, 'Route: deleted == true') &&
         validate(
           name.length >= 2 && name.length <= 80,
@@ -78,7 +78,12 @@ class Route extends AtomicEntity with Comparable<Route> {
         ) &&
         validate(distance > 0, 'Route: distance <= 0') &&
         validate(ascent == null || ascent! >= 0, 'Route: ascent < 0') &&
-        validate(descent == null || descent! >= 0, 'Route: descent < 0') &&
+        validate(descent == null || descent! >= 0, 'Route: descent < 0');
+  }
+
+  @override
+  bool isValid() {
+    return isValidIgnoreEmptyNotNull() &&
         validate(
           track == null || track!.isNotEmpty,
           'Route: track is empty but not null',

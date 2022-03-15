@@ -47,7 +47,7 @@ class ActionProvider extends AtomicEntity {
       );
 
   @override
-  bool isValid() {
+  bool isValidIgnoreEmptyNotNull() {
     return validate(!deleted, 'ActionProvider: deleted is true') &&
         validate(
           name.length >= 2 && name.length <= 80,
@@ -56,7 +56,12 @@ class ActionProvider extends AtomicEntity {
         validate(
           password.length >= 2 && password.length <= 96,
           'ActionProvider: password.length is < 2 or > 96',
-        ) &&
+        );
+  }
+
+  @override
+  bool isValid() {
+    return isValidIgnoreEmptyNotNull() &&
         validate(
           description == null || description!.isNotEmpty,
           'ActionProvider: desciption is empty but not null',
