@@ -40,8 +40,8 @@ class PlatformCredentialTable extends TableAccessor<PlatformCredential> {
       Column.int(Columns.userId),
       Column.int(Columns.platformId)
         ..references(Tables.platform, onDelete: OnAction.cascade),
-      Column.text(Columns.username)..checkLe(80),
-      Column.text(Columns.password)..checkLe(80),
+      Column.text(Columns.username)..checkLengthLe(80),
+      Column.text(Columns.password)..checkLengthLe(80),
     ],
     uniqueColumns: [
       [Columns.platformId]

@@ -116,9 +116,9 @@ class DbRouteSerializer extends DbSerializer<Route> {
       ascent: r[prefix + Columns.ascent] as int?,
       descent: r[prefix + Columns.descent] as int?,
       track: const DbPositionListConverter()
-          .mapToDart(r[prefix + Columns.track]! as Uint8List),
+          .mapToDart(r[prefix + Columns.track] as Uint8List?),
       markedPositions: const DbPositionListConverter()
-          .mapToDart(r[prefix + Columns.markedPositions]! as Uint8List),
+          .mapToDart(r[prefix + Columns.markedPositions] as Uint8List?),
       deleted: r[prefix + Columns.deleted] == 1,
     );
   }

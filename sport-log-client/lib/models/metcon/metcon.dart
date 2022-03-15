@@ -153,7 +153,7 @@ class DbMetconSerializer extends DbSerializer<Metcon> {
       userId: r[prefix + Columns.userId] == null
           ? null
           : Int64(r[prefix + Columns.userId]! as int),
-      name: r[prefix + Columns.name] as String,
+      name: r[prefix + Columns.name]! as String,
       metconType: MetconType.values[r[prefix + Columns.metconType]! as int],
       rounds: r[prefix + Columns.rounds] as int?,
       timecap: r[prefix + Columns.timecap] == null
