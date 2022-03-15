@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/picker/date_picker.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
@@ -87,6 +88,15 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
           widget.metconSessionDescription != null
               ? "Edit Metcon Session"
               : "Create Metcon Session",
+        ),
+        leading: IconButton(
+          onPressed: () async {
+            final bool? approved = await showDiscardWarningDialog(context);
+            if (approved != null && approved) {
+              Navigator.pop(context);
+            }
+          },
+          icon: const Icon(AppIcons.arrowBack),
         ),
         actions: [
           IconButton(

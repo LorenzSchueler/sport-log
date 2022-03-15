@@ -9,6 +9,7 @@ import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -84,6 +85,15 @@ class _EditMetconPageState extends State<EditMetconPage> {
         appBar: AppBar(
           title: Text(
             widget.metconDescription != null ? "Edit Metcon" : "New Metcon",
+          ),
+          leading: IconButton(
+            onPressed: () async {
+              final bool? approved = await showDiscardWarningDialog(context);
+              if (approved != null && approved) {
+                Navigator.pop(context);
+              }
+            },
+            icon: const Icon(AppIcons.arrowBack),
           ),
           actions: [
             IconButton(

@@ -98,10 +98,10 @@ class _EditMovementPageState extends State<EditMovementPage> {
           ),
           leading: IconButton(
             onPressed: () async {
-              FocusManager.instance.primaryFocus?.unfocus();
               final bool? approved = await showDiscardWarningDialog(context);
-              if (approved == null || !approved) return;
-              Navigator.pop(context);
+              if (approved != null && approved) {
+                Navigator.pop(context);
+              }
             },
             icon: const Icon(AppIcons.arrowBack),
           ),

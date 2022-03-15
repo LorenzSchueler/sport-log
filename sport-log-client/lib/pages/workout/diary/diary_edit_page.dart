@@ -5,6 +5,7 @@ import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/picker/date_picker.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -58,6 +59,15 @@ class DiaryEditPageState extends State<DiaryEditPage> {
       appBar: AppBar(
         title: Text(
           widget.diary != null ? "Edit Diary Entry" : "Create Diary Entry",
+        ),
+        leading: IconButton(
+          onPressed: () async {
+            final bool? approved = await showDiscardWarningDialog(context);
+            if (approved != null && approved) {
+              Navigator.pop(context);
+            }
+          },
+          icon: const Icon(AppIcons.arrowBack),
         ),
         actions: [
           IconButton(

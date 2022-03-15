@@ -9,6 +9,7 @@ import 'package:sport_log/models/all.dart';
 import 'package:mapbox_api/mapbox_api.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
@@ -328,6 +329,15 @@ class RouteEditPageState extends State<RouteEditPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.route != null ? "Edit Route" : "Create Route"),
+        leading: IconButton(
+          onPressed: () async {
+            final bool? approved = await showDiscardWarningDialog(context);
+            if (approved != null && approved) {
+              Navigator.pop(context);
+            }
+          },
+          icon: const Icon(AppIcons.arrowBack),
+        ),
         actions: [
           IconButton(
             onPressed: _deleteRoute,

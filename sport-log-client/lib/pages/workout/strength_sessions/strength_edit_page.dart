@@ -11,6 +11,7 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
@@ -96,6 +97,15 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
           widget.strengthSessionDescription != null
               ? "Edit Strength Session"
               : "Create Strength Session",
+        ),
+        leading: IconButton(
+          onPressed: () async {
+            final bool? approved = await showDiscardWarningDialog(context);
+            if (approved != null && approved) {
+              Navigator.pop(context);
+            }
+          },
+          icon: const Icon(AppIcons.arrowBack),
         ),
         actions: [
           IconButton(
