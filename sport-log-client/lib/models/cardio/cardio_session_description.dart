@@ -42,22 +42,19 @@ class CardioSessionDescription extends CompoundEntity {
 
   @override
   bool isValidIgnoreEmptyNotNull() {
-    return cardioSession.isValid() &&
-        (route == null ||
-            validate(
-              route!.isValid(),
-              'CardioSessionDescription: route is not valid',
-            )) &&
-        (route == null ||
-            validate(
-              cardioSession.routeId != null,
-              'CardioSessionDescription: cardio session route id is null',
-            )) &&
-        (route == null ||
-            validate(
-              cardioSession.routeId! == route!.id,
-              'CardioSessionDescription: route id mismatch',
-            )) &&
+    return cardioSession.isValidIgnoreEmptyNotNull() &&
+        validate(
+          route == null || route!.isValid(),
+          'CardioSessionDescription: route is not valid',
+        ) &&
+        validate(
+          route == null || cardioSession.routeId != null,
+          'CardioSessionDescription: cardio session route id is null',
+        ) &&
+        validate(
+          route == null || cardioSession.routeId! == route!.id,
+          'CardioSessionDescription: route id mismatch',
+        ) &&
         validate(
           movement.isValid(),
           'CardioSessionDescription: movement is not valid',

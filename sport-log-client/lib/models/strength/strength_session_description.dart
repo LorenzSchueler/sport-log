@@ -42,7 +42,7 @@ class StrengthSessionDescription extends CompoundEntity {
   @override
   bool isValidIgnoreEmptyNotNull() {
     return validate(
-          session.isValid(),
+          session.isValidIgnoreEmptyNotNull(),
           'StrengthSessionDescription: strength session not valid',
         ) &&
         validate(
@@ -58,7 +58,7 @@ class StrengthSessionDescription extends CompoundEntity {
           'StrengthSessionDescription: strengthSets indices wrong',
         ) &&
         validate(
-          sets.every((ss) => ss.isValid()),
+          sets.every((ss) => ss.isValidIgnoreEmptyNotNull()),
           'StrengthSessionDescription: strengthSets not valid',
         ) &&
         validate(

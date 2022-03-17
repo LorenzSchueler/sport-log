@@ -31,11 +31,11 @@ class MetconMovementDescription extends CompoundEntity {
   @override
   bool isValidIgnoreEmptyNotNull() {
     return validate(
-          metconMovement.isValid(),
+          metconMovement.isValidIgnoreEmptyNotNull(),
           'MetconMovementDescription: metcon movement not valid',
         ) &&
         validate(
-          movement.isValid(),
+          movement.isValidIgnoreEmptyNotNull(),
           'MetconMovementDescription: movement not valid',
         ) &&
         validate(

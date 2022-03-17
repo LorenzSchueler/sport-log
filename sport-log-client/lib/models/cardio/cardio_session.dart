@@ -122,13 +122,28 @@ class CardioSession extends AtomicEntity {
   bool isValidIgnoreEmptyNotNull() {
     return validate(!deleted, 'CardioSession: deleted is true') &&
         validate(
-          [ascent, descent, calories].every((val) => val == null || val >= 0),
-          'CardioSession: ascent or descent or calories < 0',
+          ascent == null || ascent! >= 0,
+          'CardioSession: ascent < 0',
         ) &&
         validate(
-          [distance, calories, avgCadence, avgHeartRate]
-              .every((val) => val == null || val > 0),
-          'CardioSession: distance, time, calories, avgCadence or avgHeartRate <= 0',
+          descent == null || descent! >= 0,
+          'CardioSession: descent < 0',
+        ) &&
+        validate(
+          calories == null || calories! >= 0,
+          'CardioSession: calories < 0',
+        ) &&
+        validate(
+          distance == null || distance! > 0,
+          'CardioSession: distance <= 0',
+        ) &&
+        validate(
+          avgCadence == null || avgCadence! >= 0,
+          'CardioSession: avgCadence < 0',
+        ) &&
+        validate(
+          avgHeartRate == null || avgHeartRate! >= 0,
+          'CardioSession: avgHeartRate < 0',
         ) &&
         validate(
           time == null || time! > const Duration(),
@@ -151,6 +166,14 @@ class CardioSession extends AtomicEntity {
   @override
   bool isValid() {
     return isValidIgnoreEmptyNotNull() &&
+        validate(
+          avgCadence == null || avgCadence! > 0,
+          'CardioSession: avgCadence <= 0',
+        ) &&
+        validate(
+          avgHeartRate == null || avgHeartRate! > 0,
+          'CardioSession: avgHeartRate <= 0',
+        ) &&
         validate(
           track == null || track!.isNotEmpty,
           'CardioSession: track is empty but not null',

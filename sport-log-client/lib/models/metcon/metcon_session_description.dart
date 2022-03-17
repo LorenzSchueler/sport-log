@@ -79,7 +79,7 @@ class MetconSessionDescription extends CompoundEntity {
         break;
     }
     return validate(
-          metconDescription.isValid(),
+          metconDescription.isValidIgnoreEmptyNotNull(),
           'MetconSessionDescription: metcon description not valid',
         ) &&
         validate(
