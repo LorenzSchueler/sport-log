@@ -62,6 +62,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       cardioSession: CardioSession.defaultValue(widget.movement.id)
         ..cardioType = widget.cardioType
         ..time = const Duration()
+        ..distance = 1 // TODO remove when distance calculated from track
         ..track = []
         ..cadence = []
         ..routeId = widget.route?.id,
@@ -90,18 +91,17 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   }
 
   Future<void> _saveCardioSession() async {
+    _cardioSessionDescription.setEmptyToNull();
     _cardioSessionDescription.cardioSession.ascent = _ascent.round();
     _cardioSessionDescription.cardioSession.descent = _descent.round();
-    _cardioSessionDescription.cardioSession.setAvgCadenceFromCadenceAndTime();
-    _cardioSessionDescription.cardioSession.avgCadence =
-        100; // TODO remove and make sure avgCadende is > 0 if cadence != null
-    _cardioSessionDescription.cardioSession.distance =
-        1000; // TODO remove and make sure distance is set if track != null
-    _logger.i("saving: $_cardioSessionDescription");
+    _cardioSessionDescription.cardioSession.setAvgCadence();
+    _cardioSessionDescription.cardioSession.setAvgHeartRate();
+    _cardioSessionDescription.cardioSession.setDistance();
     final result = await _dataProvider.createSingle(_cardioSessionDescription);
     if (result) {
-      Navigator.pop(context);
-      Navigator.pop(context);
+      Navigator.pop(context); // pop dialog
+      Navigator.pop(context); // pop tracking page
+      Navigator.pop(context); // pop tracking settings page
     } else {
       await showMessageDialog(
         context: context,
@@ -118,10 +118,14 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
             _cardioSessionDescription.cardioSession.time! +
                 const Duration(seconds: 1);
       }
-      _cardioSessionDescription.cardioSession.setAvgCadenceFromCadenceAndTime();
+      _cardioSessionDescription.cardioSession.setAvgCadence();
+      _cardioSessionDescription.cardioSession.setAvgHeartRate();
+      //_cardioSessionDescription.cardioSession.setDistance();
 
-      _stepInfo =
-          "steps: ${_cardioSessionDescription.cardioSession.cadence!.length}\ntime: ${_cardioSessionDescription.cardioSession.cadence!.isNotEmpty ? _cardioSessionDescription.cardioSession.cadence!.last : 0}";
+      if (_cardioSessionDescription.cardioSession.cadence != null) {
+        _stepInfo =
+            "steps: ${_cardioSessionDescription.cardioSession.cadence!.length}\ntime: ${_cardioSessionDescription.cardioSession.cadence!.isNotEmpty ? _cardioSessionDescription.cardioSession.cadence!.last : 0}";
+      }
     });
   }
 
@@ -153,7 +157,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
         }
       }
     }
-    _cardioSessionDescription.cardioSession.setAvgCadenceFromCadenceAndTime();
+    _cardioSessionDescription.cardioSession.setAvgCadence();
     _lastStepCount = stepCountEvent;
   }
 
@@ -254,13 +258,12 @@ satelites:  ${location.satelliteNumber}""";
           ),
           TextButton(
             child: const Text("Save"),
-            onPressed: // _cardioSessionDescription.isValid() ? // TODO enable if session is no longer changed in save method
-                () async {
-              _trackingMode = TrackingMode.stopped;
-              Navigator.pop(context);
-              await _saveCardioSession();
-            },
-            // : null,
+            onPressed: _cardioSessionDescription.isValidIgnoreEmptyNotNull()
+                ? () async {
+                    _trackingMode = TrackingMode.stopped;
+                    await _saveCardioSession();
+                  }
+                : null,
           )
         ],
       ),
@@ -302,9 +305,7 @@ satelites:  ${location.satelliteNumber}""";
             style: ElevatedButton.styleFrom(
               primary: Theme.of(context).colorScheme.errorContainer,
             ),
-            onPressed: () {
-              _trackingMode = TrackingMode.tracking;
-            },
+            onPressed: () => _trackingMode = TrackingMode.tracking,
             child: const Text("continue"),
           ),
         ),
@@ -315,6 +316,7 @@ satelites:  ${location.satelliteNumber}""";
               primary: Theme.of(context).colorScheme.error,
             ),
             onPressed: () async {
+              _trackingMode = TrackingMode.paused;
               await _stopDialog();
             },
             child: const Text("stop"),
@@ -415,8 +417,13 @@ satelites:  ${location.satelliteNumber}""";
                       description: "time",
                       scale: 1.3,
                     ),
-                    const ValueUnitDescription(
-                      value: "--",
+                    ValueUnitDescription(
+                      value: _cardioSessionDescription.cardioSession.distance ==
+                              null
+                          ? "--"
+                          : (_cardioSessionDescription.cardioSession.distance! /
+                                  1000)
+                              .toStringAsFixed(3),
                       unit: "km",
                       description: "distance",
                       scale: 1.3,

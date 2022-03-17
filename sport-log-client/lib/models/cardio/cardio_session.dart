@@ -84,10 +84,29 @@ class CardioSession extends AtomicEntity {
         datetime = DateTime.now(),
         deleted = false;
 
-  void setAvgCadenceFromCadenceAndTime() {
-    avgCadence = time!.inSeconds == 0
-        ? 0
-        : (cadence!.length / time!.inSeconds * 60).round();
+  void setDistance() {
+    if (track != null && track!.isNotEmpty) {
+      distance = 1; // TODO calculate distance from coords
+    } else {
+      distance = null;
+    }
+  }
+
+  void setAvgCadence() {
+    if (time != null && time!.inSeconds > 0 && cadence != null) {
+      avgCadence = (cadence!.length / (time!.inMilliseconds / 60000)).round();
+    } else {
+      avgCadence = null;
+    }
+  }
+
+  void setAvgHeartRate() {
+    if (time != null && time!.inSeconds > 0 && heartRate != null) {
+      avgHeartRate =
+          (heartRate!.length / (time!.inMilliseconds / 60000)).round();
+    } else {
+      avgHeartRate = null;
+    }
   }
 
   factory CardioSession.fromJson(Map<String, dynamic> json) =>
