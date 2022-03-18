@@ -90,7 +90,10 @@ class _CountWeightInputState extends State<CountWeightInput> {
                         child: IconButton(
                           icon: const Icon(AppIcons.add),
                           onPressed: () {
-                            setState(() => _weight = 0);
+                            setState(() {
+                              _weight = 0;
+                              _secondWeight = 0;
+                            });
                             if (!widget.confirmChanges) {
                               widget.setValue(_count, _weight, _secondWeight);
                             }
@@ -113,7 +116,10 @@ class _CountWeightInputState extends State<CountWeightInput> {
                         child: IconButton(
                           icon: const Icon(AppIcons.close),
                           onPressed: () {
-                            setState(() => _weight = null);
+                            setState(() {
+                              _weight = null;
+                              _secondWeight = null;
+                            });
                             if (!widget.confirmChanges) {
                               widget.setValue(_count, _weight, _secondWeight);
                             }
