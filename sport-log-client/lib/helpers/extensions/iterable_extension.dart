@@ -44,38 +44,28 @@ extension IterableExtension<T> on Iterable<T> {
   }
 }
 
-extension IterableNum<T extends num> on Iterable<T> {
+extension IterableInt<T extends int> on Iterable<T> {
   T get max => isEmpty ? 0 as T : reduce(math.max);
   T get min => isEmpty ? 0 as T : reduce(math.min);
   T get sum => isEmpty ? 0 as T : reduce((a, b) => a + b as T);
 }
 
-extension IterableNumOptional<T extends num> on Iterable<T?> {
-  T? get max => isEmpty
-      ? null
-      : reduce((a, b) {
-          if (a != null && b != null) {
-            return math.max(a, b);
-          } else {
-            return a ?? b;
-          }
-        });
-  T? get min => isEmpty
-      ? null
-      : reduce((a, b) {
-          if (a != null && b != null) {
-            return math.min(a, b);
-          } else {
-            return a ?? b;
-          }
-        });
-  T? get sum => isEmpty
-      ? null
-      : reduce((a, b) {
-          if (a != null && b != null) {
-            return a + b as T;
-          } else {
-            return a ?? b;
-          }
-        });
+extension IterableDouble<T extends double> on Iterable<T> {
+  T get max => isEmpty ? 0.0 as T : reduce(math.max);
+  T get min => isEmpty ? 0.0 as T : reduce(math.min);
+  T get sum => isEmpty ? 0.0 as T : reduce((a, b) => a + b as T);
+}
+
+extension IterableIntOptional<T extends int> on Iterable<T?> {
+  Iterable<T> get filterNotNull => where((element) => element != null).cast();
+  T get max => filterNotNull.max;
+  T get min => filterNotNull.min;
+  T get sum => filterNotNull.sum;
+}
+
+extension IterableDoubleOptional<T extends double> on Iterable<T?> {
+  Iterable<T> get filterNotNull => where((element) => element != null).cast();
+  T get max => filterNotNull.max;
+  T get min => filterNotNull.min;
+  T get sum => filterNotNull.sum;
 }
