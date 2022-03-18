@@ -162,6 +162,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
 
   Future<void> _resolveConflict(
     ConflictResolution conflictResolution,
+    ApiResult<void> Function(T) fnSingle,
     List<T> records,
   ) async {
     switch (conflictResolution) {
@@ -169,7 +170,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
         _logger.w("solving conflict automatically");
         for (final record in records) {
           // check if this record causes a conflict
-          final result = await api.putSingle(record);
+          final result = await fnSingle(record);
           // if record causes conflict delete it
           if (result.isFailure) {
             _logger.w("hard deleting record $record");
@@ -183,13 +184,17 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
   }
 
-  Future<bool> _pushEntriesToServer(List<T> records) async {
-    final result = await api.putMultiple(records);
+  Future<bool> _pushEntriesToServer(
+    ApiResult<void> Function(List<T>) fnMultiple,
+    ApiResult<void> Function(T) fnSingle,
+    List<T> records,
+  ) async {
+    final result = await fnMultiple(records);
     if (result.isFailure) {
       final conflictResolution =
           await DataProvider.handleApiError(result.failure);
       if (conflictResolution != null) {
-        await _resolveConflict(conflictResolution, records);
+        await _resolveConflict(conflictResolution, fnSingle, records);
         return true;
       }
       return false;
@@ -200,7 +205,11 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   @override
   Future<bool> pushUpdatedToServer() async {
     final recordsToUpdate = await db.getWithSyncStatus(SyncStatus.updated);
-    if (await _pushEntriesToServer(recordsToUpdate)) {
+    if (await _pushEntriesToServer(
+      api.putMultiple,
+      api.putSingle,
+      recordsToUpdate,
+    )) {
       db.setAllUpdatedSynchronized();
       return true;
     } else {
@@ -211,7 +220,11 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   @override
   Future<bool> pushCreatedToServer() async {
     final recordsToCreate = await db.getWithSyncStatus(SyncStatus.created);
-    if (await _pushEntriesToServer(recordsToCreate)) {
+    if (await _pushEntriesToServer(
+      api.postMultiple,
+      api.postSingle,
+      recordsToCreate,
+    )) {
       db.setAllCreatedSynchronized();
       return true;
     } else {
