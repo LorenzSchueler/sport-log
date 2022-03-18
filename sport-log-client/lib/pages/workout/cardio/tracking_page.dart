@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:flutter/material.dart' hide Route;
@@ -161,15 +161,13 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     _lastStepCount = stepCountEvent;
   }
 
-  Future<void> _onLocationUpdate(LocationData location) async {
+  Future<void> _onLocationUpdate(geolocator.Position position) async {
     setState(() {
-      _locationInfo = """provider:  ${location.provider}
-accuracy: ${location.accuracy?.toInt()} m
-time: ${location.time! ~/ 1000} s
-satelites:  ${location.satelliteNumber}""";
+      _locationInfo = """accuracy: ${position.accuracy.toInt()} m
+time: ${position.timestamp!.millisecondsSinceEpoch ~/ 1000} s""";
     });
 
-    LatLng latLng = LatLng(location.latitude!, location.longitude!);
+    LatLng latLng = LatLng(position.latitude, position.longitude);
 
     await _mapController.animateCamera(
       CameraUpdate.newLatLng(latLng),
@@ -196,8 +194,8 @@ satelites:  ${location.satelliteNumber}""";
     ]);
 
     if (_trackingMode == TrackingMode.tracking) {
-      _lastElevation ??= location.altitude;
-      double elevationDifference = location.altitude! - _lastElevation!;
+      _lastElevation ??= position.altitude;
+      double elevationDifference = position.altitude - _lastElevation!;
       setState(() {
         if (elevationDifference > 0) {
           _ascent += elevationDifference;
@@ -205,13 +203,13 @@ satelites:  ${location.satelliteNumber}""";
           _descent -= elevationDifference;
         }
       });
-      _lastElevation = location.altitude;
+      _lastElevation = position.altitude;
 
       _cardioSessionDescription.cardioSession.track!.add(
         Position(
-          latitude: location.latitude!,
-          longitude: location.longitude!,
-          elevation: location.altitude!,
+          latitude: position.latitude,
+          longitude: position.longitude,
+          elevation: position.altitude,
           distance: 0,
           time: _cardioSessionDescription.cardioSession.time!,
         ),
