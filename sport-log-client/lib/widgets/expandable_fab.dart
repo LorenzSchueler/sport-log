@@ -102,7 +102,14 @@ class _ExpandableFabState extends State<ExpandableFab>
           directionInDegrees: angleInDegrees,
           maxDistance: 100,
           progress: _expandAnimation,
-          child: widget.buttons[i],
+          child: ActionButton(
+            key: widget.buttons[i].key,
+            icon: widget.buttons[i].icon,
+            onPressed: () {
+              _toggle();
+              widget.buttons[i].onPressed?.call();
+            },
+          ),
         ),
       );
     }
