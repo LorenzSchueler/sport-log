@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:mapbox_api/mapbox_api.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 
 abstract class Defaults {
@@ -7,6 +8,7 @@ abstract class Defaults {
   static const edgeInsets = _EdgeInsets();
   static const borderRadius = _BorderRadius();
   static const mapbox = _Mapbox();
+  static final mapboxApi = MapboxApi(accessToken: Defaults.mapbox.accessToken);
   static final server = _Server();
 }
 

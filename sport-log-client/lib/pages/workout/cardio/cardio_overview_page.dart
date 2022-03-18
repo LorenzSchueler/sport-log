@@ -213,6 +213,10 @@ class CardioSessionCard extends StatelessWidget {
                       accessToken: Defaults.mapbox.accessToken,
                       styleString: Defaults.mapbox.style.outdoor,
                       initialCameraPosition: Settings.lastMapPosition,
+                      rotateGesturesEnabled: false,
+                      tiltGesturesEnabled: false,
+                      scrollGesturesEnabled: false,
+                      zoomGesturesEnabled: false,
                       onMapCreated: (MapboxMapController controller) =>
                           _sessionMapController = controller,
                       onStyleLoadedCallback: () {

@@ -91,7 +91,10 @@ class Position {
 }
 
 extension TrackLatLngBounds on List<Position> {
-  LatLngBounds get latLngBounds {
+  LatLngBounds? get latLngBounds {
+    if (isEmpty) {
+      return null;
+    }
     double north = map((p) => p.latitude).max;
     double south = map((p) => p.latitude).min;
     double latDiff = north - south;

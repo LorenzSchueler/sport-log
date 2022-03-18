@@ -36,8 +36,6 @@ class RouteEditPageState extends State<RouteEditPage> {
 
   late MapboxMapController _mapController;
 
-  MapboxApi mapbox = MapboxApi(accessToken: Defaults.mapbox.accessToken);
-
   late Route _route;
 
   @override
@@ -58,6 +56,7 @@ class RouteEditPageState extends State<RouteEditPage> {
 
   Future<void> _saveRoute() async {
     _route.setEmptyToNull();
+    _logger.i("saving route");
     final result = widget.route != null
         ? await _dataProvider.updateSingle(_route)
         : await _dataProvider.createSingle(_route);
@@ -81,7 +80,8 @@ class RouteEditPageState extends State<RouteEditPage> {
   }
 
   Future<void> _matchLocations() async {
-    DirectionsApiResponse response = await mapbox.directions.request(
+    DirectionsApiResponse response =
+        await Defaults.mapboxApi.directions.request(
       profile: NavigationProfile.WALKING,
       geometries: NavigationGeometries.POLYLINE,
       coordinates: _route.markedPositions!
