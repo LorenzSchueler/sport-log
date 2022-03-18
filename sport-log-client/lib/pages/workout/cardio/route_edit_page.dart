@@ -4,6 +4,7 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/map_utils.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:mapbox_api/mapbox_api.dart';
@@ -56,12 +57,7 @@ class RouteEditPageState extends State<RouteEditPage> {
   }
 
   Future<void> _saveRoute() async {
-    if (_route.track != null && _route.track!.isEmpty) {
-      _route.track = null;
-    }
-    if (_route.markedPositions != null && _route.markedPositions!.isEmpty) {
-      _route.markedPositions = null;
-    }
+    _route.setEmptyToNull();
     final result = widget.route != null
         ? await _dataProvider.updateSingle(_route)
         : await _dataProvider.createSingle(_route);
@@ -139,17 +135,7 @@ class RouteEditPageState extends State<RouteEditPage> {
         ),
       ),
     );
-    _circles.add(
-      await _mapController.addCircle(
-        CircleOptions(
-          circleRadius: 8.0,
-          circleColor: Defaults.mapbox.markerColor,
-          circleOpacity: 0.5,
-          geometry: latLng,
-          draggable: false,
-        ),
-      ),
-    );
+    _circles.add(await _mapController.addLocationMarker(latLng));
   }
 
   Future<void> _updatePoints() async {
@@ -367,15 +353,8 @@ class RouteEditPageState extends State<RouteEditPage> {
                 _mapController = controller;
               },
               onStyleLoadedCallback: () async {
-                final bounds = _route.track!.latLngBounds;
-                _mapController.moveCamera(CameraUpdate.newLatLngBounds(bounds));
-                _line ??= await _mapController.addLine(
-                  LineOptions(
-                    lineColor: Defaults.mapbox.routeLineColor,
-                    lineWidth: 2,
-                    geometry: [],
-                  ),
-                );
+                _mapController.setBounds(_route.track, _route.markedPositions);
+                _line ??= await _mapController.addRouteLine([]);
                 _updatePoints();
                 _updateLine();
               },

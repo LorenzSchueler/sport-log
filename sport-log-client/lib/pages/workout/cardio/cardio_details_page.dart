@@ -3,8 +3,8 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/map_utils.dart';
 import 'package:sport_log/helpers/page_return.dart';
-import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
@@ -126,35 +126,20 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                           onMapCreated: (MapboxMapController controller) =>
                               _mapController = controller,
                           onStyleLoadedCallback: () {
-                            final bounds = LatLngBoundsCombine.combinedBounds(
+                            _mapController.setBounds(
                               _cardioSessionDescription.cardioSession.track,
                               _cardioSessionDescription.route?.track,
                             );
-                            if (bounds != null) {
-                              _mapController.moveCamera(
-                                CameraUpdate.newLatLngBounds(bounds),
-                              );
-                            }
                             if (_cardioSessionDescription.cardioSession.track !=
                                 null) {
-                              _mapController.addLine(
-                                LineOptions(
-                                  lineColor: Defaults.mapbox.trackLineColor,
-                                  lineWidth: 2,
-                                  geometry: _cardioSessionDescription
-                                      .cardioSession.track!.latLngs,
-                                ),
+                              _mapController.addTrackLine(
+                                _cardioSessionDescription.cardioSession.track!,
                               );
                             }
                             if (_cardioSessionDescription.route?.track !=
                                 null) {
-                              _mapController.addLine(
-                                LineOptions(
-                                  lineColor: Defaults.mapbox.routeLineColor,
-                                  lineWidth: 2,
-                                  geometry: _cardioSessionDescription
-                                      .route!.track!.latLngs,
-                                ),
+                              _mapController.addRouteLine(
+                                _cardioSessionDescription.route!.track!,
                               );
                             }
                           },

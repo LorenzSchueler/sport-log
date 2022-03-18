@@ -5,6 +5,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/map_utils.dart';
 import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -215,33 +216,19 @@ class CardioSessionCard extends StatelessWidget {
                       onMapCreated: (MapboxMapController controller) =>
                           _sessionMapController = controller,
                       onStyleLoadedCallback: () {
-                        final bounds = LatLngBoundsCombine.combinedBounds(
+                        _sessionMapController.setBounds(
                           cardioSessionDescription.cardioSession.track,
                           cardioSessionDescription.route?.track,
                         );
-                        if (bounds != null) {
-                          _sessionMapController
-                              .moveCamera(CameraUpdate.newLatLngBounds(bounds));
-                        }
                         if (cardioSessionDescription.cardioSession.track !=
                             null) {
-                          _sessionMapController.addLine(
-                            LineOptions(
-                              lineColor: Defaults.mapbox.trackLineColor,
-                              lineWidth: 2,
-                              geometry: cardioSessionDescription
-                                  .cardioSession.track!.latLngs,
-                            ),
+                          _sessionMapController.addTrackLine(
+                            cardioSessionDescription.cardioSession.track!,
                           );
                         }
                         if (cardioSessionDescription.route?.track != null) {
-                          _sessionMapController.addLine(
-                            LineOptions(
-                              lineColor: Defaults.mapbox.routeLineColor,
-                              lineWidth: 2,
-                              geometry: cardioSessionDescription
-                                  .route!.track!.latLngs,
-                            ),
+                          _sessionMapController.addRouteLine(
+                            cardioSessionDescription.route!.track!,
                           );
                         }
                       },

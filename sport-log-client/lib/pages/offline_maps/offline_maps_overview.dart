@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/map_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -98,14 +99,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
       _point1Marker = null;
     }
     if (_point1 != null) {
-      _point1Marker = await _mapController.addCircle(
-        CircleOptions(
-          circleRadius: 8.0,
-          circleColor: Defaults.mapbox.markerColor,
-          circleOpacity: 0.5,
-          geometry: _point1,
-        ),
-      );
+      _point1Marker = await _mapController.addLocationMarker(_point1!);
     }
   }
 
@@ -122,14 +116,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
       _boundingBoxLine = null;
     }
     if (_point2 != null) {
-      _point2Marker = await _mapController.addCircle(
-        CircleOptions(
-          circleRadius: 8.0,
-          circleColor: Defaults.mapbox.markerColor,
-          circleOpacity: 0.5,
-          geometry: _point2,
-        ),
-      );
+      _point2Marker = await _mapController.addLocationMarker(_point2!);
       _boundingBoxLine = await _mapController.addLine(
         LineOptions(
           lineColor: Defaults.mapbox.trackLineColor,

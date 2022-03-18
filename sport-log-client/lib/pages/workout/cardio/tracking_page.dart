@@ -8,6 +8,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/map_utils.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/settings.dart';
@@ -176,22 +177,7 @@ time: ${position.timestamp!.millisecondsSinceEpoch ~/ 1000} s""";
     if (_circles != null) {
       await _mapController.removeCircles(_circles!);
     }
-    _circles = await _mapController.addCircles([
-      CircleOptions(
-        circleRadius: 8.0,
-        circleColor: Defaults.mapbox.markerColor,
-        circleOpacity: 0.5,
-        geometry: latLng,
-        draggable: false,
-      ),
-      CircleOptions(
-        circleRadius: 20.0,
-        circleColor: Defaults.mapbox.markerColor,
-        circleOpacity: 0.3,
-        geometry: latLng,
-        draggable: false,
-      ),
-    ]);
+    _circles = await _mapController.addCurrentLocationMarker(latLng);
 
     if (_trackingMode == TrackingMode.tracking) {
       _lastElevation ??= position.altitude;
@@ -222,13 +208,7 @@ time: ${position.timestamp!.millisecondsSinceEpoch ~/ 1000} s""";
     MapboxMapController controller,
     LatLng location,
   ) async {
-    _line ??= await controller.addLine(
-      LineOptions(
-        lineColor: Defaults.mapbox.trackLineColor,
-        lineWidth: 2,
-        geometry: [],
-      ),
-    );
+    _line ??= await controller.addTrackLine([]);
     await controller.updateLine(
       _line!,
       LineOptions(
@@ -389,12 +369,8 @@ time: ${position.timestamp!.millisecondsSinceEpoch ~/ 1000} s""";
                   _mapController = controller,
               onStyleLoadedCallback: () {
                 if (_cardioSessionDescription.route?.track != null) {
-                  _mapController.addLine(
-                    LineOptions(
-                      lineColor: Defaults.mapbox.routeLineColor,
-                      lineWidth: 2,
-                      geometry: _cardioSessionDescription.route!.track!.latLngs,
-                    ),
+                  _mapController.addRouteLine(
+                    _cardioSessionDescription.route!.track!,
                   );
                 }
                 _locationUtils.startLocationStream();
