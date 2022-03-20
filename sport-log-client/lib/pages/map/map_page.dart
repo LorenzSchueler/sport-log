@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geolocator/geolocator.dart' as geolocator;
+import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/location_utils.dart';
@@ -47,8 +47,8 @@ class MapPageState extends State<MapPage> {
     super.dispose();
   }
 
-  Future<void> _onLocationUpdate(geolocator.Position position) async {
-    LatLng latLng = LatLng(position.latitude, position.longitude);
+  Future<void> _onLocationUpdate(LocationData location) async {
+    LatLng latLng = LatLng(location.latitude!, location.longitude!);
 
     await _mapController.animateCamera(
       CameraUpdate.newLatLng(latLng),

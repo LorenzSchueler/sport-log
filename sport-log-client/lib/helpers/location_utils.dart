@@ -1,44 +1,41 @@
 import 'dart:async';
 
-import 'package:geolocator/geolocator.dart';
-import 'package:sport_log/helpers/logger.dart';
+import 'package:location/location.dart';
 
 class LocationUtils {
-  void Function(Position) onLocationUpdate;
-  StreamSubscription<Position>? _positionStream;
+  void Function(LocationData) onLocationUpdate;
+
+  final Location _location = Location();
+  StreamSubscription? _locationSubscription;
 
   LocationUtils(this.onLocationUpdate);
 
-  Future<String?> startLocationStream() async {
-    if (!await Geolocator.isLocationServiceEnabled()) {
-      await Geolocator.openLocationSettings();
-      if (!await Geolocator.isLocationServiceEnabled()) {
-        return "GPS must be enabled in order to track your position.";
+  Future<void> startLocationStream() async {
+    bool serviceEnabled = await _location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await _location.requestService();
+      if (!serviceEnabled) {
+        return;
       }
     }
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return "Sport-Log must be allowd to access your position in order to track your position.";
+    PermissionStatus permissionGranted = await _location.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await _location.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
+        return;
       }
     }
 
-    _positionStream = Geolocator.getPositionStream().listen(
-      (Position? position) => position == null
-          ? Logger("LocationUtils").i("position == null")
-          : onLocationUpdate(position),
-    );
-    return null;
+    _location.changeSettings(accuracy: LocationAccuracy.high);
+    _locationSubscription =
+        _location.onLocationChanged.listen(onLocationUpdate);
   }
 
   void stopLocationStream() {
-    _positionStream?.cancel();
-    _positionStream = null;
+    _locationSubscription?.cancel();
+    _locationSubscription = null;
   }
 
-  bool get enabled => _positionStream != null;
-
-  Future<Position?> get lastPosition => Geolocator.getLastKnownPosition();
+  bool get enabled => _locationSubscription != null;
 }
