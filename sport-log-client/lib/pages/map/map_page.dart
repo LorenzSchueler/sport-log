@@ -23,7 +23,7 @@ class MapPageState extends State<MapPage> {
   bool showOverlays = true;
   bool showMapSettings = false;
 
-  List<Circle>? _circles;
+  List<Circle> _circles = [];
   LatLng? _lastLatLng;
 
   String mapStyle = Defaults.mapbox.style.outdoor;
@@ -53,10 +53,8 @@ class MapPageState extends State<MapPage> {
     await _mapController.animateCamera(
       CameraUpdate.newLatLng(latLng),
     );
-    if (_circles != null) {
-      await _mapController.removeCircles(_circles!);
-    }
-    _circles = await _mapController.addCurrentLocationMarker(latLng);
+    _circles =
+        await _mapController.updateCurrentLocationMarker(_circles, latLng);
   }
 
   @override
@@ -149,10 +147,10 @@ class MapPageState extends State<MapPage> {
                 onPressed: () async {
                   if (_locationUtils.enabled) {
                     _locationUtils.stopLocationStream();
-                    if (_circles != null) {
-                      await _mapController.removeCircles(_circles!);
+                    if (_circles.isNotEmpty) {
+                      await _mapController.removeCircles(_circles);
                     }
-                    _circles = null;
+                    _circles = [];
                   } else {
                     _locationUtils.startLocationStream();
                   }

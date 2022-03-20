@@ -54,8 +54,8 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   late StepCount _lastStepCount;
 
   late MapboxMapController _mapController;
-  Line? _line;
-  List<Circle>? _circles;
+  late Line _line;
+  List<Circle> _circles = [];
 
   @override
   void initState() {
@@ -177,10 +177,8 @@ satelites:  ${location.satelliteNumber}""";
       CameraUpdate.newLatLng(latLng),
     );
 
-    if (_circles != null) {
-      await _mapController.removeCircles(_circles!);
-    }
-    _circles = await _mapController.addCurrentLocationMarker(latLng);
+    _circles =
+        await _mapController.updateCurrentLocationMarker(_circles, latLng);
 
     if (_trackingMode == TrackingMode.tracking) {
       _lastElevation ??= location.altitude;
@@ -203,22 +201,11 @@ satelites:  ${location.satelliteNumber}""";
           time: _cardioSessionDescription.cardioSession.time!,
         ),
       );
-      _extendLine(_mapController, latLng);
+      await _mapController.updateTrackLine(
+        _line,
+        _cardioSessionDescription.cardioSession.track!,
+      );
     }
-  }
-
-  Future<void> _extendLine(
-    MapboxMapController controller,
-    LatLng location,
-  ) async {
-    _line ??= await controller.addTrackLine([]);
-    await controller.updateLine(
-      _line!,
-      LineOptions(
-        lineWidth: 2,
-        geometry: _cardioSessionDescription.cardioSession.track!.latLngs,
-      ),
-    );
   }
 
   Future<void> _stopDialog() async {
@@ -370,12 +357,15 @@ satelites:  ${location.satelliteNumber}""";
               compassViewPosition: CompassViewPosition.TopRight,
               onMapCreated: (MapboxMapController controller) =>
                   _mapController = controller,
-              onStyleLoadedCallback: () {
+              onStyleLoadedCallback: () async {
                 if (_cardioSessionDescription.route?.track != null) {
                   _mapController.addRouteLine(
                     _cardioSessionDescription.route!.track!,
                   );
                 }
+                _line = await _mapController.addTrackLine(
+                  _cardioSessionDescription.cardioSession.track!,
+                ); // init with empty track
                 _locationUtils.startLocationStream();
                 _startStepCountStream();
               },

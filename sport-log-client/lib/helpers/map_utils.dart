@@ -32,6 +32,13 @@ extension MapControllerExt on MapboxMapController {
     );
   }
 
+  Future<void> updateTrackLine(Line line, List<Position> track) async {
+    await updateLine(
+      line,
+      LineOptions(geometry: track.latLngs),
+    );
+  }
+
   Future<List<Circle>> addCurrentLocationMarker(LatLng latLng) {
     return addCircles([
       CircleOptions(
@@ -49,6 +56,14 @@ extension MapControllerExt on MapboxMapController {
         draggable: false,
       ),
     ]);
+  }
+
+  Future<List<Circle>> updateCurrentLocationMarker(
+    List<Circle> circles,
+    LatLng latLng,
+  ) async {
+    await removeCircles(circles);
+    return await addCurrentLocationMarker(latLng);
   }
 
   Future<Circle> addLocationMarker(LatLng latLng) {
