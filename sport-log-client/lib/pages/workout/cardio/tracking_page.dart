@@ -84,7 +84,8 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     if (_mapController.cameraPosition != null) {
       Settings.lastMapPosition = _mapController.cameraPosition!;
     }
-    if (_cardioSessionDescription.cardioSession.track != null) {
+    if (_cardioSessionDescription.cardioSession.track != null &&
+        _cardioSessionDescription.cardioSession.track!.isNotEmpty) {
       Settings.lastGpsLatLng =
           _cardioSessionDescription.cardioSession.track!.last.latLng;
     }
