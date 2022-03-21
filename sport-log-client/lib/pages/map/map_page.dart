@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:location/location.dart';
@@ -20,11 +22,13 @@ class MapPage extends StatefulWidget {
 class MapPageState extends State<MapPage> {
   late LocationUtils _locationUtils;
   late MapboxMapController _mapController;
-  bool showOverlays = true;
-  bool showMapSettings = false;
+  bool _showOverlays = true;
+  bool _showMapSettings = false;
 
   List<Circle> _circles = [];
   LatLng? _lastLatLng;
+
+  double _metersPerPixel = 1;
 
   String mapStyle = Defaults.mapbox.style.outdoor;
 
@@ -43,18 +47,31 @@ class MapPageState extends State<MapPage> {
     if (_lastLatLng != null) {
       Settings.lastGpsLatLng = _lastLatLng!;
     }
+    _mapController.removeListener(_mapControllerListener);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
+  Future<void> _mapControllerListener() async {
+    final latitude = _mapController.cameraPosition!.target.latitude;
+
+    final metersPerPixel =
+        await _mapController.getMetersPerPixelAtLatitude(latitude);
+    if (((_metersPerPixel / metersPerPixel) - 1).abs() > 0.05) {
+      setState(() => _metersPerPixel = metersPerPixel);
+    }
+  }
+
   Future<void> _onLocationUpdate(LocationData location) async {
-    LatLng latLng = LatLng(location.latitude!, location.longitude!);
+    _lastLatLng = LatLng(location.latitude!, location.longitude!);
 
     await _mapController.animateCamera(
-      CameraUpdate.newLatLng(latLng),
+      CameraUpdate.newLatLng(_lastLatLng!),
     );
-    _circles =
-        await _mapController.updateCurrentLocationMarker(_circles, latLng);
+    _circles = await _mapController.updateCurrentLocationMarker(
+      _circles,
+      _lastLatLng!,
+    );
   }
 
   @override
@@ -63,7 +80,7 @@ class MapPageState extends State<MapPage> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: showOverlays
+      appBar: _showOverlays
           ? AppBar(
               backgroundColor: const Color.fromARGB(0, 0, 0, 0),
               elevation: 0,
@@ -77,14 +94,19 @@ class MapPageState extends State<MapPage> {
             styleString: mapStyle,
             initialCameraPosition: Settings.lastMapPosition,
             trackCameraPosition: true,
-            onMapCreated: (MapboxMapController controller) =>
-                _mapController = controller,
+            onMapCreated: (MapboxMapController controller) => _mapController =
+                controller..addListener(_mapControllerListener),
             onMapClick: (_, __) => setState(() {
-              showOverlays = !showOverlays;
-              showMapSettings = false;
+              _showOverlays = !_showOverlays;
+              _showMapSettings = false;
             }),
           ),
-          if (showMapSettings)
+          Positioned(
+            bottom: 10,
+            right: 10,
+            child: MapScale(metersPerPixel: _metersPerPixel),
+          ),
+          if (_showMapSettings)
             Positioned(
               bottom: 0,
               left: 10,
@@ -123,7 +145,7 @@ class MapPageState extends State<MapPage> {
                 ),
               ),
             ),
-          if (showOverlays) ...[
+          if (_showOverlays) ...[
             Positioned(
               top: 100,
               right: 15,
@@ -131,7 +153,7 @@ class MapPageState extends State<MapPage> {
                 heroTag: null,
                 child: const Icon(AppIcons.map),
                 onPressed: () => setState(() {
-                  showMapSettings = !showMapSettings;
+                  _showMapSettings = !_showMapSettings;
                 }),
               ),
             ),
@@ -160,6 +182,44 @@ class MapPageState extends State<MapPage> {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class MapScale extends StatelessWidget {
+  final double metersPerPixel;
+
+  const MapScale({required this.metersPerPixel, Key? key}) : super(key: key);
+
+  double get _scaleWidth {
+    const maxWidth = 200;
+    final maxWidthMeters = maxWidth * metersPerPixel;
+    final fac = maxWidthMeters / pow(10, (log(maxWidthMeters) / ln10).floor());
+    if (fac >= 1 && fac < 2) {
+      return maxWidth / fac;
+    } else if (fac < 5) {
+      return maxWidth / fac * 2;
+    } else {
+      // fac < 10
+      return maxWidth / fac * 5;
+    }
+  }
+
+  int get _scaleLength {
+    return (_scaleWidth * metersPerPixel).round();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: _scaleWidth,
+      color: Theme.of(context).colorScheme.background,
+      child: Text(
+        _scaleLength >= 1000
+            ? "${(_scaleLength / 1000).round()} km"
+            : "$_scaleLength m",
+        textAlign: TextAlign.center,
       ),
     );
   }
