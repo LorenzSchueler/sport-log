@@ -147,14 +147,14 @@ class _EditMovementPageState extends State<EditMovementPage> {
                           padding: const EdgeInsets.only(top: 8),
                           child: TextFormField(
                             initialValue:
-                                _movementDescription.movement.description ?? "",
+                                _movementDescription.movement.description,
                             focusNode: _descriptionFocusNode,
                             keyboardType: TextInputType.multiline,
                             minLines: 1,
                             maxLines: null,
                             onChanged: (description) => setState(
                               () => _movementDescription.movement.description =
-                                  "",
+                                  description,
                             ),
                             decoration: InputDecoration(
                               contentPadding:
