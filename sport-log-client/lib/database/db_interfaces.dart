@@ -3,11 +3,6 @@ export 'package:sport_log/helpers/validation.dart';
 
 typedef DbRecord = Map<String, Object?>;
 
-enum DbError {
-  unknown,
-  validationFailed,
-}
-
 enum SyncStatus {
   synchronized,
   updated,
