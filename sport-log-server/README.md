@@ -125,4 +125,4 @@ service template
 
 ## Client Server Synchronization
 
-refer to [synchronization](SYNCHRONIZATION.md)
+refer to [synchronization](../SYNCHRONIZATION.md)

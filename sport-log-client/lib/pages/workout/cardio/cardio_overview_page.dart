@@ -55,7 +55,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
 
   Future<void> _update() async {
     _logger.d(
-      'Updating diary page with start = ${_dateFilter.start}, end = ${_dateFilter.end}',
+      'Updating cardio session page with start = ${_dateFilter.start}, end = ${_dateFilter.end}',
     );
     final cardioSessionDescriptions =
         await _dataProvider.getByTimerangeAndMovement(

@@ -38,7 +38,7 @@ adb pull /data/user/0/org.sport_log.sport_log_client/databases/database.sqlite <
 
 ## Client Server Synchronization
 
-refer to [synchronization](SYNCHRONIZATION.md)
+refer to [synchronization](../SYNCHRONIZATION.md)
 
 ## Code generation
 
