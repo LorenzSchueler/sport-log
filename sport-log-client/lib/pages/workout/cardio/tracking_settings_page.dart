@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -19,8 +18,6 @@ class CardioTrackingSettingsPage extends StatefulWidget {
 
 class CardioTrackingSettingsPageState
     extends State<CardioTrackingSettingsPage> {
-  final _logger = Logger('CardioTrackingSettingsPage');
-
   Movement? _movement;
   CardioType? _cardioType;
   Route? _route;
@@ -48,7 +45,6 @@ class CardioTrackingSettingsPageState
                 setState(() {
                   _movement = movement;
                 });
-                _logger.i(_movement?.name);
               },
             ),
             EditTile(
@@ -63,7 +59,6 @@ class CardioTrackingSettingsPageState
                 setState(() {
                   _cardioType = cardioType;
                 });
-                _logger.i(_cardioType?.name);
               },
             ),
             EditTile(
@@ -78,7 +73,6 @@ class CardioTrackingSettingsPageState
                 setState(() {
                   _route = route;
                 });
-                _logger.i(_cardioType?.name);
               },
             ),
             SizedBox(
