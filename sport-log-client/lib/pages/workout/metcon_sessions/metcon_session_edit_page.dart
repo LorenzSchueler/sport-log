@@ -45,7 +45,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
     final result = widget.metconSessionDescription != null
         ? await _dataProvider.updateSingle(_metconSessionDescription)
         : await _dataProvider.createSingle(_metconSessionDescription);
-    if (result) {
+    if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
       Navigator.pop(
         context,
@@ -59,7 +59,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
     } else {
       await showMessageDialog(
         context: context,
-        text: 'Creating Metcon Session failed.',
+        text: 'Creating Metcon Session failed:\n${result.failure}',
       );
     }
   }

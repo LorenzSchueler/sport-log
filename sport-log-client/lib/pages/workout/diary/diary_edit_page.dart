@@ -34,13 +34,13 @@ class DiaryEditPageState extends State<DiaryEditPage> {
     final result = widget.diary != null
         ? await _dataProvider.updateSingle(_diary)
         : await _dataProvider.createSingle(_diary);
-    if (result) {
+    if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
       Navigator.pop(context);
     } else {
       await showMessageDialog(
         context: context,
-        text: 'Creating Diary Entry failed.',
+        text: 'Creating Diary Entry failed:\n${result.failure}',
       );
     }
   }

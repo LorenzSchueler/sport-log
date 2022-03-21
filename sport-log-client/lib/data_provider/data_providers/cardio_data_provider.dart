@@ -58,17 +58,17 @@ class CardioSessionDescriptionDataProvider
   }
 
   @override
-  Future<bool> createSingle(CardioSessionDescription object) async {
+  Future<DbResult> createSingle(CardioSessionDescription object) async {
     return await _cardioDataProvider.createSingle(object.cardioSession);
   }
 
   @override
-  Future<bool> updateSingle(CardioSessionDescription object) async {
+  Future<DbResult> updateSingle(CardioSessionDescription object) async {
     return await _cardioDataProvider.updateSingle(object.cardioSession);
   }
 
   @override
-  Future<bool> deleteSingle(CardioSessionDescription object) async {
+  Future<DbResult> deleteSingle(CardioSessionDescription object) async {
     return await _cardioDataProvider.deleteSingle(object.cardioSession);
   }
 

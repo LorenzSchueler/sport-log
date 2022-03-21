@@ -48,7 +48,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
     final result = widget.metconDescription != null
         ? await _dataProvider.updateSingle(_metconDescription)
         : await _dataProvider.createSingle(_metconDescription);
-    if (result) {
+    if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
       Navigator.pop(
         context,
@@ -62,7 +62,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
     } else {
       await showMessageDialog(
         context: context,
-        text: 'Creating Metcon failed.',
+        text: 'Creating Metcon failed:\n${result.failure}',
       );
     }
   }

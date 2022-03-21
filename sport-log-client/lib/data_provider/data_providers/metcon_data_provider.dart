@@ -93,10 +93,11 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   }
 
   @override
-  Future<bool> createSingle(MetconDescription object) async {
+  Future<DbResult> createSingle(MetconDescription object) async {
     assert(object.isValid());
-    if (!await _metconDataProvider.createSingle(object.metcon)) {
-      return false;
+    var result = await _metconDataProvider.createSingle(object.metcon);
+    if (result.isFailure()) {
+      return result;
     }
     return await _metconMovementDataProvider.createMultiple(
       object.moves.map((mmd) => mmd.metconMovement).toList(),
@@ -104,7 +105,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   }
 
   @override
-  Future<bool> updateSingle(MetconDescription object) async {
+  Future<DbResult> updateSingle(MetconDescription object) async {
     assert(object.isValid());
 
     final oldMMovements =
@@ -113,20 +114,23 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
 
     final diffing = diff(oldMMovements, newMMovements);
 
-    if (!await _metconDataProvider.updateSingle(object.metcon)) {
-      return false;
+    var result = await _metconDataProvider.updateSingle(object.metcon);
+    if (result.isFailure()) {
+      return result;
     }
-    if (!await _metconMovementDataProvider.deleteMultiple(diffing.toDelete)) {
-      return false;
+    result = await _metconMovementDataProvider.deleteMultiple(diffing.toDelete);
+    if (result.isFailure()) {
+      return result;
     }
-    if (!await _metconMovementDataProvider.updateMultiple(diffing.toUpdate)) {
-      return false;
+    result = await _metconMovementDataProvider.updateMultiple(diffing.toUpdate);
+    if (result.isFailure()) {
+      return result;
     }
     return await _metconMovementDataProvider.createMultiple(diffing.toCreate);
   }
 
   @override
-  Future<bool> deleteSingle(MetconDescription object) async {
+  Future<DbResult> deleteSingle(MetconDescription object) async {
     object.setDeleted();
     await _metconMovementDataProvider.deleteByMetcon(object.metcon.id);
     return await _metconDataProvider.deleteSingle(object.metcon);
@@ -224,17 +228,17 @@ class MetconSessionDescriptionDataProvider
   }
 
   @override
-  Future<bool> createSingle(MetconSessionDescription object) async {
+  Future<DbResult> createSingle(MetconSessionDescription object) async {
     return await _metconSessionDataProvider.createSingle(object.metconSession);
   }
 
   @override
-  Future<bool> updateSingle(MetconSessionDescription object) async {
+  Future<DbResult> updateSingle(MetconSessionDescription object) async {
     return await _metconSessionDataProvider.updateSingle(object.metconSession);
   }
 
   @override
-  Future<bool> deleteSingle(MetconSessionDescription object) async {
+  Future<DbResult> deleteSingle(MetconSessionDescription object) async {
     return await _metconSessionDataProvider.deleteSingle(object.metconSession);
   }
 

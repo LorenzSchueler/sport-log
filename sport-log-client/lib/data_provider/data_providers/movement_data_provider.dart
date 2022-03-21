@@ -51,17 +51,17 @@ class MovementDescriptionDataProvider
   }
 
   @override
-  Future<bool> createSingle(MovementDescription object) async {
+  Future<DbResult> createSingle(MovementDescription object) async {
     return await _dataProvider.createSingle(object.movement);
   }
 
   @override
-  Future<bool> updateSingle(MovementDescription object) async {
+  Future<DbResult> updateSingle(MovementDescription object) async {
     return await _dataProvider.updateSingle(object.movement);
   }
 
   @override
-  Future<bool> deleteSingle(MovementDescription object) async {
+  Future<DbResult> deleteSingle(MovementDescription object) async {
     return await _dataProvider.deleteSingle(object.movement);
   }
 

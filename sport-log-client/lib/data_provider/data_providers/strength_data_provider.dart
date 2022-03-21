@@ -68,36 +68,42 @@ class StrengthSessionDescriptionDataProvider
   }
 
   @override
-  Future<bool> createSingle(StrengthSessionDescription object) async {
+  Future<DbResult> createSingle(StrengthSessionDescription object) async {
     assert(object.isValid());
-    if (!await _strengthSessionDataProvider.createSingle(object.session)) {
-      return false;
+    final result =
+        await _strengthSessionDataProvider.createSingle(object.session);
+    if (result.isFailure()) {
+      return result;
     }
     return await _strengthSetDataProvider.createMultiple(object.sets);
   }
 
   @override
-  Future<bool> updateSingle(StrengthSessionDescription object) async {
+  Future<DbResult> updateSingle(StrengthSessionDescription object) async {
     assert(object.isValid());
     final oldSets =
         await _strengthSetDataProvider.getByStrengthSession(object.session.id);
     final newSets = [...object.sets];
     final diffing = diff(oldSets, newSets);
 
-    if (!await _strengthSessionDataProvider.updateSingle(object.session)) {
-      return false;
+    var result =
+        await _strengthSessionDataProvider.updateSingle(object.session);
+    if (result.isFailure()) {
+      return result;
     }
-    if (!await _strengthSetDataProvider.deleteMultiple(diffing.toDelete)) {
-      return false;
+    result = await _strengthSetDataProvider.deleteMultiple(diffing.toDelete);
+    if (result.isFailure()) {
+      return result;
     }
-    if (!await _strengthSetDataProvider.updateMultiple(diffing.toUpdate)) {
-      return false;
+    result = await _strengthSetDataProvider.updateMultiple(diffing.toUpdate);
+    if (result.isFailure()) {
+      return result;
     }
     return await _strengthSetDataProvider.createMultiple(diffing.toCreate);
   }
 
   @override
-  Future<bool> deleteSingle(StrengthSessionDescription object) async {
+  Future<DbResult> deleteSingle(StrengthSessionDescription object) async {
     object.setDeleted();
     await _strengthSetDataProvider.deleteByStrengthSession(object.session.id);
     return await _strengthSessionDataProvider.deleteSingle(object.session);

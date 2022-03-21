@@ -46,7 +46,7 @@ class CardioEditPageState extends State<CardioEditPage> {
     final result = widget.cardioSessionDescription != null
         ? await _dataProvider.updateSingle(_cardioSessionDescription)
         : await _dataProvider.createSingle(_cardioSessionDescription);
-    if (result) {
+    if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
       Navigator.pop(
         context,
@@ -60,7 +60,7 @@ class CardioEditPageState extends State<CardioEditPage> {
     } else {
       await showMessageDialog(
         context: context,
-        text: 'Creating Cardio Session failed.',
+        text: 'Creating Cardio Session failed:\n${result.failure}',
       );
     }
   }

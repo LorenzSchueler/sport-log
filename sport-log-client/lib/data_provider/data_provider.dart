@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
+import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/typedefs.dart';
@@ -15,11 +16,11 @@ import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
 final _logger = Logger('DataProvider');
 
 abstract class DataProvider<T> extends ChangeNotifier {
-  Future<bool> createSingle(T object);
+  Future<DbResult> createSingle(T object);
 
-  Future<bool> updateSingle(T object);
+  Future<DbResult> updateSingle(T object);
 
-  Future<bool> deleteSingle(T object);
+  Future<DbResult> deleteSingle(T object);
 
   Future<List<T>> getNonDeleted();
 
@@ -89,58 +90,64 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   List<T> getFromAccountData(AccountData accountData);
 
   @override
-  Future<bool> createSingle(T object) async {
+  Future<DbResult> createSingle(T object) async {
     assert(object.isValid());
-    if (!await db.createSingle(object)) {
-      return false;
+    final result = await db.createSingle(object);
+    if (result.isFailure()) {
+      return result;
     }
     notifyListeners();
-    return true;
+    return DbResult.success();
   }
 
   @override
-  Future<bool> updateSingle(T object) async {
+  Future<DbResult> updateSingle(T object) async {
     assert(object.isValid());
-    if (!await db.updateSingle(object)) {
-      return false;
+    final result = await db.updateSingle(object);
+    if (result.isFailure()) {
+      return result;
     }
     notifyListeners();
-    return true;
+    return DbResult.success();
   }
 
   @override
-  Future<bool> deleteSingle(T object) async {
-    if (!await db.deleteSingle(object.id)) {
-      return false;
+  Future<DbResult> deleteSingle(T object) async {
+    final result = await db.deleteSingle(object.id);
+    if (result.isFailure()) {
+      return result;
     }
     notifyListeners();
-    return true;
+    return DbResult.success();
   }
 
-  Future<bool> createMultiple(List<T> objects) async {
+  Future<DbResult> createMultiple(List<T> objects) async {
     assert(objects.every((element) => element.isValid()));
-    if (!await db.createMultiple(objects)) {
-      return false;
+    final result = await db.createMultiple(objects);
+    if (result.isFailure()) {
+      return result;
     }
     notifyListeners();
-    return true;
+    return DbResult.success();
   }
 
-  Future<bool> updateMultiple(List<T> objects) async {
+  Future<DbResult> updateMultiple(List<T> objects) async {
     assert(objects.every((element) => element.isValid()));
-    if (!await db.updateMultiple(objects)) {
-      return false;
+    final result = await db.updateMultiple(objects);
+    if (result.isFailure()) {
+      return result;
     }
     notifyListeners();
-    return true;
+    return DbResult.success();
   }
 
-  Future<bool> deleteMultiple(List<T> objects) async {
-    if (!await db.deleteMultiple(objects)) {
-      return false;
+  Future<DbResult> deleteMultiple(List<T> objects) async {
+    final result = await db.deleteMultiple(objects);
+    if (result.isFailure()) {
+      return result;
     }
     notifyListeners();
-    return true;
+    return DbResult.success();
   }
 
   @override
@@ -156,7 +163,8 @@ abstract class EntityDataProvider<T extends AtomicEntity>
       );
       return false;
     } else {
-      return await upsertMultiple(result.success, synchronized: true);
+      return (await upsertMultiple(result.success, synchronized: true))
+          .isSuccess();
     }
   }
 
@@ -234,25 +242,26 @@ abstract class EntityDataProvider<T extends AtomicEntity>
 
   Future<T?> getById(Int64 id) async => db.getById(id);
 
-  Future<bool> upsertFromAccountData(AccountData accountData) async {
+  Future<DbResult> upsertFromAccountData(AccountData accountData) async {
     return await upsertMultiple(
       getFromAccountData(accountData),
       synchronized: true,
     );
   }
 
-  Future<bool> upsertMultiple(
+  Future<DbResult> upsertMultiple(
     List<T> objects, {
     required bool synchronized,
   }) async {
     if (objects.isEmpty) {
-      return true;
+      return DbResult.success();
     }
-    if (!await db.upsertMultiple(objects, synchronized: synchronized)) {
-      return false;
+    final result = await db.upsertMultiple(objects, synchronized: synchronized);
+    if (result.isFailure()) {
+      return result;
     }
     notifyListeners();
-    return true;
+    return DbResult.success();
   }
 
   static Future<void> pushAllToServer() async {

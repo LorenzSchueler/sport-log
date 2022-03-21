@@ -60,13 +60,13 @@ class RouteEditPageState extends State<RouteEditPage> {
     final result = widget.route != null
         ? await _dataProvider.updateSingle(_route)
         : await _dataProvider.createSingle(_route);
-    if (result) {
+    if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
       Navigator.pop(context);
     } else {
       await showMessageDialog(
         context: context,
-        text: 'Creating Route Entry failed.',
+        text: 'Creating Route Entry failed:\n${result.failure}',
       );
     }
   }

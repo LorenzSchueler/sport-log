@@ -62,17 +62,16 @@ class _EditMovementPageState extends State<EditMovementPage> {
       return;
     }
 
-    // TODO: do error handling
     final result = widget.movementDescription != null
         ? await _dataProvider.updateSingle(_movementDescription.movement)
         : await _dataProvider.createSingle(_movementDescription.movement);
-    if (result) {
+    if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
       Navigator.pop(context);
     } else {
       await showMessageDialog(
         context: context,
-        text: 'Creating Movement failed.',
+        text: 'Creating Movement failed:\n${result.failure}',
       );
     }
   }

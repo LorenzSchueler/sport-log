@@ -52,60 +52,48 @@ abstract class TableAccessor<T extends AtomicEntity> {
     return changes == 1;
   }
 
-  Future<bool> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
-    final changes = await database.update(
-      tableName,
-      {
-        Columns.deleted: 1,
-        if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
-      },
-      where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
-      whereArgs: [id.toInt()],
-    );
-    return changes == 1;
-  }
-
-  Future<bool> deleteMultiple(
-    List<T> objects, {
-    bool isSynchronized = false,
-  }) async {
-    final batch = database.batch();
-    for (final object in objects) {
-      batch.update(
+  Future<DbResult> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
+    return DbResult.catchError(() async {
+      final changes = await database.update(
         tableName,
         {
           Columns.deleted: 1,
           if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
         },
         where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
-        whereArgs: [object.id.toInt()],
+        whereArgs: [id.toInt()],
       );
-    }
-    final changesList =
-        (await batch.commit(continueOnError: false)).cast<int>();
-    return eq(changesList, List.filled(objects.length, 1));
+      return DbResult.fromBool(changes == 1);
+    });
   }
 
-  Future<bool> updateSingle(T object, {bool isSynchronized = false}) async {
-    final changes = await database.update(
-      tableName,
-      {
-        ...serde.toDbRecord(object),
-        if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index
-      },
-      where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
-      whereArgs: [object.id.toInt()],
-    );
-    return changes == 1;
-  }
-
-  Future<bool> updateMultiple(
+  Future<DbResult> deleteMultiple(
     List<T> objects, {
     bool isSynchronized = false,
   }) async {
-    final batch = database.batch();
-    for (final object in objects) {
-      batch.update(
+    return DbResult.catchError(() async {
+      final batch = database.batch();
+      for (final object in objects) {
+        batch.update(
+          tableName,
+          {
+            Columns.deleted: 1,
+            if (isSynchronized)
+              Columns.syncStatus: SyncStatus.synchronized.index,
+          },
+          where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
+          whereArgs: [object.id.toInt()],
+        );
+      }
+      final changesList =
+          (await batch.commit(continueOnError: false)).cast<int>();
+      return DbResult.fromBool(eq(changesList, List.filled(objects.length, 1)));
+    });
+  }
+
+  Future<DbResult> updateSingle(T object, {bool isSynchronized = false}) async {
+    return DbResult.catchError(() async {
+      final changes = await database.update(
         tableName,
         {
           ...serde.toDbRecord(object),
@@ -114,33 +102,63 @@ abstract class TableAccessor<T extends AtomicEntity> {
         where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
         whereArgs: [object.id.toInt()],
       );
-    }
-    final changesList =
-        (await batch.commit(continueOnError: false)).cast<int>();
-    return eq(changesList, List.filled(objects.length, 1));
-  }
-
-  Future<bool> createSingle(T object, {bool isSynchronized = false}) async {
-    final id = await database.insert(tableName, {
-      ...serde.toDbRecord(object),
-      if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
+      return DbResult.fromBool(changes == 1);
     });
-    return id == object.id.toInt();
   }
 
-  Future<bool> createMultiple(
+  Future<DbResult> updateMultiple(
     List<T> objects, {
     bool isSynchronized = false,
   }) async {
-    final batch = database.batch();
-    for (final object in objects) {
-      batch.insert(tableName, {
+    return DbResult.catchError(() async {
+      final batch = database.batch();
+      for (final object in objects) {
+        batch.update(
+          tableName,
+          {
+            ...serde.toDbRecord(object),
+            if (isSynchronized)
+              Columns.syncStatus: SyncStatus.synchronized.index
+          },
+          where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
+          whereArgs: [object.id.toInt()],
+        );
+      }
+      final changesList =
+          (await batch.commit(continueOnError: false)).cast<int>();
+      return DbResult.fromBool(
+        eq(changesList, List.filled(objects.length, 1)),
+      );
+    });
+  }
+
+  Future<DbResult> createSingle(T object, {bool isSynchronized = false}) async {
+    return DbResult.catchError(() async {
+      final id = await database.insert(tableName, {
         ...serde.toDbRecord(object),
         if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
       });
-    }
-    final idList = (await batch.commit(continueOnError: false)).cast<int>();
-    return eq(idList, objects.map((e) => e.id.toInt()).toList());
+      return DbResult.fromBool(id == object.id.toInt());
+    });
+  }
+
+  Future<DbResult> createMultiple(
+    List<T> objects, {
+    bool isSynchronized = false,
+  }) async {
+    return DbResult.catchError(() async {
+      final batch = database.batch();
+      for (final object in objects) {
+        batch.insert(tableName, {
+          ...serde.toDbRecord(object),
+          if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
+        });
+      }
+      final idList = (await batch.commit(continueOnError: false)).cast<int>();
+      return DbResult.fromBool(
+        eq(idList, objects.map((e) => e.id.toInt()).toList()),
+      );
+    });
   }
 
   Future<List<T>> getNonDeleted() async {
@@ -192,23 +210,26 @@ abstract class TableAccessor<T extends AtomicEntity> {
     );
   }
 
-  Future<bool> upsertMultiple(
+  Future<DbResult> upsertMultiple(
     List<T> objects, {
     required bool synchronized,
   }) async {
-    final batch = database.batch();
-    for (final object in objects) {
-      // changes comming from server win over local changes
-      batch.insert(
-        tableName,
-        {
-          ...serde.toDbRecord(object),
-          if (synchronized) Columns.syncStatus: SyncStatus.synchronized.index,
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    }
-    final idList = (await batch.commit(continueOnError: false)).cast<int>();
-    return eq(idList, objects.map((e) => e.id.toInt()).toList());
+    return DbResult.catchError(() async {
+      final batch = database.batch();
+      for (final object in objects) {
+        // changes comming from server win over local changes
+        batch.insert(
+          tableName,
+          {
+            ...serde.toDbRecord(object),
+            if (synchronized) Columns.syncStatus: SyncStatus.synchronized.index,
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+      final idList = (await batch.commit(continueOnError: false)).cast<int>();
+      return DbResult.fromBool(
+          eq(idList, objects.map((e) => e.id.toInt()).toList()));
+    });
   }
 }

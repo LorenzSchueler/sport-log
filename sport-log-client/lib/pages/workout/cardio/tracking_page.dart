@@ -100,14 +100,14 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     _cardioSessionDescription.cardioSession.setAvgHeartRate();
     _cardioSessionDescription.cardioSession.setDistance();
     final result = await _dataProvider.createSingle(_cardioSessionDescription);
-    if (result) {
+    if (result.isSuccess()) {
       Navigator.pop(context); // pop dialog
       Navigator.pop(context); // pop tracking page
       Navigator.pop(context); // pop tracking settings page
     } else {
       await showMessageDialog(
         context: context,
-        text: 'Creating Cardio Session failed.',
+        text: 'Creating Cardio Session failed:\n${result.failure}',
       );
     }
   }
