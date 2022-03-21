@@ -168,7 +168,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
   }
 
-  Future<void> _resolveConflict(
+  Future<bool> _resolveConflict(
     ConflictResolution conflictResolution,
     ApiResult<void> Function(T) fnSingle,
     List<T> records,
@@ -185,10 +185,10 @@ abstract class EntityDataProvider<T extends AtomicEntity>
             db.hardDeleteSingle(record.id);
           }
         }
-        break;
+        return true; // all entries can be set to synchronized
       case ConflictResolution.manual:
         _logger.w("solving conflict manually");
-        break;
+        return false; // Entries cannot be set to synchronized yet. There are still conflicts.
     }
   }
 
@@ -202,12 +202,13 @@ abstract class EntityDataProvider<T extends AtomicEntity>
       final conflictResolution =
           await DataProvider.handleApiError(result.failure);
       if (conflictResolution != null) {
-        await _resolveConflict(conflictResolution, fnSingle, records);
-        return true;
+        return await _resolveConflict(conflictResolution, fnSingle, records);
+      } else {
+        return false;
       }
-      return false;
+    } else {
+      return true;
     }
-    return true;
   }
 
   @override
@@ -218,7 +219,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
       api.putSingle,
       recordsToUpdate,
     )) {
-      db.setAllUpdatedSynchronized();
+      await db.setAllUpdatedSynchronized();
       return true;
     } else {
       return false;
@@ -233,7 +234,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
       api.postSingle,
       recordsToCreate,
     )) {
-      db.setAllCreatedSynchronized();
+      await db.setAllCreatedSynchronized();
       return true;
     } else {
       return false;
