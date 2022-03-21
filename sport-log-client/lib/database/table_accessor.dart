@@ -229,7 +229,8 @@ abstract class TableAccessor<T extends AtomicEntity> {
       }
       final idList = (await batch.commit(continueOnError: false)).cast<int>();
       return DbResult.fromBool(
-          eq(idList, objects.map((e) => e.id.toInt()).toList()));
+        eq(idList, objects.map((e) => e.id.toInt()).toList()),
+      );
     });
   }
 }

@@ -79,7 +79,7 @@ class InitAppWrapperState extends State<InitAppWrapper> {
   }
 
   Future<void> _initialize() async {
-    await for (double progress in initialize()) {
+    await for (final double progress in initialize()) {
       setState(() => _progress = progress);
     }
     setState(() => _progress = null);

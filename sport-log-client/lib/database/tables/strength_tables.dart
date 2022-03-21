@@ -83,7 +83,7 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
   );
 
   Future<void> setSynchronizedByStrengthSession(Int64 id) async {
-    database.update(
+    await database.update(
       tableName,
       TableAccessor.synchronized,
       where: '${Columns.strengthSessionId} = ?',
@@ -195,7 +195,7 @@ class StrengthSessionDescriptionTable {
       if (movementIdValue != null) movementIdValue.toInt(),
     ]);
     List<StrengthSessionDescription> strengthSessionDescriptions = [];
-    for (Map<String, Object?> record in records) {
+    for (final Map<String, Object?> record in records) {
       final session = _strengthSessionTable.serde
           .fromDbRecord(record, prefix: _strengthSessionTable.table.prefix);
       strengthSessionDescriptions.add(

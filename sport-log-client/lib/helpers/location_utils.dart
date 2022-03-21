@@ -27,9 +27,9 @@ class LocationUtils {
       }
     }
 
-    _location.changeSettings(accuracy: LocationAccuracy.high);
+    await _location.changeSettings(accuracy: LocationAccuracy.high);
     // needs permission "always allow"
-    _location.enableBackgroundMode(enable: true);
+    await _location.enableBackgroundMode(enable: true);
     // fails if background enabled but persission not "always allow"
     _locationSubscription =
         _location.onLocationChanged.listen(onLocationUpdate);

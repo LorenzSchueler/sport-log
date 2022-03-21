@@ -58,11 +58,11 @@ class Action extends AtomicEntity {
           'Action: name.length < 2 or > 80',
         ) &&
         validate(
-          createBefore > const Duration(),
+          createBefore > Duration.zero,
           'Action: createBefore < 0',
         ) &&
         validate(
-          deleteAfter > const Duration(),
+          deleteAfter > Duration.zero,
           'Action: deleteAfter < 0',
         );
   }

@@ -182,7 +182,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
           // if record causes conflict delete it
           if (result.isFailure) {
             _logger.w("hard deleting record $record");
-            db.hardDeleteSingle(record.id);
+            await db.hardDeleteSingle(record.id);
           }
         }
         return true; // all entries can be set to synchronized

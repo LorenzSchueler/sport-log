@@ -79,7 +79,7 @@ class StrengthSessionDescription extends CompoundEntity {
   @override
   void setEmptyToNull() {
     session.setEmptyToNull();
-    for (StrengthSet set in sets) {
+    for (final StrengthSet set in sets) {
       set.setEmptyToNull();
     }
   }
@@ -95,20 +95,16 @@ class StrengthSessionDescription extends CompoundEntity {
     sets.forEachIndexed((set, index) => set.setNumber = index);
   }
 
-  static StrengthSessionDescription defaultValue() {
-    final movement = Movement.defaultMovement;
-    return StrengthSessionDescription(
-      session: StrengthSession(
-        id: randomId(),
-        userId: Settings.userId!,
-        datetime: DateTime.now(),
-        movementId: movement.id,
-        interval: null,
-        comments: null,
-        deleted: false,
-      ),
-      movement: movement,
-      sets: [],
-    );
-  }
+  StrengthSessionDescription.defaultValue()
+      : session = StrengthSession(
+          id: randomId(),
+          userId: Settings.userId!,
+          datetime: DateTime.now(),
+          movementId: Movement.defaultMovement.id,
+          interval: null,
+          comments: null,
+          deleted: false,
+        ),
+        movement = Movement.defaultMovement,
+        sets = [];
 }

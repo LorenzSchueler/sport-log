@@ -149,7 +149,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                           break;
                         case MetconType.forTime:
                           _metconSessionDescription.metconSession.time =
-                              const Duration();
+                              Duration.zero;
                           _metconSessionDescription.metconSession.rounds = null;
                           _metconSessionDescription.metconSession.reps = null;
                           _finished = true;
@@ -194,7 +194,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                           _finished = finished;
                           if (_finished) {
                             _metconSessionDescription.metconSession.time =
-                                const Duration(seconds: 0);
+                                Duration.zero;
                             _metconSessionDescription.metconSession.rounds =
                                 null;
                             _metconSessionDescription.metconSession.rounds =

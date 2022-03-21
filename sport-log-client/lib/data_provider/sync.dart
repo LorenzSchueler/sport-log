@@ -78,7 +78,10 @@ class Sync extends ChangeNotifier {
       if (accountData.user != null) {
         Account.updateUserFromDownSync(accountData.user!);
       }
-      EntityDataProvider.upsertAccountData(accountData, synchronized: true);
+      await EntityDataProvider.upsertAccountData(
+        accountData,
+        synchronized: true,
+      );
       return true;
     }
   }

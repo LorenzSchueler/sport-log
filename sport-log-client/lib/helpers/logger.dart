@@ -4,8 +4,7 @@ import 'package:sport_log/config.dart';
 export 'package:logger/logger.dart' show Level;
 
 void logInfo(String key, String message) {
-  final logger = Logger(key);
-  logger.i(message);
+  Logger(key).i(message);
 }
 
 class Logger extends l.Logger {

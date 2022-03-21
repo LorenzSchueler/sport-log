@@ -26,16 +26,18 @@ class _MovementsPageState extends State<MovementsPage> {
   @override
   void initState() {
     super.initState();
-    _dataProvider.addListener(_update);
-    _dataProvider.onNoInternetConnection =
-        () => showSimpleToast(context, 'No Internet connection.');
+    _dataProvider
+      ..addListener(_update)
+      ..onNoInternetConnection =
+          () => showSimpleToast(context, 'No Internet connection.');
     _update();
   }
 
   @override
   void dispose() {
-    _dataProvider.removeListener(_update);
-    _dataProvider.onNoInternetConnection = null;
+    _dataProvider
+      ..removeListener(_update)
+      ..onNoInternetConnection = null;
     super.dispose();
   }
 

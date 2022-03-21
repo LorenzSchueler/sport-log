@@ -115,7 +115,7 @@ class AppDatabase {
             if (Config.outputDbStatement) {
               _logger.d(statement);
             }
-            db.execute(statement);
+            await db.execute(statement);
           }
         }
       },

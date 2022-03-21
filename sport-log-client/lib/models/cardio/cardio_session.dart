@@ -165,7 +165,7 @@ class CardioSession extends AtomicEntity {
           'CardioSession: avgHeartRate < 0',
         ) &&
         validate(
-          time == null || time! > const Duration(),
+          time == null || time! > Duration.zero,
           'CardioSession: time <= 0',
         ) &&
         validate(

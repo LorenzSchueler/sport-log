@@ -107,14 +107,14 @@ class _EditMovementPageState extends State<EditMovementPage> {
           actions: [
             if (widget.movementDescription != null)
               IconButton(
-                onPressed: () => _deleteMovement(),
+                onPressed: _deleteMovement,
                 icon: const Icon(AppIcons.delete),
               ),
             IconButton(
               onPressed: _formKey.currentContext != null &&
                       _formKey.currentState!.validate() &&
                       _movementDescription.isValid()
-                  ? () => _saveMovement()
+                  ? _saveMovement
                   : null,
               icon: const Icon(AppIcons.save),
             )

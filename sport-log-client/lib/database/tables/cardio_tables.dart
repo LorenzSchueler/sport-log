@@ -144,7 +144,7 @@ class CardioSessionDescriptionTable {
       if (movementIdValue != null) movementIdValue.toInt(),
     ]);
     List<CardioSessionDescription> cardioSessionDescriptions = [];
-    for (Map<String, Object?> record in records) {
+    for (final Map<String, Object?> record in records) {
       cardioSessionDescriptions.add(
         CardioSessionDescription(
           cardioSession: _cardioSessionTable.serde

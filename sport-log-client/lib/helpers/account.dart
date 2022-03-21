@@ -70,7 +70,7 @@ class Account {
     Sync.instance.stopSync();
     Settings.lastSync = null;
     Settings.user = null;
-    Settings.setDefaults(override: true);
+    await Settings.setDefaults(override: true);
     await AppDatabase.reset();
   }
 }

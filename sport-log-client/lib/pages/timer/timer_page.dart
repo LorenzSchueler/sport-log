@@ -24,8 +24,8 @@ class TimerPage extends StatefulWidget {
 class TimerPageState extends State<TimerPage> {
   final _logger = Logger('TimerPage');
 
-  Duration _totalTime = const Duration();
-  Duration _currentTime = const Duration();
+  Duration _totalTime = Duration.zero;
+  Duration _currentTime = Duration.zero;
   int _totalRounds = 3;
   Timer? _timer;
 
@@ -49,7 +49,7 @@ class TimerPageState extends State<TimerPage> {
             onTap: (index) {
               setState(() {
                 _logger.i("ontap");
-                _currentTime = const Duration();
+                _currentTime = Duration.zero;
               });
             },
             indicatorColor: Theme.of(context).colorScheme.primary,

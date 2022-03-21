@@ -18,14 +18,9 @@ class CardioSessionDescription extends CompoundEntity {
   Route? route;
   Movement movement;
 
-  static CardioSessionDescription defaultValue() {
-    final movement = Movement.defaultMovement;
-    return CardioSessionDescription(
-      cardioSession: CardioSession.defaultValue(movement.id),
-      route: null,
-      movement: movement,
-    );
-  }
+  CardioSessionDescription.defaultValue()
+      : cardioSession = CardioSession.defaultValue(Movement.defaultMovement.id),
+        movement = Movement.defaultMovement;
 
   factory CardioSessionDescription.fromJson(Map<String, dynamic> json) =>
       _$CardioSessionDescriptionFromJson(json);

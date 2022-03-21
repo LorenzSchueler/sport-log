@@ -97,19 +97,20 @@ class RouteEditPageState extends State<RouteEditPage> {
     } else if (response.routes != null && response.routes!.isNotEmpty) {
       NavigationRoute navRoute = response.routes![0];
       setState(() {
-        _route.distance = navRoute.distance!.round();
-        _route.track = PolylinePoints()
-            .decodePolyline(navRoute.geometry as String)
-            .map(
-              (coordinate) => Position(
-                latitude: coordinate.latitude,
-                longitude: coordinate.longitude,
-                elevation: 0, // TODO
-                distance: 0, // TODO
-                time: const Duration(seconds: 0), // TODO
-              ),
-            )
-            .toList();
+        _route
+          ..distance = navRoute.distance!.round()
+          ..track = PolylinePoints()
+              .decodePolyline(navRoute.geometry as String)
+              .map(
+                (coordinate) => Position(
+                  latitude: coordinate.latitude,
+                  longitude: coordinate.longitude,
+                  elevation: 0, // TODO
+                  distance: 0, // TODO
+                  time: Duration.zero, // TODO
+                ),
+              )
+              .toList();
       });
     }
   }
@@ -164,11 +165,11 @@ class RouteEditPageState extends State<RouteEditPage> {
           longitude: location.longitude,
           elevation: 0,
           distance: 0,
-          time: const Duration(seconds: 0),
+          time: Duration.zero,
         ),
       );
     });
-    _addPoint(location, _route.markedPositions!.length);
+    await _addPoint(location, _route.markedPositions!.length);
     await _updateLine();
   }
 
@@ -353,10 +354,13 @@ class RouteEditPageState extends State<RouteEditPage> {
                 _mapController = controller;
               },
               onStyleLoadedCallback: () async {
-                _mapController.setBounds(_route.track, _route.markedPositions);
+                await _mapController.setBounds(
+                  _route.track,
+                  _route.markedPositions,
+                );
                 _line ??= await _mapController.addRouteLine([]);
-                _updatePoints();
-                _updateLine();
+                await _updatePoints();
+                await _updateLine();
               },
               onMapLongClick: (point, LatLng latLng) => _extendLine(latLng),
             ),

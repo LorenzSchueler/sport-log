@@ -478,9 +478,7 @@ class MetconMovementCard extends StatelessWidget {
               children: [
                 IconButton(
                   icon: const Icon(AppIcons.delete),
-                  onPressed: () {
-                    deleteMetconMovement();
-                  },
+                  onPressed: deleteMetconMovement,
                 ),
                 ReorderableDragStartListener(
                   child: const Icon(AppIcons.dragHandle),

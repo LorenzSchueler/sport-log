@@ -36,16 +36,18 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   @override
   void initState() {
     super.initState();
-    _dataProvider.addListener(_update);
-    _dataProvider.onNoInternetConnection =
-        () => showSimpleToast(context, 'No Internet connection.');
+    _dataProvider
+      ..addListener(_update)
+      ..onNoInternetConnection =
+          () => showSimpleToast(context, 'No Internet connection.');
     _update();
   }
 
   @override
   void dispose() {
-    _dataProvider.removeListener(_update);
-    _dataProvider.onNoInternetConnection = null;
+    _dataProvider
+      ..removeListener(_update)
+      ..onNoInternetConnection = null;
     super.dispose();
   }
 
@@ -99,7 +101,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
             initialState: _dateFilter,
             onFilterChanged: (dateFilter) async {
               setState(() => _dateFilter = dateFilter);
-              _update();
+              await _update();
             },
           ),
         ),

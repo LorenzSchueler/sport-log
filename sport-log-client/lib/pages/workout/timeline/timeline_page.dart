@@ -44,31 +44,39 @@ class TimelinePageState extends State<TimelinePage> {
   @override
   void initState() {
     super.initState();
-    _strengthDataProvider.addListener(updateStrengthSessions);
-    _strengthDataProvider.onNoInternetConnection =
-        () => showSimpleToast(context, 'No Internet connection.');
-    _metconDataProvider.addListener(updateMetconSessions);
-    _metconDataProvider.onNoInternetConnection =
-        () => showSimpleToast(context, 'No Internet connection.');
-    _cardioDataProvider.addListener(updateCardioSessions);
-    _cardioDataProvider.onNoInternetConnection =
-        () => showSimpleToast(context, 'No Internet connection.');
-    _diaryDataProvider.addListener(updateDiaries);
-    _diaryDataProvider.onNoInternetConnection =
-        () => showSimpleToast(context, 'No Internet connection.');
+    _strengthDataProvider
+      ..addListener(updateStrengthSessions)
+      ..onNoInternetConnection =
+          () => showSimpleToast(context, 'No Internet connection.');
+    _metconDataProvider
+      ..addListener(updateMetconSessions)
+      ..onNoInternetConnection =
+          () => showSimpleToast(context, 'No Internet connection.');
+    _cardioDataProvider
+      ..addListener(updateCardioSessions)
+      ..onNoInternetConnection =
+          () => showSimpleToast(context, 'No Internet connection.');
+    _diaryDataProvider
+      ..addListener(updateDiaries)
+      ..onNoInternetConnection =
+          () => showSimpleToast(context, 'No Internet connection.');
     _update();
   }
 
   @override
   void dispose() {
-    _strengthDataProvider.removeListener(updateStrengthSessions);
-    _strengthDataProvider.onNoInternetConnection = null;
-    _metconDataProvider.removeListener(updateMetconSessions);
-    _metconDataProvider.onNoInternetConnection = null;
-    _cardioDataProvider.removeListener(updateCardioSessions);
-    _cardioDataProvider.onNoInternetConnection = null;
-    _diaryDataProvider.removeListener(updateDiaries);
-    _diaryDataProvider.onNoInternetConnection = null;
+    _strengthDataProvider
+      ..removeListener(updateStrengthSessions)
+      ..onNoInternetConnection = null;
+    _metconDataProvider
+      ..removeListener(updateMetconSessions)
+      ..onNoInternetConnection = null;
+    _cardioDataProvider
+      ..removeListener(updateCardioSessions)
+      ..onNoInternetConnection = null;
+    _diaryDataProvider
+      ..removeListener(updateDiaries)
+      ..onNoInternetConnection = null;
     super.dispose();
   }
 
@@ -113,15 +121,15 @@ class TimelinePageState extends State<TimelinePage> {
   void sortItems() {
     final items = _strengthSessionsDescriptions
         .map((s) => TimelineUnion.strengthSession(s))
-        .toList();
-    items.addAll(
-      _metconSessionsDescriptions.map((m) => TimelineUnion.metconSession(m)),
-    );
-    items.addAll(
-      _cardioSessionsDescriptions.map((c) => TimelineUnion.cardioSession(c)),
-    );
-    items.addAll(_diaries.map((d) => TimelineUnion.diary(d)));
-    items.sort((a, b) => b.compareTo(a));
+        .toList()
+      ..addAll(
+        _metconSessionsDescriptions.map((m) => TimelineUnion.metconSession(m)),
+      )
+      ..addAll(
+        _cardioSessionsDescriptions.map((c) => TimelineUnion.cardioSession(c)),
+      )
+      ..addAll(_diaries.map((d) => TimelineUnion.diary(d)))
+      ..sort((a, b) => b.compareTo(a));
     if (mounted) {
       setState(() => _items = items);
     }
@@ -137,8 +145,8 @@ class TimelinePageState extends State<TimelinePage> {
     await updateDiaries();
   }
 
-  Future<void> _pullFromServer() async {
-    Future.wait([
+  Future<void> _pullFromServer() {
+    return Future.wait([
       _strengthDataProvider.pullFromServer(),
       _metconDataProvider.pullFromServer(),
       _cardioDataProvider.pullFromServer(),

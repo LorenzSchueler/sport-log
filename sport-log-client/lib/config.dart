@@ -60,12 +60,13 @@ abstract class Config {
     outputDbStatement = (dotenv.env['OUTPUT_DB_STATEMENT'] ?? "")
         .parseBool(defaultValue: false);
 
-    _logger.i('Delete database: $deleteDatabase');
-    _logger.i('Min log level: $minLogLevel');
-    _logger.i('Output request json: $outputRequestJson');
-    _logger.i('Output request headers: $outputRequestHeaders');
-    _logger.i('Output response json: $outputResponseJson');
-    _logger.i('Output db statement: $outputDbStatement');
+    _logger
+      ..i('Delete database: $deleteDatabase')
+      ..i('Min log level: $minLogLevel')
+      ..i('Output request json: $outputRequestJson')
+      ..i('Output request headers: $outputRequestHeaders')
+      ..i('Output response json: $outputResponseJson')
+      ..i('Output db statement: $outputDbStatement');
   }
 
   static bool get isTest => Platform.environment.containsKey('FLUTTER_TEST');

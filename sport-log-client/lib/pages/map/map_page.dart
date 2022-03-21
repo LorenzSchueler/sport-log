@@ -152,7 +152,7 @@ class MapPageState extends State<MapPage> {
                     }
                     _circles = [];
                   } else {
-                    _locationUtils.startLocationStream();
+                    await _locationUtils.startLocationStream();
                   }
                   setState(() {});
                 },

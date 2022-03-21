@@ -78,7 +78,7 @@ class MetconMovementTable extends TableAccessor<MetconMovement> {
   );
 
   Future<void> setSynchronizedByMetcon(Int64 id) async {
-    database.update(
+    await database.update(
       tableName,
       TableAccessor.synchronized,
       where: '${Columns.metconId} = ?',

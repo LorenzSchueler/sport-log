@@ -15,13 +15,12 @@ class ValueUnitDescription extends StatelessWidget {
   }) : super(key: key);
 
   List<TextSpan> get _textSpans {
-    List<TextSpan> textSpans = [];
-    textSpans.add(
+    List<TextSpan> textSpans = [
       TextSpan(
         text: unit == null ? value : "$value ",
         style: TextStyle(fontSize: 20 * scale),
       ),
-    );
+    ];
     if (unit != null) {
       textSpans.add(
         TextSpan(

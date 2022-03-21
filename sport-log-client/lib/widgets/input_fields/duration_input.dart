@@ -39,7 +39,7 @@ class _DurationInputState extends State<DurationInput> {
   @override
   void initState() {
     super.initState();
-    _duration = widget.initialDuration ?? const Duration();
+    _duration = widget.initialDuration ?? Duration.zero;
     _updateTextFields();
     _keyboardSubscription = KeyboardVisibilityController()
         .onChange

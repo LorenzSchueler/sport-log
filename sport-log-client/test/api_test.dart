@@ -150,11 +150,11 @@ Future<void> testActionRule() async {
 }
 
 Future<void> main() async {
-  await for (double _ in initialize()) {}
+  await for (final _ in initialize()) {}
 
   testUser();
-  testAction();
-  testDiary();
-  testStrengthSession();
-  testActionRule();
+  await testAction();
+  await testDiary();
+  await testStrengthSession();
+  await testActionRule();
 }

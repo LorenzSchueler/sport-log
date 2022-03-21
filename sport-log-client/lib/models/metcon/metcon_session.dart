@@ -44,7 +44,7 @@ class MetconSession extends AtomicEntity {
   @override
   bool deleted;
 
-  static MetconSession defaultValue(Metcon metcon) {
+  factory MetconSession.defaultValue(Metcon metcon) {
     Duration? time;
     int? rounds;
     int? reps;
@@ -56,7 +56,7 @@ class MetconSession extends AtomicEntity {
       case MetconType.emom:
         break;
       case MetconType.forTime:
-        time = const Duration();
+        time = Duration.zero;
         break;
     }
     return MetconSession(
@@ -97,7 +97,7 @@ class MetconSession extends AtomicEntity {
   bool isValidIgnoreEmptyNotNull() {
     return validate(!deleted, 'MetconSession: deleted == true') &&
         validate(
-          time == null || time! > const Duration(),
+          time == null || time! > Duration.zero,
           'MetconSession: time <= 0',
         ) &&
         validate(rounds == null || rounds! >= 0, 'MetconSession: rounds < 0') &&

@@ -29,8 +29,9 @@ class _StrengthChartState extends State<StrengthChart> {
   void initState() {
     super.initState();
     _activeSeriesType = getAvailableSeries(widget.movement.dimension).first;
-    _logger.i("movement: ${widget.movement.name}");
-    _logger.i("date filter: ${widget.dateFilterState.name}");
+    _logger
+      ..i("movement: ${widget.movement.name}")
+      ..i("date filter: ${widget.dateFilterState.name}");
   }
 
   @override

@@ -95,7 +95,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
       _point1 = latLng;
     });
     if (_point1Marker != null) {
-      _mapController.removeCircle(_point1Marker!);
+      await _mapController.removeCircle(_point1Marker!);
       _point1Marker = null;
     }
     if (_point1 != null) {
@@ -108,11 +108,11 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
       _point2 = latLng;
     });
     if (_point2Marker != null) {
-      _mapController.removeCircle(_point2Marker!);
+      await _mapController.removeCircle(_point2Marker!);
       _point2Marker = null;
     }
     if (_boundingBoxLine != null) {
-      _mapController.removeLine(_boundingBoxLine!);
+      await _mapController.removeLine(_boundingBoxLine!);
       _boundingBoxLine = null;
     }
     if (_point2 != null) {

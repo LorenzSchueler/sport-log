@@ -32,39 +32,40 @@ class Settings {
   static const String _lastGpsLatLng = "lastGpsLatLng";
 
   static Future<void> init() async {
-    Hive.registerAdapter(DurationAdapter());
-    Hive.registerAdapter(LatLngAdapter());
-    Hive.registerAdapter(CameraPositionAdapter());
+    Hive
+      ..registerAdapter(DurationAdapter())
+      ..registerAdapter(LatLngAdapter())
+      ..registerAdapter(CameraPositionAdapter());
     _storage ??= await Hive.openBox<dynamic>("settings");
     await setDefaults();
   }
 
   static Future<void> setDefaults({bool override = false}) async {
     if (!_storage!.containsKey(_syncEnabled) || override) {
-      _storage!.put(_syncEnabled, true);
+      await _storage!.put(_syncEnabled, true);
     }
     if (!_storage!.containsKey(_serverUrl) || override) {
       await setDefaultServerUrl();
     }
     if (!_storage!.containsKey(_syncInterval) || override) {
-      _storage!.put(_syncInterval, const Duration(minutes: 5));
+      await _storage!.put(_syncInterval, const Duration(minutes: 5));
     }
     if (!_storage!.containsKey(_units) || override) {
-      _storage!.put(_units, "metric");
+      await _storage!.put(_units, "metric");
     }
     if (!_storage!.containsKey(_lastMapPosition) || override) {
-      _storage!.put(
+      await _storage!.put(
         _lastMapPosition,
         CameraPosition(target: Defaults.mapbox.cameraPosition),
       );
     }
     if (!_storage!.containsKey(_lastGpsLatLng) || override) {
-      _storage!.put(_lastGpsLatLng, Defaults.mapbox.cameraPosition);
+      await _storage!.put(_lastGpsLatLng, Defaults.mapbox.cameraPosition);
     }
   }
 
   static Future<void> setDefaultServerUrl() async {
-    _storage!.put(
+    await _storage!.put(
       _serverUrl,
       await Config.isAndroidEmulator
           ? Defaults.server.emulatorUrl

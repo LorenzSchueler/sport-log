@@ -62,7 +62,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     _cardioSessionDescription = CardioSessionDescription(
       cardioSession: CardioSession.defaultValue(widget.movement.id)
         ..cardioType = widget.cardioType
-        ..time = const Duration()
+        ..time = Duration.zero
         ..distance = 1 // TODO remove when distance calculated from track
         ..track = []
         ..cadence = []
@@ -134,6 +134,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   void _startStepCountStream() {
     Stream<StepCount> _stepCountStream = Pedometer.stepCountStream;
     _stepCountSubscription = _stepCountStream.listen(_onStepCountUpdate);
+    // ignore: unnecessary_lambdas
     _stepCountSubscription.onError((dynamic error) => _logger.i(error));
   }
 
@@ -359,14 +360,14 @@ satelites:  ${location.satelliteNumber}""";
                   _mapController = controller,
               onStyleLoadedCallback: () async {
                 if (_cardioSessionDescription.route?.track != null) {
-                  _mapController.addRouteLine(
+                  await _mapController.addRouteLine(
                     _cardioSessionDescription.route!.track!,
                   );
                 }
                 _line = await _mapController.addTrackLine(
                   _cardioSessionDescription.cardioSession.track!,
                 ); // init with empty track
-                _locationUtils.startLocationStream();
+                await _locationUtils.startLocationStream();
                 _startStepCountStream();
               },
             ),
