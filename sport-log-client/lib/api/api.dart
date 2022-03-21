@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -146,8 +147,11 @@ extension ApiResultFromRequest on ApiResult {
     Future<Response> Function(Client client) request,
   ) async {
     try {
-      final response = await request(_client);
+      final response =
+          await request(_client).timeout(const Duration(seconds: 5));
       return await response.toApiResult();
+    } on TimeoutException {
+      return Failure(ApiError(ApiErrorCode.serverUnreachable));
     } on SocketException {
       return Failure(ApiError(ApiErrorCode.serverUnreachable));
     } on TypeError {
@@ -163,8 +167,11 @@ extension ApiResultFromRequest on ApiResult {
     T Function(dynamic) fromJson,
   ) async {
     try {
-      final response = await request(_client);
+      final response =
+          await request(_client).timeout(const Duration(seconds: 5));
       return await response.toApiResultWithValue(fromJson);
+    } on TimeoutException {
+      return Failure(ApiError(ApiErrorCode.serverUnreachable));
     } on SocketException {
       return Failure(ApiError(ApiErrorCode.serverUnreachable));
     } on TypeError {
