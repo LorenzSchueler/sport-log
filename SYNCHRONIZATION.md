@@ -38,6 +38,4 @@ Changes of different entries should also not influence each other as log as they
 If they do clash the same logic as for creations applies.
 For both conflicts on creations and changes of different entries the client will show a dialog in which the user can choose to fix the conflict by hand or let all conflicting entries be hard deleted automatically.
 
-TODO: Currently this only works for upsync; during downsync incoming changes that clash with local ones currently fail instead of overriding the local ones.
-
 If the user changes the same entry on different devices, the change which reaches the server first wins and the entry on the other device will silently be overridden during the next down sync.
