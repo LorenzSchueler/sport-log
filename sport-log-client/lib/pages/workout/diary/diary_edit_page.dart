@@ -20,7 +20,7 @@ class DiaryEditPage extends StatefulWidget {
 
 class DiaryEditPageState extends State<DiaryEditPage> {
   final _formKey = GlobalKey<FormState>();
-  final _dataProvider = DiaryDataProvider.instance;
+  final _dataProvider = DiaryDataProvider();
 
   late Diary _diary;
 

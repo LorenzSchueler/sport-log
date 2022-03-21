@@ -29,7 +29,7 @@ class CardioSessionsPage extends StatefulWidget {
 
 class CardioSessionsPageState extends State<CardioSessionsPage> {
   final _logger = Logger('CardioSessionsPage');
-  final _dataProvider = CardioSessionDescriptionDataProvider.instance;
+  final _dataProvider = CardioSessionDescriptionDataProvider();
   List<CardioSessionDescription> _cardioSessionDescriptions = [];
 
   DateFilterState _dateFilter = MonthFilter.current();

@@ -27,7 +27,7 @@ class YearChart extends StatefulWidget {
 }
 
 class _YearChartState extends State<YearChart> {
-  final _dataProvider = StrengthSessionDescriptionDataProvider.instance;
+  final _dataProvider = StrengthSessionDescriptionDataProvider();
 
   List<StrengthSessionStats> _strengthSessionStats = [];
 

@@ -22,7 +22,7 @@ class DiaryPage extends StatefulWidget {
 
 class DiaryPageState extends State<DiaryPage> {
   final _logger = Logger('DiaryPage');
-  final _dataProvider = DiaryDataProvider.instance;
+  final _dataProvider = DiaryDataProvider();
   List<Diary> _diaries = [];
 
   DateFilterState _dateFilter = MonthFilter.current();

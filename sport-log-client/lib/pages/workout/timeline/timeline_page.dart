@@ -28,10 +28,10 @@ class TimelinePage extends StatefulWidget {
 
 class TimelinePageState extends State<TimelinePage> {
   final _logger = Logger('TimelinePage');
-  final _strengthDataProvider = StrengthSessionDescriptionDataProvider.instance;
-  final _metconDataProvider = MetconSessionDescriptionDataProvider.instance;
-  final _cardioDataProvider = CardioSessionDescriptionDataProvider.instance;
-  final _diaryDataProvider = DiaryDataProvider.instance;
+  final _strengthDataProvider = StrengthSessionDescriptionDataProvider();
+  final _metconDataProvider = MetconSessionDescriptionDataProvider();
+  final _cardioDataProvider = CardioSessionDescriptionDataProvider();
+  final _diaryDataProvider = DiaryDataProvider();
   List<StrengthSessionDescription> _strengthSessionsDescriptions = [];
   List<MetconSessionDescription> _metconSessionsDescriptions = [];
   List<CardioSessionDescription> _cardioSessionsDescriptions = [];

@@ -31,7 +31,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
   final _formKey = GlobalKey<FormState>();
   late final MetconDescription _metconDescription;
   final _descriptionFocusNode = FocusNode();
-  final _dataProvider = MetconDescriptionDataProvider.instance;
+  final _dataProvider = MetconDescriptionDataProvider();
 
   @override
   void initState() {

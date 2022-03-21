@@ -35,7 +35,7 @@ class CardioTrackingPage extends StatefulWidget {
 
 class CardioTrackingPageState extends State<CardioTrackingPage> {
   final _logger = Logger('CardioTrackingPage');
-  final _dataProvider = CardioSessionDescriptionDataProvider.instance;
+  final _dataProvider = CardioSessionDescriptionDataProvider();
 
   late CardioSessionDescription _cardioSessionDescription;
 

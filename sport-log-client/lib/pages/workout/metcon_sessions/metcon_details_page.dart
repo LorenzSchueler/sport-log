@@ -20,7 +20,7 @@ class MetconDetailsPage extends StatefulWidget {
 }
 
 class MetconDetailsPageState extends State<MetconDetailsPage> {
-  final _dataProvider = MetconDescriptionDataProvider.instance;
+  final _dataProvider = MetconDescriptionDataProvider();
   late MetconDescription _metconDescription;
 
   @override

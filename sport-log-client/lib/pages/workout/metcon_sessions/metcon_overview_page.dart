@@ -19,7 +19,7 @@ class MetconsPage extends StatefulWidget {
 
 class _MetconsPageState extends State<MetconsPage> {
   final _logger = Logger('MetconsPage');
-  final _dataProvider = MetconDescriptionDataProvider.instance;
+  final _dataProvider = MetconDescriptionDataProvider();
   List<MetconDescription> _metconDescriptions = [];
 
   @override

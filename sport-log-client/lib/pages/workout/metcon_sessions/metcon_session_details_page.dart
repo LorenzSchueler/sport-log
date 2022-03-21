@@ -22,7 +22,7 @@ class MetconSessionDetailsPage extends StatefulWidget {
 }
 
 class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
-  final _dataProvider = MetconSessionDescriptionDataProvider.instance;
+  final _dataProvider = MetconSessionDescriptionDataProvider();
   late MetconSessionDescription _metconSessionDescription;
 
   @override

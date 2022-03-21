@@ -26,7 +26,7 @@ class RouteEditPage extends StatefulWidget {
 class RouteEditPageState extends State<RouteEditPage> {
   final _logger = Logger('RouteEditPage');
   final _formKey = GlobalKey<FormState>();
-  final _dataProvider = RouteDataProvider.instance;
+  final _dataProvider = RouteDataProvider();
 
   Line? _line;
   List<Circle> _circles = [];

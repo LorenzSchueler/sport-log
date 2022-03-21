@@ -6,7 +6,7 @@ Future<MetconDescription?> showMetconPicker({
   required BuildContext context,
   bool dismissable = true,
 }) async {
-  final _dataProvider = MetconDescriptionDataProvider.instance;
+  final _dataProvider = MetconDescriptionDataProvider();
   final _metconDescriptions = await _dataProvider.getNonDeleted();
 
   return showDialog<MetconDescription>(

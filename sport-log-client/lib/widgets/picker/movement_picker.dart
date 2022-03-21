@@ -37,7 +37,7 @@ class MovementPickerDialog extends StatefulWidget {
 }
 
 class _MovementPickerDialogState extends State<MovementPickerDialog> {
-  final _dataProvider = MovementDataProvider.instance;
+  final _dataProvider = MovementDataProvider();
 
   List<Movement> _movements = [];
   String _search = '';

@@ -6,8 +6,9 @@ import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/action/all.dart';
 
 class ActionProviderDataProvider extends EntityDataProvider<ActionProvider> {
-  static final instance = ActionProviderDataProvider._();
+  static final _instance = ActionProviderDataProvider._();
   ActionProviderDataProvider._();
+  factory ActionProviderDataProvider() => _instance;
 
   @override
   final Api<ActionProvider> api = Api.actionProviders;
@@ -21,8 +22,9 @@ class ActionProviderDataProvider extends EntityDataProvider<ActionProvider> {
 }
 
 class ActionDataProvider extends EntityDataProvider<Action> {
-  static final instance = ActionDataProvider._();
+  static final _instance = ActionDataProvider._();
   ActionDataProvider._();
+  factory ActionDataProvider() => _instance;
 
   @override
   final Api<Action> api = Api.actions;
@@ -36,8 +38,9 @@ class ActionDataProvider extends EntityDataProvider<Action> {
 }
 
 class ActionRuleDataProvider extends EntityDataProvider<ActionRule> {
-  static final instance = ActionRuleDataProvider._();
+  static final _instance = ActionRuleDataProvider._();
   ActionRuleDataProvider._();
+  factory ActionRuleDataProvider() => _instance;
 
   @override
   final Api<ActionRule> api = Api.actionRules;
@@ -51,8 +54,9 @@ class ActionRuleDataProvider extends EntityDataProvider<ActionRule> {
 }
 
 class ActionEventDataProvider extends EntityDataProvider<ActionEvent> {
-  static final instance = ActionEventDataProvider._();
+  static final _instance = ActionEventDataProvider._();
   ActionEventDataProvider._();
+  factory ActionEventDataProvider() => _instance;
 
   @override
   final Api<ActionEvent> api = Api.actionEvents;

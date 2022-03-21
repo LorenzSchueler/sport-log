@@ -10,7 +10,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
-final _dataProvider = MovementDescriptionDataProvider.instance;
+final _dataProvider = MovementDescriptionDataProvider();
 
 class MovementsPage extends StatefulWidget {
   const MovementsPage({Key? key}) : super(key: key);

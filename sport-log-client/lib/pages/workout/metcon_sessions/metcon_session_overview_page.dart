@@ -22,7 +22,7 @@ class MetconSessionsPage extends StatefulWidget {
 
 class MetconSessionsPageState extends State<MetconSessionsPage> {
   final _logger = Logger('MetconSessionsPage');
-  final _dataProvider = MetconSessionDescriptionDataProvider.instance;
+  final _dataProvider = MetconSessionDescriptionDataProvider();
   List<MetconSessionDescription> _metconSessionDescriptions = [];
 
   DateFilterState _dateFilter = MonthFilter.current();

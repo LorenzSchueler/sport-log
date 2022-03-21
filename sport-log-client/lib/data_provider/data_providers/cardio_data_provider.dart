@@ -9,8 +9,9 @@ import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 
 class RouteDataProvider extends EntityDataProvider<Route> {
-  static final instance = RouteDataProvider._();
+  static final _instance = RouteDataProvider._();
   RouteDataProvider._();
+  factory RouteDataProvider() => _instance;
 
   @override
   final Api<Route> api = Api.routes;
@@ -23,8 +24,9 @@ class RouteDataProvider extends EntityDataProvider<Route> {
 }
 
 class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
-  static final instance = CardioSessionDataProvider._();
+  static final _instance = CardioSessionDataProvider._();
   CardioSessionDataProvider._();
+  factory CardioSessionDataProvider() => _instance;
 
   @override
   final Api<CardioSession> api = Api.cardioSessions;
@@ -41,13 +43,13 @@ class CardioSessionDescriptionDataProvider
     extends DataProvider<CardioSessionDescription> {
   final _cardioSessionDescriptionDb = AppDatabase.cardioSessionDescriptions;
 
-  final _cardioDataProvider = CardioSessionDataProvider.instance;
-  final _routeDataProvider = RouteDataProvider.instance;
-  final _movementDataProvider = MovementDataProvider.instance;
+  final _cardioDataProvider = CardioSessionDataProvider();
+  final _routeDataProvider = RouteDataProvider();
+  final _movementDataProvider = MovementDataProvider();
 
-  CardioSessionDescriptionDataProvider._();
   static CardioSessionDescriptionDataProvider? _instance;
-  static CardioSessionDescriptionDataProvider get instance {
+  CardioSessionDescriptionDataProvider._();
+  factory CardioSessionDescriptionDataProvider() {
     if (_instance == null) {
       _instance = CardioSessionDescriptionDataProvider._();
       _instance!._cardioDataProvider.addListener(_instance!.notifyListeners);

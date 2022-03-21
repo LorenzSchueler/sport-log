@@ -23,7 +23,7 @@ class RoutePage extends StatefulWidget {
 
 class RoutePageState extends State<RoutePage> {
   final _logger = Logger('RoutePage');
-  final _dataProvider = RouteDataProvider.instance;
+  final _dataProvider = RouteDataProvider();
   List<Route> _routes = [];
 
   @override

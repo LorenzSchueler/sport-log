@@ -6,8 +6,9 @@ import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/wod/wod.dart';
 
 class WodDataProvider extends EntityDataProvider<Wod> {
-  static final instance = WodDataProvider._();
+  static final _instance = WodDataProvider._();
   WodDataProvider._();
+  factory WodDataProvider() => _instance;
 
   @override
   final Api<Wod> api = Api.wods;

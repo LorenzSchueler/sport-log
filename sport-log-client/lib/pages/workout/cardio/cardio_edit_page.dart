@@ -30,7 +30,7 @@ class CardioEditPage extends StatefulWidget {
 
 class CardioEditPageState extends State<CardioEditPage> {
   final _formKey = GlobalKey<FormState>();
-  final _dataProvider = CardioSessionDescriptionDataProvider.instance;
+  final _dataProvider = CardioSessionDescriptionDataProvider();
 
   late MapboxMapController _mapController;
   late CardioSessionDescription _cardioSessionDescription;

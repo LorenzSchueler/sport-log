@@ -26,7 +26,7 @@ class StrengthSessionDetailsPage extends StatefulWidget {
 
 class _StrengthSessionDetailsPageState
     extends State<StrengthSessionDetailsPage> {
-  final _dataProvider = StrengthSessionDescriptionDataProvider.instance;
+  final _dataProvider = StrengthSessionDescriptionDataProvider();
   late StrengthSessionDescription _strengthSessionDescription;
 
   @override

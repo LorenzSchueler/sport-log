@@ -10,8 +10,9 @@ import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/metcon/all.dart';
 
 class MetconDataProvider extends EntityDataProvider<Metcon> {
-  static final instance = MetconDataProvider._();
+  static final _instance = MetconDataProvider._();
   MetconDataProvider._();
+  factory MetconDataProvider() => _instance;
 
   @override
   final Api<Metcon> api = Api.metcons;
@@ -25,8 +26,9 @@ class MetconDataProvider extends EntityDataProvider<Metcon> {
 }
 
 class MetconMovementDataProvider extends EntityDataProvider<MetconMovement> {
-  static final instance = MetconMovementDataProvider._();
+  static final _instance = MetconMovementDataProvider._();
   MetconMovementDataProvider._();
+  factory MetconMovementDataProvider() => _instance;
 
   @override
   final Api<MetconMovement> api = Api.metconMovements;
@@ -45,8 +47,9 @@ class MetconMovementDataProvider extends EntityDataProvider<MetconMovement> {
 }
 
 class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
-  static final instance = MetconSessionDataProvider._();
+  static final _instance = MetconSessionDataProvider._();
   MetconSessionDataProvider._();
+  factory MetconSessionDataProvider() => _instance;
 
   @override
   final Api<MetconSession> api = Api.metconSessions;
@@ -73,15 +76,15 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
 }
 
 class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
-  final _metconDataProvider = MetconDataProvider.instance;
-  final _metconMovementDataProvider = MetconMovementDataProvider.instance;
-  final _movementDataProvider = MovementDataProvider.instance;
+  final _metconDataProvider = MetconDataProvider();
+  final _metconMovementDataProvider = MetconMovementDataProvider();
+  final _movementDataProvider = MovementDataProvider();
   final _metconSessionDataProvider =
-      MetconSessionDataProvider.instance; // don't forward notifications
+      MetconSessionDataProvider(); // don't forward notifications
 
-  MetconDescriptionDataProvider._();
   static MetconDescriptionDataProvider? _instance;
-  static MetconDescriptionDataProvider get instance {
+  MetconDescriptionDataProvider._();
+  factory MetconDescriptionDataProvider() {
     if (_instance == null) {
       _instance = MetconDescriptionDataProvider._();
       _instance!._metconDataProvider.addListener(_instance!.notifyListeners);
@@ -205,16 +208,16 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
 
 class MetconSessionDescriptionDataProvider
     extends DataProvider<MetconSessionDescription> {
-  final _metconSessionDataProvider = MetconSessionDataProvider.instance;
-  final _metconDataProvider = MetconDataProvider.instance;
-  final _metconMovementDataProvider = MetconMovementDataProvider.instance;
-  final _movementDataProvider = MovementDataProvider.instance;
+  final _metconSessionDataProvider = MetconSessionDataProvider();
+  final _metconDataProvider = MetconDataProvider();
+  final _metconMovementDataProvider = MetconMovementDataProvider();
+  final _movementDataProvider = MovementDataProvider();
   final _metconDescriptionDataProvider =
-      MetconDescriptionDataProvider.instance; // don't forward notifications
+      MetconDescriptionDataProvider(); // don't forward notifications
 
-  MetconSessionDescriptionDataProvider._();
   static MetconSessionDescriptionDataProvider? _instance;
-  static MetconSessionDescriptionDataProvider get instance {
+  MetconSessionDescriptionDataProvider._();
+  factory MetconSessionDescriptionDataProvider() {
     if (_instance == null) {
       _instance = MetconSessionDescriptionDataProvider._();
       _instance!._metconSessionDataProvider

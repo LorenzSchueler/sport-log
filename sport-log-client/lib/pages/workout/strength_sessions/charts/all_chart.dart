@@ -23,7 +23,7 @@ class AllChart extends StatefulWidget {
 }
 
 class _AllChartState extends State<AllChart> {
-  final _dataProvider = StrengthSessionDescriptionDataProvider.instance;
+  final _dataProvider = StrengthSessionDescriptionDataProvider();
 
   List<StrengthSessionStats> _strengthSessionStats = [];
 

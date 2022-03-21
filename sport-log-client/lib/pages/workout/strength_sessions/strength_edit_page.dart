@@ -33,7 +33,7 @@ class StrengthSessionEditPage extends StatefulWidget {
 }
 
 class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
-  final _dataProvider = StrengthSessionDescriptionDataProvider.instance;
+  final _dataProvider = StrengthSessionDescriptionDataProvider();
 
   late final StrengthSessionDescription _strengthSessionDescription;
 

@@ -27,7 +27,7 @@ class MetconSessionEditPage extends StatefulWidget {
 class MetconSessionEditPageState extends State<MetconSessionEditPage> {
   final _logger = Logger('MetconSessionEditPage');
   final _formKey = GlobalKey<FormState>();
-  final _dataProvider = MetconSessionDescriptionDataProvider.instance;
+  final _dataProvider = MetconSessionDescriptionDataProvider();
 
   late MetconSessionDescription _metconSessionDescription;
   late bool _finished;

@@ -29,7 +29,7 @@ class EditMovementPage extends StatefulWidget {
 }
 
 class _EditMovementPageState extends State<EditMovementPage> {
-  final _dataProvider = MovementDataProvider.instance;
+  final _dataProvider = MovementDataProvider();
   final _formKey = GlobalKey<FormState>();
   final _descriptionFocusNode = FocusNode();
   late MovementDescription _movementDescription;

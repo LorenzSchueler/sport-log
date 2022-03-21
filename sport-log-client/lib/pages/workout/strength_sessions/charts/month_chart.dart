@@ -27,7 +27,7 @@ class MonthChart extends StatefulWidget {
 }
 
 class _MonthChartState extends State<MonthChart> {
-  final _dataProvider = StrengthSessionDescriptionDataProvider.instance;
+  final _dataProvider = StrengthSessionDescriptionDataProvider();
 
   List<StrengthSessionStats> _strengthSessionStats = [];
 

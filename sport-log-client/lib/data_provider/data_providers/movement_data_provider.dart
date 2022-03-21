@@ -6,8 +6,9 @@ import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/movement/all.dart';
 
 class MovementDataProvider extends EntityDataProvider<Movement> {
-  static final instance = MovementDataProvider._();
+  static final _instance = MovementDataProvider._();
   MovementDataProvider._();
+  factory MovementDataProvider() => _instance;
 
   @override
   final Api<Movement> api = Api.movements;
@@ -38,11 +39,11 @@ class MovementDescriptionDataProvider
     extends DataProvider<MovementDescription> {
   final _movementDescriptionDb = AppDatabase.movementDescriptions;
 
-  final _dataProvider = MovementDataProvider.instance;
+  final _dataProvider = MovementDataProvider();
 
-  MovementDescriptionDataProvider._();
   static MovementDescriptionDataProvider? _instance;
-  static MovementDescriptionDataProvider get instance {
+  MovementDescriptionDataProvider._();
+  factory MovementDescriptionDataProvider() {
     if (_instance == null) {
       _instance = MovementDescriptionDataProvider._();
       _instance!._dataProvider.addListener(_instance!.notifyListeners);

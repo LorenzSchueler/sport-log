@@ -10,8 +10,9 @@ import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/strength/all.dart';
 
 class StrengthSessionDataProvider extends EntityDataProvider<StrengthSession> {
-  static final instance = StrengthSessionDataProvider._();
+  static final _instance = StrengthSessionDataProvider._();
   StrengthSessionDataProvider._();
+  factory StrengthSessionDataProvider() => _instance;
 
   @override
   final Api<StrengthSession> api = Api.strengthSessions;
@@ -25,8 +26,9 @@ class StrengthSessionDataProvider extends EntityDataProvider<StrengthSession> {
 }
 
 class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
-  static final instance = StrengthSetDataProvider._();
+  static final _instance = StrengthSetDataProvider._();
   StrengthSetDataProvider._();
+  factory StrengthSetDataProvider() => _instance;
 
   @override
   final Api<StrengthSet> api = Api.strengthSets;
@@ -49,13 +51,13 @@ class StrengthSessionDescriptionDataProvider
     extends DataProvider<StrengthSessionDescription> {
   final _strengthSessionDescriptionDb = AppDatabase.strengthSessionDescriptions;
 
-  final _strengthSessionDataProvider = StrengthSessionDataProvider.instance;
-  final _strengthSetDataProvider = StrengthSetDataProvider.instance;
-  final _movementDataProvider = MovementDataProvider.instance;
+  final _strengthSessionDataProvider = StrengthSessionDataProvider();
+  final _strengthSetDataProvider = StrengthSetDataProvider();
+  final _movementDataProvider = MovementDataProvider();
 
   StrengthSessionDescriptionDataProvider._();
   static StrengthSessionDescriptionDataProvider? _instance;
-  static StrengthSessionDescriptionDataProvider get instance {
+  factory StrengthSessionDescriptionDataProvider() {
     if (_instance == null) {
       _instance = StrengthSessionDescriptionDataProvider._();
       _instance!._strengthSessionDataProvider

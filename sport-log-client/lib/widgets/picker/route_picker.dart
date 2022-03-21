@@ -6,7 +6,7 @@ Future<Route?> showRoutePicker({
   required BuildContext context,
   bool dismissable = true,
 }) async {
-  final _dataProvider = RouteDataProvider.instance;
+  final _dataProvider = RouteDataProvider();
   final _routes = await _dataProvider.getNonDeleted();
   return showDialog<Route>(
     builder: (_) => RoutePickerDialog(_routes),

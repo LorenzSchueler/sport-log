@@ -6,8 +6,9 @@ import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/platform/all.dart';
 
 class PlatformDataProvider extends EntityDataProvider<Platform> {
-  static final instance = PlatformDataProvider._();
+  static final _instance = PlatformDataProvider._();
   PlatformDataProvider._();
+  factory PlatformDataProvider() => _instance;
 
   @override
   final Api<Platform> api = Api.platforms;
@@ -22,8 +23,9 @@ class PlatformDataProvider extends EntityDataProvider<Platform> {
 
 class PlatformCredentialDataProvider
     extends EntityDataProvider<PlatformCredential> {
-  static final instance = PlatformCredentialDataProvider._();
+  static final _instance = PlatformCredentialDataProvider._();
   PlatformCredentialDataProvider._();
+  factory PlatformCredentialDataProvider() => _instance;
 
   @override
   final Api<PlatformCredential> api = Api.platformCredentials;
