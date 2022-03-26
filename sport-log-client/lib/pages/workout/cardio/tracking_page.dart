@@ -381,7 +381,7 @@ satelites:  ${location.satelliteNumber}""";
                       value: _cardioSessionDescription
                           .cardioSession.time!.formatTime,
                       unit: null,
-                      description: "time",
+                      description: "Duration",
                       scale: 1.3,
                     ),
                     ValueUnitDescription(
@@ -392,7 +392,7 @@ satelites:  ${location.satelliteNumber}""";
                                   1000)
                               .toStringAsFixed(3),
                       unit: "km",
-                      description: "distance",
+                      description: "Distance",
                       scale: 1.3,
                     ),
                   ],
@@ -403,16 +403,10 @@ satelites:  ${location.satelliteNumber}""";
                     const ValueUnitDescription(
                       value: "--",
                       unit: "km/h",
-                      description: "speed",
+                      description: "Speed",
                       scale: 1.3,
                     ),
-                    ValueUnitDescription(
-                      value:
-                          "${_cardioSessionDescription.cardioSession.avgCadence}",
-                      unit: "rpm",
-                      description: "cadence",
-                      scale: 1.3,
-                    ),
+                    Container(),
                   ],
                 ),
                 rowSpacer,
@@ -421,13 +415,32 @@ satelites:  ${location.satelliteNumber}""";
                     ValueUnitDescription(
                       value: _ascent.round().toString(),
                       unit: "m",
-                      description: "ascent",
+                      description: "Ascent",
                       scale: 1.3,
                     ),
                     ValueUnitDescription(
                       value: _descent.round().toString(),
                       unit: "m",
-                      description: "descent",
+                      description: "Descent",
+                      scale: 1.3,
+                    ),
+                  ],
+                ),
+                rowSpacer,
+                TableRow(
+                  children: [
+                    ValueUnitDescription(
+                      value:
+                          "${_cardioSessionDescription.cardioSession.avgCadence}",
+                      unit: "rpm",
+                      description: "Cadence",
+                      scale: 1.3,
+                    ),
+                    ValueUnitDescription(
+                      value:
+                          "${_cardioSessionDescription.cardioSession.avgHeartRate}",
+                      unit: "bpm",
+                      description: "Heart Rate",
                       scale: 1.3,
                     ),
                   ],

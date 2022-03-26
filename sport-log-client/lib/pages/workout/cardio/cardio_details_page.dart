@@ -160,17 +160,17 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                     TableRow(
                       children: [
                         ValueUnitDescription(
-                          value: distance,
-                          unit: "km",
-                          description: "Distance",
-                          scale: 1.3,
-                        ),
-                        ValueUnitDescription(
                           value: _cardioSessionDescription
                                   .cardioSession.time?.formatTime ??
                               "",
                           unit: null,
                           description: "Duration",
+                          scale: 1.3,
+                        ),
+                        ValueUnitDescription(
+                          value: distance,
+                          unit: "km",
+                          description: "Distance",
                           scale: 1.3,
                         ),
                       ],
