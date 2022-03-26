@@ -117,7 +117,14 @@ class MetconMovement extends AtomicEntity {
   }
 
   @override
-  void setEmptyToNull() {}
+  void setEmptyToNull() {
+    if (maleWeight != null && maleWeight! <= 0) {
+      maleWeight = null;
+    }
+    if (femaleWeight != null && femaleWeight! <= 0) {
+      femaleWeight = null;
+    }
+  }
 }
 
 class DbMetconMovementSerializer extends DbSerializer<MetconMovement> {

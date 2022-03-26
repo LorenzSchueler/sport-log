@@ -48,7 +48,7 @@ class StrengthSession extends AtomicEntity {
   bool isValidIgnoreEmptyNotNull() {
     return validate(!deleted, 'StrengthSession: deleted == true') &&
         validate(
-          interval == null || interval!.inSeconds > 0,
+          interval == null || interval! > Duration.zero,
           'StrengthSession: interval <= 0',
         );
   }

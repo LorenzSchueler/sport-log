@@ -84,6 +84,9 @@ class Diary extends AtomicEntity {
 
   @override
   void setEmptyToNull() {
+    if (bodyweight != null && bodyweight! <= 0) {
+      bodyweight = null;
+    }
     if (comments != null && comments!.isEmpty) {
       comments = null;
     }

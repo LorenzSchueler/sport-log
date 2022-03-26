@@ -232,16 +232,22 @@ class CardioSession extends AtomicEntity {
 
   @override
   void setEmptyToNull() {
+    if (time != null && time! <= Duration.zero) {
+      time = null;
+    }
+    if (distance != null && distance! <= 0) {
+      distance = null;
+    }
     if (track != null && track!.isEmpty) {
       track = null;
     }
-    if (avgCadence == 0) {
+    if (avgCadence != null && avgCadence! <= 0) {
       avgCadence = null;
     }
     if (cadence != null && cadence!.isEmpty) {
       cadence = null;
     }
-    if (avgHeartRate == 0) {
+    if (avgHeartRate == null && avgHeartRate! <= 0) {
       avgHeartRate = null;
     }
     if (heartRate != null && heartRate!.isEmpty) {
