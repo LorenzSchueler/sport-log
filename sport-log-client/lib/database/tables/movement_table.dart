@@ -64,19 +64,6 @@ class MovementTable extends TableAccessor<Movement> {
     );
     return records.map((r) => serde.fromDbRecord(r)).toList();
   }
-
-  Future<bool> exists(String nameValue, MovementDimension dimValue) async {
-    final result = await database.rawQuery(
-      '''
-      SELECT 1 FROM $tableName
-      WHERE $deleted = 0
-        AND $name = ?
-        AND $dimension = ?
-    ''',
-      [nameValue, dimValue.index],
-    );
-    return result.isNotEmpty;
-  }
 }
 
 class MovementDescriptionTable {

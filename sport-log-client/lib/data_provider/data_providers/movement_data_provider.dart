@@ -29,10 +29,6 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
       cardioOnly: cardioOnly,
     );
   }
-
-  Future<bool> exists(String name, MovementDimension dim) async {
-    return await db.exists(name, dim);
-  }
 }
 
 class MovementDescriptionDataProvider
@@ -94,9 +90,5 @@ class MovementDescriptionDataProvider
       name,
       cardioOnly: cardioOnly,
     );
-  }
-
-  Future<bool> exists(String name, MovementDimension dim) async {
-    return await _dataProvider.exists(name, dim);
   }
 }

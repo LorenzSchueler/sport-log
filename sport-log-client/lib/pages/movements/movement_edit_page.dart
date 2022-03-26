@@ -49,18 +49,6 @@ class _EditMovementPageState extends State<EditMovementPage> {
 
   Future<void> _saveMovement() async {
     FocusManager.instance.primaryFocus?.unfocus();
-    if (widget.movementDescription == null &&
-        await _dataProvider.exists(
-          _movementDescription.movement.name,
-          _movementDescription.movement.dimension,
-        )) {
-      await showMessageDialog(
-        context: context,
-        title: 'Movement exists!',
-        text: 'Please use the existing movement.',
-      );
-      return;
-    }
 
     final result = widget.movementDescription != null
         ? await _dataProvider.updateSingle(_movementDescription.movement)
