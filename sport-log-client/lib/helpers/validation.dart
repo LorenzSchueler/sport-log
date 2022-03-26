@@ -15,19 +15,19 @@ class Validator {
   Validator._();
 
   static String? validateUrl(String? url) {
-    if (url != null && url.isEmpty) {
+    if (url == null || url.isEmpty) {
       return "URL must not be empty.";
-    } else if (url != null && !isURL(url, protocols: ["http", "https"])) {
-      return "URL is not valid.";
+    } else if (!isURL(url, protocols: ["http", "https"])) {
+      return "URL is invalid.";
     } else {
       return null;
     }
   }
 
   static String? validateUsername(String? username) {
-    if (username != null && username.isEmpty) {
+    if (username == null || username.isEmpty) {
       return "Username must not be empty.";
-    } else if (username != null && username.contains(':')) {
+    } else if (username.contains(':')) {
       return "Username must not contain ':'.";
     } else {
       return null;
@@ -35,121 +35,111 @@ class Validator {
   }
 
   static String? validatePassword(String? password) {
-    return password != null && password.isEmpty
-        ? "Password must not be empty"
-        : null;
+    if (password == null || password.isEmpty) {
+      return "Password must not be empty.";
+    } else {
+      return null;
+    }
   }
 
   static String? validatePassword2(String? password, String? password2) {
-    return password != null &&
-            password2 != null &&
-            password2.isNotEmpty &&
-            password == password2
-        ? null
-        : "Passwords do not match";
+    if (password2 == null || password2.isEmpty) {
+      return "Password must not be empty.";
+    } else if (password != password2) {
+      return "Passwords do not match.";
+    } else {
+      return null;
+    }
   }
 
   static String? validateEmail(String? email) {
-    if (email == null) {
-      return null;
-    } else {
-      if (email.isEmpty) {
-        return "Email must not be empty.";
-      } else if (!isEmail(email)) {
-        return "Input is not a valid email.";
-      } else {
-        return null;
-      }
-    }
-  }
-
-  static String? validateHour(String? value) {
-    if (value == null) return null;
-    int? intValue = int.tryParse(value);
-    if (intValue == null) {
-      return "please enter a valid number";
-    } else if (intValue < 0) {
-      return "please enter a positive number";
+    if (email == null || email.isEmpty) {
+      return "Email must not be empty.";
+    } else if (!isEmail(email)) {
+      return "Email is invalid.";
     } else {
       return null;
     }
   }
 
-  static String? validateMinOrSec(String? value) {
-    if (value == null) return null;
-    int? intValue = int.tryParse(value);
-    if (intValue == null) {
-      return "please enter a valid number";
-    } else if (intValue < 0 || intValue >= 60) {
-      return "please enter a number between 0 and 59";
-    } else {
-      return null;
-    }
-  }
+  static String? validateHour(String? value) => validateIntGeZero(value);
+
+  static String? validateMinOrSec(String? value) =>
+      validateIntGeZeroLtValue(value, 60);
 
   static String? validateStringNotEmpty(String? value) {
-    if (value != null && value.isEmpty) {
-      return "please fill out the field";
+    if (value == null || value.isEmpty) {
+      return "Field must not be empty.";
     } else {
       return null;
     }
   }
 
   static String? validateIntGtZero(String? value) {
-    if (value == null) return null;
+    if (value == null || value.isEmpty) {
+      return "Field must not be empty.";
+    }
     int? intValue = int.tryParse(value);
     if (intValue == null) {
-      return "please enter a valid number";
+      return "Number is invalid.";
     } else if (intValue <= 0) {
-      return "please enter a number greater than 0";
+      return "Number must be greater than 0.";
     } else {
       return null;
     }
   }
 
   static String? validateIntGeZero(String? value) {
-    if (value == null) return null;
+    if (value == null || value.isEmpty) {
+      return "Field must not be empty.";
+    }
     int? intValue = int.tryParse(value);
     if (intValue == null) {
-      return "please enter a valid number";
+      return "Number is invalid.";
     } else if (intValue < 0) {
-      return "please enter a number greater or equal than 0";
+      return "Number must be greater or equal than 0.";
     } else {
       return null;
     }
   }
 
   static String? validateIntGeZeroLtValue(String? value, int upperBound) {
-    if (value == null) return null;
-    final validated = Validator.validateIntGeZero(value);
-    if (validated != null) return validated;
-    final intValue = int.parse(value);
-    if (intValue >= upperBound) {
-      return "please enter a number between 0 and $upperBound";
+    if (value == null || value.isEmpty) {
+      return "Field must not be empty.";
+    }
+    int? intValue = int.tryParse(value);
+    if (intValue == null) {
+      return "Number is invalid.";
+    } else if (intValue < 0 || intValue >= upperBound) {
+      return "Number must be between 0 and ${upperBound - 1}";
     } else {
       return null;
     }
   }
 
   static String? validateIntGeZeroLeValue(String? value, int upperBound) {
-    if (value == null) return null;
-    final validated = Validator.validateIntGeZero(value);
-    if (validated != null) return validated;
-    final intValue = int.parse(value);
-    if (intValue > upperBound) {
-      return "please enter a number between 0 and $upperBound";
+    if (value == null || value.isEmpty) {
+      return "Field must not be empty.";
+    }
+    int? intValue = int.tryParse(value);
+    if (intValue == null) {
+      return "Number is invalid.";
+    } else if (intValue < 0 || intValue > upperBound) {
+      return "Number must be between 0 and $upperBound.";
     } else {
       return null;
     }
   }
 
   static String? validateDoubleGtZero(String? value) {
-    if (value == null) return null;
+    if (value == null || value.isEmpty) {
+      return "Field must not be empty.";
+    }
     double? doubleValue = double.tryParse(value);
     if (doubleValue == null) {
-      return "please enter a valid number";
+      return "Number is invalid.";
     } else if (doubleValue <= 0) {
-      return "please enter a number greater than 0";
+      return "Number must be greater than 0.";
     } else {
       return null;
     }
