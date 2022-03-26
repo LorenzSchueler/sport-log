@@ -36,8 +36,8 @@ class CardioSessionDescription extends CompoundEntity {
       );
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
-    return cardioSession.isValidIgnoreEmptyNotNull() &&
+  bool isValidBeforeSanitazion() {
+    return cardioSession.isValidBeforeSanitazion() &&
         validate(
           route == null || route!.isValid(),
           'CardioSessionDescription: route is not valid',
@@ -62,12 +62,12 @@ class CardioSessionDescription extends CompoundEntity {
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull();
+    return isValidBeforeSanitazion();
   }
 
   @override
-  void setEmptyToNull() {
-    cardioSession.setEmptyToNull();
-    route?.setEmptyToNull();
+  void sanitize() {
+    cardioSession.sanitize();
+    route?.sanitize();
   }
 }

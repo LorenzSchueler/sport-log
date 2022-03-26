@@ -45,7 +45,7 @@ class StrengthSession extends AtomicEntity {
   Map<String, dynamic> toJson() => _$StrengthSessionToJson(this);
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(!deleted, 'StrengthSession: deleted == true') &&
         validate(
           interval == null || interval! > Duration.zero,
@@ -55,7 +55,7 @@ class StrengthSession extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull() &&
+    return isValidBeforeSanitazion() &&
         validate(
           comments == null || comments!.isNotEmpty,
           'StrengthSession: comments are empty but not null',
@@ -63,7 +63,7 @@ class StrengthSession extends AtomicEntity {
   }
 
   @override
-  void setEmptyToNull() {
+  void sanitize() {
     if (comments != null && comments!.isEmpty) {
       comments = null;
     }

@@ -157,7 +157,7 @@ class CardioSession extends AtomicEntity {
       );
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(!deleted, 'CardioSession: deleted is true') &&
         validate(
           ascent == null || ascent! >= 0,
@@ -203,7 +203,7 @@ class CardioSession extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull() &&
+    return isValidBeforeSanitazion() &&
         validate(
           avgCadence == null || avgCadence! > 0,
           'CardioSession: avgCadence <= 0',
@@ -231,7 +231,7 @@ class CardioSession extends AtomicEntity {
   }
 
   @override
-  void setEmptyToNull() {
+  void sanitize() {
     if (time != null && time! <= Duration.zero) {
       time = null;
     }

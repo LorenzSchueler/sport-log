@@ -51,7 +51,7 @@ class Action extends AtomicEntity {
       );
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(!deleted, 'Action: deleted is true') &&
         validate(
           name.length >= 2 && name.length <= 80,
@@ -69,7 +69,7 @@ class Action extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull() &&
+    return isValidBeforeSanitazion() &&
         validate(
           description == null || description!.isNotEmpty,
           'Action: description is empty but not null',
@@ -77,7 +77,7 @@ class Action extends AtomicEntity {
   }
 
   @override
-  void setEmptyToNull() {
+  void sanitize() {
     if (description != null && description!.isEmpty) {
       description = null;
     }

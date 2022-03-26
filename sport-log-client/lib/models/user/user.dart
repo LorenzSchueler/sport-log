@@ -37,7 +37,7 @@ class User extends NonDeletableAtomicEntity {
       );
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(username.isNotEmpty, 'User: username is empty') &&
         validate(password.isNotEmpty, 'User: password is empty') &&
         validate(
@@ -48,9 +48,9 @@ class User extends NonDeletableAtomicEntity {
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull();
+    return isValidBeforeSanitazion();
   }
 
   @override
-  void setEmptyToNull() {}
+  void sanitize() {}
 }

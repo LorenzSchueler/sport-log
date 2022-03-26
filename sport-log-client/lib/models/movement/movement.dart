@@ -106,7 +106,7 @@ class Movement extends AtomicEntity {
       );
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(!deleted, 'Movement: deleted == true') &&
         validate(
           name.length >= 2 && name.length <= 80,
@@ -116,7 +116,7 @@ class Movement extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull() &&
+    return isValidBeforeSanitazion() &&
         validate(
           description == null || description!.isNotEmpty,
           'Movement: desciption is empty but not null',
@@ -124,7 +124,7 @@ class Movement extends AtomicEntity {
   }
 
   @override
-  void setEmptyToNull() {
+  void sanitize() {
     if (description != null && description!.isEmpty) {
       description = null;
     }

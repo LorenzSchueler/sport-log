@@ -44,13 +44,13 @@ class Wod extends AtomicEntity {
       );
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(!deleted, 'Wod: deleted == true');
   }
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull() &&
+    return isValidBeforeSanitazion() &&
         validate(
           description == null || description!.isNotEmpty,
           "Wod: description is empty but not null",
@@ -58,7 +58,7 @@ class Wod extends AtomicEntity {
   }
 
   @override
-  void setEmptyToNull() {
+  void sanitize() {
     if (description != null && description!.isEmpty) {
       description = null;
     }

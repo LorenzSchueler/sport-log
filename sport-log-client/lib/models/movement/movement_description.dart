@@ -32,16 +32,16 @@ class MovementDescription extends CompoundEntity {
       );
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(
-      movement.isValidIgnoreEmptyNotNull(),
+      movement.isValidBeforeSanitazion(),
       'MovementDescription: movement is not valid',
     );
   }
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull() &&
+    return isValidBeforeSanitazion() &&
         validate(
           movement.isValid(),
           'MovementDescription: movement is not valid',
@@ -49,8 +49,8 @@ class MovementDescription extends CompoundEntity {
   }
 
   @override
-  void setEmptyToNull() {
-    movement.setEmptyToNull();
+  void sanitize() {
+    movement.sanitize();
   }
 
   @override

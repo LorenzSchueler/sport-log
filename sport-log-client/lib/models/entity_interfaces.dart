@@ -8,7 +8,7 @@ abstract class HasId {
 abstract class Validatable {
   bool isValid();
 
-  bool isValidIgnoreEmptyNotNull();
+  bool isValidBeforeSanitazion();
 }
 
 abstract class Entity extends JsonSerializable implements Validatable {
@@ -17,7 +17,7 @@ abstract class Entity extends JsonSerializable implements Validatable {
 
   Entity clone();
 
-  void setEmptyToNull();
+  void sanitize();
 }
 
 abstract class CompoundEntity extends Entity {}

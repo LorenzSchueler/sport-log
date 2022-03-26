@@ -29,13 +29,13 @@ class MetconMovementDescription extends CompoundEntity {
       );
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(
-          metconMovement.isValidIgnoreEmptyNotNull(),
+          metconMovement.isValidBeforeSanitazion(),
           'MetconMovementDescription: metcon movement not valid',
         ) &&
         validate(
-          movement.isValidIgnoreEmptyNotNull(),
+          movement.isValidBeforeSanitazion(),
           'MetconMovementDescription: movement not valid',
         ) &&
         validate(
@@ -46,13 +46,13 @@ class MetconMovementDescription extends CompoundEntity {
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull();
+    return isValidBeforeSanitazion();
   }
 
   @override
-  void setEmptyToNull() {
-    metconMovement.setEmptyToNull();
-    movement.setEmptyToNull();
+  void sanitize() {
+    metconMovement.sanitize();
+    movement.sanitize();
   }
 
   String get movementText {

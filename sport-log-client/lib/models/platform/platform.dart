@@ -33,7 +33,7 @@ class Platform extends AtomicEntity {
   Platform clone() => Platform(id: id.clone(), name: name, deleted: deleted);
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(!deleted, 'Platform: deleted == true') &&
         validate(
           name.length >= 2 && name.length <= 80,
@@ -43,11 +43,11 @@ class Platform extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull();
+    return isValidBeforeSanitazion();
   }
 
   @override
-  void setEmptyToNull() {}
+  void sanitize() {}
 }
 
 class DbPlatformSerializer extends DbSerializer<Platform> {

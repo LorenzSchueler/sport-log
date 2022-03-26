@@ -118,7 +118,7 @@ class Metcon extends AtomicEntity {
   }
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(!deleted, 'Metcon: deleted == true') &&
         validate(userId != null, 'Metcon: userId == null') &&
         validate(
@@ -135,7 +135,7 @@ class Metcon extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull() &&
+    return isValidBeforeSanitazion() &&
         validate(
           description == null || description!.isNotEmpty,
           'Metcon: description is empty but not null',
@@ -143,7 +143,7 @@ class Metcon extends AtomicEntity {
   }
 
   @override
-  void setEmptyToNull() {
+  void sanitize() {
     if (description != null && description!.isEmpty) {
       description = null;
     }

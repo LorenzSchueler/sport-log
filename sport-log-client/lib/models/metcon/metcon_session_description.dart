@@ -37,7 +37,7 @@ class MetconSessionDescription extends CompoundEntity {
       );
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     bool metconMetconDescriptionChecks;
     switch (metconDescription.metcon.metconType) {
       case MetconType.amrap:
@@ -77,7 +77,7 @@ class MetconSessionDescription extends CompoundEntity {
         break;
     }
     return validate(
-          metconDescription.isValidIgnoreEmptyNotNull(),
+          metconDescription.isValidBeforeSanitazion(),
           'MetconSessionDescription: metcon description not valid',
         ) &&
         validate(
@@ -89,13 +89,13 @@ class MetconSessionDescription extends CompoundEntity {
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull();
+    return isValidBeforeSanitazion();
   }
 
   @override
-  void setEmptyToNull() {
-    metconSession.setEmptyToNull();
-    metconDescription.setEmptyToNull();
+  void sanitize() {
+    metconSession.sanitize();
+    metconDescription.sanitize();
   }
 
   String _resultDescription(bool short) {

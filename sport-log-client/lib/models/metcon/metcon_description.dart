@@ -40,9 +40,9 @@ class MetconDescription extends CompoundEntity {
       );
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(
-          metcon.isValidIgnoreEmptyNotNull(),
+          metcon.isValidBeforeSanitazion(),
           'MetconDescription: metcon not valid',
         ) &&
         validate(moves.isNotEmpty, 'MetconDescription: moves empty') &&
@@ -57,21 +57,21 @@ class MetconDescription extends CompoundEntity {
           'MetconDescription: moves indices wrong',
         ) &&
         validate(
-          moves.every((mm) => mm.isValidIgnoreEmptyNotNull()),
+          moves.every((mm) => mm.isValidBeforeSanitazion()),
           'MetconDescription: moves not valid',
         );
   }
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull();
+    return isValidBeforeSanitazion();
   }
 
   @override
-  void setEmptyToNull() {
-    metcon.setEmptyToNull();
+  void sanitize() {
+    metcon.sanitize();
     for (final move in moves) {
-      move.setEmptyToNull();
+      move.sanitize();
     }
   }
 

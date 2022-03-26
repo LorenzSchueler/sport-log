@@ -40,9 +40,9 @@ class StrengthSessionDescription extends CompoundEntity {
       );
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(
-          session.isValidIgnoreEmptyNotNull(),
+          session.isValidBeforeSanitazion(),
           'StrengthSessionDescription: strength session not valid',
         ) &&
         validate(
@@ -58,7 +58,7 @@ class StrengthSessionDescription extends CompoundEntity {
           'StrengthSessionDescription: strengthSets indices wrong',
         ) &&
         validate(
-          sets.every((ss) => ss.isValidIgnoreEmptyNotNull()),
+          sets.every((ss) => ss.isValidBeforeSanitazion()),
           'StrengthSessionDescription: strengthSets not valid',
         ) &&
         validate(
@@ -73,14 +73,14 @@ class StrengthSessionDescription extends CompoundEntity {
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull();
+    return isValidBeforeSanitazion();
   }
 
   @override
-  void setEmptyToNull() {
-    session.setEmptyToNull();
+  void sanitize() {
+    session.sanitize();
     for (final StrengthSet set in sets) {
-      set.setEmptyToNull();
+      set.sanitize();
     }
   }
 

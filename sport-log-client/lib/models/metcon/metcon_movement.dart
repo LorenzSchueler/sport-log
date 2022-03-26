@@ -97,7 +97,7 @@ class MetconMovement extends AtomicEntity {
       );
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(!deleted, 'MetconMovement: deleted == true') &&
         validate(movementNumber >= 0, 'MetconMovement: movement number < 0') &&
         validate(count > 0, 'MetconMovement: count <= 0') &&
@@ -113,11 +113,11 @@ class MetconMovement extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull();
+    return isValidBeforeSanitazion();
   }
 
   @override
-  void setEmptyToNull() {
+  void sanitize() {
     if (maleWeight != null && maleWeight! <= 0) {
       maleWeight = null;
     }

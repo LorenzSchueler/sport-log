@@ -71,7 +71,7 @@ class StrengthSessionDescriptionDataProvider
 
   @override
   Future<DbResult> createSingle(StrengthSessionDescription object) async {
-    object.setEmptyToNull();
+    object.sanitize();
     assert(object.isValid());
     final result =
         await _strengthSessionDataProvider.createSingle(object.session);
@@ -83,7 +83,7 @@ class StrengthSessionDescriptionDataProvider
 
   @override
   Future<DbResult> updateSingle(StrengthSessionDescription object) async {
-    object.setEmptyToNull();
+    object.sanitize();
     assert(object.isValid());
 
     final oldSets =

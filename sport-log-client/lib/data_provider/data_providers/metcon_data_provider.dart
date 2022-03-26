@@ -97,7 +97,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
 
   @override
   Future<DbResult> createSingle(MetconDescription object) async {
-    object.setEmptyToNull();
+    object.sanitize();
     assert(object.isValid());
     var result = await _metconDataProvider.createSingle(object.metcon);
     if (result.isFailure()) {
@@ -110,7 +110,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
 
   @override
   Future<DbResult> updateSingle(MetconDescription object) async {
-    object.setEmptyToNull();
+    object.sanitize();
     assert(object.isValid());
 
     final oldMMovements =

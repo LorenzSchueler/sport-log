@@ -50,7 +50,7 @@ class StrengthSet extends AtomicEntity {
       );
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(!deleted, 'StrengthSet: deleted == true') &&
         validate(setNumber >= 0, 'StrengthSet: setNumber < 0') &&
         validate(count >= 1, 'StrengthSet: count < 1') &&
@@ -59,11 +59,11 @@ class StrengthSet extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull();
+    return isValidBeforeSanitazion();
   }
 
   @override
-  void setEmptyToNull() {
+  void sanitize() {
     if (weight != null && weight! <= 0) {
       weight = null;
     }

@@ -48,7 +48,7 @@ class PlatformCredential extends AtomicEntity {
       );
 
   @override
-  bool isValidIgnoreEmptyNotNull() {
+  bool isValidBeforeSanitazion() {
     return validate(!deleted, 'PlatformCredential: deleted == true') &&
         validate(
           username.length <= 80,
@@ -62,11 +62,11 @@ class PlatformCredential extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidIgnoreEmptyNotNull();
+    return isValidBeforeSanitazion();
   }
 
   @override
-  void setEmptyToNull() {}
+  void sanitize() {}
 }
 
 class DbPlatformCredentialSerializer extends DbSerializer<PlatformCredential> {

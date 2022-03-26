@@ -227,7 +227,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
           ),
           TextButton(
             child: const Text("Save"),
-            onPressed: _cardioSessionDescription.isValidIgnoreEmptyNotNull()
+            onPressed: _cardioSessionDescription.isValidBeforeSanitazion()
                 ? () async {
                     _trackingMode = TrackingMode.stopped;
                     await _saveCardioSession();
