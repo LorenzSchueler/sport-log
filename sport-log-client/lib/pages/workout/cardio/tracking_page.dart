@@ -63,7 +63,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       cardioSession: CardioSession.defaultValue(widget.movement.id)
         ..cardioType = widget.cardioType
         ..time = Duration.zero
-        ..distance = 1 // TODO remove when distance calculated from track
+        ..distance = 0
         ..track = []
         ..cadence = []
         ..routeId = widget.route?.id,
@@ -121,7 +121,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       }
       _cardioSessionDescription.cardioSession.setAvgCadence();
       _cardioSessionDescription.cardioSession.setAvgHeartRate();
-      //_cardioSessionDescription.cardioSession.setDistance();
+      _cardioSessionDescription.cardioSession.setDistance();
 
       if (_cardioSessionDescription.cardioSession.cadence != null) {
         _stepInfo =
@@ -165,10 +165,11 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
   Future<void> _onLocationUpdate(LocationData location) async {
     setState(() {
-      _locationInfo = """provider:  ${location.provider}
+      _locationInfo = """provider:   ${location.provider}
 accuracy: ${location.accuracy?.toInt()} m
 time: ${location.time! ~/ 1000} s
-satelites:  ${location.satelliteNumber}""";
+satelites:  ${location.satelliteNumber}
+points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
     });
 
     LatLng latLng = LatLng(location.latitude!, location.longitude!);
@@ -400,8 +401,10 @@ satelites:  ${location.satelliteNumber}""";
                 rowSpacer,
                 TableRow(
                   children: [
-                    const ValueUnitDescription(
-                      value: "--",
+                    ValueUnitDescription(
+                      value: _cardioSessionDescription.cardioSession.speed
+                              ?.toStringAsFixed(1) ??
+                          "--",
                       unit: "km/h",
                       description: "Speed",
                       scale: 1.3,
@@ -430,15 +433,21 @@ satelites:  ${location.satelliteNumber}""";
                 TableRow(
                   children: [
                     ValueUnitDescription(
-                      value:
-                          "${_cardioSessionDescription.cardioSession.avgCadence}",
+                      value: _cardioSessionDescription
+                                  .cardioSession.avgCadence ==
+                              null
+                          ? "--"
+                          : "${_cardioSessionDescription.cardioSession.avgCadence}",
                       unit: "rpm",
                       description: "Cadence",
                       scale: 1.3,
                     ),
                     ValueUnitDescription(
-                      value:
-                          "${_cardioSessionDescription.cardioSession.avgHeartRate}",
+                      value: _cardioSessionDescription
+                                  .cardioSession.avgHeartRate ==
+                              null
+                          ? "--"
+                          : "${_cardioSessionDescription.cardioSession.avgHeartRate}",
                       unit: "bpm",
                       description: "Heart Rate",
                       scale: 1.3,

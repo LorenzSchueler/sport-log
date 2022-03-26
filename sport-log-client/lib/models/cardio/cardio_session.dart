@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/id_generation.dart';
@@ -84,9 +85,27 @@ class CardioSession extends AtomicEntity {
         datetime = DateTime.now(),
         deleted = false;
 
+  double? get speed {
+    return distance == null ||
+            time == null ||
+            time! < const Duration(seconds: 1)
+        ? null
+        : distance! / time!.inSeconds;
+  }
+
   void setDistance() {
-    if (track != null && track!.isNotEmpty) {
-      distance = 1; // TODO calculate distance from coords
+    if (track != null && track!.length >= 2) {
+      distance = 0;
+      for (int i = 0; i < track!.length - 1; i++) {
+        distance = distance! +
+            const Distance()
+                .as(
+                  LengthUnit.Meter,
+                  LatLng(track![i].latitude, track![i].longitude),
+                  LatLng(track![i + 1].latitude, track![i + 1].longitude),
+                )
+                .round();
+      }
     } else {
       distance = null;
     }
@@ -216,8 +235,14 @@ class CardioSession extends AtomicEntity {
     if (track != null && track!.isEmpty) {
       track = null;
     }
+    if (avgCadence == 0) {
+      avgCadence = null;
+    }
     if (cadence != null && cadence!.isEmpty) {
       cadence = null;
+    }
+    if (avgHeartRate == 0) {
+      avgHeartRate = null;
     }
     if (heartRate != null && heartRate!.isEmpty) {
       heartRate = null;
