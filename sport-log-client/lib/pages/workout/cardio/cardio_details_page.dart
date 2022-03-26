@@ -34,35 +34,6 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final distance = _cardioSessionDescription.cardioSession.distance == null
-        ? '???'
-        : (_cardioSessionDescription.cardioSession.distance! / 1000)
-            .toStringAsFixed(3);
-    final speed = _cardioSessionDescription.cardioSession.distance == null ||
-            _cardioSessionDescription.cardioSession.time == null
-        ? '???'
-        : ((_cardioSessionDescription.cardioSession.distance! / 1000) /
-                (_cardioSessionDescription.cardioSession.time!.inSeconds /
-                    3600))
-            .toStringAsFixed(1);
-    final calories = _cardioSessionDescription.cardioSession.calories == null
-        ? "-"
-        : _cardioSessionDescription.cardioSession.calories.toString();
-    final avgCadence =
-        _cardioSessionDescription.cardioSession.avgCadence == null
-            ? "-"
-            : _cardioSessionDescription.cardioSession.avgCadence.toString();
-    final avgHeartRate =
-        _cardioSessionDescription.cardioSession.avgHeartRate == null
-            ? "-"
-            : _cardioSessionDescription.cardioSession.avgHeartRate.toString();
-    final ascent = _cardioSessionDescription.cardioSession.ascent == null
-        ? "-"
-        : _cardioSessionDescription.cardioSession.ascent.toString();
-    final descent = _cardioSessionDescription.cardioSession.descent == null
-        ? "-"
-        : _cardioSessionDescription.cardioSession.descent.toString();
-
     TableRow rowSpacer = TableRow(
       children: [
         Defaults.sizedBox.vertical.normal,
@@ -161,14 +132,20 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                       children: [
                         ValueUnitDescription(
                           value: _cardioSessionDescription
-                                  .cardioSession.time?.formatTime ??
-                              "",
+                              .cardioSession.time!.formatTime,
                           unit: null,
                           description: "Duration",
                           scale: 1.3,
                         ),
                         ValueUnitDescription(
-                          value: distance,
+                          value: _cardioSessionDescription
+                                      .cardioSession.distance ==
+                                  null
+                              ? "--"
+                              : (_cardioSessionDescription
+                                          .cardioSession.distance! /
+                                      1000)
+                                  .toStringAsFixed(3),
                           unit: "km",
                           description: "Distance",
                           scale: 1.3,
@@ -179,13 +156,21 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                     TableRow(
                       children: [
                         ValueUnitDescription(
-                          value: speed,
+                          value: _cardioSessionDescription.cardioSession.speed
+                                  ?.toStringAsFixed(1) ??
+                              "--",
                           unit: "km/h",
                           description: "Speed",
                           scale: 1.3,
                         ),
                         ValueUnitDescription(
-                          value: calories,
+                          value: _cardioSessionDescription
+                                      .cardioSession.calories ==
+                                  null
+                              ? "--"
+                              : _cardioSessionDescription
+                                  .cardioSession.calories!
+                                  .toString(),
                           unit: "cal",
                           description: "Energy",
                           scale: 1.3,
@@ -196,13 +181,23 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                     TableRow(
                       children: [
                         ValueUnitDescription(
-                          value: ascent,
+                          value: _cardioSessionDescription
+                                      .cardioSession.ascent ==
+                                  null
+                              ? "--"
+                              : _cardioSessionDescription.cardioSession.ascent!
+                                  .toString(),
                           unit: "m",
                           description: "Ascent",
                           scale: 1.3,
                         ),
                         ValueUnitDescription(
-                          value: descent,
+                          value: _cardioSessionDescription
+                                      .cardioSession.descent ==
+                                  null
+                              ? "--"
+                              : _cardioSessionDescription.cardioSession.descent!
+                                  .toString(),
                           unit: "m",
                           description: "Descent",
                           scale: 1.3,
@@ -213,13 +208,21 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                     TableRow(
                       children: [
                         ValueUnitDescription(
-                          value: avgCadence,
+                          value: _cardioSessionDescription
+                                      .cardioSession.avgCadence ==
+                                  null
+                              ? "--"
+                              : "${_cardioSessionDescription.cardioSession.avgCadence}",
                           unit: "rpm",
                           description: "Cadence",
                           scale: 1.3,
                         ),
                         ValueUnitDescription(
-                          value: avgHeartRate,
+                          value: _cardioSessionDescription
+                                      .cardioSession.avgHeartRate ==
+                                  null
+                              ? "--"
+                              : "${_cardioSessionDescription.cardioSession.avgHeartRate}",
                           unit: "bpm",
                           description: "Heart Rate",
                           scale: 1.3,
