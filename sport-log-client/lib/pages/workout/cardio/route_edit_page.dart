@@ -55,7 +55,6 @@ class RouteEditPageState extends State<RouteEditPage> {
   }
 
   Future<void> _saveRoute() async {
-    _route.setEmptyToNull();
     _logger.i("saving route");
     final result = widget.route != null
         ? await _dataProvider.updateSingle(_route)

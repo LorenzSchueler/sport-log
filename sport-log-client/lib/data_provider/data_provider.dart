@@ -91,6 +91,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
 
   @override
   Future<DbResult> createSingle(T object) async {
+    object.setEmptyToNull();
     assert(object.isValid());
     final result = await db.createSingle(object);
     if (result.isFailure()) {
@@ -102,6 +103,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
 
   @override
   Future<DbResult> updateSingle(T object) async {
+    object.setEmptyToNull();
     assert(object.isValid());
     final result = await db.updateSingle(object);
     if (result.isFailure()) {
@@ -122,7 +124,9 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   }
 
   Future<DbResult> createMultiple(List<T> objects) async {
-    assert(objects.every((element) => element.isValid()));
+    // ignore: avoid_function_literals_in_foreach_calls
+    objects.forEach((object) => object.setEmptyToNull());
+    assert(objects.every((object) => object.isValid()));
     final result = await db.createMultiple(objects);
     if (result.isFailure()) {
       return result;
@@ -132,7 +136,9 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   }
 
   Future<DbResult> updateMultiple(List<T> objects) async {
-    assert(objects.every((element) => element.isValid()));
+    // ignore: avoid_function_literals_in_foreach_calls
+    objects.forEach((object) => object.setEmptyToNull());
+    assert(objects.every((object) => object.isValid()));
     final result = await db.updateMultiple(objects);
     if (result.isFailure()) {
       return result;

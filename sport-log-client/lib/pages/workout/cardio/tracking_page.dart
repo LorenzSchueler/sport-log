@@ -93,7 +93,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   }
 
   Future<void> _saveCardioSession() async {
-    _cardioSessionDescription.setEmptyToNull();
     _cardioSessionDescription.cardioSession.ascent = _ascent.round();
     _cardioSessionDescription.cardioSession.descent = _descent.round();
     _cardioSessionDescription.cardioSession.setAvgCadence();
