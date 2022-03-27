@@ -172,10 +172,6 @@ class CardioSession extends AtomicEntity {
           'CardioSession: calories < 0',
         ) &&
         validate(
-          distance == null || distance! > 0,
-          'CardioSession: distance <= 0',
-        ) &&
-        validate(
           avgCadence == null || avgCadence! >= 0,
           'CardioSession: avgCadence < 0',
         ) &&
@@ -188,15 +184,15 @@ class CardioSession extends AtomicEntity {
           'CardioSession: time <= 0',
         ) &&
         validate(
-          track == null || track!.isEmpty || distance != null,
+          track == null || track!.length <= 1 || distance != null,
           'CardioSession: distance == null when track is set',
         ) &&
         validate(
-          cadence == null || cadence!.isEmpty || avgCadence != null,
+          cadence == null || cadence!.length <= 1 || avgCadence != null,
           'CardioSession: avgCadence == null when cadence is set',
         ) &&
         validate(
-          heartRate == null || heartRate!.isEmpty || avgHeartRate != null,
+          heartRate == null || heartRate!.length <= 1 || avgHeartRate != null,
           'CardioSession: avgHeartRate == null when heartRate is set',
         );
   }
@@ -204,6 +200,10 @@ class CardioSession extends AtomicEntity {
   @override
   bool isValid() {
     return isValidBeforeSanitazion() &&
+        validate(
+          distance == null || distance! > 0,
+          'CardioSession: distance <= 0',
+        ) &&
         validate(
           avgCadence == null || avgCadence! > 0,
           'CardioSession: avgCadence <= 0',
@@ -247,7 +247,7 @@ class CardioSession extends AtomicEntity {
     if (cadence != null && cadence!.isEmpty) {
       cadence = null;
     }
-    if (avgHeartRate == null && avgHeartRate! <= 0) {
+    if (avgHeartRate != null && avgHeartRate! <= 0) {
       avgHeartRate = null;
     }
     if (heartRate != null && heartRate!.isEmpty) {
