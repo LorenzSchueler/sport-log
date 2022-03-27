@@ -256,9 +256,8 @@ class CardioSessionCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: ValueUnitDescription(
-                    value: cardioSessionDescription
-                            .cardioSession.time?.formatTime ??
-                        "--:--:--",
+                    value:
+                        cardioSessionDescription.cardioSession.time?.formatTime,
                     unit: null,
                     description: null,
                   ),

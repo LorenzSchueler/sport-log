@@ -124,7 +124,7 @@ class DiaryCard extends StatelessWidget {
                 width: 80,
                 child: diary.bodyweight != null
                     ? ValueUnitDescription(
-                        value: diary.bodyweight!.toStringAsFixed(1),
+                        value: diary.bodyweight?.toStringAsFixed(1),
                         unit: "kg",
                         description: null,
                       )
