@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -21,6 +22,8 @@ class CardioTrackingSettingsPageState
   Movement? _movement;
   CardioType? _cardioType;
   Route? _route;
+  HeartRateUtils? _heartRateUtils;
+  bool _isSearchingHRMonitor = false;
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +45,7 @@ class CardioTrackingSettingsPageState
                   dismissable: false,
                   cardioOnly: true,
                 );
-                setState(() {
-                  _movement = movement;
-                });
+                setState(() => _movement = movement);
               },
             ),
             EditTile(
@@ -56,9 +57,7 @@ class CardioTrackingSettingsPageState
                   context,
                   dismissable: false,
                 );
-                setState(() {
-                  _cardioType = cardioType;
-                });
+                setState(() => _cardioType = cardioType);
               },
             ),
             EditTile(
@@ -70,8 +69,19 @@ class CardioTrackingSettingsPageState
                   context: context,
                   dismissable: false,
                 );
+                setState(() => _route = route);
+              },
+            ),
+            EditTile(
+              leading: AppIcons.map,
+              caption: "Heart Rate Tracker",
+              child: Text(_hrStatus),
+              onTap: () async {
+                setState(() => _isSearchingHRMonitor = true);
+                final heartRateUtils = await HeartRateUtils.searchDevice();
                 setState(() {
-                  _route = route;
+                  _heartRateUtils = heartRateUtils;
+                  _isSearchingHRMonitor = false;
                 });
               },
             ),
@@ -82,7 +92,12 @@ class CardioTrackingSettingsPageState
                     ? () => Navigator.pushNamed(
                           context,
                           Routes.cardio.tracking,
-                          arguments: [_movement!, _cardioType!, _route],
+                          arguments: [
+                            _movement!,
+                            _cardioType!,
+                            _route,
+                            _heartRateUtils,
+                          ],
                         )
                     : null,
                 child: const Text("OK"),
@@ -92,5 +107,15 @@ class CardioTrackingSettingsPageState
         ),
       ),
     );
+  }
+
+  String get _hrStatus {
+    if (_isSearchingHRMonitor) {
+      return "searching...";
+    } else if (_heartRateUtils == null) {
+      return "no device";
+    } else {
+      return "device found";
+    }
   }
 }

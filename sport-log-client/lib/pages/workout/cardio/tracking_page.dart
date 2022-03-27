@@ -7,6 +7,7 @@ import 'package:polar/polar.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
+import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/map_utils.dart';
@@ -22,11 +23,13 @@ class CardioTrackingPage extends StatefulWidget {
   final Movement movement;
   final CardioType cardioType;
   final Route? route;
+  final HeartRateUtils? heartRateUtils;
 
   const CardioTrackingPage({
     required this.route,
     required this.movement,
     required this.cardioType,
+    required this.heartRateUtils,
     Key? key,
   }) : super(key: key);
 
@@ -55,9 +58,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   late StreamSubscription _stepCountSubscription;
   late StepCount _lastStepCount;
 
-  static const _identifier = 'A85AAF22';
-  final _polar = Polar();
-
   late MapboxMapController _mapController;
   late Line _line;
   List<Circle> _circles = [];
@@ -78,7 +78,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     );
     _locationUtils = LocationUtils(_onLocationUpdate);
     _startStepCountStream();
-    _startHeartRateStream();
+    widget.heartRateUtils?.startHeartRateStream(_onHeartRateUpdate);
     _timer =
         Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateData());
     super.initState();
@@ -89,7 +89,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     _timer.cancel();
     _stepCountSubscription.cancel();
     _locationUtils.stopLocationStream();
-    _polar.disconnectFromDevice(_identifier);
+    widget.heartRateUtils?.stopHeartRateStream();
     if (_mapController.cameraPosition != null) {
       Settings.lastMapPosition = _mapController.cameraPosition!;
     }
@@ -139,16 +139,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     });
   }
 
-  void _startHeartRateStream() {
-    _polar.heartRateStream.listen(_onHeartRateUpdate);
-    //_polar.streamingFeaturesReadyStream.listen((e) {
-    //if (e.features.contains(DeviceStreamingFeature.ecg)) {
-    //_polar.startEcgStreaming(e.identifier).listen(_onHeartRateUpdate2);
-    //}
-    //});
-    _polar.connectToDevice(_identifier);
-  }
-
   void _onHeartRateUpdate(PolarHeartRateEvent event) {
     _logger
       ..i('hr: ${event.data.hr}')
@@ -173,10 +163,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     }
     _heartRateInfo = "rr: ${event.data.rrsMs} ms\nhr: ${event.data.hr} bpm";
   }
-
-  //void _onHeartRateUpdate2(PolarEcgData event) {
-  //_logger.i('Heart ecg: ${event.samples}');
-  //}
 
   void _startStepCountStream() {
     Stream<StepCount> _stepCountStream = Pedometer.stepCountStream;

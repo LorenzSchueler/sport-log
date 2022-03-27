@@ -62,6 +62,7 @@ dependencies:
   location: ^4.3.0
   pedometer: ^3.0.0
   polar: ^1.14.0
+  flutter_blue: ^0.8.0
   audioplayers: ^0.20.1
 
 dev_dependencies:
