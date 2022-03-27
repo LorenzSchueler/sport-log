@@ -369,35 +369,15 @@ class RouteEditPageState extends State<RouteEditPage> {
             children: [
               TableRow(
                 children: [
-                  ValueUnitDescription(
-                    value: (_route.distance / 1000).toString(),
-                    unit: "km",
-                    description: "distance",
-                    scale: 1.3,
-                  ),
-                  ValueUnitDescription(
-                    value: _route.name,
-                    unit: null,
-                    description: "Name",
-                    scale: 1.3,
-                  )
+                  ValueUnitDescription.distance(_route.distance),
+                  ValueUnitDescription.name(_route.name)
                 ],
               ),
               rowSpacer,
               TableRow(
                 children: [
-                  ValueUnitDescription(
-                    value: _route.ascent?.toString() ?? "--",
-                    unit: "m",
-                    description: "ascent",
-                    scale: 1.3,
-                  ),
-                  ValueUnitDescription(
-                    value: _route.descent?.toString() ?? "--",
-                    unit: "m",
-                    description: "descent",
-                    scale: 1.3,
-                  ),
+                  ValueUnitDescription.ascent(_route.ascent),
+                  ValueUnitDescription.descent(_route.descent),
                 ],
               ),
             ],

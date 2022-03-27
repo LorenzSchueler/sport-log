@@ -5,7 +5,6 @@ import 'package:pedometer/pedometer.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/map_utils.dart';
@@ -378,79 +377,44 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
               children: [
                 TableRow(
                   children: [
-                    ValueUnitDescription(
-                      value: _cardioSessionDescription
-                          .cardioSession.time!.formatTime,
-                      unit: null,
-                      description: "Duration",
-                      scale: 1.3,
+                    ValueUnitDescription.time(
+                      _cardioSessionDescription.cardioSession.time,
                     ),
-                    ValueUnitDescription(
-                      value: _cardioSessionDescription.cardioSession.distance ==
-                              null
-                          ? "--"
-                          : (_cardioSessionDescription.cardioSession.distance! /
-                                  1000)
-                              .toStringAsFixed(3),
-                      unit: "km",
-                      description: "Distance",
-                      scale: 1.3,
+                    ValueUnitDescription.distance(
+                      _cardioSessionDescription.cardioSession.distance,
                     ),
                   ],
                 ),
                 rowSpacer,
                 TableRow(
                   children: [
-                    ValueUnitDescription(
-                      value: _cardioSessionDescription.cardioSession.speed
-                              ?.toStringAsFixed(1) ??
-                          "--",
-                      unit: "km/h",
-                      description: "Speed",
-                      scale: 1.3,
+                    ValueUnitDescription.speed(
+                      _cardioSessionDescription.cardioSession.speed,
                     ),
-                    Container(),
-                  ],
-                ),
-                rowSpacer,
-                TableRow(
-                  children: [
-                    ValueUnitDescription(
-                      value: _ascent.round().toString(),
-                      unit: "m",
-                      description: "Ascent",
-                      scale: 1.3,
-                    ),
-                    ValueUnitDescription(
-                      value: _descent.round().toString(),
-                      unit: "m",
-                      description: "Descent",
-                      scale: 1.3,
+                    ValueUnitDescription.calories(
+                      _cardioSessionDescription.cardioSession.calories,
                     ),
                   ],
                 ),
                 rowSpacer,
                 TableRow(
                   children: [
-                    ValueUnitDescription(
-                      value: _cardioSessionDescription
-                                  .cardioSession.avgCadence ==
-                              null
-                          ? "--"
-                          : "${_cardioSessionDescription.cardioSession.avgCadence}",
-                      unit: "rpm",
-                      description: "Cadence",
-                      scale: 1.3,
+                    ValueUnitDescription.ascent(
+                      _ascent.round(),
                     ),
-                    ValueUnitDescription(
-                      value: _cardioSessionDescription
-                                  .cardioSession.avgHeartRate ==
-                              null
-                          ? "--"
-                          : "${_cardioSessionDescription.cardioSession.avgHeartRate}",
-                      unit: "bpm",
-                      description: "Heart Rate",
-                      scale: 1.3,
+                    ValueUnitDescription.descent(
+                      _descent.round(),
+                    ),
+                  ],
+                ),
+                rowSpacer,
+                TableRow(
+                  children: [
+                    ValueUnitDescription.avgCadence(
+                      _cardioSessionDescription.cardioSession.avgCadence,
+                    ),
+                    ValueUnitDescription.avgHeartRate(
+                      _cardioSessionDescription.cardioSession.avgHeartRate,
                     ),
                   ],
                 ),
