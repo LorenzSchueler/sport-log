@@ -3,8 +3,10 @@ import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:flutter/material.dart' hide Route;
+import 'package:polar/polar.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/map_utils.dart';
@@ -45,12 +47,16 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
   String _locationInfo = "null";
   String _stepInfo = "null";
+  String _heartRateInfo = "null";
 
   late Timer _timer;
   late LocationUtils _locationUtils;
 
   late StreamSubscription _stepCountSubscription;
   late StepCount _lastStepCount;
+
+  static const _identifier = 'A85AAF22';
+  final _polar = Polar();
 
   late MapboxMapController _mapController;
   late Line _line;
@@ -65,11 +71,14 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
         ..distance = 0
         ..track = []
         ..cadence = []
+        ..heartRate = []
         ..routeId = widget.route?.id,
       movement: widget.movement,
       route: widget.route,
     );
     _locationUtils = LocationUtils(_onLocationUpdate);
+    _startStepCountStream();
+    _startHeartRateStream();
     _timer =
         Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateData());
     super.initState();
@@ -80,6 +89,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     _timer.cancel();
     _stepCountSubscription.cancel();
     _locationUtils.stopLocationStream();
+    _polar.disconnectFromDevice(_identifier);
     if (_mapController.cameraPosition != null) {
       Settings.lastMapPosition = _mapController.cameraPosition!;
     }
@@ -129,6 +139,45 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     });
   }
 
+  void _startHeartRateStream() {
+    _polar.heartRateStream.listen(_onHeartRateUpdate);
+    //_polar.streamingFeaturesReadyStream.listen((e) {
+    //if (e.features.contains(DeviceStreamingFeature.ecg)) {
+    //_polar.startEcgStreaming(e.identifier).listen(_onHeartRateUpdate2);
+    //}
+    //});
+    _polar.connectToDevice(_identifier);
+  }
+
+  void _onHeartRateUpdate(PolarHeartRateEvent event) {
+    _logger
+      ..i('hr: ${event.data.hr}')
+      ..i('rr: ${event.data.rrsMs}');
+
+    if (_trackingMode == TrackingMode.tracking) {
+      List<int> rrsMs = event.data.rrsMs;
+      if (_cardioSessionDescription.cardioSession.heartRate!.isEmpty &&
+          rrsMs.isNotEmpty) {
+        _cardioSessionDescription.cardioSession.heartRate!.add(
+          _cardioSessionDescription.cardioSession.time! -
+              Duration(milliseconds: rrsMs.sum),
+        );
+        rrsMs.removeAt(0);
+      }
+      for (final rr in rrsMs) {
+        _cardioSessionDescription.cardioSession.heartRate!.add(
+          _cardioSessionDescription.cardioSession.heartRate!.last +
+              Duration(milliseconds: rr),
+        );
+      }
+    }
+    _heartRateInfo = "rr: ${event.data.rrsMs} ms\nhr: ${event.data.hr} bpm";
+  }
+
+  //void _onHeartRateUpdate2(PolarEcgData event) {
+  //_logger.i('Heart ecg: ${event.samples}');
+  //}
+
   void _startStepCountStream() {
     Stream<StepCount> _stepCountStream = Pedometer.stepCountStream;
     _stepCountSubscription = _stepCountStream.listen(_onStepCountUpdate);
@@ -158,18 +207,15 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
         }
       }
     }
-    _cardioSessionDescription.cardioSession.setAvgCadence();
     _lastStepCount = stepCountEvent;
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
-    setState(() {
-      _locationInfo = """provider:   ${location.provider}
+    _locationInfo = """provider:   ${location.provider}
 accuracy: ${location.accuracy?.toInt()} m
 time: ${location.time! ~/ 1000} s
 satelites:  ${location.satelliteNumber}
 points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
-    });
 
     LatLng latLng = LatLng(location.latitude!, location.longitude!);
 
@@ -342,6 +388,10 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                 margin: const EdgeInsets.only(top: 25, bottom: 5),
                 child: Text(_stepInfo),
               ),
+              Card(
+                margin: const EdgeInsets.only(top: 25, bottom: 5),
+                child: Text(_heartRateInfo),
+              ),
             ],
           ),
           Expanded(
@@ -367,7 +417,6 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                   _cardioSessionDescription.cardioSession.track!,
                 ); // init with empty track
                 await _locationUtils.startLocationStream();
-                _startStepCountStream();
               },
             ),
           ),
