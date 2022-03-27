@@ -5,18 +5,19 @@ abstract class HasId {
   Int64 get id;
 }
 
-abstract class Validatable {
-  bool isValid();
-
-  bool isValidBeforeSanitazion();
-}
-
-abstract class Entity extends JsonSerializable implements Validatable {
+abstract class Entity extends JsonSerializable {
   @override
   String toString() => toJson().toString();
 
   Entity clone();
 
+  /// Check if entity is valid. If true no check constraints should fail.
+  bool isValid();
+
+  /// Check if entity would be valid after [sanitize] is applied.
+  bool isValidBeforeSanitazion();
+
+  /// set empty lists to null, set fields <= 0 to null if they are (check > 0), ...
   void sanitize();
 }
 
