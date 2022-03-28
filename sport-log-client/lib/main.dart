@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sport_log/app.dart';
@@ -15,6 +16,9 @@ import 'package:provider/provider.dart';
 
 Stream<double> initialize() async* {
   WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations(
+    [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown],
+  );
   if (Config.isTest) {
     dotenv.testLoad(fileInput: File("./.env").readAsStringSync());
   } else {
