@@ -43,7 +43,9 @@ class HeartRateUtils {
       await AppSettings.openBluetoothSettings();
     }
 
-    await LocationUtils.enableLocation();
+    if (!await LocationUtils.enableLocation()) {
+      return null;
+    }
 
     final Map<String, String> map = {};
     await for (final d
@@ -52,7 +54,8 @@ class HeartRateUtils {
         map.putIfAbsent(d.device.name, d.device.id.toString);
       }
     }
-    return map;
+
+    return map.isEmpty ? null : map;
   }
 
   void startHeartRateStream() {

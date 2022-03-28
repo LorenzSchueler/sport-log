@@ -6,33 +6,35 @@ import 'package:location/location.dart';
 import 'package:sport_log/app.dart';
 
 class LocationUtils {
-  void Function(LocationData) onLocationUpdate;
+  static final Location _location = Location();
 
-  final Location _location = Location();
+  void Function(LocationData) onLocationUpdate;
   StreamSubscription? _locationSubscription;
 
   LocationUtils(this.onLocationUpdate);
 
-  static Future<void> enableLocation() async {
-    final location = Location();
-    bool serviceEnabled = await location.serviceEnabled();
+  static Future<bool> enableLocation() async {
+    bool serviceEnabled = await _location.serviceEnabled();
     if (!serviceEnabled) {
-      serviceEnabled = await location.requestService();
+      serviceEnabled = await _location.requestService();
       if (!serviceEnabled) {
-        return;
+        return false;
       }
     }
+    return true;
   }
 
-  Future<void> startLocationStream() async {
+  Future<bool> startLocationStream() async {
     if (_locationSubscription == null) {
-      await enableLocation();
+      if (!await enableLocation()) {
+        return false;
+      }
 
       PermissionStatus permissionGranted = await _location.hasPermission();
       if (permissionGranted == PermissionStatus.denied) {
         permissionGranted = await _location.requestPermission();
         if (permissionGranted != PermissionStatus.granted) {
-          return;
+          return false;
         }
       }
 
@@ -62,13 +64,14 @@ class LocationUtils {
             ),
           );
           if (ignore == null || ignore) {
-            break;
+            return false;
           }
         }
       }
       _locationSubscription =
           _location.onLocationChanged.listen(onLocationUpdate);
     }
+    return true;
   }
 
   void stopLocationStream() {
