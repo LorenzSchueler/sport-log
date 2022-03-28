@@ -3,6 +3,7 @@ import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/action/action_overview_page.dart';
+import 'package:sport_log/pages/heart_rate/heart_rate_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
 import 'package:sport_log/pages/map/map_page.dart';
 import 'package:sport_log/pages/offline_maps/offline_maps_overview.dart';
@@ -40,6 +41,7 @@ abstract class Routes {
   static const timer = "/timer";
   static const map = "/map";
   static const offlineMaps = "/offline_maps";
+  static const heartRate = "/heart_rate";
   static const settings = "/settings";
   static const about = "/about";
   static const action = _ActionRoutes();
@@ -70,6 +72,7 @@ abstract class Routes {
     Routes.timer: (_) => _checkLogin(() => const TimerPage()),
     Routes.map: (_) => _checkLogin(() => const MapPage()),
     Routes.offlineMaps: (_) => _checkLogin(() => const OfflineMapsPage()),
+    Routes.heartRate: (_) => _checkLogin(() => const HeartRatePage()),
     Routes.settings: (_) => _checkLogin(() => const SettingsPage()),
     Routes.about: (_) => _checkLogin(() => const AboutPage()),
     // Action

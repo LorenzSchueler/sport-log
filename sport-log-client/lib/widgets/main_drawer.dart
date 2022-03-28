@@ -76,6 +76,15 @@ class MainDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(
+              AppIcons.heartbeat,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+            title: const Text('Heart Rate'),
+            onTap: () => Nav.newBase(context, Routes.heartRate),
+            selected: selectedRoute == Routes.heartRate,
+          ),
+          ListTile(
+            leading: Icon(
               AppIcons.playCircle,
               color: Theme.of(context).colorScheme.onBackground,
             ),
