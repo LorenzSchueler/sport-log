@@ -13,55 +13,62 @@ class LocationUtils {
 
   LocationUtils(this.onLocationUpdate);
 
-  Future<void> startLocationStream() async {
-    bool serviceEnabled = await _location.serviceEnabled();
+  static Future<void> enableLocation() async {
+    final location = Location();
+    bool serviceEnabled = await location.serviceEnabled();
     if (!serviceEnabled) {
-      serviceEnabled = await _location.requestService();
+      serviceEnabled = await location.requestService();
       if (!serviceEnabled) {
         return;
       }
     }
+  }
 
-    PermissionStatus permissionGranted = await _location.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await _location.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
+  Future<void> startLocationStream() async {
+    if (_locationSubscription == null) {
+      await enableLocation();
 
-    await _location.changeSettings(accuracy: LocationAccuracy.high);
-    // needs permission "always allow"
-    while (true) {
-      try {
-        await _location.enableBackgroundMode(enable: true);
-        break;
-      } on PlatformException catch (_) {
-        final ignore = await showDialog<bool>(
-          context: AppState.globalContext,
-          builder: (context) => AlertDialog(
-            content: const Text(
-              "In order to track the location while the screen is off the permission needs to be set to 'always allow'",
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Ignore'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Change Permission'),
-              )
-            ],
-          ),
-        );
-        if (ignore == null || ignore) {
-          break;
+      PermissionStatus permissionGranted = await _location.hasPermission();
+      if (permissionGranted == PermissionStatus.denied) {
+        permissionGranted = await _location.requestPermission();
+        if (permissionGranted != PermissionStatus.granted) {
+          return;
         }
       }
+
+      await _location.changeSettings(accuracy: LocationAccuracy.high);
+      // needs permission "always allow"
+      while (true) {
+        try {
+          await _location.enableBackgroundMode(enable: true);
+          break;
+        } on PlatformException catch (_) {
+          final ignore = await showDialog<bool>(
+            context: AppState.globalContext,
+            builder: (context) => AlertDialog(
+              content: const Text(
+                "In order to track the location while the screen is off the permission needs to be set to 'always allow'",
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Ignore'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Change Permission'),
+                )
+              ],
+            ),
+          );
+          if (ignore == null || ignore) {
+            break;
+          }
+        }
+      }
+      _locationSubscription =
+          _location.onLocationChanged.listen(onLocationUpdate);
     }
-    _locationSubscription =
-        _location.onLocationChanged.listen(onLocationUpdate);
   }
 
   void stopLocationStream() {
