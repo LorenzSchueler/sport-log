@@ -22,7 +22,8 @@ class CardioTrackingSettingsPageState
   Movement? _movement;
   CardioType? _cardioType;
   Route? _route;
-  HeartRateUtils? _heartRateUtils;
+  Map<String, String>? _devices;
+  String? _heartRateMonitorId;
   bool _isSearchingHRMonitor = false;
 
   @override
@@ -72,19 +73,50 @@ class CardioTrackingSettingsPageState
                 setState(() => _route = route);
               },
             ),
-            EditTile(
-              leading: AppIcons.map,
-              caption: "Heart Rate Tracker",
-              child: Text(_hrStatus),
-              onTap: () async {
-                setState(() => _isSearchingHRMonitor = true);
-                final heartRateUtils = await HeartRateUtils.searchDevice();
-                setState(() {
-                  _heartRateUtils = heartRateUtils;
-                  _isSearchingHRMonitor = false;
-                });
-              },
-            ),
+            _devices == null
+                ? EditTile(
+                    leading: AppIcons.heartbeat,
+                    caption: "Heart Rate Monitor",
+                    child: Text(_hrStatus),
+                    onTap: () async {
+                      setState(() => _isSearchingHRMonitor = true);
+                      final devices = await HeartRateUtils.searchDevices();
+                      setState(() {
+                        _devices = devices;
+                        _isSearchingHRMonitor = false;
+                      });
+                    },
+                  )
+                : EditTile(
+                    leading: AppIcons.heartbeat,
+                    caption: "Heart Rate Monitors",
+                    child: SizedBox(
+                      height: 24,
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton(
+                          value: _heartRateMonitorId,
+                          items: _devices!.entries
+                              .map(
+                                (d) => DropdownMenuItem(
+                                  value: d.value,
+                                  child: Text(d.key),
+                                ),
+                              )
+                              .toList(),
+                          underline: null,
+                          onChanged: (deviceId) {
+                            if (deviceId != null && deviceId is String) {
+                              setState(() => _heartRateMonitorId = deviceId);
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                    onCancel: () => setState(() {
+                      _devices = null;
+                      _heartRateMonitorId = null;
+                    }),
+                  ),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -96,7 +128,7 @@ class CardioTrackingSettingsPageState
                             _movement!,
                             _cardioType!,
                             _route,
-                            _heartRateUtils,
+                            _heartRateMonitorId,
                           ],
                         )
                     : null,
@@ -112,7 +144,7 @@ class CardioTrackingSettingsPageState
   String get _hrStatus {
     if (_isSearchingHRMonitor) {
       return "searching...";
-    } else if (_heartRateUtils == null) {
+    } else if (_heartRateMonitorId == null) {
       return "no device";
     } else {
       return "device found";

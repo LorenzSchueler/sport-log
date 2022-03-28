@@ -147,7 +147,7 @@ abstract class Routes {
             movement: args[0] as Movement,
             cardioType: args[1] as CardioType,
             route: args[2] as Route?,
-            heartRateUtils: args[3] as HeartRateUtils?,
+            heartRateMonitorId: args[3] as String?,
           );
         }),
     Routes.cardio.cardioEdit: (context) => _checkLogin(() {

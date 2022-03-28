@@ -63,6 +63,7 @@ dependencies:
   pedometer: ^3.0.0
   polar: ^1.14.0
   flutter_blue: ^0.8.0
+  app_settings: ^4.1.1
   audioplayers: ^0.20.1
 
 dev_dependencies:

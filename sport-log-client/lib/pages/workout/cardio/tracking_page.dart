@@ -23,13 +23,13 @@ class CardioTrackingPage extends StatefulWidget {
   final Movement movement;
   final CardioType cardioType;
   final Route? route;
-  final HeartRateUtils? heartRateUtils;
+  final String? heartRateMonitorId;
 
   const CardioTrackingPage({
     required this.route,
     required this.movement,
     required this.cardioType,
-    required this.heartRateUtils,
+    required this.heartRateMonitorId,
     Key? key,
   }) : super(key: key);
 
@@ -58,6 +58,8 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   late StreamSubscription _stepCountSubscription;
   late StepCount _lastStepCount;
 
+  HeartRateUtils? _heartRateUtils;
+
   late MapboxMapController _mapController;
   late Line _line;
   List<Circle> _circles = [];
@@ -78,7 +80,11 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     );
     _locationUtils = LocationUtils(_onLocationUpdate);
     _startStepCountStream();
-    widget.heartRateUtils?.startHeartRateStream(_onHeartRateUpdate);
+    if (widget.heartRateMonitorId != null) {
+      _heartRateUtils =
+          HeartRateUtils(widget.heartRateMonitorId!, _onHeartRateUpdate);
+      _heartRateUtils?.startHeartRateStream();
+    }
     _timer =
         Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateData());
     super.initState();
@@ -89,7 +95,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     _timer.cancel();
     _stepCountSubscription.cancel();
     _locationUtils.stopLocationStream();
-    widget.heartRateUtils?.stopHeartRateStream();
+    _heartRateUtils?.stopHeartRateStream();
     if (_mapController.cameraPosition != null) {
       Settings.lastMapPosition = _mapController.cameraPosition!;
     }
