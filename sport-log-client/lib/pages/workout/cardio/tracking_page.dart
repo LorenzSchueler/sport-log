@@ -48,6 +48,12 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   double _descent = 0;
   double? _lastElevation;
 
+  late DateTime _lastContinueTime;
+  Duration _lastStopDuration = Duration.zero;
+  Duration get _currentDuration => _trackingMode == TrackingMode.tracking
+      ? _lastStopDuration + DateTime.now().difference(_lastContinueTime)
+      : _lastStopDuration;
+
   String _locationInfo = "null";
   String _stepInfo = "null";
   String _heartRateInfo = "null";
@@ -108,6 +114,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   }
 
   Future<void> _saveCardioSession() async {
+    _cardioSessionDescription.cardioSession.time = _currentDuration;
     _cardioSessionDescription.cardioSession.ascent = _ascent.round();
     _cardioSessionDescription.cardioSession.descent = _descent.round();
     _cardioSessionDescription.cardioSession.setAvgCadence();
@@ -130,9 +137,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     // called every second
     setState(() {
       if (_trackingMode == TrackingMode.tracking) {
-        _cardioSessionDescription.cardioSession.time =
-            _cardioSessionDescription.cardioSession.time! +
-                const Duration(seconds: 1);
+        _cardioSessionDescription.cardioSession.time = _currentDuration;
       }
       _cardioSessionDescription.cardioSession.setAvgCadence();
       _cardioSessionDescription.cardioSession.setAvgHeartRate();
@@ -155,8 +160,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       if (_cardioSessionDescription.cardioSession.heartRate!.isEmpty &&
           rrsMs.isNotEmpty) {
         _cardioSessionDescription.cardioSession.heartRate!.add(
-          _cardioSessionDescription.cardioSession.time! -
-              Duration(milliseconds: rrsMs.sum),
+          _currentDuration - Duration(milliseconds: rrsMs.sum),
         );
         rrsMs.removeAt(0);
       }
@@ -236,7 +240,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
           longitude: location.longitude!,
           elevation: location.altitude!,
           distance: 0,
-          time: _cardioSessionDescription.cardioSession.time!,
+          time: _currentDuration,
         ),
       );
       await _mapController.updateTrackLine(
@@ -286,6 +290,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
             ),
             onPressed: () {
               _trackingMode = TrackingMode.paused;
+              _lastStopDuration += DateTime.now().difference(_lastContinueTime);
             },
             child: const Text("pause"),
           ),
@@ -298,6 +303,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
             ),
             onPressed: () async {
               _trackingMode = TrackingMode.paused;
+              _lastStopDuration += DateTime.now().difference(_lastContinueTime);
               await _stopDialog();
             },
             child: const Text("stop"),
@@ -311,7 +317,10 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
             style: ElevatedButton.styleFrom(
               primary: Theme.of(context).colorScheme.errorContainer,
             ),
-            onPressed: () => _trackingMode = TrackingMode.tracking,
+            onPressed: () {
+              _trackingMode = TrackingMode.tracking;
+              _lastContinueTime = DateTime.now();
+            },
             child: const Text("continue"),
           ),
         ),
@@ -339,6 +348,8 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
             onPressed: () {
               _trackingMode = TrackingMode.tracking;
               _cardioSessionDescription.cardioSession.datetime = DateTime.now();
+              _lastContinueTime =
+                  _cardioSessionDescription.cardioSession.datetime;
             },
             child: const Text("start"),
           ),

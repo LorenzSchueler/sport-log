@@ -37,7 +37,7 @@ class CardioTrackingSettingsPageState
         child: Column(
           children: [
             EditTile(
-              leading: AppIcons.sports,
+              leading: AppIcons.exercise,
               caption: "Movement",
               child: Text(_movement?.name ?? ""),
               onTap: () async {
