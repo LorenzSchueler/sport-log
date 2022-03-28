@@ -20,6 +20,12 @@ class _HeartRatePageState extends State<HeartRatePage> {
   int? _hr;
 
   @override
+  void dispose() {
+    _heartRateUtils?.stopHeartRateStream();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Heart Rate")),
@@ -33,7 +39,14 @@ class _HeartRatePageState extends State<HeartRatePage> {
                 onPressed: _isSearchingHRMonitor
                     ? null
                     : () async {
-                        setState(() => _isSearchingHRMonitor = true);
+                        _heartRateUtils?.startHeartRateStream();
+                        setState(() {
+                          _heartRateUtils = null;
+                          _heartRateMonitorId = null;
+                          _hr = null;
+                          _devices = null;
+                          _isSearchingHRMonitor = true;
+                        });
                         final devices = await HeartRateUtils.searchDevices();
                         setState(() {
                           _devices = devices;
@@ -77,7 +90,9 @@ class _HeartRatePageState extends State<HeartRatePage> {
                 ElevatedButton(
                   onPressed: () async {
                     _heartRateUtils = HeartRateUtils(
-                        _heartRateMonitorId!, _onHeartRateUpdate);
+                      _heartRateMonitorId!,
+                      _onHeartRateUpdate,
+                    );
                     _heartRateUtils?.startHeartRateStream();
                   },
                   child: const Text("select"),
@@ -86,7 +101,7 @@ class _HeartRatePageState extends State<HeartRatePage> {
               if (_hr != null) ...[
                 const Text(
                   "Heart Rate",
-                  style: const TextStyle(fontSize: 40),
+                  style: TextStyle(fontSize: 40),
                 ),
                 Text(
                   "$_hr",

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart' hide Route;
-import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/action/action_overview_page.dart';
