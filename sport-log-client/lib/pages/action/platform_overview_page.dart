@@ -98,8 +98,9 @@ class PlatformCardState extends State<PlatformCard> {
 
   @override
   void initState() {
-    platformDescription = widget.platformDescription
-      ..platformCredential ??= PlatformCredential(
+    platformDescription = widget.platformDescription;
+    if (platformDescription.platform.credential) {
+      platformDescription.platformCredential ??= PlatformCredential(
         id: randomId(),
         userId: Settings.userId!,
         platformId: widget.platformDescription.platform.id,
@@ -107,7 +108,7 @@ class PlatformCardState extends State<PlatformCard> {
         password: "",
         deleted: false,
       );
-    _logger.i(platformDescription);
+    }
     super.initState();
   }
 
