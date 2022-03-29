@@ -1,10 +1,10 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/movement_table.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
+import 'package:sport_log/models/movement/movement.dart';
 
 class RouteTable extends TableAccessor<Route> {
   @override
@@ -117,7 +117,7 @@ class CardioSessionDescriptionTable {
   static MovementTable get _movementTable => AppDatabase.movements;
 
   Future<List<CardioSessionDescription>> getByTimerangeAndMovement({
-    Int64? movementIdValue,
+    Movement? movementValue,
     DateTime? from,
     DateTime? until,
   }) async {
@@ -138,7 +138,7 @@ class CardioSessionDescriptionTable {
             TableAccessor.untilFilterOfTable(cardioSession, until),
             TableAccessor.movementIdFilterOfTable(
               cardioSession,
-              movementIdValue,
+              movementValue,
             ),
           ])}
       GROUP BY ${TableAccessor.groupByIdOfTable(cardioSession)}

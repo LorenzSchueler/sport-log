@@ -28,6 +28,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
   final _logger = Logger('MetconSessionEditPage');
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = MetconSessionDescriptionDataProvider();
+  final _metconDescriptionDataProvider = MetconDescriptionDataProvider();
 
   late MetconSessionDescription _metconSessionDescription;
   late bool _finished;
@@ -126,10 +127,13 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   _metconSessionDescription.metconDescription.metcon.name,
                 ),
                 onTap: () async {
-                  MetconDescription? metconDescription = await showMetconPicker(
+                  Metcon? metcon = await showMetconPicker(
                     context: context,
                   );
-                  if (metconDescription != null) {
+                  if (metcon != null) {
+                    final metconDescription =
+                        await _metconDescriptionDataProvider
+                            .getByMetcon(metcon);
                     setState(() {
                       _metconSessionDescription.metconDescription =
                           metconDescription;

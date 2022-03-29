@@ -419,7 +419,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
       avatar: const Icon(AppIcons.add),
       label: const Text("Add movement"),
       onPressed: () async {
-        final movement = await showMovementPicker(context);
+        final movement = await showMovementPicker(context: context);
         if (movement != null) {
           _addMetconMovementWithMovement(movement);
         }
@@ -466,7 +466,7 @@ class MetconMovementCard extends StatelessWidget {
           ListTile(
             title: Text(mmd.movement.name),
             onTap: () async {
-              final movement = await showMovementPicker(context);
+              final movement = await showMovementPicker(context: context);
               if (movement != null) {
                 mmd.movement = movement;
                 mmd.metconMovement.movementId = movement.id;

@@ -5,7 +5,7 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/formatting.dart';
-import 'package:sport_log/models/entity_interfaces.dart';
+import 'package:sport_log/models/all.dart';
 import 'package:sqflite/sqflite.dart';
 
 export 'db_interfaces.dart';
@@ -65,12 +65,12 @@ abstract class TableAccessor<T extends AtomicEntity> {
   }) =>
       untilFilterOfTable(tableName, until, dateOnly: dateOnly);
 
-  static String movementIdFilterOfTable(String tableName, Int64? movementId) =>
-      movementId == null
+  static String movementIdFilterOfTable(String tableName, Movement? movement) =>
+      movement == null
           ? ''
-          : '$tableName.${Columns.movementId} = $movementId';
-  String movementIdFilter(Int64? movementId) =>
-      movementIdFilterOfTable(tableName, movementId);
+          : '$tableName.${Columns.movementId} = ${movement.id}';
+  String movementIdFilter(Movement? movement) =>
+      movementIdFilterOfTable(tableName, movement);
 
   static String groupByIdOfTable(String tableName) =>
       "$tableName.${Columns.id}";

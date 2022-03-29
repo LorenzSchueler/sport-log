@@ -6,7 +6,6 @@ import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/models/metcon/metcon_session_description.dart';
-import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/models/timeline_union.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_overview_page.dart';
@@ -39,7 +38,6 @@ class TimelinePageState extends State<TimelinePage> {
   List<TimelineUnion> _items = [];
 
   DateFilterState _dateFilter = MonthFilter.current();
-  Movement? _movement;
 
   @override
   void initState() {
@@ -83,7 +81,7 @@ class TimelinePageState extends State<TimelinePage> {
   Future<void> updateStrengthSessions() async {
     _strengthSessionsDescriptions =
         await _strengthDataProvider.getByTimerangeAndMovement(
-      movementId: null,
+      movement: null,
       from: _dateFilter.start,
       until: _dateFilter.end,
     );
@@ -92,8 +90,8 @@ class TimelinePageState extends State<TimelinePage> {
 
   Future<void> updateMetconSessions() async {
     _metconSessionsDescriptions =
-        await _metconDataProvider.getByTimerangeAndMovement(
-      movementId: _movement?.id,
+        await _metconDataProvider.getByTimerangeAndMetcon(
+      metcon: null,
       from: _dateFilter.start,
       until: _dateFilter.end,
     );
@@ -103,7 +101,7 @@ class TimelinePageState extends State<TimelinePage> {
   Future<void> updateCardioSessions() async {
     _cardioSessionsDescriptions =
         await _cardioDataProvider.getByTimerangeAndMovement(
-      movementId: _movement?.id,
+      movement: null,
       from: _dateFilter.start,
       until: _dateFilter.end,
     );
@@ -158,7 +156,7 @@ class TimelinePageState extends State<TimelinePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_movement?.name ?? "Timeline"),
+        title: const Text("Timeline"),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(40),
           child: DateFilter(

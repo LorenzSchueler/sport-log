@@ -58,7 +58,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
     final ssds = await _dataProvider.getByTimerangeAndMovement(
       from: _dateFilter.start,
       until: _dateFilter.end,
-      movementId: _movement?.id,
+      movement: _movement,
     );
     setState(() => _sessions = ssds);
   }
@@ -72,7 +72,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
           IconButton(
             onPressed: () async {
               final Movement? movement = await showMovementPicker(
-                context,
+                context: context,
                 selectedMovement: _movement,
               );
               if (movement == null) {

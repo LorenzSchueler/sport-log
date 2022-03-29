@@ -6,8 +6,10 @@ part 'platform_description.g.dart';
 
 @JsonSerializable()
 class PlatformDescription extends CompoundEntity {
-  PlatformDescription(
-      {required this.platform, required this.platformCredential});
+  PlatformDescription({
+    required this.platform,
+    required this.platformCredential,
+  });
 
   Platform platform;
   PlatformCredential? platformCredential;

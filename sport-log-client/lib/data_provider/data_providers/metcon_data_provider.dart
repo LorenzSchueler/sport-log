@@ -3,11 +3,9 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/metcon_tables.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
-import 'package:sport_log/models/account_data/account_data.dart';
-import 'package:sport_log/models/metcon/all.dart';
+import 'package:sport_log/models/all.dart';
 
 class MetconDataProvider extends EntityDataProvider<Metcon> {
   static final _instance = MetconDataProvider._();
@@ -18,11 +16,13 @@ class MetconDataProvider extends EntityDataProvider<Metcon> {
   final Api<Metcon> api = Api.metcons;
 
   @override
-  final TableAccessor<Metcon> db = AppDatabase.metcons;
+  final MetconTable db = AppDatabase.metcons;
 
   @override
   List<Metcon> getFromAccountData(AccountData accountData) =>
       accountData.metcons;
+
+  Future<List<Metcon>> getByName(String? name) => db.getByName(name);
 }
 
 class MetconMovementDataProvider extends EntityDataProvider<MetconMovement> {
@@ -63,13 +63,13 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
 
   Future<bool> existsByMetcon(Int64 metconId) => db.existsByMetcon(metconId);
 
-  Future<List<MetconSession>> getByTimerangeAndMovement({
-    Int64? movementIdValue,
+  Future<List<MetconSession>> getByTimerangeAndMetcon({
+    Metcon? metcon,
     DateTime? from,
     DateTime? until,
   }) =>
-      db.getByTimerangeAndMovement(
-        movementIdValue: movementIdValue,
+      db.getByTimerangeAndMetcon(
+        metconValue: metcon,
         from: from,
         until: until,
       );
@@ -144,16 +144,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   @override
   Future<List<MetconDescription>> getNonDeleted() async {
     return Future.wait(
-      (await _metconDataProvider.getNonDeleted())
-          .map(
-            (metcon) async => MetconDescription(
-              metcon: metcon,
-              moves: await _getMmdByMetcon(metcon.id),
-              hasReference:
-                  await _metconSessionDataProvider.existsByMetcon(metcon.id),
-            ),
-          )
-          .toList(),
+      (await _metconDataProvider.getNonDeleted()).map(getByMetcon).toList(),
     );
   }
 
@@ -200,6 +191,14 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     if (metcon == null) {
       return null;
     }
+    return MetconDescription(
+      metcon: metcon,
+      moves: await _getMmdByMetcon(metcon.id),
+      hasReference: await _metconSessionDataProvider.existsByMetcon(metcon.id),
+    );
+  }
+
+  Future<MetconDescription> getByMetcon(Metcon metcon) async {
     return MetconDescription(
       metcon: metcon,
       moves: await _getMmdByMetcon(metcon.id),
@@ -278,16 +277,16 @@ class MetconSessionDescriptionDataProvider
     return await _metconSessionDataProvider.pushUpdatedToServer();
   }
 
-  Future<List<MetconSessionDescription>> getByTimerangeAndMovement({
-    Int64? movementId,
+  Future<List<MetconSessionDescription>> getByTimerangeAndMetcon({
+    Metcon? metcon,
     DateTime? from,
     DateTime? until,
   }) async {
     return await _mapToDescription(
-      await _metconSessionDataProvider.getByTimerangeAndMovement(
+      await _metconSessionDataProvider.getByTimerangeAndMetcon(
         from: from,
         until: until,
-        movementIdValue: movementId,
+        metcon: metcon,
       ),
     );
   }

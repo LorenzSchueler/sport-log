@@ -41,7 +41,8 @@ class MovementTable extends TableAccessor<Movement> {
     String? byName, {
     bool cardioOnly = false,
   }) async {
-    final nameFilter = byName != null ? 'AND $name LIKE ?' : '';
+    final nameFilter =
+        byName == null || byName.isEmpty ? '' : 'AND $name LIKE ?';
     final cardioFilter = cardioOnly == true ? 'AND cardio = true' : '';
     final records = await database.rawQuery(
       '''
@@ -60,7 +61,7 @@ class MovementTable extends TableAccessor<Movement> {
         )
       ORDER BY $name COLLATE NOCASE
     ''',
-      [if (byName != null) '%$byName%'],
+      [if (byName != null && byName.isNotEmpty) '%$byName%'],
     );
     return records.map((r) => serde.fromDbRecord(r)).toList();
   }

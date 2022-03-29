@@ -7,6 +7,7 @@ import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/strength_tables.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
+import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 
 class StrengthSessionDataProvider extends EntityDataProvider<StrengthSession> {
@@ -159,14 +160,14 @@ class StrengthSessionDescriptionDataProvider
       _strengthSessionDescriptionDb.getById(id);
 
   Future<List<StrengthSessionDescription>> getByTimerangeAndMovement({
-    Int64? movementId,
+    Movement? movement,
     DateTime? from,
     DateTime? until,
   }) async {
     return _strengthSessionDescriptionDb.getByTimerangeAndMovement(
       from: from,
       until: until,
-      movementIdValue: movementId,
+      movementValue: movement,
     );
   }
 

@@ -59,7 +59,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
     );
     final cardioSessionDescriptions =
         await _dataProvider.getByTimerangeAndMovement(
-      movementId: _movement?.id,
+      movement: _movement,
       from: _dateFilter.start,
       until: _dateFilter.end,
     );
@@ -79,7 +79,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
           IconButton(
             onPressed: () async {
               final Movement? movement = await showMovementPicker(
-                context,
+                context: context,
                 selectedMovement: _movement,
               );
               if (movement == null) {
@@ -88,10 +88,12 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
                 setState(() {
                   _movement = null;
                 });
+                await _update();
               } else {
                 setState(() {
                   _movement = movement;
                 });
+                await _update();
               }
             },
             icon: Icon(

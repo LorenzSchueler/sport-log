@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
@@ -7,6 +6,7 @@ import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
+import 'package:sport_log/models/movement/movement.dart';
 
 class RouteDataProvider extends EntityDataProvider<Route> {
   static final _instance = RouteDataProvider._();
@@ -112,14 +112,14 @@ class CardioSessionDescriptionDataProvider
   }
 
   Future<List<CardioSessionDescription>> getByTimerangeAndMovement({
-    Int64? movementId,
+    Movement? movement,
     DateTime? from,
     DateTime? until,
   }) async {
     return _cardioSessionDescriptionDb.getByTimerangeAndMovement(
       from: from,
       until: until,
-      movementIdValue: movementId,
+      movementValue: movement,
     );
   }
 }

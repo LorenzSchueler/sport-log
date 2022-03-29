@@ -171,7 +171,7 @@ class StrengthSessionDescriptionTable {
   }
 
   Future<List<StrengthSessionDescription>> getByTimerangeAndMovement({
-    Int64? movementIdValue,
+    Movement? movementValue,
     DateTime? from,
     DateTime? until,
   }) async {
@@ -189,7 +189,7 @@ class StrengthSessionDescriptionTable {
             TableAccessor.untilFilterOfTable(strengthSession, until),
             TableAccessor.movementIdFilterOfTable(
               strengthSession,
-              movementIdValue,
+              movementValue,
             ),
           ])}
       GROUP BY ${TableAccessor.groupByIdOfTable(strengthSession)}

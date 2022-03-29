@@ -6,8 +6,8 @@ import 'package:sport_log/models/movement/movement_description.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
-Future<Movement?> showMovementPicker(
-  BuildContext context, {
+Future<Movement?> showMovementPicker({
+  required BuildContext context,
   Movement? selectedMovement,
   bool dismissable = true,
   bool cardioOnly = false,
@@ -92,18 +92,11 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
           border: InputBorder.none,
           suffixIcon: _search.isNotEmpty
               ? IconButton(
-                  onPressed: () async {
-                    final returnObject = await Navigator.pushNamed(
-                      context,
-                      Routes.movement.edit,
-                      arguments: _search,
-                    );
-                    if (returnObject is! ReturnObject<MovementDescription>) {
-                      return;
-                    }
-                    assert(returnObject.action == ReturnAction.created);
-                    Navigator.pop(context, returnObject.payload.movement);
-                  },
+                  onPressed: () => Navigator.pushNamed(
+                    context,
+                    Routes.movement.edit,
+                    arguments: _search,
+                  ),
                   icon: const Icon(AppIcons.add),
                 )
               : null,
@@ -116,6 +109,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
     if (_movements.isEmpty) {
       return const Center(child: Text('No movements here.'));
     }
+
     return Scrollbar(
       child: ListView.separated(
         itemBuilder: _movementBuilder,
@@ -127,8 +121,8 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
 
   Widget _movementBuilder(BuildContext context, int index) {
     final movement = _movements[index];
-    final selected = widget.selectedMovement != null &&
-        movement.id == widget.selectedMovement!.id;
+    final selected = movement.id == widget.selectedMovement?.id;
+
     return ListTile(
       title: Text(movement.name),
       subtitle: Text(movement.dimension.displayName),

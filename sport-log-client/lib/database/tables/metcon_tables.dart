@@ -1,7 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/table.dart';
-import 'package:sport_log/models/metcon/all.dart';
+import 'package:sport_log/models/all.dart';
 
 class MetconTable extends TableAccessor<Metcon> {
   @override
@@ -40,6 +40,22 @@ class MetconTable extends TableAccessor<Metcon> {
       orderBy: "$tableName.${Columns.name} COLLATE NOCASE",
     );
     return result.map(serde.fromDbRecord).toList();
+  }
+
+  Future<List<Metcon>> getByName(
+    String? byName, {
+    bool cardioOnly = false,
+  }) async {
+    final records = await database.query(
+      tableName,
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        byName == null || byName.isEmpty
+            ? ''
+            : "${Columns.name} like '%$byName%'"
+      ]),
+    );
+    return records.map((r) => serde.fromDbRecord(r)).toList();
   }
 }
 
@@ -149,8 +165,8 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
         .isNotEmpty;
   }
 
-  Future<List<MetconSession>> getByTimerangeAndMovement({
-    Int64? movementIdValue,
+  Future<List<MetconSession>> getByTimerangeAndMetcon({
+    Metcon? metconValue,
     DateTime? from,
     DateTime? until,
   }) async {
@@ -160,7 +176,7 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
         notDeleted,
         fromFilter(from),
         untilFilter(until),
-        movementIdFilter(movementIdValue),
+        metconValue == null ? "" : "${Columns.metconId} = ${metconValue.id}"
       ]),
       groupBy: groupById,
       orderBy: orderByDatetime,

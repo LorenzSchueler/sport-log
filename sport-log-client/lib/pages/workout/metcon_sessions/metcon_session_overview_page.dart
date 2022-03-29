@@ -11,7 +11,7 @@ import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/picker/movement_picker.dart';
+import 'package:sport_log/widgets/picker/metcon_picker.dart';
 
 class MetconSessionsPage extends StatefulWidget {
   const MetconSessionsPage({Key? key}) : super(key: key);
@@ -26,7 +26,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
   List<MetconSessionDescription> _metconSessionDescriptions = [];
 
   DateFilterState _dateFilter = MonthFilter.current();
-  Movement? _movement;
+  Metcon? _metcon;
 
   @override
   void initState() {
@@ -51,8 +51,8 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
       'Updating metcon session page with start = ${_dateFilter.start}, end = ${_dateFilter.end}',
     );
     final metconSessionDescriptions =
-        await _dataProvider.getByTimerangeAndMovement(
-      movementId: _movement?.id,
+        await _dataProvider.getByTimerangeAndMetcon(
+      metcon: _metcon,
       from: _dateFilter.start,
       until: _dateFilter.end,
     );
@@ -63,7 +63,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_movement?.name ?? "Metcon Sessions"),
+        title: Text(_metcon?.name ?? "Metcon Sessions"),
         actions: [
           IconButton(
             onPressed: () => Nav.newBase(context, Routes.metcon.overview),
@@ -71,24 +71,26 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
           ),
           IconButton(
             onPressed: () async {
-              final Movement? movement = await showMovementPicker(
-                context,
-                selectedMovement: _movement,
+              final Metcon? metcon = await showMetconPicker(
+                context: context,
+                selectedMetcon: _metcon,
               );
-              if (movement == null) {
+              if (metcon == null) {
                 return;
-              } else if (movement.id == _movement?.id) {
+              } else if (metcon.id == _metcon?.id) {
                 setState(() {
-                  _movement = null;
+                  _metcon = null;
                 });
+                await _update();
               } else {
                 setState(() {
-                  _movement = movement;
+                  _metcon = metcon;
                 });
+                await _update();
               }
             },
             icon: Icon(
-              _movement != null ? AppIcons.filterFilled : AppIcons.filter,
+              _metcon != null ? AppIcons.filterFilled : AppIcons.filter,
             ),
           ),
         ],
