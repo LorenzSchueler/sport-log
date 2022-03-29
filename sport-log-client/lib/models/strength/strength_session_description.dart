@@ -73,7 +73,15 @@ class StrengthSessionDescription extends CompoundEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion();
+    return isValidBeforeSanitazion() &&
+        validate(
+          session.isValid(),
+          'StrengthSessionDescription: strength session not valid',
+        ) &&
+        validate(
+          sets.every((ss) => ss.isValid()),
+          'StrengthSessionDescription: strengthSets not valid',
+        );
   }
 
   @override
