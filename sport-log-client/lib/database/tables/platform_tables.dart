@@ -48,4 +48,16 @@ class PlatformCredentialTable extends TableAccessor<PlatformCredential> {
       [Columns.platformId]
     ],
   );
+
+  Future<PlatformCredential?> getByPlatform(Platform platform) async {
+    final records = await database.query(
+      tableName,
+      where: [notDeleted, "${Columns.platformId} = ?"].join(" and "),
+      whereArgs: [platform.id.toInt()],
+    );
+    if (records.isEmpty) {
+      return null;
+    }
+    return serde.fromDbRecord(records[0]);
+  }
 }

@@ -73,7 +73,7 @@ class DbPlatformSerializer extends DbSerializer<Platform> {
     return {
       Columns.id: o.id.toInt(),
       Columns.name: o.name,
-      Columns.credential: o.credential,
+      Columns.credential: o.credential ? 1 : 0,
       Columns.deleted: o.deleted ? 1 : 0,
     };
   }
