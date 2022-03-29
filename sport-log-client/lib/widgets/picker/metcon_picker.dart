@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
-import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -59,17 +58,18 @@ class MetconPickerDialogState extends State<MetconPickerDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          children: [
-            _searchBar,
-            const Divider(
-              height: 1,
-              thickness: 2,
-            ),
-            Expanded(child: _metconList)
-          ],
-        ));
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          _searchBar,
+          const Divider(
+            height: 1,
+            thickness: 2,
+          ),
+          Expanded(child: _metconList)
+        ],
+      ),
+    );
   }
 
   Widget get _searchBar {

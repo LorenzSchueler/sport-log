@@ -50,10 +50,9 @@ class MetconTable extends TableAccessor<Metcon> {
       tableName,
       where: TableAccessor.combineFilter([
         notDeleted,
-        byName == null || byName.isEmpty
-            ? ''
-            : "${Columns.name} like '%$byName%'"
+        nameFilter(byName),
       ]),
+      orderBy: orderByName,
     );
     return records.map((r) => serde.fromDbRecord(r)).toList();
   }

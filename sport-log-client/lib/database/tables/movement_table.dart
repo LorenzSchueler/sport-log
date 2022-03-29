@@ -31,7 +31,6 @@ class MovementTable extends TableAccessor<Movement> {
   static const metconMovement = Tables.metconMovement;
   static const strengthSession = Tables.strengthSession;
 
-  static const deleted = Columns.deleted;
   static const id = Columns.id;
   static const name = Columns.name;
   static const dimension = Columns.dimension;
@@ -41,25 +40,24 @@ class MovementTable extends TableAccessor<Movement> {
     String? byName, {
     bool cardioOnly = false,
   }) async {
-    final nameFilter =
-        byName == null || byName.isEmpty ? '' : 'AND $name LIKE ?';
-    final cardioFilter = cardioOnly == true ? 'AND cardio = true' : '';
     final records = await database.rawQuery(
       '''
-      SELECT * FROM $tableName m1
-      WHERE $deleted = 0
-        $nameFilter
-        $cardioFilter
+      SELECT * FROM $tableName
+      WHERE ${TableAccessor.combineFilter([
+            notDeleted,
+            nameFilter(byName),
+            cardioOnly ? '${Columns.cardio} = true' : ''
+          ])}
         AND ($userId IS NOT NULL
           OR NOT EXISTS (
             SELECT * FROM $tableName m2
-            WHERE m1.$id <> m2.$id
-              AND m1.$name = m2.$name
-              AND m1.$dimension = m2.$dimension
+            WHERE movement.$id <> m2.$id
+              AND movement.$name = m2.$name
+              AND movement.$dimension = m2.$dimension
               AND m2.$userId IS NOT NULL
           )
         )
-      ORDER BY $name COLLATE NOCASE
+      ORDER BY $orderByName
     ''',
       [if (byName != null && byName.isNotEmpty) '%$byName%'],
     );

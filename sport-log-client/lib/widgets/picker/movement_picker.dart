@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
-import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/models/movement/movement_description.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 

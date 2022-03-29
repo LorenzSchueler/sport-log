@@ -72,6 +72,12 @@ abstract class TableAccessor<T extends AtomicEntity> {
   String movementIdFilter(Movement? movement) =>
       movementIdFilterOfTable(tableName, movement);
 
+  static String nameFilterOfTable(String tableName, String? name) =>
+      name == null || name.isEmpty
+          ? ''
+          : "$tableName.${Columns.name} like '%$name%'";
+  String nameFilter(String? name) => nameFilterOfTable(tableName, name);
+
   static String groupByIdOfTable(String tableName) =>
       "$tableName.${Columns.id}";
   String get groupById => groupByIdOfTable(tableName);
@@ -79,6 +85,10 @@ abstract class TableAccessor<T extends AtomicEntity> {
   static String orderByDatetimeOfTable(String tableName) =>
       "datetime($tableName.${Columns.datetime}) desc";
   String get orderByDatetime => orderByDatetimeOfTable(tableName);
+
+  static String orderByNameOfTable(String tableName) =>
+      "$tableName.${Columns.name} collate nocase";
+  String get orderByName => orderByNameOfTable(tableName);
 
   Future<bool> hardDeleteSingle(Int64 id) async {
     final changes = await database.delete(
