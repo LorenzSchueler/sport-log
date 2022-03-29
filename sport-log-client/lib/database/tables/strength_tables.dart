@@ -175,25 +175,28 @@ class StrengthSessionDescriptionTable {
     DateTime? from,
     DateTime? until,
   }) async {
-    final records = await AppDatabase.database!.rawQuery('''
+    final records = await AppDatabase.database!.rawQuery(
+      '''
       SELECT
         ${_strengthSessionTable.table.allColumns},
         ${_movementTable.table.allColumns}
       FROM $strengthSession
       JOIN $movement ON $movement.$id = $strengthSession.$movementId
-      WHERE $movement.$deleted = 0
-        AND $strengthSession.$deleted = 0
-        ${TableAccessor.fromFilterOfTable(strengthSession, from)}
-        ${TableAccessor.untilFilterOfTable(strengthSession, until)}
-        ${TableAccessor.movementIdFilterOfTable(strengthSession, movementIdValue)}
-      ${TableAccessor.groupByIdOfTable(strengthSession)}
-      ${TableAccessor.orderByDatetimeOfTable(strengthSession)}
+      WHERE ${TableAccessor.combineFilter([
+            TableAccessor.notDeletedOfTable(movement),
+            TableAccessor.notDeletedOfTable(strengthSession),
+            TableAccessor.fromFilterOfTable(strengthSession, from),
+            TableAccessor.untilFilterOfTable(strengthSession, until),
+            TableAccessor.movementIdFilterOfTable(
+              strengthSession,
+              movementIdValue,
+            ),
+          ])}
+      GROUP BY ${TableAccessor.groupByIdOfTable(strengthSession)}
+      ORDER BY ${TableAccessor.orderByDatetimeOfTable(strengthSession)}
       ;
-    ''', [
-      if (from != null) from.toString(),
-      if (until != null) until.toString(),
-      if (movementIdValue != null) movementIdValue.toInt(),
-    ]);
+    ''',
+    );
     List<StrengthSessionDescription> strengthSessionDescriptions = [];
     for (final Map<String, Object?> record in records) {
       final session = _strengthSessionTable.serde

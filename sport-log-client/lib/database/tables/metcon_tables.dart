@@ -154,24 +154,17 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
     DateTime? from,
     DateTime? until,
   }) async {
-    final records = await database.rawQuery('''
-      SELECT
-        ${table.allColumns}
-      FROM $tableName
-      WHERE $tableName.${Columns.deleted} = 0
-        ${fromFilter(from)}
-        ${untilFilter(until)}
-        ${movementIdFilter(movementIdValue)}
-      $groupById
-      $orderByDatetime
-      ;
-    ''', [
-      if (from != null) from.toString(),
-      if (until != null) until.toString(),
-      if (movementIdValue != null) movementIdValue.toInt(),
-    ]);
-    return records
-        .map((e) => serde.fromDbRecord(e, prefix: table.prefix))
-        .toList();
+    final records = await database.query(
+      tableName,
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        fromFilter(from),
+        untilFilter(until),
+        movementIdFilter(movementIdValue),
+      ]),
+      groupBy: groupById,
+      orderBy: orderByDatetime,
+    );
+    return records.map((e) => serde.fromDbRecord(e)).toList();
   }
 }

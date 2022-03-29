@@ -100,7 +100,7 @@ class MovementDescriptionTable {
         )
       ) AS $hasReference
     FROM $movement
-    WHERE $movement.$deleted = 0
+    WHERE ${TableAccessor.notDeletedOfTable(movement)}
       AND ($userId IS NOT NULL
         OR NOT EXISTS (
           SELECT * FROM $movement m2
@@ -148,7 +148,7 @@ class MovementDescriptionTable {
         )
       ) AS $hasReference
     FROM $movement
-    WHERE $movement.$deleted = 0
+    WHERE ${TableAccessor.notDeletedOfTable(movement)}
       $nameFilter
       $cardioFilter
       AND ($userId IS NOT NULL

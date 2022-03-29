@@ -121,7 +121,8 @@ class CardioSessionDescriptionTable {
     DateTime? from,
     DateTime? until,
   }) async {
-    final records = await AppDatabase.database!.rawQuery('''
+    final records = await AppDatabase.database!.rawQuery(
+      '''
       SELECT
         ${_cardioSessionTable.table.allColumns},
         ${_routeTable.table.allColumns},
@@ -130,19 +131,21 @@ class CardioSessionDescriptionTable {
       LEFT JOIN 
         (SELECT * FROM $route WHERE $route.$deleted = false) AS $route ON $route.$id = $cardioSession.$routeId
       JOIN $movement ON $movement.$id = $cardioSession.$movementId
-      WHERE $movement.$deleted = 0
-        AND $cardioSession.$deleted = 0
-        ${TableAccessor.fromFilterOfTable(cardioSession, from)}
-        ${TableAccessor.untilFilterOfTable(cardioSession, until)}
-        ${TableAccessor.movementIdFilterOfTable(cardioSession, movementIdValue)}
-      ${TableAccessor.groupByIdOfTable(cardioSession)}
-      ${TableAccessor.orderByDatetimeOfTable(cardioSession)}
+      WHERE ${TableAccessor.combineFilter([
+            TableAccessor.notDeletedOfTable(movement),
+            TableAccessor.notDeletedOfTable(cardioSession),
+            TableAccessor.fromFilterOfTable(cardioSession, from),
+            TableAccessor.untilFilterOfTable(cardioSession, until),
+            TableAccessor.movementIdFilterOfTable(
+              cardioSession,
+              movementIdValue,
+            ),
+          ])}
+      GROUP BY ${TableAccessor.groupByIdOfTable(cardioSession)}
+      ORDER BY ${TableAccessor.orderByDatetimeOfTable(cardioSession)}
       ;
-    ''', [
-      if (from != null) from.toString(),
-      if (until != null) until.toString(),
-      if (movementIdValue != null) movementIdValue.toInt(),
-    ]);
+    ''',
+    );
     List<CardioSessionDescription> cardioSessionDescriptions = [];
     for (final Map<String, Object?> record in records) {
       cardioSessionDescriptions.add(

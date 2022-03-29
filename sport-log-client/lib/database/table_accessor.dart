@@ -4,6 +4,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -19,28 +20,64 @@ abstract class TableAccessor<T extends AtomicEntity> {
 
   Database get database => AppDatabase.database!;
 
-  static String get notDeletedOfTable => '${Columns.deleted} = 0';
-  String get notDeleted => notDeletedOfTable;
+  static String notDeletedOfTable(String tableName) =>
+      '$tableName.${Columns.deleted} = 0';
+  String get notDeleted => notDeletedOfTable(tableName);
 
-  static String fromFilterOfTable(String tableName, DateTime? from) =>
-      from == null ? '' : 'and $tableName.${Columns.datetime} >= ?';
-  String fromFilter(DateTime? from) => fromFilterOfTable(tableName, from);
+  static String combineFilter(List<String> filter) {
+    return filter.where((element) => element.isNotEmpty).join(" and ");
+  }
 
-  static String untilFilterOfTable(String tableName, DateTime? until) =>
-      until == null ? '' : 'and $tableName.${Columns.datetime} < ?';
-  String untilFilter(DateTime? until) => untilFilterOfTable(tableName, until);
+  static String fromFilterOfTable(
+    String tableName,
+    DateTime? from, {
+    bool dateOnly = false,
+  }) {
+    if (from == null) {
+      return "";
+    } else if (dateOnly) {
+      return "$tableName.${Columns.date} >= '${from.yyyyMMdd}'";
+    } else {
+      return "$tableName.${Columns.datetime} >= '$from'";
+    }
+  }
+
+  String fromFilter(DateTime? from, {bool dateOnly = false}) =>
+      fromFilterOfTable(tableName, from, dateOnly: dateOnly);
+
+  static String untilFilterOfTable(
+    String tableName,
+    DateTime? until, {
+    bool dateOnly = false,
+  }) {
+    if (until == null) {
+      return "";
+    } else if (dateOnly) {
+      return "$tableName.${Columns.date} < '${until.yyyyMMdd}'";
+    } else {
+      return "$tableName.${Columns.datetime} < '$until'";
+    }
+  }
+
+  String untilFilter(
+    DateTime? until, {
+    bool dateOnly = false,
+  }) =>
+      untilFilterOfTable(tableName, until, dateOnly: dateOnly);
 
   static String movementIdFilterOfTable(String tableName, Int64? movementId) =>
-      movementId == null ? '' : 'and $tableName.${Columns.movementId} = ?';
+      movementId == null
+          ? ''
+          : '$tableName.${Columns.movementId} = $movementId';
   String movementIdFilter(Int64? movementId) =>
       movementIdFilterOfTable(tableName, movementId);
 
   static String groupByIdOfTable(String tableName) =>
-      "group by $tableName.${Columns.id}";
+      "$tableName.${Columns.id}";
   String get groupById => groupByIdOfTable(tableName);
 
   static String orderByDatetimeOfTable(String tableName) =>
-      "order by datetime($tableName.${Columns.datetime}) desc";
+      "datetime($tableName.${Columns.datetime}) desc";
   String get orderByDatetime => orderByDatetimeOfTable(tableName);
 
   Future<bool> hardDeleteSingle(Int64 id) async {

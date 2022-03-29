@@ -1,6 +1,5 @@
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
-import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/models/diary/all.dart';
 
 class DiaryTable extends TableAccessor<Diary> {
@@ -34,15 +33,11 @@ class DiaryTable extends TableAccessor<Diary> {
   ) async {
     final records = await database.query(
       Tables.diary,
-      where: [
+      where: TableAccessor.combineFilter([
         notDeleted,
-        if (from != null) " AND $tableName.${Columns.date} >= ?",
-        if (until != null) " AND $tableName.${Columns.date} < ?"
-      ].join(),
-      whereArgs: [
-        if (from != null) from.yyyyMMdd,
-        if (until != null) until.yyyyMMdd
-      ],
+        fromFilter(from, dateOnly: true),
+        untilFilter(from, dateOnly: true),
+      ]),
       orderBy: "$tableName.${Columns.date} DESC",
     );
     return records.map(serde.fromDbRecord).toList();
