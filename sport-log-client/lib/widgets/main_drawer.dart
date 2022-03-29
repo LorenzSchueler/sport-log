@@ -89,8 +89,8 @@ class MainDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.onBackground,
             ),
             title: const Text('Server Actions'),
-            onTap: () => Nav.newBase(context, Routes.action.overview),
-            selected: selectedRoute == Routes.action.overview,
+            onTap: () => Nav.newBase(context, Routes.action.platformOverview),
+            selected: selectedRoute == Routes.action.platformOverview,
           ),
           const Spacer(),
           ListTile(

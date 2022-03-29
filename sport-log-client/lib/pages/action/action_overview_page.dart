@@ -7,23 +7,25 @@ class ActionOverviewPage extends StatefulWidget {
   const ActionOverviewPage({Key? key}) : super(key: key);
 
   @override
-  State<ActionOverviewPage> createState() => ActionOverviewPageState();
+  State<ActionOverviewPage> createState() => _ActionOverviewPageState();
 }
 
-class ActionOverviewPageState extends State<ActionOverviewPage> {
+class _ActionOverviewPageState extends State<ActionOverviewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Server Actions"),
+        title: const Text("Actions"),
       ),
       body: Container(
         padding: Defaults.edgeInsets.normal,
         child: ListView(
-          children: const [Text("not implemented")],
+          children: const [
+            Text("not implemented"),
+          ],
         ),
       ),
-      drawer: MainDrawer(selectedRoute: Routes.action.overview),
+      drawer: MainDrawer(selectedRoute: Routes.action.actionOverview),
     );
   }
 }
