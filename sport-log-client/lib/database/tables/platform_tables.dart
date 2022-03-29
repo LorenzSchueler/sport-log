@@ -16,6 +16,7 @@ class PlatformTable extends TableAccessor<Platform> {
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
       Column.text(Columns.name)..checkLengthBetween(2, 80),
+      Column.bool(Columns.credential),
     ],
     uniqueColumns: [
       [Columns.name]

@@ -13,6 +13,7 @@ class Platform extends AtomicEntity {
   Platform({
     required this.id,
     required this.name,
+    required this.credential,
     required this.deleted,
   });
 
@@ -20,6 +21,7 @@ class Platform extends AtomicEntity {
   @IdConverter()
   Int64 id;
   String name;
+  bool credential;
   @override
   bool deleted;
 
@@ -30,7 +32,12 @@ class Platform extends AtomicEntity {
   Map<String, dynamic> toJson() => _$PlatformToJson(this);
 
   @override
-  Platform clone() => Platform(id: id.clone(), name: name, deleted: deleted);
+  Platform clone() => Platform(
+        id: id.clone(),
+        name: name,
+        credential: credential,
+        deleted: deleted,
+      );
 
   @override
   bool isValidBeforeSanitazion() {
@@ -56,6 +63,7 @@ class DbPlatformSerializer extends DbSerializer<Platform> {
     return Platform(
       id: Int64(r[prefix + Columns.id]! as int),
       name: r[prefix + Columns.name]! as String,
+      credential: r[prefix + Columns.credential]! as int == 1,
       deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
@@ -65,6 +73,7 @@ class DbPlatformSerializer extends DbSerializer<Platform> {
     return {
       Columns.id: o.id.toInt(),
       Columns.name: o.name,
+      Columns.credential: o.credential,
       Columns.deleted: o.deleted ? 1 : 0,
     };
   }

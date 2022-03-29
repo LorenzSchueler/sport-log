@@ -241,6 +241,7 @@ abstract class Columns {
   static const comments = 'comments';
   static const count = 'count';
   static const createBefore = 'create_before';
+  static const credential = 'credential';
   static const date = 'date';
   static const datetime = 'datetime';
   static const deleteAfter = 'delete_after';
