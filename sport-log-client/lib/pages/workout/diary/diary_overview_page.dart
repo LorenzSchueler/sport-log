@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/diary_data_provider.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/models/diary/diary.dart';
@@ -115,29 +115,28 @@ class DiaryCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                diary.date.formatDate,
-                style: const TextStyle(fontSize: 20),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(diary.date.toHumanDay()),
+                  if (diary.bodyweight != null)
+                    ValueUnitDescription(
+                      value: diary.bodyweight?.toStringAsFixed(1),
+                      unit: "kg Bodyweight",
+                      description: null,
+                    )
+                ],
               ),
-              Defaults.sizedBox.horizontal.big,
-              SizedBox(
-                width: 80,
-                child: diary.bodyweight != null
-                    ? ValueUnitDescription(
-                        value: diary.bodyweight?.toStringAsFixed(1),
-                        unit: "kg",
-                        description: null,
-                      )
-                    : null,
-              ),
-              Defaults.sizedBox.horizontal.big,
-              Expanded(
-                child: Text(
-                  diary.comments ?? "",
-                  textAlign: TextAlign.start,
-                  softWrap: true,
+              if (diary.comments != null) ...[
+                Defaults.sizedBox.horizontal.big,
+                Expanded(
+                  child: Text(
+                    diary.comments!,
+                    textAlign: TextAlign.start,
+                    softWrap: true,
+                  ),
                 ),
-              ),
+              ]
             ],
           ),
         ),
