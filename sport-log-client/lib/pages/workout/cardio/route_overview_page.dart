@@ -104,8 +104,6 @@ class RouteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final distance = (route.distance / 1000).toStringAsFixed(3);
-
     late MapboxMapController _sessionMapController;
 
     return GestureDetector(
@@ -114,12 +112,13 @@ class RouteCard extends StatelessWidget {
         margin: EdgeInsets.zero,
         child: Column(
           children: [
-            Defaults.sizedBox.vertical.small,
-            Text(
-              route.name,
-              textAlign: TextAlign.center,
+            Padding(
+              padding: Defaults.edgeInsets.normal,
+              child: Text(
+                route.name,
+                style: const TextStyle(fontSize: 20),
+              ),
             ),
-            Defaults.sizedBox.vertical.small,
             route.track != null && route.track!.isNotEmpty
                 ? SizedBox(
                     height: 150,
@@ -152,33 +151,17 @@ class RouteCard extends StatelessWidget {
                       const Text(" no track available"),
                     ],
                   ),
-            Defaults.sizedBox.vertical.small,
-            Row(
-              children: [
-                Expanded(
-                  child: ValueUnitDescription(
-                    value: distance,
-                    unit: "km",
-                    description: null,
-                  ),
-                ),
-                Expanded(
-                  child: ValueUnitDescription(
-                    value: route.ascent.toString(),
-                    unit: "m",
-                    description: null,
-                  ),
-                ),
-                Expanded(
-                  child: ValueUnitDescription(
-                    value: route.descent.toString(),
-                    unit: "m",
-                    description: null,
-                  ),
-                ),
-              ],
+            Padding(
+              padding: Defaults.edgeInsets.normal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ValueUnitDescription.distanceSmall(route.distance),
+                  ValueUnitDescription.ascentSmall(route.ascent),
+                  ValueUnitDescription.descentSmall(route.descent),
+                ],
+              ),
             ),
-            Defaults.sizedBox.vertical.small,
           ],
         ),
       ),

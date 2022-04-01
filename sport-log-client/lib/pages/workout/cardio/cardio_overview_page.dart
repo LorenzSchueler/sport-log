@@ -2,8 +2,8 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
-import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/map_utils.dart';
 import 'package:sport_log/helpers/snackbar.dart';
@@ -170,17 +170,6 @@ class CardioSessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final distance = cardioSessionDescription.cardioSession.distance == null
-        ? '???'
-        : (cardioSessionDescription.cardioSession.distance! / 1000)
-            .toStringAsFixed(3);
-    final speed = cardioSessionDescription.cardioSession.distance == null ||
-            cardioSessionDescription.cardioSession.time == null
-        ? '???'
-        : ((cardioSessionDescription.cardioSession.distance! / 1000) /
-                (cardioSessionDescription.cardioSession.time!.inSeconds / 3600))
-            .toStringAsFixed(1);
-
     late MapboxMapController _sessionMapController;
 
     return GestureDetector(
@@ -189,26 +178,22 @@ class CardioSessionCard extends StatelessWidget {
         margin: EdgeInsets.zero,
         child: Column(
           children: [
-            Defaults.sizedBox.vertical.small,
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    cardioSessionDescription
-                        .cardioSession.datetime.formatDatetime,
-                    textAlign: TextAlign.center,
+            Padding(
+              padding: Defaults.edgeInsets.normal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    cardioSessionDescription.cardioSession.datetime
+                        .toHumanWithTime(),
                   ),
-                ),
-                const Spacer(),
-                Expanded(
-                  child: Text(
+                  Text(
                     cardioSessionDescription.movement.name,
-                    textAlign: TextAlign.center,
-                  ),
-                )
-              ],
+                    style: const TextStyle(fontSize: 20),
+                  )
+                ],
+              ),
             ),
-            Defaults.sizedBox.vertical.small,
             cardioSessionDescription.cardioSession.track != null ||
                     cardioSessionDescription.route != null
                 ? SizedBox(
@@ -253,34 +238,23 @@ class CardioSessionCard extends StatelessWidget {
                       const Text(" no track available"),
                     ],
                   ),
-            Defaults.sizedBox.vertical.small,
-            Row(
-              children: [
-                Expanded(
-                  child: ValueUnitDescription(
-                    value:
-                        cardioSessionDescription.cardioSession.time?.formatTime,
-                    unit: null,
-                    description: null,
+            Padding(
+              padding: Defaults.edgeInsets.normal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ValueUnitDescription.timeSmall(
+                    cardioSessionDescription.cardioSession.time,
                   ),
-                ),
-                Expanded(
-                  child: ValueUnitDescription(
-                    value: distance,
-                    unit: "km",
-                    description: null,
+                  ValueUnitDescription.distanceSmall(
+                    cardioSessionDescription.cardioSession.distance,
                   ),
-                ),
-                Expanded(
-                  child: ValueUnitDescription(
-                    value: speed,
-                    unit: "km/h",
-                    description: null,
+                  ValueUnitDescription.speedSmall(
+                    cardioSessionDescription.cardioSession.speed,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            Defaults.sizedBox.vertical.small,
           ],
         ),
       ),
