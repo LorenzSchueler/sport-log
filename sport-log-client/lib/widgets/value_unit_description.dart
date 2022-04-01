@@ -50,6 +50,14 @@ class ValueUnitDescription extends StatelessWidget {
           key: key,
         );
 
+  ValueUnitDescription.timeSmall(Duration? time, {Key? key})
+      : this(
+          value: time?.formatTime,
+          unit: null,
+          description: null,
+          key: key,
+        );
+
   ValueUnitDescription.distance(int? distance, {Key? key})
       : this(
           value: distance == null ? null : (distance / 1000).toStringAsFixed(3),
@@ -59,12 +67,28 @@ class ValueUnitDescription extends StatelessWidget {
           key: key,
         );
 
+  ValueUnitDescription.distanceSmall(int? distance, {Key? key})
+      : this(
+          value: distance == null ? null : (distance / 1000).toStringAsFixed(3),
+          unit: "km",
+          description: null,
+          key: key,
+        );
+
   ValueUnitDescription.speed(double? speed, {Key? key})
       : this(
           value: speed?.toStringAsFixed(1),
           unit: "km/h",
           description: "Speed",
           scale: 1.3,
+          key: key,
+        );
+
+  ValueUnitDescription.speedSmall(double? speed, {Key? key})
+      : this(
+          value: speed?.toStringAsFixed(1),
+          unit: "km/h",
+          description: null,
           key: key,
         );
 
@@ -86,12 +110,28 @@ class ValueUnitDescription extends StatelessWidget {
           key: key,
         );
 
+  ValueUnitDescription.ascentSmall(int? ascent, {Key? key})
+      : this(
+          value: ascent?.toString(),
+          unit: "m",
+          description: null,
+          key: key,
+        );
+
   ValueUnitDescription.descent(int? descent, {Key? key})
       : this(
           value: descent?.toString(),
           unit: "m",
           description: "Descent",
           scale: 1.3,
+          key: key,
+        );
+
+  ValueUnitDescription.descentSmall(int? descent, {Key? key})
+      : this(
+          value: descent?.toString(),
+          unit: "m",
+          description: null,
           key: key,
         );
 
