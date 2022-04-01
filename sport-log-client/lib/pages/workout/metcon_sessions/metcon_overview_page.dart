@@ -106,11 +106,27 @@ class MetconCard extends StatelessWidget {
       ),
       child: Card(
         margin: EdgeInsets.zero,
-        child: ListTile(
-          title: Text(metconDescription.metcon.name),
-          subtitle: Text(
-            metconDescription.moves.map((mmd) => mmd.movement.name).join(' • '),
-            overflow: TextOverflow.ellipsis,
+        child: Padding(
+          padding: Defaults.edgeInsets.normal,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                metconDescription.metcon.name,
+                style: const TextStyle(fontSize: 20),
+              ),
+              Defaults.sizedBox.vertical.normal,
+              Text(
+                metconDescription.typeLengthDescription,
+              ),
+              Defaults.sizedBox.vertical.normal,
+              Text(
+                metconDescription.moves
+                    .map((mmd) => mmd.movement.name)
+                    .join(' • '),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
         ),
       ),

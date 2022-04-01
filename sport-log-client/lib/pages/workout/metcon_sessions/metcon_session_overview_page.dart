@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/snackbar.dart';
@@ -146,25 +147,53 @@ class MetconSessionCard extends StatelessWidget {
       onTap: () {
         Navigator.pushNamed(
           context,
-          Routes.metcon.sessionEdit,
+          Routes.metcon.sessionDetails,
           arguments: metconSessionDescription,
         );
       },
       child: Card(
         margin: EdgeInsets.zero,
-        child: ListTile(
-          leading: Icon(
-            metconSessionDescription.metconDescription.metcon.metconType.icon,
-          ),
-          trailing: metconSessionDescription.metconSession.rx
-              ? const Icon(AppIcons.checkCircle)
-              : null,
-          title: Text(metconSessionDescription.metconDescription.metcon.name),
-          subtitle: Text(metconSessionDescription.longResultDescription),
-          onTap: () => Navigator.pushNamed(
-            context,
-            Routes.metcon.sessionDetails,
-            arguments: metconSessionDescription,
+        child: Padding(
+          padding: Defaults.edgeInsets.normal,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      metconSessionDescription.metconSession.datetime
+                          .toHumanWithTime(),
+                    ),
+                    Defaults.sizedBox.vertical.normal,
+                    Text(
+                      metconSessionDescription.metconDescription.metcon.name,
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(metconSessionDescription.longResultDescription),
+                    Defaults.sizedBox.vertical.normal,
+                    Row(
+                      children: [
+                        const Text("Rx "),
+                        Icon(
+                          metconSessionDescription.metconSession.rx
+                              ? AppIcons.check
+                              : AppIcons.close,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
