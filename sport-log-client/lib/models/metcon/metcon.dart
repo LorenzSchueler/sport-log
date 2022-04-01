@@ -38,11 +38,11 @@ extension ToDisplayName on MetconType {
   String get displayName {
     switch (this) {
       case MetconType.amrap:
-        return "AMRAP";
+        return "Amrap";
       case MetconType.emom:
-        return "EMOM";
+        return "Emom";
       case MetconType.forTime:
-        return "FOR TIME";
+        return "For Time";
     }
   }
 }

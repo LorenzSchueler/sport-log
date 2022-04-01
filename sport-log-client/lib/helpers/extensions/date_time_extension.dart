@@ -143,8 +143,6 @@ extension DateTimeExtension on DateTime {
       return 'Yesterday';
     } else if (isInWeek(now)) {
       return toStringWeekday();
-    } else if (isInYear(now)) {
-      return toStringDateWithoutYear();
     } else {
       return toStringDateWithYear();
     }
