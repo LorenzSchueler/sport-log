@@ -90,16 +90,18 @@ class _StrengthSessionDetailsPageState
                   TextTile(
                     caption: "Sets",
                     child: Text(
-                      [
-                        '${_strengthSessionDescription.sets.length} sets',
-                        if (widget
-                                .strengthSessionDescription.session.interval !=
-                            null)
-                          _strengthSessionDescription
-                              .session.interval!.formatTimeShort,
-                      ].join(' • '),
+                      '${_strengthSessionDescription.sets.length} sets',
                     ),
                   ),
+                  if (widget.strengthSessionDescription.session.interval !=
+                      null)
+                    TextTile(
+                      caption: "Interval",
+                      child: Text(
+                        _strengthSessionDescription
+                            .session.interval!.formatTimeShort,
+                      ),
+                    ),
                   ..._bestValuesInfo(_strengthSessionDescription),
                 ],
               ),

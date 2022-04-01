@@ -126,13 +126,9 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
               if (_sessions.isNotEmpty)
                 SliverFillRemaining(
                   child: ListView.separated(
-                    itemBuilder: (context, index) => _movement != null
-                        ? StrengthSessionCardWithMovement(
-                            strengthSessionDescription: _sessions[index],
-                          )
-                        : StrengthSessionCard(
-                            strengthSessionDescription: _sessions[index],
-                          ),
+                    itemBuilder: (context, index) => StrengthSessionCard(
+                      strengthSessionDescription: _sessions[index],
+                    ),
                     separatorBuilder: (_, __) =>
                         Defaults.sizedBox.vertical.normal,
                     itemCount: _sessions.length,
@@ -167,48 +163,58 @@ class StrengthSessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.zero,
-      child: ListTile(
-        leading: Icon(strengthSessionDescription.movement.dimension.iconData),
-        title: Text(strengthSessionDescription.movement.name),
-        subtitle: Text(
-          '${strengthSessionDescription.session.datetime.toHumanWithTime()} • ${strengthSessionDescription.stats.numSets} ${plural('set', 'sets', strengthSessionDescription.stats.numSets)}',
-        ),
-        onTap: () => Navigator.pushNamed(
-          context,
-          Routes.strength.details,
-          arguments: strengthSessionDescription,
-        ),
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(
+        context,
+        Routes.strength.details,
+        arguments: strengthSessionDescription,
       ),
-    );
-  }
-}
-
-class StrengthSessionCardWithMovement extends StatelessWidget {
-  final StrengthSessionDescription strengthSessionDescription;
-
-  const StrengthSessionCardWithMovement({
-    Key? key,
-    required this.strengthSessionDescription,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.zero,
-      child: ListTile(
-        title: Text(
-          '${strengthSessionDescription.session.datetime.toHumanWithTime()} • ${strengthSessionDescription.stats.numSets} ${plural('set', 'sets', strengthSessionDescription.stats.numSets)}',
-        ),
-        subtitle: Text(
-          strengthSessionDescription.stats
-              .toDisplayName(strengthSessionDescription.movement.dimension),
-        ),
-        onTap: () => Navigator.pushNamed(
-          context,
-          Routes.strength.details,
-          arguments: strengthSessionDescription,
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: Defaults.edgeInsets.normal,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      strengthSessionDescription.session.datetime
+                          .toHumanWithTime(),
+                    ),
+                    Defaults.sizedBox.vertical.normal,
+                    Text(
+                      strengthSessionDescription.movement.name,
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    if (strengthSessionDescription.session.interval !=
+                        null) ...[
+                      Defaults.sizedBox.vertical.normal,
+                      Text(
+                        "Interval: ${strengthSessionDescription.session.interval!.formatTimeShort}",
+                      ),
+                    ]
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: strengthSessionDescription.sets
+                      .map(
+                        (set) => Text(
+                          set.toDisplayName(
+                            strengthSessionDescription.movement.dimension,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
