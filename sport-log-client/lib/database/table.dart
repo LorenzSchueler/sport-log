@@ -156,7 +156,7 @@ class UniqueIndex {
   const UniqueIndex(this.tableName, this.columns) : super();
 
   String get setupSql {
-    return 'create unique index ${tableName}__${columns.join('__')}__idx '
+    return 'create unique index ${tableName}__${columns.join('__')}__key '
         'on $tableName (${columns.join(', ')}) where deleted = 0;';
   }
 }
