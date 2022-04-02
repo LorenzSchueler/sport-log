@@ -67,8 +67,6 @@ ThemeData _themeDataFromColors(ColorScheme colorScheme) {
     ),
     cardTheme: CardTheme(color: colorScheme.surface),
     toggleableActiveColor: colorScheme.primary,
-    // ignore: deprecated_member_use
-    accentColor: colorScheme.primary, // still needed for expansion tile cards
     dialogTheme: DialogTheme(
       backgroundColor: colorScheme.surface,
       shape: RoundedRectangleBorder(
