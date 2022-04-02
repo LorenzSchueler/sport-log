@@ -78,13 +78,6 @@ class MetconDescription extends CompoundEntity {
   static bool areTheSame(MetconDescription m1, MetconDescription m2) =>
       m1.metcon.id == m2.metcon.id;
 
-  void setDeleted() {
-    metcon.deleted = true;
-    for (final move in moves) {
-      move.metconMovement.deleted = true;
-    }
-  }
-
   String get typeLengthDescription {
     if (metcon.metconType == MetconType.forTime) {
       final timecap = metcon.timecap == null

@@ -100,15 +100,6 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
     );
     return result.map(serde.fromDbRecord).toList();
   }
-
-  Future<void> deleteByStrengthSession(Int64 id) async {
-    await database.update(
-      tableName,
-      {Columns.deleted: 1},
-      where: '${Columns.strengthSessionId} = ? AND ${Columns.deleted} = 0',
-      whereArgs: [id.toInt()],
-    );
-  }
 }
 
 class StrengthSessionDescriptionTable {

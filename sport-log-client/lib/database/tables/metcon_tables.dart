@@ -110,15 +110,6 @@ class MetconMovementTable extends TableAccessor<MetconMovement> {
     );
     return result.map(serde.fromDbRecord).toList();
   }
-
-  Future<void> deleteByMetcon(Int64 id) async {
-    await database.update(
-      tableName,
-      {Columns.deleted: 1},
-      where: '${Columns.deleted} = 0 AND ${Columns.metconId} = ?',
-      whereArgs: [id.toInt()],
-    );
-  }
 }
 
 class MetconSessionTable extends TableAccessor<MetconSession> {

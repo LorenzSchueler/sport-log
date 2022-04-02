@@ -42,8 +42,6 @@ class MetconMovementDataProvider extends EntityDataProvider<MetconMovement> {
 
   Future<List<MetconMovement>> getByMetcon(Int64 metconId) =>
       db.getByMetcon(metconId);
-
-  Future<void> deleteByMetcon(Int64 metconId) => db.deleteByMetcon(metconId);
 }
 
 class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
@@ -136,8 +134,11 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
 
   @override
   Future<DbResult> deleteSingle(MetconDescription object) async {
-    object.setDeleted();
-    await _metconMovementDataProvider.deleteByMetcon(object.metcon.id);
+    final result = await _metconMovementDataProvider
+        .deleteMultiple(object.moves.map((e) => e.metconMovement).toList());
+    if (result.isFailure()) {
+      return result;
+    }
     return await _metconDataProvider.deleteSingle(object.metcon);
   }
 

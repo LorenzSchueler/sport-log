@@ -43,9 +43,6 @@ class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
 
   Future<List<StrengthSet>> getByStrengthSession(Int64 strengthSessionId) =>
       db.getByStrengthSession(strengthSessionId);
-
-  Future<void> deleteByStrengthSession(Int64 strengthSessionId) =>
-      db.deleteByStrengthSession(strengthSessionId);
 }
 
 class StrengthSessionDescriptionDataProvider
@@ -110,8 +107,10 @@ class StrengthSessionDescriptionDataProvider
 
   @override
   Future<DbResult> deleteSingle(StrengthSessionDescription object) async {
-    object.setDeleted();
-    await _strengthSetDataProvider.deleteByStrengthSession(object.session.id);
+    final result = await _strengthSetDataProvider.deleteMultiple(object.sets);
+    if (result.isFailure()) {
+      return result;
+    }
     return await _strengthSessionDataProvider.deleteSingle(object.session);
   }
 

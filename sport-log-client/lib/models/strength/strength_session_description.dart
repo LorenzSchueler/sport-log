@@ -92,13 +92,6 @@ class StrengthSessionDescription extends CompoundEntity {
     }
   }
 
-  void setDeleted() {
-    session.deleted = true;
-    for (final set in sets) {
-      set.deleted = true;
-    }
-  }
-
   void orderSets() {
     sets.forEachIndexed((set, index) => set.setNumber = index);
   }
