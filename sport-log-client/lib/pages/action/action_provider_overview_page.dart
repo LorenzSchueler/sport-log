@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
-class ActionOverviewPage extends StatefulWidget {
-  const ActionOverviewPage({Key? key}) : super(key: key);
+class ActionProviderOverviewPage extends StatefulWidget {
+  final ActionProvider actionProvider;
+
+  const ActionProviderOverviewPage({required this.actionProvider, Key? key})
+      : super(key: key);
 
   @override
-  State<ActionOverviewPage> createState() => _ActionOverviewPageState();
+  State<ActionProviderOverviewPage> createState() =>
+      _ActionProviderOverviewPageState();
 }
 
-class _ActionOverviewPageState extends State<ActionOverviewPage> {
+class _ActionProviderOverviewPageState
+    extends State<ActionProviderOverviewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +31,7 @@ class _ActionOverviewPageState extends State<ActionOverviewPage> {
           ],
         ),
       ),
-      drawer: MainDrawer(selectedRoute: Routes.action.actionOverview),
+      drawer: MainDrawer(selectedRoute: Routes.action.actionProviderOverview),
     );
   }
 }

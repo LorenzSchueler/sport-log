@@ -123,7 +123,10 @@ class PlatformCard extends StatelessWidget {
                 behavior: HitTestBehavior.opaque,
                 onTap: !platformDescription.platform.credential ||
                         platformDescription.platformCredential != null
-                    ? () => _logger.i("tapped")
+                    ? () => Navigator.of(context).pushNamed(
+                          Routes.action.actionProviderOverview,
+                          arguments: actionProvider,
+                        )
                     : () => showMessageDialog(
                           context: context,
                           text:
