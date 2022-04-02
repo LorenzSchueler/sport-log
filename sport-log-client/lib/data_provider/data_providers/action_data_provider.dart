@@ -112,8 +112,8 @@ class ActionProviderDescriptionDataProvider
   Future<DbResult> createSingle(ActionProviderDescription object) async {
     object.sanitize();
     assert(object.isValid());
-    final result =
-        await _actionRuleDataProvider.createMultiple(object.actionRules);
+    final result = await _actionRuleDataProvider
+        .createMultiple(object.actionRules, notify: false);
     if (result.isFailure()) {
       return result;
     }
@@ -153,7 +153,7 @@ class ActionProviderDescriptionDataProvider
 
   @override
   Future<bool> pullFromServer() async {
-    if (!await _actionRuleDataProvider.pullFromServer()) {
+    if (!await _actionRuleDataProvider.pullFromServer(notify: false)) {
       return false;
     }
     return await _actionEventDataProvider.pullFromServer();

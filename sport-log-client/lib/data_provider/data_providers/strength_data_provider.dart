@@ -71,8 +71,8 @@ class StrengthSessionDescriptionDataProvider
   Future<DbResult> createSingle(StrengthSessionDescription object) async {
     object.sanitize();
     assert(object.isValid());
-    final result =
-        await _strengthSessionDataProvider.createSingle(object.session);
+    final result = await _strengthSessionDataProvider
+        .createSingle(object.session, notify: false);
     if (result.isFailure()) {
       return result;
     }
@@ -89,16 +89,24 @@ class StrengthSessionDescriptionDataProvider
     final newSets = [...object.sets];
     final diffing = diff(oldSets, newSets);
 
-    var result =
-        await _strengthSessionDataProvider.updateSingle(object.session);
+    var result = await _strengthSessionDataProvider.updateSingle(
+      object.session,
+      notify: false,
+    );
     if (result.isFailure()) {
       return result;
     }
-    result = await _strengthSetDataProvider.deleteMultiple(diffing.toDelete);
+    result = await _strengthSetDataProvider.deleteMultiple(
+      diffing.toDelete,
+      notify: false,
+    );
     if (result.isFailure()) {
       return result;
     }
-    result = await _strengthSetDataProvider.updateMultiple(diffing.toUpdate);
+    result = await _strengthSetDataProvider.updateMultiple(
+      diffing.toUpdate,
+      notify: false,
+    );
     if (result.isFailure()) {
       return result;
     }
@@ -107,7 +115,10 @@ class StrengthSessionDescriptionDataProvider
 
   @override
   Future<DbResult> deleteSingle(StrengthSessionDescription object) async {
-    final result = await _strengthSetDataProvider.deleteMultiple(object.sets);
+    final result = await _strengthSetDataProvider.deleteMultiple(
+      object.sets,
+      notify: false,
+    );
     if (result.isFailure()) {
       return result;
     }
@@ -149,7 +160,7 @@ class StrengthSessionDescriptionDataProvider
 
   @override
   Future<bool> pullFromServer() async {
-    if (!await _strengthSessionDataProvider.pullFromServer()) {
+    if (!await _strengthSessionDataProvider.pullFromServer(notify: false)) {
       return false;
     }
     return await _strengthSetDataProvider.pullFromServer();
@@ -222,7 +233,6 @@ class StrengthSessionDescriptionDataProvider
       sessions,
       synchronized: synchronized,
     );
-    notifyListeners();
   }
 
   Future<void> upsertMultipleSets(
@@ -233,6 +243,5 @@ class StrengthSessionDescriptionDataProvider
       sets,
       synchronized: synchronized,
     );
-    notifyListeners();
   }
 }

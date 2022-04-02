@@ -58,6 +58,8 @@ class PlatformDescriptionDataProvider
       _instance!._platformDataProvider.addListener(_instance!.notifyListeners);
       _instance!._platformCredentialDataProvider
           .addListener(_instance!.notifyListeners);
+      _instance!._actionProviderDataProvider
+          .addListener(_instance!.notifyListeners);
     }
     return _instance!;
   }
@@ -108,10 +110,13 @@ class PlatformDescriptionDataProvider
 
   @override
   Future<bool> pullFromServer() async {
-    if (!await _platformDataProvider.pullFromServer()) {
+    if (!await _platformDataProvider.pullFromServer(notify: false)) {
       return false;
     }
-    return await _platformCredentialDataProvider.pullFromServer();
+    if (!await _platformCredentialDataProvider.pullFromServer(notify: false)) {
+      return false;
+    }
+    return await _actionProviderDataProvider.pullFromServer();
   }
 
   @override

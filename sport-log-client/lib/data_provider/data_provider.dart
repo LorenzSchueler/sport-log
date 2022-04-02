@@ -90,40 +90,46 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   List<T> getFromAccountData(AccountData accountData);
 
   @override
-  Future<DbResult> createSingle(T object) async {
+  Future<DbResult> createSingle(T object, {bool notify = true}) async {
     object.sanitize();
     assert(object.isValid());
     final result = await db.createSingle(object);
     if (result.isFailure()) {
       return result;
     }
-    notifyListeners();
+    if (notify) {
+      notifyListeners();
+    }
     return DbResult.success();
   }
 
   @override
-  Future<DbResult> updateSingle(T object) async {
+  Future<DbResult> updateSingle(T object, {bool notify = true}) async {
     object.sanitize();
     assert(object.isValid());
     final result = await db.updateSingle(object);
     if (result.isFailure()) {
       return result;
     }
-    notifyListeners();
+    if (notify) {
+      notifyListeners();
+    }
     return DbResult.success();
   }
 
   @override
-  Future<DbResult> deleteSingle(T object) async {
+  Future<DbResult> deleteSingle(T object, {bool notify = true}) async {
     final result = await db.deleteSingle(object.id);
     if (result.isFailure()) {
       return result;
     }
-    notifyListeners();
+    if (notify) {
+      notifyListeners();
+    }
     return DbResult.success();
   }
 
-  Future<DbResult> createMultiple(List<T> objects) async {
+  Future<DbResult> createMultiple(List<T> objects, {bool notify = true}) async {
     // ignore: avoid_function_literals_in_foreach_calls
     objects.forEach((object) => object.sanitize());
     assert(objects.every((object) => object.isValid()));
@@ -131,11 +137,13 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     if (result.isFailure()) {
       return result;
     }
-    notifyListeners();
+    if (notify) {
+      notifyListeners();
+    }
     return DbResult.success();
   }
 
-  Future<DbResult> updateMultiple(List<T> objects) async {
+  Future<DbResult> updateMultiple(List<T> objects, {bool notify = true}) async {
     // ignore: avoid_function_literals_in_foreach_calls
     objects.forEach((object) => object.sanitize());
     assert(objects.every((object) => object.isValid()));
@@ -143,16 +151,20 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     if (result.isFailure()) {
       return result;
     }
-    notifyListeners();
+    if (notify) {
+      notifyListeners();
+    }
     return DbResult.success();
   }
 
-  Future<DbResult> deleteMultiple(List<T> objects) async {
+  Future<DbResult> deleteMultiple(List<T> objects, {bool notify = true}) async {
     final result = await db.deleteMultiple(objects);
     if (result.isFailure()) {
       return result;
     }
-    notifyListeners();
+    if (notify) {
+      notifyListeners();
+    }
     return DbResult.success();
   }
 
@@ -160,7 +172,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   Future<List<T>> getNonDeleted() async => db.getNonDeleted();
 
   @override
-  Future<bool> pullFromServer() async {
+  Future<bool> pullFromServer({bool notify = true}) async {
     final result = await api.getMultiple();
     if (result.isFailure) {
       await DataProvider.handleApiError(
@@ -169,7 +181,11 @@ abstract class EntityDataProvider<T extends AtomicEntity>
       );
       return false;
     } else {
-      return (await upsertMultiple(result.success, synchronized: true))
+      return (await upsertMultiple(
+        result.success,
+        synchronized: true,
+        notify: notify,
+      ))
           .isSuccess();
     }
   }
@@ -259,6 +275,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   Future<DbResult> upsertMultiple(
     List<T> objects, {
     required bool synchronized,
+    bool notify = true,
   }) async {
     if (objects.isEmpty) {
       return DbResult.success();
@@ -267,7 +284,9 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     if (result.isFailure()) {
       return result;
     }
-    notifyListeners();
+    if (notify) {
+      notifyListeners();
+    }
     return DbResult.success();
   }
 

@@ -130,7 +130,8 @@ class _ActionProviderOverviewPageState
                                       SizedBox(
                                         width: 120,
                                         child: Text(
-                                            actionName(actionRule.actionId)),
+                                          actionName(actionRule.actionId),
+                                        ),
                                       ),
                                       Defaults.sizedBox.horizontal.normal,
                                       Text(

@@ -97,7 +97,8 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   Future<DbResult> createSingle(MetconDescription object) async {
     object.sanitize();
     assert(object.isValid());
-    var result = await _metconDataProvider.createSingle(object.metcon);
+    var result =
+        await _metconDataProvider.createSingle(object.metcon, notify: false);
     if (result.isFailure()) {
       return result;
     }
@@ -117,15 +118,22 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
 
     final diffing = diff(oldMMovements, newMMovements);
 
-    var result = await _metconDataProvider.updateSingle(object.metcon);
+    var result =
+        await _metconDataProvider.updateSingle(object.metcon, notify: false);
     if (result.isFailure()) {
       return result;
     }
-    result = await _metconMovementDataProvider.deleteMultiple(diffing.toDelete);
+    result = await _metconMovementDataProvider.deleteMultiple(
+      diffing.toDelete,
+      notify: false,
+    );
     if (result.isFailure()) {
       return result;
     }
-    result = await _metconMovementDataProvider.updateMultiple(diffing.toUpdate);
+    result = await _metconMovementDataProvider.updateMultiple(
+      diffing.toUpdate,
+      notify: false,
+    );
     if (result.isFailure()) {
       return result;
     }
@@ -134,8 +142,10 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
 
   @override
   Future<DbResult> deleteSingle(MetconDescription object) async {
-    final result = await _metconMovementDataProvider
-        .deleteMultiple(object.moves.map((e) => e.metconMovement).toList());
+    final result = await _metconMovementDataProvider.deleteMultiple(
+      object.moves.map((e) => e.metconMovement).toList(),
+      notify: false,
+    );
     if (result.isFailure()) {
       return result;
     }
@@ -167,7 +177,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
 
   @override
   Future<bool> pullFromServer() async {
-    if (await _metconDataProvider.pullFromServer()) {
+    if (await _metconDataProvider.pullFromServer(notify: false)) {
       return false;
     }
     return await _metconMovementDataProvider.pullFromServer();
@@ -256,13 +266,13 @@ class MetconSessionDescriptionDataProvider
 
   @override
   Future<bool> pullFromServer() async {
-    if (!await _movementDataProvider.pullFromServer()) {
+    if (!await _movementDataProvider.pullFromServer(notify: false)) {
       return false;
     }
-    if (!await _metconDataProvider.pullFromServer()) {
+    if (!await _metconDataProvider.pullFromServer(notify: false)) {
       return false;
     }
-    if (!await _metconMovementDataProvider.pullFromServer()) {
+    if (!await _metconMovementDataProvider.pullFromServer(notify: false)) {
       return false;
     }
     return await _metconSessionDataProvider.pullFromServer();
