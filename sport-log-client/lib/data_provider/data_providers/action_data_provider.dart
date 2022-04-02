@@ -159,11 +159,16 @@ class ActionProviderDescriptionDataProvider
     return await _actionEventDataProvider.pullFromServer();
   }
 
-  Future<ActionProviderDescription> getByActionProvider(
+  Future<ActionProviderDescription?> getByActionProvider(
     ActionProvider actionProvider,
   ) async {
+    final loadedActionProvider =
+        await _actionProviderDataProvider.getById(actionProvider.id);
+    if (loadedActionProvider == null) {
+      return null;
+    }
     return ActionProviderDescription(
-      actionProvider: actionProvider,
+      actionProvider: loadedActionProvider,
       actions: await _actionDataProvider.getByActionProvider(actionProvider),
       actionRules:
           await _actionRuleDataProvider.getByActionProvider(actionProvider),
