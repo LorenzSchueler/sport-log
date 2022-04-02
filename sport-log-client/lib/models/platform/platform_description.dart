@@ -9,10 +9,12 @@ class PlatformDescription extends CompoundEntity {
   PlatformDescription({
     required this.platform,
     required this.platformCredential,
+    required this.actionProviders,
   });
 
   Platform platform;
   PlatformCredential? platformCredential;
+  List<ActionProvider> actionProviders;
 
   factory PlatformDescription.fromJson(Map<String, dynamic> json) =>
       _$PlatformDescriptionFromJson(json);
@@ -24,6 +26,7 @@ class PlatformDescription extends CompoundEntity {
   PlatformDescription clone() => PlatformDescription(
         platform: platform.clone(),
         platformCredential: platformCredential?.clone(),
+        actionProviders: actionProviders.map((a) => a.clone()).toList(),
       );
 
   @override
@@ -31,6 +34,7 @@ class PlatformDescription extends CompoundEntity {
     return platform.isValidBeforeSanitazion() &&
         (platformCredential == null ||
             platformCredential!.isValidBeforeSanitazion()) &&
+        actionProviders.every((a) => a.isValidBeforeSanitazion()) &&
         validate(
           !platform.credential || platformCredential != null,
           'PlatformDesciption: credentials required but null',
@@ -41,7 +45,8 @@ class PlatformDescription extends CompoundEntity {
   bool isValid() {
     return isValidBeforeSanitazion() &&
         platform.isValid() &&
-        (platformCredential == null || platformCredential!.isValid());
+        (platformCredential == null || platformCredential!.isValid()) &&
+        actionProviders.every((a) => a.isValid());
   }
 
   @override

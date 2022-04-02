@@ -1,6 +1,7 @@
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/models/action/all.dart';
+import 'package:sport_log/models/platform/platform.dart';
 
 class ActionTable extends TableAccessor<Action> {
   @override
@@ -104,4 +105,13 @@ class ActionProviderTable extends TableAccessor<ActionProvider> {
       [Columns.name]
     ],
   );
+
+  Future<List<ActionProvider>> getByPlatform(Platform platform) async {
+    final records = await database.query(
+      tableName,
+      where: [notDeleted, "${Columns.platformId} = ?"].join(" and "),
+      whereArgs: [platform.id.toInt()],
+    );
+    return records.map(serde.fromDbRecord).toList();
+  }
 }

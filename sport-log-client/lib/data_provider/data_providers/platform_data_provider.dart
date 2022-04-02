@@ -1,5 +1,6 @@
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
+import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/all.dart';
@@ -47,6 +48,7 @@ class PlatformDescriptionDataProvider
     extends DataProvider<PlatformDescription> {
   final _platformDataProvider = PlatformDataProvider();
   final _platformCredentialDataProvider = PlatformCredentialDataProvider();
+  final _actionProviderDataProvider = ActionProviderDataProvider();
 
   static PlatformDescriptionDataProvider? _instance;
   PlatformDescriptionDataProvider._();
@@ -96,6 +98,8 @@ class PlatformDescriptionDataProvider
               platform: platform,
               platformCredential:
                   await _platformCredentialDataProvider.getByPlatform(platform),
+              actionProviders:
+                  await _actionProviderDataProvider.getByPlatform(platform),
             ),
           )
           .toList(),

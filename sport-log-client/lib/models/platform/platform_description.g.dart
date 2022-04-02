@@ -13,6 +13,9 @@ PlatformDescription _$PlatformDescriptionFromJson(Map<String, dynamic> json) =>
           ? null
           : PlatformCredential.fromJson(
               json['platform_credential'] as Map<String, dynamic>),
+      actionProviders: (json['action_providers'] as List<dynamic>)
+          .map((e) => ActionProvider.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$PlatformDescriptionToJson(
@@ -20,4 +23,5 @@ Map<String, dynamic> _$PlatformDescriptionToJson(
     <String, dynamic>{
       'platform': instance.platform,
       'platform_credential': instance.platformCredential,
+      'action_providers': instance.actionProviders,
     };

@@ -2,8 +2,10 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/database/tables/action_tables.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/action/all.dart';
+import 'package:sport_log/models/platform/platform.dart';
 
 class ActionProviderDataProvider extends EntityDataProvider<ActionProvider> {
   static final _instance = ActionProviderDataProvider._();
@@ -14,11 +16,14 @@ class ActionProviderDataProvider extends EntityDataProvider<ActionProvider> {
   final Api<ActionProvider> api = Api.actionProviders;
 
   @override
-  final TableAccessor<ActionProvider> db = AppDatabase.actionProviders;
+  final ActionProviderTable db = AppDatabase.actionProviders;
 
   @override
   List<ActionProvider> getFromAccountData(AccountData accountData) =>
       accountData.actionProviders;
+
+  Future<List<ActionProvider>> getByPlatform(Platform platfrom) =>
+      db.getByPlatform(platfrom);
 }
 
 class ActionDataProvider extends EntityDataProvider<Action> {
