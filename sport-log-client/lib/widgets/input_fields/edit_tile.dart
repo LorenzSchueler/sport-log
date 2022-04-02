@@ -39,12 +39,10 @@ class EditTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final widget = Row(
       children: [
-        if (leading != null) Icon(leading, color: Colors.white70),
-        //Theme.of(context).colorScheme.onBackground,
-        if (leading != null)
-          const SizedBox(
-            width: 15,
-          ),
+        if (leading != null) ...[
+          Icon(leading, color: Colors.white70),
+          const SizedBox(width: 15),
+        ],
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -59,14 +57,15 @@ class EditTile extends StatelessWidget {
             ),
           ],
         ),
-        if (onCancel != null) const Spacer(),
-        if (onCancel != null)
+        if (onCancel != null) ...[
+          const Spacer(),
           IconButton(
             onPressed: onCancel,
             icon: const Icon(
               AppIcons.close,
             ),
-          )
+          ),
+        ]
       ],
     );
 
