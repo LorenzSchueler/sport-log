@@ -82,10 +82,10 @@ class PlatformOverviewPageState extends State<PlatformOverviewPage> {
 }
 
 class PlatformCard extends StatelessWidget {
-  final _logger = Logger('PlatformCard');
   final PlatformDescription platformDescription;
 
-  PlatformCard({Key? key, required this.platformDescription}) : super(key: key);
+  const PlatformCard({Key? key, required this.platformDescription})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -27,6 +27,21 @@ class ActionTable extends TableAccessor<Action> {
       [Columns.actionProviderId, Columns.name]
     ],
   );
+
+  Future<List<Action>> getByActionProvider(
+    ActionProvider actionProvider,
+  ) async {
+    final result = await database.query(
+      tableName,
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        '${Columns.actionProviderId} = ?',
+      ]),
+      whereArgs: [actionProvider.id.toInt()],
+      orderBy: orderByName,
+    );
+    return result.map(serde.fromDbRecord).toList();
+  }
 }
 
 class ActionEventTable extends TableAccessor<ActionEvent> {
@@ -53,6 +68,24 @@ class ActionEventTable extends TableAccessor<ActionEvent> {
       [Columns.actionId, Columns.datetime]
     ],
   );
+
+  Future<List<ActionEvent>> getByActionProvider(
+    ActionProvider actionProvider,
+  ) async {
+    final result = await database.query(
+      tableName,
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        '${Columns.actionId} in (select ${Columns.id} from ${Tables.action} where ${TableAccessor.combineFilter([
+              TableAccessor.notDeletedOfTable(Tables.action),
+              "${Columns.actionProviderId} = ?"
+            ])})',
+      ]),
+      whereArgs: [actionProvider.id.toInt()],
+      orderBy: orderByDatetime,
+    );
+    return result.map(serde.fromDbRecord).toList();
+  }
 }
 
 class ActionRuleTable extends TableAccessor<ActionRule> {
@@ -80,6 +113,24 @@ class ActionRuleTable extends TableAccessor<ActionRule> {
       [Columns.actionId, Columns.weekday, Columns.time]
     ],
   );
+
+  Future<List<ActionRule>> getByActionProvider(
+    ActionProvider actionProvider,
+  ) async {
+    final result = await database.query(
+      tableName,
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        '${Columns.actionId} in (select ${Columns.id} from ${Tables.action} where ${TableAccessor.combineFilter([
+              TableAccessor.notDeletedOfTable(Tables.action),
+              "${Columns.actionProviderId} = ?"
+            ])})',
+      ]),
+      whereArgs: [actionProvider.id.toInt()],
+      orderBy: Columns.weekday,
+    );
+    return result.map(serde.fromDbRecord).toList();
+  }
 }
 
 class ActionProviderTable extends TableAccessor<ActionProvider> {
