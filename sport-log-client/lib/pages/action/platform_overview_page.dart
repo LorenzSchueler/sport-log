@@ -81,37 +81,11 @@ class PlatformOverviewPageState extends State<PlatformOverviewPage> {
   }
 }
 
-class PlatformCard extends StatefulWidget {
+class PlatformCard extends StatelessWidget {
+  final _logger = Logger('PlatformCard');
   final PlatformDescription platformDescription;
 
-  const PlatformCard({Key? key, required this.platformDescription})
-      : super(key: key);
-
-  @override
-  State<PlatformCard> createState() => PlatformCardState();
-}
-
-class PlatformCardState extends State<PlatformCard> {
-  final _logger = Logger('PlatfromCard');
-  late PlatformDescription platformDescription;
-  bool credentialsExpanded = false;
-  bool actionProviderExpanded = false;
-
-  @override
-  void initState() {
-    platformDescription = widget.platformDescription;
-    if (platformDescription.platform.credential) {
-      platformDescription.platformCredential ??= PlatformCredential(
-        id: randomId(),
-        userId: Settings.userId!,
-        platformId: widget.platformDescription.platform.id,
-        username: "",
-        password: "",
-        deleted: false,
-      );
-    }
-    super.initState();
-  }
+  PlatformCard({Key? key, required this.platformDescription}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -122,40 +96,103 @@ class PlatformCardState extends State<PlatformCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => setState(
-                () => actionProviderExpanded = !actionProviderExpanded,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    platformDescription.platform.name,
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  if (platformDescription.platform.credential)
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      onPressed: () => setState(
-                        () => credentialsExpanded = !credentialsExpanded,
-                      ),
-                      icon: const Icon(AppIcons.settings),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  platformDescription.platform.name,
+                  style: const TextStyle(fontSize: 20),
+                ),
+                if (platformDescription.platform.credential)
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () => showDialog<void>(
+                      builder: (_) =>
+                          PlatformCredentialDialog(platformDescription),
+                      context: context,
                     ),
-                ],
-              ),
+                    icon: const Icon(AppIcons.settings),
+                  ),
+              ],
             ),
-            if (credentialsExpanded) ...[
-              const Divider(),
-              _usernameInput,
-              _passwordInput,
-              Center(child: _submitButton),
-            ],
-            if (actionProviderExpanded) ...[
-              const Divider(),
-              const Text("action provider list"),
-            ],
+            const Divider(),
+            for (var actionProvider in platformDescription.actionProviders) ...[
+              Defaults.sizedBox.vertical.small,
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: !platformDescription.platform.credential ||
+                        platformDescription.platformCredential != null
+                    ? () => _logger.i("tapped")
+                    : () => showMessageDialog(
+                          context: context,
+                          text:
+                              "Credentials are needed before you can use the action providers.",
+                        ),
+                child: Row(
+                  children: [
+                    Text(
+                      actionProvider.name,
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                  ],
+                ),
+              ),
+            ]
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PlatformCredentialDialog extends StatefulWidget {
+  final PlatformDescription platformDescription;
+  const PlatformCredentialDialog(this.platformDescription, {Key? key})
+      : super(key: key);
+
+  @override
+  State<PlatformCredentialDialog> createState() =>
+      PlatformCredentialDialogState();
+}
+
+class PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
+  late PlatformDescription platformDescription;
+
+  @override
+  void initState() {
+    platformDescription = widget.platformDescription.clone();
+    platformDescription.platformCredential ??= PlatformCredential(
+      id: randomId(),
+      userId: Settings.userId!,
+      platformId: widget.platformDescription.platform.id,
+      username: "",
+      password: "",
+      deleted: false,
+    );
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: Defaults.edgeInsets.normal,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _usernameInput,
+            _passwordInput,
+            Defaults.sizedBox.vertical.normal,
+            Row(
+              children: [
+                const SizedBox(width: 39),
+                _updateButton,
+                const Spacer(),
+                _deleteButton,
+              ],
+            ),
           ],
         ),
       ),
@@ -169,7 +206,7 @@ class PlatformCardState extends State<PlatformCard> {
           () => platformDescription.platformCredential!.username = username,
         );
       },
-      initialValue: platformDescription.platformCredential?.username,
+      initialValue: platformDescription.platformCredential!.username,
       decoration: const InputDecoration(
         icon: Icon(AppIcons.account),
         labelText: "Username",
@@ -188,7 +225,7 @@ class PlatformCardState extends State<PlatformCard> {
           () => platformDescription.platformCredential!.password = password,
         );
       },
-      initialValue: platformDescription.platformCredential?.password,
+      initialValue: platformDescription.platformCredential!.password,
       decoration: const InputDecoration(
         icon: Icon(AppIcons.key),
         labelText: "Password",
@@ -200,13 +237,15 @@ class PlatformCardState extends State<PlatformCard> {
     );
   }
 
-  Widget get _submitButton {
+  Widget get _updateButton {
     return ElevatedButton(
-      child: const Text(
-        "Update",
+      child: Text(
+        widget.platformDescription.platformCredential == null
+            ? "Create"
+            : "Update",
         style: TextStyle(fontSize: 18),
       ), // TODO: use theme for this
-      onPressed: _submit,
+      onPressed: _update,
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: Defaults.borderRadius.big,
@@ -215,9 +254,7 @@ class PlatformCardState extends State<PlatformCard> {
     );
   }
 
-  Future<void> _submit() async {
-    _logger.i(platformDescription);
-
+  Future<void> _update() async {
     final result = widget.platformDescription.platformCredential == null
         ? await _dataProvider.createSingle(platformDescription)
         : await _dataProvider.updateSingle(platformDescription);
@@ -226,6 +263,41 @@ class PlatformCardState extends State<PlatformCard> {
         context: context,
         text: 'Creating Credentials failed:\n${result.failure}',
       );
+    } else {
+      Navigator.pop(context);
+    }
+  }
+
+  Widget get _deleteButton {
+    return ElevatedButton(
+      child: Text(
+        widget.platformDescription.platformCredential == null
+            ? "Back"
+            : "Delete",
+        style: TextStyle(fontSize: 18),
+      ), // TODO: use theme for this
+      onPressed: _delete,
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: Defaults.borderRadius.big,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _delete() async {
+    if (widget.platformDescription.platformCredential == null) {
+      Navigator.pop(context);
+    } else {
+      final result = await _dataProvider.deleteSingle(platformDescription);
+      if (result.isFailure()) {
+        await showMessageDialog(
+          context: context,
+          text: 'Deleting Credentials failed:\n${result.failure}',
+        );
+      } else {
+        Navigator.pop(context);
+      }
     }
   }
 }
