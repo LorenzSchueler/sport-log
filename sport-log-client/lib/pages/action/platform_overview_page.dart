@@ -1,4 +1,3 @@
-import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
@@ -95,6 +94,8 @@ class PlatformCard extends StatefulWidget {
 class PlatformCardState extends State<PlatformCard> {
   final _logger = Logger('PlatfromCard');
   late PlatformDescription platformDescription;
+  bool credentialsExpanded = false;
+  bool actionProviderExpanded = false;
 
   @override
   void initState() {
@@ -114,22 +115,50 @@ class PlatformCardState extends State<PlatformCard> {
 
   @override
   Widget build(BuildContext context) {
-    return ExpansionTileCard(
-      leading: CircleAvatar(child: Text(platformDescription.platform.name[0])),
-      title: Text(platformDescription.platform.name),
-      trailing: platformDescription.platform.credential
-          ? const Icon(AppIcons.settings)
-          : null,
-      children: platformDescription.platform.credential
-          ? [
-              Container(
-                padding: Defaults.edgeInsets.normal,
-                child: Column(
-                  children: [_usernameInput, _passwordInput, _submitButton],
-                ),
-              )
-            ]
-          : [],
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: Defaults.edgeInsets.normal,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => setState(
+                () => actionProviderExpanded = !actionProviderExpanded,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    platformDescription.platform.name,
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  if (platformDescription.platform.credential)
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () => setState(
+                        () => credentialsExpanded = !credentialsExpanded,
+                      ),
+                      icon: const Icon(AppIcons.settings),
+                    ),
+                ],
+              ),
+            ),
+            if (credentialsExpanded) ...[
+              const Divider(),
+              _usernameInput,
+              _passwordInput,
+              Center(child: _submitButton),
+            ],
+            if (actionProviderExpanded) ...[
+              const Divider(),
+              const Text("action provider list"),
+            ],
+          ],
+        ),
+      ),
     );
   }
 
