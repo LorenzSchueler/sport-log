@@ -36,7 +36,7 @@ class DiaryTable extends TableAccessor<Diary> {
       where: TableAccessor.combineFilter([
         notDeleted,
         fromFilter(from, dateOnly: true),
-        untilFilter(from, dateOnly: true),
+        untilFilter(until, dateOnly: true),
       ]),
       orderBy: orderByDate,
     );

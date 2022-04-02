@@ -115,20 +115,25 @@ class DiaryCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(diary.date.toHumanDay()),
-                  if (diary.bodyweight != null)
-                    ValueUnitDescription(
-                      value: diary.bodyweight?.toStringAsFixed(1),
-                      unit: "kg Bodyweight",
-                      description: null,
-                    )
-                ],
+              SizedBox(
+                width: 150,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(diary.date.toHumanDay()),
+                    if (diary.bodyweight != null) ...[
+                      Defaults.sizedBox.vertical.normal,
+                      ValueUnitDescription(
+                        value: diary.bodyweight?.toStringAsFixed(1),
+                        unit: "kg Bodyweight",
+                        description: null,
+                      ),
+                    ]
+                  ],
+                ),
               ),
               if (diary.comments != null) ...[
-                Defaults.sizedBox.horizontal.big,
+                Defaults.sizedBox.horizontal.normal,
                 Expanded(
                   child: Text(
                     diary.comments!,

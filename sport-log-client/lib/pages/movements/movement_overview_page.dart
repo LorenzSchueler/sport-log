@@ -126,9 +126,12 @@ class MovementCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    movementDescription.movement.name,
-                    style: const TextStyle(fontSize: 20),
+                  SizedBox(
+                    width: 200,
+                    child: Text(
+                      movementDescription.movement.name,
+                      style: const TextStyle(fontSize: 20),
+                    ),
                   ),
                   Defaults.sizedBox.vertical.normal,
                   Text(movementDescription.movement.dimension.displayName),

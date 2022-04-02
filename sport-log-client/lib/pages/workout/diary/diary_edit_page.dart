@@ -113,12 +113,20 @@ class DiaryEditPageState extends State<DiaryEditPage> {
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
                 initialValue: _diary.bodyweight?.toStringAsFixed(1),
-                validator: Validator.validateDoubleGtZero,
+                validator: (weight) {
+                  if (weight == null || weight.isEmpty) {
+                    return null;
+                  }
+                  return Validator.validateDoubleGtZero(weight);
+                },
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 style: const TextStyle(height: 1),
                 keyboardType: TextInputType.number,
                 onChanged: (bodyweight) {
-                  if (Validator.validateDoubleGtZero(bodyweight) == null) {
+                  if (bodyweight.isEmpty) {
+                    setState(() => _diary.bodyweight = null);
+                  } else if (Validator.validateDoubleGtZero(bodyweight) ==
+                      null) {
                     setState(
                       () => _diary.bodyweight = double.parse(bodyweight),
                     );
