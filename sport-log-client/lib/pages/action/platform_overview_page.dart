@@ -243,7 +243,7 @@ class PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
         widget.platformDescription.platformCredential == null
             ? "Create"
             : "Update",
-        style: TextStyle(fontSize: 18),
+        style: const TextStyle(fontSize: 20),
       ), // TODO: use theme for this
       onPressed: _update,
       style: ElevatedButton.styleFrom(
@@ -274,7 +274,7 @@ class PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
         widget.platformDescription.platformCredential == null
             ? "Back"
             : "Delete",
-        style: TextStyle(fontSize: 18),
+        style: const TextStyle(fontSize: 20),
       ), // TODO: use theme for this
       onPressed: _delete,
       style: ElevatedButton.styleFrom(

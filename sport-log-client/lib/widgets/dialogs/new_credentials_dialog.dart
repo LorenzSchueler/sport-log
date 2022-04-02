@@ -41,9 +41,11 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
       child: Container(
         padding: Defaults.edgeInsets.normal,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              "Looks like you changed you credentials on another device.\nPlease update your credentials below!",
+              "Looks like you changed your credentials on another device.\nPlease update them below!",
+              style: TextStyle(fontSize: 20),
             ),
             Defaults.sizedBox.vertical.big,
             Form(
