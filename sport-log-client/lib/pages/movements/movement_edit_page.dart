@@ -93,7 +93,8 @@ class _EditMovementPageState extends State<EditMovementPage> {
             icon: const Icon(AppIcons.arrowBack),
           ),
           actions: [
-            if (widget.movementDescription != null)
+            if (widget.movementDescription != null &&
+                !widget.movementDescription!.hasReference)
               IconButton(
                 onPressed: _deleteMovement,
                 icon: const Icon(AppIcons.delete),

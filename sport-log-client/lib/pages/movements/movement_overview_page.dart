@@ -1,4 +1,3 @@
-import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/defaults.dart';
@@ -8,6 +7,7 @@ import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 final _dataProvider = MovementDescriptionDataProvider();
@@ -93,51 +93,61 @@ class MovementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ExpansionTileCard(
-      leading: CircleAvatar(child: Text(movementDescription.movement.name[0])),
-      title: Text(movementDescription.movement.name),
-      subtitle: Text(movementDescription.movement.dimension.displayName),
-      children: [
-        if (movementDescription.movement.description != null) ...[
-          const Divider(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            child: Text(movementDescription.movement.description!),
-          ),
-        ],
-        if (movementDescription.movement.userId != null) ...[
-          const Divider(),
-          ButtonBar(
-            alignment: MainAxisAlignment.spaceAround,
+    return GestureDetector(
+      onTap: () async {
+        if (movementDescription.movement.userId != null) {
+          if (movementDescription.hasReference) {
+            final bool? approved = await showApproveDialog(
+              context,
+              'Warning',
+              'Changes will be reflected in existing workouts.',
+            );
+            if (approved == null || !approved) return;
+          }
+          await Navigator.pushNamed(
+            context,
+            Routes.movement.edit,
+            arguments: movementDescription,
+          );
+        } else {
+          await showMessageDialog(
+            context: context,
+            text: "This is a default movement and cannot be edited.",
+          );
+        }
+      },
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: Defaults.edgeInsets.normal,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (!movementDescription.hasReference)
-                IconButton(
-                  onPressed: () async =>
-                      await _dataProvider.deleteSingle(movementDescription),
-                  icon: const Icon(AppIcons.delete),
-                ),
-              IconButton(
-                onPressed: () async {
-                  if (movementDescription.hasReference) {
-                    final bool? approved = await showApproveDialog(
-                      context,
-                      'Warning',
-                      'Changes will be reflected in existing workouts.',
-                    );
-                    if (approved == null || !approved) return;
-                  }
-                  await Navigator.pushNamed(
-                    context,
-                    Routes.movement.edit,
-                    arguments: movementDescription,
-                  );
-                },
-                icon: const Icon(AppIcons.edit),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    movementDescription.movement.name,
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  Defaults.sizedBox.vertical.normal,
+                  Text(movementDescription.movement.dimension.displayName),
+                ],
               ),
+              if (movementDescription.movement.description != null) ...[
+                Defaults.sizedBox.horizontal.big,
+                Expanded(
+                  child: Text(
+                    movementDescription.movement.description!,
+                    textAlign: TextAlign.start,
+                    softWrap: true,
+                  ),
+                ),
+              ]
             ],
           ),
-        ],
-      ],
+        ),
+      ),
     );
   }
 }
