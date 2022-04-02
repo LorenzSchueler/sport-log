@@ -41,7 +41,7 @@ class RouteTable extends TableAccessor<Route> {
     final result = await database.query(
       tableName,
       where: notDeleted,
-      orderBy: "$tableName.${Columns.name} COLLATE NOCASE",
+      orderBy: orderByName,
     );
     return result.map(serde.fromDbRecord).toList();
   }

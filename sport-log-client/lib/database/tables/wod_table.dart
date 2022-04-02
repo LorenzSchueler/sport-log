@@ -16,7 +16,7 @@ class WodTable extends TableAccessor<Wod> {
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
       Column.int(Columns.userId),
-      Column.text(Columns.date)..withDefault("datetime('now')"),
+      Column.text(Columns.date),
       Column.text(Columns.description)..nullable()
     ],
     uniqueColumns: [
@@ -29,7 +29,7 @@ class WodTable extends TableAccessor<Wod> {
     final result = await database.query(
       tableName,
       where: notDeleted,
-      orderBy: "$tableName.${Columns.date} DESC",
+      orderBy: orderByDate,
     );
     return result.map(serde.fromDbRecord).toList();
   }

@@ -83,8 +83,12 @@ abstract class TableAccessor<T extends AtomicEntity> {
   String get groupById => groupByIdOfTable(tableName);
 
   static String orderByDatetimeOfTable(String tableName) =>
-      "datetime($tableName.${Columns.datetime}) desc";
+      "$tableName.${Columns.datetime} desc";
   String get orderByDatetime => orderByDatetimeOfTable(tableName);
+
+  static String orderByDateOfTable(String tableName) =>
+      "$tableName.${Columns.date} desc";
+  String get orderByDate => orderByDateOfTable(tableName);
 
   static String orderByNameOfTable(String tableName) =>
       "$tableName.${Columns.name} collate nocase";
@@ -107,7 +111,10 @@ abstract class TableAccessor<T extends AtomicEntity> {
           Columns.deleted: 1,
           if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
         },
-        where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
+        where: combineFilter([
+          notDeleted,
+          '${Columns.id} = ?',
+        ]),
         whereArgs: [id.toInt()],
       );
       return DbResult.fromBool(changes == 1);
@@ -128,7 +135,10 @@ abstract class TableAccessor<T extends AtomicEntity> {
             if (isSynchronized)
               Columns.syncStatus: SyncStatus.synchronized.index,
           },
-          where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
+          where: combineFilter([
+            notDeleted,
+            '${Columns.id} = ?',
+          ]),
           whereArgs: [object.id.toInt()],
         );
       }
@@ -146,7 +156,10 @@ abstract class TableAccessor<T extends AtomicEntity> {
           ...serde.toDbRecord(object),
           if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index
         },
-        where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
+        where: combineFilter([
+          notDeleted,
+          '${Columns.id} = ?',
+        ]),
         whereArgs: [object.id.toInt()],
       );
       return DbResult.fromBool(changes == 1);
@@ -167,7 +180,10 @@ abstract class TableAccessor<T extends AtomicEntity> {
             if (isSynchronized)
               Columns.syncStatus: SyncStatus.synchronized.index
           },
-          where: '${Columns.deleted} = 0 AND ${Columns.id} = ?',
+          where: combineFilter([
+            notDeleted,
+            '${Columns.id} = ?',
+          ]),
           whereArgs: [object.id.toInt()],
         );
       }

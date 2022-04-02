@@ -37,7 +37,7 @@ class MetconTable extends TableAccessor<Metcon> {
     final result = await database.query(
       tableName,
       where: notDeleted,
-      orderBy: "$tableName.${Columns.name} COLLATE NOCASE",
+      orderBy: orderByName,
     );
     return result.map(serde.fromDbRecord).toList();
   }
@@ -104,7 +104,10 @@ class MetconMovementTable extends TableAccessor<MetconMovement> {
   Future<List<MetconMovement>> getByMetcon(Int64 id) async {
     final result = await database.query(
       tableName,
-      where: '${Columns.metconId} = ? AND ${Columns.deleted} = 0',
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        '${Columns.metconId} = ?',
+      ]),
       whereArgs: [id.toInt()],
       orderBy: Columns.movementNumber,
     );

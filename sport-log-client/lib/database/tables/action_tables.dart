@@ -109,7 +109,10 @@ class ActionProviderTable extends TableAccessor<ActionProvider> {
   Future<List<ActionProvider>> getByPlatform(Platform platform) async {
     final records = await database.query(
       tableName,
-      where: [notDeleted, "${Columns.platformId} = ?"].join(" and "),
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        "${Columns.platformId} = ?",
+      ]),
       whereArgs: [platform.id.toInt()],
     );
     return records.map(serde.fromDbRecord).toList();

@@ -52,7 +52,10 @@ class PlatformCredentialTable extends TableAccessor<PlatformCredential> {
   Future<PlatformCredential?> getByPlatform(Platform platform) async {
     final records = await database.query(
       tableName,
-      where: [notDeleted, "${Columns.platformId} = ?"].join(" and "),
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        "${Columns.platformId} = ?",
+      ]),
       whereArgs: [platform.id.toInt()],
     );
     if (records.isEmpty) {

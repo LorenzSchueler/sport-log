@@ -16,7 +16,7 @@ class DiaryTable extends TableAccessor<Diary> {
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
       Column.int(Columns.userId),
-      Column.text(Columns.date)..withDefault("datetime('now')"),
+      Column.text(Columns.date),
       Column.real(Columns.bodyweight)
         ..nullable()
         ..checkGt(0),
@@ -38,7 +38,7 @@ class DiaryTable extends TableAccessor<Diary> {
         fromFilter(from, dateOnly: true),
         untilFilter(from, dateOnly: true),
       ]),
-      orderBy: "$tableName.${Columns.date} DESC",
+      orderBy: orderByDate,
     );
     return records.map(serde.fromDbRecord).toList();
   }

@@ -31,7 +31,7 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
       Column.int(Columns.userId),
-      Column.text(Columns.datetime)..withDefault("DATETIME('now')"),
+      Column.text(Columns.datetime),
       Column.int(Columns.movementId)
         ..references(Tables.movement, onDelete: OnAction.cascade),
       Column.int(Columns.interval)
@@ -94,7 +94,10 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
   Future<List<StrengthSet>> getByStrengthSession(Int64 id) async {
     final result = await database.query(
       tableName,
-      where: '${Columns.strengthSessionId} = ? AND ${Columns.deleted} = 0',
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        '${Columns.strengthSessionId} = ?',
+      ]),
       whereArgs: [id.toInt()],
       orderBy: Columns.setNumber,
     );
