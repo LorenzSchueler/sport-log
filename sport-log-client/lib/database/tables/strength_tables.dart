@@ -82,23 +82,16 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
     ],
   );
 
-  Future<void> setSynchronizedByStrengthSession(Int64 id) async {
-    await database.update(
-      tableName,
-      TableAccessor.synchronized,
-      where: '${Columns.strengthSessionId} = ?',
-      whereArgs: [id.toInt()],
-    );
-  }
-
-  Future<List<StrengthSet>> getByStrengthSession(Int64 id) async {
+  Future<List<StrengthSet>> getByStrengthSession(
+    StrengthSession strengthSession,
+  ) async {
     final result = await database.query(
       tableName,
       where: TableAccessor.combineFilter([
         notDeleted,
         '${Columns.strengthSessionId} = ?',
       ]),
-      whereArgs: [id.toInt()],
+      whereArgs: [strengthSession.id.toInt()],
       orderBy: Columns.setNumber,
     );
     return result.map(serde.fromDbRecord).toList();
@@ -125,11 +118,6 @@ class StrengthSessionDescriptionTable {
   static const sumVolume = Columns.sumVolume;
   static const weight = Columns.weight;
 
-  static const strengthSession = Tables.strengthSession;
-  static const strengthSet = Tables.strengthSet;
-  static const movement = Tables.movement;
-  static const eorm = Tables.eorm;
-
   static StrengthSessionTable get _strengthSessionTable =>
       AppDatabase.strengthSessions;
 
@@ -142,25 +130,26 @@ class StrengthSessionDescriptionTable {
       SELECT
         ${_strengthSessionTable.table.allColumns},
         ${_movementTable.table.allColumns}
-      FROM $strengthSession
-        JOIN $movement ON $movement.$id = $strengthSession.$movementId
-      WHERE $strengthSession.$deleted = 0
-        AND $movement.$deleted = 0
-        AND $strengthSession.$id = ?;
+      FROM ${Tables.strengthSession}
+        JOIN ${Tables.movement} ON ${Tables.movement}.$id = ${Tables.strengthSession}.$movementId
+      WHERE ${Tables.strengthSession}.$deleted = 0
+        AND ${Tables.movement}.$deleted = 0
+        AND ${Tables.strengthSession}.$id = ?;
     ''',
       [idValue.toInt()],
     );
     if (records.isEmpty) {
       return null;
     }
+    final strengthSession = _strengthSessionTable.serde.fromDbRecord(
+      records.first,
+      prefix: _strengthSessionTable.table.prefix,
+    );
     return StrengthSessionDescription(
-      session: _strengthSessionTable.serde.fromDbRecord(
-        records.first,
-        prefix: _strengthSessionTable.table.prefix,
-      ),
+      session: strengthSession,
       movement: _movementTable.serde
           .fromDbRecord(records.first, prefix: _movementTable.table.prefix),
-      sets: await _strengthSetTable.getByStrengthSession(idValue),
+      sets: await _strengthSetTable.getByStrengthSession(strengthSession),
     );
   }
 
@@ -174,20 +163,20 @@ class StrengthSessionDescriptionTable {
       SELECT
         ${_strengthSessionTable.table.allColumns},
         ${_movementTable.table.allColumns}
-      FROM $strengthSession
-      JOIN $movement ON $movement.$id = $strengthSession.$movementId
+      FROM ${Tables.strengthSession}
+      JOIN ${Tables.movement} ON ${Tables.movement}.$id = ${Tables.strengthSession}.$movementId
       WHERE ${TableAccessor.combineFilter([
-            TableAccessor.notDeletedOfTable(movement),
-            TableAccessor.notDeletedOfTable(strengthSession),
-            TableAccessor.fromFilterOfTable(strengthSession, from),
-            TableAccessor.untilFilterOfTable(strengthSession, until),
+            TableAccessor.notDeletedOfTable(Tables.movement),
+            TableAccessor.notDeletedOfTable(Tables.strengthSession),
+            TableAccessor.fromFilterOfTable(Tables.strengthSession, from),
+            TableAccessor.untilFilterOfTable(Tables.strengthSession, until),
             TableAccessor.movementIdFilterOfTable(
-              strengthSession,
+              Tables.strengthSession,
               movementValue,
             ),
           ])}
-      GROUP BY ${TableAccessor.groupByIdOfTable(strengthSession)}
-      ORDER BY ${TableAccessor.orderByDatetimeOfTable(strengthSession)}
+      GROUP BY ${TableAccessor.groupByIdOfTable(Tables.strengthSession)}
+      ORDER BY ${TableAccessor.orderByDatetimeOfTable(Tables.strengthSession)}
       ;
     ''',
     );
@@ -198,7 +187,7 @@ class StrengthSessionDescriptionTable {
       strengthSessionDescriptions.add(
         StrengthSessionDescription(
           session: session,
-          sets: await _strengthSetTable.getByStrengthSession(session.id),
+          sets: await _strengthSetTable.getByStrengthSession(session),
           movement: _movementTable.serde
               .fromDbRecord(record, prefix: _movementTable.table.prefix),
         ),
@@ -217,14 +206,14 @@ class StrengthSessionDescriptionTable {
       '''
       SELECT
         ${_strengthSetTable.table.allColumns}
-      FROM $strengthSession
-        JOIN $strengthSet ON $strengthSet.$strengthSessionId = $strengthSession.$id
-      WHERE $strengthSet.$deleted = 0
-        AND $strengthSession.$deleted = 0
-        AND $strengthSession.$datetime >= ?
-        AND $strengthSession.$datetime < ?
-        AND $strengthSession.$movementId = ?
-      ORDER BY $strengthSession.$datetime, $strengthSession.$id, $strengthSet.$setNumber;
+      FROM ${Tables.strengthSession}
+        JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.$strengthSessionId = ${Tables.strengthSession}.$id
+      WHERE ${Tables.strengthSet}.$deleted = 0
+        AND ${Tables.strengthSession}.$deleted = 0
+        AND ${Tables.strengthSession}.$datetime >= ?
+        AND ${Tables.strengthSession}.$datetime < ?
+        AND ${Tables.strengthSession}.$movementId = ?
+      ORDER BY ${Tables.strengthSession}.$datetime, ${Tables.strengthSession}.$id, ${Tables.strengthSet}.$setNumber;
     ''',
       [start.toString(), end.toString(), movementIdValue.toInt()],
     );
@@ -242,23 +231,23 @@ class StrengthSessionDescriptionTable {
     final records = await AppDatabase.database!.rawQuery(
       '''
       SELECT
-        $strengthSession.$datetime AS [$datetime],
-        date($strengthSession.$datetime) AS [date],
-        COUNT($strengthSet.$id) AS $numSets,
-        MIN($strengthSet.$count) AS $minCount,
-        MAX($strengthSet.$count) AS $maxCount,
-        SUM($strengthSet.$count) AS $sumCount,
-        MAX($strengthSet.$weight) AS $maxWeight,
-        SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
-        MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
-      FROM $strengthSession
-        JOIN $strengthSet ON $strengthSet.$strengthSessionId = $strengthSession.$id
-        LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
-      WHERE $strengthSet.$deleted = 0
-        AND $strengthSession.$deleted = 0
-        AND $strengthSession.$movementId = ?
-        AND $strengthSession.$datetime >= ?
-        AND $strengthSession.$datetime < ?
+        ${Tables.strengthSession}.$datetime AS [$datetime],
+        date(${Tables.strengthSession}.$datetime) AS [date],
+        COUNT(${Tables.strengthSet}.$id) AS $numSets,
+        MIN(${Tables.strengthSet}.$count) AS $minCount,
+        MAX(${Tables.strengthSet}.$count) AS $maxCount,
+        SUM(${Tables.strengthSet}.$count) AS $sumCount,
+        MAX(${Tables.strengthSet}.$weight) AS $maxWeight,
+        SUM(${Tables.strengthSet}.$count * ${Tables.strengthSet}.$weight) AS $sumVolume,
+        MAX(${Tables.strengthSet}.$weight / $eormPercentage) AS $maxEorm
+      FROM ${Tables.strengthSession}
+        JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.$strengthSessionId = ${Tables.strengthSession}.$id
+        LEFT JOIN ${Tables.eorm} ON $eormReps = ${Tables.strengthSet}.$count
+      WHERE ${Tables.strengthSet}.$deleted = 0
+        AND ${Tables.strengthSession}.$deleted = 0
+        AND ${Tables.strengthSession}.$movementId = ?
+        AND ${Tables.strengthSession}.$datetime >= ?
+        AND ${Tables.strengthSession}.$datetime < ?
       GROUP BY [date]
       ORDER BY [date];
      ''',
@@ -280,23 +269,23 @@ class StrengthSessionDescriptionTable {
     final records = await AppDatabase.database!.rawQuery(
       '''
       SELECT
-        $strengthSession.$datetime AS [$datetime],
-        strftime('%W', $strengthSession.$datetime) AS week,
-        COUNT($strengthSet.$id) AS $numSets,
-        MIN($strengthSet.$count) AS $minCount,
-        MAX($strengthSet.$count) AS $maxCount,
-        SUM($strengthSet.$count) AS $sumCount,
-        MAX($strengthSet.$weight) AS $maxWeight,
-        SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
-        MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
-      FROM $strengthSession
-        JOIN $strengthSet ON $strengthSet.$strengthSessionId = $strengthSession.$id
-        LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
-      WHERE $strengthSet.$deleted = 0
-        AND $strengthSession.$deleted = 0
-        AND $strengthSession.$movementId = ?
-        AND $strengthSession.$datetime >= ?
-        AND $strengthSession.$datetime < ?
+        ${Tables.strengthSession}.$datetime AS [$datetime],
+        strftime('%W', ${Tables.strengthSession}.$datetime) AS week,
+        COUNT(${Tables.strengthSet}.$id) AS $numSets,
+        MIN(${Tables.strengthSet}.$count) AS $minCount,
+        MAX(${Tables.strengthSet}.$count) AS $maxCount,
+        SUM(${Tables.strengthSet}.$count) AS $sumCount,
+        MAX(${Tables.strengthSet}.$weight) AS $maxWeight,
+        SUM(${Tables.strengthSet}.$count * ${Tables.strengthSet}.$weight) AS $sumVolume,
+        MAX(${Tables.strengthSet}.$weight / $eormPercentage) AS $maxEorm
+      FROM ${Tables.strengthSession}
+        JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.$strengthSessionId = ${Tables.strengthSession}.$id
+        LEFT JOIN ${Tables.eorm} ON $eormReps = ${Tables.strengthSet}.$count
+      WHERE ${Tables.strengthSet}.$deleted = 0
+        AND ${Tables.strengthSession}.$deleted = 0
+        AND ${Tables.strengthSession}.$movementId = ?
+        AND ${Tables.strengthSession}.$datetime >= ?
+        AND ${Tables.strengthSession}.$datetime < ?
       GROUP BY week
       ORDER BY week;
     ''',
@@ -313,21 +302,21 @@ class StrengthSessionDescriptionTable {
     final records = await AppDatabase.database!.rawQuery(
       '''
       SELECT
-        $strengthSession.$datetime AS [$datetime],
-        strftime('%Y_%m', $strengthSession.$datetime) AS month,
-        COUNT($strengthSet.$id) AS $numSets,
-        MIN($strengthSet.$count) AS $minCount,
-        MAX($strengthSet.$count) AS $maxCount,
-        SUM($strengthSet.$count) AS $sumCount,
-        MAX($strengthSet.$weight) AS $maxWeight,
-        SUM($strengthSet.$count * $strengthSet.$weight) AS $sumVolume,
-        MAX($strengthSet.$weight / $eormPercentage) AS $maxEorm
-      FROM $strengthSession
-        JOIN $strengthSet ON $strengthSet.$strengthSessionId = $strengthSession.$id
-        LEFT JOIN $eorm ON $eormReps = $strengthSet.$count
-      WHERE $strengthSet.$deleted = 0
-        AND $strengthSession.$deleted = 0
-        AND $strengthSession.$movementId = ?
+        ${Tables.strengthSession}.$datetime AS [$datetime],
+        strftime('%Y_%m', ${Tables.strengthSession}.$datetime) AS month,
+        COUNT(${Tables.strengthSet}.$id) AS $numSets,
+        MIN(${Tables.strengthSet}.$count) AS $minCount,
+        MAX(${Tables.strengthSet}.$count) AS $maxCount,
+        SUM(${Tables.strengthSet}.$count) AS $sumCount,
+        MAX(${Tables.strengthSet}.$weight) AS $maxWeight,
+        SUM(${Tables.strengthSet}.$count * ${Tables.strengthSet}.$weight) AS $sumVolume,
+        MAX(${Tables.strengthSet}.$weight / $eormPercentage) AS $maxEorm
+      FROM ${Tables.strengthSession}
+        JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.$strengthSessionId = ${Tables.strengthSession}.$id
+        LEFT JOIN ${Tables.eorm} ON $eormReps = ${Tables.strengthSet}.$count
+      WHERE ${Tables.strengthSet}.$deleted = 0
+        AND ${Tables.strengthSession}.$deleted = 0
+        AND ${Tables.strengthSession}.$movementId = ?
       GROUP BY month
       ORDER BY month;
     ''',

@@ -40,8 +40,8 @@ class MetconMovementDataProvider extends EntityDataProvider<MetconMovement> {
   List<MetconMovement> getFromAccountData(AccountData accountData) =>
       accountData.metconMovements;
 
-  Future<List<MetconMovement>> getByMetcon(Int64 metconId) =>
-      db.getByMetcon(metconId);
+  Future<List<MetconMovement>> getByMetcon(Metcon metcon) =>
+      db.getByMetcon(metcon);
 }
 
 class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
@@ -59,7 +59,7 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
   List<MetconSession> getFromAccountData(AccountData accountData) =>
       accountData.metconSessions;
 
-  Future<bool> existsByMetcon(Int64 metconId) => db.existsByMetcon(metconId);
+  Future<bool> existsByMetcon(Metcon metcon) => db.existsByMetcon(metcon);
 
   Future<List<MetconSession>> getByTimerangeAndMetcon({
     Metcon? metcon,
@@ -113,7 +113,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     assert(object.isValid());
 
     final oldMMovements =
-        await _metconMovementDataProvider.getByMetcon(object.metcon.id);
+        await _metconMovementDataProvider.getByMetcon(object.metcon);
     final newMMovements = [...object.moves.map((m) => m.metconMovement)];
 
     final diffing = diff(oldMMovements, newMMovements);
@@ -183,8 +183,9 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     return await _metconMovementDataProvider.pullFromServer();
   }
 
-  Future<List<MetconMovementDescription>> _getMmdByMetcon(Int64 id) async {
-    final metconMovements = await _metconMovementDataProvider.getByMetcon(id);
+  Future<List<MetconMovementDescription>> _getMmdByMetcon(Metcon metcon) async {
+    final metconMovements =
+        await _metconMovementDataProvider.getByMetcon(metcon);
     return Future.wait(
       metconMovements
           .map(
@@ -204,16 +205,16 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     }
     return MetconDescription(
       metcon: metcon,
-      moves: await _getMmdByMetcon(metcon.id),
-      hasReference: await _metconSessionDataProvider.existsByMetcon(metcon.id),
+      moves: await _getMmdByMetcon(metcon),
+      hasReference: await _metconSessionDataProvider.existsByMetcon(metcon),
     );
   }
 
   Future<MetconDescription> getByMetcon(Metcon metcon) async {
     return MetconDescription(
       metcon: metcon,
-      moves: await _getMmdByMetcon(metcon.id),
-      hasReference: await _metconSessionDataProvider.existsByMetcon(metcon.id),
+      moves: await _getMmdByMetcon(metcon),
+      hasReference: await _metconSessionDataProvider.existsByMetcon(metcon),
     );
   }
 }

@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/models/all.dart';
@@ -51,6 +50,7 @@ class MetconTable extends TableAccessor<Metcon> {
       where: TableAccessor.combineFilter([
         notDeleted,
         nameFilter(byName),
+        cardioOnly ? "${Columns.cardio} = true" : ""
       ]),
       orderBy: orderByName,
     );
@@ -92,23 +92,23 @@ class MetconMovementTable extends TableAccessor<MetconMovement> {
     ],
   );
 
-  Future<void> setSynchronizedByMetcon(Int64 id) async {
+  Future<void> setSynchronizedByMetcon(Metcon metcon) async {
     await database.update(
       tableName,
       TableAccessor.synchronized,
       where: '${Columns.metconId} = ?',
-      whereArgs: [id.toInt()],
+      whereArgs: [metcon.id.toInt()],
     );
   }
 
-  Future<List<MetconMovement>> getByMetcon(Int64 id) async {
+  Future<List<MetconMovement>> getByMetcon(Metcon metcon) async {
     final result = await database.query(
       tableName,
       where: TableAccessor.combineFilter([
         notDeleted,
         '${Columns.metconId} = ?',
       ]),
-      whereArgs: [id.toInt()],
+      whereArgs: [metcon.id.toInt()],
       orderBy: Columns.movementNumber,
     );
     return result.map(serde.fromDbRecord).toList();
@@ -149,10 +149,10 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
     ],
   );
 
-  Future<bool> existsByMetcon(Int64 id) async {
+  Future<bool> existsByMetcon(Metcon metcon) async {
     return (await database.rawQuery(
       '''select 1 from $tableName
-            where ${Columns.metconId} = ${id.toInt()}
+            where ${Columns.metconId} = ${metcon.id.toInt()}
               and ${Columns.deleted} = 0''',
     ))
         .isNotEmpty;

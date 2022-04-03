@@ -41,8 +41,10 @@ class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
   List<StrengthSet> getFromAccountData(AccountData accountData) =>
       accountData.strengthSets;
 
-  Future<List<StrengthSet>> getByStrengthSession(Int64 strengthSessionId) =>
-      db.getByStrengthSession(strengthSessionId);
+  Future<List<StrengthSet>> getByStrengthSession(
+    StrengthSession strengthSession,
+  ) =>
+      db.getByStrengthSession(strengthSession);
 }
 
 class StrengthSessionDescriptionDataProvider
@@ -85,7 +87,7 @@ class StrengthSessionDescriptionDataProvider
     assert(object.isValid());
 
     final oldSets =
-        await _strengthSetDataProvider.getByStrengthSession(object.session.id);
+        await _strengthSetDataProvider.getByStrengthSession(object.session);
     final newSets = [...object.sets];
     final diffing = diff(oldSets, newSets);
 
@@ -134,8 +136,8 @@ class StrengthSessionDescriptionDataProvider
               session: session,
               movement:
                   (await _movementDataProvider.getById(session.movementId))!,
-              sets: await _strengthSetDataProvider
-                  .getByStrengthSession(session.id),
+              sets:
+                  await _strengthSetDataProvider.getByStrengthSession(session),
             ),
           )
           .toList(),
