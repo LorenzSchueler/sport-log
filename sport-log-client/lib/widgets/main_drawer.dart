@@ -21,7 +21,7 @@ class MainDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: Column(
+      child: ListView(
         children: [
           UserAccountsDrawerHeader(
             accountName: Text(Settings.username!),
@@ -92,7 +92,6 @@ class MainDrawer extends StatelessWidget {
             onTap: () => Nav.newBase(context, Routes.action.platformOverview),
             selected: selectedRoute == Routes.action.platformOverview,
           ),
-          const Spacer(),
           ListTile(
             leading: Icon(
               AppIcons.settings,

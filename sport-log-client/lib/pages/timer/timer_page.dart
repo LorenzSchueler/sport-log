@@ -79,62 +79,56 @@ class TimerPageState extends State<TimerPage> {
           padding: Defaults.edgeInsets.normal,
           child: TabBarView(
             children: [
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _timeFormField(MetconType.amrap),
-                    Defaults.sizedBox.vertical.huge,
-                    _startStopButton(MetconType.amrap),
-                    const SizedBox(
-                      height: 100,
-                    ),
-                    _timeText(MetconType.amrap),
-                  ],
-                ),
+              Column(
+                children: [
+                  _timeFormField(MetconType.amrap),
+                  Defaults.sizedBox.vertical.huge,
+                  _startStopButton(MetconType.amrap),
+                  const SizedBox(
+                    height: 100,
+                  ),
+                  _timeText(MetconType.amrap),
+                ],
               ),
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _timeFormField(MetconType.emom),
-                    TextFormField(
-                      keyboardType: TextInputType.number,
-                      onChanged: (rounds) {
-                        if (Validator.validateIntGtZero(rounds) == null) {
-                          setState(() => _totalRounds = int.parse(rounds));
-                        }
-                      },
-                      style: const TextStyle(height: 1),
-                      initialValue: _totalRounds.toString(),
-                      validator: Validator.validateIntGtZero,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      decoration: const InputDecoration(
-                        icon: Icon(AppIcons.repeat),
-                        labelText: "Rounds",
-                        contentPadding: EdgeInsets.symmetric(vertical: 5),
-                      ),
+              Column(
+                children: [
+                  _timeFormField(MetconType.emom),
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    onChanged: (rounds) {
+                      if (Validator.validateIntGtZero(rounds) == null) {
+                        setState(() => _totalRounds = int.parse(rounds));
+                      }
+                    },
+                    style: const TextStyle(height: 1),
+                    initialValue: _totalRounds.toString(),
+                    validator: Validator.validateIntGtZero,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: const InputDecoration(
+                      icon: Icon(AppIcons.repeat),
+                      labelText: "Rounds",
+                      contentPadding: EdgeInsets.symmetric(vertical: 5),
                     ),
-                    Defaults.sizedBox.vertical.huge,
-                    _startStopButton(MetconType.emom),
-                    const SizedBox(
-                      height: 100,
-                    ),
-                    _roundText(),
-                    _timeText(MetconType.emom),
-                  ],
-                ),
+                  ),
+                  Defaults.sizedBox.vertical.huge,
+                  _startStopButton(MetconType.emom),
+                  const SizedBox(
+                    height: 100,
+                  ),
+                  _roundText(),
+                  _timeText(MetconType.emom),
+                ],
               ),
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _timeFormField(MetconType.forTime),
-                    Defaults.sizedBox.vertical.huge,
-                    _startStopButton(MetconType.forTime),
-                    const SizedBox(
-                      height: 100,
-                    ),
-                    _timeText(MetconType.forTime),
-                  ],
-                ),
+              Column(
+                children: [
+                  _timeFormField(MetconType.forTime),
+                  Defaults.sizedBox.vertical.huge,
+                  _startStopButton(MetconType.forTime),
+                  const SizedBox(
+                    height: 100,
+                  ),
+                  _timeText(MetconType.forTime),
+                ],
               ),
             ],
           ),

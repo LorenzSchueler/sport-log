@@ -16,9 +16,7 @@ import 'package:provider/provider.dart';
 
 Stream<double> initialize() async* {
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemChrome.setPreferredOrientations(
-    [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown],
-  );
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   if (Config.isTest) {
     dotenv.testLoad(fileInput: File("./.env").readAsStringSync());
   } else {
