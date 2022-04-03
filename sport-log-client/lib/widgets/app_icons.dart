@@ -76,4 +76,5 @@ class AppIcons {
   static const IconData car = Icons.directions_car_rounded;
   static const IconData satellite = Icons.satellite_rounded;
   static const IconData location = Icons.location_on;
+  static const IconData battery = Icons.battery_std_rounded;
 }

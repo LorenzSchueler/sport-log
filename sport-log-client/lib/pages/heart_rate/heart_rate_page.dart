@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:polar/polar.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
+import 'package:sport_log/helpers/snackbar.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 class HeartRatePage extends StatefulWidget {
@@ -18,6 +19,7 @@ class _HeartRatePageState extends State<HeartRatePage> {
   String? _heartRateMonitorId;
   HeartRateUtils? _heartRateUtils;
   int? _hr;
+  int? _battery;
 
   @override
   void dispose() {
@@ -39,11 +41,12 @@ class _HeartRatePageState extends State<HeartRatePage> {
                 onPressed: _isSearchingHRMonitor
                     ? null
                     : () async {
-                        _heartRateUtils?.startHeartRateStream();
+                        _heartRateUtils?.stopHeartRateStream();
                         setState(() {
                           _heartRateUtils = null;
                           _heartRateMonitorId = null;
                           _hr = null;
+                          _battery = null;
                           _devices = null;
                           _isSearchingHRMonitor = true;
                         });
@@ -52,13 +55,16 @@ class _HeartRatePageState extends State<HeartRatePage> {
                           _devices = devices;
                           _isSearchingHRMonitor = false;
                         });
+                        if (devices == null || devices.isEmpty) {
+                          showSimpleToast(context, "no devices found");
+                        }
                       },
                 child: Text(
                   _isSearchingHRMonitor ? "seaching..." : "search devices",
                 ),
               ),
               Defaults.sizedBox.vertical.normal,
-              if (_devices != null) ...[
+              if (_devices != null && _heartRateUtils == null) ...[
                 const Text(
                   "Heart Rate Monitors",
                 ),
@@ -86,16 +92,21 @@ class _HeartRatePageState extends State<HeartRatePage> {
                 ),
               ],
               Defaults.sizedBox.vertical.normal,
-              if (_heartRateMonitorId != null)
+              if (_heartRateMonitorId != null && _heartRateUtils == null)
                 ElevatedButton(
-                  onPressed: () async {
-                    _heartRateUtils = HeartRateUtils(
-                      _heartRateMonitorId!,
-                      _onHeartRateUpdate,
-                    );
+                  onPressed: () {
+                    setState(() {
+                      _heartRateUtils = HeartRateUtils(
+                        deviceId: _heartRateMonitorId!,
+                        onHeartRateEvent: (event) =>
+                            setState(() => _hr = event.data.hr),
+                        onBatteryEvent: (event) =>
+                            setState(() => _battery = event.level),
+                      );
+                    });
                     _heartRateUtils?.startHeartRateStream();
                   },
-                  child: const Text("select"),
+                  child: const Text("connect"),
                 ),
               Defaults.sizedBox.vertical.huge,
               if (_hr != null) ...[
@@ -107,15 +118,22 @@ class _HeartRatePageState extends State<HeartRatePage> {
                   "$_hr",
                   style: const TextStyle(fontSize: 120),
                 ),
-              ]
+              ],
+              if (_battery != null)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(AppIcons.battery),
+                    Text(
+                      "$_battery%",
+                      style: const TextStyle(fontSize: 24),
+                    ),
+                  ],
+                )
             ],
           ),
         ),
       ),
     );
-  }
-
-  void _onHeartRateUpdate(PolarHeartRateEvent event) {
-    setState(() => _hr = event.data.hr);
   }
 }

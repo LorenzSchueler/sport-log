@@ -87,8 +87,10 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     _locationUtils = LocationUtils(_onLocationUpdate);
     _startStepCountStream();
     if (widget.heartRateMonitorId != null) {
-      _heartRateUtils =
-          HeartRateUtils(widget.heartRateMonitorId!, _onHeartRateUpdate);
+      _heartRateUtils = HeartRateUtils(
+        deviceId: widget.heartRateMonitorId!,
+        onHeartRateEvent: _onHeartRateUpdate,
+      );
       _heartRateUtils?.startHeartRateStream();
     }
     _timer =

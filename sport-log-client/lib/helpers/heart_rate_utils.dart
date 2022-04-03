@@ -11,11 +11,17 @@ class HeartRateUtils {
   static final _polar = Polar();
   static final FlutterBlue _flutterBlue = FlutterBlue.instance;
 
-  final String _deviceId;
-  final void Function(PolarHeartRateEvent) _onHeartRateEvent;
+  final String deviceId;
+  final void Function(PolarHeartRateEvent) onHeartRateEvent;
+  final void Function(PolarBatteryLevelEvent)? onBatteryEvent;
   StreamSubscription? _heartRateSubscription;
+  StreamSubscription? _batterySubscription;
 
-  HeartRateUtils(this._deviceId, this._onHeartRateEvent);
+  HeartRateUtils({
+    required this.deviceId,
+    required this.onHeartRateEvent,
+    this.onBatteryEvent,
+  });
 
   static Future<Map<String, String>?> searchDevices() async {
     while (!await _flutterBlue.isOn) {
@@ -60,14 +66,18 @@ class HeartRateUtils {
 
   void startHeartRateStream() {
     if (_heartRateSubscription == null) {
-      _heartRateSubscription = _polar.heartRateStream.listen(_onHeartRateEvent);
-      _polar.connectToDevice(_deviceId);
+      _heartRateSubscription = _polar.heartRateStream.listen(onHeartRateEvent);
+      if (onBatteryEvent != null) {
+        _batterySubscription = _polar.batteryLevelStream.listen(onBatteryEvent);
+      }
+      _polar.connectToDevice(deviceId);
     }
   }
 
   void stopHeartRateStream() {
     _heartRateSubscription?.cancel();
-    _polar.disconnectFromDevice(_deviceId);
+    _batterySubscription?.cancel();
+    _polar.disconnectFromDevice(deviceId);
   }
 
   bool get enabled => _heartRateSubscription != null;

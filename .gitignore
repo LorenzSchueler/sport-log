@@ -6,3 +6,4 @@
 /sport-log-server/sport-log-server.toml
 .env
 geckodriver
+upgrade.sh
