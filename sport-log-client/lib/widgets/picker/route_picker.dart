@@ -8,6 +8,7 @@ Future<Route?> showRoutePicker({
 }) async {
   final _dataProvider = RouteDataProvider();
   final _routes = await _dataProvider.getNonDeleted();
+
   return showDialog<Route>(
     builder: (_) => RoutePickerDialog(_routes),
     barrierDismissible: dismissable,
@@ -22,30 +23,20 @@ class RoutePickerDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(clipBehavior: Clip.antiAlias, child: _routeList);
-  }
-
-  Widget get _routeList {
-    if (_routes.isEmpty) {
-      return const Center(child: Text('No routes here.'));
-    }
-    return Scrollbar(
-      child: ListView.separated(
-        itemBuilder: _routeBuilder,
-        separatorBuilder: (_, __) => const Divider(height: 1),
-        itemCount: _routes.length,
-      ),
-    );
-  }
-
-  Widget _routeBuilder(BuildContext context, int index) {
-    final route = _routes[index];
-
-    return ListTile(
-      title: Text(route.name),
-      onTap: () {
-        Navigator.pop(context, route);
-      },
+    return Dialog(
+      clipBehavior: Clip.antiAlias,
+      child: _routes.isEmpty
+          ? const Center(child: Text('No routes here.'))
+          : Scrollbar(
+              child: ListView.separated(
+                itemBuilder: (context, index) => ListTile(
+                  title: Text(_routes[index].name),
+                  onTap: () => Navigator.pop(context, _routes[index]),
+                ),
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemCount: _routes.length,
+              ),
+            ),
     );
   }
 }

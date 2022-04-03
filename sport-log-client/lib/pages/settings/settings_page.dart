@@ -214,14 +214,11 @@ class SettingsPageState extends State<SettingsPage> {
                   child: DropdownButton(
                     value: Settings.units,
                     items: [
-                      DropdownMenuItem(
-                        value: Units.metric,
-                        child: Text(Units.metric.name),
-                      ),
-                      DropdownMenuItem(
-                        value: Units.imperial,
-                        child: Text(Units.imperial.name),
-                      )
+                      for (final unit in Units.values)
+                        DropdownMenuItem(
+                          value: unit,
+                          child: Text(unit.name),
+                        ),
                     ],
                     underline: null,
                     onChanged: (units) {

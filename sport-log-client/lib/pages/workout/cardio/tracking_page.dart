@@ -282,6 +282,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
     );
   }
 
+  // ignore: long-method
   List<Widget> _buildButtons() {
     switch (_trackingMode) {
       case TrackingMode.tracking:

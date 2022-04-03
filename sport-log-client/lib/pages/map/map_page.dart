@@ -57,9 +57,7 @@ class MapPageState extends State<MapPage> {
 
     final metersPerPixel =
         await _mapController.getMetersPerPixelAtLatitude(latitude);
-    if (((_metersPerPixel / metersPerPixel) - 1).abs() > 0.05) {
-      setState(() => _metersPerPixel = metersPerPixel);
-    }
+    setState(() => _metersPerPixel = metersPerPixel);
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {

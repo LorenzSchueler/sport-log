@@ -69,7 +69,7 @@ dart_code_metrics:
     - test/**
     - "**/*.g.dart"
   rules:
-    - avoid-returning-widgets
+    # - avoid-returning-widgets
     - always-remove-listener
     # - avoid-non-null-assertion
     - avoid-throw-in-catch-block

@@ -195,12 +195,7 @@ class _EditMovementPageState extends State<EditMovementPage> {
     return SelectionBar<MovementDimension>(
       onChange: (dim) =>
           setState(() => _movementDescription.movement.dimension = dim),
-      items: const [
-        MovementDimension.reps,
-        MovementDimension.time,
-        MovementDimension.distance,
-        MovementDimension.energy
-      ],
+      items: MovementDimension.values,
       getLabel: (dim) => dim.displayName,
       selectedItem: _movementDescription.movement.dimension,
     );
