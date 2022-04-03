@@ -129,7 +129,7 @@ class MovementDescriptionTable {
   }) async {
     const hasReference = 'has_reference';
     final nameFilter = byName != null ? 'AND $name LIKE ?' : '';
-    final cardioFilter = cardioOnly == true ? 'AND cardio = true' : '';
+    final cardioFilter = cardioOnly ? 'AND cardio = true' : '';
     final records = await AppDatabase.database!.rawQuery(
       '''
     SELECT

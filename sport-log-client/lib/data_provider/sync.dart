@@ -40,7 +40,7 @@ class Sync extends ChangeNotifier {
       _logger.i("sync disabled.");
       return;
     }
-    if (_isSyncing == true) {
+    if (_isSyncing) {
       _logger.d('Sync job already running.');
       return;
     }

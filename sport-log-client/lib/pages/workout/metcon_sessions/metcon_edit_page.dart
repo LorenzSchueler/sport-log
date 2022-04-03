@@ -117,11 +117,11 @@ class _EditMetconPageState extends State<EditMetconPage> {
             child: ListView(
               children: [
                 _nameInput(context),
-                _maybeDescriptionInput(context),
+                _maybeDescriptionInput(),
                 _typeInput(context),
-                _additionalFieldsInput(context),
+                _additionalFieldsInput(),
                 const Divider(thickness: 2),
-                _metconMovementsList(context),
+                _metconMovementsList(),
                 _addMetconMovementButton(context),
               ],
             ),
@@ -189,22 +189,22 @@ class _EditMetconPageState extends State<EditMetconPage> {
     });
   }
 
-  Widget _additionalFieldsInput(BuildContext context) {
+  Widget _additionalFieldsInput() {
     switch (_metconDescription.metcon.metconType) {
       case MetconType.amrap:
-        return _amrapInputs(context);
+        return _amrapInputs();
       case MetconType.emom:
-        return _emomInputs(context);
+        return _emomInputs();
       case MetconType.forTime:
-        return _forTimeInputs(context);
+        return _forTimeInputs();
     }
   }
 
-  Widget _amrapInputs(BuildContext context) {
+  Widget _amrapInputs() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _timecapInput(context),
+        _timecapInput(),
         Text(
           plural(
                 "min",
@@ -217,13 +217,13 @@ class _EditMetconPageState extends State<EditMetconPage> {
     );
   }
 
-  Widget _emomInputs(BuildContext context) {
+  Widget _emomInputs() {
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _roundsInput(context),
+            _roundsInput(),
             Text(
               plural(
                 "round",
@@ -237,7 +237,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text("in"),
-            _timecapInput(context),
+            _timecapInput(),
             Text(
               plural(
                 "min",
@@ -251,13 +251,13 @@ class _EditMetconPageState extends State<EditMetconPage> {
     );
   }
 
-  Widget _forTimeInputs(BuildContext context) {
+  Widget _forTimeInputs() {
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _roundsInput(context),
+            _roundsInput(),
             Text(
               plural(
                 "round",
@@ -267,12 +267,12 @@ class _EditMetconPageState extends State<EditMetconPage> {
             ),
           ],
         ),
-        _maybeTimecapInput(context),
+        _maybeTimecapInput(),
       ],
     );
   }
 
-  Widget _descriptionInput(BuildContext context) {
+  Widget _descriptionInput() {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: TextFormField(
@@ -296,22 +296,20 @@ class _EditMetconPageState extends State<EditMetconPage> {
     );
   }
 
-  Widget _maybeDescriptionInput(BuildContext context) {
-    if (_metconDescription.metcon.description == null) {
-      return ActionChip(
-        avatar: const Icon(AppIcons.add),
-        label: const Text("Add description"),
-        onPressed: () {
-          setState(() => _metconDescription.metcon.description = "");
-          _descriptionFocusNode.requestFocus();
-        },
-      );
-    } else {
-      return _descriptionInput(context);
-    }
+  Widget _maybeDescriptionInput() {
+    return _metconDescription.metcon.description == null
+        ? ActionChip(
+            avatar: const Icon(AppIcons.add),
+            label: const Text("Add description"),
+            onPressed: () {
+              setState(() => _metconDescription.metcon.description = "");
+              _descriptionFocusNode.requestFocus();
+            },
+          )
+        : _descriptionInput();
   }
 
-  Widget _roundsInput(BuildContext context) {
+  Widget _roundsInput() {
     return IntInput(
       initialValue:
           _metconDescription.metcon.rounds ?? Metcon.roundsDefaultValue,
@@ -322,7 +320,7 @@ class _EditMetconPageState extends State<EditMetconPage> {
     );
   }
 
-  Widget _timecapInput(BuildContext context) {
+  Widget _timecapInput() {
     return IntInput(
       initialValue: (_metconDescription.metcon.timecap ??=
               Metcon.timecapDefaultValue)
@@ -336,51 +334,48 @@ class _EditMetconPageState extends State<EditMetconPage> {
     );
   }
 
-  Widget _maybeTimecapInput(BuildContext context) {
-    if (_metconDescription.metcon.timecap == null) {
-      return ActionChip(
-        avatar: const Icon(AppIcons.add),
-        label: const Text("Add timecap"),
-        onPressed: () {
-          FocusManager.instance.primaryFocus?.unfocus();
-          setState(
-            () =>
-                _metconDescription.metcon.timecap = Metcon.timecapDefaultValue,
-          );
-        },
-      );
-    } else {
-      // _metcon.timecap != null
-      return Stack(
-        alignment: Alignment.centerRight,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text("timecap"),
-              _timecapInput(context),
-              Text(
-                plural(
-                  "minute",
-                  "minutes",
-                  _metconDescription.metcon.timecap!.inMinutes,
-                ),
-              ),
-            ],
-          ),
-          IconButton(
-            icon: const Icon(AppIcons.close),
+  Widget _maybeTimecapInput() {
+    return _metconDescription.metcon.timecap == null
+        ? ActionChip(
+            avatar: const Icon(AppIcons.add),
+            label: const Text("Add timecap"),
             onPressed: () {
               FocusManager.instance.primaryFocus?.unfocus();
-              setState(() => _metconDescription.metcon.timecap = null);
+              setState(
+                () => _metconDescription.metcon.timecap =
+                    Metcon.timecapDefaultValue,
+              );
             },
-          ),
-        ],
-      );
-    }
+          )
+        : Stack(
+            alignment: Alignment.centerRight,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("timecap"),
+                  _timecapInput(),
+                  Text(
+                    plural(
+                      "minute",
+                      "minutes",
+                      _metconDescription.metcon.timecap!.inMinutes,
+                    ),
+                  )
+                ],
+              ),
+              IconButton(
+                icon: const Icon(AppIcons.close),
+                onPressed: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  setState(() => _metconDescription.metcon.timecap = null);
+                },
+              )
+            ],
+          );
   }
 
-  Widget _metconMovementsList(BuildContext context) {
+  Widget _metconMovementsList() {
     return ReorderableListView.builder(
       buildDefaultDragHandles: false,
       physics: const NeverScrollableScrollPhysics(),

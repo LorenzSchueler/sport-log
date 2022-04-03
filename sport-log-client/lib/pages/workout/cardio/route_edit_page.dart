@@ -200,46 +200,38 @@ class RouteEditPageState extends State<RouteEditPage> {
     await _updateLine();
   }
 
+  Widget _buildDragTarget(int index) {
+    return DragTarget(
+      onWillAccept: (value) => true,
+      onAccept: (value) => _switchPoints(value as int, index),
+      builder: (context, candidates, reject) {
+        if (candidates.isNotEmpty) {
+          int index = candidates[0] as int;
+          return ListTile(
+            leading: Container(
+              margin: const EdgeInsets.only(left: 12),
+              child: const Icon(AppIcons.add),
+            ),
+            title: Text(
+              "${index + 1}",
+              style: const TextStyle(fontSize: 20),
+            ),
+            dense: true,
+          );
+        } else {
+          return const Divider();
+        }
+      },
+    );
+  }
+
   Widget _buildDraggableList() {
     List<Widget> listElements = [];
-
-    Widget _buildDragTarget(int index) {
-      return DragTarget(
-        onWillAccept: (value) => true,
-        onAccept: (value) => _switchPoints(value as int, index),
-        builder: (context, candidates, reject) {
-          if (candidates.isNotEmpty) {
-            int index = candidates[0] as int;
-            return ListTile(
-              leading: Container(
-                margin: const EdgeInsets.only(left: 12),
-                child: const Icon(
-                  AppIcons.add,
-                ),
-              ),
-              title: Text(
-                "${index + 1}",
-                style: const TextStyle(fontSize: 20),
-              ),
-              dense: true,
-            );
-          } else {
-            return const Divider();
-          }
-        },
-      );
-    }
 
     for (int index = 0; index < _route.markedPositions!.length; index++) {
       listElements.add(_buildDragTarget(index));
 
-      var icon = const Icon(
-        AppIcons.dragHandle,
-      );
-      Text title = Text(
-        "${index + 1}",
-        style: const TextStyle(fontSize: 20),
-      );
+      var icon = const Icon(AppIcons.dragHandle);
       listElements.add(
         ListTile(
           leading: IconButton(
@@ -256,7 +248,10 @@ class RouteEditPageState extends State<RouteEditPage> {
             ),
             feedback: icon,
           ),
-          title: title,
+          title: Text(
+            "${index + 1}",
+            style: const TextStyle(fontSize: 20),
+          ),
           dense: true,
         ),
       );
@@ -268,39 +263,35 @@ class RouteEditPageState extends State<RouteEditPage> {
   }
 
   Widget _buildExpandableListContainer() {
-    if (_listExpanded) {
-      return Container(
-        padding: Defaults.edgeInsets.normal,
-        height: 350,
-        child: Column(
-          children: [
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => setState(() {
-                  _listExpanded = false;
-                }),
-                child: const Text("hide List"),
-              ),
+    return _listExpanded
+        ? Container(
+            padding: Defaults.edgeInsets.normal,
+            height: 350,
+            child: Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => setState(() {
+                      _listExpanded = false;
+                    }),
+                    child: const Text("hide List"),
+                  ),
+                ),
+                Expanded(child: _buildDraggableList())
+              ],
             ),
-            Expanded(
-              child: _buildDraggableList(),
+          )
+        : Container(
+            width: double.infinity,
+            padding: Defaults.edgeInsets.normal,
+            child: ElevatedButton(
+              onPressed: () => setState(() {
+                _listExpanded = true;
+              }),
+              child: const Text("show List"),
             ),
-          ],
-        ),
-      );
-    } else {
-      return Container(
-        width: double.infinity,
-        padding: Defaults.edgeInsets.normal,
-        child: ElevatedButton(
-          onPressed: () => setState(() {
-            _listExpanded = true;
-          }),
-          child: const Text("show List"),
-        ),
-      );
-    }
+          );
   }
 
   @override

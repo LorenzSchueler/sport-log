@@ -35,6 +35,7 @@ class Validator {
   }
 
   static String? validatePassword(String? password) {
+    // ignore: prefer-conditional-expressions
     if (password == null || password.isEmpty) {
       return "Password must not be empty.";
     } else {
@@ -68,6 +69,7 @@ class Validator {
       validateIntGeZeroLtValue(value, 60);
 
   static String? validateStringNotEmpty(String? value) {
+    // ignore: prefer-conditional-expressions
     if (value == null || value.isEmpty) {
       return "Field must not be empty.";
     } else {

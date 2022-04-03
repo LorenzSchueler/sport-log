@@ -120,10 +120,12 @@ class DbRouteSerializer extends DbSerializer<Route> {
       distance: r[prefix + Columns.distance]! as int,
       ascent: r[prefix + Columns.ascent] as int?,
       descent: r[prefix + Columns.descent] as int?,
-      track: const DbPositionListConverter()
-          .mapToDart(r[prefix + Columns.track] as Uint8List?),
-      markedPositions: const DbPositionListConverter()
-          .mapToDart(r[prefix + Columns.markedPositions] as Uint8List?),
+      track: DbPositionListConverter.mapToDart(
+        r[prefix + Columns.track] as Uint8List?,
+      ),
+      markedPositions: DbPositionListConverter.mapToDart(
+        r[prefix + Columns.markedPositions] as Uint8List?,
+      ),
       deleted: r[prefix + Columns.deleted] == 1,
     );
   }
@@ -137,9 +139,9 @@ class DbRouteSerializer extends DbSerializer<Route> {
       Columns.distance: o.distance,
       Columns.ascent: o.ascent,
       Columns.descent: o.descent,
-      Columns.track: const DbPositionListConverter().mapToSql(o.track),
+      Columns.track: DbPositionListConverter.mapToSql(o.track),
       Columns.markedPositions:
-          const DbPositionListConverter().mapToSql(o.markedPositions),
+          DbPositionListConverter.mapToSql(o.markedPositions),
       Columns.deleted: o.deleted ? 1 : 0,
     };
   }

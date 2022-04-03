@@ -23,17 +23,17 @@ class ValueUnitDescription extends StatelessWidget {
         children: [
           TextSpan(
             text: unit == null ? value : "$value ",
-            style: TextStyle(fontSize: 20 * scale),
+            style: TextStyle(fontSize: scale * 20),
           ),
           if (unit != null)
             TextSpan(
               text: unit,
-              style: TextStyle(fontSize: 14 * scale),
+              style: TextStyle(fontSize: scale * 14),
             ),
           if (description != null)
             TextSpan(
               text: "\n$description",
-              style: TextStyle(fontSize: 12 * scale),
+              style: TextStyle(fontSize: scale * 12),
             ),
         ],
       ),

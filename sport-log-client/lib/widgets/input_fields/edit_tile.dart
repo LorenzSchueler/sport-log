@@ -69,13 +69,6 @@ class EditTile extends StatelessWidget {
       ],
     );
 
-    if (onTap == null) {
-      return widget;
-    } else {
-      return InkWell(
-        onTap: onTap,
-        child: widget,
-      );
-    }
+    return onTap == null ? widget : InkWell(onTap: onTap, child: widget);
   }
 }

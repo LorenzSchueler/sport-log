@@ -175,8 +175,7 @@ class TimelinePageState extends State<TimelinePage> {
             : Container(
                 padding: Defaults.edgeInsets.normal,
                 child: ListView.separated(
-                  itemBuilder: (context, index) =>
-                      _itemCard(context, _items[index]),
+                  itemBuilder: (context, index) => _itemCard(_items[index]),
                   separatorBuilder: (_, __) =>
                       Defaults.sizedBox.vertical.normal,
                   itemCount: _items.length,
@@ -192,7 +191,7 @@ class TimelinePageState extends State<TimelinePage> {
     );
   }
 
-  Widget _itemCard(BuildContext context, TimelineUnion item) {
+  Widget _itemCard(TimelineUnion item) {
     return item.map(
       (strengthSession) =>
           StrengthSessionCard(strengthSessionDescription: strengthSession),

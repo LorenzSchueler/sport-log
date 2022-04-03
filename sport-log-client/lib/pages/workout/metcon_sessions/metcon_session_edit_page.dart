@@ -73,9 +73,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
     Navigator.pop(
       context,
       ReturnObject(
-        action: widget.metconSessionDescription != null
-            ? ReturnAction.deleted
-            : ReturnAction.deleted,
+        action: ReturnAction.deleted,
         payload: _metconSessionDescription,
       ), // needed for return to details page
     );

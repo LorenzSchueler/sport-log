@@ -112,20 +112,15 @@ class CardioSession extends AtomicEntity {
   }
 
   void setAvgCadence() {
-    if (time != null && time!.inSeconds > 0 && cadence != null) {
-      avgCadence = (cadence!.length / (time!.inMilliseconds / 60000)).round();
-    } else {
-      avgCadence = null;
-    }
+    avgCadence = time != null && time!.inSeconds > 0 && cadence != null
+        ? (cadence!.length / (time!.inMilliseconds / 60000)).round()
+        : null;
   }
 
   void setAvgHeartRate() {
-    if (time != null && time!.inSeconds > 0 && heartRate != null) {
-      avgHeartRate =
-          (heartRate!.length / (time!.inMilliseconds / 60000)).round();
-    } else {
-      avgHeartRate = null;
-    }
+    avgHeartRate = time != null && time!.inSeconds > 0 && heartRate != null
+        ? (heartRate!.length / (time!.inMilliseconds / 60000)).round()
+        : null;
   }
 
   factory CardioSession.fromJson(Map<String, dynamic> json) =>
@@ -275,14 +270,17 @@ class DbCardioSessionSerializer extends DbSerializer<CardioSession> {
           ? null
           : Duration(milliseconds: r[prefix + Columns.time]! as int),
       calories: r[prefix + Columns.calories] as int?,
-      track: const DbPositionListConverter()
-          .mapToDart(r[prefix + Columns.track] as Uint8List?),
+      track: DbPositionListConverter.mapToDart(
+        r[prefix + Columns.track] as Uint8List?,
+      ),
       avgCadence: r[prefix + Columns.avgCadence] as int?,
-      cadence: const DbDurationListConverter()
-          .mapToDart(r[prefix + Columns.cadence] as Uint8List?),
+      cadence: DbDurationListConverter.mapToDart(
+        r[prefix + Columns.cadence] as Uint8List?,
+      ),
       avgHeartRate: r[prefix + Columns.avgHeartRate] as int?,
-      heartRate: const DbDurationListConverter()
-          .mapToDart(r[prefix + Columns.heartRate] as Uint8List?),
+      heartRate: DbDurationListConverter.mapToDart(
+        r[prefix + Columns.heartRate] as Uint8List?,
+      ),
       routeId: r[prefix + Columns.routeId] == null
           ? null
           : Int64(r[prefix + Columns.routeId]! as int),
@@ -304,11 +302,11 @@ class DbCardioSessionSerializer extends DbSerializer<CardioSession> {
       Columns.descent: o.descent,
       Columns.time: o.time?.inMilliseconds,
       Columns.calories: o.calories,
-      Columns.track: const DbPositionListConverter().mapToSql(o.track),
+      Columns.track: DbPositionListConverter.mapToSql(o.track),
       Columns.avgCadence: o.avgCadence,
-      Columns.cadence: const DbDurationListConverter().mapToSql(o.cadence),
+      Columns.cadence: DbDurationListConverter.mapToSql(o.cadence),
       Columns.avgHeartRate: o.avgHeartRate,
-      Columns.heartRate: const DbDurationListConverter().mapToSql(o.heartRate),
+      Columns.heartRate: DbDurationListConverter.mapToSql(o.heartRate),
       Columns.routeId: o.routeId?.toInt(),
       Columns.comments: o.comments,
       Columns.deleted: o.deleted ? 1 : 0,

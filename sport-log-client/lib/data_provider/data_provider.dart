@@ -35,7 +35,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
       pushUpdatedToServer(),
       pushCreatedToServer(),
     ]))
-        .every((result) => result == true);
+        .every((result) => result);
   }
 
   /// only called if internet connection is needed
@@ -223,11 +223,9 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     if (result.isFailure) {
       final conflictResolution =
           await DataProvider.handleApiError(result.failure);
-      if (conflictResolution != null) {
-        return await _resolveConflict(conflictResolution, fnSingle, records);
-      } else {
-        return false;
-      }
+      return conflictResolution != null
+          ? await _resolveConflict(conflictResolution, fnSingle, records)
+          : false;
     } else {
       return true;
     }

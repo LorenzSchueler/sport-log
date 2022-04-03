@@ -28,9 +28,9 @@ void main() {
       ),
     ];
 
-    final blob = const DbPositionListConverter().mapToSql(positions1);
+    final blob = DbPositionListConverter.mapToSql(positions1);
 
-    final positions2 = const DbPositionListConverter().mapToDart(blob);
+    final positions2 = DbPositionListConverter.mapToDart(blob);
 
     expect(positions2 != null, true);
     expect(positions1.length, positions2!.length);

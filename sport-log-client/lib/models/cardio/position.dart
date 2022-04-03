@@ -98,14 +98,14 @@ extension TrackLatLngBounds on List<Position> {
     double north = map((p) => p.latitude).max;
     double south = map((p) => p.latitude).min;
     double latDiff = north - south;
-    north += 0.1 * latDiff;
-    south -= 0.1 * latDiff;
+    north += latDiff * 0.1;
+    south -= latDiff * 0.1;
 
     double east = map((p) => p.longitude).max;
     double west = map((p) => p.longitude).min;
     double longDiff = east - west;
-    east += 0.1 * longDiff;
-    west -= 0.1 * longDiff;
+    east += longDiff * 0.1;
+    west -= longDiff * 0.1;
 
     return LatLngBounds(
       northeast: LatLng(north, east),

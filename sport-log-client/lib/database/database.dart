@@ -50,11 +50,9 @@ class DbError {
       case DbErrorCode.uniqueViolation:
         return "An entry with the same values for ${conflictDescriptor!.columns.join(', ')} already exists.";
       case DbErrorCode.unknown:
-        if (databaseException != null) {
-          return "Unknown database error: $databaseException";
-        } else {
-          return "Unknown database error";
-        }
+        return databaseException != null
+            ? "Unknown database error: $databaseException"
+            : "Unknown database error";
     }
   }
 }

@@ -283,90 +283,94 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
   }
 
   List<Widget> _buildButtons() {
-    if (_trackingMode == TrackingMode.tracking) {
-      return [
-        Expanded(
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              primary: Theme.of(context).colorScheme.error,
+    switch (_trackingMode) {
+      case TrackingMode.tracking:
+        return [
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).colorScheme.error,
+              ),
+              onPressed: () {
+                _trackingMode = TrackingMode.paused;
+                _lastStopDuration +=
+                    DateTime.now().difference(_lastContinueTime);
+              },
+              child: const Text("pause"),
             ),
-            onPressed: () {
-              _trackingMode = TrackingMode.paused;
-              _lastStopDuration += DateTime.now().difference(_lastContinueTime);
-            },
-            child: const Text("pause"),
           ),
-        ),
-        Defaults.sizedBox.horizontal.normal,
-        Expanded(
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              primary: Theme.of(context).colorScheme.error,
+          Defaults.sizedBox.horizontal.normal,
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).colorScheme.error,
+              ),
+              onPressed: () async {
+                _trackingMode = TrackingMode.paused;
+                _lastStopDuration +=
+                    DateTime.now().difference(_lastContinueTime);
+                await _stopDialog();
+              },
+              child: const Text("stop"),
             ),
-            onPressed: () async {
-              _trackingMode = TrackingMode.paused;
-              _lastStopDuration += DateTime.now().difference(_lastContinueTime);
-              await _stopDialog();
-            },
-            child: const Text("stop"),
           ),
-        ),
-      ];
-    } else if (_trackingMode == TrackingMode.paused) {
-      return [
-        Expanded(
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              primary: Theme.of(context).colorScheme.errorContainer,
+        ];
+      case TrackingMode.paused:
+        return [
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).colorScheme.errorContainer,
+              ),
+              onPressed: () {
+                _trackingMode = TrackingMode.tracking;
+                _lastContinueTime = DateTime.now();
+              },
+              child: const Text("continue"),
             ),
-            onPressed: () {
-              _trackingMode = TrackingMode.tracking;
-              _lastContinueTime = DateTime.now();
-            },
-            child: const Text("continue"),
           ),
-        ),
-        Defaults.sizedBox.horizontal.normal,
-        Expanded(
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              primary: Theme.of(context).colorScheme.error,
+          Defaults.sizedBox.horizontal.normal,
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).colorScheme.error,
+              ),
+              onPressed: () async {
+                _trackingMode = TrackingMode.paused;
+                await _stopDialog();
+              },
+              child: const Text("stop"),
             ),
-            onPressed: () async {
-              _trackingMode = TrackingMode.paused;
-              await _stopDialog();
-            },
-            child: const Text("stop"),
           ),
-        ),
-      ];
-    } else {
-      return [
-        Expanded(
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              primary: Theme.of(context).colorScheme.errorContainer,
+        ];
+      default:
+        return [
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).colorScheme.errorContainer,
+              ),
+              onPressed: () {
+                _trackingMode = TrackingMode.tracking;
+                _cardioSessionDescription.cardioSession.datetime =
+                    DateTime.now();
+                _lastContinueTime =
+                    _cardioSessionDescription.cardioSession.datetime;
+              },
+              child: const Text("start"),
             ),
-            onPressed: () {
-              _trackingMode = TrackingMode.tracking;
-              _cardioSessionDescription.cardioSession.datetime = DateTime.now();
-              _lastContinueTime =
-                  _cardioSessionDescription.cardioSession.datetime;
-            },
-            child: const Text("start"),
           ),
-        ),
-        Defaults.sizedBox.horizontal.normal,
-        Expanded(
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              primary: Theme.of(context).colorScheme.error,
+          Defaults.sizedBox.horizontal.normal,
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).colorScheme.error,
+              ),
+              onPressed: () => Navigator.pop(context),
+              child: const Text("cancel"),
             ),
-            onPressed: () => Navigator.pop(context),
-            child: const Text("cancel"),
           ),
-        ),
-      ];
+        ];
     }
   }
 

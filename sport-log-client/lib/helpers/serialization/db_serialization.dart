@@ -1,24 +1,11 @@
 import 'dart:typed_data';
 
-import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/models/cardio/all.dart';
 
-class DbIdConverter {
-  const DbIdConverter() : super();
-
-  Int64? mapToDart(int? fromDb) {
-    return fromDb == null ? null : Int64(fromDb);
-  }
-
-  int? mapToSql(Int64? value) {
-    return value?.toInt();
-  }
-}
-
 class DbDurationListConverter {
-  const DbDurationListConverter() : super();
+  const DbDurationListConverter._() : super();
 
-  List<Duration>? mapToDart(Uint8List? fromDb) {
+  static List<Duration>? mapToDart(Uint8List? fromDb) {
     assert(fromDb == null || fromDb.length % 8 == 0);
     return fromDb?.buffer
         .asInt64List()
@@ -27,7 +14,7 @@ class DbDurationListConverter {
         .toList();
   }
 
-  Uint8List? mapToSql(List<Duration>? value) {
+  static Uint8List? mapToSql(List<Duration>? value) {
     return value == null
         ? null
         : Int64List.fromList(value.map((e) => e.inMilliseconds).toList())
@@ -37,9 +24,9 @@ class DbDurationListConverter {
 }
 
 class DbPositionListConverter {
-  const DbPositionListConverter() : super();
+  const DbPositionListConverter._() : super();
 
-  List<Position>? mapToDart(Uint8List? fromDb) {
+  static List<Position>? mapToDart(Uint8List? fromDb) {
     if (fromDb == null) {
       return null;
     }
@@ -53,7 +40,7 @@ class DbPositionListConverter {
     return positions;
   }
 
-  Uint8List? mapToSql(List<Position>? value) {
+  static Uint8List? mapToSql(List<Position>? value) {
     if (value == null) {
       return null;
     }

@@ -78,11 +78,9 @@ class ApiError {
 
   @override
   String toString() {
-    if (message != null) {
-      return "${errorCode.description}\n${message!.keys.first} in table ${message!.values.first.table} on columns ${message!.values.first.columns.join(', ')}";
-    } else {
-      return errorCode.description;
-    }
+    return message != null
+        ? "${errorCode.description}\n${message!.keys.first} in table ${message!.values.first.table} on columns ${message!.values.first.columns.join(', ')}"
+        : errorCode.description;
   }
 }
 
