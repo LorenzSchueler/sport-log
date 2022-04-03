@@ -95,21 +95,29 @@ class RouteEditPageState extends State<RouteEditPage> {
       }
     } else if (response.routes != null && response.routes!.isNotEmpty) {
       NavigationRoute navRoute = response.routes![0];
+      List<Position> track = [];
+      for (final pointLatLng
+          in PolylinePoints().decodePolyline(navRoute.geometry as String)) {
+        track.add(
+          Position(
+            latitude: pointLatLng.latitude,
+            longitude: pointLatLng.longitude,
+            elevation: 0, // TODO
+            distance: track.isEmpty
+                ? 0
+                : track.last
+                    .addDistanceTo(pointLatLng.latitude, pointLatLng.longitude),
+            time: Duration.zero,
+          ),
+        );
+      }
+      _logger
+        ..i("mapbox distance ${navRoute.distance}")
+        ..i("own distance ${track.last.distance}");
       setState(() {
         _route
-          ..distance = navRoute.distance!.round()
-          ..track = PolylinePoints()
-              .decodePolyline(navRoute.geometry as String)
-              .map(
-                (coordinate) => Position(
-                  latitude: coordinate.latitude,
-                  longitude: coordinate.longitude,
-                  elevation: 0, // TODO
-                  distance: 0, // TODO
-                  time: Duration.zero, // TODO
-                ),
-              )
-              .toList();
+          ..distance = track.last.distance.round()
+          ..track = track;
       });
     }
   }
@@ -162,7 +170,7 @@ class RouteEditPageState extends State<RouteEditPage> {
         Position(
           latitude: location.latitude,
           longitude: location.longitude,
-          elevation: 0,
+          elevation: 0, // TODO
           distance: 0,
           time: Duration.zero,
         ),

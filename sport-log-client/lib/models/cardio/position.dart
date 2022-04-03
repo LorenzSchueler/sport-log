@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:latlong2/latlong.dart' as latlong;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
@@ -88,6 +89,18 @@ class Position {
       hashValues(longitude, latitude, elevation, distance, time);
 
   LatLng get latLng => LatLng(latitude, longitude);
+
+  double distanceTo(double otherLatitude, double otherLongitude) {
+    return const latlong.Distance().as(
+      latlong.LengthUnit.Meter,
+      latlong.LatLng(latitude, longitude),
+      latlong.LatLng(otherLatitude, otherLongitude),
+    );
+  }
+
+  double addDistanceTo(double otherLatitude, double otherLongitude) {
+    return distance + distanceTo(otherLatitude, otherLongitude);
+  }
 }
 
 extension TrackLatLngBounds on List<Position> {

@@ -241,7 +241,10 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
           latitude: location.latitude!,
           longitude: location.longitude!,
           elevation: location.altitude!,
-          distance: 0,
+          distance: _cardioSessionDescription.cardioSession.track!.isEmpty
+              ? 0
+              : _cardioSessionDescription.cardioSession.track!.last
+                  .addDistanceTo(location.latitude!, location.longitude!),
           time: _currentDuration,
         ),
       );

@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/id_generation.dart';
@@ -94,21 +93,7 @@ class CardioSession extends AtomicEntity {
   }
 
   void setDistance() {
-    if (track != null && track!.length >= 2) {
-      distance = 0;
-      for (int i = 0; i < track!.length - 1; i++) {
-        distance = distance! +
-            const Distance()
-                .as(
-                  LengthUnit.Meter,
-                  LatLng(track![i].latitude, track![i].longitude),
-                  LatLng(track![i + 1].latitude, track![i + 1].longitude),
-                )
-                .round();
-      }
-    } else {
-      distance = null;
-    }
+    distance = track?.last.distance.round();
   }
 
   void setAvgCadence() {
