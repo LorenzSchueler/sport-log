@@ -50,5 +50,41 @@ analyzer:
   strong-mode:
     implicit-casts: false
     implicit-dynamic: false
+
+  plugins:
+    - dart_code_metrics
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
+
+dart_code_metrics:
+  anti-patterns:
+    - long-method
+    - long-parameter-list
+  metrics:
+    cyclomatic-complexity: 20
+    maximum-nesting-level: 5
+    number-of-parameters: 4
+    source-lines-of-code: 50
+  metrics-exclude:
+    - test/**
+    - "**/*.g.dart"
+  rules:
+    - avoid-returning-widgets
+    - always-remove-listener
+    # - avoid-non-null-assertion
+    - avoid-throw-in-catch-block
+    - avoid-unused-parameters
+    - avoid-unnecessary-setstate
+    - avoid-wrapping-in-padding
+    - binary-expression-operand-order
+    - no-boolean-literal-compare
+    # - no-empty-block
+    - no-equal-then-else
+    - prefer-async-await
+    - prefer-conditional-expressions
+    - prefer-immediate-return 
+    # - prefer-extracting-callbacks:
+        # ignored-named-arguments:
+          # - onPressed
+  rules-exclude:
+    - "**/*.g.dart"
