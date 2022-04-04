@@ -9,11 +9,13 @@ Future<Movement?> showMovementPicker({
   Movement? selectedMovement,
   bool dismissable = true,
   bool cardioOnly = false,
+  bool distanceOnly = false,
 }) async {
   return showDialog<Movement>(
     builder: (_) => MovementPickerDialog(
       selectedMovement: selectedMovement,
       cardioOnly: cardioOnly,
+      distanceOnly: distanceOnly,
     ),
     barrierDismissible: dismissable,
     context: context,
@@ -25,10 +27,12 @@ class MovementPickerDialog extends StatefulWidget {
     Key? key,
     required this.selectedMovement,
     required this.cardioOnly,
+    required this.distanceOnly,
   }) : super(key: key);
 
   final Movement? selectedMovement;
   final bool cardioOnly;
+  final bool distanceOnly;
 
   @override
   State<MovementPickerDialog> createState() => _MovementPickerDialogState();
@@ -50,6 +54,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
     final movements = await _dataProvider.getByName(
       newSearch.trim(),
       cardioOnly: widget.cardioOnly,
+      distanceOnly: widget.distanceOnly,
     );
     if (widget.selectedMovement != null) {
       final index = movements

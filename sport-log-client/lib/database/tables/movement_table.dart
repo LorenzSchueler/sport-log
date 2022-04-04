@@ -39,6 +39,7 @@ class MovementTable extends TableAccessor<Movement> {
   Future<List<Movement>> getByName(
     String? byName, {
     bool cardioOnly = false,
+    bool distanceOnly = false,
   }) async {
     final records = await database.rawQuery(
       '''
@@ -46,7 +47,10 @@ class MovementTable extends TableAccessor<Movement> {
       WHERE ${TableAccessor.combineFilter([
             notDeleted,
             nameFilter(byName),
-            cardioOnly ? '${Columns.cardio} = true' : ''
+            cardioOnly ? '${Columns.cardio} = true' : '',
+            distanceOnly
+                ? "${Columns.dimension} = '${MovementDimension.distance.index}'"
+                : '',
           ])}
         AND ($userId IS NOT NULL
           OR NOT EXISTS (

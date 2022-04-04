@@ -45,6 +45,7 @@ class CardioTrackingSettingsPageState
                   context: context,
                   dismissable: false,
                   cardioOnly: true,
+                  distanceOnly: true,
                 );
                 setState(() => _movement = movement);
               },

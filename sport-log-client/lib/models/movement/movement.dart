@@ -1,5 +1,4 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/id_generation.dart';
@@ -8,7 +7,6 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/settings.dart';
-import 'package:sport_log/widgets/app_icons.dart';
 
 part 'movement.g.dart';
 
@@ -34,19 +32,6 @@ extension MovementDimensionStrings on MovementDimension {
         return 'Distance';
       case MovementDimension.time:
         return 'Time';
-    }
-  }
-
-  IconData get iconData {
-    switch (this) {
-      case MovementDimension.reps:
-        return AppIcons.repeat;
-      case MovementDimension.time:
-        return AppIcons.timer;
-      case MovementDimension.distance:
-        return AppIcons.ruler;
-      case MovementDimension.energy:
-        return AppIcons.gauge;
     }
   }
 }

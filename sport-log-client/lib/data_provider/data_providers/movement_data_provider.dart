@@ -23,8 +23,9 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
   Future<List<Movement>> getByName(
     String? name, {
     bool cardioOnly = false,
+    bool distanceOnly = false,
   }) =>
-      db.getByName(name, cardioOnly: cardioOnly);
+      db.getByName(name, cardioOnly: cardioOnly, distanceOnly: distanceOnly);
 }
 
 class MovementDescriptionDataProvider
