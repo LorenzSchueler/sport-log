@@ -13,9 +13,9 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/map_utils.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
+import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
-import 'package:sport_log/widgets/value_unit_description.dart';
 
 enum TrackingMode { notStarted, tracking, paused, stopped }
 
@@ -366,13 +366,6 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
 
   @override
   Widget build(BuildContext context) {
-    TableRow rowSpacer = TableRow(
-      children: [
-        Defaults.sizedBox.vertical.normal,
-        Defaults.sizedBox.vertical.normal,
-      ],
-    );
-
     return Scaffold(
       body: Column(
         children: [
@@ -423,61 +416,8 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
             padding: Defaults.edgeInsets.normal,
             child: Column(
               children: [
-                Table(
-                  children: [
-                    TableRow(
-                      children: [
-                        ValueUnitDescription.time(
-                          _cardioSessionDescription.cardioSession.time,
-                        ),
-                        ValueUnitDescription.distance(
-                          _cardioSessionDescription.cardioSession.distance,
-                        ),
-                      ],
-                    ),
-                    rowSpacer,
-                    TableRow(
-                      children: [
-                        ValueUnitDescription.speed(
-                          _cardioSessionDescription.cardioSession.speed,
-                        ),
-                        ValueUnitDescription.tempo(
-                          _cardioSessionDescription.cardioSession.tempo,
-                        ),
-                      ],
-                    ),
-                    rowSpacer,
-                    TableRow(
-                      children: [
-                        ValueUnitDescription.ascent(
-                          _cardioSessionDescription.cardioSession.ascent,
-                        ),
-                        ValueUnitDescription.descent(
-                          _cardioSessionDescription.cardioSession.descent,
-                        ),
-                      ],
-                    ),
-                    rowSpacer,
-                    TableRow(
-                      children: [
-                        ValueUnitDescription.avgCadence(
-                          _cardioSessionDescription.cardioSession.avgCadence,
-                        ),
-                        ValueUnitDescription.avgHeartRate(
-                          _cardioSessionDescription.cardioSession.avgHeartRate,
-                        ),
-                      ],
-                    ),
-                    rowSpacer,
-                    TableRow(
-                      children: [
-                        ValueUnitDescription.calories(
-                          _cardioSessionDescription.cardioSession.calories,
-                        ),
-                        Container(),
-                      ],
-                    ),
-                  ],
+                CardioValueUnitDescriptionTable(
+                  cardioSessionDescription: _cardioSessionDescription,
                 ),
                 Defaults.sizedBox.vertical.normal,
                 Row(children: _buildButtons()),
