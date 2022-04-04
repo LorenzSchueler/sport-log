@@ -92,6 +92,15 @@ class ValueUnitDescription extends StatelessWidget {
           key: key,
         );
 
+  ValueUnitDescription.tempo(Duration? tempo, {Key? key})
+      : this(
+          value: tempo?.formatTimeShort,
+          unit: "/km",
+          description: "Tempo",
+          scale: 1.3,
+          key: key,
+        );
+
   ValueUnitDescription.calories(int? calories, {Key? key})
       : this(
           value: calories?.toString(),

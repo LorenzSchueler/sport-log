@@ -89,7 +89,17 @@ class CardioSession extends AtomicEntity {
             time == null ||
             time! < const Duration(seconds: 1)
         ? null
-        : distance! / time!.inSeconds;
+        : (distance! / 1000) / (time!.inSeconds / 3600);
+  }
+
+  Duration? get tempo {
+    return distance == null ||
+            time == null ||
+            time! < const Duration(seconds: 1)
+        ? null
+        : Duration(
+            milliseconds: (time!.inMilliseconds / (distance! / 1000)).round(),
+          );
   }
 
   void setDistance() {

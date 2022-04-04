@@ -84,102 +84,120 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
       ),
       body: Stack(
         children: [
-          Container(
-            color: Theme.of(context).colorScheme.background,
-            child: Column(
-              children: [
-                _cardioSessionDescription.cardioSession.track != null
-                    ? Expanded(
-                        child: MapboxMap(
-                          accessToken: Defaults.mapbox.accessToken,
-                          styleString: Defaults.mapbox.style.outdoor,
-                          initialCameraPosition: Settings.lastMapPosition,
-                          onMapCreated: (MapboxMapController controller) =>
-                              _mapController = controller,
-                          onStyleLoadedCallback: () {
-                            _mapController.setBounds(
-                              _cardioSessionDescription.cardioSession.track,
-                              _cardioSessionDescription.route?.track,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _cardioSessionDescription.cardioSession.track != null
+                  ? Expanded(
+                      child: MapboxMap(
+                        accessToken: Defaults.mapbox.accessToken,
+                        styleString: Defaults.mapbox.style.outdoor,
+                        initialCameraPosition: Settings.lastMapPosition,
+                        onMapCreated: (MapboxMapController controller) =>
+                            _mapController = controller,
+                        onStyleLoadedCallback: () {
+                          _mapController.setBounds(
+                            _cardioSessionDescription.cardioSession.track,
+                            _cardioSessionDescription.route?.track,
+                          );
+                          if (_cardioSessionDescription.cardioSession.track !=
+                              null) {
+                            _mapController.addTrackLine(
+                              _cardioSessionDescription.cardioSession.track!,
                             );
-                            if (_cardioSessionDescription.cardioSession.track !=
-                                null) {
-                              _mapController.addTrackLine(
-                                _cardioSessionDescription.cardioSession.track!,
-                              );
-                            }
-                            if (_cardioSessionDescription.route?.track !=
-                                null) {
-                              _mapController.addRouteLine(
-                                _cardioSessionDescription.route!.track!,
-                              );
-                            }
-                          },
-                        ),
-                      )
-                    : Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(AppIcons.route),
-                            Text(" no track available"),
+                          }
+                          if (_cardioSessionDescription.route?.track != null) {
+                            _mapController.addRouteLine(
+                              _cardioSessionDescription.route!.track!,
+                            );
+                          }
+                        },
+                      ),
+                    )
+                  : Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(AppIcons.route),
+                          Text(" no track available"),
+                        ],
+                      ),
+                    ),
+              Container(
+                padding: Defaults.edgeInsets.normal,
+                color: Theme.of(context).colorScheme.background,
+                child: Column(
+                  children: [
+                    Table(
+                      children: [
+                        TableRow(
+                          children: [
+                            ValueUnitDescription.time(
+                              _cardioSessionDescription.cardioSession.time,
+                            ),
+                            ValueUnitDescription.distance(
+                              _cardioSessionDescription.cardioSession.distance,
+                            ),
                           ],
                         ),
+                        rowSpacer,
+                        TableRow(
+                          children: [
+                            ValueUnitDescription.speed(
+                              _cardioSessionDescription.cardioSession.speed,
+                            ),
+                            ValueUnitDescription.tempo(
+                              _cardioSessionDescription.cardioSession.tempo,
+                            ),
+                          ],
+                        ),
+                        rowSpacer,
+                        TableRow(
+                          children: [
+                            ValueUnitDescription.ascent(
+                              _cardioSessionDescription.cardioSession.ascent,
+                            ),
+                            ValueUnitDescription.descent(
+                              _cardioSessionDescription.cardioSession.descent,
+                            ),
+                          ],
+                        ),
+                        rowSpacer,
+                        TableRow(
+                          children: [
+                            ValueUnitDescription.avgCadence(
+                              _cardioSessionDescription
+                                  .cardioSession.avgCadence,
+                            ),
+                            ValueUnitDescription.avgHeartRate(
+                              _cardioSessionDescription
+                                  .cardioSession.avgHeartRate,
+                            ),
+                          ],
+                        ),
+                        rowSpacer,
+                        TableRow(
+                          children: [
+                            ValueUnitDescription.calories(
+                              _cardioSessionDescription.cardioSession.calories,
+                            ),
+                            Container(),
+                          ],
+                        ),
+                      ],
+                    ),
+                    if (_cardioSessionDescription.cardioSession.comments !=
+                        null) ...[
+                      Defaults.sizedBox.vertical.normal,
+                      Text(
+                        _cardioSessionDescription.cardioSession.comments!,
+                        textAlign: TextAlign.left,
                       ),
-                Defaults.sizedBox.vertical.normal,
-                Table(
-                  children: [
-                    TableRow(
-                      children: [
-                        ValueUnitDescription.time(
-                          _cardioSessionDescription.cardioSession.time,
-                        ),
-                        ValueUnitDescription.distance(
-                          _cardioSessionDescription.cardioSession.distance,
-                        ),
-                      ],
-                    ),
-                    rowSpacer,
-                    TableRow(
-                      children: [
-                        ValueUnitDescription.speed(
-                          _cardioSessionDescription.cardioSession.speed,
-                        ),
-                        ValueUnitDescription.calories(
-                          _cardioSessionDescription.cardioSession.calories,
-                        ),
-                      ],
-                    ),
-                    rowSpacer,
-                    TableRow(
-                      children: [
-                        ValueUnitDescription.ascent(
-                          _cardioSessionDescription.cardioSession.ascent,
-                        ),
-                        ValueUnitDescription.descent(
-                          _cardioSessionDescription.cardioSession.descent,
-                        ),
-                      ],
-                    ),
-                    rowSpacer,
-                    TableRow(
-                      children: [
-                        ValueUnitDescription.avgCadence(
-                          _cardioSessionDescription.cardioSession.avgCadence,
-                        ),
-                        ValueUnitDescription.avgHeartRate(
-                          _cardioSessionDescription.cardioSession.avgHeartRate,
-                        ),
-                      ],
-                    ),
+                    ]
                   ],
                 ),
-                Defaults.sizedBox.vertical.normal,
-                if (_cardioSessionDescription.cardioSession.comments != null)
-                  Text(_cardioSessionDescription.cardioSession.comments!),
-                if (_cardioSessionDescription.cardioSession.comments != null)
-                  Defaults.sizedBox.vertical.normal,
-              ],
-            ),
+              ),
+            ],
           ),
           Container(
             width: double.infinity,

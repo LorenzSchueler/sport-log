@@ -420,61 +420,70 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
             ),
           ),
           Container(
-            padding: const EdgeInsets.only(top: 10),
-            child: Table(
+            padding: Defaults.edgeInsets.normal,
+            child: Column(
               children: [
-                TableRow(
+                Table(
                   children: [
-                    ValueUnitDescription.time(
-                      _cardioSessionDescription.cardioSession.time,
+                    TableRow(
+                      children: [
+                        ValueUnitDescription.time(
+                          _cardioSessionDescription.cardioSession.time,
+                        ),
+                        ValueUnitDescription.distance(
+                          _cardioSessionDescription.cardioSession.distance,
+                        ),
+                      ],
                     ),
-                    ValueUnitDescription.distance(
-                      _cardioSessionDescription.cardioSession.distance,
+                    rowSpacer,
+                    TableRow(
+                      children: [
+                        ValueUnitDescription.speed(
+                          _cardioSessionDescription.cardioSession.speed,
+                        ),
+                        ValueUnitDescription.tempo(
+                          _cardioSessionDescription.cardioSession.tempo,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                rowSpacer,
-                TableRow(
-                  children: [
-                    ValueUnitDescription.speed(
-                      _cardioSessionDescription.cardioSession.speed,
-                    ),
-                    ValueUnitDescription.calories(
-                      _cardioSessionDescription.cardioSession.calories,
-                    ),
-                  ],
-                ),
-                rowSpacer,
-                TableRow(
-                  children: [
-                    ValueUnitDescription.ascent(
+                    rowSpacer,
+                    TableRow(
+                      children: [
+                        ValueUnitDescription.ascent(
                           _cardioSessionDescription.cardioSession.ascent,
-                    ),
-                    ValueUnitDescription.descent(
+                        ),
+                        ValueUnitDescription.descent(
                           _cardioSessionDescription.cardioSession.descent,
+                        ),
+                      ],
+                    ),
+                    rowSpacer,
+                    TableRow(
+                      children: [
+                        ValueUnitDescription.avgCadence(
+                          _cardioSessionDescription.cardioSession.avgCadence,
+                        ),
+                        ValueUnitDescription.avgHeartRate(
+                          _cardioSessionDescription.cardioSession.avgHeartRate,
+                        ),
+                      ],
+                    ),
+                    rowSpacer,
+                    TableRow(
+                      children: [
+                        ValueUnitDescription.calories(
+                          _cardioSessionDescription.cardioSession.calories,
+                        ),
+                        Container(),
+                      ],
                     ),
                   ],
                 ),
-                rowSpacer,
-                TableRow(
-                  children: [
-                    ValueUnitDescription.avgCadence(
-                      _cardioSessionDescription.cardioSession.avgCadence,
-                    ),
-                    ValueUnitDescription.avgHeartRate(
-                      _cardioSessionDescription.cardioSession.avgHeartRate,
-                    ),
-                  ],
-                ),
+                Defaults.sizedBox.vertical.normal,
+                Row(children: _buildButtons()),
               ],
             ),
           ),
-          Container(
-            padding: Defaults.edgeInsets.normal,
-            child: Row(
-              children: _buildButtons(),
-            ),
-          )
         ],
       ),
     );
