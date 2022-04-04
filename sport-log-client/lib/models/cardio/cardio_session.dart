@@ -85,29 +85,37 @@ class CardioSession extends AtomicEntity {
         deleted = false;
 
   double? get speed {
-    return distance == null ||
-            time == null ||
-            time! < const Duration(seconds: 1)
-        ? null
-        : (distance! / 1000) / (time!.inSeconds / 3600);
+    if (distance == null || time == null) {
+      return null;
+    } else if (distance == 0 || time!.inSeconds == 0) {
+      return 0.0;
+    } else {
+      return (distance! / 1000) / (time!.inSeconds / 3600);
+    }
   }
 
   Duration? get tempo {
-    return distance == null ||
-            time == null ||
-            time! < const Duration(seconds: 1)
-        ? null
-        : Duration(
-            milliseconds: (time!.inMilliseconds / (distance! / 1000)).round(),
-          );
+    if (distance == null || time == null) {
+      return null;
+    } else if (distance == 0 || time!.inSeconds == 0) {
+      return Duration.zero;
+    } else {
+      return Duration(
+        milliseconds: (time!.inMilliseconds / (distance! / 1000)).round(),
+      );
+    }
   }
 
   void setDistance() {
-    distance = track?.last.distance.round();
+    distance = track != null && track!.isNotEmpty
+        ? track?.last.distance.round()
+        : null;
   }
 
   void setAscentDescent() {
-    if (track == null) {
+    if (track == null || track!.isEmpty) {
+      ascent = null;
+      descent = null;
       return;
     }
     double _ascent = 0;
