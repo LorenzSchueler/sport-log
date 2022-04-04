@@ -44,9 +44,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   late CardioSessionDescription _cardioSessionDescription;
 
   TrackingMode _trackingMode = TrackingMode.notStarted;
-  double _ascent = 0;
-  double _descent = 0;
-  double? _lastElevation;
 
   late DateTime _lastContinueTime;
   Duration _lastStopDuration = Duration.zero;
@@ -117,8 +114,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
   Future<void> _saveCardioSession() async {
     _cardioSessionDescription.cardioSession.time = _currentDuration;
-    _cardioSessionDescription.cardioSession.ascent = _ascent.round();
-    _cardioSessionDescription.cardioSession.descent = _descent.round();
+    _cardioSessionDescription.cardioSession.setAscentDescent();
     _cardioSessionDescription.cardioSession.setAvgCadence();
     _cardioSessionDescription.cardioSession.setAvgHeartRate();
     _cardioSessionDescription.cardioSession.setDistance();
@@ -141,6 +137,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       if (_trackingMode == TrackingMode.tracking) {
         _cardioSessionDescription.cardioSession.time = _currentDuration;
       }
+      _cardioSessionDescription.cardioSession.setAscentDescent();
       _cardioSessionDescription.cardioSession.setAvgCadence();
       _cardioSessionDescription.cardioSession.setAvgHeartRate();
       _cardioSessionDescription.cardioSession.setDistance();
@@ -225,17 +222,6 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
         await _mapController.updateCurrentLocationMarker(_circles, latLng);
 
     if (_trackingMode == TrackingMode.tracking) {
-      _lastElevation ??= location.altitude;
-      double elevationDifference = location.altitude! - _lastElevation!;
-      setState(() {
-        if (elevationDifference > 0) {
-          _ascent += elevationDifference;
-        } else {
-          _descent -= elevationDifference;
-        }
-      });
-      _lastElevation = location.altitude;
-
       _cardioSessionDescription.cardioSession.track!.add(
         Position(
           latitude: location.latitude!,
@@ -462,10 +448,10 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                 TableRow(
                   children: [
                     ValueUnitDescription.ascent(
-                      _ascent.round(),
+                          _cardioSessionDescription.cardioSession.ascent,
                     ),
                     ValueUnitDescription.descent(
-                      _descent.round(),
+                          _cardioSessionDescription.cardioSession.descent,
                     ),
                   ],
                 ),

@@ -96,6 +96,25 @@ class CardioSession extends AtomicEntity {
     distance = track?.last.distance.round();
   }
 
+  void setAscentDescent() {
+    if (track == null) {
+      return;
+    }
+    double _ascent = 0;
+    double _descent = 0;
+    for (int i = 0; i < track!.length - 1; i++) {
+      double elevationDifference =
+          track![i + 1].elevation - track![i].elevation;
+      if (elevationDifference > 0) {
+        _ascent += elevationDifference;
+      } else {
+        _descent -= elevationDifference;
+      }
+    }
+    ascent = _ascent.round();
+    descent = _descent.round();
+  }
+
   void setAvgCadence() {
     avgCadence = time != null && time!.inSeconds > 0 && cadence != null
         ? (cadence!.length / (time!.inMilliseconds / 60000)).round()
