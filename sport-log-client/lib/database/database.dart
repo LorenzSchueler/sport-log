@@ -94,7 +94,7 @@ class AppDatabase {
   }
 
   static Future<void> init() async {
-    if (Config.deleteDatabase) {
+    if (Config.instance.deleteDatabase) {
       await reset();
     }
     await open();
@@ -110,7 +110,7 @@ class AppDatabase {
         for (final tableAccessor in tablesAccessors) {
           _logger.d("Creating table: ${tableAccessor.tableName}");
           for (final statement in tableAccessor.table.setupSql) {
-            if (Config.outputDbStatement) {
+            if (Config.instance.outputDbStatement) {
               _logger.d(statement);
             }
             await db.execute(statement);

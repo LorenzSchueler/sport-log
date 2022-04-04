@@ -2,90 +2,111 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:sport_log/helpers/formatting.dart';
+import 'package:flutter/services.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:logger/logger.dart' as l;
+import 'package:yaml/yaml.dart';
 
-final _logger = Logger('CONFIG');
+part 'config.g.dart';
 
-abstract class Config {
-  static late final bool deleteDatabase;
-  static late final l.Level minLogLevel;
-  static late final bool outputRequestJson;
-  static late final bool outputRequestHeaders;
-  static late final bool outputResponseJson;
-  static late final bool outputDbStatement;
+@JsonSerializable()
+class Config extends JsonSerializable {
+  Config({
+    required this.accessToken,
+    required this.serverAddress,
+    required this.deleteDatabase,
+    required this.minLogLevel,
+    required this.outputRequestJson,
+    required this.outputRequestHeaders,
+    required this.outputResponseJson,
+    required this.outputDbStatement,
+  });
+
+  static late final Config instance;
 
   static Future<void> init() async {
-    deleteDatabase =
-        (dotenv.env['DELETE_DATABASE'] ?? "").parseBool(defaultValue: false);
+    try {
+      final map = (isTest
+              ? loadYaml(File("./sport-log-client.yaml").readAsStringSync())
+              : loadYaml(await rootBundle.loadString('sport-log-client.yaml')))
+          as YamlMap;
 
-    final logLevelStr = dotenv.env['LOG_LEVEL'] ?? '';
-    switch (logLevelStr.toUpperCase()) {
-      case 'VERBOSE':
-        minLogLevel = l.Level.verbose;
-        break;
-      case 'DEBUG':
-        minLogLevel = l.Level.debug;
-        break;
-      case 'INFO':
-        minLogLevel = l.Level.info;
-        break;
-      case 'WARNING':
-        minLogLevel = l.Level.warning;
-        break;
-      case 'Error':
-        minLogLevel = l.Level.error;
-        break;
-      case 'WTF':
-        minLogLevel = l.Level.wtf;
-        break;
-      case 'NOTHING':
-        minLogLevel = l.Level.nothing;
-        break;
-      default:
-        minLogLevel = l.Level.debug;
+      if (kReleaseMode) {
+        instance = Config.fromJson(map["release"]! as Map<String, dynamic>);
+      } else if (kProfileMode) {
+        instance = Config.fromJson(map["profile"]! as Map<String, dynamic>);
+      } else {
+        instance =
+            Config.fromJson((map["debug"]! as YamlMap).cast<String, dynamic>());
+      }
+    } on YamlException catch (e) {
+      _logger.i("sport-log-client.yaml is not a valid YAML file: $e");
+      exit(1);
+    } on MissingRequiredKeysException catch (e) {
+      _logger
+          .i("sport-log-client.yaml does not contain keys: ${e.missingKeys}");
+      exit(1);
+    } on TypeError catch (e) {
+      _logger.i(
+        "sport-log-client.yaml has a invalid format or contains invalid datatypes for some fields: $e",
+      );
+      exit(1);
+    } catch (e) {
+      _logger.i("sport-log-client.yaml could not be parsed: $e");
+      exit(1);
     }
 
-    outputRequestJson = (dotenv.env['OUTPUT_REQUEST_JSON'] ?? "")
-        .parseBool(defaultValue: false);
-
-    outputRequestHeaders = (dotenv.env['OUTPUT_REQUEST_HEADERS'] ?? "")
-        .parseBool(defaultValue: false);
-
-    outputResponseJson = (dotenv.env['OUTPUT_RESPONSE_JSON'] ?? "")
-        .parseBool(defaultValue: false);
-
-    outputDbStatement = (dotenv.env['OUTPUT_DB_STATEMENT'] ?? "")
-        .parseBool(defaultValue: false);
+    final bool isAndroidEmulator;
+    if (isAndroid) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      final _isPhysicalDevice = androidInfo.isPhysicalDevice;
+      isAndroidEmulator = _isPhysicalDevice != null && !_isPhysicalDevice;
+    } else {
+      isAndroidEmulator = false;
+    }
+    instance.isAndroidEmulator = isAndroidEmulator;
 
     _logger
-      ..i('Delete database: $deleteDatabase')
-      ..i('Min log level: $minLogLevel')
-      ..i('Output request json: $outputRequestJson')
-      ..i('Output request headers: $outputRequestHeaders')
-      ..i('Output response json: $outputResponseJson')
-      ..i('Output db statement: $outputDbStatement');
+      ..i('Min log level: ${instance.minLogLevel}')
+      ..i('Delete database: ${instance.deleteDatabase}')
+      ..i('Output request json: ${instance.outputRequestJson}')
+      ..i('Output request headers: ${instance.outputRequestHeaders}')
+      ..i('Output response json: ${instance.outputResponseJson}')
+      ..i('Output db statement: ${instance.outputDbStatement}');
   }
 
-  static bool get isTest => Platform.environment.containsKey('FLUTTER_TEST');
+  factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
 
-  static bool get isWeb => kIsWeb;
-  // Workaround for Platform.XXX not being supported on web
-  static bool get isAndroid => !isWeb && Platform.isAndroid;
-  static bool get isIOS => !isWeb && Platform.isIOS;
-  static bool get isLinux => !isWeb && Platform.isLinux;
+  @override
+  Map<String, dynamic> toJson() => _$ConfigToJson(this);
 
-  static Future<bool> get isAndroidEmulator async {
-    if (isAndroid) {
-      final deviceInfo = DeviceInfoPlugin();
-      final androidInfo = await deviceInfo.androidInfo;
-      final _isPhysicalDevice = androidInfo.isPhysicalDevice;
-      return _isPhysicalDevice != null && !_isPhysicalDevice;
-    }
-    return false;
-  }
+  @JsonKey(required: true)
+  final String accessToken;
+  @JsonKey(defaultValue: "")
+  final String serverAddress;
+  @JsonKey(defaultValue: Level.nothing)
+  final Level minLogLevel;
+  @JsonKey(defaultValue: false)
+  final bool deleteDatabase;
+  @JsonKey(defaultValue: false)
+  final bool outputRequestJson;
+  @JsonKey(defaultValue: false)
+  final bool outputRequestHeaders;
+  @JsonKey(defaultValue: false)
+  final bool outputResponseJson;
+  @JsonKey(defaultValue: false)
+  final bool outputDbStatement;
+  @JsonKey(ignore: true)
+  late final bool isAndroidEmulator;
 
   static const String databaseName = 'database.sqlite';
+
+  static bool get isTest => Platform.environment.containsKey('FLUTTER_TEST');
+  static const bool isWeb = kIsWeb;
+  static bool isAndroid = Platform.isAndroid;
+  static bool isIOS = Platform.isIOS;
+  static bool isLinux = Platform.isLinux;
+  static bool isWindows = Platform.isWindows;
+
+  static final _logger = InitLogger('Config');
 }

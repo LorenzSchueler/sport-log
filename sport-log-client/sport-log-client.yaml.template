@@ -1,0 +1,29 @@
+debug:
+  access_token: <token>
+  server_address: <address>
+  min_log_level: debug
+  # delete_database: false # if true server must be reachable
+  output_request_json: true
+  output_request_headers: true
+  output_response_json: true
+  output_db_statement: true
+
+profile:
+  access_token: <token>
+  server_address: <address>
+  # min_log_level: nothing
+  # delete_database: false # if true server must be reachable
+  # output_request_json: false
+  # output_request_headers: false
+  # output_response_json: false
+  # output_db_statement: false
+
+release:
+  access_token: <token>
+  server_address: <address>
+  # min_log_level: nothing
+  # delete_database: false # if true server must be reachable
+  # output_request_json: false
+  # output_request_headers: false
+  # output_response_json: false
+  # output_db_statement: false

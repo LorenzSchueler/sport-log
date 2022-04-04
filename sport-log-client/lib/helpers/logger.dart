@@ -11,8 +11,12 @@ class Logger extends l.Logger {
   Logger(String key)
       : super(
           printer: _Printer(key),
-          level: Config.minLogLevel,
+          level: Config.instance.minLogLevel,
         );
+}
+
+class InitLogger extends l.Logger {
+  InitLogger(String key) : super(printer: _Printer(key));
 }
 
 class _Printer extends l.PrettyPrinter {

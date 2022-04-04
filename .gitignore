@@ -4,6 +4,7 @@
 .idea/
 /sport-log-action-provider-map-matching/map-matching
 /sport-log-server/sport-log-server.toml
+/sport-log-client/sport-log-client.yaml
 .env
 geckodriver
 upgrade.sh

@@ -53,7 +53,6 @@ dependencies:
   fluttertoast: ^8.0.8
   flutter_keyboard_visibility: ^5.0.3
   url_launcher: ^6.0.20
-  flutter_dotenv: ^5.0.2
   mapbox_gl: ^0.15.0 # mapping lib for osm
   mapbox_api: ^1.0.0
   flutter_polyline_points: ^1.0.0
@@ -64,6 +63,7 @@ dependencies:
   flutter_blue: ^0.8.0
   app_settings: ^4.1.1
   audioplayers: ^0.20.1
+  yaml: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -94,7 +94,7 @@ flutter_icons:
 
 flutter:
   assets:
-    - .env
+    - sport-log-client.yaml
     - assets/audio/beep_long.mp3
     - assets/audio/beep_short.mp3
 

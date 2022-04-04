@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mapbox_api/mapbox_api.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:sport_log/config.dart';
 
 abstract class Defaults {
   static const sizedBox = _SizedBox();
   static const edgeInsets = _EdgeInsets();
   static const borderRadius = _BorderRadius();
-  static const mapbox = _Mapbox();
+  static final mapbox = _Mapbox();
   static final mapboxApi = MapboxApi(accessToken: Defaults.mapbox.accessToken);
   static final server = _Server();
 }
@@ -15,9 +15,8 @@ abstract class Defaults {
 class _Server {
   _Server();
 
-  static const _defaultUrl = "http://127.0.0.1";
   final emulatorUrl = 'http://10.0.2.2:8000';
-  final url = dotenv.env['SERVER_ADDRESS'] ?? _defaultUrl;
+  final url = Config.instance.serverAddress;
 }
 
 class _EdgeInsets {
@@ -36,35 +35,19 @@ class _SizedBox {
 class _Horizontal {
   const _Horizontal();
 
-  final huge = const SizedBox(
-    width: 40,
-  );
-  final big = const SizedBox(
-    width: 20,
-  );
-  final normal = const SizedBox(
-    width: 10,
-  );
-  final small = const SizedBox(
-    width: 5,
-  );
+  final huge = const SizedBox(width: 40);
+  final big = const SizedBox(width: 20);
+  final normal = const SizedBox(width: 10);
+  final small = const SizedBox(width: 5);
 }
 
 class _Vertical {
   const _Vertical();
 
-  final huge = const SizedBox(
-    height: 40,
-  );
-  final big = const SizedBox(
-    height: 20,
-  );
-  final normal = const SizedBox(
-    height: 10,
-  );
-  final small = const SizedBox(
-    height: 5,
-  );
+  final huge = const SizedBox(height: 40);
+  final big = const SizedBox(height: 20);
+  final normal = const SizedBox(height: 10);
+  final small = const SizedBox(height: 5);
 }
 
 class _BorderRadius {
@@ -76,22 +59,9 @@ class _BorderRadius {
 }
 
 class _Mapbox {
-  const _Mapbox();
+  _Mapbox();
 
-  static String? _accessToken;
-  String get accessToken {
-    if (_accessToken == null) {
-      String? token = dotenv.env['ACCESS_TOKEN'];
-      if (token == null) {
-        throw Exception(
-          "please supply mapbox access token using --dart-define ACCESS_TOKEN=<token>",
-        );
-      }
-      _accessToken = token;
-    }
-    return _accessToken!;
-  }
-
+  final String accessToken = Config.instance.accessToken;
   final style = const _Style();
   final markerColor = "#0060a0";
   final trackLineColor = "red";

@@ -26,7 +26,7 @@ class Sync extends ChangeNotifier {
   Sync._() : _isSyncing = false;
 
   Future<void> init() async {
-    if (Config.deleteDatabase) {
+    if (Config.instance.deleteDatabase) {
       _logger.i('Removing last sync...');
       Settings.lastSync = null;
     }

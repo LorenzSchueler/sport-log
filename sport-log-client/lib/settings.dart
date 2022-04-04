@@ -67,7 +67,7 @@ class Settings {
   static Future<void> setDefaultServerUrl() async {
     await _storage!.put(
       _serverUrl,
-      await Config.isAndroidEmulator
+      Config.instance.isAndroidEmulator
           ? Defaults.server.emulatorUrl
           : Defaults.server.url,
     );

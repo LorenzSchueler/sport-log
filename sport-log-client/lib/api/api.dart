@@ -323,10 +323,10 @@ mixin ApiLogging {
     Map<String, String> headers, [
     dynamic json,
   ]) {
-    final headersStr = Config.outputRequestHeaders
+    final headersStr = Config.instance.outputRequestHeaders
         ? "\n${headers.entries.map((e) => '${e.key}:${e.value}').join('\n')}"
         : "";
-    json != null && Config.outputRequestJson
+    json != null && Config.instance.outputRequestJson
         ? logger.d(
             'request: $httpMethod ${Settings.serverUrl}$route$headersStr\n${_prettyJson(json)}',
           )
@@ -337,7 +337,7 @@ mixin ApiLogging {
   void _logResponse(Response response) {
     final body = utf8.decode(response.bodyBytes);
     final successful = response.statusCode >= 200 && response.statusCode < 300;
-    body.isNotEmpty && (!successful || Config.outputResponseJson)
+    body.isNotEmpty && (!successful || Config.instance.outputResponseJson)
         ? logger.log(
             successful ? l.Level.debug : l.Level.error,
             'response: ${response.statusCode}\n${_prettyJson(jsonDecode(body))}',
