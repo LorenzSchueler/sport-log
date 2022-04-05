@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
+import 'package:sport_log/pages/action/action_event_edit_page.dart';
 import 'package:sport_log/pages/action/action_provider_overview_page.dart';
+import 'package:sport_log/pages/action/action_rule_edit_page.dart';
 import 'package:sport_log/pages/action/platform_overview_page.dart';
 import 'package:sport_log/pages/heart_rate/heart_rate_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
@@ -82,6 +84,16 @@ abstract class Routes {
           final actionProvider =
               ModalRoute.of(context)?.settings.arguments as ActionProvider;
           return ActionProviderOverviewPage(actionProvider: actionProvider);
+        }),
+    Routes.action.actionRuleEdit: (context) => _checkLogin(() {
+          final actionRule =
+              ModalRoute.of(context)?.settings.arguments as ActionRule?;
+          return ActionRuleEditPage(actionRule: actionRule);
+        }),
+    Routes.action.actionEventEdit: (context) => _checkLogin(() {
+          final actionEvent =
+              ModalRoute.of(context)?.settings.arguments as ActionEvent?;
+          return ActionEventEditPage(actionEvent: actionEvent);
         }),
     // movement
     Routes.movement.overview: (_) => _checkLogin(() => const MovementsPage()),
@@ -199,6 +211,8 @@ class _ActionRoutes {
 
   final String platformOverview = '/action/platform_overview';
   final String actionProviderOverview = '/action/action_overview';
+  final String actionRuleEdit = '/action/action_rule_edit';
+  final String actionEventEdit = '/action/action_event_edit';
 }
 
 class _MovementRoutes {

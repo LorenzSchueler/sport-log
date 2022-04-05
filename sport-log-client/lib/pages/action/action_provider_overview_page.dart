@@ -154,7 +154,19 @@ class ActionRulesCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const CaptionTile(caption: "Action Rules"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CaptionTile(caption: "Action Rules"),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () => Navigator.of(context)
+                      .pushNamed(Routes.action.actionRuleEdit),
+                  icon: const Icon(AppIcons.add),
+                ),
+              ],
+            ),
             for (final actionRule in actionProviderDescription.actionRules) ...[
               const Divider(),
               Column(
@@ -215,7 +227,19 @@ class ActionEventsCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const CaptionTile(caption: "Action Events"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CaptionTile(caption: "Action Events"),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () => Navigator.of(context)
+                      .pushNamed(Routes.action.actionEventEdit),
+                  icon: const Icon(AppIcons.add),
+                ),
+              ],
+            ),
             for (final actionEvent
                 in actionProviderDescription.actionEvents) ...[
               const Divider(),
