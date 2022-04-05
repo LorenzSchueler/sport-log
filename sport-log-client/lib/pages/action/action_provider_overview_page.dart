@@ -9,9 +9,17 @@ import 'package:sport_log/models/action/action_provider.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/models/action/weekday.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+
+String actionName(
+        ActionProviderDescription actionProviderDescription, Int64 actionId) =>
+    actionProviderDescription.actions
+        .where((action) => action.id == actionId)
+        .first
+        .name;
 
 class ActionProviderOverviewPage extends StatefulWidget {
   final ActionProvider actionProvider;
@@ -63,11 +71,6 @@ class _ActionProviderOverviewPageState
     }
   }
 
-  String actionName(Int64 actionId) => _actionProviderDescription!.actions
-      .where((action) => action.id == actionId)
-      .first
-      .name;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,150 +85,180 @@ class _ActionProviderOverviewPageState
                 padding: Defaults.edgeInsets.normal,
                 child: ListView(
                   children: [
-                    Card(
-                      margin: EdgeInsets.zero,
-                      child: Padding(
-                        padding: Defaults.edgeInsets.normal,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const CaptionTile(caption: "Actions"),
-                            for (final action
-                                in _actionProviderDescription!.actions) ...[
-                              const Divider(),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width: 120,
-                                    child: Text(action.name),
-                                  ),
-                                  Defaults.sizedBox.horizontal.normal,
-                                  Expanded(
-                                    child: Text(action.description ?? "--"),
-                                  ),
-                                ],
-                              ),
-                            ]
-                          ],
-                        ),
-                      ),
+                    ActionsCard(
+                      actionProviderDescription: _actionProviderDescription!,
                     ),
                     Defaults.sizedBox.vertical.normal,
-                    Card(
-                      margin: EdgeInsets.zero,
-                      child: Padding(
-                        padding: Defaults.edgeInsets.normal,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const CaptionTile(caption: "Action Rules"),
-                            for (final actionRule
-                                in _actionProviderDescription!.actionRules) ...[
-                              const Divider(),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 120,
-                                        child: Text(
-                                          actionName(actionRule.actionId),
-                                        ),
-                                      ),
-                                      Defaults.sizedBox.horizontal.normal,
-                                      Text(
-                                        "${actionRule.weekday.toDisplayName()} at ${actionRule.time.toStringHourMinute()}",
-                                      ),
-                                      const Spacer(),
-                                      Checkbox(
-                                        value: actionRule.enabled,
-                                        onChanged: null,
-                                        materialTapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
-                                      )
-                                    ],
-                                  ),
-                                  if (actionRule.arguments != null)
-                                    Row(
-                                      children: [
-                                        const SizedBox(
-                                          width: 120,
-                                        ),
-                                        Defaults.sizedBox.horizontal.normal,
-                                        Text(
-                                          "Arguments: ${actionRule.arguments}",
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ]
-                          ],
-                        ),
-                      ),
+                    ActionRulesCard(
+                      actionProviderDescription: _actionProviderDescription!,
                     ),
                     Defaults.sizedBox.vertical.normal,
-                    Card(
-                      margin: EdgeInsets.zero,
-                      child: Padding(
-                        padding: Defaults.edgeInsets.normal,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const CaptionTile(caption: "Action Events"),
-                            for (final actionEvent
-                                in _actionProviderDescription!
-                                    .actionEvents) ...[
-                              const Divider(),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 120,
-                                        child: Text(
-                                          actionName(actionEvent.actionId),
-                                        ),
-                                      ),
-                                      Defaults.sizedBox.horizontal.normal,
-                                      Text(
-                                        actionEvent.datetime.toHumanWithTime(),
-                                      ),
-                                      const Spacer(),
-                                      Checkbox(
-                                        value: actionEvent.enabled,
-                                        onChanged: null,
-                                        materialTapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
-                                      )
-                                    ],
-                                  ),
-                                  if (actionEvent.arguments != null)
-                                    Row(
-                                      children: [
-                                        const SizedBox(
-                                          width: 120,
-                                        ),
-                                        Defaults.sizedBox.horizontal.normal,
-                                        Text(
-                                          "Arguments: ${actionEvent.arguments}",
-                                        ),
-                                      ],
-                                    ),
-                                ],
-                              )
-                            ]
-                          ],
-                        ),
-                      ),
+                    ActionEventsCard(
+                      actionProviderDescription: _actionProviderDescription!,
                     ),
                   ],
                 ),
               ),
             ),
       drawer: MainDrawer(selectedRoute: Routes.action.actionProviderOverview),
+    );
+  }
+}
+
+class ActionsCard extends StatelessWidget {
+  final ActionProviderDescription actionProviderDescription;
+  const ActionsCard({required this.actionProviderDescription, Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: Defaults.edgeInsets.normal,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const CaptionTile(caption: "Actions"),
+            for (final action in actionProviderDescription.actions) ...[
+              const Divider(),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 120,
+                    child: Text(action.name),
+                  ),
+                  Defaults.sizedBox.horizontal.normal,
+                  Expanded(child: Text(action.description ?? "--")),
+                ],
+              ),
+            ]
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ActionRulesCard extends StatelessWidget {
+  final ActionProviderDescription actionProviderDescription;
+  const ActionRulesCard({required this.actionProviderDescription, Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: Defaults.edgeInsets.normal,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const CaptionTile(caption: "Action Rules"),
+            for (final actionRule in actionProviderDescription.actionRules) ...[
+              const Divider(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 120,
+                        child: Text(
+                          actionName(
+                            actionProviderDescription,
+                            actionRule.actionId,
+                          ),
+                        ),
+                      ),
+                      Defaults.sizedBox.horizontal.normal,
+                      Text(
+                        "${actionRule.weekday.toDisplayName()} at ${actionRule.time.toStringHourMinute()}",
+                      ),
+                      const Spacer(),
+                      Checkbox(
+                        value: actionRule.enabled,
+                        onChanged: null,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      )
+                    ],
+                  ),
+                  if (actionRule.arguments != null)
+                    Row(
+                      children: [
+                        const SizedBox(width: 120),
+                        Defaults.sizedBox.horizontal.normal,
+                        Text("Arguments: ${actionRule.arguments}"),
+                      ],
+                    ),
+                ],
+              ),
+            ]
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ActionEventsCard extends StatelessWidget {
+  final ActionProviderDescription actionProviderDescription;
+  const ActionEventsCard({required this.actionProviderDescription, Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: Defaults.edgeInsets.normal,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const CaptionTile(caption: "Action Events"),
+            for (final actionEvent
+                in actionProviderDescription.actionEvents) ...[
+              const Divider(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 120,
+                        child: Text(
+                          actionName(
+                            actionProviderDescription,
+                            actionEvent.actionId,
+                          ),
+                        ),
+                      ),
+                      Defaults.sizedBox.horizontal.normal,
+                      Text(
+                        actionEvent.datetime.toHumanWithTime(),
+                      ),
+                      const Spacer(),
+                      Checkbox(
+                        value: actionEvent.enabled,
+                        onChanged: null,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      )
+                    ],
+                  ),
+                  if (actionEvent.arguments != null)
+                    Row(
+                      children: [
+                        const SizedBox(width: 120),
+                        Defaults.sizedBox.horizontal.normal,
+                        Text("Arguments: ${actionEvent.arguments}"),
+                      ],
+                    ),
+                ],
+              )
+            ]
+          ],
+        ),
+      ),
     );
   }
 }
