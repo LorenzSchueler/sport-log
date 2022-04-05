@@ -14,8 +14,8 @@ import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
-class EditMetconPage extends StatefulWidget {
-  const EditMetconPage({
+class MetconEditPage extends StatefulWidget {
+  const MetconEditPage({
     Key? key,
     this.metconDescription,
   }) : super(key: key);
@@ -23,10 +23,10 @@ class EditMetconPage extends StatefulWidget {
   final MetconDescription? metconDescription;
 
   @override
-  State<StatefulWidget> createState() => _EditMetconPageState();
+  State<StatefulWidget> createState() => _MetconEditPageState();
 }
 
-class _EditMetconPageState extends State<EditMetconPage> {
+class _MetconEditPageState extends State<MetconEditPage> {
   final _logger = Logger('EditMetconPage');
   final _formKey = GlobalKey<FormState>();
   late final MetconDescription _metconDescription;

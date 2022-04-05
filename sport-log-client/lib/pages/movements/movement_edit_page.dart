@@ -8,14 +8,14 @@ import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
-class EditMovementPage extends StatefulWidget {
-  const EditMovementPage({
+class MovementEditPage extends StatefulWidget {
+  const MovementEditPage({
     required this.movementDescription,
     Key? key,
   })  : name = null,
         super(key: key);
 
-  const EditMovementPage.fromName({
+  const MovementEditPage.fromName({
     required String this.name,
     Key? key,
   })  : movementDescription = null,
@@ -25,10 +25,10 @@ class EditMovementPage extends StatefulWidget {
   final String? name;
 
   @override
-  State<StatefulWidget> createState() => _EditMovementPageState();
+  State<StatefulWidget> createState() => _MovementEditPageState();
 }
 
-class _EditMovementPageState extends State<EditMovementPage> {
+class _MovementEditPageState extends State<MovementEditPage> {
   final _dataProvider = MovementDataProvider();
   final _formKey = GlobalKey<FormState>();
   final _descriptionFocusNode = FocusNode();

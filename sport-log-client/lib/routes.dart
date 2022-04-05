@@ -100,11 +100,11 @@ abstract class Routes {
     Routes.movement.edit: (context) => _checkLogin(() {
           final arg = ModalRoute.of(context)?.settings.arguments;
           if (arg is MovementDescription) {
-            return EditMovementPage(movementDescription: arg);
+            return MovementEditPage(movementDescription: arg);
           } else if (arg is String) {
-            return EditMovementPage.fromName(name: arg);
+            return MovementEditPage.fromName(name: arg);
           }
-          return const EditMovementPage(movementDescription: null);
+          return const MovementEditPage(movementDescription: null);
         }),
     // metcon
     Routes.metcon.overview: (_) => _checkLogin(() => const MetconsPage()),
@@ -116,7 +116,7 @@ abstract class Routes {
     Routes.metcon.edit: (context) => _checkLogin(() {
           final metconDescription =
               ModalRoute.of(context)?.settings.arguments as MetconDescription?;
-          return EditMetconPage(metconDescription: metconDescription);
+          return MetconEditPage(metconDescription: metconDescription);
         }),
     // timeline
     Routes.timeline.overview: (_) => _checkLogin(() => const TimelinePage()),
