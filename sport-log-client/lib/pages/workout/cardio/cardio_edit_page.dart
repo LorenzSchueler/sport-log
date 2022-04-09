@@ -155,7 +155,6 @@ class CardioEditPageState extends State<CardioEditPage> {
                 onTap: () async {
                   Movement? movement = await showMovementPicker(
                     context: context,
-                    dismissable: true,
                     cardioOnly: true,
                   );
                   if (movement != null) {
@@ -177,7 +176,6 @@ class CardioEditPageState extends State<CardioEditPage> {
                 onTap: () async {
                   CardioType? cardioType = await showCardioTypePicker(
                     context: context,
-                    dismissable: false,
                   );
                   if (cardioType != null) {
                     setState(() {
@@ -228,7 +226,6 @@ class CardioEditPageState extends State<CardioEditPage> {
                 onTap: () async {
                   Route? route = await showRoutePicker(
                     context: context,
-                    dismissable: true,
                   );
                   if (route != null) {
                     setState(() {

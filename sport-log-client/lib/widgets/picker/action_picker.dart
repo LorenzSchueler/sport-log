@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide Action;
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/models/action/action.dart';
 
 Future<Action?> showActionPicker({
@@ -22,15 +23,19 @@ class ActionPickerDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       clipBehavior: Clip.antiAlias,
-      child: ListView.separated(
-        itemBuilder: (context, index) => ListTile(
-          title: Text(actions[index].name),
-          onTap: () {
-            Navigator.pop(context, actions[index]);
-          },
+      child: Padding(
+        padding: Defaults.edgeInsets.normal,
+        child: ListView.separated(
+          itemBuilder: (context, index) => ListTile(
+            title: Text(actions[index].name),
+            onTap: () {
+              Navigator.pop(context, actions[index]);
+            },
+          ),
+          itemCount: actions.length,
+          separatorBuilder: (context, _) => const Divider(),
+          shrinkWrap: true,
         ),
-        itemCount: actions.length,
-        separatorBuilder: (context, _) => const Divider(),
       ),
     );
   }

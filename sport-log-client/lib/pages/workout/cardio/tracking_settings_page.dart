@@ -43,7 +43,6 @@ class CardioTrackingSettingsPageState
               onTap: () async {
                 Movement? movement = await showMovementPicker(
                   context: context,
-                  dismissable: false,
                   cardioOnly: true,
                   distanceOnly: true,
                 );
@@ -57,7 +56,6 @@ class CardioTrackingSettingsPageState
               onTap: () async {
                 CardioType? cardioType = await showCardioTypePicker(
                   context: context,
-                  dismissable: false,
                 );
                 setState(() => _cardioType = cardioType);
               },
@@ -69,7 +67,6 @@ class CardioTrackingSettingsPageState
               onTap: () async {
                 Route? route = await showRoutePicker(
                   context: context,
-                  dismissable: false,
                 );
                 setState(() => _route = route);
               },

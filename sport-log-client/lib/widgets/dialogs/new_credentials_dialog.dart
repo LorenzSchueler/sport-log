@@ -38,7 +38,7 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       clipBehavior: Clip.antiAlias,
-      child: Container(
+      child: Padding(
         padding: Defaults.edgeInsets.normal,
         child: Column(
           mainAxisSize: MainAxisSize.min,
