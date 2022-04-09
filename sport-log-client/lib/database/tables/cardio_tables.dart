@@ -113,16 +113,6 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
 }
 
 class CardioSessionDescriptionTable {
-  static const datetime = Columns.datetime;
-  static const deleted = Columns.deleted;
-  static const id = Columns.id;
-  static const routeId = Columns.routeId;
-  static const movementId = Columns.movementId;
-
-  static const cardioSession = Tables.cardioSession;
-  static const route = Tables.route;
-  static const movement = Tables.movement;
-
   static CardioSessionTable get _cardioSessionTable =>
       AppDatabase.cardioSessions;
   static RouteTable get _routeTable => AppDatabase.routes;
@@ -139,23 +129,24 @@ class CardioSessionDescriptionTable {
         ${_cardioSessionTable.table.allColumns},
         ${_routeTable.table.allColumns},
         ${_movementTable.table.allColumns}
-      FROM $cardioSession
-      LEFT JOIN 
-        (SELECT * FROM $route WHERE $route.$deleted = false) AS $route ON $route.$id = $cardioSession.$routeId
-      JOIN $movement ON $movement.$id = $cardioSession.$movementId
+      FROM ${Tables.cardioSession}
+      LEFT JOIN (
+        SELECT * FROM ${Tables.route} 
+        WHERE ${Tables.route}.${Columns.deleted} = false
+      ) AS ${Tables.route} ON ${Tables.route}.${Columns.id} = ${Tables.cardioSession}.${Columns.routeId}
+      JOIN ${Tables.movement} ON ${Tables.movement}.${Columns.id} = ${Tables.cardioSession}.${Columns.movementId}
       WHERE ${TableAccessor.combineFilter([
-            TableAccessor.notDeletedOfTable(movement),
-            TableAccessor.notDeletedOfTable(cardioSession),
-            TableAccessor.fromFilterOfTable(cardioSession, from),
-            TableAccessor.untilFilterOfTable(cardioSession, until),
+            TableAccessor.notDeletedOfTable(Tables.movement),
+            TableAccessor.notDeletedOfTable(Tables.cardioSession),
+            TableAccessor.fromFilterOfTable(Tables.cardioSession, from),
+            TableAccessor.untilFilterOfTable(Tables.cardioSession, until),
             TableAccessor.movementIdFilterOfTable(
-              cardioSession,
+              Tables.cardioSession,
               movementValue,
             ),
           ])}
-      GROUP BY ${TableAccessor.groupByIdOfTable(cardioSession)}
-      ORDER BY ${TableAccessor.orderByDatetimeOfTable(cardioSession)}
-      ;
+      GROUP BY ${TableAccessor.groupByIdOfTable(Tables.cardioSession)}
+      ORDER BY ${TableAccessor.orderByDatetimeOfTable(Tables.cardioSession)}
     ''',
     );
     List<CardioSessionDescription> cardioSessionDescriptions = [];
