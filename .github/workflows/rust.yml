@@ -32,21 +32,19 @@ jobs:
     #- name: Run tests
     #  run: cargo test --verbose
   
-  style:
-    name: Check style
+  format:
+    name: Check Formatting
     needs: [ build ]
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-
-    - name: Install rust
+    - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
         components: rustfmt
-
     - name: Cargo fmt
       uses: actions-rs/cargo@v1
       with:
@@ -54,20 +52,18 @@ jobs:
         args: --all -- --check
 
   clippy:
-    name: Run clippy
-    needs: [style]
+    name: Run Clippy
+    needs: [ format ]
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-
-    - name: Install rust
+    - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
         components: clippy
-
     - name: Cargo clippy
       uses: actions-rs/cargo@v1
       with:

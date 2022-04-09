@@ -7,31 +7,59 @@ on:
     branches: [ master, develop ]
 
 jobs:
-  build:
-    name: Build
+  format:
+    name: Check Formatting
     runs-on: ubuntu-latest
 
     steps:
-    # Setup Java environment in order to build the Android app.
-    - uses: actions/checkout@v2
-    - uses: actions/setup-java@v2
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+    - name: Format
+      working-directory: sport-log-client
+      run: flutter format --set-exit-if-changed .
+
+  analyze:
+    name: "Analize"
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Java
+      uses: actions/setup-java@v2
       with:
         distribution: 'temurin'
         java-version: '17'
-    # Setup the flutter environment.
-    - uses: subosito/flutter-action@v2
-    - name: get dependencies
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+    - name: Get Dependencies
+      working-directory: sport-log-client
       run: flutter pub get
+    - name: Analyze
       working-directory: sport-log-client
-    - name: format
-      run: flutter format --set-exit-if-changed .
+      run: flutter analyze
+
+  build-android:
+    name: "Build Android"
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Java
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+    - name: Get Dependencies
       working-directory: sport-log-client
-    # - name: analyze
-      # run: flutter analyze
-      # working-directory: sport-log-client
-    # - name: test
-      # run: flutter test
-      # working-directory: sport-log-client
-    # - name: build # needs SDK_REGISTRY_TOKEN as env arg
-      # run: flutter build apk
-      # working-directory: sport-log-client
+      run: flutter pub get
+    - name: Build APK
+      working-directory: sport-log-client
+      run: flutter build apk
+      env:
+        SDK_REGISTRY_TOKEN: ${{ secrets.SDK_REGISTRY_TOKEN }}
