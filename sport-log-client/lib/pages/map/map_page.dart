@@ -82,6 +82,7 @@ class MapPageState extends State<MapPage> {
         extendBodyBehindAppBar: true,
         appBar: _showOverlays
             ? AppBar(
+                foregroundColor: Theme.of(context).colorScheme.background,
                 backgroundColor: const Color.fromARGB(0, 0, 0, 0),
                 elevation: 0,
               )
