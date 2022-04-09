@@ -11,7 +11,7 @@ env:
 
 jobs:
   build:
-    name: Build
+    name: "Rust: Build"
     runs-on: ubuntu-latest
 
     steps:
@@ -33,7 +33,7 @@ jobs:
     #  run: cargo test --verbose
   
   format:
-    name: Check Formatting
+    name: "Rust: Check Formatting"
     runs-on: ubuntu-latest
 
     steps:
@@ -51,7 +51,7 @@ jobs:
         args: --all -- --check
 
   clippy:
-    name: Run Clippy
+    name: "Rust: Run Clippy"
     runs-on: ubuntu-latest
 
     steps:

@@ -8,7 +8,7 @@ on:
 
 jobs:
   format:
-    name: Check Formatting
+    name: "Flutter: Check Formatting"
     runs-on: ubuntu-latest
 
     steps:
@@ -21,7 +21,7 @@ jobs:
       run: flutter format --set-exit-if-changed .
 
   analyze:
-    name: "Analize"
+    name: "Flutter: Analize"
     runs-on: ubuntu-latest
 
     steps:
@@ -42,7 +42,7 @@ jobs:
       run: flutter analyze
 
   build-android:
-    name: "Build Android"
+    name: "Flutter: Build Android"
     runs-on: ubuntu-latest
 
     steps:
