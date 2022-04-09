@@ -13,6 +13,7 @@ import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/never_pop.dart';
 
 class TimerPage extends StatefulWidget {
   const TimerPage({Key? key}) : super(key: key);
@@ -40,100 +41,102 @@ class TimerPageState extends State<TimerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Timer"),
-          bottom: TabBar(
-            onTap: (index) {
-              setState(() {
-                _logger.i("ontap");
-                _currentTime = Duration.zero;
-              });
-            },
-            indicatorColor: Theme.of(context).colorScheme.primary,
-            tabs: [
-              Tab(
-                text: "AMRAP",
-                icon: Icon(
-                  MetconType.amrap.icon,
-                ),
-              ),
-              Tab(
-                text: "EMOM",
-                icon: Icon(
-                  MetconType.emom.icon,
-                ),
-              ),
-              Tab(
-                text: "FOR TIME",
-                icon: Icon(
-                  MetconType.forTime.icon,
-                ),
-              )
-            ],
-          ),
-        ),
-        body: Container(
-          padding: Defaults.edgeInsets.normal,
-          child: TabBarView(
-            children: [
-              Column(
-                children: [
-                  _timeFormField(MetconType.amrap),
-                  Defaults.sizedBox.vertical.huge,
-                  _startStopButton(MetconType.amrap),
-                  const SizedBox(
-                    height: 100,
+    return NeverPop(
+      child: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text("Timer"),
+            bottom: TabBar(
+              onTap: (index) {
+                setState(() {
+                  _logger.i("ontap");
+                  _currentTime = Duration.zero;
+                });
+              },
+              indicatorColor: Theme.of(context).colorScheme.primary,
+              tabs: [
+                Tab(
+                  text: "AMRAP",
+                  icon: Icon(
+                    MetconType.amrap.icon,
                   ),
-                  _timeText(MetconType.amrap),
-                ],
-              ),
-              Column(
-                children: [
-                  _timeFormField(MetconType.emom),
-                  TextFormField(
-                    keyboardType: TextInputType.number,
-                    onChanged: (rounds) {
-                      if (Validator.validateIntGtZero(rounds) == null) {
-                        setState(() => _totalRounds = int.parse(rounds));
-                      }
-                    },
-                    style: const TextStyle(height: 1),
-                    initialValue: _totalRounds.toString(),
-                    validator: Validator.validateIntGtZero,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    decoration: const InputDecoration(
-                      icon: Icon(AppIcons.repeat),
-                      labelText: "Rounds",
-                      contentPadding: EdgeInsets.symmetric(vertical: 5),
+                ),
+                Tab(
+                  text: "EMOM",
+                  icon: Icon(
+                    MetconType.emom.icon,
+                  ),
+                ),
+                Tab(
+                  text: "FOR TIME",
+                  icon: Icon(
+                    MetconType.forTime.icon,
+                  ),
+                )
+              ],
+            ),
+          ),
+          body: Container(
+            padding: Defaults.edgeInsets.normal,
+            child: TabBarView(
+              children: [
+                Column(
+                  children: [
+                    _timeFormField(MetconType.amrap),
+                    Defaults.sizedBox.vertical.huge,
+                    _startStopButton(MetconType.amrap),
+                    const SizedBox(
+                      height: 100,
                     ),
-                  ),
-                  Defaults.sizedBox.vertical.huge,
-                  _startStopButton(MetconType.emom),
-                  const SizedBox(
-                    height: 100,
-                  ),
-                  _roundText(),
-                  _timeText(MetconType.emom),
-                ],
-              ),
-              Column(
-                children: [
-                  _timeFormField(MetconType.forTime),
-                  Defaults.sizedBox.vertical.huge,
-                  _startStopButton(MetconType.forTime),
-                  const SizedBox(
-                    height: 100,
-                  ),
-                  _timeText(MetconType.forTime),
-                ],
-              ),
-            ],
+                    _timeText(MetconType.amrap),
+                  ],
+                ),
+                Column(
+                  children: [
+                    _timeFormField(MetconType.emom),
+                    TextFormField(
+                      keyboardType: TextInputType.number,
+                      onChanged: (rounds) {
+                        if (Validator.validateIntGtZero(rounds) == null) {
+                          setState(() => _totalRounds = int.parse(rounds));
+                        }
+                      },
+                      style: const TextStyle(height: 1),
+                      initialValue: _totalRounds.toString(),
+                      validator: Validator.validateIntGtZero,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      decoration: const InputDecoration(
+                        icon: Icon(AppIcons.repeat),
+                        labelText: "Rounds",
+                        contentPadding: EdgeInsets.symmetric(vertical: 5),
+                      ),
+                    ),
+                    Defaults.sizedBox.vertical.huge,
+                    _startStopButton(MetconType.emom),
+                    const SizedBox(
+                      height: 100,
+                    ),
+                    _roundText(),
+                    _timeText(MetconType.emom),
+                  ],
+                ),
+                Column(
+                  children: [
+                    _timeFormField(MetconType.forTime),
+                    Defaults.sizedBox.vertical.huge,
+                    _startStopButton(MetconType.forTime),
+                    const SizedBox(
+                      height: 100,
+                    ),
+                    _timeText(MetconType.forTime),
+                  ],
+                ),
+              ],
+            ),
           ),
+          drawer: const MainDrawer(selectedRoute: Routes.settings),
         ),
-        drawer: const MainDrawer(selectedRoute: Routes.settings),
       ),
     );
   }

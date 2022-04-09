@@ -9,6 +9,7 @@ import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/never_pop.dart';
 
 class MetconsPage extends StatefulWidget {
   const MetconsPage({Key? key}) : super(key: key);
@@ -48,43 +49,48 @@ class _MetconsPageState extends State<MetconsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Metcons"),
-        actions: [
-          IconButton(
-            onPressed: () =>
-                Nav.newBase(context, Routes.metcon.sessionOverview),
-            icon: const Icon(AppIcons.notes),
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: _dataProvider.pullFromServer,
-        child: _metconDescriptions.isEmpty
-            ? const Center(
-                child: Text(
-                  "looks like there are no metcons there yet 😔 \npress ＋ to create a new one",
-                  textAlign: TextAlign.center,
+    return NeverPop(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Metcons"),
+          actions: [
+            IconButton(
+              onPressed: () =>
+                  Nav.newBase(context, Routes.metcon.sessionOverview),
+              icon: const Icon(AppIcons.notes),
+            ),
+          ],
+        ),
+        body: RefreshIndicator(
+          onRefresh: _dataProvider.pullFromServer,
+          child: _metconDescriptions.isEmpty
+              ? const Center(
+                  child: Text(
+                    "looks like there are no metcons there yet 😔 \npress ＋ to create a new one",
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : Container(
+                  padding: Defaults.edgeInsets.normal,
+                  child: ListView.separated(
+                    itemBuilder: (_, index) => MetconCard(
+                      metconDescription: _metconDescriptions[index],
+                    ),
+                    separatorBuilder: (_, __) =>
+                        Defaults.sizedBox.vertical.normal,
+                    itemCount: _metconDescriptions.length,
+                  ),
                 ),
-              )
-            : Container(
-                padding: Defaults.edgeInsets.normal,
-                child: ListView.separated(
-                  itemBuilder: (_, index) =>
-                      MetconCard(metconDescription: _metconDescriptions[index]),
-                  separatorBuilder: (_, __) =>
-                      Defaults.sizedBox.vertical.normal,
-                  itemCount: _metconDescriptions.length,
-                ),
-              ),
-      ),
-      bottomNavigationBar:
-          SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.metcon),
-      drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(AppIcons.add),
-        onPressed: () => Navigator.pushNamed(context, Routes.metcon.edit),
+        ),
+        bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
+          context,
+          SessionsPageTab.metcon,
+        ),
+        drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(AppIcons.add),
+          onPressed: () => Navigator.pushNamed(context, Routes.metcon.edit),
+        ),
       ),
     );
   }

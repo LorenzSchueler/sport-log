@@ -17,6 +17,7 @@ import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/never_pop.dart';
 
 class TimelinePage extends StatefulWidget {
   const TimelinePage({Key? key}) : super(key: key);
@@ -154,40 +155,42 @@ class TimelinePageState extends State<TimelinePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Timeline"),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(40),
-          child: DateFilter(
-            initialState: _dateFilter,
-            onFilterChanged: (dateFilter) async {
-              setState(() => _dateFilter = dateFilter);
-              await _update();
-            },
+    return NeverPop(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Timeline"),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(40),
+            child: DateFilter(
+              initialState: _dateFilter,
+              onFilterChanged: (dateFilter) async {
+                setState(() => _dateFilter = dateFilter);
+                await _update();
+              },
+            ),
           ),
         ),
-      ),
-      body: RefreshIndicator(
-        onRefresh: _pullFromServer,
-        child: _items.isEmpty
-            ? SessionsPageTab.timeline.noEntriesText
-            : Container(
-                padding: Defaults.edgeInsets.normal,
-                child: ListView.separated(
-                  itemBuilder: (context, index) => _itemCard(_items[index]),
-                  separatorBuilder: (_, __) =>
-                      Defaults.sizedBox.vertical.normal,
-                  itemCount: _items.length,
+        body: RefreshIndicator(
+          onRefresh: _pullFromServer,
+          child: _items.isEmpty
+              ? SessionsPageTab.timeline.noEntriesText
+              : Container(
+                  padding: Defaults.edgeInsets.normal,
+                  child: ListView.separated(
+                    itemBuilder: (context, index) => _itemCard(_items[index]),
+                    separatorBuilder: (_, __) =>
+                        Defaults.sizedBox.vertical.normal,
+                    itemCount: _items.length,
+                  ),
                 ),
-              ),
+        ),
+        bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
+          context,
+          SessionsPageTab.timeline,
+        ),
+        drawer: MainDrawer(selectedRoute: Routes.timeline.overview),
+        floatingActionButton: null,
       ),
-      bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
-        context,
-        SessionsPageTab.timeline,
-      ),
-      drawer: MainDrawer(selectedRoute: Routes.timeline.overview),
-      floatingActionButton: null,
     );
   }
 

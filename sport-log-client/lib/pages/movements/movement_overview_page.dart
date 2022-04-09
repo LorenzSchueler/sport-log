@@ -9,6 +9,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/never_pop.dart';
 
 final _dataProvider = MovementDescriptionDataProvider();
 
@@ -49,37 +50,39 @@ class _MovementsPageState extends State<MovementsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Movements"),
-      ),
-      drawer: MainDrawer(selectedRoute: Routes.movement.overview),
-      body: RefreshIndicator(
-        onRefresh: _dataProvider.pullFromServer,
-        child: _movementDescriptions.isEmpty
-            ? const Center(
-                child: Text(
-                  "looks like there are no movements there yet 😔 \npress ＋ to create a new one",
-                  textAlign: TextAlign.center,
-                ),
-              )
-            : Container(
-                padding: Defaults.edgeInsets.normal,
-                child: ListView.separated(
-                  itemBuilder: (_, index) => MovementCard(
-                    movementDescription: _movementDescriptions[index],
+    return NeverPop(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Movements"),
+        ),
+        drawer: MainDrawer(selectedRoute: Routes.movement.overview),
+        body: RefreshIndicator(
+          onRefresh: _dataProvider.pullFromServer,
+          child: _movementDescriptions.isEmpty
+              ? const Center(
+                  child: Text(
+                    "looks like there are no movements there yet 😔 \npress ＋ to create a new one",
+                    textAlign: TextAlign.center,
                   ),
-                  separatorBuilder: (_, __) =>
-                      Defaults.sizedBox.vertical.normal,
-                  itemCount: _movementDescriptions.length,
+                )
+              : Container(
+                  padding: Defaults.edgeInsets.normal,
+                  child: ListView.separated(
+                    itemBuilder: (_, index) => MovementCard(
+                      movementDescription: _movementDescriptions[index],
+                    ),
+                    separatorBuilder: (_, __) =>
+                        Defaults.sizedBox.vertical.normal,
+                    itemCount: _movementDescriptions.length,
+                  ),
                 ),
-              ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(AppIcons.add),
-        onPressed: () async {
-          await Navigator.pushNamed(context, Routes.movement.edit);
-        },
+        ),
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(AppIcons.add),
+          onPressed: () async {
+            await Navigator.pushNamed(context, Routes.movement.edit);
+          },
+        ),
       ),
     );
   }

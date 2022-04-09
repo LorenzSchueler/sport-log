@@ -11,6 +11,7 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/never_pop.dart';
 
 final _dataProvider = PlatformDescriptionDataProvider();
 
@@ -51,32 +52,34 @@ class PlatformOverviewPageState extends State<PlatformOverviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Server Actions"),
-      ),
-      body: RefreshIndicator(
-        onRefresh: _dataProvider.pullFromServer,
-        child: _platformDescriptions.isEmpty
-            ? const Center(
-                child: Text(
-                  "looks like there are no platforms 😔",
-                  textAlign: TextAlign.center,
-                ),
-              )
-            : Container(
-                padding: Defaults.edgeInsets.normal,
-                child: ListView.separated(
-                  itemBuilder: (_, index) => PlatformCard(
-                    platformDescription: _platformDescriptions[index],
+    return NeverPop(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Server Actions"),
+        ),
+        body: RefreshIndicator(
+          onRefresh: _dataProvider.pullFromServer,
+          child: _platformDescriptions.isEmpty
+              ? const Center(
+                  child: Text(
+                    "looks like there are no platforms 😔",
+                    textAlign: TextAlign.center,
                   ),
-                  separatorBuilder: (_, __) =>
-                      Defaults.sizedBox.vertical.normal,
-                  itemCount: _platformDescriptions.length,
+                )
+              : Container(
+                  padding: Defaults.edgeInsets.normal,
+                  child: ListView.separated(
+                    itemBuilder: (_, index) => PlatformCard(
+                      platformDescription: _platformDescriptions[index],
+                    ),
+                    separatorBuilder: (_, __) =>
+                        Defaults.sizedBox.vertical.normal,
+                    itemCount: _platformDescriptions.length,
+                  ),
                 ),
-              ),
+        ),
+        drawer: MainDrawer(selectedRoute: Routes.action.platformOverview),
       ),
-      drawer: MainDrawer(selectedRoute: Routes.action.platformOverview),
     );
   }
 }

@@ -12,6 +12,7 @@ import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/never_pop.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RoutePage extends StatefulWidget {
@@ -52,42 +53,46 @@ class RoutePageState extends State<RoutePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Routes"),
-        actions: [
-          IconButton(
-            onPressed: () => Nav.newBase(context, Routes.cardio.overview),
-            icon: const Icon(AppIcons.heartbeat),
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: _dataProvider.pullFromServer,
-        child: _routes.isEmpty
-            ? const Center(
-                child: Text(
-                  "looks like there are no routes there yet 😔 \npress ＋ to create a new one",
-                  textAlign: TextAlign.center,
+    return NeverPop(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Routes"),
+          actions: [
+            IconButton(
+              onPressed: () => Nav.newBase(context, Routes.cardio.overview),
+              icon: const Icon(AppIcons.heartbeat),
+            ),
+          ],
+        ),
+        body: RefreshIndicator(
+          onRefresh: _dataProvider.pullFromServer,
+          child: _routes.isEmpty
+              ? const Center(
+                  child: Text(
+                    "looks like there are no routes there yet 😔 \npress ＋ to create a new one",
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : Container(
+                  padding: Defaults.edgeInsets.normal,
+                  child: ListView.separated(
+                    itemBuilder: (_, index) => RouteCard(route: _routes[index]),
+                    separatorBuilder: (_, __) =>
+                        Defaults.sizedBox.vertical.normal,
+                    itemCount: _routes.length,
+                  ),
                 ),
-              )
-            : Container(
-                padding: Defaults.edgeInsets.normal,
-                child: ListView.separated(
-                  itemBuilder: (_, index) => RouteCard(route: _routes[index]),
-                  separatorBuilder: (_, __) =>
-                      Defaults.sizedBox.vertical.normal,
-                  itemCount: _routes.length,
-                ),
-              ),
-      ),
-      bottomNavigationBar:
-          SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.cardio),
-      drawer: MainDrawer(selectedRoute: Routes.cardio.routeOverview),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async =>
-            await Navigator.pushNamed(context, Routes.cardio.routeEdit),
-        child: const Icon(AppIcons.add),
+        ),
+        bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
+          context,
+          SessionsPageTab.cardio,
+        ),
+        drawer: MainDrawer(selectedRoute: Routes.cardio.routeOverview),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async =>
+              await Navigator.pushNamed(context, Routes.cardio.routeEdit),
+          child: const Icon(AppIcons.add),
+        ),
       ),
     );
   }

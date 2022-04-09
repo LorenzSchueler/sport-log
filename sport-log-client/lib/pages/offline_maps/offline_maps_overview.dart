@@ -10,6 +10,7 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/never_pop.dart';
 
 class OfflineMapsPage extends StatefulWidget {
   const OfflineMapsPage({Key? key}) : super(key: key);
@@ -135,58 +136,60 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Offline Maps")),
-      drawer: const MainDrawer(selectedRoute: Routes.offlineMaps),
-      body: Column(
-        children: [
-          Stack(
-            children: [
-              SizedBox(
-                height: 400,
-                child: MapboxMap(
-                  accessToken: Defaults.mapbox.accessToken,
-                  styleString: Defaults.mapbox.style.outdoor,
-                  initialCameraPosition: Settings.lastMapPosition,
-                  trackCameraPosition: true,
-                  onMapCreated: (MapboxMapController controller) =>
-                      _mapController = controller,
-                  onMapLongClick: (_, latLng) => _point1 == null
-                      ? _updatePoint1(latLng)
-                      : _updatePoint2(latLng),
-                ),
-              ),
-              Positioned(
-                bottom: 10,
-                right: 10,
-                child: FloatingActionButton.small(
-                  heroTag: null,
-                  child: const Icon(AppIcons.undo),
-                  onPressed: () => _point2 != null
-                      ? _updatePoint2(null)
-                      : _updatePoint1(null),
-                ),
-              )
-            ],
-          ),
-          Container(
-            padding: Defaults.edgeInsets.normal,
-            child: _progress == null
-                ? ElevatedButton(
-                    onPressed: _downloadMap,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(AppIcons.download),
-                        Text("download")
-                      ],
-                    ),
-                  )
-                : LinearProgressIndicator(
-                    value: _progress ?? 0.3,
+    return NeverPop(
+      child: Scaffold(
+        appBar: AppBar(title: const Text("Offline Maps")),
+        drawer: const MainDrawer(selectedRoute: Routes.offlineMaps),
+        body: Column(
+          children: [
+            Stack(
+              children: [
+                SizedBox(
+                  height: 400,
+                  child: MapboxMap(
+                    accessToken: Defaults.mapbox.accessToken,
+                    styleString: Defaults.mapbox.style.outdoor,
+                    initialCameraPosition: Settings.lastMapPosition,
+                    trackCameraPosition: true,
+                    onMapCreated: (MapboxMapController controller) =>
+                        _mapController = controller,
+                    onMapLongClick: (_, latLng) => _point1 == null
+                        ? _updatePoint1(latLng)
+                        : _updatePoint2(latLng),
                   ),
-          )
-        ],
+                ),
+                Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: FloatingActionButton.small(
+                    heroTag: null,
+                    child: const Icon(AppIcons.undo),
+                    onPressed: () => _point2 != null
+                        ? _updatePoint2(null)
+                        : _updatePoint1(null),
+                  ),
+                )
+              ],
+            ),
+            Container(
+              padding: Defaults.edgeInsets.normal,
+              child: _progress == null
+                  ? ElevatedButton(
+                      onPressed: _downloadMap,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(AppIcons.download),
+                          Text("download")
+                        ],
+                      ),
+                    )
+                  : LinearProgressIndicator(
+                      value: _progress ?? 0.3,
+                    ),
+            )
+          ],
+        ),
       ),
     );
   }

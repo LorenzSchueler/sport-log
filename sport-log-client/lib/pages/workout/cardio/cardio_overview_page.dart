@@ -17,6 +17,7 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/never_pop.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
@@ -68,12 +69,14 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return NeverPop(
+      child: Scaffold(
       appBar: AppBar(
         title: Text(_movement?.name ?? "Cardio Sessions"),
         actions: [
           IconButton(
-            onPressed: () => Nav.newBase(context, Routes.cardio.routeOverview),
+              onPressed: () =>
+                  Nav.newBase(context, Routes.cardio.routeOverview),
             icon: const Icon(AppIcons.route),
           ),
           IconButton(
@@ -120,7 +123,8 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
                 padding: Defaults.edgeInsets.normal,
                 child: ListView.separated(
                   itemBuilder: (_, index) => CardioSessionCard(
-                    cardioSessionDescription: _cardioSessionDescriptions[index],
+                      cardioSessionDescription:
+                          _cardioSessionDescriptions[index],
                   ),
                   separatorBuilder: (_, __) =>
                       Defaults.sizedBox.vertical.normal,
@@ -128,8 +132,10 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
                 ),
               ),
       ),
-      bottomNavigationBar:
-          SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.cardio),
+        bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
+          context,
+          SessionsPageTab.cardio,
+        ),
       drawer: MainDrawer(selectedRoute: Routes.cardio.overview),
       floatingActionButton: ExpandableFab(
         icon: const Icon(AppIcons.add),
@@ -149,6 +155,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

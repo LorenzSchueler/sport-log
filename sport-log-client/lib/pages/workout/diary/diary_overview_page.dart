@@ -11,6 +11,7 @@ import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/never_pop.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class DiaryPage extends StatefulWidget {
@@ -56,42 +57,45 @@ class DiaryPageState extends State<DiaryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Diary"),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(40),
-          child: DateFilter(
-            initialState: _dateFilter,
-            onFilterChanged: (dateFilter) async {
-              setState(() => _dateFilter = dateFilter);
-              await _update();
-            },
+    return NeverPop(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Diary"),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(40),
+            child: DateFilter(
+              initialState: _dateFilter,
+              onFilterChanged: (dateFilter) async {
+                setState(() => _dateFilter = dateFilter);
+                await _update();
+              },
+            ),
           ),
         ),
-      ),
-      body: RefreshIndicator(
-        onRefresh: _dataProvider.pullFromServer,
-        child: _diaries.isEmpty
-            ? SessionsPageTab.diary.noEntriesText
-            : Container(
-                padding: Defaults.edgeInsets.normal,
-                child: ListView.separated(
-                  itemBuilder: (_, index) => DiaryCard(diary: _diaries[index]),
-                  separatorBuilder: (_, __) =>
-                      Defaults.sizedBox.vertical.normal,
-                  itemCount: _diaries.length,
+        body: RefreshIndicator(
+          onRefresh: _dataProvider.pullFromServer,
+          child: _diaries.isEmpty
+              ? SessionsPageTab.diary.noEntriesText
+              : Container(
+                  padding: Defaults.edgeInsets.normal,
+                  child: ListView.separated(
+                    itemBuilder: (_, index) =>
+                        DiaryCard(diary: _diaries[index]),
+                    separatorBuilder: (_, __) =>
+                        Defaults.sizedBox.vertical.normal,
+                    itemCount: _diaries.length,
+                  ),
                 ),
-              ),
-      ),
-      bottomNavigationBar:
-          SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.diary),
-      drawer: MainDrawer(selectedRoute: Routes.diary.overview),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(AppIcons.add),
-        onPressed: () {
-          Navigator.pushNamed(context, Routes.diary.edit);
-        },
+        ),
+        bottomNavigationBar:
+            SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.diary),
+        drawer: MainDrawer(selectedRoute: Routes.diary.overview),
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(AppIcons.add),
+          onPressed: () {
+            Navigator.pushNamed(context, Routes.diary.edit);
+          },
+        ),
       ),
     );
   }

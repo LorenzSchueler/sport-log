@@ -12,6 +12,7 @@ import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/never_pop.dart';
 import 'package:sport_log/widgets/picker/metcon_picker.dart';
 
 class MetconSessionsPage extends StatefulWidget {
@@ -62,74 +63,79 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_metcon?.name ?? "Metcon Sessions"),
-        actions: [
-          IconButton(
-            onPressed: () => Nav.newBase(context, Routes.metcon.overview),
-            icon: const Icon(AppIcons.notes),
-          ),
-          IconButton(
-            onPressed: () async {
-              final Metcon? metcon = await showMetconPicker(
-                context: context,
-                selectedMetcon: _metcon,
-              );
-              if (metcon == null) {
-                return;
-              } else if (metcon.id == _metcon?.id) {
-                setState(() {
-                  _metcon = null;
-                });
+    return NeverPop(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_metcon?.name ?? "Metcon Sessions"),
+          actions: [
+            IconButton(
+              onPressed: () => Nav.newBase(context, Routes.metcon.overview),
+              icon: const Icon(AppIcons.notes),
+            ),
+            IconButton(
+              onPressed: () async {
+                final Metcon? metcon = await showMetconPicker(
+                  context: context,
+                  selectedMetcon: _metcon,
+                );
+                if (metcon == null) {
+                  return;
+                } else if (metcon.id == _metcon?.id) {
+                  setState(() {
+                    _metcon = null;
+                  });
+                  await _update();
+                } else {
+                  setState(() {
+                    _metcon = metcon;
+                  });
+                  await _update();
+                }
+              },
+              icon: Icon(
+                _metcon != null ? AppIcons.filterFilled : AppIcons.filter,
+              ),
+            ),
+          ],
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(40),
+            child: DateFilter(
+              initialState: _dateFilter,
+              onFilterChanged: (dateFilter) async {
+                setState(() => _dateFilter = dateFilter);
                 await _update();
-              } else {
-                setState(() {
-                  _metcon = metcon;
-                });
-                await _update();
-              }
-            },
-            icon: Icon(
-              _metcon != null ? AppIcons.filterFilled : AppIcons.filter,
+              },
             ),
           ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(40),
-          child: DateFilter(
-            initialState: _dateFilter,
-            onFilterChanged: (dateFilter) async {
-              setState(() => _dateFilter = dateFilter);
-              await _update();
-            },
-          ),
         ),
-      ),
-      body: RefreshIndicator(
-        onRefresh: _dataProvider.pullFromServer,
-        child: _metconSessionDescriptions.isEmpty
-            ? SessionsPageTab.metcon.noEntriesText
-            : Container(
-                padding: Defaults.edgeInsets.normal,
-                child: ListView.separated(
-                  itemBuilder: (_, index) => MetconSessionCard(
-                    metconSessionDescription: _metconSessionDescriptions[index],
+        body: RefreshIndicator(
+          onRefresh: _dataProvider.pullFromServer,
+          child: _metconSessionDescriptions.isEmpty
+              ? SessionsPageTab.metcon.noEntriesText
+              : Container(
+                  padding: Defaults.edgeInsets.normal,
+                  child: ListView.separated(
+                    itemBuilder: (_, index) => MetconSessionCard(
+                      metconSessionDescription:
+                          _metconSessionDescriptions[index],
+                    ),
+                    separatorBuilder: (_, __) =>
+                        Defaults.sizedBox.vertical.normal,
+                    itemCount: _metconSessionDescriptions.length,
                   ),
-                  separatorBuilder: (_, __) =>
-                      Defaults.sizedBox.vertical.normal,
-                  itemCount: _metconSessionDescriptions.length,
                 ),
-              ),
-      ),
-      bottomNavigationBar:
-          SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.metcon),
-      drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(AppIcons.add),
-        onPressed: () {
-          Navigator.pushNamed(context, Routes.metcon.sessionEdit);
-        },
+        ),
+        bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
+          context,
+          SessionsPageTab.metcon,
+        ),
+        drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(AppIcons.add),
+          onPressed: () {
+            Navigator.pushNamed(context, Routes.metcon.sessionEdit);
+          },
+        ),
       ),
     );
   }

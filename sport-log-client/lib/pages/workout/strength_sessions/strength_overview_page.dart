@@ -14,6 +14,7 @@ import 'package:sport_log/pages/workout/strength_sessions/strength_chart.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/never_pop.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
 
 class StrengthSessionsPage extends StatefulWidget {
@@ -65,89 +66,91 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_movement?.name ?? "Strength Sessions"),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              final Movement? movement = await showMovementPicker(
-                context: context,
-                selectedMovement: _movement,
-              );
-              if (movement == null) {
-                return;
-              } else if (movement.id == _movement?.id) {
-                setState(() {
-                  _movement = null;
-                });
+    return NeverPop(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_movement?.name ?? "Strength Sessions"),
+          actions: [
+            IconButton(
+              onPressed: () async {
+                final Movement? movement = await showMovementPicker(
+                  context: context,
+                  selectedMovement: _movement,
+                );
+                if (movement == null) {
+                  return;
+                } else if (movement.id == _movement?.id) {
+                  setState(() {
+                    _movement = null;
+                  });
+                  await _update();
+                } else {
+                  setState(() {
+                    _movement = movement;
+                  });
+                  await _update();
+                }
+                _logger.i("selected movement: ${movement.name}");
+              },
+              icon: Icon(
+                _movement != null ? AppIcons.filterFilled : AppIcons.filter,
+              ),
+            ),
+          ],
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(40),
+            child: DateFilter(
+              initialState: _dateFilter,
+              onFilterChanged: (dateFilter) async {
+                setState(() => _dateFilter = dateFilter);
                 await _update();
-              } else {
-                setState(() {
-                  _movement = movement;
-                });
-                await _update();
-              }
-              _logger.i("selected movement: ${movement.name}");
-            },
-            icon: Icon(
-              _movement != null ? AppIcons.filterFilled : AppIcons.filter,
+              },
             ),
           ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(40),
-          child: DateFilter(
-            initialState: _dateFilter,
-            onFilterChanged: (dateFilter) async {
-              setState(() => _dateFilter = dateFilter);
-              await _update();
-            },
-          ),
         ),
-      ),
-      body: RefreshIndicator(
-        onRefresh: _dataProvider.pullFromServer,
-        child: Container(
-          padding: Defaults.edgeInsets.normal,
-          child: CustomScrollView(
-            slivers: [
-              if (_sessions.isEmpty)
-                SliverFillRemaining(
-                  child: SessionsPageTab.strength.noEntriesText,
-                ),
-              if (_sessions.isNotEmpty && _movement != null)
-                SliverToBoxAdapter(
-                  child: StrengthChart(
-                    movement: _movement!,
-                    dateFilterState: _dateFilter,
+        body: RefreshIndicator(
+          onRefresh: _dataProvider.pullFromServer,
+          child: Container(
+            padding: Defaults.edgeInsets.normal,
+            child: CustomScrollView(
+              slivers: [
+                if (_sessions.isEmpty)
+                  SliverFillRemaining(
+                    child: SessionsPageTab.strength.noEntriesText,
                   ),
-                ),
-              if (_sessions.isNotEmpty)
-                SliverFillRemaining(
-                  child: ListView.separated(
-                    itemBuilder: (context, index) => StrengthSessionCard(
-                      strengthSessionDescription: _sessions[index],
+                if (_sessions.isNotEmpty && _movement != null)
+                  SliverToBoxAdapter(
+                    child: StrengthChart(
+                      movement: _movement!,
+                      dateFilterState: _dateFilter,
                     ),
-                    separatorBuilder: (_, __) =>
-                        Defaults.sizedBox.vertical.normal,
-                    itemCount: _sessions.length,
                   ),
-                ),
-            ],
+                if (_sessions.isNotEmpty)
+                  SliverFillRemaining(
+                    child: ListView.separated(
+                      itemBuilder: (context, index) => StrengthSessionCard(
+                        strengthSessionDescription: _sessions[index],
+                      ),
+                      separatorBuilder: (_, __) =>
+                          Defaults.sizedBox.vertical.normal,
+                      itemCount: _sessions.length,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
-      ),
-      bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
-        context,
-        SessionsPageTab.strength,
-      ),
-      drawer: MainDrawer(selectedRoute: Routes.strength.overview),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(AppIcons.add),
-        onPressed: () {
-          Navigator.pushNamed(context, Routes.strength.edit);
-        },
+        bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
+          context,
+          SessionsPageTab.strength,
+        ),
+        drawer: MainDrawer(selectedRoute: Routes.strength.overview),
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(AppIcons.add),
+          onPressed: () {
+            Navigator.pushNamed(context, Routes.strength.edit);
+          },
+        ),
       ),
     );
   }
