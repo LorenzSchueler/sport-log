@@ -78,14 +78,4 @@ class MovementDescriptionDataProvider
   Future<bool> pushUpdatedToServer() async {
     return await _dataProvider.pushUpdatedToServer();
   }
-
-  Future<List<MovementDescription>> getByName(
-    String? name, {
-    bool cardioOnly = false,
-  }) async {
-    return await _movementDescriptionDb.getByName(
-      name,
-      cardioOnly: cardioOnly,
-    );
-  }
 }
