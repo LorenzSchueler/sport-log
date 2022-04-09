@@ -110,10 +110,9 @@ extension DateTimeExtension on DateTime {
   static final _dateWithoutYear = DateFormat('dd.MM.');
   static final _dateWithYear = DateFormat('dd.MM.yyyy');
   static final _dateTimeFull = DateFormat('dd.MM.yyyy HH:mm');
-  static final _timeFull = DateFormat('HH:mm');
+  static final _timeHourMinute = DateFormat('HH:mm');
   static final _monthName = DateFormat.MMMM();
   static final _monthNameWithYear = DateFormat('MMMM yyyy');
-  static final _timeHourMinute = DateFormat.Hm();
   static final _longWeekday = DateFormat.EEEE();
 
   String toStringDateWithoutYear() {
@@ -128,8 +127,8 @@ extension DateTimeExtension on DateTime {
     return _dateTimeFull.format(this);
   }
 
-  String toStringTime() {
-    return _timeFull.format(this);
+  String toStringHourMinute() {
+    return _timeHourMinute.format(this);
   }
 
   String toStringMonthWithoutYear() {
@@ -138,10 +137,6 @@ extension DateTimeExtension on DateTime {
 
   String toStringMonthWithYear() {
     return _monthNameWithYear.format(this);
-  }
-
-  String toStringHourMinute() {
-    return _timeHourMinute.format(this);
   }
 
   String toStringWeekday() {

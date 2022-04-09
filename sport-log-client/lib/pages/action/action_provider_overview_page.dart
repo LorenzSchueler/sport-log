@@ -144,7 +144,9 @@ class ActionsCard extends StatelessWidget {
 
 class ActionRulesCard extends StatelessWidget {
   final ActionProviderDescription actionProviderDescription;
-  const ActionRulesCard({required this.actionProviderDescription, Key? key})
+  final _dataProvider = ActionRuleDataProvider();
+
+  ActionRulesCard({required this.actionProviderDescription, Key? key})
       : super(key: key);
 
   @override
@@ -173,41 +175,55 @@ class ActionRulesCard extends StatelessWidget {
             ),
             for (final actionRule in actionProviderDescription.actionRules) ...[
               const Divider(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 120,
-                        child: Text(
-                          actionName(
-                            actionProviderDescription,
-                            actionRule.actionId,
-                          ),
-                        ),
-                      ),
-                      Defaults.sizedBox.horizontal.normal,
-                      Text(
-                        "${actionRule.weekday.displayName} at ${actionRule.time.toStringHourMinute()}",
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                        value: actionRule.enabled,
-                        onChanged: null,
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      )
-                    ],
-                  ),
-                  if (actionRule.arguments != null)
+              GestureDetector(
+                onTap: () => Navigator.of(context).pushNamed(
+                  Routes.action.actionRuleEdit,
+                  arguments: [actionProviderDescription, actionRule],
+                ),
+                behavior: HitTestBehavior.opaque,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Row(
                       children: [
-                        const SizedBox(width: 120),
+                        SizedBox(
+                          width: 120,
+                          child: Text(
+                            actionName(
+                              actionProviderDescription,
+                              actionRule.actionId,
+                            ),
+                          ),
+                        ),
                         Defaults.sizedBox.horizontal.normal,
-                        Text("Arguments: ${actionRule.arguments}"),
+                        Text(
+                          "${actionRule.weekday.displayName} at ${actionRule.time.toStringHourMinute()}",
+                        ),
+                        const Spacer(),
+                        Checkbox(
+                          value: actionRule.enabled,
+                          onChanged: (value) {
+                            if (value != null) {
+                              actionRule.enabled = value;
+                              _dataProvider.updateSingle(actionRule);
+                            }
+                          },
+                          visualDensity: VisualDensity.compact,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        )
                       ],
                     ),
-                ],
+                    if (actionRule.arguments != null)
+                      Row(
+                        children: [
+                          const SizedBox(width: 120),
+                          Defaults.sizedBox.horizontal.normal,
+                          Text("Arguments: ${actionRule.arguments}"),
+                        ],
+                      ),
+                  ],
+                ),
               ),
             ]
           ],
@@ -219,7 +235,9 @@ class ActionRulesCard extends StatelessWidget {
 
 class ActionEventsCard extends StatelessWidget {
   final ActionProviderDescription actionProviderDescription;
-  const ActionEventsCard({required this.actionProviderDescription, Key? key})
+  final _dataProvider = ActionEventDataProvider();
+
+  ActionEventsCard({required this.actionProviderDescription, Key? key})
       : super(key: key);
 
   @override
@@ -249,43 +267,57 @@ class ActionEventsCard extends StatelessWidget {
             for (final actionEvent
                 in actionProviderDescription.actionEvents) ...[
               const Divider(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 120,
-                        child: Text(
-                          actionName(
-                            actionProviderDescription,
-                            actionEvent.actionId,
-                          ),
-                        ),
-                      ),
-                      Defaults.sizedBox.horizontal.normal,
-                      Text(
-                        actionEvent.datetime.toHumanWithTime(),
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                        value: actionEvent.enabled,
-                        onChanged: null,
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      )
-                    ],
-                  ),
-                  if (actionEvent.arguments != null)
+              GestureDetector(
+                onTap: () => Navigator.of(context).pushNamed(
+                  Routes.action.actionEventEdit,
+                  arguments: [actionProviderDescription, actionEvent],
+                ),
+                behavior: HitTestBehavior.opaque,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Row(
                       children: [
-                        const SizedBox(width: 120),
+                        SizedBox(
+                          width: 120,
+                          child: Text(
+                            actionName(
+                              actionProviderDescription,
+                              actionEvent.actionId,
+                            ),
+                          ),
+                        ),
                         Defaults.sizedBox.horizontal.normal,
-                        Text("Arguments: ${actionEvent.arguments}"),
+                        Text(
+                          actionEvent.datetime.toHumanWithTime(),
+                        ),
+                        const Spacer(),
+                        Checkbox(
+                          value: actionEvent.enabled,
+                          onChanged: (value) {
+                            if (value != null) {
+                              actionEvent.enabled = value;
+                              _dataProvider.updateSingle(actionEvent);
+                            }
+                          },
+                          visualDensity: VisualDensity.compact,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        )
                       ],
                     ),
-                ],
-              )
-            ]
+                    if (actionEvent.arguments != null)
+                      Row(
+                        children: [
+                          const SizedBox(width: 120),
+                          Defaults.sizedBox.horizontal.normal,
+                          Text("Arguments: ${actionEvent.arguments}"),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
       ),

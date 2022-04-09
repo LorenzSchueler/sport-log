@@ -102,7 +102,7 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
         child: ListView(
           children: [
             EditTile(
-              leading: AppIcons.calendar,
+              leading: AppIcons.radio,
               caption: "Action",
               child: Text(
                 widget.actionProviderDescription.actions
@@ -132,9 +132,9 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
               },
             ),
             EditTile(
-              leading: AppIcons.calendar,
+              leading: AppIcons.clock,
               caption: "Time",
-              child: Text(_actionRule.time.toStringTime()),
+              child: Text(_actionRule.time.toStringHourMinute()),
               onTap: () async {
                 TimeOfDay? time = await showTimePicker(
                   context: context,
