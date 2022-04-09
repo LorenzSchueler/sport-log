@@ -30,13 +30,16 @@ class AppState extends State<App> {
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.dark,
-        builder: (context, child) => child != null
-            ? MediaQuery(
-                data: MediaQuery.of(context).copyWith(textScaleFactor: 1),
-                child: child,
-              )
-            : Container(),
+        builder: ignoreSystemTextScaleFactor,
       ),
     );
   }
 }
+
+Widget ignoreSystemTextScaleFactor(BuildContext context, Widget? child) =>
+    child != null
+        ? MediaQuery(
+            data: MediaQuery.of(context).copyWith(textScaleFactor: 1),
+            child: child,
+          )
+        : Container();

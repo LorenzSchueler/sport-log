@@ -66,6 +66,7 @@ class InitAppWrapperState extends State<InitAppWrapper> {
                 child: LinearProgressIndicator(value: _progress),
               ),
             ),
+            builder: ignoreSystemTextScaleFactor,
           );
   }
 
