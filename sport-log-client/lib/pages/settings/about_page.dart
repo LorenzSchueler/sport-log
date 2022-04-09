@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/config.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/text_tile.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class _Contributor {
   final String name;
@@ -33,6 +34,11 @@ class AboutPage extends StatelessWidget {
         padding: Defaults.edgeInsets.normal,
         child: Column(
           children: [
+            TextTile(
+              leading: AppIcons.radio,
+              caption: "Version",
+              child: Text(Config.instance.version),
+            ),
             TextTile(
               leading: AppIcons.github,
               caption: "GitHub",

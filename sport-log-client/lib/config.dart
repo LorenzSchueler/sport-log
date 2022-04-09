@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:yaml/yaml.dart';
 
@@ -66,6 +67,9 @@ class Config extends JsonSerializable {
     }
     instance.isAndroidEmulator = isAndroidEmulator;
 
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    instance.version = packageInfo.version;
+
     _logger
       ..i('Min log level: ${instance.minLogLevel}')
       ..i('Delete database: ${instance.deleteDatabase}')
@@ -98,6 +102,8 @@ class Config extends JsonSerializable {
   final bool outputDbStatement;
   @JsonKey(ignore: true)
   late final bool isAndroidEmulator;
+  @JsonKey(ignore: true)
+  late final String version;
 
   static const String databaseName = 'database.sqlite';
 

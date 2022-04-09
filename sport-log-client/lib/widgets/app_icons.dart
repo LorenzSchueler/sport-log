@@ -77,4 +77,5 @@ class AppIcons {
   static const IconData satellite = Icons.satellite_rounded;
   static const IconData location = Icons.location_on;
   static const IconData battery = Icons.battery_std_rounded;
+  static const IconData radio = Icons.radio_button_checked_rounded;
 }
