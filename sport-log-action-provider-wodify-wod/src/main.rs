@@ -9,9 +9,7 @@ use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError, StatusCode};
 use serde::Deserialize;
-use thirtyfour::{
-    error::WebDriverError, http::reqwest_async::ReqwestDriverAsync, prelude::*, GenericWebDriver,
-};
+use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use tokio::{process::Command, time};
 use tracing::{debug, error, info, warn};
 
@@ -267,7 +265,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
 }
 
 async fn try_get_wod(
-    driver: &GenericWebDriver<ReqwestDriverAsync>,
+    driver: &WebDriver,
     client: &Client,
     username: &str,
     password: &str,

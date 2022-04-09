@@ -31,7 +31,7 @@ use chrono::{Duration, Utc};
 use err_derive::Error as StdError;
 use geo_types::Point;
 use geoutils::Location as GeoLocation;
-use gpx::{self, errors::Error as GpxError, Gpx, GpxVersion, Track, TrackSegment, Waypoint};
+use gpx::{self, errors::GpxError, Gpx, GpxVersion, Track, TrackSegment, Waypoint};
 use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError};
@@ -359,8 +359,8 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Result<Route> {
         .map(|point| {
             let point = point.point();
             Location {
-                latitude: point.lat(),
-                longitude: point.lng(),
+                latitude: point.y(),
+                longitude: point.x(),
             }
         })
         .collect();

@@ -9,9 +9,7 @@ use lazy_static::lazy_static;
 use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
 use sport_log_types::{ActionEventId, ExecutableActionEvent};
-use thirtyfour::{
-    error::WebDriverError, http::reqwest_async::ReqwestDriverAsync, prelude::*, GenericWebDriver,
-};
+use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use tracing::{debug, error, info, warn};
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
@@ -249,7 +247,7 @@ async fn login(mode: Mode) -> Result<()> {
 }
 
 async fn try_login(
-    driver: &GenericWebDriver<ReqwestDriverAsync>,
+    driver: &WebDriver,
     username: &str,
     password: &str,
     exec_action_event: &ExecutableActionEvent,
