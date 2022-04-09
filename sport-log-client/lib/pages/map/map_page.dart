@@ -114,40 +114,37 @@ class MapPageState extends State<MapPage> {
                   child: const Icon(AppIcons.map),
                   onPressed: () => showModalBottomSheet<void>(
                     context: context,
-                    builder: (context) => Container(
-                      //color: Colors.red,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          IconButton(
-                            icon: const Icon(AppIcons.map),
-                            onPressed: () {
-                              setState(() {
-                                mapStyle = Defaults.mapbox.style.outdoor;
-                              });
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(AppIcons.car),
-                            onPressed: () {
-                              setState(() {
-                                mapStyle = Defaults.mapbox.style.street;
-                              });
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(AppIcons.satellite),
-                            onPressed: () {
-                              setState(() {
-                                mapStyle = Defaults.mapbox.style.satellite;
-                              });
-                              Navigator.of(context).pop();
-                            },
-                          )
-                        ],
-                      ),
+                    builder: (context) => Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        IconButton(
+                          icon: const Icon(AppIcons.map),
+                          onPressed: () {
+                            setState(() {
+                              mapStyle = Defaults.mapbox.style.outdoor;
+                            });
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(AppIcons.car),
+                          onPressed: () {
+                            setState(() {
+                              mapStyle = Defaults.mapbox.style.street;
+                            });
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(AppIcons.satellite),
+                          onPressed: () {
+                            setState(() {
+                              mapStyle = Defaults.mapbox.style.satellite;
+                            });
+                            Navigator.of(context).pop();
+                          },
+                        )
+                      ],
                     ),
                   ),
                 ),
