@@ -24,7 +24,6 @@ class MapPageState extends State<MapPage> {
   late LocationUtils _locationUtils;
   late MapboxMapController _mapController;
   bool _showOverlays = true;
-  bool _showMapSettings = false;
 
   List<Circle> _circles = [];
   LatLng? _lastLatLng;
@@ -99,7 +98,6 @@ class MapPageState extends State<MapPage> {
                   controller..addListener(_mapControllerListener),
               onMapClick: (_, __) => setState(() {
                 _showOverlays = !_showOverlays;
-                _showMapSettings = false;
               }),
             ),
             Positioned(
@@ -107,45 +105,6 @@ class MapPageState extends State<MapPage> {
               right: 10,
               child: MapScale(metersPerPixel: _metersPerPixel),
             ),
-            if (_showMapSettings)
-              Positioned(
-                bottom: 0,
-                left: 10,
-                child: Container(
-                  width: MediaQuery.of(context).size.width - 20,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.background,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      IconButton(
-                        icon: const Icon(AppIcons.map),
-                        onPressed: () => setState(() {
-                          mapStyle = Defaults.mapbox.style.outdoor;
-                        }),
-                      ),
-                      IconButton(
-                        icon: const Icon(AppIcons.car),
-                        onPressed: () => setState(() {
-                          mapStyle = Defaults.mapbox.style.street;
-                        }),
-                      ),
-                      IconButton(
-                        icon: const Icon(AppIcons.satellite),
-                        onPressed: () => setState(() {
-                          mapStyle = Defaults.mapbox.style.satellite;
-                        }),
-                      )
-                    ],
-                  ),
-                ),
-              ),
             if (_showOverlays) ...[
               Positioned(
                 top: 100,
@@ -153,9 +112,44 @@ class MapPageState extends State<MapPage> {
                 child: FloatingActionButton.small(
                   heroTag: null,
                   child: const Icon(AppIcons.map),
-                  onPressed: () => setState(() {
-                    _showMapSettings = !_showMapSettings;
-                  }),
+                  onPressed: () => showModalBottomSheet<void>(
+                    context: context,
+                    builder: (context) => Container(
+                      //color: Colors.red,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          IconButton(
+                            icon: const Icon(AppIcons.map),
+                            onPressed: () {
+                              setState(() {
+                                mapStyle = Defaults.mapbox.style.outdoor;
+                              });
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(AppIcons.car),
+                            onPressed: () {
+                              setState(() {
+                                mapStyle = Defaults.mapbox.style.street;
+                              });
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(AppIcons.satellite),
+                            onPressed: () {
+                              setState(() {
+                                mapStyle = Defaults.mapbox.style.satellite;
+                              });
+                              Navigator.of(context).pop();
+                            },
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
               Positioned(
