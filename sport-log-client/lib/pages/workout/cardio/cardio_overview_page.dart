@@ -71,91 +71,91 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
   Widget build(BuildContext context) {
     return NeverPop(
       child: Scaffold(
-      appBar: AppBar(
-        title: Text(_movement?.name ?? "Cardio Sessions"),
-        actions: [
-          IconButton(
+        appBar: AppBar(
+          title: Text(_movement?.name ?? "Cardio Sessions"),
+          actions: [
+            IconButton(
               onPressed: () =>
                   Nav.newBase(context, Routes.cardio.routeOverview),
-            icon: const Icon(AppIcons.route),
-          ),
-          IconButton(
-            onPressed: () async {
-              final Movement? movement = await showMovementPicker(
-                context: context,
-                selectedMovement: _movement,
-              );
-              if (movement == null) {
-                return;
-              } else if (movement.id == _movement?.id) {
-                setState(() {
-                  _movement = null;
-                });
+              icon: const Icon(AppIcons.route),
+            ),
+            IconButton(
+              onPressed: () async {
+                final Movement? movement = await showMovementPicker(
+                  context: context,
+                  selectedMovement: _movement,
+                );
+                if (movement == null) {
+                  return;
+                } else if (movement.id == _movement?.id) {
+                  setState(() {
+                    _movement = null;
+                  });
+                  await _update();
+                } else {
+                  setState(() {
+                    _movement = movement;
+                  });
+                  await _update();
+                }
+              },
+              icon: Icon(
+                _movement != null ? AppIcons.filterFilled : AppIcons.filter,
+              ),
+            ),
+          ],
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(40),
+            child: DateFilter(
+              initialState: _dateFilter,
+              onFilterChanged: (dateFilter) async {
+                setState(() => _dateFilter = dateFilter);
                 await _update();
-              } else {
-                setState(() {
-                  _movement = movement;
-                });
-                await _update();
-              }
-            },
-            icon: Icon(
-              _movement != null ? AppIcons.filterFilled : AppIcons.filter,
+              },
             ),
           ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(40),
-          child: DateFilter(
-            initialState: _dateFilter,
-            onFilterChanged: (dateFilter) async {
-              setState(() => _dateFilter = dateFilter);
-              await _update();
-            },
-          ),
         ),
-      ),
-      body: RefreshIndicator(
-        onRefresh: _dataProvider.pullFromServer,
-        child: _cardioSessionDescriptions.isEmpty
-            ? SessionsPageTab.cardio.noEntriesText
-            : Container(
-                padding: Defaults.edgeInsets.normal,
-                child: ListView.separated(
-                  itemBuilder: (_, index) => CardioSessionCard(
+        body: RefreshIndicator(
+          onRefresh: _dataProvider.pullFromServer,
+          child: _cardioSessionDescriptions.isEmpty
+              ? SessionsPageTab.cardio.noEntriesText
+              : Container(
+                  padding: Defaults.edgeInsets.normal,
+                  child: ListView.separated(
+                    itemBuilder: (_, index) => CardioSessionCard(
                       cardioSessionDescription:
                           _cardioSessionDescriptions[index],
+                    ),
+                    separatorBuilder: (_, __) =>
+                        Defaults.sizedBox.vertical.normal,
+                    itemCount: _cardioSessionDescriptions.length,
                   ),
-                  separatorBuilder: (_, __) =>
-                      Defaults.sizedBox.vertical.normal,
-                  itemCount: _cardioSessionDescriptions.length,
                 ),
-              ),
-      ),
+        ),
         bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
           context,
           SessionsPageTab.cardio,
         ),
-      drawer: MainDrawer(selectedRoute: Routes.cardio.overview),
-      floatingActionButton: ExpandableFab(
-        icon: const Icon(AppIcons.add),
-        buttons: [
-          ActionButton(
-            icon: const Icon(AppIcons.timer),
-            onPressed: () => Navigator.pushNamed(
-              context,
-              Routes.cardio.trackingSettings,
+        drawer: MainDrawer(selectedRoute: Routes.cardio.overview),
+        floatingActionButton: ExpandableFab(
+          icon: const Icon(AppIcons.add),
+          buttons: [
+            ActionButton(
+              icon: const Icon(AppIcons.timer),
+              onPressed: () => Navigator.pushNamed(
+                context,
+                Routes.cardio.trackingSettings,
+              ),
             ),
-          ),
-          ActionButton(
-            icon: const Icon(AppIcons.notes),
-            onPressed: () => Navigator.pushNamed(
-              context,
-              Routes.cardio.cardioEdit,
+            ActionButton(
+              icon: const Icon(AppIcons.notes),
+              onPressed: () => Navigator.pushNamed(
+                context,
+                Routes.cardio.cardioEdit,
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
