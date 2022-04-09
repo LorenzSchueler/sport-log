@@ -163,8 +163,10 @@ class ActionRulesCard extends StatelessWidget {
                 IconButton(
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  onPressed: () => Navigator.of(context)
-                      .pushNamed(Routes.action.actionRuleEdit),
+                  onPressed: () => Navigator.of(context).pushNamed(
+                    Routes.action.actionRuleEdit,
+                    arguments: [actionProviderDescription, null],
+                  ),
                   icon: const Icon(AppIcons.add),
                 ),
               ],
@@ -236,8 +238,10 @@ class ActionEventsCard extends StatelessWidget {
                 IconButton(
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
-                  onPressed: () => Navigator.of(context)
-                      .pushNamed(Routes.action.actionEventEdit),
+                  onPressed: () => Navigator.of(context).pushNamed(
+                    Routes.action.actionEventEdit,
+                    arguments: [actionProviderDescription, null],
+                  ),
                   icon: const Icon(AppIcons.add),
                 ),
               ],

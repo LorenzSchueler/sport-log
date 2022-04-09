@@ -1,9 +1,14 @@
-import 'package:flutter/material.dart';
+import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/models/action/action_rule.dart';
 
 class ActionRuleEditPage extends StatefulWidget {
-  const ActionRuleEditPage({required this.actionRule, Key? key})
-      : super(key: key);
+  const ActionRuleEditPage({
+    required this.actionProviderDescription,
+    required this.actionRule,
+    Key? key,
+  }) : super(key: key);
+
+  final ActionProviderDescription actionProviderDescription;
   final ActionRule? actionRule;
 
   @override

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
+import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/action/action_event_edit_page.dart';
@@ -86,14 +87,20 @@ abstract class Routes {
           return ActionProviderOverviewPage(actionProvider: actionProvider);
         }),
     Routes.action.actionRuleEdit: (context) => _checkLogin(() {
-          final actionRule =
-              ModalRoute.of(context)?.settings.arguments as ActionRule?;
-          return ActionRuleEditPage(actionRule: actionRule);
+          final args =
+              ModalRoute.of(context)?.settings.arguments as List<dynamic>;
+          return ActionRuleEditPage(
+            actionProviderDescription: args[0] as ActionProviderDescription,
+            actionRule: args[1] as ActionRule?,
+          );
         }),
     Routes.action.actionEventEdit: (context) => _checkLogin(() {
-          final actionEvent =
-              ModalRoute.of(context)?.settings.arguments as ActionEvent?;
-          return ActionEventEditPage(actionEvent: actionEvent);
+          final args =
+              ModalRoute.of(context)?.settings.arguments as List<dynamic>;
+          return ActionEventEditPage(
+            actionProviderDescription: args[0] as ActionProviderDescription,
+            actionEvent: args[1] as ActionEvent?,
+          );
         }),
     // movement
     Routes.movement.overview: (_) => _checkLogin(() => const MovementsPage()),
