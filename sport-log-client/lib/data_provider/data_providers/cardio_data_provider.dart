@@ -3,6 +3,7 @@ import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/database/tables/cardio_tables.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -17,10 +18,12 @@ class RouteDataProvider extends EntityDataProvider<Route> {
   final Api<Route> api = Api.routes;
 
   @override
-  final TableAccessor<Route> db = AppDatabase.routes;
+  final RouteTable db = AppDatabase.routes;
 
   @override
   List<Route> getFromAccountData(AccountData accountData) => accountData.routes;
+
+  Future<List<Route>> getByName(String? name) => db.getByName(name);
 }
 
 class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {

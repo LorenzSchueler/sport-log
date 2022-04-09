@@ -45,6 +45,18 @@ class RouteTable extends TableAccessor<Route> {
     );
     return result.map(serde.fromDbRecord).toList();
   }
+
+  Future<List<Route>> getByName(String? name) async {
+    final records = await database.query(
+      tableName,
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        nameFilter(name),
+      ]),
+      orderBy: orderByName,
+    );
+    return records.map((r) => serde.fromDbRecord(r)).toList();
+  }
 }
 
 class CardioSessionTable extends TableAccessor<CardioSession> {

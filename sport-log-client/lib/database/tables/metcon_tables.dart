@@ -42,14 +42,14 @@ class MetconTable extends TableAccessor<Metcon> {
   }
 
   Future<List<Metcon>> getByName(
-    String? byName, {
+    String? name, {
     bool cardioOnly = false,
   }) async {
     final records = await database.query(
       tableName,
       where: TableAccessor.combineFilter([
         notDeleted,
-        nameFilter(byName),
+        nameFilter(name),
         cardioOnly ? "${Columns.cardio} = true" : ""
       ]),
       orderBy: orderByName,

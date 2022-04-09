@@ -218,11 +218,7 @@ class CardioEditPageState extends State<CardioEditPage> {
               EditTile(
                 leading: AppIcons.route,
                 caption: "Route",
-                child: Text(
-                  _cardioSessionDescription.route != null
-                      ? _cardioSessionDescription.route!.name
-                      : "none",
-                ),
+                child: Text(_cardioSessionDescription.route?.name ?? ""),
                 onTap: () async {
                   Route? route = await showRoutePicker(
                     context: context,
