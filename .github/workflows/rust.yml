@@ -34,7 +34,6 @@ jobs:
   
   format:
     name: Check Formatting
-    needs: [ build ]
     runs-on: ubuntu-latest
 
     steps:
@@ -53,7 +52,6 @@ jobs:
 
   clippy:
     name: Run Clippy
-    needs: [ format ]
     runs-on: ubuntu-latest
 
     steps:

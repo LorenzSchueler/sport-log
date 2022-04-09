@@ -47,6 +47,9 @@ analyzer:
   exclude:
     - "**/*.g.dart"
 
+  errors:
+    asset_does_not_exist: ignore
+
   strong-mode:
     implicit-casts: false
     implicit-dynamic: false

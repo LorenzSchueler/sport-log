@@ -15,7 +15,9 @@ import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
 String actionName(
-        ActionProviderDescription actionProviderDescription, Int64 actionId) =>
+  ActionProviderDescription actionProviderDescription,
+  Int64 actionId,
+) =>
     actionProviderDescription.actions
         .where((action) => action.id == actionId)
         .first
