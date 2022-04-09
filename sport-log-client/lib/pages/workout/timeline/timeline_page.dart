@@ -173,7 +173,7 @@ class TimelinePageState extends State<TimelinePage> {
         body: RefreshIndicator(
           onRefresh: _pullFromServer,
           child: _items.isEmpty
-              ? SessionsPageTab.timeline.noEntriesText
+              ? SessionsPageTab.timeline.noEntriesWithoutAddText
               : Container(
                   padding: Defaults.edgeInsets.normal,
                   child: ListView.separated(

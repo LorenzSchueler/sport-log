@@ -32,6 +32,13 @@ extension SessionTabUtils on SessionsPageTab {
         ),
       );
 
+  Widget get noEntriesWithoutAddText => Center(
+        child: Text(
+          "looks like there are no $_entryName there yet 😔 \nselect a different time range above ↑",
+          textAlign: TextAlign.center,
+        ),
+      );
+
   static void onBottomNavItemTapped(BuildContext context, int index) {
     var sessionRoutes = [
       Routes.timeline.overview,
