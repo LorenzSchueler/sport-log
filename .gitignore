@@ -8,3 +8,5 @@
 .env
 geckodriver
 upgrade.sh
+
+# git update-index --assume-unchanged sport-log-client.sport-log-client.yaml

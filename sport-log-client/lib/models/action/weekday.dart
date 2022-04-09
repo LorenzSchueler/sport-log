@@ -18,7 +18,7 @@ enum Weekday {
 }
 
 extension WeekdayToDisplayName on Weekday {
-  String toDisplayName() {
+  String get displayName {
     switch (this) {
       case Weekday.monday:
         return "Monday";

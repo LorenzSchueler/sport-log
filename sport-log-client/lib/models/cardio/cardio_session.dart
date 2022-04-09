@@ -23,6 +23,19 @@ enum CardioType {
   freetime
 }
 
+extension CardioTypeToDisplayName on CardioType {
+  String get displayName {
+    switch (this) {
+      case CardioType.training:
+        return "Training";
+      case CardioType.activeRecovery:
+        return "Active Recovery";
+      case CardioType.freetime:
+        return "Freetime";
+    }
+  }
+}
+
 @JsonSerializable()
 class CardioSession extends AtomicEntity {
   CardioSession({

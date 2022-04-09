@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+extension TimeOfDayExtension on TimeOfDay {
+  DateTime toDateTime() {
+    final now = DateTime.now();
+
+    return DateTime(now.year, now.month, now.day, hour, minute);
+  }
+}
+
 extension DateTimeExtension on DateTime {
   DateTime beginningOfDay() {
     return DateTime(year, month, day);
@@ -102,6 +110,7 @@ extension DateTimeExtension on DateTime {
   static final _dateWithoutYear = DateFormat('dd.MM.');
   static final _dateWithYear = DateFormat('dd.MM.yyyy');
   static final _dateTimeFull = DateFormat('dd.MM.yyyy HH:mm');
+  static final _timeFull = DateFormat('HH:mm');
   static final _monthName = DateFormat.MMMM();
   static final _monthNameWithYear = DateFormat('MMMM yyyy');
   static final _timeHourMinute = DateFormat.Hm();
@@ -117,6 +126,10 @@ extension DateTimeExtension on DateTime {
 
   String toStringDateTime() {
     return _dateTimeFull.format(this);
+  }
+
+  String toStringTime() {
+    return _timeFull.format(this);
   }
 
   String toStringMonthWithoutYear() {

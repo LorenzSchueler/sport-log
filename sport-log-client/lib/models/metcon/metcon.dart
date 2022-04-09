@@ -34,7 +34,7 @@ extension ToIcon on MetconType {
   }
 }
 
-extension ToDisplayName on MetconType {
+extension MetconTypeToDisplayName on MetconType {
   String get displayName {
     switch (this) {
       case MetconType.amrap:

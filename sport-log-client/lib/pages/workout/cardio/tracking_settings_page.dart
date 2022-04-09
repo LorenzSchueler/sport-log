@@ -53,10 +53,10 @@ class CardioTrackingSettingsPageState
             EditTile(
               leading: AppIcons.sports,
               caption: "Cardio Type",
-              child: Text(_cardioType?.name ?? ""),
+              child: Text(_cardioType?.displayName ?? ""),
               onTap: () async {
                 CardioType? cardioType = await showCardioTypePicker(
-                  context,
+                  context: context,
                   dismissable: false,
                 );
                 setState(() => _cardioType = cardioType);

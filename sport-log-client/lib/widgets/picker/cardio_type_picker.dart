@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
 
-Future<CardioType?> showCardioTypePicker(
-  BuildContext context, {
+Future<CardioType?> showCardioTypePicker({
+  required BuildContext context,
   bool dismissable = true,
 }) async {
   return showDialog<CardioType>(
@@ -21,7 +21,7 @@ class CardioTypePickerDialog extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: ListView.separated(
         itemBuilder: (context, index) => ListTile(
-          title: Text(CardioType.values[index].name),
+          title: Text(CardioType.values[index].displayName),
           onTap: () {
             Navigator.pop(context, CardioType.values[index]);
           },
