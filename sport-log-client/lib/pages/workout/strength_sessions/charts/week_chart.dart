@@ -75,15 +75,15 @@ class _WeekChartState extends State<WeekChart> {
             x: i,
             barRods: [
               BarChartRodData(
-                y: getValue(_strengthSessionStats[index]),
-                colors: [Theme.of(context).colorScheme.primary],
+                toY: getValue(_strengthSessionStats[index]),
+                color: Theme.of(context).colorScheme.primary,
               )
             ],
           ),
         );
         ++index;
       } else {
-        result.add(BarChartGroupData(x: i, barRods: [BarChartRodData(y: 0)]));
+        result.add(BarChartGroupData(x: i, barRods: [BarChartRodData(toY: 0)]));
       }
     }
     return result;
@@ -97,21 +97,29 @@ class _WeekChartState extends State<WeekChart> {
         barGroups: _barData,
         borderData: FlBorderData(show: false),
         titlesData: FlTitlesData(
-          leftTitles: SideTitles(
-            interval: null,
-            showTitles: true,
-            reservedSize: isTime ? 60 : 40,
-            getTitles: isTime
-                ? (value) =>
-                    Duration(milliseconds: value.round()).formatTimeWithMillis
-                : null,
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              interval: null,
+              showTitles: true,
+              reservedSize: isTime ? 60 : 40,
+              getTitlesWidget: isTime
+                  ? (value, _) => Text(
+                        Duration(milliseconds: value.round())
+                            .formatTimeWithMillis,
+                      )
+                  : null,
+            ),
           ),
-          bottomTitles: SideTitles(
-            showTitles: true,
-            getTitles: (value) => shortWeekdayName(value.round() + 1),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, _) => Text(
+                shortWeekdayName(value.round() + 1),
+              ),
+            ),
           ),
-          rightTitles: SideTitles(showTitles: false),
-          topTitles: SideTitles(showTitles: false),
+          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
         gridData: FlGridData(
           getDrawingHorizontalLine: gridLineDrawer(context),

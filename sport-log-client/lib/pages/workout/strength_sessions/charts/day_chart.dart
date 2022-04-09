@@ -72,8 +72,8 @@ class _DayChartState extends State<DayChart> {
                 x: index,
                 barRods: [
                   BarChartRodData(
-                    y: getValue(set),
-                    colors: [color],
+                    toY: getValue(set),
+                    color: color,
                   )
                 ],
               ),
@@ -81,18 +81,22 @@ class _DayChartState extends State<DayChart> {
             .toList(),
         borderData: FlBorderData(show: false),
         titlesData: FlTitlesData(
-          leftTitles: SideTitles(
-            interval: null,
-            showTitles: true,
-            reservedSize: isTime ? 60 : 40,
-            getTitles: isTime
-                ? (value) =>
-                    Duration(milliseconds: value.round()).formatTimeWithMillis
-                : null,
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              interval: null,
+              showTitles: true,
+              reservedSize: isTime ? 60 : 40,
+              getTitlesWidget: isTime
+                  ? (value, _) => Text(
+                        Duration(milliseconds: value.round())
+                            .formatTimeWithMillis,
+                      )
+                  : null,
+            ),
           ),
-          bottomTitles: SideTitles(showTitles: false),
-          rightTitles: SideTitles(showTitles: false),
-          topTitles: SideTitles(showTitles: false),
+          bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
         gridData: FlGridData(
           getDrawingHorizontalLine: gridLineDrawer(context),

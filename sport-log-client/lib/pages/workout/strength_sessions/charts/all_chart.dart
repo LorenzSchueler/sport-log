@@ -73,7 +73,7 @@ class _AllChartState extends State<AllChart> {
             spots: _strengthSessionStats.map((s) {
               return FlSpot(fromDate(s.datetime), getValue(s));
             }).toList(),
-            colors: [Theme.of(context).colorScheme.primary],
+            color: Theme.of(context).colorScheme.primary,
             dotData: FlDotData(show: false),
             isCurved: true,
             preventCurveOverShooting: true,
@@ -81,22 +81,28 @@ class _AllChartState extends State<AllChart> {
           ),
         ],
         titlesData: FlTitlesData(
-          topTitles: SideTitles(showTitles: false),
-          rightTitles: SideTitles(showTitles: false),
-          bottomTitles: SideTitles(
-            showTitles: true,
-            getTitles: (value) {
-              final date = fromValue(value);
-              return shortMonthName(date.month) + '\n' + '${date.year}';
-            },
+          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, _) {
+                final date = fromValue(value);
+                return Text(shortMonthName(date.month) + '\n' + '${date.year}');
+              },
+            ),
           ),
-          leftTitles: SideTitles(
-            showTitles: true,
-            reservedSize: isTime ? 60 : 40,
-            getTitles: isTime
-                ? (value) =>
-                    Duration(milliseconds: value.round()).formatTimeWithMillis
-                : null,
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: isTime ? 60 : 40,
+              getTitlesWidget: isTime
+                  ? (value, _) => Text(
+                        Duration(milliseconds: value.round())
+                            .formatTimeWithMillis,
+                      )
+                  : null,
+            ),
           ),
         ),
         borderData: FlBorderData(show: false),

@@ -71,23 +71,29 @@ class _MonthChartState extends State<MonthChart> {
             spots: _strengthSessionStats.map((s) {
               return FlSpot(s.datetime.day.toDouble(), getValue(s));
             }).toList(),
-            colors: [Theme.of(context).colorScheme.primary],
+            color: Theme.of(context).colorScheme.primary,
           ),
         ],
         titlesData: FlTitlesData(
-          topTitles: SideTitles(showTitles: false),
-          rightTitles: SideTitles(showTitles: false),
-          bottomTitles: SideTitles(
-            showTitles: true,
-            interval: 2,
+          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: 2,
+            ),
           ),
-          leftTitles: SideTitles(
-            showTitles: true,
-            reservedSize: isTime ? 60 : 40,
-            getTitles: isTime
-                ? (value) =>
-                    Duration(milliseconds: value.round()).formatTimeWithMillis
-                : null,
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: isTime ? 60 : 40,
+              getTitlesWidget: isTime
+                  ? (value, _) => Text(
+                        Duration(milliseconds: value.round())
+                            .formatTimeWithMillis,
+                      )
+                  : null,
+            ),
           ),
         ),
         gridData: FlGridData(

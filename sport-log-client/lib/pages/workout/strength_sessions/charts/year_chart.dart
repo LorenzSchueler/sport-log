@@ -74,7 +74,7 @@ class _YearChartState extends State<YearChart> {
                 getValue(s),
               );
             }).toList(),
-            colors: [Theme.of(context).colorScheme.primary],
+            color: Theme.of(context).colorScheme.primary,
             dotData: FlDotData(show: false),
             isCurved: true,
             preventCurveOverShooting: true,
@@ -82,26 +82,34 @@ class _YearChartState extends State<YearChart> {
           ),
         ],
         titlesData: FlTitlesData(
-          topTitles: SideTitles(showTitles: false),
-          rightTitles: SideTitles(showTitles: false),
-          bottomTitles: SideTitles(
-            showTitles: true,
-            interval: 1,
-            checkToShowTitle: (_, __, ___, ____, value) {
-              final date = DateTime(widget.start.year, 1, value.round());
-              return date.day == 15;
-            },
-            getTitles: (value) => shortMonthName(
-              DateTime(widget.start.year, 1, value.round()).month,
+          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: 1,
+              // checkToShowTitle: (_, __, ___, ____, value) {
+              // final date = DateTime(widget.start.year, 1, value.round());
+              // return date.day == 15;
+              // },
+              getTitlesWidget: (value, _) => Text(
+                shortMonthName(
+                  DateTime(widget.start.year, 1, value.round()).month,
+                ),
+              ),
             ),
           ),
-          leftTitles: SideTitles(
-            showTitles: true,
-            reservedSize: isTime ? 60 : 40,
-            getTitles: isTime
-                ? (value) =>
-                    Duration(milliseconds: value.round()).formatTimeWithMillis
-                : null,
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: isTime ? 60 : 40,
+              getTitlesWidget: isTime
+                  ? (value, _) => Text(
+                        Duration(milliseconds: value.round())
+                            .formatTimeWithMillis,
+                      )
+                  : null,
+            ),
           ),
         ),
         minX: 0,
