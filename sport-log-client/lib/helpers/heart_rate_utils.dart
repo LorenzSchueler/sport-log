@@ -1,11 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:polar/polar.dart';
-import 'package:sport_log/app.dart';
 import 'package:sport_log/helpers/location_utils.dart';
+import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
 
 class HeartRateUtils {
   static final _polar = Polar();
@@ -25,23 +24,9 @@ class HeartRateUtils {
 
   static Future<Map<String, String>?> searchDevices() async {
     while (!await _flutterBlue.isOn) {
-      final ignore = await showDialog<bool>(
-        context: AppState.globalContext,
-        builder: (context) => AlertDialog(
-          content: const Text(
+      final ignore = await showSystemSettingsDialog(
+        text:
             "In order to discover heart rate monitors bluetooth must be enabled.",
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Ignore'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Change Permission'),
-            )
-          ],
-        ),
       );
       if (ignore == null || ignore) {
         return null;

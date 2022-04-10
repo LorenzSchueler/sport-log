@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:location/location.dart';
-import 'package:sport_log/app.dart';
+import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
 
 class LocationUtils {
   static final Location _location = Location();
@@ -14,29 +13,12 @@ class LocationUtils {
   LocationUtils(this.onLocationUpdate);
 
   static Future<bool> enableLocation() async {
-    while (!await _location.serviceEnabled()) {
-      if (!await _location.requestService()) {
-        final ignore = await showDialog<bool>(
-          context: AppState.globalContext,
-          builder: (context) => AlertDialog(
-            content: const Text(
-              "In order to track your location GPS must be enabled.",
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Ignore'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Change Permission'),
-              )
-            ],
-          ),
-        );
-        if (ignore == null || ignore) {
-          return false;
-        }
+    while (!await _location.requestService()) {
+      final ignore = await showSystemSettingsDialog(
+        text: "In order to track your location GPS must be enabled.",
+      );
+      if (ignore == null || ignore) {
+        return false;
       }
     }
     return true;
@@ -63,23 +45,9 @@ class LocationUtils {
           await _location.enableBackgroundMode(enable: true);
           break;
         } on PlatformException catch (_) {
-          final ignore = await showDialog<bool>(
-            context: AppState.globalContext,
-            builder: (context) => AlertDialog(
-              content: const Text(
+          final ignore = await showSystemSettingsDialog(
+            text:
                 "In order to track your location while the screen is off the permission needs to be set to 'always allow'",
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Ignore'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Change Permission'),
-                )
-              ],
-            ),
           );
           if (ignore == null || ignore) {
             return false;

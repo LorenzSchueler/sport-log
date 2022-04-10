@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sport_log/app.dart';
+import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
 
 class StepCountUtils {
   void Function(StepCount stepCount) onStepCountUpdate;
@@ -15,23 +14,9 @@ class StepCountUtils {
 
   Future<bool> startStepCountStream() async {
     while (!await Permission.activityRecognition.request().isGranted) {
-      final ignore = await showDialog<bool>(
-        context: AppState.globalContext,
-        builder: (context) => AlertDialog(
-          content: const Text(
+      final ignore = await showSystemSettingsDialog(
+        text:
             "In order to record your steps 'Activity Recognition' must be allowed.",
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Ignore'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Change Permission'),
-            )
-          ],
-        ),
       );
       if (ignore == null || ignore) {
         return false;
