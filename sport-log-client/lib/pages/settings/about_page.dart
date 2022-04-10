@@ -37,7 +37,11 @@ class AboutPage extends StatelessWidget {
             TextTile(
               leading: AppIcons.radio,
               caption: "Version",
-              child: Text(Config.instance.version),
+              child: Text(
+                Config.debugMode
+                    ? "${Config.instance.version} (debug build)"
+                    : Config.instance.version,
+              ),
             ),
             TextTile(
               leading: AppIcons.github,

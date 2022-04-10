@@ -107,12 +107,17 @@ class Config extends JsonSerializable {
 
   static const String databaseName = 'database.sqlite';
 
-  static bool get isTest => Platform.environment.containsKey('FLUTTER_TEST');
   static const bool isWeb = kIsWeb;
   static bool isAndroid = Platform.isAndroid;
   static bool isIOS = Platform.isIOS;
   static bool isLinux = Platform.isLinux;
   static bool isWindows = Platform.isWindows;
+
+  static bool get isTest => Platform.environment.containsKey('FLUTTER_TEST');
+
+  static const bool releaseMode = kReleaseMode;
+  static const bool profileMode = kProfileMode;
+  static const bool debugMode = kDebugMode;
 
   static final _logger = InitLogger('Config');
 }
