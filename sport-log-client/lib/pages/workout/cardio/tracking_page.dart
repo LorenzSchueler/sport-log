@@ -84,13 +84,11 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     );
     _locationUtils = LocationUtils(_onLocationUpdate);
     _stepUtils = StepCountUtils(_onStepCountUpdate);
-    _stepUtils.startStepCountStream();
     if (widget.heartRateMonitorId != null) {
       _heartRateUtils = HeartRateUtils(
         deviceId: widget.heartRateMonitorId!,
         onHeartRateEvent: _onHeartRateUpdate,
       );
-      _heartRateUtils?.startHeartRateStream();
     }
     _timer =
         Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateData());
@@ -144,6 +142,12 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       _cardioSessionDescription.cardioSession.setAvgHeartRate();
       _cardioSessionDescription.cardioSession.setDistance();
     });
+  }
+
+  Future<void> _startStreams() async {
+    await _locationUtils.startLocationStream();
+    await _stepUtils.startStepCountStream();
+    _heartRateUtils?.startHeartRateStream();
   }
 
   void _onHeartRateUpdate(PolarHeartRateEvent event) {
@@ -394,7 +398,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                 _line = await _mapController.addTrackLine(
                   _cardioSessionDescription.cardioSession.track!,
                 ); // init with empty track
-                await _locationUtils.startLocationStream();
+                await _startStreams();
               },
             ),
           ),
