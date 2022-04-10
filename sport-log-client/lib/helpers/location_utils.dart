@@ -14,11 +14,29 @@ class LocationUtils {
   LocationUtils(this.onLocationUpdate);
 
   static Future<bool> enableLocation() async {
-    bool serviceEnabled = await _location.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await _location.requestService();
-      if (!serviceEnabled) {
-        return false;
+    while (!await _location.serviceEnabled()) {
+      if (!await _location.requestService()) {
+        final ignore = await showDialog<bool>(
+          context: AppState.globalContext,
+          builder: (context) => AlertDialog(
+            content: const Text(
+              "In order to track your location GPS must be enabled.",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Ignore'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Change Permission'),
+              )
+            ],
+          ),
+        );
+        if (ignore == null || ignore) {
+          return false;
+        }
       }
     }
     return true;
@@ -49,7 +67,7 @@ class LocationUtils {
             context: AppState.globalContext,
             builder: (context) => AlertDialog(
               content: const Text(
-                "In order to track the location while the screen is off the permission needs to be set to 'always allow'",
+                "In order to track your location while the screen is off the permission needs to be set to 'always allow'",
               ),
               actions: [
                 TextButton(

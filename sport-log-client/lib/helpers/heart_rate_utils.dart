@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
+import 'package:app_settings/app_settings.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:polar/polar.dart';
 import 'package:sport_log/app.dart';
