@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
-import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 

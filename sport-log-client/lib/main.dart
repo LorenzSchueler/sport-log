@@ -5,7 +5,7 @@ import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/helpers/theme.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/pages/login/landing_page.dart';
 import 'package:sport_log/settings.dart';
 import 'package:provider/provider.dart';

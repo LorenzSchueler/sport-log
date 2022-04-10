@@ -3,7 +3,7 @@ import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/snackbar.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';

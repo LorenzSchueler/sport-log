@@ -4,7 +4,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
-import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sqflite/sqflite.dart';
 

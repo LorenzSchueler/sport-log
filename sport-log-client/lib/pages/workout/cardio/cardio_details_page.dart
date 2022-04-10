@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/helpers/map_utils.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';

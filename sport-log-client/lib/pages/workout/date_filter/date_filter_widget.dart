@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
@@ -12,7 +11,7 @@ class DateFilter extends StatefulWidget {
   }) : super(key: key);
 
   final DateFilterState initialState;
-  final ChangeCallback<DateFilterState> onFilterChanged;
+  final void Function(DateFilterState) onFilterChanged;
 
   @override
   _DateFilterState createState() => _DateFilterState();

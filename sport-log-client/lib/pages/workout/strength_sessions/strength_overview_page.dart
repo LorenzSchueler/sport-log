@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/formatting.dart';
+import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/snackbar.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';

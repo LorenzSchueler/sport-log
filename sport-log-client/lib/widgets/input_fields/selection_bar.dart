@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/helpers/typedefs.dart';
 
 class SelectionBar<T> extends StatelessWidget {
   const SelectionBar({
@@ -10,7 +9,7 @@ class SelectionBar<T> extends StatelessWidget {
     required this.selectedItem,
   }) : super(key: key);
 
-  final ChangeCallback<T> onChange;
+  final void Function(T) onChange;
   final List<T> items;
   final String Function(T) getLabel;
   final T selectedItem;

@@ -3,7 +3,7 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/movement_table.dart';
-import 'package:sport_log/helpers/eorm.dart';
+import 'package:sport_log/models/strength/eorm.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/models/all.dart';

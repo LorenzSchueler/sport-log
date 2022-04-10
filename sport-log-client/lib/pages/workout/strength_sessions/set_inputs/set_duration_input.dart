@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/text_editing_controller_extension.dart';
-import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 class SetDurationInput extends StatefulWidget {
@@ -192,7 +191,7 @@ class _CaptionTextField extends StatelessWidget {
 
   final TextEditingController controller;
   final FocusNode focusNode;
-  final ChangeCallback<String> onChanged;
+  final void Function(String) onChanged;
   final String caption;
   final String placeholder;
   final TextInputFormatFunction formatFn;
@@ -273,7 +272,7 @@ class PaddedIntInput extends StatefulWidget {
         super(key: key);
 
   final int placeholder;
-  final ChangeCallback<int> onChanged;
+  final void Function(int) onChanged;
   final VoidCallback? onSubmitted;
   final String caption;
   final int numberOfDigits;

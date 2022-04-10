@@ -4,7 +4,7 @@ import 'package:sport_log/data_provider/data_providers/action_data_provider.dart
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/snackbar.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/action/action_provider.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/models/action/weekday.dart';

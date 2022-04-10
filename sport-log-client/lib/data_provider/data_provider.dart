@@ -1,12 +1,11 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:flutter/foundation.dart' show ChangeNotifier;
+import 'package:flutter/foundation.dart' show ChangeNotifier, VoidCallback;
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/typedefs.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/widgets/dialogs/conflict_dialog.dart';

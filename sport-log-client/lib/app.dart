@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:sport_log/helpers/theme.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/main.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
