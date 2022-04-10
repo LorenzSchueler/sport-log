@@ -47,7 +47,7 @@ extension SessionTabUtils on SessionsPageTab {
       Routes.cardio.overview,
       Routes.diary.overview,
     ];
-    Nav.newBase(context, sessionRoutes[index]);
+    Navigator.of(context).newBase(sessionRoutes[index]);
   }
 
   static List<BottomNavigationBarItem> get bottomNavItems {

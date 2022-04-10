@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/defaults.dart';
 import 'package:sport_log/widgets/input_fields/double_input.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/app_icons.dart';

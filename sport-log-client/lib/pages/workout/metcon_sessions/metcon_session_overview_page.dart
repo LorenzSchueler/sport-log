@@ -69,7 +69,8 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
           title: Text(_metcon?.name ?? "Metcon Sessions"),
           actions: [
             IconButton(
-              onPressed: () => Nav.newBase(context, Routes.metcon.overview),
+              onPressed: () =>
+                  Navigator.of(context).newBase(Routes.metcon.overview),
               icon: const Icon(AppIcons.notes),
             ),
             IconButton(

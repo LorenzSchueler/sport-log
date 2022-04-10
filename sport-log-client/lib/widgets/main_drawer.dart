@@ -34,7 +34,7 @@ class MainDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.onBackground,
             ),
             onTap: () {
-              Nav.newBase(context, Routes.timeline.overview);
+              Navigator.of(context).newBase(Routes.timeline.overview);
             },
             selected: selectedRoute == Routes.timeline.overview,
           ),
@@ -44,7 +44,8 @@ class MainDrawer extends StatelessWidget {
               AppIcons.exercise,
               color: Theme.of(context).colorScheme.onBackground,
             ),
-            onTap: () => Nav.newBase(context, Routes.movement.overview),
+            onTap: () =>
+                Navigator.of(context).newBase(Routes.movement.overview),
             selected: selectedRoute == Routes.movement.overview,
           ),
           ListTile(
@@ -53,7 +54,7 @@ class MainDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.onBackground,
             ),
             title: const Text('Timer'),
-            onTap: () => Nav.newBase(context, Routes.timer),
+            onTap: () => Navigator.of(context).newBase(Routes.timer),
             selected: selectedRoute == Routes.timer,
           ),
           ListTile(
@@ -62,7 +63,7 @@ class MainDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.onBackground,
             ),
             title: const Text('Map'),
-            onTap: () => Nav.newBase(context, Routes.map),
+            onTap: () => Navigator.of(context).newBase(Routes.map),
             selected: selectedRoute == Routes.map,
           ),
           ListTile(
@@ -71,7 +72,7 @@ class MainDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.onBackground,
             ),
             title: const Text('Offline Maps'),
-            onTap: () => Nav.newBase(context, Routes.offlineMaps),
+            onTap: () => Navigator.of(context).newBase(Routes.offlineMaps),
             selected: selectedRoute == Routes.offlineMaps,
           ),
           ListTile(
@@ -80,7 +81,7 @@ class MainDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.onBackground,
             ),
             title: const Text('Heart Rate'),
-            onTap: () => Nav.newBase(context, Routes.heartRate),
+            onTap: () => Navigator.of(context).newBase(Routes.heartRate),
             selected: selectedRoute == Routes.heartRate,
           ),
           ListTile(
@@ -89,7 +90,8 @@ class MainDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.onBackground,
             ),
             title: const Text('Server Actions'),
-            onTap: () => Nav.newBase(context, Routes.action.platformOverview),
+            onTap: () =>
+                Navigator.of(context).newBase(Routes.action.platformOverview),
             selected: selectedRoute == Routes.action.platformOverview,
           ),
           ListTile(
@@ -98,7 +100,7 @@ class MainDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.onBackground,
             ),
             title: const Text('Settings'),
-            onTap: () => Nav.newBase(context, Routes.settings),
+            onTap: () => Navigator.of(context).newBase(Routes.settings),
             selected: selectedRoute == Routes.settings,
           ),
           Consumer<Sync>(
@@ -140,7 +142,7 @@ class MainDrawer extends StatelessWidget {
                     ? null
                     : () async {
                         await Account.logout();
-                        Nav.newBase(context, Routes.landing);
+                        Navigator.of(context).newBase(Routes.landing);
                       },
               ),
             ),

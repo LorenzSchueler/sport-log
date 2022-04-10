@@ -76,7 +76,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
           actions: [
             IconButton(
               onPressed: () =>
-                  Nav.newBase(context, Routes.cardio.routeOverview),
+                  Navigator.of(context).newBase(Routes.cardio.routeOverview),
               icon: const Icon(AppIcons.route),
             ),
             IconButton(

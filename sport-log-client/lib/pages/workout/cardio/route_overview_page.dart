@@ -59,7 +59,8 @@ class RoutePageState extends State<RoutePage> {
           title: const Text("Routes"),
           actions: [
             IconButton(
-              onPressed: () => Nav.newBase(context, Routes.cardio.overview),
+              onPressed: () =>
+                  Navigator.of(context).newBase(Routes.cardio.overview),
               icon: const Icon(AppIcons.heartbeat),
             ),
           ],
