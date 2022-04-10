@@ -6,6 +6,8 @@ extension FormatDateTime on DateTime {
 
   String get formatDate => DateFormat('dd.MM.yy').format(this);
 
+  String get formatTime => DateFormat('kk:mm:ss').format(this);
+
   String get yyyyMMdd => DateFormat('yyyy-MM-dd').format(this);
 }
 

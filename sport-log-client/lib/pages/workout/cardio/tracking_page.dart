@@ -7,10 +7,12 @@ import 'package:polar/polar.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
+import 'package:sport_log/helpers/formatting.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/map_utils.dart';
+import 'package:sport_log/helpers/step_count_utils.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
@@ -58,8 +60,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   late Timer _timer;
   late LocationUtils _locationUtils;
 
-  late StreamSubscription _stepCountSubscription;
-  late StepCount _lastStepCount;
+  late StepCountUtils _stepUtils;
 
   HeartRateUtils? _heartRateUtils;
 
@@ -82,7 +83,8 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       route: widget.route,
     );
     _locationUtils = LocationUtils(_onLocationUpdate);
-    _startStepCountStream();
+    _stepUtils = StepCountUtils(_onStepCountUpdate);
+    _stepUtils.startStepCountStream();
     if (widget.heartRateMonitorId != null) {
       _heartRateUtils = HeartRateUtils(
         deviceId: widget.heartRateMonitorId!,
@@ -98,7 +100,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   @override
   void dispose() {
     _timer.cancel();
-    _stepCountSubscription.cancel();
+    _stepUtils.stopStepCountStream();
     _locationUtils.stopLocationStream();
     _heartRateUtils?.stopHeartRateStream();
     if (_mapController.cameraPosition != null) {
@@ -168,11 +170,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
     _heartRateInfo = "rr: ${event.data.rrsMs} ms\nhr: ${event.data.hr} bpm";
   }
 
-  void _startStepCountStream() {
-    Stream<StepCount> _stepCountStream = Pedometer.stepCountStream;
-    _stepCountSubscription = _stepCountStream.listen(_onStepCountUpdate);
-  }
-
   void _onStepCountUpdate(StepCount stepCount) {
     if (_trackingMode == TrackingMode.tracking) {
       if (_cardioSessionDescription.cardioSession.cadence!.isEmpty) {
@@ -182,9 +179,9 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
         );
       } else {
         /// interpolate steps since last stepCount update
-        int newSteps = stepCount.steps - _lastStepCount.steps;
+        int newSteps = stepCount.steps - _stepUtils.lastStepCount.steps;
         double avgTimeDiff = stepCount.timeStamp
-                .difference(_lastStepCount.timeStamp)
+                .difference(_stepUtils.lastStepCount.timeStamp)
                 .inMilliseconds /
             newSteps;
         for (int i = 1; i <= newSteps; i++) {
@@ -195,9 +192,8 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
         }
       }
     }
-    _lastStepCount = stepCount;
     _stepInfo =
-        "step count: ${stepCount.steps}\ntimestamp: ${stepCount.timeStamp}";
+        "step count: ${stepCount.steps}\ntimestamp: ${stepCount.timeStamp.formatTime}";
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
