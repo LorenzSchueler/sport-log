@@ -51,9 +51,9 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       ? _lastStopDuration + DateTime.now().difference(_lastContinueTime)
       : _lastStopDuration;
 
-  String _locationInfo = "null";
-  String _stepInfo = "null";
-  String _heartRateInfo = "null";
+  String _locationInfo = "no data";
+  String _stepInfo = "no data";
+  String _heartRateInfo = "no data";
 
   late Timer _timer;
   late LocationUtils _locationUtils;
@@ -76,7 +76,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
         ..distance = 0
         ..track = []
         ..cadence = []
-        ..heartRate = []
+        ..heartRate = widget.heartRateMonitorId != null ? [] : null
         ..routeId = widget.route?.id,
       movement: widget.movement,
       route: widget.route,
@@ -141,11 +141,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       _cardioSessionDescription.cardioSession.setAvgCadence();
       _cardioSessionDescription.cardioSession.setAvgHeartRate();
       _cardioSessionDescription.cardioSession.setDistance();
-
-      if (_cardioSessionDescription.cardioSession.cadence != null) {
-        _stepInfo =
-            "steps: ${_cardioSessionDescription.cardioSession.cadence!.length}\ntime: ${_cardioSessionDescription.cardioSession.cadence!.isNotEmpty ? _cardioSessionDescription.cardioSession.cadence!.last : 0}";
-      }
     });
   }
 
@@ -176,21 +171,19 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   void _startStepCountStream() {
     Stream<StepCount> _stepCountStream = Pedometer.stepCountStream;
     _stepCountSubscription = _stepCountStream.listen(_onStepCountUpdate);
-    // ignore: unnecessary_lambdas
-    _stepCountSubscription.onError((dynamic error) => _logger.i(error));
   }
 
-  void _onStepCountUpdate(StepCount stepCountEvent) {
+  void _onStepCountUpdate(StepCount stepCount) {
     if (_trackingMode == TrackingMode.tracking) {
       if (_cardioSessionDescription.cardioSession.cadence!.isEmpty) {
         _cardioSessionDescription.cardioSession.cadence!.add(
-          stepCountEvent.timeStamp
+          stepCount.timeStamp
               .difference(_cardioSessionDescription.cardioSession.datetime),
         );
       } else {
         /// interpolate steps since last stepCount update
-        int newSteps = stepCountEvent.steps - _lastStepCount.steps;
-        double avgTimeDiff = stepCountEvent.timeStamp
+        int newSteps = stepCount.steps - _lastStepCount.steps;
+        double avgTimeDiff = stepCount.timeStamp
                 .difference(_lastStepCount.timeStamp)
                 .inMilliseconds /
             newSteps;
@@ -202,7 +195,9 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
         }
       }
     }
-    _lastStepCount = stepCountEvent;
+    _lastStepCount = stepCount;
+    _stepInfo =
+        "step count: ${stepCount.steps}\ntimestamp: ${stepCount.timeStamp}";
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
@@ -369,22 +364,17 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
     return Scaffold(
       body: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Card(
-                margin: const EdgeInsets.only(top: 25, bottom: 5),
-                child: Text(_locationInfo),
-              ),
-              Card(
-                margin: const EdgeInsets.only(top: 25, bottom: 5),
-                child: Text(_stepInfo),
-              ),
-              Card(
-                margin: const EdgeInsets.only(top: 25, bottom: 5),
-                child: Text(_heartRateInfo),
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.only(top: 25, bottom: 5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(_locationInfo),
+                Text(_stepInfo),
+                Text(_heartRateInfo),
+              ],
+            ),
           ),
           Expanded(
             child: MapboxMap(

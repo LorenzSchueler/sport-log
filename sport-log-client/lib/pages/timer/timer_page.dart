@@ -45,6 +45,7 @@ class TimerPageState extends State<TimerPage> {
       child: DefaultTabController(
         length: 3,
         child: Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: AppBar(
             title: const Text("Timer"),
             bottom: TabBar(
