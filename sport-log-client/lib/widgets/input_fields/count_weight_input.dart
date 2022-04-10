@@ -51,7 +51,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
           columnWidths: const {
             0: FixedColumnWidth(30),
             1: FixedColumnWidth(140),
-            2: FixedColumnWidth(166),
+            2: FixedColumnWidth(118), // 24 + 70 + 24
           },
           children: [
             TableRow(
@@ -187,17 +187,20 @@ class _CountWeightInputState extends State<CountWeightInput> {
               )
           ],
         ),
-        if (widget.confirmChanges) ...[
-          Defaults.sizedBox.horizontal.normal,
-          IconButton(
-            icon: const Icon(AppIcons.check),
-            iconSize: 40,
-            color: _count > 0 ? Theme.of(context).colorScheme.primary : null,
-            onPressed: _count > 0
-                ? () => widget.setValue(_count, _weight, _secondWeight)
-                : null,
+        if (widget.confirmChanges)
+          Expanded(
+            child: Center(
+              child: IconButton(
+                icon: const Icon(AppIcons.check),
+                iconSize: 40,
+                onPressed: _count > 0 && (_weight == null || _weight! > 0)
+                    ? () => widget.setValue(_count, _weight, _secondWeight)
+                    : null,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+            ),
           ),
-        ]
       ],
     );
   }

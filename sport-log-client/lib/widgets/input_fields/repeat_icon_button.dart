@@ -26,10 +26,7 @@ class _RepeatIconButtonState extends State<RepeatIconButton> {
     return GestureDetector(
       child: IconButton(
         padding: EdgeInsets.zero,
-        constraints: BoxConstraints(
-          minWidth: widget.icon.size ?? 24,
-          minHeight: widget.icon.size ?? 24,
-        ),
+        constraints: const BoxConstraints(),
         icon: widget.icon,
         color: widget.color,
         onPressed: widget.onClick,

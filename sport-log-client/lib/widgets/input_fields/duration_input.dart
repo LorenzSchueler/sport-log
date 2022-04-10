@@ -30,9 +30,8 @@ class _DurationInputState extends State<DurationInput> {
   final _secondsController = TextEditingController();
   late final StreamSubscription<bool> _keyboardSubscription;
 
-  static const double _iconSize = 30;
-  static const double _textWidth = 30;
-  static const double _fontSize = 25;
+  static const double _fontSize = 24;
+  static const double _textWidth = 13;
   static const int _timeStep = 30; // seconds
   static const int _maxSeconds = 60 * 100 - 1;
 
@@ -59,9 +58,7 @@ class _DurationInputState extends State<DurationInput> {
               Duration d, {
               required bool format,
             }) {
-              setState(() {
-                _duration = d;
-              });
+              setState(() => _duration = d);
               if (format) {
                 _updateTextFields();
               }
@@ -84,6 +81,7 @@ class _DurationInputState extends State<DurationInput> {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _minusButton,
@@ -99,10 +97,7 @@ class _DurationInputState extends State<DurationInput> {
 
   Widget get _minusButton {
     return RepeatIconButton(
-      icon: const Icon(
-        AppIcons.subtractBox,
-        size: _iconSize,
-      ),
+      icon: const Icon(AppIcons.subtractBox),
       onClick: _duration.inSeconds > 0 && _setDuration != null
           ? () {
               _setDuration?.call(
@@ -117,10 +112,7 @@ class _DurationInputState extends State<DurationInput> {
 
   Widget get _plusButton {
     return RepeatIconButton(
-      icon: const Icon(
-        AppIcons.addBox,
-        size: _iconSize,
-      ),
+      icon: const Icon(AppIcons.addBox),
       onClick: _duration.inSeconds < _maxSeconds && _setDuration != null
           ? () {
               _setDuration?.call(
@@ -137,7 +129,7 @@ class _DurationInputState extends State<DurationInput> {
 
   Widget get _minutesInput {
     return SizedBox(
-      width: _textWidth,
+      width: _textWidth * 2,
       child: TextFormField(
         controller: _minutesController,
         keyboardType: TextInputType.number,
@@ -181,7 +173,7 @@ class _DurationInputState extends State<DurationInput> {
 
   Widget get _secondsInput {
     return SizedBox(
-      width: _textWidth,
+      width: _textWidth * 2,
       child: TextFormField(
         controller: _secondsController,
         keyboardType: TextInputType.number,
