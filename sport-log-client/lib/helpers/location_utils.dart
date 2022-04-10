@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:location/location.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
 
 class LocationUtils {
@@ -30,30 +30,26 @@ class LocationUtils {
         return false;
       }
 
-      PermissionStatus permissionGranted = await _location.hasPermission();
-      if (permissionGranted == PermissionStatus.denied) {
-        permissionGranted = await _location.requestPermission();
-        if (permissionGranted != PermissionStatus.granted) {
+      while (!await Permission.locationWhenInUse.request().isGranted) {
+        final ignore = await showSystemSettingsDialog(
+          text:
+              "In order to track your location the permission needs to be 'allowed'",
+        );
+        if (ignore == null || ignore) {
           return false;
         }
       }
-
-      await _location.changeSettings(accuracy: LocationAccuracy.high);
-      // needs permission "always allow"
-      while (true) {
-        try {
-          await _location.enableBackgroundMode(enable: true);
-          break;
-        } on PlatformException catch (_) {
-          final ignore = await showSystemSettingsDialog(
-            text:
-                "In order to track your location while the screen is off the permission needs to be set to 'always allow'",
-          );
-          if (ignore == null || ignore) {
-            return false;
-          }
+      while (!await Permission.locationAlways.request().isGranted) {
+        final ignore = await showSystemSettingsDialog(
+          text:
+              "In order to track your location while the screen is off the permission needs to be set to 'always allow'",
+        );
+        if (ignore == null || ignore) {
+          return false;
         }
       }
+      await _location.enableBackgroundMode(enable: true);
+      await _location.changeSettings(accuracy: LocationAccuracy.high);
       _locationSubscription =
           _location.onLocationChanged.listen(onLocationUpdate);
     }
