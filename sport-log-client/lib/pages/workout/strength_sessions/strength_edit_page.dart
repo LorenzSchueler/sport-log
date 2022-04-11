@@ -219,7 +219,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     return EditTile(
       caption: 'Date',
       child:
-          Text(_strengthSessionDescription.session.datetime.toHumanWithTime()),
+          Text(_strengthSessionDescription.session.datetime.toHumanDateTime()),
       leading: AppIcons.calendar,
       onTap: () async {
         final date = await showRoundedDatePicker(

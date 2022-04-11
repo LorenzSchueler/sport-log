@@ -1,6 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+const _shortMonthNames = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+String shortMonthName(int month) {
+  return _shortMonthNames[month - 1];
+}
+
+const _shortWeekdayNames = [
+  'Mon',
+  'Tue',
+  'Wed',
+  'Thu',
+  'Fri',
+  'Sat',
+  'Sun',
+];
+
+String shortWeekdayName(int weekday) {
+  return _shortWeekdayNames[weekday - 1];
+}
+
+extension FormatDuration on Duration {
+  String get formatTime => toString().split('.').first.padLeft(8, "0");
+
+  String get formatTimeShort => inSeconds < 3600
+      ? toString().split('.').first.split(":").skip(1).join(":")
+      : toString().split('.').first.padLeft(8, "0");
+
+  String get formatTimeWithMillis => toString().split(":").skip(1).join(":");
+}
+
 extension TimeOfDayExtension on TimeOfDay {
   DateTime toDateTime() {
     final now = DateTime.now();
@@ -10,6 +53,76 @@ extension TimeOfDayExtension on TimeOfDay {
 }
 
 extension DateTimeExtension on DateTime {
+  String get _formatDate => DateFormat("dd'.' MMMM yyyy").format(this);
+  String get _formatDateShort => DateFormat("dd'.' MMMM").format(this);
+  String get formatDateyyyyMMdd => DateFormat('yyyy-MM-dd').format(this);
+
+  String get _formatMonth => DateFormat('MMMM yyyy').format(this);
+  String get _formatMonthShort => DateFormat.MMMM().format(this);
+
+  String get _formatWeekday => DateFormat.EEEE().format(this);
+
+  String get formatTimeHms => DateFormat.Hms().format(this);
+  String get formatTime => DateFormat.Hm().format(this);
+
+  String toHumanDateTime() => '${toHumanDay()} at $formatTime';
+
+  String toHumanDate() => toHumanDay();
+
+  String toHumanDay() {
+    final now = DateTime.now();
+    if (isOnDay(now)) {
+      return 'Today';
+    } else if (isOnDay(DateTime.now().dayEarlier())) {
+      return 'Yesterday';
+    } else if (isInWeek(now)) {
+      return _formatWeekday;
+    } else if (isInYear(now)) {
+      return _formatDateShort;
+    } else {
+      return _formatDate;
+    }
+  }
+
+  String toHumanWeek() {
+    final now = DateTime.now();
+    if (isInWeek(now)) {
+      return 'This week';
+    } else if (weekLater().isInWeek(now)) {
+      return 'Last week';
+    } else if (isInYear(now)) {
+      final lastDay = add(const Duration(days: 6));
+      return "$_formatDateShort - ${lastDay._formatDateShort}";
+    } else {
+      final lastDay = add(const Duration(days: 6));
+      return "$_formatDate - ${lastDay._formatDate}";
+    }
+  }
+
+  String toHumanMonth() {
+    final now = DateTime.now();
+    if (isInMonth(now)) {
+      return 'This month';
+    } else if (monthLater().isInMonth(now)) {
+      return 'Last month';
+    } else if (isInYear(now)) {
+      return _formatMonthShort;
+    } else {
+      return _formatMonth;
+    }
+  }
+
+  String toHumanYear() {
+    final now = DateTime.now();
+    if (isInYear(now)) {
+      return 'This year';
+    } else if (yearLater().isInYear(now)) {
+      return 'Last year';
+    } else {
+      return year.toString();
+    }
+  }
+
   DateTime beginningOfDay() {
     return DateTime(year, month, day);
   }
@@ -105,98 +218,6 @@ extension DateTimeExtension on DateTime {
     const numDaysNormYear = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     const numDaysLeapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     return isLeapYear ? numDaysLeapYear[month - 1] : numDaysNormYear[month - 1];
-  }
-
-  static final _dateWithoutYear = DateFormat('dd.MM.');
-  static final _dateWithYear = DateFormat('dd.MM.yyyy');
-  static final _dateTimeFull = DateFormat('dd.MM.yyyy HH:mm');
-  static final _timeHourMinute = DateFormat('HH:mm');
-  static final _monthName = DateFormat.MMMM();
-  static final _monthNameWithYear = DateFormat('MMMM yyyy');
-  static final _longWeekday = DateFormat.EEEE();
-
-  String toStringDateWithoutYear() {
-    return _dateWithoutYear.format(this);
-  }
-
-  String toStringDateWithYear() {
-    return _dateWithYear.format(this);
-  }
-
-  String toStringDateTime() {
-    return _dateTimeFull.format(this);
-  }
-
-  String toStringHourMinute() {
-    return _timeHourMinute.format(this);
-  }
-
-  String toStringMonthWithoutYear() {
-    return _monthName.format(this);
-  }
-
-  String toStringMonthWithYear() {
-    return _monthNameWithYear.format(this);
-  }
-
-  String toStringWeekday() {
-    return _longWeekday.format(this);
-  }
-
-  String toHumanDay() {
-    final now = DateTime.now();
-    if (isOnDay(now)) {
-      return 'Today';
-    } else if (isOnDay(DateTime.now().dayEarlier())) {
-      return 'Yesterday';
-    } else if (isInWeek(now)) {
-      return toStringWeekday();
-    } else {
-      return toStringDateWithYear();
-    }
-  }
-
-  String toHumanWithTime() {
-    return '${toHumanDay()} at ${toStringHourMinute()}';
-  }
-
-  String toHumanWeek() {
-    final now = DateTime.now();
-    if (isInWeek(now)) {
-      return 'This week';
-    }
-    if (weekLater().isInWeek(now)) {
-      return 'Last week';
-    }
-    final lastDay = add(const Duration(days: 6));
-    if (isInYear(now) && isInYear(lastDay)) {
-      return toStringDateWithoutYear() + ' - ' + toStringDateWithoutYear();
-    }
-    return toStringDateWithYear() + ' - ' + lastDay.toStringDateWithYear();
-  }
-
-  String toHumanMonth() {
-    final now = DateTime.now();
-    if (isInMonth(now)) {
-      return 'This month';
-    } else if (monthLater().isInMonth(now)) {
-      return 'Last month';
-    } else if (isInYear(now)) {
-      return toStringMonthWithoutYear();
-    } else {
-      return toStringMonthWithYear();
-    }
-  }
-
-  String toHumanYear() {
-    final now = DateTime.now();
-    if (isInYear(now)) {
-      return 'This year';
-    } else if (yearLater().isInYear(now)) {
-      return 'Last year';
-    } else {
-      return year.toString();
-    }
   }
 
   DateTime withTime(TimeOfDay time) {

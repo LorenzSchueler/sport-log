@@ -171,7 +171,7 @@ class MetconSessionCard extends StatelessWidget {
                   children: [
                     Text(
                       metconSessionDescription.metconSession.datetime
-                          .toHumanWithTime(),
+                          .toHumanDateTime(),
                     ),
                     Defaults.sizedBox.vertical.normal,
                     Text(

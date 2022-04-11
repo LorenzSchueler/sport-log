@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/formatting.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/map_utils.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -143,7 +143,8 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
               top: 5,
             ),
             child: Text(
-              _cardioSessionDescription.cardioSession.datetime.formatDatetime,
+              _cardioSessionDescription.cardioSession.datetime
+                  .toHumanDateTime(),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: _cardioSessionDescription.cardioSession.track != null

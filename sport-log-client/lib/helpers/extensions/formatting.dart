@@ -1,61 +1,8 @@
-import 'package:intl/intl.dart';
-import 'package:sport_log/models/all.dart';
-
-extension FormatDateTime on DateTime {
-  String get formatDatetime => DateFormat('dd.MM.yy kk:mm').format(this);
-
-  String get formatDate => DateFormat('dd.MM.yy').format(this);
-
-  String get formatTime => DateFormat('kk:mm:ss').format(this);
-
-  String get yyyyMMdd => DateFormat('yyyy-MM-dd').format(this);
-}
-
-extension FormatDuration on Duration {
-  String get formatTime => toString().split('.').first.padLeft(8, "0");
-
-  String get formatTimeShort => inSeconds < 3600
-      ? toString().split('.').first.split(":").skip(1).join(":")
-      : toString().split('.').first.padLeft(8, "0");
-
-  String get formatTimeWithMillis => toString().split(":").skip(1).join(":");
-}
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/models/movement/movement.dart';
 
 String plural(String singular, String plural, int count) {
   return (count == 1) ? singular : plural;
-}
-
-const _shortMonthNames = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
-
-String shortMonthName(int month) {
-  return _shortMonthNames[month - 1];
-}
-
-const _shortWeekdayNames = [
-  'Mon',
-  'Tue',
-  'Wed',
-  'Thu',
-  'Fri',
-  'Sat',
-  'Sun',
-];
-
-String shortWeekdayName(int weekday) {
-  return _shortWeekdayNames[weekday - 1];
 }
 
 String formatDistance(int meters) {
@@ -97,18 +44,5 @@ String formatCountWeight(MovementDimension dim, int count, double? weight) {
     case MovementDimension.distance:
       final result = formatDistance(count);
       return weight != null ? result + ' (${roundedWeight(weight)})' : result;
-  }
-}
-
-extension BoolParsing on String {
-  bool parseBool({required bool defaultValue}) {
-    switch (toLowerCase()) {
-      case "true":
-        return true;
-      case "false":
-        return false;
-      default:
-        return defaultValue;
-    }
   }
 }

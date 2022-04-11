@@ -2,7 +2,7 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/formatting.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/map_utils.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
@@ -189,8 +189,8 @@ class CardioEditPageState extends State<CardioEditPage> {
                 leading: AppIcons.calendar,
                 caption: "Start Time",
                 child: Text(
-                  _cardioSessionDescription
-                      .cardioSession.datetime.formatDatetime,
+                  _cardioSessionDescription.cardioSession.datetime
+                      .toHumanDateTime(),
                 ),
                 onTap: () async {
                   DateTime? datetime = await showDatePickerWithDefaults(

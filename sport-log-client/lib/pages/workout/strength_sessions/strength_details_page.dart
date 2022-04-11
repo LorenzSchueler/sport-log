@@ -84,7 +84,7 @@ class _StrengthSessionDetailsPageState
                     caption: "Date",
                     child: Text(
                       _strengthSessionDescription.session.datetime
-                          .toHumanWithTime(),
+                          .toHumanDateTime(),
                     ),
                   ),
                   TextTile(

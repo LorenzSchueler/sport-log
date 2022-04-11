@@ -6,8 +6,8 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:polar/polar.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
-import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -197,7 +197,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       }
     }
     _stepInfo =
-        "step count: ${stepCount.steps}\ntimestamp: ${stepCount.timeStamp.formatTime}";
+        "step count: ${stepCount.steps}\ntimestamp: ${stepCount.timeStamp.formatTimeHms}";
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {

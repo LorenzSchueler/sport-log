@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/helpers/extensions/formatting.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 
 class ValueUnitDescription extends StatelessWidget {
   final String value;

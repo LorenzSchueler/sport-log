@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -185,7 +184,7 @@ class StrengthSessionCard extends StatelessWidget {
                   children: [
                     Text(
                       strengthSessionDescription.session.datetime
-                          .toHumanWithTime(),
+                          .toHumanDateTime(),
                     ),
                     Defaults.sizedBox.vertical.normal,
                     Text(

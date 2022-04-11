@@ -122,7 +122,7 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
             ),
             EditTile(
               caption: 'Date',
-              child: Text(_actionEvent.datetime.toHumanWithTime()),
+              child: Text(_actionEvent.datetime.toHumanDateTime()),
               leading: AppIcons.calendar,
               onTap: () async {
                 final date = await showRoundedDatePicker(

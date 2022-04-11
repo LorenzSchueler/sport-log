@@ -192,7 +192,7 @@ class CardioSessionCard extends StatelessWidget {
                 children: [
                   Text(
                     cardioSessionDescription.cardioSession.datetime
-                        .toHumanWithTime(),
+                        .toHumanDateTime(),
                   ),
                   Text(
                     cardioSessionDescription.movement.name,

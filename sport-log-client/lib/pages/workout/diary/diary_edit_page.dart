@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/diary_data_provider.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/formatting.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -93,7 +93,7 @@ class DiaryEditPageState extends State<DiaryEditPage> {
               EditTile(
                 leading: AppIcons.calendar,
                 caption: "Date",
-                child: Text(_diary.date.formatDate),
+                child: Text(_diary.date.toHumanDate()),
                 onTap: () async {
                   DateTime? date = await showDatePickerWithDefaults(
                     context: context,
