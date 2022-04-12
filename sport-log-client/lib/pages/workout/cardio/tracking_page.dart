@@ -152,24 +152,20 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   }
 
   void _onHeartRateUpdate(PolarHeartRateEvent event) {
-    _logger
-      ..i('hr: ${event.data.hr}')
-      ..i('rr: ${event.data.rrsMs}');
+    _logger.i('rr: ${event.data.rrsMs}');
 
     if (_trackingMode == TrackingMode.tracking) {
-      List<int> rrsMs = event.data.rrsMs;
       if (_cardioSessionDescription.cardioSession.heartRate!.isEmpty &&
-          rrsMs.isNotEmpty) {
-        _cardioSessionDescription.cardioSession.heartRate!.add(
-          _currentDuration - Duration(milliseconds: rrsMs.sum),
-        );
-        rrsMs.removeAt(0);
-      }
-      for (final rr in rrsMs) {
-        _cardioSessionDescription.cardioSession.heartRate!.add(
-          _cardioSessionDescription.cardioSession.heartRate!.last +
-              Duration(milliseconds: rr),
-        );
+          event.data.rrsMs.isNotEmpty) {
+        _cardioSessionDescription.cardioSession.heartRate!
+            .add(_currentDuration);
+      } else {
+        for (final rr in event.data.rrsMs) {
+          _cardioSessionDescription.cardioSession.heartRate!.add(
+            _cardioSessionDescription.cardioSession.heartRate!.last +
+                Duration(milliseconds: rr),
+          );
+        }
       }
     }
     _heartRateInfo = "rr: ${event.data.rrsMs} ms\nhr: ${event.data.hr} bpm";
