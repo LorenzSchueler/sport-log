@@ -1,5 +1,6 @@
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -206,7 +207,7 @@ class CardioSessionCard extends StatelessWidget {
                 ? SizedBox(
                     height: 150,
                     child: MapboxMap(
-                      accessToken: Defaults.mapbox.accessToken,
+                      accessToken: Config.instance.accessToken,
                       styleString: Defaults.mapbox.style.outdoor,
                       initialCameraPosition: Settings.lastMapPosition,
                       rotateGesturesEnabled: false,

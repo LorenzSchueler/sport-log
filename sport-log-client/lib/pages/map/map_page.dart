@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/map_utils.dart';
@@ -96,7 +97,7 @@ class MapPageState extends State<MapPage> {
         body: Stack(
           children: [
             MapboxMap(
-              accessToken: Defaults.mapbox.accessToken,
+              accessToken: Config.instance.accessToken,
               styleString: mapStyle,
               initialCameraPosition: Settings.lastMapPosition,
               trackCameraPosition: true,

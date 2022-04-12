@@ -73,7 +73,7 @@ class Settings {
       _serverUrl,
       Config.instance.isAndroidEmulator
           ? Defaults.server.emulatorUrl
-          : Defaults.server.url,
+          : Config.instance.serverAddress,
     );
   }
 

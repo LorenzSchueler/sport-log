@@ -8,7 +8,7 @@ abstract class Defaults {
   static const edgeInsets = _EdgeInsets();
   static const borderRadius = _BorderRadius();
   static final mapbox = _Mapbox();
-  static final mapboxApi = MapboxApi(accessToken: Defaults.mapbox.accessToken);
+  static final mapboxApi = MapboxApi(accessToken: Config.instance.accessToken);
   static final server = _Server();
 }
 
@@ -16,7 +16,6 @@ class _Server {
   _Server();
 
   final emulatorUrl = 'http://10.0.2.2:8000';
-  final url = Config.instance.serverAddress;
 }
 
 class _EdgeInsets {
@@ -61,7 +60,6 @@ class _BorderRadius {
 class _Mapbox {
   _Mapbox();
 
-  final String accessToken = Config.instance.accessToken;
   final style = const _Style();
   final markerColor = "#0060a0";
   final trackLineColor = "red";

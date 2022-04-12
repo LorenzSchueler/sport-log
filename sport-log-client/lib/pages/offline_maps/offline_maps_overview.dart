@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/map_utils.dart';
@@ -80,7 +81,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
           mapStyleUrl: Defaults.mapbox.style.outdoor,
         ),
         onEvent: _onMapDownload,
-        accessToken: Defaults.mapbox.accessToken,
+        accessToken: Config.instance.accessToken,
       );
     } else {
       showMessageDialog(
@@ -147,7 +148,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
                 SizedBox(
                   height: 400,
                   child: MapboxMap(
-                    accessToken: Defaults.mapbox.accessToken,
+                    accessToken: Config.instance.accessToken,
                     styleString: Defaults.mapbox.style.outdoor,
                     initialCameraPosition: Settings.lastMapPosition,
                     trackCameraPosition: true,

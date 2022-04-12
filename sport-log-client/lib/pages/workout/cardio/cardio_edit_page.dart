@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -122,7 +123,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                 SizedBox(
                   height: 150,
                   child: MapboxMap(
-                    accessToken: Defaults.mapbox.accessToken,
+                    accessToken: Config.instance.accessToken,
                     styleString: Defaults.mapbox.style.outdoor,
                     initialCameraPosition: Settings.lastMapPosition,
                     onMapCreated: (MapboxMapController controller) =>

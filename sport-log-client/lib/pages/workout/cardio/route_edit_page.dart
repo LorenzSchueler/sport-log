@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -342,7 +343,7 @@ class RouteEditPageState extends State<RouteEditPage> {
         children: [
           Expanded(
             child: MapboxMap(
-              accessToken: Defaults.mapbox.accessToken,
+              accessToken: Config.instance.accessToken,
               styleString: Defaults.mapbox.style.outdoor,
               initialCameraPosition: Settings.lastMapPosition,
               trackCameraPosition: true,

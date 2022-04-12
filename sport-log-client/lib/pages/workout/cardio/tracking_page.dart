@@ -4,6 +4,7 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:polar/polar.dart';
+import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -378,7 +379,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
           ),
           Expanded(
             child: MapboxMap(
-              accessToken: Defaults.mapbox.accessToken,
+              accessToken: Config.instance.accessToken,
               styleString: Defaults.mapbox.style.outdoor,
               initialCameraPosition: CameraPosition(
                 zoom: 15.0,
