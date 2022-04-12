@@ -38,6 +38,9 @@ class Position {
 
   Map<String, dynamic> toJson() => _$PositionToJson(this);
 
+  @override
+  String toString() => toJson().toString();
+
   Position clone() => Position(
         longitude: longitude,
         latitude: latitude,
