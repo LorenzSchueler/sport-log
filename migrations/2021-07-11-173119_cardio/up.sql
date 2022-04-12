@@ -91,9 +91,9 @@ create table cardio_session (
     calories integer check (calories >= 0),
     track "position"[],
     avg_cadence integer check (avg_cadence > 0), 
-    cadence real[], -- = millisecs since start
+    cadence integer[], -- = millisecs since start
     avg_heart_rate integer check (avg_heart_rate > 0),
-    heart_rate real[], -- = millisecs since start
+    heart_rate integer[], -- = millisecs since start
     route_id bigint references route on delete set null,
     comments text,
     last_change timestamptz not null default now(),

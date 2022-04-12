@@ -294,11 +294,11 @@ pub struct CardioSession {
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub avg_cadence: Option<i32>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
-    pub cadence: Option<Vec<f32>>,
+    pub cadence: Option<Vec<i32>>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub avg_heart_rate: Option<i32>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
-    pub heart_rate: Option<Vec<f32>>,
+    pub heart_rate: Option<Vec<i32>>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     #[serde(serialize_with = "to_str_optional")]
     #[serde(deserialize_with = "from_str_optional")]
