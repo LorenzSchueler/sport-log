@@ -7,11 +7,14 @@ class DbDurationListConverter {
 
   static List<Duration>? mapToDart(Uint8List? fromDb) {
     assert(fromDb == null || fromDb.length % 8 == 0);
-    return fromDb?.buffer
-        .asInt64List()
-        .toList()
-        .map((e) => Duration(milliseconds: e))
-        .toList();
+    if (fromDb == null) {
+      return null;
+    }
+    final List<int> list = [];
+    for (int index = 0; index < fromDb.length; index += 8) {
+      list.add(ByteData.sublistView(fromDb).getInt64(index, Endian.host));
+    }
+    return list.map((e) => Duration(milliseconds: e)).toList();
   }
 
   static Uint8List? mapToSql(List<Duration>? value) {
