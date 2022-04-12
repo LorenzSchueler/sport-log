@@ -32,7 +32,7 @@ class _DurationInputState extends State<DurationInput> {
 
   static const double _fontSize = 24;
   static const double _textWidth = 13;
-  static const int _timeStep = 30; // seconds
+  static const int _timeStep = 60; // seconds
   static const int _maxSeconds = 60 * 100 - 1;
 
   @override

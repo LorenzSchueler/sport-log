@@ -24,6 +24,7 @@ class Settings {
   static const String _syncInterval = "syncInterval";
   static const String _lastSync = "lastSync";
   static const String _units = "units";
+  static const String _weightIncrement = "weightIncrement";
   static const String _id = "id";
   static const String _username = "username";
   static const String _password = "password";
@@ -52,6 +53,9 @@ class Settings {
     }
     if (!_storage!.containsKey(_units) || override) {
       await _storage!.put(_units, "metric");
+    }
+    if (!_storage!.containsKey(_weightIncrement) || override) {
+      await _storage!.put(_weightIncrement, 2.5);
     }
     if (!_storage!.containsKey(_lastMapPosition) || override) {
       await _storage!.put(
@@ -82,6 +86,10 @@ class Settings {
   //static int _getInt(String key) {
   //return _storage!.get(key)! as int;
   //}
+
+  static double _getDouble(String key) {
+    return _storage!.get(key)! as double;
+  }
 
   static String _getString(String key) {
     return _storage!.get(key)! as String;
@@ -145,6 +153,14 @@ class Settings {
 
   static set units(Units units) {
     _put(_units, units.name);
+  }
+
+  static double get weightIncrement {
+    return _getDouble(_weightIncrement);
+  }
+
+  static set weightIncrement(double incement) {
+    _put(_weightIncrement, incement);
   }
 
   static Int64? get userId {

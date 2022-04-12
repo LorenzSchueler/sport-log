@@ -236,6 +236,25 @@ class SettingsPageState extends State<SettingsPage> {
                 ),
                 leading: AppIcons.sync,
               ),
+              TextFormField(
+                decoration: const InputDecoration(
+                  icon: Icon(AppIcons.timeInterval),
+                  labelText: "Weight Increment",
+                  contentPadding: EdgeInsets.symmetric(vertical: 5),
+                ),
+                keyboardType: TextInputType.number,
+                initialValue: Settings.weightIncrement.toString(),
+                validator: Validator.validateDoubleGtZero,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                style: const TextStyle(height: 1),
+                onFieldSubmitted: (increment) async {
+                  final validated = Validator.validateDoubleGtZero(increment);
+                  if (validated == null) {
+                    final weightIncrement = double.parse(increment);
+                    setState(() => Settings.weightIncrement = weightIncrement);
+                  }
+                },
+              ),
               Defaults.sizedBox.vertical.small,
               const Divider(),
               const CaptionTile(caption: "About"),

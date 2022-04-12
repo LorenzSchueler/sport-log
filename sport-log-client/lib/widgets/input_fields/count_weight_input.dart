@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/input_fields/double_input.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -137,6 +138,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
                         verticalAlignment: TableCellVerticalAlignment.middle,
                         child: DoubleInput(
                           initialValue: _weight!,
+                          stepSize: Settings.weightIncrement,
                           setValue: (weight) {
                             setState(() => _weight = weight);
                             if (!widget.confirmChanges) {
@@ -174,6 +176,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: DoubleInput(
                             initialValue: _secondWeight!,
+                            stepSize: Settings.weightIncrement,
                             setValue: (weight) {
                               setState(() => _secondWeight = weight);
                               if (!widget.confirmChanges) {
