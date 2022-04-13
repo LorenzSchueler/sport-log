@@ -27,7 +27,6 @@ class MapPageState extends State<MapPage> {
   bool _showOverlays = true;
 
   List<Circle> _circles = [];
-  LatLng? _lastLatLng;
 
   double _metersPerPixel = 1;
 
@@ -45,8 +44,8 @@ class MapPageState extends State<MapPage> {
     if (_mapController.cameraPosition != null) {
       Settings.lastMapPosition = _mapController.cameraPosition!;
     }
-    if (_lastLatLng != null) {
-      Settings.lastGpsLatLng = _lastLatLng!;
+    if (_locationUtils.lastLatLng != null) {
+      Settings.lastGpsLatLng = _locationUtils.lastLatLng!;
     }
     _mapController.removeListener(_mapControllerListener);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -63,14 +62,12 @@ class MapPageState extends State<MapPage> {
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
-    _lastLatLng = LatLng(location.latitude!, location.longitude!);
+    final _latLng = LatLng(location.latitude!, location.longitude!);
 
-    await _mapController.animateCamera(
-      CameraUpdate.newLatLng(_lastLatLng!),
-    );
+    await _mapController.animateCamera(CameraUpdate.newLatLng(_latLng));
     _circles = await _mapController.updateCurrentLocationMarker(
       _circles,
-      _lastLatLng!,
+      _latLng,
     );
   }
 

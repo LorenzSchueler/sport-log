@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:location/location.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
 
@@ -9,6 +10,7 @@ class LocationUtils {
 
   void Function(LocationData) onLocationUpdate;
   StreamSubscription? _locationSubscription;
+  LatLng? _lastLatLng;
 
   LocationUtils(this.onLocationUpdate);
 
@@ -51,7 +53,10 @@ class LocationUtils {
       await _location.enableBackgroundMode(enable: true);
       await _location.changeSettings(accuracy: LocationAccuracy.high);
       _locationSubscription =
-          _location.onLocationChanged.listen(onLocationUpdate);
+          _location.onLocationChanged.listen((locationData) {
+        _lastLatLng = LatLng(locationData.latitude!, locationData.longitude!);
+        onLocationUpdate(locationData);
+      });
     }
     return true;
   }
@@ -61,6 +66,8 @@ class LocationUtils {
     _locationSubscription = null;
     _location.enableBackgroundMode(enable: false);
   }
+
+  LatLng? get lastLatLng => _lastLatLng;
 
   bool get enabled => _locationSubscription != null;
 }
