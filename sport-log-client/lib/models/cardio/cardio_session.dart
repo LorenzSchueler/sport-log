@@ -119,6 +119,18 @@ class CardioSession extends AtomicEntity {
     }
   }
 
+  void setEmptyListsToNull() {
+    if (track != null && track!.isEmpty) {
+      track = null;
+    }
+    if (cadence != null && cadence!.isEmpty) {
+      cadence = null;
+    }
+    if (heartRate != null && heartRate!.isEmpty) {
+      heartRate = null;
+    }
+  }
+
   void setDistance() {
     distance = track != null && track!.isNotEmpty
         ? track?.last.distance.round()

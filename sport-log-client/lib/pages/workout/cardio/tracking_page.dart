@@ -114,6 +114,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
 
   Future<void> _saveCardioSession() async {
     _cardioSessionDescription.cardioSession.time = _currentDuration;
+    _cardioSessionDescription.cardioSession.setEmptyListsToNull();
     _cardioSessionDescription.cardioSession.setAscentDescent();
     _cardioSessionDescription.cardioSession.setAvgCadence();
     _cardioSessionDescription.cardioSession.setAvgHeartRate();
