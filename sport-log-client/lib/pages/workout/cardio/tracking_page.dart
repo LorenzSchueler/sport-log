@@ -261,7 +261,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
               style: ElevatedButton.styleFrom(
                 primary: Theme.of(context).colorScheme.error,
               ),
-              onPressed: _trackingUtils.pause,
+              onPressed: () => setState(_trackingUtils.pause),
               child: const Text("pause"),
             ),
           ),
@@ -273,7 +273,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
               style: ElevatedButton.styleFrom(
                 primary: Theme.of(context).colorScheme.errorContainer,
               ),
-              onPressed: _trackingUtils.resume,
+              onPressed: () => setState(_trackingUtils.resume),
               child: const Text("resume"),
             ),
           ),
@@ -297,7 +297,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
               ),
               onPressed: _heartRateUtils == null || _heartRateUtils!.active
                   ? () {
-                      _trackingUtils.start();
+                      setState(_trackingUtils.start);
                       _cardioSessionDescription.cardioSession.datetime =
                           DateTime.now();
                     }
