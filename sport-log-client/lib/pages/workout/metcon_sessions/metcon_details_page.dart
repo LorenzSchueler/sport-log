@@ -55,7 +55,7 @@ class MetconDetailsPageState extends State<MetconDetailsPage> {
                 if (returnObj is ReturnObject<MetconDescription>) {
                   if (returnObj.action == ReturnAction.deleted) {
                     Navigator.pop(context);
-                  } else {
+                  } else if (mounted) {
                     setState(() {
                       _metconDescription = returnObj.payload;
                     });

@@ -53,12 +53,14 @@ class _HeartRatePageState extends State<HeartRatePage> {
                             _isSearchingHRMonitor = true;
                           });
                           final devices = await HeartRateUtils.searchDevices();
-                          setState(() {
-                            _devices = devices;
-                            _isSearchingHRMonitor = false;
-                          });
-                          if (devices == null || devices.isEmpty) {
-                            showSimpleToast(context, "no devices found");
+                          if (mounted) {
+                            setState(() {
+                              _devices = devices;
+                              _isSearchingHRMonitor = false;
+                            });
+                            if (devices == null || devices.isEmpty) {
+                              showSimpleToast(context, "no devices found");
+                            }
                           }
                         },
                   child: Text(

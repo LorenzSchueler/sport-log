@@ -65,7 +65,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
               if (returnObj is ReturnObject<CardioSessionDescription>) {
                 if (returnObj.action == ReturnAction.deleted) {
                   Navigator.pop(context);
-                } else {
+                } else if (mounted) {
                   setState(() {
                     _cardioSessionDescription = returnObj.payload;
                   });

@@ -60,7 +60,7 @@ class _StrengthSessionDetailsPageState
               if (returnObj is ReturnObject<StrengthSessionDescription>) {
                 if (returnObj.action == ReturnAction.deleted) {
                   Navigator.pop(context);
-                } else {
+                } else if (mounted) {
                   setState(() {
                     _strengthSessionDescription = returnObj.payload;
                   });

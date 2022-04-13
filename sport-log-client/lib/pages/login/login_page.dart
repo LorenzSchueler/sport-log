@@ -247,9 +247,11 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       result = await Account.login(_username, _password);
     }
-    setState(() {
-      _loginPending = false;
-    });
+    if (mounted) {
+      setState(() {
+        _loginPending = false;
+      });
+    }
     if (result.isSuccess) {
       Navigator.of(context).newBase(Routes.timeline.overview);
     } else {

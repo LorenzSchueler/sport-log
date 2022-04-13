@@ -175,7 +175,9 @@ class MapPageState extends State<MapPage> {
                     } else {
                       await _locationUtils.startLocationStream();
                     }
-                    setState(() {});
+                    if (mounted) {
+                      setState(() {});
+                    }
                   },
                 ),
               ),

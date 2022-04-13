@@ -38,6 +38,12 @@ class _DayChartState extends State<DayChart> {
     _update();
   }
 
+  @override
+  void dispose() {
+    _dataProvider.removeListener(_update);
+    super.dispose();
+  }
+
   Future<void> _update() async {
     final sets = await _dataProvider.getSetsOnDay(
       movementId: widget.movement.id,
@@ -103,11 +109,5 @@ class _DayChartState extends State<DayChart> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _dataProvider.removeListener(_update);
-    super.dispose();
   }
 }

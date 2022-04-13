@@ -37,6 +37,12 @@ class _WeekChartState extends State<WeekChart> {
     _update();
   }
 
+  @override
+  void dispose() {
+    _dataProvider.removeListener(_update);
+    super.dispose();
+  }
+
   Future<void> _update() async {
     final strengthSessionStats = await _dataProvider.getStatsAggregationsByDay(
       movementId: widget.movement.id,
@@ -126,11 +132,5 @@ class _WeekChartState extends State<WeekChart> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _dataProvider.removeListener(_update);
-    super.dispose();
   }
 }

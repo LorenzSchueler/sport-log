@@ -79,10 +79,12 @@ class CardioTrackingSettingsPageState
                     onTap: () async {
                       setState(() => _isSearchingHRMonitor = true);
                       final devices = await HeartRateUtils.searchDevices();
-                      setState(() {
-                        _devices = devices;
-                        _isSearchingHRMonitor = false;
-                      });
+                      if (mounted) {
+                        setState(() {
+                          _devices = devices;
+                          _isSearchingHRMonitor = false;
+                        });
+                      }
                     },
                   )
                 : EditTile(

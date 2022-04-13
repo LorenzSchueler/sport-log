@@ -37,6 +37,12 @@ class _MonthChartState extends State<MonthChart> {
     _update();
   }
 
+  @override
+  void dispose() {
+    _dataProvider.removeListener(_update);
+    super.dispose();
+  }
+
   Future<void> _update() async {
     final strengthSessionStats = await _dataProvider.getStatsAggregationsByDay(
       movementId: widget.movement.id,
@@ -105,11 +111,5 @@ class _MonthChartState extends State<MonthChart> {
         borderData: FlBorderData(show: false),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _dataProvider.removeListener(_update);
-    super.dispose();
   }
 }

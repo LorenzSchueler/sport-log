@@ -34,6 +34,12 @@ class _AllChartState extends State<AllChart> {
     _update();
   }
 
+  @override
+  void dispose() {
+    _dataProvider.removeListener(_update);
+    super.dispose();
+  }
+
   Future<void> _update() async {
     final strengthSessionStats = await _dataProvider
         .getStatsAggregationsByMonth(movementId: widget.movement.id);
@@ -114,11 +120,5 @@ class _AllChartState extends State<AllChart> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _dataProvider.removeListener(_update);
-    super.dispose();
   }
 }

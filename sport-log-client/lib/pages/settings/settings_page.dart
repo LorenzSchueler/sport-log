@@ -136,7 +136,7 @@ class SettingsPageState extends State<SettingsPage> {
                   final validated = Validator.validateUsername(username);
                   if (validated == null) {
                     final result = await Account.editUser(username: username);
-                    if (result.isFailure) {
+                    if (mounted && result.isFailure) {
                       await showMessageDialog(
                         context: context,
                         title: "Changing Username Failed",
@@ -146,7 +146,9 @@ class SettingsPageState extends State<SettingsPage> {
                   } else {
                     await showMessageDialog(context: context, text: validated);
                   }
-                  setState(() {});
+                  if (mounted) {
+                    setState(() {});
+                  }
                 },
               ),
               TextFormField(
@@ -163,7 +165,7 @@ class SettingsPageState extends State<SettingsPage> {
                   final validated = Validator.validatePassword(password);
                   if (validated == null) {
                     final result = await Account.editUser(password: password);
-                    if (result.isFailure) {
+                    if (mounted && result.isFailure) {
                       await showMessageDialog(
                         context: context,
                         title: "Changing Password Failed",
@@ -173,7 +175,9 @@ class SettingsPageState extends State<SettingsPage> {
                   } else {
                     await showMessageDialog(context: context, text: validated);
                   }
-                  setState(() {});
+                  if (mounted) {
+                    setState(() {});
+                  }
                 },
               ),
               TextFormField(
@@ -191,7 +195,7 @@ class SettingsPageState extends State<SettingsPage> {
                   final validated = Validator.validateEmail(email);
                   if (validated == null) {
                     final result = await Account.editUser(email: email);
-                    if (result.isFailure) {
+                    if (mounted && result.isFailure) {
                       await showMessageDialog(
                         context: context,
                         title: "Changing Email Failed",
@@ -201,7 +205,9 @@ class SettingsPageState extends State<SettingsPage> {
                   } else {
                     await showMessageDialog(context: context, text: validated);
                   }
-                  setState(() {});
+                  if (mounted) {
+                    setState(() {});
+                  }
                 },
               ),
               Defaults.sizedBox.vertical.small,
