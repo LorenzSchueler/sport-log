@@ -2,7 +2,7 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/models/cardio/position.dart';
 
-extension MapControllerExt on MapboxMapController {
+extension MapControllerExtension on MapboxMapController {
   Future<void> setBounds(List<Position>? track1, List<Position>? track2) async {
     final bounds = LatLngBoundsCombine.combinedBounds(track1, track2);
     if (bounds != null) {

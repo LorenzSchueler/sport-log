@@ -6,8 +6,9 @@ import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/location_utils.dart';
-import 'package:sport_log/helpers/map_utils.dart';
+import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -62,12 +63,10 @@ class MapPageState extends State<MapPage> {
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
-    final _latLng = LatLng(location.latitude!, location.longitude!);
-
-    await _mapController.animateCamera(CameraUpdate.newLatLng(_latLng));
+    await _mapController.animateCamera(CameraUpdate.newLatLng(location.latLng));
     _circles = await _mapController.updateCurrentLocationMarker(
       _circles,
-      _latLng,
+      location.latLng,
     );
   }
 

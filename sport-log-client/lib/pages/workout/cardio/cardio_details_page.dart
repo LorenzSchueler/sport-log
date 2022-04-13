@@ -4,7 +4,7 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/map_utils.dart';
+import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';

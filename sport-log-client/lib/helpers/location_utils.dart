@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
 
 class LocationUtils {
@@ -54,7 +55,7 @@ class LocationUtils {
       await _location.changeSettings(accuracy: LocationAccuracy.high);
       _locationSubscription =
           _location.onLocationChanged.listen((locationData) {
-        _lastLatLng = LatLng(locationData.latitude!, locationData.longitude!);
+        _lastLatLng = locationData.latLng;
         onLocationUpdate(locationData);
       });
     }

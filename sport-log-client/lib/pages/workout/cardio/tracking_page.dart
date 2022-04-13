@@ -8,10 +8,11 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/map_utils.dart';
+import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -202,14 +203,14 @@ time: ${location.time! ~/ 1000} s
 satelites:  ${location.satelliteNumber}
 points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
 
-    LatLng latLng = LatLng(location.latitude!, location.longitude!);
-
     await _mapController.animateCamera(
-      CameraUpdate.newLatLng(latLng),
+      CameraUpdate.newLatLng(location.latLng),
     );
 
-    _circles =
-        await _mapController.updateCurrentLocationMarker(_circles, latLng);
+    _circles = await _mapController.updateCurrentLocationMarker(
+      _circles,
+      location.latLng,
+    );
 
     if (_trackingMode == TrackingMode.tracking) {
       _cardioSessionDescription.cardioSession.track!.add(
