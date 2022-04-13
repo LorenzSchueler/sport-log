@@ -87,12 +87,12 @@ class OptionalDurationConverter extends JsonConverter<Duration?, int?> {
 }
 
 class OptionalDurationListConverter
-    extends JsonConverter<List<Duration>?, List<int>?> {
+    extends JsonConverter<List<Duration>?, List<dynamic>?> {
   const OptionalDurationListConverter() : super();
 
   @override
-  List<Duration>? fromJson(List<int>? json) {
-    return json?.map((e) => Duration(milliseconds: e)).toList();
+  List<Duration>? fromJson(List<dynamic>? json) {
+    return json?.cast<int>().map((e) => Duration(milliseconds: e)).toList();
   }
 
   @override

@@ -23,10 +23,10 @@ CardioSession _$CardioSessionFromJson(Map<String, dynamic> json) =>
           .toList(),
       avgCadence: json['avg_cadence'] as int?,
       cadence: const OptionalDurationListConverter()
-          .fromJson(json['cadence'] as List<int>?),
+          .fromJson(json['cadence'] as List?),
       avgHeartRate: json['avg_heart_rate'] as int?,
       heartRate: const OptionalDurationListConverter()
-          .fromJson(json['heart_rate'] as List<int>?),
+          .fromJson(json['heart_rate'] as List?),
       routeId:
           const OptionalIdConverter().fromJson(json['route_id'] as String?),
       comments: json['comments'] as String?,
