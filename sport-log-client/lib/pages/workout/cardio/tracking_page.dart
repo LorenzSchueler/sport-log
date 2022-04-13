@@ -14,13 +14,12 @@ import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
+import 'package:sport_log/helpers/tracking_utils.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
-
-enum TrackingMode { notStarted, tracking, paused, stopped }
 
 class CardioTrackingPage extends StatefulWidget {
   final Movement movement;
@@ -44,28 +43,19 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   final _logger = Logger('CardioTrackingPage');
   final _dataProvider = CardioSessionDescriptionDataProvider();
 
-  late CardioSessionDescription _cardioSessionDescription;
-
-  TrackingMode _trackingMode = TrackingMode.notStarted;
-
-  late DateTime _lastContinueTime;
-  Duration _lastStopDuration = Duration.zero;
-  Duration get _currentDuration => _trackingMode == TrackingMode.tracking
-      ? _lastStopDuration + DateTime.now().difference(_lastContinueTime)
-      : _lastStopDuration;
+  late final CardioSessionDescription _cardioSessionDescription;
 
   String _locationInfo = "no data";
   String _stepInfo = "no data";
   String _heartRateInfo = "no data";
 
-  late Timer _timer;
-  late LocationUtils _locationUtils;
-
-  late StepCountUtils _stepUtils;
-
+  late final Timer _timer;
+  final TrackingUtils _trackingUtils = TrackingUtils();
+  late final LocationUtils _locationUtils;
+  late final StepCountUtils _stepUtils;
   HeartRateUtils? _heartRateUtils;
 
-  late MapboxMapController _mapController;
+  late final MapboxMapController _mapController;
   late Line _line;
   List<Circle> _circles = [];
 
@@ -112,7 +102,8 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   }
 
   Future<void> _saveCardioSession() async {
-    _cardioSessionDescription.cardioSession.time = _currentDuration;
+    _cardioSessionDescription.cardioSession.time =
+        _trackingUtils.currentDuration;
     _cardioSessionDescription.cardioSession.setEmptyListsToNull();
     _cardioSessionDescription.cardioSession.setAscentDescent();
     _cardioSessionDescription.cardioSession.setAvgCadence();
@@ -134,8 +125,9 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   void _updateData() {
     // called every second
     setState(() {
-      if (_trackingMode == TrackingMode.tracking) {
-        _cardioSessionDescription.cardioSession.time = _currentDuration;
+      if (_trackingUtils.isTracking) {
+        _cardioSessionDescription.cardioSession.time =
+            _trackingUtils.currentDuration;
       }
       _cardioSessionDescription.cardioSession.setAscentDescent();
       _cardioSessionDescription.cardioSession.setAvgCadence();
@@ -153,11 +145,11 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   void _onHeartRateUpdate(PolarHeartRateEvent event) {
     _logger.i('rr: ${event.data.rrsMs}');
 
-    if (_trackingMode == TrackingMode.tracking) {
+    if (_trackingUtils.isTracking) {
       if (_cardioSessionDescription.cardioSession.heartRate!.isEmpty &&
           event.data.rrsMs.isNotEmpty) {
         _cardioSessionDescription.cardioSession.heartRate!
-            .add(_currentDuration);
+            .add(_trackingUtils.currentDuration);
       } else {
         for (final rr in event.data.rrsMs) {
           _cardioSessionDescription.cardioSession.heartRate!.add(
@@ -171,7 +163,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   }
 
   void _onStepCountUpdate(StepCount stepCount) {
-    if (_trackingMode == TrackingMode.tracking) {
+    if (_trackingUtils.isTracking) {
       if (_cardioSessionDescription.cardioSession.cadence!.isEmpty) {
         _cardioSessionDescription.cardioSession.cadence!.add(
           stepCount.timeStamp
@@ -212,7 +204,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
       location.latLng,
     );
 
-    if (_trackingMode == TrackingMode.tracking) {
+    if (_trackingUtils.isTracking) {
       _cardioSessionDescription.cardioSession.track!.add(
         Position(
           latitude: location.latitude!,
@@ -222,7 +214,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
               ? 0
               : _cardioSessionDescription.cardioSession.track!.last
                   .addDistanceTo(location.latitude!, location.longitude!),
-          time: _currentDuration,
+          time: _trackingUtils.currentDuration,
         ),
       );
       await _mapController.updateTrackLine(
@@ -232,7 +224,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
     }
   }
 
-  Future<void> _stopDialog() async {
+  Future<void> _saveDialog() async {
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -251,10 +243,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
           TextButton(
             child: const Text("Save"),
             onPressed: _cardioSessionDescription.isValidBeforeSanitazion()
-                ? () async {
-                    _trackingMode = TrackingMode.stopped;
-                    await _saveCardioSession();
-                  }
+                ? _saveCardioSession
                 : null,
           )
         ],
@@ -264,7 +253,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
 
   // ignore: long-method
   List<Widget> _buildButtons() {
-    switch (_trackingMode) {
+    switch (_trackingUtils.mode) {
       case TrackingMode.tracking:
         return [
           Expanded(
@@ -272,27 +261,8 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
               style: ElevatedButton.styleFrom(
                 primary: Theme.of(context).colorScheme.error,
               ),
-              onPressed: () {
-                _trackingMode = TrackingMode.paused;
-                _lastStopDuration +=
-                    DateTime.now().difference(_lastContinueTime);
-              },
+              onPressed: _trackingUtils.pause,
               child: const Text("pause"),
-            ),
-          ),
-          Defaults.sizedBox.horizontal.normal,
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: Theme.of(context).colorScheme.error,
-              ),
-              onPressed: () async {
-                _trackingMode = TrackingMode.paused;
-                _lastStopDuration +=
-                    DateTime.now().difference(_lastContinueTime);
-                await _stopDialog();
-              },
-              child: const Text("stop"),
             ),
           ),
         ];
@@ -303,11 +273,8 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
               style: ElevatedButton.styleFrom(
                 primary: Theme.of(context).colorScheme.errorContainer,
               ),
-              onPressed: () {
-                _trackingMode = TrackingMode.tracking;
-                _lastContinueTime = DateTime.now();
-              },
-              child: const Text("continue"),
+              onPressed: _trackingUtils.resume,
+              child: const Text("resume"),
             ),
           ),
           Defaults.sizedBox.horizontal.normal,
@@ -316,11 +283,8 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
               style: ElevatedButton.styleFrom(
                 primary: Theme.of(context).colorScheme.error,
               ),
-              onPressed: () async {
-                _trackingMode = TrackingMode.paused;
-                await _stopDialog();
-              },
-              child: const Text("stop"),
+              onPressed: _saveDialog,
+              child: const Text("save"),
             ),
           ),
         ];
@@ -333,11 +297,9 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
               ),
               onPressed: _heartRateUtils == null || _heartRateUtils!.active
                   ? () {
-                      _trackingMode = TrackingMode.tracking;
+                      _trackingUtils.start();
                       _cardioSessionDescription.cardioSession.datetime =
                           DateTime.now();
-                      _lastContinueTime =
-                          _cardioSessionDescription.cardioSession.datetime;
                     }
                   : null,
               child: Text(
