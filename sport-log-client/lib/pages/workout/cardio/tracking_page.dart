@@ -8,7 +8,6 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -332,14 +331,20 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
               style: ElevatedButton.styleFrom(
                 primary: Theme.of(context).colorScheme.errorContainer,
               ),
-              onPressed: () {
-                _trackingMode = TrackingMode.tracking;
-                _cardioSessionDescription.cardioSession.datetime =
-                    DateTime.now();
-                _lastContinueTime =
-                    _cardioSessionDescription.cardioSession.datetime;
-              },
-              child: const Text("start"),
+              onPressed: _heartRateUtils == null || _heartRateUtils!.active
+                  ? () {
+                      _trackingMode = TrackingMode.tracking;
+                      _cardioSessionDescription.cardioSession.datetime =
+                          DateTime.now();
+                      _lastContinueTime =
+                          _cardioSessionDescription.cardioSession.datetime;
+                    }
+                  : null,
+              child: Text(
+                _heartRateUtils == null || _heartRateUtils!.active
+                    ? "start"
+                    : "waiting on HR Monitor",
+              ),
             ),
           ),
           Defaults.sizedBox.horizontal.normal,

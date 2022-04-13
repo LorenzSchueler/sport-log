@@ -15,6 +15,7 @@ class HeartRateUtils {
   final void Function(PolarBatteryLevelEvent)? onBatteryEvent;
   StreamSubscription? _heartRateSubscription;
   StreamSubscription? _batterySubscription;
+  bool _active = false;
 
   HeartRateUtils({
     required this.deviceId,
@@ -51,7 +52,10 @@ class HeartRateUtils {
 
   void startHeartRateStream() {
     if (_heartRateSubscription == null) {
-      _heartRateSubscription = _polar.heartRateStream.listen(onHeartRateEvent);
+      _heartRateSubscription = _polar.heartRateStream.listen((heartRateEvent) {
+        _active = true;
+        onHeartRateEvent(heartRateEvent);
+      });
       if (onBatteryEvent != null) {
         _batterySubscription = _polar.batteryLevelStream.listen(onBatteryEvent);
       }
@@ -64,6 +68,8 @@ class HeartRateUtils {
     _batterySubscription?.cancel();
     _polar.disconnectFromDevice(deviceId);
   }
+
+  bool get active => _active;
 
   bool get enabled => _heartRateSubscription != null;
 }
