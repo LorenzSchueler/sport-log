@@ -8,6 +8,7 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/location_utils.dart';
@@ -143,8 +144,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   }
 
   void _onHeartRateUpdate(PolarHeartRateEvent event) {
-    _logger.i('rr: ${event.data.rrsMs}');
-
     if (_trackingUtils.isTracking) {
       if (_cardioSessionDescription.cardioSession.heartRate!.isEmpty &&
           event.data.rrsMs.isNotEmpty) {
@@ -153,8 +152,8 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       } else {
         for (final rr in event.data.rrsMs) {
           _cardioSessionDescription.cardioSession.heartRate!.add(
-            _cardioSessionDescription.cardioSession.heartRate!.last +
-                Duration(milliseconds: rr),
+            _trackingUtils.currentDuration +
+                Duration(milliseconds: -event.data.rrsMs.sum + rr),
           );
         }
       }
@@ -165,27 +164,25 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
   void _onStepCountUpdate(StepCount stepCount) {
     if (_trackingUtils.isTracking) {
       if (_cardioSessionDescription.cardioSession.cadence!.isEmpty) {
-        _cardioSessionDescription.cardioSession.cadence!.add(
-          stepCount.timeStamp
-              .difference(_cardioSessionDescription.cardioSession.datetime),
-        );
+        _cardioSessionDescription.cardioSession.cadence!
+            .add(_trackingUtils.currentDuration);
       } else {
         /// interpolate steps since last stepCount update
         int newSteps = stepCount.steps - _stepUtils.lastStepCount.steps;
-        double avgTimeDiff = stepCount.timeStamp
-                .difference(_stepUtils.lastStepCount.timeStamp)
-                .inMilliseconds /
-            newSteps;
-        for (int i = 1; i <= newSteps; i++) {
+        int timeDiff = stepCount.timeStamp
+            .difference(_stepUtils.lastStepCount.timeStamp)
+            .inMilliseconds;
+        int avgTimeDiff = (timeDiff / newSteps).floor();
+        for (int ms = 0; ms < timeDiff; ms += avgTimeDiff) {
           _cardioSessionDescription.cardioSession.cadence!.add(
-            _cardioSessionDescription.cardioSession.cadence!.last +
-                Duration(milliseconds: (avgTimeDiff * i).round()),
+            _trackingUtils.currentDuration +
+                Duration(milliseconds: -timeDiff + ms),
           );
         }
       }
     }
     _stepInfo =
-        "step count: ${stepCount.steps}\ntimestamp: ${stepCount.timeStamp.formatTimeHms}";
+        "step count: ${stepCount.steps}\ntime: ${stepCount.timeStamp.formatTimeHms}";
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
