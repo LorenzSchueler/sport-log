@@ -35,16 +35,21 @@ class ServerVersion extends JsonSerializable {
 }
 
 class Version {
-  Version(this.major, this.minor);
+  Version(this.major, this.minor, [this.patch]);
 
   factory Version.fromString(String version) {
     final parts = version.split(".");
-    return Version(int.parse(parts[0]), int.parse(parts[1]));
+    return Version(
+      int.parse(parts[0]),
+      int.parse(parts[1]),
+      parts.length == 3 ? int.parse(parts[2]) : null,
+    );
   }
 
   int major;
   int minor;
+  int? patch;
 
   @override
-  String toString() => "$major.$minor";
+  String toString() => patch != null ? "$major.$minor.$patch" : "$major.$minor";
 }

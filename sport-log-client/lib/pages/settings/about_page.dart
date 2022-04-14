@@ -40,7 +40,7 @@ class AboutPage extends StatelessWidget {
               child: Text(
                 Config.debugMode
                     ? "${Config.instance.version} (debug build)"
-                    : Config.instance.version,
+                    : "${Config.instance.version}",
               ),
             ),
             TextTile(
