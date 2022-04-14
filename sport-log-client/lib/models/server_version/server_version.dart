@@ -34,9 +34,9 @@ class ServerVersion extends JsonSerializable {
   @override
   String toString() => "$min - $max";
 
-  bool comatibleWithClientVersion() {
-    final version = Config.instance.version;
-    return version.compareTo(min) >= 0 && version.compareTo(max) <= 0;
+  bool comatibleWithClientApiVersion() {
+    return Config.apiVersion.compareTo(min) >= 0 &&
+        Config.apiVersion.compareTo(max) <= 0;
   }
 }
 
@@ -52,9 +52,9 @@ class Version extends Comparable<Version> {
     );
   }
 
-  int major;
-  int minor;
-  int? patch;
+  final int major;
+  final int minor;
+  final int? patch;
 
   @override
   String toString() => patch != null ? "$major.$minor.$patch" : "$major.$minor";

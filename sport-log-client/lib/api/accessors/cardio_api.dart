@@ -5,7 +5,7 @@ class RouteApi extends Api<Route> {
   Route _fromJson(Map<String, dynamic> json) => Route.fromJson(json);
 
   @override
-  String get _singularRoute => version + '/route';
+  String get _singularRoute => apiVersion + '/route';
 }
 
 class CardioSessionApi extends Api<CardioSession> {
@@ -14,5 +14,5 @@ class CardioSessionApi extends Api<CardioSession> {
       CardioSession.fromJson(json);
 
   @override
-  String get _singularRoute => version + '/cardio_session';
+  String get _singularRoute => apiVersion + '/cardio_session';
 }

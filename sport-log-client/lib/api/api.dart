@@ -25,7 +25,7 @@ part 'accessors/strength_api.dart';
 part 'accessors/user_api.dart';
 part 'accessors/wod_api.dart';
 
-const String version = '/v1.0';
+String apiVersion = '/v${Config.apiVersion}';
 
 enum ApiErrorCode {
   // http error

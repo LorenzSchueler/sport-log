@@ -6,7 +6,7 @@ class ActionProviderApi extends Api<ActionProvider> {
       ActionProvider.fromJson(json);
 
   @override
-  String get _singularRoute => version + '/action_provider';
+  String get _singularRoute => apiVersion + '/action_provider';
 }
 
 class ActionApi extends Api<Action> {
@@ -14,7 +14,7 @@ class ActionApi extends Api<Action> {
   Action _fromJson(Map<String, dynamic> json) => Action.fromJson(json);
 
   @override
-  String get _singularRoute => version + '/action';
+  String get _singularRoute => apiVersion + '/action';
 }
 
 class ActionRuleApi extends Api<ActionRule> {
@@ -22,7 +22,7 @@ class ActionRuleApi extends Api<ActionRule> {
   ActionRule _fromJson(Map<String, dynamic> json) => ActionRule.fromJson(json);
 
   @override
-  String get _singularRoute => version + '/action_rule';
+  String get _singularRoute => apiVersion + '/action_rule';
 }
 
 class ActionEventApi extends Api<ActionEvent> {
@@ -31,5 +31,5 @@ class ActionEventApi extends Api<ActionEvent> {
       ActionEvent.fromJson(json);
 
   @override
-  String get _singularRoute => version + '/action_event';
+  String get _singularRoute => apiVersion + '/action_event';
 }

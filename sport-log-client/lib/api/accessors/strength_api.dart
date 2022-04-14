@@ -6,7 +6,7 @@ class StrengthSessionApi extends Api<StrengthSession> {
       StrengthSession.fromJson(json);
 
   @override
-  String get _singularRoute => version + '/strength_session';
+  String get _singularRoute => apiVersion + '/strength_session';
 }
 
 class StrengthSetApi extends Api<StrengthSet> {
@@ -15,5 +15,5 @@ class StrengthSetApi extends Api<StrengthSet> {
       StrengthSet.fromJson(json);
 
   @override
-  String get _singularRoute => version + '/strength_set';
+  String get _singularRoute => apiVersion + '/strength_set';
 }

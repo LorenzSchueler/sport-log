@@ -106,6 +106,7 @@ class Config extends JsonSerializable {
   @JsonKey(ignore: true)
   late final Version version;
 
+  static final Version apiVersion = Version(1, 0);
   static const String databaseName = 'database.sqlite';
 
   static const bool isWeb = kIsWeb;

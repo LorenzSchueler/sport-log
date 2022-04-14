@@ -44,6 +44,11 @@ class AboutPage extends StatelessWidget {
               ),
             ),
             TextTile(
+              leading: AppIcons.radio,
+              caption: "Api Version",
+              child: Text("${Config.apiVersion}"),
+            ),
+            TextTile(
               leading: AppIcons.github,
               caption: "GitHub",
               child: GestureDetector(

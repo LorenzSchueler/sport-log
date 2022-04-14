@@ -9,7 +9,7 @@ class AccountDataApi with ApiLogging, ApiHelpers {
   }
 
   String _route(DateTime? dateTime) =>
-      version +
+      apiVersion +
       (dateTime == null
           ? '/account_data'
           : '/account_data/${dateTime.toUtc().toIso8601String()}');
