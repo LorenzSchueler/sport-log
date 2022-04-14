@@ -58,11 +58,14 @@ class Sync extends ChangeNotifier {
       final serverVersionResult = await Api.getServerVersion();
       if (serverVersionResult.isSuccess) {
         serverVersion = serverVersionResult.success;
-
-        await showMessageDialog(
-          context: AppState.globalContext,
-          text: "Server Version: $serverVersion",
-        );
+        if (!serverVersion!.comatibleWithClientVersion()) {
+          await showMessageDialog(
+            context: AppState.globalContext,
+            text:
+                "Client version ${Config.instance.version} is not compatible with server versions: $serverVersion\n"
+                "This can lead to undefined behavour. Update the app or use at your own risk.",
+          );
+        }
       }
     }
     final syncStart = DateTime.now();

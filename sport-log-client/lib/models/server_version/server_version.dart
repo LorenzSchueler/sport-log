@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sport_log/config.dart';
 
 part 'server_version.g.dart';
 
@@ -32,9 +33,14 @@ class ServerVersion extends JsonSerializable {
 
   @override
   String toString() => "$min - $max";
+
+  bool comatibleWithClientVersion() {
+    final version = Config.instance.version;
+    return version.compareTo(min) >= 0 && version.compareTo(max) <= 0;
+  }
 }
 
-class Version {
+class Version extends Comparable<Version> {
   Version(this.major, this.minor, [this.patch]);
 
   factory Version.fromString(String version) {
@@ -52,4 +58,9 @@ class Version {
 
   @override
   String toString() => patch != null ? "$major.$minor.$patch" : "$major.$minor";
+
+  @override
+  int compareTo(Version other) {
+    return major != other.major ? major - other.major : minor - other.minor;
+  }
 }
