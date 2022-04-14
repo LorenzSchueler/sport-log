@@ -6,13 +6,14 @@ part of 'server_version.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-ServerVersion _$ServerVersionFromJson(Map<String, dynamic> json) =>
-    ServerVersion(
+_ServerVersionString _$ServerVersionStringFromJson(Map<String, dynamic> json) =>
+    _ServerVersionString(
       min: json['min'] as String,
       max: json['max'] as String,
     );
 
-Map<String, dynamic> _$ServerVersionToJson(ServerVersion instance) =>
+Map<String, dynamic> _$ServerVersionStringToJson(
+        _ServerVersionString instance) =>
     <String, dynamic>{
       'min': instance.min,
       'max': instance.max,
