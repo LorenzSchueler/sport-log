@@ -62,9 +62,13 @@ class Sync extends ChangeNotifier {
           await showMessageDialog(
             context: AppState.globalContext,
             text:
-                "Client version ${Config.instance.version} is not compatible with server versions: $serverVersion\n"
-                "This can lead to undefined behavour. Update the app or use at your own risk.",
+                "Client api version ${Config.apiVersion} is not compatible with server versions: $serverVersion\n"
+                "Server synchronization is no longer possible. Please update the app.",
           );
+          stopSync();
+          _isSyncing = false;
+          notifyListeners();
+          return;
         }
       }
     }
