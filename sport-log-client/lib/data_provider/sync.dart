@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier, VoidCallback;
 import 'package:sport_log/api/api.dart';
+import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
@@ -11,7 +12,9 @@ import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/models/server_version/server_version.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 class Sync extends ChangeNotifier {
   final _logger = Logger('Sync');
@@ -20,6 +23,8 @@ class Sync extends ChangeNotifier {
 
   bool _isSyncing;
   bool get isSyncing => _isSyncing;
+
+  ServerVersion? serverVersion;
 
   static final Sync instance = Sync._();
   Sync._() : _isSyncing = false;
@@ -49,6 +54,17 @@ class Sync extends ChangeNotifier {
     }
     _isSyncing = true;
     notifyListeners();
+    if (serverVersion == null) {
+      final serverVersionResult = await Api.getServerVersion();
+      if (serverVersionResult.isSuccess) {
+        serverVersion = serverVersionResult.success;
+
+        await showMessageDialog(
+          context: AppState.globalContext,
+          text: "Server Version: $serverVersion",
+        );
+      }
+    }
     final syncStart = DateTime.now();
     if (await _downSync(onNoInternet: onNoInternet)) {
       await _upSync();
@@ -105,6 +121,7 @@ class Sync extends ChangeNotifier {
   }
 
   void stopSync() {
+    serverVersion = null;
     if (_syncTimer != null) {
       _logger.d('Stopping sync timer...');
       _syncTimer?.cancel();

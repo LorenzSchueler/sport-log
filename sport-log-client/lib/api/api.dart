@@ -11,6 +11,7 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/error_message.dart';
+import 'package:sport_log/models/server_version/server_version.dart';
 import 'package:sport_log/settings.dart';
 
 part 'accessors/account_data_api.dart';
@@ -200,6 +201,14 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   static final strengthSessions = StrengthSessionApi();
   static final strengthSets = StrengthSetApi();
   static final wods = WodApi();
+
+  static ApiResult<ServerVersion> getServerVersion() {
+    const route = "/version";
+    return ApiResultFromRequest.fromRequestWithValue<ServerVersion>(
+      (client) => client.get(UriFromRoute.fromRoute(route)),
+      (dynamic json) => ServerVersion.fromJson(json as Map<String, dynamic>),
+    );
+  }
 
   // things needed to be overridden
   T _fromJson(Map<String, dynamic> json);
