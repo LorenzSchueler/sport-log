@@ -42,9 +42,9 @@ use handler::{IntoJson, JsonError, JsonResult};
 
 pub const CONFIG_FILE: &str = "sport-log-server.toml";
 
-const VERSION_1_0: &str = "1.0";
-const MIN_VERSION: &str = VERSION_1_0;
-const MAX_VERSION: &str = VERSION_1_0;
+const VERSION: &str = "0.2";
+const MIN_VERSION: &str = VERSION;
+const MAX_VERSION: &str = VERSION;
 
 #[catch(default)]
 fn default_catcher(status: Status, _request: &Request) -> JsonError {
@@ -118,7 +118,7 @@ fn rocket() -> Rocket<Build> {
         .register("/", catchers![default_catcher, catcher_404])
         .mount("/", routes![get_version])
         .mount(
-            format!("/v{}", VERSION_1_0),
+            format!("/v{}", VERSION),
             routes![
                 user::adm_create_user,
                 platform::adm_create_platform,
