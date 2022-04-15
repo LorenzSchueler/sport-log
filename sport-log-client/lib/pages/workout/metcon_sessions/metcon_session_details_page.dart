@@ -24,11 +24,21 @@ class MetconSessionDetailsPage extends StatefulWidget {
 class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
   final _dataProvider = MetconSessionDescriptionDataProvider();
   late MetconSessionDescription _metconSessionDescription;
+  List<MetconSessionDescription> _metconSessionDescriptions = [];
 
   @override
   void initState() {
     _metconSessionDescription = widget.metconSessionDescription;
+    _loadOtherSessions();
     super.initState();
+  }
+
+  Future<void> _loadOtherSessions() async {
+    final metconSessionDescriptions =
+        await _dataProvider.getByTimerangeAndMetcon(
+      metcon: _metconSessionDescription.metconDescription.metcon,
+    );
+    setState(() => _metconSessionDescriptions = metconSessionDescriptions);
   }
 
   Future<void> _deleteMetconSession() async {
@@ -108,9 +118,17 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
               "${_metconSessionDescription.shortResultDescription} (${_metconSessionDescription.metconSession.datetime.toHumanDate()})",
             ),
           ),
-          const TextTile(
-            caption: "Best Score",
-            child: Text("<my best score> <date>"),
+          TextTile(
+            caption: "Previous Scores",
+            child: Column(
+              children: [
+                for (final metconSessionDescription
+                    in _metconSessionDescriptions)
+                  Text(
+                    "${metconSessionDescription.shortResultDescription} (${metconSessionDescription.metconSession.datetime.toHumanDate()})",
+                  ),
+              ],
+            ),
           ),
           if (_metconSessionDescription.metconSession.comments != null)
             TextTile(

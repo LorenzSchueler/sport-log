@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:sport_log/defaults.dart';
 
 class AppTheme {
   AppTheme._();
