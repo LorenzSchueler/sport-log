@@ -213,20 +213,12 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _submitButton(BuildContext context) {
     return ElevatedButton(
-      child: Text(
-        widget.register ? "Register" : "Login",
-        style: const TextStyle(fontSize: 18),
-      ), // TODO: use theme for this
+      child: Text(widget.register ? "Register" : "Login"),
       onPressed: (!_loginPending &&
               _formKey.currentContext != null &&
               _formKey.currentState!.validate())
           ? () => _submit(context)
           : null,
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: Defaults.borderRadius.big,
-        ),
-      ),
     );
   }
 

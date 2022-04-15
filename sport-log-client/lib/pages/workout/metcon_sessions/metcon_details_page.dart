@@ -69,9 +69,9 @@ class MetconDetailsPageState extends State<MetconDetailsPage> {
       body: ListView(
         padding: Defaults.edgeInsets.normal,
         children: [
-          const Text(
+          Text(
             "Metcon",
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.headline5,
           ),
           TextTile(
             caption: "Type",

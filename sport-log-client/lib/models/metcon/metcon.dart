@@ -120,7 +120,6 @@ class Metcon extends AtomicEntity {
   @override
   bool isValidBeforeSanitazion() {
     return validate(!deleted, 'Metcon: deleted == true') &&
-        validate(userId != null, 'Metcon: userId == null') &&
         validate(
           name.length >= 2 && name.length <= 80,
           'Metcon: name.length is < 2 or > 80',

@@ -30,8 +30,7 @@ class _DurationInputState extends State<DurationInput> {
   final _secondsController = TextEditingController();
   late final StreamSubscription<bool> _keyboardSubscription;
 
-  static const double _fontSize = 24;
-  static const double _textWidth = 13;
+  static const double _textWidth = 11; // width of subtitle1 = 20
   static const int _timeStep = 60; // seconds
   static const int _maxSeconds = 60 * 100 - 1;
 
@@ -87,7 +86,7 @@ class _DurationInputState extends State<DurationInput> {
         _minusButton,
         Defaults.sizedBox.horizontal.normal,
         _minutesInput,
-        const Text(' : ', style: TextStyle(fontSize: _fontSize)),
+        Text(' : ', style: Theme.of(context).textTheme.subtitle1),
         _secondsInput,
         Defaults.sizedBox.horizontal.normal,
         _plusButton,
@@ -145,7 +144,6 @@ class _DurationInputState extends State<DurationInput> {
             );
           }
         },
-        style: const TextStyle(fontSize: _fontSize),
         textAlign: TextAlign.center,
         decoration: const InputDecoration(
           contentPadding: EdgeInsets.zero,
@@ -189,7 +187,6 @@ class _DurationInputState extends State<DurationInput> {
             );
           }
         },
-        style: const TextStyle(fontSize: _fontSize),
         textAlign: TextAlign.center,
         decoration: const InputDecoration(
           contentPadding: EdgeInsets.zero,

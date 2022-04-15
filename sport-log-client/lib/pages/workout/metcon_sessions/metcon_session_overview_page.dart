@@ -176,7 +176,7 @@ class MetconSessionCard extends StatelessWidget {
                     Defaults.sizedBox.vertical.normal,
                     Text(
                       metconSessionDescription.metconDescription.metcon.name,
-                      style: const TextStyle(fontSize: 20),
+                      style: Theme.of(context).textTheme.subtitle1,
                     ),
                   ],
                 ),

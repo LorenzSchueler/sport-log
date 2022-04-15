@@ -46,14 +46,10 @@ class EditTile extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (caption != null)
-              CaptionTile(
-                caption: caption!,
-              ),
-            AnimatedDefaultTextStyle(
+            if (caption != null) CaptionTile(caption: caption!),
+            DefaultTextStyle(
               child: child,
               style: Theme.of(context).textTheme.subtitle1!,
-              duration: const Duration(milliseconds: 200),
             ),
           ],
         ),

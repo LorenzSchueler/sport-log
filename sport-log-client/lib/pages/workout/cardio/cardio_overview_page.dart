@@ -197,7 +197,7 @@ class CardioSessionCard extends StatelessWidget {
                   ),
                   Text(
                     cardioSessionDescription.movement.name,
-                    style: const TextStyle(fontSize: 20),
+                    style: Theme.of(context).textTheme.subtitle1,
                   )
                 ],
               ),
@@ -243,7 +243,8 @@ class CardioSessionCard extends StatelessWidget {
                         AppIcons.route,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
-                      const Text(" no track available"),
+                      Defaults.sizedBox.horizontal.normal,
+                      const Text("no track available"),
                     ],
                   ),
             Padding(

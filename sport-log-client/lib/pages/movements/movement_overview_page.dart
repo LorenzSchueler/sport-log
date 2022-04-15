@@ -133,7 +133,7 @@ class MovementCard extends StatelessWidget {
                     width: 200,
                     child: Text(
                       movementDescription.movement.name,
-                      style: const TextStyle(fontSize: 20),
+                      style: Theme.of(context).textTheme.subtitle1,
                     ),
                   ),
                   Defaults.sizedBox.vertical.normal,

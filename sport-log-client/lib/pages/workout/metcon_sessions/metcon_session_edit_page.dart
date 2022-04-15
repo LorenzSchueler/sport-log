@@ -165,7 +165,8 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                 leading: AppIcons.calendar,
                 caption: "Start Time",
                 child: Text(
-                  _metconSessionDescription.metconSession.datetime.toHumanDate(),
+                  _metconSessionDescription.metconSession.datetime
+                      .toHumanDate(),
                 ),
                 onTap: () async {
                   DateTime? date = await showDatePickerWithDefaults(
@@ -260,7 +261,6 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                           }
                         },
                         autovalidateMode: AutovalidateMode.onUserInteraction,
-                        style: const TextStyle(height: 1),
                         keyboardType: TextInputType.number,
                         textInputAction: TextInputAction.next,
                         onChanged: (rounds) {
@@ -300,7 +300,6 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                               .sum,
                         ),
                         autovalidateMode: AutovalidateMode.onUserInteraction,
-                        style: const TextStyle(height: 1),
                         keyboardType: TextInputType.number,
                         onChanged: (reps) {
                           if (Validator.validateIntGeZeroLtValue(
@@ -345,7 +344,6 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   labelText: "Comments",
                 ),
                 initialValue: _metconSessionDescription.metconSession.comments,
-                style: const TextStyle(height: 1),
                 keyboardType: TextInputType.multiline,
                 minLines: 1,
                 maxLines: 5,

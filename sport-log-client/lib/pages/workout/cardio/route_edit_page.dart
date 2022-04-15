@@ -223,7 +223,7 @@ class RouteEditPageState extends State<RouteEditPage> {
             ),
             title: Text(
               "${index + 1}",
-              style: const TextStyle(fontSize: 20),
+              style: Theme.of(context).textTheme.subtitle1,
             ),
             dense: true,
           );
@@ -259,7 +259,7 @@ class RouteEditPageState extends State<RouteEditPage> {
           ),
           title: Text(
             "${index + 1}",
-            style: const TextStyle(fontSize: 20),
+            style: Theme.of(context).textTheme.subtitle1,
           ),
           dense: true,
         ),
@@ -395,7 +395,6 @@ class RouteEditPageState extends State<RouteEditPage> {
                 initialValue: _route.name,
                 validator: Validator.validateStringNotEmpty,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                style: const TextStyle(height: 1),
                 decoration: const InputDecoration(
                   labelText: "Name",
                   contentPadding: EdgeInsets.symmetric(vertical: 5),

@@ -152,7 +152,6 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                 contentPadding: EdgeInsets.symmetric(vertical: 5),
               ),
               initialValue: _actionRule.arguments,
-              style: const TextStyle(height: 1),
               keyboardType: TextInputType.multiline,
               onChanged: (arguments) =>
                   _actionRule.arguments = arguments.isEmpty ? null : arguments,

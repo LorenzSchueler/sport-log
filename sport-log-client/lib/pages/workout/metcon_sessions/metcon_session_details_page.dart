@@ -70,9 +70,9 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
       body: ListView(
         padding: Defaults.edgeInsets.normal,
         children: [
-          const Text(
+          Text(
             "Metcon",
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.headline5,
           ),
           TextTile(
             caption: "Type",
@@ -98,9 +98,9 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
               ),
             ),
           Defaults.sizedBox.vertical.big,
-          const Text(
+          Text(
             "Results",
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.headline5,
           ),
           TextTile(
             caption: "Score",

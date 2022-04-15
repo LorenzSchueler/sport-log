@@ -123,7 +123,7 @@ class RouteCard extends StatelessWidget {
               padding: Defaults.edgeInsets.normal,
               child: Text(
                 route.name,
-                style: const TextStyle(fontSize: 20),
+                style: Theme.of(context).textTheme.subtitle1,
               ),
             ),
             route.track != null && route.track!.isNotEmpty

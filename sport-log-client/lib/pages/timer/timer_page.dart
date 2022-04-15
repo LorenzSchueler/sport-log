@@ -103,7 +103,6 @@ class TimerPageState extends State<TimerPage> {
                           setState(() => _totalRounds = int.parse(rounds));
                         }
                       },
-                      style: const TextStyle(height: 1),
                       initialValue: _totalRounds.toString(),
                       validator: Validator.validateIntGtZero,
                       autovalidateMode: AutovalidateMode.onUserInteraction,

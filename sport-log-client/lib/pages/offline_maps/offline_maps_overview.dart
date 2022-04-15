@@ -181,7 +181,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
                           Icon(AppIcons.download),
-                          Text("download")
+                          Text("Download")
                         ],
                       ),
                     )

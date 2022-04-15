@@ -119,7 +119,7 @@ class MetconCard extends StatelessWidget {
             children: [
               Text(
                 metconDescription.metcon.name,
-                style: const TextStyle(fontSize: 20),
+                style: Theme.of(context).textTheme.subtitle1,
               ),
               Defaults.sizedBox.vertical.normal,
               Text(

@@ -229,11 +229,7 @@ class _CaptionTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       onChanged: onChanged,
-      onSubmitted: (_) {
-        if (onSubmitted != null) {
-          onSubmitted!();
-        }
-      },
+      onSubmitted: (_) => onSubmitted?.call(),
       focusNode: focusNode,
       onTap: onTap,
       textInputAction: TextInputAction.next,
@@ -333,9 +329,8 @@ class PaddedIntInputState extends State<PaddedIntInput> {
     assert(widget.maxValue == null || maybeValue <= widget.maxValue!);
     widget.onChanged(maybeValue);
     if (widget.submitOnDigitsReached &&
-        maybeValue >= pow(10, widget.numberOfDigits - 1) &&
-        widget.onSubmitted != null) {
-      widget.onSubmitted!();
+        maybeValue >= pow(10, widget.numberOfDigits - 1)) {
+      widget.onSubmitted?.call();
     }
   }
 

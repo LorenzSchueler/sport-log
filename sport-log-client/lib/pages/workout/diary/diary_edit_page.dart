@@ -120,7 +120,6 @@ class DiaryEditPageState extends State<DiaryEditPage> {
                   return Validator.validateDoubleGtZero(weight);
                 },
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                style: const TextStyle(height: 1),
                 keyboardType: TextInputType.number,
                 onChanged: (bodyweight) {
                   if (bodyweight.isEmpty) {
@@ -140,7 +139,6 @@ class DiaryEditPageState extends State<DiaryEditPage> {
                   contentPadding: EdgeInsets.symmetric(vertical: 5),
                 ),
                 initialValue: _diary.comments,
-                style: const TextStyle(height: 1),
                 keyboardType: TextInputType.multiline,
                 minLines: 1,
                 maxLines: 5,

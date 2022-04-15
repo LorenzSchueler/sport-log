@@ -189,7 +189,7 @@ class StrengthSessionCard extends StatelessWidget {
                     Defaults.sizedBox.vertical.normal,
                     Text(
                       strengthSessionDescription.movement.name,
-                      style: const TextStyle(fontSize: 20),
+                      style: Theme.of(context).textTheme.subtitle1,
                     ),
                     if (strengthSessionDescription.session.interval !=
                         null) ...[

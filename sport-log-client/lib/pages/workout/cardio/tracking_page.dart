@@ -12,7 +12,6 @@ import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/location_utils.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
 import 'package:sport_log/helpers/tracking_utils.dart';
@@ -41,7 +40,6 @@ class CardioTrackingPage extends StatefulWidget {
 }
 
 class CardioTrackingPageState extends State<CardioTrackingPage> {
-  final _logger = Logger('CardioTrackingPage');
   final _dataProvider = CardioSessionDescriptionDataProvider();
 
   late final CardioSessionDescription _cardioSessionDescription;

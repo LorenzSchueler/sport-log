@@ -152,7 +152,6 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
                 contentPadding: EdgeInsets.symmetric(vertical: 5),
               ),
               initialValue: _actionEvent.arguments,
-              style: const TextStyle(height: 1),
               keyboardType: TextInputType.multiline,
               onChanged: (arguments) =>
                   _actionEvent.arguments = arguments.isEmpty ? null : arguments,

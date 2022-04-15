@@ -43,9 +43,9 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               "Looks like you changed your credentials on another device.\nPlease update them below!",
-              style: TextStyle(fontSize: 20),
+              style: Theme.of(context).textTheme.subtitle1,
             ),
             Defaults.sizedBox.vertical.big,
             Form(
@@ -134,20 +134,12 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
     BuildContext context,
   ) {
     return ElevatedButton(
-      child: const Text(
-        "Update",
-        style: TextStyle(fontSize: 18),
-      ), // TODO: use theme for this
+      child: const Text("Update"),
       onPressed: (!_loginPending &&
               _formKey.currentContext != null &&
               _formKey.currentState!.validate())
           ? () => _submit(context)
           : null,
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: Defaults.borderRadius.big,
-        ),
-      ),
     );
   }
 

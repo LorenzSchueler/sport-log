@@ -74,7 +74,6 @@ class SettingsPageState extends State<SettingsPage> {
                   initialValue: Settings.serverUrl,
                   validator: Validator.validateUrl,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  style: const TextStyle(height: 1),
                   onFieldSubmitted: (serverUrl) async {
                     final validated = Validator.validateUrl(serverUrl);
                     if (validated == null) {
@@ -101,7 +100,6 @@ class SettingsPageState extends State<SettingsPage> {
                   initialValue: Settings.syncInterval.inMinutes.toString(),
                   validator: Validator.validateIntGtZero,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  style: const TextStyle(height: 1),
                   onFieldSubmitted: (syncInterval) async {
                     final validated = Validator.validateIntGtZero(syncInterval);
                     if (validated == null) {
@@ -131,7 +129,6 @@ class SettingsPageState extends State<SettingsPage> {
                 initialValue: Settings.username,
                 validator: Validator.validateUsername,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                style: const TextStyle(height: 1),
                 onFieldSubmitted: (username) async {
                   final validated = Validator.validateUsername(username);
                   if (validated == null) {
@@ -160,7 +157,6 @@ class SettingsPageState extends State<SettingsPage> {
                 initialValue: Settings.password,
                 validator: Validator.validatePassword,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                style: const TextStyle(height: 1),
                 onFieldSubmitted: (password) async {
                   final validated = Validator.validatePassword(password);
                   if (validated == null) {
@@ -189,7 +185,6 @@ class SettingsPageState extends State<SettingsPage> {
                 initialValue: Settings.email,
                 validator: Validator.validateEmail,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                style: const TextStyle(height: 1),
                 keyboardType: TextInputType.emailAddress,
                 onFieldSubmitted: (email) async {
                   final validated = Validator.validateEmail(email);
@@ -252,7 +247,6 @@ class SettingsPageState extends State<SettingsPage> {
                 initialValue: Settings.weightIncrement.toString(),
                 validator: Validator.validateDoubleGtZero,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
-                style: const TextStyle(height: 1),
                 onFieldSubmitted: (increment) async {
                   final validated = Validator.validateDoubleGtZero(increment);
                   if (validated == null) {

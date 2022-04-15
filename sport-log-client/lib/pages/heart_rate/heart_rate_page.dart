@@ -130,7 +130,7 @@ class _HeartRatePageState extends State<HeartRatePage> {
                       const Icon(AppIcons.battery),
                       Text(
                         "$_battery%",
-                        style: const TextStyle(fontSize: 24),
+                        style: Theme.of(context).textTheme.subtitle1,
                       ),
                     ],
                   )

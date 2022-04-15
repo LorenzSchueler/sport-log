@@ -104,7 +104,7 @@ class PlatformCard extends StatelessWidget {
               children: [
                 Text(
                   platformDescription.platform.name,
-                  style: const TextStyle(fontSize: 20),
+                  style: Theme.of(context).textTheme.subtitle1,
                 ),
                 if (platformDescription.platform.credential)
                   IconButton(
@@ -139,7 +139,7 @@ class PlatformCard extends StatelessWidget {
                   children: [
                     Text(
                       actionProvider.name,
-                      style: const TextStyle(fontSize: 20),
+                      style: Theme.of(context).textTheme.subtitle1,
                     ),
                   ],
                 ),
@@ -249,14 +249,8 @@ class PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
         widget.platformDescription.platformCredential == null
             ? "Create"
             : "Update",
-        style: const TextStyle(fontSize: 20),
-      ), // TODO: use theme for this
-      onPressed: _update,
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: Defaults.borderRadius.big,
-        ),
       ),
+      onPressed: _update,
     );
   }
 
@@ -280,14 +274,8 @@ class PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
         widget.platformDescription.platformCredential == null
             ? "Back"
             : "Delete",
-        style: const TextStyle(fontSize: 20),
-      ), // TODO: use theme for this
-      onPressed: _delete,
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: Defaults.borderRadius.big,
-        ),
       ),
+      onPressed: _delete,
     );
   }
 

@@ -53,9 +53,7 @@ class _DateFilterState extends State<DateFilter> {
         TextButton.icon(
           icon: Text(
             _state.label,
-            style: TextStyle(
-              color: onAppBar,
-            ),
+            style: TextStyle(color: onAppBar),
           ),
           label: Icon(
             AppIcons.arrowDropDown,

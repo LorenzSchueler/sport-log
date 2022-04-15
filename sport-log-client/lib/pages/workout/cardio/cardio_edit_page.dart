@@ -233,14 +233,12 @@ class CardioEditPageState extends State<CardioEditPage> {
                   }
                 },
               ),
-              // TODO add GPX/ GeoJson upload option for track
               TextFormField(
                 keyboardType: TextInputType.number,
                 onChanged: (distance) => setState(() {
                   _cardioSessionDescription.cardioSession.distance =
                       (double.parse(distance) * 1000).round();
                 }),
-                style: const TextStyle(height: 1),
                 initialValue:
                     _cardioSessionDescription.cardioSession.distance == null
                         ? null
@@ -259,7 +257,6 @@ class CardioEditPageState extends State<CardioEditPage> {
                   _cardioSessionDescription.cardioSession.ascent =
                       int.parse(ascent);
                 }),
-                style: const TextStyle(height: 1),
                 initialValue:
                     _cardioSessionDescription.cardioSession.ascent?.toString(),
                 decoration: const InputDecoration(
@@ -274,7 +271,6 @@ class CardioEditPageState extends State<CardioEditPage> {
                   _cardioSessionDescription.cardioSession.descent =
                       int.parse(descent);
                 }),
-                style: const TextStyle(height: 1),
                 initialValue:
                     _cardioSessionDescription.cardioSession.descent?.toString(),
                 decoration: const InputDecoration(
@@ -299,7 +295,6 @@ class CardioEditPageState extends State<CardioEditPage> {
                   _cardioSessionDescription.cardioSession.calories =
                       int.parse(calories);
                 }),
-                style: const TextStyle(height: 1),
                 initialValue: _cardioSessionDescription.cardioSession.calories
                     ?.toString(),
                 decoration: const InputDecoration(
@@ -314,7 +309,6 @@ class CardioEditPageState extends State<CardioEditPage> {
                   _cardioSessionDescription.cardioSession.avgCadence =
                       int.parse(avgCadence);
                 }),
-                style: const TextStyle(height: 1),
                 initialValue: _cardioSessionDescription.cardioSession.avgCadence
                     ?.toString(),
                 decoration: const InputDecoration(
@@ -329,7 +323,6 @@ class CardioEditPageState extends State<CardioEditPage> {
                   _cardioSessionDescription.cardioSession.avgHeartRate =
                       int.parse(avgHeartRate);
                 }),
-                style: const TextStyle(height: 1),
                 initialValue: _cardioSessionDescription
                     .cardioSession.avgHeartRate
                     ?.toString(),
@@ -343,7 +336,6 @@ class CardioEditPageState extends State<CardioEditPage> {
                 onChanged: (comments) => setState(() {
                   _cardioSessionDescription.cardioSession.comments = comments;
                 }),
-                style: const TextStyle(height: 1),
                 initialValue: _cardioSessionDescription.cardioSession.comments,
                 decoration: const InputDecoration(
                   icon: Icon(AppIcons.comment),

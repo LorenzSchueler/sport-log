@@ -42,14 +42,12 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
             children: [
               TextSpan(
                 text: _cardioSessionDescription.movement.name + "  ",
-                style:
-                    const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headline6,
               ),
               TextSpan(
                 text: describeEnum(
                   _cardioSessionDescription.cardioSession.cardioType,
                 ),
-                style: const TextStyle(fontSize: 14),
               )
             ],
           ),
@@ -111,9 +109,13 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                   : Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(AppIcons.route),
-                          Text(" no track available"),
+                        children: [
+                          Icon(
+                            AppIcons.route,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          Defaults.sizedBox.horizontal.normal,
+                          const Text("no track available"),
                         ],
                       ),
                     ),
