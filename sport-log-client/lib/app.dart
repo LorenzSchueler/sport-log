@@ -5,14 +5,9 @@ import 'package:sport_log/main.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 
-class App extends StatefulWidget {
+class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
 
-  @override
-  State<StatefulWidget> createState() => AppState();
-}
-
-class AppState extends State<App> {
   static final navigatorKey = GlobalKey<NavigatorState>();
   static BuildContext get globalContext =>
       navigatorKey.currentContext ??

@@ -60,7 +60,7 @@ class Sync extends ChangeNotifier {
         serverVersion = serverVersionResult.success;
         if (!serverVersion!.comatibleWithClientApiVersion()) {
           await showMessageDialog(
-            context: AppState.globalContext,
+            context: App.globalContext,
             text:
                 "Client api version ${Config.apiVersion} is not compatible with server versions: $serverVersion\n"
                 "Server synchronization is no longer possible. Please update the app.",

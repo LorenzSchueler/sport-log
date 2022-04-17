@@ -63,7 +63,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
       // primary foreign or unique key violation
       case ApiErrorCode.conflict:
         final conflicResolution = await showConflictDialog(
-          context: AppState.globalContext,
+          context: App.globalContext,
           title: "An error occured.",
           text: error.toString(),
         );
@@ -71,7 +71,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
         return conflicResolution;
       default:
         await showMessageDialog(
-          context: AppState.globalContext,
+          context: App.globalContext,
           title: "An error occured.",
           text: error.toString(),
         );

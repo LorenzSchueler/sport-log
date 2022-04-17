@@ -14,7 +14,7 @@ Future<void> showNewCredentialsDialog() async {
     await showDialog<User>(
       builder: (_) => const NewCredentialsDialog(),
       barrierDismissible: false,
-      context: AppState.globalContext,
+      context: App.globalContext,
     );
     _dialogShown = false;
   }

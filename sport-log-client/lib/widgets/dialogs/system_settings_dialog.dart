@@ -3,7 +3,7 @@ import 'package:sport_log/app.dart';
 
 Future<bool?> showSystemSettingsDialog({required String text}) {
   return showDialog<bool>(
-    context: AppState.globalContext,
+    context: App.globalContext,
     builder: (context) => SystemSettingsDialog(text: text),
   );
 }
