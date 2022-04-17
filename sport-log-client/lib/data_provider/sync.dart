@@ -119,7 +119,11 @@ class Sync extends ChangeNotifier {
       return;
     }
     _logger.d('Starting sync timer.');
-    await sync();
+    if (Settings.lastSync == null) {
+      await sync(); // wait to make sure movement 1 and metcon 1 exist
+    } else {
+      unawaited(sync()); // let sync finish later
+    }
     Movement.defaultMovement =
         (await MovementDataProvider().getById(Int64(1)))!; // FIXME
     MetconDescription.defaultMetconDescription =

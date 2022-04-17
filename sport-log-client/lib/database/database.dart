@@ -117,8 +117,8 @@ class AppDatabase {
           }
         }
       },
-      onUpgrade: null, // TODO
-      onDowngrade: null, // TODO
+      onUpgrade: null,
+      onDowngrade: null,
       onOpen: (db) => _logger.d("Database initialization done"),
     );
     _logger.i("Database ready");
