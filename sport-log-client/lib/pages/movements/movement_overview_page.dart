@@ -22,7 +22,9 @@ class MovementsPage extends StatefulWidget {
 
 class _MovementsPageState extends State<MovementsPage> {
   final _logger = Logger('MovementsPage');
+  final _searchBar = FocusNode();
   List<MovementDescription> _movementDescriptions = [];
+  String? _movementName;
 
   @override
   void initState() {
@@ -44,7 +46,7 @@ class _MovementsPageState extends State<MovementsPage> {
 
   Future<void> _update() async {
     _logger.d('Updating movement page');
-    final movementDescriptions = await _dataProvider.getNonDeleted();
+    final movementDescriptions = await _dataProvider.getByName(_movementName);
     setState(() => _movementDescriptions = movementDescriptions);
   }
 
@@ -53,7 +55,29 @@ class _MovementsPageState extends State<MovementsPage> {
     return NeverPop(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Movements"),
+          title: _movementName == null
+              ? const Text("Movements")
+              : TextFormField(
+                  focusNode: _searchBar,
+                  onChanged: (name) {
+                    _movementName = name;
+                    _update();
+                  },
+                ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                _movementName = _movementName == null ? "" : null;
+                _update();
+                if (_movementName != null) {
+                  _searchBar.requestFocus();
+                }
+              },
+              icon: Icon(
+                _movementName != null ? AppIcons.close : AppIcons.search,
+              ),
+            ),
+          ],
         ),
         drawer: MainDrawer(selectedRoute: Routes.movement.overview),
         body: RefreshIndicator(

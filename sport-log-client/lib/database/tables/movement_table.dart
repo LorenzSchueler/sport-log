@@ -104,4 +104,59 @@ class MovementDescriptionTable {
         )
         .toList();
   }
+
+  Future<List<MovementDescription>> getByName(
+    String? name, {
+    bool cardioOnly = false,
+    bool distanceOnly = false,
+  }) async {
+    const hasReference = 'has_reference';
+    final records = await AppDatabase.database!.rawQuery(
+      '''
+    SELECT
+      ${AppDatabase.movements.table.allColumns},
+      (
+        EXISTS (
+          SELECT * FROM ${Tables.metconMovement}
+          WHERE ${Tables.metconMovement}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+        ) OR EXISTS (
+          SELECT * FROM ${Tables.cardioSession}
+          WHERE ${Tables.cardioSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+        ) OR EXISTS (
+          SELECT * FROM ${Tables.strengthSession}
+          WHERE ${Tables.strengthSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+        )
+      ) AS $hasReference
+    FROM ${Tables.movement}
+    WHERE ${TableAccessor.combineFilter([
+            TableAccessor.notDeletedOfTable(Tables.movement),
+            TableAccessor.nameFilterOfTable(Tables.movement, name),
+            cardioOnly ? '${Tables.movement}.${Columns.cardio} = true' : '',
+            distanceOnly
+                ? "${Tables.movement}.${Columns.dimension} = '${MovementDimension.distance.index}'"
+                : '',
+            """(${Columns.userId} IS NOT NULL
+        OR NOT EXISTS (
+          SELECT * FROM ${Tables.movement} m2
+          WHERE ${TableAccessor.combineFilter([
+                  "${Tables.movement}.${Columns.id} <> m2.${Columns.id}",
+                  "${Tables.movement}.${Columns.name} = m2.${Columns.name}",
+                  "${Tables.movement}.${Columns.dimension} = m2.${Columns.dimension}",
+                  "m2.${Columns.userId} IS NOT NULL",
+                ])}
+        ))"""
+          ])}
+    ORDER BY ${TableAccessor.orderByNameOfTable(Tables.movement)}
+    ''',
+    );
+    return records
+        .map(
+          (r) => MovementDescription(
+            movement: AppDatabase.movements.serde
+                .fromDbRecord(r, prefix: AppDatabase.movements.table.prefix),
+            hasReference: r[hasReference]! as int == 1,
+          ),
+        )
+        .toList();
+  }
 }
