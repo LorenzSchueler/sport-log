@@ -84,6 +84,9 @@ class MovementDescriptionDataProvider
     bool cardioOnly = false,
     bool distanceOnly = false,
   }) =>
-      _movementDescriptionDb.getByName(name,
-          cardioOnly: cardioOnly, distanceOnly: distanceOnly);
+      _movementDescriptionDb.getByName(
+        name,
+        cardioOnly: cardioOnly,
+        distanceOnly: distanceOnly,
+      );
 }

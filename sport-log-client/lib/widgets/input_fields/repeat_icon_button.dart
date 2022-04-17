@@ -22,6 +22,12 @@ class _RepeatIconButtonState extends State<RepeatIconButton> {
   Timer? _timer;
 
   @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       child: IconButton(
