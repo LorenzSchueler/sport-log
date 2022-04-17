@@ -14,6 +14,7 @@ import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/never_pop.dart';
+import 'package:wakelock/wakelock.dart';
 
 class TimerPage extends StatefulWidget {
   const TimerPage({Key? key}) : super(key: key);
@@ -37,6 +38,13 @@ class TimerPageState extends State<TimerPage> {
     _player = AudioCache(prefix: "assets/audio/");
     _player.loadAll(['beep_long.mp3', 'beep_short.mp3']);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    Wakelock.disable();
+    super.dispose();
   }
 
   @override
@@ -244,6 +252,7 @@ class TimerPageState extends State<TimerPage> {
       setState(() => _currentTime += const Duration(seconds: 1));
       _tickCallback(metconType);
     });
+    Wakelock.enable();
   }
 
   void _tickCallback(MetconType metconType) {
@@ -267,5 +276,6 @@ class TimerPageState extends State<TimerPage> {
     setState(() {
       _timer = null;
     });
+    Wakelock.disable();
   }
 }
