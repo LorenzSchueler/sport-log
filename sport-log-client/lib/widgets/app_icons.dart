@@ -79,4 +79,5 @@ class AppIcons {
   static const IconData battery = Icons.battery_std_rounded;
   static const IconData radio = Icons.radio_button_checked_rounded;
   static const IconData clock = Icons.access_time_rounded;
+  static const IconData drawer = Icons.dehaze_rounded;
 }

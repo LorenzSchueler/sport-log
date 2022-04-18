@@ -49,8 +49,6 @@ class MapPageState extends State<MapPage> {
       Settings.lastGpsLatLng = _locationUtils.lastLatLng!;
     }
     _mapController.removeListener(_mapControllerListener);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     super.dispose();
   }
 
@@ -84,6 +82,20 @@ class MapPageState extends State<MapPage> {
         extendBodyBehindAppBar: true,
         appBar: _showOverlays
             ? AppBar(
+                leading: Builder(
+                  builder: (context) => IconButton(
+                    icon: const Icon(AppIcons.drawer),
+                    onPressed: () async {
+                      await SystemChrome.setEnabledSystemUIMode(
+                        SystemUiMode.edgeToEdge,
+                      );
+                      await SystemChrome.setPreferredOrientations(
+                        [DeviceOrientation.portraitUp],
+                      );
+                      Scaffold.of(context).openDrawer();
+                    },
+                  ),
+                ),
                 foregroundColor: Theme.of(context).colorScheme.background,
                 backgroundColor: const Color.fromARGB(0, 0, 0, 0),
                 elevation: 0,
