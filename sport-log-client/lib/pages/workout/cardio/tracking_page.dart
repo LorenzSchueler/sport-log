@@ -257,7 +257,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                 primary: Theme.of(context).colorScheme.error,
               ),
               onPressed: () => setState(_trackingUtils.pause),
-              child: const Text("pause"),
+              child: const Text("Pause"),
             ),
           ),
         ];
@@ -269,7 +269,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                 primary: Theme.of(context).colorScheme.errorContainer,
               ),
               onPressed: () => setState(_trackingUtils.resume),
-              child: const Text("resume"),
+              child: const Text("Resume"),
             ),
           ),
           Defaults.sizedBox.horizontal.normal,
@@ -279,7 +279,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                 primary: Theme.of(context).colorScheme.error,
               ),
               onPressed: _saveDialog,
-              child: const Text("save"),
+              child: const Text("Save"),
             ),
           ),
         ];
@@ -299,8 +299,8 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                   : null,
               child: Text(
                 _heartRateUtils == null || _heartRateUtils!.active
-                    ? "start"
-                    : "waiting on HR Monitor",
+                    ? "Start"
+                    : "Waiting on HR Monitor",
               ),
             ),
           ),
@@ -311,7 +311,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                 primary: Theme.of(context).colorScheme.error,
               ),
               onPressed: () => Navigator.pop(context),
-              child: const Text("cancel"),
+              child: const Text("Cancel"),
             ),
           ),
         ];

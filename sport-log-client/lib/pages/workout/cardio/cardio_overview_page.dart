@@ -126,6 +126,9 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
                     itemBuilder: (_, index) => CardioSessionCard(
                       cardioSessionDescription:
                           _cardioSessionDescriptions[index],
+                      key: ValueKey(
+                        _cardioSessionDescriptions[index].cardioSession.id,
+                      ),
                     ),
                     separatorBuilder: (_, __) =>
                         Defaults.sizedBox.vertical.normal,
