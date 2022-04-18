@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:sport_log/defaults.dart';
 
 class AppTheme {
   AppTheme._();
@@ -58,6 +59,11 @@ class AppTheme {
               fontWeight: FontWeight.w500,
             ),
           ),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: Defaults.borderRadius.normal,
+            ),
+          ),
         ),
       ),
       iconTheme: IconThemeData(
@@ -71,6 +77,9 @@ class AppTheme {
       toggleableActiveColor: colorScheme.primary,
       dialogTheme: DialogTheme(
         backgroundColor: colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: Defaults.borderRadius.normal,
+        ),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: colorScheme.surface,
