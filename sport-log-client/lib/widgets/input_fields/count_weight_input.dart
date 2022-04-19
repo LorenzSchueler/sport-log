@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/input_fields/double_input.dart';
+import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
@@ -47,146 +49,96 @@ class _CountWeightInputState extends State<CountWeightInput> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Table(
-          columnWidths: const {
-            0: FixedColumnWidth(30),
-            1: FixedColumnWidth(140),
-            2: FixedColumnWidth(118), // 24 + 70 + 24
-          },
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TableRow(
+            EditTile(
+              leading: null,
+              caption: widget.countUnit == null
+                  ? widget.countLabel
+                  : "${widget.countLabel} (${widget.countUnit!})",
+              child: IntInput(
+                initialValue: _count,
+                setValue: (count) {
+                  if (count > 0) {
+                    setState(() => _count = count);
+                    if (!widget.confirmChanges) {
+                      widget.setValue(_count, _weight, _secondWeight);
+                    }
+                  }
+                },
+              ),
+            ),
+            Row(
               children: [
-                Container(),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Text(
-                    widget.countUnit == null
-                        ? widget.countLabel
-                        : "${widget.countLabel} (${widget.countUnit!})",
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: IntInput(
-                    initialValue: _count,
-                    setValue: (count) {
-                      if (count > 0) {
-                        setState(() => _count = count);
-                        if (!widget.confirmChanges) {
-                          widget.setValue(_count, _weight, _secondWeight);
-                        }
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
-            TableRow(
-              children: _weight == null
-                  ? [
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: IconButton(
-                          icon: const Icon(AppIcons.add),
-                          onPressed: () {
-                            setState(() {
-                              _weight = 0;
-                              _secondWeight = 0;
-                            });
-                            if (!widget.confirmChanges) {
-                              widget.setValue(_count, _weight, _secondWeight);
-                            }
-                          },
-                          padding: EdgeInsets.zero,
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Text(
-                          "Weight",
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ),
-                      Container(),
-                    ]
-                  : [
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: IconButton(
-                          icon: const Icon(AppIcons.close),
-                          onPressed: () {
-                            setState(() {
-                              _weight = null;
-                              _secondWeight = null;
-                            });
-                            if (!widget.confirmChanges) {
-                              widget.setValue(_count, _weight, _secondWeight);
-                            }
-                          },
-                          padding: EdgeInsets.zero,
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Text(
-                          "Weight",
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: DoubleInput(
-                          initialValue: _weight!,
-                          stepSize: Settings.weightIncrement,
-                          setValue: (weight) {
-                            setState(() => _weight = weight);
-                            if (!widget.confirmChanges) {
-                              widget.setValue(_count, _weight, _secondWeight);
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-            ),
-            if (widget.secondWeight)
-              TableRow(
-                children: _secondWeight == null
-                    ? [
-                        Container(),
-                        TableCell(
-                          verticalAlignment: TableCellVerticalAlignment.middle,
-                          child: Text(
-                            "Female Weight",
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                        ),
-                        Container(),
-                      ]
-                    : [
-                        Container(),
-                        TableCell(
-                          verticalAlignment: TableCellVerticalAlignment.middle,
-                          child: Text(
-                            "Female Weight",
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                        ),
-                        TableCell(
-                          verticalAlignment: TableCellVerticalAlignment.middle,
-                          child: DoubleInput(
-                            initialValue: _secondWeight!,
-                            stepSize: Settings.weightIncrement,
-                            setValue: (weight) {
-                              setState(() => _secondWeight = weight);
+                Column(
+                  children: [
+                    _weight == null
+                        ? ActionChip(
+                            avatar: const Icon(AppIcons.add),
+                            label: const Text("Add Weight"),
+                            onPressed: () {
+                              setState(() {
+                                _weight = 0;
+                                _secondWeight = 0;
+                              });
                               if (!widget.confirmChanges) {
                                 widget.setValue(_count, _weight, _secondWeight);
                               }
                             },
+                          )
+                        : EditTile(
+                            leading: null,
+                            caption:
+                                widget.secondWeight ? "Male Weight" : "Weight",
+                            child: DoubleInput(
+                              initialValue: _weight!,
+                              stepSize: Settings.weightIncrement,
+                              setValue: (weight) {
+                                setState(() => _weight = weight);
+                                if (!widget.confirmChanges) {
+                                  widget.setValue(
+                                      _count, _weight, _secondWeight);
+                                }
+                              },
+                            ),
                           ),
+                    if (widget.secondWeight && _secondWeight != null)
+                      EditTile(
+                        leading: null,
+                        caption: "Female Weight",
+                        child: DoubleInput(
+                          initialValue: _secondWeight!,
+                          stepSize: Settings.weightIncrement,
+                          setValue: (weight) {
+                            setState(() => _secondWeight = weight);
+                            if (!widget.confirmChanges) {
+                              widget.setValue(_count, _weight, _secondWeight);
+                            }
+                          },
                         ),
-                      ],
-              )
+                      ),
+                  ],
+                ),
+                if (_weight != null) ...[
+                  Defaults.sizedBox.horizontal.normal,
+                  IconButton(
+                    icon: const Icon(AppIcons.close),
+                    onPressed: () {
+                      setState(() {
+                        _weight = null;
+                        _secondWeight = null;
+                      });
+                      if (!widget.confirmChanges) {
+                        widget.setValue(_count, _weight, _secondWeight);
+                      }
+                    },
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ],
+            )
           ],
         ),
         if (widget.confirmChanges)
