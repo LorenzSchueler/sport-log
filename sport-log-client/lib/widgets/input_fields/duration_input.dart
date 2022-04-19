@@ -84,11 +84,17 @@ class _DurationInputState extends State<DurationInput> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _minusButton,
-        Defaults.sizedBox.horizontal.normal,
-        _minutesInput,
-        Text(' : ', style: Theme.of(context).textTheme.subtitle1),
-        _secondsInput,
-        Defaults.sizedBox.horizontal.normal,
+        SizedBox(
+          width: 70,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _minutesInput,
+              Text(' : ', style: Theme.of(context).textTheme.subtitle1),
+              _secondsInput,
+            ],
+          ),
+        ),
         _plusButton,
       ],
     );

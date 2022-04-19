@@ -56,6 +56,8 @@ class EditTile extends StatelessWidget {
         if (onCancel != null) ...[
           const Spacer(),
           IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
             onPressed: onCancel,
             icon: const Icon(
               AppIcons.close,

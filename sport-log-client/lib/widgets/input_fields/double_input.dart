@@ -64,7 +64,7 @@ class _DoubleInputState extends State<DoubleInput> {
                     decoration: const InputDecoration(
                       isDense: true,
                     ),
-                    style: Theme.of(context).textTheme.headline5,
+                    style: Theme.of(context).textTheme.subtitle1,
                   ),
                   onFocusChange: (focus) =>
                       setState(() => showFormField = focus),
@@ -76,7 +76,7 @@ class _DoubleInputState extends State<DoubleInput> {
                   child: Text(
                     "$_value",
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headline5,
+                    style: Theme.of(context).textTheme.subtitle1,
                   ),
                 ),
         ),
