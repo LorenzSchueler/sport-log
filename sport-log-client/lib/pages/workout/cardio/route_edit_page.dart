@@ -209,91 +209,45 @@ class RouteEditPageState extends State<RouteEditPage> {
     await _updateLine();
   }
 
-  Widget _buildDragTarget(int index) {
-    return DragTarget(
-      onWillAccept: (value) => true,
-      onAccept: (value) => _switchPoints(value as int, index),
-      builder: (context, candidates, reject) {
-        if (candidates.isNotEmpty) {
-          int index = candidates[0] as int;
-          return ListTile(
-            leading: Container(
-              margin: const EdgeInsets.only(left: 12),
-              child: const Icon(AppIcons.add),
-            ),
-            title: Text(
-              "${index + 1}",
-              style: Theme.of(context).textTheme.subtitle1,
-            ),
-            dense: true,
-          );
-        } else {
-          return const Divider();
-        }
-      },
-    );
-  }
-
-  Widget _buildDraggableList() {
-    List<Widget> listElements = [];
-
-    for (int index = 0; index < _route.markedPositions!.length; index++) {
-      listElements.add(_buildDragTarget(index));
-
-      var icon = const Icon(AppIcons.dragHandle);
-      listElements.add(
-        ListTile(
-          leading: IconButton(
-            onPressed: () => _removePoint(index),
-            icon: const Icon(AppIcons.delete),
-          ),
-          trailing: Draggable(
-            axis: Axis.vertical,
-            data: index,
-            child: icon,
-            childWhenDragging: Opacity(
-              opacity: 0.4,
-              child: icon,
-            ),
-            feedback: icon,
-          ),
-          title: Text(
-            "${index + 1}",
-            style: Theme.of(context).textTheme.subtitle1,
-          ),
-          dense: true,
-        ),
-      );
-    }
-
-    listElements.add(_buildDragTarget(_route.markedPositions!.length));
-
-    return ListView(children: listElements);
-  }
-
   Widget _buildExpandableListContainer() {
     return _listExpanded
-        ? Container(
-            padding: Defaults.edgeInsets.normal,
-            height: 350,
-            child: Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => setState(() {
-                      _listExpanded = false;
-                    }),
-                    child: const Text("hide List"),
-                  ),
+        ? Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => setState(() {
+                    _listExpanded = false;
+                  }),
+                  child: const Text("hide List"),
                 ),
-                Expanded(child: _buildDraggableList())
-              ],
-            ),
+              ),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 300),
+                child: ReorderableListView.builder(
+                  itemBuilder: (context, index) => ListTile(
+                    key: ValueKey(index),
+                    leading: IconButton(
+                      onPressed: () => _removePoint(index),
+                      icon: const Icon(AppIcons.delete),
+                    ),
+                    title: Text(
+                      "${index + 1}",
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ),
+                    trailing: const Icon(AppIcons.dragHandle),
+                    dense: true,
+                  ),
+                  itemCount: _route.markedPositions!.length,
+                  onReorder: _switchPoints,
+                  shrinkWrap: true,
+                ),
+              ),
+            ],
           )
-        : Container(
+        : SizedBox(
             width: double.infinity,
-            padding: Defaults.edgeInsets.normal,
             child: ElevatedButton(
               onPressed: () => setState(() {
                 _listExpanded = true;
@@ -364,45 +318,50 @@ class RouteEditPageState extends State<RouteEditPage> {
               onMapLongClick: (point, LatLng latLng) => _extendLine(latLng),
             ),
           ),
-          _buildExpandableListContainer(),
-          Table(
-            children: [
-              TableRow(
-                children: [
-                  ValueUnitDescription.distance(_route.distance),
-                  ValueUnitDescription.name(_route.name)
-                ],
-              ),
-              rowSpacer,
-              TableRow(
-                children: [
-                  ValueUnitDescription.ascent(_route.ascent),
-                  ValueUnitDescription.descent(_route.descent),
-                ],
-              ),
-            ],
-          ),
-          Defaults.sizedBox.vertical.normal,
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Form(
-              key: _formKey,
-              child: TextFormField(
-                onTap: () => setState(() {
-                  _listExpanded = false;
-                }),
-                onChanged: (name) => setState(() => _route.name = name),
-                initialValue: _route.name,
-                validator: Validator.validateStringNotEmpty,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                decoration: const InputDecoration(
-                  labelText: "Name",
-                  contentPadding: EdgeInsets.symmetric(vertical: 5),
+          Padding(
+            padding: Defaults.edgeInsets.normal,
+            child: Column(
+              children: [
+                _buildExpandableListContainer(),
+                const Divider(),
+                Defaults.sizedBox.vertical.normal,
+                Table(
+                  children: [
+                    TableRow(
+                      children: [
+                        ValueUnitDescription.distance(_route.distance),
+                        ValueUnitDescription.name(_route.name)
+                      ],
+                    ),
+                    rowSpacer,
+                    TableRow(
+                      children: [
+                        ValueUnitDescription.ascent(_route.ascent),
+                        ValueUnitDescription.descent(_route.descent),
+                      ],
+                    ),
+                  ],
                 ),
-              ),
+                Defaults.sizedBox.vertical.normal,
+                Form(
+                  key: _formKey,
+                  child: TextFormField(
+                    onTap: () => setState(() {
+                      _listExpanded = false;
+                    }),
+                    onChanged: (name) => setState(() => _route.name = name),
+                    initialValue: _route.name,
+                    validator: Validator.validateStringNotEmpty,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: const InputDecoration(
+                      labelText: "Name",
+                      contentPadding: EdgeInsets.symmetric(vertical: 5),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          Defaults.sizedBox.vertical.normal,
+          )
         ],
       ),
     );
