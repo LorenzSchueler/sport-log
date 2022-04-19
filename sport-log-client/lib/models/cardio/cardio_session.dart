@@ -97,25 +97,81 @@ class CardioSession extends AtomicEntity {
         datetime = DateTime.now(),
         deleted = false;
 
+  static const _currentDurationOffset = Duration(minutes: 1);
+
+  /// km/h
   double? get speed {
-    if (distance == null || time == null) {
+    return time == null || time!.inMilliseconds == 0 || distance == null
+        ? null
+        : (distance! / 1000) / (time!.inMilliseconds / (1000 * 60 * 60));
+  }
+
+  /// km/h
+  double? currentSpeed(Duration currentDuration) {
+    if (time == null || time!.inMilliseconds == 0 || track == null) {
       return null;
-    } else if (distance == 0 || time!.inSeconds == 0) {
-      return 0.0;
     } else {
-      return (distance! / 1000) / (time!.inSeconds / 3600);
+      final lastPositions = track!.where(
+        (position) => position.time >= currentDuration - _currentDurationOffset,
+      );
+      final distance = lastPositions.isEmpty
+          ? 0.0
+          : lastPositions.last.distance - lastPositions.first.distance;
+      final time = lastPositions.isEmpty
+          ? Duration.zero
+          : lastPositions.last.time - lastPositions.first.time;
+      return time.inMilliseconds == 0
+          ? null
+          : (distance / 1000) / (time.inMilliseconds / (1000 * 60 * 60));
     }
   }
 
+  /// min/km
   Duration? get tempo {
-    if (distance == null || time == null) {
+    final _speed = speed;
+    return speed == null || speed == 0
+        ? null
+        : Duration(milliseconds: (60 * 60 * 1000 / _speed!).round());
+  }
+
+  /// min/km
+  Duration? currentTempo(Duration currentDuration) {
+    final _speed = currentSpeed(currentDuration);
+    return speed == null || speed == 0
+        ? null
+        : Duration(milliseconds: (60 * 60 * 1000 / _speed!).round());
+  }
+
+  /// rpm
+  int? currentCadence(Duration currentDuration) {
+    if (time == null || time!.inMilliseconds == 0 || cadence == null) {
       return null;
-    } else if (distance == 0 || time!.inSeconds == 0) {
-      return Duration.zero;
     } else {
-      return Duration(
-        milliseconds: (time!.inMilliseconds / (distance! / 1000)).round(),
-      );
+      final lastCadence =
+          cadence!.where((d) => d >= currentDuration - _currentDurationOffset);
+      final time = lastCadence.isEmpty
+          ? Duration.zero
+          : lastCadence.last - lastCadence.first;
+      return time.inMilliseconds == 0 || lastCadence.isEmpty
+          ? null
+          : (lastCadence.length / (time.inMilliseconds / (1000 * 60))).round();
+    }
+  }
+
+  /// bpm
+  int? currentHeartRate(Duration currentDuration) {
+    if (time == null || time!.inMilliseconds == 0 || heartRate == null) {
+      return null;
+    } else {
+      final lastHeartRate = heartRate!
+          .where((d) => d >= currentDuration - _currentDurationOffset);
+      final time = lastHeartRate.isEmpty
+          ? Duration.zero
+          : lastHeartRate.last - lastHeartRate.first;
+      return time.inMilliseconds == 0 || lastHeartRate.isEmpty
+          ? null
+          : (lastHeartRate.length / (time.inMilliseconds / (1000 * 60)))
+              .round();
     }
   }
 
@@ -132,9 +188,8 @@ class CardioSession extends AtomicEntity {
   }
 
   void setDistance() {
-    distance = track != null && track!.isNotEmpty
-        ? track?.last.distance.round()
-        : null;
+    distance =
+        track == null || track!.isEmpty ? null : track?.last.distance.round();
   }
 
   void setAscentDescent() {
@@ -159,15 +214,17 @@ class CardioSession extends AtomicEntity {
   }
 
   void setAvgCadence() {
-    avgCadence = time != null && time!.inSeconds > 0 && cadence != null
-        ? (cadence!.length / (time!.inMilliseconds / 60000)).round()
-        : null;
+    avgCadence = time == null || time!.inMilliseconds == 0 || cadence == null
+        ? null
+        : (cadence!.length / (time!.inMilliseconds / (1000 * 60))).round();
   }
 
   void setAvgHeartRate() {
-    avgHeartRate = time != null && time!.inSeconds > 0 && heartRate != null
-        ? (heartRate!.length / (time!.inMilliseconds / 60000)).round()
-        : null;
+    avgHeartRate = time == null ||
+            time!.inMilliseconds == 0 ||
+            heartRate == null
+        ? null
+        : (heartRate!.length / (time!.inMilliseconds / (1000 * 60))).round();
   }
 
   factory CardioSession.fromJson(Map<String, dynamic> json) =>

@@ -142,7 +142,7 @@ class MainDrawer extends StatelessWidget {
                     ? null
                     : () async {
                         await Account.logout();
-                        Navigator.of(context).newBase(Routes.landing);
+                        await Navigator.of(context).newBase(Routes.landing);
                       },
               ),
             ),

@@ -75,11 +75,11 @@ class ValueUnitDescription extends StatelessWidget {
           key: key,
         );
 
-  ValueUnitDescription.speed(double? speed, {Key? key})
+  ValueUnitDescription.speed(double? speed, {bool current = false, Key? key})
       : this(
           value: speed?.toStringAsFixed(1),
           unit: "km/h",
-          description: "Speed",
+          description: current ? "Current Speed" : "Speed",
           scale: 1.3,
           key: key,
         );
@@ -92,11 +92,11 @@ class ValueUnitDescription extends StatelessWidget {
           key: key,
         );
 
-  ValueUnitDescription.tempo(Duration? tempo, {Key? key})
+  ValueUnitDescription.tempo(Duration? tempo, {bool current = false, Key? key})
       : this(
           value: tempo?.formatTimeShort,
           unit: "/km",
-          description: "Tempo",
+          description: current ? "Current Tempo" : "Tempo",
           scale: 1.3,
           key: key,
         );
@@ -144,20 +144,26 @@ class ValueUnitDescription extends StatelessWidget {
           key: key,
         );
 
-  ValueUnitDescription.avgCadence(int? avgCadence, {Key? key})
-      : this(
+  ValueUnitDescription.avgCadence(
+    int? avgCadence, {
+    bool current = false,
+    Key? key,
+  }) : this(
           value: avgCadence?.toString(),
           unit: "rpm",
-          description: "Cadence",
+          description: current ? "Current Cadence" : "Cadence",
           scale: 1.3,
           key: key,
         );
 
-  ValueUnitDescription.avgHeartRate(int? avgHeartRate, {Key? key})
-      : this(
+  ValueUnitDescription.avgHeartRate(
+    int? avgHeartRate, {
+    bool current = false,
+    Key? key,
+  }) : this(
           value: avgHeartRate?.toString(),
           unit: "bpm",
-          description: "Heart Rate",
+          description: current ? "Current Heart Rate" : "Heart Rate",
           scale: 1.3,
           key: key,
         );

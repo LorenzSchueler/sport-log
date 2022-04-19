@@ -126,6 +126,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                   children: [
                     CardioValueUnitDescriptionTable(
                       cardioSessionDescription: _cardioSessionDescription,
+                      currentDuration: null,
                     ),
                     if (_cardioSessionDescription.cardioSession.comments !=
                         null) ...[

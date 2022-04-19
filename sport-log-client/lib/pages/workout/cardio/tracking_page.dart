@@ -64,7 +64,6 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       cardioSession: CardioSession.defaultValue(widget.movement.id)
         ..cardioType = widget.cardioType
         ..time = Duration.zero
-        ..distance = 0
         ..track = []
         ..cadence = []
         ..heartRate = widget.heartRateMonitorId != null ? [] : null
@@ -367,6 +366,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
               children: [
                 CardioValueUnitDescriptionTable(
                   cardioSessionDescription: _cardioSessionDescription,
+                  currentDuration: _trackingUtils.currentDuration,
                 ),
                 Defaults.sizedBox.vertical.normal,
                 Row(children: _buildButtons()),

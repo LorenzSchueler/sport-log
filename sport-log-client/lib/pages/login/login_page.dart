@@ -245,7 +245,7 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
     if (result.isSuccess) {
-      Navigator.of(context).newBase(Routes.timeline.overview);
+      await Navigator.of(context).newBase(Routes.timeline.overview);
     } else {
       await showMessageDialog(
         context: context,
