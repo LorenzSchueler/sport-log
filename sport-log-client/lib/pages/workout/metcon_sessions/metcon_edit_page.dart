@@ -36,9 +36,9 @@ class _MetconEditPageState extends State<MetconEditPage> {
   @override
   void initState() {
     _logger.i("got ${widget.metconDescription}");
-    super.initState();
     _metconDescription =
         widget.metconDescription?.clone() ?? MetconDescription.defaultValue();
+    super.initState();
   }
 
   Future<void> _saveMetcon() async {
@@ -448,56 +448,55 @@ class MetconMovementCard extends StatelessWidget {
   }) : super(key: key);
 
   final MetconMovementDescription mmd;
-  final Function(MetconMovementDescription) editMetconMovementDescription;
-  final Function() deleteMetconMovement;
+  final void Function(MetconMovementDescription) editMetconMovementDescription;
+  final void Function() deleteMetconMovement;
 
   @override
   Widget build(BuildContext context) {
-    final move = mmd.metconMovement;
     return Card(
-      margin: EdgeInsets.zero,
-      child: Column(
-        children: [
-          ListTile(
-            title: Text(mmd.movement.name),
-            onTap: () async {
-              final movement = await showMovementPicker(context: context);
-              if (movement != null) {
-                mmd.movement = movement;
-                mmd.metconMovement.movementId = movement.id;
-                editMetconMovementDescription(mmd);
-              }
-            },
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
+      margin: const EdgeInsets.only(bottom: 10),
+      child: Padding(
+        padding: Defaults.edgeInsets.normal,
+        child: Column(
+          children: [
+            Row(
               children: [
+                Text(
+                  mmd.movement.name,
+                  style: Theme.of(context).textTheme.headline5,
+                ),
+                const Spacer(),
                 IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                   icon: const Icon(AppIcons.delete),
                   onPressed: deleteMetconMovement,
                 ),
+                Defaults.sizedBox.horizontal.big,
                 ReorderableDragStartListener(
                   child: const Icon(AppIcons.dragHandle),
-                  index: move.movementNumber,
+                  index: mmd.metconMovement.movementNumber,
                 ),
               ],
             ),
-          ),
-          NewSetInput(
-            onNewSet: (count, weight, secondWeight) {
-              mmd.metconMovement.count = count;
-              mmd.metconMovement.maleWeight = weight;
-              mmd.metconMovement.femaleWeight = secondWeight;
-              editMetconMovementDescription(mmd);
-            },
-            confirmChanges: false,
-            dimension: mmd.movement.dimension,
-            distanceUnit: move.distanceUnit,
-            initialCount: move.count,
-            initialWeight: move.maleWeight,
-            secondWeight: true,
-            initialSecondWeight: move.femaleWeight,
-          ),
-        ],
+            Defaults.sizedBox.vertical.normal,
+            NewSetInput(
+              onNewSet: (count, weight, secondWeight) {
+                mmd.metconMovement.count = count;
+                mmd.metconMovement.maleWeight = weight;
+                mmd.metconMovement.femaleWeight = secondWeight;
+                editMetconMovementDescription(mmd);
+              },
+              confirmChanges: false,
+              dimension: mmd.movement.dimension,
+              distanceUnit: mmd.metconMovement.distanceUnit,
+              initialCount: mmd.metconMovement.count,
+              initialWeight: mmd.metconMovement.maleWeight,
+              secondWeight: true,
+              initialSecondWeight: mmd.metconMovement.femaleWeight,
+            ),
+          ],
+        ),
       ),
     );
   }
