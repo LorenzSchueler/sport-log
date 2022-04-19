@@ -1,10 +1,6 @@
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
-String plural(String singular, String plural, int count) {
-  return (count == 1) ? singular : plural;
-}
-
 String formatDistance(int meters) {
   assert(meters >= 0);
   final kmRemainder = meters % 1000;

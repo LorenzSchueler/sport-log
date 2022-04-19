@@ -103,7 +103,7 @@ class MetconSessionDescription extends CompoundEntity {
       case MetconType.amrap:
         return "${metconSession.rounds} rounds + ${metconSession.reps} reps";
       case MetconType.emom:
-        return "${metconDescription.metcon.rounds!} * ${metconDescription.metcon.timecap!.inSeconds / metconDescription.metcon.rounds!}s";
+        return "${metconDescription.metcon.rounds!} x ${Duration(seconds: (metconDescription.metcon.timecap!.inSeconds / metconDescription.metcon.rounds!).round()).formatTimeShort}";
       case MetconType.forTime:
         if (short) {
           return metconSession.time != null

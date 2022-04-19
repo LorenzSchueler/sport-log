@@ -79,14 +79,20 @@ class MetconDescription extends CompoundEntity {
       m1.metcon.id == m2.metcon.id;
 
   String get typeLengthDescription {
-    if (metcon.metconType == MetconType.forTime) {
-      final timecap = metcon.timecap == null
-          ? ""
-          : " (Timecap ${metcon.timecap?.formatTimeShort})";
-      final rounds = metcon.rounds! > 1 ? "${metcon.rounds!} Rounds " : "";
-      return "$rounds${metcon.metconType.displayName}$timecap";
-    } else {
-      return "${metcon.metconType.displayName} ${metcon.timecap?.formatTimeShort}";
+    switch (metcon.metconType) {
+      case MetconType.amrap:
+        return "${metcon.metconType.displayName} ${metcon.timecap?.formatTimeShort}";
+      case MetconType.emom:
+        return metcon.timecap!.inSeconds / metcon.rounds! ==
+                const Duration(minutes: 1).inSeconds
+            ? "${metcon.metconType.displayName} ${metcon.timecap?.formatTimeShort}"
+            : "${metcon.metconType.displayName} ${metcon.timecap?.formatTimeShort} (${metcon.rounds} x ${Duration(seconds: (metcon.timecap!.inSeconds / metcon.rounds!).round()).formatTimeShort})";
+      case MetconType.forTime:
+        final timecap = metcon.timecap == null
+            ? ""
+            : " (Timecap ${metcon.timecap?.formatTimeShort})";
+        final rounds = metcon.rounds! > 1 ? "${metcon.rounds!} Rounds " : "";
+        return "$rounds${metcon.metconType.displayName}$timecap";
     }
   }
 }

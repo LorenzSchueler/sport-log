@@ -3,14 +3,16 @@ import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
-import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
+import 'package:sport_log/widgets/input_fields/duration_input.dart';
+import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
+import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
@@ -117,8 +119,8 @@ class _MetconEditPageState extends State<MetconEditPage> {
             child: ListView(
               children: [
                 _nameInput(context),
-                _maybeDescriptionInput(),
-                _typeInput(context),
+                _descriptionInput(),
+                _typeInput(),
                 _additionalFieldsInput(),
                 const Divider(thickness: 2),
                 _metconMovementsList(),
@@ -148,23 +150,46 @@ class _MetconEditPageState extends State<MetconEditPage> {
     );
   }
 
-  Widget _typeInput(BuildContext context) {
-    final style = Theme.of(context).textTheme.button!;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: MetconType.values.map((type) {
-        return TextButton(
-          onPressed: () => _setType(type),
-          child: Text(
-            type.displayName,
-            style: style.copyWith(
-              color: (type == _metconDescription.metcon.metconType)
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).disabledColor,
+  Widget _descriptionInput() {
+    return _metconDescription.metcon.description == null
+        ? ActionChip(
+            avatar: const Icon(AppIcons.add),
+            label: const Text("Add Description"),
+            onPressed: () {
+              setState(() => _metconDescription.metcon.description = "");
+              _descriptionFocusNode.requestFocus();
+            },
+          )
+        : Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: TextFormField(
+              initialValue: _metconDescription.metcon.description ?? "",
+              focusNode: _descriptionFocusNode,
+              keyboardType: TextInputType.multiline,
+              minLines: 1,
+              onChanged: (description) => setState(
+                () => _metconDescription.metcon.description = description,
+              ),
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(vertical: 5),
+                labelText: "Description",
+                suffixIcon: IconButton(
+                  icon: const Icon(AppIcons.close),
+                  onPressed: () => setState(
+                    () => _metconDescription.metcon.description = null,
+                  ),
+                ),
+              ),
             ),
-          ),
-        );
-      }).toList(),
+          );
+  }
+
+  Widget _typeInput() {
+    return SelectionBar<MetconType>(
+      onChange: _setType,
+      items: MetconType.values,
+      getLabel: (metconType) => metconType.displayName,
+      selectedItem: _metconDescription.metcon.metconType,
     );
   }
 
@@ -192,145 +217,52 @@ class _MetconEditPageState extends State<MetconEditPage> {
   Widget _additionalFieldsInput() {
     switch (_metconDescription.metcon.metconType) {
       case MetconType.amrap:
-        return _amrapInputs();
+        return _timecapInput(caption: "Time");
       case MetconType.emom:
-        return _emomInputs();
+        return Column(
+          children: [
+            _roundsInput(),
+            _timecapInput(caption: "Total Time"),
+          ],
+        );
       case MetconType.forTime:
-        return _forTimeInputs();
+        return Column(
+          children: [
+            _roundsInput(),
+            _maybeTimecapInput(),
+          ],
+        );
     }
   }
 
-  Widget _amrapInputs() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _timecapInput(),
-        Text(
-          plural(
-                "min",
-                "mins",
-                _metconDescription.metcon.timecap?.inMinutes ?? 0,
-              ) +
-              " in total",
-        ),
-      ],
-    );
-  }
-
-  Widget _emomInputs() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _roundsInput(),
-            Text(
-              plural(
-                "round",
-                "rounds",
-                _metconDescription.metcon.rounds ?? 0,
-              ),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("in"),
-            _timecapInput(),
-            Text(
-              plural(
-                "min",
-                "mins",
-                _metconDescription.metcon.timecap?.inMinutes ?? 0,
-              ),
-            ),
-          ],
-        )
-      ],
-    );
-  }
-
-  Widget _forTimeInputs() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _roundsInput(),
-            Text(
-              plural(
-                "round",
-                "rounds",
-                _metconDescription.metcon.rounds ?? 0,
-              ),
-            ),
-          ],
-        ),
-        _maybeTimecapInput(),
-      ],
-    );
-  }
-
-  Widget _descriptionInput() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: TextFormField(
-        initialValue: _metconDescription.metcon.description ?? "",
-        focusNode: _descriptionFocusNode,
-        keyboardType: TextInputType.multiline,
-        minLines: 1,
-        maxLines: null,
-        onChanged: (description) =>
-            setState(() => _metconDescription.metcon.description = description),
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.symmetric(vertical: 5),
-          labelText: "Description",
-          suffixIcon: IconButton(
-            icon: const Icon(AppIcons.close),
-            onPressed: () =>
-                setState(() => _metconDescription.metcon.description = null),
-          ),
-        ),
+  Widget _roundsInput() {
+    return EditTile(
+      leading: AppIcons.timeInterval,
+      caption: "Rounds",
+      child: IntInput(
+        initialValue:
+            _metconDescription.metcon.rounds ?? Metcon.roundsDefaultValue,
+        setValue: (rounds) {
+          FocusManager.instance.primaryFocus?.unfocus();
+          setState(() => _metconDescription.metcon.rounds = rounds);
+        },
       ),
     );
   }
 
-  Widget _maybeDescriptionInput() {
-    return _metconDescription.metcon.description == null
-        ? ActionChip(
-            avatar: const Icon(AppIcons.add),
-            label: const Text("Add description"),
-            onPressed: () {
-              setState(() => _metconDescription.metcon.description = "");
-              _descriptionFocusNode.requestFocus();
-            },
-          )
-        : _descriptionInput();
-  }
-
-  Widget _roundsInput() {
-    return IntInput(
-      initialValue:
-          _metconDescription.metcon.rounds ?? Metcon.roundsDefaultValue,
-      setValue: (rounds) {
-        FocusManager.instance.primaryFocus?.unfocus();
-        setState(() => _metconDescription.metcon.rounds = rounds);
-      },
-    );
-  }
-
-  Widget _timecapInput() {
-    return IntInput(
-      initialValue: (_metconDescription.metcon.timecap ??=
-              Metcon.timecapDefaultValue)
-          .inMinutes,
-      setValue: (int timecap) {
-        FocusManager.instance.primaryFocus?.unfocus();
-        setState(
-          () => _metconDescription.metcon.timecap = Duration(seconds: timecap),
-        );
-      },
+  Widget _timecapInput({required String caption, void Function()? onCancel}) {
+    return EditTile(
+      leading: AppIcons.timeInterval,
+      caption: caption,
+      child: DurationInput(
+        initialDuration: _metconDescription.metcon.timecap ??=
+            Metcon.timecapDefaultValue,
+        setDuration: (timecap) {
+          FocusManager.instance.primaryFocus?.unfocus();
+          setState(() => _metconDescription.metcon.timecap = timecap);
+        },
+      ),
+      onCancel: onCancel,
     );
   }
 
@@ -338,7 +270,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
     return _metconDescription.metcon.timecap == null
         ? ActionChip(
             avatar: const Icon(AppIcons.add),
-            label: const Text("Add timecap"),
+            label: const Text("Add Timecap"),
             onPressed: () {
               FocusManager.instance.primaryFocus?.unfocus();
               setState(
@@ -347,31 +279,12 @@ class _MetconEditPageState extends State<MetconEditPage> {
               );
             },
           )
-        : Stack(
-            alignment: Alignment.centerRight,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("timecap"),
-                  _timecapInput(),
-                  Text(
-                    plural(
-                      "minute",
-                      "minutes",
-                      _metconDescription.metcon.timecap!.inMinutes,
-                    ),
-                  )
-                ],
-              ),
-              IconButton(
-                icon: const Icon(AppIcons.close),
-                onPressed: () {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  setState(() => _metconDescription.metcon.timecap = null);
-                },
-              )
-            ],
+        : _timecapInput(
+            caption: "Timecap",
+            onCancel: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              setState(() => _metconDescription.metcon.timecap = null);
+            },
           );
   }
 
@@ -463,7 +376,7 @@ class MetconMovementCard extends StatelessWidget {
               children: [
                 Text(
                   mmd.movement.name,
-                  style: Theme.of(context).textTheme.headline5,
+                  style: Theme.of(context).textTheme.subtitle1,
                 ),
                 const Spacer(),
                 IconButton(
