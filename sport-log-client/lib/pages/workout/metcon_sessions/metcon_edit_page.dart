@@ -98,10 +98,12 @@ class _MetconEditPageState extends State<MetconEditPage> {
             icon: const Icon(AppIcons.arrowBack),
           ),
           actions: [
-            IconButton(
-              onPressed: _metconDescription.hasReference ? null : _deleteMetcon,
-              icon: const Icon(AppIcons.delete),
-            ),
+            if (!_metconDescription.hasReference &&
+                _metconDescription.metcon.userId != null)
+              IconButton(
+                onPressed: _deleteMetcon,
+                icon: const Icon(AppIcons.delete),
+              ),
             IconButton(
               onPressed: _formKey.currentContext != null &&
                       _formKey.currentState!.validate() &&

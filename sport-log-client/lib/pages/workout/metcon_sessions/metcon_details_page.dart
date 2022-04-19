@@ -40,10 +40,12 @@ class MetconDetailsPageState extends State<MetconDetailsPage> {
       appBar: AppBar(
         title: Text(_metconDescription.metcon.name),
         actions: [
-          IconButton(
-            onPressed: _deleteMetcon,
-            icon: const Icon(AppIcons.delete),
-          ),
+          if (!_metconDescription.hasReference &&
+              widget.metconDescription.metcon.userId != null)
+            IconButton(
+              onPressed: _deleteMetcon,
+              icon: const Icon(AppIcons.delete),
+            ),
           if (widget.metconDescription.metcon.userId != null)
             IconButton(
               onPressed: () async {
