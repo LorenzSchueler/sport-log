@@ -22,7 +22,7 @@ class IntInput extends StatefulWidget {
 class _IntInputState extends State<IntInput> {
   late int _value;
 
-  bool showFormField = false;
+  bool _showFormField = false;
 
   @override
   void initState() {
@@ -37,16 +37,19 @@ class _IntInputState extends State<IntInput> {
       children: [
         RepeatIconButton(
           icon: const Icon(AppIcons.subtractBox),
-          onClick: widget.setValue == null || _value <= 1
+          onClick: widget.setValue == null || _value <= 0
               ? null
               : () {
-                  setState(() => _value -= widget.stepSize);
+                  setState(() {
+                    _value -= widget.stepSize;
+                    _showFormField = false;
+                  });
                   widget.setValue?.call(_value);
                 },
         ),
         SizedBox(
           width: 70,
-          child: showFormField
+          child: _showFormField
               ? Focus(
                   child: TextFormField(
                     initialValue: "$_value",
@@ -69,11 +72,11 @@ class _IntInputState extends State<IntInput> {
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                   onFocusChange: (focus) =>
-                      setState(() => showFormField = focus),
+                      setState(() => _showFormField = focus),
                 )
               : GestureDetector(
                   onTap: () => setState(
-                    () => showFormField = true,
+                    () => _showFormField = true,
                   ),
                   child: Text(
                     "$_value",
@@ -87,7 +90,10 @@ class _IntInputState extends State<IntInput> {
           onClick: widget.setValue == null
               ? null
               : () {
-                  setState(() => _value += widget.stepSize);
+                  setState(() {
+                    _value += widget.stepSize;
+                    _showFormField = false;
+                  });
                   widget.setValue?.call(_value);
                 },
         ),

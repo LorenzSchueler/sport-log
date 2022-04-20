@@ -22,7 +22,7 @@ class DoubleInput extends StatefulWidget {
 class _DoubleInputState extends State<DoubleInput> {
   late double _value;
 
-  bool showFormField = false;
+  bool _showFormField = false;
 
   @override
   void initState() {
@@ -40,13 +40,16 @@ class _DoubleInputState extends State<DoubleInput> {
           onClick: widget.setValue == null || _value < widget.stepSize
               ? null
               : () {
-                  setState(() => _value -= widget.stepSize);
+                  setState(() {
+                    _value -= widget.stepSize;
+                    _showFormField = false;
+                  });
                   widget.setValue?.call(_value);
                 },
         ),
         SizedBox(
           width: 70,
-          child: showFormField
+          child: _showFormField
               ? Focus(
                   child: TextFormField(
                     initialValue: _value.toStringAsFixed(1),
@@ -68,11 +71,11 @@ class _DoubleInputState extends State<DoubleInput> {
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                   onFocusChange: (focus) =>
-                      setState(() => showFormField = focus),
+                      setState(() => _showFormField = focus),
                 )
               : GestureDetector(
                   onTap: () => setState(
-                    () => showFormField = true,
+                    () => _showFormField = true,
                   ),
                   child: Text(
                     "$_value",
@@ -86,7 +89,10 @@ class _DoubleInputState extends State<DoubleInput> {
           onClick: widget.setValue == null
               ? null
               : () {
-                  setState(() => _value += widget.stepSize);
+                  setState(() {
+                    _value += widget.stepSize;
+                    _showFormField = false;
+                  });
                   widget.setValue?.call(_value);
                 },
         ),
