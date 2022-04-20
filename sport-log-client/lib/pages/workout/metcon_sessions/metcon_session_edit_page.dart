@@ -5,7 +5,6 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
-import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
@@ -246,28 +245,17 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                           initialValue:
                               _metconSessionDescription.metconSession.rounds ??
                                   0,
-                          setValue: (rounds) {
-                            final metconType = _metconSessionDescription
-                                .metconDescription.metcon.metconType;
-                            if (metconType == MetconType.amrap && rounds >= 0 ||
-                                metconType == MetconType.forTime &&
-                                    rounds >= 0 &&
-                                    rounds <=
-                                        _metconSessionDescription
-                                            .metconDescription.metcon.rounds!) {
-                              setState(
-                                () => _metconSessionDescription
-                                    .metconSession.rounds = rounds,
-                              );
-                            } else {
-                              showMessageDialog(
-                                context: context,
-                                text: metconType == MetconType.forTime
-                                    ? "Rounds must be greater or equal than 0 and smaller or equal than ${_metconSessionDescription.metconDescription.metcon.rounds}."
-                                    : "Rounds must be greater or equal than 0.",
-                              );
-                            }
-                          },
+                          maxValue: _metconSessionDescription
+                                      .metconDescription.metcon.metconType ==
+                                  MetconType.forTime
+                              ? _metconSessionDescription
+                                      .metconDescription.metcon.rounds! -
+                                  1
+                              : 999,
+                          setValue: (rounds) => setState(
+                            () => _metconSessionDescription
+                                .metconSession.rounds = rounds,
+                          ),
                         ),
                       ),
                     ),
@@ -279,24 +267,15 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                         child: IntInput(
                           initialValue:
                               _metconSessionDescription.metconSession.reps ?? 0,
-                          setValue: (reps) {
-                            final totalReps = _metconSessionDescription
-                                .metconDescription.moves
-                                .map((e) => e.metconMovement.count)
-                                .sum;
-                            if (reps >= 0 && reps < totalReps) {
-                              setState(
-                                () => _metconSessionDescription
-                                    .metconSession.reps = reps,
-                              );
-                            } else {
-                              showMessageDialog(
-                                context: context,
-                                text:
-                                    "Reps must be greater or equal than 0 and smaller than $totalReps.",
-                              );
-                            }
-                          },
+                          maxValue: _metconSessionDescription
+                                  .metconDescription.moves
+                                  .map((e) => e.metconMovement.count)
+                                  .sum -
+                              1,
+                          setValue: (reps) => setState(
+                            () => _metconSessionDescription.metconSession.reps =
+                                reps,
+                          ),
                         ),
                       ),
                     ),

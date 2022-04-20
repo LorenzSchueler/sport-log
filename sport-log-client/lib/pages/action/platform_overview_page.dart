@@ -106,10 +106,12 @@ class PlatformCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.subtitle1,
                 ),
                 Defaults.sizedBox.horizontal.normal,
-                Icon(!platformDescription.platform.credential ||
-                        platformDescription.platformCredential != null
-                    ? AppIcons.check
-                    : AppIcons.close),
+                Icon(
+                  !platformDescription.platform.credential ||
+                          platformDescription.platformCredential != null
+                      ? AppIcons.check
+                      : AppIcons.close,
+                ),
                 const Spacer(),
                 if (platformDescription.platform.credential)
                   IconButton(

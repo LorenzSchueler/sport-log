@@ -5,7 +5,6 @@ import 'package:audioplayers/audioplayers.dart' hide Logger;
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -158,13 +157,10 @@ class TimerPageState extends State<TimerPage> {
       caption: "Rounds",
       child: IntInput(
         initialValue: _totalRounds,
+        minValue: 1,
         setValue: _timer != null
             ? null
-            : (rounds) {
-                if (rounds >= 0) {
-                  setState(() => _totalRounds = rounds);
-                }
-              },
+            : (rounds) => setState(() => _totalRounds = rounds),
       ),
     );
   }

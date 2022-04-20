@@ -244,6 +244,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
       child: IntInput(
         initialValue:
             _metconDescription.metcon.rounds ?? Metcon.roundsDefaultValue,
+        minValue: 1,
         setValue: (rounds) {
           FocusManager.instance.primaryFocus?.unfocus();
           setState(() => _metconDescription.metcon.rounds = rounds);

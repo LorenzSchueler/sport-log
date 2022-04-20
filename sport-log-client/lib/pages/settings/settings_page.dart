@@ -96,20 +96,13 @@ class SettingsPageState extends State<SettingsPage> {
                   caption: "Synchronization Interval (min)",
                   child: IntInput(
                     initialValue: Settings.syncInterval.inMinutes,
-                    setValue: (syncInterval) async {
-                      if (syncInterval > 0) {
-                        setState(() {
-                          Settings.syncInterval =
-                              Duration(minutes: syncInterval);
-                        });
-                        Sync.instance.stopSync();
-                        await Sync.instance.startSync();
-                      } else {
-                        await showMessageDialog(
-                          context: context,
-                          text: "Interval must be greater than 0.",
-                        );
-                      }
+                    minValue: 1,
+                    setValue: (syncInterval) {
+                      setState(() {
+                        Settings.syncInterval = Duration(minutes: syncInterval);
+                      });
+                      Sync.instance.stopSync();
+                      Sync.instance.startSync();
                     },
                   ),
                 ),

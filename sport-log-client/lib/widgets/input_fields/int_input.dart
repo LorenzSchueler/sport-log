@@ -7,11 +7,15 @@ class IntInput extends StatefulWidget {
   const IntInput({
     required this.setValue,
     this.initialValue = 0,
+    this.minValue = 0,
+    this.maxValue = 999,
     this.stepSize = 1,
     Key? key,
   }) : super(key: key);
 
   final int initialValue;
+  final int minValue;
+  final int maxValue;
   final int stepSize;
   final void Function(int value)? setValue;
 
@@ -37,7 +41,7 @@ class _IntInputState extends State<IntInput> {
       children: [
         RepeatIconButton(
           icon: const Icon(AppIcons.subtractBox),
-          onClick: widget.setValue == null || _value <= 0
+          onClick: widget.setValue == null || _value <= widget.minValue
               ? null
               : () {
                   setState(() {
@@ -58,8 +62,11 @@ class _IntInputState extends State<IntInput> {
                     textAlign: TextAlign.center,
                     enabled: widget.setValue != null,
                     onChanged: (value) {
-                      final validated =
-                          Validator.validateIntGeZeroLtValue(value, 1000);
+                      final validated = Validator.validateIntBetween(
+                        value,
+                        widget.minValue,
+                        widget.maxValue,
+                      );
                       if (validated == null) {
                         final v = int.parse(value);
                         setState(() => _value = v);
@@ -87,7 +94,7 @@ class _IntInputState extends State<IntInput> {
         ),
         RepeatIconButton(
           icon: const Icon(AppIcons.addBox),
-          onClick: widget.setValue == null
+          onClick: widget.setValue == null || _value >= widget.maxValue
               ? null
               : () {
                   setState(() {

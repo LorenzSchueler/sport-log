@@ -60,11 +60,9 @@ class _CountWeightInputState extends State<CountWeightInput> {
               child: IntInput(
                 initialValue: _count,
                 setValue: (count) {
-                  if (count > 0) {
-                    setState(() => _count = count);
-                    if (!widget.confirmChanges) {
-                      widget.setValue(_count, _weight, _secondWeight);
-                    }
+                  setState(() => _count = count);
+                  if (!widget.confirmChanges) {
+                    widget.setValue(_count, _weight, _secondWeight);
                   }
                 },
               ),
@@ -98,7 +96,10 @@ class _CountWeightInputState extends State<CountWeightInput> {
                                 setState(() => _weight = weight);
                                 if (!widget.confirmChanges) {
                                   widget.setValue(
-                                      _count, _weight, _secondWeight);
+                                    _count,
+                                    _weight,
+                                    _secondWeight,
+                                  );
                                 }
                               },
                             ),
