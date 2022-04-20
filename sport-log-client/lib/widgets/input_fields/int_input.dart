@@ -13,7 +13,7 @@ class IntInput extends StatefulWidget {
 
   final int initialValue;
   final int stepSize;
-  final void Function(int value) setValue;
+  final void Function(int value)? setValue;
 
   @override
   _IntInputState createState() => _IntInputState();
@@ -37,12 +37,12 @@ class _IntInputState extends State<IntInput> {
       children: [
         RepeatIconButton(
           icon: const Icon(AppIcons.subtractBox),
-          onClick: _value > 1
-              ? () {
+          onClick: widget.setValue == null || _value <= 1
+              ? null
+              : () {
                   setState(() => _value -= widget.stepSize);
-                  widget.setValue(_value);
-                }
-              : null,
+                  widget.setValue?.call(_value);
+                },
         ),
         SizedBox(
           width: 70,
@@ -53,13 +53,14 @@ class _IntInputState extends State<IntInput> {
                     autofocus: true,
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
+                    enabled: widget.setValue != null,
                     onChanged: (value) {
                       final validated =
                           Validator.validateIntGeZeroLtValue(value, 1000);
                       if (validated == null) {
                         final v = int.parse(value);
                         setState(() => _value = v);
-                        widget.setValue(_value);
+                        widget.setValue?.call(_value);
                       }
                     },
                     decoration: const InputDecoration(
@@ -83,10 +84,12 @@ class _IntInputState extends State<IntInput> {
         ),
         RepeatIconButton(
           icon: const Icon(AppIcons.addBox),
-          onClick: () {
-            setState(() => _value += widget.stepSize);
-            widget.setValue(_value);
-          },
+          onClick: widget.setValue == null
+              ? null
+              : () {
+                  setState(() => _value += widget.stepSize);
+                  widget.setValue?.call(_value);
+                },
         ),
       ],
     );
