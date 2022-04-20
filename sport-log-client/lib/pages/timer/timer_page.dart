@@ -12,6 +12,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
+import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/never_pop.dart';
 import 'package:wakelock/wakelock.dart';
@@ -95,36 +96,17 @@ class TimerPageState extends State<TimerPage> {
                     _timeFormField(MetconType.amrap),
                     Defaults.sizedBox.vertical.huge,
                     _startStopButton(MetconType.amrap),
-                    const SizedBox(
-                      height: 100,
-                    ),
+                    const SizedBox(height: 100),
                     _timeText(MetconType.amrap),
                   ],
                 ),
                 Column(
                   children: [
                     _timeFormField(MetconType.emom),
-                    TextFormField(
-                      keyboardType: TextInputType.number,
-                      onChanged: (rounds) {
-                        if (Validator.validateIntGtZero(rounds) == null) {
-                          setState(() => _totalRounds = int.parse(rounds));
-                        }
-                      },
-                      initialValue: _totalRounds.toString(),
-                      validator: Validator.validateIntGtZero,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      decoration: const InputDecoration(
-                        icon: Icon(AppIcons.repeat),
-                        labelText: "Rounds",
-                        contentPadding: EdgeInsets.symmetric(vertical: 5),
-                      ),
-                    ),
+                    _roundsFormField(),
                     Defaults.sizedBox.vertical.huge,
                     _startStopButton(MetconType.emom),
-                    const SizedBox(
-                      height: 100,
-                    ),
+                    const SizedBox(height: 100),
                     _roundText(),
                     _timeText(MetconType.emom),
                   ],
@@ -134,9 +116,7 @@ class TimerPageState extends State<TimerPage> {
                     _timeFormField(MetconType.forTime),
                     Defaults.sizedBox.vertical.huge,
                     _startStopButton(MetconType.forTime),
-                    const SizedBox(
-                      height: 100,
-                    ),
+                    const SizedBox(height: 100),
                     _timeText(MetconType.forTime),
                   ],
                 ),
@@ -169,6 +149,23 @@ class TimerPageState extends State<TimerPage> {
         initialDuration: _totalTime,
       ),
       leading: AppIcons.timeInterval,
+    );
+  }
+
+  Widget _roundsFormField() {
+    return EditTile(
+      leading: AppIcons.repeat,
+      caption: "Rounds",
+      child: IntInput(
+        initialValue: _totalRounds,
+        setValue: _timer != null
+            ? null
+            : (rounds) {
+                if (rounds >= 0) {
+                  setState(() => _totalRounds = rounds);
+                }
+              },
+      ),
     );
   }
 

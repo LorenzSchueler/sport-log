@@ -9,6 +9,7 @@ import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
+import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/picker/date_picker.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
@@ -238,85 +239,65 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                 Row(
                   children: [
                     Expanded(
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          icon: Icon(AppIcons.repeat),
-                          labelText: "Rounds",
-                          contentPadding: EdgeInsets.symmetric(vertical: 5),
-                        ),
-                        initialValue:
-                            "${_metconSessionDescription.metconSession.rounds}",
-                        validator: (rounds) {
-                          final metconType = _metconSessionDescription
-                              .metconDescription.metcon.metconType;
-                          if (metconType == MetconType.amrap) {
-                            return Validator.validateIntGeZero(rounds);
-                          } else if (metconType == MetconType.forTime) {
-                            return Validator.validateIntGeZeroLeValue(
-                              rounds,
-                              _metconSessionDescription
-                                  .metconDescription.metcon.rounds!,
-                            );
-                          } else {
-                            return null;
-                          }
-                        },
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        keyboardType: TextInputType.number,
-                        textInputAction: TextInputAction.next,
-                        onChanged: (rounds) {
-                          final metconType = _metconSessionDescription
-                              .metconDescription.metcon.metconType;
-                          if (metconType == MetconType.amrap &&
-                                  Validator.validateIntGeZero(rounds) == null ||
-                              metconType == MetconType.forTime &&
-                                  Validator.validateIntGeZeroLeValue(
-                                        rounds,
+                      child: EditTile(
+                        leading: AppIcons.repeat,
+                        caption: "Rounds",
+                        child: IntInput(
+                          initialValue:
+                              _metconSessionDescription.metconSession.rounds ??
+                                  0,
+                          setValue: (rounds) {
+                            final metconType = _metconSessionDescription
+                                .metconDescription.metcon.metconType;
+                            if (metconType == MetconType.amrap && rounds >= 0 ||
+                                metconType == MetconType.forTime &&
+                                    rounds >= 0 &&
+                                    rounds <=
                                         _metconSessionDescription
-                                            .metconDescription.metcon.rounds!,
-                                      ) ==
-                                      null) {
-                            setState(
-                              () => _metconSessionDescription
-                                  .metconSession.rounds = int.parse(rounds),
-                            );
-                          }
-                        },
+                                            .metconDescription.metcon.rounds!) {
+                              setState(
+                                () => _metconSessionDescription
+                                    .metconSession.rounds = rounds,
+                              );
+                            } else {
+                              showMessageDialog(
+                                context: context,
+                                text: metconType == MetconType.forTime
+                                    ? "Rounds must be greater or equal than 0 and smaller or equal than ${_metconSessionDescription.metconDescription.metcon.rounds}."
+                                    : "Rounds must be greater or equal than 0.",
+                              );
+                            }
+                          },
+                        ),
                       ),
                     ),
                     Defaults.sizedBox.horizontal.normal,
                     Expanded(
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: "Reps",
-                          contentPadding: EdgeInsets.symmetric(vertical: 5),
+                      child: EditTile(
+                        leading: null,
+                        caption: "Reps",
+                        child: IntInput(
+                          initialValue:
+                              _metconSessionDescription.metconSession.reps ?? 0,
+                          setValue: (reps) {
+                            final totalReps = _metconSessionDescription
+                                .metconDescription.moves
+                                .map((e) => e.metconMovement.count)
+                                .sum;
+                            if (reps >= 0 && reps < totalReps) {
+                              setState(
+                                () => _metconSessionDescription
+                                    .metconSession.reps = reps,
+                              );
+                            } else {
+                              showMessageDialog(
+                                context: context,
+                                text:
+                                    "Reps must be greater or equal than 0 and smaller than $totalReps.",
+                              );
+                            }
+                          },
                         ),
-                        initialValue: _metconSessionDescription
-                            .metconSession.reps
-                            .toString(),
-                        validator: (reps) => Validator.validateIntGeZeroLtValue(
-                          reps,
-                          _metconSessionDescription.metconDescription.moves
-                              .map((e) => e.metconMovement.count)
-                              .sum,
-                        ),
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        keyboardType: TextInputType.number,
-                        onChanged: (reps) {
-                          if (Validator.validateIntGeZeroLtValue(
-                                reps,
-                                _metconSessionDescription
-                                    .metconDescription.moves
-                                    .map((e) => e.metconMovement.count)
-                                    .sum,
-                              ) ==
-                              null) {
-                            setState(
-                              () => _metconSessionDescription
-                                  .metconSession.reps = int.parse(reps),
-                            );
-                          }
-                        },
                       ),
                     ),
                   ],

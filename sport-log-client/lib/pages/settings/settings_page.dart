@@ -7,6 +7,7 @@ import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
+import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/input_fields/text_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -90,32 +91,27 @@ class SettingsPageState extends State<SettingsPage> {
                   },
                 ),
               if (Settings.syncEnabled)
-                TextFormField(
-                  decoration: const InputDecoration(
-                    icon: Icon(AppIcons.timeInterval),
-                    labelText: "Synchronization Interval (min)",
-                    contentPadding: EdgeInsets.symmetric(vertical: 5),
+                EditTile(
+                  leading: AppIcons.timeInterval,
+                  caption: "Synchronization Interval (min)",
+                  child: IntInput(
+                    initialValue: Settings.syncInterval.inMinutes,
+                    setValue: (syncInterval) async {
+                      if (syncInterval > 0) {
+                        setState(() {
+                          Settings.syncInterval =
+                              Duration(minutes: syncInterval);
+                        });
+                        Sync.instance.stopSync();
+                        await Sync.instance.startSync();
+                      } else {
+                        await showMessageDialog(
+                          context: context,
+                          text: "Interval must be greater than 0.",
+                        );
+                      }
+                    },
                   ),
-                  keyboardType: TextInputType.number,
-                  initialValue: Settings.syncInterval.inMinutes.toString(),
-                  validator: Validator.validateIntGtZero,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  onFieldSubmitted: (syncInterval) async {
-                    final validated = Validator.validateIntGtZero(syncInterval);
-                    if (validated == null) {
-                      final min = int.parse(syncInterval);
-                      setState(() {
-                        Settings.syncInterval = Duration(minutes: min);
-                      });
-                      Sync.instance.stopSync();
-                      await Sync.instance.startSync();
-                    } else {
-                      await showMessageDialog(
-                        context: context,
-                        text: validated,
-                      );
-                    }
-                  },
                 ),
               Defaults.sizedBox.vertical.small,
               const Divider(),
