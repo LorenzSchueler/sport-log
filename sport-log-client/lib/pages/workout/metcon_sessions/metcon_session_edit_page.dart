@@ -188,6 +188,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("finished"),
+                    Defaults.sizedBox.horizontal.normal,
                     SizedBox(
                       height: 20,
                       width: 34,

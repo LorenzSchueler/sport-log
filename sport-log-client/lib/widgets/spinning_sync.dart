@@ -55,7 +55,10 @@ class _SpinningSyncState extends State<SpinningSync>
       turns: _controller,
       child: IconButton(
         onPressed: widget.onPressed,
-        icon: const Icon(AppIcons.syncClockwise),
+        icon: Transform.scale(
+          scaleX: -1,
+          child: const Icon(AppIcons.sync),
+        ),
         color: widget.color,
       ),
     );
