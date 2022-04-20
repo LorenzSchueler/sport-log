@@ -105,6 +105,25 @@ class Validator {
     }
   }
 
+  /// incluse range [lowerBound, upperBound]
+  static String? validateIntBetween(
+    String? value,
+    int lowerBound,
+    int upperBound,
+  ) {
+    if (value == null || value.isEmpty) {
+      return "Field must not be empty.";
+    }
+    int? intValue = int.tryParse(value);
+    if (intValue == null) {
+      return "Number is invalid.";
+    } else if (intValue < lowerBound || intValue > upperBound) {
+      return "Number must be between $lowerBound and $upperBound";
+    } else {
+      return null;
+    }
+  }
+
   static String? validateIntGeZeroLtValue(String? value, int upperBound) {
     if (value == null || value.isEmpty) {
       return "Field must not be empty.";
