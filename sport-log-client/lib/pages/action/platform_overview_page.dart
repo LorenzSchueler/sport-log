@@ -100,12 +100,17 @@ class PlatformCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   platformDescription.platform.name,
                   style: Theme.of(context).textTheme.subtitle1,
                 ),
+                Defaults.sizedBox.horizontal.normal,
+                Icon(!platformDescription.platform.credential ||
+                        platformDescription.platformCredential != null
+                    ? AppIcons.check
+                    : AppIcons.close),
+                const Spacer(),
                 if (platformDescription.platform.credential)
                   IconButton(
                     padding: EdgeInsets.zero,
