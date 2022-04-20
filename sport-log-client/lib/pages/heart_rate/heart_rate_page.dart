@@ -59,12 +59,12 @@ class _HeartRatePageState extends State<HeartRatePage> {
                               _isSearchingHRMonitor = false;
                             });
                             if (devices == null || devices.isEmpty) {
-                              showSimpleToast(context, "no devices found");
+                              showSimpleToast(context, "No devices found.");
                             }
                           }
                         },
                   child: Text(
-                    _isSearchingHRMonitor ? "seaching..." : "search devices",
+                    _isSearchingHRMonitor ? "Seaching..." : "Search Devices",
                   ),
                 ),
                 Defaults.sizedBox.vertical.normal,
@@ -110,7 +110,7 @@ class _HeartRatePageState extends State<HeartRatePage> {
                       });
                       _heartRateUtils?.startHeartRateStream();
                     },
-                    child: const Text("connect"),
+                    child: const Text("Connect"),
                   ),
                 Defaults.sizedBox.vertical.huge,
                 if (_hr != null) ...[

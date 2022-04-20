@@ -120,76 +120,76 @@ class MapPageState extends State<MapPage> {
               right: 10,
               child: MapScale(metersPerPixel: _metersPerPixel),
             ),
-            if (_showOverlays) ...[
+            if (_showOverlays)
               Positioned(
-                top: 100,
+                top: 120,
                 right: 15,
-                child: FloatingActionButton.small(
-                  heroTag: null,
-                  child: const Icon(AppIcons.map),
-                  onPressed: () => showModalBottomSheet<void>(
-                    context: context,
-                    builder: (context) => Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        IconButton(
-                          icon: const Icon(AppIcons.map),
-                          onPressed: () {
-                            setState(() {
-                              mapStyle = Defaults.mapbox.style.outdoor;
-                            });
-                            Navigator.of(context).pop();
-                          },
+                child: Column(
+                  children: [
+                    FloatingActionButton.small(
+                      heroTag: null,
+                      child: const Icon(AppIcons.layers),
+                      onPressed: () => showModalBottomSheet<void>(
+                        context: context,
+                        builder: (context) => Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            IconButton(
+                              icon: const Icon(AppIcons.mountains),
+                              onPressed: () {
+                                setState(() {
+                                  mapStyle = Defaults.mapbox.style.outdoor;
+                                });
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(AppIcons.car),
+                              onPressed: () {
+                                setState(() {
+                                  mapStyle = Defaults.mapbox.style.street;
+                                });
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(AppIcons.satellite),
+                              onPressed: () {
+                                setState(() {
+                                  mapStyle = Defaults.mapbox.style.satellite;
+                                });
+                                Navigator.of(context).pop();
+                              },
+                            )
+                          ],
                         ),
-                        IconButton(
-                          icon: const Icon(AppIcons.car),
-                          onPressed: () {
-                            setState(() {
-                              mapStyle = Defaults.mapbox.style.street;
-                            });
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(AppIcons.satellite),
-                          onPressed: () {
-                            setState(() {
-                              mapStyle = Defaults.mapbox.style.satellite;
-                            });
-                            Navigator.of(context).pop();
-                          },
-                        )
-                      ],
+                      ),
                     ),
-                  ),
+                    FloatingActionButton.small(
+                      heroTag: null,
+                      child: Icon(
+                        _locationUtils.enabled
+                            ? AppIcons.myLocation
+                            : AppIcons.myLocationDisabled,
+                      ),
+                      onPressed: () async {
+                        if (_locationUtils.enabled) {
+                          _locationUtils.stopLocationStream();
+                          if (_circles.isNotEmpty) {
+                            await _mapController.removeCircles(_circles);
+                          }
+                          _circles = [];
+                        } else {
+                          await _locationUtils.startLocationStream();
+                        }
+                        if (mounted) {
+                          setState(() {});
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
-              Positioned(
-                top: 150,
-                right: 15,
-                child: FloatingActionButton.small(
-                  heroTag: null,
-                  foregroundColor: _locationUtils.enabled
-                      ? Theme.of(context).colorScheme.onPrimary
-                      : Theme.of(context).disabledColor,
-                  child: const Icon(AppIcons.location),
-                  onPressed: () async {
-                    if (_locationUtils.enabled) {
-                      _locationUtils.stopLocationStream();
-                      if (_circles.isNotEmpty) {
-                        await _mapController.removeCircles(_circles);
-                      }
-                      _circles = [];
-                    } else {
-                      await _locationUtils.startLocationStream();
-                    }
-                    if (mounted) {
-                      setState(() {});
-                    }
-                  },
-                ),
-              ),
-            ],
           ],
         ),
       ),

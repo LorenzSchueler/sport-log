@@ -76,8 +76,12 @@ class AppIcons {
   static const IconData car = Icons.directions_car_rounded;
   static const IconData satellite = Icons.satellite_rounded;
   static const IconData location = Icons.location_on;
+  static const IconData myLocation = Icons.my_location_rounded;
+  static const IconData myLocationDisabled = Icons.location_disabled_rounded;
   static const IconData battery = Icons.battery_std_rounded;
   static const IconData radio = Icons.radio_button_checked_rounded;
   static const IconData clock = Icons.access_time_rounded;
   static const IconData drawer = Icons.dehaze_rounded;
+  static const IconData mountains = Icons.filter_hdr_rounded;
+  static const IconData layers = Icons.layers_rounded;
 }
