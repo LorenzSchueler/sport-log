@@ -12,9 +12,9 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/picker/cardio_type_picker.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/picker/date_picker.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
+import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
 import 'package:sport_log/widgets/picker/route_picker.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -194,24 +194,14 @@ class CardioEditPageState extends State<CardioEditPage> {
                       .toHumanDateTime(),
                 ),
                 onTap: () async {
-                  DateTime? datetime = await showDatePickerWithDefaults(
+                  final datetime = await showDateTimePicker(
                     context: context,
-                    initialDate:
-                        _cardioSessionDescription.cardioSession.datetime,
+                    initial: _cardioSessionDescription.cardioSession.datetime,
                   );
-                  TimeOfDay? time = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.fromDateTime(
-                      _cardioSessionDescription.cardioSession.datetime,
-                    ),
-                  );
-                  if (datetime != null && time != null) {
-                    datetime = datetime.add(
-                      Duration(hours: time.hour, minutes: time.minute),
-                    );
+                  if (datetime != null) {
                     setState(() {
                       _cardioSessionDescription.cardioSession.datetime =
-                          datetime!;
+                          datetime;
                     });
                   }
                 },

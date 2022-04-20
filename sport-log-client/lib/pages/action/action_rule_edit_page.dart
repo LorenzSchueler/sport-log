@@ -13,6 +13,7 @@ import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/picker/action_picker.dart';
+import 'package:sport_log/widgets/picker/time_picker.dart';
 import 'package:sport_log/widgets/picker/weekday_picker.dart';
 
 class ActionRuleEditPage extends StatefulWidget {
@@ -136,12 +137,12 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
               caption: "Time",
               child: Text(_actionRule.time.formatTime),
               onTap: () async {
-                TimeOfDay? time = await showTimePicker(
+                DateTime? time = await showScrollableTimePicker(
                   context: context,
-                  initialTime: TimeOfDay.fromDateTime(_actionRule.time),
+                  initialTime: _actionRule.time,
                 );
                 if (time != null) {
-                  setState(() => _actionRule.time = time.toDateTime());
+                  setState(() => _actionRule.time = time);
                 }
               },
             ),

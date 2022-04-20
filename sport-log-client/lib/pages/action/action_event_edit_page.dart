@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart' hide Action;
-import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:sport_log/data_provider/data_providers/action_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -13,6 +12,7 @@ import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/picker/action_picker.dart';
+import 'package:sport_log/widgets/picker/datetime_picker.dart';
 
 class ActionEventEditPage extends StatefulWidget {
   const ActionEventEditPage({
@@ -125,22 +125,13 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
               child: Text(_actionEvent.datetime.toHumanDateTime()),
               leading: AppIcons.calendar,
               onTap: () async {
-                final date = await showRoundedDatePicker(
+                final datetime = await showDateTimePicker(
                   context: context,
-                  theme: Theme.of(context),
+                  initial: _actionEvent.datetime,
                 );
-                if (date != null) {
-                  final defaultTime = TimeOfDay.fromDateTime(
-                    _actionEvent.datetime,
-                  );
-                  final time = await showRoundedTimePicker(
-                    context: context,
-                    initialTime: defaultTime,
-                    theme: Theme.of(context),
-                  );
-                  final newDateTime = date.withTime(time ?? defaultTime);
+                if (datetime != null) {
                   setState(() {
-                    _actionEvent.datetime = newDateTime;
+                    _actionEvent.datetime = datetime;
                   });
                 }
               },
