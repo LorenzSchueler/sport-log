@@ -165,9 +165,11 @@ insert into movement (id, user_id, name, description, movement_dimension, cardio
     (140, null, 'V-Up', null, 'reps', false),
     (141, null, 'Hollow Rock', null, 'reps', false),
     (142, null, 'Hollow Hold', null, 'time', false),
-    (143, null, 'Single Under', null, 'reps', false), -- jump rope
-    (144, null, 'Double Under', null, 'reps', false),
-    (145, null, 'Tripple Under', null, 'reps', false);
+    (143, null, 'Ab Mat Sit Up', null, 'reps', false),
+    (144, null, 'Single Under', null, 'reps', false), -- jump rope
+    (145, null, 'Double Under', null, 'reps', false),
+    (146, null, 'Tripple Under', null, 'reps', false),
+    (147, null, 'Rest', null, 'time', false); -- rest
 
 insert into eorm (reps, percentage) values
     (1, 1.0),
@@ -202,17 +204,56 @@ insert into eorm (reps, percentage) values
     (30, 0.50);
 
 insert into metcon (id, user_id, name, metcon_type, rounds, timecap, description) values
-    (1, null, 'Cindy', 'amrap', null, 1200000, null),
-    (2, null, 'Murph', 'for_time', 1, null, 'wear a weight vest (20/ 14 pounds)'),
-    (3, null, '5k Row', 'for_time', 1, 1800000, null);
+    (1, null, 'Barbara', 'for_time', 5, NULL, NULL),
+    (2, null, 'Chelsea', 'emom', 30, 1800000, NULL),
+    (3, null, 'Mary', 'amrap', NULL, 1200000, NULL),
+    (4, null, 'Cindy', 'amrap', NULL, 1200000, NULL),
+    (5, null, 'Annie', 'for_time', 1, NULL, NULL),
+    (6, null, 'Nicole', 'amrap', NULL, 1200000, NULL),
+    (7, null, 'Angie', 'for_time', 1, NULL, NULL),
+    (8, null, 'Kelly', 'for_time', 5, NULL, NULL),
+    (9, null, 'Eva', 'for_time', 5, NULL, NULL),
+    (10, null, 'Helen', 'for_time', 3, NULL, NULL),
+    (11, null, 'Karen', 'for_time', 1, NULL, NULL);
 
 insert into metcon_movement (id, metcon_id, movement_id, distance_unit, movement_number, count, male_weight, female_weight) values
-    (1, 1, 10, null, 0, 5, null, null),
-    (2, 1, 11, null, 1, 10, null, null),
-    (3, 1, 12, null, 2, 15, null, null),
-    (4, 2, 5, null, 0, 1, 9, 6),
-    (5, 2, 10, null, 1, 100, 9, 6),
-    (6, 2, 11, null, 2, 200, 9, 6),
-    (7, 2, 12, null, 3, 300, 9, 6),
-    (8, 2, 5, null, 4, 1, 9, 6),
-    (9, 3, 8, 'km', 0, 5, null, null);
+    (1, 1, 107, null, 0, 20, NULL, NULL),
+    (2, 1, 97, null, 1, 30, NULL, NULL),
+    (3, 1, 143, null, 2, 40, NULL, NULL),
+    (4, 1, 95, null, 3, 50, NULL, NULL),
+    (5, 1, 147, null, 4, 180000, NULL, NULL),
+    (6, 2, 107, null, 0, 5, NULL, NULL),
+    (7, 2, 97, null, 1, 10, NULL, NULL),
+    (8, 2, 95, null, 2, 15, NULL, NULL),
+    (9, 3, 101, null, 0, 5, NULL, NULL),
+    (10, 3, 96, null, 1, 10, NULL, NULL),
+    (11, 3, 107, null, 2, 15, NULL, NULL),
+    (12, 4, 107, null, 0, 5, NULL, NULL),
+    (13, 4, 97, null, 1, 10, NULL, NULL),
+    (14, 4, 95, null, 2, 15, NULL, NULL),
+    (15, 5, 145, null, 0, 50, NULL, NULL),
+    (16, 5, 143, null, 1, 50, NULL, NULL),
+    (17, 5, 145, null, 2, 40, NULL, NULL),
+    (18, 5, 143, null, 3, 40, NULL, NULL),
+    (19, 5, 145, null, 4, 30, NULL, NULL),
+    (20, 5, 143, null, 5, 30, NULL, NULL),
+    (21, 5, 145, null, 6, 20, NULL, NULL),
+    (22, 5, 143, null, 7, 20, NULL, NULL),
+    (23, 5, 145, null, 8, 10, NULL, NULL),
+    (24, 5, 143, null, 9, 10, NULL, NULL),
+    (25, 6, 1, 'meter', 0, 400, NULL, NULL),
+    (26, 6, 107, null, 1, 5, NULL, NULL),
+    (27, 7, 107, null, 0, 100, NULL, NULL),
+    (28, 7, 97, null, 1, 100, NULL, NULL),
+    (29, 7, 143, null, 2, 100, NULL, NULL),
+    (30, 7, 95, null, 3, 100, NULL, NULL),
+    (31, 8, 1, 'meter', 0, 400, NULL, NULL),
+    (32, 8, 130, null, 1, 30, NULL, NULL),
+    (33, 8, 124, null, 2, 30, 9, 6),
+    (34, 9, 1, 'meter', 0, 800, NULL, NULL),
+    (35, 9, 83, null, 1, 30, 32, 24),
+    (36, 9, 107, null, 2, 30, NULL, NULL),
+    (37, 10, 1, 'meter', 0, 400, NULL, NULL),
+    (38, 10, 83, null, 1, 21, 24, 16),
+    (39, 10, 107, null, 2, 12, NULL, NULL),
+    (40, 11, 124, null, 0, 150, 9, 6);
