@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -56,15 +57,24 @@ class MetconMovementDescription extends CompoundEntity {
   }
 
   String get movementText {
-    String text = "${movement.name} ${metconMovement.count} ";
-    text += movement.dimension == MovementDimension.distance
-        ? metconMovement.distanceUnit!.displayName
-        : movement.dimension.displayName;
-    if (metconMovement.maleWeight != null &&
-        metconMovement.femaleWeight != null) {
-      text +=
-          " @ ${metconMovement.maleWeight}/${metconMovement.femaleWeight} kg";
+    final count = movement.dimension == MovementDimension.time
+        ? Duration(milliseconds: metconMovement.count).formatTimeShort
+        : "${metconMovement.count}";
+
+    final String unit;
+    if (movement.dimension == MovementDimension.distance) {
+      unit = metconMovement.distanceUnit!.displayName;
+    } else if (movement.dimension == MovementDimension.time) {
+      unit = "";
+    } else {
+      unit = movement.dimension.displayName;
     }
-    return text;
+
+    final weight = metconMovement.maleWeight != null &&
+            metconMovement.femaleWeight != null
+        ? " @ ${metconMovement.maleWeight}/${metconMovement.femaleWeight} kg"
+        : "";
+
+    return "${movement.name}: $count $unit $weight";
   }
 }

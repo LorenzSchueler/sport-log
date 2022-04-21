@@ -71,6 +71,9 @@ class MetconDescription extends CompoundEntity {
   void sanitize() {
     metcon.sanitize();
     for (final move in moves) {
+      if (move.movement.dimension != MovementDimension.distance) {
+        move.metconMovement.distanceUnit = null;
+      }
       move.sanitize();
     }
   }
