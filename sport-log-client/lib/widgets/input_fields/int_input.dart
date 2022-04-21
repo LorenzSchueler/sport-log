@@ -26,12 +26,20 @@ class IntInput extends StatefulWidget {
 class _IntInputState extends State<IntInput> {
   late int _value;
 
-  bool _showFormField = false;
+  late final TextEditingController _textController;
 
   @override
   void initState() {
     _value = widget.initialValue;
+    _textController = TextEditingController(text: _value.toString());
     super.initState();
+  }
+
+  void _setValue(int value) {
+    setState(() => _value = value);
+    _textController.text = _value.toString();
+    FocusScope.of(context).requestFocus(FocusNode()); // unfocus
+    widget.setValue?.call(_value);
   }
 
   @override
@@ -43,66 +51,46 @@ class _IntInputState extends State<IntInput> {
           icon: const Icon(AppIcons.subtractBox),
           onClick: widget.setValue == null || _value <= widget.minValue
               ? null
-              : () {
-                  setState(() {
-                    _value -= widget.stepSize;
-                    _showFormField = false;
-                  });
-                  widget.setValue?.call(_value);
-                },
+              : () => _setValue(_value - widget.stepSize),
         ),
         SizedBox(
           width: 70,
-          child: _showFormField
-              ? Focus(
-                  child: TextFormField(
-                    initialValue: "$_value",
-                    autofocus: true,
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-                    enabled: widget.setValue != null,
-                    onChanged: (value) {
-                      final validated = Validator.validateIntBetween(
-                        value,
-                        widget.minValue,
-                        widget.maxValue,
-                      );
-                      if (validated == null) {
-                        final v = int.parse(value);
-                        setState(() => _value = v);
-                        widget.setValue?.call(_value);
-                      }
-                    },
-                    decoration: const InputDecoration(
-                      isDense: true,
-                    ),
-                    style: Theme.of(context).textTheme.subtitle1,
-                  ),
-                  onFocusChange: (focus) =>
-                      setState(() => _showFormField = focus),
-                )
-              : GestureDetector(
-                  onTap: () => setState(
-                    () => _showFormField = true,
-                  ),
-                  child: Text(
-                    "$_value",
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.subtitle1,
-                  ),
-                ),
+          child: Focus(
+            child: TextFormField(
+              controller: _textController,
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.center,
+              enabled: widget.setValue != null,
+              onChanged: (value) {
+                if (Validator.validateIntBetween(
+                      value,
+                      widget.minValue,
+                      widget.maxValue,
+                    ) ==
+                    null) {
+                  final v = int.parse(value);
+                  setState(() => _value = v);
+                }
+              },
+              decoration: const InputDecoration(
+                isCollapsed: true,
+                isDense: true,
+                border: InputBorder.none,
+              ),
+              style: Theme.of(context).textTheme.subtitle1,
+            ),
+            onFocusChange: (focus) {
+              if (!focus) {
+                widget.setValue?.call(_value);
+              }
+            },
+          ),
         ),
         RepeatIconButton(
           icon: const Icon(AppIcons.addBox),
           onClick: widget.setValue == null || _value >= widget.maxValue
               ? null
-              : () {
-                  setState(() {
-                    _value += widget.stepSize;
-                    _showFormField = false;
-                  });
-                  widget.setValue?.call(_value);
-                },
+              : () => _setValue(_value + widget.stepSize),
         ),
       ],
     );
