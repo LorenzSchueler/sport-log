@@ -39,6 +39,7 @@ class User extends NonDeletableAtomicEntity {
   @override
   bool isValidBeforeSanitazion() {
     return validate(username.isNotEmpty, 'User: username is empty') &&
+        validate(username.length >= 2, 'User: username.length < 2') &&
         validate(password.isNotEmpty, 'User: password is empty') &&
         validate(
           Validator.validateEmail(email) == null,

@@ -27,6 +27,8 @@ class Validator {
   static String? validateUsername(String? username) {
     if (username == null || username.isEmpty) {
       return "Username must not be empty.";
+    } else if (username.length < 2) {
+      return "Username must at least be 2 characters long.";
     } else if (username.contains(':')) {
       return "Username must not contain ':'.";
     } else {
