@@ -226,7 +226,13 @@ class SettingsPageState extends State<SettingsPage> {
                             ),
                           ),
                           child: const Text('Delete Account'),
-                          onPressed: null,
+                          onPressed: sync.isSyncing
+                              ? null
+                              : () async {
+                                  await Account.delete();
+                                  await Navigator.of(context)
+                                      .newBase(Routes.landing);
+                                },
                         ),
                       ),
                     ],

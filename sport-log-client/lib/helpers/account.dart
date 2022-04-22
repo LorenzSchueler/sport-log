@@ -73,4 +73,18 @@ class Account {
     await Settings.setDefaults(override: true);
     await AppDatabase.reset();
   }
+
+  static ApiResult<void> delete() async {
+    Sync.instance.stopSync();
+    final result = await Api.user.deleteSingle();
+    if (result.isSuccess) {
+      Settings.lastSync = null;
+      Settings.user = null;
+      await Settings.setDefaults(override: true);
+      await AppDatabase.reset();
+      return Success(null);
+    } else {
+      return Failure(result.failure);
+    }
+  }
 }
