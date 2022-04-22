@@ -266,11 +266,9 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
             labelText: 'Comment',
             icon: const Icon(AppIcons.edit),
             suffixIcon: IconButton(
-              onPressed: () async {
-                setState(
-                  () => _strengthSessionDescription.session.comments = null,
-                );
-              },
+              onPressed: () => setState(
+                () => _strengthSessionDescription.session.comments = null,
+              ),
               icon: const Icon(AppIcons.close),
             ),
           ),

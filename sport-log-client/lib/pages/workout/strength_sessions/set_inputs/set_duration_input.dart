@@ -261,7 +261,6 @@ class PaddedIntInput extends StatefulWidget {
     required this.caption,
     required this.numberOfDigits,
     this.submitOnDigitsReached = false,
-    // TODO: not necessary
     this.onSubmitted,
     this.maxValue,
   })  : assert(numberOfDigits > 0),

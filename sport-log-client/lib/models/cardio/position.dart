@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:latlong2/latlong.dart' as latlong;
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:sport_log/helpers/extensions/iterable_extension.dart';
+import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/clone_extensions.dart';
 
@@ -106,31 +106,9 @@ class Position {
   }
 }
 
-extension TrackLatLngBounds on List<Position> {
-  LatLngBounds? get latLngBounds {
-    if (isEmpty) {
-      return null;
-    }
-    double north = map((p) => p.latitude).max;
-    double south = map((p) => p.latitude).min;
-    double latDiff = north - south;
-    north += latDiff * 0.1;
-    south -= latDiff * 0.1;
+extension TrackExtension on List<Position> {
+  LatLngBounds? get latLngBounds => map((p) => p.latLng).toList().latLngBounds;
 
-    double east = map((p) => p.longitude).max;
-    double west = map((p) => p.longitude).min;
-    double longDiff = east - west;
-    east += longDiff * 0.1;
-    west -= longDiff * 0.1;
-
-    return LatLngBounds(
-      northeast: LatLng(north, east),
-      southwest: LatLng(south, west),
-    );
-  }
-}
-
-extension TrackToLatLngs on List<Position> {
   List<LatLng> get latLngs {
     return map((pos) => pos.latLng).toList();
   }
