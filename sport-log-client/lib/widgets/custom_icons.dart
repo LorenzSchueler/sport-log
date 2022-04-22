@@ -24,10 +24,6 @@
 ///         Author:    Dave Gandy
 ///         License:   SIL ()
 ///         Homepage:  http://fortawesome.github.com/Font-Awesome/
-/// * Octicons, Copyright (C) 2020 by GitHub Inc.
-///         Author:    GitHub
-///         License:   MIT (http://opensource.org/licenses/mit-license.php)
-///         Homepage:  https://primer.style/octicons/
 ///
 import 'package:flutter/widgets.dart';
 
@@ -52,11 +48,10 @@ class CustomIcons {
       IconData(0xf0e4, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData food =
       IconData(0xf0f5, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData compass =
+      IconData(0xf14e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData heartbeat =
       IconData(0xf21e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  // ignore: constant_identifier_names
-  static const IconData sync_icon =
-      IconData(0xf328, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData weight =
       IconData(0xf496, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData route =
