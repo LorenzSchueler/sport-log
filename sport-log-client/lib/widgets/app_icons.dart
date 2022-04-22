@@ -12,7 +12,6 @@ class AppIcons {
   static const IconData dumbbell = CustomIcons.dumbbell;
   static const IconData plan = CustomIcons.plan;
   static const IconData repeat = CustomIcons.cw;
-  //static const IconData syncClockwise = CustomIcons.sync_icon;
   static const IconData timeInterval = CustomIcons.time_interval;
   static const IconData github = CustomIcons.github;
   static const IconData gauge = CustomIcons.gauge;
@@ -22,6 +21,7 @@ class AppIcons {
   static const IconData route = CustomIcons.route;
   static const IconData ruler = CustomIcons.ruler_horizontal;
   static const IconData medal = CustomIcons.medal;
+  static const IconData compass = CustomIcons.compass;
 
   // actions
   static const IconData add = Icons.add_rounded;

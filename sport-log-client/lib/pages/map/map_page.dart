@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:location/location.dart';
@@ -165,6 +166,7 @@ class MapPageState extends State<MapPage> {
                         ),
                       ),
                     ),
+                    Defaults.sizedBox.vertical.normal,
                     FloatingActionButton.small(
                       heroTag: null,
                       child: Icon(
@@ -186,6 +188,12 @@ class MapPageState extends State<MapPage> {
                           setState(() {});
                         }
                       },
+                    ),
+                    Defaults.sizedBox.vertical.normal,
+                    FloatingActionButton.small(
+                      heroTag: null,
+                      child: const Icon(AppIcons.compass),
+                      onPressed: () => _mapController.setNorth(),
                     ),
                   ],
                 ),
