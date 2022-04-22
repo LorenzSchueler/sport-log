@@ -4,13 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mapbox_search/mapbox_search.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/never_pop.dart';
@@ -25,12 +28,17 @@ class MapPage extends StatefulWidget {
 class MapPageState extends State<MapPage> {
   late LocationUtils _locationUtils;
   late MapboxMapController _mapController;
+  final _searchBar = FocusNode();
+  final placesSearch =
+      PlacesSearch(apiKey: Config.instance.accessToken, limit: 10);
+
   bool _showOverlays = true;
+  String? _search;
+  List<MapBoxPlace> _searchResults = [];
+  bool _searchResultsVisible = false;
 
   List<Circle> _circles = [];
-
   double _metersPerPixel = 1;
-
   String mapStyle = Defaults.mapbox.style.outdoor;
 
   @override
@@ -96,13 +104,44 @@ class MapPageState extends State<MapPage> {
                     },
                   ),
                 ),
-                foregroundColor: Theme.of(context).colorScheme.background,
-                backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-                elevation: 0,
+                title: _search == null
+                    ? null
+                    : TextFormField(
+                        focusNode: _searchBar,
+                        onChanged: (name) async {
+                          _search = name;
+                          final places = await placesSearch.getPlaces(_search!);
+                          setState(() {
+                            _searchResults = places ?? [];
+                            _searchResultsVisible = true;
+                          });
+                        },
+                        decoration: Theme.of(context).textFormFieldDecoration,
+                      ),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _search = _search == null ? "" : null;
+                        if (_search == null) {
+                          _searchResults = [];
+                          _searchResultsVisible = false;
+                        }
+                      });
+                      if (_search != null) {
+                        _searchBar.requestFocus();
+                      }
+                    },
+                    icon: Icon(
+                      _search != null ? AppIcons.close : AppIcons.search,
+                    ),
+                  ),
+                ],
               )
             : null,
         drawer: const MainDrawer(selectedRoute: Routes.map),
         body: Stack(
+          alignment: Alignment.center,
           children: [
             MapboxMap(
               accessToken: Config.instance.accessToken,
@@ -195,6 +234,60 @@ class MapPageState extends State<MapPage> {
                       onPressed: () => _mapController.setNorth(),
                     ),
                   ],
+                ),
+              ),
+            if (_showOverlays && _searchResultsVisible)
+              Positioned(
+                top: 56,
+                right: 0,
+                left: 0,
+                child: Container(
+                  padding: Defaults.edgeInsets.normal,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(10),
+                      bottomRight: Radius.circular(10),
+                    ),
+                  ),
+                  constraints: const BoxConstraints(maxHeight: 200),
+                  child: Scrollbar(
+                    child: ListView.separated(
+                      padding: EdgeInsets.zero,
+                      itemBuilder: (context, index) => GestureDetector(
+                        onTap: () {
+                          setState(() => _searchResultsVisible = false);
+                          FocusScope.of(context)
+                              .requestFocus(FocusNode()); // unfocus
+                          final coords = _searchResults[index].center!;
+                          final latLng = LatLng(coords[1], coords[0]);
+                          _mapController
+                              .animateCamera(CameraUpdate.newLatLng(latLng));
+
+                          final bbox = _searchResults[index].bbox;
+                          if (bbox != null) {
+                            final bounds = [
+                              LatLng(bbox[1], bbox[0]),
+                              LatLng(bbox[3], bbox[2])
+                            ].latLngBounds!;
+                            _mapController.animateCamera(
+                              CameraUpdate.newLatLngBounds(bounds),
+                            );
+                          } else {
+                            _mapController
+                                .animateCamera(CameraUpdate.zoomTo(16));
+                          }
+                        },
+                        child: Text(
+                          _searchResults[index].toString(),
+                          style: Theme.of(context).textTheme.subtitle1,
+                        ),
+                      ),
+                      itemCount: _searchResults.length,
+                      separatorBuilder: (context, index) => const Divider(),
+                      shrinkWrap: true,
+                    ),
+                  ),
                 ),
               ),
           ],
