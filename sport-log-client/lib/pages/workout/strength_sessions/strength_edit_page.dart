@@ -246,9 +246,8 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         initialDuration: _strengthSessionDescription.session.interval!,
       ),
       leading: AppIcons.timeInterval,
-      onCancel: () {
-        setState(() => _strengthSessionDescription.session.interval = null);
-      },
+      onCancel: () =>
+          setState(() => _strengthSessionDescription.session.interval = null),
     );
   }
 

@@ -49,98 +49,89 @@ class _CountWeightInputState extends State<CountWeightInput> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            EditTile(
-              leading: null,
-              caption: widget.countUnit == null
-                  ? widget.countLabel
-                  : "${widget.countLabel} (${widget.countUnit!})",
-              child: IntInput(
-                initialValue: _count,
-                setValue: (count) {
-                  setState(() => _count = count);
-                  if (!widget.confirmChanges) {
-                    widget.setValue(_count, _weight, _secondWeight);
-                  }
-                },
-              ),
-            ),
-            Row(
-              children: [
-                Column(
-                  children: [
-                    _weight == null
-                        ? ActionChip(
-                            avatar: const Icon(AppIcons.add),
-                            label: const Text("Add Weight"),
-                            onPressed: () {
-                              setState(() {
-                                _weight = 0;
-                                _secondWeight = 0;
-                              });
-                              if (!widget.confirmChanges) {
-                                widget.setValue(_count, _weight, _secondWeight);
-                              }
-                            },
-                          )
-                        : EditTile(
-                            leading: null,
-                            caption:
-                                widget.secondWeight ? "Male Weight" : "Weight",
-                            child: DoubleInput(
-                              initialValue: _weight!,
-                              stepSize: Settings.weightIncrement,
-                              setValue: (weight) {
-                                setState(() => _weight = weight);
-                                if (!widget.confirmChanges) {
-                                  widget.setValue(
-                                    _count,
-                                    _weight,
-                                    _secondWeight,
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                    if (widget.secondWeight && _secondWeight != null)
-                      EditTile(
-                        leading: null,
-                        caption: "Female Weight",
-                        child: DoubleInput(
-                          initialValue: _secondWeight!,
-                          stepSize: Settings.weightIncrement,
-                          setValue: (weight) {
-                            setState(() => _secondWeight = weight);
-                            if (!widget.confirmChanges) {
-                              widget.setValue(_count, _weight, _secondWeight);
-                            }
-                          },
-                        ),
-                      ),
-                  ],
+        SizedBox(
+          width: 160,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              EditTile(
+                leading: null,
+                caption: widget.countUnit == null
+                    ? widget.countLabel
+                    : "${widget.countLabel} (${widget.countUnit!})",
+                child: IntInput(
+                  initialValue: _count,
+                  setValue: (count) {
+                    setState(() => _count = count);
+                    if (!widget.confirmChanges) {
+                      widget.setValue(_count, _weight, _secondWeight);
+                    }
+                  },
                 ),
-                if (_weight != null) ...[
-                  Defaults.sizedBox.horizontal.normal,
-                  IconButton(
-                    icon: const Icon(AppIcons.close),
-                    onPressed: () {
-                      setState(() {
-                        _weight = null;
-                        _secondWeight = null;
-                      });
+              ),
+              if (_weight != null)
+                EditTile(
+                  leading: null,
+                  caption: widget.secondWeight ? "Male Weight" : "Weight",
+                  child: DoubleInput(
+                    initialValue: _weight!,
+                    stepSize: Settings.weightIncrement,
+                    setValue: (weight) {
+                      setState(() => _weight = weight);
+                      if (!widget.confirmChanges) {
+                        widget.setValue(
+                          _count,
+                          _weight,
+                          _secondWeight,
+                        );
+                      }
+                    },
+                  ),
+                ),
+              if (widget.secondWeight && _secondWeight != null)
+                EditTile(
+                  leading: null,
+                  caption: "Female Weight",
+                  child: DoubleInput(
+                    initialValue: _secondWeight!,
+                    stepSize: Settings.weightIncrement,
+                    setValue: (weight) {
+                      setState(() => _secondWeight = weight);
                       if (!widget.confirmChanges) {
                         widget.setValue(_count, _weight, _secondWeight);
                       }
                     },
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
                   ),
-                ],
-              ],
-            )
-          ],
+                ),
+              _weight == null
+                  ? ActionChip(
+                      avatar: const Icon(AppIcons.add),
+                      label: const Text("Add Weight"),
+                      onPressed: () {
+                        setState(() {
+                          _weight = 0;
+                          _secondWeight = 0;
+                        });
+                        if (!widget.confirmChanges) {
+                          widget.setValue(_count, _weight, _secondWeight);
+                        }
+                      },
+                    )
+                  : ActionChip(
+                      avatar: const Icon(AppIcons.close),
+                      label: const Text("Remove Weight"),
+                      onPressed: () {
+                        setState(() {
+                          _weight = null;
+                          _secondWeight = null;
+                        });
+                        if (!widget.confirmChanges) {
+                          widget.setValue(_count, _weight, _secondWeight);
+                        }
+                      },
+                    ),
+            ],
+          ),
         ),
         if (widget.confirmChanges)
           Expanded(
