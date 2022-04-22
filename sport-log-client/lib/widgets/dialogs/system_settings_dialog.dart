@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/app.dart';
 
-Future<bool?> showSystemSettingsDialog({required String text}) {
-  return showDialog<bool>(
+Future<bool> showSystemSettingsDialog({required String text}) async {
+  final ignore = await showDialog<bool>(
     context: App.globalContext,
     builder: (context) => SystemSettingsDialog(text: text),
   );
+  return ignore == null || ignore;
 }
 
 class SystemSettingsDialog extends StatelessWidget {

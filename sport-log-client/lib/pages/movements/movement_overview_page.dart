@@ -124,12 +124,12 @@ class MovementCard extends StatelessWidget {
       onTap: () async {
         if (movementDescription.movement.userId != null) {
           if (movementDescription.hasReference) {
-            final bool? approved = await showApproveDialog(
+            final approved = await showApproveDialog(
               context,
               'Warning',
               'Changes will be reflected in existing workouts.',
             );
-            if (approved == null || !approved) return;
+            if (!approved) return;
           }
           await Navigator.pushNamed(
             context,

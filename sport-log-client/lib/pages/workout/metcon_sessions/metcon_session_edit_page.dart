@@ -90,8 +90,8 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
         ),
         leading: IconButton(
           onPressed: () async {
-            final bool? approved = await showDiscardWarningDialog(context);
-            if (approved != null && approved) {
+            final approved = await showDiscardWarningDialog(context);
+            if (approved) {
               Navigator.pop(context);
             }
           },

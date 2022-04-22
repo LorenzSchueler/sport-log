@@ -20,7 +20,7 @@ class LocationUtils {
       final ignore = await showSystemSettingsDialog(
         text: "In order to track your location GPS must be enabled.",
       );
-      if (ignore == null || ignore) {
+      if (ignore) {
         return false;
       }
     }
@@ -38,7 +38,7 @@ class LocationUtils {
           text:
               "In order to track your location the permission needs to be 'allowed'",
         );
-        if (ignore == null || ignore) {
+        if (ignore) {
           return false;
         }
       }
@@ -47,7 +47,7 @@ class LocationUtils {
           text:
               "In order to track your location while the screen is off the permission needs to be set to 'always allow'",
         );
-        if (ignore == null || ignore) {
+        if (ignore) {
           return false;
         }
       }

@@ -212,12 +212,12 @@ class SettingsPageState extends State<SettingsPage> {
                           onPressed: sync.isSyncing
                               ? null
                               : () async {
-                                  final appoved = await showApproveDialog(
+                                  final approved = await showApproveDialog(
                                     context,
                                     "Logout",
                                     "Make sure you know you credentials before logging out. Otherwise you will lose access to your account and all your data.",
                                   );
-                                  if (appoved != null && appoved) {
+                                  if (approved) {
                                     await Account.logout();
                                     await Navigator.of(context)
                                         .newBase(Routes.landing);
@@ -237,12 +237,12 @@ class SettingsPageState extends State<SettingsPage> {
                           onPressed: sync.isSyncing
                               ? null
                               : () async {
-                                  final appoved = await showApproveDialog(
+                                  final approved = await showApproveDialog(
                                     context,
                                     "Delete Account",
                                     "If you delete your account all data will be permanently lost.",
                                   );
-                                  if (appoved != null && appoved) {
+                                  if (approved) {
                                     await Account.delete();
                                     await Navigator.of(context)
                                         .newBase(Routes.landing);

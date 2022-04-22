@@ -29,7 +29,7 @@ class HeartRateUtils {
         text:
             "In order to discover heart rate monitors bluetooth must be enabled.",
       );
-      if (ignore == null || ignore) {
+      if (ignore) {
         return null;
       }
       await AppSettings.openBluetoothSettings();

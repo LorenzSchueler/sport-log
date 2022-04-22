@@ -18,7 +18,7 @@ class StepCountUtils {
         text:
             "In order to record your steps 'Activity Recognition' must be allowed.",
       );
-      if (ignore == null || ignore) {
+      if (ignore) {
         return false;
       }
     }

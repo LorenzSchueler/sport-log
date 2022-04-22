@@ -271,8 +271,8 @@ class RouteEditPageState extends State<RouteEditPage> {
         title: Text(widget.route != null ? "Edit Route" : "Create Route"),
         leading: IconButton(
           onPressed: () async {
-            final bool? approved = await showDiscardWarningDialog(context);
-            if (approved != null && approved) {
+            final approved = await showDiscardWarningDialog(context);
+            if (approved) {
               Navigator.pop(context);
             }
           },
