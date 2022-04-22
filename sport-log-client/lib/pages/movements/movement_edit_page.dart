@@ -3,6 +3,7 @@ import 'package:sport_log/data_provider/data_providers/movement_data_provider.da
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/movement/all.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/input_fields/selection_bar.dart';
@@ -140,23 +141,23 @@ class _MovementEditPageState extends State<MovementEditPage> {
                             focusNode: _descriptionFocusNode,
                             keyboardType: TextInputType.multiline,
                             minLines: 1,
-                            maxLines: null,
+                            maxLines: 5,
                             onChanged: (description) => setState(
                               () => _movementDescription.movement.description =
                                   description,
                             ),
-                            decoration: InputDecoration(
-                              contentPadding:
-                                  const EdgeInsets.symmetric(vertical: 5),
-                              labelText: "Description",
-                              suffixIcon: IconButton(
-                                icon: const Icon(AppIcons.close),
-                                onPressed: () => setState(
-                                  () => _movementDescription
-                                      .movement.description = null,
+                            decoration: Theme.of(context)
+                                .textFormFieldDecoration
+                                .copyWith(
+                                  labelText: "Description",
+                                  suffixIcon: IconButton(
+                                    icon: const Icon(AppIcons.close),
+                                    onPressed: () => setState(
+                                      () => _movementDescription
+                                          .movement.description = null,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
                           ),
                         ),
                       ],
@@ -184,10 +185,9 @@ class _MovementEditPageState extends State<MovementEditPage> {
       style: Theme.of(context).textTheme.headline6,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-        labelText: "Name",
-        contentPadding: EdgeInsets.symmetric(vertical: 5),
-      ),
+      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+            labelText: "Name",
+          ),
     );
   }
 

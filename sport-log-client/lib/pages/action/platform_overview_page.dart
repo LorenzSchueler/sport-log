@@ -3,6 +3,7 @@ import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/platform/platform_credential.dart';
 import 'package:sport_log/models/platform/platform_description.dart';
@@ -220,11 +221,10 @@ class PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
         );
       },
       initialValue: platformDescription.platformCredential!.username,
-      decoration: const InputDecoration(
-        icon: Icon(AppIcons.account),
-        labelText: "Username",
-        contentPadding: EdgeInsets.symmetric(vertical: 5),
-      ),
+      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+            icon: const Icon(AppIcons.account),
+            labelText: "Username",
+          ),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.emailAddress,
@@ -239,11 +239,10 @@ class PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
         );
       },
       initialValue: platformDescription.platformCredential!.password,
-      decoration: const InputDecoration(
-        icon: Icon(AppIcons.key),
-        labelText: "Password",
-        contentPadding: EdgeInsets.symmetric(vertical: 5),
-      ),
+      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+            icon: const Icon(AppIcons.key),
+            labelText: "Password",
+          ),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       textInputAction: TextInputAction.done,
       obscureText: true,

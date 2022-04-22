@@ -7,6 +7,7 @@ import 'package:sport_log/models/action/action.dart';
 import 'package:sport_log/models/action/action_event.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -137,13 +138,11 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
               },
             ),
             TextFormField(
-              decoration: const InputDecoration(
-                icon: Icon(AppIcons.comment),
-                labelText: "Arguments",
-                contentPadding: EdgeInsets.symmetric(vertical: 5),
-              ),
+              decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                    icon: const Icon(AppIcons.comment),
+                    labelText: "Arguments",
+                  ),
               initialValue: _actionEvent.arguments,
-              keyboardType: TextInputType.multiline,
               onChanged: (arguments) =>
                   _actionEvent.arguments = arguments.isEmpty ? null : arguments,
             ),

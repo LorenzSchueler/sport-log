@@ -177,3 +177,10 @@ class AppTheme {
         1,
       );
 }
+
+extension ThemeDataExtension on ThemeData {
+  InputDecoration get textFormFieldDecoration => const InputDecoration(
+        contentPadding: EdgeInsets.symmetric(vertical: 5),
+        border: InputBorder.none,
+      );
+}

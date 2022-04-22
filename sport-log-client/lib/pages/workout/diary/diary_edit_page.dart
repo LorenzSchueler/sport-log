@@ -4,6 +4,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/diary/diary.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/picker/date_picker.dart';
@@ -107,11 +108,10 @@ class DiaryEditPageState extends State<DiaryEditPage> {
                 },
               ),
               TextFormField(
-                decoration: const InputDecoration(
-                  icon: Icon(AppIcons.weight),
-                  labelText: "Bodyweight",
-                  contentPadding: EdgeInsets.symmetric(vertical: 5),
-                ),
+                decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                      icon: const Icon(AppIcons.weight),
+                      labelText: "Bodyweight",
+                    ),
                 initialValue: _diary.bodyweight?.toStringAsFixed(1),
                 validator: (weight) {
                   if (weight == null || weight.isEmpty) {
@@ -133,11 +133,10 @@ class DiaryEditPageState extends State<DiaryEditPage> {
                 },
               ),
               TextFormField(
-                decoration: const InputDecoration(
-                  icon: Icon(AppIcons.comment),
-                  labelText: "Comments",
-                  contentPadding: EdgeInsets.symmetric(vertical: 5),
-                ),
+                decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                      icon: const Icon(AppIcons.comment),
+                      labelText: "Comments",
+                    ),
                 initialValue: _diary.comments,
                 keyboardType: TextInputType.multiline,
                 minLines: 1,

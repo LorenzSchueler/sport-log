@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
@@ -145,10 +146,9 @@ class _MetconEditPageState extends State<MetconEditPage> {
       style: Theme.of(context).textTheme.headline6,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-        labelText: "Name",
-        contentPadding: EdgeInsets.symmetric(vertical: 5),
-      ),
+      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+            labelText: "Name",
+          ),
     );
   }
 
@@ -169,19 +169,19 @@ class _MetconEditPageState extends State<MetconEditPage> {
               focusNode: _descriptionFocusNode,
               keyboardType: TextInputType.multiline,
               minLines: 1,
+              maxLines: 5,
               onChanged: (description) => setState(
                 () => _metconDescription.metcon.description = description,
               ),
-              decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(vertical: 5),
-                labelText: "Description",
-                suffixIcon: IconButton(
-                  icon: const Icon(AppIcons.close),
-                  onPressed: () => setState(
-                    () => _metconDescription.metcon.description = null,
+              decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                    labelText: "Description",
+                    suffixIcon: IconButton(
+                      icon: const Icon(AppIcons.close),
+                      onPressed: () => setState(
+                        () => _metconDescription.metcon.description = null,
+                      ),
+                    ),
                   ),
-                ),
-              ),
             ),
           );
   }

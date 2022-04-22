@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 Future<Route?> showRoutePicker({
@@ -78,20 +79,19 @@ class RoutePickerDialogState extends State<RoutePickerDialog> {
       child: TextFormField(
         initialValue: _search,
         onChanged: _update,
-        decoration: InputDecoration(
-          labelText: 'Search',
-          prefixIcon: const Icon(AppIcons.search),
-          border: InputBorder.none,
-          suffixIcon: _search.isNotEmpty
-              ? IconButton(
-                  onPressed: () => Navigator.pushNamed(
-                    context,
-                    Routes.cardio.routeEdit,
-                  ),
-                  icon: const Icon(AppIcons.add),
-                )
-              : null,
-        ),
+        decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+              labelText: 'Search',
+              prefixIcon: const Icon(AppIcons.search),
+              suffixIcon: _search.isNotEmpty
+                  ? IconButton(
+                      onPressed: () => Navigator.pushNamed(
+                        context,
+                        Routes.cardio.routeEdit,
+                      ),
+                      icon: const Icon(AppIcons.add),
+                    )
+                  : null,
+            ),
       ),
     );
   }

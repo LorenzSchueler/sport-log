@@ -9,6 +9,7 @@ import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
@@ -90,20 +91,19 @@ class _LoginPageState extends State<LoginPage> {
         }
       },
       controller: _serverUrlInputController,
-      decoration: InputDecoration(
-        icon: const Icon(AppIcons.cloudUpload),
-        labelText: "Server URL",
-        contentPadding: const EdgeInsets.symmetric(vertical: 5),
-        suffixIcon: IconButton(
-          onPressed: () async {
-            await Settings.setDefaultServerUrl();
-            setState(() {
-              _serverUrlInputController.text = Settings.serverUrl;
-            });
-          },
-          icon: const Icon(AppIcons.restore),
-        ),
-      ),
+      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+            icon: const Icon(AppIcons.cloudUpload),
+            labelText: "Server URL",
+            suffixIcon: IconButton(
+              onPressed: () async {
+                await Settings.setDefaultServerUrl();
+                setState(() {
+                  _serverUrlInputController.text = Settings.serverUrl;
+                });
+              },
+              icon: const Icon(AppIcons.restore),
+            ),
+          ),
       validator: Validator.validateUrl,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
@@ -122,11 +122,10 @@ class _LoginPageState extends State<LoginPage> {
           setState(() => _username = username);
         }
       },
-      decoration: const InputDecoration(
-        icon: Icon(AppIcons.account),
-        labelText: "Username",
-        contentPadding: EdgeInsets.symmetric(vertical: 5),
-      ),
+      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+            icon: const Icon(AppIcons.account),
+            labelText: "Username",
+          ),
       validator: Validator.validateUsername,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
@@ -145,11 +144,10 @@ class _LoginPageState extends State<LoginPage> {
           setState(() => _password = password);
         }
       },
-      decoration: const InputDecoration(
-        icon: Icon(AppIcons.key),
-        labelText: "Password",
-        contentPadding: EdgeInsets.symmetric(vertical: 5),
-      ),
+      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+            icon: const Icon(AppIcons.key),
+            labelText: "Password",
+          ),
       validator: Validator.validatePassword,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
@@ -170,11 +168,10 @@ class _LoginPageState extends State<LoginPage> {
           setState(() => _password2 = password2);
         }
       },
-      decoration: const InputDecoration(
-        icon: Icon(AppIcons.key),
-        labelText: "Repeat password",
-        contentPadding: EdgeInsets.symmetric(vertical: 5),
-      ),
+      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+            icon: const Icon(AppIcons.key),
+            labelText: "Repeat password",
+          ),
       validator: (password2) =>
           Validator.validatePassword2(_password, password2),
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -195,11 +192,10 @@ class _LoginPageState extends State<LoginPage> {
           setState(() => _email = email);
         }
       },
-      decoration: const InputDecoration(
-        icon: Icon(AppIcons.email),
-        labelText: "Email",
-        contentPadding: EdgeInsets.symmetric(vertical: 5),
-      ),
+      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+            icon: const Icon(AppIcons.email),
+            labelText: "Email",
+          ),
       validator: Validator.validateEmail,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,

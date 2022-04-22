@@ -8,6 +8,7 @@ import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/models/action/action_rule.dart';
 import 'package:sport_log/models/action/weekday.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -147,13 +148,11 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
               },
             ),
             TextFormField(
-              decoration: const InputDecoration(
-                icon: Icon(AppIcons.comment),
-                labelText: "Arguments",
-                contentPadding: EdgeInsets.symmetric(vertical: 5),
-              ),
+              decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                    icon: const Icon(AppIcons.comment),
+                    labelText: "Arguments",
+                  ),
               initialValue: _actionRule.arguments,
-              keyboardType: TextInputType.multiline,
               onChanged: (arguments) =>
                   _actionRule.arguments = arguments.isEmpty ? null : arguments,
             ),

@@ -9,6 +9,7 @@ import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
@@ -260,17 +261,17 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         setState(() => _strengthSessionDescription.session.comments = text);
       },
       initialValue: _strengthSessionDescription.session.comments,
-      decoration: InputDecoration(
-        labelText: 'Comment',
-        icon: const Icon(AppIcons.edit),
-        contentPadding: const EdgeInsets.symmetric(vertical: 5),
-        suffixIcon: IconButton(
-          onPressed: () async {
-            setState(() => _strengthSessionDescription.session.comments = null);
-          },
-          icon: const Icon(AppIcons.close),
-        ),
-      ),
+      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+            labelText: 'Comment',
+            icon: const Icon(AppIcons.edit),
+            suffixIcon: IconButton(
+              onPressed: () async {
+                setState(
+                    () => _strengthSessionDescription.session.comments = null);
+              },
+              icon: const Icon(AppIcons.close),
+            ),
+          ),
       onEditingComplete: () {
         _commentsNode.unfocus();
         setState(() => _strengthSessionDescription.session.comments = null);

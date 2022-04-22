@@ -10,6 +10,7 @@ import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:mapbox_api/mapbox_api.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -353,10 +354,10 @@ class RouteEditPageState extends State<RouteEditPage> {
                     initialValue: _route.name,
                     validator: Validator.validateStringNotEmpty,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
-                    decoration: const InputDecoration(
-                      labelText: "Name",
-                      contentPadding: EdgeInsets.symmetric(vertical: 5),
-                    ),
+                    decoration:
+                        Theme.of(context).textFormFieldDecoration.copyWith(
+                              labelText: "Name",
+                            ),
                   ),
                 ),
               ],

@@ -19,6 +19,7 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 class CardioTrackingPage extends StatefulWidget {
@@ -223,11 +224,16 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Save Recording"),
-        content: TextField(
-          onSubmitted: (comments) => setState(
+        content: TextFormField(
+          onChanged: (comments) => setState(
             () => _cardioSessionDescription.cardioSession.comments = comments,
           ),
-          decoration: const InputDecoration(hintText: "Comments"),
+          decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                labelText: "Comments",
+              ),
+          keyboardType: TextInputType.multiline,
+          minLines: 1,
+          maxLines: 5,
         ),
         actions: [
           TextButton(

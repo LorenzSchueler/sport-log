@@ -4,6 +4,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 bool _dialogShown = false;
@@ -88,11 +89,10 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
           setState(() => _username = username);
         }
       },
-      decoration: const InputDecoration(
-        icon: Icon(AppIcons.account),
-        labelText: "Username",
-        contentPadding: EdgeInsets.symmetric(vertical: 5),
-      ),
+      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+            icon: const Icon(AppIcons.account),
+            labelText: "Username",
+          ),
       validator: Validator.validateUsername,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
@@ -114,11 +114,10 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
           setState(() => _password = password);
         }
       },
-      decoration: const InputDecoration(
-        icon: Icon(AppIcons.key),
-        labelText: "Password",
-        contentPadding: EdgeInsets.symmetric(vertical: 5),
-      ),
+      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+            icon: const Icon(AppIcons.key),
+            labelText: "Password",
+          ),
       validator: Validator.validatePassword,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,

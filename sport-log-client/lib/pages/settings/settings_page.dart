@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
@@ -70,11 +71,11 @@ class SettingsPageState extends State<SettingsPage> {
               ),
               if (Settings.syncEnabled)
                 TextFormField(
-                  decoration: const InputDecoration(
-                    icon: Icon(AppIcons.cloudUpload),
-                    labelText: "Server URL",
-                    contentPadding: EdgeInsets.symmetric(vertical: 5),
-                  ),
+                  decoration:
+                      Theme.of(context).textFormFieldDecoration.copyWith(
+                            icon: const Icon(AppIcons.cloudUpload),
+                            labelText: "Server URL",
+                          ),
                   initialValue: Settings.serverUrl,
                   validator: Validator.validateUrl,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -113,11 +114,10 @@ class SettingsPageState extends State<SettingsPage> {
               const Divider(),
               const CaptionTile(caption: "Account"),
               TextFormField(
-                decoration: const InputDecoration(
-                  icon: Icon(AppIcons.account),
-                  labelText: "Username",
-                  contentPadding: EdgeInsets.symmetric(vertical: 5),
-                ),
+                decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                      icon: const Icon(AppIcons.account),
+                      labelText: "Username",
+                    ),
                 initialValue: Settings.username,
                 validator: Validator.validateUsername,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -141,11 +141,10 @@ class SettingsPageState extends State<SettingsPage> {
                 },
               ),
               TextFormField(
-                decoration: const InputDecoration(
-                  icon: Icon(AppIcons.key),
-                  labelText: "Password",
-                  contentPadding: EdgeInsets.symmetric(vertical: 5),
-                ),
+                decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                      icon: const Icon(AppIcons.key),
+                      labelText: "Password",
+                    ),
                 initialValue: Settings.password,
                 validator: Validator.validatePassword,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -169,11 +168,10 @@ class SettingsPageState extends State<SettingsPage> {
                 },
               ),
               TextFormField(
-                decoration: const InputDecoration(
-                  icon: Icon(AppIcons.email),
-                  labelText: "Email",
-                  contentPadding: EdgeInsets.symmetric(vertical: 5),
-                ),
+                decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                      icon: const Icon(AppIcons.email),
+                      labelText: "Email",
+                    ),
                 initialValue: Settings.email,
                 validator: Validator.validateEmail,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -288,11 +286,10 @@ class SettingsPageState extends State<SettingsPage> {
                 leading: AppIcons.sync,
               ),
               TextFormField(
-                decoration: const InputDecoration(
-                  icon: Icon(AppIcons.timeInterval),
-                  labelText: "Weight Increment",
-                  contentPadding: EdgeInsets.symmetric(vertical: 5),
-                ),
+                decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                      icon: const Icon(AppIcons.timeInterval),
+                      labelText: "Weight Increment",
+                    ),
                 keyboardType: TextInputType.number,
                 initialValue: Settings.weightIncrement.toString(),
                 validator: Validator.validateDoubleGtZero,

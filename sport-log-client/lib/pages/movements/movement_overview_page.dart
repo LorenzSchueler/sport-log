@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/routes.dart';
@@ -63,6 +64,7 @@ class _MovementsPageState extends State<MovementsPage> {
                     _movementName = name;
                     _update();
                   },
+                  decoration: Theme.of(context).textFormFieldDecoration,
                 ),
           actions: [
             IconButton(
