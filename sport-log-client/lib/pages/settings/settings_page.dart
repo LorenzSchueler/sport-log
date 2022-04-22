@@ -295,10 +295,10 @@ class SettingsPageState extends State<SettingsPage> {
                 validator: Validator.validateDoubleGtZero,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 onFieldSubmitted: (increment) async {
-                  final validated = Validator.validateDoubleGtZero(increment);
-                  if (validated == null) {
-                    final weightIncrement = double.parse(increment);
-                    setState(() => Settings.weightIncrement = weightIncrement);
+                  if (Validator.validateDoubleGtZero(increment) == null) {
+                    setState(
+                      () => Settings.weightIncrement = double.parse(increment),
+                    );
                   }
                 },
               ),

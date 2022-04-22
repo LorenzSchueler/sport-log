@@ -113,24 +113,19 @@ class DiaryEditPageState extends State<DiaryEditPage> {
                       labelText: "Bodyweight",
                     ),
                 initialValue: _diary.bodyweight?.toStringAsFixed(1),
-                validator: (weight) {
-                  if (weight == null || weight.isEmpty) {
-                    return null;
-                  }
-                  return Validator.validateDoubleGtZero(weight);
-                },
+                validator: (weight) => weight == null || weight.isEmpty
+                    ? null
+                    : Validator.validateDoubleGtZero(weight),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 keyboardType: TextInputType.number,
-                onChanged: (bodyweight) {
+                onChanged: (bodyweight) => setState(() {
                   if (bodyweight.isEmpty) {
-                    setState(() => _diary.bodyweight = null);
+                    _diary.bodyweight = null;
                   } else if (Validator.validateDoubleGtZero(bodyweight) ==
                       null) {
-                    setState(
-                      () => _diary.bodyweight = double.parse(bodyweight),
-                    );
+                    _diary.bodyweight = double.parse(bodyweight);
                   }
-                },
+                }),
               ),
               TextFormField(
                 decoration: Theme.of(context).textFormFieldDecoration.copyWith(

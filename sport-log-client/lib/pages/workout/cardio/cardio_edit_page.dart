@@ -6,6 +6,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/page_return.dart';
+import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/settings.dart';
@@ -226,9 +227,17 @@ class CardioEditPageState extends State<CardioEditPage> {
               ),
               TextFormField(
                 keyboardType: TextInputType.number,
+                validator: (distance) => distance == null || distance.isEmpty
+                    ? null
+                    : Validator.validateDoubleGtZero(distance),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (distance) => setState(() {
-                  _cardioSessionDescription.cardioSession.distance =
-                      (double.parse(distance) * 1000).round();
+                  if (distance.isEmpty) {
+                    _cardioSessionDescription.cardioSession.distance = null;
+                  } else if (Validator.validateDoubleGtZero(distance) == null) {
+                    _cardioSessionDescription.cardioSession.distance =
+                        (double.parse(distance) * 1000).round();
+                  }
                 }),
                 initialValue:
                     _cardioSessionDescription.cardioSession.distance == null
@@ -243,9 +252,17 @@ class CardioEditPageState extends State<CardioEditPage> {
               ),
               TextFormField(
                 keyboardType: TextInputType.number,
+                validator: (ascent) => ascent == null || ascent.isEmpty
+                    ? null
+                    : Validator.validateIntGeZero(ascent),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (ascent) => setState(() {
-                  _cardioSessionDescription.cardioSession.ascent =
-                      int.parse(ascent);
+                  if (ascent.isEmpty) {
+                    _cardioSessionDescription.cardioSession.distance = null;
+                  } else if (Validator.validateIntGeZero(ascent) == null) {
+                    _cardioSessionDescription.cardioSession.ascent =
+                        int.parse(ascent);
+                  }
                 }),
                 initialValue:
                     _cardioSessionDescription.cardioSession.ascent?.toString(),
@@ -256,9 +273,17 @@ class CardioEditPageState extends State<CardioEditPage> {
               ),
               TextFormField(
                 keyboardType: TextInputType.number,
+                validator: (descent) => descent == null || descent.isEmpty
+                    ? null
+                    : Validator.validateIntGeZero(descent),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (descent) => setState(() {
-                  _cardioSessionDescription.cardioSession.descent =
-                      int.parse(descent);
+                  if (descent.isEmpty) {
+                    _cardioSessionDescription.cardioSession.distance = null;
+                  } else if (Validator.validateIntGeZero(descent) == null) {
+                    _cardioSessionDescription.cardioSession.descent =
+                        int.parse(descent);
+                  }
                 }),
                 initialValue:
                     _cardioSessionDescription.cardioSession.descent?.toString(),
@@ -279,9 +304,17 @@ class CardioEditPageState extends State<CardioEditPage> {
               ),
               TextFormField(
                 keyboardType: TextInputType.number,
+                validator: (calories) => calories == null || calories.isEmpty
+                    ? null
+                    : Validator.validateIntGtZero(calories),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (calories) => setState(() {
-                  _cardioSessionDescription.cardioSession.calories =
-                      int.parse(calories);
+                  if (calories.isEmpty) {
+                    _cardioSessionDescription.cardioSession.distance = null;
+                  } else if (Validator.validateIntGtZero(calories) == null) {
+                    _cardioSessionDescription.cardioSession.calories =
+                        int.parse(calories);
+                  }
                 }),
                 initialValue: _cardioSessionDescription.cardioSession.calories
                     ?.toString(),
@@ -292,9 +325,18 @@ class CardioEditPageState extends State<CardioEditPage> {
               ),
               TextFormField(
                 keyboardType: TextInputType.number,
+                validator: (avgCadence) =>
+                    avgCadence == null || avgCadence.isEmpty
+                        ? null
+                        : Validator.validateIntGtZero(avgCadence),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (avgCadence) => setState(() {
-                  _cardioSessionDescription.cardioSession.avgCadence =
-                      int.parse(avgCadence);
+                  if (avgCadence.isEmpty) {
+                    _cardioSessionDescription.cardioSession.distance = null;
+                  } else if (Validator.validateIntGtZero(avgCadence) == null) {
+                    _cardioSessionDescription.cardioSession.avgCadence =
+                        int.parse(avgCadence);
+                  }
                 }),
                 initialValue: _cardioSessionDescription.cardioSession.avgCadence
                     ?.toString(),
@@ -305,9 +347,19 @@ class CardioEditPageState extends State<CardioEditPage> {
               ),
               TextFormField(
                 keyboardType: TextInputType.number,
+                validator: (avgHeartRate) =>
+                    avgHeartRate == null || avgHeartRate.isEmpty
+                        ? null
+                        : Validator.validateIntGtZero(avgHeartRate),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (avgHeartRate) => setState(() {
-                  _cardioSessionDescription.cardioSession.avgHeartRate =
-                      int.parse(avgHeartRate);
+                  if (avgHeartRate.isEmpty) {
+                    _cardioSessionDescription.cardioSession.distance = null;
+                  } else if (Validator.validateIntGtZero(avgHeartRate) ==
+                      null) {
+                    _cardioSessionDescription.cardioSession.avgHeartRate =
+                        int.parse(avgHeartRate);
+                  }
                 }),
                 initialValue: _cardioSessionDescription
                     .cardioSession.avgHeartRate

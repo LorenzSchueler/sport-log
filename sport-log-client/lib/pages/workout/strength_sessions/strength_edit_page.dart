@@ -256,7 +256,9 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     assert(_strengthSessionDescription.session.comments != null);
     return TextFormField(
       focusNode: _commentsNode,
-      maxLines: null,
+      keyboardType: TextInputType.multiline,
+      minLines: null,
+      maxLines: 5,
       onChanged: (text) {
         setState(() => _strengthSessionDescription.session.comments = text);
       },
@@ -267,7 +269,8 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
             suffixIcon: IconButton(
               onPressed: () async {
                 setState(
-                    () => _strengthSessionDescription.session.comments = null);
+                  () => _strengthSessionDescription.session.comments = null,
+                );
               },
               icon: const Icon(AppIcons.close),
             ),
