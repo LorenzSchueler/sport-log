@@ -37,36 +37,39 @@ class EditTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final widget = Row(
-      children: [
-        if (leading != null) ...[
-          Icon(leading, color: Colors.white70),
-          const SizedBox(width: 15),
-        ],
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (caption != null) CaptionTile(caption: caption!),
-            DefaultTextStyle(
-              child: child,
-              style: Theme.of(context).textTheme.subtitle1!,
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Row(
+        children: [
+          if (leading != null) ...[
+            Icon(leading, color: Colors.white70),
+            const SizedBox(width: 15),
           ],
-        ),
-        if (onCancel != null) ...[
-          const Spacer(),
-          IconButton(
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            onPressed: onCancel,
-            icon: const Icon(
-              AppIcons.close,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (caption != null) CaptionTile(caption: caption!),
+                DefaultTextStyle(
+                  child: child,
+                  style: Theme.of(context).textTheme.subtitle1!,
+                ),
+              ],
             ),
           ),
-        ]
-      ],
+          if (onCancel != null) ...[
+            const Spacer(),
+            IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              onPressed: onCancel,
+              icon: const Icon(
+                AppIcons.close,
+              ),
+            ),
+          ]
+        ],
+      ),
     );
-
-    return onTap == null ? widget : InkWell(onTap: onTap, child: widget);
   }
 }
