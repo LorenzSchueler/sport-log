@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/input_fields/text_tile.dart';
@@ -211,9 +212,16 @@ class SettingsPageState extends State<SettingsPage> {
                           onPressed: sync.isSyncing
                               ? null
                               : () async {
-                                  await Account.logout();
-                                  await Navigator.of(context)
-                                      .newBase(Routes.landing);
+                                  final appoved = await showApproveDialog(
+                                    context,
+                                    "Logout",
+                                    "Make sure you know you credentials before logging out. Otherwise you will lose access to your account and all your data.",
+                                  );
+                                  if (appoved != null && appoved) {
+                                    await Account.logout();
+                                    await Navigator.of(context)
+                                        .newBase(Routes.landing);
+                                  }
                                 },
                         ),
                       ),
@@ -229,9 +237,16 @@ class SettingsPageState extends State<SettingsPage> {
                           onPressed: sync.isSyncing
                               ? null
                               : () async {
-                                  await Account.delete();
-                                  await Navigator.of(context)
-                                      .newBase(Routes.landing);
+                                  final appoved = await showApproveDialog(
+                                    context,
+                                    "Delete Account",
+                                    "If you delete your account all data will be permanently lost.",
+                                  );
+                                  if (appoved != null && appoved) {
+                                    await Account.delete();
+                                    await Navigator.of(context)
+                                        .newBase(Routes.landing);
+                                  }
                                 },
                         ),
                       ),
