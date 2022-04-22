@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
+import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -108,7 +110,7 @@ class SettingsPageState extends State<SettingsPage> {
                 ),
               Defaults.sizedBox.vertical.small,
               const Divider(),
-              const CaptionTile(caption: "User Settings"),
+              const CaptionTile(caption: "Account"),
               TextFormField(
                 decoration: const InputDecoration(
                   icon: Icon(AppIcons.account),
@@ -193,6 +195,44 @@ class SettingsPageState extends State<SettingsPage> {
                     setState(() {});
                   }
                 },
+              ),
+              Consumer<Sync>(
+                builder: (context, sync, _) => TextTile(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                              Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                          child: const Text('Logout'),
+                          onPressed: sync.isSyncing
+                              ? null
+                              : () async {
+                                  await Account.logout();
+                                  await Navigator.of(context)
+                                      .newBase(Routes.landing);
+                                },
+                        ),
+                      ),
+                      Defaults.sizedBox.horizontal.normal,
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                              Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                          child: const Text('Delete Account'),
+                          onPressed: null,
+                        ),
+                      ),
+                    ],
+                  ),
+                  leading: AppIcons.logout,
+                ),
               ),
               Defaults.sizedBox.vertical.small,
               const Divider(),
