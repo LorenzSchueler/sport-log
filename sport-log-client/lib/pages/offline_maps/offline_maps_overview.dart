@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/routes.dart';
@@ -225,58 +226,59 @@ class RegionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     late MapboxMapController _sessionMapController;
 
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Column(
-        children: [
-          //Text(region.metadata.toString()),
-          //Text(region.definition.toString()),
-          Stack(
-            children: [
-              SizedBox(
-                height: 150,
-                child: MapboxMap(
-                  accessToken: Config.instance.accessToken,
-                  styleString: Defaults.mapbox.style.outdoor,
-                  initialCameraPosition: Settings.lastMapPosition,
-                  rotateGesturesEnabled: false,
-                  tiltGesturesEnabled: false,
-                  scrollGesturesEnabled: false,
-                  zoomGesturesEnabled: false,
-                  onMapCreated: (MapboxMapController controller) =>
-                      _sessionMapController = controller,
-                  onStyleLoadedCallback: () async {
-                    await _sessionMapController.moveCamera(
-                      CameraUpdate.newLatLngBounds(
-                        [
-                          region.definition.bounds.northeast,
-                          region.definition.bounds.southwest
-                        ].latLngBounds!,
-                      ),
-                    );
-                    await _sessionMapController.addBoundingBoxLine(
-                      region.definition.bounds.northeast,
-                      region.definition.bounds.southwest,
-                    );
-                  },
+    return Stack(
+      children: [
+        SizedBox(
+          height: 150,
+          child: MapboxMap(
+            accessToken: Config.instance.accessToken,
+            styleString: Defaults.mapbox.style.outdoor,
+            initialCameraPosition: Settings.lastMapPosition,
+            rotateGesturesEnabled: false,
+            tiltGesturesEnabled: false,
+            scrollGesturesEnabled: false,
+            zoomGesturesEnabled: false,
+            onMapCreated: (MapboxMapController controller) =>
+                _sessionMapController = controller,
+            onStyleLoadedCallback: () async {
+              await _sessionMapController.moveCamera(
+                CameraUpdate.newLatLngBounds(
+                  [
+                    region.definition.bounds.northeast,
+                    region.definition.bounds.southwest
+                  ].latLngBounds!,
                 ),
-              ),
-              Positioned(
-                top: 10,
-                right: 10,
-                child: FloatingActionButton.small(
-                  heroTag: null,
-                  child: const Icon(AppIcons.delete),
-                  onPressed: () async {
-                    await deleteOfflineRegion(region.id);
-                    onDelete();
-                  },
-                ),
-              ),
-            ],
+              );
+              await _sessionMapController.addBoundingBoxLine(
+                region.definition.bounds.northeast,
+                region.definition.bounds.southwest,
+              );
+            },
           ),
-        ],
-      ),
+        ),
+        Positioned(
+          top: 10,
+          left: 10,
+          child: Text(
+            DateTime.parse(region.metadata["datetime"] as String).toHumanDate(),
+            style: Theme.of(context).textTheme.subtitle2!.copyWith(
+                  color: Theme.of(context).colorScheme.background,
+                ),
+          ),
+        ),
+        Positioned(
+          top: 10,
+          right: 10,
+          child: FloatingActionButton.small(
+            heroTag: null,
+            child: const Icon(AppIcons.delete),
+            onPressed: () async {
+              await deleteOfflineRegion(region.id);
+              onDelete();
+            },
+          ),
+        ),
+      ],
     );
   }
 }
