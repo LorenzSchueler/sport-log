@@ -14,6 +14,22 @@ extension MapControllerExtension on MapboxMapController {
     }
   }
 
+  Future<Line> addBoundingBoxLine(LatLng point1, LatLng point2) {
+    return addLine(
+      LineOptions(
+        lineColor: Defaults.mapbox.trackLineColor,
+        lineWidth: 2,
+        geometry: [
+          LatLng(point1.latitude, point1.longitude),
+          LatLng(point1.latitude, point2.longitude),
+          LatLng(point2.latitude, point2.longitude),
+          LatLng(point2.latitude, point1.longitude),
+          LatLng(point1.latitude, point1.longitude)
+        ],
+      ),
+    );
+  }
+
   Future<Line> addRouteLine(List<Position> track) {
     return addLine(
       LineOptions(
