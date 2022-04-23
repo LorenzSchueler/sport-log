@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
@@ -21,8 +21,6 @@ class OfflineMapsPage extends StatefulWidget {
 }
 
 class OfflineMapsPageState extends State<OfflineMapsPage> {
-  final _logger = Logger('OfflineMapsPage');
-
   late MapboxMapController _mapController;
 
   LatLng? _point1;
@@ -33,6 +31,14 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
 
   double? _progress;
 
+  List<OfflineRegion> _regions = [];
+
+  @override
+  void initState() {
+    _updateRegions();
+    super.initState();
+  }
+
   @override
   void dispose() {
     if (_mapController.cameraPosition != null) {
@@ -41,21 +47,24 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
     super.dispose();
   }
 
-  void _onMapDownload(DownloadRegionStatus status) {
+  Future<void> _updateRegions() async {
+    final regions =
+        await getListOfRegions(accessToken: Config.instance.accessToken);
+    setState(() => _regions = regions);
+  }
+
+  Future<void> _onMapDownload(DownloadRegionStatus status) async {
     if (status.runtimeType == Success) {
-      setState(() {
-        _progress = null;
-      });
-      showMessageDialog(context: context, text: "Download Successful");
+      setState(() => _progress = null);
+      await showMessageDialog(context: context, text: "Download Successful");
+      await _updateRegions();
+      await _updatePoint2(null);
+      await _updatePoint1(null);
     } else if (status.runtimeType == InProgress) {
-      setState(() {
-        _progress = (status as InProgress).progress;
-      });
+      setState(() => _progress = (status as InProgress).progress);
     } else if (status.runtimeType == Error) {
-      setState(() {
-        _progress = null;
-      });
-      showMessageDialog(context: context, text: "Download Failed");
+      setState(() => _progress = null);
+      await showMessageDialog(context: context, text: "Download Failed");
     }
   }
 
@@ -69,7 +78,6 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
         min(_point1!.latitude, _point2!.latitude),
         min(_point1!.longitude, _point2!.longitude),
       );
-      _logger.i("northwest: $northeast\n southeast: $southwest");
       downloadOfflineRegion(
         OfflineRegionDefinition(
           bounds: LatLngBounds(
@@ -82,12 +90,15 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
         ),
         onEvent: _onMapDownload,
         accessToken: Config.instance.accessToken,
+        metadata: <String, dynamic>{
+          "datetime": DateTime.now().toIso8601String()
+        },
       );
     } else {
       showMessageDialog(
         context: context,
         text:
-            "Please set two points to form a BoundingBox by long pressing on the map.",
+            "Please mark two points to form a bounding box by long pressing on the map.",
       );
     }
   }
@@ -119,19 +130,8 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
     }
     if (_point2 != null) {
       _point2Marker = await _mapController.addLocationMarker(_point2!);
-      _boundingBoxLine = await _mapController.addLine(
-        LineOptions(
-          lineColor: Defaults.mapbox.trackLineColor,
-          lineWidth: 2,
-          geometry: [
-            LatLng(_point1!.latitude, _point1!.longitude),
-            LatLng(_point1!.latitude, _point2!.longitude),
-            LatLng(_point2!.latitude, _point2!.longitude),
-            LatLng(_point2!.latitude, _point1!.longitude),
-            LatLng(_point1!.latitude, _point1!.longitude)
-          ],
-        ),
-      );
+      _boundingBoxLine =
+          await _mapController.addBoundingBoxLine(_point1!, _point2!);
     }
   }
 
@@ -172,25 +172,110 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
                 )
               ],
             ),
-            Container(
-              padding: Defaults.edgeInsets.normal,
-              child: _progress == null
-                  ? ElevatedButton(
-                      onPressed: _downloadMap,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(AppIcons.download),
-                          Text("Download")
-                        ],
+            Expanded(
+              child: Container(
+                padding: Defaults.edgeInsets.normal,
+                child: Column(
+                  children: [
+                    _progress == null
+                        ? ElevatedButton(
+                            onPressed: _downloadMap,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(AppIcons.download),
+                                Text("Download")
+                              ],
+                            ),
+                          )
+                        : LinearProgressIndicator(
+                            value: _progress ?? 0.3,
+                          ),
+                    Defaults.sizedBox.vertical.normal,
+                    Expanded(
+                      child: ListView.separated(
+                        itemBuilder: (_, index) => RegionCard(
+                          region: _regions[index],
+                          onDelete: _updateRegions,
+                        ),
+                        separatorBuilder: (_, __) =>
+                            Defaults.sizedBox.vertical.normal,
+                        itemCount: _regions.length,
                       ),
-                    )
-                  : LinearProgressIndicator(
-                      value: _progress ?? 0.3,
                     ),
-            )
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class RegionCard extends StatelessWidget {
+  final OfflineRegion region;
+  final void Function() onDelete;
+
+  const RegionCard({required this.region, required this.onDelete, Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    late MapboxMapController _sessionMapController;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Column(
+        children: [
+          //Text(region.metadata.toString()),
+          //Text(region.definition.toString()),
+          Stack(
+            children: [
+              SizedBox(
+                height: 150,
+                child: MapboxMap(
+                  accessToken: Config.instance.accessToken,
+                  styleString: Defaults.mapbox.style.outdoor,
+                  initialCameraPosition: Settings.lastMapPosition,
+                  rotateGesturesEnabled: false,
+                  tiltGesturesEnabled: false,
+                  scrollGesturesEnabled: false,
+                  zoomGesturesEnabled: false,
+                  onMapCreated: (MapboxMapController controller) =>
+                      _sessionMapController = controller,
+                  onStyleLoadedCallback: () async {
+                    await _sessionMapController.moveCamera(
+                      CameraUpdate.newLatLngBounds(
+                        [
+                          region.definition.bounds.northeast,
+                          region.definition.bounds.southwest
+                        ].latLngBounds!,
+                      ),
+                    );
+                    await _sessionMapController.addBoundingBoxLine(
+                      region.definition.bounds.northeast,
+                      region.definition.bounds.southwest,
+                    );
+                  },
+                ),
+              ),
+              Positioned(
+                top: 10,
+                right: 10,
+                child: FloatingActionButton.small(
+                  heroTag: null,
+                  child: const Icon(AppIcons.delete),
+                  onPressed: () async {
+                    await deleteOfflineRegion(region.id);
+                    onDelete();
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
