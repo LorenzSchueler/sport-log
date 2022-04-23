@@ -1,23 +1,36 @@
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
 import 'package:sport_log/models/cardio/position.dart';
 
 extension MapControllerExtension on MapboxMapController {
   Future<void> setNorth() => animateCamera(CameraUpdate.bearingTo(0));
 
-  Future<void> setBounds(LatLngBounds bounds) =>
-      moveCamera(CameraUpdate.newLatLngBounds(bounds));
+  Future<void> setBounds(LatLngBounds bounds, {required bool padded}) {
+    if (padded) {
+      bounds = bounds.padded();
+    }
+    return moveCamera(CameraUpdate.newLatLngBounds(bounds));
+  }
 
-  Future<void> animateBounds(LatLngBounds bounds) =>
-      animateCamera(CameraUpdate.newLatLngBounds(bounds));
+  Future<void> animateBounds(LatLngBounds bounds, {required bool padded}) {
+    if (padded) {
+      bounds = bounds.padded();
+    }
+    return animateCamera(CameraUpdate.newLatLngBounds(bounds));
+  }
 
   Future<void> setBoundsFromTracks(
     List<Position>? track1,
-    List<Position>? track2,
-  ) async {
-    final bounds = LatLngBoundsCombine.combinedBounds(track1, track2);
+    List<Position>? track2, {
+    required bool padded,
+  }) async {
+    final bounds = LatLngBoundsCombine.combinedBounds(
+      track1?.latLngBounds,
+      track2?.latLngBounds,
+    );
     if (bounds != null) {
-      await setBounds(bounds);
+      await setBounds(bounds, padded: padded);
     }
   }
 

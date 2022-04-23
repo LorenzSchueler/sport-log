@@ -5,7 +5,6 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
@@ -62,7 +61,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
       await _updatePoint2(null);
       await _updatePoint1(null);
     } else if (status.runtimeType == InProgress) {
-      setState(() => _progress = (status as InProgress).progress);
+      setState(() => _progress = (status as InProgress).progress / 100);
     } else if (status.runtimeType == Error) {
       setState(() => _progress = null);
       await showMessageDialog(context: context, text: "Download Failed");
@@ -241,7 +240,10 @@ class RegionCard extends StatelessWidget {
             onMapCreated: (MapboxMapController controller) =>
                 _sessionMapController = controller,
             onStyleLoadedCallback: () async {
-              await _sessionMapController.setBounds(region.definition.bounds);
+              await _sessionMapController.setBounds(
+                region.definition.bounds,
+                padded: true,
+              );
               await _sessionMapController.addBoundingBoxLine(
                 region.definition.bounds.northeast,
                 region.definition.bounds.southwest,

@@ -223,6 +223,7 @@ class CardioSessionCard extends StatelessWidget {
                         _sessionMapController.setBoundsFromTracks(
                           cardioSessionDescription.cardioSession.track,
                           cardioSessionDescription.route?.track,
+                          padded: true,
                         );
                         if (cardioSessionDescription.cardioSession.track !=
                             null) {

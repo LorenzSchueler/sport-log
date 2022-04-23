@@ -143,6 +143,7 @@ class RouteCard extends StatelessWidget {
                         _sessionMapController.setBoundsFromTracks(
                           route.track,
                           null,
+                          padded: true,
                         );
                         if (route.track != null) {
                           _sessionMapController.addRouteLine(route.track!);

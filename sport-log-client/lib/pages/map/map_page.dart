@@ -269,7 +269,7 @@ class MapPageState extends State<MapPage> {
                               LatLng(bbox[1], bbox[0]),
                               LatLng(bbox[3], bbox[2])
                             ].latLngBounds!;
-                            _mapController.animateBounds(bounds);
+                            _mapController.animateBounds(bounds, padded: false);
                           } else {
                             _mapController.animateZoom(16);
                           }

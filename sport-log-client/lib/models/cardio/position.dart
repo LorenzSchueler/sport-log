@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -109,29 +108,5 @@ class Position {
 extension TrackExtension on List<Position> {
   LatLngBounds? get latLngBounds => map((p) => p.latLng).toList().latLngBounds;
 
-  List<LatLng> get latLngs {
-    return map((pos) => pos.latLng).toList();
-  }
-}
-
-extension LatLngBoundsCombine on LatLngBounds {
-  static LatLngBounds? combinedBounds(
-    List<Position>? track1,
-    List<Position>? track2,
-  ) {
-    final bounds1 = track1?.latLngBounds;
-    final bounds2 = track2?.latLngBounds;
-    if (bounds1 == null || bounds2 == null) {
-      return bounds1 ?? bounds2;
-    }
-    final north = max(bounds1.northeast.latitude, bounds2.northeast.latitude);
-    final south = min(bounds1.southwest.latitude, bounds2.southwest.latitude);
-    final east = max(bounds1.northeast.longitude, bounds2.northeast.longitude);
-    final west = min(bounds1.southwest.longitude, bounds2.southwest.longitude);
-
-    return LatLngBounds(
-      northeast: LatLng(north, east),
-      southwest: LatLng(south, west),
-    );
-  }
+  List<LatLng> get latLngs => map((pos) => pos.latLng).toList();
 }

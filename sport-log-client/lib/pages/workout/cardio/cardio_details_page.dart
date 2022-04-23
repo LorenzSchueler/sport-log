@@ -91,6 +91,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                           _mapController.setBoundsFromTracks(
                             _cardioSessionDescription.cardioSession.track,
                             _cardioSessionDescription.route?.track,
+                            padded: true,
                           );
                           if (_cardioSessionDescription.cardioSession.track !=
                               null) {

@@ -134,6 +134,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                       _mapController.setBoundsFromTracks(
                         _cardioSessionDescription.cardioSession.track,
                         _cardioSessionDescription.route?.track,
+                        padded: true,
                       );
                       if (_cardioSessionDescription.cardioSession.track !=
                           null) {
