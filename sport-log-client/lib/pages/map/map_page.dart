@@ -39,7 +39,8 @@ class MapPageState extends State<MapPage> {
 
   List<Circle> _circles = [];
   double _metersPerPixel = 1;
-  String mapStyle = MapboxStyles.OUTDOORS;
+  String _mapStyle = MapboxStyles.OUTDOORS;
+  bool _hillshade = false;
 
   @override
   void initState() {
@@ -145,7 +146,7 @@ class MapPageState extends State<MapPage> {
           children: [
             MapboxMap(
               accessToken: Config.instance.accessToken,
-              styleString: mapStyle,
+              styleString: _mapStyle,
               initialCameraPosition: Settings.lastMapPosition,
               trackCameraPosition: true,
               onMapCreated: (MapboxMapController controller) => _mapController =
@@ -170,37 +171,13 @@ class MapPageState extends State<MapPage> {
                       child: const Icon(AppIcons.layers),
                       onPressed: () => showModalBottomSheet<void>(
                         context: context,
-                        builder: (context) => Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            IconButton(
-                              icon: const Icon(AppIcons.mountains),
-                              onPressed: () {
-                                setState(() {
-                                  mapStyle = MapboxStyles.OUTDOORS;
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(AppIcons.car),
-                              onPressed: () {
-                                setState(() {
-                                  mapStyle = MapboxStyles.MAPBOX_STREETS;
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(AppIcons.satellite),
-                              onPressed: () {
-                                setState(() {
-                                  mapStyle = MapboxStyles.SATELLITE;
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            )
-                          ],
+                        builder: (context) => MapStylesBottomSheet(
+                          hillshade: _hillshade,
+                          mapController: _mapController,
+                          onStyleChange: (style) =>
+                              setState(() => _mapStyle = style),
+                          onHillshadeChange: (hillshade) =>
+                              setState(() => _hillshade = hillshade),
                         ),
                       ),
                     ),
@@ -326,6 +303,108 @@ class MapScale extends StatelessWidget {
             ? "${(_scaleLength / 1000).round()} km"
             : "$_scaleLength m",
         textAlign: TextAlign.center,
+      ),
+    );
+  }
+}
+
+class MapStylesBottomSheet extends StatelessWidget {
+  final bool hillshade;
+  final MapboxMapController mapController;
+  final void Function(String style) onStyleChange;
+  final void Function(bool hillshade) onHillshadeChange;
+
+  MapStylesBottomSheet({
+    required this.hillshade,
+    required this.mapController,
+    required this.onStyleChange,
+    required this.onHillshadeChange,
+    Key? key,
+  }) : super(key: key);
+
+  final style = ButtonStyle(
+    shape: MaterialStateProperty.all(const CircleBorder()),
+    padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: Defaults.edgeInsets.normal,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                child: const Icon(AppIcons.mountains),
+                onPressed: () {
+                  onStyleChange(MapboxStyles.OUTDOORS);
+                  onHillshadeChange(false);
+                  Navigator.of(context).pop();
+                },
+                style: style,
+              ),
+              ElevatedButton(
+                child: const Icon(AppIcons.car),
+                onPressed: () {
+                  onStyleChange(MapboxStyles.MAPBOX_STREETS);
+                  onHillshadeChange(false);
+                  Navigator.of(context).pop();
+                },
+                style: style,
+              ),
+              ElevatedButton(
+                child: const Icon(AppIcons.satellite),
+                onPressed: () {
+                  onStyleChange(MapboxStyles.SATELLITE);
+                  onHillshadeChange(false);
+                  Navigator.of(context).pop();
+                },
+                style: style,
+              ),
+            ],
+          ),
+          Defaults.sizedBox.vertical.normal,
+          ElevatedButton(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(hillshade ? AppIcons.close : AppIcons.add),
+                Defaults.sizedBox.horizontal.normal,
+                const Text("Hillshade"),
+              ],
+            ),
+            onPressed: () {
+              if (hillshade) {
+                mapController.removeLayer("hillshadeX");
+              } else {
+                mapController
+                  ..addSource(
+                    'dem',
+                    const RasterDemSourceProperties(
+                      url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+                    ),
+                  )
+                  ..addHillshadeLayer(
+                    "dem",
+                    "hillshadeX",
+                    HillshadeLayerProperties(
+                      hillshadeShadowColor:
+                          const Color.fromARGB(255, 60, 60, 60)
+                              .toHexStringRGB(),
+                      hillshadeHighlightColor:
+                          const Color.fromARGB(255, 60, 60, 60)
+                              .toHexStringRGB(),
+                    ),
+                  );
+              }
+              onHillshadeChange(!hillshade);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
       ),
     );
   }
