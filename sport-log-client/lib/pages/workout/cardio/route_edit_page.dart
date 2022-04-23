@@ -308,7 +308,7 @@ class RouteEditPageState extends State<RouteEditPage> {
                 _mapController = controller;
               },
               onStyleLoadedCallback: () async {
-                await _mapController.setBounds(
+                await _mapController.setBoundsFromTracks(
                   _route.track,
                   _route.markedPositions,
                 );

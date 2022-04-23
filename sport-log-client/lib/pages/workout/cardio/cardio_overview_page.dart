@@ -220,7 +220,7 @@ class CardioSessionCard extends StatelessWidget {
                       onMapCreated: (MapboxMapController controller) =>
                           _sessionMapController = controller,
                       onStyleLoadedCallback: () {
-                        _sessionMapController.setBounds(
+                        _sessionMapController.setBoundsFromTracks(
                           cardioSessionDescription.cardioSession.track,
                           cardioSessionDescription.route?.track,
                         );

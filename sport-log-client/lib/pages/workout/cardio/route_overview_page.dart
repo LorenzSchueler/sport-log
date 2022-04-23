@@ -140,7 +140,10 @@ class RouteCard extends StatelessWidget {
                       onMapCreated: (MapboxMapController controller) =>
                           _sessionMapController = controller,
                       onStyleLoadedCallback: () {
-                        _sessionMapController.setBounds(route.track, null);
+                        _sessionMapController.setBoundsFromTracks(
+                          route.track,
+                          null,
+                        );
                         if (route.track != null) {
                           _sessionMapController.addRouteLine(route.track!);
                         }

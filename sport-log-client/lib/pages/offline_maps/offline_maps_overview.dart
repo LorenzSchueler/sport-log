@@ -241,14 +241,7 @@ class RegionCard extends StatelessWidget {
             onMapCreated: (MapboxMapController controller) =>
                 _sessionMapController = controller,
             onStyleLoadedCallback: () async {
-              await _sessionMapController.moveCamera(
-                CameraUpdate.newLatLngBounds(
-                  [
-                    region.definition.bounds.northeast,
-                    region.definition.bounds.southwest
-                  ].latLngBounds!,
-                ),
-              );
+              await _sessionMapController.setBounds(region.definition.bounds);
               await _sessionMapController.addBoundingBoxLine(
                 region.definition.bounds.northeast,
                 region.definition.bounds.southwest,

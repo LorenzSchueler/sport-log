@@ -190,9 +190,7 @@ time: ${location.time! ~/ 1000} s
 satelites:  ${location.satelliteNumber}
 points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
 
-    await _mapController.animateCamera(
-      CameraUpdate.newLatLng(location.latLng),
-    );
+    await _mapController.animateCenter(location.latLng);
 
     _circles = await _mapController.updateCurrentLocationMarker(
       _circles,

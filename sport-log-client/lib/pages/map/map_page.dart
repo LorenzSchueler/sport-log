@@ -69,7 +69,7 @@ class MapPageState extends State<MapPage> {
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
-    await _mapController.animateCamera(CameraUpdate.newLatLng(location.latLng));
+    await _mapController.animateCenter(location.latLng);
     _circles = await _mapController.updateCurrentLocationMarker(
       _circles,
       location.latLng,
@@ -261,8 +261,7 @@ class MapPageState extends State<MapPage> {
                               .requestFocus(FocusNode()); // unfocus
                           final coords = _searchResults[index].center!;
                           final latLng = LatLng(coords[1], coords[0]);
-                          _mapController
-                              .animateCamera(CameraUpdate.newLatLng(latLng));
+                          _mapController.animateCenter(latLng);
 
                           final bbox = _searchResults[index].bbox;
                           if (bbox != null) {
@@ -270,12 +269,9 @@ class MapPageState extends State<MapPage> {
                               LatLng(bbox[1], bbox[0]),
                               LatLng(bbox[3], bbox[2])
                             ].latLngBounds!;
-                            _mapController.animateCamera(
-                              CameraUpdate.newLatLngBounds(bounds),
-                            );
+                            _mapController.animateBounds(bounds);
                           } else {
-                            _mapController
-                                .animateCamera(CameraUpdate.zoomTo(16));
+                            _mapController.animateZoom(16);
                           }
                         },
                         child: Text(

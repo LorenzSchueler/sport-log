@@ -5,14 +5,27 @@ import 'package:sport_log/models/cardio/position.dart';
 extension MapControllerExtension on MapboxMapController {
   Future<void> setNorth() => animateCamera(CameraUpdate.bearingTo(0));
 
-  Future<void> setBounds(List<Position>? track1, List<Position>? track2) async {
+  Future<void> setBounds(LatLngBounds bounds) =>
+      moveCamera(CameraUpdate.newLatLngBounds(bounds));
+
+  Future<void> animateBounds(LatLngBounds bounds) =>
+      animateCamera(CameraUpdate.newLatLngBounds(bounds));
+
+  Future<void> setBoundsFromTracks(
+    List<Position>? track1,
+    List<Position>? track2,
+  ) async {
     final bounds = LatLngBoundsCombine.combinedBounds(track1, track2);
     if (bounds != null) {
-      await moveCamera(
-        CameraUpdate.newLatLngBounds(bounds),
-      );
+      await setBounds(bounds);
     }
   }
+
+  Future<void> animateCenter(LatLng center) =>
+      animateCamera(CameraUpdate.newLatLng(center));
+
+  Future<void> animateZoom(double zoom) =>
+      animateCamera(CameraUpdate.zoomTo(zoom));
 
   Future<Line> addBoundingBoxLine(LatLng point1, LatLng point2) {
     return addLine(

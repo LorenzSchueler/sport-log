@@ -88,7 +88,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                         onMapCreated: (MapboxMapController controller) =>
                             _mapController = controller,
                         onStyleLoadedCallback: () {
-                          _mapController.setBounds(
+                          _mapController.setBoundsFromTracks(
                             _cardioSessionDescription.cardioSession.track,
                             _cardioSessionDescription.route?.track,
                           );
