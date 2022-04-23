@@ -299,7 +299,7 @@ class RouteEditPageState extends State<RouteEditPage> {
           Expanded(
             child: MapboxMap(
               accessToken: Config.instance.accessToken,
-              styleString: Defaults.mapbox.style.outdoor,
+              styleString: MapboxStyles.OUTDOORS,
               initialCameraPosition: Settings.lastMapPosition,
               trackCameraPosition: true,
               compassEnabled: true,

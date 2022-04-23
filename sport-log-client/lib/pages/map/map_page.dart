@@ -39,7 +39,7 @@ class MapPageState extends State<MapPage> {
 
   List<Circle> _circles = [];
   double _metersPerPixel = 1;
-  String mapStyle = Defaults.mapbox.style.outdoor;
+  String mapStyle = MapboxStyles.OUTDOORS;
 
   @override
   void initState() {
@@ -177,7 +177,7 @@ class MapPageState extends State<MapPage> {
                               icon: const Icon(AppIcons.mountains),
                               onPressed: () {
                                 setState(() {
-                                  mapStyle = Defaults.mapbox.style.outdoor;
+                                  mapStyle = MapboxStyles.OUTDOORS;
                                 });
                                 Navigator.of(context).pop();
                               },
@@ -186,7 +186,7 @@ class MapPageState extends State<MapPage> {
                               icon: const Icon(AppIcons.car),
                               onPressed: () {
                                 setState(() {
-                                  mapStyle = Defaults.mapbox.style.street;
+                                  mapStyle = MapboxStyles.MAPBOX_STREETS;
                                 });
                                 Navigator.of(context).pop();
                               },
@@ -195,7 +195,7 @@ class MapPageState extends State<MapPage> {
                               icon: const Icon(AppIcons.satellite),
                               onPressed: () {
                                 setState(() {
-                                  mapStyle = Defaults.mapbox.style.satellite;
+                                  mapStyle = MapboxStyles.SATELLITE;
                                 });
                                 Navigator.of(context).pop();
                               },

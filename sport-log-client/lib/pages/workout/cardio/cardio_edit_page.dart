@@ -126,7 +126,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                   height: 150,
                   child: MapboxMap(
                     accessToken: Config.instance.accessToken,
-                    styleString: Defaults.mapbox.style.outdoor,
+                    styleString: MapboxStyles.OUTDOORS,
                     initialCameraPosition: Settings.lastMapPosition,
                     onMapCreated: (MapboxMapController controller) =>
                         _mapController = controller,

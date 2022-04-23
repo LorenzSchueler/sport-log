@@ -60,17 +60,8 @@ class _BorderRadius {
 class _Mapbox {
   _Mapbox();
 
-  final style = const _Style();
   final markerColor = "#0060a0";
   final trackLineColor = "red";
   final routeLineColor = "blue";
   final cameraPosition = const LatLng(47.27, 11.33);
-}
-
-class _Style {
-  const _Style();
-
-  final String outdoor = "mapbox://styles/mapbox/outdoors-v11";
-  final String street = "mapbox://styles/mapbox/streets-v11";
-  final String satellite = "mapbox://styles/mapbox/satellite-v9";
 }

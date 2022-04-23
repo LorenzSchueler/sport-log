@@ -342,7 +342,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
           Expanded(
             child: MapboxMap(
               accessToken: Config.instance.accessToken,
-              styleString: Defaults.mapbox.style.outdoor,
+              styleString: MapboxStyles.OUTDOORS,
               initialCameraPosition: CameraPosition(
                 zoom: 15.0,
                 target: Settings.lastGpsLatLng,

@@ -86,7 +86,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
           ),
           minZoom: 0,
           maxZoom: 16,
-          mapStyleUrl: Defaults.mapbox.style.outdoor,
+          mapStyleUrl: MapboxStyles.OUTDOORS,
         ),
         onEvent: _onMapDownload,
         accessToken: Config.instance.accessToken,
@@ -149,7 +149,7 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
                   height: 400,
                   child: MapboxMap(
                     accessToken: Config.instance.accessToken,
-                    styleString: Defaults.mapbox.style.outdoor,
+                    styleString: MapboxStyles.OUTDOORS,
                     initialCameraPosition: Settings.lastMapPosition,
                     trackCameraPosition: true,
                     onMapCreated: (MapboxMapController controller) =>
@@ -231,7 +231,7 @@ class RegionCard extends StatelessWidget {
           height: 150,
           child: MapboxMap(
             accessToken: Config.instance.accessToken,
-            styleString: Defaults.mapbox.style.outdoor,
+            styleString: MapboxStyles.OUTDOORS,
             initialCameraPosition: Settings.lastMapPosition,
             rotateGesturesEnabled: false,
             tiltGesturesEnabled: false,
