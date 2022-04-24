@@ -12,6 +12,7 @@ class CountWeightInput extends StatefulWidget {
     required this.setValue,
     required this.confirmChanges,
     required this.dimension,
+    required this.editWeightUnit,
     this.distanceUnit,
     this.editDistanceUnit,
     this.initialCount = 0,
@@ -29,6 +30,7 @@ class CountWeightInput extends StatefulWidget {
   ) setValue;
   final bool confirmChanges;
   final MovementDimension dimension;
+  final bool editWeightUnit;
   final DistanceUnit? distanceUnit;
   final bool? editDistanceUnit;
   final int initialCount;
@@ -45,6 +47,9 @@ class _CountWeightInputState extends State<CountWeightInput> {
   late double? _weight;
   late double? _secondWeight;
   late DistanceUnit? _distanceUnit;
+  String _weightUnit = "kg";
+
+  static const double _lbToKg = 0.45359237;
 
   @override
   void initState() {
@@ -119,14 +124,64 @@ class _CountWeightInputState extends State<CountWeightInput> {
                   },
                 ),
               ),
+              if (_weight != null && widget.editWeightUnit)
+                EditTile(
+                  leading: null,
+                  caption: "Weight Unit",
+                  child: SizedBox(
+                    height: 24,
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton(
+                        value: _weightUnit,
+                        items: const [
+                          DropdownMenuItem(
+                            value: "kg",
+                            child: Text("kg"),
+                          ),
+                          DropdownMenuItem(
+                            value: "lb",
+                            child: Text("lb"),
+                          ),
+                        ],
+                        onChanged: (unit) {
+                          if (unit != null &&
+                              unit is String &&
+                              unit != _weightUnit) {
+                            setState(() {
+                              _weightUnit = unit;
+                              _weight = _weightUnit == "lb"
+                                  ? _weight! * _lbToKg
+                                  : _weight! / _lbToKg;
+                              if (_secondWeight != null) {
+                                _secondWeight = _weightUnit == "lb"
+                                    ? _secondWeight! * _lbToKg
+                                    : _secondWeight! / _lbToKg;
+                              }
+                            });
+                            if (!widget.confirmChanges) {
+                              widget.setValue(
+                                _count,
+                                _weight,
+                                _secondWeight,
+                                _distanceUnit,
+                              );
+                            }
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ),
               if (_weight != null)
                 EditTile(
                   leading: null,
                   caption: widget.secondWeight ? "Male Weight" : "Weight",
                   child: DoubleInput(
-                    initialValue: _weight!,
+                    initialValue:
+                        _weightUnit == "lb" ? _weight! / _lbToKg : _weight!,
                     stepSize: Settings.weightIncrement,
                     setValue: (weight) {
+                      weight = _weightUnit == "lb" ? weight * _lbToKg : weight;
                       setState(() => _weight = weight);
                       if (!widget.confirmChanges) {
                         widget.setValue(
@@ -144,9 +199,12 @@ class _CountWeightInputState extends State<CountWeightInput> {
                   leading: null,
                   caption: "Female Weight",
                   child: DoubleInput(
-                    initialValue: _secondWeight!,
+                    initialValue: _weightUnit == "lb"
+                        ? _secondWeight! / _lbToKg
+                        : _secondWeight!,
                     stepSize: Settings.weightIncrement,
                     setValue: (weight) {
+                      weight = _weightUnit == "lb" ? weight * _lbToKg : weight;
                       setState(() => _secondWeight = weight);
                       if (!widget.confirmChanges) {
                         widget.setValue(

@@ -9,6 +9,7 @@ class NewSetInput extends StatelessWidget {
     required this.onNewSet,
     required this.confirmChanges,
     required this.dimension,
+    required this.editWeightUnit,
     this.distanceUnit,
     this.editDistanceUnit,
     this.initialCount = 0,
@@ -25,6 +26,7 @@ class NewSetInput extends StatelessWidget {
   ) onNewSet;
   final bool confirmChanges;
   final MovementDimension dimension;
+  final bool editWeightUnit;
   final DistanceUnit? distanceUnit;
   final bool? editDistanceUnit;
   final int initialCount;
@@ -44,6 +46,7 @@ class NewSetInput extends StatelessWidget {
             setValue: onNewSet,
             confirmChanges: confirmChanges,
             dimension: dimension,
+            editWeightUnit: editWeightUnit,
             distanceUnit: distanceUnit,
             editDistanceUnit: editDistanceUnit,
             initialCount: initialCount,

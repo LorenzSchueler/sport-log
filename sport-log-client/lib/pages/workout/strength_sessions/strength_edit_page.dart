@@ -150,6 +150,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
                 },
                 confirmChanges: true,
                 dimension: _strengthSessionDescription.movement.dimension,
+                editWeightUnit: false,
                 distanceUnit: DistanceUnit.m,
                 editDistanceUnit: false,
               ),

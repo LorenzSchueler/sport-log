@@ -399,6 +399,7 @@ class MetconMovementCard extends StatelessWidget {
               },
               confirmChanges: false,
               dimension: mmd.movement.dimension,
+              editWeightUnit: true,
               distanceUnit: mmd.metconMovement.distanceUnit,
               editDistanceUnit: true,
               initialCount: mmd.metconMovement.count,
