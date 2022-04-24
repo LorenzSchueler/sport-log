@@ -13,7 +13,7 @@ import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/never_pop.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:wakelock/wakelock.dart';
 
 class TimerPage extends StatefulWidget {

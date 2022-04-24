@@ -5,7 +5,7 @@ import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/never_pop.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
 
 class HeartRatePage extends StatefulWidget {
   const HeartRatePage({Key? key}) : super(key: key);

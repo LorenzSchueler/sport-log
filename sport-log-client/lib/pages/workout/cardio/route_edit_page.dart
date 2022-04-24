@@ -12,8 +12,8 @@ import 'package:mapbox_api/mapbox_api.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RouteEditPage extends StatefulWidget {
@@ -267,104 +267,97 @@ class RouteEditPageState extends State<RouteEditPage> {
       ],
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.route != null ? "Edit Route" : "Create Route"),
-        leading: IconButton(
-          onPressed: () async {
-            final approved = await showDiscardWarningDialog(context);
-            if (approved) {
-              Navigator.pop(context);
-            }
-          },
-          icon: const Icon(AppIcons.arrowBack),
+    return DiscardWarningOnPop(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.route != null ? "Edit Route" : "Create Route"),
+          actions: [
+            IconButton(
+              onPressed: _deleteRoute,
+              icon: const Icon(AppIcons.delete),
+            ),
+            IconButton(
+              onPressed: _formKey.currentContext != null &&
+                      _formKey.currentState!.validate() &&
+                      _route.isValid()
+                  ? _saveRoute
+                  : null,
+              icon: const Icon(AppIcons.save),
+            )
+          ],
         ),
-        actions: [
-          IconButton(
-            onPressed: _deleteRoute,
-            icon: const Icon(AppIcons.delete),
-          ),
-          IconButton(
-            onPressed: _formKey.currentContext != null &&
-                    _formKey.currentState!.validate() &&
-                    _route.isValid()
-                ? _saveRoute
-                : null,
-            icon: const Icon(AppIcons.save),
-          )
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: MapboxMap(
-              accessToken: Config.instance.accessToken,
-              styleString: MapboxStyles.OUTDOORS,
-              initialCameraPosition: Settings.lastMapPosition,
-              trackCameraPosition: true,
-              compassEnabled: true,
-              compassViewPosition: CompassViewPosition.TopRight,
-              onMapCreated: (MapboxMapController controller) async {
-                _mapController = controller;
-              },
-              onStyleLoadedCallback: () async {
-                await _mapController.setBoundsFromTracks(
-                  _route.track,
-                  _route.markedPositions,
-                  padded: true,
-                );
-                _line ??= await _mapController.addRouteLine([]);
-                await _updatePoints();
-                await _updateLine();
-              },
-              onMapLongClick: (point, LatLng latLng) => _extendLine(latLng),
+        body: Column(
+          children: [
+            Expanded(
+              child: MapboxMap(
+                accessToken: Config.instance.accessToken,
+                styleString: MapboxStyles.OUTDOORS,
+                initialCameraPosition: Settings.lastMapPosition,
+                trackCameraPosition: true,
+                compassEnabled: true,
+                compassViewPosition: CompassViewPosition.TopRight,
+                onMapCreated: (MapboxMapController controller) async {
+                  _mapController = controller;
+                },
+                onStyleLoadedCallback: () async {
+                  await _mapController.setBoundsFromTracks(
+                    _route.track,
+                    _route.markedPositions,
+                    padded: true,
+                  );
+                  _line ??= await _mapController.addRouteLine([]);
+                  await _updatePoints();
+                  await _updateLine();
+                },
+                onMapLongClick: (point, LatLng latLng) => _extendLine(latLng),
+              ),
             ),
-          ),
-          Padding(
-            padding: Defaults.edgeInsets.normal,
-            child: Column(
-              children: [
-                _buildExpandableListContainer(),
-                const Divider(),
-                Defaults.sizedBox.vertical.normal,
-                Table(
-                  children: [
-                    TableRow(
-                      children: [
-                        ValueUnitDescription.distance(_route.distance),
-                        ValueUnitDescription.name(_route.name)
-                      ],
-                    ),
-                    rowSpacer,
-                    TableRow(
-                      children: [
-                        ValueUnitDescription.ascent(_route.ascent),
-                        ValueUnitDescription.descent(_route.descent),
-                      ],
-                    ),
-                  ],
-                ),
-                Defaults.sizedBox.vertical.normal,
-                Form(
-                  key: _formKey,
-                  child: TextFormField(
-                    onTap: () => setState(() {
-                      _listExpanded = false;
-                    }),
-                    onChanged: (name) => setState(() => _route.name = name),
-                    initialValue: _route.name,
-                    validator: Validator.validateStringNotEmpty,
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                    decoration:
-                        Theme.of(context).textFormFieldDecoration.copyWith(
-                              labelText: "Name",
-                            ),
+            Padding(
+              padding: Defaults.edgeInsets.normal,
+              child: Column(
+                children: [
+                  _buildExpandableListContainer(),
+                  const Divider(),
+                  Defaults.sizedBox.vertical.normal,
+                  Table(
+                    children: [
+                      TableRow(
+                        children: [
+                          ValueUnitDescription.distance(_route.distance),
+                          ValueUnitDescription.name(_route.name)
+                        ],
+                      ),
+                      rowSpacer,
+                      TableRow(
+                        children: [
+                          ValueUnitDescription.ascent(_route.ascent),
+                          ValueUnitDescription.descent(_route.descent),
+                        ],
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          )
-        ],
+                  Defaults.sizedBox.vertical.normal,
+                  Form(
+                    key: _formKey,
+                    child: TextFormField(
+                      onTap: () => setState(() {
+                        _listExpanded = false;
+                      }),
+                      onChanged: (name) => setState(() => _route.name = name),
+                      initialValue: _route.name,
+                      validator: Validator.validateStringNotEmpty,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      decoration:
+                          Theme.of(context).textFormFieldDecoration.copyWith(
+                                labelText: "Name",
+                              ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

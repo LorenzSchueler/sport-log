@@ -16,7 +16,7 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/never_pop.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);

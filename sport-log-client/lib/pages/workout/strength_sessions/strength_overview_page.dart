@@ -13,7 +13,7 @@ import 'package:sport_log/pages/workout/strength_sessions/strength_chart.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/never_pop.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
 
 class StrengthSessionsPage extends StatefulWidget {

@@ -21,6 +21,7 @@ import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_tab
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
 
 class CardioTrackingPage extends StatefulWidget {
   final Movement movement;
@@ -323,62 +324,64 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 25, bottom: 5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(_locationInfo),
-                Text(_stepInfo),
-                Text(_heartRateInfo),
-              ],
-            ),
-          ),
-          Expanded(
-            child: MapboxMap(
-              accessToken: Config.instance.accessToken,
-              styleString: MapboxStyles.OUTDOORS,
-              initialCameraPosition: CameraPosition(
-                zoom: 15.0,
-                target: Settings.lastGpsLatLng,
+    return DiscardWarningOnPop(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 25, bottom: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(_locationInfo),
+                  Text(_stepInfo),
+                  Text(_heartRateInfo),
+                ],
               ),
-              trackCameraPosition: true,
-              compassEnabled: true,
-              compassViewPosition: CompassViewPosition.TopRight,
-              onMapCreated: (MapboxMapController controller) =>
-                  _mapController = controller,
-              onStyleLoadedCallback: () async {
-                if (_cardioSessionDescription.route?.track != null) {
-                  await _mapController.addRouteLine(
-                    _cardioSessionDescription.route!.track!,
-                  );
-                }
-                _line = await _mapController.addTrackLine(
-                  _cardioSessionDescription.cardioSession.track!,
-                ); // init with empty track
-                await _startStreams();
-              },
             ),
-          ),
-          Container(
-            padding: Defaults.edgeInsets.normal,
-            child: Column(
-              children: [
-                CardioValueUnitDescriptionTable(
-                  cardioSessionDescription: _cardioSessionDescription,
-                  currentDuration: _trackingUtils.currentDuration,
+            Expanded(
+              child: MapboxMap(
+                accessToken: Config.instance.accessToken,
+                styleString: MapboxStyles.OUTDOORS,
+                initialCameraPosition: CameraPosition(
+                  zoom: 15.0,
+                  target: Settings.lastGpsLatLng,
                 ),
-                Defaults.sizedBox.vertical.normal,
-                Row(children: _buildButtons()),
-              ],
+                trackCameraPosition: true,
+                compassEnabled: true,
+                compassViewPosition: CompassViewPosition.TopRight,
+                onMapCreated: (MapboxMapController controller) =>
+                    _mapController = controller,
+                onStyleLoadedCallback: () async {
+                  if (_cardioSessionDescription.route?.track != null) {
+                    await _mapController.addRouteLine(
+                      _cardioSessionDescription.route!.track!,
+                    );
+                  }
+                  _line = await _mapController.addTrackLine(
+                    _cardioSessionDescription.cardioSession.track!,
+                  ); // init with empty track
+                  await _startStreams();
+                },
+              ),
             ),
-          ),
-        ],
+            Container(
+              padding: Defaults.edgeInsets.normal,
+              child: Column(
+                children: [
+                  CardioValueUnitDescriptionTable(
+                    cardioSessionDescription: _cardioSessionDescription,
+                    currentDuration: _trackingUtils.currentDuration,
+                  ),
+                  Defaults.sizedBox.vertical.normal,
+                  Row(children: _buildButtons()),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -10,9 +10,9 @@ import 'package:sport_log/models/action/weekday.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/picker/action_picker.dart';
 import 'package:sport_log/widgets/picker/time_picker.dart';
 import 'package:sport_log/widgets/picker/weekday_picker.dart';
@@ -74,89 +74,84 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.actionRule != null ? "Edit Action Rule" : "Create Action Rule",
-        ),
-        leading: IconButton(
-          onPressed: () async {
-            final approved = await showDiscardWarningDialog(context);
-            if (approved) {
-              Navigator.pop(context);
-            }
-          },
-          icon: const Icon(AppIcons.arrowBack),
-        ),
-        actions: [
-          IconButton(
-            onPressed: _deleteActionRule,
-            icon: const Icon(AppIcons.delete),
+    return DiscardWarningOnPop(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            widget.actionRule != null
+                ? "Edit Action Rule"
+                : "Create Action Rule",
           ),
-          IconButton(
-            onPressed: _actionRule.isValid() ? _saveActionRule : null,
-            icon: const Icon(AppIcons.save),
-          ),
-        ],
-      ),
-      body: Container(
-        padding: Defaults.edgeInsets.normal,
-        child: ListView(
-          children: [
-            EditTile(
-              leading: AppIcons.radio,
-              caption: "Action",
-              child: Text(
-                widget.actionProviderDescription.actions
-                    .where((action) => action.id == _actionRule.actionId)
-                    .first
-                    .name,
-              ),
-              onTap: () async {
-                Action? action = await showActionPicker(
-                  actions: widget.actionProviderDescription.actions,
-                  context: context,
-                );
-                if (action != null) {
-                  setState(() => _actionRule.actionId = action.id);
-                }
-              },
+          actions: [
+            IconButton(
+              onPressed: _deleteActionRule,
+              icon: const Icon(AppIcons.delete),
             ),
-            EditTile(
-              leading: AppIcons.calendar,
-              caption: "Weekday",
-              child: Text(_actionRule.weekday.displayName),
-              onTap: () async {
-                Weekday? weekday = await showWeekdayPicker(context: context);
-                if (weekday != null) {
-                  setState(() => _actionRule.weekday = weekday);
-                }
-              },
-            ),
-            EditTile(
-              leading: AppIcons.clock,
-              caption: "Time",
-              child: Text(_actionRule.time.formatTime),
-              onTap: () async {
-                DateTime? time = await showScrollableTimePicker(
-                  context: context,
-                  initialTime: _actionRule.time,
-                );
-                if (time != null) {
-                  setState(() => _actionRule.time = time);
-                }
-              },
-            ),
-            TextFormField(
-              decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-                    icon: const Icon(AppIcons.comment),
-                    labelText: "Arguments",
-                  ),
-              initialValue: _actionRule.arguments,
-              onChanged: (arguments) =>
-                  _actionRule.arguments = arguments.isEmpty ? null : arguments,
+            IconButton(
+              onPressed: _actionRule.isValid() ? _saveActionRule : null,
+              icon: const Icon(AppIcons.save),
             ),
           ],
+        ),
+        body: Container(
+          padding: Defaults.edgeInsets.normal,
+          child: ListView(
+            children: [
+              EditTile(
+                leading: AppIcons.radio,
+                caption: "Action",
+                child: Text(
+                  widget.actionProviderDescription.actions
+                      .where((action) => action.id == _actionRule.actionId)
+                      .first
+                      .name,
+                ),
+                onTap: () async {
+                  Action? action = await showActionPicker(
+                    actions: widget.actionProviderDescription.actions,
+                    context: context,
+                  );
+                  if (action != null) {
+                    setState(() => _actionRule.actionId = action.id);
+                  }
+                },
+              ),
+              EditTile(
+                leading: AppIcons.calendar,
+                caption: "Weekday",
+                child: Text(_actionRule.weekday.displayName),
+                onTap: () async {
+                  Weekday? weekday = await showWeekdayPicker(context: context);
+                  if (weekday != null) {
+                    setState(() => _actionRule.weekday = weekday);
+                  }
+                },
+              ),
+              EditTile(
+                leading: AppIcons.clock,
+                caption: "Time",
+                child: Text(_actionRule.time.formatTime),
+                onTap: () async {
+                  DateTime? time = await showScrollableTimePicker(
+                    context: context,
+                    initialTime: _actionRule.time,
+                  );
+                  if (time != null) {
+                    setState(() => _actionRule.time = time);
+                  }
+                },
+              ),
+              TextFormField(
+                decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                      icon: const Icon(AppIcons.comment),
+                      labelText: "Arguments",
+                    ),
+                initialValue: _actionRule.arguments,
+                onChanged: (arguments) => _actionRule.arguments =
+                    arguments.isEmpty ? null : arguments,
+              ),
+            ],
+          ),
         ),
       ),
     );

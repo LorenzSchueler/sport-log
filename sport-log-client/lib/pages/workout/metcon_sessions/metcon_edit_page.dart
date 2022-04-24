@@ -9,11 +9,11 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/input_fields/selection_bar.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
@@ -82,53 +82,46 @@ class _MetconEditPageState extends State<MetconEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            widget.metconDescription != null ? "Edit Metcon" : "New Metcon",
-          ),
-          leading: IconButton(
-            onPressed: () async {
-              final approved = await showDiscardWarningDialog(context);
-              if (approved) {
-                Navigator.pop(context);
-              }
-            },
-            icon: const Icon(AppIcons.arrowBack),
-          ),
-          actions: [
-            if (!_metconDescription.hasReference &&
-                _metconDescription.metcon.userId != null)
-              IconButton(
-                onPressed: _deleteMetcon,
-                icon: const Icon(AppIcons.delete),
-              ),
-            IconButton(
-              onPressed: _formKey.currentContext != null &&
-                      _formKey.currentState!.validate() &&
-                      _metconDescription.isValid()
-                  ? _saveMetcon
-                  : null,
-              icon: const Icon(AppIcons.save),
+    return DiscardWarningOnPop(
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              widget.metconDescription != null ? "Edit Metcon" : "New Metcon",
             ),
-          ],
-        ),
-        body: Container(
-          padding: Defaults.edgeInsets.normal,
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              children: [
-                _nameInput(context),
-                _descriptionInput(),
-                _typeInput(),
-                _additionalFieldsInput(),
-                const Divider(thickness: 2),
-                _metconMovementsList(),
-                _addMetconMovementButton(context),
-              ],
+            actions: [
+              if (!_metconDescription.hasReference &&
+                  _metconDescription.metcon.userId != null)
+                IconButton(
+                  onPressed: _deleteMetcon,
+                  icon: const Icon(AppIcons.delete),
+                ),
+              IconButton(
+                onPressed: _formKey.currentContext != null &&
+                        _formKey.currentState!.validate() &&
+                        _metconDescription.isValid()
+                    ? _saveMetcon
+                    : null,
+                icon: const Icon(AppIcons.save),
+              ),
+            ],
+          ),
+          body: Container(
+            padding: Defaults.edgeInsets.normal,
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                children: [
+                  _nameInput(context),
+                  _descriptionInput(),
+                  _typeInput(),
+                  _additionalFieldsInput(),
+                  const Divider(thickness: 2),
+                  _metconMovementsList(),
+                  _addMetconMovementButton(context),
+                ],
+              ),
             ),
           ),
         ),

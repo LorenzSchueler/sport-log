@@ -11,9 +11,9 @@ import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -92,77 +92,70 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.strengthSessionDescription != null
-              ? "Edit Strength Session"
-              : "Create Strength Session",
-        ),
-        leading: IconButton(
-          onPressed: () async {
-            final approved = await showDiscardWarningDialog(context);
-            if (approved) {
-              Navigator.pop(context);
-            }
-          },
-          icon: const Icon(AppIcons.arrowBack),
-        ),
-        actions: [
-          IconButton(
-            onPressed: _deleteStrengthSession,
-            icon: const Icon(AppIcons.delete),
+    return DiscardWarningOnPop(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            widget.strengthSessionDescription != null
+                ? "Edit Strength Session"
+                : "Create Strength Session",
           ),
-          IconButton(
-            onPressed: _strengthSessionDescription.isValid()
-                ? _saveStrengthSession
-                : null,
-            icon: const Icon(AppIcons.save),
-          ),
-        ],
-      ),
-      body: Container(
-        padding: Defaults.edgeInsets.normal,
-        child: Column(
-          children: [
-            _movementInput,
-            _dateTimeInput,
-            if (_strengthSessionDescription.session.interval != null)
-              _intervalInput,
-            if (_strengthSessionDescription.session.comments != null)
-              _commentInput,
-            if (_strengthSessionDescription.session.interval == null ||
-                _strengthSessionDescription.session.comments == null)
-              _buttonBar,
-            NewSetInput(
-              onNewSet: (count, weight, _) {
-                final newSet = StrengthSet(
-                  id: randomId(),
-                  strengthSessionId: _strengthSessionDescription.session.id,
-                  setNumber: _strengthSessionDescription.sets.length,
-                  count: count,
-                  weight: weight,
-                  deleted: false,
-                );
-                setState(() {
-                  _strengthSessionDescription.sets.add(newSet);
-                  _strengthSessionDescription.orderSets();
-                });
-                Future.delayed(
-                  const Duration(milliseconds: 100),
-                  () => _scrollController.animateTo(
-                    _scrollController.position.maxScrollExtent,
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.decelerate,
-                  ),
-                );
-              },
-              confirmChanges: true,
-              dimension: _strengthSessionDescription.movement.dimension,
+          actions: [
+            IconButton(
+              onPressed: _deleteStrengthSession,
+              icon: const Icon(AppIcons.delete),
             ),
-            const Divider(),
-            Expanded(child: _setList),
+            IconButton(
+              onPressed: _strengthSessionDescription.isValid()
+                  ? _saveStrengthSession
+                  : null,
+              icon: const Icon(AppIcons.save),
+            ),
           ],
+        ),
+        body: Container(
+          padding: Defaults.edgeInsets.normal,
+          child: Column(
+            children: [
+              _movementInput,
+              _dateTimeInput,
+              if (_strengthSessionDescription.session.interval != null)
+                _intervalInput,
+              if (_strengthSessionDescription.session.comments != null)
+                _commentInput,
+              if (_strengthSessionDescription.session.interval == null ||
+                  _strengthSessionDescription.session.comments == null)
+                _buttonBar,
+              NewSetInput(
+                onNewSet: (count, weight, _) {
+                  final newSet = StrengthSet(
+                    id: randomId(),
+                    strengthSessionId: _strengthSessionDescription.session.id,
+                    setNumber: _strengthSessionDescription.sets.length,
+                    count: count,
+                    weight: weight,
+                    deleted: false,
+                  );
+                  setState(() {
+                    _strengthSessionDescription.sets.add(newSet);
+                    _strengthSessionDescription.orderSets();
+                  });
+                  Future.delayed(
+                    const Duration(milliseconds: 100),
+                    () => _scrollController.animateTo(
+                      _scrollController.position.maxScrollExtent,
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.decelerate,
+                    ),
+                  );
+                },
+                confirmChanges: true,
+                dimension: _strengthSessionDescription.movement.dimension,
+              ),
+              const Divider(),
+              Expanded(child: _setList),
+            ],
+          ),
         ),
       ),
     );

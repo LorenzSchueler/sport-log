@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/never_pop.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
 
 class LandingPage extends StatelessWidget {
   const LandingPage({Key? key}) : super(key: key);

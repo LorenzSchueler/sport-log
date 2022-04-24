@@ -5,9 +5,9 @@ import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
 
 class MovementEditPage extends StatefulWidget {
   const MovementEditPage({
@@ -75,96 +75,89 @@ class _MovementEditPageState extends State<MovementEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            widget.movementDescription != null
-                ? "Edit Movement"
-                : "New Movement",
-          ),
-          leading: IconButton(
-            onPressed: () async {
-              final approved = await showDiscardWarningDialog(context);
-              if (approved) {
-                Navigator.pop(context);
-              }
-            },
-            icon: const Icon(AppIcons.arrowBack),
-          ),
-          actions: [
-            if (widget.movementDescription != null &&
-                !widget.movementDescription!.hasReference)
+    return DiscardWarningOnPop(
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              widget.movementDescription != null
+                  ? "Edit Movement"
+                  : "New Movement",
+            ),
+            actions: [
+              if (widget.movementDescription != null &&
+                  !widget.movementDescription!.hasReference)
+                IconButton(
+                  onPressed: _deleteMovement,
+                  icon: const Icon(AppIcons.delete),
+                ),
               IconButton(
-                onPressed: _deleteMovement,
-                icon: const Icon(AppIcons.delete),
-              ),
-            IconButton(
-              onPressed: _formKey.currentContext != null &&
-                      _formKey.currentState!.validate() &&
-                      _movementDescription.isValid()
-                  ? _saveMovement
-                  : null,
-              icon: const Icon(AppIcons.save),
-            )
-          ],
-        ),
-        body: Container(
-          padding: Defaults.edgeInsets.normal,
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              children: [
-                _nameInput(context),
-                ..._movementDescription.movement.description == null
-                    ? [
-                        Defaults.sizedBox.vertical.small,
-                        ActionChip(
-                          avatar: const Icon(AppIcons.add),
-                          label: const Text("Add description"),
-                          onPressed: () {
-                            setState(
-                              () => _movementDescription.movement.description =
-                                  "",
-                            );
-                            _descriptionFocusNode.requestFocus();
-                          },
-                        ),
-                      ]
-                    : [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: TextFormField(
-                            initialValue:
-                                _movementDescription.movement.description,
-                            focusNode: _descriptionFocusNode,
-                            keyboardType: TextInputType.multiline,
-                            minLines: 1,
-                            maxLines: 5,
-                            onChanged: (description) => setState(
-                              () => _movementDescription.movement.description =
-                                  description,
-                            ),
-                            decoration: Theme.of(context)
-                                .textFormFieldDecoration
-                                .copyWith(
-                                  labelText: "Description",
-                                  suffixIcon: IconButton(
-                                    icon: const Icon(AppIcons.close),
-                                    onPressed: () => setState(
-                                      () => _movementDescription
-                                          .movement.description = null,
+                onPressed: _formKey.currentContext != null &&
+                        _formKey.currentState!.validate() &&
+                        _movementDescription.isValid()
+                    ? _saveMovement
+                    : null,
+                icon: const Icon(AppIcons.save),
+              )
+            ],
+          ),
+          body: Container(
+            padding: Defaults.edgeInsets.normal,
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                children: [
+                  _nameInput(context),
+                  ..._movementDescription.movement.description == null
+                      ? [
+                          Defaults.sizedBox.vertical.small,
+                          ActionChip(
+                            avatar: const Icon(AppIcons.add),
+                            label: const Text("Add description"),
+                            onPressed: () {
+                              setState(
+                                () => _movementDescription
+                                    .movement.description = "",
+                              );
+                              _descriptionFocusNode.requestFocus();
+                            },
+                          ),
+                        ]
+                      : [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: TextFormField(
+                              initialValue:
+                                  _movementDescription.movement.description,
+                              focusNode: _descriptionFocusNode,
+                              keyboardType: TextInputType.multiline,
+                              minLines: 1,
+                              maxLines: 5,
+                              onChanged: (description) => setState(
+                                () => _movementDescription
+                                    .movement.description = description,
+                              ),
+                              decoration: Theme.of(context)
+                                  .textFormFieldDecoration
+                                  .copyWith(
+                                    labelText: "Description",
+                                    suffixIcon: IconButton(
+                                      icon: const Icon(AppIcons.close),
+                                      onPressed: () => setState(
+                                        () => _movementDescription
+                                            .movement.description = null,
+                                      ),
                                     ),
                                   ),
-                                ),
+                            ),
                           ),
-                        ),
-                      ],
-                Defaults.sizedBox.vertical.small,
-                _dimInput,
-                _categoryInput(context),
-              ],
+                        ],
+                  Defaults.sizedBox.vertical.small,
+                  _dimInput,
+                  _categoryInput(context),
+                ],
+              ),
             ),
           ),
         ),

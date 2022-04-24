@@ -9,9 +9,9 @@ import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/picker/action_picker.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
 
@@ -71,82 +71,75 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.actionEvent != null
-              ? "Edit Action Event"
-              : "Create Action Event",
-        ),
-        leading: IconButton(
-          onPressed: () async {
-            final approved = await showDiscardWarningDialog(context);
-            if (approved) {
-              Navigator.pop(context);
-            }
-          },
-          icon: const Icon(AppIcons.arrowBack),
-        ),
-        actions: [
-          IconButton(
-            onPressed: _deleteActionEvent,
-            icon: const Icon(AppIcons.delete),
+    return DiscardWarningOnPop(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            widget.actionEvent != null
+                ? "Edit Action Event"
+                : "Create Action Event",
           ),
-          IconButton(
-            onPressed: _actionEvent.isValid() ? _saveActionEvent : null,
-            icon: const Icon(AppIcons.save),
-          ),
-        ],
-      ),
-      body: Container(
-        padding: Defaults.edgeInsets.normal,
-        child: ListView(
-          children: [
-            EditTile(
-              leading: AppIcons.radio,
-              caption: "Action",
-              child: Text(
-                widget.actionProviderDescription.actions
-                    .where((action) => action.id == _actionEvent.actionId)
-                    .first
-                    .name,
-              ),
-              onTap: () async {
-                Action? action = await showActionPicker(
-                  actions: widget.actionProviderDescription.actions,
-                  context: context,
-                );
-                if (action != null) {
-                  setState(() => _actionEvent.actionId = action.id);
-                }
-              },
+          actions: [
+            IconButton(
+              onPressed: _deleteActionEvent,
+              icon: const Icon(AppIcons.delete),
             ),
-            EditTile(
-              caption: 'Date',
-              child: Text(_actionEvent.datetime.toHumanDateTime()),
-              leading: AppIcons.calendar,
-              onTap: () async {
-                final datetime = await showDateTimePicker(
-                  context: context,
-                  initial: _actionEvent.datetime,
-                );
-                if (datetime != null) {
-                  setState(() {
-                    _actionEvent.datetime = datetime;
-                  });
-                }
-              },
-            ),
-            TextFormField(
-              decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-                    icon: const Icon(AppIcons.comment),
-                    labelText: "Arguments",
-                  ),
-              initialValue: _actionEvent.arguments,
-              onChanged: (arguments) =>
-                  _actionEvent.arguments = arguments.isEmpty ? null : arguments,
+            IconButton(
+              onPressed: _actionEvent.isValid() ? _saveActionEvent : null,
+              icon: const Icon(AppIcons.save),
             ),
           ],
+        ),
+        body: Container(
+          padding: Defaults.edgeInsets.normal,
+          child: ListView(
+            children: [
+              EditTile(
+                leading: AppIcons.radio,
+                caption: "Action",
+                child: Text(
+                  widget.actionProviderDescription.actions
+                      .where((action) => action.id == _actionEvent.actionId)
+                      .first
+                      .name,
+                ),
+                onTap: () async {
+                  Action? action = await showActionPicker(
+                    actions: widget.actionProviderDescription.actions,
+                    context: context,
+                  );
+                  if (action != null) {
+                    setState(() => _actionEvent.actionId = action.id);
+                  }
+                },
+              ),
+              EditTile(
+                caption: 'Date',
+                child: Text(_actionEvent.datetime.toHumanDateTime()),
+                leading: AppIcons.calendar,
+                onTap: () async {
+                  final datetime = await showDateTimePicker(
+                    context: context,
+                    initial: _actionEvent.datetime,
+                  );
+                  if (datetime != null) {
+                    setState(() {
+                      _actionEvent.datetime = datetime;
+                    });
+                  }
+                },
+              ),
+              TextFormField(
+                decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                      icon: const Icon(AppIcons.comment),
+                      labelText: "Arguments",
+                    ),
+                initialValue: _actionEvent.arguments,
+                onChanged: (arguments) => _actionEvent.arguments =
+                    arguments.isEmpty ? null : arguments,
+              ),
+            ],
+          ),
         ),
       ),
     );
