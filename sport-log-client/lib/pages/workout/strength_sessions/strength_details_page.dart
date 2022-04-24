@@ -158,17 +158,17 @@ class _StrengthSessionDetailsPageState
           if (maxEorm != null)
             TextTile(
               caption: 'Max Eorm',
-              child: Text(roundedWeight(maxEorm)),
+              child: Text(formatWeight(maxEorm)),
             ),
           if (sumVolume != null)
             TextTile(
               caption: 'Volume',
-              child: Text(roundedWeight(sumVolume)),
+              child: Text(formatWeight(sumVolume)),
             ),
           if (maxWeight != null)
             TextTile(
               caption: 'Max Weight',
-              child: Text(roundedWeight(maxWeight)),
+              child: Text(formatWeight(maxWeight)),
             ),
           TextTile(
             caption: 'Avg Reps',
@@ -186,7 +186,7 @@ class _StrengthSessionDetailsPageState
         return [
           TextTile(
             caption: 'Best Distance',
-            child: Text(formatDistance(stats.maxCount)),
+            child: Text("${stats.maxCount} m"),
           ),
         ];
       case MovementDimension.energy:

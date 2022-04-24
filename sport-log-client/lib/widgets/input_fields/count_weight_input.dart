@@ -7,11 +7,13 @@ import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 class CountWeightInput extends StatefulWidget {
+  /// If [this.dimension == MovementDimension.distance] [distanceUnit] and [editDistanceUnit] must not be null.
   const CountWeightInput({
     required this.setValue,
     required this.confirmChanges,
     required this.dimension,
     this.distanceUnit,
+    this.editDistanceUnit,
     this.initialCount = 0,
     this.initialWeight,
     this.secondWeight = false,
@@ -28,6 +30,7 @@ class CountWeightInput extends StatefulWidget {
   final bool confirmChanges;
   final MovementDimension dimension;
   final DistanceUnit? distanceUnit;
+  final bool? editDistanceUnit;
   final int initialCount;
   final double? initialWeight;
   final bool secondWeight;
@@ -61,7 +64,8 @@ class _CountWeightInputState extends State<CountWeightInput> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (widget.dimension == MovementDimension.distance)
+              if (widget.dimension == MovementDimension.distance &&
+                  widget.editDistanceUnit!)
                 EditTile(
                   leading: null,
                   caption: "Distance Unit",

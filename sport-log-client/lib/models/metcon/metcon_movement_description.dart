@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -72,7 +73,7 @@ class MetconMovementDescription extends CompoundEntity {
 
     final weight = metconMovement.maleWeight != null &&
             metconMovement.femaleWeight != null
-        ? " @ ${metconMovement.maleWeight}/${metconMovement.femaleWeight} kg"
+        ? " @ ${formatWeight(metconMovement.maleWeight!, metconMovement.femaleWeight)}"
         : "";
 
     return "${movement.name}: $count $unit $weight";

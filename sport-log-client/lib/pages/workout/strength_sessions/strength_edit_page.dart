@@ -6,8 +6,7 @@ import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/page_return.dart';
-import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/models/strength/all.dart';
+import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -151,6 +150,8 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
                 },
                 confirmChanges: true,
                 dimension: _strengthSessionDescription.movement.dimension,
+                distanceUnit: DistanceUnit.m,
+                editDistanceUnit: false,
               ),
               const Divider(),
               Expanded(child: _setList),

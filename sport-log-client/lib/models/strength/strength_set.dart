@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/models/strength/eorm.dart';
 import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
@@ -69,8 +70,22 @@ class StrengthSet extends AtomicEntity {
     }
   }
 
-  String toDisplayName(MovementDimension dim) =>
-      formatCountWeight(dim, count, weight);
+  String toDisplayName(MovementDimension dim) {
+    final weightStr = weight == null ? null : formatWeight(weight!);
+    switch (dim) {
+      case MovementDimension.reps:
+        return weightStr != null ? '$count x $weightStr' : '$count reps';
+      case MovementDimension.time:
+        final result = Duration(milliseconds: count).formatTimeWithMillis;
+        return weightStr != null ? result + ' ($weightStr)' : result;
+      case MovementDimension.energy:
+        final result = '$count cal';
+        return weightStr != null ? result + ' ($weightStr)' : result;
+      case MovementDimension.distance:
+        final result = "$count m";
+        return weightStr != null ? result + ' ($weightStr)' : result;
+    }
+  }
 
   double? get volume => weight == null ? null : weight! * count.toDouble();
 
