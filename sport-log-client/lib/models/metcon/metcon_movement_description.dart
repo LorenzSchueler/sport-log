@@ -63,7 +63,7 @@ class MetconMovementDescription extends CompoundEntity {
 
     final String unit;
     if (movement.dimension == MovementDimension.distance) {
-      unit = metconMovement.distanceUnit!.displayName;
+      unit = metconMovement.distanceUnit!.name;
     } else if (movement.dimension == MovementDimension.time) {
       unit = "";
     } else {

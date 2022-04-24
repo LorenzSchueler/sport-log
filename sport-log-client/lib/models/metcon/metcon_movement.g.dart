@@ -36,7 +36,7 @@ Map<String, dynamic> _$MetconMovementToJson(MetconMovement instance) =>
 const _$DistanceUnitEnumMap = {
   DistanceUnit.m: 'Meter',
   DistanceUnit.km: 'Km',
-  DistanceUnit.yards: 'Yard',
-  DistanceUnit.feet: 'Foot',
-  DistanceUnit.miles: 'Mile',
+  DistanceUnit.yd: 'Yard',
+  DistanceUnit.ft: 'Foot',
+  DistanceUnit.mi: 'Mile',
 };

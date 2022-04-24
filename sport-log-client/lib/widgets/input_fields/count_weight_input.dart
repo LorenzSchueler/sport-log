@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/models/all.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/input_fields/double_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
@@ -9,8 +10,8 @@ class CountWeightInput extends StatefulWidget {
   const CountWeightInput({
     required this.setValue,
     required this.confirmChanges,
-    required this.countLabel,
-    this.countUnit,
+    required this.dimension,
+    this.distanceUnit,
     this.initialCount = 0,
     this.initialWeight,
     this.secondWeight = false,
@@ -18,10 +19,15 @@ class CountWeightInput extends StatefulWidget {
     Key? key,
   }) : super(key: key);
 
-  final void Function(int count, double? weight, double? secondWeight) setValue;
+  final void Function(
+    int count,
+    double? weight,
+    double? secondWeight,
+    DistanceUnit? distanceUnit,
+  ) setValue;
   final bool confirmChanges;
-  final String countLabel;
-  final String? countUnit;
+  final MovementDimension dimension;
+  final DistanceUnit? distanceUnit;
   final int initialCount;
   final double? initialWeight;
   final bool secondWeight;
@@ -35,12 +41,14 @@ class _CountWeightInputState extends State<CountWeightInput> {
   late int _count;
   late double? _weight;
   late double? _secondWeight;
+  late DistanceUnit? _distanceUnit;
 
   @override
   void initState() {
     _count = widget.initialCount;
     _weight = widget.initialWeight;
     _secondWeight = widget.initialSecondWeight;
+    _distanceUnit = widget.distanceUnit;
     super.initState();
   }
 
@@ -53,17 +61,56 @@ class _CountWeightInputState extends State<CountWeightInput> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (widget.dimension == MovementDimension.distance)
+                EditTile(
+                  leading: null,
+                  caption: "Distance Unit",
+                  child: SizedBox(
+                    height: 24,
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton(
+                        value: _distanceUnit,
+                        items: DistanceUnit.values
+                            .map(
+                              (unit) => DropdownMenuItem(
+                                value: unit,
+                                child: Text(unit.name),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (unit) {
+                          if (unit != null && unit is DistanceUnit) {
+                            setState(() => _distanceUnit = unit);
+                            if (!widget.confirmChanges) {
+                              widget.setValue(
+                                _count,
+                                _weight,
+                                _secondWeight,
+                                _distanceUnit,
+                              );
+                            }
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ),
               EditTile(
                 leading: null,
-                caption: widget.countUnit == null
-                    ? widget.countLabel
-                    : "${widget.countLabel} (${widget.countUnit!})",
+                caption: widget.dimension == MovementDimension.distance
+                    ? "${widget.dimension.displayName} (${_distanceUnit!.name})"
+                    : widget.dimension.displayName,
                 child: IntInput(
                   initialValue: _count,
                   setValue: (count) {
                     setState(() => _count = count);
                     if (!widget.confirmChanges) {
-                      widget.setValue(_count, _weight, _secondWeight);
+                      widget.setValue(
+                        _count,
+                        _weight,
+                        _secondWeight,
+                        _distanceUnit,
+                      );
                     }
                   },
                 ),
@@ -82,6 +129,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
                           _count,
                           _weight,
                           _secondWeight,
+                          _distanceUnit,
                         );
                       }
                     },
@@ -97,7 +145,12 @@ class _CountWeightInputState extends State<CountWeightInput> {
                     setValue: (weight) {
                       setState(() => _secondWeight = weight);
                       if (!widget.confirmChanges) {
-                        widget.setValue(_count, _weight, _secondWeight);
+                        widget.setValue(
+                          _count,
+                          _weight,
+                          _secondWeight,
+                          _distanceUnit,
+                        );
                       }
                     },
                   ),
@@ -112,7 +165,12 @@ class _CountWeightInputState extends State<CountWeightInput> {
                           _secondWeight = 0;
                         });
                         if (!widget.confirmChanges) {
-                          widget.setValue(_count, _weight, _secondWeight);
+                          widget.setValue(
+                            _count,
+                            _weight,
+                            _secondWeight,
+                            _distanceUnit,
+                          );
                         }
                       },
                     )
@@ -125,7 +183,12 @@ class _CountWeightInputState extends State<CountWeightInput> {
                           _secondWeight = null;
                         });
                         if (!widget.confirmChanges) {
-                          widget.setValue(_count, _weight, _secondWeight);
+                          widget.setValue(
+                            _count,
+                            _weight,
+                            _secondWeight,
+                            _distanceUnit,
+                          );
                         }
                       },
                     ),
@@ -139,7 +202,12 @@ class _CountWeightInputState extends State<CountWeightInput> {
                 icon: const Icon(AppIcons.check),
                 iconSize: 40,
                 onPressed: _count > 0 && (_weight == null || _weight! > 0)
-                    ? () => widget.setValue(_count, _weight, _secondWeight)
+                    ? () => widget.setValue(
+                          _count,
+                          _weight,
+                          _secondWeight,
+                          _distanceUnit,
+                        )
                     : null,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),

@@ -15,28 +15,11 @@ enum DistanceUnit {
   @JsonValue('Km')
   km,
   @JsonValue('Yard')
-  yards,
+  yd,
   @JsonValue('Foot')
-  feet,
+  ft,
   @JsonValue('Mile')
-  miles,
-}
-
-extension DisplayName on DistanceUnit {
-  String get displayName {
-    switch (this) {
-      case DistanceUnit.m:
-        return 'm';
-      case DistanceUnit.km:
-        return 'km';
-      case DistanceUnit.yards:
-        return 'yard';
-      case DistanceUnit.feet:
-        return 'ft';
-      case DistanceUnit.miles:
-        return 'miles';
-    }
-  }
+  mi,
 }
 
 @JsonSerializable()

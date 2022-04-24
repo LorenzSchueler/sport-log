@@ -16,7 +16,12 @@ class NewSetInput extends StatelessWidget {
     this.initialSecondWeight,
   }) : super(key: key);
 
-  final void Function(int count, double? weight, double? secondWeight) onNewSet;
+  final void Function(
+    int count,
+    double? weight,
+    double? secondWeight,
+    DistanceUnit? distanceUnit,
+  ) onNewSet;
   final bool confirmChanges;
   final MovementDimension dimension;
   final DistanceUnit? distanceUnit;
@@ -27,43 +32,21 @@ class NewSetInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    switch (dimension) {
-      case MovementDimension.reps:
-        return CountWeightInput(
-          setValue: onNewSet,
-          confirmChanges: confirmChanges,
-          countLabel: dimension.displayName,
-          initialCount: initialCount,
-          initialWeight: initialWeight,
-          secondWeight: secondWeight,
-          initialSecondWeight: initialSecondWeight,
-        );
-      case MovementDimension.time:
-        return SetDurationInput(
-          onNewSet: onNewSet,
-          confirmChanges: confirmChanges,
-        );
-      case MovementDimension.distance:
-        return CountWeightInput(
-          setValue: onNewSet,
-          confirmChanges: confirmChanges,
-          countLabel: dimension.displayName,
-          countUnit: (distanceUnit ?? DistanceUnit.m).displayName,
-          initialCount: initialCount,
-          initialWeight: initialWeight,
-          secondWeight: secondWeight,
-          initialSecondWeight: initialSecondWeight,
-        );
-      case MovementDimension.energy:
-        return CountWeightInput(
-          setValue: onNewSet,
-          confirmChanges: confirmChanges,
-          countLabel: dimension.displayName,
-          initialCount: initialCount,
-          initialWeight: initialWeight,
-          secondWeight: secondWeight,
-          initialSecondWeight: initialSecondWeight,
-        );
-    }
+    return dimension == MovementDimension.time
+        ? SetDurationInput(
+            onNewSet: (count, weight, secondWeight) =>
+                onNewSet(count, weight, secondWeight, null),
+            confirmChanges: confirmChanges,
+          )
+        : CountWeightInput(
+            setValue: onNewSet,
+            confirmChanges: confirmChanges,
+            dimension: dimension,
+            distanceUnit: distanceUnit,
+            initialCount: initialCount,
+            initialWeight: initialWeight,
+            secondWeight: secondWeight,
+            initialSecondWeight: initialSecondWeight,
+          );
   }
 }

@@ -271,13 +271,9 @@ class SettingsPageState extends State<SettingsPage> {
                             child: Text(unit.name),
                           ),
                       ],
-                      underline: null,
                       onChanged: (units) {
                         if (units != null && units is Units) {
-                          setState(() {
-                            Settings.units =
-                                UnitsFromString.fromString(units.name);
-                          });
+                          setState(() => Settings.units = units);
                         }
                       },
                     ),
