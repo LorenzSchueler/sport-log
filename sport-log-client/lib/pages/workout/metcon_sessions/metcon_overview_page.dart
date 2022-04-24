@@ -3,6 +3,7 @@ import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -20,8 +21,10 @@ class MetconsPage extends StatefulWidget {
 
 class _MetconsPageState extends State<MetconsPage> {
   final _logger = Logger('MetconsPage');
+  final _searchBar = FocusNode();
   final _dataProvider = MetconDescriptionDataProvider();
   List<MetconDescription> _metconDescriptions = [];
+  String? _metconName;
 
   @override
   void initState() {
@@ -42,8 +45,8 @@ class _MetconsPageState extends State<MetconsPage> {
   }
 
   Future<void> _update() async {
-    _logger.d('Updating metcon page');
-    final metconDescriptions = await _dataProvider.getNonDeleted();
+    _logger.d('Updating metcon page filtered by name: $_metconName');
+    final metconDescriptions = await _dataProvider.getByMetconName(_metconName);
     setState(() => _metconDescriptions = metconDescriptions);
   }
 
@@ -52,8 +55,29 @@ class _MetconsPageState extends State<MetconsPage> {
     return NeverPop(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Metcons"),
+          title: _metconName == null
+              ? const Text("Metcons")
+              : TextFormField(
+                  focusNode: _searchBar,
+                  onChanged: (name) {
+                    _metconName = name;
+                    _update();
+                  },
+                  decoration: Theme.of(context).textFormFieldDecoration,
+                ),
           actions: [
+            IconButton(
+              onPressed: () {
+                _metconName = _metconName == null ? "" : null;
+                _update();
+                if (_metconName != null) {
+                  _searchBar.requestFocus();
+                }
+              },
+              icon: Icon(
+                _metconName != null ? AppIcons.close : AppIcons.search,
+              ),
+            ),
             IconButton(
               onPressed: () =>
                   Navigator.of(context).newBase(Routes.metcon.sessionOverview),

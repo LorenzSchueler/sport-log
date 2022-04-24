@@ -217,6 +217,19 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
       hasReference: await _metconSessionDataProvider.existsByMetcon(metcon),
     );
   }
+
+  Future<List<MetconDescription>> getByMetconName(String? name) async {
+    final metcons = await _metconDataProvider.getByName(name);
+    return await Future.wait(
+      metcons.map(
+        (metcon) async => MetconDescription(
+          metcon: metcon,
+          moves: await _getMmdByMetcon(metcon),
+          hasReference: await _metconSessionDataProvider.existsByMetcon(metcon),
+        ),
+      ),
+    );
+  }
 }
 
 class MetconSessionDescriptionDataProvider
