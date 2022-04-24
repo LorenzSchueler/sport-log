@@ -9,6 +9,7 @@ import 'package:sport_log/theme.dart';
 import 'package:sport_log/pages/login/landing_page.dart';
 import 'package:sport_log/settings.dart';
 import 'package:provider/provider.dart';
+import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
 
 Stream<double> initialize() async* {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,6 +75,7 @@ class InitAppWrapperState extends State<InitAppWrapper> {
     await for (final double progress in initialize()) {
       setState(() => _progress = progress);
     }
+    NewCredentialsDialog.isShown = false;
     setState(() => _progress = null);
   }
 }

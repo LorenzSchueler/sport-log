@@ -7,21 +7,20 @@ import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
-bool _dialogShown = false;
-
 Future<void> showNewCredentialsDialog() async {
-  if (!_dialogShown) {
-    _dialogShown = true;
+  if (!NewCredentialsDialog.isShown) {
+    NewCredentialsDialog.isShown = true;
     await showDialog<User>(
       builder: (_) => const NewCredentialsDialog(),
-      barrierDismissible: false,
       context: App.globalContext,
     );
-    _dialogShown = false;
+    NewCredentialsDialog.isShown = false;
   }
 }
 
 class NewCredentialsDialog extends StatefulWidget {
+  static bool isShown = false;
+
   const NewCredentialsDialog({Key? key}) : super(key: key);
 
   @override
@@ -58,8 +57,12 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
                   _passwordInput(context),
                   Defaults.sizedBox.vertical.normal,
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      ElevatedButton(
+                        child: const Text("Ignore"),
+                        onPressed: Navigator.of(context).pop,
+                      ),
+                      const Spacer(),
                       if (_loginPending)
                         Container(
                           child: const CircularProgressIndicator(),

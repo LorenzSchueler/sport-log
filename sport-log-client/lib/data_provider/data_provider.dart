@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier, VoidCallback;
 import 'package:sport_log/api/api.dart';
@@ -56,7 +58,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
         return null;
       case ApiErrorCode.unauthorized:
         _logger.w('Tried sync but access unauthorized.', error);
-        await showNewCredentialsDialog();
+        unawaited(showNewCredentialsDialog());
         return null;
       // create something that refereces non existing object
       case ApiErrorCode.forbidden:
