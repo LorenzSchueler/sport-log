@@ -77,6 +77,8 @@ class MapPageState extends State<MapPage> {
     );
   }
 
+  static const _searchBackgroundColor = Color.fromARGB(150, 255, 255, 255);
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
@@ -118,6 +120,10 @@ class MapPageState extends State<MapPage> {
                           });
                         },
                         decoration: Theme.of(context).textFormFieldDecoration,
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline6!
+                            .copyWith(color: Colors.black),
                       ),
                 actions: [
                   IconButton(
@@ -138,6 +144,9 @@ class MapPageState extends State<MapPage> {
                     ),
                   ),
                 ],
+                foregroundColor: Theme.of(context).colorScheme.background,
+                backgroundColor: _searchBackgroundColor,
+                elevation: 0,
               )
             : null,
         drawer: const MainDrawer(selectedRoute: Routes.map),
@@ -220,45 +229,50 @@ class MapPageState extends State<MapPage> {
                 left: 0,
                 child: Container(
                   padding: Defaults.edgeInsets.normal,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(10),
-                    ),
-                  ),
+                  color: _searchBackgroundColor,
                   constraints: const BoxConstraints(maxHeight: 200),
-                  child: Scrollbar(
-                    child: ListView.separated(
-                      padding: EdgeInsets.zero,
-                      itemBuilder: (context, index) => GestureDetector(
-                        onTap: () {
-                          setState(() => _searchResultsVisible = false);
-                          FocusScope.of(context)
-                              .requestFocus(FocusNode()); // unfocus
-                          final coords = _searchResults[index].center!;
-                          final latLng = LatLng(coords[1], coords[0]);
-                          _mapController.animateCenter(latLng);
+                  child: MediaQuery.removePadding(
+                    context: context,
+                    removeTop: true,
+                    child: Scrollbar(
+                      isAlwaysShown: true,
+                      child: ListView.separated(
+                        padding: EdgeInsets.zero,
+                        itemBuilder: (context, index) => GestureDetector(
+                          onTap: () {
+                            setState(() => _searchResultsVisible = false);
+                            FocusScope.of(context)
+                                .requestFocus(FocusNode()); // unfocus
+                            final coords = _searchResults[index].center!;
+                            final latLng = LatLng(coords[1], coords[0]);
+                            _mapController.animateCenter(latLng);
 
-                          final bbox = _searchResults[index].bbox;
-                          if (bbox != null) {
-                            final bounds = [
-                              LatLng(bbox[1], bbox[0]),
-                              LatLng(bbox[3], bbox[2])
-                            ].latLngBounds!;
-                            _mapController.animateBounds(bounds, padded: false);
-                          } else {
-                            _mapController.animateZoom(16);
-                          }
-                        },
-                        child: Text(
-                          _searchResults[index].toString(),
-                          style: Theme.of(context).textTheme.subtitle1,
+                            final bbox = _searchResults[index].bbox;
+                            if (bbox != null) {
+                              final bounds = [
+                                LatLng(bbox[1], bbox[0]),
+                                LatLng(bbox[3], bbox[2])
+                              ].latLngBounds!;
+                              _mapController.animateBounds(
+                                bounds,
+                                padded: false,
+                              );
+                            } else {
+                              _mapController.animateZoom(16);
+                            }
+                          },
+                          child: Text(
+                            _searchResults[index].toString(),
+                            style: Theme.of(context)
+                                .textTheme
+                                .subtitle1!
+                                .copyWith(color: Colors.black),
+                          ),
                         ),
+                        itemCount: _searchResults.length,
+                        separatorBuilder: (context, index) => const Divider(),
+                        shrinkWrap: true,
                       ),
-                      itemCount: _searchResults.length,
-                      separatorBuilder: (context, index) => const Divider(),
-                      shrinkWrap: true,
                     ),
                   ),
                 ),
@@ -378,7 +392,7 @@ class MapStylesBottomSheet extends StatelessWidget {
             ),
             onPressed: () {
               if (hillshade) {
-                mapController.removeLayer("hillshadeX");
+                mapController.removeLayer("custom-hillshade");
               } else {
                 mapController
                   ..addSource(
@@ -389,7 +403,7 @@ class MapStylesBottomSheet extends StatelessWidget {
                   )
                   ..addHillshadeLayer(
                     "dem",
-                    "hillshadeX",
+                    "custom-hillshade",
                     HillshadeLayerProperties(
                       hillshadeShadowColor:
                           const Color.fromARGB(255, 60, 60, 60)
