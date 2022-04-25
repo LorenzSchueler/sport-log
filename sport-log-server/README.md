@@ -45,6 +45,12 @@
 psql -h localhost -U sport_admin -d sport_log
 ```
 
+## Backup database
+
+```bash
+pg_dump --dbname=postgres://sport_admin:<password>@localhost/sport_log --data-only --inserts > sport-log_$(date +%Y-%m-%d).dump.sql
+```
+
 ## Run server in debug mode
 
 ```bash
