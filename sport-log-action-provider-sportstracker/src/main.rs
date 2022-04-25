@@ -252,7 +252,7 @@ async fn fetch() -> Result<(), ReqwestError> {
                         .map_err(Error::Reqwest)?;
                     let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
                     let movements: Vec<Movement> = client
-                        .get(format!("{}/v1.0/movement", CONFIG.base_url))
+                        .get(format!("{}/v0.2/movement", CONFIG.base_url))
                         .basic_auth(&username, Some(&CONFIG.password))
                         .send()
                         .await
@@ -329,7 +329,7 @@ async fn fetch() -> Result<(), ReqwestError> {
                         };
 
                         let response = client
-                            .post(format!("{}/v1.0/cardio_session", CONFIG.base_url))
+                            .post(format!("{}/v0.2/cardio_session", CONFIG.base_url))
                             .basic_auth(&username, Some(&CONFIG.password))
                             .json(&cardio_session)
                             .send()

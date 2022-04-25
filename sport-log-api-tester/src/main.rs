@@ -21,7 +21,7 @@
 //! Create a [User](../sport_log_types/types/struct.User.html)
 //!
 //! ```sh
-//! sport-log-api-tester POST /v1.0/user '
+//! sport-log-api-tester POST /v0.2/user '
 //! {
 //!     "username": "MyUsername",
 //!     "password": "MyPassword",
@@ -32,7 +32,7 @@
 //! Create new [PlatformCredential](../sport_log_types/types/struct.PlatformCredential.html)
 //!
 //! ```sh
-//! sport-log-api-tester POST /v1.0/platform_credential MyUsername MyPassword '
+//! sport-log-api-tester POST /v0.2/platform_credential MyUsername MyPassword '
 //! {
 //!     "user_id": 4,
 //!     "platform_id": 1,
@@ -44,13 +44,13 @@
 //! Get own [User](../sport_log_types/types/struct.User.html)
 //!
 //! ```sh
-//! sport-log-api-tester GET /v1.0/user MyUsername MyPassword
+//! sport-log-api-tester GET /v0.2/user MyUsername MyPassword
 //! ```
 //!
 //! Update own [User](../sport_log_types/types/struct.User.html)
 //!
 //! ```sh
-//! sport-log-api-tester PUT /v1.0/user MyUsername MyPassword '
+//! sport-log-api-tester PUT /v0.2/user MyUsername MyPassword '
 //! {
 //!     "id": 4,
 //!     "username": "MyNewUsername",
@@ -62,7 +62,7 @@
 //! Delete own [User](../sport_log_types/types/struct.User.html)
 //!
 //! ```sh
-//! sport-log-api-tester DELETE /v1.0/user MyUsername MyPassword
+//! sport-log-api-tester DELETE /v0.2/user MyUsername MyPassword
 //! ```
 
 use std::{

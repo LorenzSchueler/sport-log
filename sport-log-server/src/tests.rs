@@ -23,7 +23,7 @@ use sport_log_types::{
     Db, Diary, DiaryId, HardDelete, Platform, PlatformId, Update, User, UserId, ADMIN_USERNAME,
 };
 
-use crate::rocket;
+use crate::{rocket, VERSION};
 
 const ADMIN_PASSWORD: &str = "admin-passwd";
 const AP_ID: ActionProviderId = ActionProviderId(123456789);
@@ -37,6 +37,10 @@ const USER2_USERNAME: &str = "user2123456789";
 const USER2_PASSWORD: &str = "user2123456789-passwd";
 const PLATFORM_ID: PlatformId = PlatformId(123456789);
 const ACTION_ID: ActionId = ActionId(123456789);
+
+fn route(path: &str) -> String {
+    format!("/v{VERSION}{path}")
+}
 
 fn basic_auth<'h>(username: &str, password: &str) -> Header<'h> {
     Header::new(
@@ -330,38 +334,38 @@ async fn auth_as_without_credentials(route: &str, id: i64) {
 
 #[tokio::test]
 async fn admin_auth() {
-    auth("/v1.0/adm/platform", ADMIN_USERNAME, ADMIN_PASSWORD).await
+    auth(&route("/adm/platform"), ADMIN_USERNAME, ADMIN_PASSWORD).await
 }
 
 #[tokio::test]
 async fn admin_auth_wrong_credentials() {
-    auth_wrong_credentials("/v1.0/adm/platform", ADMIN_USERNAME).await;
+    auth_wrong_credentials(&route("/adm/platform"), ADMIN_USERNAME).await;
 }
 
 #[tokio::test]
 async fn admin_auth_without_credentials() {
-    auth_without_credentials("/v1.0/adm/platform").await;
+    auth_without_credentials(&route("/adm/platform")).await;
 }
 
 #[tokio::test]
 async fn ap_auth() {
-    auth("/v1.0/ap/action_provider", AP_USERNAME, AP_PASSWORD).await;
+    auth(&route("/ap/action_provider"), AP_USERNAME, AP_PASSWORD).await;
 }
 
 #[tokio::test]
 async fn ap_auth_wrong_credentials() {
-    auth_wrong_credentials("/v1.0/ap/action_provider", AP_USERNAME).await;
+    auth_wrong_credentials(&route("/ap/action_provider"), AP_USERNAME).await;
 }
 
 #[tokio::test]
 async fn ap_auth_without_credentials() {
-    auth_without_credentials("/v1.0/ap/action_provider").await;
+    auth_without_credentials(&route("/ap/action_provider")).await;
 }
 
 #[tokio::test]
 async fn admin_as_ap_auth() {
     auth_as(
-        "/v1.0/ap/action_provider",
+        &route("/ap/action_provider"),
         ADMIN_USERNAME,
         AP_ID.0,
         ADMIN_PASSWORD,
@@ -371,57 +375,57 @@ async fn admin_as_ap_auth() {
 
 #[tokio::test]
 async fn admin_as_ap_auth_wrong_credentials() {
-    auth_as_wrong_credentials("/v1.0/ap/action_provider", ADMIN_USERNAME, AP_ID.0).await;
+    auth_as_wrong_credentials(&route("/ap/action_provider"), ADMIN_USERNAME, AP_ID.0).await;
 }
 
 #[tokio::test]
 async fn admin_as_ap_auth_without_credentials() {
-    auth_as_without_credentials("/v1.0/ap/action_provider", AP_ID.0).await;
+    auth_as_without_credentials(&route("/ap/action_provider"), AP_ID.0).await;
 }
 
 #[tokio::test]
 async fn user_auth() {
-    auth("/v1.0/user", USER_USERNAME, USER_PASSWORD).await;
+    auth(&route("/user"), USER_USERNAME, USER_PASSWORD).await;
 }
 
 #[tokio::test]
 async fn user_auth_wrong_credentials() {
-    auth_wrong_credentials("/v1.0/user", USER_USERNAME).await;
+    auth_wrong_credentials(&route("/user"), USER_USERNAME).await;
 }
 
 #[tokio::test]
 async fn user_auth_without_credentials() {
-    auth_without_credentials("/v1.0/user").await;
+    auth_without_credentials(&route("/user")).await;
 }
 
 #[tokio::test]
 async fn admin_as_user_auth() {
-    auth_as("/v1.0/user", ADMIN_USERNAME, USER_ID.0, ADMIN_PASSWORD).await;
+    auth_as(&route("/user"), ADMIN_USERNAME, USER_ID.0, ADMIN_PASSWORD).await;
 }
 
 #[tokio::test]
 async fn admin_as_user_auth_wrong_credentials() {
-    auth_as_wrong_credentials("/v1.0/user", ADMIN_USERNAME, USER_ID.0).await;
+    auth_as_wrong_credentials(&route("/user"), ADMIN_USERNAME, USER_ID.0).await;
 }
 
 #[tokio::test]
 async fn admin_as_user_auth_without_credentials() {
-    auth_as_without_credentials("/v1.0/user", USER_ID.0).await;
+    auth_as_without_credentials(&route("/user"), USER_ID.0).await;
 }
 
 #[tokio::test]
 async fn user_ap_auth() {
-    auth("/v1.0/diary", USER_USERNAME, USER_PASSWORD).await;
+    auth(&route("/diary"), USER_USERNAME, USER_PASSWORD).await;
 }
 
 #[tokio::test]
 async fn user_ap_auth_wrong_credentials() {
-    auth_wrong_credentials("/v1.0/diary", USER_USERNAME).await;
+    auth_wrong_credentials(&route("/diary"), USER_USERNAME).await;
 }
 
 #[tokio::test]
 async fn user_ap_auth_without_credentials() {
-    auth_without_credentials("/v1.0/diary").await;
+    auth_without_credentials(&route("/diary")).await;
 }
 
 #[tokio::test]
@@ -439,7 +443,7 @@ async fn ap_as_user_ap_auth() {
     };
     create_action_event(action_event.clone()).await;
 
-    auth_as("/v1.0/diary", AP_USERNAME, USER_ID.0, AP_PASSWORD).await;
+    auth_as(&route("/diary"), AP_USERNAME, USER_ID.0, AP_PASSWORD).await;
 
     delete_action_event(action_event).await;
 }
@@ -473,7 +477,7 @@ async fn ap_as_user_ap_auth_no_event() {
     create_action_event(action_event2.clone()).await;
 
     //  check that ap has no access
-    auth_as_not_allowed("/v1.0/diary", AP_USERNAME, USER_ID.0, AP_PASSWORD).await;
+    auth_as_not_allowed(&route("/diary"), AP_USERNAME, USER_ID.0, AP_PASSWORD).await;
 
     delete_action_event(action_event1).await;
     delete_action_event(action_event2).await;
@@ -494,7 +498,7 @@ async fn ap_as_user_ap_auth_wrong_credentials() {
     };
     create_action_event(action_event.clone()).await;
 
-    auth_as_wrong_credentials("/v1.0/diary", AP_USERNAME, USER_ID.0).await;
+    auth_as_wrong_credentials(&route("/diary"), AP_USERNAME, USER_ID.0).await;
 
     delete_action_event(action_event).await;
 }
@@ -514,32 +518,32 @@ async fn ap_as_user_ap_auth_without_credentials() {
     };
     create_action_event(action_event).await;
 
-    auth_as_without_credentials("/v1.0/diary", USER_ID.0).await;
+    auth_as_without_credentials(&route("/diary"), USER_ID.0).await;
 }
 
 #[tokio::test]
 async fn admin_as_user_ap_auth() {
-    auth_as("/v1.0/diary", ADMIN_USERNAME, USER_ID.0, ADMIN_PASSWORD).await;
+    auth_as(&route("/diary"), ADMIN_USERNAME, USER_ID.0, ADMIN_PASSWORD).await;
 }
 
 #[tokio::test]
 async fn admin_as_user_ap_auth_wrong_credentials() {
-    auth_as_wrong_credentials("/v1.0/diary", ADMIN_USERNAME, USER_ID.0).await;
+    auth_as_wrong_credentials(&route("/diary"), ADMIN_USERNAME, USER_ID.0).await;
 }
 
 #[tokio::test]
 async fn admin_as_user_ap_auth_without_credentials() {
-    auth_as_without_credentials("/v1.0/diary", USER_ID.0).await;
+    auth_as_without_credentials(&route("/diary"), USER_ID.0).await;
 }
 
-#[allow(clippy::needless_lifetimes)]
+//#[allow(clippy::needless_lifetimes)]
 async fn create_diary<'c>(
     client: &'c Client,
     username: &str,
     password: &str,
     user_id: i64,
 ) -> (DiaryId, LocalResponse<'c>) {
-    let mut request = client.post("/v1.0/diary");
+    let mut request = client.post("/v0.2/diary");
     request.add_header(basic_auth(username, password));
     let diary_id = DiaryId(rand::thread_rng().gen());
     let diary = Diary {
@@ -582,13 +586,14 @@ async fn foreign_get() {
     assert_ok_json(&response);
 
     // check that get works for same user
-    let mut request = client.get(format!("/v1.0/diary/{}", diary_id.0));
+    let mut request = client.get(format!("{}/{}", route("/diary"), diary_id.0));
     request.add_header(basic_auth(USER_USERNAME, USER_PASSWORD));
     let response = request.dispatch().await;
     assert_ok_json(&response);
 
     // check that get does not work for other user
-    let mut request = client.get(format!("/v1.0/diary/{}", diary_id.0));
+    let mut request = client.get(format!("{}/{}", route("/diary"), diary_id.0));
+
     request.add_header(basic_auth(USER2_USERNAME, USER2_PASSWORD));
     let response = request.dispatch().await;
     assert_forbidden_json(&response);
@@ -614,14 +619,15 @@ async fn foreign_update() {
     };
 
     // check that update works for same user
-    let mut request = client.put("/v1.0/diary");
+    let route = route("/diary");
+    let mut request = client.put(&route);
     request.add_header(basic_auth(USER_USERNAME, USER_PASSWORD));
     let request = request.json(&diary);
     let response = request.dispatch().await;
     assert_ok_json(&response);
 
     // check that update does not work for other user
-    let mut request = client.put("/v1.0/diary");
+    let mut request = client.put(&route);
     request.add_header(basic_auth(USER2_USERNAME, USER2_PASSWORD));
     let request = request.json(&diary);
     let response = request.dispatch().await;
@@ -644,7 +650,8 @@ async fn user_self_registration() {
         last_change: Utc::now(),
     };
 
-    let request = client.post("/v1.0/user");
+    let route = route("/user");
+    let request = client.post(&route);
     let request = request.json(&user);
     let response = request.dispatch().await;
 
@@ -671,7 +678,8 @@ async fn ap_self_registration() {
         deleted: false,
     };
 
-    let request = client.post("/v1.0/ap/platform");
+    let platform_route = route("/ap/platform");
+    let request = client.post(&platform_route);
     let request = request.json(&platform);
     let response = request.dispatch().await;
 
@@ -681,7 +689,7 @@ async fn ap_self_registration() {
         assert_forbidden_json(&response);
     }
 
-    let request = client.get("/v1.0/ap/platform");
+    let request = client.get(&platform_route);
     let response = request.dispatch().await;
 
     if config.ap_self_registration {
@@ -700,7 +708,8 @@ async fn ap_self_registration() {
         deleted: false,
     };
 
-    let request = client.post("/v1.0/ap/action_provider");
+    let ap_route = route("/ap/action_provider");
+    let request = client.post(&ap_route);
     let request = request.json(&action_provider);
     let response = request.dispatch().await;
 
@@ -727,7 +736,8 @@ async fn update_non_existing() {
         deleted: false,
     };
 
-    let mut request = client.put("/v1.0/diary");
+    let route = route("/diary");
+    let mut request = client.put(&route);
     request.add_header(basic_auth(USER_USERNAME, USER_PASSWORD));
     let request = request.json(&diary);
     let response = request.dispatch().await;

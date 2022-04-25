@@ -211,7 +211,7 @@ async fn map_match() -> Result<()> {
 
             let mut cardio_session: CardioSession = client
                 .get(format!(
-                    "{}/v1.0/cardio_session/{}",
+                    "{}/v0.2/cardio_session/{}",
                     CONFIG.base_url, cardio_session_id.0
                 ))
                 .basic_auth(&username, Some(&CONFIG.password))
@@ -225,7 +225,7 @@ async fn map_match() -> Result<()> {
             let route = match_to_map(&cardio_session, exec_action_event.action_event_id).await?;
 
             let routes: Vec<Route> = client
-                .get(format!("{}/v1.0/route", CONFIG.base_url))
+                .get(format!("{}/v0.2/route", CONFIG.base_url))
                 .basic_auth(&username, Some(&CONFIG.password))
                 .send()
                 .await
@@ -238,7 +238,7 @@ async fn map_match() -> Result<()> {
                 cardio_session.route_id = Some(route_id);
             } else {
                 client
-                    .post(format!("{}/v1.0/route", CONFIG.base_url))
+                    .post(format!("{}/v0.2/route", CONFIG.base_url))
                     .basic_auth(&username, Some(&CONFIG.password))
                     .json(&route)
                     .send()
@@ -247,7 +247,7 @@ async fn map_match() -> Result<()> {
             }
 
             client
-                .put(format!("{}/v1.0/cardio_session", CONFIG.base_url))
+                .put(format!("{}/v0.2/cardio_session", CONFIG.base_url))
                 .basic_auth(&username, Some(&CONFIG.password))
                 .json(&cardio_session)
                 .send()

@@ -35,7 +35,7 @@ pub async fn setup(
     };
 
     let response = client
-        .post(format!("{}/v1.0/ap/platform", base_url))
+        .post(format!("{}/v0.2/ap/platform", base_url))
         .json(&platform)
         .send()
         .await?;
@@ -48,7 +48,7 @@ pub async fn setup(
         StatusCode::CONFLICT => {
             info!("platform already exists");
             let platforms: Vec<Platform> = client
-                .get(format!("{}/v1.0/ap/platform", base_url))
+                .get(format!("{}/v0.2/ap/platform", base_url))
                 .send()
                 .await?
                 .json()
@@ -80,7 +80,7 @@ pub async fn setup(
     };
 
     let response = client
-        .post(format!("{}/v1.0/ap/action_provider", base_url))
+        .post(format!("{}/v0.2/ap/action_provider", base_url))
         .basic_auth(name, Some(&password))
         .json(&action_provider)
         .send()
@@ -94,7 +94,7 @@ pub async fn setup(
         StatusCode::CONFLICT => {
             info!("action provider already exists");
             let action_provider: ActionProvider = client
-                .get(format!("{}/v1.0/ap/action_provider", base_url))
+                .get(format!("{}/v0.2/ap/action_provider", base_url))
                 .basic_auth(name, Some(&password))
                 .send()
                 .await?
@@ -127,7 +127,7 @@ pub async fn setup(
         .collect();
 
     match client
-        .post(format!("{}/v1.0/ap/actions", base_url))
+        .post(format!("{}/v0.2/ap/actions", base_url))
         .basic_auth(name, Some(&password))
         .json(&actions)
         .send()
@@ -155,7 +155,7 @@ pub async fn get_events(
 
     let exec_action_events: Vec<ExecutableActionEvent> = client
         .get(format!(
-            "{}/v1.0/ap/executable_action_event/timespan/{}/{}",
+            "{}/v0.2/ap/executable_action_event/timespan/{}/{}",
             base_url, datetime_start, datetime_end
         ))
         .basic_auth(name, Some(&password))
@@ -174,7 +174,7 @@ pub async fn delete_events(
     action_event_ids: &[ActionEventId],
 ) -> Result<(), Error> {
     client
-        .delete(format!("{}/v1.0/ap/action_events", base_url,))
+        .delete(format!("{}/v0.2/ap/action_events", base_url,))
         .basic_auth(name, Some(&password))
         .json(action_event_ids)
         .send()
