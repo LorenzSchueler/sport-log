@@ -1,27 +1,3 @@
--- insert into "user" (id, username, password, email) values 
-    -- (1, 'user1', '$argon2id$v=19$m=4096,t=3,p=1$PurNCF1Y9tu+ETV/3yHSqA$mrMyoQ7YQbf+s9/30Bfma8VPlykLnC17dN2wG3zl9qc', 'email1'); -- "user1-passwd"
-
-insert into platform (id, name, credential) values 
-    (1, 'wodify', true),
-    (2, 'sportstracker', true);
-
-insert into action_provider (id, name, password, platform_id, description) values
-    (1, 'wodify-login', '$argon2id$v=19$m=4096,t=3,p=1$NZeOJg1K37UlxV5wB7yFhg$C7HNfVK9yLZTJyvJNSOhvYRfUK+nGo1rz0lIck1aO6c', 1, 
-        'Wodify Login can reserve spots in classes. The action names correspond to the class types.'), -- "wodify-login-passwd"
-    (2, 'wodify-wod', '$argon2id$v=19$m=4096,t=3,p=1$FscunZHcMdL3To4Zxc5z5w$InsqwdstEFdkszaokG1rk0HS0oazMm4zTynD6pjQEgw', 1,  
-        'Wodify Wod can fetch the Workout of the Day and save it in your wods. The action names correspond to the class type the wod should be fetched for.'), -- "wodify-wod-passwd"
-    (3, 'sportstracker-fetch', '$argon2id$v=19$m=4096,t=3,p=1$mmRowryKPKBhRSvrRZRFmg$VPInpHpMq47ZEymwSojrst+CWVOoHopBlvSIwybchAg', 2,  
-        'Sportstracker Fetch can fetch the latests workouts recorded with sportstracker and save them in your cardio sessions.'); -- "sportstracker-fetch-passwd"
-
-insert into action (id, name, action_provider_id, description, create_before, delete_after) values 
-    (1, 'CrossFit', 1, 'Reserve a spot in a CrossFit class.', 604800000, 0), 
-    (2, 'Weightlifting', 1, 'Reserve a spot in a Weightlifting class.', 604800000, 0), 
-    (3, 'Open Fridge', 1, 'Reserve a spot in a Open Fridge class.', 604800000, 0),
-    (4, 'CrossFit', 2, 'Fetch and save the CrossFit wod for the current day.', 604800000, 0), 
-    (5, 'Weightlifting', 2, 'Fetch and save the Weightlifting wod for the current day.', 604800000, 0), 
-    (6, 'Open Fridge', 2, 'Fetch and save the Open Fridge wod for the current day.', 604800000, 0), 
-    (7, 'fetch', 3, 'Fetch and save new workouts.', 604800000, 0);
-
 insert into movement (id, user_id, name, description, movement_dimension, cardio) values
     (1, null, 'Running', null, 'distance', true), -- outdoor
     (2, null, 'Running', null, 'energy', true),
