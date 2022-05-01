@@ -3,7 +3,7 @@ use std::{
     time::Duration as StdDuration,
 };
 
-use chrono::{Duration, Local, Utc};
+use chrono::{DateTime, Duration, Local, Utc};
 use err_derive::Error as StdError;
 use lazy_static::lazy_static;
 use reqwest::{Client, Error as ReqwestError};
@@ -49,7 +49,7 @@ type Result<T> = StdResult<T, Error>;
 #[derive(Deserialize, Debug)]
 struct Config {
     password: String,
-    base_url: String,
+    server_url: String,
 }
 
 lazy_static! {
@@ -110,7 +110,7 @@ async fn main() {
 
 async fn setup() -> Result<()> {
     setup_db(
-        &CONFIG.base_url,
+        &CONFIG.server_url,
         NAME,
         &CONFIG.password,
         DESCRIPTION,
@@ -149,7 +149,7 @@ async fn login(mode: Mode) -> Result<()> {
 
     let exec_action_events = get_events(
         &client,
-        &CONFIG.base_url,
+        &CONFIG.server_url,
         NAME,
         &CONFIG.password,
         Duration::hours(0),
@@ -216,8 +216,8 @@ async fn login(mode: Mode) -> Result<()> {
                 Err(Error::LoginFailed(action_event_id)) => {
                     delete_action_event_ids.push(action_event_id)
                 }
-                Err(Error::Timeout(action_event_id)) => {
-                    delete_action_event_ids.push(action_event_id)
+                Err(Error::Timeout(_)) => {
+                    error!("timeout")
                 }
                 Err(error) => error!("{}", error),
             },
@@ -231,7 +231,7 @@ async fn login(mode: Mode) -> Result<()> {
     if !delete_action_event_ids.is_empty() {
         delete_events(
             &client,
-            &CONFIG.base_url,
+            &CONFIG.server_url,
             NAME,
             &CONFIG.password,
             &delete_action_event_ids,
@@ -292,6 +292,7 @@ async fn try_login(
         .click()
         .await
         .map_err(Error::WebDriver)?;
+
     time::sleep(StdDuration::from_secs(2)).await;
 
     if driver
@@ -309,9 +310,7 @@ async fn try_login(
     }
     debug!("ready");
 
-    while Utc::now() < exec_action_event.datetime
-    // - Duration::days(1) + Duration::minutes(1) // TODO
-    {
+    while Utc::now() < exec_action_event.datetime - Duration::days(1) + Duration::minutes(1) {
         driver.refresh().await.map_err(Error::WebDriver)?; // TODO can this be removed?
 
         let rows = driver
