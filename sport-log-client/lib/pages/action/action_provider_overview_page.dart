@@ -102,7 +102,6 @@ class _ActionProviderOverviewPageState
                 ),
               ),
             ),
-      drawer: MainDrawer(selectedRoute: Routes.action.actionProviderOverview),
     );
   }
 }
