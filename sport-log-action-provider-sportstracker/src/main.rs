@@ -38,7 +38,7 @@ enum Error {
 #[derive(Deserialize, Debug)]
 struct Config {
     password: String,
-    base_url: String,
+    server_url: String,
 }
 
 lazy_static! {
@@ -154,7 +154,7 @@ async fn main() {
 
 async fn setup() -> Result<(), ReqwestError> {
     setup_db(
-        &CONFIG.base_url,
+        &CONFIG.server_url,
         NAME,
         &CONFIG.password,
         DESCRIPTION,
@@ -187,7 +187,7 @@ async fn fetch() -> Result<(), ReqwestError> {
 
     let exec_action_events = get_events(
         &client,
-        &CONFIG.base_url,
+        &CONFIG.server_url,
         NAME,
         &CONFIG.password,
         Duration::hours(0),
@@ -226,7 +226,7 @@ async fn fetch() -> Result<(), ReqwestError> {
 
                     let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
                     let movements: Vec<Movement> = client
-                        .get(format!("{}/v0.2/movement", CONFIG.base_url))
+                        .get(format!("{}/v0.2/movement", CONFIG.server_url))
                         .basic_auth(&username, Some(&CONFIG.password))
                         .send()
                         .await
@@ -320,7 +320,7 @@ async fn fetch() -> Result<(), ReqwestError> {
                         };
 
                         let response = client
-                            .post(format!("{}/v0.2/cardio_session", CONFIG.base_url))
+                            .post(format!("{}/v0.2/cardio_session", CONFIG.server_url))
                             .basic_auth(&username, Some(&CONFIG.password))
                             .json(&cardio_session)
                             .send()
@@ -378,7 +378,7 @@ async fn fetch() -> Result<(), ReqwestError> {
     if !delete_action_event_ids.is_empty() {
         delete_events(
             &client,
-            &CONFIG.base_url,
+            &CONFIG.server_url,
             NAME,
             &CONFIG.password,
             &delete_action_event_ids,
