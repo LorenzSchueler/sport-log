@@ -82,7 +82,7 @@ async fn main() {
     if cfg!(debug_assertions) {
         env::set_var(
             "RUST_LOG",
-            "warn,sport_log_action_provider_wodify_login=debug",
+            "info,sport_log_action_provider_wodify_login=debug",
         );
     } else {
         env::set_var("RUST_LOG", "warn");
