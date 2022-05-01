@@ -64,20 +64,28 @@ struct User {
 }
 
 #[derive(Deserialize, Debug)]
-struct Workouts {
-    payload: Vec<Workout>,
+struct WorkoutKeys {
+    payload: Vec<WorkoutKey>,
 }
 
 #[derive(Deserialize, Debug)]
-struct Workout {
+struct WorkoutKey {
+    #[serde(rename(deserialize = "workoutKey"))]
+    workout_key: String,
+}
+
+#[derive(Deserialize, Debug)]
+struct WorkoutStatsWrapper {
+    payload: WorkoutStats,
+}
+
+#[derive(Deserialize, Debug)]
+struct WorkoutStats {
     description: Option<String>,
     #[serde(rename(deserialize = "activityId"))]
     activity_id: u32,
     #[serde(rename(deserialize = "startTime"))]
     start_time: u64,
-    #[allow(dead_code)]
-    #[serde(rename(deserialize = "stopTime"))]
-    stop_time: u64,
     #[serde(rename(deserialize = "totalTime"))]
     total_time: f32,
     #[serde(rename(deserialize = "totalDistance"))]
@@ -86,60 +94,25 @@ struct Workout {
     total_ascent: f32,
     #[serde(rename(deserialize = "totalDescent"))]
     total_descent: f32,
-    #[allow(dead_code)]
-    #[serde(rename(deserialize = "startPosition"))]
-    start_position: StPosition,
-    #[allow(dead_code)]
-    #[serde(rename(deserialize = "stopPosition"))]
-    stop_position: StPosition,
-    #[allow(dead_code)]
-    #[serde(rename(deserialize = "centerPosition"))]
-    center_position: StPosition,
-    #[allow(dead_code)]
     #[serde(rename(deserialize = "stepCount"))]
     step_count: u32,
-    #[allow(dead_code)]
-    #[serde(rename(deserialize = "minAltitude"))]
-    min_altitude: Option<f32>,
-    #[allow(dead_code)]
-    #[serde(rename(deserialize = "sessionkey"))]
-    max_altitude: Option<f32>,
-    #[serde(rename(deserialize = "workoutKey"))]
-    workout_key: String,
-    //hrdata:
-    cadence: Cadence,
     #[serde(rename(deserialize = "energyConsumption"))]
     energy_consumption: u16,
 }
 
 #[derive(Deserialize, Debug)]
-struct StPosition {
-    #[allow(dead_code)]
-    x: f64,
-    #[allow(dead_code)]
-    y: f64,
+struct WorkoutTrackWrapper {
+    payload: WorkoutTrack,
 }
 
 #[derive(Deserialize, Debug)]
-struct Cadence {
-    #[allow(dead_code)]
-    max: f32,
-    avg: f32,
-}
-
-#[derive(Deserialize, Debug)]
-struct WorkoutDataWrapper {
-    payload: WorkoutData,
-}
-
-#[derive(Deserialize, Debug)]
-struct WorkoutData {
+struct WorkoutTrack {
     locations: Vec<Location>,
 }
 
 #[derive(Deserialize, Debug)]
 struct Location {
-    t: u32,  // seconds since start in 1/100 s
+    t: u32,  // seconds since start
     la: f64, // lat
     ln: f64, // lon
     s: u32,  // meter since start
@@ -247,9 +220,10 @@ async fn fetch() -> Result<(), ReqwestError> {
                 Some(token) => {
                     let token = (token.0, token.1.as_str());
 
-                    let workouts = get_workouts(&client, &token)
+                    let workout_keys = get_workout_keys(&client, &token)
                         .await
                         .map_err(Error::Reqwest)?;
+
                     let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
                     let movements: Vec<Movement> = client
                         .get(format!("{}/v0.2/movement", CONFIG.base_url))
@@ -268,15 +242,21 @@ async fn fetch() -> Result<(), ReqwestError> {
                         })
                         .collect();
 
-                    for workout in workouts {
-                        let workout_data = get_workout_data(&client, &token, &workout.workout_key)
-                            .await
-                            .map_err(Error::Reqwest)?;
-                        // TODO find more mappings or api endpoint
+                    for workout_key in workout_keys.payload {
+                        let workout_stats =
+                            get_workout_stats(&client, &token, &workout_key.workout_key)
+                                .await
+                                .map_err(Error::Reqwest)?;
+                        let workout_track =
+                            get_workout_track(&client, &token, &workout_key.workout_key)
+                                .await
+                                .map_err(Error::Reqwest)?;
 
-                        let activity = match workout.activity_id {
+                        let activity = match workout_stats.activity_id {
                             1 => "running",
+                            11 => "hiking",
                             22 => "trailrunning",
+                            31 => "skitouring",
                             _ => continue,
                         };
 
@@ -286,23 +266,34 @@ async fn fetch() -> Result<(), ReqwestError> {
                                 None => continue,
                             };
 
+                        let avg_cadence = (workout_stats.step_count as f64
+                            / (workout_stats.total_time / 60.) as f64)
+                            as i32;
+
                         let cardio_session = CardioSession {
                             id: CardioSessionId(rand::thread_rng().gen()),
                             user_id: exec_action_event.user_id,
                             cardio_blueprint_id: None,
                             movement_id,
-                            cardio_type: CardioType::Training,
+                            cardio_type: if activity == "running" || activity == "trailrunning" {
+                                CardioType::Training
+                            } else {
+                                CardioType::Freetime
+                            },
                             datetime: DateTime::from_utc(
-                                NaiveDateTime::from_timestamp(workout.start_time as i64 / 1000, 0),
+                                NaiveDateTime::from_timestamp(
+                                    workout_stats.start_time as i64 / 1000,
+                                    0,
+                                ),
                                 Utc,
                             ),
-                            distance: Some(workout.total_distance as i32),
-                            ascent: Some(workout.total_ascent as i32),
-                            descent: Some(workout.total_descent as i32),
-                            time: Some(workout.total_time as i32),
-                            calories: Some(workout.energy_consumption as i32),
+                            distance: Some(workout_stats.total_distance as i32),
+                            ascent: Some(workout_stats.total_ascent as i32),
+                            descent: Some(workout_stats.total_descent as i32),
+                            time: Some(workout_stats.total_time as i32 * 1000),
+                            calories: Some(workout_stats.energy_consumption as i32),
                             track: Some(
-                                workout_data
+                                workout_track
                                     .locations
                                     .into_iter()
                                     .map(|location| Position {
@@ -310,12 +301,12 @@ async fn fetch() -> Result<(), ReqwestError> {
                                         longitude: location.ln,
                                         elevation: location.h as f64,
                                         distance: location.s as f64,
-                                        time: location.t as i32,
+                                        time: location.t as i32 * 1000,
                                     })
                                     .collect(),
                             ),
-                            avg_cadence: if workout.cadence.avg > 0. {
-                                Some(workout.cadence.avg as i32)
+                            avg_cadence: if avg_cadence > 0 {
+                                Some(avg_cadence)
                             } else {
                                 None
                             },
@@ -323,7 +314,7 @@ async fn fetch() -> Result<(), ReqwestError> {
                             avg_heart_rate: None,
                             heart_rate: None,
                             route_id: None,
-                            comments: workout.description,
+                            comments: workout_stats.description,
                             last_change: Utc::now(),
                             deleted: false,
                         };
@@ -381,7 +372,7 @@ async fn fetch() -> Result<(), ReqwestError> {
         }
     }
 
-    info!("deleting {} action event", delete_action_event_ids.len());
+    info!("deleting {} action events", delete_action_event_ids.len());
     debug!("delete event ids: {:?}", delete_action_event_ids);
 
     if !delete_action_event_ids.is_empty() {
@@ -412,26 +403,53 @@ async fn get_token(
         .json()
         .await?;
 
+    debug!("token = {:?}", user.session_key);
+
     Ok(user.session_key.map(|key| ("token", key)))
 }
 
-async fn get_workouts(client: &Client, token: &(&str, &str)) -> Result<Vec<Workout>, ReqwestError> {
-    let workouts: Workouts = client
+async fn get_workout_keys(
+    client: &Client,
+    token: &(&str, &str),
+) -> Result<WorkoutKeys, ReqwestError> {
+    let limited = &("limited", "true");
+    let limit = &("limit", "100000");
+    let workouts: WorkoutKeys = client
         .get("https://api.sports-tracker.com/apiserver/v1/workouts")
-        .query(&[token])
+        .query(&[token, limited, limit])
         .send()
         .await?
         .json()
         .await?;
 
-    Ok(workouts.payload)
+    Ok(workouts)
 }
 
-async fn get_workout_data(
+async fn get_workout_stats(
     client: &Client,
     token: &(&str, &str),
     workout_key: &str,
-) -> Result<WorkoutData, ReqwestError> {
+) -> Result<WorkoutStats, ReqwestError> {
+    let samples = &("samples", "100000");
+
+    Ok(client
+        .get(format!(
+            "https://api.sports-tracker.com/apiserver/v1/workouts/{}",
+            workout_key
+        ))
+        .query(&[token, samples])
+        .send()
+        .await?
+        .json::<WorkoutStatsWrapper>()
+        .await?
+        .payload)
+}
+
+async fn get_workout_track(
+    client: &Client,
+    token: &(&str, &str),
+    workout_key: &str,
+) -> Result<WorkoutTrack, ReqwestError> {
     let samples = &("samples", "100000");
 
     Ok(client
@@ -442,11 +460,13 @@ async fn get_workout_data(
         .query(&[token, samples])
         .send()
         .await?
-        .json::<WorkoutDataWrapper>()
+        .json::<WorkoutTrackWrapper>()
         .await?
         .payload)
 }
 
-// workout stats:   https://api.sports-tracker.com/apiserver/v1/workouts/<workout_id>?token=sessionkey
-// gpx:             https://api.sports-tracker.com/apiserver/v1/workout/exportGpx/<workout_id>?token=sessionkey
-// similar routes:  https://api.sports-tracker.com/apiserver/v1/workouts/similarRoutes/<workout_id>?token=sessionkey
+// workout overview:https://api.sports-tracker.com/apiserver/v1/workouts?token=sessionkey&limited=true&limit=1000000
+// workout stats:   https://api.sports-tracker.com/apiserver/v1/workouts/<workout_key>?token=sessionkey
+// workout data:    https://api.sports-tracker.com/apiserver/v1/workouts/<workout_key>/data?token=sessionkey
+// gpx:             https://api.sports-tracker.com/apiserver/v1/workout/exportGpx/<workout_key>?token=sessionkey
+// similar routes:  https://api.sports-tracker.com/apiserver/v1/workouts/similarRoutes/<workout_key>?token=sessionkey
