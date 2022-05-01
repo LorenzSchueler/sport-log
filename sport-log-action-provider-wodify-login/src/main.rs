@@ -1,9 +1,12 @@
 use std::{
-    env, fs, io::Error as IoError, process, result::Result as StdResult,
+    env, fs,
+    io::Error as IoError,
+    process::{self, Stdio},
+    result::Result as StdResult,
     time::Duration as StdDuration,
 };
 
-use chrono::{DateTime, Duration, Local, Utc};
+use chrono::{Duration, Local, Utc};
 use err_derive::Error as StdError;
 use lazy_static::lazy_static;
 use reqwest::{Client, Error as ReqwestError};
@@ -79,7 +82,7 @@ async fn main() {
     if cfg!(debug_assertions) {
         env::set_var(
             "RUST_LOG",
-            "info,sport_log_action_provider_wodify_login=debug",
+            "warn,sport_log_action_provider_wodify_login=debug",
         );
     } else {
         env::set_var("RUST_LOG", "warn");
@@ -164,7 +167,11 @@ async fn login(mode: Mode) -> Result<()> {
         return Ok(());
     }
 
-    let mut webdriver = Command::new("../geckodriver").spawn().map_err(Error::Io)?;
+    let mut webdriver = Command::new("geckodriver")
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .map_err(Error::Io)?;
 
     let mut caps = DesiredCapabilities::firefox();
     if mode == Mode::Headless {
@@ -310,8 +317,9 @@ async fn try_login(
     }
     debug!("ready");
 
-    while Utc::now() < exec_action_event.datetime - Duration::days(1) + Duration::minutes(1) {
+    for _ in 0..10 {
         driver.refresh().await.map_err(Error::WebDriver)?; // TODO can this be removed?
+        debug!("reload done");
 
         let rows = driver
             .find_elements(By::XPath("//table[@class='TableRecords']/tbody/tr"))
@@ -344,7 +352,7 @@ async fn try_login(
                     .map_err(Error::WebDriver)?
                 {
                     if title.contains(&exec_action_event.action_name) && title.contains(&time) {
-                        row.find_element(By::XPath("./td[3]/div"))
+                        row.find_element(By::XPath("./td[3]/div/a"))
                             .await
                             .map_err(Error::WebDriver)?
                             .click()
