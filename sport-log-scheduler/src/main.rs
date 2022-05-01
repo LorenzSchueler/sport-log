@@ -39,7 +39,7 @@ pub const CONFIG_FILE: &str = "sport-log-scheduler.toml";
 ///
 /// `admin_password` is the password for the admin endpoints.
 ///
-/// `base_url` is the left part of the URL (everthing before `/<version>/...`)
+/// `server_url` is the left part of the URL (everthing before `/<version>/...`)
 ///
 /// `garbage_collection_min_days` is the number of days for which an entry has to been deleted and not changed in order to get hard deleted.
 /// If set to `0` garbage collection is disabled.

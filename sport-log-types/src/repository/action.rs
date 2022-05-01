@@ -301,6 +301,7 @@ impl GetAll for DeletableActionEvent {
     fn get_all(conn: &PgConnection) -> QueryResult<Vec<Self>> {
         action_event::table
             .inner_join(action::table)
+            .filter(action_event::columns::deleted.eq(false))
             .select((
                 action_event::columns::id,
                 action_event::columns::datetime,
