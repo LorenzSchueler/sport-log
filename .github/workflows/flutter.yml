@@ -60,6 +60,6 @@ jobs:
       run: flutter pub get
     - name: Build APK
       working-directory: sport-log-client
-      run: flutter build apk
+      run: flutter build apk --flavor production
       env:
         SDK_REGISTRY_TOKEN: ${{ secrets.SDK_REGISTRY_TOKEN }}

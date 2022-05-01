@@ -108,6 +108,7 @@ class Config extends JsonSerializable {
 
   static final Version apiVersion = Version(0, 2);
   static const String databaseName = 'database.sqlite';
+  static const Duration httpTimeout = Duration(seconds: 20);
 
   static const bool isWeb = kIsWeb;
   static bool isAndroid = Platform.isAndroid;
