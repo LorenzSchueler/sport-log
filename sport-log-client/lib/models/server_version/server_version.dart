@@ -44,7 +44,7 @@ class Version extends Comparable<Version> {
   Version(this.major, this.minor, [this.patch]);
 
   factory Version.fromString(String version) {
-    final parts = version.split(".");
+    final parts = version.split("-")[0].split(".");
     return Version(
       int.parse(parts[0]),
       int.parse(parts[1]),
