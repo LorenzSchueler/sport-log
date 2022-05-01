@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/config.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/text_tile.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class _Contributor {
   final String name;
@@ -56,8 +56,9 @@ class AboutPage extends StatelessWidget {
                   AppIcons.openInBrowser,
                   color: Theme.of(context).colorScheme.onBackground,
                 ),
-                onTap: () =>
-                    launch("https://github.com/LorenzSchueler/sport-log"),
+                onTap: () => launchUrlString(
+                  "https://github.com/LorenzSchueler/sport-log",
+                ),
               ),
             ),
             TextTile(
@@ -70,8 +71,9 @@ class AboutPage extends StatelessWidget {
                     decoration: TextDecoration.underline,
                   ),
                 ),
-                onTap: () =>
-                    launch("https://www.gnu.org/licenses/gpl-3.0.html"),
+                onTap: () => launchUrlString(
+                  "https://www.gnu.org/licenses/gpl-3.0.html",
+                ),
               ),
             ),
             TextTile(
@@ -88,7 +90,7 @@ class AboutPage extends StatelessWidget {
                           decoration: TextDecoration.underline,
                         ),
                       ),
-                      onTap: () => launch(c.github),
+                      onTap: () => launchUrlString(c.github),
                     ),
                   )
                 ],
