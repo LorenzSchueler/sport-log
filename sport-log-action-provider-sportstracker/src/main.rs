@@ -254,6 +254,7 @@ async fn fetch() -> Result<(), ReqwestError> {
 
                         let activity = match workout_stats.activity_id {
                             1 => "running",
+                            2 => "biking",
                             11 => "hiking",
                             22 => "trailrunning",
                             31 => "skitouring",
