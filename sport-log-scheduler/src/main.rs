@@ -46,13 +46,13 @@ pub const CONFIG_FILE: &str = "sport-log-scheduler.toml";
 #[derive(Deserialize)]
 pub struct Config {
     pub admin_password: String,
-    pub base_url: String,
+    pub server_url: String,
     pub garbage_collection_min_days: u32,
 }
 
 fn main() {
     if cfg!(debug_assertions) {
-        env::set_var("RUST_LOG", "info,sport_log_scheduler=debug");
+        env::set_var("RUST_LOG", "warn,sport_log_scheduler=debug");
     } else {
         env::set_var("RUST_LOG", "warn");
     }
@@ -99,7 +99,7 @@ fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     let creatable_action_rules: Vec<CreatableActionRule> = client
         .get(format!(
             "{}/v0.2/adm/creatable_action_rule",
-            config.base_url
+            config.server_url
         ))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .send()?
@@ -150,7 +150,7 @@ fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     debug!("{:#?}", action_events);
 
     client
-        .post(format!("{}/v0.2/adm/action_events", config.base_url))
+        .post(format!("{}/v0.2/adm/action_events", config.server_url))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .json(&action_events)
         .send()?
@@ -165,7 +165,7 @@ fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     let deletable_action_events: Vec<DeletableActionEvent> = client
         .get(format!(
             "{}/v0.2/adm/deletable_action_event",
-            config.base_url
+            config.server_url
         ))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .send()?
@@ -192,7 +192,7 @@ fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     debug!("{:#?}", action_event_ids);
 
     client
-        .delete(format!("{}/v0.2/adm/action_events", config.base_url,))
+        .delete(format!("{}/v0.2/adm/action_events", config.server_url,))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .json(&action_event_ids)
         .send()?
@@ -213,7 +213,7 @@ fn garbage_collection(client: &Client, config: &Config) -> Result<(), ReqwestErr
         client
             .delete(format!(
                 "{}/v0.2/adm/garbage_collection/{}",
-                config.base_url,
+                config.server_url,
                 Utc::now() - Duration::days(config.garbage_collection_min_days as i64)
             ))
             .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))

@@ -1,3 +1,0 @@
-admin_password = "admin-passwd"
-base_url = "http://localhost:8000"
-garbage_collection_min_days = 30
