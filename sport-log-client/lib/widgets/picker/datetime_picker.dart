@@ -5,10 +5,12 @@ import 'package:sport_log/widgets/picker/time_picker.dart';
 Future<DateTime?> showDateTimePicker({
   required BuildContext context,
   required DateTime initial,
+  bool future = false,
 }) async {
   final date = await showDatePickerWithDefaults(
     context: context,
     initialDate: initial,
+    future: future,
   );
   if (date != null) {
     final time = await showScrollableTimePicker(

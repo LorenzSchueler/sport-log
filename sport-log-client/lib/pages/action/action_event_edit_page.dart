@@ -121,6 +121,7 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
                   final datetime = await showDateTimePicker(
                     context: context,
                     initial: _actionEvent.datetime,
+                    future: true,
                   );
                   if (datetime != null) {
                     setState(() {
