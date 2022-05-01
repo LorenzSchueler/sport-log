@@ -35,7 +35,7 @@ class DateConverter extends JsonConverter<DateTime, String> {
 
   @override
   DateTime fromJson(String json) {
-    return DateTime.parse(json);
+    return DateTime.parse(json).toLocal();
   }
 
   @override
@@ -49,7 +49,7 @@ class DateTimeConverter extends JsonConverter<DateTime, String> {
 
   @override
   DateTime fromJson(String json) {
-    return DateTime.parse(json);
+    return DateTime.parse(json).toLocal();
   }
 
   @override
