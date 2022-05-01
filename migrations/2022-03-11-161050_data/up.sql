@@ -145,7 +145,13 @@ insert into movement (id, user_id, name, description, movement_dimension, cardio
     (144, null, 'Single Under', null, 'reps', false), -- jump rope
     (145, null, 'Double Under', null, 'reps', false),
     (146, null, 'Tripple Under', null, 'reps', false),
-    (147, null, 'Rest', null, 'time', false); -- rest
+    (147, null, 'Rest', null, 'time', false), -- rest
+    (148, null, 'Power Clean & Push Press', null, 'reps', false),
+    (149, null, 'Cable Row', null, 'reps', false),
+    (150, null, 'Barbell Biceps Curl', null, 'reps', false),
+    (151, null, 'Dumbbell Biceps Curl', null, 'reps', false),
+    (152, null, 'Kettlebell Overhead Press', null, 'reps', false),
+    (153, null, 'Snowboarding', null, 'distance', true);
 
 insert into eorm (reps, percentage) values
     (1, 1.0),
