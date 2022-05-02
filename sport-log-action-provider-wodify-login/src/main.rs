@@ -352,12 +352,12 @@ async fn try_login(
                     .map_err(Error::WebDriver)?
                 {
                     if title.contains(&exec_action_event.action_name) && title.contains(&time) {
-                        row.find_element(By::XPath("./td[3]/div/a"))
-                            .await
-                            .map_err(Error::WebDriver)?
-                            .click()
+                        let icon = row
+                            .find_element(By::XPath("./td[3]/div"))
                             .await
                             .map_err(Error::WebDriver)?;
+                        icon.scroll_into_view().await.map_err(Error::WebDriver)?;
+                        icon.click().await.map_err(Error::WebDriver)?;
                         info!("reservation successful");
 
                         if mode == Mode::Interactive {
