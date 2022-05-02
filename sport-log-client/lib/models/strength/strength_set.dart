@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/strength/eorm.dart';
 import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
@@ -70,11 +71,15 @@ class StrengthSet extends AtomicEntity {
     }
   }
 
-  String toDisplayName(MovementDimension dim) {
+  String toDisplayName(MovementDimension dim, {bool withEorm = false}) {
     final weightStr = weight == null ? null : formatWeight(weight!);
     switch (dim) {
       case MovementDimension.reps:
-        return weightStr != null ? '$count x $weightStr' : '$count reps';
+        return weightStr != null
+            ? withEorm
+                ? '$count x $weightStr  # ${formatWeight(eorm!)}'
+                : '$count x $weightStr'
+            : '$count reps';
       case MovementDimension.time:
         final result = Duration(milliseconds: count).formatTimeWithMillis;
         return weightStr != null ? result + ' ($weightStr)' : result;

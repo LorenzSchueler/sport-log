@@ -135,6 +135,7 @@ class _StrengthSessionDetailsPageState
                     child: Text(
                       set.toDisplayName(
                         _strengthSessionDescription.movement.dimension,
+                        withEorm: true,
                       ),
                     ),
                   ),
