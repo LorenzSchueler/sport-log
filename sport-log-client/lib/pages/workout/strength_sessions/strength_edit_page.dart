@@ -114,7 +114,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         ),
         body: Container(
           padding: Defaults.edgeInsets.normal,
-          child: Column(
+          child: ListView(
             children: [
               _movementInput,
               _dateTimeInput,
@@ -251,7 +251,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     return TextFormField(
       focusNode: _commentsNode,
       keyboardType: TextInputType.multiline,
-      minLines: null,
+      minLines: 1,
       maxLines: 5,
       onChanged: (text) {
         setState(() => _strengthSessionDescription.session.comments = text);
