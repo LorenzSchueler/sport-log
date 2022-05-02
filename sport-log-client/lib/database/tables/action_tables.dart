@@ -82,7 +82,7 @@ class ActionEventTable extends TableAccessor<ActionEvent> {
             ])})',
       ]),
       whereArgs: [actionProvider.id.toInt()],
-      orderBy: orderByDatetime,
+      orderBy: orderByDatetimeAsc,
     );
     return result.map(serde.fromDbRecord).toList();
   }

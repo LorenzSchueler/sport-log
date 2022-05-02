@@ -86,6 +86,10 @@ abstract class TableAccessor<T extends AtomicEntity> {
       "$tableName.${Columns.datetime} desc";
   String get orderByDatetime => orderByDatetimeOfTable(tableName);
 
+  static String orderByDatetimeOfTableAsc(String tableName) =>
+      "$tableName.${Columns.datetime} asc";
+  String get orderByDatetimeAsc => orderByDatetimeOfTableAsc(tableName);
+
   static String orderByDateOfTable(String tableName) =>
       "$tableName.${Columns.date} desc";
   String get orderByDate => orderByDateOfTable(tableName);
