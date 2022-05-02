@@ -9,6 +9,7 @@ import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/disable_tab_bar.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
@@ -56,34 +57,37 @@ class TimerPageState extends State<TimerPage> {
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
             title: const Text("Timer"),
-            bottom: TabBar(
-              onTap: (index) {
-                setState(() {
-                  _logger.i("ontap");
-                  _currentTime = Duration.zero;
-                });
-              },
-              indicatorColor: Theme.of(context).colorScheme.primary,
-              tabs: [
-                Tab(
-                  text: "AMRAP",
-                  icon: Icon(
-                    MetconType.amrap.icon,
+            bottom: DeactivatableTabBar(
+              child: TabBar(
+                onTap: (index) {
+                  setState(() {
+                    _logger.i("ontap");
+                    _currentTime = Duration.zero;
+                  });
+                },
+                indicatorColor: Theme.of(context).colorScheme.primary,
+                tabs: [
+                  Tab(
+                    text: "AMRAP",
+                    icon: Icon(
+                      MetconType.amrap.icon,
+                    ),
                   ),
-                ),
-                Tab(
-                  text: "EMOM",
-                  icon: Icon(
-                    MetconType.emom.icon,
+                  Tab(
+                    text: "EMOM",
+                    icon: Icon(
+                      MetconType.emom.icon,
+                    ),
                   ),
-                ),
-                Tab(
-                  text: "FOR TIME",
-                  icon: Icon(
-                    MetconType.forTime.icon,
-                  ),
-                )
-              ],
+                  Tab(
+                    text: "FOR TIME",
+                    icon: Icon(
+                      MetconType.forTime.icon,
+                    ),
+                  )
+                ],
+              ),
+              disabled: _timer != null,
             ),
           ),
           body: Container(
