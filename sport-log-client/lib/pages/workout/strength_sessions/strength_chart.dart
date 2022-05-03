@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
@@ -22,13 +23,14 @@ class StrengthChart extends StatefulWidget {
 
 class _StrengthChartState extends State<StrengthChart> {
   final _logger = Logger('StrengthChart');
+  late final availableSeries = getAvailableSeries(widget.movement.dimension);
 
   late SeriesType _activeSeriesType;
 
   @override
   void initState() {
     super.initState();
-    _activeSeriesType = getAvailableSeries(widget.movement.dimension).first;
+    _activeSeriesType = availableSeries.first;
     _logger
       ..i("movement: ${widget.movement.name}")
       ..i("date filter: ${widget.dateFilterState.name}");
@@ -38,7 +40,13 @@ class _StrengthChartState extends State<StrengthChart> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _seriesSelection(),
+        Scrollbar(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: _seriesSelection(),
+          ),
+        ),
+        Defaults.sizedBox.vertical.small,
         AspectRatio(
           aspectRatio: 1.8,
           child: Padding(
@@ -50,49 +58,43 @@ class _StrengthChartState extends State<StrengthChart> {
     );
   }
 
-  void _setSeriesType(SeriesType type) {
-    setState(() => _activeSeriesType = type);
-  }
-
   Widget _chart() {
-    if (widget.dateFilterState is DayFilter) {
-      return DayChart(
-        series: _activeSeriesType,
-        date: (widget.dateFilterState as DayFilter).start,
-        movement: widget.movement,
-      );
+    switch (widget.dateFilterState.runtimeType) {
+      case DayFilter:
+        return DayChart(
+          series: _activeSeriesType,
+          start: (widget.dateFilterState as DayFilter).start,
+          movement: widget.movement,
+        );
+      case WeekFilter:
+        return WeekChart(
+          series: _activeSeriesType,
+          start: (widget.dateFilterState as WeekFilter).start,
+          movement: widget.movement,
+        );
+      case MonthFilter:
+        return MonthChart(
+          series: _activeSeriesType,
+          start: (widget.dateFilterState as MonthFilter).start,
+          movement: widget.movement,
+        );
+      case YearFilter:
+        return YearChart(
+          series: _activeSeriesType,
+          start: (widget.dateFilterState as YearFilter).start,
+          movement: widget.movement,
+        );
+      default:
+        return AllChart(
+          series: _activeSeriesType,
+          movement: widget.movement,
+        );
     }
-    if (widget.dateFilterState is WeekFilter) {
-      return WeekChart(
-        series: _activeSeriesType,
-        start: (widget.dateFilterState as WeekFilter).start,
-        movement: widget.movement,
-      );
-    }
-    if (widget.dateFilterState is MonthFilter) {
-      return MonthChart(
-        series: _activeSeriesType,
-        start: (widget.dateFilterState as MonthFilter).start,
-        movement: widget.movement,
-      );
-    }
-    if (widget.dateFilterState is YearFilter) {
-      return YearChart(
-        series: _activeSeriesType,
-        start: (widget.dateFilterState as YearFilter).start,
-        movement: widget.movement,
-      );
-    }
-    return AllChart(
-      series: _activeSeriesType,
-      movement: widget.movement,
-    );
   }
 
   Widget _seriesSelection() {
-    final availableSeries = getAvailableSeries(widget.movement.dimension);
     return SelectionBar(
-      onChange: _setSeriesType,
+      onChange: (SeriesType type) => setState(() => _activeSeriesType = type),
       items: availableSeries,
       getLabel: (SeriesType type) =>
           type.toDisplayName(widget.movement.dimension),

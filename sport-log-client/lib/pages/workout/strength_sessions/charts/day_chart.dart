@@ -13,9 +13,9 @@ class DayChart extends StatefulWidget {
   DayChart({
     Key? key,
     required this.series,
-    required DateTime date,
+    required DateTime start,
     required this.movement,
-  })  : date = date.beginningOfDay(),
+  })  : date = start.beginningOfDay(),
         super(key: key);
 
   final SeriesType series;
