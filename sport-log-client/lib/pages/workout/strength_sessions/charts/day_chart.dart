@@ -67,7 +67,6 @@ class _DayChartState extends State<DayChart> {
   @override
   Widget build(BuildContext context) {
     final isTime = widget.movement.dimension == MovementDimension.time;
-    final getValue = setAccessor(widget.series);
     final color = Theme.of(context).colorScheme.primary;
     return BarChart(
       BarChartData(
@@ -77,7 +76,7 @@ class _DayChartState extends State<DayChart> {
                 x: index,
                 barRods: [
                   BarChartRodData(
-                    toY: getValue(set),
+                    toY: widget.series.setValue(set),
                     color: color,
                   )
                 ],

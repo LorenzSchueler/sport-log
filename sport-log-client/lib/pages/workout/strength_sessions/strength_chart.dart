@@ -96,8 +96,7 @@ class _StrengthChartState extends State<StrengthChart> {
     return SelectionBar(
       onChange: (SeriesType type) => setState(() => _activeSeriesType = type),
       items: availableSeries,
-      getLabel: (SeriesType type) =>
-          type.toDisplayName(widget.movement.dimension),
+      getLabel: (SeriesType type) => type.toDisplayName(),
       selectedItem: _activeSeriesType,
     );
   }

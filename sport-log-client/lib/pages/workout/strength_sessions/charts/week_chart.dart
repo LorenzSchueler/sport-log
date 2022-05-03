@@ -66,7 +66,6 @@ class _WeekChartState extends State<WeekChart> {
   }
 
   List<BarChartGroupData> get _barData {
-    final getValue = statsAccessor(widget.series);
     final result = <BarChartGroupData>[];
 
     var index = 0;
@@ -80,7 +79,7 @@ class _WeekChartState extends State<WeekChart> {
             x: i,
             barRods: [
               BarChartRodData(
-                toY: getValue(_strengthSessionStats[index]),
+                toY: widget.series.statValue(_strengthSessionStats[index]),
                 color: Theme.of(context).colorScheme.primary,
               )
             ],

@@ -67,14 +67,16 @@ class _MonthChartState extends State<MonthChart> {
 
   @override
   Widget build(BuildContext context) {
-    final getValue = statsAccessor(widget.series);
     final isTime = widget.movement.dimension == MovementDimension.time;
     return LineChart(
       LineChartData(
         lineBarsData: [
           LineChartBarData(
             spots: _strengthSessionStats.map((s) {
-              return FlSpot(s.datetime.day.toDouble(), getValue(s));
+              return FlSpot(
+                s.datetime.day.toDouble(),
+                widget.series.statValue(s),
+              );
             }).toList(),
             color: Theme.of(context).colorScheme.primary,
           ),

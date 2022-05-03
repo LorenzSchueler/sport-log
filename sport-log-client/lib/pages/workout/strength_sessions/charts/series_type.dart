@@ -14,7 +14,7 @@ enum SeriesType {
 }
 
 extension DisplayName on SeriesType {
-  String toDisplayName(MovementDimension dim) {
+  String toDisplayName() {
     switch (this) {
       case SeriesType.maxDistance:
         return 'Best Distance';
@@ -55,41 +55,43 @@ List<SeriesType> getAvailableSeries(MovementDimension dim) {
   }
 }
 
-double Function(StrengthSessionStats stats) statsAccessor(SeriesType type) {
-  switch (type) {
-    case SeriesType.maxDistance:
-      return (stats) => stats.maxCount.toDouble();
-    case SeriesType.minTime:
-      return (stats) => stats.minCount.toDouble();
-    case SeriesType.sumCalories:
-      return (stats) => stats.sumCount.toDouble();
-    case SeriesType.maxEorm:
-      return (stats) => stats.maxEorm ?? 0;
-    case SeriesType.maxWeight:
-      return (stats) => stats.maxWeight ?? 0;
-    case SeriesType.maxReps:
-      return (stats) => stats.maxCount.toDouble();
-    case SeriesType.avgReps:
-      return (stats) => stats.avgCount;
-    case SeriesType.sumVolume:
-      return (stats) => stats.sumVolume ?? 0;
+extension SeriesAccessor on SeriesType {
+  double statValue(StrengthSessionStats stats) {
+    switch (this) {
+      case SeriesType.maxDistance:
+        return stats.maxCount.toDouble();
+      case SeriesType.minTime:
+        return stats.minCount.toDouble();
+      case SeriesType.sumCalories:
+        return stats.sumCount.toDouble();
+      case SeriesType.maxEorm:
+        return stats.maxEorm ?? 0;
+      case SeriesType.maxWeight:
+        return stats.maxWeight ?? 0;
+      case SeriesType.maxReps:
+        return stats.maxCount.toDouble();
+      case SeriesType.avgReps:
+        return stats.avgCount;
+      case SeriesType.sumVolume:
+        return stats.sumVolume ?? 0;
+    }
   }
-}
 
-double Function(StrengthSet set) setAccessor(SeriesType type) {
-  switch (type) {
-    case SeriesType.maxDistance:
-    case SeriesType.minTime:
-    case SeriesType.sumCalories:
-    case SeriesType.maxEorm:
-      return (set) => set.eorm ?? 0;
-    case SeriesType.maxWeight:
-      return (set) => set.weight ?? 0;
-    case SeriesType.maxReps:
-      return (set) => set.count.toDouble();
-    case SeriesType.avgReps:
-      return (set) => set.count.toDouble();
-    case SeriesType.sumVolume:
-      return (set) => set.volume ?? 0;
+  double setValue(StrengthSet set) {
+    switch (this) {
+      case SeriesType.maxDistance:
+      case SeriesType.minTime:
+      case SeriesType.sumCalories:
+      case SeriesType.maxEorm:
+        return set.eorm ?? 0;
+      case SeriesType.maxWeight:
+        return set.weight ?? 0;
+      case SeriesType.maxReps:
+        return set.count.toDouble();
+      case SeriesType.avgReps:
+        return set.count.toDouble();
+      case SeriesType.sumVolume:
+        return set.volume ?? 0;
+    }
   }
 }

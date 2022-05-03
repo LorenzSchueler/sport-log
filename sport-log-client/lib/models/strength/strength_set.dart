@@ -3,7 +3,6 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/strength/eorm.dart';
 import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';

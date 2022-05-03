@@ -67,7 +67,6 @@ class _YearChartState extends State<YearChart> {
 
   @override
   Widget build(BuildContext context) {
-    final getValue = statsAccessor(widget.series);
     final isTime = widget.movement.dimension == MovementDimension.time;
     return LineChart(
       LineChartData(
@@ -76,7 +75,7 @@ class _YearChartState extends State<YearChart> {
             spots: _strengthSessionStats.map((s) {
               return FlSpot(
                 (s.datetime.difference(widget.start).inDays + 1).toDouble(),
-                getValue(s),
+                widget.series.statValue(s),
               );
             }).toList(),
             color: Theme.of(context).colorScheme.primary,

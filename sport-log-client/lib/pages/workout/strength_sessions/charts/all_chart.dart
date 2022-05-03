@@ -59,7 +59,6 @@ class _AllChartState extends State<AllChart> {
 
   @override
   Widget build(BuildContext context) {
-    final getValue = statsAccessor(widget.series);
     final isTime = widget.movement.dimension == MovementDimension.time;
 
     double fromDate(DateTime date) =>
@@ -77,7 +76,7 @@ class _AllChartState extends State<AllChart> {
         lineBarsData: [
           LineChartBarData(
             spots: _strengthSessionStats.map((s) {
-              return FlSpot(fromDate(s.datetime), getValue(s));
+              return FlSpot(fromDate(s.datetime), widget.series.statValue(s));
             }).toList(),
             color: Theme.of(context).colorScheme.primary,
             dotData: FlDotData(show: false),
