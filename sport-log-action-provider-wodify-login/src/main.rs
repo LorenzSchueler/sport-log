@@ -123,6 +123,11 @@ async fn setup() -> Result<()> {
             ("CrossFit", "Reserve a spot in a CrossFit class."),
             ("Weightlifting", "Reserve a spot in a Weightlifting class."),
             ("Open Fridge", "Reserve a spot in a Open Fridge class."),
+            ("Open Gym", "Reserve a spot in a Open Gym class."),
+            ("Gymnastics", "Reserve a spot in a Gymnastics class."),
+            ("Strongman", "Reserve a spot in a Strongman class."),
+            ("Yoga", "Reserve a spot in a Yoga class."),
+            ("Swim WOD", "Reserve a spot in a Swim class."),
         ],
         168,
         0,
@@ -156,7 +161,7 @@ async fn login(mode: Mode) -> Result<()> {
         NAME,
         &CONFIG.password,
         Duration::hours(0),
-        Duration::days(1) + Duration::minutes(1),
+        Duration::days(1) + Duration::minutes(2),
     )
     .await
     .map_err(Error::Reqwest)?;
@@ -248,7 +253,7 @@ async fn login(mode: Mode) -> Result<()> {
     }
 
     info!("terminating webdriver");
-    let _ = webdriver.kill();
+    let _ = webdriver.kill().await;
 
     Ok(())
 }
