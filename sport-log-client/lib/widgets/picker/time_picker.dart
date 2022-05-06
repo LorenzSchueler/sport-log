@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 
 Future<DateTime?> showScrollableTimePicker({
   required BuildContext context,
   required DateTime? initialTime,
-}) =>
-    showDialog<DateTime>(
-      context: context,
-      builder: (context) => TimePickerDialog(datetime: initialTime),
-    );
+}) async {
+  DateTime? datetime = await showDialog<DateTime>(
+    context: context,
+    builder: (context) => TimePickerDialog(datetime: initialTime),
+  );
+  if (datetime != null) {
+    datetime.copyWith(second: 0);
+  }
+  return datetime;
+}
 
 class TimePickerDialog extends StatefulWidget {
   const TimePickerDialog({this.datetime, Key? key}) : super(key: key);

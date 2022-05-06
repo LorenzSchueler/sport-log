@@ -75,6 +75,8 @@ extension DateTimeExtension on DateTime {
       return 'Today';
     } else if (isOnDay(DateTime.now().dayEarlier())) {
       return 'Yesterday';
+    } else if (isOnDay(DateTime.now().dayLater())) {
+      return 'Tomorrow';
     } else if (isInWeek(now)) {
       return _formatWeekday;
     } else if (isInYear(now)) {
@@ -222,5 +224,28 @@ extension DateTimeExtension on DateTime {
 
   DateTime withTime(TimeOfDay time) {
     return DateTime(year, month, day, time.hour, time.minute);
+  }
+
+  // ignore: long-parameter-list
+  DateTime copyWith({
+    int? year,
+    int? month,
+    int? day,
+    int? hour,
+    int? minute,
+    int? second,
+    int? millisecond,
+    int? microsecond,
+  }) {
+    return DateTime(
+      year ?? this.year,
+      month ?? this.month,
+      day ?? this.day,
+      hour ?? this.hour,
+      minute ?? this.minute,
+      second ?? this.second,
+      millisecond ?? this.millisecond,
+      microsecond ?? this.microsecond,
+    );
   }
 }
