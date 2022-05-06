@@ -96,6 +96,7 @@ class _WeekChartState extends State<WeekChart> {
   @override
   Widget build(BuildContext context) {
     final isTime = widget.movement.dimension == MovementDimension.time;
+
     return BarChart(
       BarChartData(
         barGroups: _barData,
@@ -103,7 +104,6 @@ class _WeekChartState extends State<WeekChart> {
         titlesData: FlTitlesData(
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
-              interval: null,
               showTitles: true,
               reservedSize: isTime ? 60 : 40,
               getTitlesWidget: isTime
@@ -127,7 +127,7 @@ class _WeekChartState extends State<WeekChart> {
         ),
         gridData: FlGridData(
           getDrawingHorizontalLine: gridLineDrawer(context),
-          getDrawingVerticalLine: gridLineDrawer(context),
+          drawVerticalLine: false,
         ),
       ),
     );

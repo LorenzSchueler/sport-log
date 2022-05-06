@@ -68,6 +68,7 @@ class _YearChartState extends State<YearChart> {
   @override
   Widget build(BuildContext context) {
     final isTime = widget.movement.dimension == MovementDimension.time;
+
     return LineChart(
       LineChartData(
         lineBarsData: [
@@ -92,15 +93,15 @@ class _YearChartState extends State<YearChart> {
             sideTitles: SideTitles(
               showTitles: true,
               interval: 1,
-              // checkToShowTitle: (_, __, ___, ____, value) {
-              // final date = DateTime(widget.start.year, 1, value.round());
-              // return date.day == 15;
-              // },
-              getTitlesWidget: (value, _) => Text(
-                shortMonthName(
-                  DateTime(widget.start.year, 1, value.round()).month,
-                ),
-              ),
+              getTitlesWidget: (value, _) {
+                return DateTime(widget.start.year, 1, value.round()).day == 15
+                    ? Text(
+                        shortMonthName(
+                          DateTime(widget.start.year, 1, value.round()).month,
+                        ),
+                      )
+                    : const Text("");
+              },
             ),
           ),
           leftTitles: AxisTitles(

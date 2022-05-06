@@ -67,7 +67,7 @@ class _DayChartState extends State<DayChart> {
   @override
   Widget build(BuildContext context) {
     final isTime = widget.movement.dimension == MovementDimension.time;
-    final color = Theme.of(context).colorScheme.primary;
+
     return BarChart(
       BarChartData(
         barGroups: _sets
@@ -77,7 +77,7 @@ class _DayChartState extends State<DayChart> {
                 barRods: [
                   BarChartRodData(
                     toY: widget.series.setValue(set),
-                    color: color,
+                    color: Theme.of(context).colorScheme.primary,
                   )
                 ],
               ),
@@ -87,7 +87,6 @@ class _DayChartState extends State<DayChart> {
         titlesData: FlTitlesData(
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
-              interval: null,
               showTitles: true,
               reservedSize: isTime ? 60 : 40,
               getTitlesWidget: isTime
@@ -98,13 +97,18 @@ class _DayChartState extends State<DayChart> {
                   : null,
             ),
           ),
-          bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, _) => Text("Set ${value.round() + 1}"),
+            ),
+          ),
           rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
           topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
         gridData: FlGridData(
           getDrawingHorizontalLine: gridLineDrawer(context),
-          getDrawingVerticalLine: gridLineDrawer(context),
+          drawVerticalLine: false,
         ),
       ),
     );

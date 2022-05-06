@@ -68,6 +68,7 @@ class _MonthChartState extends State<MonthChart> {
   @override
   Widget build(BuildContext context) {
     final isTime = widget.movement.dimension == MovementDimension.time;
+
     return LineChart(
       LineChartData(
         lineBarsData: [
@@ -87,7 +88,10 @@ class _MonthChartState extends State<MonthChart> {
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: 2,
+              interval: 1,
+              getTitlesWidget: (value, _) => value % 2 == 0
+                  ? Text(value.round().toString())
+                  : const Text(""),
             ),
           ),
           leftTitles: AxisTitles(
