@@ -6,8 +6,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/strength_session_stats.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
-import 'package:sport_log/pages/workout/strength_sessions/charts/all.dart';
-import 'package:sport_log/pages/workout/strength_sessions/charts/helpers.dart';
+import 'package:sport_log/pages/workout/charts/all.dart';
 import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 
 enum SeriesType {

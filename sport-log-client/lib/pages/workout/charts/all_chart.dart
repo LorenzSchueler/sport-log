@@ -2,7 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
-import 'package:sport_log/pages/workout/strength_sessions/charts/helpers.dart';
+import 'package:sport_log/pages/workout/charts/helpers.dart';
 
 /// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
 class AllChart extends StatelessWidget {
