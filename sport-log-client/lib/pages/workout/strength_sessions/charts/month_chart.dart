@@ -70,6 +70,14 @@ class _MonthChartState extends State<MonthChart> {
   Widget build(BuildContext context) {
     final isTime = widget.movement.dimension == MovementDimension.time;
 
+    double maxY = _strengthSessionStats
+        .map((s) => widget.series.statValue(s))
+        .max
+        .ceil()
+        .toDouble();
+    if (maxY == 0) {
+      maxY = 1;
+    }
     return _strengthSessionStats.isEmpty
         ? const CircularProgressIndicator()
         : LineChart(
@@ -122,11 +130,7 @@ class _MonthChartState extends State<MonthChart> {
               minX: 1.0,
               maxX: widget.start.numDaysInMonth.toDouble(),
               minY: 0,
-              maxY: _strengthSessionStats
-                  .map((s) => widget.series.statValue(s))
-                  .max
-                  .ceil()
-                  .toDouble(),
+              maxY: maxY,
               borderData: FlBorderData(show: false),
             ),
           );

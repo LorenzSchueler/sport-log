@@ -98,6 +98,14 @@ class _WeekChartState extends State<WeekChart> {
   Widget build(BuildContext context) {
     final isTime = widget.movement.dimension == MovementDimension.time;
 
+    double maxY = _strengthSessionStats
+        .map((s) => widget.series.statValue(s))
+        .max
+        .ceil()
+        .toDouble();
+    if (maxY == 0) {
+      maxY = 1;
+    }
     return _strengthSessionStats.isEmpty
         ? const CircularProgressIndicator()
         : BarChart(
@@ -131,11 +139,7 @@ class _WeekChartState extends State<WeekChart> {
                     AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
               minY: 0,
-              maxY: _strengthSessionStats
-                  .map((s) => widget.series.statValue(s))
-                  .max
-                  .ceil()
-                  .toDouble(),
+              maxY: maxY,
               gridData: FlGridData(
                 getDrawingHorizontalLine: gridLineDrawer(context),
                 drawVerticalLine: false,

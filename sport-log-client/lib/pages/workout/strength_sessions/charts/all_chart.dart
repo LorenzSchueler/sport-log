@@ -84,6 +84,14 @@ class _AllChartState extends State<AllChart> {
         markedMonths = [1];
       }
 
+      double maxY = _strengthSessionStats
+          .map((s) => widget.series.statValue(s))
+          .max
+          .ceil()
+          .toDouble();
+      if (maxY == 0) {
+        maxY = 1;
+      }
       return Padding(
         padding: const EdgeInsets.fromLTRB(0, 5, 15, 0),
         child: LineChart(
@@ -133,11 +141,7 @@ class _AllChartState extends State<AllChart> {
               ),
             ),
             minY: 0,
-            maxY: _strengthSessionStats
-                .map((s) => widget.series.statValue(s))
-                .max
-                .ceil()
-                .toDouble(),
+            maxY: maxY,
             borderData: FlBorderData(show: false),
             gridData: FlGridData(
               verticalInterval: 1,

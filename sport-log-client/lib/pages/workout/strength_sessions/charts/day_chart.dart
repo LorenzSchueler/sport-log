@@ -68,6 +68,11 @@ class _DayChartState extends State<DayChart> {
   Widget build(BuildContext context) {
     final isTime = widget.movement.dimension == MovementDimension.time;
 
+    double maxY =
+        _sets.map((s) => widget.series.setValue(s)).max.ceil().toDouble();
+    if (maxY == 0) {
+      maxY = 1;
+    }
     return _sets.isEmpty
         ? const CircularProgressIndicator()
         : BarChart(
@@ -112,11 +117,7 @@ class _DayChartState extends State<DayChart> {
                     AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
               minY: 0,
-              maxY: _sets
-                  .map((s) => widget.series.setValue(s))
-                  .max
-                  .ceil()
-                  .toDouble(),
+              maxY: maxY,
               gridData: FlGridData(
                 getDrawingHorizontalLine: gridLineDrawer(context),
                 drawVerticalLine: false,

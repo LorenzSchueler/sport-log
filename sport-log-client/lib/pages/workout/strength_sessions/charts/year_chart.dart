@@ -70,6 +70,14 @@ class _YearChartState extends State<YearChart> {
   Widget build(BuildContext context) {
     final isTime = widget.movement.dimension == MovementDimension.time;
 
+    double maxY = _strengthSessionStats
+        .map((s) => widget.series.statValue(s))
+        .max
+        .ceil()
+        .toDouble();
+    if (maxY == 0) {
+      maxY = 1;
+    }
     return _strengthSessionStats.isEmpty
         ? const CircularProgressIndicator()
         : LineChart(
@@ -123,11 +131,7 @@ class _YearChartState extends State<YearChart> {
               minX: 0,
               maxX: (widget.start.isLeapYear ? 366 : 365).toDouble(),
               minY: 0,
-              maxY: _strengthSessionStats
-                  .map((s) => widget.series.statValue(s))
-                  .max
-                  .ceil()
-                  .toDouble(),
+              maxY: maxY,
               borderData: FlBorderData(show: false),
               gridData: FlGridData(
                 verticalInterval: 1,
