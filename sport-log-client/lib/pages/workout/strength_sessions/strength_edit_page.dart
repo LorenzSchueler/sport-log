@@ -49,7 +49,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     _keyboardSubscription =
         KeyboardVisibilityController().onChange.listen((isVisible) {
       if (!isVisible) {
-        FocusScope.of(context).unfocus();
+        FocusManager.instance.primaryFocus?.unfocus();
       }
     });
   }

@@ -34,7 +34,7 @@ class _DoubleInputState extends State<DoubleInput> {
   void _setValue(double value) {
     setState(() => _value = value);
     _textController.text = _value.toStringAsFixed(2);
-    FocusScope.of(context).requestFocus(FocusNode()); // unfocus
+    FocusManager.instance.primaryFocus?.unfocus();
     widget.setValue?.call(_value);
   }
 

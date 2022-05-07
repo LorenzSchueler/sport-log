@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart' hide Route;
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/routes.dart';
@@ -31,14 +34,27 @@ class MetconPickerDialog extends StatefulWidget {
 
 class MetconPickerDialogState extends State<MetconPickerDialog> {
   final _dataProvider = MetconDataProvider();
+  late final StreamSubscription<bool> _keyboardSubscription;
 
   List<Metcon> _metcons = [];
   String _search = '';
 
   @override
   void initState() {
-    super.initState();
+    _keyboardSubscription =
+        KeyboardVisibilityController().onChange.listen((isVisible) {
+      if (!isVisible) {
+        FocusManager.instance.primaryFocus?.unfocus();
+      }
+    });
     _update('');
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _keyboardSubscription.cancel();
+    super.dispose();
   }
 
   Future<void> _update(String newSearch) async {
@@ -75,8 +91,9 @@ class MetconPickerDialogState extends State<MetconPickerDialog> {
 
   Widget get _searchBar {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
       child: TextFormField(
+        autofocus: true,
         initialValue: _search,
         onChanged: _update,
         decoration: Theme.of(context).textFormFieldDecoration.copyWith(
@@ -97,16 +114,15 @@ class MetconPickerDialogState extends State<MetconPickerDialog> {
   }
 
   Widget get _metconList {
-    if (_metcons.isEmpty) {
-      return const Center(child: Text('No routes here.'));
-    }
-    return Scrollbar(
-      child: ListView.separated(
-        itemBuilder: _routeBuilder,
-        separatorBuilder: (_, __) => const Divider(height: 1),
-        itemCount: _metcons.length,
-      ),
-    );
+    return _metcons.isEmpty
+        ? const Center(child: Text('No metcons here.'))
+        : Scrollbar(
+            child: ListView.separated(
+              itemBuilder: _routeBuilder,
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemCount: _metcons.length,
+            ),
+          );
   }
 
   Widget _routeBuilder(BuildContext context, int index) {

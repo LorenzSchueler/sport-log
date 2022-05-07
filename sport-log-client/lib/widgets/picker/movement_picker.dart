@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/routes.dart';
@@ -41,14 +44,27 @@ class MovementPickerDialog extends StatefulWidget {
 
 class _MovementPickerDialogState extends State<MovementPickerDialog> {
   final _dataProvider = MovementDataProvider();
+  late final StreamSubscription<bool> _keyboardSubscription;
 
   List<Movement> _movements = [];
   String _search = '';
 
   @override
   void initState() {
-    super.initState();
+    _keyboardSubscription =
+        KeyboardVisibilityController().onChange.listen((isVisible) {
+      if (!isVisible) {
+        FocusManager.instance.primaryFocus?.unfocus();
+      }
+    });
     _update('');
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _keyboardSubscription.cancel();
+    super.dispose();
   }
 
   Future<void> _update(String newSearch) async {
@@ -86,8 +102,9 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
 
   Widget get _searchBar {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
       child: TextFormField(
+        autofocus: true,
         initialValue: _search,
         onChanged: _update,
         decoration: Theme.of(context).textFormFieldDecoration.copyWith(
@@ -109,17 +126,15 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
   }
 
   Widget get _movementList {
-    if (_movements.isEmpty) {
-      return const Center(child: Text('No movements here.'));
-    }
-
-    return Scrollbar(
-      child: ListView.separated(
-        itemBuilder: _movementBuilder,
-        separatorBuilder: (_, __) => const Divider(height: 1),
-        itemCount: _movements.length,
-      ),
-    );
+    return _movements.isEmpty
+        ? const Center(child: Text('No movements here.'))
+        : Scrollbar(
+            child: ListView.separated(
+              itemBuilder: _movementBuilder,
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemCount: _movements.length,
+            ),
+          );
   }
 
   Widget _movementBuilder(BuildContext context, int index) {

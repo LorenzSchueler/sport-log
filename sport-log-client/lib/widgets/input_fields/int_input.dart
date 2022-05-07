@@ -38,7 +38,7 @@ class _IntInputState extends State<IntInput> {
   void _setValue(int value) {
     setState(() => _value = value);
     _textController.text = _value.toString();
-    FocusScope.of(context).requestFocus(FocusNode()); // unfocus
+    FocusManager.instance.primaryFocus?.unfocus();
     widget.setValue?.call(_value);
   }
 

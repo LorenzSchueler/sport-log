@@ -241,8 +241,7 @@ class MapPageState extends State<MapPage> {
                         itemBuilder: (context, index) => GestureDetector(
                           onTap: () {
                             setState(() => _searchResultsVisible = false);
-                            FocusScope.of(context)
-                                .requestFocus(FocusNode()); // unfocus
+                            FocusManager.instance.primaryFocus?.unfocus();
                             final coords = _searchResults[index].center!;
                             final latLng = LatLng(coords[1], coords[0]);
                             _mapController.animateCenter(latLng);
