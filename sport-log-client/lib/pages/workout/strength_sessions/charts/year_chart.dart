@@ -73,17 +73,16 @@ class _YearChartState extends State<YearChart> {
       LineChartData(
         lineBarsData: [
           LineChartBarData(
-            spots: _strengthSessionStats.map((s) {
-              return FlSpot(
-                (s.datetime.difference(widget.start).inDays + 1).toDouble(),
-                widget.series.statValue(s),
-              );
-            }).toList(),
+            spots: _strengthSessionStats
+                .map(
+                  (s) => FlSpot(
+                    (s.datetime.difference(widget.start).inDays + 1).toDouble(),
+                    widget.series.statValue(s),
+                  ),
+                )
+                .toList(),
             color: Theme.of(context).colorScheme.primary,
             dotData: FlDotData(show: false),
-            isCurved: true,
-            preventCurveOverShooting: true,
-            preventCurveOvershootingThreshold: 1.5,
           ),
         ],
         titlesData: FlTitlesData(
@@ -93,15 +92,13 @@ class _YearChartState extends State<YearChart> {
             sideTitles: SideTitles(
               showTitles: true,
               interval: 1,
-              getTitlesWidget: (value, _) {
-                return DateTime(widget.start.year, 1, value.round()).day == 15
-                    ? Text(
-                        shortMonthName(
-                          DateTime(widget.start.year, 1, value.round()).month,
-                        ),
-                      )
-                    : const Text("");
-              },
+              getTitlesWidget: (value, _) =>
+                  DateTime(widget.start.year, 1, value.round()).day == 15
+                      ? Text(
+                          DateTime(widget.start.year, 1, value.round())
+                              .shortMonthName,
+                        )
+                      : const Text(""),
             ),
           ),
           leftTitles: AxisTitles(

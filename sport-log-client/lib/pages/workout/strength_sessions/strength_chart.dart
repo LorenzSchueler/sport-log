@@ -43,16 +43,19 @@ class _StrengthChartState extends State<StrengthChart> {
         Scrollbar(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: _seriesSelection(),
+            child: SelectionBar(
+              onChange: (SeriesType type) =>
+                  setState(() => _activeSeriesType = type),
+              items: availableSeries,
+              getLabel: (SeriesType type) => type.toDisplayName(),
+              selectedItem: _activeSeriesType,
+            ),
           ),
         ),
         Defaults.sizedBox.vertical.small,
         AspectRatio(
           aspectRatio: 1.8,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 8, 10, 20),
-            child: _chart(),
-          ),
+          child: _chart(),
         ),
       ],
     );
@@ -90,14 +93,5 @@ class _StrengthChartState extends State<StrengthChart> {
           movement: widget.movement,
         );
     }
-  }
-
-  Widget _seriesSelection() {
-    return SelectionBar(
-      onChange: (SeriesType type) => setState(() => _activeSeriesType = type),
-      items: availableSeries,
-      getLabel: (SeriesType type) => type.toDisplayName(),
-      selectedItem: _activeSeriesType,
-    );
   }
 }

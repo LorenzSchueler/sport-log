@@ -119,9 +119,14 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
                   ),
                 if (_sessions.isNotEmpty && _movement != null)
                   SliverToBoxAdapter(
-                    child: StrengthChart(
-                      movement: _movement!,
-                      dateFilterState: _dateFilter,
+                    child: Column(
+                      children: [
+                        StrengthChart(
+                          movement: _movement!,
+                          dateFilterState: _dateFilter,
+                        ),
+                        Defaults.sizedBox.vertical.normal,
+                      ],
                     ),
                   ),
                 if (_sessions.isNotEmpty)

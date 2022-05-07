@@ -73,12 +73,14 @@ class _MonthChartState extends State<MonthChart> {
       LineChartData(
         lineBarsData: [
           LineChartBarData(
-            spots: _strengthSessionStats.map((s) {
-              return FlSpot(
-                s.datetime.day.toDouble(),
-                widget.series.statValue(s),
-              );
-            }).toList(),
+            spots: _strengthSessionStats
+                .map(
+                  (s) => FlSpot(
+                    s.datetime.day.toDouble(),
+                    widget.series.statValue(s),
+                  ),
+                )
+                .toList(),
             color: Theme.of(context).colorScheme.primary,
           ),
         ],
