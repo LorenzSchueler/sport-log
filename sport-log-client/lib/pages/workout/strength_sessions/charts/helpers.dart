@@ -8,3 +8,10 @@ FlLine Function(double value) gridLineDrawer(BuildContext context) {
         dashArray: [4, 4],
       );
 }
+
+class ChartValue {
+  final DateTime datetime;
+  final double value;
+
+  ChartValue(this.datetime, this.value);
+}

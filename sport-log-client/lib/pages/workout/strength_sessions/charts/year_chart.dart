@@ -1,100 +1,44 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
-import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/strength_sessions/charts/helpers.dart';
-import 'package:sport_log/pages/workout/strength_sessions/charts/series_type.dart';
 
 /// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
-class YearChart extends StatefulWidget {
-  YearChart({
+class YearChart extends StatelessWidget {
+  const YearChart({
+    required this.chartValues,
+    required this.isTime,
     Key? key,
-    required this.series,
-    required DateTime start,
-    required this.movement,
-  })  : start = start.beginningOfYear(),
-        super(key: key);
+  }) : super(key: key);
 
-  final SeriesType series;
-  final DateTime start;
-  final Movement movement;
-
-  @override
-  State<YearChart> createState() => _YearChartState();
-}
-
-class _YearChartState extends State<YearChart> {
-  final _dataProvider = StrengthSessionDescriptionDataProvider();
-
-  List<StrengthSessionStats> _strengthSessionStats = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _dataProvider.addListener(_update);
-    _update();
-  }
-
-  @override
-  void dispose() {
-    _dataProvider.removeListener(_update);
-    super.dispose();
-  }
-
-  Future<void> _update() async {
-    final strengthSessionStats = await _dataProvider.getStatsAggregationsByWeek(
-      movementId: widget.movement.id,
-      from: widget.start,
-      until: widget.start.yearLater(),
-    );
-    assert(strengthSessionStats.length <= 54);
-    if (mounted) {
-      setState(() => _strengthSessionStats = strengthSessionStats);
-    }
-  }
-
-  @override
-  void didUpdateWidget(YearChart oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // ignore a change in series type
-    if (oldWidget.movement != widget.movement ||
-        oldWidget.start != widget.start) {
-      _update();
-    }
-  }
+  final List<ChartValue> chartValues;
+  final bool isTime;
 
   @override
   Widget build(BuildContext context) {
-    final isTime = widget.movement.dimension == MovementDimension.time;
-
-    double maxY = _strengthSessionStats
-        .map((s) => widget.series.statValue(s))
-        .max
-        .ceil()
-        .toDouble();
+    double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
     if (maxY == 0) {
       maxY = 1;
     }
-    return _strengthSessionStats.isEmpty
+    final start =
+        chartValues.first.datetime.copyWith(hour: 0, minute: 0, second: 0);
+
+    return chartValues.isEmpty
         ? const CircularProgressIndicator()
         : LineChart(
             LineChartData(
               lineBarsData: [
                 LineChartBarData(
-                  spots: _strengthSessionStats
+                  spots: chartValues
                       .map(
-                        (s) => FlSpot(
-                          (s.datetime.difference(widget.start).inDays + 1)
-                              .toDouble(),
-                          widget.series.statValue(s),
+                        (v) => FlSpot(
+                          v.datetime.difference(start).inDays + 1,
+                          v.value,
                         ),
                       )
                       .toList(),
                   color: Theme.of(context).colorScheme.primary,
-                  dotData: FlDotData(show: false),
                 ),
               ],
               titlesData: FlTitlesData(
@@ -106,13 +50,20 @@ class _YearChartState extends State<YearChart> {
                   sideTitles: SideTitles(
                     showTitles: true,
                     interval: 1,
-                    getTitlesWidget: (value, _) =>
-                        DateTime(widget.start.year, 1, value.round()).day == 15
-                            ? Text(
-                                DateTime(widget.start.year, 1, value.round())
-                                    .shortMonthName,
-                              )
-                            : const Text(""),
+                    getTitlesWidget: (value, _) => DateTime(
+                              start.year,
+                              1,
+                              value.round(),
+                            ).day ==
+                            15
+                        ? Text(
+                            DateTime(
+                              start.year,
+                              1,
+                              value.round(),
+                            ).shortMonthName,
+                          )
+                        : const Text(""),
                   ),
                 ),
                 leftTitles: AxisTitles(
@@ -128,18 +79,18 @@ class _YearChartState extends State<YearChart> {
                   ),
                 ),
               ),
-              minX: 0,
-              maxX: (widget.start.isLeapYear ? 366 : 365).toDouble(),
-              minY: 0,
-              maxY: maxY,
-              borderData: FlBorderData(show: false),
               gridData: FlGridData(
                 verticalInterval: 1,
                 checkToShowVerticalLine: (value) =>
-                    DateTime(widget.start.year, 1, value.round()).day == 1,
+                    DateTime(start.year, 1, value.round()).day == 1,
                 getDrawingVerticalLine: gridLineDrawer(context),
                 getDrawingHorizontalLine: gridLineDrawer(context),
               ),
+              minX: 1.0,
+              maxX: (start.isLeapYear ? 366 : 365).toDouble(),
+              minY: 0.0,
+              maxY: maxY,
+              borderData: FlBorderData(show: false),
             ),
           );
   }

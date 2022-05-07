@@ -176,7 +176,7 @@ class StrengthSessionDescriptionTable {
     return strengthSessionDescriptions;
   }
 
-  Future<List<StrengthSet>> getSetsOnDay({
+  Future<List<StrengthSessionStats>> getStatsAggregationsBySet({
     required DateTime date,
     required Int64 movementIdValue,
   }) async {
@@ -197,10 +197,13 @@ class StrengthSessionDescriptionTable {
     ''',
       [start.toString(), end.toString(), movementIdValue.toInt()],
     );
-    return records.mapToList(
-      (record) => _strengthSetTable.serde
-          .fromDbRecord(record, prefix: _strengthSetTable.table.prefix),
-    );
+    return records
+        .mapToList(
+          (record) => _strengthSetTable.serde
+              .fromDbRecord(record, prefix: _strengthSetTable.table.prefix),
+        )
+        .map((set) => StrengthSessionStats.fromStrengthSets(date, [set]))
+        .toList();
   }
 
   Future<List<StrengthSessionStats>> getStatsAggregationsByDay({

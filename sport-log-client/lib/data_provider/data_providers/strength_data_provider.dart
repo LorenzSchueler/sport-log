@@ -183,11 +183,12 @@ class StrengthSessionDescriptionDataProvider
     );
   }
 
-  Future<List<StrengthSet>> getSetsOnDay({
+  // dayly view
+  Future<List<StrengthSessionStats>> getStatsAggregationsBySet({
     required DateTime date,
     required Int64 movementId,
   }) async =>
-      _strengthSessionDescriptionDb.getSetsOnDay(
+      _strengthSessionDescriptionDb.getStatsAggregationsBySet(
         date: date,
         movementIdValue: movementId,
       );

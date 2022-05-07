@@ -1,89 +1,38 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
-import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/strength_sessions/charts/helpers.dart';
-import 'package:sport_log/pages/workout/strength_sessions/charts/series_type.dart';
 
 /// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
-class DayChart extends StatefulWidget {
-  DayChart({
+class DayChart extends StatelessWidget {
+  const DayChart({
+    required this.chartValues,
+    required this.isTime,
     Key? key,
-    required this.series,
-    required DateTime start,
-    required this.movement,
-  })  : date = start.beginningOfDay(),
-        super(key: key);
+  }) : super(key: key);
 
-  final SeriesType series;
-  final DateTime date;
-  final Movement movement;
-
-  @override
-  State<DayChart> createState() => _DayChartState();
-}
-
-class _DayChartState extends State<DayChart> {
-  final _dataProvider = StrengthSessionDescriptionDataProvider();
-
-  List<StrengthSet> _sets = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _dataProvider.addListener(_update);
-    _update();
-  }
-
-  @override
-  void dispose() {
-    _dataProvider.removeListener(_update);
-    super.dispose();
-  }
-
-  Future<void> _update() async {
-    final sets = await _dataProvider.getSetsOnDay(
-      movementId: widget.movement.id,
-      date: widget.date,
-    );
-    if (mounted) {
-      setState(() => _sets = sets);
-    }
-  }
-
-  @override
-  void didUpdateWidget(DayChart oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // ignore a change in series type
-    if (oldWidget.movement != widget.movement ||
-        oldWidget.date != widget.date) {
-      _update();
-    }
-  }
+  final List<ChartValue> chartValues;
+  final bool isTime;
 
   @override
   Widget build(BuildContext context) {
-    final isTime = widget.movement.dimension == MovementDimension.time;
-
-    double maxY =
-        _sets.map((s) => widget.series.setValue(s)).max.ceil().toDouble();
+    double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
     if (maxY == 0) {
       maxY = 1;
     }
-    return _sets.isEmpty
+
+    return chartValues.isEmpty
         ? const CircularProgressIndicator()
         : BarChart(
             BarChartData(
-              barGroups: _sets
+              barGroups: chartValues
                   .mapIndexed(
-                    (set, index) => BarChartGroupData(
+                    (v, index) => BarChartGroupData(
                       x: index,
                       barRods: [
                         BarChartRodData(
-                          toY: widget.series.setValue(set),
+                          toY: v.value,
                           color: Theme.of(context).colorScheme.primary,
                         )
                       ],

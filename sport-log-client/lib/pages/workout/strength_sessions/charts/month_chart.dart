@@ -1,94 +1,40 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
-import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/strength_sessions/charts/helpers.dart';
-import 'package:sport_log/pages/workout/strength_sessions/charts/series_type.dart';
 
 /// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
-class MonthChart extends StatefulWidget {
-  MonthChart({
+class MonthChart extends StatelessWidget {
+  const MonthChart({
+    required this.chartValues,
+    required this.isTime,
     Key? key,
-    required this.series,
-    required DateTime start,
-    required this.movement,
-  })  : start = start.beginningOfMonth(),
-        super(key: key);
+  }) : super(key: key);
 
-  final SeriesType series;
-  final DateTime start;
-  final Movement movement;
-
-  @override
-  State<MonthChart> createState() => _MonthChartState();
-}
-
-class _MonthChartState extends State<MonthChart> {
-  final _dataProvider = StrengthSessionDescriptionDataProvider();
-
-  List<StrengthSessionStats> _strengthSessionStats = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _dataProvider.addListener(_update);
-    _update();
-  }
-
-  @override
-  void dispose() {
-    _dataProvider.removeListener(_update);
-    super.dispose();
-  }
-
-  Future<void> _update() async {
-    final strengthSessionStats = await _dataProvider.getStatsAggregationsByDay(
-      movementId: widget.movement.id,
-      from: widget.start,
-      until: widget.start.monthLater(),
-    );
-    assert(strengthSessionStats.length <= 31);
-    if (mounted) {
-      setState(() => _strengthSessionStats = strengthSessionStats);
-    }
-  }
-
-  @override
-  void didUpdateWidget(MonthChart oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // ignore a change in series type
-    if (oldWidget.movement != widget.movement ||
-        oldWidget.start != widget.start) {
-      _update();
-    }
-  }
+  final List<ChartValue> chartValues;
+  final bool isTime;
 
   @override
   Widget build(BuildContext context) {
-    final isTime = widget.movement.dimension == MovementDimension.time;
-
-    double maxY = _strengthSessionStats
-        .map((s) => widget.series.statValue(s))
-        .max
-        .ceil()
-        .toDouble();
+    double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
     if (maxY == 0) {
       maxY = 1;
     }
-    return _strengthSessionStats.isEmpty
+    final start =
+        chartValues.first.datetime.copyWith(hour: 0, minute: 0, second: 0);
+
+    return chartValues.isEmpty
         ? const CircularProgressIndicator()
         : LineChart(
             LineChartData(
               lineBarsData: [
                 LineChartBarData(
-                  spots: _strengthSessionStats
+                  spots: chartValues
                       .map(
-                        (s) => FlSpot(
-                          s.datetime.day.toDouble(),
-                          widget.series.statValue(s),
+                        (v) => FlSpot(
+                          v.datetime.day.toDouble(),
+                          v.value,
                         ),
                       )
                       .toList(),
@@ -123,13 +69,13 @@ class _MonthChartState extends State<MonthChart> {
                 ),
               ),
               gridData: FlGridData(
-                verticalInterval: 2,
+                verticalInterval: 1,
                 getDrawingHorizontalLine: gridLineDrawer(context),
                 getDrawingVerticalLine: gridLineDrawer(context),
               ),
               minX: 1.0,
-              maxX: widget.start.numDaysInMonth.toDouble(),
-              minY: 0,
+              maxX: start.numDaysInMonth.toDouble(),
+              minY: 0.0,
               maxY: maxY,
               borderData: FlBorderData(show: false),
             ),

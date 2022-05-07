@@ -1,72 +1,28 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
-import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/charts/helpers.dart';
-import 'package:sport_log/pages/workout/strength_sessions/charts/series_type.dart';
 
 /// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
-class AllChart extends StatefulWidget {
+class AllChart extends StatelessWidget {
   const AllChart({
+    required this.chartValues,
+    required this.isTime,
     Key? key,
-    required this.series,
-    required this.movement,
   }) : super(key: key);
 
-  final SeriesType series;
-  final Movement movement;
-
-  @override
-  State<AllChart> createState() => _AllChartState();
-}
-
-class _AllChartState extends State<AllChart> {
-  final _dataProvider = StrengthSessionDescriptionDataProvider();
-
-  List<StrengthSessionStats> _strengthSessionStats = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _dataProvider.addListener(_update);
-    _update();
-  }
-
-  @override
-  void dispose() {
-    _dataProvider.removeListener(_update);
-    super.dispose();
-  }
-
-  Future<void> _update() async {
-    final strengthSessionStats = await _dataProvider
-        .getStatsAggregationsByMonth(movementId: widget.movement.id);
-    if (mounted) {
-      setState(() => _strengthSessionStats = strengthSessionStats);
-    }
-  }
-
-  @override
-  void didUpdateWidget(AllChart oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // ignore a change in series type
-    if (oldWidget.movement != widget.movement) {
-      _update();
-    }
-  }
+  final List<ChartValue> chartValues;
+  final bool isTime;
 
   @override
   Widget build(BuildContext context) {
-    final isTime = widget.movement.dimension == MovementDimension.time;
-
-    if (_strengthSessionStats.isEmpty) {
+    if (chartValues.isEmpty) {
       return const CircularProgressIndicator();
     } else {
-      final start = _strengthSessionStats.map((s) => s.datetime).min!;
-      final end = _strengthSessionStats.map((s) => s.datetime).max!;
+      final start =
+          chartValues.first.datetime.copyWith(hour: 0, minute: 0, second: 0);
+      final end = chartValues.last.datetime;
       final months = (end.difference(start).inDays / 30).round();
       final titleInterval = (months / 8).ceil();
       final List<int> markedMonths;
@@ -84,11 +40,7 @@ class _AllChartState extends State<AllChart> {
         markedMonths = [1];
       }
 
-      double maxY = _strengthSessionStats
-          .map((s) => widget.series.statValue(s))
-          .max
-          .ceil()
-          .toDouble();
+      double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
       if (maxY == 0) {
         maxY = 1;
       }
@@ -98,16 +50,15 @@ class _AllChartState extends State<AllChart> {
           LineChartData(
             lineBarsData: [
               LineChartBarData(
-                spots: _strengthSessionStats
+                spots: chartValues
                     .map(
-                      (s) => FlSpot(
-                        (s.datetime.difference(start).inDays + 1).toDouble(),
-                        widget.series.statValue(s),
+                      (v) => FlSpot(
+                        v.datetime.difference(start).inDays + 1,
+                        v.value,
                       ),
                     )
                     .toList(),
                 color: Theme.of(context).colorScheme.primary,
-                dotData: FlDotData(show: false),
               ),
             ],
             titlesData: FlTitlesData(
@@ -140,9 +91,6 @@ class _AllChartState extends State<AllChart> {
                 ),
               ),
             ),
-            minY: 0,
-            maxY: maxY,
-            borderData: FlBorderData(show: false),
             gridData: FlGridData(
               verticalInterval: 1,
               checkToShowVerticalLine: (value) {
@@ -155,6 +103,9 @@ class _AllChartState extends State<AllChart> {
               getDrawingVerticalLine: gridLineDrawer(context),
               getDrawingHorizontalLine: gridLineDrawer(context),
             ),
+            minY: 0.0,
+            maxY: maxY,
+            borderData: FlBorderData(show: false),
           ),
         ),
       );
