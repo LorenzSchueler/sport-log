@@ -90,7 +90,7 @@ class _DayChartState extends State<DayChart> {
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: isTime ? 60 : 40,
+                    reservedSize: isTime ? 60 : 30,
                     getTitlesWidget: isTime
                         ? (value, _) => Text(
                               Duration(milliseconds: value.round())
@@ -111,6 +111,12 @@ class _DayChartState extends State<DayChart> {
                 topTitles:
                     AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
+              minY: 0,
+              maxY: _sets
+                  .map((s) => widget.series.setValue(s))
+                  .max
+                  .ceil()
+                  .toDouble(),
               gridData: FlGridData(
                 getDrawingHorizontalLine: gridLineDrawer(context),
                 drawVerticalLine: false,

@@ -114,7 +114,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         ),
         body: Container(
           padding: Defaults.edgeInsets.normal,
-          child: ListView(
+          child: Column(
             children: [
               _movementInput,
               _dateTimeInput,

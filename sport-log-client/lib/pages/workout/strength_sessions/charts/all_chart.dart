@@ -122,7 +122,7 @@ class _AllChartState extends State<AllChart> {
               leftTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  reservedSize: isTime ? 60 : 40,
+                  reservedSize: isTime ? 60 : 30,
                   getTitlesWidget: isTime
                       ? (value, _) => Text(
                             Duration(milliseconds: value.round())
@@ -132,6 +132,12 @@ class _AllChartState extends State<AllChart> {
                 ),
               ),
             ),
+            minY: 0,
+            maxY: _strengthSessionStats
+                .map((s) => widget.series.statValue(s))
+                .max
+                .ceil()
+                .toDouble(),
             borderData: FlBorderData(show: false),
             gridData: FlGridData(
               verticalInterval: 1,
