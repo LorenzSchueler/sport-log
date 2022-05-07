@@ -68,49 +68,54 @@ class _DayChartState extends State<DayChart> {
   Widget build(BuildContext context) {
     final isTime = widget.movement.dimension == MovementDimension.time;
 
-    return BarChart(
-      BarChartData(
-        barGroups: _sets
-            .mapIndexed(
-              (set, index) => BarChartGroupData(
-                x: index,
-                barRods: [
-                  BarChartRodData(
-                    toY: widget.series.setValue(set),
-                    color: Theme.of(context).colorScheme.primary,
+    return _sets.isEmpty
+        ? const CircularProgressIndicator()
+        : BarChart(
+            BarChartData(
+              barGroups: _sets
+                  .mapIndexed(
+                    (set, index) => BarChartGroupData(
+                      x: index,
+                      barRods: [
+                        BarChartRodData(
+                          toY: widget.series.setValue(set),
+                          color: Theme.of(context).colorScheme.primary,
+                        )
+                      ],
+                    ),
                   )
-                ],
+                  .toList(),
+              borderData: FlBorderData(show: false),
+              titlesData: FlTitlesData(
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: isTime ? 60 : 40,
+                    getTitlesWidget: isTime
+                        ? (value, _) => Text(
+                              Duration(milliseconds: value.round())
+                                  .formatTimeWithMillis,
+                            )
+                        : null,
+                  ),
+                ),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, _) =>
+                        Text("Set ${value.round() + 1}"),
+                  ),
+                ),
+                rightTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
-            )
-            .toList(),
-        borderData: FlBorderData(show: false),
-        titlesData: FlTitlesData(
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: isTime ? 60 : 40,
-              getTitlesWidget: isTime
-                  ? (value, _) => Text(
-                        Duration(milliseconds: value.round())
-                            .formatTimeWithMillis,
-                      )
-                  : null,
+              gridData: FlGridData(
+                getDrawingHorizontalLine: gridLineDrawer(context),
+                drawVerticalLine: false,
+              ),
             ),
-          ),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              getTitlesWidget: (value, _) => Text("Set ${value.round() + 1}"),
-            ),
-          ),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        ),
-        gridData: FlGridData(
-          getDrawingHorizontalLine: gridLineDrawer(context),
-          drawVerticalLine: false,
-        ),
-      ),
-    );
+          );
   }
 }

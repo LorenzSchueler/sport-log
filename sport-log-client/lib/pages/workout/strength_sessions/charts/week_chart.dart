@@ -97,39 +97,43 @@ class _WeekChartState extends State<WeekChart> {
   Widget build(BuildContext context) {
     final isTime = widget.movement.dimension == MovementDimension.time;
 
-    return BarChart(
-      BarChartData(
-        barGroups: _barData,
-        borderData: FlBorderData(show: false),
-        titlesData: FlTitlesData(
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: isTime ? 60 : 40,
-              getTitlesWidget: isTime
-                  ? (value, _) => Text(
-                        Duration(milliseconds: value.round())
-                            .formatTimeWithMillis,
-                      )
-                  : null,
-            ),
-          ),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              getTitlesWidget: (value, _) => Text(
-                shortWeekdayName(value.round() + 1),
+    return _strengthSessionStats.isEmpty
+        ? const CircularProgressIndicator()
+        : BarChart(
+            BarChartData(
+              barGroups: _barData,
+              borderData: FlBorderData(show: false),
+              titlesData: FlTitlesData(
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: isTime ? 60 : 40,
+                    getTitlesWidget: isTime
+                        ? (value, _) => Text(
+                              Duration(milliseconds: value.round())
+                                  .formatTimeWithMillis,
+                            )
+                        : null,
+                  ),
+                ),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, _) => Text(
+                      shortWeekdayName(value.round() + 1),
+                    ),
+                  ),
+                ),
+                rightTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              ),
+              gridData: FlGridData(
+                getDrawingHorizontalLine: gridLineDrawer(context),
+                drawVerticalLine: false,
               ),
             ),
-          ),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        ),
-        gridData: FlGridData(
-          getDrawingHorizontalLine: gridLineDrawer(context),
-          drawVerticalLine: false,
-        ),
-      ),
-    );
+          );
   }
 }

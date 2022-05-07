@@ -69,55 +69,59 @@ class _MonthChartState extends State<MonthChart> {
   Widget build(BuildContext context) {
     final isTime = widget.movement.dimension == MovementDimension.time;
 
-    return LineChart(
-      LineChartData(
-        lineBarsData: [
-          LineChartBarData(
-            spots: _strengthSessionStats
-                .map(
-                  (s) => FlSpot(
-                    s.datetime.day.toDouble(),
-                    widget.series.statValue(s),
-                  ),
-                )
-                .toList(),
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ],
-        titlesData: FlTitlesData(
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              interval: 1,
-              getTitlesWidget: (value, _) => value % 2 == 0
-                  ? Text(value.round().toString())
-                  : const Text(""),
-            ),
-          ),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: isTime ? 60 : 40,
-              getTitlesWidget: isTime
-                  ? (value, _) => Text(
-                        Duration(milliseconds: value.round())
-                            .formatTimeWithMillis,
+    return _strengthSessionStats.isEmpty
+        ? const CircularProgressIndicator()
+        : LineChart(
+            LineChartData(
+              lineBarsData: [
+                LineChartBarData(
+                  spots: _strengthSessionStats
+                      .map(
+                        (s) => FlSpot(
+                          s.datetime.day.toDouble(),
+                          widget.series.statValue(s),
+                        ),
                       )
-                  : null,
+                      .toList(),
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ],
+              titlesData: FlTitlesData(
+                topTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    interval: 1,
+                    getTitlesWidget: (value, _) => value % 2 == 0
+                        ? Text(value.round().toString())
+                        : const Text(""),
+                  ),
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: isTime ? 60 : 40,
+                    getTitlesWidget: isTime
+                        ? (value, _) => Text(
+                              Duration(milliseconds: value.round())
+                                  .formatTimeWithMillis,
+                            )
+                        : null,
+                  ),
+                ),
+              ),
+              gridData: FlGridData(
+                verticalInterval: 2,
+                getDrawingHorizontalLine: gridLineDrawer(context),
+                getDrawingVerticalLine: gridLineDrawer(context),
+              ),
+              minX: 1.0,
+              maxX: widget.start.numDaysInMonth.toDouble(),
+              borderData: FlBorderData(show: false),
             ),
-          ),
-        ),
-        gridData: FlGridData(
-          verticalInterval: 2,
-          getDrawingHorizontalLine: gridLineDrawer(context),
-          getDrawingVerticalLine: gridLineDrawer(context),
-        ),
-        minX: 1.0,
-        maxX: widget.start.numDaysInMonth.toDouble(),
-        borderData: FlBorderData(show: false),
-      ),
-    );
+          );
   }
 }
