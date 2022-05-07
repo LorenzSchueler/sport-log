@@ -5,6 +5,7 @@ import 'package:sport_log/data_provider/data_providers/movement_data_provider.da
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/tables/metcon_tables.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
+import 'package:sport_log/helpers/extensions/sort_extension.dart';
 import 'package:sport_log/models/all.dart';
 
 class MetconDataProvider extends EntityDataProvider<Metcon> {
@@ -22,7 +23,10 @@ class MetconDataProvider extends EntityDataProvider<Metcon> {
   List<Metcon> getFromAccountData(AccountData accountData) =>
       accountData.metcons;
 
-  Future<List<Metcon>> getByName(String? name) => db.getByName(name);
+  Future<List<Metcon>> getByName(String? name) async {
+    return (await db.getNonDeleted())
+        .sortByKey(key: name, toString: (m) => m.name);
+  }
 }
 
 class MetconMovementDataProvider extends EntityDataProvider<MetconMovement> {

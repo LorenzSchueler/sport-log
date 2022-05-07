@@ -4,6 +4,7 @@ import 'package:sport_log/data_provider/data_providers/movement_data_provider.da
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/cardio_tables.dart';
+import 'package:sport_log/helpers/extensions/sort_extension.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -23,7 +24,10 @@ class RouteDataProvider extends EntityDataProvider<Route> {
   @override
   List<Route> getFromAccountData(AccountData accountData) => accountData.routes;
 
-  Future<List<Route>> getByName(String? name) => db.getByName(name);
+  Future<List<Route>> getByName(String? name) async {
+    return (await db.getNonDeleted())
+        .sortByKey(key: name, toString: (m) => m.name);
+  }
 }
 
 class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {

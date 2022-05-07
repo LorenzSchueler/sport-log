@@ -27,8 +27,7 @@ class MovementTable extends TableAccessor<Movement> {
     ],
   );
 
-  Future<List<Movement>> getByName(
-    String? name, {
+  Future<List<Movement>> getByCardioAndDistance({
     bool cardioOnly = false,
     bool distanceOnly = false,
   }) async {
@@ -36,7 +35,6 @@ class MovementTable extends TableAccessor<Movement> {
       tableName,
       where: TableAccessor.combineFilter([
         notDeleted,
-        nameFilter(name),
         cardioOnly ? '${Columns.cardio} = true' : '',
         distanceOnly
             ? "${Columns.dimension} = '${MovementDimension.distance.index}'"
@@ -105,8 +103,7 @@ class MovementDescriptionTable {
         .toList();
   }
 
-  Future<List<MovementDescription>> getByName(
-    String? name, {
+  Future<List<MovementDescription>> getByCardioAndDistance({
     bool cardioOnly = false,
     bool distanceOnly = false,
   }) async {
@@ -130,7 +127,6 @@ class MovementDescriptionTable {
     FROM ${Tables.movement}
     WHERE ${TableAccessor.combineFilter([
             TableAccessor.notDeletedOfTable(Tables.movement),
-            TableAccessor.nameFilterOfTable(Tables.movement, name),
             cardioOnly ? '${Tables.movement}.${Columns.cardio} = true' : '',
             distanceOnly
                 ? "${Tables.movement}.${Columns.dimension} = '${MovementDimension.distance.index}'"

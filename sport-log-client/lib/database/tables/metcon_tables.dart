@@ -40,22 +40,6 @@ class MetconTable extends TableAccessor<Metcon> {
     );
     return result.map(serde.fromDbRecord).toList();
   }
-
-  Future<List<Metcon>> getByName(
-    String? name, {
-    bool cardioOnly = false,
-  }) async {
-    final records = await database.query(
-      tableName,
-      where: TableAccessor.combineFilter([
-        notDeleted,
-        nameFilter(name),
-        cardioOnly ? "${Columns.cardio} = true" : ""
-      ]),
-      orderBy: orderByName,
-    );
-    return records.map((r) => serde.fromDbRecord(r)).toList();
-  }
 }
 
 class MetconMovementTable extends TableAccessor<MetconMovement> {

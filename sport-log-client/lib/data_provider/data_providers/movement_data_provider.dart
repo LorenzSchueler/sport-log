@@ -2,6 +2,7 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/tables/all.dart';
+import 'package:sport_log/helpers/extensions/sort_extension.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/movement/all.dart';
 
@@ -24,8 +25,13 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
     String? name, {
     bool cardioOnly = false,
     bool distanceOnly = false,
-  }) =>
-      db.getByName(name, cardioOnly: cardioOnly, distanceOnly: distanceOnly);
+  }) async {
+    return (await db.getByCardioAndDistance(
+      cardioOnly: cardioOnly,
+      distanceOnly: distanceOnly,
+    ))
+        .sortByKey(key: name, toString: (m) => m.name);
+  }
 }
 
 class MovementDescriptionDataProvider
@@ -83,10 +89,11 @@ class MovementDescriptionDataProvider
     String? name, {
     bool cardioOnly = false,
     bool distanceOnly = false,
-  }) =>
-      _movementDescriptionDb.getByName(
-        name,
-        cardioOnly: cardioOnly,
-        distanceOnly: distanceOnly,
-      );
+  }) async {
+    return (await _movementDescriptionDb.getByCardioAndDistance(
+      cardioOnly: cardioOnly,
+      distanceOnly: distanceOnly,
+    ))
+        .sortByKey(key: name, toString: (m) => m.movement.name);
+  }
 }
