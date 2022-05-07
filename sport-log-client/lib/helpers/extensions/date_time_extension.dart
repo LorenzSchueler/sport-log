@@ -53,6 +53,9 @@ extension TimeOfDayExtension on TimeOfDay {
 }
 
 extension DateTimeExtension on DateTime {
+  String get shortMonthName => _shortMonthNames[month - 1];
+  String get shortWeekdayName => _shortWeekdayNames[weekday - 1];
+
   String get _formatDate => DateFormat("dd'.' MMMM yyyy").format(this);
   String get _formatDateShort => DateFormat("dd'.' MMMM").format(this);
   String get formatDateyyyyMMdd => DateFormat('yyyy-MM-dd').format(this);

@@ -69,3 +69,10 @@ extension IterableDoubleOptional<T extends double> on Iterable<T?> {
   T get min => filterNotNull.min;
   T get sum => filterNotNull.sum;
 }
+
+extension IterableDateTime<T extends DateTime> on Iterable<T> {
+  T? get max =>
+      isEmpty ? null : reduce((d1, d2) => d1.compareTo(d2) > 0 ? d1 : d2);
+  T? get min =>
+      isEmpty ? null : reduce((d1, d2) => d1.compareTo(d2) < 0 ? d1 : d2);
+}
