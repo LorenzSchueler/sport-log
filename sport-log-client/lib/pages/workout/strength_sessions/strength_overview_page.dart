@@ -109,40 +109,32 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
         ),
         body: RefreshIndicator(
           onRefresh: _dataProvider.pullFromServer,
-          child: Container(
-            padding: Defaults.edgeInsets.normal,
-            child: CustomScrollView(
-              slivers: [
-                if (_sessions.isEmpty)
-                  SliverFillRemaining(
-                    child: SessionsPageTab.strength.noEntriesText,
-                  ),
-                if (_sessions.isNotEmpty && _movement != null)
-                  SliverToBoxAdapter(
-                    child: Column(
-                      children: [
+          child: _sessions.isEmpty
+              ? SessionsPageTab.strength.noEntriesText
+              : Container(
+                  padding: Defaults.edgeInsets.normal,
+                  child: Column(
+                    children: [
+                      if (_movement != null) ...[
                         StrengthChart(
                           movement: _movement!,
                           dateFilterState: _dateFilter,
                         ),
                         Defaults.sizedBox.vertical.normal,
                       ],
-                    ),
-                  ),
-                if (_sessions.isNotEmpty)
-                  SliverFillRemaining(
-                    child: ListView.separated(
-                      itemBuilder: (context, index) => StrengthSessionCard(
-                        strengthSessionDescription: _sessions[index],
+                      Expanded(
+                        child: ListView.separated(
+                          itemBuilder: (context, index) => StrengthSessionCard(
+                            strengthSessionDescription: _sessions[index],
+                          ),
+                          separatorBuilder: (_, __) =>
+                              Defaults.sizedBox.vertical.normal,
+                          itemCount: _sessions.length,
+                        ),
                       ),
-                      separatorBuilder: (_, __) =>
-                          Defaults.sizedBox.vertical.normal,
-                      itemCount: _sessions.length,
-                    ),
+                    ],
                   ),
-              ],
-            ),
-          ),
+                ),
         ),
         bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
           context,

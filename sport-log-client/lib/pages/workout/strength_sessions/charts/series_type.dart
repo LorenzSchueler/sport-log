@@ -80,8 +80,11 @@ extension SeriesAccessor on SeriesType {
   double setValue(StrengthSet set) {
     switch (this) {
       case SeriesType.maxDistance:
+        return set.count.toDouble();
       case SeriesType.minTime:
+        return set.count.toDouble();
       case SeriesType.sumCalories:
+        return set.count.toDouble();
       case SeriesType.maxEorm:
         return set.eorm ?? 0;
       case SeriesType.maxWeight:
