@@ -1,17 +1,29 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/charts/all.dart';
 
-class DiaryChart extends StatelessWidget {
-  const DiaryChart({
+class ChartValue {
+  final DateTime datetime;
+  final double value;
+
+  ChartValue(this.datetime, this.value);
+
+  @override
+  String toString() => "$datetime: $value";
+}
+
+class Chart extends StatelessWidget {
+  const Chart({
     Key? key,
-    required this.diaries,
+    required this.chartValues,
+    required this.desc,
     required this.dateFilterState,
   }) : super(key: key);
 
+  final List<ChartValue> chartValues;
+  final bool desc;
   final DateFilterState dateFilterState;
-  final List<Diary> diaries;
 
   @override
   Widget build(BuildContext context) {
@@ -22,37 +34,43 @@ class DiaryChart extends StatelessWidget {
   }
 
   Widget _chart() {
-    final chartValues = diaries
-        .map((s) => ChartValue(s.date, s.bodyweight ?? 0))
-        .toList()
-        .reversed // data must be ordered asc datetime
-        .toList();
+    final _chartValues = desc
+        ? chartValues.reversed.toList() // data must be ordered asc datetime
+        : chartValues;
     switch (dateFilterState.runtimeType) {
       case DayFilter:
         return DayChart(
-          chartValues: chartValues,
+          chartValues: _chartValues,
           isTime: false,
         );
       case WeekFilter:
         return WeekChart(
-          chartValues: chartValues,
+          chartValues: _chartValues,
           isTime: false,
         );
       case MonthFilter:
         return MonthChart(
-          chartValues: chartValues,
+          chartValues: _chartValues,
           isTime: false,
         );
       case YearFilter:
         return YearChart(
-          chartValues: chartValues,
+          chartValues: _chartValues,
           isTime: false,
         );
       default:
         return AllChart(
-          chartValues: chartValues,
+          chartValues: _chartValues,
           isTime: false,
         );
     }
   }
+}
+
+FlLine Function(double value) gridLineDrawer(BuildContext context) {
+  return (value) => FlLine(
+        color: Theme.of(context).colorScheme.primary,
+        strokeWidth: 0.3,
+        dashArray: [4, 4],
+      );
 }

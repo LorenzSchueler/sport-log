@@ -4,8 +4,8 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/strength_session_description.dart';
 import 'package:sport_log/models/strength/strength_session_stats.dart';
+import 'package:sport_log/pages/workout/charts/chart.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
-import 'package:sport_log/pages/workout/charts/all.dart';
 import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 
 enum SeriesType {
@@ -145,61 +145,16 @@ class _StrengthChartState extends State<StrengthChart> {
           ),
         ),
         Defaults.sizedBox.vertical.small,
-        AspectRatio(
-          aspectRatio: 1.8,
-          child: _chart(),
+        Chart(
+          chartValues: _strengthSessionStats
+              .map(
+                (s) => ChartValue(s.datetime, _selectedSeries.statValue(s)),
+              )
+              .toList(),
+          desc: true,
+          dateFilterState: widget.dateFilterState,
         ),
       ],
     );
-  }
-
-  Widget _chart() {
-    switch (widget.dateFilterState.runtimeType) {
-      case DayFilter:
-        return DayChart(
-          chartValues: _strengthSessionStats
-              .map(
-                (s) => ChartValue(s.datetime, _selectedSeries.statValue(s)),
-              )
-              .toList(),
-          isTime: isTime,
-        );
-      case WeekFilter:
-        return WeekChart(
-          chartValues: _strengthSessionStats
-              .map(
-                (s) => ChartValue(s.datetime, _selectedSeries.statValue(s)),
-              )
-              .toList(),
-          isTime: isTime,
-        );
-      case MonthFilter:
-        return MonthChart(
-          chartValues: _strengthSessionStats
-              .map(
-                (s) => ChartValue(s.datetime, _selectedSeries.statValue(s)),
-              )
-              .toList(),
-          isTime: isTime,
-        );
-      case YearFilter:
-        return YearChart(
-          chartValues: _strengthSessionStats
-              .map(
-                (s) => ChartValue(s.datetime, _selectedSeries.statValue(s)),
-              )
-              .toList(),
-          isTime: isTime,
-        );
-      default:
-        return AllChart(
-          chartValues: _strengthSessionStats
-              .map(
-                (s) => ChartValue(s.datetime, _selectedSeries.statValue(s)),
-              )
-              .toList(),
-          isTime: isTime,
-        );
-    }
   }
 }
