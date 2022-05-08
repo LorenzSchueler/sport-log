@@ -257,30 +257,30 @@ class SettingsPageState extends State<SettingsPage> {
               const Divider(),
               const CaptionTile(caption: "Other Settings"),
               Defaults.sizedBox.vertical.small,
-              EditTile(
-                caption: "Units",
-                child: SizedBox(
-                  height: 24,
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton(
-                      value: Settings.units,
-                      items: [
-                        for (final unit in Units.values)
-                          DropdownMenuItem(
-                            value: unit,
-                            child: Text(unit.name),
-                          ),
-                      ],
-                      onChanged: (units) {
-                        if (units != null && units is Units) {
-                          setState(() => Settings.units = units);
-                        }
-                      },
-                    ),
-                  ),
-                ),
-                leading: AppIcons.sync,
-              ),
+              //EditTile(
+              //caption: "Units",
+              //child: SizedBox(
+              //height: 24,
+              //child: DropdownButtonHideUnderline(
+              //child: DropdownButton(
+              //value: Settings.units,
+              //items: [
+              //for (final unit in Units.values)
+              //DropdownMenuItem(
+              //value: unit,
+              //child: Text(unit.name),
+              //),
+              //],
+              //onChanged: (units) {
+              //if (units != null && units is Units) {
+              //setState(() => Settings.units = units);
+              //}
+              //},
+              //),
+              //),
+              //),
+              //leading: AppIcons.sync,
+              //),
               TextFormField(
                 decoration: Theme.of(context).textFormFieldDecoration.copyWith(
                       icon: const Icon(AppIcons.timeInterval),
