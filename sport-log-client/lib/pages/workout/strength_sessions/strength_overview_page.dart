@@ -117,7 +117,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
                     children: [
                       if (_movement != null) ...[
                         StrengthChart(
-                          movement: _movement!,
+                          strengthSessionDescriptions: _sessions,
                           dateFilterState: _dateFilter,
                         ),
                         Defaults.sizedBox.vertical.normal,

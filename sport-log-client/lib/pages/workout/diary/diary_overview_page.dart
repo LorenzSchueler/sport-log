@@ -83,7 +83,10 @@ class DiaryPageState extends State<DiaryPage> {
                   padding: Defaults.edgeInsets.normal,
                   child: Column(
                     children: [
-                      DiaryChart(dateFilterState: _dateFilter),
+                      DiaryChart(
+                        diaries: _diaries,
+                        dateFilterState: _dateFilter,
+                      ),
                       Defaults.sizedBox.vertical.normal,
                       Expanded(
                         child: ListView.separated(

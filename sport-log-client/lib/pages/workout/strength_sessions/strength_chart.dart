@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/models/strength/strength_session_description.dart';
 import 'package:sport_log/models/strength/strength_session_stats.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/charts/all.dart';
@@ -83,12 +83,12 @@ List<SeriesType> getAvailableSeries(MovementDimension dim) {
 }
 
 class StrengthChart extends StatefulWidget {
-  final Movement movement;
+  final List<StrengthSessionDescription> strengthSessionDescriptions;
   final DateFilterState dateFilterState;
 
   const StrengthChart({
     Key? key,
-    required this.movement,
+    required this.strengthSessionDescriptions,
     required this.dateFilterState,
   }) : super(key: key);
 
@@ -98,90 +98,34 @@ class StrengthChart extends StatefulWidget {
 
 class _StrengthChartState extends State<StrengthChart> {
   final _logger = Logger('StrengthChart');
-  final _dataProvider = StrengthSessionDescriptionDataProvider();
-  late final availableSeries = getAvailableSeries(widget.movement.dimension);
+  late final availableSeries = getAvailableSeries(movementDimension);
+  MovementDimension get movementDimension =>
+      widget.strengthSessionDescriptions.first.movement.dimension;
+  bool get isTime => movementDimension == MovementDimension.time;
 
-  late SeriesType _selectedSeries;
-  List<StrengthSessionStats> _strengthSessionStats = [];
-  late Type _dataFilterType;
+  late SeriesType _selectedSeries = availableSeries.first;
+  late List<StrengthSessionStats> _strengthSessionStats;
 
   @override
   void initState() {
+    calculateStats();
+    _logger.i("date filter: ${widget.dateFilterState.name}");
     super.initState();
-    _dataFilterType = widget.dateFilterState.runtimeType;
-    _dataProvider.addListener(_update);
-    _update();
-    _selectedSeries = availableSeries.first;
-    _logger
-      ..i("movement: ${widget.movement.name}")
-      ..i("date filter: ${widget.dateFilterState.name}");
   }
 
   @override
-  void dispose() {
-    _dataProvider.removeListener(_update);
-    super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(StrengthChart oldWidget) {
+  void didUpdateWidget(covariant StrengthChart oldWidget) {
+    calculateStats();
     super.didUpdateWidget(oldWidget);
-    // ignore a change in series type
-    if (oldWidget.movement != widget.movement ||
-        oldWidget.dateFilterState.start != widget.dateFilterState.start ||
-        oldWidget.dateFilterState.end != widget.dateFilterState.end) {
-      _update();
-    }
   }
 
-  Future<void> _update() async {
-    final List<StrengthSessionStats> strengthSessionStats;
-    final Type dataFilterType;
-    switch (widget.dateFilterState.runtimeType) {
-      case DayFilter:
-        strengthSessionStats = await _dataProvider.getStatsAggregationsBySet(
-          movementId: widget.movement.id,
-          date: (widget.dateFilterState as DayFilter).start,
-        );
-        dataFilterType = DayFilter;
-        break;
-      case WeekFilter:
-        strengthSessionStats = await _dataProvider.getStatsAggregationsByDay(
-          movementId: widget.movement.id,
-          from: (widget.dateFilterState as WeekFilter).start,
-          until: (widget.dateFilterState as WeekFilter).end,
-        );
-        dataFilterType = WeekFilter;
-        break;
-      case MonthFilter:
-        strengthSessionStats = await _dataProvider.getStatsAggregationsByDay(
-          movementId: widget.movement.id,
-          from: (widget.dateFilterState as MonthFilter).start,
-          until: (widget.dateFilterState as MonthFilter).end,
-        );
-        dataFilterType = MonthFilter;
-        break;
-      case YearFilter:
-        strengthSessionStats = await _dataProvider.getStatsAggregationsByWeek(
-          movementId: widget.movement.id,
-          from: (widget.dateFilterState as YearFilter).start,
-          until: (widget.dateFilterState as YearFilter).end,
-        );
-        dataFilterType = YearFilter;
-        break;
-      default:
-        strengthSessionStats = await _dataProvider.getStatsAggregationsByMonth(
-          movementId: widget.movement.id,
-        );
-        dataFilterType = NoFilter;
-        break;
-    }
-    if (mounted) {
-      setState(() {
-        _strengthSessionStats = strengthSessionStats;
-        _dataFilterType = dataFilterType;
-      });
-    }
+  void calculateStats() {
+    _strengthSessionStats = widget.strengthSessionDescriptions
+        .map(
+          (e) =>
+              StrengthSessionStats.fromStrengthSets(e.session.datetime, e.sets),
+        )
+        .toList();
   }
 
   @override
@@ -210,8 +154,7 @@ class _StrengthChartState extends State<StrengthChart> {
   }
 
   Widget _chart() {
-    // use _dataFilterType instead of widget.dateFilterState.runtimeType to keep data in sync with chart type even if update not yet computed
-    switch (_dataFilterType) {
+    switch (widget.dateFilterState.runtimeType) {
       case DayFilter:
         return DayChart(
           chartValues: _strengthSessionStats
@@ -219,7 +162,7 @@ class _StrengthChartState extends State<StrengthChart> {
                 (s) => ChartValue(s.datetime, _selectedSeries.statValue(s)),
               )
               .toList(),
-          isTime: widget.movement.dimension == MovementDimension.time,
+          isTime: isTime,
         );
       case WeekFilter:
         return WeekChart(
@@ -228,7 +171,7 @@ class _StrengthChartState extends State<StrengthChart> {
                 (s) => ChartValue(s.datetime, _selectedSeries.statValue(s)),
               )
               .toList(),
-          isTime: widget.movement.dimension == MovementDimension.time,
+          isTime: isTime,
         );
       case MonthFilter:
         return MonthChart(
@@ -237,7 +180,7 @@ class _StrengthChartState extends State<StrengthChart> {
                 (s) => ChartValue(s.datetime, _selectedSeries.statValue(s)),
               )
               .toList(),
-          isTime: widget.movement.dimension == MovementDimension.time,
+          isTime: isTime,
         );
       case YearFilter:
         return YearChart(
@@ -246,7 +189,7 @@ class _StrengthChartState extends State<StrengthChart> {
                 (s) => ChartValue(s.datetime, _selectedSeries.statValue(s)),
               )
               .toList(),
-          isTime: widget.movement.dimension == MovementDimension.time,
+          isTime: isTime,
         );
       default:
         return AllChart(
@@ -255,7 +198,7 @@ class _StrengthChartState extends State<StrengthChart> {
                 (s) => ChartValue(s.datetime, _selectedSeries.statValue(s)),
               )
               .toList(),
-          isTime: widget.movement.dimension == MovementDimension.time,
+          isTime: isTime,
         );
     }
   }
