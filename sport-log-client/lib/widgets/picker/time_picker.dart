@@ -5,16 +5,12 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 Future<DateTime?> showScrollableTimePicker({
   required BuildContext context,
   required DateTime? initialTime,
-}) async {
-  DateTime? datetime = await showDialog<DateTime>(
-    context: context,
-    builder: (context) => TimePickerDialog(datetime: initialTime),
-  );
-  if (datetime != null) {
-    datetime.copyWith(second: 0, millisecond: 0, microsecond: 0);
-  }
-  return datetime;
-}
+}) async =>
+    (await showDialog<DateTime>(
+      context: context,
+      builder: (context) => TimePickerDialog(datetime: initialTime),
+    ))
+        ?.beginningOfMinute();
 
 class TimePickerDialog extends StatefulWidget {
   const TimePickerDialog({this.datetime, Key? key}) : super(key: key);

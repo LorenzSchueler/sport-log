@@ -18,7 +18,7 @@ Future<DateTime?> showDateTimePicker({
       initialTime: initial,
     );
     if (time != null) {
-      return date.add(Duration(hours: time.hour, minutes: time.minute));
+      return DateTime(date.year, date.month, date.day, time.hour, time.minute);
     }
   }
   return null;

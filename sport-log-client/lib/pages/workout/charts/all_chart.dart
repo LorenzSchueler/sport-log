@@ -24,8 +24,7 @@ class AllChart extends StatelessWidget {
       if (maxY == 0) {
         maxY = 1;
       }
-      final start =
-          chartValues.first.datetime.copyWith(hour: 0, minute: 0, second: 0);
+      final start = chartValues.first.datetime.beginningOfDay();
       final end = chartValues.last.datetime;
       final months = (end.difference(start).inDays / 30).round();
       final titleInterval = (months / 8).ceil();

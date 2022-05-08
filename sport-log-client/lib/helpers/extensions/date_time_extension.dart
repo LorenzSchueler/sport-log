@@ -119,6 +119,10 @@ extension DateTimeExtension on DateTime {
     }
   }
 
+  DateTime beginningOfMinute() {
+    return DateTime(year, month, day, hour, minute);
+  }
+
   DateTime beginningOfDay() {
     return DateTime(year, month, day);
   }
@@ -217,27 +221,4 @@ extension DateTimeExtension on DateTime {
   }
 
   int get numDaysInYear => isLeapYear ? 366 : 365;
-
-  // ignore: long-parameter-list
-  DateTime copyWith({
-    int? year,
-    int? month,
-    int? day,
-    int? hour,
-    int? minute,
-    int? second,
-    int? millisecond,
-    int? microsecond,
-  }) {
-    return DateTime(
-      year ?? this.year,
-      month ?? this.month,
-      day ?? this.day,
-      hour ?? this.hour,
-      minute ?? this.minute,
-      second ?? this.second,
-      millisecond ?? this.millisecond,
-      microsecond ?? this.microsecond,
-    );
-  }
 }
