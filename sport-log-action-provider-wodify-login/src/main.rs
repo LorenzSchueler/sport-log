@@ -13,7 +13,7 @@ use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
 use sport_log_types::{ActionEventId, ExecutableActionEvent};
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
 use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
 use tokio::{process::Command, time};
@@ -85,7 +85,7 @@ async fn main() {
             "info,sport_log_action_provider_wodify_login=debug",
         );
     } else {
-        env::set_var("RUST_LOG", "warn");
+        env::set_var("RUST_LOG", "info");
     }
 
     tracing_subscriber::fmt::init();
@@ -166,7 +166,7 @@ async fn login(mode: Mode) -> Result<()> {
     .await
     .map_err(Error::Reqwest)?;
 
-    info!("got {} executable action events", exec_action_events.len());
+    debug!("got {} executable action events", exec_action_events.len());
 
     if exec_action_events.is_empty() {
         return Ok(());
@@ -174,7 +174,6 @@ async fn login(mode: Mode) -> Result<()> {
 
     let mut webdriver = Command::new("geckodriver")
         .stdout(Stdio::null())
-        .stderr(Stdio::null())
         .spawn()
         .map_err(Error::Io)?;
 
@@ -188,7 +187,7 @@ async fn login(mode: Mode) -> Result<()> {
         let caps = caps.clone();
 
         tasks.push(tokio::spawn(async move {
-            info!("processing {:#?}", exec_action_event);
+            debug!("processing {:#?}", exec_action_event);
 
             match (&exec_action_event.username, &exec_action_event.password) {
                 (Some(username), Some(password)) => {
@@ -203,16 +202,12 @@ async fn login(mode: Mode) -> Result<()> {
                     let result =
                         try_login(&driver, username, password, &exec_action_event, mode).await;
 
-                    info!("closing browser");
+                    debug!("closing browser");
                     driver.quit().await.map_err(Error::WebDriver)?;
 
                     result
                 }
-                _ => {
-                    warn!("can not log in: no credential provided");
-
-                    Err(Error::NoCredential(exec_action_event.action_event_id))
-                }
+                _ => Err(Error::NoCredential(exec_action_event.action_event_id)),
             }
         }));
     }
@@ -223,13 +218,15 @@ async fn login(mode: Mode) -> Result<()> {
             Ok(result) => match result {
                 Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
                 Err(Error::NoCredential(action_event_id)) => {
+                    info!("can not log in: no credential provided");
                     delete_action_event_ids.push(action_event_id)
                 }
                 Err(Error::LoginFailed(action_event_id)) => {
+                    info!("can not log in: login failed");
                     delete_action_event_ids.push(action_event_id)
                 }
                 Err(Error::Timeout(_)) => {
-                    error!("timeout")
+                    info!("timeout")
                 }
                 Err(error) => error!("{}", error),
             },
@@ -237,7 +234,7 @@ async fn login(mode: Mode) -> Result<()> {
         }
     }
 
-    info!("deleting {} action event", delete_action_event_ids.len());
+    debug!("deleting {} action event", delete_action_event_ids.len());
     debug!("delete event ids: {:?}", delete_action_event_ids);
 
     if !delete_action_event_ids.is_empty() {
@@ -312,10 +309,10 @@ async fn try_login(
         .await
         .is_err()
     {
-        warn!("login failed");
+        info!("login failed");
         return Err(Error::LoginFailed(exec_action_event.action_event_id));
     }
-    info!("login successful");
+    debug!("login successful");
 
     if let Ok(duration) = (exec_action_event.datetime - Duration::days(1) - Utc::now()).to_std() {
         time::sleep(duration).await;
@@ -363,7 +360,11 @@ async fn try_login(
                             .map_err(Error::WebDriver)?;
                         icon.scroll_into_view().await.map_err(Error::WebDriver)?;
                         icon.click().await.map_err(Error::WebDriver)?;
-                        info!("reservation successful");
+                        info!(
+                            "reservation for {} at {}",
+                            exec_action_event.datetime,
+                            Utc::now()
+                        );
 
                         if mode == Mode::Interactive {
                             time::sleep(StdDuration::from_secs(3)).await;
