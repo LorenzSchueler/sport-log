@@ -13,7 +13,7 @@ use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use tokio::{process::Command, time};
 use tracing::{debug, error, info, warn};
 
-use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
+use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{ActionEventId, ExecutableActionEvent, Wod, WodId};
 
 const CONFIG_FILE: &str = "sport-log-action-provider-wodify-wod.toml";
@@ -247,7 +247,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
     debug!("delete event ids: {:?}", delete_action_event_ids);
 
     if !delete_action_event_ids.is_empty() {
-        delete_events(
+        disable_events(
             &client,
             &CONFIG.base_url,
             NAME,

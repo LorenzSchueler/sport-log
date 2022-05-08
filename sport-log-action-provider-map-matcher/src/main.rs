@@ -39,7 +39,7 @@ use serde::{Deserialize, Serialize};
 use tokio::process::Command;
 use tracing::{debug, error, info};
 
-use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
+use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{ActionEventId, CardioSession, CardioSessionId, Position, Route, RouteId};
 
 pub const CONFIG_FILE: &str = "sport-log-action-provider-map-matcher.toml";
@@ -276,7 +276,7 @@ async fn map_match() -> Result<()> {
     }
 
     if !delete_action_event_ids.is_empty() {
-        delete_events(
+        disable_events(
             &client,
             &CONFIG.base_url,
             NAME,

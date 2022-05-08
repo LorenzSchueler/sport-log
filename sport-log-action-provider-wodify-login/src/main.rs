@@ -15,7 +15,7 @@ use sport_log_types::{ActionEventId, ExecutableActionEvent};
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use tracing::{debug, error, info};
 
-use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
+use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use tokio::{process::Command, time};
 
 const CONFIG_FILE: &str = "sport-log-action-provider-wodify-login.toml";
@@ -217,18 +217,18 @@ async fn login(mode: Mode) -> Result<()> {
         }));
     }
 
-    let mut delete_action_event_ids = vec![];
+    let mut disable_action_event_ids = vec![];
     for task in tasks {
         match task.await {
             Ok(result) => match result {
-                Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
+                Ok(action_event_id) => disable_action_event_ids.push(action_event_id),
                 Err(Error::NoCredential(action_event_id)) => {
                     info!("can not log in: no credential provided");
-                    delete_action_event_ids.push(action_event_id)
+                    disable_action_event_ids.push(action_event_id)
                 }
                 Err(Error::LoginFailed(action_event_id)) => {
                     info!("can not log in: login failed");
-                    delete_action_event_ids.push(action_event_id)
+                    disable_action_event_ids.push(action_event_id)
                 }
                 Err(Error::Timeout(_)) => {
                     info!("timeout")
@@ -239,16 +239,16 @@ async fn login(mode: Mode) -> Result<()> {
         }
     }
 
-    debug!("deleting {} action event", delete_action_event_ids.len());
-    debug!("delete event ids: {:?}", delete_action_event_ids);
+    debug!("deleting {} action event", disable_action_event_ids.len());
+    debug!("disable event ids: {:?}", disable_action_event_ids);
 
-    if !delete_action_event_ids.is_empty() {
-        delete_events(
+    if !disable_action_event_ids.is_empty() {
+        disable_events(
             &client,
             &CONFIG.server_url,
             NAME,
             &CONFIG.password,
-            &delete_action_event_ids,
+            &disable_action_event_ids,
         )
         .await
         .map_err(Error::Reqwest)?;

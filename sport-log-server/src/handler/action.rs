@@ -423,13 +423,13 @@ pub async fn adm_update_action_event(
     format = "application/json",
     data = "<action_event_ids>"
 )]
-pub async fn ap_delete_action_events(
+pub async fn ap_disable_action_events(
     action_event_ids: UnverifiedIds<ActionEventId>,
     auth: AuthAP,
     conn: Db,
 ) -> Result<Status, JsonError> {
     conn.run(move |c| {
-        ActionEvent::delete_multiple(
+        ActionEvent::disable_multiple(
             action_event_ids
                 .verify_ap(&auth, c)
                 .map_err(|status| JsonError {

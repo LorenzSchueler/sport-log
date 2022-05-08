@@ -166,7 +166,7 @@ pub async fn get_events(
     Ok(exec_action_events)
 }
 
-pub async fn delete_events(
+pub async fn disable_events(
     client: &Client,
     base_url: &str,
     name: &str,

@@ -8,7 +8,7 @@ use reqwest::{Client, Error as ReqwestError, StatusCode};
 use serde::Deserialize;
 use tracing::{debug, error, info, warn};
 
-use sport_log_ap_utils::{delete_events, get_events, setup as setup_db};
+use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{
     ActionEventId, CardioSession, CardioSessionId, CardioType, Movement, Position,
 };
@@ -377,7 +377,7 @@ async fn fetch() -> Result<(), ReqwestError> {
     debug!("delete event ids: {:?}", delete_action_event_ids);
 
     if !delete_action_event_ids.is_empty() {
-        delete_events(
+        disable_events(
             &client,
             &CONFIG.server_url,
             NAME,

@@ -208,6 +208,17 @@ impl ActionEvent {
             .get_results(conn)
     }
 
+    pub fn disable_multiple(
+        action_event_ids: Vec<ActionEventId>,
+        conn: &PgConnection,
+    ) -> QueryResult<usize> {
+        diesel::update(
+            action_event::table.filter(action_event::columns::id.eq_any(action_event_ids)),
+        )
+        .set(action_event::columns::enabled.eq(false))
+        .execute(conn)
+    }
+
     pub fn delete_multiple(
         action_event_ids: Vec<ActionEventId>,
         conn: &PgConnection,
