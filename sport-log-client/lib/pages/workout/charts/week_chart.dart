@@ -17,64 +17,86 @@ class WeekChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
-    if (maxY == 0) {
-      maxY = 1;
-    }
-    final start =
-        chartValues.first.datetime.copyWith(hour: 0, minute: 0, second: 0);
+    if (chartValues.isEmpty) {
+      return const CircularProgressIndicator();
+    } else {
+      double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
+      if (maxY == 0) {
+        maxY = 1;
+      }
+      final start = chartValues.first.datetime.beginningOfWeek();
 
-    return chartValues.isEmpty
-        ? const CircularProgressIndicator()
-        : BarChart(
-            BarChartData(
-              barGroups: chartValues
-                  .map(
-                    (v) => BarChartGroupData(
-                      x: v.datetime.difference(start).inDays + 1,
-                      barRods: [
-                        BarChartRodData(
-                          toY: v.value,
-                          color: Theme.of(context).colorScheme.primary,
-                        )
-                      ],
-                    ),
-                  )
-                  .toList(),
-              borderData: FlBorderData(show: false),
-              titlesData: FlTitlesData(
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: isTime ? 60 : 30,
-                    getTitlesWidget: isTime
-                        ? (value, _) => Text(
-                              Duration(milliseconds: value.round())
-                                  .formatTimeWithMillis,
-                            )
-                        : null,
-                  ),
-                ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (value, _) => Text(
-                      shortWeekdayName(value.round()),
-                    ),
-                  ),
-                ),
-                rightTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              ),
-              minY: 0,
-              maxY: maxY,
-              gridData: FlGridData(
-                getDrawingHorizontalLine: gridLineDrawer(context),
-                drawVerticalLine: false,
-              ),
+      var barGroups = chartValues
+          .map(
+            (v) => BarChartGroupData(
+              x: v.datetime.difference(start).inDays + 1,
+              barRods: [
+                BarChartRodData(
+                  toY: v.value,
+                  color: Theme.of(context).colorScheme.primary,
+                )
+              ],
+            ),
+          )
+          .toList();
+      final days = barGroups.map((e) => e.x);
+      for (int day = 1; day <= 7; day++) {
+        if (!days.contains(day.toDouble())) {
+          barGroups.insert(
+            day - 1,
+            BarChartGroupData(
+              x: day,
+              barRods: [
+                BarChartRodData(
+                  toY: 0,
+                  color: Theme.of(context).colorScheme.primary,
+                )
+              ],
             ),
           );
+        }
+      }
+
+      return chartValues.isEmpty
+          ? const CircularProgressIndicator()
+          : BarChart(
+              BarChartData(
+                barGroups: barGroups,
+                borderData: FlBorderData(show: false),
+                titlesData: FlTitlesData(
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: isTime ? 60 : 30,
+                      getTitlesWidget: isTime
+                          ? (value, _) => Text(
+                                Duration(milliseconds: value.round())
+                                    .formatTimeWithMillis,
+                              )
+                          : null,
+                    ),
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (value, _) => Text(
+                        shortWeekdayName(value.round()),
+                      ),
+                    ),
+                  ),
+                  rightTitles:
+                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles:
+                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                ),
+                minY: 0,
+                maxY: maxY,
+                gridData: FlGridData(
+                  getDrawingHorizontalLine: gridLineDrawer(context),
+                  drawVerticalLine: false,
+                ),
+              ),
+            );
+    }
   }
 }

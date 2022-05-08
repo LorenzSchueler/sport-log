@@ -70,7 +70,7 @@ class AllChart extends StatelessWidget {
                   showTitles: true,
                   interval: 1,
                   getTitlesWidget: (value, _) {
-                    final date = DateTime(start.year, 1, value.round());
+                    final date = start.add(Duration(days: value.round()));
                     return date.day == 15 && markedMonths.contains(date.month)
                         ? Text("${date.shortMonthName}\n${date.year}")
                         : const Text("");
@@ -94,7 +94,7 @@ class AllChart extends StatelessWidget {
             gridData: FlGridData(
               verticalInterval: 1,
               checkToShowVerticalLine: (value) {
-                final datetime = DateTime(start.year, 1, value.round());
+                final datetime = start.add(Duration(days: value.round()));
                 return datetime.day == 1 &&
                         markedMonths.contains(datetime.month)
                     ? true

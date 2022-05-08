@@ -225,6 +225,8 @@ extension DateTimeExtension on DateTime {
     return isLeapYear ? numDaysLeapYear[month - 1] : numDaysNormYear[month - 1];
   }
 
+  int get numDaysInYear => isLeapYear ? 366 : 365;
+
   DateTime withTime(TimeOfDay time) {
     return DateTime(year, month, day, time.hour, time.minute);
   }

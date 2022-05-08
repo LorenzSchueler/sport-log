@@ -11,7 +11,7 @@ Future<DateTime?> showScrollableTimePicker({
     builder: (context) => TimePickerDialog(datetime: initialTime),
   );
   if (datetime != null) {
-    datetime.copyWith(second: 0);
+    datetime.copyWith(second: 0, millisecond: 0, microsecond: 0);
   }
   return datetime;
 }

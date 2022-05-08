@@ -14,4 +14,7 @@ class ChartValue {
   final double value;
 
   ChartValue(this.datetime, this.value);
+
+  @override
+  String toString() => "$datetime: $value";
 }
