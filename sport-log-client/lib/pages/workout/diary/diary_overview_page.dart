@@ -3,6 +3,7 @@ import 'package:sport_log/data_provider/data_providers/diary_data_provider.dart'
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/pages/workout/diary/diary_chart.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
@@ -50,8 +51,10 @@ class DiaryPageState extends State<DiaryPage> {
     _logger.d(
       'Updating diary page with start = ${_dateFilter.start}, end = ${_dateFilter.end}',
     );
-    final diaries =
-        await _dataProvider.getByTimerange(_dateFilter.start, _dateFilter.end);
+    final diaries = await _dataProvider.getByTimerange(
+      from: _dateFilter.start,
+      until: _dateFilter.end,
+    );
     setState(() => _diaries = diaries);
   }
 
@@ -78,12 +81,20 @@ class DiaryPageState extends State<DiaryPage> {
               ? SessionsPageTab.diary.noEntriesText
               : Container(
                   padding: Defaults.edgeInsets.normal,
-                  child: ListView.separated(
-                    itemBuilder: (_, index) =>
-                        DiaryCard(diary: _diaries[index]),
-                    separatorBuilder: (_, __) =>
-                        Defaults.sizedBox.vertical.normal,
-                    itemCount: _diaries.length,
+                  child: Column(
+                    children: [
+                      DiaryChart(dateFilterState: _dateFilter),
+                      Defaults.sizedBox.vertical.normal,
+                      Expanded(
+                        child: ListView.separated(
+                          itemBuilder: (_, index) =>
+                              DiaryCard(diary: _diaries[index]),
+                          separatorBuilder: (_, __) =>
+                              Defaults.sizedBox.vertical.normal,
+                          itemCount: _diaries.length,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
         ),

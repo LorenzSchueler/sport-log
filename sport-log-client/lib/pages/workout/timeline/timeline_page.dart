@@ -111,8 +111,8 @@ class TimelinePageState extends State<TimelinePage> {
 
   Future<void> updateDiaries() async {
     _diaries = await _diaryDataProvider.getByTimerange(
-      _dateFilter.start,
-      _dateFilter.end,
+      from: _dateFilter.start,
+      until: _dateFilter.end,
     );
     sortItems();
   }
