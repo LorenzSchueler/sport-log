@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
+import 'package:sport_log/pages/workout/charts/chart.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -122,17 +123,42 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
               ? SessionsPageTab.cardio.noEntriesText
               : Container(
                   padding: Defaults.edgeInsets.normal,
-                  child: ListView.separated(
-                    itemBuilder: (_, index) => CardioSessionCard(
-                      cardioSessionDescription:
-                          _cardioSessionDescriptions[index],
-                      key: ValueKey(
-                        _cardioSessionDescriptions[index].cardioSession.id,
-                      ),
-                    ),
-                    separatorBuilder: (_, __) =>
+                  child: Column(
+                    children: [
+                      if (_movement != null) ...[
+                        Chart(
+                          chartValues: _cardioSessionDescriptions
+                              .map(
+                                (s) => ChartValue(
+                                  s.cardioSession.datetime,
+                                  (s.cardioSession.distance?.toDouble() ??
+                                          0.0) /
+                                      1000,
+                                ),
+                              )
+                              .toList(),
+                          desc: true,
+                          dateFilterState: _dateFilter,
+                        ),
                         Defaults.sizedBox.vertical.normal,
-                    itemCount: _cardioSessionDescriptions.length,
+                      ],
+                      Expanded(
+                        child: ListView.separated(
+                          itemBuilder: (_, index) => CardioSessionCard(
+                            cardioSessionDescription:
+                                _cardioSessionDescriptions[index],
+                            key: ValueKey(
+                              _cardioSessionDescriptions[index]
+                                  .cardioSession
+                                  .id,
+                            ),
+                          ),
+                          separatorBuilder: (_, __) =>
+                              Defaults.sizedBox.vertical.normal,
+                          itemCount: _cardioSessionDescriptions.length,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
         ),
