@@ -85,10 +85,15 @@ async fn main() {
             "info,sport_log_action_provider_wodify_login=debug",
         );
     } else {
-        env::set_var("RUST_LOG", "info");
+        env::set_var(
+            "RUST_LOG",
+            "warn,sport_log_action_provider_wodify_login=info",
+        );
     }
 
-    tracing_subscriber::fmt::init();
+    tracing_subscriber::fmt()
+        .with_writer(std::io::stderr)
+        .init();
 
     match &env::args().collect::<Vec<_>>()[1..] {
         [] => {
