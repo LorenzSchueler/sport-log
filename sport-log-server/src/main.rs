@@ -142,7 +142,7 @@ fn rocket() -> Rocket<Build> {
                 action::ap_get_actions,
                 action::ap_get_executable_action_events,
                 action::ap_get_ordered_executable_action_events_by_timespan,
-                action::ap_delete_action_events,
+                action::ap_disable_action_events,
                 user::create_user,
                 user::get_user,
                 user::update_user,
