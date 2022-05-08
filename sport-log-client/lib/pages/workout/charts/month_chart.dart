@@ -26,62 +26,58 @@ class MonthChart extends StatelessWidget {
       }
       final start = chartValues.first.datetime.beginningOfMonth();
 
-      return chartValues.isEmpty
-          ? const CircularProgressIndicator()
-          : LineChart(
-              LineChartData(
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: chartValues
-                        .map(
-                          (v) => FlSpot(
-                            v.datetime.difference(start).inDays + 1,
-                            v.value,
-                          ),
-                        )
-                        .toList(),
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ],
-                titlesData: FlTitlesData(
-                  topTitles:
-                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles:
-                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      interval: 1,
-                      getTitlesWidget: (value, _) => value % 2 == 0
-                          ? Text(value.round().toString())
-                          : const Text(""),
+      return LineChart(
+        LineChartData(
+          lineBarsData: [
+            LineChartBarData(
+              spots: chartValues
+                  .map(
+                    (v) => FlSpot(
+                      v.datetime.difference(start).inDays + 1,
+                      v.value,
                     ),
-                  ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: isTime ? 60 : 30,
-                      getTitlesWidget: isTime
-                          ? (value, _) => Text(
-                                Duration(milliseconds: value.round())
-                                    .formatTimeWithMillis,
-                              )
-                          : null,
-                    ),
-                  ),
-                ),
-                gridData: FlGridData(
-                  verticalInterval: 1,
-                  getDrawingHorizontalLine: gridLineDrawer(context),
-                  getDrawingVerticalLine: gridLineDrawer(context),
-                ),
-                minX: 1.0,
-                maxX: start.numDaysInMonth.toDouble(),
-                minY: 0.0,
-                maxY: maxY,
-                borderData: FlBorderData(show: false),
+                  )
+                  .toList(),
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ],
+          titlesData: FlTitlesData(
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: 1,
+                getTitlesWidget: (value, _) => value % 2 == 0
+                    ? Text(value.round().toString())
+                    : const Text(""),
               ),
-            );
+            ),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: isTime ? 60 : 30,
+                getTitlesWidget: isTime
+                    ? (value, _) => Text(
+                          Duration(milliseconds: value.round())
+                              .formatTimeWithMillis,
+                        )
+                    : null,
+              ),
+            ),
+          ),
+          gridData: FlGridData(
+            verticalInterval: 1,
+            getDrawingHorizontalLine: gridLineDrawer(context),
+            getDrawingVerticalLine: gridLineDrawer(context),
+          ),
+          minX: 1.0,
+          maxX: start.numDaysInMonth.toDouble(),
+          minY: 0.0,
+          maxY: maxY,
+          borderData: FlBorderData(show: false),
+        ),
+      );
     }
   }
 }

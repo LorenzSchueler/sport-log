@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 const _shortMonthNames = [
@@ -16,7 +15,7 @@ const _shortMonthNames = [
   'Dec',
 ];
 
-String shortMonthName(int month) {
+String shortMonthNameOfInt(int month) {
   return _shortMonthNames[month - 1];
 }
 
@@ -30,7 +29,7 @@ const _shortWeekdayNames = [
   'Sun',
 ];
 
-String shortWeekdayName(int weekday) {
+String shortWeekdayNameOfInt(int weekday) {
   return _shortWeekdayNames[weekday - 1];
 }
 
@@ -44,17 +43,9 @@ extension FormatDuration on Duration {
   String get formatTimeWithMillis => toString().split(":").skip(1).join(":");
 }
 
-extension TimeOfDayExtension on TimeOfDay {
-  DateTime toDateTime() {
-    final now = DateTime.now();
-
-    return DateTime(now.year, now.month, now.day, hour, minute);
-  }
-}
-
 extension DateTimeExtension on DateTime {
-  String get shortMonthName => _shortMonthNames[month - 1];
-  String get shortWeekdayName => _shortWeekdayNames[weekday - 1];
+  String get shortMonthName => shortMonthNameOfInt(month);
+  String get shortWeekdayName => shortWeekdayNameOfInt(weekday);
 
   String get _formatDate => DateFormat("dd'.' MMMM yyyy").format(this);
   String get _formatDateShort => DateFormat("dd'.' MMMM").format(this);
@@ -226,10 +217,6 @@ extension DateTimeExtension on DateTime {
   }
 
   int get numDaysInYear => isLeapYear ? 366 : 365;
-
-  DateTime withTime(TimeOfDay time) {
-    return DateTime(year, month, day, time.hour, time.minute);
-  }
 
   // ignore: long-parameter-list
   DateTime copyWith({

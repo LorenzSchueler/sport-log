@@ -17,61 +17,60 @@ class DayChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
-    if (maxY == 0) {
-      maxY = 1;
-    }
+    if (chartValues.isEmpty) {
+      return const CircularProgressIndicator();
+    } else {
+      double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
+      if (maxY == 0) {
+        maxY = 1;
+      }
 
-    return chartValues.isEmpty
-        ? const CircularProgressIndicator()
-        : BarChart(
-            BarChartData(
-              barGroups: chartValues
-                  .mapIndexed(
-                    (v, index) => BarChartGroupData(
-                      x: index,
-                      barRods: [
-                        BarChartRodData(
-                          toY: v.value,
-                          color: Theme.of(context).colorScheme.primary,
+      return BarChart(
+        BarChartData(
+          barGroups: chartValues
+              .mapIndexed(
+                (v, index) => BarChartGroupData(
+                  x: index,
+                  barRods: [
+                    BarChartRodData(
+                      toY: v.value,
+                      color: Theme.of(context).colorScheme.primary,
+                    )
+                  ],
+                ),
+              )
+              .toList(),
+          borderData: FlBorderData(show: false),
+          titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: isTime ? 60 : 30,
+                getTitlesWidget: isTime
+                    ? (value, _) => Text(
+                          Duration(milliseconds: value.round())
+                              .formatTimeWithMillis,
                         )
-                      ],
-                    ),
-                  )
-                  .toList(),
-              borderData: FlBorderData(show: false),
-              titlesData: FlTitlesData(
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: isTime ? 60 : 30,
-                    getTitlesWidget: isTime
-                        ? (value, _) => Text(
-                              Duration(milliseconds: value.round())
-                                  .formatTimeWithMillis,
-                            )
-                        : null,
-                  ),
-                ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (value, _) =>
-                        Text("Set ${value.round() + 1}"),
-                  ),
-                ),
-                rightTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              ),
-              minY: 0,
-              maxY: maxY,
-              gridData: FlGridData(
-                getDrawingHorizontalLine: gridLineDrawer(context),
-                drawVerticalLine: false,
+                    : null,
               ),
             ),
-          );
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, _) => Text("Set ${value.round() + 1}"),
+              ),
+            ),
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          ),
+          minY: 0,
+          maxY: maxY,
+          gridData: FlGridData(
+            getDrawingHorizontalLine: gridLineDrawer(context),
+            drawVerticalLine: false,
+          ),
+        ),
+      );
+    }
   }
 }

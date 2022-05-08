@@ -57,46 +57,42 @@ class WeekChart extends StatelessWidget {
         }
       }
 
-      return chartValues.isEmpty
-          ? const CircularProgressIndicator()
-          : BarChart(
-              BarChartData(
-                barGroups: barGroups,
-                borderData: FlBorderData(show: false),
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: isTime ? 60 : 30,
-                      getTitlesWidget: isTime
-                          ? (value, _) => Text(
-                                Duration(milliseconds: value.round())
-                                    .formatTimeWithMillis,
-                              )
-                          : null,
-                    ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, _) => Text(
-                        shortWeekdayName(value.round()),
-                      ),
-                    ),
-                  ),
-                  rightTitles:
-                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles:
-                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                ),
-                minY: 0,
-                maxY: maxY,
-                gridData: FlGridData(
-                  getDrawingHorizontalLine: gridLineDrawer(context),
-                  drawVerticalLine: false,
+      return BarChart(
+        BarChartData(
+          barGroups: barGroups,
+          borderData: FlBorderData(show: false),
+          titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: isTime ? 60 : 30,
+                getTitlesWidget: isTime
+                    ? (value, _) => Text(
+                          Duration(milliseconds: value.round())
+                              .formatTimeWithMillis,
+                        )
+                    : null,
+              ),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, _) => Text(
+                  shortWeekdayNameOfInt(value.round()),
                 ),
               ),
-            );
+            ),
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          ),
+          minY: 0,
+          maxY: maxY,
+          gridData: FlGridData(
+            getDrawingHorizontalLine: gridLineDrawer(context),
+            drawVerticalLine: false,
+          ),
+        ),
+      );
     }
   }
 }

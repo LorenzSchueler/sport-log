@@ -20,6 +20,10 @@ class AllChart extends StatelessWidget {
     if (chartValues.isEmpty) {
       return const CircularProgressIndicator();
     } else {
+      double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
+      if (maxY == 0) {
+        maxY = 1;
+      }
       final start =
           chartValues.first.datetime.copyWith(hour: 0, minute: 0, second: 0);
       final end = chartValues.last.datetime;
@@ -40,10 +44,6 @@ class AllChart extends StatelessWidget {
         markedMonths = [1];
       }
 
-      double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
-      if (maxY == 0) {
-        maxY = 1;
-      }
       return Padding(
         padding: const EdgeInsets.fromLTRB(0, 5, 15, 0),
         child: LineChart(
