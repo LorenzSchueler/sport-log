@@ -46,7 +46,7 @@ class MainDrawer extends StatelessWidget {
             ),
             ListTile(
               leading: Icon(
-                AppIcons.timer,
+                AppIcons.stopwatch,
                 color: Theme.of(context).colorScheme.onBackground,
               ),
               title: const Text('Timer'),

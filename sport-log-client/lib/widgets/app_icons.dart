@@ -61,7 +61,7 @@ class AppIcons {
   static const IconData email = Icons.email_outlined;
   static const IconData key = Icons.key_outlined;
   static const IconData map = Icons.map_rounded;
-  static const IconData timer = Icons.timer_outlined;
+  static const IconData stopwatch = Icons.timer_outlined;
   static const IconData sports = Icons.sports_rounded;
   static const IconData comment = Icons.comment_outlined;
   static const IconData exercise = Icons.directions_run_rounded;

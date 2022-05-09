@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/timer_utils.dart';
-import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -43,24 +42,18 @@ class TimerPageState extends State<TimerPage> {
             bottom: DeactivatableTabBar(
               child: TabBar(
                 indicatorColor: Theme.of(context).colorScheme.primary,
-                tabs: [
+                tabs: const [
                   Tab(
-                    text: "AMRAP",
-                    icon: Icon(
-                      MetconType.amrap.icon,
-                    ),
+                    text: "Timer",
+                    icon: Icon(AppIcons.timeInterval),
                   ),
                   Tab(
-                    text: "EMOM",
-                    icon: Icon(
-                      MetconType.emom.icon,
-                    ),
+                    text: "Interval",
+                    icon: Icon(AppIcons.repeat),
                   ),
                   Tab(
-                    text: "FOR TIME",
-                    icon: Icon(
-                      MetconType.forTime.icon,
-                    ),
+                    text: "Stopwatch",
+                    icon: Icon(AppIcons.stopwatch),
                   )
                 ],
               ),
@@ -73,19 +66,19 @@ class TimerPageState extends State<TimerPage> {
               children: [
                 Column(
                   children: [
-                    _timeFormField(MetconType.amrap),
+                    _timeFormField(TimerType.timer),
                     Defaults.sizedBox.vertical.huge,
-                    _startStopButton(MetconType.amrap),
+                    _startStopButton(TimerType.timer),
                     const SizedBox(height: 100),
                     if (_timerUtils != null) timeText(),
                   ],
                 ),
                 Column(
                   children: [
-                    _timeFormField(MetconType.emom),
+                    _timeFormField(TimerType.interval),
                     _roundsFormField(),
                     Defaults.sizedBox.vertical.huge,
-                    _startStopButton(MetconType.emom),
+                    _startStopButton(TimerType.interval),
                     const SizedBox(height: 100),
                     if (_timerUtils != null)
                       Text(
@@ -97,9 +90,9 @@ class TimerPageState extends State<TimerPage> {
                 ),
                 Column(
                   children: [
-                    _timeFormField(MetconType.forTime),
+                    _timeFormField(TimerType.stopwatch),
                     Defaults.sizedBox.vertical.huge,
-                    _startStopButton(MetconType.forTime),
+                    _startStopButton(TimerType.stopwatch),
                     const SizedBox(height: 100),
                     if (_timerUtils != null) timeText(),
                   ],
@@ -113,20 +106,20 @@ class TimerPageState extends State<TimerPage> {
     );
   }
 
-  String _caption(MetconType metconType) {
-    switch (metconType) {
-      case MetconType.amrap:
+  String _caption(TimerType timerType) {
+    switch (timerType) {
+      case TimerType.timer:
         return "Time";
-      case MetconType.emom:
+      case TimerType.interval:
         return "Round Time";
-      case MetconType.forTime:
+      case TimerType.stopwatch:
         return "Timecap";
     }
   }
 
-  Widget _timeFormField(MetconType metconType) {
+  Widget _timeFormField(TimerType timerType) {
     return EditTile(
-      caption: _caption(metconType),
+      caption: _caption(timerType),
       child: DurationInput(
         setDuration:
             _timerUtils != null ? null : (d) => setState(() => _totalTime = d),
@@ -150,7 +143,7 @@ class TimerPageState extends State<TimerPage> {
     );
   }
 
-  Widget _startStopButton(MetconType metconType) {
+  Widget _startStopButton(TimerType timerType) {
     return _timerUtils != null
         ? ElevatedButton(
             onPressed: () => setState(_timerUtils!.stopTimer),
@@ -163,7 +156,7 @@ class TimerPageState extends State<TimerPage> {
             onPressed: () => _totalTime.inSeconds > 0
                 ? setState(
                     () => _timerUtils = TimerUtils.startTimer(
-                      metconType: metconType,
+                      timerType: timerType,
                       totalTime: _totalTime,
                       totalRounds: _totalRounds,
                       onTick: () => setState(() {}),
@@ -172,7 +165,7 @@ class TimerPageState extends State<TimerPage> {
                   )
                 : showMessageDialog(
                     context: context,
-                    text: "The ${_caption(metconType)} must be greater than 0.",
+                    text: "The ${_caption(timerType)} must be greater than 0.",
                   ),
             child: const Text(
               "Start",
