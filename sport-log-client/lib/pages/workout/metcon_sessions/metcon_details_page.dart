@@ -3,6 +3,7 @@ import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_description_card.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/text_tile.dart';
@@ -68,35 +69,11 @@ class MetconDetailsPageState extends State<MetconDetailsPage> {
             )
         ],
       ),
-      body: ListView(
+      body: Padding(
         padding: Defaults.edgeInsets.normal,
-        children: [
-          Text(
-            "Metcon",
-            style: Theme.of(context).textTheme.headline5,
-          ),
-          TextTile(
-            caption: "Type",
-            child: Text(_metconDescription.typeLengthDescription),
-          ),
-          TextTile(
-            caption: "Movements",
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (var metconMovementDescription in _metconDescription.moves)
-                  Text(metconMovementDescription.movementText),
-              ],
-            ),
-          ),
-          if (_metconDescription.metcon.description != null)
-            TextTile(
-              caption: "Description",
-              child: Text(
-                _metconDescription.metcon.description!,
-              ),
-            ),
-        ],
+        child: MetconDescriptionCard(
+          metconDescription: _metconDescription,
+        ),
       ),
     );
   }

@@ -4,6 +4,8 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_description_card.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_results_card.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/text_tile.dart';
@@ -80,61 +82,14 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
       body: ListView(
         padding: Defaults.edgeInsets.normal,
         children: [
-          Text(
-            "Metcon",
-            style: Theme.of(context).textTheme.headline5,
+          MetconDescriptionCard(
+            metconDescription: _metconSessionDescription.metconDescription,
           ),
-          TextTile(
-            caption: "Type",
-            child: Text(_metconSessionDescription.typeLengthDescription),
+          Defaults.sizedBox.vertical.normal,
+          MetconSessionResultsCard(
+            metconSessionDescription: _metconSessionDescription,
+            metconSessionDescriptions: _metconSessionDescriptions,
           ),
-          TextTile(
-            caption: "Movements",
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (var metconMovementDescription
-                    in _metconSessionDescription.metconDescription.moves)
-                  Text(metconMovementDescription.movementText),
-              ],
-            ),
-          ),
-          if (_metconSessionDescription.metconDescription.metcon.description !=
-              null)
-            TextTile(
-              caption: "Description",
-              child: Text(
-                _metconSessionDescription.metconDescription.metcon.description!,
-              ),
-            ),
-          Defaults.sizedBox.vertical.big,
-          Text(
-            "Results",
-            style: Theme.of(context).textTheme.headline5,
-          ),
-          TextTile(
-            caption: "Score",
-            child: Text(
-              "${_metconSessionDescription.shortResultDescription} (${_metconSessionDescription.metconSession.datetime.toHumanDate()})",
-            ),
-          ),
-          TextTile(
-            caption: "Previous Scores",
-            child: Column(
-              children: [
-                for (final metconSessionDescription
-                    in _metconSessionDescriptions)
-                  Text(
-                    "${metconSessionDescription.shortResultDescription} (${metconSessionDescription.metconSession.datetime.toHumanDate()})",
-                  ),
-              ],
-            ),
-          ),
-          if (_metconSessionDescription.metconSession.comments != null)
-            TextTile(
-              caption: "Comments",
-              child: Text(_metconSessionDescription.metconSession.comments!),
-            ),
         ],
       ),
     );
