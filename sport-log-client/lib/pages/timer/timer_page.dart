@@ -20,8 +20,9 @@ class TimerPage extends StatefulWidget {
 }
 
 class TimerPageState extends State<TimerPage> {
-  Duration _totalTime = Duration.zero;
-  int _totalRounds = 3;
+  Duration _time = Duration.zero;
+  Duration? _restTime;
+  int _rounds = 3;
   TimerUtils? _timerUtils;
 
   @override
@@ -76,6 +77,7 @@ class TimerPageState extends State<TimerPage> {
                 Column(
                   children: [
                     _timeFormField(TimerType.interval),
+                    _restTimeFormField(),
                     _roundsFormField(),
                     Defaults.sizedBox.vertical.huge,
                     _startStopButton(TimerType.interval),
@@ -122,11 +124,36 @@ class TimerPageState extends State<TimerPage> {
       caption: _caption(timerType),
       child: DurationInput(
         setDuration:
-            _timerUtils != null ? null : (d) => setState(() => _totalTime = d),
-        initialDuration: _totalTime,
+            _timerUtils != null ? null : (d) => setState(() => _time = d),
+        initialDuration: _time,
       ),
       leading: AppIcons.timeInterval,
     );
+  }
+
+  Widget _restTimeFormField() {
+    return _restTime == null
+        ? EditTile(
+            child: ActionChip(
+              avatar: const Icon(AppIcons.add),
+              label: const Text("Rest Time"),
+              onPressed: () => setState(() {
+                _restTime = const Duration(minutes: 1);
+              }),
+            ),
+            leading: AppIcons.timeInterval,
+          )
+        : EditTile(
+            caption: "Rest Time",
+            child: DurationInput(
+              setDuration: _timerUtils != null
+                  ? null
+                  : (d) => setState(() => _restTime = d),
+              initialDuration: _restTime,
+            ),
+            leading: AppIcons.timeInterval,
+            onCancel: () => setState(() => _restTime = null),
+          );
   }
 
   Widget _roundsFormField() {
@@ -134,11 +161,11 @@ class TimerPageState extends State<TimerPage> {
       leading: AppIcons.repeat,
       caption: "Rounds",
       child: IntInput(
-        initialValue: _totalRounds,
+        initialValue: _rounds,
         minValue: 1,
         setValue: _timerUtils != null
             ? null
-            : (rounds) => setState(() => _totalRounds = rounds),
+            : (rounds) => setState(() => _rounds = rounds),
       ),
     );
   }
@@ -153,12 +180,13 @@ class TimerPageState extends State<TimerPage> {
             ),
           )
         : ElevatedButton(
-            onPressed: () => _totalTime.inSeconds > 0
+            onPressed: () => _time.inSeconds > 0
                 ? setState(
                     () => _timerUtils = TimerUtils.startTimer(
                       timerType: timerType,
-                      totalTime: _totalTime,
-                      totalRounds: _totalRounds,
+                      time: _time,
+                      restTime: _restTime,
+                      rounds: _rounds,
                       onTick: () => setState(() {}),
                       onStop: () => setState(() => _timerUtils = null),
                     ),
