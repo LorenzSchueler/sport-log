@@ -4,6 +4,8 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_description_card.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_results_card.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
@@ -115,15 +117,41 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
               ? SessionsPageTab.metcon.noEntriesText
               : Container(
                   padding: Defaults.edgeInsets.normal,
-                  child: ListView.separated(
-                    itemBuilder: (_, index) => MetconSessionCard(
-                      metconSessionDescription:
-                          _metconSessionDescriptions[index],
-                    ),
-                    separatorBuilder: (_, __) =>
-                        Defaults.sizedBox.vertical.normal,
-                    itemCount: _metconSessionDescriptions.length,
-                  ),
+                  child: _metcon != null &&
+                          _metconSessionDescriptions.isNotEmpty
+                      ? ListView.separated(
+                          itemBuilder: (_, index) {
+                            if (index == 0) {
+                              return MetconDescriptionCard(
+                                metconDescription: _metconSessionDescriptions
+                                    .first.metconDescription,
+                              );
+                            } else if (index == 1) {
+                              return MetconSessionResultsCard(
+                                metconSessionDescription: null,
+                                metconSessionDescriptions:
+                                    _metconSessionDescriptions,
+                              );
+                            } else {
+                              return MetconSessionCard(
+                                metconSessionDescription:
+                                    _metconSessionDescriptions[index - 2],
+                              );
+                            }
+                          },
+                          separatorBuilder: (_, __) =>
+                              Defaults.sizedBox.vertical.normal,
+                          itemCount: _metconSessionDescriptions.length + 2,
+                        )
+                      : ListView.separated(
+                          itemBuilder: (_, index) => MetconSessionCard(
+                            metconSessionDescription:
+                                _metconSessionDescriptions[index],
+                          ),
+                          separatorBuilder: (_, __) =>
+                              Defaults.sizedBox.vertical.normal,
+                          itemCount: _metconSessionDescriptions.length,
+                        ),
                 ),
         ),
         bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
