@@ -289,17 +289,34 @@ class CardioEditPageState extends State<CardioEditPage> {
                             labelText: "Descent (m)",
                           ),
                 ),
-                EditTile(
-                  caption: 'Time',
-                  child: DurationInput(
-                    setDuration: (d) => setState(
-                      () => _cardioSessionDescription.cardioSession.time = d,
-                    ),
-                    initialDuration:
-                        _cardioSessionDescription.cardioSession.time,
-                  ),
-                  leading: AppIcons.timeInterval,
-                ),
+                _cardioSessionDescription.cardioSession.time == null
+                    ? EditTile(
+                        child: ActionChip(
+                          avatar: const Icon(AppIcons.add),
+                          label: const Text("Time"),
+                          onPressed: () => setState(() {
+                            _cardioSessionDescription.cardioSession.time =
+                                const Duration(minutes: 1);
+                          }),
+                        ),
+                        leading: AppIcons.timeInterval,
+                      )
+                    : EditTile(
+                        caption: 'Time',
+                        child: DurationInput(
+                          setDuration: (d) => setState(
+                            () => _cardioSessionDescription.cardioSession.time =
+                                d,
+                          ),
+                          initialDuration:
+                              _cardioSessionDescription.cardioSession.time,
+                        ),
+                        leading: AppIcons.timeInterval,
+                        onCancel: () => setState(
+                          () => _cardioSessionDescription.cardioSession.time =
+                              null,
+                        ),
+                      ),
                 TextFormField(
                   keyboardType: TextInputType.number,
                   validator: (calories) => calories == null || calories.isEmpty
