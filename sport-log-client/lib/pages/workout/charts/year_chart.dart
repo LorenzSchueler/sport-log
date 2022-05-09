@@ -8,11 +8,13 @@ import 'package:sport_log/pages/workout/charts/chart.dart';
 class YearChart extends StatelessWidget {
   const YearChart({
     required this.chartValues,
+    required this.yFromZero,
     required this.isTime,
     Key? key,
   }) : super(key: key);
 
   final List<ChartValue> chartValues;
+  final bool yFromZero;
   final bool isTime;
 
   @override
@@ -24,6 +26,9 @@ class YearChart extends StatelessWidget {
       if (maxY == 0) {
         maxY = 1;
       }
+      double minY = yFromZero
+          ? 0.0
+          : chartValues.map((v) => v.value).min.floor().toDouble();
       final start = chartValues.first.datetime.beginningOfYear();
 
       return LineChart(
@@ -80,7 +85,7 @@ class YearChart extends StatelessWidget {
           ),
           minX: 1.0,
           maxX: start.numDaysInYear.toDouble(),
-          minY: 0.0,
+          minY: minY,
           maxY: maxY,
           borderData: FlBorderData(show: false),
         ),

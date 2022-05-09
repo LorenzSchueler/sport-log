@@ -130,15 +130,17 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
                           chartValues: _cardioSessionDescriptions
                               .map(
                                 (s) => ChartValue(
-                                  s.cardioSession.datetime,
-                                  (s.cardioSession.distance?.toDouble() ??
-                                          0.0) /
-                                      1000,
+                                  datetime: s.cardioSession.datetime,
+                                  value:
+                                      (s.cardioSession.distance?.toDouble() ??
+                                              0.0) /
+                                          1000,
                                 ),
                               )
                               .toList(),
                           desc: true,
                           dateFilterState: _dateFilter,
+                          yFromZero: true,
                         ),
                         Defaults.sizedBox.vertical.normal,
                       ],

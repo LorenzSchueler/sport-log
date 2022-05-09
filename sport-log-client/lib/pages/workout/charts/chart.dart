@@ -7,7 +7,7 @@ class ChartValue {
   final DateTime datetime;
   final double value;
 
-  ChartValue(this.datetime, this.value);
+  ChartValue({required this.datetime, required this.value});
 
   @override
   String toString() => "$datetime: $value";
@@ -19,11 +19,13 @@ class Chart extends StatelessWidget {
     required this.chartValues,
     required this.desc,
     required this.dateFilterState,
+    required this.yFromZero,
   }) : super(key: key);
 
   final List<ChartValue> chartValues;
   final bool desc;
   final DateFilterState dateFilterState;
+  final bool yFromZero;
 
   @override
   Widget build(BuildContext context) {
@@ -51,16 +53,19 @@ class Chart extends StatelessWidget {
       case MonthFilter:
         return MonthChart(
           chartValues: _chartValues,
+          yFromZero: yFromZero,
           isTime: false,
         );
       case YearFilter:
         return YearChart(
           chartValues: _chartValues,
+          yFromZero: yFromZero,
           isTime: false,
         );
       default:
         return AllChart(
           chartValues: _chartValues,
+          yFromZero: yFromZero,
           isTime: false,
         );
     }

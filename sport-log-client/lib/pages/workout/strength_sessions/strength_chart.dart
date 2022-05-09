@@ -61,6 +61,13 @@ extension on SeriesType {
         return stats.sumVolume ?? 0;
     }
   }
+
+  bool statYFromZero() => [
+        SeriesType.maxDistance,
+        SeriesType.maxReps,
+        SeriesType.avgReps,
+        SeriesType.sumVolume
+      ].contains(this);
 }
 
 List<SeriesType> getAvailableSeries(MovementDimension dim) {
@@ -148,11 +155,15 @@ class _StrengthChartState extends State<StrengthChart> {
         Chart(
           chartValues: _strengthSessionStats
               .map(
-                (s) => ChartValue(s.datetime, _selectedSeries.statValue(s)),
+                (s) => ChartValue(
+                  datetime: s.datetime,
+                  value: _selectedSeries.statValue(s),
+                ),
               )
               .toList(),
           desc: true,
           dateFilterState: widget.dateFilterState,
+          yFromZero: _selectedSeries.statYFromZero(),
         ),
       ],
     );

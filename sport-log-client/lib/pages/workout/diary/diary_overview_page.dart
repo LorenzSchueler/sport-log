@@ -85,10 +85,16 @@ class DiaryPageState extends State<DiaryPage> {
                     children: [
                       Chart(
                         chartValues: _diaries
-                            .map((s) => ChartValue(s.date, s.bodyweight ?? 0))
+                            .map(
+                              (s) => ChartValue(
+                                datetime: s.date,
+                                value: s.bodyweight ?? 0,
+                              ),
+                            )
                             .toList(),
                         desc: true,
                         dateFilterState: _dateFilter,
+                        yFromZero: false,
                       ),
                       Defaults.sizedBox.vertical.normal,
                       Expanded(

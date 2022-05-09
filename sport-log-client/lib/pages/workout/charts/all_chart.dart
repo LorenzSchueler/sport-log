@@ -8,11 +8,13 @@ import 'package:sport_log/pages/workout/charts/chart.dart';
 class AllChart extends StatelessWidget {
   const AllChart({
     required this.chartValues,
+    required this.yFromZero,
     required this.isTime,
     Key? key,
   }) : super(key: key);
 
   final List<ChartValue> chartValues;
+  final bool yFromZero;
   final bool isTime;
 
   @override
@@ -24,6 +26,9 @@ class AllChart extends StatelessWidget {
       if (maxY == 0) {
         maxY = 1;
       }
+      double minY = yFromZero
+          ? 0.0
+          : chartValues.map((v) => v.value).min.floor().toDouble();
       final start = chartValues.first.datetime.beginningOfDay();
       final end = chartValues.last.datetime;
       final months = (end.difference(start).inDays / 30).round();
@@ -102,7 +107,7 @@ class AllChart extends StatelessWidget {
               getDrawingVerticalLine: gridLineDrawer(context),
               getDrawingHorizontalLine: gridLineDrawer(context),
             ),
-            minY: 0.0,
+            minY: minY,
             maxY: maxY,
             borderData: FlBorderData(show: false),
           ),

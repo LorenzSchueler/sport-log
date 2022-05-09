@@ -8,11 +8,13 @@ import 'package:sport_log/pages/workout/charts/chart.dart';
 class MonthChart extends StatelessWidget {
   const MonthChart({
     required this.chartValues,
+    required this.yFromZero,
     required this.isTime,
     Key? key,
   }) : super(key: key);
 
   final List<ChartValue> chartValues;
+  final bool yFromZero;
   final bool isTime;
 
   @override
@@ -24,6 +26,9 @@ class MonthChart extends StatelessWidget {
       if (maxY == 0) {
         maxY = 1;
       }
+      double minY = yFromZero
+          ? 0.0
+          : chartValues.map((v) => v.value).min.floor().toDouble();
       final start = chartValues.first.datetime.beginningOfMonth();
 
       return LineChart(
@@ -73,7 +78,7 @@ class MonthChart extends StatelessWidget {
           ),
           minX: 1.0,
           maxX: start.numDaysInMonth.toDouble(),
-          minY: 0.0,
+          minY: minY,
           maxY: maxY,
           borderData: FlBorderData(show: false),
         ),
