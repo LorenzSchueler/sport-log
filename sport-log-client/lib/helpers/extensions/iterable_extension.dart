@@ -44,35 +44,52 @@ extension IterableExtension<T> on Iterable<T> {
   }
 }
 
-extension IterableInt<T extends int> on Iterable<T> {
-  T get max => isEmpty ? 0 as T : reduce(math.max);
-  T get min => isEmpty ? 0 as T : reduce(math.min);
-  T get sum => isEmpty ? 0 as T : reduce((a, b) => a + b as T);
+extension Iterables<E> on Iterable<E> {
+  Map<K, List<V>> groupBy<K, V>(
+    K Function(E) keyFunction,
+    V Function(E) valueFunction,
+  ) =>
+      fold(
+        <K, List<V>>{},
+        (Map<K, List<V>> map, E element) => map
+          ..putIfAbsent(keyFunction(element), () => <V>[])
+              .add(valueFunction(element)),
+      );
 }
 
-extension IterableDouble<T extends double> on Iterable<T> {
-  T get max => isEmpty ? 0.0 as T : reduce(math.max);
-  T get min => isEmpty ? 0.0 as T : reduce(math.min);
-  T get sum => isEmpty ? 0.0 as T : reduce((a, b) => a + b as T);
+extension IterableInt on Iterable<int> {
+  int get max => isEmpty ? 0 : reduce(math.max);
+  int get min => isEmpty ? 0 : reduce(math.min);
+  int get sum => isEmpty ? 0 : reduce((a, b) => a + b);
+  double get avg => sum / length;
 }
 
-extension IterableIntOptional<T extends int> on Iterable<T?> {
-  Iterable<T> get filterNotNull => where((element) => element != null).cast();
-  T get max => filterNotNull.max;
-  T get min => filterNotNull.min;
-  T get sum => filterNotNull.sum;
+extension IterableDouble on Iterable<double> {
+  double get max => isEmpty ? 0.0 : reduce(math.max);
+  double get min => isEmpty ? 0.0 : reduce(math.min);
+  double get sum => isEmpty ? 0.0 : reduce((a, b) => a + b);
+  double get avg => sum / length;
 }
 
-extension IterableDoubleOptional<T extends double> on Iterable<T?> {
-  Iterable<T> get filterNotNull => where((element) => element != null).cast();
-  T get max => filterNotNull.max;
-  T get min => filterNotNull.min;
-  T get sum => filterNotNull.sum;
+extension IterableIntOptional on Iterable<int?> {
+  Iterable<int> get filterNotNull => where((e) => e != null).cast();
+  int get max => filterNotNull.max;
+  int get min => filterNotNull.min;
+  int get sum => filterNotNull.sum;
+  double get avg => filterNotNull.avg;
 }
 
-extension IterableDateTime<T extends DateTime> on Iterable<T> {
-  T? get max =>
+extension IterableDoubleOptional on Iterable<double?> {
+  Iterable<double> get filterNotNull => where((e) => e != null).cast();
+  double get max => filterNotNull.max;
+  double get min => filterNotNull.min;
+  double get sum => filterNotNull.sum;
+  double get avg => filterNotNull.avg;
+}
+
+extension IterableDateTime on Iterable<DateTime> {
+  DateTime? get max =>
       isEmpty ? null : reduce((d1, d2) => d1.compareTo(d2) > 0 ? d1 : d2);
-  T? get min =>
+  DateTime? get min =>
       isEmpty ? null : reduce((d1, d2) => d1.compareTo(d2) < 0 ? d1 : d2);
 }
