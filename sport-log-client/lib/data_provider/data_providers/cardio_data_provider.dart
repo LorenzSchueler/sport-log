@@ -26,7 +26,7 @@ class RouteDataProvider extends EntityDataProvider<Route> {
 
   Future<List<Route>> getByName(String? name) async {
     return (await db.getNonDeleted())
-        .sortByKey(key: name, toString: (m) => m.name);
+        .fuzzySortByKey(key: name, toString: (m) => m.name);
   }
 }
 

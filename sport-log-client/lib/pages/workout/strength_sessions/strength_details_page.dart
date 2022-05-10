@@ -1,8 +1,8 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -129,17 +129,19 @@ class _StrengthSessionDetailsPageState
               padding: Defaults.edgeInsets.normal,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: _strengthSessionDescription.sets.mapToListIndexed(
-                  (set, index) => TextTile(
-                    caption: "Set ${index + 1}",
-                    child: Text(
-                      set.toDisplayName(
-                        _strengthSessionDescription.movement.dimension,
-                        withEorm: true,
+                children: _strengthSessionDescription.sets
+                    .mapIndexed(
+                      (index, set) => TextTile(
+                        caption: "Set ${index + 1}",
+                        child: Text(
+                          set.toDisplayName(
+                            _strengthSessionDescription.movement.dimension,
+                            withEorm: true,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
+                    )
+                    .toList(),
               ),
             ),
           ),

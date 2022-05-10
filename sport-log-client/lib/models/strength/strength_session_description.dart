@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
@@ -54,7 +55,7 @@ class StrengthSessionDescription extends CompoundEntity {
           'StrengthSessionDescription: strengthSessionId != strengthSession.id',
         ) &&
         validate(
-          sets.everyIndexed((ss, index) => ss.setNumber == index),
+          sets.everyIndexed((index, ss) => ss.setNumber == index),
           'StrengthSessionDescription: strengthSets indices wrong',
         ) &&
         validate(
@@ -93,7 +94,7 @@ class StrengthSessionDescription extends CompoundEntity {
   }
 
   void orderSets() {
-    sets.forEachIndexed((set, index) => set.setNumber = index);
+    sets.forEachIndexed((index, set) => set.setNumber = index);
   }
 
   StrengthSessionDescription.defaultValue()

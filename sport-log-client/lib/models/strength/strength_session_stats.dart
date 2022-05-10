@@ -1,9 +1,10 @@
+import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/extensions/formatting.dart';
+import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 
@@ -37,12 +38,12 @@ class StrengthSessionStats extends JsonSerializable {
     DateTime datetime,
     List<StrengthSet> sets,
   ) {
-    int minCount = sets.map((s) => s.count).min;
-    int maxCount = sets.map((s) => s.count).max;
+    int minCount = sets.map((s) => s.count).minOrNull ?? 0;
+    int maxCount = sets.map((s) => s.count).maxOrNull ?? 0;
     int sumCount = sets.map((s) => s.count).sum;
-    double? maxWeight = sets.map((s) => s.weight).max;
-    double? maxEorm = sets.map((s) => s.eorm).max;
-    double? sumVolume = sets.map((s) => s.volume).sum;
+    double? maxWeight = sets.map((s) => s.weight).filterNotNull().maxOrNull;
+    double? maxEorm = sets.map((s) => s.eorm).filterNotNull().maxOrNull;
+    double? sumVolume = sets.map((s) => s.volume).filterNotNull().sum;
     double avgCount = sets.isEmpty ? 0 : sumCount / sets.length;
 
     return StrengthSessionStats(

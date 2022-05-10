@@ -1,8 +1,7 @@
+import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/extensions/iterable_extension.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/charts/all.dart';
 
@@ -26,16 +25,16 @@ enum AggregatorType {
 
 extension on AggregatorType {
   /// list must not be empty
-  double compute(List<double> list) {
+  double compute(Iterable<double> list) {
     switch (this) {
       case AggregatorType.min:
-        return list.min;
+        return list.minOrNull ?? 0;
       case AggregatorType.max:
-        return list.max;
+        return list.maxOrNull ?? 0;
       case AggregatorType.sum:
         return list.sum;
       case AggregatorType.avg:
-        return list.avg;
+        return list.average;
       case AggregatorType.none:
         return list.first;
     }
@@ -68,12 +67,12 @@ class Chart extends StatelessWidget {
 
   Widget _chart() {
     final _chartValues = chartValues
-        .groupBy((v) => _groupFunction(v.datetime), (v) => v.value)
+        .groupListsBy((v) => _groupFunction(v.datetime))
         .entries
         .map(
           (entry) => ChartValue(
             datetime: entry.key,
-            value: aggregatorType.compute(entry.value),
+            value: aggregatorType.compute(entry.value.map((e) => e.value)),
           ),
         )
         .toList()

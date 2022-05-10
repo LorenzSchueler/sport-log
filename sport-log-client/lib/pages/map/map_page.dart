@@ -235,7 +235,7 @@ class MapPageState extends State<MapPage> {
                     context: context,
                     removeTop: true,
                     child: Scrollbar(
-                      isAlwaysShown: true,
+                      thumbVisibility: true,
                       child: ListView.separated(
                         padding: EdgeInsets.zero,
                         itemBuilder: (context, index) => GestureDetector(

@@ -52,7 +52,7 @@ class MetconDescription extends CompoundEntity {
         ) &&
         validate(
           moves.everyIndexed(
-            (mmd, index) => mmd.metconMovement.movementNumber == index,
+            (index, mmd) => mmd.metconMovement.movementNumber == index,
           ),
           'MetconDescription: moves indices wrong',
         ) &&

@@ -25,7 +25,7 @@ class MetconDataProvider extends EntityDataProvider<Metcon> {
 
   Future<List<Metcon>> getByName(String? name) async {
     return (await db.getNonDeleted())
-        .sortByKey(key: name, toString: (m) => m.name);
+        .fuzzySortByKey(key: name, toString: (m) => m.name);
   }
 }
 

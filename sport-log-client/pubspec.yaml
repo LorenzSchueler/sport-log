@@ -68,8 +68,8 @@ dependencies:
   package_info_plus: ^1.0.6
   permission_handler: ^9.2.0
   wakelock: ^0.6.1+2
-  fuzzywuzzy: ^0.1.7
-  collection: ^1.15.0
+  fuzzywuzzy: ^0.2.0
+  collection: ^1.16.0
 
 dev_dependencies:
   flutter_test:
@@ -80,7 +80,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^1.0.0
+  flutter_lints: ^2.0.1
   json_serializable: ^6.1.4 # json
   build_runner: ^2.1.0 # json
     # flutter pub run build_runner build --delete-conflicting-outputs

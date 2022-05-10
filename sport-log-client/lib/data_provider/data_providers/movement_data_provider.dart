@@ -30,7 +30,7 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
       cardioOnly: cardioOnly,
       distanceOnly: distanceOnly,
     ))
-        .sortByKey(key: name, toString: (m) => m.name);
+        .fuzzySortByKey(key: name, toString: (m) => m.name);
   }
 }
 
@@ -94,6 +94,6 @@ class MovementDescriptionDataProvider
       cardioOnly: cardioOnly,
       distanceOnly: distanceOnly,
     ))
-        .sortByKey(key: name, toString: (m) => m.movement.name);
+        .fuzzySortByKey(key: name, toString: (m) => m.movement.name);
   }
 }

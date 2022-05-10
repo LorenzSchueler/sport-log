@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:collection/collection.dart';
 import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pedometer/pedometer.dart';
@@ -8,7 +9,6 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/location_utils.dart';

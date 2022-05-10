@@ -7,7 +7,7 @@ class _SortAlgorithm implements Applicable {
 }
 
 extension SortExtension<T> on List<T> {
-  List<T> sortByKey({
+  List<T> fuzzySortByKey({
     required String? key,
     required String Function(T) toString,
   }) {

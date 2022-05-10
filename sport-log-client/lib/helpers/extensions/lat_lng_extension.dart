@@ -1,7 +1,7 @@
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 
 extension LatLngsExtension on List<LatLng> {
   LatLngBounds? get latLngBounds {
