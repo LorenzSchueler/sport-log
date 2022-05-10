@@ -83,20 +83,24 @@ class DiaryPageState extends State<DiaryPage> {
                   padding: Defaults.edgeInsets.normal,
                   child: Column(
                     children: [
-                      Chart(
-                        chartValues: _diaries
-                            .map(
-                              (s) => ChartValue(
-                                datetime: s.date,
-                                value: s.bodyweight ?? 0,
-                              ),
-                            )
-                            .toList(),
-                        desc: true,
-                        dateFilterState: _dateFilter,
-                        yFromZero: false,
-                      ),
-                      Defaults.sizedBox.vertical.normal,
+                      if (_diaries.any((d) => d.bodyweight != null)) ...[
+                        Chart(
+                          chartValues: _diaries
+                              .where((d) => d.bodyweight != null)
+                              .map(
+                                (s) => ChartValue(
+                                  datetime: s.date,
+                                  value: s.bodyweight ?? 0,
+                                ),
+                              )
+                              .toList(),
+                          desc: true,
+                          dateFilterState: _dateFilter,
+                          yFromZero: false,
+                          aggregatorType: AggregatorType.avg,
+                        ),
+                        Defaults.sizedBox.vertical.normal,
+                      ],
                       Expanded(
                         child: ListView.separated(
                           itemBuilder: (_, index) =>

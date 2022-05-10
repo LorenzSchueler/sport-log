@@ -22,13 +22,14 @@ class AllChart extends StatelessWidget {
     if (chartValues.isEmpty) {
       return const CircularProgressIndicator();
     } else {
-      double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
-      if (maxY == 0) {
-        maxY = 1;
-      }
       double minY = yFromZero
           ? 0.0
           : chartValues.map((v) => v.value).min.floor().toDouble();
+      double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
+      if (maxY == minY) {
+        maxY += 1;
+        minY -= 1;
+      }
       final start = chartValues.first.datetime.beginningOfDay();
       final end = chartValues.last.datetime;
       final months = (end.difference(start).inDays / 30).round();
@@ -63,6 +64,7 @@ class AllChart extends StatelessWidget {
                     )
                     .toList(),
                 color: Theme.of(context).colorScheme.primary,
+                dotData: FlDotData(show: false),
               ),
             ],
             titlesData: FlTitlesData(

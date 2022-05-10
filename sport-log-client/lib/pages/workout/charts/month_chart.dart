@@ -22,13 +22,14 @@ class MonthChart extends StatelessWidget {
     if (chartValues.isEmpty) {
       return const CircularProgressIndicator();
     } else {
-      double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
-      if (maxY == 0) {
-        maxY = 1;
-      }
       double minY = yFromZero
           ? 0.0
           : chartValues.map((v) => v.value).min.floor().toDouble();
+      double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
+      if (maxY == minY) {
+        maxY += 1;
+        minY -= 1;
+      }
       final start = chartValues.first.datetime.beginningOfMonth();
 
       return LineChart(

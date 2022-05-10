@@ -141,6 +141,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
                           desc: true,
                           dateFilterState: _dateFilter,
                           yFromZero: true,
+                          aggregatorType: AggregatorType.sum,
                         ),
                         Defaults.sizedBox.vertical.normal,
                       ],

@@ -62,6 +62,27 @@ extension on SeriesType {
     }
   }
 
+  AggregatorType statAggregator() {
+    switch (this) {
+      case SeriesType.maxDistance:
+        return AggregatorType.max;
+      case SeriesType.minTime:
+        return AggregatorType.min;
+      case SeriesType.sumCalories:
+        return AggregatorType.sum;
+      case SeriesType.maxEorm:
+        return AggregatorType.max;
+      case SeriesType.maxWeight:
+        return AggregatorType.max;
+      case SeriesType.maxReps:
+        return AggregatorType.max;
+      case SeriesType.avgReps:
+        return AggregatorType.avg;
+      case SeriesType.sumVolume:
+        return AggregatorType.sum;
+    }
+  }
+
   bool statYFromZero() => [
         SeriesType.maxDistance,
         SeriesType.maxReps,
@@ -164,6 +185,7 @@ class _StrengthChartState extends State<StrengthChart> {
           desc: true,
           dateFilterState: widget.dateFilterState,
           yFromZero: _selectedSeries.statYFromZero(),
+          aggregatorType: _selectedSeries.statAggregator(),
         ),
       ],
     );
