@@ -41,7 +41,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
           text: TextSpan(
             children: [
               TextSpan(
-                text: _cardioSessionDescription.movement.name + "  ",
+                text: "${_cardioSessionDescription.movement.name}  ",
                 style: Theme.of(context).textTheme.headline6,
               ),
               TextSpan(
@@ -60,10 +60,11 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                 Routes.cardio.cardioEdit,
                 arguments: _cardioSessionDescription,
               );
-              if (returnObj is ReturnObject<CardioSessionDescription>) {
+              if (returnObj is ReturnObject<CardioSessionDescription> &&
+                  mounted) {
                 if (returnObj.action == ReturnAction.deleted) {
                   Navigator.pop(context);
-                } else if (mounted) {
+                } else {
                   setState(() {
                     _cardioSessionDescription = returnObj.payload;
                   });

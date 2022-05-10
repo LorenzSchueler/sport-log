@@ -27,6 +27,6 @@ class _Printer extends l.PrettyPrinter {
 
   @override
   String stringifyMessage(dynamic message) {
-    return '[$key] ' + super.stringifyMessage(message);
+    return '[$key] ${super.stringifyMessage(message)}';
   }
 }

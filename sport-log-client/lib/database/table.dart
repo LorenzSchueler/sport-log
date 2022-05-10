@@ -168,7 +168,7 @@ class Table {
     required List<List<String>> uniqueColumns,
     this.rawSql = const [],
   })  : uniqueIndices = uniqueColumns.map((c) => UniqueIndex(name, c)).toList(),
-        prefix = name + '__';
+        prefix = '${name}__';
 
   final String prefix;
   final String name;
@@ -185,7 +185,7 @@ class Table {
       ${[
       ...columns.map((c) => c.setUpSql()),
       primaryKeyStr,
-    ].map((s) => '\t' + s).join(',\n')}
+    ].map((s) => '\t$s').join(',\n')}
     );
     ''';
     final uniqueIndicesSetup = uniqueIndices.map((u) => u.setupSql);

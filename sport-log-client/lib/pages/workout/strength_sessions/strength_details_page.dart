@@ -20,11 +20,11 @@ class StrengthSessionDetailsPage extends StatefulWidget {
   final StrengthSessionDescription strengthSessionDescription;
 
   @override
-  _StrengthSessionDetailsPageState createState() =>
-      _StrengthSessionDetailsPageState();
+  StrengthSessionDetailsPageState createState() =>
+      StrengthSessionDetailsPageState();
 }
 
-class _StrengthSessionDetailsPageState
+class StrengthSessionDetailsPageState
     extends State<StrengthSessionDetailsPage> {
   final _dataProvider = StrengthSessionDescriptionDataProvider();
   late StrengthSessionDescription _strengthSessionDescription;
@@ -37,7 +37,9 @@ class _StrengthSessionDetailsPageState
 
   Future<void> _deleteStrengthSession() async {
     await _dataProvider.deleteSingle(_strengthSessionDescription);
-    Navigator.pop(context);
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -57,10 +59,11 @@ class _StrengthSessionDetailsPageState
                 Routes.strength.edit,
                 arguments: _strengthSessionDescription,
               );
-              if (returnObj is ReturnObject<StrengthSessionDescription>) {
+              if (returnObj is ReturnObject<StrengthSessionDescription> &&
+                  mounted) {
                 if (returnObj.action == ReturnAction.deleted) {
                   Navigator.pop(context);
-                } else if (mounted) {
+                } else {
                   setState(() {
                     _strengthSessionDescription = returnObj.payload;
                   });
@@ -196,7 +199,7 @@ class _StrengthSessionDetailsPageState
         return [
           TextTile(
             caption: 'Total Energy',
-            child: Text(stats.sumCount.toString() + 'cals'),
+            child: Text('${stats.sumCount}cals'),
           ),
         ];
     }

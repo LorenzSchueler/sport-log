@@ -213,12 +213,12 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   String get _singularRoute; // everything after url base, e. g. '/v1.0/user'
 
   // default impls
-  String get _pluralRoute => _singularRoute + 's';
+  String get _pluralRoute => '${_singularRoute}s';
   Map<String, dynamic> _toJson(T object) => object.toJson();
 
   ApiResult<T> getSingle(Int64 id) async {
     return _getRequest(
-      _singularRoute + '/$id',
+      '$_singularRoute/$id',
       (dynamic json) => _fromJson(json as Map<String, dynamic>),
     );
   }
@@ -302,7 +302,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
 class _ApiHeaders {
   static Map<String, String> _basicAuth(String username, String password) {
     final basicAuth =
-        'Basic ' + base64Encode(utf8.encode('$username:$password'));
+        'Basic ${base64Encode(utf8.encode('$username:$password'))}';
     return {'authorization': basicAuth};
   }
 

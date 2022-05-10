@@ -108,7 +108,7 @@ class MainDrawer extends StatelessWidget {
                 } else if (Settings.lastSync == null) {
                   title = 'No syncs yet';
                 } else {
-                  title = 'Last sync: ' + Settings.lastSync!.toHumanDateTime();
+                  title = 'Last sync: ${Settings.lastSync!.toHumanDateTime()}';
                 }
                 return ListTile(
                   title: Text(title),

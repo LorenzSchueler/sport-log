@@ -49,6 +49,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
         : await _dataProvider.createSingle(_metconSessionDescription);
     if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
+      if (mounted) {
       Navigator.pop(
         context,
         ReturnObject(
@@ -58,6 +59,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
           payload: _metconSessionDescription,
         ), // needed for return to details page
       );
+      }
     } else {
       await showMessageDialog(
         context: context,
@@ -71,6 +73,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
       await _dataProvider.deleteSingle(_metconSessionDescription);
     }
     _formKey.currentState!.deactivate();
+      if (mounted) {
     Navigator.pop(
       context,
       ReturnObject(
@@ -78,6 +81,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
         payload: _metconSessionDescription,
       ), // needed for return to details page
     );
+  }
   }
 
   @override
@@ -217,6 +221,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                     _finished)
                   EditTile(
                     caption: 'Time',
+                    leading: AppIcons.timeInterval,
                     child: DurationInput(
                       setDuration: (d) => setState(
                         () => _metconSessionDescription.metconSession.time = d,
@@ -224,7 +229,6 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                       initialDuration:
                           _metconSessionDescription.metconSession.time!,
                     ),
-                    leading: AppIcons.timeInterval,
                   ),
                 if (_metconSessionDescription
                                 .metconDescription.metcon.metconType ==
@@ -282,6 +286,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   ),
                 EditTile(
                   caption: "Rx",
+                  leading: AppIcons.checkBox,
                   child: SizedBox(
                     height: 20,
                     width: 34,
@@ -295,7 +300,6 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                   ),
-                  leading: AppIcons.checkBox,
                 ),
                 TextFormField(
                   decoration:

@@ -31,7 +31,9 @@ class MetconDetailsPageState extends State<MetconDetailsPage> {
 
   Future<void> _deleteMetcon() async {
     await _dataProvider.deleteSingle(widget.metconDescription);
-    Navigator.pop(context);
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -54,10 +56,10 @@ class MetconDetailsPageState extends State<MetconDetailsPage> {
                   Routes.metcon.edit,
                   arguments: _metconDescription,
                 );
-                if (returnObj is ReturnObject<MetconDescription>) {
+                if (returnObj is ReturnObject<MetconDescription> && mounted) {
                   if (returnObj.action == ReturnAction.deleted) {
                     Navigator.pop(context);
-                  } else if (mounted) {
+                  } else {
                     setState(() {
                       _metconDescription = returnObj.payload;
                     });

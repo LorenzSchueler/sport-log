@@ -198,8 +198,8 @@ extension DateTimeExtension on DateTime {
   }
 
   bool isInWeek(DateTime date) {
-    final _date = date.beginningOfWeek();
-    return isBetween(_date, _date.weekLater());
+    final beginning = date.beginningOfWeek();
+    return isBetween(beginning, beginning.weekLater());
   }
 
   bool isInMonth(DateTime date) {

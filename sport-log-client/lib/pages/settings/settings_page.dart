@@ -50,6 +50,7 @@ class SettingsPageState extends State<SettingsPage> {
               Defaults.sizedBox.vertical.small,
               EditTile(
                 caption: "Server Synchronization",
+                leading: AppIcons.sync,
                 child: SizedBox(
                   height: 20,
                   width: 34,
@@ -67,7 +68,6 @@ class SettingsPageState extends State<SettingsPage> {
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                 ),
-                leading: AppIcons.sync,
               ),
               if (Settings.syncEnabled)
                 TextFormField(
@@ -197,6 +197,7 @@ class SettingsPageState extends State<SettingsPage> {
               ),
               Consumer<Sync>(
                 builder: (context, sync, _) => TextTile(
+                  leading: AppIcons.logout,
                   child: Row(
                     children: [
                       Expanded(
@@ -206,7 +207,6 @@ class SettingsPageState extends State<SettingsPage> {
                               Theme.of(context).colorScheme.error,
                             ),
                           ),
-                          child: const Text('Logout'),
                           onPressed: sync.isSyncing
                               ? null
                               : () async {
@@ -217,10 +217,13 @@ class SettingsPageState extends State<SettingsPage> {
                                   );
                                   if (approved) {
                                     await Account.logout();
-                                    await Navigator.of(context)
-                                        .newBase(Routes.landing);
+                                    if (mounted) {
+                                      await Navigator.of(context)
+                                          .newBase(Routes.landing);
+                                    }
                                   }
                                 },
+                          child: const Text('Logout'),
                         ),
                       ),
                       Defaults.sizedBox.horizontal.normal,
@@ -231,7 +234,6 @@ class SettingsPageState extends State<SettingsPage> {
                               Theme.of(context).colorScheme.error,
                             ),
                           ),
-                          child: const Text('Delete Account'),
                           onPressed: sync.isSyncing
                               ? null
                               : () async {
@@ -242,15 +244,17 @@ class SettingsPageState extends State<SettingsPage> {
                                   );
                                   if (approved) {
                                     await Account.delete();
-                                    await Navigator.of(context)
-                                        .newBase(Routes.landing);
+                                    if (mounted) {
+                                      await Navigator.of(context)
+                                          .newBase(Routes.landing);
+                                    }
                                   }
                                 },
+                          child: const Text('Delete Account'),
                         ),
                       ),
                     ],
                   ),
-                  leading: AppIcons.logout,
                 ),
               ),
               Defaults.sizedBox.vertical.small,

@@ -16,10 +16,10 @@ class DoubleInput extends StatefulWidget {
   final void Function(double value)? setValue;
 
   @override
-  _DoubleInputState createState() => _DoubleInputState();
+  DoubleInputState createState() => DoubleInputState();
 }
 
-class _DoubleInputState extends State<DoubleInput> {
+class DoubleInputState extends State<DoubleInput> {
   late double _value;
 
   late final TextEditingController _textController;

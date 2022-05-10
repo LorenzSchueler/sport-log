@@ -18,10 +18,10 @@ class TextTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return EditTile(
-      child: child,
       leading: leading,
       caption: caption,
       onCancel: onCancel,
+      child: child,
     );
   }
 }

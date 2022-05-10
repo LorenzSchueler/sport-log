@@ -59,14 +59,14 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
                   Row(
                     children: [
                       ElevatedButton(
-                        child: const Text("Ignore"),
                         onPressed: Navigator.of(context).pop,
+                        child: const Text("Ignore"),
                       ),
                       const Spacer(),
                       if (_loginPending)
                         Container(
-                          child: const CircularProgressIndicator(),
                           margin: const EdgeInsets.only(right: 20),
+                          child: const CircularProgressIndicator(),
                         ),
                       _submitButton(context),
                     ],
@@ -136,12 +136,12 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
     BuildContext context,
   ) {
     return ElevatedButton(
-      child: const Text("Update"),
       onPressed: (!_loginPending &&
               _formKey.currentContext != null &&
               _formKey.currentState!.validate())
           ? () => _submit(context)
           : null,
+      child: const Text("Update"),
     );
   }
 
@@ -154,7 +154,9 @@ class NewCredentialsDialogState extends State<NewCredentialsDialog> {
       _loginPending = false;
     });
     if (result.isSuccess) {
-      Navigator.pop(context, result.success);
+      if (mounted) {
+        Navigator.pop(context, result.success);
+      }
     } else {
       setState(() {
         _errorMessage = result.failure.toString();

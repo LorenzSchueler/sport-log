@@ -6,7 +6,7 @@ class MetconSessionApi extends Api<MetconSession> {
       MetconSession.fromJson(json);
 
   @override
-  String get _singularRoute => apiVersion + '/metcon_session';
+  String get _singularRoute => '$apiVersion/metcon_session';
 }
 
 class MetconApi extends Api<Metcon> {
@@ -14,7 +14,7 @@ class MetconApi extends Api<Metcon> {
   Metcon _fromJson(Map<String, dynamic> json) => Metcon.fromJson(json);
 
   @override
-  String get _singularRoute => apiVersion + '/metcon';
+  String get _singularRoute => '$apiVersion/metcon';
 }
 
 class MetconMovementApi extends Api<MetconMovement> {
@@ -23,5 +23,5 @@ class MetconMovementApi extends Api<MetconMovement> {
       MetconMovement.fromJson(json);
 
   @override
-  String get _singularRoute => apiVersion + '/metcon_movement';
+  String get _singularRoute => '$apiVersion/metcon_movement';
 }

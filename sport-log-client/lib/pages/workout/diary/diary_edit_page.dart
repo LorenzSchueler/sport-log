@@ -37,7 +37,9 @@ class DiaryEditPageState extends State<DiaryEditPage> {
         : await _dataProvider.createSingle(_diary);
     if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
     } else {
       await showMessageDialog(
         context: context,
@@ -51,7 +53,9 @@ class DiaryEditPageState extends State<DiaryEditPage> {
       await _dataProvider.deleteSingle(_diary);
     }
     _formKey.currentState!.deactivate();
-    Navigator.pop(context);
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override

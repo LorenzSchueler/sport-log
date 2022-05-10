@@ -51,15 +51,17 @@ class CardioEditPageState extends State<CardioEditPage> {
         : await _dataProvider.createSingle(_cardioSessionDescription);
     if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
-      Navigator.pop(
-        context,
-        ReturnObject(
-          action: widget.cardioSessionDescription != null
-              ? ReturnAction.updated
-              : ReturnAction.created,
-          payload: _cardioSessionDescription,
-        ), // needed for cardio overview page
-      );
+      if (mounted) {
+        Navigator.pop(
+          context,
+          ReturnObject(
+            action: widget.cardioSessionDescription != null
+                ? ReturnAction.updated
+                : ReturnAction.created,
+            payload: _cardioSessionDescription,
+          ), // needed for cardio overview page
+        );
+      }
     } else {
       await showMessageDialog(
         context: context,
@@ -73,13 +75,15 @@ class CardioEditPageState extends State<CardioEditPage> {
       await _dataProvider.deleteSingle(_cardioSessionDescription);
     }
     _formKey.currentState!.deactivate();
-    Navigator.pop(
-      context,
-      ReturnObject(
-        action: ReturnAction.deleted,
-        payload: _cardioSessionDescription,
-      ), // needed for cardio overview page
-    );
+    if (mounted) {
+      Navigator.pop(
+        context,
+        ReturnObject(
+          action: ReturnAction.deleted,
+          payload: _cardioSessionDescription,
+        ), // needed for cardio overview page
+      );
+    }
   }
 
   @override
@@ -291,6 +295,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                 ),
                 _cardioSessionDescription.cardioSession.time == null
                     ? EditTile(
+                        leading: AppIcons.timeInterval,
                         child: ActionChip(
                           avatar: const Icon(AppIcons.add),
                           label: const Text("Time"),
@@ -299,10 +304,14 @@ class CardioEditPageState extends State<CardioEditPage> {
                                 const Duration(minutes: 1);
                           }),
                         ),
-                        leading: AppIcons.timeInterval,
                       )
                     : EditTile(
                         caption: 'Time',
+                        leading: AppIcons.timeInterval,
+                        onCancel: () => setState(
+                          () => _cardioSessionDescription.cardioSession.time =
+                              null,
+                        ),
                         child: DurationInput(
                           setDuration: (d) => setState(
                             () => _cardioSessionDescription.cardioSession.time =
@@ -310,11 +319,6 @@ class CardioEditPageState extends State<CardioEditPage> {
                           ),
                           initialDuration:
                               _cardioSessionDescription.cardioSession.time,
-                        ),
-                        leading: AppIcons.timeInterval,
-                        onCancel: () => setState(
-                          () => _cardioSessionDescription.cardioSession.time =
-                              null,
                         ),
                       ),
                 TextFormField(

@@ -22,7 +22,6 @@ class SelectionBar<T> extends StatelessWidget {
         final isSelected = item == selectedItem;
         return OutlinedButton(
           onPressed: isSelected ? () {} : () => onChange(item),
-          child: Text(getLabel(item)),
           style: isSelected
               ? OutlinedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
@@ -31,6 +30,7 @@ class SelectionBar<T> extends StatelessWidget {
               : OutlinedButton.styleFrom(
                   side: BorderSide.none,
                 ),
+          child: Text(getLabel(item)),
         );
       }).toList(),
     );

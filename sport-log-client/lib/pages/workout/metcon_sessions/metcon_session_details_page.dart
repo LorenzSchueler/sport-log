@@ -43,7 +43,9 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
 
   Future<void> _deleteMetconSession() async {
     await _dataProvider.deleteSingle(widget.metconSessionDescription);
-    Navigator.pop(context);
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -63,10 +65,11 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
                 Routes.metcon.sessionEdit,
                 arguments: _metconSessionDescription,
               );
-              if (returnObj is ReturnObject<MetconSessionDescription>) {
+              if (returnObj is ReturnObject<MetconSessionDescription> &&
+                  mounted) {
                 if (returnObj.action == ReturnAction.deleted) {
                   Navigator.pop(context);
-                } else if (mounted) {
+                } else {
                   setState(() {
                     _metconSessionDescription = returnObj.payload;
                   });

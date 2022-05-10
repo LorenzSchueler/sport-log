@@ -1,7 +1,7 @@
 part of '../api.dart';
 
 class UserApi with ApiLogging, ApiHelpers {
-  final String route = apiVersion + '/user';
+  final String route = '$apiVersion/user';
 
   ApiResult<User> getSingle(String username, String password) {
     return ApiResultFromRequest.fromRequestWithValue<User>(

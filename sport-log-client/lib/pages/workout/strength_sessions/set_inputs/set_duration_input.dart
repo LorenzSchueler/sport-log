@@ -17,10 +17,10 @@ class SetDurationInput extends StatefulWidget {
   final bool confirmChanges;
 
   @override
-  _SetDurationInputState createState() => _SetDurationInputState();
+  SetDurationInputState createState() => SetDurationInputState();
 }
 
-class _SetDurationInputState extends State<SetDurationInput> {
+class SetDurationInputState extends State<SetDurationInput> {
   int _hours = 0;
   int _minutes = 0;
   int _seconds = 0;

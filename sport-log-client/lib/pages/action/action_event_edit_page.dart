@@ -53,7 +53,9 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
         ? await _dataProvider.updateSingle(_actionEvent)
         : await _dataProvider.createSingle(_actionEvent);
     if (result.isSuccess()) {
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
     } else {
       await showMessageDialog(
         context: context,
@@ -66,7 +68,9 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
     if (widget.actionEvent != null) {
       await _dataProvider.deleteSingle(_actionEvent);
     }
-    Navigator.pop(context);
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -115,7 +119,6 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
               ),
               EditTile(
                 caption: 'Date',
-                child: Text(_actionEvent.datetime.toHumanDateTime()),
                 leading: AppIcons.calendar,
                 onTap: () async {
                   final datetime = await showDateTimePicker(
@@ -129,6 +132,7 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
                     });
                   }
                 },
+                child: Text(_actionEvent.datetime.toHumanDateTime()),
               ),
               TextFormField(
                 decoration: Theme.of(context).textFormFieldDecoration.copyWith(

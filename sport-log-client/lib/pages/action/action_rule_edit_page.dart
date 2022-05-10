@@ -56,7 +56,9 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
         ? await _dataProvider.updateSingle(_actionRule)
         : await _dataProvider.createSingle(_actionRule);
     if (result.isSuccess()) {
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
     } else {
       await showMessageDialog(
         context: context,
@@ -69,7 +71,9 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
     if (widget.actionRule != null) {
       await _dataProvider.deleteSingle(_actionRule);
     }
-    Navigator.pop(context);
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override

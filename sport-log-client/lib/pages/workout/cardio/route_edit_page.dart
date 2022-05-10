@@ -63,7 +63,9 @@ class RouteEditPageState extends State<RouteEditPage> {
         : await _dataProvider.createSingle(_route);
     if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
     } else {
       await showMessageDialog(
         context: context,
@@ -77,7 +79,9 @@ class RouteEditPageState extends State<RouteEditPage> {
       await _dataProvider.deleteSingle(_route);
     }
     _formKey.currentState!.deactivate();
-    Navigator.pop(context);
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   Future<void> _matchLocations() async {

@@ -210,7 +210,7 @@ class CardioSessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    late MapboxMapController _sessionMapController;
+    late MapboxMapController sessionMapController;
 
     return GestureDetector(
       onTap: () => showDetails(context),
@@ -247,21 +247,21 @@ class CardioSessionCard extends StatelessWidget {
                       scrollGesturesEnabled: false,
                       zoomGesturesEnabled: false,
                       onMapCreated: (MapboxMapController controller) =>
-                          _sessionMapController = controller,
+                          sessionMapController = controller,
                       onStyleLoadedCallback: () {
-                        _sessionMapController.setBoundsFromTracks(
+                        sessionMapController.setBoundsFromTracks(
                           cardioSessionDescription.cardioSession.track,
                           cardioSessionDescription.route?.track,
                           padded: true,
                         );
                         if (cardioSessionDescription.cardioSession.track !=
                             null) {
-                          _sessionMapController.addTrackLine(
+                          sessionMapController.addTrackLine(
                             cardioSessionDescription.cardioSession.track!,
                           );
                         }
                         if (cardioSessionDescription.route?.track != null) {
-                          _sessionMapController.addRouteLine(
+                          sessionMapController.addRouteLine(
                             cardioSessionDescription.route!.track!,
                           );
                         }

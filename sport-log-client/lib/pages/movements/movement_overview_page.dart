@@ -133,6 +133,7 @@ class MovementCard extends StatelessWidget {
             );
             if (!approved) return;
           }
+          // ignore: use_build_context_synchronously
           await Navigator.pushNamed(
             context,
             Routes.movement.edit,

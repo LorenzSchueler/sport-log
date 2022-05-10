@@ -223,7 +223,7 @@ class RegionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    late MapboxMapController _sessionMapController;
+    late MapboxMapController sessionMapController;
 
     return Stack(
       children: [
@@ -238,13 +238,13 @@ class RegionCard extends StatelessWidget {
             scrollGesturesEnabled: false,
             zoomGesturesEnabled: false,
             onMapCreated: (MapboxMapController controller) =>
-                _sessionMapController = controller,
+                sessionMapController = controller,
             onStyleLoadedCallback: () async {
-              await _sessionMapController.setBounds(
+              await sessionMapController.setBounds(
                 region.definition.bounds,
                 padded: true,
               );
-              await _sessionMapController.addBoundingBoxLine(
+              await sessionMapController.addBoundingBoxLine(
                 region.definition.bounds.northeast,
                 region.definition.bounds.southwest,
               );

@@ -150,6 +150,7 @@ Future<void> testActionRule() async {
 }
 
 Future<void> main() async {
+  // ignore: no_leading_underscores_for_local_identifiers
   await for (final _ in initialize()) {}
 
   testUser();

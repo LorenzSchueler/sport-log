@@ -209,12 +209,12 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _submitButton(BuildContext context) {
     return ElevatedButton(
-      child: Text(widget.register ? "Register" : "Login"),
       onPressed: (!_loginPending &&
               _formKey.currentContext != null &&
               _formKey.currentState!.validate())
           ? () => _submit(context)
           : null,
+      child: Text(widget.register ? "Register" : "Login"),
     );
   }
 
@@ -241,7 +241,9 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
     if (result.isSuccess) {
-      await Navigator.of(context).newBase(Routes.timeline.overview);
+      if (mounted) {
+        await Navigator.of(context).newBase(Routes.timeline.overview);
+      }
     } else {
       await showMessageDialog(
         context: context,

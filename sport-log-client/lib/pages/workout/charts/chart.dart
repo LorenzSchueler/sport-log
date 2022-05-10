@@ -66,7 +66,8 @@ class Chart extends StatelessWidget {
   }
 
   Widget _chart() {
-    final _chartValues = chartValues
+    final chartValues = this
+        .chartValues
         .groupListsBy((v) => _groupFunction(v.datetime))
         .entries
         .map(
@@ -80,34 +81,34 @@ class Chart extends StatelessWidget {
     switch (dateFilterState.runtimeType) {
       case DayFilter:
         return DayChart(
-          chartValues: _chartValues,
+          chartValues: chartValues,
           yFromZero: yFromZero,
           isTime: false,
         );
       case WeekFilter:
         return WeekChart(
-          chartValues: _chartValues,
+          chartValues: chartValues,
           yFromZero: yFromZero,
           isTime: false,
           startDateTime: dateFilterState.start!,
         );
       case MonthFilter:
         return MonthChart(
-          chartValues: _chartValues,
+          chartValues: chartValues,
           yFromZero: yFromZero,
           isTime: false,
           startDateTime: dateFilterState.start!,
         );
       case YearFilter:
         return YearChart(
-          chartValues: _chartValues,
+          chartValues: chartValues,
           yFromZero: yFromZero,
           isTime: false,
           startDateTime: dateFilterState.start!,
         );
       default:
         return AllChart(
-          chartValues: _chartValues,
+          chartValues: chartValues,
           yFromZero: yFromZero,
           isTime: false,
         );

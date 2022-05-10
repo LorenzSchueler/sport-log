@@ -251,12 +251,12 @@ class PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
 
   Widget get _updateButton {
     return ElevatedButton(
+      onPressed: _update,
       child: Text(
         widget.platformDescription.platformCredential == null
             ? "Create"
             : "Update",
       ),
-      onPressed: _update,
     );
   }
 
@@ -269,19 +269,19 @@ class PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
         context: context,
         text: 'Creating Credentials failed:\n${result.failure}',
       );
-    } else {
+    } else if (mounted) {
       Navigator.pop(context);
     }
   }
 
   Widget get _deleteButton {
     return ElevatedButton(
+      onPressed: _delete,
       child: Text(
         widget.platformDescription.platformCredential == null
             ? "Back"
             : "Delete",
       ),
-      onPressed: _delete,
     );
   }
 
@@ -295,7 +295,7 @@ class PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
           context: context,
           text: 'Deleting Credentials failed:\n${result.failure}',
         );
-      } else {
+      } else if (mounted) {
         Navigator.pop(context);
       }
     }

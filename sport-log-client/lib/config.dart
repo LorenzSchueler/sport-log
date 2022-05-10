@@ -61,8 +61,8 @@ class Config extends JsonSerializable {
     final bool isAndroidEmulator;
     if (isAndroid) {
       final androidInfo = await DeviceInfoPlugin().androidInfo;
-      final _isPhysicalDevice = androidInfo.isPhysicalDevice;
-      isAndroidEmulator = _isPhysicalDevice != null && !_isPhysicalDevice;
+      final isPhysicalDevice = androidInfo.isPhysicalDevice;
+      isAndroidEmulator = isPhysicalDevice != null && !isPhysicalDevice;
     } else {
       isAndroidEmulator = false;
     }

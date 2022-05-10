@@ -66,7 +66,9 @@ class _ActionProviderOverviewPageState
         context: context,
         text: "Action Provider was deleted.",
       );
-      Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     } else {
       setState(() => _actionProviderDescription = actionProviderDescription);
     }

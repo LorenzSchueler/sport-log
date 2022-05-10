@@ -128,18 +128,17 @@ class CardioSession extends AtomicEntity {
 
   /// min/km
   Duration? get tempo {
-    final _speed = speed;
     return speed == null || speed == 0
         ? null
-        : Duration(milliseconds: (60 * 60 * 1000 / _speed!).round());
+        : Duration(milliseconds: (60 * 60 * 1000 / speed!).round());
   }
 
   /// min/km
   Duration? currentTempo(Duration currentDuration) {
-    final _speed = currentSpeed(currentDuration);
+    final speed = currentSpeed(currentDuration);
     return speed == null || speed == 0
         ? null
-        : Duration(milliseconds: (60 * 60 * 1000 / _speed!).round());
+        : Duration(milliseconds: (60 * 60 * 1000 / speed).round());
   }
 
   /// rpm
@@ -194,23 +193,23 @@ class CardioSession extends AtomicEntity {
 
   void setAscentDescent() {
     if (track == null || track!.isEmpty) {
-      ascent = null;
-      descent = null;
+      this.ascent = null;
+      this.descent = null;
       return;
     }
-    double _ascent = 0;
-    double _descent = 0;
+    double ascent = 0;
+    double descent = 0;
     for (int i = 0; i < track!.length - 1; i++) {
       double elevationDifference =
           track![i + 1].elevation - track![i].elevation;
       if (elevationDifference > 0) {
-        _ascent += elevationDifference;
+        ascent += elevationDifference;
       } else {
-        _descent -= elevationDifference;
+        descent -= elevationDifference;
       }
     }
-    ascent = _ascent.round();
-    descent = _descent.round();
+    this.ascent = ascent.round();
+    this.descent = descent.round();
   }
 
   void setAvgCadence() {

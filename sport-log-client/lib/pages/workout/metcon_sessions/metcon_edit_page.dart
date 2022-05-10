@@ -53,15 +53,18 @@ class _MetconEditPageState extends State<MetconEditPage> {
         : await _dataProvider.createSingle(_metconDescription);
     if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
-      Navigator.pop(
-        context,
-        ReturnObject(
-          action: widget.metconDescription != null
-              ? ReturnAction.updated
-              : ReturnAction.created,
-          payload: _metconDescription,
-        ), // needed for return to details page
-      );
+
+      if (mounted) {
+        Navigator.pop(
+          context,
+          ReturnObject(
+            action: widget.metconDescription != null
+                ? ReturnAction.updated
+                : ReturnAction.created,
+            payload: _metconDescription,
+          ), // needed for return to details page
+        );
+      }
     } else {
       await showMessageDialog(
         context: context,
@@ -74,10 +77,12 @@ class _MetconEditPageState extends State<MetconEditPage> {
     if (widget.metconDescription != null) {
       await _dataProvider.deleteSingle(_metconDescription);
     }
-    Navigator.pop(
-      context,
-      ReturnObject(action: ReturnAction.deleted, payload: _metconDescription),
-    );
+    if (mounted) {
+      Navigator.pop(
+        context,
+        ReturnObject(action: ReturnAction.deleted, payload: _metconDescription),
+      );
+    }
   }
 
   @override
@@ -250,6 +255,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
     return EditTile(
       leading: AppIcons.timeInterval,
       caption: caption,
+      onCancel: onCancel,
       child: DurationInput(
         initialDuration: _metconDescription.metcon.timecap ??=
             Metcon.timecapDefaultValue,
@@ -258,7 +264,6 @@ class _MetconEditPageState extends State<MetconEditPage> {
           setState(() => _metconDescription.metcon.timecap = timecap);
         },
       ),
-      onCancel: onCancel,
     );
   }
 
@@ -383,8 +388,8 @@ class MetconMovementCard extends StatelessWidget {
                 ),
                 Defaults.sizedBox.horizontal.big,
                 ReorderableDragStartListener(
-                  child: const Icon(AppIcons.dragHandle),
                   index: mmd.metconMovement.movementNumber,
+                  child: const Icon(AppIcons.dragHandle),
                 ),
               ],
             ),

@@ -28,11 +28,10 @@ class StrengthSessionEditPage extends StatefulWidget {
   final StrengthSessionDescription? strengthSessionDescription;
 
   @override
-  _StrengthSessionEditPageState createState() =>
-      _StrengthSessionEditPageState();
+  StrengthSessionEditPageState createState() => StrengthSessionEditPageState();
 }
 
-class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
+class StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   final _dataProvider = StrengthSessionDescriptionDataProvider();
 
   late final StrengthSessionDescription _strengthSessionDescription;
@@ -65,15 +64,17 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         ? await _dataProvider.updateSingle(_strengthSessionDescription)
         : await _dataProvider.createSingle(_strengthSessionDescription);
     if (result.isSuccess()) {
-      Navigator.pop(
-        context,
-        ReturnObject(
-          action: widget.strengthSessionDescription != null
-              ? ReturnAction.updated
-              : ReturnAction.created,
-          payload: _strengthSessionDescription,
-        ), // needed for return to details page
-      );
+      if (mounted) {
+        Navigator.pop(
+          context,
+          ReturnObject(
+            action: widget.strengthSessionDescription != null
+                ? ReturnAction.updated
+                : ReturnAction.created,
+            payload: _strengthSessionDescription,
+          ), // needed for return to details page
+        );
+      }
     } else {
       await showMessageDialog(
         context: context,
@@ -86,7 +87,9 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     if (widget.strengthSessionDescription != null) {
       await _dataProvider.deleteSingle(_strengthSessionDescription);
     }
-    Navigator.pop(context);
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -166,9 +169,6 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   Widget get _movementInput {
     return EditTile(
       caption: 'Movement',
-      child: Text(
-        '${_strengthSessionDescription.movement.name} (${_strengthSessionDescription.movement.dimension.displayName})',
-      ),
       leading: AppIcons.exercise,
       onTap: () async {
         final movement = await showMovementPicker(context: context);
@@ -179,6 +179,9 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
           });
         }
       },
+      child: Text(
+        '${_strengthSessionDescription.movement.name} (${_strengthSessionDescription.movement.dimension.displayName})',
+      ),
     );
   }
 
@@ -214,8 +217,6 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   Widget get _dateTimeInput {
     return EditTile(
       caption: 'Date',
-      child:
-          Text(_strengthSessionDescription.session.datetime.toHumanDateTime()),
       leading: AppIcons.calendar,
       onTap: () async {
         final datetime = await showDateTimePicker(
@@ -228,6 +229,8 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
           });
         }
       },
+      child:
+          Text(_strengthSessionDescription.session.datetime.toHumanDateTime()),
     );
   }
 
@@ -235,14 +238,14 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     assert(_strengthSessionDescription.session.interval != null);
     return EditTile(
       caption: 'Interval',
+      leading: AppIcons.timeInterval,
+      onCancel: () =>
+          setState(() => _strengthSessionDescription.session.interval = null),
       child: DurationInput(
         setDuration: (d) =>
             setState(() => _strengthSessionDescription.session.interval = d),
         initialDuration: _strengthSessionDescription.session.interval!,
       ),
-      leading: AppIcons.timeInterval,
-      onCancel: () =>
-          setState(() => _strengthSessionDescription.session.interval = null),
     );
   }
 

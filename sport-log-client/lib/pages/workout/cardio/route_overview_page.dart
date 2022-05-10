@@ -111,7 +111,7 @@ class RouteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    late MapboxMapController _sessionMapController;
+    late MapboxMapController sessionMapController;
 
     return GestureDetector(
       onTap: () => showDetails(context),
@@ -138,15 +138,15 @@ class RouteCard extends StatelessWidget {
                       scrollGesturesEnabled: false,
                       zoomGesturesEnabled: false,
                       onMapCreated: (MapboxMapController controller) =>
-                          _sessionMapController = controller,
+                          sessionMapController = controller,
                       onStyleLoadedCallback: () {
-                        _sessionMapController.setBoundsFromTracks(
+                        sessionMapController.setBoundsFromTracks(
                           route.track,
                           null,
                           padded: true,
                         );
                         if (route.track != null) {
-                          _sessionMapController.addRouteLine(route.track!);
+                          sessionMapController.addRouteLine(route.track!);
                         }
                       },
                       onMapClick: (_, __) => showDetails(context),

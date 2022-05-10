@@ -103,7 +103,9 @@ class MapPageState extends State<MapPage> {
                       await SystemChrome.setPreferredOrientations(
                         [DeviceOrientation.portraitUp],
                       );
-                      Scaffold.of(context).openDrawer();
+                      if (mounted) {
+                        Scaffold.of(context).openDrawer();
+                      }
                     },
                   ),
                 ),
@@ -351,31 +353,31 @@ class MapStylesBottomSheet extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                child: const Icon(AppIcons.mountains),
                 onPressed: () {
                   onStyleChange(MapboxStyles.OUTDOORS);
                   onHillshadeChange(false);
                   Navigator.of(context).pop();
                 },
                 style: style,
+                child: const Icon(AppIcons.mountains),
               ),
               ElevatedButton(
-                child: const Icon(AppIcons.car),
                 onPressed: () {
                   onStyleChange(MapboxStyles.MAPBOX_STREETS);
                   onHillshadeChange(false);
                   Navigator.of(context).pop();
                 },
                 style: style,
+                child: const Icon(AppIcons.car),
               ),
               ElevatedButton(
-                child: const Icon(AppIcons.satellite),
                 onPressed: () {
                   onStyleChange(MapboxStyles.SATELLITE);
                   onHillshadeChange(false);
                   Navigator.of(context).pop();
                 },
                 style: style,
+                child: const Icon(AppIcons.satellite),
               ),
             ],
           ),

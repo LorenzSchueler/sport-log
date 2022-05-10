@@ -41,6 +41,7 @@ class TimerPageState extends State<TimerPage> {
           appBar: AppBar(
             title: const Text("Timer"),
             bottom: DeactivatableTabBar(
+              disabled: _timerUtils != null,
               child: TabBar(
                 indicatorColor: Theme.of(context).colorScheme.primary,
                 tabs: const [
@@ -58,7 +59,6 @@ class TimerPageState extends State<TimerPage> {
                   )
                 ],
               ),
-              disabled: _timerUtils != null,
             ),
           ),
           body: Container(
@@ -122,18 +122,19 @@ class TimerPageState extends State<TimerPage> {
   Widget _timeFormField(TimerType timerType) {
     return EditTile(
       caption: _caption(timerType),
+      leading: AppIcons.timeInterval,
       child: DurationInput(
         setDuration:
             _timerUtils != null ? null : (d) => setState(() => _time = d),
         initialDuration: _time,
       ),
-      leading: AppIcons.timeInterval,
     );
   }
 
   Widget _restTimeFormField() {
     return _restTime == null
         ? EditTile(
+            leading: AppIcons.timeInterval,
             child: ActionChip(
               avatar: const Icon(AppIcons.add),
               label: const Text("Rest Time"),
@@ -141,18 +142,17 @@ class TimerPageState extends State<TimerPage> {
                 _restTime = const Duration(minutes: 1);
               }),
             ),
-            leading: AppIcons.timeInterval,
           )
         : EditTile(
             caption: "Rest Time",
+            leading: AppIcons.timeInterval,
+            onCancel: () => setState(() => _restTime = null),
             child: DurationInput(
               setDuration: _timerUtils != null
                   ? null
                   : (d) => setState(() => _restTime = d),
               initialDuration: _restTime,
             ),
-            leading: AppIcons.timeInterval,
-            onCancel: () => setState(() => _restTime = null),
           );
   }
 
