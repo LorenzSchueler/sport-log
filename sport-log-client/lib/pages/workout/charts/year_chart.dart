@@ -10,87 +10,84 @@ class YearChart extends StatelessWidget {
     required this.chartValues,
     required this.yFromZero,
     required this.isTime,
+    required this.startDateTime,
     Key? key,
   }) : super(key: key);
 
   final List<ChartValue> chartValues;
   final bool yFromZero;
   final bool isTime;
+  final DateTime startDateTime;
 
   @override
   Widget build(BuildContext context) {
-    if (chartValues.isEmpty) {
-      return const CircularProgressIndicator();
-    } else {
-      double minY = yFromZero
-          ? 0.0
-          : chartValues.map((v) => v.value).min.floor().toDouble();
-      double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
-      if (maxY == minY) {
-        maxY += 1;
-        minY -= 1;
-      }
-      final start = chartValues.first.datetime.beginningOfYear();
-
-      return LineChart(
-        LineChartData(
-          lineBarsData: [
-            LineChartBarData(
-              spots: chartValues
-                  .map(
-                    (v) => FlSpot(
-                      v.datetime.difference(start).inDays + 1,
-                      v.value,
-                    ),
-                  )
-                  .toList(),
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ],
-          titlesData: FlTitlesData(
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: 1,
-                getTitlesWidget: (value, _) =>
-                    start.add(Duration(days: value.round())).day == 15
-                        ? Text(
-                            start
-                                .add(Duration(days: value.round()))
-                                .shortMonthName,
-                          )
-                        : const Text(""),
-              ),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: isTime ? 60 : 30,
-                getTitlesWidget: isTime
-                    ? (value, _) => Text(
-                          Duration(milliseconds: value.round())
-                              .formatTimeWithMillis,
-                        )
-                    : null,
-              ),
-            ),
-          ),
-          gridData: FlGridData(
-            verticalInterval: 1,
-            checkToShowVerticalLine: (value) =>
-                start.add(Duration(days: value.round())).day == 1,
-            getDrawingVerticalLine: gridLineDrawer(context),
-            getDrawingHorizontalLine: gridLineDrawer(context),
-          ),
-          minX: 1.0,
-          maxX: start.numDaysInYear.toDouble(),
-          minY: minY,
-          maxY: maxY,
-          borderData: FlBorderData(show: false),
-        ),
-      );
+    double minY = yFromZero
+        ? 0.0
+        : chartValues.map((v) => v.value).min.floor().toDouble();
+    double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
+    if (maxY == minY) {
+      maxY += 1;
+      minY -= 1;
     }
+
+    return LineChart(
+      LineChartData(
+        lineBarsData: [
+          LineChartBarData(
+            spots: chartValues
+                .map(
+                  (v) => FlSpot(
+                    v.datetime.difference(startDateTime).inDays + 1,
+                    v.value,
+                  ),
+                )
+                .toList(),
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ],
+        minX: 1.0,
+        maxX: startDateTime.numDaysInYear.toDouble(),
+        minY: minY,
+        maxY: maxY,
+        titlesData: FlTitlesData(
+          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: 1,
+              getTitlesWidget: (value, _) =>
+                  startDateTime.add(Duration(days: value.round())).day == 15
+                      ? Text(
+                          startDateTime
+                              .add(Duration(days: value.round()))
+                              .shortMonthName,
+                        )
+                      : const Text(""),
+            ),
+          ),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: isTime ? 60 : 30,
+              getTitlesWidget: isTime
+                  ? (value, _) => Text(
+                        Duration(milliseconds: value.round())
+                            .formatTimeWithMillis,
+                      )
+                  : null,
+            ),
+          ),
+        ),
+        gridData: FlGridData(
+          getDrawingHorizontalLine: gridLineDrawer(context),
+          verticalInterval: 1,
+          checkToShowVerticalLine: (value) =>
+              startDateTime.add(Duration(days: value.round())).day == 1,
+          getDrawingVerticalLine: gridLineDrawer(context),
+        ),
+        borderData: FlBorderData(show: false),
+      ),
+    );
   }
 }

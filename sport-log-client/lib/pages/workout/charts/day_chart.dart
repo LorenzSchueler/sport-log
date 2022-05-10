@@ -8,69 +8,73 @@ import 'package:sport_log/pages/workout/charts/chart.dart';
 class DayChart extends StatelessWidget {
   const DayChart({
     required this.chartValues,
+    required this.yFromZero,
     required this.isTime,
     Key? key,
   }) : super(key: key);
 
   final List<ChartValue> chartValues;
+  final bool yFromZero;
   final bool isTime;
 
   @override
   Widget build(BuildContext context) {
-    if (chartValues.isEmpty) {
-      return const CircularProgressIndicator();
-    } else {
-      double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
-      if (maxY == 0) {
-        maxY = 1;
-      }
+    double minY = yFromZero
+        ? 0.0
+        : chartValues.map((v) => v.value).min.floor().toDouble();
+    double maxY = chartValues.map((v) => v.value).max.ceil().toDouble();
+    if (maxY == minY) {
+      maxY += 1;
+      minY -= 1;
+    }
 
-      return BarChart(
-        BarChartData(
-          barGroups: chartValues
-              .mapIndexed(
-                (v, index) => BarChartGroupData(
-                  x: index,
-                  barRods: [
-                    BarChartRodData(
-                      toY: v.value,
-                      color: Theme.of(context).colorScheme.primary,
-                    )
-                  ],
-                ),
-              )
-              .toList(),
-          borderData: FlBorderData(show: false),
-          titlesData: FlTitlesData(
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: isTime ? 60 : 30,
-                getTitlesWidget: isTime
-                    ? (value, _) => Text(
-                          Duration(milliseconds: value.round())
-                              .formatTimeWithMillis,
-                        )
-                    : null,
-              ),
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, _) => Text("Set ${value.round() + 1}"),
-              ),
-            ),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+    return LineChart(
+      LineChartData(
+        lineBarsData: [
+          LineChartBarData(
+            spots: chartValues
+                .mapIndexed(
+                  (v, index) => FlSpot(
+                    index + 1,
+                    v.value,
+                  ),
+                )
+                .toList(),
+            color: Theme.of(context).colorScheme.primary,
           ),
-          minY: 0,
-          maxY: maxY,
-          gridData: FlGridData(
-            getDrawingHorizontalLine: gridLineDrawer(context),
-            drawVerticalLine: false,
+        ],
+        minX: 1.0,
+        minY: minY,
+        maxY: maxY,
+        titlesData: FlTitlesData(
+          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: 1,
+              getTitlesWidget: (value, _) => Text("Set ${value.round()}"),
+            ),
+          ),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: isTime ? 60 : 30,
+              getTitlesWidget: isTime
+                  ? (value, _) => Text(
+                        Duration(milliseconds: value.round())
+                            .formatTimeWithMillis,
+                      )
+                  : null,
+            ),
           ),
         ),
-      );
-    }
+        gridData: FlGridData(
+          getDrawingHorizontalLine: gridLineDrawer(context),
+          drawVerticalLine: false,
+        ),
+        borderData: FlBorderData(show: false),
+      ),
+    );
   }
 }

@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/charts/all.dart';
 
@@ -81,24 +82,29 @@ class Chart extends StatelessWidget {
       case DayFilter:
         return DayChart(
           chartValues: _chartValues,
+          yFromZero: yFromZero,
           isTime: false,
         );
       case WeekFilter:
         return WeekChart(
           chartValues: _chartValues,
+          yFromZero: yFromZero,
           isTime: false,
+          startDateTime: dateFilterState.start!,
         );
       case MonthFilter:
         return MonthChart(
           chartValues: _chartValues,
           yFromZero: yFromZero,
           isTime: false,
+          startDateTime: dateFilterState.start!,
         );
       case YearFilter:
         return YearChart(
           chartValues: _chartValues,
           yFromZero: yFromZero,
           isTime: false,
+          startDateTime: dateFilterState.start!,
         );
       default:
         return AllChart(

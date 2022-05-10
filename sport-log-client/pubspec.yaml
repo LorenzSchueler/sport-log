@@ -69,6 +69,7 @@ dependencies:
   permission_handler: ^9.2.0
   wakelock: ^0.6.1+2
   fuzzywuzzy: ^0.1.7
+  collection: ^1.15.0
 
 dev_dependencies:
   flutter_test:
