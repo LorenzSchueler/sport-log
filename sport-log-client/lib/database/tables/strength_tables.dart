@@ -235,9 +235,7 @@ class StrengthSessionDescriptionTable {
      ''',
       [movementIdValue.toInt(), from.toString(), until.toString()],
     );
-    return records
-        .map((record) => StrengthSessionStats.fromDbRecord(record))
-        .toList();
+    return records.map(StrengthSessionStats.fromDbRecord).toList();
   }
 
   Future<List<StrengthSessionStats>> getStatsAggregationsByWeek({
@@ -273,9 +271,7 @@ class StrengthSessionDescriptionTable {
     ''',
       [movementIdValue.toInt(), from.toString(), until.toString()],
     );
-    return records
-        .map((record) => StrengthSessionStats.fromDbRecord(record))
-        .toList();
+    return records.map(StrengthSessionStats.fromDbRecord).toList();
   }
 
   Future<List<StrengthSessionStats>> getStatsAggregationsByMonth({
@@ -304,8 +300,6 @@ class StrengthSessionDescriptionTable {
     ''',
       [movementIdValue.toInt()],
     );
-    return records
-        .map((record) => StrengthSessionStats.fromDbRecord(record))
-        .toList();
+    return records.map(StrengthSessionStats.fromDbRecord).toList();
   }
 }

@@ -119,15 +119,11 @@ class TimelinePageState extends State<TimelinePage> {
 
   void sortItems() {
     final items = _strengthSessionsDescriptions
-        .map((s) => TimelineUnion.strengthSession(s))
+        .map(TimelineUnion.strengthSession)
         .toList()
-      ..addAll(
-        _metconSessionsDescriptions.map((m) => TimelineUnion.metconSession(m)),
-      )
-      ..addAll(
-        _cardioSessionsDescriptions.map((c) => TimelineUnion.cardioSession(c)),
-      )
-      ..addAll(_diaries.map((d) => TimelineUnion.diary(d)))
+      ..addAll(_metconSessionsDescriptions.map(TimelineUnion.metconSession))
+      ..addAll(_cardioSessionsDescriptions.map(TimelineUnion.cardioSession))
+      ..addAll(_diaries.map(TimelineUnion.diary))
       ..sort((a, b) => b.compareTo(a));
     if (mounted) {
       setState(() => _items = items);
