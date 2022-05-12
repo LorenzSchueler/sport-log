@@ -114,6 +114,7 @@ class SettingsPageState extends State<SettingsPage> {
               const Divider(),
               const CaptionTile(caption: "Account"),
               TextFormField(
+                key: UniqueKey(),
                 decoration: Theme.of(context).textFormFieldDecoration.copyWith(
                       icon: const Icon(AppIcons.account),
                       labelText: "Username",
@@ -136,11 +137,12 @@ class SettingsPageState extends State<SettingsPage> {
                     await showMessageDialog(context: context, text: validated);
                   }
                   if (mounted) {
-                    setState(() {});
+                    setState(() {}); // reload values from Settings
                   }
                 },
               ),
               TextFormField(
+                key: UniqueKey(),
                 decoration: Theme.of(context).textFormFieldDecoration.copyWith(
                       icon: const Icon(AppIcons.key),
                       labelText: "Password",
@@ -163,11 +165,12 @@ class SettingsPageState extends State<SettingsPage> {
                     await showMessageDialog(context: context, text: validated);
                   }
                   if (mounted) {
-                    setState(() {});
+                    setState(() {}); // reload values from Settings
                   }
                 },
               ),
               TextFormField(
+                key: UniqueKey(),
                 decoration: Theme.of(context).textFormFieldDecoration.copyWith(
                       icon: const Icon(AppIcons.email),
                       labelText: "Email",
@@ -191,7 +194,7 @@ class SettingsPageState extends State<SettingsPage> {
                     await showMessageDialog(context: context, text: validated);
                   }
                   if (mounted) {
-                    setState(() {});
+                    setState(() {}); // reload values from Settings
                   }
                 },
               ),

@@ -128,9 +128,10 @@ class CardioSession extends AtomicEntity {
 
   /// min/km
   Duration? get tempo {
+    final speed = this.speed;
     return speed == null || speed == 0
         ? null
-        : Duration(milliseconds: (60 * 60 * 1000 / speed!).round());
+        : Duration(milliseconds: (60 * 60 * 1000 / speed).round());
   }
 
   /// min/km
