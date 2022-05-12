@@ -136,7 +136,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
                   ),
                 ),
         ),
-        bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
+        bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
           context,
           SessionsPageTab.strength,
         ),

@@ -14,11 +14,10 @@ enum Weekday {
   @JsonValue("Saturday")
   saturday,
   @JsonValue("Sunday")
-  sunday,
-}
+  sunday;
 
-extension WeekdayToDisplayName on Weekday {
-  String get displayName {
+  @override
+  String toString() {
     switch (this) {
       case Weekday.monday:
         return "Monday";

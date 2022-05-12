@@ -7,7 +7,6 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/action/action_provider.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
-import 'package:sport_log/models/action/weekday.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -197,7 +196,7 @@ class ActionRulesCard extends StatelessWidget {
                         ),
                         Defaults.sizedBox.horizontal.normal,
                         Text(
-                          "${actionRule.weekday.displayName} at ${actionRule.time.formatTime}",
+                          "${actionRule.weekday} at ${actionRule.time.formatTime}",
                         ),
                         const Spacer(),
                         Checkbox(

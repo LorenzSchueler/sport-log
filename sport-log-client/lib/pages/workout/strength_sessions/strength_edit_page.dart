@@ -180,7 +180,7 @@ class StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         }
       },
       child: Text(
-        '${_strengthSessionDescription.movement.name} (${_strengthSessionDescription.movement.dimension.displayName})',
+        '${_strengthSessionDescription.movement.name} (${_strengthSessionDescription.movement.dimension})',
       ),
     );
   }

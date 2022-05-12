@@ -184,7 +184,7 @@ class TimelinePageState extends State<TimelinePage> {
                   ),
                 ),
         ),
-        bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
+        bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
           context,
           SessionsPageTab.timeline,
         ),

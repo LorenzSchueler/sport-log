@@ -24,7 +24,7 @@ class CardioTypePickerDialog extends StatelessWidget {
         padding: Defaults.edgeInsets.normal,
         child: ListView.separated(
           itemBuilder: (context, index) => ListTile(
-            title: Text(CardioType.values[index].displayName),
+            title: Text("${CardioType.values[index]}"),
             onTap: () {
               Navigator.pop(context, CardioType.values[index]);
             },

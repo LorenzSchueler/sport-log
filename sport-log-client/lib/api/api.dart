@@ -39,10 +39,8 @@ enum ApiErrorCode {
   // request error
   serverUnreachable,
   badJson,
-  unknownRequestError, // unknown request error
-}
+  unknownRequestError; // unknown request error
 
-extension ToErrorMessage on ApiErrorCode {
   String get description {
     switch (this) {
       case ApiErrorCode.badRequest:

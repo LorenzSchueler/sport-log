@@ -6,9 +6,10 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/user/user.dart';
 
-enum Units { metric, imperial }
+enum Units {
+  metric,
+  imperial;
 
-extension UnitsFromString on Units {
   static Units fromString(String unitString) {
     return Units.values.firstWhere((value) => value.name == unitString);
   }
@@ -148,7 +149,7 @@ class Settings {
   }
 
   static Units get units {
-    return UnitsFromString.fromString(_getString(_units));
+    return Units.fromString(_getString(_units));
   }
 
   static set units(Units units) {

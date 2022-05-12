@@ -191,7 +191,7 @@ class _MovementEditPageState extends State<MovementEditPage> {
       onChange: (dim) =>
           setState(() => _movementDescription.movement.dimension = dim),
       items: MovementDimension.values,
-      getLabel: (dim) => dim.displayName,
+      getLabel: (dim) => "$dim",
       selectedItem: _movementDescription.movement.dimension,
     );
   }

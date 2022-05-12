@@ -18,11 +18,10 @@ enum MovementDimension {
   @JsonValue('Distance')
   distance,
   @JsonValue('Energy')
-  energy,
-}
+  energy;
 
-extension MovementDimensionStrings on MovementDimension {
-  String get displayName {
+  @override
+  String toString() {
     switch (this) {
       case MovementDimension.reps:
         return 'Reps';

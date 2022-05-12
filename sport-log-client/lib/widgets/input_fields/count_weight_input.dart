@@ -107,8 +107,8 @@ class CountWeightInputState extends State<CountWeightInput> {
               EditTile(
                 leading: null,
                 caption: widget.dimension == MovementDimension.distance
-                    ? "${widget.dimension.displayName} (${_distanceUnit!.name})"
-                    : widget.dimension.displayName,
+                    ? "${widget.dimension} (${_distanceUnit!.name})"
+                    : "${widget.dimension}",
                 child: IntInput(
                   initialValue: _count,
                   setValue: (count) {

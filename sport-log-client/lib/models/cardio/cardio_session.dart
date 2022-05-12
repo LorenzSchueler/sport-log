@@ -20,11 +20,10 @@ enum CardioType {
   @JsonValue("ActiveRecovery")
   activeRecovery,
   @JsonValue("Freetime")
-  freetime
-}
+  freetime;
 
-extension CardioTypeToDisplayName on CardioType {
-  String get displayName {
+  @override
+  String toString() {
     switch (this) {
       case CardioType.training:
         return "Training";

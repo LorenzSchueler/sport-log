@@ -115,7 +115,7 @@ class DiaryPageState extends State<DiaryPage> {
                 ),
         ),
         bottomNavigationBar:
-            SessionTabUtils.bottomNavigationBar(context, SessionsPageTab.diary),
+            SessionsPageTab.bottomNavigationBar(context, SessionsPageTab.diary),
         drawer: MainDrawer(selectedRoute: Routes.diary.overview),
         floatingActionButton: FloatingActionButton(
           child: const Icon(AppIcons.add),

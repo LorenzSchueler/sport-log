@@ -3,9 +3,13 @@ import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
-enum SessionsPageTab { timeline, strength, metcon, cardio, diary }
+enum SessionsPageTab {
+  timeline,
+  strength,
+  metcon,
+  cardio,
+  diary;
 
-extension SessionTabUtils on SessionsPageTab {
   int indexOf() {
     return SessionsPageTab.values.indexOf(this);
   }
@@ -89,9 +93,9 @@ extension SessionTabUtils on SessionsPageTab {
     SessionsPageTab sessionsPageTab,
   ) {
     return BottomNavigationBar(
-      items: SessionTabUtils.bottomNavItems,
+      items: SessionsPageTab.bottomNavItems,
       currentIndex: sessionsPageTab.indexOf(),
-      onTap: (index) => SessionTabUtils.onBottomNavItemTapped(context, index),
+      onTap: (index) => SessionsPageTab.onBottomNavItemTapped(context, index),
       type: BottomNavigationBarType.fixed,
     );
   }

@@ -143,7 +143,7 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
 
     return ListTile(
       title: Text(movement.name),
-      subtitle: Text(movement.dimension.displayName),
+      subtitle: Text("${movement.dimension}"),
       onTap: () {
         Navigator.pop(context, movement);
       },

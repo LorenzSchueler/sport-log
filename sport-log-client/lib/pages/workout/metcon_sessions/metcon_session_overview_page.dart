@@ -154,7 +154,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                         ),
                 ),
         ),
-        bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
+        bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
           context,
           SessionsPageTab.metcon,
         ),

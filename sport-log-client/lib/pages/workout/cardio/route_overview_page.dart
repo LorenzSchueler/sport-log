@@ -85,7 +85,7 @@ class RoutePageState extends State<RoutePage> {
                   ),
                 ),
         ),
-        bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
+        bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
           context,
           SessionsPageTab.cardio,
         ),

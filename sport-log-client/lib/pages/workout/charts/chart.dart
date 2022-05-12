@@ -20,10 +20,8 @@ enum AggregatorType {
   max,
   sum,
   avg,
-  none,
-}
+  none;
 
-extension on AggregatorType {
   /// list must not be empty
   double compute(Iterable<double> list) {
     switch (this) {

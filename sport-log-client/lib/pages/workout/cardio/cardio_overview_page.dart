@@ -165,7 +165,7 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
                   ),
                 ),
         ),
-        bottomNavigationBar: SessionTabUtils.bottomNavigationBar(
+        bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
           context,
           SessionsPageTab.cardio,
         ),

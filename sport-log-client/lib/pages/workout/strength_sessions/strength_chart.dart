@@ -16,11 +16,10 @@ enum SeriesType {
   maxWeight, // reps
   maxReps, // reps
   avgReps, // reps
-  sumVolume, // reps
-}
+  sumVolume; // reps
 
-extension on SeriesType {
-  String toDisplayName() {
+  @override
+  String toString() {
     switch (this) {
       case SeriesType.maxDistance:
         return 'Best Distance';
@@ -167,7 +166,7 @@ class _StrengthChartState extends State<StrengthChart> {
               onChange: (SeriesType type) =>
                   setState(() => _selectedSeries = type),
               items: availableSeries,
-              getLabel: (SeriesType type) => type.toDisplayName(),
+              getLabel: (SeriesType type) => type.toString(),
               selectedItem: _selectedSeries,
             ),
           ),

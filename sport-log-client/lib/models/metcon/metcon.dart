@@ -16,11 +16,10 @@ enum MetconType {
   @JsonValue("Emom")
   emom,
   @JsonValue("ForTime")
-  forTime
-}
+  forTime;
 
-extension MetconTypeToDisplayName on MetconType {
-  String get displayName {
+  @override
+  String toString() {
     switch (this) {
       case MetconType.amrap:
         return "Amrap";
