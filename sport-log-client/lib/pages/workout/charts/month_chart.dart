@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/pages/workout/charts/chart.dart';
+import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 
 /// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
 class MonthChart extends StatelessWidget {
@@ -14,7 +14,7 @@ class MonthChart extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
-  final List<ChartValue> chartValues;
+  final List<DateTimeChartValue> chartValues;
   final bool yFromZero;
   final bool isTime;
   final DateTime startDateTime;

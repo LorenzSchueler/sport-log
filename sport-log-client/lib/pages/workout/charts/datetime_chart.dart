@@ -5,11 +5,11 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/charts/all.dart';
 
-class ChartValue {
+class DateTimeChartValue {
   final DateTime datetime;
   final double value;
 
-  ChartValue({required this.datetime, required this.value});
+  DateTimeChartValue({required this.datetime, required this.value});
 
   @override
   String toString() => "$datetime: $value";
@@ -39,18 +39,16 @@ enum AggregatorType {
   }
 }
 
-class Chart extends StatelessWidget {
-  const Chart({
+class DateTimeChart extends StatelessWidget {
+  const DateTimeChart({
     Key? key,
     required this.chartValues,
-    required this.desc,
     required this.dateFilterState,
     required this.yFromZero,
     required this.aggregatorType,
   }) : super(key: key);
 
-  final List<ChartValue> chartValues;
-  final bool desc;
+  final List<DateTimeChartValue> chartValues;
   final DateFilterState dateFilterState;
   final bool yFromZero;
   final AggregatorType aggregatorType;
@@ -69,7 +67,7 @@ class Chart extends StatelessWidget {
         .groupListsBy((v) => _groupFunction(v.datetime))
         .entries
         .map(
-          (entry) => ChartValue(
+          (entry) => DateTimeChartValue(
             datetime: entry.key,
             value: aggregatorType.compute(entry.value.map((e) => e.value)),
           ),

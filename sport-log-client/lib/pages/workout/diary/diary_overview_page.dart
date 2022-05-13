@@ -3,7 +3,7 @@ import 'package:sport_log/data_provider/data_providers/diary_data_provider.dart'
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/pages/workout/charts/chart.dart';
+import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
@@ -84,17 +84,16 @@ class DiaryPageState extends State<DiaryPage> {
                   child: Column(
                     children: [
                       if (_diaries.any((d) => d.bodyweight != null)) ...[
-                        Chart(
+                        DateTimeChart(
                           chartValues: _diaries
                               .where((d) => d.bodyweight != null)
                               .map(
-                                (s) => ChartValue(
+                                (s) => DateTimeChartValue(
                                   datetime: s.date,
                                   value: s.bodyweight ?? 0,
                                 ),
                               )
                               .toList(),
-                          desc: true,
                           dateFilterState: _dateFilter,
                           yFromZero: false,
                           aggregatorType: AggregatorType.avg,

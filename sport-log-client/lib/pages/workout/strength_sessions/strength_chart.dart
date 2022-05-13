@@ -4,7 +4,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/strength_session_description.dart';
 import 'package:sport_log/models/strength/strength_session_stats.dart';
-import 'package:sport_log/pages/workout/charts/chart.dart';
+import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 
@@ -172,16 +172,15 @@ class _StrengthChartState extends State<StrengthChart> {
           ),
         ),
         Defaults.sizedBox.vertical.small,
-        Chart(
+        DateTimeChart(
           chartValues: _strengthSessionStats
               .map(
-                (s) => ChartValue(
+                (s) => DateTimeChartValue(
                   datetime: s.datetime,
                   value: _selectedSeries.statValue(s),
                 ),
               )
               .toList(),
-          desc: true,
           dateFilterState: widget.dateFilterState,
           yFromZero: _selectedSeries.statYFromZero(),
           aggregatorType: _selectedSeries.statAggregator(),

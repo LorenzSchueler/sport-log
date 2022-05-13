@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
-import 'package:sport_log/pages/workout/charts/chart.dart';
+import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -126,10 +126,10 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
                   child: Column(
                     children: [
                       if (_movement != null) ...[
-                        Chart(
+                        DateTimeChart(
                           chartValues: _cardioSessionDescriptions
                               .map(
-                                (s) => ChartValue(
+                                (s) => DateTimeChartValue(
                                   datetime: s.cardioSession.datetime,
                                   value:
                                       (s.cardioSession.distance?.toDouble() ??
@@ -138,7 +138,6 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
                                 ),
                               )
                               .toList(),
-                          desc: true,
                           dateFilterState: _dateFilter,
                           yFromZero: true,
                           aggregatorType: AggregatorType.sum,
