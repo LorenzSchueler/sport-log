@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
@@ -125,12 +124,4 @@ class DateTimeChart extends StatelessWidget {
         return dateTime.beginningOfMonth().add(const Duration(days: 15));
     }
   }
-}
-
-FlLine Function(double value) gridLineDrawer(BuildContext context) {
-  return (value) => FlLine(
-        color: Theme.of(context).colorScheme.primary,
-        strokeWidth: 0.3,
-        dashArray: [4, 4],
-      );
 }
