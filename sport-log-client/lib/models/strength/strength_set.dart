@@ -80,7 +80,7 @@ class StrengthSet extends AtomicEntity {
                 : '$count x $weightStr'
             : '$count reps';
       case MovementDimension.time:
-        final result = Duration(milliseconds: count).formatTimeWithMillis;
+        final result = Duration(milliseconds: count).formatMsMill;
         return weightStr != null ? '$result ($weightStr)' : result;
       case MovementDimension.energy:
         final result = '$count cal';

@@ -134,7 +134,7 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
               EditTile(
                 leading: AppIcons.clock,
                 caption: "Time",
-                child: Text(_actionRule.time.formatTime),
+                child: Text(_actionRule.time.formatHm),
                 onTap: () async {
                   DateTime? time = await showScrollableTimePicker(
                     context: context,

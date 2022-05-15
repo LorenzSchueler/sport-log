@@ -43,7 +43,7 @@ class ValueUnitDescription extends StatelessWidget {
 
   ValueUnitDescription.time(Duration? time, {Key? key})
       : this(
-          value: time?.formatTime,
+          value: time?.formatHms,
           unit: null,
           description: "Duration",
           scale: 1.3,
@@ -52,7 +52,7 @@ class ValueUnitDescription extends StatelessWidget {
 
   ValueUnitDescription.timeSmall(Duration? time, {Key? key})
       : this(
-          value: time?.formatTime,
+          value: time?.formatHms,
           unit: null,
           description: null,
           key: key,

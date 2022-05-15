@@ -309,7 +309,7 @@ class CardioEditPageState extends State<CardioEditPage> {
                         caption: "Time",
                         child: Text(
                           _cardioSessionDescription
-                              .cardioSession.time!.formatTime,
+                              .cardioSession.time!.formatHms,
                         ),
                         onTap: () async {
                           final duration = await showScrollableDurationPicker(

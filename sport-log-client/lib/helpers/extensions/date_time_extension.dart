@@ -34,13 +34,16 @@ String shortWeekdayNameOfInt(int weekday) {
 }
 
 extension FormatDuration on Duration {
-  String get formatTime => toString().split('.').first.padLeft(8, "0");
+  String get formatHms => toString().split('.').first.padLeft(8, "0");
 
   String get formatTimeShort => inSeconds < 3600
       ? toString().split('.').first.split(":").skip(1).join(":")
       : toString().split('.').first.padLeft(8, "0");
 
-  String get formatTimeWithMillis => toString().split(":").skip(1).join(":");
+  String get formatHm =>
+      toString().split('.').first.split(":").take(2).join(":").padLeft(5, "0");
+
+  String get formatMsMill => toString().split(":").skip(1).join(":");
 }
 
 extension DateTimeExtension on DateTime {
@@ -52,14 +55,14 @@ extension DateTimeExtension on DateTime {
   String get formatDateyyyyMMdd => DateFormat('yyyy-MM-dd').format(this);
 
   String get _formatMonth => DateFormat('MMMM yyyy').format(this);
-  String get _formatMonthShort => DateFormat.MMMM().format(this);
+  String get longMonthName => DateFormat.MMMM().format(this);
 
-  String get _formatWeekday => DateFormat.EEEE().format(this);
+  String get longWeekdayName => DateFormat.EEEE().format(this);
 
-  String get formatTimeHms => DateFormat.Hms().format(this);
-  String get formatTime => DateFormat.Hm().format(this);
+  String get formatHms => DateFormat.Hms().format(this);
+  String get formatHm => DateFormat.Hm().format(this);
 
-  String toHumanDateTime() => '${toHumanDay()} at $formatTime';
+  String toHumanDateTime() => '${toHumanDay()} at $formatHm';
 
   String toHumanDate() => toHumanDay();
 
@@ -72,7 +75,7 @@ extension DateTimeExtension on DateTime {
     } else if (isOnDay(DateTime.now().dayLater())) {
       return 'Tomorrow';
     } else if (isInWeek(now)) {
-      return _formatWeekday;
+      return longWeekdayName;
     } else if (isInYear(now)) {
       return _formatDateShort;
     } else {
@@ -102,7 +105,7 @@ extension DateTimeExtension on DateTime {
     } else if (monthLater().isInMonth(now)) {
       return 'Last month';
     } else if (isInYear(now)) {
-      return _formatMonthShort;
+      return longMonthName;
     } else {
       return _formatMonth;
     }

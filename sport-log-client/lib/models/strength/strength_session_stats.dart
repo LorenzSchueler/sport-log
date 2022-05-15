@@ -92,7 +92,7 @@ class StrengthSessionStats extends JsonSerializable {
           'Avg Reps: ${avgCount.toStringAsFixed(1)}',
         ].join(' • ');
       case MovementDimension.time:
-        return 'Best time: ${Duration(milliseconds: minCount).formatTimeWithMillis}';
+        return 'Best time: ${Duration(milliseconds: minCount).formatMsMill}';
       case MovementDimension.distance:
         return 'Best distance: $maxCount m';
       case MovementDimension.energy:

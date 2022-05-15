@@ -183,7 +183,7 @@ class CardioTrackingPageState extends State<CardioTrackingPage> {
       }
     }
     _stepInfo =
-        "step count: ${stepCount.steps}\ntime: ${stepCount.timeStamp.formatTimeHms}";
+        "step count: ${stepCount.steps}\ntime: ${stepCount.timeStamp.formatHms}";
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {

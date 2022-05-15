@@ -185,7 +185,7 @@ class StrengthSessionDetailsPageState
         return [
           TextTile(
             caption: 'Best Time',
-            child: Text(Duration(milliseconds: stats.minCount).formatTime),
+            child: Text(Duration(milliseconds: stats.minCount).formatHms),
           ),
         ];
       case MovementDimension.distance:

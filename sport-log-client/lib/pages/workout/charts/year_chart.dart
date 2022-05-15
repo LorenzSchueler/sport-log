@@ -74,8 +74,7 @@ class YearChart extends StatelessWidget {
               reservedSize: isTime ? 60 : 30,
               getTitlesWidget: isTime
                   ? (value, _) => Text(
-                        Duration(milliseconds: value.round())
-                            .formatTimeWithMillis,
+                        Duration(milliseconds: value.round()).formatMsMill,
                       )
                   : null,
             ),
