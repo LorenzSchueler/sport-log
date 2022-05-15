@@ -119,6 +119,10 @@ extension DateTimeExtension on DateTime {
     }
   }
 
+  DateTime beginningOfSecond() {
+    return DateTime(year, month, day, hour, minute, second);
+  }
+
   DateTime beginningOfMinute() {
     return DateTime(year, month, day, hour, minute);
   }
