@@ -11,6 +11,7 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
+import 'package:sport_log/widgets/picker/time_picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/picker/cardio_type_picker.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -305,20 +306,28 @@ class CardioEditPageState extends State<CardioEditPage> {
                         ),
                       )
                     : EditTile(
-                        caption: 'Time',
                         leading: AppIcons.timeInterval,
-                        onCancel: () => setState(
-                          () => _cardioSessionDescription.cardioSession.time =
-                              null,
+                        caption: "Time",
+                        child: Text(
+                          _cardioSessionDescription
+                              .cardioSession.time!.formatTime,
                         ),
-                        child: DurationInput(
-                          setDuration: (d) => setState(
-                            () => _cardioSessionDescription.cardioSession.time =
-                                d,
-                          ),
-                          initialDuration:
-                              _cardioSessionDescription.cardioSession.time,
-                        ),
+                        onTap: () async {
+                          final duration = await showScrollableDurationPicker(
+                            context: context,
+                            initialDuration:
+                                _cardioSessionDescription.cardioSession.time,
+                          );
+                          if (duration != null) {
+                            setState(
+                              () => _cardioSessionDescription
+                                  .cardioSession.time = duration,
+                            );
+                          }
+                        },
+                        onCancel: () => setState(() {
+                          _cardioSessionDescription.cardioSession.time = null;
+                        }),
                       ),
                 TextFormField(
                   keyboardType: TextInputType.number,
