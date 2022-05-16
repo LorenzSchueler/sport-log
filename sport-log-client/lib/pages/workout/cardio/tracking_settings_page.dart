@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -90,26 +91,26 @@ class CardioTrackingSettingsPageState
                 : EditTile(
                     leading: AppIcons.heartbeat,
                     caption: "Heart Rate Monitors",
-                    child: SizedBox(
-                      height: 24,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                          value: _heartRateMonitorId,
-                          items: _devices!.entries
-                              .map(
-                                (d) => DropdownMenuItem(
-                                  value: d.value,
-                                  child: Text(d.key),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton(
+                        value: _heartRateMonitorId,
+                        items: _devices!.entries
+                            .map(
+                              (d) => DropdownMenuItem(
+                                value: d.value,
+                                child: Text(
+                                  d.key,
+                                  softWrap: false,
                                 ),
-                              )
-                              .toList(),
-                          underline: null,
-                          onChanged: (deviceId) {
-                            if (deviceId != null && deviceId is String) {
-                              setState(() => _heartRateMonitorId = deviceId);
-                            }
-                          },
-                        ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (deviceId) {
+                          if (deviceId != null && deviceId is String) {
+                            setState(() => _heartRateMonitorId = deviceId);
+                          }
+                        },
+                        isDense: true,
                       ),
                     ),
                     onCancel: () => setState(() {

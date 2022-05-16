@@ -58,8 +58,7 @@ class EditTile extends StatelessWidget {
               ],
             ),
           ),
-          if (onCancel != null) ...[
-            const Spacer(),
+          if (onCancel != null)
             IconButton(
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
@@ -68,7 +67,6 @@ class EditTile extends StatelessWidget {
                 AppIcons.close,
               ),
             ),
-          ]
         ],
       ),
     );
