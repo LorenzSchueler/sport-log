@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
@@ -8,6 +9,7 @@ import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
+import 'package:sport_log/pages/workout/charts/duration_chart.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -32,6 +34,8 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
   }
 
   late MapboxMapController _mapController;
+  List<double>? currentChartXValues;
+  List<double>? currentChartYValues;
 
   @override
   Widget build(BuildContext context) {
@@ -75,14 +79,13 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
           )
         ],
       ),
-      body: Stack(
+      body: Column(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _cardioSessionDescription.cardioSession.track != null
-                  ? Expanded(
-                      child: MapboxMap(
+          Expanded(
+            child: Stack(
+              children: [
+                _cardioSessionDescription.cardioSession.track != null
+                    ? MapboxMap(
                         accessToken: Config.instance.accessToken,
                         styleString: MapboxStyles.OUTDOORS,
                         initialCameraPosition: Settings.lastMapPosition,
@@ -106,63 +109,149 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
                             );
                           }
                         },
+                      )
+                    : Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              AppIcons.route,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            Defaults.sizedBox.horizontal.normal,
+                            const Text("no track available"),
+                          ],
+                        ),
                       ),
-                    )
-                  : Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            AppIcons.route,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          Defaults.sizedBox.horizontal.normal,
-                          const Text("no track available"),
-                        ],
-                      ),
+                Positioned(
+                  top: 5,
+                  left: 0,
+                  right: 0,
+                  child: Text(
+                    _cardioSessionDescription.cardioSession.datetime
+                        .toHumanDateTime(),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color:
+                          _cardioSessionDescription.cardioSession.track != null
+                              ? Theme.of(context).colorScheme.background
+                              : Theme.of(context).colorScheme.onBackground,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
-              Container(
-                padding: Defaults.edgeInsets.normal,
-                color: Theme.of(context).colorScheme.background,
-                child: Column(
-                  children: [
-                    CardioValueUnitDescriptionTable(
-                      cardioSessionDescription: _cardioSessionDescription,
-                      currentDuration: null,
-                    ),
-                    if (_cardioSessionDescription.cardioSession.comments !=
-                        null) ...[
-                      Defaults.sizedBox.vertical.normal,
-                      Text(
-                        _cardioSessionDescription.cardioSession.comments!,
-                        textAlign: TextAlign.left,
-                      ),
-                    ]
-                  ],
+                  ),
                 ),
-              ),
-            ],
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: currentChartYValues
+                                ?.map((e) => Text(e.toString()))
+                                .toList() ??
+                            [],
+                      ),
+                      DurationChart(
+                        chartLines: [
+                          _speedLine(),
+                          _elevationLine(),
+                          _cadenceLine(),
+                          _heartRateLine()
+                        ],
+                        yFromZero: true,
+                        rightYScaleFactor: 5,
+                        touchCallback: (xValues, yValues) {
+                          setState(() {
+                            currentChartXValues = xValues;
+                            currentChartYValues = yValues;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
           Container(
-            width: double.infinity,
-            padding: const EdgeInsets.only(
-              top: 5,
-            ),
-            child: Text(
-              _cardioSessionDescription.cardioSession.datetime
-                  .toHumanDateTime(),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: _cardioSessionDescription.cardioSession.track != null
-                    ? Theme.of(context).colorScheme.background
-                    : Theme.of(context).colorScheme.onBackground,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+            padding: Defaults.edgeInsets.normal,
+            color: Theme.of(context).colorScheme.background,
+            child: Column(
+              children: [
+                CardioValueUnitDescriptionTable(
+                  cardioSessionDescription: _cardioSessionDescription,
+                  currentDuration: null,
+                ),
+                if (_cardioSessionDescription.cardioSession.comments !=
+                    null) ...[
+                  Defaults.sizedBox.vertical.normal,
+                  Text(
+                    _cardioSessionDescription.cardioSession.comments!,
+                    textAlign: TextAlign.left,
+                  ),
+                ]
+              ],
             ),
           ),
         ],
       ),
     );
   }
+
+  DurationChartLine _speedLine() => DurationChartLine.fromUngroupedChartValues(
+        chartValues: _cardioSessionDescription.cardioSession.track
+                ?.groupListsBy(
+                  (p) => Duration(minutes: p.time.inMinutes),
+                )
+                .entries
+                .map((entry) {
+              final km =
+                  (entry.value.last.distance - entry.value.first.distance) /
+                      1000;
+              final hour = (entry.value.last.time - entry.value.first.time)
+                      .inMilliseconds /
+                  (1000 * 60 * 60);
+              return DurationChartValue(
+                duration: entry.key,
+                value: km / hour,
+              );
+            }).toList() ??
+            []
+          ..sort(
+            (v1, v2) => v1.duration.compareTo(v2.duration),
+          ),
+        lineColor: Colors.blue,
+        isRight: true,
+      );
+
+  DurationChartLine _elevationLine() =>
+      DurationChartLine.fromUngroupedChartValues(
+        chartValues: _cardioSessionDescription.cardioSession.track
+                ?.map(
+                  (t) => DurationChartValue(
+                    duration: t.time,
+                    value: t.elevation,
+                  ),
+                )
+                .toList() ??
+            [],
+        lineColor: Colors.white,
+        isRight: true,
+      );
+
+  DurationChartLine _heartRateLine() => DurationChartLine.fromDurationList(
+        durations: _cardioSessionDescription.cardioSession.heartRate ?? [],
+        lineColor: Colors.red,
+        isRight: false,
+      );
+
+  DurationChartLine _cadenceLine() => DurationChartLine.fromDurationList(
+        durations: _cardioSessionDescription.cardioSession.cadence ?? [],
+        lineColor: Colors.orange,
+        isRight: false,
+      );
 }
