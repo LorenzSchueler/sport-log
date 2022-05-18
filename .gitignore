@@ -9,8 +9,10 @@
 /sport-log-server/sport-log-server.toml
 /sport-log-client/sport-log-client.yaml
 /sport-log-client/build.sh
+/sport-log-client/flutter_checks.sh
 .env
 geckodriver
+rust_checks.sh
 upgrade.sh
 
 # git update-index --assume-unchanged sport-log-client.sport-log-client.yaml
