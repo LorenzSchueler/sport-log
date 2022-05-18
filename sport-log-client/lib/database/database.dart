@@ -102,24 +102,26 @@ class AppDatabase {
 
   static Future<void> open() async {
     _logger.i("Opening Database");
-    _database = await openDatabase(
+    _database = await databaseFactory.openDatabase(
       Config.databaseName,
-      version: 1,
-      onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
-      onCreate: (db, version) async {
-        for (final tableAccessor in tablesAccessors) {
-          _logger.d("Creating table: ${tableAccessor.tableName}");
-          for (final statement in tableAccessor.table.setupSql) {
-            if (Config.instance.outputDbStatement) {
-              _logger.d(statement);
+      options: OpenDatabaseOptions(
+        version: 1,
+        onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
+        onCreate: (db, version) async {
+          for (final tableAccessor in tablesAccessors) {
+            _logger.d("Creating table: ${tableAccessor.tableName}");
+            for (final statement in tableAccessor.table.setupSql) {
+              if (Config.instance.outputDbStatement) {
+                _logger.d(statement);
+              }
+              await db.execute(statement);
             }
-            await db.execute(statement);
           }
-        }
-      },
-      onUpgrade: null,
-      onDowngrade: null,
-      onOpen: (db) => _logger.d("Database initialization done"),
+        },
+        onUpgrade: null,
+        onDowngrade: null,
+        onOpen: (db) => _logger.d("Database initialization done"),
+      ),
     );
     _logger.i("Database ready");
   }

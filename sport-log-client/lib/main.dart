@@ -10,6 +10,8 @@ import 'package:sport_log/pages/login/landing_page.dart';
 import 'package:sport_log/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 Stream<double> initialize() async* {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +23,10 @@ Stream<double> initialize() async* {
   yield 0.4;
   await Settings.init();
   yield 0.5;
+  if (Config.isWindows || Config.isLinux) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
   await AppDatabase.init();
   yield 0.7;
   await Sync.instance.init();

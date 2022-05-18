@@ -45,6 +45,7 @@ dependencies:
   result_type: ^0.1.0 # convenience for returning something that can either be a success or failure
   intl: ^0.17.0  # used for date formatting
   sqflite: ^2.0.0+3 # sqlite database
+  sqflite_common_ffi: ^2.1.1
   flutter_time_picker_spinner: ^2.0.0
   logger: ^1.0.0
   fl_chart: ^0.50.1
