@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
+import 'package:sport_log/config.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -10,6 +11,7 @@ import 'package:sport_log/pages/heart_rate/heart_rate_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
 import 'package:sport_log/pages/map/map_page.dart';
 import 'package:sport_log/pages/offline_maps/offline_maps_overview.dart';
+import 'package:sport_log/pages/platform_not_supported_page.dart';
 import 'package:sport_log/pages/settings/about_page.dart';
 import 'package:sport_log/pages/settings/settings_page.dart';
 import 'package:sport_log/pages/timer/timer_page.dart';
@@ -59,6 +61,14 @@ abstract class Routes {
     return Settings.userExists() ? builder() : const LandingPage();
   }
 
+  static Widget _checkLoginAndroidIos(Widget Function() builder) {
+    return Settings.userExists()
+        ? Config.isAndroid || Config.isIOS
+            ? builder()
+            : const PlatformNotSupportedPage()
+        : const LandingPage();
+  }
+
   static Widget _checkNotLogin(Widget Function() builder) {
     return Settings.userExists() ? const TimelinePage() : builder();
   }
@@ -73,9 +83,10 @@ abstract class Routes {
     Routes.registration: (_) =>
         _checkNotLogin(() => const LoginPage(register: true)),
     Routes.timer: (_) => _checkLogin(() => const TimerPage()),
-    Routes.map: (_) => _checkLogin(() => const MapPage()),
-    Routes.offlineMaps: (_) => _checkLogin(() => const OfflineMapsPage()),
-    Routes.heartRate: (_) => _checkLogin(() => const HeartRatePage()),
+    Routes.map: (_) => _checkLoginAndroidIos(() => const MapPage()),
+    Routes.offlineMaps: (_) =>
+        _checkLoginAndroidIos(() => const OfflineMapsPage()),
+    Routes.heartRate: (_) => _checkLoginAndroidIos(() => const HeartRatePage()),
     Routes.settings: (_) => _checkLogin(() => const SettingsPage()),
     Routes.about: (_) => _checkLogin(() => const AboutPage()),
     // Action
@@ -166,8 +177,8 @@ abstract class Routes {
     Routes.cardio.overview: (_) =>
         _checkLogin(() => const CardioSessionsPage()),
     Routes.cardio.trackingSettings: (_) =>
-        _checkLogin(() => const CardioTrackingSettingsPage()),
-    Routes.cardio.tracking: (context) => _checkLogin(() {
+        _checkLoginAndroidIos(() => const CardioTrackingSettingsPage()),
+    Routes.cardio.tracking: (context) => _checkLoginAndroidIos(() {
           final args =
               ModalRoute.of(context)?.settings.arguments as List<dynamic>;
           return CardioTrackingPage(
