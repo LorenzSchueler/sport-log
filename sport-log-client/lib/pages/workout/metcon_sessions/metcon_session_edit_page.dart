@@ -50,15 +50,15 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
     if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
       if (mounted) {
-      Navigator.pop(
-        context,
-        ReturnObject(
-          action: widget.metconSessionDescription != null
-              ? ReturnAction.updated
-              : ReturnAction.created,
-          payload: _metconSessionDescription,
-        ), // needed for return to details page
-      );
+        Navigator.pop(
+          context,
+          ReturnObject(
+            action: widget.metconSessionDescription != null
+                ? ReturnAction.updated
+                : ReturnAction.created,
+            payload: _metconSessionDescription,
+          ), // needed for return to details page
+        );
       }
     } else {
       await showMessageDialog(
@@ -73,15 +73,15 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
       await _dataProvider.deleteSingle(_metconSessionDescription);
     }
     _formKey.currentState!.deactivate();
-      if (mounted) {
-    Navigator.pop(
-      context,
-      ReturnObject(
-        action: ReturnAction.deleted,
-        payload: _metconSessionDescription,
-      ), // needed for return to details page
-    );
-  }
+    if (mounted) {
+      Navigator.pop(
+        context,
+        ReturnObject(
+          action: ReturnAction.deleted,
+          payload: _metconSessionDescription,
+        ), // needed for return to details page
+      );
+    }
   }
 
   @override
