@@ -39,18 +39,18 @@ class Sync extends ChangeNotifier {
     }
   }
 
-  Future<void> sync({VoidCallback? onNoInternet}) async {
+  Future<bool> sync({VoidCallback? onNoInternet}) async {
     if (!Settings.syncEnabled) {
       _logger.i("sync disabled.");
-      return;
+      return false;
     }
     if (_isSyncing) {
       _logger.d('Sync job already running.');
-      return;
+      return false;
     }
     if (!Settings.userExists()) {
       _logger.d('Sync cannot be run: no user.');
-      return;
+      return false;
     }
     _isSyncing = true;
     notifyListeners();
@@ -68,12 +68,13 @@ class Sync extends ChangeNotifier {
           stopSync();
           _isSyncing = false;
           notifyListeners();
-          return;
+          return false;
         }
       }
     }
     final syncStart = DateTime.now();
-    if (await _downSync(onNoInternet: onNoInternet)) {
+    final downSyncSuccessful = await _downSync(onNoInternet: onNoInternet);
+    if (downSyncSuccessful) {
       await _upSync();
       _logger.i('Setting last sync to $syncStart.');
       // make sure sync intervals overlap slightly in case client and server clocks differ a little bit
@@ -81,6 +82,7 @@ class Sync extends ChangeNotifier {
     }
     _isSyncing = false;
     notifyListeners();
+    return downSyncSuccessful;
   }
 
   Future<void> _upSync() async {
@@ -119,16 +121,19 @@ class Sync extends ChangeNotifier {
       return;
     }
     _logger.d('Starting sync timer.');
+    bool success = true;
     if (Settings.lastSync == null) {
-      await sync(); // wait to make sure movement 1 and metcon 1 exist
+      success = await sync(); // wait to make sure movement 1 and metcon 1 exist
     } else {
       unawaited(sync()); // let sync finish later
     }
-    Movement.defaultMovement =
-        (await MovementDataProvider().getById(Int64(1)))!; // FIXME
-    MetconDescription.defaultMetconDescription =
-        (await MetconDescriptionDataProvider().getById(Int64(1)))!; // FIXME
-    _syncTimer = Timer.periodic(Settings.syncInterval, (_) => sync());
+    if (success) {
+      Movement.defaultMovement =
+          (await MovementDataProvider().getById(Int64(1)))!; // FIXME
+      MetconDescription.defaultMetconDescription =
+          (await MetconDescriptionDataProvider().getById(Int64(1)))!; // FIXME
+      _syncTimer = Timer.periodic(Settings.syncInterval, (_) => sync());
+    }
   }
 
   void stopSync() {
