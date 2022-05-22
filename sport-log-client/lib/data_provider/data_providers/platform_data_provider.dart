@@ -69,7 +69,7 @@ class PlatformDescriptionDataProvider
     if (object.platformCredential == null) {
       return DbResult.success();
     }
-    return await _platformCredentialDataProvider
+    return _platformCredentialDataProvider
         .createSingle(object.platformCredential!);
   }
 
@@ -78,7 +78,7 @@ class PlatformDescriptionDataProvider
     if (object.platformCredential == null) {
       return DbResult.success();
     }
-    return await _platformCredentialDataProvider
+    return _platformCredentialDataProvider
         .updateSingle(object.platformCredential!);
   }
 
@@ -87,7 +87,7 @@ class PlatformDescriptionDataProvider
     if (object.platformCredential == null) {
       return DbResult.success();
     }
-    return await _platformCredentialDataProvider
+    return _platformCredentialDataProvider
         .deleteSingle(object.platformCredential!);
   }
 
@@ -116,16 +116,16 @@ class PlatformDescriptionDataProvider
     if (!await _platformCredentialDataProvider.pullFromServer(notify: false)) {
       return false;
     }
-    return await _actionProviderDataProvider.pullFromServer();
+    return _actionProviderDataProvider.pullFromServer();
   }
 
   @override
   Future<bool> pushCreatedToServer() async {
-    return await _platformCredentialDataProvider.pushCreatedToServer();
+    return _platformCredentialDataProvider.pushCreatedToServer();
   }
 
   @override
   Future<bool> pushUpdatedToServer() async {
-    return await _platformCredentialDataProvider.pushUpdatedToServer();
+    return _platformCredentialDataProvider.pushUpdatedToServer();
   }
 }

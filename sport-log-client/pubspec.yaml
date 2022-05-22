@@ -54,7 +54,7 @@ dependencies:
   fluttertoast: ^8.0.8
   flutter_keyboard_visibility: ^5.0.3
   url_launcher: ^6.0.20
-  mapbox_gl: ^0.15.0 # mapping lib for osm
+  mapbox_gl: ^0.16.0 # mapping lib for osm
   mapbox_api: ^1.0.0
   mapbox_search: ^3.0.1+2
   flutter_polyline_points: ^1.0.0

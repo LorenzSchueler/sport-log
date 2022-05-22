@@ -24,6 +24,6 @@ class DiaryDataProvider extends EntityDataProvider<Diary> {
     required DateTime? from,
     required DateTime? until,
   }) async {
-    return await db.getByTimerange(from, until);
+    return db.getByTimerange(from, until);
   }
 }

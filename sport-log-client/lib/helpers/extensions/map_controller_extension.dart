@@ -107,7 +107,7 @@ extension MapControllerExtension on MapboxMapController {
     LatLng latLng,
   ) async {
     await removeCircles(circles);
-    return await addCurrentLocationMarker(latLng);
+    return addCurrentLocationMarker(latLng);
   }
 
   Future<Circle> addLocationMarker(LatLng latLng) {

@@ -117,7 +117,7 @@ class ActionProviderDescriptionDataProvider
     if (result.isFailure()) {
       return result;
     }
-    return await _actionEventDataProvider.createMultiple(object.actionEvents);
+    return _actionEventDataProvider.createMultiple(object.actionEvents);
   }
 
   @override
@@ -140,7 +140,7 @@ class ActionProviderDescriptionDataProvider
     if (!await _actionRuleDataProvider.pushUpdatedToServer()) {
       return false;
     }
-    return await _actionEventDataProvider.pushUpdatedToServer();
+    return _actionEventDataProvider.pushUpdatedToServer();
   }
 
   @override
@@ -148,7 +148,7 @@ class ActionProviderDescriptionDataProvider
     if (!await _actionRuleDataProvider.pushCreatedToServer()) {
       return false;
     }
-    return await _actionEventDataProvider.pushCreatedToServer();
+    return _actionEventDataProvider.pushCreatedToServer();
   }
 
   @override
@@ -156,7 +156,7 @@ class ActionProviderDescriptionDataProvider
     if (!await _actionRuleDataProvider.pullFromServer(notify: false)) {
       return false;
     }
-    return await _actionEventDataProvider.pullFromServer();
+    return _actionEventDataProvider.pullFromServer();
   }
 
   Future<ActionProviderDescription?> getByActionProvider(

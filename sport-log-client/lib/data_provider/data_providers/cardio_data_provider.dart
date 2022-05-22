@@ -68,17 +68,17 @@ class CardioSessionDescriptionDataProvider
 
   @override
   Future<DbResult> createSingle(CardioSessionDescription object) async {
-    return await _cardioDataProvider.createSingle(object.cardioSession);
+    return _cardioDataProvider.createSingle(object.cardioSession);
   }
 
   @override
   Future<DbResult> updateSingle(CardioSessionDescription object) async {
-    return await _cardioDataProvider.updateSingle(object.cardioSession);
+    return _cardioDataProvider.updateSingle(object.cardioSession);
   }
 
   @override
   Future<DbResult> deleteSingle(CardioSessionDescription object) async {
-    return await _cardioDataProvider.deleteSingle(object.cardioSession);
+    return _cardioDataProvider.deleteSingle(object.cardioSession);
   }
 
   @override
@@ -105,17 +105,17 @@ class CardioSessionDescriptionDataProvider
     if (!await _routeDataProvider.pullFromServer(notify: false)) {
       return false;
     }
-    return await _cardioDataProvider.pullFromServer();
+    return _cardioDataProvider.pullFromServer();
   }
 
   @override
   Future<bool> pushCreatedToServer() async {
-    return await _cardioDataProvider.pushCreatedToServer();
+    return _cardioDataProvider.pushCreatedToServer();
   }
 
   @override
   Future<bool> pushUpdatedToServer() async {
-    return await _cardioDataProvider.pushUpdatedToServer();
+    return _cardioDataProvider.pushUpdatedToServer();
   }
 
   Future<List<CardioSessionDescription>> getByTimerangeAndMovement({

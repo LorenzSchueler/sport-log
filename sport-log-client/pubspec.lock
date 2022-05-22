@@ -414,7 +414,7 @@ packages:
       name: hive
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.2.0"
+    version: "2.2.1"
   hive_flutter:
     dependency: "direct main"
     description:
@@ -449,14 +449,14 @@ packages:
       name: http_parser
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.0"
+    version: "4.0.1"
   image:
     dependency: transitive
     description:
       name: image
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.1.3"
+    version: "3.2.0"
   intl:
     dependency: "direct main"
     description:
@@ -554,7 +554,7 @@ packages:
       name: mapbox_gl
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.15.0"
+    version: "0.16.0"
   mapbox_gl_dart:
     dependency: transitive
     description:
@@ -568,14 +568,14 @@ packages:
       name: mapbox_gl_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.15.0"
+    version: "0.16.0"
   mapbox_gl_web:
     dependency: transitive
     description:
       name: mapbox_gl_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.15.0"
+    version: "0.16.0"
   mapbox_search:
     dependency: "direct main"
     description:
@@ -792,7 +792,7 @@ packages:
       name: polar
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.15.0"
+    version: "1.16.0"
   pool:
     dependency: transitive
     description:
@@ -1007,7 +1007,7 @@ packages:
       name: url_launcher_ios
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.0.16"
+    version: "6.0.17"
   url_launcher_linux:
     dependency: transitive
     description:
@@ -1133,7 +1133,7 @@ packages:
       name: xml
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.4.1"
+    version: "6.0.1"
   yaml:
     dependency: "direct main"
     description:

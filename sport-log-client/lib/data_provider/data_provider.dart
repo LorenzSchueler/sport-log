@@ -264,12 +264,11 @@ abstract class EntityDataProvider<T extends AtomicEntity>
 
   Future<T?> getById(Int64 id) async => db.getById(id);
 
-  Future<DbResult> upsertFromAccountData(AccountData accountData) async {
-    return await upsertMultiple(
-      getFromAccountData(accountData),
-      synchronized: true,
-    );
-  }
+  Future<DbResult> upsertFromAccountData(AccountData accountData) =>
+      upsertMultiple(
+        getFromAccountData(accountData),
+        synchronized: true,
+      );
 
   Future<DbResult> upsertMultiple(
     List<T> objects, {

@@ -78,7 +78,7 @@ class StrengthSessionDescriptionDataProvider
     if (result.isFailure()) {
       return result;
     }
-    return await _strengthSetDataProvider.createMultiple(object.sets);
+    return _strengthSetDataProvider.createMultiple(object.sets);
   }
 
   @override
@@ -112,7 +112,7 @@ class StrengthSessionDescriptionDataProvider
     if (result.isFailure()) {
       return result;
     }
-    return await _strengthSetDataProvider.createMultiple(diffing.toCreate);
+    return _strengthSetDataProvider.createMultiple(diffing.toCreate);
   }
 
   @override
@@ -124,7 +124,7 @@ class StrengthSessionDescriptionDataProvider
     if (result.isFailure()) {
       return result;
     }
-    return await _strengthSessionDataProvider.deleteSingle(object.session);
+    return _strengthSessionDataProvider.deleteSingle(object.session);
   }
 
   @override
@@ -149,7 +149,7 @@ class StrengthSessionDescriptionDataProvider
     if (!await _strengthSessionDataProvider.pushUpdatedToServer()) {
       return false;
     }
-    return await _strengthSetDataProvider.pushUpdatedToServer();
+    return _strengthSetDataProvider.pushUpdatedToServer();
   }
 
   @override
@@ -157,7 +157,7 @@ class StrengthSessionDescriptionDataProvider
     if (!await _strengthSessionDataProvider.pushCreatedToServer()) {
       return false;
     }
-    return await _strengthSetDataProvider.pushCreatedToServer();
+    return _strengthSetDataProvider.pushCreatedToServer();
   }
 
   @override
@@ -165,7 +165,7 @@ class StrengthSessionDescriptionDataProvider
     if (!await _strengthSessionDataProvider.pullFromServer(notify: false)) {
       return false;
     }
-    return await _strengthSetDataProvider.pullFromServer();
+    return _strengthSetDataProvider.pullFromServer();
   }
 
   Future<StrengthSessionDescription?> getById(Int64 id) =>

@@ -106,7 +106,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     if (result.isFailure()) {
       return result;
     }
-    return await _metconMovementDataProvider.createMultiple(
+    return _metconMovementDataProvider.createMultiple(
       object.moves.map((mmd) => mmd.metconMovement).toList(),
     );
   }
@@ -141,7 +141,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     if (result.isFailure()) {
       return result;
     }
-    return await _metconMovementDataProvider.createMultiple(diffing.toCreate);
+    return _metconMovementDataProvider.createMultiple(diffing.toCreate);
   }
 
   @override
@@ -153,7 +153,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     if (result.isFailure()) {
       return result;
     }
-    return await _metconDataProvider.deleteSingle(object.metcon);
+    return _metconDataProvider.deleteSingle(object.metcon);
   }
 
   @override
@@ -168,7 +168,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     if (await _metconDataProvider.pushUpdatedToServer()) {
       return false;
     }
-    return await _metconMovementDataProvider.pushUpdatedToServer();
+    return _metconMovementDataProvider.pushUpdatedToServer();
   }
 
   @override
@@ -176,7 +176,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     if (await _metconDataProvider.pushCreatedToServer()) {
       return false;
     }
-    return await _metconMovementDataProvider.pushCreatedToServer();
+    return _metconMovementDataProvider.pushCreatedToServer();
   }
 
   @override
@@ -184,7 +184,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     if (await _metconDataProvider.pullFromServer(notify: false)) {
       return false;
     }
-    return await _metconMovementDataProvider.pullFromServer();
+    return _metconMovementDataProvider.pullFromServer();
   }
 
   Future<List<MetconMovementDescription>> _getMmdByMetcon(Metcon metcon) async {
@@ -224,7 +224,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
 
   Future<List<MetconDescription>> getByMetconName(String? name) async {
     final metcons = await _metconDataProvider.getByName(name);
-    return await Future.wait(
+    return Future.wait(
       metcons.map(
         (metcon) async => MetconDescription(
           metcon: metcon,
@@ -262,22 +262,22 @@ class MetconSessionDescriptionDataProvider
 
   @override
   Future<DbResult> createSingle(MetconSessionDescription object) async {
-    return await _metconSessionDataProvider.createSingle(object.metconSession);
+    return _metconSessionDataProvider.createSingle(object.metconSession);
   }
 
   @override
   Future<DbResult> updateSingle(MetconSessionDescription object) async {
-    return await _metconSessionDataProvider.updateSingle(object.metconSession);
+    return _metconSessionDataProvider.updateSingle(object.metconSession);
   }
 
   @override
   Future<DbResult> deleteSingle(MetconSessionDescription object) async {
-    return await _metconSessionDataProvider.deleteSingle(object.metconSession);
+    return _metconSessionDataProvider.deleteSingle(object.metconSession);
   }
 
   @override
   Future<List<MetconSessionDescription>> getNonDeleted() async {
-    return await _mapToDescription(
+    return _mapToDescription(
       await _metconSessionDataProvider.getNonDeleted(),
     );
   }
@@ -293,17 +293,17 @@ class MetconSessionDescriptionDataProvider
     if (!await _metconMovementDataProvider.pullFromServer(notify: false)) {
       return false;
     }
-    return await _metconSessionDataProvider.pullFromServer();
+    return _metconSessionDataProvider.pullFromServer();
   }
 
   @override
   Future<bool> pushCreatedToServer() async {
-    return await _metconSessionDataProvider.pushCreatedToServer();
+    return _metconSessionDataProvider.pushCreatedToServer();
   }
 
   @override
   Future<bool> pushUpdatedToServer() async {
-    return await _metconSessionDataProvider.pushUpdatedToServer();
+    return _metconSessionDataProvider.pushUpdatedToServer();
   }
 
   Future<List<MetconSessionDescription>> getByTimerangeAndMetcon({
@@ -311,7 +311,7 @@ class MetconSessionDescriptionDataProvider
     DateTime? from,
     DateTime? until,
   }) async {
-    return await _mapToDescription(
+    return _mapToDescription(
       await _metconSessionDataProvider.getByTimerangeAndMetcon(
         from: from,
         until: until,

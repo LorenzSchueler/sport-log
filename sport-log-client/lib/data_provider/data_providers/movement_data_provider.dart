@@ -52,37 +52,37 @@ class MovementDescriptionDataProvider
 
   @override
   Future<DbResult> createSingle(MovementDescription object) async {
-    return await _dataProvider.createSingle(object.movement);
+    return _dataProvider.createSingle(object.movement);
   }
 
   @override
   Future<DbResult> updateSingle(MovementDescription object) async {
-    return await _dataProvider.updateSingle(object.movement);
+    return _dataProvider.updateSingle(object.movement);
   }
 
   @override
   Future<DbResult> deleteSingle(MovementDescription object) async {
-    return await _dataProvider.deleteSingle(object.movement);
+    return _dataProvider.deleteSingle(object.movement);
   }
 
   @override
   Future<List<MovementDescription>> getNonDeleted() async {
-    return await _movementDescriptionDb.getNonDeleted();
+    return _movementDescriptionDb.getNonDeleted();
   }
 
   @override
   Future<bool> pullFromServer() async {
-    return await _dataProvider.pullFromServer();
+    return _dataProvider.pullFromServer();
   }
 
   @override
   Future<bool> pushCreatedToServer() async {
-    return await _dataProvider.pushCreatedToServer();
+    return _dataProvider.pushCreatedToServer();
   }
 
   @override
   Future<bool> pushUpdatedToServer() async {
-    return await _dataProvider.pushUpdatedToServer();
+    return _dataProvider.pushUpdatedToServer();
   }
 
   Future<List<MovementDescription>> getByName(

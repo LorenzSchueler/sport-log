@@ -91,8 +91,8 @@ class RoutePageState extends State<RoutePage> {
         ),
         drawer: MainDrawer(selectedRoute: Routes.cardio.routeOverview),
         floatingActionButton: FloatingActionButton(
-          onPressed: () async =>
-              await Navigator.pushNamed(context, Routes.cardio.routeEdit),
+          onPressed: () =>
+              Navigator.pushNamed(context, Routes.cardio.routeEdit),
           child: const Icon(AppIcons.add),
         ),
       ),
