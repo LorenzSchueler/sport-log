@@ -21,7 +21,7 @@ Stream<double> initialize() async* {
   yield 0.2;
   await Hive.initFlutter();
   yield 0.4;
-  await Settings.init();
+  Config.isTest ? await Settings.init(override: true) : await Settings.init();
   yield 0.5;
   if (Config.isWindows || Config.isLinux) {
     sqfliteFfiInit();

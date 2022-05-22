@@ -33,13 +33,13 @@ class Settings {
   static const String _lastMapPosition = "lastMapPosition";
   static const String _lastGpsLatLng = "lastGpsLatLng";
 
-  static Future<void> init() async {
+  static Future<void> init({bool override = false}) async {
     Hive
       ..registerAdapter(DurationAdapter())
       ..registerAdapter(LatLngAdapter())
       ..registerAdapter(CameraPositionAdapter());
     _storage ??= await Hive.openBox<dynamic>("settings");
-    await setDefaults();
+    await setDefaults(override: override);
   }
 
   static Future<void> setDefaults({bool override = false}) async {
@@ -52,11 +52,26 @@ class Settings {
     if (!_storage!.containsKey(_syncInterval) || override) {
       await _storage!.put(_syncInterval, const Duration(minutes: 5));
     }
+    if (override) {
+      await _storage!.delete(_lastSync);
+    }
     if (!_storage!.containsKey(_units) || override) {
       await _storage!.put(_units, "metric");
     }
     if (!_storage!.containsKey(_weightIncrement) || override) {
       await _storage!.put(_weightIncrement, 2.5);
+    }
+    if (override) {
+      await _storage!.delete(_id);
+    }
+    if (override) {
+      await _storage!.delete(_username);
+    }
+    if (override) {
+      await _storage!.delete(_password);
+    }
+    if (override) {
+      await _storage!.delete(_email);
     }
     if (!_storage!.containsKey(_lastMapPosition) || override) {
       await _storage!.put(
@@ -217,18 +232,14 @@ class Settings {
   }
 
   static User? get user {
-    if (userExists()) {
-      _logger.i("user data found");
-      return User(
-        id: userId!,
-        username: username!,
-        password: password!,
-        email: email!,
-      );
-    } else {
-      _logger.i("no user data found");
-      return null;
-    }
+    return userExists()
+        ? User(
+            id: userId!,
+            username: username!,
+            password: password!,
+            email: email!,
+          )
+        : null;
   }
 
   static CameraPosition get lastMapPosition {

@@ -33,9 +33,9 @@ class Config extends JsonSerializable {
               : loadYaml(await rootBundle.loadString('sport-log-client.yaml')))
           as YamlMap;
 
-      if (kReleaseMode) {
+      if (releaseMode) {
         instance = Config.fromJson(map["release"]! as Map<String, dynamic>);
-      } else if (kProfileMode) {
+      } else if (profileMode) {
         instance = Config.fromJson(map["profile"]! as Map<String, dynamic>);
       } else {
         instance =
@@ -69,7 +69,9 @@ class Config extends JsonSerializable {
     instance.isAndroidEmulator = isAndroidEmulator;
 
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    instance.version = Version.fromString(packageInfo.version);
+    instance.version = Version.fromString(
+      isTest ? "0.1.0" : packageInfo.version,
+    );
 
     _logger
       ..i('Min log level: ${instance.minLogLevel}')
