@@ -53,7 +53,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
 
   Future<void> _update() async {
     _logger.d(
-      'Updating strength sessions with start = ${_dateFilter.start}, end = ${_dateFilter.end}',
+      'Updating strength sessions with start = ${_dateFilter.start}, end = ${_dateFilter.end}, movement = ${_movement?.name}',
     );
     final ssds = await _dataProvider.getByTimerangeAndMovement(
       from: _dateFilter.start,
@@ -194,7 +194,12 @@ class StrengthSessionCard extends StatelessWidget {
                       Text(
                         "Interval: ${strengthSessionDescription.session.interval!.formatTimeShort}",
                       ),
-                    ]
+                    ],
+                    if (strengthSessionDescription.session.comments !=
+                        null) ...[
+                      Defaults.sizedBox.vertical.normal,
+                      Text(strengthSessionDescription.session.comments!),
+                    ],
                   ],
                 ),
               ),
