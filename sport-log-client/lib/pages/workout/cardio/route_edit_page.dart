@@ -122,8 +122,9 @@ class RouteEditPageState extends State<RouteEditPage> {
         ..i("own distance ${track.last.distance}");
       setState(() {
         _route
-          ..distance = track.last.distance.round()
-          ..track = track;
+          ..track = track
+          ..setDistance()
+          ..setAscentDescent();
       });
     }
   }

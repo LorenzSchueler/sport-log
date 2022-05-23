@@ -51,6 +51,32 @@ class Route extends AtomicEntity with Comparable<Route> {
         descent = null,
         deleted = false;
 
+  void setDistance() {
+    distance =
+        track == null || track!.isEmpty ? 0 : track!.last.distance.round();
+  }
+
+  void setAscentDescent() {
+    if (track == null || track!.isEmpty) {
+      this.ascent = null;
+      this.descent = null;
+      return;
+    }
+    double ascent = 0;
+    double descent = 0;
+    for (int i = 0; i < track!.length - 1; i++) {
+      double elevationDifference =
+          track![i + 1].elevation - track![i].elevation;
+      if (elevationDifference > 0) {
+        ascent += elevationDifference;
+      } else {
+        descent -= elevationDifference;
+      }
+    }
+    this.ascent = ascent.round();
+    this.descent = descent.round();
+  }
+
   factory Route.fromJson(Map<String, dynamic> json) => _$RouteFromJson(json);
 
   @override
