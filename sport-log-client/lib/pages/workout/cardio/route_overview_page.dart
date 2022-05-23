@@ -6,6 +6,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
+import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -90,10 +91,24 @@ class RoutePageState extends State<RoutePage> {
           SessionsPageTab.cardio,
         ),
         drawer: MainDrawer(selectedRoute: Routes.cardio.routeOverview),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () =>
-              Navigator.pushNamed(context, Routes.cardio.routeEdit),
-          child: const Icon(AppIcons.add),
+        floatingActionButton: ExpandableFab(
+          icon: const Icon(AppIcons.add),
+          buttons: [
+            ActionButton(
+              icon: const Icon(AppIcons.route),
+              onPressed: () => Navigator.pushNamed(
+                context,
+                Routes.cardio.routeEdit,
+              ),
+            ),
+            ActionButton(
+              icon: const Icon(AppIcons.upload),
+              onPressed: () => Navigator.pushNamed(
+                context,
+                Routes.cardio.routeUpload,
+              ),
+            ),
+          ],
         ),
       ),
     );

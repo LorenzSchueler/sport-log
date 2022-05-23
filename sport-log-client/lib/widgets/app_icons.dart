@@ -43,6 +43,7 @@ class AppIcons {
   static const IconData openInBrowser = Icons.open_in_browser_outlined;
   static const IconData fileDownload = Icons.file_download_rounded;
   static const IconData dragHandle = Icons.drag_handle_rounded;
+  static const IconData upload = Icons.upload_rounded;
 
   // arrows
   static const IconData arrowBack = Icons.arrow_back_rounded;

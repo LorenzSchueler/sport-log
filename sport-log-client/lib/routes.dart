@@ -20,6 +20,7 @@ import 'package:sport_log/pages/workout/cardio/cardio_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_overview_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_overview_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_edit_page.dart';
+import 'package:sport_log/pages/workout/cardio/route_upload_page.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_page.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings_page.dart';
 import 'package:sport_log/pages/login/landing_page.dart';
@@ -205,6 +206,8 @@ abstract class Routes {
           );
         }),
     Routes.cardio.routeOverview: (_) => _checkLogin(() => const RoutePage()),
+    Routes.cardio.routeUpload: (_) =>
+        _checkLogin(() => const RouteUploadPage()),
     Routes.cardio.routeEdit: (context) => _checkLogin(() {
           final route = ModalRoute.of(context)?.settings.arguments as Route?;
           return RouteEditPage(
@@ -266,6 +269,7 @@ class _CardioRoutes {
   final String cardioEdit = '/cardio/cardio_edit';
   final String cardioDetails = '/cardio/cardio_details';
   final String routeEdit = '/cardio/route_edit';
+  final String routeUpload = '/cardio/route_upload';
   final String routeOverview = '/cardio/route_overview';
 }
 
