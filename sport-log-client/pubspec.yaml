@@ -71,6 +71,8 @@ dependencies:
   wakelock: ^0.6.1+2
   fuzzywuzzy: ^0.2.0
   collection: ^1.16.0
+  gpx: ^2.1.1
+  file_picker: ^4.5.1
 
 dev_dependencies:
   flutter_test:
