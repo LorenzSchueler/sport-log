@@ -50,8 +50,10 @@ String trackToGpx(List<Position> track, {DateTime? startTime}) {
   return GpxWriter().asString(gpx);
 }
 
-Future<String> saveTrackAsGpx(List<Position> track,
-    {DateTime? startTime}) async {
+Future<String> saveTrackAsGpx(
+  List<Position> track, {
+  DateTime? startTime,
+}) async {
   final gpxString = trackToGpx(track, startTime: startTime);
 
   final dir = Config.isAndroid

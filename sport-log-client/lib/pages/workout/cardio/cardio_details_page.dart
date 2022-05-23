@@ -70,6 +70,12 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
           ),
         ),
         actions: [
+          if (_cardioSessionDescription.cardioSession.track != null &&
+              _cardioSessionDescription.cardioSession.track!.isNotEmpty)
+            IconButton(
+              onPressed: _exportFile,
+              icon: const Icon(AppIcons.download),
+            ),
           IconButton(
             onPressed: () async {
               final returnObj = await Navigator.pushNamed(

@@ -9,8 +9,8 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
+import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
-import 'package:sport_log/widgets/picker/date_picker.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/picker/metcon_picker.dart';
@@ -166,17 +166,17 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   caption: "Start Time",
                   child: Text(
                     _metconSessionDescription.metconSession.datetime
-                        .toHumanDate(),
+                        .toHumanDateTime(),
                   ),
                   onTap: () async {
-                    DateTime? date = await showDatePickerWithDefaults(
+                    DateTime? datetime = await showDateTimePicker(
                       context: context,
-                      initialDate:
-                          _metconSessionDescription.metconSession.datetime,
+                      initial: _metconSessionDescription.metconSession.datetime,
                     );
-                    if (date != null) {
+                    if (datetime != null) {
                       setState(() {
-                        _metconSessionDescription.metconSession.datetime = date;
+                        _metconSessionDescription.metconSession.datetime =
+                            datetime;
                       });
                     }
                   },

@@ -216,7 +216,7 @@ class StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
 
   Widget get _dateTimeInput {
     return EditTile(
-      caption: 'Date',
+      caption: 'Start Time',
       leading: AppIcons.calendar,
       onTap: () async {
         final datetime = await showDateTimePicker(
