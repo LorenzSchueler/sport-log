@@ -9,25 +9,27 @@ List<Position> gpxToTrack(String gpxString) {
   final startTime = points
       .map((p) => p.time)
       .firstWhere((element) => element != null, orElse: () => null);
-  // ignore: prefer-immediate-return
-  final positions = points
-      .map(
-        (p) => Position(
-          longitude: p.lon ?? 0.0,
-          latitude: p.lat ?? 0.0,
-          elevation: p.ele?.toDouble() ?? 0.0,
-          distance: 0.0,
-          time: startTime == null || p.time == null
-              ? Duration.zero
-              : p.time!.difference(startTime),
-        ),
-      )
-      .toList();
-  return positions;
+  List<Position> track = [];
+  for (final point in points) {
+    track.add(
+      Position(
+        longitude: point.lon ?? 0.0,
+        latitude: point.lat ?? 0.0,
+        elevation: point.ele?.toDouble() ?? 0.0,
+        distance: track.isEmpty
+            ? 0
+            : track.last.addDistanceTo(point.lat ?? 0.0, point.lon ?? 0.0),
+        time: startTime == null || point.time == null
+            ? Duration.zero
+            : point.time!.difference(startTime),
+      ),
+    );
+  }
+  return track;
 }
 
-String trackToGpx(List<Position> positions, {DateTime? startTime}) {
-  final points = positions
+String trackToGpx(List<Position> track, {DateTime? startTime}) {
+  final points = track
       .map(
         (p) => Wpt(
           lon: p.longitude,
