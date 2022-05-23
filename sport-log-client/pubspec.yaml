@@ -73,6 +73,7 @@ dependencies:
   collection: ^1.16.0
   gpx: ^2.1.1
   file_picker: ^4.5.1
+  path_provider: ^2.0.10
 
 dev_dependencies:
   flutter_test:

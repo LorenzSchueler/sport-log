@@ -6,6 +6,7 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
+import 'package:sport_log/helpers/gpx.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
@@ -13,6 +14,7 @@ import 'package:sport_log/pages/workout/charts/duration_chart.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 class CardioDetailsPage extends StatefulWidget {
   final CardioSessionDescription cardioSessionDescription;
@@ -36,6 +38,17 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
   late MapboxMapController _mapController;
   List<double>? currentChartXValues;
   List<double>? currentChartYValues;
+
+  Future<void> _exportFile() async {
+    final file = await saveTrackAsGpx(
+      _cardioSessionDescription.cardioSession.track ?? [],
+      startTime: _cardioSessionDescription.cardioSession.datetime,
+    );
+    await showMessageDialog(
+      context: context,
+      text: 'Track exported to $file',
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

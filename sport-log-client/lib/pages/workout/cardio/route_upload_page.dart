@@ -111,14 +111,13 @@ class RouteUploadPageState extends State<RouteUploadPage> {
               padding: Defaults.edgeInsets.normal,
               child: Column(
                 children: [
-                  ElevatedButton(
-                    onPressed: _uploadFile,
-                    child: const Text("Open Gpx File"),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _uploadFile,
+                      child: const Text("Open GPX File"),
+                    ),
                   ),
-                  //ElevatedButton(
-                  //onPressed: _exportFile,
-                  //child: const Text("Export Gpx"),
-                  //),
                   Defaults.sizedBox.vertical.normal,
                   Table(
                     children: [
@@ -191,27 +190,4 @@ class RouteUploadPageState extends State<RouteUploadPage> {
       logInfo("file", "no file selected");
     }
   }
-
-  // Future<void> _exportFile() async {
-  // final gpxString = trackToGpx([
-  // Position(
-  // longitude: 13.11,
-  // latitude: 45.38,
-  // elevation: 1.1,
-  // distance: 0,
-  // time: Duration.zero,
-  // ),
-  // Position(
-  // longitude: 13.12,
-  // latitude: 45.38,
-  // elevation: 3.2,
-  // distance: 5,
-  // time: const Duration(seconds: 3),
-  // ),
-  // ]);
-
-  // File file = File("~/Downloads"); // TODO
-  // logInfo("path", file.path);
-  // await file.writeAsString(gpxString);
-  // }
 }
