@@ -20,13 +20,20 @@ abstract class TableAccessor<T extends AtomicEntity> {
 
   Database get database => AppDatabase.database!;
 
+  static String combineFilter(List<String> filter) {
+    return filter.where((element) => element.isNotEmpty).join(" and ");
+  }
+
   static String notDeletedOfTable(String tableName) =>
       '$tableName.${Columns.deleted} = 0';
   String get notDeleted => notDeletedOfTable(tableName);
 
-  static String combineFilter(List<String> filter) {
-    return filter.where((element) => element.isNotEmpty).join(" and ");
-  }
+  static String cardioOnlyOfTable(bool cardioOnly) =>
+      cardioOnly ? '${Tables.movement}.${Columns.cardio} = 1' : '';
+
+  static String distanceOnlyOfTable(bool distanceOnly) => distanceOnly
+      ? "${Tables.movement}.${Columns.dimension} = ${MovementDimension.distance.index}"
+      : '';
 
   static String fromFilterOfTable(
     String tableName,

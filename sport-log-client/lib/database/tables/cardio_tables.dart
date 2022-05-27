@@ -118,13 +118,13 @@ class CardioSessionDescriptionTable {
         ${_routeTable.table.allColumns},
         ${_movementTable.table.allColumns}
       FROM ${Tables.cardioSession}
-      LEFT JOIN (
-        SELECT * FROM ${Tables.route} 
-        WHERE ${Tables.route}.${Columns.deleted} = false
-      ) AS ${Tables.route} ON ${Tables.route}.${Columns.id} = ${Tables.cardioSession}.${Columns.routeId}
-      JOIN ${Tables.movement} ON ${Tables.movement}.${Columns.id} = ${Tables.cardioSession}.${Columns.movementId}
+      LEFT JOIN ${Tables.route} 
+      ON ${Tables.route}.${Columns.id} = ${Tables.cardioSession}.${Columns.routeId}
+      JOIN ${Tables.movement} 
+      ON ${Tables.movement}.${Columns.id} = ${Tables.cardioSession}.${Columns.movementId}
       WHERE ${TableAccessor.combineFilter([
             TableAccessor.notDeletedOfTable(Tables.movement),
+            TableAccessor.notDeletedOfTable(Tables.route),
             TableAccessor.notDeletedOfTable(Tables.cardioSession),
             TableAccessor.fromFilterOfTable(Tables.cardioSession, from),
             TableAccessor.untilFilterOfTable(Tables.cardioSession, until),

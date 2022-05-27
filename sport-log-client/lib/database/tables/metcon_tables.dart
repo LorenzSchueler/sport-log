@@ -134,10 +134,13 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
   );
 
   Future<bool> existsByMetcon(Metcon metcon) async {
-    return (await database.rawQuery(
-      '''select 1 from $tableName
-            where ${Columns.metconId} = ${metcon.id.toInt()}
-              and ${Columns.deleted} = 0''',
+    return (await database.query(
+      tableName,
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        "${Columns.metconId} = ?",
+      ]),
+      whereArgs: [metcon.id.toInt()],
     ))
         .isNotEmpty;
   }

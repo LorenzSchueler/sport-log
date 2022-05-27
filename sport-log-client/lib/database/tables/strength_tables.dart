@@ -111,9 +111,11 @@ class StrengthSessionDescriptionTable {
         ${_movementTable.table.allColumns}
       FROM ${Tables.strengthSession}
         JOIN ${Tables.movement} ON ${Tables.movement}.${Columns.id} = ${Tables.strengthSession}.${Columns.movementId}
-      WHERE ${Tables.strengthSession}.${Columns.deleted} = 0
-        AND ${Tables.movement}.${Columns.deleted} = 0
-        AND ${Tables.strengthSession}.${Columns.id} = ?;
+      WHERE ${TableAccessor.combineFilter([
+            TableAccessor.notDeletedOfTable(Tables.strengthSession),
+            TableAccessor.notDeletedOfTable(Tables.movement),
+            "${Tables.strengthSession}.${Columns.id} = ?",
+          ])}
     ''',
       [idValue.toInt()],
     );
@@ -187,11 +189,13 @@ class StrengthSessionDescriptionTable {
         ${_strengthSetTable.table.allColumns}
       FROM ${Tables.strengthSession}
         JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
-      WHERE ${Tables.strengthSet}.${Columns.deleted} = 0
-        AND ${Tables.strengthSession}.${Columns.deleted} = 0
-        AND ${Tables.strengthSession}.${Columns.datetime} >= ?
-        AND ${Tables.strengthSession}.${Columns.datetime} < ?
-        AND ${Tables.strengthSession}.${Columns.movementId} = ?
+      WHERE ${TableAccessor.combineFilter([
+            TableAccessor.notDeletedOfTable(Tables.strengthSet),
+            TableAccessor.notDeletedOfTable(Tables.strengthSession),
+            "${Tables.strengthSession}.${Columns.datetime} >= ?",
+            "${Tables.strengthSession}.${Columns.datetime} < ?",
+            "${Tables.strengthSession}.${Columns.movementId} = ?",
+          ])}
       ORDER BY ${Tables.strengthSession}.${Columns.datetime}, ${Tables.strengthSession}.${Columns.id}, ${Tables.strengthSet}.${Columns.setNumber}
     ''',
       [start.toString(), end.toString(), movementIdValue.toInt()],
@@ -225,11 +229,13 @@ class StrengthSessionDescriptionTable {
       FROM ${Tables.strengthSession}
         JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
         LEFT JOIN ${Tables.eorm} ON ${Columns.eormReps} = ${Tables.strengthSet}.${Columns.count}
-      WHERE ${Tables.strengthSet}.${Columns.deleted} = 0
-        AND ${Tables.strengthSession}.${Columns.deleted} = 0
-        AND ${Tables.strengthSession}.${Columns.movementId} = ?
-        AND ${Tables.strengthSession}.${Columns.datetime} >= ?
-        AND ${Tables.strengthSession}.${Columns.datetime} < ?
+      WHERE ${TableAccessor.combineFilter([
+            TableAccessor.notDeletedOfTable(Tables.strengthSet),
+            TableAccessor.notDeletedOfTable(Tables.strengthSession),
+            "${Tables.strengthSession}.${Columns.datetime} >= ?",
+            "${Tables.strengthSession}.${Columns.datetime} < ?",
+            "${Tables.strengthSession}.${Columns.movementId} = ?",
+          ])}
       GROUP BY date
       ORDER BY date
      ''',
@@ -261,11 +267,13 @@ class StrengthSessionDescriptionTable {
       FROM ${Tables.strengthSession}
         JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
         LEFT JOIN ${Tables.eorm} ON ${Columns.eormReps} = ${Tables.strengthSet}.${Columns.count}
-      WHERE ${Tables.strengthSet}.${Columns.deleted} = 0
-        AND ${Tables.strengthSession}.${Columns.deleted} = 0
-        AND ${Tables.strengthSession}.${Columns.movementId} = ?
-        AND ${Tables.strengthSession}.${Columns.datetime} >= ?
-        AND ${Tables.strengthSession}.${Columns.datetime} < ?
+      WHERE ${TableAccessor.combineFilter([
+            TableAccessor.notDeletedOfTable(Tables.strengthSet),
+            TableAccessor.notDeletedOfTable(Tables.strengthSession),
+            "${Tables.strengthSession}.${Columns.datetime} >= ?",
+            "${Tables.strengthSession}.${Columns.datetime} < ?",
+            "${Tables.strengthSession}.${Columns.movementId} = ?",
+          ])}
       GROUP BY week
       ORDER BY week
     ''',
@@ -292,9 +300,11 @@ class StrengthSessionDescriptionTable {
       FROM ${Tables.strengthSession}
         JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
         LEFT JOIN ${Tables.eorm} ON ${Columns.eormReps} = ${Tables.strengthSet}.${Columns.count}
-      WHERE ${Tables.strengthSet}.${Columns.deleted} = 0
-        AND ${Tables.strengthSession}.${Columns.deleted} = 0
-        AND ${Tables.strengthSession}.${Columns.movementId} = ?
+      WHERE ${TableAccessor.combineFilter([
+            TableAccessor.notDeletedOfTable(Tables.strengthSet),
+            TableAccessor.notDeletedOfTable(Tables.strengthSession),
+            "${Tables.strengthSession}.${Columns.datetime} >= ?",
+          ])}
       GROUP BY month
       ORDER BY month
     ''',

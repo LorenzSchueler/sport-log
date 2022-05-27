@@ -35,10 +35,8 @@ class MovementTable extends TableAccessor<Movement> {
       tableName,
       where: TableAccessor.combineFilter([
         notDeleted,
-        cardioOnly ? '${Columns.cardio} = true' : '',
-        distanceOnly
-            ? "${Columns.dimension} = '${MovementDimension.distance.index}'"
-            : '',
+        TableAccessor.cardioOnlyOfTable(cardioOnly),
+        TableAccessor.distanceOnlyOfTable(distanceOnly),
         '''(${Columns.userId} IS NOT NULL
           OR NOT EXISTS (
             SELECT * FROM $tableName m2
@@ -127,10 +125,8 @@ class MovementDescriptionTable {
     FROM ${Tables.movement}
     WHERE ${TableAccessor.combineFilter([
             TableAccessor.notDeletedOfTable(Tables.movement),
-            cardioOnly ? '${Tables.movement}.${Columns.cardio} = true' : '',
-            distanceOnly
-                ? "${Tables.movement}.${Columns.dimension} = '${MovementDimension.distance.index}'"
-                : '',
+            TableAccessor.cardioOnlyOfTable(cardioOnly),
+            TableAccessor.distanceOnlyOfTable(distanceOnly),
             """(${Columns.userId} IS NOT NULL
         OR NOT EXISTS (
           SELECT * FROM ${Tables.movement} m2
