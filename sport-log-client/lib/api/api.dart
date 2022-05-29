@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:http/http.dart';
+import 'package:http/io_client.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart' as l;
 import 'package:result_type/result_type.dart';
@@ -126,15 +127,14 @@ extension _ToApiResult on Response {
 }
 
 extension ApiResultFromRequest on ApiResult {
-  static final _client = Client();
+  static final _ioClient = HttpClient()..connectionTimeout = Config.httpTimeout;
+  static final _client = IOClient(_ioClient);
 
   static Future<ApiResult<T>> _handleError<T>(
     Future<ApiResult<T>> Function() request,
   ) async {
     try {
       return await request();
-    } on TimeoutException {
-      return Failure(ApiError(ApiErrorCode.serverUnreachable));
     } on SocketException {
       return Failure(ApiError(ApiErrorCode.serverUnreachable));
     } on TypeError {
@@ -149,7 +149,7 @@ extension ApiResultFromRequest on ApiResult {
     Future<Response> Function(Client client) request,
   ) =>
       _handleError(() async {
-        final response = await request(_client).timeout(Config.httpTimeout);
+        final response = await request(_client);
         return response.toApiResult();
       });
 
@@ -158,7 +158,7 @@ extension ApiResultFromRequest on ApiResult {
     T Function(dynamic) fromJson,
   ) =>
       _handleError(() async {
-        final response = await request(_client).timeout(Config.httpTimeout);
+        final response = await request(_client);
         return response.toApiResultWithValue(fromJson);
       });
 }
