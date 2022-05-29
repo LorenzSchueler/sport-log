@@ -3,7 +3,7 @@ part of '../api.dart';
 class UserApi with ApiLogging, ApiHelpers {
   final String route = '$apiVersion/user';
 
-  ApiResult<User> getSingle(String username, String password) {
+  Future<ApiResult<User>> getSingle(String username, String password) {
     return ApiResultFromRequest.fromRequestWithValue<User>(
       (client) async {
         final headers = _ApiHeaders._basicAuth(username, password);
@@ -20,7 +20,7 @@ class UserApi with ApiLogging, ApiHelpers {
     );
   }
 
-  ApiResult<void> postSingle(User user) async {
+  Future<ApiResult<void>> postSingle(User user) async {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = user.toJson();
       const headers = _ApiHeaders._jsonContentType;
@@ -35,7 +35,7 @@ class UserApi with ApiLogging, ApiHelpers {
     });
   }
 
-  ApiResult<void> putSingle(User user) async {
+  Future<ApiResult<void>> putSingle(User user) async {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = user.toJson();
       final headers = _ApiHeaders._defaultHeaders;
@@ -50,7 +50,7 @@ class UserApi with ApiLogging, ApiHelpers {
     });
   }
 
-  ApiResult<void> deleteSingle() async {
+  Future<ApiResult<void>> deleteSingle() async {
     return ApiResultFromRequest.fromRequest((client) async {
       final headers = _ApiHeaders._defaultHeaders;
       _logRequest('DELETE', route, headers);

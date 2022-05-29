@@ -83,19 +83,23 @@ class ApiError {
   }
 }
 
-typedef ApiResult<T> = Future<Result<T, ApiError>>;
+typedef ApiResult<T> = Result<T, ApiError>;
 
 extension _ToApiResult on Response {
   Map<String, ConflictDescriptor>? get _message => ErrorMessage.fromJson(
         jsonDecode(utf8.decode(bodyBytes)) as Map<String, dynamic>,
       ).message;
 
-  ApiResult<void> toApiResult() async {
+  ApiResult<T?> _mapToApiResult<T>(T Function()? fromJson) {
     switch (statusCode) {
       case 200:
-        return Success(null);
+        return Success(fromJson?.call());
       case 204:
-        return Success(null);
+        return fromJson == null
+            ? Success(null)
+            : Failure(
+                ApiError(ApiErrorCode.unknownServerError),
+              ); // value needed but nothing returned
       case 400:
         return Failure(ApiError(ApiErrorCode.badRequest, _message));
       case 401:
@@ -113,39 +117,22 @@ extension _ToApiResult on Response {
     }
   }
 
-  ApiResult<T> toApiResultWithValue<T>(T Function(dynamic) fromJson) async {
-    switch (statusCode) {
-      case 200:
-        return Success(fromJson(jsonDecode(utf8.decode(bodyBytes))));
-      case 204: // this should not happen as a response for a get request
-        return Failure(ApiError(ApiErrorCode.unknownServerError));
-      case 400:
-        return Failure(ApiError(ApiErrorCode.badRequest, _message));
-      case 401:
-        return Failure(ApiError(ApiErrorCode.unauthorized, _message));
-      case 403:
-        return Failure(ApiError(ApiErrorCode.forbidden, _message));
-      case 404:
-        return Failure(ApiError(ApiErrorCode.notFound, _message));
-      case 409:
-        return Failure(ApiError(ApiErrorCode.conflict, _message));
-      case 500:
-        return Failure(ApiError(ApiErrorCode.internalServerError, _message));
-      default:
-        return Failure(ApiError(ApiErrorCode.unknownServerError, _message));
-    }
-  }
+  ApiResult<void> toApiResult() => _mapToApiResult(null);
+
+  ApiResult<T> toApiResultWithValue<T>(T Function(dynamic) fromJson) =>
+      _mapToApiResult(
+        () => fromJson(jsonDecode(utf8.decode(bodyBytes))),
+      ) as ApiResult<T>;
 }
 
 extension ApiResultFromRequest on ApiResult {
   static final _client = Client();
 
-  static ApiResult<void> fromRequest(
-    Future<Response> Function(Client client) request,
+  static Future<ApiResult<T>> _handleError<T>(
+    Future<ApiResult<T>> Function() request,
   ) async {
     try {
-      final response = await request(_client).timeout(Config.httpTimeout);
-      return await response.toApiResult();
+      return await request();
     } on TimeoutException {
       return Failure(ApiError(ApiErrorCode.serverUnreachable));
     } on SocketException {
@@ -158,24 +145,22 @@ extension ApiResultFromRequest on ApiResult {
     }
   }
 
-  static ApiResult<T> fromRequestWithValue<T>(
+  static Future<ApiResult<void>> fromRequest(
+    Future<Response> Function(Client client) request,
+  ) =>
+      _handleError(() async {
+        final response = await request(_client).timeout(Config.httpTimeout);
+        return response.toApiResult();
+      });
+
+  static Future<ApiResult<T>> fromRequestWithValue<T>(
     Future<Response> Function(Client client) request,
     T Function(dynamic) fromJson,
-  ) async {
-    try {
-      final response = await request(_client).timeout(Config.httpTimeout);
-      return await response.toApiResultWithValue(fromJson);
-    } on TimeoutException {
-      return Failure(ApiError(ApiErrorCode.serverUnreachable));
-    } on SocketException {
-      return Failure(ApiError(ApiErrorCode.serverUnreachable));
-    } on TypeError {
-      return Failure(ApiError(ApiErrorCode.badJson));
-    } catch (e) {
-      ApiLogging.logger.e("Unhandled error", e);
-      return Failure(ApiError(ApiErrorCode.unknownRequestError));
-    }
-  }
+  ) =>
+      _handleError(() async {
+        final response = await request(_client).timeout(Config.httpTimeout);
+        return response.toApiResultWithValue(fromJson);
+      });
 }
 
 abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
@@ -198,7 +183,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   static final strengthSets = StrengthSetApi();
   static final wods = WodApi();
 
-  static ApiResult<ServerVersion> getServerVersion() {
+  static Future<ApiResult<ServerVersion>> getServerVersion() {
     const route = "/version";
     return ApiResultFromRequest.fromRequestWithValue<ServerVersion>(
       (client) => client.get(UriFromRoute.fromRoute(route)),
@@ -214,14 +199,14 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   String get _pluralRoute => '${_singularRoute}s';
   Map<String, dynamic> _toJson(T object) => object.toJson();
 
-  ApiResult<T> getSingle(Int64 id) async {
+  Future<ApiResult<T>> getSingle(Int64 id) async {
     return _getRequest(
       '$_singularRoute/$id',
       (dynamic json) => _fromJson(json as Map<String, dynamic>),
     );
   }
 
-  ApiResult<List<T>> getMultiple() async {
+  Future<ApiResult<List<T>>> getMultiple() async {
     return _getRequest(
       _singularRoute,
       (dynamic json) => (json as List<dynamic>)
@@ -230,7 +215,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     );
   }
 
-  ApiResult<void> postSingle(T object) async {
+  Future<ApiResult<void>> postSingle(T object) async {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = _toJson(object);
       final headers = _ApiHeaders._defaultHeaders;
@@ -245,7 +230,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     });
   }
 
-  ApiResult<void> postMultiple(List<T> objects) async {
+  Future<ApiResult<void>> postMultiple(List<T> objects) async {
     if (objects.isEmpty) {
       return Success(null);
     }
@@ -263,7 +248,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     });
   }
 
-  ApiResult<void> putSingle(T object) async {
+  Future<ApiResult<void>> putSingle(T object) async {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = _toJson(object);
       final headers = _ApiHeaders._defaultHeaders;
@@ -278,7 +263,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     });
   }
 
-  ApiResult<void> putMultiple(List<T> objects) async {
+  Future<ApiResult<void>> putMultiple(List<T> objects) async {
     if (objects.isEmpty) {
       return Success(null);
     }
@@ -359,7 +344,7 @@ extension UriFromRoute on Uri {
 }
 
 mixin ApiHelpers on ApiLogging {
-  ApiResult<T> _getRequest<T>(
+  Future<ApiResult<T>> _getRequest<T>(
     String route,
     T Function(dynamic) fromJson,
   ) async {

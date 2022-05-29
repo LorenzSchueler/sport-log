@@ -8,7 +8,7 @@ import 'package:sport_log/settings.dart';
 class Account {
   Account._();
 
-  static ApiResult<User> register(User user) async {
+  static Future<ApiResult<User>> register(User user) async {
     final result = await Api.user.postSingle(user);
     if (result.isSuccess) {
       Settings.user = user;
@@ -19,7 +19,7 @@ class Account {
     }
   }
 
-  static ApiResult<User> login(
+  static Future<ApiResult<User>> login(
     String username,
     String password,
   ) async {
@@ -34,7 +34,7 @@ class Account {
     }
   }
 
-  static ApiResult<User> editUser({
+  static Future<ApiResult<User>> editUser({
     String? username,
     String? password,
     String? email,
@@ -74,7 +74,7 @@ class Account {
     await AppDatabase.reset();
   }
 
-  static ApiResult<void> delete() async {
+  static Future<ApiResult<void>> delete() async {
     Sync.instance.stopSync();
     final result = await Api.user.deleteSingle();
     if (result.isSuccess) {

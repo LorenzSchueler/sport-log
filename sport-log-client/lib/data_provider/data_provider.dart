@@ -193,7 +193,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
 
   Future<bool> _resolveConflict(
     ConflictResolution conflictResolution,
-    ApiResult<void> Function(T) fnSingle,
+    Future<ApiResult<void>> Function(T) fnSingle,
     List<T> records,
   ) async {
     switch (conflictResolution) {
@@ -216,8 +216,8 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   }
 
   Future<bool> _pushEntriesToServer(
-    ApiResult<void> Function(List<T>) fnMultiple,
-    ApiResult<void> Function(T) fnSingle,
+    Future<ApiResult<void>> Function(List<T>) fnMultiple,
+    Future<ApiResult<void>> Function(T) fnSingle,
     List<T> records,
   ) async {
     final result = await fnMultiple(records);
