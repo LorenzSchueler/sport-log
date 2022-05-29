@@ -124,7 +124,7 @@ class CardioSessionDescriptionTable {
       ON ${Tables.movement}.${Columns.id} = ${Tables.cardioSession}.${Columns.movementId}
       WHERE ${TableAccessor.combineFilter([
             TableAccessor.notDeletedOfTable(Tables.movement),
-            TableAccessor.notDeletedOfTable(Tables.route),
+            "(${TableAccessor.notDeletedOfTable(Tables.route)} or ${Tables.route}.${Columns.deleted} is null)", // left join -> can be null
             TableAccessor.notDeletedOfTable(Tables.cardioSession),
             TableAccessor.fromFilterOfTable(Tables.cardioSession, from),
             TableAccessor.untilFilterOfTable(Tables.cardioSession, until),
