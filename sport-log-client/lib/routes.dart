@@ -44,6 +44,7 @@ abstract class Routes {
   static const landing = '/landing';
   static const login = '/login';
   static const registration = '/register';
+  static const noAccount = '/no_account';
   static const timer = "/timer";
   static const map = "/map";
   static const offlineMaps = "/offline_maps";
@@ -76,13 +77,12 @@ abstract class Routes {
 
   static final Map<String, Widget Function(BuildContext)> _routeList = {
     Routes.landing: (_) => _checkNotLogin(() => const LandingPage()),
-    Routes.login: (_) => _checkNotLogin(
-          () => const LoginPage(
-            register: false,
-          ),
-        ),
+    Routes.login: (_) =>
+        _checkNotLogin(() => const LoginPage(loginType: LoginType.login)),
     Routes.registration: (_) =>
-        _checkNotLogin(() => const LoginPage(register: true)),
+        _checkNotLogin(() => const LoginPage(loginType: LoginType.register)),
+    Routes.noAccount: (_) =>
+        _checkNotLogin(() => const LoginPage(loginType: LoginType.noAccount)),
     Routes.timer: (_) => _checkLogin(() => const TimerPage()),
     Routes.map: (_) => _checkLoginAndroidIos(() => const MapPage()),
     Routes.offlineMaps: (_) =>

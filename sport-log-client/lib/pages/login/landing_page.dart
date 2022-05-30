@@ -9,24 +9,40 @@ class LandingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WelcomeScreen(
-      content: Row(
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, Routes.login);
-              },
-              child: const Text("Login"),
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, Routes.login);
+                  },
+                  child: const Text("Login"),
+                ),
+              ),
+              Defaults.sizedBox.horizontal.big,
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, Routes.registration);
+                  },
+                  child: const Text("Register"),
+                ),
+              ),
+            ],
           ),
-          Defaults.sizedBox.horizontal.big,
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, Routes.registration);
-              },
-              child: const Text("Register"),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushNamed(context, Routes.noAccount);
+            },
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(
+                Theme.of(context).colorScheme.onBackground,
+              ),
             ),
+            child: const Text("Use Without Account"),
           ),
         ],
       ),

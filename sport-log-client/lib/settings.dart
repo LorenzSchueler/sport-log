@@ -20,6 +20,7 @@ class Settings {
 
   static Box? _storage;
 
+  static const String _accountCreated = "accountCreated";
   static const String _syncEnabled = "syncEnabled";
   static const String _serverUrl = "serverUrl";
   static const String _syncInterval = "syncInterval";
@@ -43,6 +44,9 @@ class Settings {
   }
 
   static Future<void> setDefaults({bool override = false}) async {
+    if (!_storage!.containsKey(_accountCreated) || override) {
+      await _storage!.put(_accountCreated, true);
+    }
     if (!_storage!.containsKey(_syncEnabled) || override) {
       await _storage!.put(_syncEnabled, true);
     }
@@ -129,6 +133,14 @@ class Settings {
 
   static void _put(String key, dynamic value) {
     _storage!.put(key, value);
+  }
+
+  static bool get accountCreated {
+    return _getBool(_accountCreated);
+  }
+
+  static set accountCreated(bool created) {
+    _put(_accountCreated, created);
   }
 
   static bool get syncEnabled {

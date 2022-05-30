@@ -13,10 +13,20 @@ import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({required this.register, Key? key}) : super(key: key);
+enum LoginType {
+  login,
+  register,
+  noAccount;
 
-  final bool register;
+  bool get isLogin => this == LoginType.login;
+  bool get isRegister => this == LoginType.register;
+  bool get isNoAccount => this == LoginType.noAccount;
+}
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({required this.loginType, Key? key}) : super(key: key);
+
+  final LoginType loginType;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -32,6 +42,13 @@ class _LoginPageState extends State<LoginPage> {
   String _password2 = "";
   String _email = "";
 
+  User get user => User(
+        id: randomId(),
+        email: _email,
+        username: _username,
+        password: _password,
+      );
+
   bool _loginPending = false;
 
   late TextEditingController _serverUrlInputController;
@@ -45,7 +62,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.register ? "Register" : "Login")),
+      appBar: AppBar(
+        title: Text(widget.loginType.isRegister ? "Register" : "Login"),
+      ),
       body: Container(
         padding: Defaults.edgeInsets.normal,
         child: Center(
@@ -54,13 +73,15 @@ class _LoginPageState extends State<LoginPage> {
             child: ListView(
               shrinkWrap: true,
               children: [
-                _serverUrlInput(context),
-                Defaults.sizedBox.vertical.normal,
+                if (!widget.loginType.isNoAccount) ...[
+                  _serverUrlInput(context),
+                  Defaults.sizedBox.vertical.normal,
+                ],
                 _usernameInput(context),
                 Defaults.sizedBox.vertical.normal,
                 _passwordInput(context),
                 Defaults.sizedBox.vertical.normal,
-                if (widget.register) ...[
+                if (!widget.loginType.isLogin) ...[
                   _passwordInput2(context),
                   Defaults.sizedBox.vertical.normal,
                   _emailInput(context),
@@ -154,8 +175,9 @@ class _LoginPageState extends State<LoginPage> {
       style: _loginPending
           ? TextStyle(color: Theme.of(context).disabledColor)
           : null,
-      textInputAction:
-          widget.register ? TextInputAction.next : TextInputAction.done,
+      textInputAction: widget.loginType.isLogin
+          ? TextInputAction.done
+          : TextInputAction.next,
       obscureText: true,
     );
   }
@@ -214,27 +236,24 @@ class _LoginPageState extends State<LoginPage> {
               _formKey.currentState!.validate())
           ? () => _submit(context)
           : null,
-      child: Text(widget.register ? "Register" : "Login"),
+      child: Text(widget.loginType.isRegister ? "Register" : "Login"),
     );
   }
 
   Future<void> _submit(BuildContext context) async {
+    if (widget.loginType.isNoAccount) {
+      Account.noAccount(user);
+      await Navigator.of(context).newBase(Routes.timeline.overview);
+      return;
+    }
     setState(() {
       _loginPending = true;
     });
     Settings.serverUrl = _serverUrl;
     final Result<User, ApiError> result;
-    if (widget.register) {
-      final user = User(
-        id: randomId(),
-        email: _email,
-        username: _username,
-        password: _password,
-      );
-      result = await Account.register(user);
-    } else {
-      result = await Account.login(_username, _password);
-    }
+    result = widget.loginType.isRegister
+        ? await Account.register(user)
+        : await Account.login(_username, _password);
     if (mounted) {
       setState(() {
         _loginPending = false;

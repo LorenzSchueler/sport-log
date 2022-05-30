@@ -51,49 +51,74 @@ class SettingsPageState extends State<SettingsPage> {
               EditTile(
                 caption: "Server Synchronization",
                 leading: AppIcons.sync,
-                child: SizedBox(
-                  height: 20,
-                  width: 34,
-                  child: Switch(
-                    value: Settings.syncEnabled,
-                    onChanged: (syncEnabled) async {
-                      setState(() => Settings.syncEnabled = syncEnabled);
-                      if (syncEnabled) {
-                        await checkSync();
-                        await Sync.instance.startSync();
-                      } else {
-                        Sync.instance.stopSync();
-                      }
-                    },
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                ),
-              ),
-              if (Settings.syncEnabled)
-                TextFormField(
-                  decoration:
-                      Theme.of(context).textFormFieldDecoration.copyWith(
-                            icon: const Icon(AppIcons.cloudUpload),
-                            labelText: "Server URL",
+                child: Settings.accountCreated
+                    ? SizedBox(
+                        height: 20,
+                        width: 34,
+                        child: Switch(
+                          value: Settings.syncEnabled,
+                          onChanged: (syncEnabled) async {
+                            setState(() => Settings.syncEnabled = syncEnabled);
+                            if (syncEnabled) {
+                              await checkSync();
+                              await Sync.instance.startSync();
+                            } else {
+                              Sync.instance.stopSync();
+                            }
+                          },
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      )
+                    : ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                            Theme.of(context).colorScheme.errorContainer,
                           ),
-                  initialValue: Settings.serverUrl,
-                  validator: Validator.validateUrl,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  onFieldSubmitted: (serverUrl) async {
-                    final validated = Validator.validateUrl(serverUrl);
-                    if (validated == null) {
-                      setState(() => Settings.serverUrl = serverUrl);
-                      Sync.instance.stopSync();
-                      await checkSync();
-                      await Sync.instance.startSync();
-                    } else {
-                      await showMessageDialog(
-                        context: context,
-                        text: validated,
-                      );
-                    }
-                  },
-                ),
+                        ),
+                        onPressed: () async {
+                          Settings.accountCreated = true;
+                          Settings.syncEnabled = true;
+                          final result = await Account.register(Settings.user!);
+                          if (mounted && result.isFailure) {
+                            await showMessageDialog(
+                              context: context,
+                              title: "An Error occured:",
+                              text: result.failure.toString(),
+                            );
+                            Settings.accountCreated = false;
+                            Settings.syncEnabled = false;
+                          }
+                          if (mounted) {
+                            setState(() {}); // reload values from Settings
+                          }
+                        },
+                        child: const Text('Create Account'),
+                      ),
+              ),
+              TextFormField(
+                decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                      icon: const Icon(AppIcons.cloudUpload),
+                      labelText: "Server URL",
+                    ),
+                initialValue: Settings.serverUrl,
+                validator: Validator.validateUrl,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                onFieldSubmitted: (serverUrl) async {
+                  final validated = Validator.validateUrl(serverUrl);
+                  if (validated == null) {
+                    setState(() => Settings.serverUrl = serverUrl);
+                    Sync.instance.stopSync();
+                    await checkSync();
+                    await Sync.instance.startSync();
+                  } else {
+                    await showMessageDialog(
+                      context: context,
+                      text: validated,
+                    );
+                  }
+                },
+              ),
               if (Settings.syncEnabled)
                 EditTile(
                   leading: AppIcons.timeInterval,

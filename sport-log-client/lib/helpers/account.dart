@@ -8,6 +8,12 @@ import 'package:sport_log/settings.dart';
 class Account {
   Account._();
 
+  static void noAccount(User user) {
+    Settings.accountCreated = false;
+    Settings.syncEnabled = false;
+    Settings.user = user;
+  }
+
   static Future<ApiResult<User>> register(User user) async {
     final result = await Api.user.postSingle(user);
     if (result.isSuccess) {
