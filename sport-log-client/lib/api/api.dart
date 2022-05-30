@@ -120,10 +120,14 @@ extension _ToApiResult on Response {
 
   ApiResult<void> toApiResult() => _mapToApiResult(null);
 
-  ApiResult<T> toApiResultWithValue<T>(T Function(dynamic) fromJson) =>
-      _mapToApiResult(
-        () => fromJson(jsonDecode(utf8.decode(bodyBytes))),
-      ) as ApiResult<T>;
+  ApiResult<T> toApiResultWithValue<T>(T Function(dynamic) fromJson) {
+    final result = _mapToApiResult(
+      () => fromJson(jsonDecode(utf8.decode(bodyBytes))),
+    );
+    return result.isSuccess
+        ? Success(result.success as T)
+        : Failure(result.failure);
+  }
 }
 
 extension ApiResultFromRequest on ApiResult {
