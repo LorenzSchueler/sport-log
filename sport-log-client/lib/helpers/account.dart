@@ -87,4 +87,19 @@ class Account {
       return Failure(result.failure);
     }
   }
+
+  static Future<ApiResult<void>> newInitSync() async {
+    final result =
+        await Api.user.getSingle(Settings.username!, Settings.password!);
+    if (result.isFailure) {
+      return Failure(result.failure);
+    }
+
+    Sync.instance.stopSync();
+    Settings.lastSync = null;
+    await AppDatabase.reset();
+
+    await Sync.instance.startSync();
+    return Success(null);
+  }
 }

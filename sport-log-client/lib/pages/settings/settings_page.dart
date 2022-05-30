@@ -207,6 +207,35 @@ class SettingsPageState extends State<SettingsPage> {
                         child: ElevatedButton(
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all(
+                              Theme.of(context).colorScheme.errorContainer,
+                            ),
+                          ),
+                          onPressed: sync.isSyncing
+                              ? null
+                              : () async {
+                                  final approved = await showApproveDialog(
+                                    context,
+                                    "Warning",
+                                    "Conflicting entries will get lost.",
+                                  );
+                                  if (approved) {
+                                    final result = await Account.newInitSync();
+                                    if (mounted && result.isFailure) {
+                                      await showMessageDialog(
+                                        context: context,
+                                        text: result.failure.toString(),
+                                      );
+                                    }
+                                  }
+                                },
+                          child: const Text('New Init Sync'),
+                        ),
+                      ),
+                      Defaults.sizedBox.horizontal.normal,
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
                               Theme.of(context).colorScheme.error,
                             ),
                           ),

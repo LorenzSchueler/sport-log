@@ -110,15 +110,15 @@ class Sync extends ChangeNotifier {
     }
   }
 
-  Future<void> startSync() async {
+  Future<bool> startSync() async {
     assert(Settings.userExists());
     if (!Settings.syncEnabled) {
       _logger.i("sync disabled.");
-      return;
+      return false;
     }
     if (_syncTimer != null && _syncTimer!.isActive) {
       _logger.d('Sync already enabled.');
-      return;
+      return false;
     }
     _logger.d('Starting sync timer.');
     bool success = true;
@@ -134,6 +134,7 @@ class Sync extends ChangeNotifier {
           (await MetconDescriptionDataProvider().getById(Int64(1)))!; // FIXME
       _syncTimer = Timer.periodic(Settings.syncInterval, (_) => sync());
     }
+    return success;
   }
 
   void stopSync() {

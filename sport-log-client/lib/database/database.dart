@@ -96,8 +96,9 @@ class AppDatabase {
   static Future<void> init() async {
     if (Config.instance.deleteDatabase) {
       await reset();
+    } else {
+      await open();
     }
-    await open();
   }
 
   static Future<void> open() async {
