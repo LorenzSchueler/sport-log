@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/config.dart';
@@ -114,7 +111,7 @@ class RouteUploadPageState extends State<RouteUploadPage> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _uploadFile,
+                      onPressed: _loadFile,
                       child: const Text("Open GPX File"),
                     ),
                   ),
@@ -159,35 +156,28 @@ class RouteUploadPageState extends State<RouteUploadPage> {
     );
   }
 
-  Future<void> _uploadFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-    if (result != null) {
-      File file = File(result.files.single.path!);
-      if (result.files.single.extension != "gpx") {
-        logInfo("extension", "wrong");
-      } else {
-        logInfo("path", file.path);
-        final gpxString = await file.readAsString();
-        logInfo("gpx", gpxString);
-        final track = gpxToTrack(gpxString);
-        logInfo("track", track.toString());
-        setState(() {
-          _route
-            ..track = track
-            ..setDistance()
-            ..setAscentDescent();
-        });
-        await _mapController.updateLine(
-          _line!,
-          LineOptions(
-            lineWidth: 2,
-            geometry: _route.track?.latLngs,
-          ),
-        );
-      }
+  Future<void> _loadFile() async {
+    final track = await loadTrackFromGpxFile();
+    if (track == null) {
+      await showMessageDialog(
+        context: context,
+        title: "An Error occured",
+        text: "Parsing file failed.",
+      );
     } else {
-      logInfo("file", "no file selected");
+      setState(() {
+        _route
+          ..track = track
+          ..setDistance()
+          ..setAscentDescent();
+      });
+      await _mapController.updateLine(
+        _line!,
+        LineOptions(
+          lineWidth: 2,
+          geometry: _route.track?.latLngs,
+        ),
+      );
     }
   }
 }

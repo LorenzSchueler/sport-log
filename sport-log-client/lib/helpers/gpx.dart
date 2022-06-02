@@ -7,8 +7,13 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/cardio/position.dart';
 
-List<Position> gpxToTrack(String gpxString) {
-  final gpx = GpxReader().fromString(gpxString);
+List<Position>? gpxToTrack(String gpxString) {
+  final Gpx gpx;
+  try {
+    gpx = GpxReader().fromString(gpxString);
+  } on StateError {
+    return null;
+  }
   final points =
       gpx.trks.map((t) => t.trksegs).flattened.map((t) => t.trkpts).flattened;
   final startTime = points
