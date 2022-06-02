@@ -23,8 +23,8 @@ class MetconDescription extends CompoundEntity {
         moves = [],
         hasReference = false;
 
-  static late MetconDescription
-      defaultMetconDescription; // must be initialized in sync::startSync
+  static MetconDescription?
+      defaultMetconDescription; // default metcon description that already exists in db
 
   factory MetconDescription.fromJson(Map<String, dynamic> json) =>
       _$MetconDescriptionFromJson(json);

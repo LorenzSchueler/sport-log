@@ -151,12 +151,20 @@ abstract class Routes {
           );
         }),
     Routes.metcon.sessionEdit: (context) => _checkLogin(() {
-          final metconSessionDescription = ModalRoute.of(context)
+          var isNew = false;
+          var metconSessionDescription = ModalRoute.of(context)
               ?.settings
               .arguments as MetconSessionDescription?;
-          return MetconSessionEditPage(
-            metconSessionDescription: metconSessionDescription,
-          );
+          if (metconSessionDescription == null) {
+            metconSessionDescription = MetconSessionDescription.defaultValue();
+            isNew = true;
+          }
+          return metconSessionDescription == null
+              ? const MetconEditPage(metconDescription: null)
+              : MetconSessionEditPage(
+                  metconSessionDescription: metconSessionDescription,
+                  isNew: isNew,
+                );
         }),
     // strength
     Routes.strength.overview: (_) =>
@@ -170,9 +178,19 @@ abstract class Routes {
           );
         }),
     Routes.strength.edit: (context) => _checkLogin(() {
-          final arg = ModalRoute.of(context)?.settings.arguments
+          var isNew = false;
+          var arg = ModalRoute.of(context)?.settings.arguments
               as StrengthSessionDescription?;
-          return StrengthSessionEditPage(strengthSessionDescription: arg);
+          if (arg == null) {
+            arg = StrengthSessionDescription.defaultValue();
+            isNew = true;
+          }
+          return arg == null
+              ? const MovementEditPage(movementDescription: null)
+              : StrengthSessionEditPage(
+                  strengthSessionDescription: arg,
+                  isNew: isNew,
+                );
         }),
     // cardio
     Routes.cardio.overview: (_) =>
@@ -190,12 +208,20 @@ abstract class Routes {
           );
         }),
     Routes.cardio.cardioEdit: (context) => _checkLogin(() {
-          final cardioSessionDescription = ModalRoute.of(context)
+          var isNew = false;
+          var cardioSessionDescription = ModalRoute.of(context)
               ?.settings
               .arguments as CardioSessionDescription?;
-          return CardioEditPage(
-            cardioSessionDescription: cardioSessionDescription,
-          );
+          if (cardioSessionDescription == null) {
+            cardioSessionDescription = CardioSessionDescription.defaultValue();
+            isNew = true;
+          }
+          return cardioSessionDescription == null
+              ? const MovementEditPage(movementDescription: null)
+              : CardioEditPage(
+                  cardioSessionDescription: cardioSessionDescription,
+                  isNew: isNew,
+                );
         }),
     Routes.cardio.cardioDetails: (context) => _checkLogin(() {
           final cardioSessionDescription = ModalRoute.of(context)

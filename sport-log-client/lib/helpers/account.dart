@@ -2,6 +2,8 @@ import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
+import 'package:sport_log/models/metcon/metcon_description.dart';
+import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/settings.dart';
 
@@ -76,6 +78,8 @@ class Account {
     Sync.instance.stopSync();
     Settings.lastSync = null;
     Settings.user = null;
+    Movement.defaultMovement = null;
+    MetconDescription.defaultMetconDescription = null;
     await Settings.setDefaults(override: true);
     await AppDatabase.reset();
   }
@@ -86,6 +90,8 @@ class Account {
     if (result.isSuccess) {
       Settings.lastSync = null;
       Settings.user = null;
+      Movement.defaultMovement = null;
+      MetconDescription.defaultMetconDescription = null;
       await Settings.setDefaults(override: true);
       await AppDatabase.reset();
       return Success(null);
@@ -103,6 +109,8 @@ class Account {
 
     Sync.instance.stopSync();
     Settings.lastSync = null;
+    Movement.defaultMovement = null;
+    MetconDescription.defaultMetconDescription = null;
     await AppDatabase.reset();
 
     await Sync.instance.startSync();

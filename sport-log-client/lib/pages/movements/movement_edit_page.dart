@@ -55,6 +55,7 @@ class _MovementEditPageState extends State<MovementEditPage> {
         ? await _dataProvider.updateSingle(_movementDescription.movement)
         : await _dataProvider.createSingle(_movementDescription.movement);
     if (result.isSuccess()) {
+      Movement.defaultMovement ??= _movementDescription.movement;
       _formKey.currentState!.deactivate();
       if (mounted) {
         Navigator.pop(context);

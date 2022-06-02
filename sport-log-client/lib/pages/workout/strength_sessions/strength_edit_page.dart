@@ -21,11 +21,13 @@ import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 class StrengthSessionEditPage extends StatefulWidget {
   const StrengthSessionEditPage({
-    Key? key,
     required this.strengthSessionDescription,
+    required this.isNew,
+    Key? key,
   }) : super(key: key);
 
-  final StrengthSessionDescription? strengthSessionDescription;
+  final StrengthSessionDescription strengthSessionDescription;
+  final bool isNew;
 
   @override
   StrengthSessionEditPageState createState() => StrengthSessionEditPageState();
@@ -43,8 +45,9 @@ class StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   @override
   void initState() {
     super.initState();
-    _strengthSessionDescription = widget.strengthSessionDescription?.clone() ??
-        StrengthSessionDescription.defaultValue();
+    final strengthSessionDescription =
+        widget.strengthSessionDescription.clone();
+    _strengthSessionDescription = strengthSessionDescription;
     _keyboardSubscription =
         KeyboardVisibilityController().onChange.listen((isVisible) {
       if (!isVisible) {
@@ -60,17 +63,15 @@ class StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   }
 
   Future<void> _saveStrengthSession() async {
-    final result = widget.strengthSessionDescription != null
-        ? await _dataProvider.updateSingle(_strengthSessionDescription)
-        : await _dataProvider.createSingle(_strengthSessionDescription);
+    final result = widget.isNew
+        ? await _dataProvider.createSingle(_strengthSessionDescription)
+        : await _dataProvider.updateSingle(_strengthSessionDescription);
     if (result.isSuccess()) {
       if (mounted) {
         Navigator.pop(
           context,
           ReturnObject(
-            action: widget.strengthSessionDescription != null
-                ? ReturnAction.updated
-                : ReturnAction.created,
+            action: widget.isNew ? ReturnAction.created : ReturnAction.updated,
             payload: _strengthSessionDescription,
           ), // needed for return to details page
         );
@@ -84,7 +85,7 @@ class StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   }
 
   Future<void> _deleteStrengthSession() async {
-    if (widget.strengthSessionDescription != null) {
+    if (!widget.isNew) {
       await _dataProvider.deleteSingle(_strengthSessionDescription);
     }
     if (mounted) {
@@ -98,9 +99,7 @@ class StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            widget.strengthSessionDescription != null
-                ? "Edit Strength Session"
-                : "Create Strength Session",
+            widget.isNew ? "Create Strength Session" : "Edit Strength Session",
           ),
           actions: [
             IconButton(

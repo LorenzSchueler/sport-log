@@ -110,31 +110,27 @@ class Sync extends ChangeNotifier {
     }
   }
 
-  Future<bool> startSync() async {
+  Future<void> startSync() async {
     assert(Settings.userExists());
     if (!Settings.syncEnabled) {
       _logger.i("sync disabled.");
-      return false;
+      return;
     }
     if (_syncTimer != null && _syncTimer!.isActive) {
       _logger.d('Sync already enabled.');
-      return false;
+      return;
     }
     _logger.d('Starting sync timer.');
-    bool success = true;
     if (Settings.lastSync == null) {
-      success = await sync(); // wait to make sure movement 1 and metcon 1 exist
+      await sync(); // wait to make sure movement 1 and metcon 1 exist
     } else {
       unawaited(sync()); // let sync finish later
     }
-    if (success) {
-      Movement.defaultMovement =
-          (await MovementDataProvider().getById(Int64(1)))!; // FIXME
-      MetconDescription.defaultMetconDescription =
-          (await MetconDescriptionDataProvider().getById(Int64(1)))!; // FIXME
-      _syncTimer = Timer.periodic(Settings.syncInterval, (_) => sync());
-    }
-    return success;
+    Movement.defaultMovement ??= await MovementDataProvider().getById(Int64(1));
+    MetconDescription.defaultMetconDescription ??=
+        await MetconDescriptionDataProvider().getById(Int64(1));
+    _syncTimer = Timer.periodic(Settings.syncInterval, (_) => sync());
+    return;
   }
 
   void stopSync() {

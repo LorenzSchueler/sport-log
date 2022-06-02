@@ -22,10 +22,14 @@ import 'package:sport_log/widgets/picker/route_picker.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 class CardioEditPage extends StatefulWidget {
-  final CardioSessionDescription? cardioSessionDescription;
+  final CardioSessionDescription cardioSessionDescription;
+  final bool isNew;
 
-  const CardioEditPage({Key? key, this.cardioSessionDescription})
-      : super(key: key);
+  const CardioEditPage({
+    required this.cardioSessionDescription,
+    required this.isNew,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<CardioEditPage> createState() => CardioEditPageState();
@@ -40,24 +44,21 @@ class CardioEditPageState extends State<CardioEditPage> {
 
   @override
   void initState() {
-    _cardioSessionDescription = widget.cardioSessionDescription?.clone() ??
-        CardioSessionDescription.defaultValue();
+    _cardioSessionDescription = widget.cardioSessionDescription.clone();
     super.initState();
   }
 
   Future<void> _saveCardioSession() async {
-    final result = widget.cardioSessionDescription != null
-        ? await _dataProvider.updateSingle(_cardioSessionDescription)
-        : await _dataProvider.createSingle(_cardioSessionDescription);
+    final result = widget.isNew
+        ? await _dataProvider.createSingle(_cardioSessionDescription)
+        : await _dataProvider.updateSingle(_cardioSessionDescription);
     if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
       if (mounted) {
         Navigator.pop(
           context,
           ReturnObject(
-            action: widget.cardioSessionDescription != null
-                ? ReturnAction.updated
-                : ReturnAction.created,
+            action: widget.isNew ? ReturnAction.created : ReturnAction.updated,
             payload: _cardioSessionDescription,
           ), // needed for cardio overview page
         );
@@ -71,7 +72,7 @@ class CardioEditPageState extends State<CardioEditPage> {
   }
 
   Future<void> _deleteCardioSession() async {
-    if (widget.cardioSessionDescription != null) {
+    if (!widget.isNew) {
       await _dataProvider.deleteSingle(_cardioSessionDescription);
     }
     _formKey.currentState!.deactivate();
@@ -92,9 +93,7 @@ class CardioEditPageState extends State<CardioEditPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            widget.cardioSessionDescription != null
-                ? "Edit Cardio Session"
-                : "Create Cardio Session",
+            widget.isNew ? "Create Cardio Session" : "Edit Cardio Session",
           ),
           actions: [
             IconButton(

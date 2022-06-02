@@ -17,9 +17,14 @@ import 'package:sport_log/widgets/picker/metcon_picker.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 class MetconSessionEditPage extends StatefulWidget {
-  final MetconSessionDescription? metconSessionDescription;
-  const MetconSessionEditPage({Key? key, this.metconSessionDescription})
-      : super(key: key);
+  const MetconSessionEditPage({
+    required this.metconSessionDescription,
+    required this.isNew,
+    Key? key,
+  }) : super(key: key);
+
+  final MetconSessionDescription metconSessionDescription;
+  final bool isNew;
 
   @override
   State<MetconSessionEditPage> createState() => MetconSessionEditPageState();
@@ -31,31 +36,29 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
   final _dataProvider = MetconSessionDescriptionDataProvider();
   final _metconDescriptionDataProvider = MetconDescriptionDataProvider();
 
-  late MetconSessionDescription _metconSessionDescription;
+  late final MetconSessionDescription _metconSessionDescription;
   late bool _finished;
 
   @override
   void initState() {
     super.initState();
-    _metconSessionDescription = widget.metconSessionDescription?.clone() ??
-        MetconSessionDescription.defaultValue();
+    final metconSessionDescription = widget.metconSessionDescription.clone();
+    _metconSessionDescription = metconSessionDescription;
     _finished = _metconSessionDescription.metconSession.time != null;
   }
 
   Future<void> _saveMetconSession() async {
     _logger.i("saving metcon session: $_metconSessionDescription");
-    final result = widget.metconSessionDescription != null
-        ? await _dataProvider.updateSingle(_metconSessionDescription)
-        : await _dataProvider.createSingle(_metconSessionDescription);
+    final result = widget.isNew
+        ? await _dataProvider.createSingle(_metconSessionDescription)
+        : await _dataProvider.updateSingle(_metconSessionDescription);
     if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
       if (mounted) {
         Navigator.pop(
           context,
           ReturnObject(
-            action: widget.metconSessionDescription != null
-                ? ReturnAction.updated
-                : ReturnAction.created,
+            action: widget.isNew ? ReturnAction.created : ReturnAction.updated,
             payload: _metconSessionDescription,
           ), // needed for return to details page
         );
@@ -69,7 +72,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
   }
 
   Future<void> _deleteMetconSession() async {
-    if (widget.metconSessionDescription != null) {
+    if (!widget.isNew) {
       await _dataProvider.deleteSingle(_metconSessionDescription);
     }
     _formKey.currentState!.deactivate();
@@ -90,9 +93,7 @@ class MetconSessionEditPageState extends State<MetconSessionEditPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            widget.metconSessionDescription != null
-                ? "Edit Metcon Session"
-                : "Create Metcon Session",
+            widget.isNew ? "Create Metcon Session" : "Edit Metcon Session",
           ),
           actions: [
             IconButton(

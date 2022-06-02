@@ -69,8 +69,8 @@ class Movement extends AtomicEntity {
         deleted = false,
         dimension = MovementDimension.reps;
 
-  static late Movement
-      defaultMovement; // must be initialized in sync::startSync
+  static Movement?
+      defaultMovement; // default movement that already exists in db
 
   factory Movement.fromJson(Map<String, dynamic> json) =>
       _$MovementFromJson(json);

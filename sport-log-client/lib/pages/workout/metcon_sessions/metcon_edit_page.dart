@@ -20,7 +20,7 @@ import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 class MetconEditPage extends StatefulWidget {
   const MetconEditPage({
     Key? key,
-    this.metconDescription,
+    required this.metconDescription,
   }) : super(key: key);
 
   final MetconDescription? metconDescription;
@@ -52,8 +52,8 @@ class _MetconEditPageState extends State<MetconEditPage> {
         ? await _dataProvider.updateSingle(_metconDescription)
         : await _dataProvider.createSingle(_metconDescription);
     if (result.isSuccess()) {
+      MetconDescription.defaultMetconDescription ??= _metconDescription;
       _formKey.currentState!.deactivate();
-
       if (mounted) {
         Navigator.pop(
           context,

@@ -27,6 +27,23 @@ class StrengthSessionDescription extends CompoundEntity {
   StrengthSessionStats get stats =>
       StrengthSessionStats.fromStrengthSets(session.datetime, sets);
 
+  static StrengthSessionDescription? defaultValue() =>
+      Movement.defaultMovement == null
+          ? null
+          : StrengthSessionDescription(
+              session: StrengthSession(
+                id: randomId(),
+                userId: Settings.userId!,
+                datetime: DateTime.now(),
+                movementId: Movement.defaultMovement!.id,
+                interval: null,
+                comments: null,
+                deleted: false,
+              ),
+              movement: Movement.defaultMovement!,
+              sets: [],
+            );
+
   factory StrengthSessionDescription.fromJson(Map<String, dynamic> json) =>
       _$StrengthSessionDescriptionFromJson(json);
 
@@ -96,17 +113,4 @@ class StrengthSessionDescription extends CompoundEntity {
   void orderSets() {
     sets.forEachIndexed((index, set) => set.setNumber = index);
   }
-
-  StrengthSessionDescription.defaultValue()
-      : session = StrengthSession(
-          id: randomId(),
-          userId: Settings.userId!,
-          datetime: DateTime.now(),
-          movementId: Movement.defaultMovement.id,
-          interval: null,
-          comments: null,
-          deleted: false,
-        ),
-        movement = Movement.defaultMovement,
-        sets = [];
 }
