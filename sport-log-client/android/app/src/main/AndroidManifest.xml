@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.BLUETOOTH" /> <!-- flutter blue -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- flutter blue -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" /> <!-- pedometer -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- gpx export -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- gpx export -->
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" /> <!-- gpx export -->
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />

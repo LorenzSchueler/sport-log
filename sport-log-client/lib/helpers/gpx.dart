@@ -1,17 +1,22 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:gpx/gpx.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/cardio/position.dart';
+
+final _logger = Logger("Gpx");
 
 List<Position>? gpxToTrack(String gpxString) {
   final Gpx gpx;
   try {
     gpx = GpxReader().fromString(gpxString);
   } on StateError {
+    _logger.i("parsing gpx failed");
     return null;
   }
   final points =
@@ -55,21 +60,45 @@ String trackToGpx(List<Position> track, {DateTime? startTime}) {
   return GpxWriter().asString(gpx);
 }
 
-Future<String> saveTrackAsGpx(
+Future<String?> saveTrackAsGpx(
   List<Position> track, {
   DateTime? startTime,
 }) async {
-  final gpxString = trackToGpx(track, startTime: startTime);
-
+  if (!(await Permission.storage.request()).isGranted ||
+      !(await Permission.accessMediaLocation.request()).isGranted) {
+    _logger.i("permission denied");
+    return null;
+  }
   final dir = Config.isAndroid
-      ? (await getExternalStorageDirectory())!
+      ? '/storage/emulated/0/Download'
       : Config.isIOS
           ? await getApplicationDocumentsDirectory()
           : (await getDownloadsDirectory())!;
-  final file = File("${dir.path}/track-${DateTime.now()}.gpx");
-  logInfo("gpx", "file: ${file.path}");
-  logInfo("gpx", gpxString);
-  await file.writeAsString(gpxString, flush: true);
-
+  var file = File("$dir/track.gpx");
+  var index = 1;
+  while (await file.exists()) {
+    file = File("$dir/track$index.gpx");
+    index++;
+  }
+  final gpxString = trackToGpx(track, startTime: startTime);
+  try {
+    await file.writeAsString(gpxString, flush: true);
+  } on FileSystemException catch (e) {
+    _logger.w(e.toString());
+    return null;
+  }
+  _logger.i("track exported to ${file.path}");
   return file.path;
+}
+
+Future<List<Position>?> loadTrackFromGpxFile() async {
+  await FilePicker.platform.clearTemporaryFiles();
+  FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+  if (result == null) {
+    return null;
+  }
+  File file = File(result.files.single.path!);
+  final gpxString = await file.readAsString();
+  return gpxToTrack(gpxString);
 }

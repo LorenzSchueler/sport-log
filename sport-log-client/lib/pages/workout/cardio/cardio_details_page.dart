@@ -44,10 +44,12 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
       _cardioSessionDescription.cardioSession.track ?? [],
       startTime: _cardioSessionDescription.cardioSession.datetime,
     );
-    await showMessageDialog(
-      context: context,
-      text: 'Track exported to $file',
-    );
+    if (file != null) {
+      await showMessageDialog(
+        context: context,
+        text: 'Track exported to $file',
+      );
+    }
   }
 
   @override
@@ -201,6 +203,13 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
             color: Theme.of(context).colorScheme.background,
             child: Column(
               children: [
+                // TODO remove
+                if (_cardioSessionDescription.cardioSession.track != null &&
+                    _cardioSessionDescription.cardioSession.track!.isNotEmpty)
+                  IconButton(
+                    onPressed: _exportFile,
+                    icon: const Icon(AppIcons.download),
+                  ),
                 CardioValueUnitDescriptionTable(
                   cardioSessionDescription: _cardioSessionDescription,
                   currentDuration: null,
