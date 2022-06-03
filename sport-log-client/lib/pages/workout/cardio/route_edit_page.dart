@@ -7,6 +7,7 @@ import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/settings.dart';
@@ -17,7 +18,7 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RouteEditPage extends StatefulWidget {
-  const RouteEditPage({Key? key, this.route}) : super(key: key);
+  const RouteEditPage({Key? key, required this.route}) : super(key: key);
 
   final Route? route;
 
@@ -64,7 +65,15 @@ class RouteEditPageState extends State<RouteEditPage> {
     if (result.isSuccess()) {
       _formKey.currentState!.deactivate();
       if (mounted) {
-        Navigator.pop(context);
+        Navigator.pop(
+          context,
+          ReturnObject(
+            action: widget.route == null
+                ? ReturnAction.created
+                : ReturnAction.updated,
+            payload: _route,
+          ), // needed for route details page
+        );
       }
     } else {
       await showMessageDialog(
@@ -80,7 +89,13 @@ class RouteEditPageState extends State<RouteEditPage> {
     }
     _formKey.currentState!.deactivate();
     if (mounted) {
-      Navigator.pop(context);
+      Navigator.pop(
+        context,
+        ReturnObject(
+          action: ReturnAction.deleted,
+          payload: _route,
+        ), // needed for route details page
+      );
     }
   }
 

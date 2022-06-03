@@ -121,7 +121,7 @@ class RouteCard extends StatelessWidget {
   final Route route;
 
   void showDetails(BuildContext context) {
-    Navigator.pushNamed(context, Routes.cardio.routeEdit, arguments: route);
+    Navigator.pushNamed(context, Routes.cardio.routeDetails, arguments: route);
   }
 
   @override

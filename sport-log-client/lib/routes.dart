@@ -21,6 +21,7 @@ import 'package:sport_log/pages/timer/timer_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_details_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_overview_page.dart';
+import 'package:sport_log/pages/workout/cardio/route_details_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_overview_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_upload_page.dart';
@@ -240,6 +241,10 @@ abstract class Routes {
             route: route,
           );
         }),
+    Routes.cardio.routeDetails: (context) => _checkLogin(() {
+          final route = ModalRoute.of(context)?.settings.arguments as Route;
+          return RouteDetailsPage(route: route);
+        }),
     // diary
     Routes.diary.overview: (_) => _checkLogin(() => const DiaryPage()),
     Routes.diary.edit: (context) => _checkLogin(() {
@@ -295,6 +300,7 @@ class _CardioRoutes {
   final String cardioEdit = '/cardio/cardio_edit';
   final String cardioDetails = '/cardio/cardio_details';
   final String routeEdit = '/cardio/route_edit';
+  final String routeDetails = '/cardio/route_details';
   final String routeUpload = '/cardio/route_upload';
   final String routeOverview = '/cardio/route_overview';
 }

@@ -60,7 +60,7 @@ class CardioEditPageState extends State<CardioEditPage> {
           ReturnObject(
             action: widget.isNew ? ReturnAction.created : ReturnAction.updated,
             payload: _cardioSessionDescription,
-          ), // needed for cardio overview page
+          ), // needed for cardio details page
         );
       }
     } else {
@@ -82,7 +82,7 @@ class CardioEditPageState extends State<CardioEditPage> {
         ReturnObject(
           action: ReturnAction.deleted,
           payload: _cardioSessionDescription,
-        ), // needed for cardio overview page
+        ), // needed for cardio details page
       );
     }
   }
