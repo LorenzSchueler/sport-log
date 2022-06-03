@@ -9,9 +9,11 @@ import 'package:sport_log/models/platform/all.dart';
 import 'package:sport_log/models/platform/platform_description.dart';
 
 class PlatformDataProvider extends EntityDataProvider<Platform> {
-  static final _instance = PlatformDataProvider._();
-  PlatformDataProvider._();
   factory PlatformDataProvider() => _instance;
+
+  PlatformDataProvider._();
+
+  static final _instance = PlatformDataProvider._();
 
   @override
   final Api<Platform> api = Api.platforms;
@@ -26,9 +28,11 @@ class PlatformDataProvider extends EntityDataProvider<Platform> {
 
 class PlatformCredentialDataProvider
     extends EntityDataProvider<PlatformCredential> {
-  static final _instance = PlatformCredentialDataProvider._();
-  PlatformCredentialDataProvider._();
   factory PlatformCredentialDataProvider() => _instance;
+
+  PlatformCredentialDataProvider._();
+
+  static final _instance = PlatformCredentialDataProvider._();
 
   @override
   final Api<PlatformCredential> api = Api.platformCredentials;
@@ -46,12 +50,6 @@ class PlatformCredentialDataProvider
 
 class PlatformDescriptionDataProvider
     extends DataProvider<PlatformDescription> {
-  final _platformDataProvider = PlatformDataProvider();
-  final _platformCredentialDataProvider = PlatformCredentialDataProvider();
-  final _actionProviderDataProvider = ActionProviderDataProvider();
-
-  static PlatformDescriptionDataProvider? _instance;
-  PlatformDescriptionDataProvider._();
   factory PlatformDescriptionDataProvider() {
     if (_instance == null) {
       _instance = PlatformDescriptionDataProvider._();
@@ -63,6 +61,14 @@ class PlatformDescriptionDataProvider
     }
     return _instance!;
   }
+
+  PlatformDescriptionDataProvider._();
+
+  static PlatformDescriptionDataProvider? _instance;
+
+  final _platformDataProvider = PlatformDataProvider();
+  final _platformCredentialDataProvider = PlatformCredentialDataProvider();
+  final _actionProviderDataProvider = ActionProviderDataProvider();
 
   @override
   Future<DbResult> createSingle(PlatformDescription object) async {

@@ -4,8 +4,8 @@ import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/models/clone_extensions.dart';
+import 'package:sport_log/models/entity_interfaces.dart';
 
 part 'strength_session.g.dart';
 
@@ -20,6 +20,9 @@ class StrengthSession extends AtomicEntity {
     required this.comments,
     required this.deleted,
   });
+
+  factory StrengthSession.fromJson(Map<String, dynamic> json) =>
+      _$StrengthSessionFromJson(json);
 
   @override
   @IdConverter()
@@ -37,9 +40,6 @@ class StrengthSession extends AtomicEntity {
   String? comments;
   @override
   bool deleted;
-
-  factory StrengthSession.fromJson(Map<String, dynamic> json) =>
-      _$StrengthSessionFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$StrengthSessionToJson(this);

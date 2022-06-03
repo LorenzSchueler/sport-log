@@ -27,74 +27,62 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  flutter:
-    sdk: flutter
-
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  # cupertino_icons: ^1.0.2
-
-  provider: ^6.0.2 # state management
-  equatable: ^2.0.0 # makes classes equatable with little boilerplate code
-  validators: ^3.0.0
-  http: ^0.13.3
-  device_info_plus: ^3.2.1
-  json_annotation: ^4.4.0
-  fixnum: ^1.0.0 # used for ids (in web ints go only up to 2^53-1)
-  result_type: ^0.1.0 # convenience for returning something that can either be a success or failure
-  intl: ^0.17.0  # used for date formatting
-  sqflite: ^2.0.0+3 # sqlite database
-  sqflite_common_ffi: ^2.1.1
-  flutter_time_picker_spinner: ^2.0.0
-  logger: ^1.0.0
-  fl_chart: ^0.50.1
-  hive: ^2.0.4
-  hive_flutter: ^1.1.0
-  fluttertoast: ^8.0.8
-  flutter_keyboard_visibility: ^5.0.3
-  url_launcher: ^6.0.20
-  mapbox_gl: ^0.16.0 # mapping lib for osm
-  mapbox_api: ^1.0.0
-  mapbox_search: ^3.0.1+2
-  flutter_polyline_points: ^1.0.0
-  latlong2: ^0.8.1
-  location: ^4.3.0
-  pedometer: ^3.0.0
-  polar: ^1.14.0
-  flutter_blue: ^0.8.0
   app_settings: ^4.1.1
   audioplayers: ^0.20.1
-  yaml: ^3.1.0
-  package_info_plus: ^1.0.6
-  permission_handler: ^9.2.0
-  wakelock: ^0.6.1+2
-  fuzzywuzzy: ^0.2.0
   collection: ^1.16.0
-  gpx: ^2.1.1
+  device_info_plus: ^3.2.1
+  equatable: ^2.0.0 # makes classes equatable with little boilerplate code
   file_picker: ^4.5.1
+  fixnum: ^1.0.0 # used for ids (in web ints go only up to 2^53-1)
+  fl_chart: ^0.51.0
+  flutter:
+    sdk: flutter
+  flutter_blue: ^0.8.0
+  flutter_keyboard_visibility: ^5.0.3
+  flutter_polyline_points: ^1.0.0
+  flutter_time_picker_spinner: ^2.0.0
+  fluttertoast: ^8.0.8
+  fuzzywuzzy: ^0.2.0
+  gpx: ^2.1.1
+  hive: ^2.0.4
+  hive_flutter: ^1.1.0
+  http: ^0.13.3
+  intl: ^0.17.0  # used for date formatting
+  json_annotation: ^4.4.0
+  latlong2: ^0.8.1
+  location: ^4.3.0
+  logger: ^1.0.0
+  mapbox_api: ^1.0.0
+  mapbox_gl: ^0.16.0 # mapping lib for osm
+  mapbox_search: ^3.0.1+2
+  package_info_plus: ^1.0.6
   path_provider: ^2.0.10
+  pedometer: ^3.0.0
+  permission_handler: ^9.2.0
+  polar: ^1.14.0
+  provider: ^6.0.2 # state management
+  result_type: ^0.1.0 # convenience for returning something that can either be a success or failure
+  sqflite: ^2.0.0+3 # sqlite database
+  sqflite_common_ffi: ^2.1.1
+  url_launcher: ^6.0.20
+  validators: ^3.0.0
+  wakelock: ^0.6.1+2
+  yaml: ^3.1.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
-  flutter_lints: ^2.0.1
-  json_serializable: ^6.1.4 # json
   build_runner: ^2.1.0 # json
     # flutter pub run build_runner build --delete-conflicting-outputs
-  faker: ^2.0.0
-  icons_launcher: ^1.1.8 
-    # flutter pub run icons_launcher:create
   dart_code_metrics: ^4.13.0
     # flutter pub run dart_code_metrics:metrics analyze lib
     # flutter pub run dart_code_metrics:metrics check-unused-files lib
     # flutter pub run dart_code_metrics:metrics check-unused-code lib
+  faker: ^2.0.0
+  flutter_lints: ^2.0.1
+  flutter_test:
+    sdk: flutter
+  icons_launcher: ^1.1.8 
+    # flutter pub run icons_launcher:create
+  json_serializable: ^6.1.4 # json
 
 flutter_icons:
   image_path: "launcher_icon.png"

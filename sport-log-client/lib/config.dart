@@ -24,6 +24,8 @@ class Config extends JsonSerializable {
     required this.outputDbStatement,
   });
 
+  factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
+
   static late final Config instance;
 
   static Future<void> init() async {
@@ -81,8 +83,6 @@ class Config extends JsonSerializable {
       ..i('Output response json: ${instance.outputResponseJson}')
       ..i('Output db statement: ${instance.outputDbStatement}');
   }
-
-  factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$ConfigToJson(this);

@@ -15,14 +15,14 @@ Future<void> showMessageDialog({
 }
 
 class MessageDialog extends StatelessWidget {
-  final String? title;
-  final String text;
-
   const MessageDialog({
     Key? key,
     required this.title,
     required this.text,
   }) : super(key: key);
+
+  final String? title;
+  final String text;
 
   @override
   Widget build(BuildContext context) {

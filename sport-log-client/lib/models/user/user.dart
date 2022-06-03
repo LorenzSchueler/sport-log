@@ -16,14 +16,14 @@ class User extends NonDeletableAtomicEntity {
     required this.email,
   });
 
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+
   @override
   @IdConverter()
   Int64 id;
   String username;
   String password;
   String email;
-
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$UserToJson(this);

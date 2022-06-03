@@ -12,6 +12,23 @@ enum TimerType {
 }
 
 class TimerUtils {
+  TimerUtils.startTimer({
+    required this.timerType,
+    required this.time,
+    required Duration? restTime,
+    required this.rounds,
+    required this.onTick,
+    required this.onStop,
+  }) : restTime = (timerType == TimerType.interval ? restTime : null) ??
+            Duration.zero {
+    totalTime = time + this.restTime;
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (Timer t) => _tickCallback(),
+    );
+    Wakelock.enable();
+  }
+
   final AudioCache _player = AudioCache(prefix: "assets/audio/")
     ..loadAll(['beep_long.mp3', 'beep_short.mp3']);
 
@@ -30,23 +47,6 @@ class TimerUtils {
   void dispose() {
     _timer.cancel();
     Wakelock.disable();
-  }
-
-  TimerUtils.startTimer({
-    required this.timerType,
-    required this.time,
-    required Duration? restTime,
-    required this.rounds,
-    required this.onTick,
-    required this.onStop,
-  }) : restTime = (timerType == TimerType.interval ? restTime : null) ??
-            Duration.zero {
-    totalTime = time + this.restTime;
-    _timer = Timer.periodic(
-      const Duration(seconds: 1),
-      (Timer t) => _tickCallback(),
-    );
-    Wakelock.enable();
   }
 
   void stopTimer() {

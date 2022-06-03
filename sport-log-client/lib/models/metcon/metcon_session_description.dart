@@ -15,6 +15,9 @@ class MetconSessionDescription extends CompoundEntity {
     required this.metconDescription,
   });
 
+  factory MetconSessionDescription.fromJson(Map<String, dynamic> json) =>
+      _$MetconSessionDescriptionFromJson(json);
+
   MetconSession metconSession;
   MetconDescription metconDescription;
 
@@ -27,9 +30,6 @@ class MetconSessionDescription extends CompoundEntity {
               ),
               metconDescription: MetconDescription.defaultMetconDescription!,
             );
-
-  factory MetconSessionDescription.fromJson(Map<String, dynamic> json) =>
-      _$MetconSessionDescriptionFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$MetconSessionDescriptionToJson(this);

@@ -20,6 +20,21 @@ class Position {
     required this.time,
   });
 
+  factory Position.fromJson(Map<String, dynamic> json) =>
+      _$PositionFromJson(json);
+
+  factory Position.fromBytesList(Uint8List list) {
+    assert(list.length == byteSize);
+    final bytes = list.buffer.asByteData();
+    return Position(
+      longitude: bytes.getFloat64(0),
+      latitude: bytes.getFloat64(8),
+      elevation: bytes.getFloat64(16),
+      distance: bytes.getFloat64(24),
+      time: Duration(milliseconds: bytes.getInt64(32)),
+    );
+  }
+
   @JsonKey(name: "lo")
   double longitude;
   @JsonKey(name: "la")
@@ -31,9 +46,6 @@ class Position {
   @JsonKey(name: "t")
   @DurationConverter()
   Duration time;
-
-  factory Position.fromJson(Map<String, dynamic> json) =>
-      _$PositionFromJson(json);
 
   Map<String, dynamic> toJson() => _$PositionToJson(this);
 
@@ -60,18 +72,6 @@ class Position {
     final list = bytes.buffer.asUint8List();
     assert(list.length == byteSize);
     return list;
-  }
-
-  factory Position.fromBytesList(Uint8List list) {
-    assert(list.length == byteSize);
-    final bytes = list.buffer.asByteData();
-    return Position(
-      longitude: bytes.getFloat64(0),
-      latitude: bytes.getFloat64(8),
-      elevation: bytes.getFloat64(16),
-      distance: bytes.getFloat64(24),
-      time: Duration(milliseconds: bytes.getInt64(32)),
-    );
   }
 
   @override

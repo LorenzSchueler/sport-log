@@ -1,14 +1,14 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/charts/all.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 
 class DateTimeChartValue {
+  DateTimeChartValue({required this.datetime, required this.value});
+
   final DateTime datetime;
   final double value;
-
-  DateTimeChartValue({required this.datetime, required this.value});
 
   @override
   String toString() => "$datetime: $value";

@@ -8,12 +8,12 @@ import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 class MetconDetailsPage extends StatefulWidget {
-  final MetconDescription metconDescription;
-
   const MetconDetailsPage({
     Key? key,
     required this.metconDescription,
   }) : super(key: key);
+
+  final MetconDescription metconDescription;
 
   @override
   State<MetconDetailsPage> createState() => MetconDetailsPageState();

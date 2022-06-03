@@ -3,18 +3,18 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
-import 'package:sport_log/widgets/expandable_fab.dart';
-import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RoutePage extends StatefulWidget {
@@ -116,9 +116,9 @@ class RoutePageState extends State<RoutePage> {
 }
 
 class RouteCard extends StatelessWidget {
-  final Route route;
-
   const RouteCard({required this.route, Key? key}) : super(key: key);
+
+  final Route route;
 
   void showDetails(BuildContext context) {
     Navigator.pushNamed(context, Routes.cardio.routeEdit, arguments: route);

@@ -150,10 +150,10 @@ class Column {
 }
 
 class UniqueIndex {
+  const UniqueIndex(this.tableName, this.columns) : super();
+
   final String tableName;
   final List<String> columns;
-
-  const UniqueIndex(this.tableName, this.columns) : super();
 
   String get setupSql {
     return 'create unique index ${tableName}__${columns.join('__')}__key '

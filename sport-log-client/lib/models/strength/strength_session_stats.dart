@@ -12,16 +12,6 @@ part 'strength_session_stats.g.dart';
 
 @JsonSerializable()
 class StrengthSessionStats extends JsonSerializable {
-  DateTime datetime;
-  int numSets;
-  int minCount;
-  int maxCount;
-  int sumCount;
-  double avgCount;
-  double? maxEorm;
-  double? sumVolume;
-  double? maxWeight;
-
   StrengthSessionStats({
     required this.datetime,
     required this.numSets,
@@ -78,6 +68,16 @@ class StrengthSessionStats extends JsonSerializable {
 
   factory StrengthSessionStats.fromJson(Map<String, dynamic> json) =>
       _$StrengthSessionStatsFromJson(json);
+
+  DateTime datetime;
+  int numSets;
+  int minCount;
+  int maxCount;
+  int sumCount;
+  double avgCount;
+  double? maxEorm;
+  double? sumVolume;
+  double? maxWeight;
 
   @override
   Map<String, dynamic> toJson() => _$StrengthSessionStatsToJson(this);

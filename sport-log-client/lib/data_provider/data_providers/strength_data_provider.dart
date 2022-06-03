@@ -11,9 +11,11 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 
 class StrengthSessionDataProvider extends EntityDataProvider<StrengthSession> {
-  static final _instance = StrengthSessionDataProvider._();
-  StrengthSessionDataProvider._();
   factory StrengthSessionDataProvider() => _instance;
+
+  StrengthSessionDataProvider._();
+
+  static final _instance = StrengthSessionDataProvider._();
 
   @override
   final Api<StrengthSession> api = Api.strengthSessions;
@@ -27,9 +29,11 @@ class StrengthSessionDataProvider extends EntityDataProvider<StrengthSession> {
 }
 
 class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
-  static final _instance = StrengthSetDataProvider._();
-  StrengthSetDataProvider._();
   factory StrengthSetDataProvider() => _instance;
+
+  StrengthSetDataProvider._();
+
+  static final _instance = StrengthSetDataProvider._();
 
   @override
   final Api<StrengthSet> api = Api.strengthSets;
@@ -49,14 +53,6 @@ class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
 
 class StrengthSessionDescriptionDataProvider
     extends DataProvider<StrengthSessionDescription> {
-  final _strengthSessionDescriptionDb = AppDatabase.strengthSessionDescriptions;
-
-  final _strengthSessionDataProvider = StrengthSessionDataProvider();
-  final _strengthSetDataProvider = StrengthSetDataProvider();
-  final _movementDataProvider = MovementDataProvider();
-
-  StrengthSessionDescriptionDataProvider._();
-  static StrengthSessionDescriptionDataProvider? _instance;
   factory StrengthSessionDescriptionDataProvider() {
     if (_instance == null) {
       _instance = StrengthSessionDescriptionDataProvider._();
@@ -68,6 +64,16 @@ class StrengthSessionDescriptionDataProvider
     }
     return _instance!;
   }
+
+  StrengthSessionDescriptionDataProvider._();
+
+  static StrengthSessionDescriptionDataProvider? _instance;
+
+  final _strengthSessionDescriptionDb = AppDatabase.strengthSessionDescriptions;
+
+  final _strengthSessionDataProvider = StrengthSessionDataProvider();
+  final _strengthSetDataProvider = StrengthSetDataProvider();
+  final _movementDataProvider = MovementDataProvider();
 
   @override
   Future<DbResult> createSingle(StrengthSessionDescription object) async {

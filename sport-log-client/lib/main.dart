@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/pages/login/welcome_screen.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/settings.dart';
-import 'package:provider/provider.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';

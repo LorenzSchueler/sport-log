@@ -4,13 +4,13 @@ import 'package:sport_log/data_provider/data_providers/action_data_provider.dart
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/action/action_provider.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 String actionName(
   ActionProviderDescription actionProviderDescription,
@@ -22,10 +22,10 @@ String actionName(
         .name;
 
 class ActionProviderOverviewPage extends StatefulWidget {
-  final ActionProvider actionProvider;
-
   const ActionProviderOverviewPage({required this.actionProvider, Key? key})
       : super(key: key);
+
+  final ActionProvider actionProvider;
 
   @override
   State<ActionProviderOverviewPage> createState() =>
@@ -107,9 +107,10 @@ class _ActionProviderOverviewPageState
 }
 
 class ActionsCard extends StatelessWidget {
-  final ActionProviderDescription actionProviderDescription;
   const ActionsCard({required this.actionProviderDescription, Key? key})
       : super(key: key);
+
+  final ActionProviderDescription actionProviderDescription;
 
   @override
   Widget build(BuildContext context) {
@@ -142,11 +143,11 @@ class ActionsCard extends StatelessWidget {
 }
 
 class ActionRulesCard extends StatelessWidget {
-  final ActionProviderDescription actionProviderDescription;
-  final _dataProvider = ActionRuleDataProvider();
-
   ActionRulesCard({required this.actionProviderDescription, Key? key})
       : super(key: key);
+
+  final ActionProviderDescription actionProviderDescription;
+  final _dataProvider = ActionRuleDataProvider();
 
   @override
   Widget build(BuildContext context) {
@@ -233,11 +234,11 @@ class ActionRulesCard extends StatelessWidget {
 }
 
 class ActionEventsCard extends StatelessWidget {
-  final ActionProviderDescription actionProviderDescription;
-  final _dataProvider = ActionEventDataProvider();
-
   ActionEventsCard({required this.actionProviderDescription, Key? key})
       : super(key: key);
+
+  final ActionProviderDescription actionProviderDescription;
+  final _dataProvider = ActionEventDataProvider();
 
   @override
   Widget build(BuildContext context) {

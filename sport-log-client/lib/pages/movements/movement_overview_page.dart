@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/theme.dart';
-import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 final _dataProvider = MovementDescriptionDataProvider();
 
@@ -115,10 +115,10 @@ class _MovementsPageState extends State<MovementsPage> {
 }
 
 class MovementCard extends StatelessWidget {
-  final MovementDescription movementDescription;
-
   const MovementCard({Key? key, required this.movementDescription})
       : super(key: key);
+
+  final MovementDescription movementDescription;
 
   @override
   Widget build(BuildContext context) {

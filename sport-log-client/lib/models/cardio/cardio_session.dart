@@ -58,6 +58,16 @@ class CardioSession extends AtomicEntity {
     required this.deleted,
   });
 
+  CardioSession.defaultValue(this.movementId)
+      : id = randomId(),
+        userId = Settings.userId!,
+        cardioType = CardioType.training,
+        datetime = DateTime.now(),
+        deleted = false;
+
+  factory CardioSession.fromJson(Map<String, dynamic> json) =>
+      _$CardioSessionFromJson(json);
+
   @override
   @IdConverter()
   Int64 id;
@@ -88,13 +98,6 @@ class CardioSession extends AtomicEntity {
   String? comments;
   @override
   bool deleted;
-
-  CardioSession.defaultValue(this.movementId)
-      : id = randomId(),
-        userId = Settings.userId!,
-        cardioType = CardioType.training,
-        datetime = DateTime.now(),
-        deleted = false;
 
   static const _currentDurationOffset = Duration(minutes: 1);
 
@@ -225,9 +228,6 @@ class CardioSession extends AtomicEntity {
         ? null
         : (heartRate!.length / (time!.inMilliseconds / (1000 * 60))).round();
   }
-
-  factory CardioSession.fromJson(Map<String, dynamic> json) =>
-      _$CardioSessionFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$CardioSessionToJson(this);

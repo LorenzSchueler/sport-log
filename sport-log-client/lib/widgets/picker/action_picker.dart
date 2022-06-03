@@ -15,9 +15,9 @@ Future<Action?> showActionPicker({
 }
 
 class ActionPickerDialog extends StatelessWidget {
-  final List<Action> actions;
-
   const ActionPickerDialog({required this.actions, Key? key}) : super(key: key);
+
+  final List<Action> actions;
 
   @override
   Widget build(BuildContext context) {

@@ -1,16 +1,15 @@
-import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:flutter/material.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
-import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
-import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
+import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -19,8 +18,9 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class CardioSessionsPage extends StatefulWidget {
@@ -194,10 +194,10 @@ class CardioSessionsPageState extends State<CardioSessionsPage> {
 }
 
 class CardioSessionCard extends StatelessWidget {
-  final CardioSessionDescription cardioSessionDescription;
-
   const CardioSessionCard({Key? key, required this.cardioSessionDescription})
       : super(key: key);
+
+  final CardioSessionDescription cardioSessionDescription;
 
   void showDetails(BuildContext context) {
     Navigator.pushNamed(

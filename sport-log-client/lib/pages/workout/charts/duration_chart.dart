@@ -7,19 +7,31 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';
 
 class DurationChartValue {
+  DurationChartValue({required this.duration, required this.value});
+
   final Duration duration;
   final double value;
-
-  DurationChartValue({required this.duration, required this.value});
 
   @override
   String toString() => "$duration: $value";
 }
 
 class DurationChartLine {
-  final List<DurationChartValue> chartValues;
-  final Color lineColor;
-  final bool isRight;
+  DurationChartLine.fromUngroupedChartValues({
+    required List<DurationChartValue> chartValues,
+    required this.lineColor,
+    required this.isRight,
+  }) : chartValues = chartValues
+            .groupListsBy((v) => _groupFunction(v.duration))
+            .entries
+            .map(
+              (entry) => DurationChartValue(
+                duration: entry.key,
+                value: entry.value.map((v) => v.value).average,
+              ),
+            )
+            .toList()
+          ..sort((v1, v2) => v1.duration.compareTo(v2.duration));
 
   DurationChartLine.fromDurationList({
     required List<Duration> durations,
@@ -37,21 +49,9 @@ class DurationChartLine {
             .toList()
           ..sort((v1, v2) => v1.duration.compareTo(v2.duration));
 
-  DurationChartLine.fromUngroupedChartValues({
-    required List<DurationChartValue> chartValues,
-    required this.lineColor,
-    required this.isRight,
-  }) : chartValues = chartValues
-            .groupListsBy((v) => _groupFunction(v.duration))
-            .entries
-            .map(
-              (entry) => DurationChartValue(
-                duration: entry.key,
-                value: entry.value.map((v) => v.value).average,
-              ),
-            )
-            .toList()
-          ..sort((v1, v2) => v1.duration.compareTo(v2.duration));
+  final List<DurationChartValue> chartValues;
+  final Color lineColor;
+  final bool isRight;
 
   int yScaleFactor(int yScaleFactor) => isRight ? yScaleFactor : 1;
 

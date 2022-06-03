@@ -5,14 +5,14 @@ import 'package:sport_log/models/metcon/metcon_session_description.dart';
 import 'package:sport_log/widgets/input_fields/text_tile.dart';
 
 class MetconSessionResultsCard extends StatelessWidget {
-  final MetconSessionDescription? metconSessionDescription;
-  final List<MetconSessionDescription> metconSessionDescriptions;
-
   const MetconSessionResultsCard({
     required this.metconSessionDescription,
     required this.metconSessionDescriptions,
     Key? key,
   }) : super(key: key);
+
+  final MetconSessionDescription? metconSessionDescription;
+  final List<MetconSessionDescription> metconSessionDescriptions;
 
   @override
   Widget build(BuildContext context) {

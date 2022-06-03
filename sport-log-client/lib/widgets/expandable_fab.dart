@@ -1,18 +1,18 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 @immutable
 class ExpandableFab extends StatefulWidget {
-  final Icon icon;
-  final List<ActionButton> buttons;
-
   const ExpandableFab({
     Key? key,
     required this.icon,
     required this.buttons,
   }) : super(key: key);
+
+  final Icon icon;
+  final List<ActionButton> buttons;
 
   @override
   ExpandableFabState createState() => ExpandableFabState();

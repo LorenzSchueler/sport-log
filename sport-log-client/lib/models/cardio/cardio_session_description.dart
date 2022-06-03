@@ -14,6 +14,9 @@ class CardioSessionDescription extends CompoundEntity {
     required this.movement,
   });
 
+  factory CardioSessionDescription.fromJson(Map<String, dynamic> json) =>
+      _$CardioSessionDescriptionFromJson(json);
+
   CardioSession cardioSession;
   Route? route;
   Movement movement;
@@ -27,9 +30,6 @@ class CardioSessionDescription extends CompoundEntity {
               route: null,
               movement: Movement.defaultMovement!,
             );
-
-  factory CardioSessionDescription.fromJson(Map<String, dynamic> json) =>
-      _$CardioSessionDescriptionFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$CardioSessionDescriptionToJson(this);

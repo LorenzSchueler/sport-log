@@ -17,6 +17,9 @@ class Platform extends AtomicEntity {
     required this.deleted,
   });
 
+  factory Platform.fromJson(Map<String, dynamic> json) =>
+      _$PlatformFromJson(json);
+
   @override
   @IdConverter()
   Int64 id;
@@ -24,9 +27,6 @@ class Platform extends AtomicEntity {
   bool credential;
   @override
   bool deleted;
-
-  factory Platform.fromJson(Map<String, dynamic> json) =>
-      _$PlatformFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$PlatformToJson(this);

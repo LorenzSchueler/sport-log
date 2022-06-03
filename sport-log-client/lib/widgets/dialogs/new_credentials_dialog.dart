@@ -19,9 +19,9 @@ Future<void> showNewCredentialsDialog() async {
 }
 
 class NewCredentialsDialog extends StatefulWidget {
-  static bool isShown = false;
-
   const NewCredentialsDialog({Key? key}) : super(key: key);
+
+  static bool isShown = false;
 
   @override
   State<NewCredentialsDialog> createState() => NewCredentialsDialogState();

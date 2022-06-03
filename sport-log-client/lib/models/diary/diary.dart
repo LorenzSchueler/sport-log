@@ -21,6 +21,16 @@ class Diary extends AtomicEntity {
     required this.deleted,
   });
 
+  Diary.defaultValue()
+      : id = randomId(),
+        userId = Settings.userId!,
+        date = DateTime.now(),
+        bodyweight = null,
+        comments = null,
+        deleted = false;
+
+  factory Diary.fromJson(Map<String, dynamic> json) => _$DiaryFromJson(json);
+
   @override
   @IdConverter()
   Int64 id;
@@ -32,16 +42,6 @@ class Diary extends AtomicEntity {
   String? comments;
   @override
   bool deleted;
-
-  Diary.defaultValue()
-      : id = randomId(),
-        userId = Settings.userId!,
-        date = DateTime.now(),
-        bodyweight = null,
-        comments = null,
-        deleted = false;
-
-  factory Diary.fromJson(Map<String, dynamic> json) => _$DiaryFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$DiaryToJson(this);

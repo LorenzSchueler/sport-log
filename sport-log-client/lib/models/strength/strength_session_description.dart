@@ -20,6 +20,9 @@ class StrengthSessionDescription extends CompoundEntity {
     required this.sets,
   });
 
+  factory StrengthSessionDescription.fromJson(Map<String, dynamic> json) =>
+      _$StrengthSessionDescriptionFromJson(json);
+
   StrengthSession session;
   Movement movement;
   List<StrengthSet> sets;
@@ -43,9 +46,6 @@ class StrengthSessionDescription extends CompoundEntity {
               movement: Movement.defaultMovement!,
               sets: [],
             );
-
-  factory StrengthSessionDescription.fromJson(Map<String, dynamic> json) =>
-      _$StrengthSessionDescriptionFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$StrengthSessionDescriptionToJson(this);

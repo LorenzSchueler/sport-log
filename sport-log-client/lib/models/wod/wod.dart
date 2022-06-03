@@ -18,6 +18,8 @@ class Wod extends AtomicEntity {
     required this.deleted,
   });
 
+  factory Wod.fromJson(Map<String, dynamic> json) => _$WodFromJson(json);
+
   @override
   @IdConverter()
   Int64 id;
@@ -28,8 +30,6 @@ class Wod extends AtomicEntity {
   String? description;
   @override
   bool deleted;
-
-  factory Wod.fromJson(Map<String, dynamic> json) => _$WodFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$WodToJson(this);

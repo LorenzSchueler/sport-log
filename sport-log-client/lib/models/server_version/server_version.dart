@@ -10,11 +10,11 @@ class _ServerVersionString {
     required this.max,
   });
 
-  String min;
-  String max;
-
   factory _ServerVersionString.fromJson(Map<String, dynamic> json) =>
       _$ServerVersionStringFromJson(json);
+
+  String min;
+  String max;
 }
 
 class ServerVersion extends JsonSerializable {

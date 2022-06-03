@@ -3,9 +3,8 @@ import 'package:sport_log/data_provider/data_providers/diary_data_provider.dart'
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
-import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/diary/diary.dart';
+import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -13,6 +12,7 @@ import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class DiaryPage extends StatefulWidget {
@@ -128,9 +128,9 @@ class DiaryPageState extends State<DiaryPage> {
 }
 
 class DiaryCard extends StatelessWidget {
-  final Diary diary;
-
   const DiaryCard({Key? key, required this.diary}) : super(key: key);
+
+  final Diary diary;
 
   @override
   Widget build(BuildContext context) {

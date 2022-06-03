@@ -28,6 +28,17 @@ class Route extends AtomicEntity with Comparable<Route> {
     required this.deleted,
   });
 
+  Route.defaultValue()
+      : id = randomId(),
+        userId = Settings.userId!,
+        name = "",
+        distance = 0,
+        ascent = null,
+        descent = null,
+        deleted = false;
+
+  factory Route.fromJson(Map<String, dynamic> json) => _$RouteFromJson(json);
+
   @override
   @IdConverter()
   Int64 id;
@@ -41,15 +52,6 @@ class Route extends AtomicEntity with Comparable<Route> {
   List<Position>? markedPositions;
   @override
   bool deleted;
-
-  Route.defaultValue()
-      : id = randomId(),
-        userId = Settings.userId!,
-        name = "",
-        distance = 0,
-        ascent = null,
-        descent = null,
-        deleted = false;
 
   void setDistance() {
     distance =
@@ -76,8 +78,6 @@ class Route extends AtomicEntity with Comparable<Route> {
     this.ascent = ascent.round();
     this.descent = descent.round();
   }
-
-  factory Route.fromJson(Map<String, dynamic> json) => _$RouteFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$RouteToJson(this);

@@ -4,18 +4,18 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/pages/workout/metcon_sessions/metcon_description_card.dart';
-import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_results_card.dart';
-import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_description_card.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_results_card.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/picker/metcon_picker.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 class MetconSessionsPage extends StatefulWidget {
   const MetconSessionsPage({Key? key}) : super(key: key);
@@ -171,10 +171,10 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
 }
 
 class MetconSessionCard extends StatelessWidget {
-  final MetconSessionDescription metconSessionDescription;
-
   const MetconSessionCard({Key? key, required this.metconSessionDescription})
       : super(key: key);
+
+  final MetconSessionDescription metconSessionDescription;
 
   @override
   Widget build(BuildContext context) {

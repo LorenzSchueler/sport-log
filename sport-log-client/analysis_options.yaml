@@ -27,6 +27,7 @@ linter:
     avoid_void_async: true
     cancel_subscriptions: true
     cascade_invocations: true
+    directives_ordering: true
     # prefer_single_quotes: true
     # prefer_double_quotes: true
     prefer_constructors_over_static_methods: true
@@ -34,6 +35,9 @@ linter:
     prefer_final_in_for_each: true
     # prefer_final_locals: true
     require_trailing_commas: true
+    sort_constructors_first: true
+    sort_unnamed_constructors_first: true
+    sort_pub_dependencies: true
     unawaited_futures: true
     unnecessary_await_in_return: true
     unnecessary_lambdas: true

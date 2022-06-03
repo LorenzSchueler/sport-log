@@ -11,25 +11,25 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
-import 'package:sport_log/widgets/picker/time_picker.dart';
-import 'package:sport_log/widgets/pop_scopes.dart';
-import 'package:sport_log/widgets/picker/cardio_type_picker.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
+import 'package:sport_log/widgets/picker/cardio_type_picker.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
 import 'package:sport_log/widgets/picker/route_picker.dart';
-import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/picker/time_picker.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
 
 class CardioEditPage extends StatefulWidget {
-  final CardioSessionDescription cardioSessionDescription;
-  final bool isNew;
-
   const CardioEditPage({
     required this.cardioSessionDescription,
     required this.isNew,
     Key? key,
   }) : super(key: key);
+
+  final CardioSessionDescription cardioSessionDescription;
+  final bool isNew;
 
   @override
   State<CardioEditPage> createState() => CardioEditPageState();

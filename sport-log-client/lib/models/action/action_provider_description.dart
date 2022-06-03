@@ -12,13 +12,13 @@ class ActionProviderDescription extends CompoundEntity {
     required this.actionEvents,
   });
 
+  factory ActionProviderDescription.fromJson(Map<String, dynamic> json) =>
+      _$ActionProviderDescriptionFromJson(json);
+
   ActionProvider actionProvider;
   List<Action> actions;
   List<ActionRule> actionRules;
   List<ActionEvent> actionEvents;
-
-  factory ActionProviderDescription.fromJson(Map<String, dynamic> json) =>
-      _$ActionProviderDescriptionFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$ActionProviderDescriptionToJson(this);

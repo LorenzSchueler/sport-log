@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/models/metcon/metcon_session_description.dart';
@@ -18,6 +17,7 @@ import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 class TimelinePage extends StatefulWidget {
   const TimelinePage({Key? key}) : super(key: key);

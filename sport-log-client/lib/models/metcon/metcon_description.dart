@@ -14,20 +14,22 @@ class MetconDescription extends CompoundEntity {
     required this.hasReference,
   });
 
-  Metcon metcon;
-  List<MetconMovementDescription> moves;
-  bool hasReference; // whether there is a MetconSession referencing this metcon
+  factory MetconDescription.fromJson(Map<String, dynamic> json) =>
+      _$MetconDescriptionFromJson(
+        json,
+      ); // whether there is a MetconSession referencing this metcon
 
   MetconDescription.defaultValue()
       : metcon = Metcon.defaultValue(),
         moves = [],
         hasReference = false;
 
+  Metcon metcon;
+  List<MetconMovementDescription> moves;
+  bool hasReference;
+
   static MetconDescription?
       defaultMetconDescription; // default metcon description that already exists in db
-
-  factory MetconDescription.fromJson(Map<String, dynamic> json) =>
-      _$MetconDescriptionFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$MetconDescriptionToJson(this);

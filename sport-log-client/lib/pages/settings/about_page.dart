@@ -6,10 +6,10 @@ import 'package:sport_log/widgets/input_fields/text_tile.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class _Contributor {
+  _Contributor(this.name, this.github);
+
   final String name;
   final String github;
-
-  _Contributor(this.name, this.github);
 
   static List<_Contributor> all = [
     _Contributor(

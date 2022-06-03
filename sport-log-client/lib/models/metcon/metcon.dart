@@ -1,8 +1,8 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
@@ -44,6 +44,18 @@ class Metcon extends AtomicEntity {
     required this.deleted,
   });
 
+  Metcon.defaultValue()
+      : id = randomId(),
+        userId = Settings.userId,
+        name = "",
+        metconType = MetconType.amrap,
+        rounds = null,
+        timecap = timecapDefaultValue,
+        description = null,
+        deleted = false;
+
+  factory Metcon.fromJson(Map<String, dynamic> json) => _$MetconFromJson(json);
+
   @override
   @IdConverter()
   Int64 id;
@@ -60,18 +72,6 @@ class Metcon extends AtomicEntity {
 
   static const Duration timecapDefaultValue = Duration(minutes: 30);
   static const int roundsDefaultValue = 3;
-
-  Metcon.defaultValue()
-      : id = randomId(),
-        userId = Settings.userId,
-        name = "",
-        metconType = MetconType.amrap,
-        rounds = null,
-        timecap = timecapDefaultValue,
-        description = null,
-        deleted = false;
-
-  factory Metcon.fromJson(Map<String, dynamic> json) => _$MetconFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$MetconToJson(this);

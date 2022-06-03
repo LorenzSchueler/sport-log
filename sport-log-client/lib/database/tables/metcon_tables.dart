@@ -1,5 +1,5 @@
-import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/models/all.dart';
 
 class MetconTable extends TableAccessor<Metcon> {

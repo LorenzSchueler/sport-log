@@ -3,12 +3,12 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/models/strength/eorm.dart';
 import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/models/strength/eorm.dart';
 
 part 'strength_set.g.dart';
 
@@ -23,6 +23,9 @@ class StrengthSet extends AtomicEntity {
     required this.deleted,
   });
 
+  factory StrengthSet.fromJson(Map<String, dynamic> json) =>
+      _$StrengthSetFromJson(json);
+
   @override
   @IdConverter()
   Int64 id;
@@ -33,9 +36,6 @@ class StrengthSet extends AtomicEntity {
   double? weight;
   @override
   bool deleted;
-
-  factory StrengthSet.fromJson(Map<String, dynamic> json) =>
-      _$StrengthSetFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$StrengthSetToJson(this);

@@ -12,12 +12,12 @@ class PlatformDescription extends CompoundEntity {
     required this.actionProviders,
   });
 
+  factory PlatformDescription.fromJson(Map<String, dynamic> json) =>
+      _$PlatformDescriptionFromJson(json);
+
   Platform platform;
   PlatformCredential? platformCredential;
   List<ActionProvider> actionProviders;
-
-  factory PlatformDescription.fromJson(Map<String, dynamic> json) =>
-      _$PlatformDescriptionFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$PlatformDescriptionToJson(this);

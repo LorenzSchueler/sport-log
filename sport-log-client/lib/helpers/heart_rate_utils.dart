@@ -7,6 +7,12 @@ import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
 
 class HeartRateUtils {
+  HeartRateUtils({
+    required this.deviceId,
+    required this.onHeartRateEvent,
+    this.onBatteryEvent,
+  });
+
   static final _polar = Polar();
   static final FlutterBlue _flutterBlue = FlutterBlue.instance;
 
@@ -16,12 +22,6 @@ class HeartRateUtils {
   StreamSubscription? _heartRateSubscription;
   StreamSubscription? _batterySubscription;
   bool _active = false;
-
-  HeartRateUtils({
-    required this.deviceId,
-    required this.onHeartRateEvent,
-    this.onBatteryEvent,
-  });
 
   static Future<Map<String, String>?> searchDevices() async {
     while (!await _flutterBlue.isOn) {

@@ -3,16 +3,16 @@ import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/theme.dart';
-import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/platform/platform_credential.dart';
 import 'package:sport_log/models/platform/platform_description.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 final _dataProvider = PlatformDescriptionDataProvider();
 
@@ -86,10 +86,10 @@ class PlatformOverviewPageState extends State<PlatformOverviewPage> {
 }
 
 class PlatformCard extends StatelessWidget {
-  final PlatformDescription platformDescription;
-
   const PlatformCard({Key? key, required this.platformDescription})
       : super(key: key);
+
+  final PlatformDescription platformDescription;
 
   @override
   Widget build(BuildContext context) {
@@ -161,9 +161,9 @@ class PlatformCard extends StatelessWidget {
 }
 
 class PlatformCredentialDialog extends StatefulWidget {
-  final PlatformDescription platformDescription;
   const PlatformCredentialDialog(this.platformDescription, {Key? key})
       : super(key: key);
+  final PlatformDescription platformDescription;
 
   @override
   State<PlatformCredentialDialog> createState() =>

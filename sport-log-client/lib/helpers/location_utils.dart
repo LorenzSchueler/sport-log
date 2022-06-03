@@ -7,13 +7,13 @@ import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
 
 class LocationUtils {
+  LocationUtils(this.onLocationUpdate);
+
   static final Location _location = Location();
 
   void Function(LocationData) onLocationUpdate;
   StreamSubscription? _locationSubscription;
   LatLng? _lastLatLng;
-
-  LocationUtils(this.onLocationUpdate);
 
   static Future<bool> enableLocation() async {
     while (!await _location.requestService()) {

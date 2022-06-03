@@ -12,15 +12,15 @@ class MovementDescription extends CompoundEntity {
     required this.hasReference,
   });
 
-  Movement movement;
-  bool hasReference;
-
   MovementDescription.defaultValue()
       : movement = Movement.defaultValue(),
         hasReference = false;
 
   factory MovementDescription.fromJson(Map<String, dynamic> json) =>
       _$MovementDescriptionFromJson(json);
+
+  Movement movement;
+  bool hasReference;
 
   @override
   Map<String, dynamic> toJson() => _$MovementDescriptionToJson(this);

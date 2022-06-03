@@ -69,12 +69,12 @@ enum ApiErrorCode {
 }
 
 class ApiError {
+  ApiError(this.errorCode, [this.message]);
+
   final ApiErrorCode errorCode;
 
   /// contains always only one entry
   final Map<String, ConflictDescriptor>? message;
-
-  ApiError(this.errorCode, [this.message]);
 
   @override
   String toString() {

@@ -15,11 +15,11 @@ class MetconMovementDescription extends CompoundEntity {
     required this.movement,
   });
 
-  MetconMovement metconMovement;
-  Movement movement;
-
   factory MetconMovementDescription.fromJson(Map<String, dynamic> json) =>
       _$MetconMovementDescriptionFromJson(json);
+
+  MetconMovement metconMovement;
+  Movement movement;
 
   @override
   Map<String, dynamic> toJson() => _$MetconMovementDescriptionToJson(this);

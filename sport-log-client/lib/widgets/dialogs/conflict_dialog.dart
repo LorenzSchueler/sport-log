@@ -21,14 +21,14 @@ Future<ConflictResolution> showConflictDialog({
 }
 
 class ConflictDialog extends StatelessWidget {
-  final String? title;
-  final String text;
-
   const ConflictDialog({
     Key? key,
     required this.title,
     required this.text,
   }) : super(key: key);
+
+  final String? title;
+  final String text;
 
   @override
   Widget build(BuildContext context) {

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/double_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
-import 'package:sport_log/widgets/app_icons.dart';
 
 class CountWeightInput extends StatefulWidget {
   /// If [this.dimension == MovementDimension.distance] [distanceUnit] and [editDistanceUnit] must not be null.

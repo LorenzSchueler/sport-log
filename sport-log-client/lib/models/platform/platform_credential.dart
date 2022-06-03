@@ -19,6 +19,9 @@ class PlatformCredential extends AtomicEntity {
     required this.deleted,
   });
 
+  factory PlatformCredential.fromJson(Map<String, dynamic> json) =>
+      _$PlatformCredentialFromJson(json);
+
   @override
   @IdConverter()
   Int64 id;
@@ -30,9 +33,6 @@ class PlatformCredential extends AtomicEntity {
   String password;
   @override
   bool deleted;
-
-  factory PlatformCredential.fromJson(Map<String, dynamic> json) =>
-      _$PlatformCredentialFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$PlatformCredentialToJson(this);

@@ -1,18 +1,19 @@
 import 'dart:async';
+
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart' hide Route;
 import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pedometer/pedometer.dart';
-import 'package:flutter/material.dart' hide Route;
 import 'package:polar/polar.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
+import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/location_utils.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
 import 'package:sport_log/helpers/tracking_utils.dart';
 import 'package:sport_log/models/all.dart';
@@ -24,11 +25,6 @@ import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class CardioTrackingPage extends StatefulWidget {
-  final Movement movement;
-  final CardioType cardioType;
-  final Route? route;
-  final String? heartRateMonitorId;
-
   const CardioTrackingPage({
     required this.route,
     required this.movement,
@@ -36,6 +32,11 @@ class CardioTrackingPage extends StatefulWidget {
     required this.heartRateMonitorId,
     Key? key,
   }) : super(key: key);
+
+  final Movement movement;
+  final CardioType cardioType;
+  final Route? route;
+  final String? heartRateMonitorId;
 
   @override
   State<CardioTrackingPage> createState() => CardioTrackingPageState();

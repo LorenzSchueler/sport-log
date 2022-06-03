@@ -4,10 +4,10 @@ import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/widgets/input_fields/text_tile.dart';
 
 class MetconDescriptionCard extends StatelessWidget {
-  final MetconDescription metconDescription;
-
   const MetconDescriptionCard({required this.metconDescription, Key? key})
       : super(key: key);
+
+  final MetconDescription metconDescription;
 
   @override
   Widget build(BuildContext context) {

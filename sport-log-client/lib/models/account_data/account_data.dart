@@ -25,6 +25,9 @@ class AccountData {
     required this.actionEvents,
   });
 
+  factory AccountData.fromJson(Map<String, dynamic> json) =>
+      _$AccountDataFromJson(json);
+
   User? user; // only send if updated
   List<Diary> diaries;
   List<Wod> wods;
@@ -43,7 +46,5 @@ class AccountData {
   List<ActionRule> actionRules;
   List<ActionEvent> actionEvents;
 
-  factory AccountData.fromJson(Map<String, dynamic> json) =>
-      _$AccountDataFromJson(json);
   Map<String, dynamic> toJson() => _$AccountDataToJson(this);
 }

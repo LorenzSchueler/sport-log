@@ -9,12 +9,12 @@ import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 class MetconSessionDetailsPage extends StatefulWidget {
-  final MetconSessionDescription metconSessionDescription;
-
   const MetconSessionDetailsPage({
     Key? key,
     required this.metconSessionDescription,
   }) : super(key: key);
+
+  final MetconSessionDescription metconSessionDescription;
 
   @override
   State<MetconSessionDetailsPage> createState() =>

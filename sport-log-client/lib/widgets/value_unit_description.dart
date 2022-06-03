@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 
 class ValueUnitDescription extends StatelessWidget {
-  final String value;
-  final String? unit;
-  final String? description;
-  final double scale;
-
   const ValueUnitDescription({
     Key? key,
     required String? value,
@@ -15,100 +10,6 @@ class ValueUnitDescription extends StatelessWidget {
     this.scale = 1,
   })  : value = value ?? "--",
         super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return RichText(
-      text: TextSpan(
-        children: [
-          TextSpan(
-            text: unit == null ? value : "$value ",
-            style: TextStyle(fontSize: scale * 20),
-          ),
-          if (unit != null)
-            TextSpan(
-              text: unit,
-              style: TextStyle(fontSize: scale * 14),
-            ),
-          if (description != null)
-            TextSpan(
-              text: "\n$description",
-              style: TextStyle(fontSize: scale * 12),
-            ),
-        ],
-      ),
-      textAlign: TextAlign.center,
-    );
-  }
-
-  ValueUnitDescription.time(Duration? time, {Key? key})
-      : this(
-          value: time?.formatHms,
-          unit: null,
-          description: "Duration",
-          scale: 1.3,
-          key: key,
-        );
-
-  ValueUnitDescription.timeSmall(Duration? time, {Key? key})
-      : this(
-          value: time?.formatHms,
-          unit: null,
-          description: null,
-          key: key,
-        );
-
-  ValueUnitDescription.distance(int? distance, {Key? key})
-      : this(
-          value: distance == null ? null : (distance / 1000).toStringAsFixed(3),
-          unit: "km",
-          description: "Distance",
-          scale: 1.3,
-          key: key,
-        );
-
-  ValueUnitDescription.distanceSmall(int? distance, {Key? key})
-      : this(
-          value: distance == null ? null : (distance / 1000).toStringAsFixed(3),
-          unit: "km",
-          description: null,
-          key: key,
-        );
-
-  ValueUnitDescription.speed(double? speed, {bool current = false, Key? key})
-      : this(
-          value: speed?.toStringAsFixed(1),
-          unit: "km/h",
-          description: current ? "Current Speed" : "Speed",
-          scale: 1.3,
-          key: key,
-        );
-
-  ValueUnitDescription.speedSmall(double? speed, {Key? key})
-      : this(
-          value: speed?.toStringAsFixed(1),
-          unit: "km/h",
-          description: null,
-          key: key,
-        );
-
-  ValueUnitDescription.tempo(Duration? tempo, {bool current = false, Key? key})
-      : this(
-          value: tempo?.formatTimeShort,
-          unit: "/km",
-          description: current ? "Current Tempo" : "Tempo",
-          scale: 1.3,
-          key: key,
-        );
-
-  ValueUnitDescription.calories(int? calories, {Key? key})
-      : this(
-          value: calories?.toString(),
-          unit: "cal",
-          description: "Energy",
-          scale: 1.3,
-          key: key,
-        );
 
   ValueUnitDescription.ascent(int? ascent, {Key? key})
       : this(
@@ -122,23 +23,6 @@ class ValueUnitDescription extends StatelessWidget {
   ValueUnitDescription.ascentSmall(int? ascent, {Key? key})
       : this(
           value: ascent?.toString(),
-          unit: "m",
-          description: null,
-          key: key,
-        );
-
-  ValueUnitDescription.descent(int? descent, {Key? key})
-      : this(
-          value: descent?.toString(),
-          unit: "m",
-          description: "Descent",
-          scale: 1.3,
-          key: key,
-        );
-
-  ValueUnitDescription.descentSmall(int? descent, {Key? key})
-      : this(
-          value: descent?.toString(),
           unit: "m",
           description: null,
           key: key,
@@ -168,6 +52,49 @@ class ValueUnitDescription extends StatelessWidget {
           key: key,
         );
 
+  ValueUnitDescription.calories(int? calories, {Key? key})
+      : this(
+          value: calories?.toString(),
+          unit: "cal",
+          description: "Energy",
+          scale: 1.3,
+          key: key,
+        );
+
+  ValueUnitDescription.descent(int? descent, {Key? key})
+      : this(
+          value: descent?.toString(),
+          unit: "m",
+          description: "Descent",
+          scale: 1.3,
+          key: key,
+        );
+
+  ValueUnitDescription.descentSmall(int? descent, {Key? key})
+      : this(
+          value: descent?.toString(),
+          unit: "m",
+          description: null,
+          key: key,
+        );
+
+  ValueUnitDescription.distance(int? distance, {Key? key})
+      : this(
+          value: distance == null ? null : (distance / 1000).toStringAsFixed(3),
+          unit: "km",
+          description: "Distance",
+          scale: 1.3,
+          key: key,
+        );
+
+  ValueUnitDescription.distanceSmall(int? distance, {Key? key})
+      : this(
+          value: distance == null ? null : (distance / 1000).toStringAsFixed(3),
+          unit: "km",
+          description: null,
+          key: key,
+        );
+
   const ValueUnitDescription.name(String? name, {Key? key})
       : this(
           value: name,
@@ -176,4 +103,80 @@ class ValueUnitDescription extends StatelessWidget {
           scale: 1.3,
           key: key,
         );
+
+  ValueUnitDescription.speed(double? speed, {bool current = false, Key? key})
+      : this(
+          value: speed?.toStringAsFixed(1),
+          unit: "km/h",
+          description: current ? "Current Speed" : "Speed",
+          scale: 1.3,
+          key: key,
+        );
+
+  ValueUnitDescription.speedSmall(double? speed, {Key? key})
+      : this(
+          value: speed?.toStringAsFixed(1),
+          unit: "km/h",
+          description: null,
+          key: key,
+        );
+
+  ValueUnitDescription.tempo(Duration? tempo, {bool current = false, Key? key})
+      : this(
+          value: tempo?.formatTimeShort,
+          unit: "/km",
+          description: current ? "Current Tempo" : "Tempo",
+          scale: 1.3,
+          key: key,
+        );
+
+  ValueUnitDescription.time(Duration? time, {Key? key})
+      : this(
+          value: time?.formatHms,
+          unit: null,
+          description: "Duration",
+          scale: 1.3,
+          key: key,
+        );
+
+  ValueUnitDescription.timeSmall(Duration? time, {Key? key})
+      : this(
+          value: time?.formatHms,
+          unit: null,
+          description: null,
+          key: key,
+        );
+
+  final String value;
+
+  final String? unit;
+
+  final String? description;
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: unit == null ? value : "$value ",
+            style: TextStyle(fontSize: scale * 20),
+          ),
+          if (unit != null)
+            TextSpan(
+              text: unit,
+              style: TextStyle(fontSize: scale * 14),
+            ),
+          if (description != null)
+            TextSpan(
+              text: "\n$description",
+              style: TextStyle(fontSize: scale * 12),
+            ),
+        ],
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
 }

@@ -17,10 +17,10 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 class CardioDetailsPage extends StatefulWidget {
-  final CardioSessionDescription cardioSessionDescription;
-
   const CardioDetailsPage({Key? key, required this.cardioSessionDescription})
       : super(key: key);
+
+  final CardioSessionDescription cardioSessionDescription;
 
   @override
   State<CardioDetailsPage> createState() => CardioDetailsPageState();
@@ -29,27 +29,14 @@ class CardioDetailsPage extends StatefulWidget {
 class CardioDetailsPageState extends State<CardioDetailsPage> {
   late CardioSessionDescription _cardioSessionDescription;
 
-  @override
-  void initState() {
-    _cardioSessionDescription = widget.cardioSessionDescription;
-    super.initState();
-  }
-
   late MapboxMapController _mapController;
   List<double>? currentChartXValues;
   List<double>? currentChartYValues;
 
-  Future<void> _exportFile() async {
-    final file = await saveTrackAsGpx(
-      _cardioSessionDescription.cardioSession.track ?? [],
-      startTime: _cardioSessionDescription.cardioSession.datetime,
-    );
-    if (file != null) {
-      await showMessageDialog(
-        context: context,
-        text: 'Track exported to $file',
-      );
-    }
+  @override
+  void initState() {
+    _cardioSessionDescription = widget.cardioSessionDescription;
+    super.initState();
   }
 
   @override
@@ -282,4 +269,17 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
         lineColor: Colors.orange,
         isRight: false,
       );
+
+  Future<void> _exportFile() async {
+    final file = await saveTrackAsGpx(
+      _cardioSessionDescription.cardioSession.track ?? [],
+      startTime: _cardioSessionDescription.cardioSession.datetime,
+    );
+    if (file != null) {
+      await showMessageDialog(
+        context: context,
+        text: 'Track exported to $file',
+      );
+    }
+  }
 }

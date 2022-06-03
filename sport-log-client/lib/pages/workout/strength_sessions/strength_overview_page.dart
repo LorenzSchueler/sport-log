@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
-import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_chart.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 class StrengthSessionsPage extends StatefulWidget {
   const StrengthSessionsPage({
@@ -153,12 +153,12 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
 }
 
 class StrengthSessionCard extends StatelessWidget {
-  final StrengthSessionDescription strengthSessionDescription;
-
   const StrengthSessionCard({
     Key? key,
     required this.strengthSessionDescription,
   }) : super(key: key);
+
+  final StrengthSessionDescription strengthSessionDescription;
 
   @override
   Widget build(BuildContext context) {

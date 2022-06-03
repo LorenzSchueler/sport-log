@@ -14,12 +14,10 @@ enum DbErrorCode {
 }
 
 class DbError {
-  DbErrorCode dbErrorCode;
-  ConflictDescriptor? conflictDescriptor;
-  DatabaseException? databaseException;
-
   DbError.uniqueViolation(ConflictDescriptor this.conflictDescriptor)
       : dbErrorCode = DbErrorCode.uniqueViolation;
+
+  DbError.unknown(this.databaseException) : dbErrorCode = DbErrorCode.unknown;
 
   factory DbError.fromDbException(DatabaseException databaseException) {
     if (databaseException.isUniqueConstraintError()) {
@@ -42,7 +40,9 @@ class DbError {
     }
   }
 
-  DbError.unknown(this.databaseException) : dbErrorCode = DbErrorCode.unknown;
+  DbErrorCode dbErrorCode;
+  ConflictDescriptor? conflictDescriptor;
+  DatabaseException? databaseException;
 
   @override
   String toString() {
@@ -58,17 +58,17 @@ class DbError {
 }
 
 class DbResult {
-  Result<void, DbError> result;
-
-  DbResult.success() : result = Success(null);
+  DbResult.fromDbException(DatabaseException exception)
+      : this.failure(DbError.fromDbException(exception));
 
   DbResult.failure(DbError dbError) : result = Failure(dbError);
+
+  DbResult.success() : result = Success(null);
 
   DbResult.fromBool(bool cond)
       : result = cond ? Success(null) : Failure(DbError.unknown(null));
 
-  DbResult.fromDbException(DatabaseException exception)
-      : this.failure(DbError.fromDbException(exception));
+  Result<void, DbError> result;
 
   static Future<DbResult> catchError(Future<DbResult> Function() fn) async {
     try {

@@ -2,30 +2,33 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 
 class TimelineUnion extends Comparable<TimelineUnion> {
-  final StrengthSessionDescription? _strengthSessionDescription;
-  final MetconSessionDescription? _metconSessionDescription;
-  final CardioSessionDescription? _cardioSessionDescription;
-  final Diary? _diary;
-
   TimelineUnion.strengthSession(
     StrengthSessionDescription this._strengthSessionDescription,
   )   : _metconSessionDescription = null,
         _cardioSessionDescription = null,
         _diary = null;
+
   TimelineUnion.metconSession(
     MetconSessionDescription this._metconSessionDescription,
   )   : _strengthSessionDescription = null,
         _cardioSessionDescription = null,
         _diary = null;
+
   TimelineUnion.cardioSession(
     CardioSessionDescription this._cardioSessionDescription,
   )   : _strengthSessionDescription = null,
         _metconSessionDescription = null,
         _diary = null;
+
   TimelineUnion.diary(Diary this._diary)
       : _strengthSessionDescription = null,
         _metconSessionDescription = null,
         _cardioSessionDescription = null;
+
+  final StrengthSessionDescription? _strengthSessionDescription;
+  final MetconSessionDescription? _metconSessionDescription;
+  final CardioSessionDescription? _cardioSessionDescription;
+  final Diary? _diary;
 
   DateTime get datetime {
     if (_strengthSessionDescription != null) {

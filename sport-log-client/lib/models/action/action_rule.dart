@@ -22,6 +22,9 @@ class ActionRule extends AtomicEntity {
     required this.deleted,
   });
 
+  factory ActionRule.fromJson(Map<String, dynamic> json) =>
+      _$ActionRuleFromJson(json);
+
   @override
   @IdConverter()
   Int64 id;
@@ -36,9 +39,6 @@ class ActionRule extends AtomicEntity {
   bool enabled;
   @override
   bool deleted;
-
-  factory ActionRule.fromJson(Map<String, dynamic> json) =>
-      _$ActionRuleFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$ActionRuleToJson(this);

@@ -9,8 +9,8 @@ import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class OfflineMapsPage extends StatefulWidget {
@@ -215,11 +215,11 @@ class OfflineMapsPageState extends State<OfflineMapsPage> {
 }
 
 class RegionCard extends StatelessWidget {
-  final OfflineRegion region;
-  final void Function() onDelete;
-
   const RegionCard({required this.region, required this.onDelete, Key? key})
       : super(key: key);
+
+  final OfflineRegion region;
+  final void Function() onDelete;
 
   @override
   Widget build(BuildContext context) {

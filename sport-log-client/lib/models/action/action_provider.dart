@@ -19,6 +19,9 @@ class ActionProvider extends AtomicEntity {
     required this.deleted,
   });
 
+  factory ActionProvider.fromJson(Map<String, dynamic> json) =>
+      _$ActionProviderFromJson(json);
+
   @override
   @IdConverter()
   Int64 id;
@@ -29,9 +32,6 @@ class ActionProvider extends AtomicEntity {
   String? description;
   @override
   bool deleted;
-
-  factory ActionProvider.fromJson(Map<String, dynamic> json) =>
-      _$ActionProviderFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$ActionProviderToJson(this);

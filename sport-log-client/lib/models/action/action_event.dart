@@ -20,6 +20,9 @@ class ActionEvent extends AtomicEntity {
     required this.deleted,
   });
 
+  factory ActionEvent.fromJson(Map<String, dynamic> json) =>
+      _$ActionEventFromJson(json);
+
   @override
   @IdConverter()
   Int64 id;
@@ -33,9 +36,6 @@ class ActionEvent extends AtomicEntity {
   bool enabled;
   @override
   bool deleted;
-
-  factory ActionEvent.fromJson(Map<String, dynamic> json) =>
-      _$ActionEventFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$ActionEventToJson(this);

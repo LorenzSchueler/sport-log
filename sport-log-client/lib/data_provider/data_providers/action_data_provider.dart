@@ -8,9 +8,11 @@ import 'package:sport_log/models/action/all.dart';
 import 'package:sport_log/models/platform/platform.dart';
 
 class ActionProviderDataProvider extends EntityDataProvider<ActionProvider> {
-  static final _instance = ActionProviderDataProvider._();
-  ActionProviderDataProvider._();
   factory ActionProviderDataProvider() => _instance;
+
+  ActionProviderDataProvider._();
+
+  static final _instance = ActionProviderDataProvider._();
 
   @override
   final Api<ActionProvider> api = Api.actionProviders;
@@ -27,9 +29,11 @@ class ActionProviderDataProvider extends EntityDataProvider<ActionProvider> {
 }
 
 class ActionDataProvider extends EntityDataProvider<Action> {
-  static final _instance = ActionDataProvider._();
-  ActionDataProvider._();
   factory ActionDataProvider() => _instance;
+
+  ActionDataProvider._();
+
+  static final _instance = ActionDataProvider._();
 
   @override
   final Api<Action> api = Api.actions;
@@ -46,9 +50,11 @@ class ActionDataProvider extends EntityDataProvider<Action> {
 }
 
 class ActionRuleDataProvider extends EntityDataProvider<ActionRule> {
-  static final _instance = ActionRuleDataProvider._();
-  ActionRuleDataProvider._();
   factory ActionRuleDataProvider() => _instance;
+
+  ActionRuleDataProvider._();
+
+  static final _instance = ActionRuleDataProvider._();
 
   @override
   final Api<ActionRule> api = Api.actionRules;
@@ -65,9 +71,11 @@ class ActionRuleDataProvider extends EntityDataProvider<ActionRule> {
 }
 
 class ActionEventDataProvider extends EntityDataProvider<ActionEvent> {
-  static final _instance = ActionEventDataProvider._();
-  ActionEventDataProvider._();
   factory ActionEventDataProvider() => _instance;
+
+  ActionEventDataProvider._();
+
+  static final _instance = ActionEventDataProvider._();
 
   @override
   final Api<ActionEvent> api = Api.actionEvents;
@@ -87,13 +95,6 @@ class ActionEventDataProvider extends EntityDataProvider<ActionEvent> {
 
 class ActionProviderDescriptionDataProvider
     extends DataProvider<ActionProviderDescription> {
-  final _actionProviderDataProvider = ActionProviderDataProvider();
-  final _actionDataProvider = ActionDataProvider();
-  final _actionRuleDataProvider = ActionRuleDataProvider();
-  final _actionEventDataProvider = ActionEventDataProvider();
-
-  ActionProviderDescriptionDataProvider._();
-  static ActionProviderDescriptionDataProvider? _instance;
   factory ActionProviderDescriptionDataProvider() {
     if (_instance == null) {
       _instance = ActionProviderDescriptionDataProvider._();
@@ -107,6 +108,15 @@ class ActionProviderDescriptionDataProvider
     }
     return _instance!;
   }
+
+  ActionProviderDescriptionDataProvider._();
+
+  static ActionProviderDescriptionDataProvider? _instance;
+
+  final _actionProviderDataProvider = ActionProviderDataProvider();
+  final _actionDataProvider = ActionDataProvider();
+  final _actionRuleDataProvider = ActionRuleDataProvider();
+  final _actionEventDataProvider = ActionEventDataProvider();
 
   @override
   Future<DbResult> createSingle(ActionProviderDescription object) async {

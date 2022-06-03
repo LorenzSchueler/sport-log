@@ -3,14 +3,14 @@ import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/theme.dart';
-import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 class MetconsPage extends StatefulWidget {
   const MetconsPage({Key? key}) : super(key: key);
@@ -121,10 +121,10 @@ class _MetconsPageState extends State<MetconsPage> {
 }
 
 class MetconCard extends StatelessWidget {
-  final MetconDescription metconDescription;
-
   const MetconCard({Key? key, required this.metconDescription})
       : super(key: key);
+
+  final MetconDescription metconDescription;
 
   @override
   Widget build(BuildContext context) {

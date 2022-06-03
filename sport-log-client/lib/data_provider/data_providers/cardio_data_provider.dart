@@ -11,9 +11,11 @@ import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
 class RouteDataProvider extends EntityDataProvider<Route> {
-  static final _instance = RouteDataProvider._();
-  RouteDataProvider._();
   factory RouteDataProvider() => _instance;
+
+  RouteDataProvider._();
+
+  static final _instance = RouteDataProvider._();
 
   @override
   final Api<Route> api = Api.routes;
@@ -31,9 +33,11 @@ class RouteDataProvider extends EntityDataProvider<Route> {
 }
 
 class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
-  static final _instance = CardioSessionDataProvider._();
-  CardioSessionDataProvider._();
   factory CardioSessionDataProvider() => _instance;
+
+  CardioSessionDataProvider._();
+
+  static final _instance = CardioSessionDataProvider._();
 
   @override
   final Api<CardioSession> api = Api.cardioSessions;
@@ -48,14 +52,6 @@ class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
 
 class CardioSessionDescriptionDataProvider
     extends DataProvider<CardioSessionDescription> {
-  final _cardioSessionDescriptionDb = AppDatabase.cardioSessionDescriptions;
-
-  final _cardioDataProvider = CardioSessionDataProvider();
-  final _routeDataProvider = RouteDataProvider();
-  final _movementDataProvider = MovementDataProvider();
-
-  static CardioSessionDescriptionDataProvider? _instance;
-  CardioSessionDescriptionDataProvider._();
   factory CardioSessionDescriptionDataProvider() {
     if (_instance == null) {
       _instance = CardioSessionDescriptionDataProvider._();
@@ -65,6 +61,15 @@ class CardioSessionDescriptionDataProvider
     }
     return _instance!;
   }
+  CardioSessionDescriptionDataProvider._();
+
+  static CardioSessionDescriptionDataProvider? _instance;
+
+  final _cardioSessionDescriptionDb = AppDatabase.cardioSessionDescriptions;
+
+  final _cardioDataProvider = CardioSessionDataProvider();
+  final _routeDataProvider = RouteDataProvider();
+  final _movementDataProvider = MovementDataProvider();
 
   @override
   Future<DbResult> createSingle(CardioSessionDescription object) async {

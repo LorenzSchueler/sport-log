@@ -9,8 +9,8 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
-import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
+import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
@@ -286,9 +286,9 @@ class MapPageState extends State<MapPage> {
 }
 
 class MapScale extends StatelessWidget {
-  final double metersPerPixel;
-
   const MapScale({required this.metersPerPixel, Key? key}) : super(key: key);
+
+  final double metersPerPixel;
 
   double get _scaleWidth {
     const maxWidth = 200;
@@ -324,11 +324,6 @@ class MapScale extends StatelessWidget {
 }
 
 class MapStylesBottomSheet extends StatelessWidget {
-  final bool hillshade;
-  final MapboxMapController mapController;
-  final void Function(String style) onStyleChange;
-  final void Function(bool hillshade) onHillshadeChange;
-
   MapStylesBottomSheet({
     required this.hillshade,
     required this.mapController,
@@ -336,6 +331,11 @@ class MapStylesBottomSheet extends StatelessWidget {
     required this.onHillshadeChange,
     Key? key,
   }) : super(key: key);
+
+  final bool hillshade;
+  final MapboxMapController mapController;
+  final void Function(String style) onStyleChange;
+  final void Function(bool hillshade) onHillshadeChange;
 
   final style = ButtonStyle(
     shape: MaterialStateProperty.all(const CircleBorder()),

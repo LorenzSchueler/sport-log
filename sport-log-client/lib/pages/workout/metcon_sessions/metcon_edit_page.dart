@@ -9,13 +9,13 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/input_fields/selection_bar.dart';
-import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
-import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/pop_scopes.dart';
 
 class MetconEditPage extends StatefulWidget {
   const MetconEditPage({

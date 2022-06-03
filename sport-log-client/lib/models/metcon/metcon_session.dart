@@ -26,24 +26,6 @@ class MetconSession extends AtomicEntity {
     required this.deleted,
   });
 
-  @override
-  @IdConverter()
-  Int64 id;
-  @IdConverter()
-  Int64 userId;
-  @IdConverter()
-  Int64 metconId;
-  @DateTimeConverter()
-  DateTime datetime;
-  @OptionalDurationConverter()
-  Duration? time;
-  int? rounds;
-  int? reps;
-  bool rx;
-  String? comments;
-  @override
-  bool deleted;
-
   factory MetconSession.defaultValue(Metcon metcon) {
     Duration? time;
     int? rounds;
@@ -75,6 +57,24 @@ class MetconSession extends AtomicEntity {
 
   factory MetconSession.fromJson(Map<String, dynamic> json) =>
       _$MetconSessionFromJson(json);
+
+  @override
+  @IdConverter()
+  Int64 id;
+  @IdConverter()
+  Int64 userId;
+  @IdConverter()
+  Int64 metconId;
+  @DateTimeConverter()
+  DateTime datetime;
+  @OptionalDurationConverter()
+  Duration? time;
+  int? rounds;
+  int? reps;
+  bool rx;
+  String? comments;
+  @override
+  bool deleted;
 
   @override
   Map<String, dynamic> toJson() => _$MetconSessionToJson(this);

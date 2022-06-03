@@ -17,6 +17,10 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 class Sync extends ChangeNotifier {
+  Sync._() : _isSyncing = false;
+
+  static final Sync instance = Sync._();
+
   final _logger = Logger('Sync');
 
   Timer? _syncTimer;
@@ -25,9 +29,6 @@ class Sync extends ChangeNotifier {
   bool get isSyncing => _isSyncing;
 
   ServerVersion? serverVersion;
-
-  static final Sync instance = Sync._();
-  Sync._() : _isSyncing = false;
 
   Future<void> init() async {
     if (Config.instance.deleteDatabase) {

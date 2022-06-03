@@ -4,14 +4,14 @@ import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class CardioValueUnitDescriptionTable extends StatelessWidget {
-  final CardioSessionDescription cardioSessionDescription;
-  final Duration? currentDuration;
-
   const CardioValueUnitDescriptionTable({
     required this.cardioSessionDescription,
     required this.currentDuration,
     Key? key,
   }) : super(key: key);
+
+  final CardioSessionDescription cardioSessionDescription;
+  final Duration? currentDuration;
 
   @override
   Widget build(BuildContext context) {

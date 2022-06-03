@@ -10,9 +10,9 @@ Future<bool> showSystemSettingsDialog({required String text}) async {
 }
 
 class SystemSettingsDialog extends StatelessWidget {
-  final String text;
-
   const SystemSettingsDialog({required this.text, Key? key}) : super(key: key);
+
+  final String text;
 
   @override
   Widget build(BuildContext context) {

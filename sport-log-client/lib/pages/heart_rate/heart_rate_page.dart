@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
-import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 class HeartRatePage extends StatefulWidget {
   const HeartRatePage({Key? key}) : super(key: key);
