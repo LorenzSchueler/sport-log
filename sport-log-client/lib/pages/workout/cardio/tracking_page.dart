@@ -290,7 +290,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
             ),
           ),
         ];
-      default:
+      case TrackingMode.notStarted:
         return [
           Expanded(
             child: ElevatedButton(

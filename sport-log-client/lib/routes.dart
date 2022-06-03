@@ -96,12 +96,12 @@ abstract class Routes {
         _checkLogin(() => const PlatformOverviewPage()),
     Routes.action.actionProviderOverview: (context) => _checkLogin(() {
           final actionProvider =
-              ModalRoute.of(context)?.settings.arguments as ActionProvider;
+              ModalRoute.of(context)!.settings.arguments! as ActionProvider;
           return ActionProviderOverviewPage(actionProvider: actionProvider);
         }),
     Routes.action.actionRuleEdit: (context) => _checkLogin(() {
           final args =
-              ModalRoute.of(context)?.settings.arguments as List<dynamic>;
+              ModalRoute.of(context)!.settings.arguments! as List<dynamic>;
           return ActionRuleEditPage(
             actionProviderDescription: args[0] as ActionProviderDescription,
             actionRule: args[1] as ActionRule?,
@@ -109,7 +109,7 @@ abstract class Routes {
         }),
     Routes.action.actionEventEdit: (context) => _checkLogin(() {
           final args =
-              ModalRoute.of(context)?.settings.arguments as List<dynamic>;
+              ModalRoute.of(context)!.settings.arguments! as List<dynamic>;
           return ActionEventEditPage(
             actionProviderDescription: args[0] as ActionProviderDescription,
             actionEvent: args[1] as ActionEvent?,
@@ -130,7 +130,7 @@ abstract class Routes {
     Routes.metcon.overview: (_) => _checkLogin(() => const MetconsPage()),
     Routes.metcon.details: (context) => _checkLogin(() {
           final metconDescription =
-              ModalRoute.of(context)?.settings.arguments as MetconDescription;
+              ModalRoute.of(context)!.settings.arguments! as MetconDescription;
           return MetconDetailsPage(metconDescription: metconDescription);
         }),
     Routes.metcon.edit: (context) => _checkLogin(() {
@@ -144,9 +144,9 @@ abstract class Routes {
     Routes.metcon.sessionOverview: (_) =>
         _checkLogin(() => const MetconSessionsPage()),
     Routes.metcon.sessionDetails: (context) => _checkLogin(() {
-          final metconSessionDescription = ModalRoute.of(context)
-              ?.settings
-              .arguments as MetconSessionDescription;
+          final metconSessionDescription = ModalRoute.of(context)!
+              .settings
+              .arguments! as MetconSessionDescription;
           return MetconSessionDetailsPage(
             metconSessionDescription: metconSessionDescription,
           );
@@ -171,9 +171,9 @@ abstract class Routes {
     Routes.strength.overview: (_) =>
         _checkLogin(() => const StrengthSessionsPage()),
     Routes.strength.details: (context) => _checkLogin(() {
-          final strengthSessionDescription = ModalRoute.of(context)
-              ?.settings
-              .arguments as StrengthSessionDescription;
+          final strengthSessionDescription = ModalRoute.of(context)!
+              .settings
+              .arguments! as StrengthSessionDescription;
           return StrengthSessionDetailsPage(
             strengthSessionDescription: strengthSessionDescription,
           );
@@ -200,7 +200,7 @@ abstract class Routes {
         _checkLoginAndroidIos(() => const CardioTrackingSettingsPage()),
     Routes.cardio.tracking: (context) => _checkLoginAndroidIos(() {
           final args =
-              ModalRoute.of(context)?.settings.arguments as List<dynamic>;
+              ModalRoute.of(context)!.settings.arguments! as List<dynamic>;
           return CardioTrackingPage(
             movement: args[0] as Movement,
             cardioType: args[1] as CardioType,
@@ -225,9 +225,9 @@ abstract class Routes {
                 );
         }),
     Routes.cardio.cardioDetails: (context) => _checkLogin(() {
-          final cardioSessionDescription = ModalRoute.of(context)
-              ?.settings
-              .arguments as CardioSessionDescription;
+          final cardioSessionDescription = ModalRoute.of(context)!
+              .settings
+              .arguments! as CardioSessionDescription;
           return CardioDetailsPage(
             cardioSessionDescription: cardioSessionDescription,
           );
@@ -242,7 +242,7 @@ abstract class Routes {
           );
         }),
     Routes.cardio.routeDetails: (context) => _checkLogin(() {
-          final route = ModalRoute.of(context)?.settings.arguments as Route;
+          final route = ModalRoute.of(context)!.settings.arguments! as Route;
           return RouteDetailsPage(route: route);
         }),
     // diary

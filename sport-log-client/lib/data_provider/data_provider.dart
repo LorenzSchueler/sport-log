@@ -71,6 +71,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
         );
         _logger.i(conflicResolution);
         return conflicResolution;
+      // ignore: no_default_cases
       default:
         await showMessageDialog(
           context: App.globalContext,

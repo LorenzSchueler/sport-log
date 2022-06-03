@@ -123,7 +123,7 @@ class DbMetconMovementSerializer extends DbSerializer<MetconMovement> {
       femaleWeight: r[prefix + Columns.femaleWeight] as double?,
       distanceUnit: r[prefix + Columns.distanceUnit] == null
           ? null
-          : DistanceUnit.values[r[prefix + Columns.distanceUnit] as int],
+          : DistanceUnit.values[r[prefix + Columns.distanceUnit]! as int],
       deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
