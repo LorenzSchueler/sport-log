@@ -9,6 +9,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/cardio/route.dart';
+import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -59,13 +60,6 @@ class RouteUploadPageState extends State<RouteUploadPage> {
 
   @override
   Widget build(BuildContext context) {
-    TableRow rowSpacer = TableRow(
-      children: [
-        Defaults.sizedBox.vertical.normal,
-        Defaults.sizedBox.vertical.normal,
-      ],
-    );
-
     return DiscardWarningOnPop(
       child: Scaffold(
         appBar: AppBar(
@@ -116,23 +110,7 @@ class RouteUploadPageState extends State<RouteUploadPage> {
                     ),
                   ),
                   Defaults.sizedBox.vertical.normal,
-                  Table(
-                    children: [
-                      TableRow(
-                        children: [
-                          ValueUnitDescription.distance(_route.distance),
-                          ValueUnitDescription.name(_route.name)
-                        ],
-                      ),
-                      rowSpacer,
-                      TableRow(
-                        children: [
-                          ValueUnitDescription.ascent(_route.ascent),
-                          ValueUnitDescription.descent(_route.descent),
-                        ],
-                      ),
-                    ],
-                  ),
+                  RouteValueUnitDescriptionTable(route: _route),
                   Defaults.sizedBox.vertical.normal,
                   Form(
                     key: _formKey,

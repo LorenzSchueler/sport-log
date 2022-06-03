@@ -10,12 +10,12 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
-import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RouteEditPage extends StatefulWidget {
   const RouteEditPage({Key? key, required this.route}) : super(key: key);
@@ -280,13 +280,6 @@ class RouteEditPageState extends State<RouteEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    TableRow rowSpacer = TableRow(
-      children: [
-        Defaults.sizedBox.vertical.normal,
-        Defaults.sizedBox.vertical.normal,
-      ],
-    );
-
     return DiscardWarningOnPop(
       child: Scaffold(
         appBar: AppBar(
@@ -339,23 +332,7 @@ class RouteEditPageState extends State<RouteEditPage> {
                   _buildExpandableListContainer(),
                   const Divider(),
                   Defaults.sizedBox.vertical.normal,
-                  Table(
-                    children: [
-                      TableRow(
-                        children: [
-                          ValueUnitDescription.distance(_route.distance),
-                          ValueUnitDescription.name(_route.name)
-                        ],
-                      ),
-                      rowSpacer,
-                      TableRow(
-                        children: [
-                          ValueUnitDescription.ascent(_route.ascent),
-                          ValueUnitDescription.descent(_route.descent),
-                        ],
-                      ),
-                    ],
-                  ),
+                  RouteValueUnitDescriptionTable(route: _route),
                   Defaults.sizedBox.vertical.normal,
                   Form(
                     key: _formKey,
