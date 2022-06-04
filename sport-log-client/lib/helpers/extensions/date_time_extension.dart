@@ -34,16 +34,33 @@ String shortWeekdayNameOfInt(int weekday) {
 }
 
 extension FormatDuration on Duration {
-  String get formatHms => toString().split('.').first.padLeft(8, "0");
+  String _threeDigits(int n) {
+    if (n >= 100) return "$n";
+    if (n >= 10) return "0$n";
+    return "00$n";
+  }
 
-  String get formatTimeShort => inSeconds < 3600
-      ? toString().split('.').first.split(":").skip(1).join(":")
-      : toString().split('.').first.padLeft(8, "0");
+  String _twoDigits(int n) {
+    if (n >= 10) return "$n";
+    return "0$n";
+  }
 
-  String get formatHm =>
-      toString().split('.').first.split(":").take(2).join(":").padLeft(5, "0");
+  String get _twoDigitMinutes =>
+      _twoDigits(inMinutes.remainder(Duration.minutesPerHour));
+  String get _twoDigitSeconds =>
+      _twoDigits(inSeconds.remainder(Duration.secondsPerMinute));
+  String get _threeDigitMillis =>
+      _threeDigits(inMilliseconds.remainder(Duration.millisecondsPerSecond));
 
-  String get formatMsMill => toString().split(":").skip(1).join(":");
+  String get formatHms => "$inHours:$_twoDigitMinutes:$_twoDigitSeconds";
+
+  String get formatHm => "$inHours:$_twoDigitMinutes";
+
+  String get formatTimeShort =>
+      inSeconds < 3600 ? "$_twoDigitMinutes:$_twoDigitSeconds" : formatHms;
+
+  String get formatMsMill =>
+      "$_twoDigitMinutes:$_twoDigitSeconds.$_threeDigitMillis";
 }
 
 extension DateTimeExtension on DateTime {
