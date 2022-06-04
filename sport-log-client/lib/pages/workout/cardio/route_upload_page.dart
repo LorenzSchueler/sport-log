@@ -15,7 +15,6 @@ import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
-import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RouteUploadPage extends StatefulWidget {
   const RouteUploadPage({Key? key}) : super(key: key);

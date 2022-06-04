@@ -6,6 +6,7 @@ import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/models/metcon/metcon_session_description.dart';
 import 'package:sport_log/models/strength/all.dart';
+import 'package:sport_log/models/strength/strength_session_records.dart';
 import 'package:sport_log/models/timeline_union.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_overview_page.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
@@ -29,10 +30,12 @@ class TimelinePage extends StatefulWidget {
 class TimelinePageState extends State<TimelinePage> {
   final _logger = Logger('TimelinePage');
   final _strengthDataProvider = StrengthSessionDescriptionDataProvider();
+  final _strengthSetDataProvider = StrengthSetDataProvider();
   final _metconDataProvider = MetconSessionDescriptionDataProvider();
   final _cardioDataProvider = CardioSessionDescriptionDataProvider();
   final _diaryDataProvider = DiaryDataProvider();
   List<StrengthSessionDescription> _strengthSessionsDescriptions = [];
+  StrengthRecords _strengthRecords = {};
   List<MetconSessionDescription> _metconSessionsDescriptions = [];
   List<CardioSessionDescription> _cardioSessionsDescriptions = [];
   List<Diary> _diaries = [];
@@ -80,6 +83,7 @@ class TimelinePageState extends State<TimelinePage> {
   }
 
   Future<void> updateStrengthSessions() async {
+    _strengthRecords = await _strengthSetDataProvider.getStrengthRecords();
     _strengthSessionsDescriptions =
         await _strengthDataProvider.getByTimerangeAndMovement(
       movement: null,
@@ -192,8 +196,10 @@ class TimelinePageState extends State<TimelinePage> {
 
   Widget _itemCard(TimelineUnion item) {
     return item.map(
-      (strengthSession) =>
-          StrengthSessionCard(strengthSessionDescription: strengthSession),
+      (strengthSession) => StrengthSessionCard(
+        strengthSessionDescription: strengthSession,
+        strengthRecords: _strengthRecords,
+      ),
       (metconSessionDescription) => MetconSessionCard(
         metconSessionDescription: metconSessionDescription,
       ),

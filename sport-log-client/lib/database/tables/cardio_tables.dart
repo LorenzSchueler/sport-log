@@ -38,12 +38,12 @@ class RouteTable extends TableAccessor<Route> {
 
   @override
   Future<List<Route>> getNonDeleted() async {
-    final result = await database.query(
+    final records = await database.query(
       tableName,
       where: notDeleted,
       orderBy: orderByName,
     );
-    return result.map(serde.fromDbRecord).toList();
+    return records.map(serde.fromDbRecord).toList();
   }
 }
 

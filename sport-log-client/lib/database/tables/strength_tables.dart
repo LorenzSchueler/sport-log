@@ -5,6 +5,7 @@ import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/movement_table.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/strength/strength_session_records.dart';
 
 class StrengthSessionAndMovement {
   StrengthSessionAndMovement({
@@ -83,7 +84,7 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
   Future<List<StrengthSet>> getByStrengthSession(
     StrengthSession strengthSession,
   ) async {
-    final result = await database.query(
+    final records = await database.query(
       tableName,
       where: TableAccessor.combineFilter([
         notDeleted,
@@ -92,7 +93,30 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
       whereArgs: [strengthSession.id.toInt()],
       orderBy: Columns.setNumber,
     );
-    return result.map(serde.fromDbRecord).toList();
+    return records.map(serde.fromDbRecord).toList();
+  }
+
+  Future<StrengthRecords> getStrengthRecords() async {
+    final records = await database.rawQuery(
+      """
+      select ${Tables.movement}.${Columns.id} as ${Columns.movementId}, 
+        max(${Tables.strengthSet}.${Columns.weight}) as ${Columns.maxWeight}, 
+        max(${Tables.strengthSet}.${Columns.count}) as ${Columns.maxCount}, 
+        max(${Tables.strengthSet}.${Columns.weight} / ${Tables.eorm}.${Columns.eormPercentage}) as ${Columns.maxEorm}
+      from ${Tables.strengthSet}
+      join ${Tables.strengthSession} on ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
+      join ${Tables.movement} on ${Tables.strengthSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+      left join ${Tables.eorm} on ${Tables.strengthSet}.${Columns.count} = ${Tables.eorm}.${Columns.eormReps} 
+        and ${Tables.strengthSet}.${Columns.count} <= 10 
+        and ${Tables.movement}.${Columns.dimension} = ${MovementDimension.reps.index}
+      group by ${Tables.movement}.${Columns.id}
+      """,
+    );
+    return {
+      for (final record in records)
+        Int64(record[Columns.movementId]! as int):
+            StrengthRecord.fromDbRecord(record)
+    };
   }
 }
 

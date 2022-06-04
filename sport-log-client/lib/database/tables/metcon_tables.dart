@@ -33,12 +33,12 @@ class MetconTable extends TableAccessor<Metcon> {
 
   @override
   Future<List<Metcon>> getNonDeleted() async {
-    final result = await database.query(
+    final records = await database.query(
       tableName,
       where: notDeleted,
       orderBy: orderByName,
     );
-    return result.map(serde.fromDbRecord).toList();
+    return records.map(serde.fromDbRecord).toList();
   }
 }
 
@@ -86,7 +86,7 @@ class MetconMovementTable extends TableAccessor<MetconMovement> {
   }
 
   Future<List<MetconMovement>> getByMetcon(Metcon metcon) async {
-    final result = await database.query(
+    final records = await database.query(
       tableName,
       where: TableAccessor.combineFilter([
         notDeleted,
@@ -95,7 +95,7 @@ class MetconMovementTable extends TableAccessor<MetconMovement> {
       whereArgs: [metcon.id.toInt()],
       orderBy: Columns.movementNumber,
     );
-    return result.map(serde.fromDbRecord).toList();
+    return records.map(serde.fromDbRecord).toList();
   }
 }
 

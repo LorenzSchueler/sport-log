@@ -26,11 +26,11 @@ class WodTable extends TableAccessor<Wod> {
 
   @override
   Future<List<Wod>> getNonDeleted() async {
-    final result = await database.query(
+    final records = await database.query(
       tableName,
       where: notDeleted,
       orderBy: orderByDate,
     );
-    return result.map(serde.fromDbRecord).toList();
+    return records.map(serde.fromDbRecord).toList();
   }
 }

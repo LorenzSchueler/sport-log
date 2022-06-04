@@ -31,7 +31,7 @@ class ActionTable extends TableAccessor<Action> {
   Future<List<Action>> getByActionProvider(
     ActionProvider actionProvider,
   ) async {
-    final result = await database.query(
+    final records = await database.query(
       tableName,
       where: TableAccessor.combineFilter([
         notDeleted,
@@ -40,7 +40,7 @@ class ActionTable extends TableAccessor<Action> {
       whereArgs: [actionProvider.id.toInt()],
       orderBy: orderByName,
     );
-    return result.map(serde.fromDbRecord).toList();
+    return records.map(serde.fromDbRecord).toList();
   }
 }
 
@@ -72,7 +72,7 @@ class ActionEventTable extends TableAccessor<ActionEvent> {
   Future<List<ActionEvent>> getByActionProvider(
     ActionProvider actionProvider,
   ) async {
-    final result = await database.query(
+    final records = await database.query(
       tableName,
       where: TableAccessor.combineFilter([
         notDeleted,
@@ -84,7 +84,7 @@ class ActionEventTable extends TableAccessor<ActionEvent> {
       whereArgs: [actionProvider.id.toInt()],
       orderBy: orderByDatetimeAsc,
     );
-    return result.map(serde.fromDbRecord).toList();
+    return records.map(serde.fromDbRecord).toList();
   }
 }
 
@@ -117,7 +117,7 @@ class ActionRuleTable extends TableAccessor<ActionRule> {
   Future<List<ActionRule>> getByActionProvider(
     ActionProvider actionProvider,
   ) async {
-    final result = await database.query(
+    final records = await database.query(
       tableName,
       where: TableAccessor.combineFilter([
         notDeleted,
@@ -129,7 +129,7 @@ class ActionRuleTable extends TableAccessor<ActionRule> {
       whereArgs: [actionProvider.id.toInt()],
       orderBy: Columns.weekday,
     );
-    return result.map(serde.fromDbRecord).toList();
+    return records.map(serde.fromDbRecord).toList();
   }
 }
 

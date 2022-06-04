@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/defaults.dart';
@@ -5,6 +6,7 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
+import 'package:sport_log/models/strength/strength_session_records.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -27,8 +29,10 @@ class StrengthSessionsPage extends StatefulWidget {
 
 class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   final _dataProvider = StrengthSessionDescriptionDataProvider();
+  final _setDataProvider = StrengthSetDataProvider();
   final _logger = Logger('StrengthSessionsPage');
   List<StrengthSessionDescription> _sessions = [];
+  StrengthRecords _strengthRecords = {};
 
   DateFilterState _dateFilter = MonthFilter.current();
   Movement? _movement;
@@ -60,7 +64,11 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
       until: _dateFilter.end,
       movement: _movement,
     );
-    setState(() => _sessions = ssds);
+    final records = await _setDataProvider.getStrengthRecords();
+    setState(() {
+      _sessions = ssds;
+      _strengthRecords = records;
+    });
   }
 
   @override
@@ -126,6 +134,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
                         child: ListView.separated(
                           itemBuilder: (context, index) => StrengthSessionCard(
                             strengthSessionDescription: _sessions[index],
+                            strengthRecords: _strengthRecords,
                           ),
                           separatorBuilder: (_, __) =>
                               Defaults.sizedBox.vertical.normal,
@@ -153,12 +162,17 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
 }
 
 class StrengthSessionCard extends StatelessWidget {
-  const StrengthSessionCard({
+  StrengthSessionCard({
     Key? key,
     required this.strengthSessionDescription,
-  }) : super(key: key);
+    required this.strengthRecords,
+  })  : strengthRecordTypes =
+            strengthRecords.getCombinedRecordTypes(strengthSessionDescription),
+        super(key: key);
 
   final StrengthSessionDescription strengthSessionDescription;
+  final StrengthRecords strengthRecords;
+  final List<StrengthRecordType> strengthRecordTypes;
 
   @override
   Widget build(BuildContext context) {
@@ -188,6 +202,12 @@ class StrengthSessionCard extends StatelessWidget {
                       strengthSessionDescription.movement.name,
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
+                    if (strengthRecordTypes.isNotEmpty) ...[
+                      Defaults.sizedBox.vertical.normal,
+                      StrengthRecordMarkers(
+                        strengthRecordTypes: strengthRecordTypes,
+                      ),
+                    ],
                     if (strengthSessionDescription.session.interval !=
                         null) ...[
                       Defaults.sizedBox.vertical.normal,
@@ -203,7 +223,8 @@ class StrengthSessionCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Expanded(
+              SizedBox(
+                width: 150,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: strengthSessionDescription.sets
@@ -221,6 +242,58 @@ class StrengthSessionCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class StrengthRecordMarkers extends StatelessWidget {
+  const StrengthRecordMarkers({
+    Key? key,
+    required this.strengthRecordTypes,
+  }) : super(key: key);
+
+  final List<StrengthRecordType> strengthRecordTypes;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: strengthRecordTypes
+          .map(
+            (recordType) {
+              switch (recordType) {
+                case StrengthRecordType.maxWeight:
+                  return [
+                    const Icon(
+                      AppIcons.medal,
+                      color: Colors.orange,
+                      size: 20,
+                    ),
+                    Defaults.sizedBox.horizontal.normal,
+                  ];
+                case StrengthRecordType.maxCount:
+                  return [
+                    const Icon(
+                      AppIcons.medal,
+                      color: Colors.yellow,
+                      size: 20,
+                    ),
+                    Defaults.sizedBox.horizontal.normal,
+                  ];
+                case StrengthRecordType.maxEorm:
+                  return [
+                    const Icon(
+                      AppIcons.medal,
+                      color: Colors.grey,
+                      size: 20,
+                    ),
+                    Defaults.sizedBox.horizontal.normal,
+                  ];
+              }
+            },
+          )
+          .toList()
+          .flattened
+          .toList(),
     );
   }
 }
