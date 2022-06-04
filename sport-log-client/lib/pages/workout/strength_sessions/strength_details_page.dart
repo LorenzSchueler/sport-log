@@ -185,7 +185,7 @@ class StrengthSessionDetailsPageState
         return [
           TextTile(
             caption: 'Best Time',
-            child: Text(Duration(milliseconds: stats.minCount).formatHms),
+            child: Text(Duration(milliseconds: stats.minCount).formatMsMill),
           ),
         ];
       case MovementDimension.distance:
@@ -199,7 +199,7 @@ class StrengthSessionDetailsPageState
         return [
           TextTile(
             caption: 'Total Energy',
-            child: Text('${stats.sumCount}cals'),
+            child: Text('${stats.sumCount} cal'),
           ),
         ];
     }

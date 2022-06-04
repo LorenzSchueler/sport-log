@@ -96,7 +96,7 @@ class StrengthSessionStats extends JsonSerializable {
       case MovementDimension.distance:
         return 'Best distance: $maxCount m';
       case MovementDimension.energy:
-        return 'Total energy: ${sumCount}cals';
+        return 'Total energy: $sumCount cal';
     }
   }
 }

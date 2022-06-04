@@ -129,6 +129,11 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
                           dateFilterState: _dateFilter,
                         ),
                         Defaults.sizedBox.vertical.normal,
+                        StrengthRecodsCard(
+                          strengthRecords: _strengthRecords,
+                          movement: _movement!,
+                        ),
+                        Defaults.sizedBox.vertical.normal,
                       ],
                       Expanded(
                         child: ListView.separated(
@@ -243,6 +248,91 @@ class StrengthSessionCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class StrengthRecodsCard extends StatelessWidget {
+  StrengthRecodsCard({
+    Key? key,
+    required this.movement,
+    required this.strengthRecords,
+  })  : strengthRecord = strengthRecords[movement.id],
+        super(key: key);
+
+  final Movement movement;
+  final StrengthRecords strengthRecords;
+  final StrengthRecord? strengthRecord;
+
+  @override
+  Widget build(BuildContext context) {
+    String countText = "";
+    if (strengthRecord != null) {
+      switch (movement.dimension) {
+        case MovementDimension.reps:
+          countText = "${strengthRecord!.maxCount} reps";
+          break;
+        case MovementDimension.time:
+          countText =
+              Duration(milliseconds: strengthRecord!.maxCount).formatMsMill;
+          break;
+        case MovementDimension.distance:
+          countText = '${strengthRecord!.maxCount} m';
+          break;
+        case MovementDimension.energy:
+          countText = '${strengthRecord!.maxCount} cal';
+          break;
+      }
+    }
+
+    return strengthRecord == null
+        ? Container()
+        : Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: Defaults.edgeInsets.normal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (strengthRecord!.maxWeight != null) ...[
+                    const Icon(
+                      AppIcons.medal,
+                      color: Colors.orange,
+                      size: 20,
+                    ),
+                    Defaults.sizedBox.horizontal.small,
+                    Text(
+                      "${strengthRecord!.maxWeight!.round()} kg",
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ),
+                    Defaults.sizedBox.horizontal.normal,
+                  ],
+                  const Icon(
+                    AppIcons.medal,
+                    color: Colors.yellow,
+                    size: 20,
+                  ),
+                  Defaults.sizedBox.horizontal.small,
+                  Text(
+                    countText,
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                  if (strengthRecord!.maxEorm != null) ...[
+                    Defaults.sizedBox.horizontal.normal,
+                    const Icon(
+                      AppIcons.medal,
+                      color: Colors.grey,
+                      size: 20,
+                    ),
+                    Defaults.sizedBox.horizontal.small,
+                    Text(
+                      "${strengthRecord!.maxEorm!.round()} kg",
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          );
   }
 }
 
