@@ -27,10 +27,10 @@ class MetconSessionEditPage extends StatefulWidget {
   final bool isNew;
 
   @override
-  State<MetconSessionEditPage> createState() => MetconSessionEditPageState();
+  State<MetconSessionEditPage> createState() => _MetconSessionEditPageState();
 }
 
-class MetconSessionEditPageState extends State<MetconSessionEditPage> {
+class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
   final _logger = Logger('MetconSessionEditPage');
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = MetconSessionDescriptionDataProvider();

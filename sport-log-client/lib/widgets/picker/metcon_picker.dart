@@ -29,10 +29,10 @@ class MetconPickerDialog extends StatefulWidget {
   final Metcon? selectedMetcon;
 
   @override
-  State<MetconPickerDialog> createState() => MetconPickerDialogState();
+  State<MetconPickerDialog> createState() => _MetconPickerDialogState();
 }
 
-class MetconPickerDialogState extends State<MetconPickerDialog> {
+class _MetconPickerDialogState extends State<MetconPickerDialog> {
   final _dataProvider = MetconDataProvider();
   late final StreamSubscription<bool> _keyboardSubscription;
 

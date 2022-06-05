@@ -30,10 +30,11 @@ class StrengthSessionEditPage extends StatefulWidget {
   final bool isNew;
 
   @override
-  StrengthSessionEditPageState createState() => StrengthSessionEditPageState();
+  State<StrengthSessionEditPage> createState() =>
+      _StrengthSessionEditPageState();
 }
 
-class StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
+class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   final _dataProvider = StrengthSessionDescriptionDataProvider();
 
   late final StrengthSessionDescription _strengthSessionDescription;

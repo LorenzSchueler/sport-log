@@ -29,10 +29,10 @@ class RoutePickerDialog extends StatefulWidget {
   final Route? selectedRoute;
 
   @override
-  State<RoutePickerDialog> createState() => RoutePickerDialogState();
+  State<RoutePickerDialog> createState() => _RoutePickerDialogState();
 }
 
-class RoutePickerDialogState extends State<RoutePickerDialog> {
+class _RoutePickerDialogState extends State<RoutePickerDialog> {
   final _dataProvider = RouteDataProvider();
   late final StreamSubscription<bool> _keyboardSubscription;
 

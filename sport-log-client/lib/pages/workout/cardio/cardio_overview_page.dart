@@ -27,10 +27,10 @@ class CardioSessionsPage extends StatefulWidget {
   const CardioSessionsPage({Key? key}) : super(key: key);
 
   @override
-  State<CardioSessionsPage> createState() => CardioSessionsPageState();
+  State<CardioSessionsPage> createState() => _CardioSessionsPageState();
 }
 
-class CardioSessionsPageState extends State<CardioSessionsPage> {
+class _CardioSessionsPageState extends State<CardioSessionsPage> {
   final _logger = Logger('CardioSessionsPage');
   final _dataProvider = CardioSessionDescriptionDataProvider();
   List<CardioSessionDescription> _cardioSessionDescriptions = [];

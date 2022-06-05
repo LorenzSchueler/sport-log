@@ -24,10 +24,10 @@ class NewCredentialsDialog extends StatefulWidget {
   static bool isShown = false;
 
   @override
-  State<NewCredentialsDialog> createState() => NewCredentialsDialogState();
+  State<NewCredentialsDialog> createState() => _NewCredentialsDialogState();
 }
 
-class NewCredentialsDialogState extends State<NewCredentialsDialog> {
+class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
   final _formKey = GlobalKey<FormState>();
   String _username = "";
   String _password = "";

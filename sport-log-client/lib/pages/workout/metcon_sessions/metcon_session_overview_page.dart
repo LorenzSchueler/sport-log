@@ -22,10 +22,10 @@ class MetconSessionsPage extends StatefulWidget {
   const MetconSessionsPage({Key? key}) : super(key: key);
 
   @override
-  State<MetconSessionsPage> createState() => MetconSessionsPageState();
+  State<MetconSessionsPage> createState() => _MetconSessionsPageState();
 }
 
-class MetconSessionsPageState extends State<MetconSessionsPage> {
+class _MetconSessionsPageState extends State<MetconSessionsPage> {
   final _logger = Logger('MetconSessionsPage');
   final _dataProvider = MetconSessionDescriptionDataProvider();
   List<MetconSessionDescription> _metconSessionDescriptions = [];

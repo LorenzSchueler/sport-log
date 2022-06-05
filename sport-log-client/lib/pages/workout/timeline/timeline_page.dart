@@ -25,10 +25,10 @@ class TimelinePage extends StatefulWidget {
   const TimelinePage({Key? key}) : super(key: key);
 
   @override
-  State<TimelinePage> createState() => TimelinePageState();
+  State<TimelinePage> createState() => _TimelinePageState();
 }
 
-class TimelinePageState extends State<TimelinePage> {
+class _TimelinePageState extends State<TimelinePage> {
   final _logger = Logger('TimelinePage');
   final _strengthDataProvider = StrengthSessionDescriptionDataProvider();
   final _metconDataProvider = MetconSessionDescriptionDataProvider();

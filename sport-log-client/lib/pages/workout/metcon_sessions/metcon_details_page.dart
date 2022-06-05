@@ -16,10 +16,10 @@ class MetconDetailsPage extends StatefulWidget {
   final MetconDescription metconDescription;
 
   @override
-  State<MetconDetailsPage> createState() => MetconDetailsPageState();
+  State<MetconDetailsPage> createState() => _MetconDetailsPageState();
 }
 
-class MetconDetailsPageState extends State<MetconDetailsPage> {
+class _MetconDetailsPageState extends State<MetconDetailsPage> {
   final _dataProvider = MetconDescriptionDataProvider();
   late MetconDescription _metconDescription;
 

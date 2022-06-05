@@ -20,10 +20,10 @@ class RouteUploadPage extends StatefulWidget {
   const RouteUploadPage({Key? key}) : super(key: key);
 
   @override
-  State<RouteUploadPage> createState() => RouteUploadPageState();
+  State<RouteUploadPage> createState() => _RouteUploadPageState();
 }
 
-class RouteUploadPageState extends State<RouteUploadPage> {
+class _RouteUploadPageState extends State<RouteUploadPage> {
   final _logger = Logger('RouteUploadPage');
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = RouteDataProvider();

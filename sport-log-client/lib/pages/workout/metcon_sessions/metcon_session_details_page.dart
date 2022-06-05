@@ -19,10 +19,10 @@ class MetconSessionDetailsPage extends StatefulWidget {
 
   @override
   State<MetconSessionDetailsPage> createState() =>
-      MetconSessionDetailsPageState();
+      _MetconSessionDetailsPageState();
 }
 
-class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
+class _MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
   final _dataProvider = MetconSessionDescriptionDataProvider();
   late MetconSessionDescription _metconSessionDescription;
   List<MetconSessionDescription> _metconSessionDescriptions = [];

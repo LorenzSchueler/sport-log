@@ -18,10 +18,10 @@ class PlatformOverviewPage extends StatefulWidget {
   const PlatformOverviewPage({Key? key}) : super(key: key);
 
   @override
-  State<PlatformOverviewPage> createState() => PlatformOverviewPageState();
+  State<PlatformOverviewPage> createState() => _PlatformOverviewPageState();
 }
 
-class PlatformOverviewPageState extends State<PlatformOverviewPage> {
+class _PlatformOverviewPageState extends State<PlatformOverviewPage> {
   final _logger = Logger('PlatformOverviewPage');
   List<PlatformDescription> _platformDescriptions = [];
   final _dataProvider = PlatformDescriptionDataProvider();
@@ -166,10 +166,10 @@ class PlatformCredentialDialog extends StatefulWidget {
 
   @override
   State<PlatformCredentialDialog> createState() =>
-      PlatformCredentialDialogState();
+      _PlatformCredentialDialogState();
 }
 
-class PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
+class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
   late PlatformDescription platformDescription;
   final _dataProvider = PlatformDescriptionDataProvider();
 

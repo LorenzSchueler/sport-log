@@ -39,10 +39,10 @@ class CountWeightInput extends StatefulWidget {
   final double? initialSecondWeight;
 
   @override
-  CountWeightInputState createState() => CountWeightInputState();
+  State<CountWeightInput> createState() => _CountWeightInputState();
 }
 
-class CountWeightInputState extends State<CountWeightInput> {
+class _CountWeightInputState extends State<CountWeightInput> {
   late int _count;
   late double? _weight;
   late double? _secondWeight;

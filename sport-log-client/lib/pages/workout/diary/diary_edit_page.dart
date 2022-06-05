@@ -17,10 +17,10 @@ class DiaryEditPage extends StatefulWidget {
   final Diary? diary;
 
   @override
-  State<DiaryEditPage> createState() => DiaryEditPageState();
+  State<DiaryEditPage> createState() => _DiaryEditPageState();
 }
 
-class DiaryEditPageState extends State<DiaryEditPage> {
+class _DiaryEditPageState extends State<DiaryEditPage> {
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = DiaryDataProvider();
 

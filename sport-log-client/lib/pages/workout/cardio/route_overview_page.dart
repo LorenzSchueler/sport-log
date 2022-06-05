@@ -21,10 +21,10 @@ class RoutePage extends StatefulWidget {
   const RoutePage({Key? key}) : super(key: key);
 
   @override
-  State<RoutePage> createState() => RoutePageState();
+  State<RoutePage> createState() => _RoutePageState();
 }
 
-class RoutePageState extends State<RoutePage> {
+class _RoutePageState extends State<RoutePage> {
   final _logger = Logger('RoutePage');
   final _dataProvider = RouteDataProvider();
   List<Route> _routes = [];

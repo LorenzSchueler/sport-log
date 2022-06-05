@@ -16,10 +16,10 @@ class TimerPage extends StatefulWidget {
   const TimerPage({Key? key}) : super(key: key);
 
   @override
-  State<TimerPage> createState() => TimerPageState();
+  State<TimerPage> createState() => _TimerPageState();
 }
 
-class TimerPageState extends State<TimerPage> {
+class _TimerPageState extends State<TimerPage> {
   Duration _time = Duration.zero;
   Duration? _restTime;
   int _rounds = 3;

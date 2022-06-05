@@ -39,10 +39,10 @@ class CardioTrackingPage extends StatefulWidget {
   final String? heartRateMonitorId;
 
   @override
-  State<CardioTrackingPage> createState() => CardioTrackingPageState();
+  State<CardioTrackingPage> createState() => _CardioTrackingPageState();
 }
 
-class CardioTrackingPageState extends State<CardioTrackingPage> {
+class _CardioTrackingPageState extends State<CardioTrackingPage> {
   final _dataProvider = CardioSessionDescriptionDataProvider();
 
   late final CardioSessionDescription _cardioSessionDescription;

@@ -20,10 +20,10 @@ class IntInput extends StatefulWidget {
   final void Function(int value)? setValue;
 
   @override
-  IntInputState createState() => IntInputState();
+  State<IntInput> createState() => _IntInputState();
 }
 
-class IntInputState extends State<IntInput> {
+class _IntInputState extends State<IntInput> {
   late int _value;
 
   late final TextEditingController _textController;

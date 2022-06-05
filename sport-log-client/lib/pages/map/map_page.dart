@@ -22,10 +22,10 @@ class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
 
   @override
-  State<MapPage> createState() => MapPageState();
+  State<MapPage> createState() => _MapPageState();
 }
 
-class MapPageState extends State<MapPage> {
+class _MapPageState extends State<MapPage> {
   late LocationUtils _locationUtils;
   late MapboxMapController _mapController;
   final _searchBar = FocusNode();

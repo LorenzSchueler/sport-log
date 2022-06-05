@@ -15,10 +15,10 @@ class ExpandableFab extends StatefulWidget {
   final List<ActionButton> buttons;
 
   @override
-  ExpandableFabState createState() => ExpandableFabState();
+  State<ExpandableFab> createState() => _ExpandableFabState();
 }
 
-class ExpandableFabState extends State<ExpandableFab>
+class _ExpandableFabState extends State<ExpandableFab>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _expandAnimation;

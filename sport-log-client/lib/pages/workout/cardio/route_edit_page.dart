@@ -23,10 +23,10 @@ class RouteEditPage extends StatefulWidget {
   final Route? route;
 
   @override
-  State<RouteEditPage> createState() => RouteEditPageState();
+  State<RouteEditPage> createState() => _RouteEditPageState();
 }
 
-class RouteEditPageState extends State<RouteEditPage> {
+class _RouteEditPageState extends State<RouteEditPage> {
   final _logger = Logger('RouteEditPage');
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = RouteDataProvider();

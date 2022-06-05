@@ -24,10 +24,10 @@ class StrengthSessionsPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StrengthSessionsPage> createState() => StrengthSessionsPageState();
+  State<StrengthSessionsPage> createState() => _StrengthSessionsPageState();
 }
 
-class StrengthSessionsPageState extends State<StrengthSessionsPage> {
+class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   final _dataProvider = StrengthSessionDescriptionDataProvider();
   final _logger = Logger('StrengthSessionsPage');
   List<StrengthSessionDescription> _sessions = [];

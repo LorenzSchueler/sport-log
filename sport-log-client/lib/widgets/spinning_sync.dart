@@ -14,10 +14,10 @@ class SpinningSync extends StatefulWidget {
   final Color? color;
 
   @override
-  SpinningSyncState createState() => SpinningSyncState();
+  State<SpinningSync> createState() => _SpinningSyncState();
 }
 
-class SpinningSyncState extends State<SpinningSync>
+class _SpinningSyncState extends State<SpinningSync>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 

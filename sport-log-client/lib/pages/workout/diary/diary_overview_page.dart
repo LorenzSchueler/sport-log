@@ -19,10 +19,10 @@ class DiaryPage extends StatefulWidget {
   const DiaryPage({Key? key}) : super(key: key);
 
   @override
-  State<DiaryPage> createState() => DiaryPageState();
+  State<DiaryPage> createState() => _DiaryPageState();
 }
 
-class DiaryPageState extends State<DiaryPage> {
+class _DiaryPageState extends State<DiaryPage> {
   final _logger = Logger('DiaryPage');
   final _dataProvider = DiaryDataProvider();
   List<Diary> _diaries = [];

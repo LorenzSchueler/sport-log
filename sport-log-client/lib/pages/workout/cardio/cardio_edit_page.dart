@@ -32,10 +32,10 @@ class CardioEditPage extends StatefulWidget {
   final bool isNew;
 
   @override
-  State<CardioEditPage> createState() => CardioEditPageState();
+  State<CardioEditPage> createState() => _CardioEditPageState();
 }
 
-class CardioEditPageState extends State<CardioEditPage> {
+class _CardioEditPageState extends State<CardioEditPage> {
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = CardioSessionDescriptionDataProvider();
 

@@ -23,10 +23,10 @@ class CardioDetailsPage extends StatefulWidget {
   final CardioSessionDescription cardioSessionDescription;
 
   @override
-  State<CardioDetailsPage> createState() => CardioDetailsPageState();
+  State<CardioDetailsPage> createState() => _CardioDetailsPageState();
 }
 
-class CardioDetailsPageState extends State<CardioDetailsPage> {
+class _CardioDetailsPageState extends State<CardioDetailsPage> {
   late CardioSessionDescription _cardioSessionDescription;
 
   late MapboxMapController _mapController;

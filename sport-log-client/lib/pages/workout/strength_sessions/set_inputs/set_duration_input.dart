@@ -17,19 +17,19 @@ class SetDurationInput extends StatefulWidget {
   final bool confirmChanges;
 
   @override
-  SetDurationInputState createState() => SetDurationInputState();
+  State<SetDurationInput> createState() => _SetDurationInputState();
 }
 
-class SetDurationInputState extends State<SetDurationInput> {
+class _SetDurationInputState extends State<SetDurationInput> {
   int _hours = 0;
   int _minutes = 0;
   int _seconds = 0;
   int _milliseconds = 0;
 
-  final _hoursKey = GlobalKey<PaddedIntInputState>();
-  final _minutesKey = GlobalKey<PaddedIntInputState>();
-  final _secondsKey = GlobalKey<PaddedIntInputState>();
-  final _millisecondsKey = GlobalKey<PaddedIntInputState>();
+  final _hoursKey = GlobalKey<_PaddedIntInputState>();
+  final _minutesKey = GlobalKey<_PaddedIntInputState>();
+  final _secondsKey = GlobalKey<_PaddedIntInputState>();
+  final _millisecondsKey = GlobalKey<_PaddedIntInputState>();
 
   void _submit() {
     final duration = Duration(
@@ -277,10 +277,10 @@ class PaddedIntInput extends StatefulWidget {
   static double get fontSize => _CaptionTextField.textFontSize;
 
   @override
-  PaddedIntInputState createState() => PaddedIntInputState();
+  State<PaddedIntInput> createState() => _PaddedIntInputState();
 }
 
-class PaddedIntInputState extends State<PaddedIntInput> {
+class _PaddedIntInputState extends State<PaddedIntInput> {
   static const double _widthPerDigit = 31;
 
   final _focusNode = FocusNode();

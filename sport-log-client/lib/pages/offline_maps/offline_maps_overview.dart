@@ -17,10 +17,10 @@ class OfflineMapsPage extends StatefulWidget {
   const OfflineMapsPage({Key? key}) : super(key: key);
 
   @override
-  State<OfflineMapsPage> createState() => OfflineMapsPageState();
+  State<OfflineMapsPage> createState() => _OfflineMapsPageState();
 }
 
-class OfflineMapsPageState extends State<OfflineMapsPage> {
+class _OfflineMapsPageState extends State<OfflineMapsPage> {
   late MapboxMapController _mapController;
 
   LatLng? _point1;
