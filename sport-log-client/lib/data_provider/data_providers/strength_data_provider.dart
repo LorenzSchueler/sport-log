@@ -9,7 +9,7 @@ import 'package:sport_log/helpers/diff_algorithm.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
-import 'package:sport_log/models/strength/strength_session_records.dart';
+import 'package:sport_log/models/strength/strength_records.dart';
 
 class StrengthSessionDataProvider extends EntityDataProvider<StrengthSession> {
   factory StrengthSessionDataProvider() => _instance;
@@ -256,4 +256,7 @@ class StrengthSessionDescriptionDataProvider
       synchronized: synchronized,
     );
   }
+
+  Future<StrengthRecords> getStrengthRecords() =>
+      _strengthSetDataProvider.getStrengthRecords();
 }

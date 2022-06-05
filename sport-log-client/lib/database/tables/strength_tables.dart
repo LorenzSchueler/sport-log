@@ -5,7 +5,7 @@ import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/movement_table.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/models/strength/strength_session_records.dart';
+import 'package:sport_log/models/strength/strength_records.dart';
 
 class StrengthSessionAndMovement {
   StrengthSessionAndMovement({
@@ -109,6 +109,11 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
       left join ${Tables.eorm} on ${Tables.strengthSet}.${Columns.count} = ${Tables.eorm}.${Columns.eormReps} 
         and ${Tables.strengthSet}.${Columns.count} <= 10 
         and ${Tables.movement}.${Columns.dimension} = ${MovementDimension.reps.index}
+      where ${TableAccessor.combineFilter([
+            notDeleted,
+            TableAccessor.notDeletedOfTable(Tables.strengthSession),
+            TableAccessor.notDeletedOfTable(Tables.movement),
+          ])}
       group by ${Tables.movement}.${Columns.id}
       """,
     );

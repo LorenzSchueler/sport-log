@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/helpers/extensions/num_extension.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/strength_session_description.dart';
 import 'package:sport_log/models/strength/strength_session_stats.dart';
@@ -23,17 +24,13 @@ extension StrengthRecordExtension on StrengthRecords {
   ) {
     List<StrengthRecordType> recordTypes = [];
     if (strengthRecord != null) {
-      if (strengthSessionStats.maxWeight != null &&
-          strengthSessionStats.maxWeight?.round() ==
-              strengthRecord.maxWeight?.round()) {
+      if (isRecord(strengthSessionStats.maxWeight, strengthRecord.maxWeight)) {
         recordTypes.add(StrengthRecordType.maxWeight);
       }
-      if (strengthSessionStats.maxCount == strengthRecord.maxCount) {
+      if (strengthSessionStats.maxCount >= strengthRecord.maxCount) {
         recordTypes.add(StrengthRecordType.maxCount);
       }
-      if (strengthSessionStats.maxEorm != null &&
-          strengthSessionStats.maxEorm?.round() ==
-              strengthRecord.maxEorm?.round()) {
+      if (isRecord(strengthSessionStats.maxEorm, strengthRecord.maxEorm)) {
         recordTypes.add(StrengthRecordType.maxEorm);
       }
     }

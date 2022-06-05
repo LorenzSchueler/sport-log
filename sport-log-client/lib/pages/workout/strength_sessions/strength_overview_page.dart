@@ -6,7 +6,7 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
-import 'package:sport_log/models/strength/strength_session_records.dart';
+import 'package:sport_log/models/strength/strength_records.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -29,7 +29,6 @@ class StrengthSessionsPage extends StatefulWidget {
 
 class StrengthSessionsPageState extends State<StrengthSessionsPage> {
   final _dataProvider = StrengthSessionDescriptionDataProvider();
-  final _setDataProvider = StrengthSetDataProvider();
   final _logger = Logger('StrengthSessionsPage');
   List<StrengthSessionDescription> _sessions = [];
   StrengthRecords _strengthRecords = {};
@@ -64,7 +63,7 @@ class StrengthSessionsPageState extends State<StrengthSessionsPage> {
       until: _dateFilter.end,
       movement: _movement,
     );
-    final records = await _setDataProvider.getStrengthRecords();
+    final records = await _dataProvider.getStrengthRecords();
     setState(() {
       _sessions = ssds;
       _strengthRecords = records;
@@ -228,8 +227,7 @@ class StrengthSessionCard extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(
-                width: 150,
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: strengthSessionDescription.sets

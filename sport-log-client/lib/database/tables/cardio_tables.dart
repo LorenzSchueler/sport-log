@@ -137,19 +137,17 @@ class CardioSessionDescriptionTable {
       ORDER BY ${TableAccessor.orderByDatetimeOfTable(Tables.cardioSession)}
     ''',
     );
-    List<CardioSessionDescription> cardioSessionDescriptions = [];
-    for (final Map<String, Object?> record in records) {
-      cardioSessionDescriptions.add(
-        CardioSessionDescription(
-          cardioSession: _cardioSessionTable.serde
-              .fromDbRecord(record, prefix: _cardioSessionTable.table.prefix),
-          route: _routeTable.serde
-              .fromOptionalDbRecord(record, prefix: _routeTable.table.prefix),
-          movement: _movementTable.serde
-              .fromDbRecord(record, prefix: _movementTable.table.prefix),
-        ),
-      );
-    }
-    return cardioSessionDescriptions;
+    return records
+        .map(
+          (record) => CardioSessionDescription(
+            cardioSession: _cardioSessionTable.serde
+                .fromDbRecord(record, prefix: _cardioSessionTable.table.prefix),
+            route: _routeTable.serde
+                .fromOptionalDbRecord(record, prefix: _routeTable.table.prefix),
+            movement: _movementTable.serde
+                .fromDbRecord(record, prefix: _movementTable.table.prefix),
+          ),
+        )
+        .toList();
   }
 }
