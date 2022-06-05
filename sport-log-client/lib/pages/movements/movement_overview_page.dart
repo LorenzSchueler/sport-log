@@ -12,8 +12,6 @@ import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
-final _dataProvider = MovementDescriptionDataProvider();
-
 class MovementsPage extends StatefulWidget {
   const MovementsPage({Key? key}) : super(key: key);
 
@@ -23,6 +21,7 @@ class MovementsPage extends StatefulWidget {
 
 class _MovementsPageState extends State<MovementsPage> {
   final _logger = Logger('MovementsPage');
+  final _dataProvider = MovementDescriptionDataProvider();
   final _searchBar = FocusNode();
   List<MovementDescription> _movementDescriptions = [];
   String? _movementName;

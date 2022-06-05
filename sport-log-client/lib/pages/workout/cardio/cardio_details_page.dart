@@ -35,7 +35,7 @@ class CardioDetailsPageState extends State<CardioDetailsPage> {
 
   @override
   void initState() {
-    _cardioSessionDescription = widget.cardioSessionDescription;
+    _cardioSessionDescription = widget.cardioSessionDescription.clone();
     super.initState();
   }
 

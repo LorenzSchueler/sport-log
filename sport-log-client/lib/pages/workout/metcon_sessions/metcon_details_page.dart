@@ -25,7 +25,7 @@ class MetconDetailsPageState extends State<MetconDetailsPage> {
 
   @override
   void initState() {
-    _metconDescription = widget.metconDescription;
+    _metconDescription = widget.metconDescription.clone();
     super.initState();
   }
 

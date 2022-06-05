@@ -182,13 +182,12 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
 class MetconSessionCard extends StatelessWidget {
   MetconSessionCard({
     required this.metconSessionDescription,
-    required this.metconRecords,
+    required MetconRecords metconRecords,
     Key? key,
   })  : metconRecord = metconRecords.isMetconRecord(metconSessionDescription),
         super(key: key);
 
   final MetconSessionDescription metconSessionDescription;
-  final MetconRecords metconRecords;
   final bool metconRecord;
 
   @override

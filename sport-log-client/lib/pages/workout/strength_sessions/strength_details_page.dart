@@ -31,7 +31,7 @@ class StrengthSessionDetailsPageState
 
   @override
   void initState() {
-    _strengthSessionDescription = widget.strengthSessionDescription;
+    _strengthSessionDescription = widget.strengthSessionDescription.clone();
     super.initState();
   }
 

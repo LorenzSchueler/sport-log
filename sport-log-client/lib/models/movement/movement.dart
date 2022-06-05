@@ -73,7 +73,9 @@ class Movement extends AtomicEntity {
   MovementDimension dimension;
 
   static Movement?
-      defaultMovement; // default movement that already exists in db
+      _defaultMovement; // default movement that already exists in db
+  static set defaultMovement(Movement? movement) => _defaultMovement = movement;
+  static Movement? get defaultMovement => _defaultMovement?.clone();
 
   @override
   Map<String, dynamic> toJson() => _$MovementToJson(this);

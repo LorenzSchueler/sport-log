@@ -14,8 +14,6 @@ import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
-final _dataProvider = PlatformDescriptionDataProvider();
-
 class PlatformOverviewPage extends StatefulWidget {
   const PlatformOverviewPage({Key? key}) : super(key: key);
 
@@ -26,6 +24,7 @@ class PlatformOverviewPage extends StatefulWidget {
 class PlatformOverviewPageState extends State<PlatformOverviewPage> {
   final _logger = Logger('PlatformOverviewPage');
   List<PlatformDescription> _platformDescriptions = [];
+  final _dataProvider = PlatformDescriptionDataProvider();
 
   @override
   void initState() {
@@ -172,6 +171,7 @@ class PlatformCredentialDialog extends StatefulWidget {
 
 class PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
   late PlatformDescription platformDescription;
+  final _dataProvider = PlatformDescriptionDataProvider();
 
   @override
   void initState() {

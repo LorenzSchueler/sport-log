@@ -31,7 +31,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
 
   @override
   void initState() {
-    _route = widget.route;
+    _route = widget.route.clone();
     super.initState();
   }
 

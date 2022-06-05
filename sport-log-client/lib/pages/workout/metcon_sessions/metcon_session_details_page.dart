@@ -30,7 +30,7 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
 
   @override
   void initState() {
-    _metconSessionDescription = widget.metconSessionDescription;
+    _metconSessionDescription = widget.metconSessionDescription.clone();
     _loadOtherSessions();
     super.initState();
   }

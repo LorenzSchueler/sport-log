@@ -29,7 +29,11 @@ class MetconDescription extends CompoundEntity {
   bool hasReference;
 
   static MetconDescription?
-      defaultMetconDescription; // default metcon description that already exists in db
+      _defaultMetconDescription; // default metcon description that already exists in db
+  static set defaultMetconDescription(MetconDescription? metconDescription) =>
+      _defaultMetconDescription = metconDescription;
+  static MetconDescription? get defaultMetconDescription =>
+      _defaultMetconDescription?.clone();
 
   @override
   Map<String, dynamic> toJson() => _$MetconDescriptionToJson(this);

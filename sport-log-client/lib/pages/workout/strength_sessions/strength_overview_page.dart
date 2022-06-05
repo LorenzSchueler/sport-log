@@ -253,12 +253,11 @@ class StrengthRecodsCard extends StatelessWidget {
   StrengthRecodsCard({
     Key? key,
     required this.movement,
-    required this.strengthRecords,
+    required StrengthRecords strengthRecords,
   })  : strengthRecord = strengthRecords[movement.id],
         super(key: key);
 
   final Movement movement;
-  final StrengthRecords strengthRecords;
   final StrengthRecord? strengthRecord;
 
   @override
