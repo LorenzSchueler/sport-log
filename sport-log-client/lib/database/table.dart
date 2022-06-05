@@ -274,6 +274,7 @@ abstract class Columns {
   static const platformId = 'platform_id';
   static const reps = 'reps';
   static const rounds = 'rounds';
+  static const roundsAndReps = 'rounds_and_reps';
   static const routeId = 'route_id';
   static const rx = 'rx';
   static const setNumber = 'set_number';

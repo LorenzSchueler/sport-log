@@ -4,6 +4,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/models/diary/diary.dart';
+import 'package:sport_log/models/metcon/metcon_records.dart';
 import 'package:sport_log/models/metcon/metcon_session_description.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/models/strength/strength_records.dart';
@@ -36,6 +37,7 @@ class TimelinePageState extends State<TimelinePage> {
   List<StrengthSessionDescription> _strengthSessionsDescriptions = [];
   StrengthRecords _strengthRecords = {};
   List<MetconSessionDescription> _metconSessionsDescriptions = [];
+  MetconRecords _metconRecords = {};
   List<CardioSessionDescription> _cardioSessionsDescriptions = [];
   List<Diary> _diaries = [];
   List<TimelineUnion> _items = [];
@@ -93,6 +95,7 @@ class TimelinePageState extends State<TimelinePage> {
   }
 
   Future<void> updateMetconSessions() async {
+    _metconRecords = await _metconDataProvider.getMetconRecords();
     _metconSessionsDescriptions =
         await _metconDataProvider.getByTimerangeAndMetcon(
       metcon: null,
@@ -201,6 +204,7 @@ class TimelinePageState extends State<TimelinePage> {
       ),
       (metconSessionDescription) => MetconSessionCard(
         metconSessionDescription: metconSessionDescription,
+        metconRecords: _metconRecords,
       ),
       (cardioSession) =>
           CardioSessionCard(cardioSessionDescription: cardioSession),

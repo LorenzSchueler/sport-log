@@ -5,6 +5,7 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/metcon/metcon_records.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_description_card.dart';
@@ -28,6 +29,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
   final _logger = Logger('MetconSessionsPage');
   final _dataProvider = MetconSessionDescriptionDataProvider();
   List<MetconSessionDescription> _metconSessionDescriptions = [];
+  MetconRecords _metconRecords = {};
 
   DateFilterState _dateFilter = MonthFilter.current();
   Metcon? _metcon;
@@ -60,7 +62,11 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
       from: _dateFilter.start,
       until: _dateFilter.end,
     );
-    setState(() => _metconSessionDescriptions = metconSessionDescriptions);
+    final records = await _dataProvider.getMetconRecords();
+    setState(() {
+      _metconSessionDescriptions = metconSessionDescriptions;
+      _metconRecords = records;
+    });
   }
 
   @override
@@ -136,6 +142,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                               return MetconSessionCard(
                                 metconSessionDescription:
                                     _metconSessionDescriptions[index - 2],
+                                metconRecords: _metconRecords,
                               );
                             }
                           },
@@ -147,6 +154,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                           itemBuilder: (_, index) => MetconSessionCard(
                             metconSessionDescription:
                                 _metconSessionDescriptions[index],
+                            metconRecords: _metconRecords,
                           ),
                           separatorBuilder: (_, __) =>
                               Defaults.sizedBox.vertical.normal,
@@ -171,10 +179,16 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
 }
 
 class MetconSessionCard extends StatelessWidget {
-  const MetconSessionCard({Key? key, required this.metconSessionDescription})
-      : super(key: key);
+  MetconSessionCard({
+    required this.metconSessionDescription,
+    required this.metconRecords,
+    Key? key,
+  })  : metconRecord = metconRecords.getRecordTypes(metconSessionDescription),
+        super(key: key);
 
   final MetconSessionDescription metconSessionDescription;
+  final MetconRecords metconRecords;
+  final bool? metconRecord;
 
   @override
   Widget build(BuildContext context) {
@@ -206,6 +220,14 @@ class MetconSessionCard extends StatelessWidget {
                       metconSessionDescription.metconDescription.metcon.name,
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
+                    if (metconRecord != null && metconRecord!) ...[
+                      Defaults.sizedBox.vertical.normal,
+                      const Icon(
+                        AppIcons.medal,
+                        color: Colors.orange,
+                        size: 20,
+                      ),
+                    ],
                   ],
                 ),
               ),

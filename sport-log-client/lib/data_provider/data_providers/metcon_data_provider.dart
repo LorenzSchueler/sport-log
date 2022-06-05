@@ -7,6 +7,7 @@ import 'package:sport_log/database/tables/metcon_tables.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
 import 'package:sport_log/helpers/extensions/sort_extension.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/metcon/metcon_records.dart';
 
 class MetconDataProvider extends EntityDataProvider<Metcon> {
   factory MetconDataProvider() => _instance;
@@ -81,6 +82,8 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
         from: from,
         until: until,
       );
+
+  Future<MetconRecords> getMetconRecords() => db.getMetconRecords();
 }
 
 class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
@@ -344,4 +347,7 @@ class MetconSessionDescriptionDataProvider
           .toList(),
     );
   }
+
+  Future<MetconRecords> getMetconRecords() =>
+      _metconSessionDataProvider.getMetconRecords();
 }

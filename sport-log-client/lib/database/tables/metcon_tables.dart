@@ -1,6 +1,8 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/metcon/metcon_records.dart';
 
 class MetconTable extends TableAccessor<Metcon> {
   @override
@@ -162,5 +164,27 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
       orderBy: orderByDatetime,
     );
     return records.map((e) => serde.fromDbRecord(e)).toList();
+  }
+
+  Future<MetconRecords> getMetconRecords() async {
+    final records = await database.rawQuery(
+      """
+      select 
+        ${Tables.metconSession}.${Columns.metconId}, 
+        min(${Tables.metconSession}.${Columns.time}) as ${Columns.time}, 
+        max(${Tables.metconSession}.${Columns.rounds} * ${MetconRecord.multiplier} + ${Tables.metconSession}.${Columns.reps}) as ${Columns.roundsAndReps}
+      from ${Tables.metconSession}
+      where ${TableAccessor.combineFilter([
+            notDeleted,
+            "${Tables.metconSession}.${Columns.rx} = 1",
+          ])} 
+      group by ${Tables.metconSession}.${Columns.metconId}
+      """,
+    );
+    return {
+      for (final record in records)
+        Int64(record[Columns.metconId]! as int):
+            MetconRecord.fromDbRecord(record)
+    };
   }
 }
