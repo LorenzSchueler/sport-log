@@ -8,7 +8,7 @@ import 'package:sport_log/models/metcon/metcon_session_description.dart';
 typedef MetconRecords = Map<Int64, MetconRecord>;
 
 extension MetconRecordsExtension on MetconRecords {
-  bool getRecordTypes(
+  bool isMetconRecord(
     MetconSessionDescription metconSessionDescription,
   ) {
     if (!metconSessionDescription.metconSession.rx) {

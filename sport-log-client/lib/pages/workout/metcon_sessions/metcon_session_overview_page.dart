@@ -137,6 +137,7 @@ class MetconSessionsPageState extends State<MetconSessionsPage> {
                                 metconSessionDescription: null,
                                 metconSessionDescriptions:
                                     _metconSessionDescriptions,
+                                metconRecords: _metconRecords,
                               );
                             } else {
                               return MetconSessionCard(
@@ -183,12 +184,12 @@ class MetconSessionCard extends StatelessWidget {
     required this.metconSessionDescription,
     required this.metconRecords,
     Key? key,
-  })  : metconRecord = metconRecords.getRecordTypes(metconSessionDescription),
+  })  : metconRecord = metconRecords.isMetconRecord(metconSessionDescription),
         super(key: key);
 
   final MetconSessionDescription metconSessionDescription;
   final MetconRecords metconRecords;
-  final bool? metconRecord;
+  final bool metconRecord;
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +221,7 @@ class MetconSessionCard extends StatelessWidget {
                       metconSessionDescription.metconDescription.metcon.name,
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
-                    if (metconRecord != null && metconRecord!) ...[
+                    if (metconRecord) ...[
                       Defaults.sizedBox.vertical.normal,
                       const Icon(
                         AppIcons.medal,

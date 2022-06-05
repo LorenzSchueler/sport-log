@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/models/metcon/metcon_records.dart';
 import 'package:sport_log/models/metcon/metcon_session_description.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/text_tile.dart';
 
 class MetconSessionResultsCard extends StatelessWidget {
   const MetconSessionResultsCard({
     required this.metconSessionDescription,
     required this.metconSessionDescriptions,
+    required this.metconRecords,
     Key? key,
   }) : super(key: key);
 
   final MetconSessionDescription? metconSessionDescription;
   final List<MetconSessionDescription> metconSessionDescriptions;
+  final MetconRecords metconRecords;
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +50,22 @@ class MetconSessionResultsCard extends StatelessWidget {
                 children: [
                   for (final metconSessionDescription
                       in metconSessionDescriptions)
-                    Text(
-                      "${metconSessionDescription.shortResultDescription} (${metconSessionDescription.metconSession.datetime.toHumanDate()})",
-                    ),
+                    Row(
+                      children: [
+                        Text(
+                          "${metconSessionDescription.shortResultDescription} (${metconSessionDescription.metconSession.datetime.toHumanDate()})",
+                        ),
+                        if (metconRecords
+                            .isMetconRecord(metconSessionDescription)) ...[
+                          Defaults.sizedBox.horizontal.normal,
+                          const Icon(
+                            AppIcons.medal,
+                            color: Colors.orange,
+                            size: 20,
+                          ),
+                        ],
+                      ],
+                    )
                 ],
               ),
             ),

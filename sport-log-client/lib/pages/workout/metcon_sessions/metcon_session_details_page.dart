@@ -3,6 +3,7 @@ import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/metcon/metcon_records.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_description_card.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_results_card.dart';
 import 'package:sport_log/routes.dart';
@@ -25,6 +26,7 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
   final _dataProvider = MetconSessionDescriptionDataProvider();
   late MetconSessionDescription _metconSessionDescription;
   List<MetconSessionDescription> _metconSessionDescriptions = [];
+  MetconRecords _metconRecords = {};
 
   @override
   void initState() {
@@ -38,7 +40,11 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
         await _dataProvider.getByTimerangeAndMetcon(
       metcon: _metconSessionDescription.metconDescription.metcon,
     );
-    setState(() => _metconSessionDescriptions = metconSessionDescriptions);
+    final records = await _dataProvider.getMetconRecords();
+    setState(() {
+      _metconSessionDescriptions = metconSessionDescriptions;
+      _metconRecords = records;
+    });
   }
 
   Future<void> _deleteMetconSession() async {
@@ -90,6 +96,7 @@ class MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
           MetconSessionResultsCard(
             metconSessionDescription: _metconSessionDescription,
             metconSessionDescriptions: _metconSessionDescriptions,
+            metconRecords: _metconRecords,
           ),
         ],
       ),
