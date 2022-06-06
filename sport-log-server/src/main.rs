@@ -307,5 +307,5 @@ async fn main() -> Result<(), rocket::Error> {
     info!("db is up to date");
 
     info!("launching rocket");
-    rocket.launch().await
+    rocket.launch().await.map(|_| ())
 }
