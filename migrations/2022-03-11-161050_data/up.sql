@@ -89,10 +89,10 @@ insert into movement (id, user_id, name, description, movement_dimension, cardio
     (88, null, 'Kettlebell Jerk', null, 'reps', false),
     (89, null, 'Kettlebell Clean & Jerk', null, 'reps', false),
     (90, null, 'Kettlebell Windmill', null, 'reps', false),
-    (91, null, 'Farmers Carry', null, 'reps', false), -- strongman
-    (92, null, 'Yoke Carry', null, 'reps', false),
-    (93, null, 'Sled Push', null, 'reps', false),
-    (94, null, 'Sled Pull', null, 'reps', false),
+    (91, null, 'Farmers Carry', null, 'distance', false), -- strongman
+    (92, null, 'Yoke Carry', null, 'distance', false),
+    (93, null, 'Sled Push', null, 'distance', false),
+    (94, null, 'Sled Pull', null, 'distance', false),
     (95, null, 'Air Squat', null, 'reps', false), -- bodyweight
     (96, null, 'Pistol', null, 'reps', false),
     (97, null, 'Push Up', null, 'reps', false),
@@ -104,7 +104,7 @@ insert into movement (id, user_id, name, description, movement_dimension, cardio
     (103, null, 'Free Stading Hand Stand Push Up', null, 'reps', false),
     (104, null, 'Deficit Hand Stand Push Up', null, 'reps', false),
     (105, null, 'Strict Deficit Hand Stand Push Up', null, 'reps', false),
-    (106, null, 'Hang', null, 'reps', false),
+    (106, null, 'Hang', null, 'time', false),
     (107, null, 'Pull Up', null, 'reps', false),
     (108, null, 'Strict Pull Up', null, 'reps', false),
     (109, null, 'Chest To Bar Pull Up', null, 'reps', false),
@@ -119,7 +119,7 @@ insert into movement (id, user_id, name, description, movement_dimension, cardio
     (118, null, 'Ring Row', null, 'reps', false),
     (119, null, 'Ring Muscle Up', null, 'reps', false),
     (120, null, 'Strict Ring Muscle Up', null, 'reps', false),
-    (121, null, 'Ring L-Sit', null, 'reps', false),
+    (121, null, 'Ring L-Sit', null, 'time', false),
     (122, null, 'Rope Climb', null, 'reps', false), -- rope
     (123, null, 'Legless Rope Climb', null, 'reps', false),
     (124, null, 'Wall Ball', null, 'reps', false), -- ball
