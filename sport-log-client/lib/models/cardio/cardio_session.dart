@@ -60,7 +60,7 @@ class CardioSession extends AtomicEntity {
 
   CardioSession.defaultValue(this.movementId)
       : id = randomId(),
-        userId = Settings.userId!,
+        userId = Settings.instance.userId!,
         cardioType = CardioType.training,
         datetime = DateTime.now(),
         deleted = false;

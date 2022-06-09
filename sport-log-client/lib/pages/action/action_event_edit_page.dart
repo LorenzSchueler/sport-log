@@ -2,11 +2,9 @@ import 'package:flutter/material.dart' hide Action;
 import 'package:sport_log/data_provider/data_providers/action_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/action/action.dart';
 import 'package:sport_log/models/action/action_event.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -36,14 +34,8 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
   @override
   void initState() {
     _actionEvent = widget.actionEvent?.clone() ??
-        ActionEvent(
-          id: randomId(),
-          userId: Settings.userId!,
-          actionId: widget.actionProviderDescription.actions.first.id,
-          datetime: DateTime.now(),
-          arguments: null,
-          enabled: true,
-          deleted: false,
+        ActionEvent.defaultValue(
+          widget.actionProviderDescription.actions.first.id,
         );
     super.initState();
   }

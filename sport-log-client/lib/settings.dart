@@ -1,4 +1,5 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/config.dart';
@@ -15,7 +16,11 @@ enum Units {
   }
 }
 
-class Settings {
+class Settings extends ChangeNotifier {
+  Settings._();
+
+  static final Settings instance = Settings._();
+
   static final _logger = Logger('Settings');
 
   static Box? _storage;
@@ -34,7 +39,7 @@ class Settings {
   static const String _lastMapPosition = "lastMapPosition";
   static const String _lastGpsLatLng = "lastGpsLatLng";
 
-  static Future<void> init({bool override = false}) async {
+  Future<void> init({bool override = false}) async {
     Hive
       ..registerAdapter(DurationAdapter())
       ..registerAdapter(LatLngAdapter())
@@ -43,7 +48,7 @@ class Settings {
     await setDefaults(override: override);
   }
 
-  static Future<void> setDefaults({bool override = false}) async {
+  Future<void> setDefaults({bool override = false}) async {
     if (!_storage!.containsKey(_accountCreated) || override) {
       await _storage!.put(_accountCreated, true);
     }
@@ -88,146 +93,146 @@ class Settings {
     }
   }
 
-  static Future<void> setDefaultServerUrl() async {
-    await _storage!.put(
-      _serverUrl,
-      Config.instance.isAndroidEmulator
-          ? Defaults.server.emulatorUrl
-          : Config.instance.serverAddress,
-    );
+  Future<String> setDefaultServerUrl() async {
+    final url = Config.instance.isAndroidEmulator
+        ? Defaults.server.emulatorUrl
+        : Config.instance.serverAddress;
+    await _storage!.put(_serverUrl, url);
+    return url;
   }
 
   // Hive supports all primitive types, List, Map, DateTime and Uint8List
 
-  static bool _getBool(String key) {
+  bool _getBool(String key) {
     return _storage!.get(key)! as bool;
   }
 
-  //static int _getInt(String key) {
-  //return _storage!.get(key)! as int;
-  //}
-
-  static double _getDouble(String key) {
+  double _getDouble(String key) {
     return _storage!.get(key)! as double;
   }
 
-  static String _getString(String key) {
+  String _getString(String key) {
     return _storage!.get(key)! as String;
   }
 
-  static DateTime? _getDateTimeOptional(String key) {
+  DateTime? _getDateTimeOptional(String key) {
     return _storage!.get(key) as DateTime?;
   }
 
-  static Duration _getDuration(String key) {
+  Duration _getDuration(String key) {
     return _storage!.get(key) as Duration;
   }
 
-  static LatLng _getLatLng(String key) {
+  LatLng _getLatLng(String key) {
     return _storage!.get(key) as LatLng;
   }
 
-  static CameraPosition _getCameraPosition(String key) {
+  CameraPosition _getCameraPosition(String key) {
     return _storage!.get(key) as CameraPosition;
   }
 
-  static void _put(String key, dynamic value) {
-    _storage!.put(key, value);
+  Future<void> _put(String key, dynamic value) async {
+    await _storage!.put(key, value);
+    notifyListeners();
   }
 
-  static bool get accountCreated {
+  bool get accountCreated {
     return _getBool(_accountCreated);
   }
 
-  static set accountCreated(bool created) {
+  set accountCreated(bool created) {
     _put(_accountCreated, created);
   }
 
-  static bool get syncEnabled {
+  bool get syncEnabled {
     return _getBool(_syncEnabled);
   }
 
-  static set syncEnabled(bool enabled) {
+  set syncEnabled(bool enabled) {
     _put(_syncEnabled, enabled);
   }
 
-  static String get serverUrl {
+  String get serverUrl {
     return _getString(_serverUrl);
   }
 
-  static set serverUrl(String url) {
+  set serverUrl(String url) {
     _put(_serverUrl, url);
   }
 
-  static Duration get syncInterval {
+  Duration get syncInterval {
     return _getDuration(_syncInterval);
   }
 
-  static set syncInterval(Duration interval) {
+  set syncInterval(Duration interval) {
     _put(_syncInterval, interval);
   }
 
-  static DateTime? get lastSync {
+  DateTime? get lastSync {
     return _getDateTimeOptional(_lastSync);
   }
 
-  static set lastSync(DateTime? lastSync) {
+  set lastSync(DateTime? lastSync) {
     _put(_lastSync, lastSync);
   }
 
-  static Units get units {
+  Units get units {
     return Units.fromString(_getString(_units));
   }
 
-  static set units(Units units) {
+  set units(Units units) {
     _put(_units, units.name);
   }
 
-  static double get weightIncrement {
+  double get weightIncrement {
     return _getDouble(_weightIncrement);
   }
 
-  static set weightIncrement(double incement) {
+  set weightIncrement(double incement) {
     _put(_weightIncrement, incement);
   }
 
-  static Int64? get userId {
+  Int64? get userId {
     return userExists() ? Int64.parseInt(_getString(_id)) : null;
   }
 
-  static set userId(Int64? id) {
+  set userId(Int64? id) {
     id == null ? _storage!.delete(_id) : _put(_id, id.toString());
+    notifyListeners();
   }
 
-  static String? get username {
+  String? get username {
     return userExists() ? _getString(_username) : null;
   }
 
-  static set username(String? username) {
+  set username(String? username) {
     username == null ? _storage!.delete(_username) : _put(_username, username);
+    notifyListeners();
   }
 
-  static String? get password {
+  String? get password {
     return userExists() ? _getString(_password) : null;
   }
 
-  static set password(String? password) {
+  set password(String? password) {
     password == null ? _storage!.delete(_password) : _put(_password, password);
+    notifyListeners();
   }
 
-  static String? get email {
+  String? get email {
     return userExists() ? _getString(_email) : null;
   }
 
-  static set email(String? email) {
+  set email(String? email) {
     email == null ? _storage!.delete(_email) : _put(_email, email);
+    notifyListeners();
   }
 
-  static bool userExists() {
+  bool userExists() {
     return _storage!.containsKey(_id);
   }
 
-  static set user(User? user) {
+  set user(User? user) {
     if (user == null) {
       userId = null;
       username = null;
@@ -243,7 +248,7 @@ class Settings {
     }
   }
 
-  static User? get user {
+  User? get user {
     return userExists()
         ? User(
             id: userId!,
@@ -254,19 +259,19 @@ class Settings {
         : null;
   }
 
-  static CameraPosition get lastMapPosition {
+  CameraPosition get lastMapPosition {
     return _getCameraPosition(_lastMapPosition);
   }
 
-  static set lastMapPosition(CameraPosition latLng) {
+  set lastMapPosition(CameraPosition latLng) {
     _put(_lastMapPosition, latLng);
   }
 
-  static LatLng get lastGpsLatLng {
+  LatLng get lastGpsLatLng {
     return _getLatLng(_lastGpsLatLng);
   }
 
-  static set lastGpsLatLng(LatLng latLng) {
+  set lastGpsLatLng(LatLng latLng) {
     _put(_lastGpsLatLng, latLng);
   }
 }

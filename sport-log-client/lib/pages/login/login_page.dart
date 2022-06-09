@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/defaults.dart';
@@ -35,7 +36,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
-  String _serverUrl = Settings.serverUrl;
+  String _serverUrl = Settings.instance.serverUrl;
   String _username = "";
   String _password = "";
   // ignore: unused_field
@@ -117,9 +118,10 @@ class _LoginPageState extends State<LoginPage> {
             labelText: "Server URL",
             suffixIcon: IconButton(
               onPressed: () async {
-                await Settings.setDefaultServerUrl();
+                final url =
+                    await context.read<Settings>().setDefaultServerUrl();
                 setState(() {
-                  _serverUrlInputController.text = Settings.serverUrl;
+                  _serverUrlInputController.text = url;
                 });
               },
               icon: const Icon(AppIcons.restore),
@@ -249,11 +251,9 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       _loginPending = true;
     });
-    Settings.serverUrl = _serverUrl;
-    final Result<User, ApiError> result;
-    result = widget.loginType.isRegister
-        ? await Account.register(user)
-        : await Account.login(_username, _password);
+    final Result<User, ApiError> result = widget.loginType.isRegister
+        ? await Account.register(_serverUrl, user)
+        : await Account.login(_serverUrl, _username, _password);
     if (mounted) {
       setState(() {
         _loginPending = false;
@@ -269,6 +269,5 @@ class _LoginPageState extends State<LoginPage> {
         text: result.failure.toString(),
       );
     }
-    _formKey.currentState!.deactivate();
   }
 }

@@ -21,7 +21,7 @@ Stream<double> initialize() async* {
   yield 0.2;
   await Hive.initFlutter();
   yield 0.4;
-  Config.isTest ? await Settings.init(override: true) : await Settings.init();
+  await Settings.instance.init(override: Config.isTest);
   yield 0.5;
   if (Config.isWindows || Config.isLinux) {
     sqfliteFfiInit();
@@ -58,8 +58,11 @@ class InitAppWrapperState extends State<InitAppWrapper> {
   @override
   Widget build(BuildContext context) {
     return _progress == null
-        ? ChangeNotifierProvider.value(
-            value: Sync.instance,
+        ? MultiProvider(
+            providers: [
+              ChangeNotifierProvider<Sync>.value(value: Sync.instance),
+              ChangeNotifierProvider<Settings>.value(value: Settings.instance),
+            ],
             child: const App(),
           )
         : MaterialApp(

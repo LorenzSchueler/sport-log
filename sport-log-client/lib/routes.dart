@@ -61,11 +61,11 @@ abstract class Routes {
   static const diary = _DiaryRoutes();
 
   static Widget _checkLogin(Widget Function() builder) {
-    return Settings.userExists() ? builder() : const LandingPage();
+    return Settings.instance.userExists() ? builder() : const LandingPage();
   }
 
   static Widget _checkLoginAndroidIos(Widget Function() builder) {
-    return Settings.userExists()
+    return Settings.instance.userExists()
         ? Config.isAndroid || Config.isIOS
             ? builder()
             : const PlatformNotSupportedPage()
@@ -73,7 +73,7 @@ abstract class Routes {
   }
 
   static Widget _checkNotLogin(Widget Function() builder) {
-    return Settings.userExists() ? const TimelinePage() : builder();
+    return Settings.instance.userExists() ? const TimelinePage() : builder();
   }
 
   static final Map<String, Widget Function(BuildContext)> _routeList = {

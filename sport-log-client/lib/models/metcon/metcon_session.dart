@@ -43,7 +43,7 @@ class MetconSession extends AtomicEntity {
     }
     return MetconSession(
       id: randomId(),
-      userId: Settings.userId!,
+      userId: Settings.instance.userId!,
       metconId: metcon.id,
       datetime: DateTime.now(),
       time: time,

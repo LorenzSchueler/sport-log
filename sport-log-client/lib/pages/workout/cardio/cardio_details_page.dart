@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -96,7 +97,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                     ? MapboxMap(
                         accessToken: Config.instance.accessToken,
                         styleString: MapboxStyles.OUTDOORS,
-                        initialCameraPosition: Settings.lastMapPosition,
+                        initialCameraPosition:
+                            context.read<Settings>().lastMapPosition,
                         onMapCreated: (MapboxMapController controller) =>
                             _mapController = controller,
                         onStyleLoadedCallback: () {

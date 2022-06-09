@@ -23,7 +23,7 @@ class Diary extends AtomicEntity {
 
   Diary.defaultValue()
       : id = randomId(),
-        userId = Settings.userId!,
+        userId = Settings.instance.userId!,
         date = DateTime.now(),
         bodyweight = null,
         comments = null,

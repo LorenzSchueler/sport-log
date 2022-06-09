@@ -2,10 +2,12 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/action/weekday.dart';
 import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
+import 'package:sport_log/settings.dart';
 
 part 'action_rule.g.dart';
 
@@ -21,6 +23,15 @@ class ActionRule extends AtomicEntity {
     required this.enabled,
     required this.deleted,
   });
+
+  ActionRule.defaultValue(this.actionId)
+      : id = randomId(),
+        userId = Settings.instance.userId!,
+        weekday = Weekday.monday,
+        time = DateTime.now(),
+        arguments = null,
+        enabled = true,
+        deleted = false;
 
   factory ActionRule.fromJson(Map<String, dynamic> json) =>
       _$ActionRuleFromJson(json);

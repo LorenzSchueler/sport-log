@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:mapbox_search/mapbox_search.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
@@ -52,10 +53,10 @@ class _MapPageState extends State<MapPage> {
   void dispose() {
     _locationUtils.stopLocationStream();
     if (_mapController.cameraPosition != null) {
-      Settings.lastMapPosition = _mapController.cameraPosition!;
+      context.read<Settings>().lastMapPosition = _mapController.cameraPosition!;
     }
     if (_locationUtils.lastLatLng != null) {
-      Settings.lastGpsLatLng = _locationUtils.lastLatLng!;
+      context.read<Settings>().lastGpsLatLng = _locationUtils.lastLatLng!;
     }
     _mapController.removeListener(_mapControllerListener);
     super.dispose();
@@ -158,7 +159,7 @@ class _MapPageState extends State<MapPage> {
             MapboxMap(
               accessToken: Config.instance.accessToken,
               styleString: _mapStyle,
-              initialCameraPosition: Settings.lastMapPosition,
+              initialCameraPosition: context.read<Settings>().lastMapPosition,
               trackCameraPosition: true,
               onMapCreated: (MapboxMapController controller) => _mapController =
                   controller..addListener(_mapControllerListener),

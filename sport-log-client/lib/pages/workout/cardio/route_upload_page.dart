@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
@@ -80,7 +81,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
               child: MapboxMap(
                 accessToken: Config.instance.accessToken,
                 styleString: MapboxStyles.OUTDOORS,
-                initialCameraPosition: Settings.lastMapPosition,
+                initialCameraPosition: context.read<Settings>().lastMapPosition,
                 trackCameraPosition: true,
                 compassEnabled: true,
                 compassViewPosition: CompassViewPosition.TopRight,

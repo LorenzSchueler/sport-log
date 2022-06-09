@@ -11,15 +11,16 @@ class Account {
   Account._();
 
   static void noAccount(User user) {
-    Settings.accountCreated = false;
-    Settings.syncEnabled = false;
-    Settings.user = user;
+    Settings.instance.accountCreated = false;
+    Settings.instance.syncEnabled = false;
+    Settings.instance.user = user;
   }
 
-  static Future<ApiResult<User>> register(User user) async {
+  static Future<ApiResult<User>> register(String serverUrl, User user) async {
+    Settings.instance.serverUrl = serverUrl;
     final result = await Api.user.postSingle(user);
     if (result.isSuccess) {
-      Settings.user = user;
+      Settings.instance.user = user;
       await Sync.instance.startSync();
       return Success(user);
     } else {
@@ -28,13 +29,15 @@ class Account {
   }
 
   static Future<ApiResult<User>> login(
+    String serverUrl,
     String username,
     String password,
   ) async {
+    Settings.instance.serverUrl = serverUrl;
     final result = await Api.user.getSingle(username, password);
     if (result.isSuccess) {
       User user = result.success;
-      Settings.user = user;
+      Settings.instance.user = user;
       await Sync.instance.startSync();
       return Success(user);
     } else {
@@ -47,7 +50,7 @@ class Account {
     String? password,
     String? email,
   }) async {
-    final user = Settings.user!;
+    final user = Settings.instance.user!;
     if (username == null && password == null && email == null) {
       return Success(user);
     }
@@ -62,7 +65,7 @@ class Account {
     }
     final result = await Api.user.putSingle(user);
     if (result.isSuccess) {
-      Settings.user = user;
+      Settings.instance.user = user;
       return Success(user);
     } else {
       return Failure(result.failure);
@@ -70,17 +73,17 @@ class Account {
   }
 
   static void updateUserFromDownSync(User user) {
-    user.password = Settings.password!;
-    Settings.user = user;
+    user.password = Settings.instance.password!;
+    Settings.instance.user = user;
   }
 
   static Future<void> logout() async {
     Sync.instance.stopSync();
-    Settings.lastSync = null;
-    Settings.user = null;
+    Settings.instance.lastSync = null;
+    Settings.instance.user = null;
     Movement.defaultMovement = null;
     MetconDescription.defaultMetconDescription = null;
-    await Settings.setDefaults(override: true);
+    await Settings.instance.setDefaults(override: true);
     await AppDatabase.reset();
   }
 
@@ -88,11 +91,11 @@ class Account {
     Sync.instance.stopSync();
     final result = await Api.user.deleteSingle();
     if (result.isSuccess) {
-      Settings.lastSync = null;
-      Settings.user = null;
+      Settings.instance.lastSync = null;
+      Settings.instance.user = null;
       Movement.defaultMovement = null;
       MetconDescription.defaultMetconDescription = null;
-      await Settings.setDefaults(override: true);
+      await Settings.instance.setDefaults(override: true);
       await AppDatabase.reset();
       return Success(null);
     } else {
@@ -101,14 +104,14 @@ class Account {
   }
 
   static Future<ApiResult<void>> newInitSync() async {
-    final result =
-        await Api.user.getSingle(Settings.username!, Settings.password!);
+    final result = await Api.user
+        .getSingle(Settings.instance.username!, Settings.instance.password!);
     if (result.isFailure) {
       return Failure(result.failure);
     }
 
     Sync.instance.stopSync();
-    Settings.lastSync = null;
+    Settings.instance.lastSync = null;
     Movement.defaultMovement = null;
     MetconDescription.defaultMetconDescription = null;
     await AppDatabase.reset();

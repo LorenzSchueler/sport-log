@@ -33,15 +33,15 @@ class Sync extends ChangeNotifier {
   Future<void> init() async {
     if (Config.instance.deleteDatabase) {
       _logger.i('Removing last sync...');
-      Settings.lastSync = null;
+      Settings.instance.lastSync = null;
     }
-    if (Settings.userExists()) {
+    if (Settings.instance.userExists()) {
       await startSync();
     }
   }
 
   Future<bool> sync({VoidCallback? onNoInternet}) async {
-    if (!Settings.syncEnabled) {
+    if (!Settings.instance.syncEnabled) {
       _logger.i("sync disabled.");
       return false;
     }
@@ -49,7 +49,7 @@ class Sync extends ChangeNotifier {
       _logger.d('Sync job already running.');
       return false;
     }
-    if (!Settings.userExists()) {
+    if (!Settings.instance.userExists()) {
       _logger.d('Sync cannot be run: no user.');
       return false;
     }
@@ -79,7 +79,8 @@ class Sync extends ChangeNotifier {
       await _upSync();
       _logger.i('Setting last sync to $syncStart.');
       // make sure sync intervals overlap slightly in case client and server clocks differ a little bit
-      Settings.lastSync = syncStart.subtract(const Duration(seconds: 10));
+      Settings.instance.lastSync =
+          syncStart.subtract(const Duration(seconds: 10));
     }
     _isSyncing = false;
     notifyListeners();
@@ -91,7 +92,8 @@ class Sync extends ChangeNotifier {
   }
 
   Future<bool> _downSync({VoidCallback? onNoInternet}) async {
-    final accountDataResult = await Api.accountData.get(Settings.lastSync);
+    final accountDataResult =
+        await Api.accountData.get(Settings.instance.lastSync);
     if (accountDataResult.isFailure) {
       await DataProvider.handleApiError(
         accountDataResult.failure,
@@ -112,8 +114,8 @@ class Sync extends ChangeNotifier {
   }
 
   Future<void> startSync() async {
-    assert(Settings.userExists());
-    if (!Settings.syncEnabled) {
+    assert(Settings.instance.userExists());
+    if (!Settings.instance.syncEnabled) {
       _logger.i("sync disabled.");
       return;
     }
@@ -122,7 +124,7 @@ class Sync extends ChangeNotifier {
       return;
     }
     _logger.d('Starting sync timer.');
-    if (Settings.lastSync == null) {
+    if (Settings.instance.lastSync == null) {
       await sync(); // wait to make sure movement 1 and metcon 1 exist
     } else {
       unawaited(sync()); // let sync finish later
@@ -130,7 +132,7 @@ class Sync extends ChangeNotifier {
     Movement.defaultMovement ??= await MovementDataProvider().getById(Int64(1));
     MetconDescription.defaultMetconDescription ??=
         await MetconDescriptionDataProvider().getById(Int64(1));
-    _syncTimer = Timer.periodic(Settings.syncInterval, (_) => sync());
+    _syncTimer = Timer.periodic(Settings.instance.syncInterval, (_) => sync());
     return;
   }
 

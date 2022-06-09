@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -42,7 +43,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
   @override
   void dispose() {
     if (_mapController.cameraPosition != null) {
-      Settings.lastMapPosition = _mapController.cameraPosition!;
+      context.read<Settings>().lastMapPosition = _mapController.cameraPosition!;
     }
     super.dispose();
   }
@@ -150,7 +151,8 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                   child: MapboxMap(
                     accessToken: Config.instance.accessToken,
                     styleString: MapboxStyles.OUTDOORS,
-                    initialCameraPosition: Settings.lastMapPosition,
+                    initialCameraPosition:
+                        context.read<Settings>().lastMapPosition,
                     trackCameraPosition: true,
                     onMapCreated: (MapboxMapController controller) =>
                         _mapController = controller,
@@ -232,7 +234,7 @@ class RegionCard extends StatelessWidget {
           child: MapboxMap(
             accessToken: Config.instance.accessToken,
             styleString: MapboxStyles.OUTDOORS,
-            initialCameraPosition: Settings.lastMapPosition,
+            initialCameraPosition: context.read<Settings>().lastMapPosition,
             rotateGesturesEnabled: false,
             tiltGesturesEnabled: false,
             scrollGesturesEnabled: false,

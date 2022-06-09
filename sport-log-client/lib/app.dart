@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/main.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
@@ -16,16 +17,18 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return KeyboardDismissOnTap(
-      child: MaterialApp(
-        routes: Routes.all,
-        initialRoute:
-            Settings.userExists() ? Routes.timeline.overview : Routes.landing,
-        navigatorKey: navigatorKey,
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.dark,
-        builder: ignoreSystemTextScaleFactor,
+      child: Selector<Settings, bool>(
+        selector: (_, settings) => settings.userExists(),
+        builder: (context, userExists, _) => MaterialApp(
+          routes: Routes.all,
+          initialRoute: userExists ? Routes.timeline.overview : Routes.landing,
+          navigatorKey: navigatorKey,
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeMode.dark,
+          builder: ignoreSystemTextScaleFactor,
+        ),
       ),
     );
   }

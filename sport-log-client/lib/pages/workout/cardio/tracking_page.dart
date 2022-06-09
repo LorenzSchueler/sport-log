@@ -6,6 +6,7 @@ import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:polar/polar.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
@@ -94,10 +95,10 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
     _locationUtils.stopLocationStream();
     _heartRateUtils?.stopHeartRateStream();
     if (_mapController.cameraPosition != null) {
-      Settings.lastMapPosition = _mapController.cameraPosition!;
+      context.read<Settings>().lastMapPosition = _mapController.cameraPosition!;
     }
     if (_locationUtils.lastLatLng != null) {
-      Settings.lastGpsLatLng = _locationUtils.lastLatLng!;
+      context.read<Settings>().lastGpsLatLng = _locationUtils.lastLatLng!;
     }
     super.dispose();
   }
@@ -350,7 +351,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                 styleString: MapboxStyles.OUTDOORS,
                 initialCameraPosition: CameraPosition(
                   zoom: 15.0,
-                  target: Settings.lastGpsLatLng,
+                  target: context.read<Settings>().lastGpsLatLng,
                 ),
                 trackCameraPosition: true,
                 compassEnabled: true,

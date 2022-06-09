@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart' hide Route;
+import 'package:provider/provider.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
@@ -149,7 +151,11 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
     setState(() {
       _loginPending = true;
     });
-    final result = await Account.login(_username, _password);
+    final result = await Account.login(
+      context.read<Settings>().serverUrl,
+      _username,
+      _password,
+    );
     setState(() {
       _loginPending = false;
     });

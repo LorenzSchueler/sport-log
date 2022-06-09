@@ -100,21 +100,21 @@ class MainDrawer extends StatelessWidget {
               selected: selectedRoute == Routes.settings,
             ),
             const Spacer(),
-            Consumer<Sync>(
-              builder: (context, sync, _) {
+            Consumer2<Sync, Settings>(
+              builder: (context, sync, settings, _) {
                 String title;
                 if (sync.isSyncing) {
                   title = 'Syncing...';
-                } else if (Settings.lastSync == null) {
+                } else if (settings.lastSync == null) {
                   title = 'No syncs yet';
                 } else {
-                  title = 'Last sync: ${Settings.lastSync!.toHumanDateTime()}';
+                  title = 'Last sync: ${settings.lastSync!.toHumanDateTime()}';
                 }
                 return ListTile(
                   title: Text(title),
                   trailing: SpinningSync(
                     color: Theme.of(context).colorScheme.errorContainer,
-                    onPressed: Settings.syncEnabled && !sync.isSyncing
+                    onPressed: settings.syncEnabled && !sync.isSyncing
                         ? () => Sync.instance.sync(
                               onNoInternet: () {
                                 showSimpleToast(

@@ -46,7 +46,7 @@ class Metcon extends AtomicEntity {
 
   Metcon.defaultValue()
       : id = randomId(),
-        userId = Settings.userId,
+        userId = Settings.instance.userId,
         name = "",
         metconType = MetconType.amrap,
         rounds = null,

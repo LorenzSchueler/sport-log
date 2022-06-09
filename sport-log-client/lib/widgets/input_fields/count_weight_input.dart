@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -66,123 +67,54 @@ class _CountWeightInputState extends State<CountWeightInput> {
       children: [
         SizedBox(
           width: 160,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (widget.dimension == MovementDimension.distance &&
-                  widget.editDistanceUnit!)
-                EditTile(
-                  leading: null,
-                  caption: "Distance Unit",
-                  child: SizedBox(
-                    height: 24,
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton(
-                        value: _distanceUnit,
-                        items: DistanceUnit.values
-                            .map(
-                              (unit) => DropdownMenuItem(
-                                value: unit,
-                                child: Text(unit.name),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (unit) {
-                          if (unit != null && unit is DistanceUnit) {
-                            setState(() => _distanceUnit = unit);
-                            if (!widget.confirmChanges) {
-                              widget.setValue(
-                                _count,
-                                _weight,
-                                _secondWeight,
-                                _distanceUnit,
-                              );
-                            }
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              EditTile(
-                leading: null,
-                caption: widget.dimension == MovementDimension.distance
-                    ? "${widget.dimension} (${_distanceUnit!.name})"
-                    : "${widget.dimension}",
-                child: IntInput(
-                  initialValue: _count,
-                  setValue: (count) {
-                    setState(() => _count = count);
-                    if (!widget.confirmChanges) {
-                      widget.setValue(
-                        _count,
-                        _weight,
-                        _secondWeight,
-                        _distanceUnit,
-                      );
-                    }
-                  },
-                ),
-              ),
-              if (_weight != null && widget.editWeightUnit)
-                EditTile(
-                  leading: null,
-                  caption: "Weight Unit",
-                  child: SizedBox(
-                    height: 24,
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton(
-                        value: _weightUnit,
-                        items: const [
-                          DropdownMenuItem(
-                            value: "kg",
-                            child: Text("kg"),
-                          ),
-                          DropdownMenuItem(
-                            value: "lb",
-                            child: Text("lb"),
-                          ),
-                        ],
-                        onChanged: (unit) {
-                          if (unit != null &&
-                              unit is String &&
-                              unit != _weightUnit) {
-                            setState(() {
-                              _weightUnit = unit;
-                              _weight = _weightUnit == "lb"
-                                  ? _weight! * _lbToKg
-                                  : _weight! / _lbToKg;
-                              if (_secondWeight != null) {
-                                _secondWeight = _weightUnit == "lb"
-                                    ? _secondWeight! * _lbToKg
-                                    : _secondWeight! / _lbToKg;
+          child: Consumer<Settings>(
+            builder: (context, settings, _) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (widget.dimension == MovementDimension.distance &&
+                    widget.editDistanceUnit!)
+                  EditTile(
+                    leading: null,
+                    caption: "Distance Unit",
+                    child: SizedBox(
+                      height: 24,
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton(
+                          value: _distanceUnit,
+                          items: DistanceUnit.values
+                              .map(
+                                (unit) => DropdownMenuItem(
+                                  value: unit,
+                                  child: Text(unit.name),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (unit) {
+                            if (unit != null && unit is DistanceUnit) {
+                              setState(() => _distanceUnit = unit);
+                              if (!widget.confirmChanges) {
+                                widget.setValue(
+                                  _count,
+                                  _weight,
+                                  _secondWeight,
+                                  _distanceUnit,
+                                );
                               }
-                            });
-                            if (!widget.confirmChanges) {
-                              widget.setValue(
-                                _count,
-                                _weight,
-                                _secondWeight,
-                                _distanceUnit,
-                              );
                             }
-                          }
-                        },
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
-              if (_weight != null)
                 EditTile(
                   leading: null,
-                  caption: widget.secondWeight ? "Male Weight" : "Weight",
-                  child: DoubleInput(
-                    initialValue:
-                        _weightUnit == "lb" ? _weight! / _lbToKg : _weight!,
-                    stepSize: Settings.weightIncrement,
-                    setValue: (weight) {
-                      weight = _weightUnit == "lb" ? weight * _lbToKg : weight;
-                      setState(() => _weight = weight);
+                  caption: widget.dimension == MovementDimension.distance
+                      ? "${widget.dimension} (${_distanceUnit!.name})"
+                      : "${widget.dimension}",
+                  child: IntInput(
+                    initialValue: _count,
+                    setValue: (count) {
+                      setState(() => _count = count);
                       if (!widget.confirmChanges) {
                         widget.setValue(
                           _count,
@@ -194,56 +126,66 @@ class _CountWeightInputState extends State<CountWeightInput> {
                     },
                   ),
                 ),
-              if (widget.secondWeight && _secondWeight != null)
-                EditTile(
-                  leading: null,
-                  caption: "Female Weight",
-                  child: DoubleInput(
-                    initialValue: _weightUnit == "lb"
-                        ? _secondWeight! / _lbToKg
-                        : _secondWeight!,
-                    stepSize: Settings.weightIncrement,
-                    setValue: (weight) {
-                      weight = _weightUnit == "lb" ? weight * _lbToKg : weight;
-                      setState(() => _secondWeight = weight);
-                      if (!widget.confirmChanges) {
-                        widget.setValue(
-                          _count,
-                          _weight,
-                          _secondWeight,
-                          _distanceUnit,
-                        );
-                      }
-                    },
+                if (_weight != null && widget.editWeightUnit)
+                  EditTile(
+                    leading: null,
+                    caption: "Weight Unit",
+                    child: SizedBox(
+                      height: 24,
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton(
+                          value: _weightUnit,
+                          items: const [
+                            DropdownMenuItem(
+                              value: "kg",
+                              child: Text("kg"),
+                            ),
+                            DropdownMenuItem(
+                              value: "lb",
+                              child: Text("lb"),
+                            ),
+                          ],
+                          onChanged: (unit) {
+                            if (unit != null &&
+                                unit is String &&
+                                unit != _weightUnit) {
+                              setState(() {
+                                _weightUnit = unit;
+                                _weight = _weightUnit == "lb"
+                                    ? _weight! * _lbToKg
+                                    : _weight! / _lbToKg;
+                                if (_secondWeight != null) {
+                                  _secondWeight = _weightUnit == "lb"
+                                      ? _secondWeight! * _lbToKg
+                                      : _secondWeight! / _lbToKg;
+                                }
+                              });
+                              if (!widget.confirmChanges) {
+                                widget.setValue(
+                                  _count,
+                                  _weight,
+                                  _secondWeight,
+                                  _distanceUnit,
+                                );
+                              }
+                            }
+                          },
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              _weight == null
-                  ? ActionChip(
-                      avatar: const Icon(AppIcons.add),
-                      label: const Text("Add Weight"),
-                      onPressed: () {
-                        setState(() {
-                          _weight = 0;
-                          _secondWeight = 0;
-                        });
-                        if (!widget.confirmChanges) {
-                          widget.setValue(
-                            _count,
-                            _weight,
-                            _secondWeight,
-                            _distanceUnit,
-                          );
-                        }
-                      },
-                    )
-                  : ActionChip(
-                      avatar: const Icon(AppIcons.close),
-                      label: const Text("Remove Weight"),
-                      onPressed: () {
-                        setState(() {
-                          _weight = null;
-                          _secondWeight = null;
-                        });
+                if (_weight != null)
+                  EditTile(
+                    leading: null,
+                    caption: widget.secondWeight ? "Male Weight" : "Weight",
+                    child: DoubleInput(
+                      initialValue:
+                          _weightUnit == "lb" ? _weight! / _lbToKg : _weight!,
+                      stepSize: settings.weightIncrement,
+                      setValue: (weight) {
+                        weight =
+                            _weightUnit == "lb" ? weight * _lbToKg : weight;
+                        setState(() => _weight = weight);
                         if (!widget.confirmChanges) {
                           widget.setValue(
                             _count,
@@ -254,7 +196,70 @@ class _CountWeightInputState extends State<CountWeightInput> {
                         }
                       },
                     ),
-            ],
+                  ),
+                if (widget.secondWeight && _secondWeight != null)
+                  EditTile(
+                    leading: null,
+                    caption: "Female Weight",
+                    child: DoubleInput(
+                      initialValue: _weightUnit == "lb"
+                          ? _secondWeight! / _lbToKg
+                          : _secondWeight!,
+                      stepSize: settings.weightIncrement,
+                      setValue: (weight) {
+                        weight =
+                            _weightUnit == "lb" ? weight * _lbToKg : weight;
+                        setState(() => _secondWeight = weight);
+                        if (!widget.confirmChanges) {
+                          widget.setValue(
+                            _count,
+                            _weight,
+                            _secondWeight,
+                            _distanceUnit,
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                _weight == null
+                    ? ActionChip(
+                        avatar: const Icon(AppIcons.add),
+                        label: const Text("Add Weight"),
+                        onPressed: () {
+                          setState(() {
+                            _weight = 0;
+                            _secondWeight = 0;
+                          });
+                          if (!widget.confirmChanges) {
+                            widget.setValue(
+                              _count,
+                              _weight,
+                              _secondWeight,
+                              _distanceUnit,
+                            );
+                          }
+                        },
+                      )
+                    : ActionChip(
+                        avatar: const Icon(AppIcons.close),
+                        label: const Text("Remove Weight"),
+                        onPressed: () {
+                          setState(() {
+                            _weight = null;
+                            _secondWeight = null;
+                          });
+                          if (!widget.confirmChanges) {
+                            widget.setValue(
+                              _count,
+                              _weight,
+                              _secondWeight,
+                              _distanceUnit,
+                            );
+                          }
+                        },
+                      ),
+              ],
+            ),
           ),
         ),
         if (widget.confirmChanges)

@@ -52,7 +52,7 @@ class Movement extends AtomicEntity {
 
   Movement.defaultValue()
       : id = randomId(),
-        userId = Settings.userId,
+        userId = Settings.instance.userId,
         name = '',
         description = null,
         cardio = true,

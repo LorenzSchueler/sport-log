@@ -36,7 +36,7 @@ class StrengthSessionDescription extends CompoundEntity {
           : StrengthSessionDescription(
               session: StrengthSession(
                 id: randomId(),
-                userId: Settings.userId!,
+                userId: Settings.instance.userId!,
                 datetime: DateTime.now(),
                 movementId: Movement.defaultMovement!.id,
                 interval: null,

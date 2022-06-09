@@ -30,7 +30,7 @@ class Route extends AtomicEntity with Comparable<Route> {
 
   Route.defaultValue()
       : id = randomId(),
-        userId = Settings.userId!,
+        userId = Settings.instance.userId!,
         name = "",
         distance = 0,
         ascent = null,

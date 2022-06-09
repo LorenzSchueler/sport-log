@@ -164,7 +164,7 @@ Future<void> main() async {
 
     setUpAll(() async {
       expect(await Api.user.postSingle(sampleUser), isA<Success>());
-      Settings.user = sampleUser;
+      Settings.instance.user = sampleUser;
     });
 
     tearDownAll(() async {
@@ -187,7 +187,7 @@ Future<void> main() async {
     );
 
     setUpAll(() {
-      Settings.user = user;
+      Settings.instance.user = user;
     });
 
     final updatedUser = user

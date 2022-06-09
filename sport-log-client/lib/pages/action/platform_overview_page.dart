@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/platform/platform_credential.dart';
 import 'package:sport_log/models/platform/platform_description.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -176,13 +174,8 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
   @override
   void initState() {
     platformDescription = widget.platformDescription.clone();
-    platformDescription.platformCredential ??= PlatformCredential(
-      id: randomId(),
-      userId: Settings.userId!,
-      platformId: widget.platformDescription.platform.id,
-      username: "",
-      password: "",
-      deleted: false,
+    platformDescription.platformCredential ??= PlatformCredential.defaultValue(
+      widget.platformDescription.platform.id,
     );
     super.initState();
   }
