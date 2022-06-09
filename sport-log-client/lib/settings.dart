@@ -44,7 +44,7 @@ class Settings extends ChangeNotifier {
       ..registerAdapter(DurationAdapter())
       ..registerAdapter(LatLngAdapter())
       ..registerAdapter(CameraPositionAdapter());
-    _storage ??= await Hive.openBox<dynamic>("settings");
+    _storage ??= await Hive.openBox<dynamic>(Config.hiveBoxName);
     await setDefaults(override: override);
   }
 

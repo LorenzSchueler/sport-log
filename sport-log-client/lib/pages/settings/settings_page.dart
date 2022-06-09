@@ -240,9 +240,10 @@ class SettingsPage extends StatelessWidget {
                                   ? null
                                   : () async {
                                       final approved = await showApproveDialog(
-                                        context,
-                                        "Warning",
-                                        "Conflicting entries will get lost.",
+                                        context: context,
+                                        title: "Warning",
+                                        text:
+                                            "Conflicting entries will get lost.",
                                       );
                                       if (approved) {
                                         final result =
@@ -272,9 +273,10 @@ class SettingsPage extends StatelessWidget {
                                 : () async {
                                     final navigator = Navigator.of(context);
                                     final approved = await showApproveDialog(
-                                      context,
-                                      "Logout",
-                                      "Make sure you know you credentials before logging out. Otherwise you will lose access to your account and all your data.",
+                                      context: context,
+                                      title: "Logout",
+                                      text:
+                                          "Make sure you know you credentials before logging out. Otherwise you will lose access to your account and all your data.",
                                     );
                                     if (approved) {
                                       await Account.logout();
@@ -298,9 +300,10 @@ class SettingsPage extends StatelessWidget {
                                   : () async {
                                       final navigator = Navigator.of(context);
                                       final approved = await showApproveDialog(
-                                        context,
-                                        "Delete Account",
-                                        "If you delete your account all data will be permanently lost.",
+                                        context: context,
+                                        title: "Delete Account",
+                                        text:
+                                            "If you delete your account all data will be permanently lost.",
                                       );
                                       if (approved) {
                                         final result = await Account.delete();

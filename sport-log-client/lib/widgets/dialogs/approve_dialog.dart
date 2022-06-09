@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-Future<bool> showApproveDialog(
-  BuildContext context,
-  String title,
-  String description,
-) async {
+Future<bool> showApproveDialog({
+  required BuildContext context,
+  required String title,
+  required String text,
+}) async {
   final approved = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
       title: Text(title),
-      content: Text(description),
+      content: Text(text),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
@@ -25,6 +25,9 @@ Future<bool> showApproveDialog(
   return approved != null && approved;
 }
 
-Future<bool> showDiscardWarningDialog(BuildContext context) {
-  return showApproveDialog(context, 'Discard changes', 'Changes will be lost.');
-}
+Future<bool> showDiscardWarningDialog(BuildContext context) =>
+    showApproveDialog(
+      context: context,
+      title: 'Discard changes',
+      text: 'Changes will be lost.',
+    );

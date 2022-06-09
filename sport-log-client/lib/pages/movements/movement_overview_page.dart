@@ -126,9 +126,9 @@ class MovementCard extends StatelessWidget {
         if (movementDescription.movement.userId != null) {
           if (movementDescription.hasReference) {
             final approved = await showApproveDialog(
-              context,
-              'Warning',
-              'Changes will be reflected in existing workouts.',
+              context: context,
+              title: 'Warning',
+              text: 'Changes will be reflected in existing workouts.',
             );
             if (!approved) return;
           }
