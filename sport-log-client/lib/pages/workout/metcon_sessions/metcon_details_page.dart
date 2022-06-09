@@ -42,6 +42,13 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
       appBar: AppBar(
         title: Text(_metconDescription.metcon.name),
         actions: [
+          IconButton(
+            onPressed: () => Navigator.of(context).pushNamed(
+              Routes.metcon.sessionEdit,
+              arguments: _metconDescription,
+            ),
+            icon: const Icon(AppIcons.add),
+          ),
           if (!_metconDescription.hasReference &&
               widget.metconDescription.metcon.userId != null)
             IconButton(

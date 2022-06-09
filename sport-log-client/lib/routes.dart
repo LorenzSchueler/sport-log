@@ -152,11 +152,18 @@ abstract class Routes {
           );
         }),
     Routes.metcon.sessionEdit: (context) => _checkLogin(() {
-          var isNew = false;
-          var metconSessionDescription = ModalRoute.of(context)
-              ?.settings
-              .arguments as MetconSessionDescription?;
-          if (metconSessionDescription == null) {
+          var arg = ModalRoute.of(context)?.settings.arguments;
+          final bool isNew;
+          final MetconSessionDescription? metconSessionDescription;
+          if (arg is MetconSessionDescription) {
+            metconSessionDescription = arg;
+            isNew = false;
+          } else if (arg is MetconDescription) {
+            metconSessionDescription = MetconSessionDescription.defaultValue()
+              ?..metconDescription = arg
+              ..metconSession.metconId = arg.metcon.id;
+            isNew = true;
+          } else {
             metconSessionDescription = MetconSessionDescription.defaultValue();
             isNew = true;
           }
