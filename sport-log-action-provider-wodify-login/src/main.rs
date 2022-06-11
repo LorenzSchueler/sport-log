@@ -196,13 +196,9 @@ async fn login(mode: Mode) -> Result<()> {
 
             match (&exec_action_event.username, &exec_action_event.password) {
                 (Some(username), Some(password)) => {
-                    let driver = WebDriver::new_with_timeout(
-                        "http://localhost:4444/",
-                        &caps,
-                        Some(StdDuration::from_secs(5)),
-                    )
-                    .await
-                    .map_err(Error::WebDriver)?;
+                    let driver = WebDriver::new("http://localhost:4444/", caps)
+                        .await
+                        .map_err(Error::WebDriver)?;
 
                     let result =
                         try_login(&driver, username, password, &exec_action_event, mode).await;

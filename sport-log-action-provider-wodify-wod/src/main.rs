@@ -191,13 +191,9 @@ async fn get_wod(mode: Mode) -> Result<()> {
 
             match (&exec_action_event.username, &exec_action_event.password) {
                 (Some(username), Some(password)) => {
-                    let driver = WebDriver::new_with_timeout(
-                        "http://localhost:4444/",
-                        &caps,
-                        Some(StdDuration::from_secs(5)),
-                    )
-                    .await
-                    .map_err(Error::WebDriver)?;
+                    let driver = WebDriver::new("http://localhost:4444/", caps)
+                        .await
+                        .map_err(Error::WebDriver)?;
 
                     let result = try_get_wod(
                         &driver,
@@ -348,7 +344,7 @@ async fn try_get_wod(
                 .map_err(Error::WebDriver)?
                 .replace("<br>", "\n")
                 .replace("&nbsp;", " ");
-            description += &name;
+            description += name.as_str();
             description += "\n";
 
             let content = element
@@ -360,7 +356,7 @@ async fn try_get_wod(
                 .map_err(Error::WebDriver)?
                 .replace("<br>", "\n")
                 .replace("&nbsp;", " ");
-            description += &content;
+            description += content.as_str();
             description += "\n";
         }
 
@@ -406,7 +402,7 @@ async fn try_get_wod(
                     .next()
                     .expect("server returned multiple wods for the same date");
                 if let Some(old_description) = wod.description {
-                    wod.description = Some(old_description + &description);
+                    wod.description = Some(old_description + description.as_str());
                 } else {
                     wod.description = Some(description);
                 }
