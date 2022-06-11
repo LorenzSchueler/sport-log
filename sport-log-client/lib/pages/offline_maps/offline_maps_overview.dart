@@ -43,7 +43,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
   @override
   void dispose() {
     if (_mapController.cameraPosition != null) {
-      context.read<Settings>().lastMapPosition = _mapController.cameraPosition!;
+      Settings.instance.lastMapPosition = _mapController.cameraPosition!;
     }
     super.dispose();
   }

@@ -89,10 +89,10 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
     _locationUtils.stopLocationStream();
     widget.heartRateUtils?.stopHeartRateStream();
     if (_mapController.cameraPosition != null) {
-      context.read<Settings>().lastMapPosition = _mapController.cameraPosition!;
+      Settings.instance.lastMapPosition = _mapController.cameraPosition!;
     }
     if (_locationUtils.lastLatLng != null) {
-      context.read<Settings>().lastGpsLatLng = _locationUtils.lastLatLng!;
+      Settings.instance.lastGpsLatLng = _locationUtils.lastLatLng!;
     }
     super.dispose();
   }

@@ -53,10 +53,10 @@ class _MapPageState extends State<MapPage> {
   void dispose() {
     _locationUtils.stopLocationStream();
     if (_mapController.cameraPosition != null) {
-      context.read<Settings>().lastMapPosition = _mapController.cameraPosition!;
+      Settings.instance.lastMapPosition = _mapController.cameraPosition!;
     }
     if (_locationUtils.lastLatLng != null) {
-      context.read<Settings>().lastGpsLatLng = _locationUtils.lastLatLng!;
+      Settings.instance.lastGpsLatLng = _locationUtils.lastLatLng!;
     }
     _mapController.removeListener(_mapControllerListener);
     super.dispose();

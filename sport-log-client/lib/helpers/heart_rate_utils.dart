@@ -14,6 +14,8 @@ class HeartRateUtils extends ChangeNotifier {
   static final _polar = Polar();
   static final FlutterBlue _flutterBlue = FlutterBlue.instance;
 
+  static const searchDuration = Duration(seconds: 10);
+
   bool isSearching = false;
   Map<String, String> devices = {};
   String? deviceId;
@@ -53,7 +55,7 @@ class HeartRateUtils extends ChangeNotifier {
 
     devices = {
       await for (final d in _flutterBlue
-          .scan(timeout: const Duration(seconds: 10))
+          .scan(timeout: searchDuration)
           .where((d) => d.device.name.toLowerCase().contains("polar h")))
         d.device.name: d.device.id.toString()
     };
