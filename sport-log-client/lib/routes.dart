@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/config.dart';
+import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -212,7 +213,7 @@ abstract class Routes {
             movement: args[0] as Movement,
             cardioType: args[1] as CardioType,
             route: args[2] as Route?,
-            heartRateMonitorId: args[3] as String?,
+            heartRateUtils: args[3] as HeartRateUtils?,
           );
         }),
     Routes.cardio.cardioEdit: (context) => _checkLogin(() {

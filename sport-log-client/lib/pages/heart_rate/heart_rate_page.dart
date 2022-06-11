@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sport_log/app.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/routes.dart';
@@ -7,26 +9,8 @@ import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
-class HeartRatePage extends StatefulWidget {
+class HeartRatePage extends StatelessWidget {
   const HeartRatePage({Key? key}) : super(key: key);
-
-  @override
-  State<HeartRatePage> createState() => _HeartRatePageState();
-}
-
-class _HeartRatePageState extends State<HeartRatePage> {
-  bool _isSearchingHRMonitor = false;
-  Map<String, String>? _devices;
-  String? _heartRateMonitorId;
-  HeartRateUtils? _heartRateUtils;
-  int? _hr;
-  int? _battery;
-
-  @override
-  void dispose() {
-    _heartRateUtils?.stopHeartRateStream();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,104 +21,97 @@ class _HeartRatePageState extends State<HeartRatePage> {
         body: Container(
           padding: Defaults.edgeInsets.normal,
           child: Center(
-            child: Column(
-              children: [
-                ElevatedButton(
-                  onPressed: _isSearchingHRMonitor
-                      ? null
-                      : () async {
-                          _heartRateUtils?.stopHeartRateStream();
-                          setState(() {
-                            _heartRateUtils = null;
-                            _heartRateMonitorId = null;
-                            _hr = null;
-                            _battery = null;
-                            _devices = null;
-                            _isSearchingHRMonitor = true;
-                          });
-                          final devices = await HeartRateUtils.searchDevices();
-                          if (mounted) {
-                            setState(() {
-                              _devices = devices;
-                              _isSearchingHRMonitor = false;
-                            });
-                            if (devices == null || devices.isEmpty) {
-                              showSimpleToast(context, "No devices found.");
-                            }
-                          }
-                        },
-                  child: Text(
-                    _isSearchingHRMonitor ? "Seaching..." : "Search Devices",
-                  ),
-                ),
-                Defaults.sizedBox.vertical.normal,
-                if (_devices != null && _heartRateUtils == null) ...[
-                  const Text(
-                    "Heart Rate Monitors",
-                  ),
-                  SizedBox(
-                    height: 24,
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton(
-                        value: _heartRateMonitorId,
-                        items: _devices!.entries
-                            .map(
-                              (d) => DropdownMenuItem(
-                                value: d.value,
-                                child: Text(d.key),
+            child: ChangeNotifierProvider<HeartRateUtils>(
+              create: (_) => HeartRateUtils(),
+              child: Consumer<HeartRateUtils>(
+                builder: (_, heartRateUtils, __) => Column(
+                  children: [
+                    SizedBox(
+                      height: 200,
+                      child: Column(
+                        children: [
+                          ElevatedButton(
+                            onPressed: heartRateUtils.isSearching
+                                ? null
+                                : () async {
+                                    heartRateUtils.stopHeartRateStream();
+                                    await heartRateUtils.searchDevices();
+                                    if (heartRateUtils.devices.isEmpty) {
+                                      // ignore: use_build_context_synchronously
+                                      showSimpleToast(
+                                        App.globalContext,
+                                        "No devices found.",
+                                      );
+                                    }
+                                  },
+                            child: Text(
+                              heartRateUtils.isSearching
+                                  ? "Seaching..."
+                                  : "Search Devices",
+                            ),
+                          ),
+                          if (!heartRateUtils.isSearching &&
+                              !heartRateUtils.isActive &&
+                              heartRateUtils.devices.isNotEmpty) ...[
+                            Defaults.sizedBox.vertical.normal,
+                            const Text("Heart Rate Monitors"),
+                            SizedBox(
+                              height: 24,
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton(
+                                  value: heartRateUtils.deviceId,
+                                  items: heartRateUtils.devices.entries
+                                      .map(
+                                        (d) => DropdownMenuItem(
+                                          value: d.value,
+                                          child: Text(d.key),
+                                        ),
+                                      )
+                                      .toList(),
+                                  underline: null,
+                                  onChanged: (deviceId) {
+                                    if (deviceId != null &&
+                                        deviceId is String) {
+                                      heartRateUtils.deviceId = deviceId;
+                                    }
+                                  },
+                                ),
                               ),
-                            )
-                            .toList(),
-                        underline: null,
-                        onChanged: (deviceId) {
-                          if (deviceId != null && deviceId is String) {
-                            setState(() => _heartRateMonitorId = deviceId);
-                          }
-                        },
+                            ),
+                          ],
+                          if (!heartRateUtils.isActive &&
+                              heartRateUtils.canStartStream) ...[
+                            Defaults.sizedBox.vertical.normal,
+                            ElevatedButton(
+                              onPressed: heartRateUtils.startHeartRateStream,
+                              child: const Text("Connect"),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                  ),
-                ],
-                Defaults.sizedBox.vertical.normal,
-                if (_heartRateMonitorId != null && _heartRateUtils == null)
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _heartRateUtils = HeartRateUtils(
-                          deviceId: _heartRateMonitorId!,
-                          onHeartRateEvent: (event) =>
-                              setState(() => _hr = event.data.hr),
-                          onBatteryEvent: (event) =>
-                              setState(() => _battery = event.level),
-                        );
-                      });
-                      _heartRateUtils?.startHeartRateStream();
-                    },
-                    child: const Text("Connect"),
-                  ),
-                Defaults.sizedBox.vertical.huge,
-                if (_hr != null) ...[
-                  const Text(
-                    "Heart Rate",
-                    style: TextStyle(fontSize: 40),
-                  ),
-                  Text(
-                    "$_hr",
-                    style: const TextStyle(fontSize: 120),
-                  ),
-                ],
-                if (_battery != null)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(AppIcons.battery),
-                      Text(
-                        "$_battery%",
-                        style: Theme.of(context).textTheme.subtitle1,
-                      ),
-                    ],
-                  )
-              ],
+                    const Text(
+                      "Heart Rate",
+                      style: TextStyle(fontSize: 40),
+                    ),
+                    Text(
+                      heartRateUtils.hr != null ? "${heartRateUtils.hr}" : "--",
+                      style: const TextStyle(fontSize: 120),
+                    ),
+                    if (heartRateUtils.battery != null)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(AppIcons.battery),
+                          Text(
+                            "${heartRateUtils.battery}%",
+                            style: Theme.of(context).textTheme.subtitle1,
+                          ),
+                        ],
+                      )
+                  ],
+                ),
+              ),
             ),
           ),
         ),

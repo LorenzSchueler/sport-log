@@ -30,14 +30,14 @@ class CardioTrackingPage extends StatefulWidget {
     required this.route,
     required this.movement,
     required this.cardioType,
-    required this.heartRateMonitorId,
+    required this.heartRateUtils,
     Key? key,
   }) : super(key: key);
 
   final Movement movement;
   final CardioType cardioType;
   final Route? route;
-  final String? heartRateMonitorId;
+  final HeartRateUtils? heartRateUtils;
 
   @override
   State<CardioTrackingPage> createState() => _CardioTrackingPageState();
@@ -56,7 +56,6 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   final TrackingUtils _trackingUtils = TrackingUtils();
   late final LocationUtils _locationUtils;
   late final StepCountUtils _stepUtils;
-  HeartRateUtils? _heartRateUtils;
 
   late final MapboxMapController _mapController;
   late Line _line;
@@ -70,19 +69,14 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
         ..time = Duration.zero
         ..track = []
         ..cadence = []
-        ..heartRate = widget.heartRateMonitorId != null ? [] : null
+        ..heartRate = widget.heartRateUtils != null ? [] : null
         ..routeId = widget.route?.id,
       movement: widget.movement,
       route: widget.route,
     );
     _locationUtils = LocationUtils(_onLocationUpdate);
     _stepUtils = StepCountUtils(_onStepCountUpdate);
-    if (widget.heartRateMonitorId != null) {
-      _heartRateUtils = HeartRateUtils(
-        deviceId: widget.heartRateMonitorId!,
-        onHeartRateEvent: _onHeartRateUpdate,
-      );
-    }
+    widget.heartRateUtils?.onHeartRateEvent = _onHeartRateUpdate;
     _timer =
         Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateData());
     super.initState();
@@ -93,7 +87,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
     _timer.cancel();
     _stepUtils.stopStepCountStream();
     _locationUtils.stopLocationStream();
-    _heartRateUtils?.stopHeartRateStream();
+    widget.heartRateUtils?.stopHeartRateStream();
     if (_mapController.cameraPosition != null) {
       context.read<Settings>().lastMapPosition = _mapController.cameraPosition!;
     }
@@ -143,7 +137,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   Future<void> _startStreams() async {
     await _locationUtils.startLocationStream();
     await _stepUtils.startStepCountStream();
-    _heartRateUtils?.startHeartRateStream();
+    widget.heartRateUtils?.startHeartRateStream();
   }
 
   void _onHeartRateUpdate(PolarHeartRateEvent event) {
@@ -298,7 +292,8 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
               style: ElevatedButton.styleFrom(
                 primary: Theme.of(context).colorScheme.errorContainer,
               ),
-              onPressed: _heartRateUtils == null || _heartRateUtils!.active
+              onPressed: widget.heartRateUtils == null ||
+                      widget.heartRateUtils!.isActive
                   ? () {
                       setState(_trackingUtils.start);
                       _cardioSessionDescription.cardioSession.datetime =
@@ -306,7 +301,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                     }
                   : null,
               child: Text(
-                _heartRateUtils == null || _heartRateUtils!.active
+                widget.heartRateUtils == null || widget.heartRateUtils!.isActive
                     ? "Start"
                     : "Waiting on HR Monitor",
               ),
