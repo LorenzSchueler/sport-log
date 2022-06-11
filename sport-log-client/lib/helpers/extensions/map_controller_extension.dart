@@ -56,6 +56,21 @@ extension MapControllerExtension on MapboxMapController {
     );
   }
 
+  Future<Line?> updateBoundingBoxLine(
+    Line? line,
+    LatLng? point1,
+    LatLng? point2,
+  ) async {
+    if (line != null) {
+      await removeLine(line);
+      line = null;
+    }
+    if (point1 != null && point2 != null) {
+      line = await addBoundingBoxLine(point1, point2);
+    }
+    return line;
+  }
+
   Future<Line> addRouteLine(List<Position> track) {
     return addLine(
       LineOptions(
@@ -119,5 +134,23 @@ extension MapControllerExtension on MapboxMapController {
         geometry: latLng,
       ),
     );
+  }
+
+  Future<Circle?> updateLocationMarker(Circle? circle, LatLng? latLng) async {
+    if (circle != null) {
+      await removeCircle(circle);
+      circle = null;
+    }
+    if (latLng != null) {
+      circle = await addCircle(
+        CircleOptions(
+          circleRadius: 8.0,
+          circleColor: Defaults.mapbox.markerColor,
+          circleOpacity: 0.5,
+          geometry: latLng,
+        ),
+      );
+    }
+    return circle;
   }
 }

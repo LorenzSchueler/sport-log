@@ -1,11 +1,10 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
@@ -71,20 +70,9 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
 
   void _downloadMap() {
     if (_point1 != null && _point2 != null) {
-      LatLng northeast = LatLng(
-        max(_point1!.latitude, _point2!.latitude),
-        max(_point1!.longitude, _point2!.longitude),
-      );
-      LatLng southwest = LatLng(
-        min(_point1!.latitude, _point2!.latitude),
-        min(_point1!.longitude, _point2!.longitude),
-      );
       downloadOfflineRegion(
         OfflineRegionDefinition(
-          bounds: LatLngBounds(
-            northeast: northeast,
-            southwest: southwest,
-          ),
+          bounds: [_point1!, _point2!].latLngBounds!,
           minZoom: 0,
           maxZoom: 16,
           mapStyleUrl: MapboxStyles.OUTDOORS,
@@ -98,42 +86,26 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
     } else {
       showMessageDialog(
         context: context,
-        text:
-            "Please mark two points to form a bounding box by long pressing on the map.",
+        text: "Please mark 2 points by long pressing on the map.",
       );
     }
   }
 
   Future<void> _updatePoint1(LatLng? latLng) async {
-    setState(() {
-      _point1 = latLng;
-    });
-    if (_point1Marker != null) {
-      await _mapController.removeCircle(_point1Marker!);
-      _point1Marker = null;
-    }
-    if (_point1 != null) {
-      _point1Marker = await _mapController.addLocationMarker(_point1!);
-    }
+    setState(() => _point1 = latLng);
+    _point1Marker =
+        await _mapController.updateLocationMarker(_point1Marker, _point1);
   }
 
   Future<void> _updatePoint2(LatLng? latLng) async {
-    setState(() {
-      _point2 = latLng;
-    });
-    if (_point2Marker != null) {
-      await _mapController.removeCircle(_point2Marker!);
-      _point2Marker = null;
-    }
-    if (_boundingBoxLine != null) {
-      await _mapController.removeLine(_boundingBoxLine!);
-      _boundingBoxLine = null;
-    }
-    if (_point2 != null) {
-      _point2Marker = await _mapController.addLocationMarker(_point2!);
-      _boundingBoxLine =
-          await _mapController.addBoundingBoxLine(_point1!, _point2!);
-    }
+    setState(() => _point2 = latLng);
+    _point2Marker =
+        await _mapController.updateLocationMarker(_point2Marker, _point2);
+    _boundingBoxLine = await _mapController.updateBoundingBoxLine(
+      _boundingBoxLine,
+      _point1,
+      _point2,
+    );
   }
 
   @override
