@@ -11,6 +11,77 @@ enum TimerType {
   stopwatch,
 }
 
+class TimerState extends ChangeNotifier {
+  Duration _time = Duration.zero;
+  Duration? _restTime;
+  int _rounds = 3;
+  TimerType _timerType = TimerType.timer;
+  TimerUtils? _timerUtils;
+
+  bool get isRunning => _timerUtils != null;
+  bool get isNotRunning => _timerUtils == null;
+
+  Duration get time => _time;
+  set time(Duration time) {
+    if (isNotRunning) {
+      _time = time;
+      notifyListeners();
+    }
+  }
+
+  Duration? get restTime => _restTime;
+  set restTime(Duration? restTime) {
+    if (isNotRunning) {
+      _restTime = restTime;
+      notifyListeners();
+    }
+  }
+
+  int get rounds => _rounds;
+  set rounds(int rounds) {
+    if (isNotRunning) {
+      _rounds = rounds;
+      notifyListeners();
+    }
+  }
+
+  set timerType(TimerType timerType) {
+    if (isNotRunning) {
+      _timerType = timerType;
+      notifyListeners();
+    }
+  }
+
+  Duration? get displayTime => _timerUtils?.displayTime;
+  int? get currentRound => _timerUtils?.currentRound;
+
+  void start() {
+    _timerUtils = TimerUtils.startTimer(
+      timerType: _timerType,
+      time: _time,
+      restTime: _restTime,
+      rounds: _rounds,
+      onTick: notifyListeners,
+      onStop: () {
+        _timerUtils = null;
+        notifyListeners();
+      },
+    );
+    notifyListeners();
+  }
+
+  void stop() {
+    _timerUtils?.stopTimer();
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _timerUtils?.dispose();
+    super.dispose();
+  }
+}
+
 class TimerUtils {
   TimerUtils.startTimer({
     required this.timerType,
@@ -50,8 +121,7 @@ class TimerUtils {
   }
 
   void stopTimer() {
-    _timer.cancel();
-    Wakelock.disable();
+    dispose();
     onStop();
   }
 

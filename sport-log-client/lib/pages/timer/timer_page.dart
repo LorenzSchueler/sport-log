@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/timer_utils.dart';
@@ -12,188 +13,172 @@ import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
-class TimerPage extends StatefulWidget {
+class TimerPage extends StatelessWidget {
   const TimerPage({Key? key}) : super(key: key);
-
-  @override
-  State<TimerPage> createState() => _TimerPageState();
-}
-
-class _TimerPageState extends State<TimerPage> {
-  Duration _time = Duration.zero;
-  Duration? _restTime;
-  int _rounds = 3;
-  TimerUtils? _timerUtils;
-
-  @override
-  void dispose() {
-    _timerUtils?.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return NeverPop(
-      child: DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          resizeToAvoidBottomInset: false,
-          appBar: AppBar(
-            title: const Text("Timer"),
-            bottom: DeactivatableTabBar(
-              disabled: _timerUtils != null,
-              child: TabBar(
-                indicatorColor: Theme.of(context).colorScheme.primary,
-                tabs: const [
-                  Tab(
-                    text: "Timer",
-                    icon: Icon(AppIcons.timeInterval),
-                  ),
-                  Tab(
-                    text: "Interval",
-                    icon: Icon(AppIcons.repeat),
-                  ),
-                  Tab(
-                    text: "Stopwatch",
-                    icon: Icon(AppIcons.stopwatch),
-                  )
-                ],
-              ),
-            ),
-          ),
-          body: Container(
-            padding: Defaults.edgeInsets.normal,
-            child: TabBarView(
-              children: [
-                Column(
-                  children: [
-                    _timeFormField(TimerType.timer),
-                    Defaults.sizedBox.vertical.huge,
-                    _startStopButton(TimerType.timer),
-                    const SizedBox(height: 100),
-                    if (_timerUtils != null) timeText(),
-                  ],
-                ),
-                Column(
-                  children: [
-                    _timeFormField(TimerType.interval),
-                    _restTimeFormField(),
-                    _roundsFormField(),
-                    Defaults.sizedBox.vertical.huge,
-                    _startStopButton(TimerType.interval),
-                    const SizedBox(height: 100),
-                    if (_timerUtils != null)
-                      Text(
-                        "Round ${_timerUtils!.currentRound}",
-                        style: const TextStyle(fontSize: 50),
+      child: ChangeNotifierProvider(
+        create: (_) => TimerState(),
+        child: Consumer<TimerState>(
+          builder: (context, timerState, _) => DefaultTabController(
+            length: 3,
+            child: Builder(
+              builder: (context) {
+                final tabController = DefaultTabController.of(context)!;
+                tabController.addListener(() {
+                  if (!tabController.indexIsChanging) {
+                    switch (tabController.index) {
+                      case 0:
+                        timerState.timerType = TimerType.timer;
+                        break;
+                      case 1:
+                        timerState.timerType = TimerType.interval;
+                        break;
+                      default:
+                        timerState.timerType = TimerType.stopwatch;
+                        break;
+                    }
+                  }
+                });
+
+                return Scaffold(
+                  resizeToAvoidBottomInset: false,
+                  appBar: AppBar(
+                    title: const Text("Timer"),
+                    bottom: DeactivatableTabBar(
+                      disabled: timerState.isRunning,
+                      child: TabBar(
+                        indicatorColor: Theme.of(context).colorScheme.primary,
+                        tabs: const [
+                          Tab(
+                            text: "Timer",
+                            icon: Icon(AppIcons.timeInterval),
+                          ),
+                          Tab(
+                            text: "Interval",
+                            icon: Icon(AppIcons.repeat),
+                          ),
+                          Tab(
+                            text: "Stopwatch",
+                            icon: Icon(AppIcons.stopwatch),
+                          )
+                        ],
                       ),
-                    if (_timerUtils != null) timeText(),
-                  ],
-                ),
-                Column(
-                  children: [
-                    _timeFormField(TimerType.stopwatch),
-                    Defaults.sizedBox.vertical.huge,
-                    _startStopButton(TimerType.stopwatch),
-                    const SizedBox(height: 100),
-                    if (_timerUtils != null) timeText(),
-                  ],
-                ),
-              ],
+                    ),
+                  ),
+                  body: Container(
+                    padding: Defaults.edgeInsets.normal,
+                    child: TabBarView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        Column(
+                          children: [
+                            _timeFormField("Time", timerState),
+                            Defaults.sizedBox.vertical.huge,
+                            _startStopButton(context, timerState),
+                            const SizedBox(height: 100),
+                            timeText(timerState),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            _timeFormField("Round Time", timerState),
+                            _restTimeFormField(timerState),
+                            _roundsFormField(timerState),
+                            Defaults.sizedBox.vertical.huge,
+                            _startStopButton(context, timerState),
+                            const SizedBox(height: 100),
+                            if (timerState.isRunning)
+                              Text(
+                                "Round ${timerState.currentRound}",
+                                style: const TextStyle(fontSize: 50),
+                              ),
+                            timeText(timerState),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            _timeFormField("Timecap", timerState),
+                            Defaults.sizedBox.vertical.huge,
+                            _startStopButton(context, timerState),
+                            const SizedBox(height: 100),
+                            timeText(timerState),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  drawer: const MainDrawer(selectedRoute: Routes.settings),
+                );
+              },
             ),
           ),
-          drawer: const MainDrawer(selectedRoute: Routes.settings),
         ),
       ),
     );
   }
 
-  String _caption(TimerType timerType) {
-    switch (timerType) {
-      case TimerType.timer:
-        return "Time";
-      case TimerType.interval:
-        return "Round Time";
-      case TimerType.stopwatch:
-        return "Timecap";
-    }
-  }
-
-  Widget _timeFormField(TimerType timerType) {
+  Widget _timeFormField(String caption, TimerState timerState) {
     return EditTile(
-      caption: _caption(timerType),
+      caption: caption,
       leading: AppIcons.timeInterval,
       child: DurationInput(
-        setDuration:
-            _timerUtils != null ? null : (d) => setState(() => _time = d),
-        initialDuration: _time,
+        setDuration: (d) => timerState.time = d,
+        initialDuration: timerState.time,
       ),
     );
   }
 
-  Widget _restTimeFormField() {
-    return _restTime == null
+  Widget _restTimeFormField(TimerState timerState) {
+    return timerState.restTime == null
         ? EditTile(
             leading: AppIcons.timeInterval,
             child: ActionChip(
               avatar: const Icon(AppIcons.add),
               label: const Text("Rest Time"),
-              onPressed: () => setState(() {
-                _restTime = const Duration(minutes: 1);
-              }),
+              onPressed: () => timerState.restTime = const Duration(minutes: 1),
             ),
           )
         : EditTile(
             caption: "Rest Time",
             leading: AppIcons.timeInterval,
-            onCancel: () => setState(() => _restTime = null),
+            onCancel: () => timerState.restTime = null,
             child: DurationInput(
-              setDuration: _timerUtils != null
-                  ? null
-                  : (d) => setState(() => _restTime = d),
-              initialDuration: _restTime,
+              setDuration: (d) => timerState.restTime = d,
+              initialDuration: timerState.restTime,
             ),
           );
   }
 
-  Widget _roundsFormField() {
+  Widget _roundsFormField(TimerState timerState) {
     return EditTile(
       leading: AppIcons.repeat,
       caption: "Rounds",
       child: IntInput(
-        initialValue: _rounds,
+        initialValue: timerState.rounds,
         minValue: 1,
-        setValue: _timerUtils != null
-            ? null
-            : (rounds) => setState(() => _rounds = rounds),
+        setValue: (rounds) => timerState.rounds = rounds,
       ),
     );
   }
 
-  Widget _startStopButton(TimerType timerType) {
-    return _timerUtils != null
+  Widget _startStopButton(BuildContext context, TimerState timerState) {
+    return timerState.isRunning
         ? ElevatedButton(
-            onPressed: () => setState(_timerUtils!.stopTimer),
+            onPressed: timerState.stop,
             child: const Text(
               "Stop",
               style: TextStyle(fontSize: 40),
             ),
           )
         : ElevatedButton(
-            onPressed: () => _time.inSeconds > 0
-                ? setState(
-                    () => _timerUtils = TimerUtils.startTimer(
-                      timerType: timerType,
-                      time: _time,
-                      restTime: _restTime,
-                      rounds: _rounds,
-                      onTick: () => setState(() {}),
-                      onStop: () => setState(() => _timerUtils = null),
-                    ),
-                  )
+            onPressed: () => timerState.time.inSeconds > 0
+                ? timerState.start()
                 : showMessageDialog(
                     context: context,
-                    text: "The ${_caption(timerType)} must be greater than 0.",
+                    text: "The time must be greater than 0.",
                   ),
             child: const Text(
               "Start",
@@ -202,19 +187,27 @@ class _TimerPageState extends State<TimerPage> {
           );
   }
 
-  Text timeText() {
-    final displayTime = _timerUtils!.displayTime;
-    return displayTime.isNegative
-        ? Text(
-            displayTime.abs().formatTimeShort,
-            style: const TextStyle(
-              fontSize: 120,
-              color: Color.fromARGB(255, 150, 150, 150),
-            ),
-          )
-        : Text(
-            displayTime.formatTimeShort,
-            style: const TextStyle(fontSize: 120),
-          );
+  Text timeText(TimerState timerState) {
+    const disabledStyle = TextStyle(
+      fontSize: 120,
+      color: Color.fromARGB(255, 150, 150, 150),
+    );
+    if (timerState.isNotRunning) {
+      return const Text(
+        "-- : --",
+        style: disabledStyle,
+      );
+    } else {
+      final displayTime = timerState.displayTime!;
+      return displayTime.isNegative
+          ? Text(
+              displayTime.abs().formatTimeShort,
+              style: disabledStyle,
+            )
+          : Text(
+              displayTime.formatTimeShort,
+              style: const TextStyle(fontSize: 120),
+            );
+    }
   }
 }
