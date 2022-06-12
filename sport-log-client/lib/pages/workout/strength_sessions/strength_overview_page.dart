@@ -32,6 +32,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   final _logger = Logger('StrengthSessionsPage');
   List<StrengthSessionDescription> _sessions = [];
   StrengthRecords _strengthRecords = {};
+  bool _isLoading = false;
 
   DateFilterState _dateFilter = MonthFilter.current();
   Movement? _movement;
@@ -55,6 +56,7 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
   }
 
   Future<void> _update() async {
+    setState(() => _isLoading = true);
     _logger.d(
       'Updating strength sessions with start = ${_dateFilter.start}, end = ${_dateFilter.end}, movement = ${_movement?.name}',
     );
@@ -67,7 +69,9 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
     setState(() {
       _sessions = ssds;
       _strengthRecords = records;
+      _isLoading = false;
     });
+    _logger.d("Updated strength sessions.");
   }
 
   @override
@@ -114,40 +118,51 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
             ),
           ),
         ),
-        body: RefreshIndicator(
-          onRefresh: _dataProvider.pullFromServer,
-          child: _sessions.isEmpty
-              ? SessionsPageTab.strength.noEntriesText
-              : Container(
-                  padding: Defaults.edgeInsets.normal,
-                  child: Column(
-                    children: [
-                      if (_movement != null) ...[
-                        StrengthChart(
-                          strengthSessionDescriptions: _sessions,
-                          dateFilterState: _dateFilter,
-                        ),
-                        Defaults.sizedBox.vertical.normal,
-                        StrengthRecodsCard(
-                          strengthRecords: _strengthRecords,
-                          movement: _movement!,
-                        ),
-                        Defaults.sizedBox.vertical.normal,
-                      ],
-                      Expanded(
-                        child: ListView.separated(
-                          itemBuilder: (context, index) => StrengthSessionCard(
-                            strengthSessionDescription: _sessions[index],
-                            strengthRecords: _strengthRecords,
+        body: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            RefreshIndicator(
+              onRefresh: _dataProvider.pullFromServer,
+              child: _sessions.isEmpty
+                  ? SessionsPageTab.strength.noEntriesText
+                  : Container(
+                      padding: Defaults.edgeInsets.normal,
+                      child: Column(
+                        children: [
+                          if (_movement != null) ...[
+                            StrengthChart(
+                              strengthSessionDescriptions: _sessions,
+                              dateFilterState: _dateFilter,
+                            ),
+                            Defaults.sizedBox.vertical.normal,
+                            StrengthRecodsCard(
+                              strengthRecords: _strengthRecords,
+                              movement: _movement!,
+                            ),
+                            Defaults.sizedBox.vertical.normal,
+                          ],
+                          Expanded(
+                            child: ListView.separated(
+                              itemBuilder: (context, index) =>
+                                  StrengthSessionCard(
+                                strengthSessionDescription: _sessions[index],
+                                strengthRecords: _strengthRecords,
+                              ),
+                              separatorBuilder: (_, __) =>
+                                  Defaults.sizedBox.vertical.normal,
+                              itemCount: _sessions.length,
+                            ),
                           ),
-                          separatorBuilder: (_, __) =>
-                              Defaults.sizedBox.vertical.normal,
-                          itemCount: _sessions.length,
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+            ),
+            if (_isLoading)
+              const Positioned(
+                top: 40,
+                child: RefreshProgressIndicator(),
+              ),
+          ],
         ),
         bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
           context,

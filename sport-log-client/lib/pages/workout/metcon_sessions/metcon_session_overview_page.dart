@@ -30,6 +30,7 @@ class _MetconSessionsPageState extends State<MetconSessionsPage> {
   final _dataProvider = MetconSessionDescriptionDataProvider();
   List<MetconSessionDescription> _metconSessionDescriptions = [];
   MetconRecords _metconRecords = {};
+  bool _isLoading = false;
 
   DateFilterState _dateFilter = MonthFilter.current();
   Metcon? _metcon;
@@ -53,6 +54,7 @@ class _MetconSessionsPageState extends State<MetconSessionsPage> {
   }
 
   Future<void> _update() async {
+    setState(() => _isLoading = true);
     _logger.d(
       'Updating metcon session page with start = ${_dateFilter.start}, end = ${_dateFilter.end}',
     );
@@ -66,7 +68,9 @@ class _MetconSessionsPageState extends State<MetconSessionsPage> {
     setState(() {
       _metconSessionDescriptions = metconSessionDescriptions;
       _metconRecords = records;
+      _isLoading = false;
     });
+    _logger.d("Updated metcon sessions.");
   }
 
   @override
@@ -117,51 +121,62 @@ class _MetconSessionsPageState extends State<MetconSessionsPage> {
             ),
           ),
         ),
-        body: RefreshIndicator(
-          onRefresh: _dataProvider.pullFromServer,
-          child: _metconSessionDescriptions.isEmpty
-              ? SessionsPageTab.metcon.noEntriesText
-              : Container(
-                  padding: Defaults.edgeInsets.normal,
-                  child: _metcon != null &&
-                          _metconSessionDescriptions.isNotEmpty
-                      ? ListView.separated(
-                          itemBuilder: (_, index) {
-                            if (index == 0) {
-                              return MetconDescriptionCard(
-                                metconDescription: _metconSessionDescriptions
-                                    .first.metconDescription,
-                              );
-                            } else if (index == 1) {
-                              return MetconSessionResultsCard(
-                                metconSessionDescription: null,
-                                metconSessionDescriptions:
-                                    _metconSessionDescriptions,
-                                metconRecords: _metconRecords,
-                              );
-                            } else {
-                              return MetconSessionCard(
+        body: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            RefreshIndicator(
+              onRefresh: _dataProvider.pullFromServer,
+              child: _metconSessionDescriptions.isEmpty
+                  ? SessionsPageTab.metcon.noEntriesText
+                  : Container(
+                      padding: Defaults.edgeInsets.normal,
+                      child: _metcon != null &&
+                              _metconSessionDescriptions.isNotEmpty
+                          ? ListView.separated(
+                              itemBuilder: (_, index) {
+                                if (index == 0) {
+                                  return MetconDescriptionCard(
+                                    metconDescription:
+                                        _metconSessionDescriptions
+                                            .first.metconDescription,
+                                  );
+                                } else if (index == 1) {
+                                  return MetconSessionResultsCard(
+                                    metconSessionDescription: null,
+                                    metconSessionDescriptions:
+                                        _metconSessionDescriptions,
+                                    metconRecords: _metconRecords,
+                                  );
+                                } else {
+                                  return MetconSessionCard(
+                                    metconSessionDescription:
+                                        _metconSessionDescriptions[index - 2],
+                                    metconRecords: _metconRecords,
+                                  );
+                                }
+                              },
+                              separatorBuilder: (_, __) =>
+                                  Defaults.sizedBox.vertical.normal,
+                              itemCount: _metconSessionDescriptions.length + 2,
+                            )
+                          : ListView.separated(
+                              itemBuilder: (_, index) => MetconSessionCard(
                                 metconSessionDescription:
-                                    _metconSessionDescriptions[index - 2],
+                                    _metconSessionDescriptions[index],
                                 metconRecords: _metconRecords,
-                              );
-                            }
-                          },
-                          separatorBuilder: (_, __) =>
-                              Defaults.sizedBox.vertical.normal,
-                          itemCount: _metconSessionDescriptions.length + 2,
-                        )
-                      : ListView.separated(
-                          itemBuilder: (_, index) => MetconSessionCard(
-                            metconSessionDescription:
-                                _metconSessionDescriptions[index],
-                            metconRecords: _metconRecords,
-                          ),
-                          separatorBuilder: (_, __) =>
-                              Defaults.sizedBox.vertical.normal,
-                          itemCount: _metconSessionDescriptions.length,
-                        ),
-                ),
+                              ),
+                              separatorBuilder: (_, __) =>
+                                  Defaults.sizedBox.vertical.normal,
+                              itemCount: _metconSessionDescriptions.length,
+                            ),
+                    ),
+            ),
+            if (_isLoading)
+              const Positioned(
+                top: 40,
+                child: RefreshProgressIndicator(),
+              ),
+          ],
         ),
         bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
           context,

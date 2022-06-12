@@ -41,6 +41,7 @@ class _TimelinePageState extends State<TimelinePage> {
   List<CardioSessionDescription> _cardioSessionsDescriptions = [];
   List<Diary> _diaries = [];
   List<TimelineUnion> _items = [];
+  bool _isLoading = false;
 
   DateFilterState _dateFilter = MonthFilter.current();
 
@@ -48,19 +49,19 @@ class _TimelinePageState extends State<TimelinePage> {
   void initState() {
     super.initState();
     _strengthDataProvider
-      ..addListener(updateStrengthSessions)
+      ..addListener(_updateStrengthSessions)
       ..onNoInternetConnection =
           () => showSimpleToast(context, 'No Internet connection.');
     _metconDataProvider
-      ..addListener(updateMetconSessions)
+      ..addListener(_updateMetconSessions)
       ..onNoInternetConnection =
           () => showSimpleToast(context, 'No Internet connection.');
     _cardioDataProvider
-      ..addListener(updateCardioSessions)
+      ..addListener(_updateCardioSessions)
       ..onNoInternetConnection =
           () => showSimpleToast(context, 'No Internet connection.');
     _diaryDataProvider
-      ..addListener(updateDiaries)
+      ..addListener(_updateDiaries)
       ..onNoInternetConnection =
           () => showSimpleToast(context, 'No Internet connection.');
     _update();
@@ -69,21 +70,24 @@ class _TimelinePageState extends State<TimelinePage> {
   @override
   void dispose() {
     _strengthDataProvider
-      ..removeListener(updateStrengthSessions)
+      ..removeListener(_updateStrengthSessions)
       ..onNoInternetConnection = null;
     _metconDataProvider
-      ..removeListener(updateMetconSessions)
+      ..removeListener(_updateMetconSessions)
       ..onNoInternetConnection = null;
     _cardioDataProvider
-      ..removeListener(updateCardioSessions)
+      ..removeListener(_updateCardioSessions)
       ..onNoInternetConnection = null;
     _diaryDataProvider
-      ..removeListener(updateDiaries)
+      ..removeListener(_updateDiaries)
       ..onNoInternetConnection = null;
     super.dispose();
   }
 
-  Future<void> updateStrengthSessions() async {
+  Future<void> _updateStrengthSessions({bool isManual = false}) async {
+    if (!isManual) {
+      setState(() => _isLoading = true);
+    }
     _strengthRecords = await _strengthDataProvider.getStrengthRecords();
     _strengthSessionsDescriptions =
         await _strengthDataProvider.getByTimerangeAndMovement(
@@ -92,9 +96,15 @@ class _TimelinePageState extends State<TimelinePage> {
       until: _dateFilter.end,
     );
     sortItems();
+    if (!isManual) {
+      setState(() => _isLoading = false);
+    }
   }
 
-  Future<void> updateMetconSessions() async {
+  Future<void> _updateMetconSessions({bool isManual = false}) async {
+    if (!isManual) {
+      setState(() => _isLoading = true);
+    }
     _metconRecords = await _metconDataProvider.getMetconRecords();
     _metconSessionsDescriptions =
         await _metconDataProvider.getByTimerangeAndMetcon(
@@ -103,9 +113,15 @@ class _TimelinePageState extends State<TimelinePage> {
       until: _dateFilter.end,
     );
     sortItems();
+    if (!isManual) {
+      setState(() => _isLoading = false);
+    }
   }
 
-  Future<void> updateCardioSessions() async {
+  Future<void> _updateCardioSessions({bool isManual = false}) async {
+    if (!isManual) {
+      setState(() => _isLoading = true);
+    }
     _cardioSessionsDescriptions =
         await _cardioDataProvider.getByTimerangeAndMovement(
       movement: null,
@@ -113,37 +129,46 @@ class _TimelinePageState extends State<TimelinePage> {
       until: _dateFilter.end,
     );
     sortItems();
+    if (!isManual) {
+      setState(() => _isLoading = false);
+    }
   }
 
-  Future<void> updateDiaries() async {
+  Future<void> _updateDiaries({bool isManual = false}) async {
+    if (!isManual) {
+      setState(() => _isLoading = true);
+    }
     _diaries = await _diaryDataProvider.getByTimerange(
       from: _dateFilter.start,
       until: _dateFilter.end,
     );
     sortItems();
+    if (!isManual) {
+      setState(() => _isLoading = false);
+    }
   }
 
   void sortItems() {
-    final items = _strengthSessionsDescriptions
+    _items = _strengthSessionsDescriptions
         .map(TimelineUnion.strengthSession)
         .toList()
       ..addAll(_metconSessionsDescriptions.map(TimelineUnion.metconSession))
       ..addAll(_cardioSessionsDescriptions.map(TimelineUnion.cardioSession))
       ..addAll(_diaries.map(TimelineUnion.diary))
       ..sort((a, b) => b.compareTo(a));
-    if (mounted) {
-      setState(() => _items = items);
-    }
   }
 
   Future<void> _update() async {
+    setState(() => _isLoading = true);
     _logger.d(
       'Updating timeline with start = ${_dateFilter.start}, end = ${_dateFilter.end}',
     );
-    await updateStrengthSessions();
-    await updateMetconSessions();
-    await updateCardioSessions();
-    await updateDiaries();
+    await _updateStrengthSessions(isManual: true);
+    await _updateMetconSessions(isManual: true);
+    await _updateCardioSessions(isManual: true);
+    await _updateDiaries(isManual: true);
+    setState(() => _isLoading = false);
+    _logger.d("Updated timeline.");
   }
 
   Future<void> _pullFromServer() {
@@ -172,19 +197,30 @@ class _TimelinePageState extends State<TimelinePage> {
             ),
           ),
         ),
-        body: RefreshIndicator(
-          onRefresh: _pullFromServer,
-          child: _items.isEmpty
-              ? SessionsPageTab.timeline.noEntriesWithoutAddText
-              : Container(
-                  padding: Defaults.edgeInsets.normal,
-                  child: ListView.separated(
-                    itemBuilder: (context, index) => _itemCard(_items[index]),
-                    separatorBuilder: (_, __) =>
-                        Defaults.sizedBox.vertical.normal,
-                    itemCount: _items.length,
-                  ),
-                ),
+        body: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            RefreshIndicator(
+              onRefresh: _pullFromServer,
+              child: _items.isEmpty
+                  ? SessionsPageTab.timeline.noEntriesWithoutAddText
+                  : Container(
+                      padding: Defaults.edgeInsets.normal,
+                      child: ListView.separated(
+                        itemBuilder: (context, index) =>
+                            _itemCard(_items[index]),
+                        separatorBuilder: (_, __) =>
+                            Defaults.sizedBox.vertical.normal,
+                        itemCount: _items.length,
+                      ),
+                    ),
+            ),
+            if (_isLoading)
+              const Positioned(
+                top: 40,
+                child: RefreshProgressIndicator(),
+              ),
+          ],
         ),
         bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
           context,

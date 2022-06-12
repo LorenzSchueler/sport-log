@@ -35,6 +35,7 @@ class _CardioSessionsPageState extends State<CardioSessionsPage> {
   final _logger = Logger('CardioSessionsPage');
   final _dataProvider = CardioSessionDescriptionDataProvider();
   List<CardioSessionDescription> _cardioSessionDescriptions = [];
+  bool _isLoading = false;
 
   DateFilterState _dateFilter = MonthFilter.current();
   Movement? _movement;
@@ -58,6 +59,7 @@ class _CardioSessionsPageState extends State<CardioSessionsPage> {
   }
 
   Future<void> _update() async {
+    setState(() => _isLoading = true);
     _logger.d(
       'Updating cardio session page with start = ${_dateFilter.start}, end = ${_dateFilter.end}',
     );
@@ -67,7 +69,11 @@ class _CardioSessionsPageState extends State<CardioSessionsPage> {
       from: _dateFilter.start,
       until: _dateFilter.end,
     );
-    setState(() => _cardioSessionDescriptions = cardioSessionDescriptions);
+    setState(() {
+      _cardioSessionDescriptions = cardioSessionDescriptions;
+      _isLoading = false;
+    });
+    _logger.d("Updated cardio sessions.");
   }
 
   @override
@@ -118,52 +124,62 @@ class _CardioSessionsPageState extends State<CardioSessionsPage> {
             ),
           ),
         ),
-        body: RefreshIndicator(
-          onRefresh: _dataProvider.pullFromServer,
-          child: _cardioSessionDescriptions.isEmpty
-              ? SessionsPageTab.cardio.noEntriesText
-              : Container(
-                  padding: Defaults.edgeInsets.normal,
-                  child: Column(
-                    children: [
-                      if (_movement != null) ...[
-                        DateTimeChart(
-                          chartValues: _cardioSessionDescriptions
-                              .map(
-                                (s) => DateTimeChartValue(
-                                  datetime: s.cardioSession.datetime,
-                                  value:
-                                      (s.cardioSession.distance?.toDouble() ??
+        body: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            RefreshIndicator(
+              onRefresh: _dataProvider.pullFromServer,
+              child: _cardioSessionDescriptions.isEmpty
+                  ? SessionsPageTab.cardio.noEntriesText
+                  : Container(
+                      padding: Defaults.edgeInsets.normal,
+                      child: Column(
+                        children: [
+                          if (_movement != null) ...[
+                            DateTimeChart(
+                              chartValues: _cardioSessionDescriptions
+                                  .map(
+                                    (s) => DateTimeChartValue(
+                                      datetime: s.cardioSession.datetime,
+                                      value: (s.cardioSession.distance
+                                                  ?.toDouble() ??
                                               0.0) /
                                           1000,
+                                    ),
+                                  )
+                                  .toList(),
+                              dateFilterState: _dateFilter,
+                              yFromZero: true,
+                              aggregatorType: AggregatorType.sum,
+                            ),
+                            Defaults.sizedBox.vertical.normal,
+                          ],
+                          Expanded(
+                            child: ListView.separated(
+                              itemBuilder: (_, index) => CardioSessionCard(
+                                cardioSessionDescription:
+                                    _cardioSessionDescriptions[index],
+                                key: ValueKey(
+                                  _cardioSessionDescriptions[index]
+                                      .cardioSession
+                                      .id,
                                 ),
-                              )
-                              .toList(),
-                          dateFilterState: _dateFilter,
-                          yFromZero: true,
-                          aggregatorType: AggregatorType.sum,
-                        ),
-                        Defaults.sizedBox.vertical.normal,
-                      ],
-                      Expanded(
-                        child: ListView.separated(
-                          itemBuilder: (_, index) => CardioSessionCard(
-                            cardioSessionDescription:
-                                _cardioSessionDescriptions[index],
-                            key: ValueKey(
-                              _cardioSessionDescriptions[index]
-                                  .cardioSession
-                                  .id,
+                              ),
+                              separatorBuilder: (_, __) =>
+                                  Defaults.sizedBox.vertical.normal,
+                              itemCount: _cardioSessionDescriptions.length,
                             ),
                           ),
-                          separatorBuilder: (_, __) =>
-                              Defaults.sizedBox.vertical.normal,
-                          itemCount: _cardioSessionDescriptions.length,
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+            ),
+            if (_isLoading)
+              const Positioned(
+                top: 40,
+                child: RefreshProgressIndicator(),
+              ),
+          ],
         ),
         bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
           context,

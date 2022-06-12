@@ -26,6 +26,7 @@ class _DiaryPageState extends State<DiaryPage> {
   final _logger = Logger('DiaryPage');
   final _dataProvider = DiaryDataProvider();
   List<Diary> _diaries = [];
+  bool _isLoading = false;
 
   DateFilterState _dateFilter = MonthFilter.current();
 
@@ -48,6 +49,7 @@ class _DiaryPageState extends State<DiaryPage> {
   }
 
   Future<void> _update() async {
+    setState(() => _isLoading = true);
     _logger.d(
       'Updating diary page with start = ${_dateFilter.start}, end = ${_dateFilter.end}',
     );
@@ -55,7 +57,11 @@ class _DiaryPageState extends State<DiaryPage> {
       from: _dateFilter.start,
       until: _dateFilter.end,
     );
-    setState(() => _diaries = diaries);
+    setState(() {
+      _diaries = diaries;
+      _isLoading = false;
+    });
+    _logger.d("Updated diary entries.");
   }
 
   @override
@@ -75,43 +81,53 @@ class _DiaryPageState extends State<DiaryPage> {
             ),
           ),
         ),
-        body: RefreshIndicator(
-          onRefresh: _dataProvider.pullFromServer,
-          child: _diaries.isEmpty
-              ? SessionsPageTab.diary.noEntriesText
-              : Container(
-                  padding: Defaults.edgeInsets.normal,
-                  child: Column(
-                    children: [
-                      if (_diaries.any((d) => d.bodyweight != null)) ...[
-                        DateTimeChart(
-                          chartValues: _diaries
-                              .where((d) => d.bodyweight != null)
-                              .map(
-                                (s) => DateTimeChartValue(
-                                  datetime: s.date,
-                                  value: s.bodyweight ?? 0,
-                                ),
-                              )
-                              .toList(),
-                          dateFilterState: _dateFilter,
-                          yFromZero: false,
-                          aggregatorType: AggregatorType.avg,
-                        ),
-                        Defaults.sizedBox.vertical.normal,
-                      ],
-                      Expanded(
-                        child: ListView.separated(
-                          itemBuilder: (_, index) =>
-                              DiaryCard(diary: _diaries[index]),
-                          separatorBuilder: (_, __) =>
-                              Defaults.sizedBox.vertical.normal,
-                          itemCount: _diaries.length,
-                        ),
+        body: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            RefreshIndicator(
+              onRefresh: _dataProvider.pullFromServer,
+              child: _diaries.isEmpty
+                  ? SessionsPageTab.diary.noEntriesText
+                  : Container(
+                      padding: Defaults.edgeInsets.normal,
+                      child: Column(
+                        children: [
+                          if (_diaries.any((d) => d.bodyweight != null)) ...[
+                            DateTimeChart(
+                              chartValues: _diaries
+                                  .where((d) => d.bodyweight != null)
+                                  .map(
+                                    (s) => DateTimeChartValue(
+                                      datetime: s.date,
+                                      value: s.bodyweight ?? 0,
+                                    ),
+                                  )
+                                  .toList(),
+                              dateFilterState: _dateFilter,
+                              yFromZero: false,
+                              aggregatorType: AggregatorType.avg,
+                            ),
+                            Defaults.sizedBox.vertical.normal,
+                          ],
+                          Expanded(
+                            child: ListView.separated(
+                              itemBuilder: (_, index) =>
+                                  DiaryCard(diary: _diaries[index]),
+                              separatorBuilder: (_, __) =>
+                                  Defaults.sizedBox.vertical.normal,
+                              itemCount: _diaries.length,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+            ),
+            if (_isLoading)
+              const Positioned(
+                top: 40,
+                child: RefreshProgressIndicator(),
+              ),
+          ],
         ),
         bottomNavigationBar:
             SessionsPageTab.bottomNavigationBar(context, SessionsPageTab.diary),
