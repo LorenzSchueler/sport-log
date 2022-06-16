@@ -192,50 +192,50 @@ class StrengthSessionDescriptionDataProvider
     );
   }
 
-  // dayly view
-  Future<List<StrengthSessionStats>> getStatsAggregationsBySet({
-    required DateTime date,
-    required Int64 movementId,
-  }) async =>
-      _strengthSessionDescriptionDb.getStatsAggregationsBySet(
-        date: date,
-        movementIdValue: movementId,
-      );
+  //// dayly view
+  //Future<List<StrengthSessionStats>> getStatsAggregationsBySet({
+  //required DateTime date,
+  //required Int64 movementId,
+  //}) async =>
+  //_strengthSessionDescriptionDb.getStatsAggregationsBySet(
+  //date: date,
+  //movementIdValue: movementId,
+  //);
 
-  // weekly/monthly view
-  Future<List<StrengthSessionStats>> getStatsAggregationsByDay({
-    required Int64 movementId,
-    required DateTime from,
-    required DateTime until,
-  }) async {
-    return _strengthSessionDescriptionDb.getStatsAggregationsByDay(
-      movementIdValue: movementId,
-      from: from,
-      until: until,
-    );
-  }
+  //// weekly/monthly view
+  //Future<List<StrengthSessionStats>> getStatsAggregationsByDay({
+  //required Int64 movementId,
+  //required DateTime from,
+  //required DateTime until,
+  //}) async {
+  //return _strengthSessionDescriptionDb.getStatsAggregationsByDay(
+  //movementIdValue: movementId,
+  //from: from,
+  //until: until,
+  //);
+  //}
 
-  // yearly view
-  Future<List<StrengthSessionStats>> getStatsAggregationsByWeek({
-    required Int64 movementId,
-    required DateTime from,
-    required DateTime until,
-  }) async {
-    return _strengthSessionDescriptionDb.getStatsAggregationsByWeek(
-      from: from,
-      until: until,
-      movementIdValue: movementId,
-    );
-  }
+  //// yearly view
+  //Future<List<StrengthSessionStats>> getStatsAggregationsByWeek({
+  //required Int64 movementId,
+  //required DateTime from,
+  //required DateTime until,
+  //}) async {
+  //return _strengthSessionDescriptionDb.getStatsAggregationsByWeek(
+  //from: from,
+  //until: until,
+  //movementIdValue: movementId,
+  //);
+  //}
 
-  // all time view
-  Future<List<StrengthSessionStats>> getStatsAggregationsByMonth({
-    required Int64 movementId,
-  }) async {
-    return _strengthSessionDescriptionDb.getStatsAggregationsByMonth(
-      movementIdValue: movementId,
-    );
-  }
+  //// all time view
+  //Future<List<StrengthSessionStats>> getStatsAggregationsByMonth({
+  //required Int64 movementId,
+  //}) async {
+  //return _strengthSessionDescriptionDb.getStatsAggregationsByMonth(
+  //movementIdValue: movementId,
+  //);
+  //}
 
   Future<void> upsertMultipleSessions(
     List<StrengthSession> sessions, {

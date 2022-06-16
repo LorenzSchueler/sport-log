@@ -3,7 +3,6 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/movement_table.dart';
-import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/strength_records.dart';
 
@@ -206,139 +205,139 @@ class StrengthSessionDescriptionTable {
     return strengthSessionDescriptions;
   }
 
-  Future<List<StrengthSessionStats>> getStatsAggregationsBySet({
-    required DateTime date,
-    required Int64 movementIdValue,
-  }) async {
-    final start = date.beginningOfDay();
-    final end = date.endOfDay();
-    final records = await AppDatabase.database!.rawQuery(
-      '''
-      SELECT
-        ${_strengthSetTable.table.allColumns}
-      FROM ${Tables.strengthSession}
-        JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
-      WHERE ${TableAccessor.combineFilter([
-            TableAccessor.notDeletedOfTable(Tables.strengthSet),
-            TableAccessor.notDeletedOfTable(Tables.strengthSession),
-            "${Tables.strengthSession}.${Columns.datetime} >= ?",
-            "${Tables.strengthSession}.${Columns.datetime} < ?",
-            "${Tables.strengthSession}.${Columns.movementId} = ?",
-          ])}
-      ORDER BY ${Tables.strengthSession}.${Columns.datetime}, ${Tables.strengthSession}.${Columns.id}, ${Tables.strengthSet}.${Columns.setNumber}
-    ''',
-      [start.toString(), end.toString(), movementIdValue.toInt()],
-    );
-    return records
-        .map(
-          (record) => _strengthSetTable.serde
-              .fromDbRecord(record, prefix: _strengthSetTable.table.prefix),
-        )
-        .map((set) => StrengthSessionStats.fromStrengthSets(date, [set]))
-        .toList();
-  }
+  //Future<List<StrengthSessionStats>> getStatsAggregationsBySet({
+  //required DateTime date,
+  //required Int64 movementIdValue,
+  //}) async {
+  //final start = date.beginningOfDay();
+  //final end = date.endOfDay();
+  //final records = await AppDatabase.database!.rawQuery(
+  //'''
+  //SELECT
+  //${_strengthSetTable.table.allColumns}
+  //FROM ${Tables.strengthSession}
+  //JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
+  //WHERE ${TableAccessor.combineFilter([
+  //TableAccessor.notDeletedOfTable(Tables.strengthSet),
+  //TableAccessor.notDeletedOfTable(Tables.strengthSession),
+  //"${Tables.strengthSession}.${Columns.datetime} >= ?",
+  //"${Tables.strengthSession}.${Columns.datetime} < ?",
+  //"${Tables.strengthSession}.${Columns.movementId} = ?",
+  //])}
+  //ORDER BY ${Tables.strengthSession}.${Columns.datetime}, ${Tables.strengthSession}.${Columns.id}, ${Tables.strengthSet}.${Columns.setNumber}
+  //''',
+  //[start.toString(), end.toString(), movementIdValue.toInt()],
+  //);
+  //return records
+  //.map(
+  //(record) => _strengthSetTable.serde
+  //.fromDbRecord(record, prefix: _strengthSetTable.table.prefix),
+  //)
+  //.map((set) => StrengthSessionStats.fromStrengthSets(date, [set]))
+  //.toList();
+  //}
 
-  Future<List<StrengthSessionStats>> getStatsAggregationsByDay({
-    required Int64 movementIdValue,
-    required DateTime from,
-    required DateTime until,
-  }) async {
-    final records = await AppDatabase.database!.rawQuery(
-      '''
-      SELECT
-        ${Tables.strengthSession}.${Columns.datetime} AS [${Columns.datetime}],
-        date(${Tables.strengthSession}.${Columns.datetime}) AS [date],
-        COUNT(${Tables.strengthSet}.${Columns.id}) AS ${Columns.numSets},
-        MIN(${Tables.strengthSet}.${Columns.count}) AS ${Columns.minCount},
-        MAX(${Tables.strengthSet}.${Columns.count}) AS ${Columns.maxCount},
-        SUM(${Tables.strengthSet}.${Columns.count}) AS ${Columns.sumCount},
-        MAX(${Tables.strengthSet}.${Columns.weight}) AS ${Columns.maxWeight},
-        SUM(${Tables.strengthSet}.${Columns.count} * ${Tables.strengthSet}.${Columns.weight}) AS ${Columns.sumVolume},
-        MAX(${Tables.strengthSet}.${Columns.weight} / ${Columns.eormPercentage}) AS ${Columns.maxEorm}
-      FROM ${Tables.strengthSession}
-        JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
-        LEFT JOIN ${Tables.eorm} ON ${Columns.eormReps} = ${Tables.strengthSet}.${Columns.count}
-      WHERE ${TableAccessor.combineFilter([
-            TableAccessor.notDeletedOfTable(Tables.strengthSet),
-            TableAccessor.notDeletedOfTable(Tables.strengthSession),
-            "${Tables.strengthSession}.${Columns.datetime} >= ?",
-            "${Tables.strengthSession}.${Columns.datetime} < ?",
-            "${Tables.strengthSession}.${Columns.movementId} = ?",
-          ])}
-      GROUP BY date
-      ORDER BY date
-     ''',
-      [movementIdValue.toInt(), from.toString(), until.toString()],
-    );
-    return records.map(StrengthSessionStats.fromDbRecord).toList();
-  }
+  //Future<List<StrengthSessionStats>> getStatsAggregationsByDay({
+  //required Int64 movementIdValue,
+  //required DateTime from,
+  //required DateTime until,
+  //}) async {
+  //final records = await AppDatabase.database!.rawQuery(
+  //'''
+  //SELECT
+  //${Tables.strengthSession}.${Columns.datetime} AS [${Columns.datetime}],
+  //date(${Tables.strengthSession}.${Columns.datetime}) AS [date],
+  //COUNT(${Tables.strengthSet}.${Columns.id}) AS ${Columns.numSets},
+  //MIN(${Tables.strengthSet}.${Columns.count}) AS ${Columns.minCount},
+  //MAX(${Tables.strengthSet}.${Columns.count}) AS ${Columns.maxCount},
+  //SUM(${Tables.strengthSet}.${Columns.count}) AS ${Columns.sumCount},
+  //MAX(${Tables.strengthSet}.${Columns.weight}) AS ${Columns.maxWeight},
+  //SUM(${Tables.strengthSet}.${Columns.count} * ${Tables.strengthSet}.${Columns.weight}) AS ${Columns.sumVolume},
+  //MAX(${Tables.strengthSet}.${Columns.weight} / ${Columns.eormPercentage}) AS ${Columns.maxEorm}
+  //FROM ${Tables.strengthSession}
+  //JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
+  //LEFT JOIN ${Tables.eorm} ON ${Columns.eormReps} = ${Tables.strengthSet}.${Columns.count}
+  //WHERE ${TableAccessor.combineFilter([
+  //TableAccessor.notDeletedOfTable(Tables.strengthSet),
+  //TableAccessor.notDeletedOfTable(Tables.strengthSession),
+  //"${Tables.strengthSession}.${Columns.datetime} >= ?",
+  //"${Tables.strengthSession}.${Columns.datetime} < ?",
+  //"${Tables.strengthSession}.${Columns.movementId} = ?",
+  //])}
+  //GROUP BY date
+  //ORDER BY date
+  //''',
+  //[movementIdValue.toInt(), from.toString(), until.toString()],
+  //);
+  //return records.map(StrengthSessionStats.fromDbRecord).toList();
+  //}
 
-  Future<List<StrengthSessionStats>> getStatsAggregationsByWeek({
-    required Int64 movementIdValue,
-    required DateTime from,
-    required DateTime until,
-  }) async {
-    assert(
-      from.year == until.year || from.beginningOfYear().yearLater() == until,
-    );
-    final records = await AppDatabase.database!.rawQuery(
-      '''
-      SELECT
-        ${Tables.strengthSession}.${Columns.datetime} AS [${Columns.datetime}],
-        strftime('%W', ${Tables.strengthSession}.${Columns.datetime}) AS week,
-        COUNT(${Tables.strengthSet}.${Columns.id}) AS ${Columns.numSets},
-        MIN(${Tables.strengthSet}.${Columns.count}) AS ${Columns.minCount},
-        MAX(${Tables.strengthSet}.${Columns.count}) AS ${Columns.maxCount},
-        SUM(${Tables.strengthSet}.${Columns.count}) AS ${Columns.sumCount},
-        MAX(${Tables.strengthSet}.${Columns.weight}) AS ${Columns.maxWeight},
-        SUM(${Tables.strengthSet}.${Columns.count} * ${Tables.strengthSet}.${Columns.weight}) AS ${Columns.sumVolume},
-        MAX(${Tables.strengthSet}.${Columns.weight} / ${Columns.eormPercentage}) AS ${Columns.maxEorm}
-      FROM ${Tables.strengthSession}
-        JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
-        LEFT JOIN ${Tables.eorm} ON ${Columns.eormReps} = ${Tables.strengthSet}.${Columns.count}
-      WHERE ${TableAccessor.combineFilter([
-            TableAccessor.notDeletedOfTable(Tables.strengthSet),
-            TableAccessor.notDeletedOfTable(Tables.strengthSession),
-            "${Tables.strengthSession}.${Columns.datetime} >= ?",
-            "${Tables.strengthSession}.${Columns.datetime} < ?",
-            "${Tables.strengthSession}.${Columns.movementId} = ?",
-          ])}
-      GROUP BY week
-      ORDER BY week
-    ''',
-      [movementIdValue.toInt(), from.toString(), until.toString()],
-    );
-    return records.map(StrengthSessionStats.fromDbRecord).toList();
-  }
+  //Future<List<StrengthSessionStats>> getStatsAggregationsByWeek({
+  //required Int64 movementIdValue,
+  //required DateTime from,
+  //required DateTime until,
+  //}) async {
+  //assert(
+  //from.year == until.year || from.beginningOfYear().yearLater() == until,
+  //);
+  //final records = await AppDatabase.database!.rawQuery(
+  //'''
+  //SELECT
+  //${Tables.strengthSession}.${Columns.datetime} AS [${Columns.datetime}],
+  //strftime('%W', ${Tables.strengthSession}.${Columns.datetime}) AS week,
+  //COUNT(${Tables.strengthSet}.${Columns.id}) AS ${Columns.numSets},
+  //MIN(${Tables.strengthSet}.${Columns.count}) AS ${Columns.minCount},
+  //MAX(${Tables.strengthSet}.${Columns.count}) AS ${Columns.maxCount},
+  //SUM(${Tables.strengthSet}.${Columns.count}) AS ${Columns.sumCount},
+  //MAX(${Tables.strengthSet}.${Columns.weight}) AS ${Columns.maxWeight},
+  //SUM(${Tables.strengthSet}.${Columns.count} * ${Tables.strengthSet}.${Columns.weight}) AS ${Columns.sumVolume},
+  //MAX(${Tables.strengthSet}.${Columns.weight} / ${Columns.eormPercentage}) AS ${Columns.maxEorm}
+  //FROM ${Tables.strengthSession}
+  //JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
+  //LEFT JOIN ${Tables.eorm} ON ${Columns.eormReps} = ${Tables.strengthSet}.${Columns.count}
+  //WHERE ${TableAccessor.combineFilter([
+  //TableAccessor.notDeletedOfTable(Tables.strengthSet),
+  //TableAccessor.notDeletedOfTable(Tables.strengthSession),
+  //"${Tables.strengthSession}.${Columns.datetime} >= ?",
+  //"${Tables.strengthSession}.${Columns.datetime} < ?",
+  //"${Tables.strengthSession}.${Columns.movementId} = ?",
+  //])}
+  //GROUP BY week
+  //ORDER BY week
+  //''',
+  //[movementIdValue.toInt(), from.toString(), until.toString()],
+  //);
+  //return records.map(StrengthSessionStats.fromDbRecord).toList();
+  //}
 
-  Future<List<StrengthSessionStats>> getStatsAggregationsByMonth({
-    required Int64 movementIdValue,
-  }) async {
-    final records = await AppDatabase.database!.rawQuery(
-      '''
-      SELECT
-        ${Tables.strengthSession}.${Columns.datetime} AS [${Columns.datetime}],
-        strftime('%Y_%m', ${Tables.strengthSession}.${Columns.datetime}) AS month,
-        COUNT(${Tables.strengthSet}.${Columns.id}) AS ${Columns.numSets},
-        MIN(${Tables.strengthSet}.${Columns.count}) AS ${Columns.minCount},
-        MAX(${Tables.strengthSet}.${Columns.count}) AS ${Columns.maxCount},
-        SUM(${Tables.strengthSet}.${Columns.count}) AS ${Columns.sumCount},
-        MAX(${Tables.strengthSet}.${Columns.weight}) AS ${Columns.maxWeight},
-        SUM(${Tables.strengthSet}.${Columns.count} * ${Tables.strengthSet}.${Columns.weight}) AS ${Columns.sumVolume},
-        MAX(${Tables.strengthSet}.${Columns.weight} / ${Columns.eormPercentage}) AS ${Columns.maxEorm}
-      FROM ${Tables.strengthSession}
-        JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
-        LEFT JOIN ${Tables.eorm} ON ${Columns.eormReps} = ${Tables.strengthSet}.${Columns.count}
-      WHERE ${TableAccessor.combineFilter([
-            TableAccessor.notDeletedOfTable(Tables.strengthSet),
-            TableAccessor.notDeletedOfTable(Tables.strengthSession),
-            "${Tables.strengthSession}.${Columns.datetime} >= ?",
-          ])}
-      GROUP BY month
-      ORDER BY month
-    ''',
-      [movementIdValue.toInt()],
-    );
-    return records.map(StrengthSessionStats.fromDbRecord).toList();
-  }
+  //Future<List<StrengthSessionStats>> getStatsAggregationsByMonth({
+  //required Int64 movementIdValue,
+  //}) async {
+  //final records = await AppDatabase.database!.rawQuery(
+  //'''
+  //SELECT
+  //${Tables.strengthSession}.${Columns.datetime} AS [${Columns.datetime}],
+  //strftime('%Y_%m', ${Tables.strengthSession}.${Columns.datetime}) AS month,
+  //COUNT(${Tables.strengthSet}.${Columns.id}) AS ${Columns.numSets},
+  //MIN(${Tables.strengthSet}.${Columns.count}) AS ${Columns.minCount},
+  //MAX(${Tables.strengthSet}.${Columns.count}) AS ${Columns.maxCount},
+  //SUM(${Tables.strengthSet}.${Columns.count}) AS ${Columns.sumCount},
+  //MAX(${Tables.strengthSet}.${Columns.weight}) AS ${Columns.maxWeight},
+  //SUM(${Tables.strengthSet}.${Columns.count} * ${Tables.strengthSet}.${Columns.weight}) AS ${Columns.sumVolume},
+  //MAX(${Tables.strengthSet}.${Columns.weight} / ${Columns.eormPercentage}) AS ${Columns.maxEorm}
+  //FROM ${Tables.strengthSession}
+  //JOIN ${Tables.strengthSet} ON ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
+  //LEFT JOIN ${Tables.eorm} ON ${Columns.eormReps} = ${Tables.strengthSet}.${Columns.count}
+  //WHERE ${TableAccessor.combineFilter([
+  //TableAccessor.notDeletedOfTable(Tables.strengthSet),
+  //TableAccessor.notDeletedOfTable(Tables.strengthSession),
+  //"${Tables.strengthSession}.${Columns.datetime} >= ?",
+  //])}
+  //GROUP BY month
+  //ORDER BY month
+  //''',
+  //[movementIdValue.toInt()],
+  //);
+  //return records.map(StrengthSessionStats.fromDbRecord).toList();
+  //}
 }

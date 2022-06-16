@@ -26,13 +26,15 @@ class StrengthSessionStats extends JsonSerializable {
 
   factory StrengthSessionStats.fromStrengthSets(
     DateTime datetime,
+    MovementDimension movementDimension,
     List<StrengthSet> sets,
   ) {
     int minCount = sets.map((s) => s.count).minOrNull ?? 0;
     int maxCount = sets.map((s) => s.count).maxOrNull ?? 0;
     int sumCount = sets.map((s) => s.count).sum;
     double? maxWeight = sets.map((s) => s.weight).filterNotNull().maxOrNull;
-    double? maxEorm = sets.map((s) => s.eorm).filterNotNull().maxOrNull;
+    double? maxEorm =
+        sets.map((s) => s.eorm(movementDimension)).filterNotNull().maxOrNull;
     double? sumVolume = sets.map((s) => s.volume).filterNotNull().sum;
     double avgCount = sets.isEmpty ? 0 : sumCount / sets.length;
 

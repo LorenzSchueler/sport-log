@@ -149,8 +149,11 @@ class _StrengthChartState extends State<StrengthChart> {
   void calculateStats() {
     _strengthSessionStats = widget.strengthSessionDescriptions
         .map(
-          (e) =>
-              StrengthSessionStats.fromStrengthSets(e.session.datetime, e.sets),
+          (e) => StrengthSessionStats.fromStrengthSets(
+            e.session.datetime,
+            movementDimension,
+            e.sets,
+          ),
         )
         .toList();
   }

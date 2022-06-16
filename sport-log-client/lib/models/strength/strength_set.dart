@@ -76,7 +76,7 @@ class StrengthSet extends AtomicEntity {
       case MovementDimension.reps:
         return weightStr != null
             ? withEorm
-                ? '$count x $weightStr  # ${formatWeight(eorm!)}'
+                ? '$count x $weightStr  # ${formatWeight(eorm(dim)!)}'
                 : '$count x $weightStr'
             : '$count reps';
       case MovementDimension.time:
@@ -93,8 +93,10 @@ class StrengthSet extends AtomicEntity {
 
   double? get volume => weight == null ? null : weight! * count.toDouble();
 
-  double? get eorm {
-    return weight == null ? null : getEorm(count, weight!);
+  double? eorm(MovementDimension movementDimension) {
+    return movementDimension != MovementDimension.reps || weight == null
+        ? null
+        : getEorm(count, weight!);
   }
 }
 

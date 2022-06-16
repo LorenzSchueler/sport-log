@@ -18,7 +18,7 @@ enum StrengthRecordType {
 typedef StrengthRecords = Map<Int64, StrengthRecord>;
 
 extension StrengthRecordExtension on StrengthRecords {
-  List<StrengthRecordType> _getRecordTypesfromStats(
+  List<StrengthRecordType> _getRecordTypesFromStats(
     StrengthSessionStats strengthSessionStats,
     StrengthRecord? strengthRecord,
   ) {
@@ -42,11 +42,14 @@ extension StrengthRecordExtension on StrengthRecords {
     StrengthSet strengthSet,
     Movement movement,
   ) {
-    final strengthSessionStats =
-        StrengthSessionStats.fromStrengthSets(DateTime.now(), [strengthSet]);
+    final strengthSessionStats = StrengthSessionStats.fromStrengthSets(
+      DateTime.now(),
+      movement.dimension,
+      [strengthSet],
+    );
     final strengthRecord = this[movement.id];
 
-    return _getRecordTypesfromStats(strengthSessionStats, strengthRecord);
+    return _getRecordTypesFromStats(strengthSessionStats, strengthRecord);
   }
 
   List<StrengthRecordType> getCombinedRecordTypes(
@@ -54,11 +57,12 @@ extension StrengthRecordExtension on StrengthRecords {
   ) {
     final strengthSessionStats = StrengthSessionStats.fromStrengthSets(
       strengthSessionDescription.session.datetime,
+      strengthSessionDescription.movement.dimension,
       strengthSessionDescription.sets,
     );
     final strengthRecord = this[strengthSessionDescription.movement.id];
 
-    return _getRecordTypesfromStats(strengthSessionStats, strengthRecord);
+    return _getRecordTypesFromStats(strengthSessionStats, strengthRecord);
   }
 }
 
@@ -83,4 +87,8 @@ class StrengthRecord {
   double? maxWeight;
   int maxCount;
   double? maxEorm;
+
+  @override
+  String toString() =>
+      "{maxWeight: $maxWeight, maxCount: $maxCount, maxEorm: $maxEorm}";
 }

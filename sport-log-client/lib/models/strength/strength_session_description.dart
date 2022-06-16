@@ -27,8 +27,11 @@ class StrengthSessionDescription extends CompoundEntity {
   Movement movement;
   List<StrengthSet> sets;
 
-  StrengthSessionStats get stats =>
-      StrengthSessionStats.fromStrengthSets(session.datetime, sets);
+  StrengthSessionStats get stats => StrengthSessionStats.fromStrengthSets(
+        session.datetime,
+        movement.dimension,
+        sets,
+      );
 
   static StrengthSessionDescription? defaultValue() =>
       Movement.defaultMovement == null
