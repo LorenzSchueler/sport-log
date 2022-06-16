@@ -251,7 +251,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
     );
   }
 
-  Widget _timecapInput({required String caption, void Function()? onCancel}) {
+  Widget _timecapInput({required String caption, VoidCallback? onCancel}) {
     return EditTile(
       leading: AppIcons.timeInterval,
       caption: caption,
@@ -363,7 +363,7 @@ class MetconMovementCard extends StatelessWidget {
 
   final MetconMovementDescription mmd;
   final void Function(MetconMovementDescription) editMetconMovementDescription;
-  final void Function() deleteMetconMovement;
+  final VoidCallback deleteMetconMovement;
 
   @override
   Widget build(BuildContext context) {

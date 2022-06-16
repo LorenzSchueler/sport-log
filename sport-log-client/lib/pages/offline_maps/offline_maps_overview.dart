@@ -193,7 +193,7 @@ class RegionCard extends StatelessWidget {
       : super(key: key);
 
   final OfflineRegion region;
-  final void Function() onDelete;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {

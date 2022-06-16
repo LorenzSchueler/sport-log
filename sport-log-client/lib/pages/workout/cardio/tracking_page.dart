@@ -78,7 +78,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
     _stepUtils = StepCountUtils(_onStepCountUpdate);
     widget.heartRateUtils?.onHeartRateEvent = _onHeartRateUpdate;
     _timer =
-        Timer.periodic(const Duration(seconds: 1), (Timer t) => _updateData());
+        Timer.periodic(const Duration(seconds: 1), (Timer t) => _refresh());
     super.initState();
   }
 
@@ -120,7 +120,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
     }
   }
 
-  void _updateData() {
+  void _refresh() {
     // called every second
     setState(() {
       if (_trackingUtils.isTracking) {
@@ -248,79 +248,6 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
     );
   }
 
-  // ignore: long-method
-  List<Widget> _buildButtons() {
-    switch (_trackingUtils.mode) {
-      case TrackingMode.tracking:
-        return [
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: Theme.of(context).colorScheme.error,
-              ),
-              onPressed: () => setState(_trackingUtils.pause),
-              child: const Text("Pause"),
-            ),
-          ),
-        ];
-      case TrackingMode.paused:
-        return [
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: Theme.of(context).colorScheme.errorContainer,
-              ),
-              onPressed: () => setState(_trackingUtils.resume),
-              child: const Text("Resume"),
-            ),
-          ),
-          Defaults.sizedBox.horizontal.normal,
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: Theme.of(context).colorScheme.error,
-              ),
-              onPressed: _saveDialog,
-              child: const Text("Save"),
-            ),
-          ),
-        ];
-      case TrackingMode.notStarted:
-        return [
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: Theme.of(context).colorScheme.errorContainer,
-              ),
-              onPressed: widget.heartRateUtils == null ||
-                      widget.heartRateUtils!.isActive
-                  ? () {
-                      setState(_trackingUtils.start);
-                      _cardioSessionDescription.cardioSession.datetime =
-                          DateTime.now();
-                    }
-                  : null,
-              child: Text(
-                widget.heartRateUtils == null || widget.heartRateUtils!.isActive
-                    ? "Start"
-                    : "Waiting on HR Monitor",
-              ),
-            ),
-          ),
-          Defaults.sizedBox.horizontal.normal,
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: Theme.of(context).colorScheme.error,
-              ),
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
-          ),
-        ];
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return DiscardWarningOnPop(
@@ -368,20 +295,118 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
             ),
             Container(
               padding: Defaults.edgeInsets.normal,
-              child: Column(
-                children: [
-                  CardioValueUnitDescriptionTable(
-                    cardioSessionDescription: _cardioSessionDescription,
-                    currentDuration: _trackingUtils.currentDuration,
+              child: ChangeNotifierProvider.value(
+                value: _trackingUtils,
+                child: Consumer<TrackingUtils>(
+                  builder: (context, trackingUtils, _) => Column(
+                    children: [
+                      CardioValueUnitDescriptionTable(
+                        cardioSessionDescription: _cardioSessionDescription,
+                        currentDuration: trackingUtils.currentDuration,
+                      ),
+                      Defaults.sizedBox.vertical.normal,
+                      _TrackingPageButtons(
+                        trackingUtils: trackingUtils,
+                        onStart: widget.heartRateUtils == null ||
+                                widget.heartRateUtils!.isActive
+                            ? () {
+                                trackingUtils.start();
+                                _cardioSessionDescription
+                                    .cardioSession.datetime = DateTime.now();
+                              }
+                            : null,
+                        onStop: _saveDialog,
+                      ),
+                    ],
                   ),
-                  Defaults.sizedBox.vertical.normal,
-                  Row(children: _buildButtons()),
-                ],
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+}
+
+class _TrackingPageButtons extends StatelessWidget {
+  const _TrackingPageButtons({
+    required this.trackingUtils,
+    required this.onStart,
+    required this.onStop,
+    Key? key,
+  }) : super(key: key);
+
+  final TrackingUtils trackingUtils;
+  final VoidCallback? onStart;
+  final VoidCallback onStop;
+
+  @override
+  Widget build(BuildContext context) {
+    switch (trackingUtils.mode) {
+      case TrackingMode.tracking:
+        return Row(
+          children: [
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).colorScheme.error,
+                ),
+                onPressed: trackingUtils.pause,
+                child: const Text("Pause"),
+              ),
+            ),
+          ],
+        );
+      case TrackingMode.paused:
+        return Row(
+          children: [
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).colorScheme.errorContainer,
+                ),
+                onPressed: trackingUtils.resume,
+                child: const Text("Resume"),
+              ),
+            ),
+            Defaults.sizedBox.horizontal.normal,
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).colorScheme.error,
+                ),
+                onPressed: onStop,
+                child: const Text("Save"),
+              ),
+            ),
+          ],
+        );
+      case TrackingMode.notStarted:
+        return Row(
+          children: [
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).colorScheme.errorContainer,
+                ),
+                onPressed: onStart,
+                child:
+                    Text(onStart != null ? "Start" : "Waiting on HR Monitor"),
+              ),
+            ),
+            Defaults.sizedBox.horizontal.normal,
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).colorScheme.error,
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Cancel"),
+              ),
+            ),
+          ],
+        );
+    }
   }
 }
