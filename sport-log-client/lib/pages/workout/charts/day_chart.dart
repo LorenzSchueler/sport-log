@@ -61,11 +61,10 @@ class DayChart extends StatelessWidget {
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              reservedSize: isTime ? 60 : 30,
+              reservedSize: isTime ? 60 : 40,
               getTitlesWidget: isTime
-                  ? (value, _) => Text(
-                        Duration(milliseconds: value.round()).formatMsMill,
-                      )
+                  ? (value, _) =>
+                      Text(Duration(milliseconds: value.round()).formatMsMill)
                   : null,
             ),
           ),
