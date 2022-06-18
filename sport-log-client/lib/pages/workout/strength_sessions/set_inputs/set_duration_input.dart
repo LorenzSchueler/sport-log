@@ -8,10 +8,10 @@ import 'package:sport_log/widgets/app_icons.dart';
 
 class SetDurationInput extends StatefulWidget {
   const SetDurationInput({
-    Key? key,
     required this.onNewSet,
     required this.confirmChanges,
-  }) : super(key: key);
+    super.key,
+  });
 
   final void Function(int count, double? weight, double? secondWeight) onNewSet;
   final bool confirmChanges;
@@ -176,7 +176,6 @@ class _SetDurationInputState extends State<SetDurationInput> {
 
 class _CaptionTextField extends StatelessWidget {
   const _CaptionTextField({
-    Key? key,
     required this.controller,
     required this.focusNode,
     required this.onChanged,
@@ -187,7 +186,7 @@ class _CaptionTextField extends StatelessWidget {
     required this.onTap,
     required this.width,
     required this.scrollable,
-  }) : super(key: key);
+  });
 
   final TextEditingController controller;
   final FocusNode focusNode;
@@ -255,7 +254,6 @@ class _CaptionTextField extends StatelessWidget {
 /// Text Field with box that only accepts non-negative ints
 class PaddedIntInput extends StatefulWidget {
   const PaddedIntInput({
-    Key? key,
     required this.placeholder,
     required this.onChanged,
     required this.caption,
@@ -263,8 +261,8 @@ class PaddedIntInput extends StatefulWidget {
     this.submitOnDigitsReached = false,
     this.onSubmitted,
     this.maxValue,
-  })  : assert(numberOfDigits > 0),
-        super(key: key);
+    super.key,
+  }) : assert(numberOfDigits > 0);
 
   final int placeholder;
   final void Function(int) onChanged;

@@ -3,11 +3,11 @@ import 'package:sport_log/widgets/app_icons.dart';
 
 class SpinningSync extends StatefulWidget {
   const SpinningSync({
-    Key? key,
     required this.isSpinning,
     required this.onPressed,
     this.color,
-  }) : super(key: key);
+    super.key,
+  });
 
   final bool isSpinning;
   final VoidCallback? onPressed;

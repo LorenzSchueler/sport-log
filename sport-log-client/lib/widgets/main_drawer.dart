@@ -11,9 +11,9 @@ import 'package:sport_log/widgets/spinning_sync.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({
-    Key? key,
     required this.selectedRoute,
-  }) : super(key: key);
+    super.key,
+  });
 
   final String selectedRoute;
 

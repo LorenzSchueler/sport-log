@@ -22,10 +22,10 @@ Future<ConflictResolution> showConflictDialog({
 
 class ConflictDialog extends StatelessWidget {
   const ConflictDialog({
-    Key? key,
     required this.title,
     required this.text,
-  }) : super(key: key);
+    super.key,
+  });
 
   final String? title;
   final String text;

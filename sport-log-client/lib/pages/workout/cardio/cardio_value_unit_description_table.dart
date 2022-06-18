@@ -7,8 +7,8 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
   const CardioValueUnitDescriptionTable({
     required this.cardioSessionDescription,
     required this.currentDuration,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final CardioSessionDescription cardioSessionDescription;
   final Duration? currentDuration;

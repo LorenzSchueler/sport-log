@@ -13,7 +13,7 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
 class MovementsPage extends StatefulWidget {
-  const MovementsPage({Key? key}) : super(key: key);
+  const MovementsPage({super.key});
 
   @override
   State<MovementsPage> createState() => _MovementsPageState();
@@ -114,8 +114,7 @@ class _MovementsPageState extends State<MovementsPage> {
 }
 
 class MovementCard extends StatelessWidget {
-  const MovementCard({Key? key, required this.movementDescription})
-      : super(key: key);
+  const MovementCard({required this.movementDescription, super.key});
 
   final MovementDescription movementDescription;
 

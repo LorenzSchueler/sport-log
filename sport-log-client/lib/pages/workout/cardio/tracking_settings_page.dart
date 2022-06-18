@@ -12,7 +12,7 @@ import 'package:sport_log/widgets/picker/route_picker.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
 class CardioTrackingSettingsPage extends StatefulWidget {
-  const CardioTrackingSettingsPage({Key? key}) : super(key: key);
+  const CardioTrackingSettingsPage({super.key});
 
   @override
   State<CardioTrackingSettingsPage> createState() =>

@@ -38,7 +38,7 @@ Future<void> main() async {
 }
 
 class InitAppWrapper extends StatefulWidget {
-  const InitAppWrapper({Key? key}) : super(key: key);
+  const InitAppWrapper({super.key});
 
   @override
   State<StatefulWidget> createState() => InitAppWrapperState();

@@ -13,9 +13,9 @@ import 'package:sport_log/widgets/input_fields/text_tile.dart';
 
 class StrengthSessionDetailsPage extends StatefulWidget {
   const StrengthSessionDetailsPage({
-    Key? key,
     required this.strengthSessionDescription,
-  }) : super(key: key);
+    super.key,
+  });
 
   final StrengthSessionDescription strengthSessionDescription;
 

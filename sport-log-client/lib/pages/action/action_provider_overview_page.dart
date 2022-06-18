@@ -22,8 +22,7 @@ String actionName(
         .name;
 
 class ActionProviderOverviewPage extends StatefulWidget {
-  const ActionProviderOverviewPage({required this.actionProvider, Key? key})
-      : super(key: key);
+  const ActionProviderOverviewPage({required this.actionProvider, super.key});
 
   final ActionProvider actionProvider;
 
@@ -107,8 +106,7 @@ class _ActionProviderOverviewPageState
 }
 
 class ActionsCard extends StatelessWidget {
-  const ActionsCard({required this.actionProviderDescription, Key? key})
-      : super(key: key);
+  const ActionsCard({required this.actionProviderDescription, super.key});
 
   final ActionProviderDescription actionProviderDescription;
 
@@ -143,8 +141,7 @@ class ActionsCard extends StatelessWidget {
 }
 
 class ActionRulesCard extends StatelessWidget {
-  ActionRulesCard({required this.actionProviderDescription, Key? key})
-      : super(key: key);
+  ActionRulesCard({required this.actionProviderDescription, super.key});
 
   final ActionProviderDescription actionProviderDescription;
   final _dataProvider = ActionRuleDataProvider();
@@ -234,8 +231,7 @@ class ActionRulesCard extends StatelessWidget {
 }
 
 class ActionEventsCard extends StatelessWidget {
-  ActionEventsCard({required this.actionProviderDescription, Key? key})
-      : super(key: key);
+  ActionEventsCard({required this.actionProviderDescription, super.key});
 
   final ActionProviderDescription actionProviderDescription;
   final _dataProvider = ActionEventDataProvider();

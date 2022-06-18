@@ -8,8 +8,8 @@ class DoubleInput extends StatefulWidget {
     required this.setValue,
     this.initialValue = 0,
     this.stepSize = 2.5,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final double initialValue;
   final double stepSize;

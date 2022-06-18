@@ -23,8 +23,8 @@ Future<Route?> showRoutePicker({
 class RoutePickerDialog extends StatefulWidget {
   const RoutePickerDialog({
     required this.selectedRoute,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final Route? selectedRoute;
 

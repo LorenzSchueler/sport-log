@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class SelectionBar<T> extends StatelessWidget {
   const SelectionBar({
-    Key? key,
     required this.onChange,
     required this.items,
     required this.getLabel,
     required this.selectedItem,
-  }) : super(key: key);
+    super.key,
+  });
 
   final void Function(T) onChange;
   final List<T> items;

@@ -14,7 +14,7 @@ import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class TimerPage extends StatelessWidget {
-  const TimerPage({Key? key}) : super(key: key);
+  const TimerPage({super.key});
 
   @override
   Widget build(BuildContext context) {

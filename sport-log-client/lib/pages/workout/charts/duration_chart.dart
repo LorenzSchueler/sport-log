@@ -63,12 +63,12 @@ class DurationChartLine {
 
 class DurationChart extends StatelessWidget {
   const DurationChart({
-    Key? key,
     required this.chartLines,
     required this.yFromZero,
     required this.rightYScaleFactor,
     this.touchCallback,
-  }) : super(key: key);
+    super.key,
+  });
 
   final List<DurationChartLine> chartLines;
   final bool yFromZero;

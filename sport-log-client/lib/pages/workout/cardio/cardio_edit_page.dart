@@ -26,8 +26,8 @@ class CardioEditPage extends StatefulWidget {
   const CardioEditPage({
     required this.cardioSessionDescription,
     required this.isNew,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final CardioSessionDescription cardioSessionDescription;
   final bool isNew;

@@ -4,7 +4,7 @@ import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class PlatformNotSupportedPage extends StatelessWidget {
-  const PlatformNotSupportedPage({Key? key}) : super(key: key);
+  const PlatformNotSupportedPage({super.key});
 
   @override
   Widget build(BuildContext context) {

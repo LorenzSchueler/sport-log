@@ -10,8 +10,8 @@ class IntInput extends StatefulWidget {
     this.minValue = 0,
     this.maxValue = 999,
     this.stepSize = 1,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final int initialValue;
   final int minValue;

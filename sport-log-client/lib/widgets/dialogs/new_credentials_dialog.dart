@@ -21,7 +21,7 @@ Future<void> showNewCredentialsDialog() async {
 }
 
 class NewCredentialsDialog extends StatefulWidget {
-  const NewCredentialsDialog({Key? key}) : super(key: key);
+  const NewCredentialsDialog({super.key});
 
   static bool isShown = false;
 

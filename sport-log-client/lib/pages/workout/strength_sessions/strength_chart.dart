@@ -111,10 +111,10 @@ List<SeriesType> getAvailableSeries(MovementDimension dim) {
 
 class StrengthChart extends StatefulWidget {
   const StrengthChart({
-    Key? key,
     required this.strengthSessionDescriptions,
     required this.dateFilterState,
-  }) : super(key: key);
+    super.key,
+  });
 
   final List<StrengthSessionDescription> strengthSessionDescriptions;
   final DateFilterState dateFilterState;

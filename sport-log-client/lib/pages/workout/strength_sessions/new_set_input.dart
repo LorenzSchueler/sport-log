@@ -5,7 +5,6 @@ import 'package:sport_log/widgets/input_fields/count_weight_input.dart';
 
 class NewSetInput extends StatelessWidget {
   const NewSetInput({
-    Key? key,
     required this.onNewSet,
     required this.confirmChanges,
     required this.dimension,
@@ -16,7 +15,8 @@ class NewSetInput extends StatelessWidget {
     this.initialWeight,
     this.secondWeight = false,
     this.initialSecondWeight,
-  }) : super(key: key);
+    super.key,
+  });
 
   final void Function(
     int count,

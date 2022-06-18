@@ -18,7 +18,7 @@ import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   Future<void> checkSync(BuildContext context) async {
     await Sync.instance.sync(

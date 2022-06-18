@@ -16,10 +16,10 @@ Future<void> showMessageDialog({
 
 class MessageDialog extends StatelessWidget {
   const MessageDialog({
-    Key? key,
     required this.title,
     required this.text,
-  }) : super(key: key);
+    super.key,
+  });
 
   final String? title;
   final String text;

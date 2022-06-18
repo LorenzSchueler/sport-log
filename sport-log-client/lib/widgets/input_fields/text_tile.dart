@@ -3,12 +3,12 @@ import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 
 class TextTile extends StatelessWidget {
   const TextTile({
-    Key? key,
     required this.child,
     this.leading,
     this.caption,
     this.onCancel,
-  }) : super(key: key);
+    super.key,
+  });
 
   final String? caption;
   final Widget child;

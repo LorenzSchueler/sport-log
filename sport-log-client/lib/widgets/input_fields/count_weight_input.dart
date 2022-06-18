@@ -20,8 +20,8 @@ class CountWeightInput extends StatefulWidget {
     this.initialWeight,
     this.secondWeight = false,
     this.initialSecondWeight,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final void Function(
     int count,

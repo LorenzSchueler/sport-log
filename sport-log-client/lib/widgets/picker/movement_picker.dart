@@ -28,11 +28,11 @@ Future<Movement?> showMovementPicker({
 
 class MovementPickerDialog extends StatefulWidget {
   const MovementPickerDialog({
-    Key? key,
     required this.selectedMovement,
     required this.cardioOnly,
     required this.distanceOnly,
-  }) : super(key: key);
+    super.key,
+  });
 
   final Movement? selectedMovement;
   final bool cardioOnly;

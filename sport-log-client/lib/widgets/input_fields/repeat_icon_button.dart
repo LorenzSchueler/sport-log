@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 
 class RepeatIconButton extends StatefulWidget {
   const RepeatIconButton({
-    Key? key,
     required this.icon,
     required this.onClick,
     this.color,
-  }) : super(key: key);
+    super.key,
+  });
 
   final Icon icon;
   final VoidCallback? onClick;

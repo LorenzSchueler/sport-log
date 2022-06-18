@@ -5,10 +5,10 @@ import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
 
 class DateFilter extends StatefulWidget {
   const DateFilter({
-    Key? key,
     required this.initialState,
     required this.onFilterChanged,
-  }) : super(key: key);
+    super.key,
+  });
 
   final DateFilterState initialState;
   final void Function(DateFilterState) onFilterChanged;

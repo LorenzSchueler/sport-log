@@ -20,7 +20,7 @@ import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class MapPage extends StatefulWidget {
-  const MapPage({Key? key}) : super(key: key);
+  const MapPage({super.key});
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -287,7 +287,7 @@ class _MapPageState extends State<MapPage> {
 }
 
 class MapScale extends StatelessWidget {
-  const MapScale({required this.metersPerPixel, Key? key}) : super(key: key);
+  const MapScale({required this.metersPerPixel, super.key});
 
   final double metersPerPixel;
 
@@ -330,8 +330,8 @@ class MapStylesBottomSheet extends StatelessWidget {
     required this.mapController,
     required this.onStyleChange,
     required this.onHillshadeChange,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final bool hillshade;
   final MapboxMapController mapController;

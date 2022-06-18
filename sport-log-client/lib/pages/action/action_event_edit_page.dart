@@ -17,8 +17,8 @@ class ActionEventEditPage extends StatefulWidget {
   const ActionEventEditPage({
     required this.actionProviderDescription,
     required this.actionEvent,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final ActionProviderDescription actionProviderDescription;
   final ActionEvent? actionEvent;

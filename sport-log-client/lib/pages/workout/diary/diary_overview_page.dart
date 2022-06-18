@@ -16,7 +16,7 @@ import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class DiaryPage extends StatefulWidget {
-  const DiaryPage({Key? key}) : super(key: key);
+  const DiaryPage({super.key});
 
   @override
   State<DiaryPage> createState() => _DiaryPageState();
@@ -144,7 +144,7 @@ class _DiaryPageState extends State<DiaryPage> {
 }
 
 class DiaryCard extends StatelessWidget {
-  const DiaryCard({Key? key, required this.diary}) : super(key: key);
+  const DiaryCard({required this.diary, super.key});
 
   final Diary diary;
 

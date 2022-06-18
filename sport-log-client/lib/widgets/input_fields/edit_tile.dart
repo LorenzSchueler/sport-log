@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 class CaptionTile extends StatelessWidget {
-  const CaptionTile({Key? key, required this.caption}) : super(key: key);
+  const CaptionTile({required this.caption, super.key});
 
   final String caption;
 
@@ -21,13 +21,13 @@ class CaptionTile extends StatelessWidget {
 
 class EditTile extends StatelessWidget {
   const EditTile({
-    Key? key,
     required this.child,
     required this.leading,
     this.caption,
     this.onTap,
     this.onCancel,
-  }) : super(key: key);
+    super.key,
+  });
 
   final String? caption;
   final Widget child;

@@ -18,7 +18,7 @@ import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class RouteUploadPage extends StatefulWidget {
-  const RouteUploadPage({Key? key}) : super(key: key);
+  const RouteUploadPage({super.key});
 
   @override
   State<RouteUploadPage> createState() => _RouteUploadPageState();

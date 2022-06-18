@@ -42,8 +42,8 @@ class TimePickerDialog extends StatefulWidget {
   const TimePickerDialog({
     required this.datetime,
     required this.withSeconds,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final DateTime? datetime;
   final bool withSeconds;

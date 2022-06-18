@@ -5,8 +5,8 @@ class DeactivatableTabBar extends StatelessWidget
   const DeactivatableTabBar({
     required this.child,
     required this.disabled,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final TabBar child;
   final bool disabled;

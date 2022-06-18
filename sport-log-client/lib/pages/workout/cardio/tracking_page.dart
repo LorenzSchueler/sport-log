@@ -31,8 +31,8 @@ class CardioTrackingPage extends StatefulWidget {
     required this.movement,
     required this.cardioType,
     required this.heartRateUtils,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final Movement movement;
   final CardioType cardioType;
@@ -334,8 +334,9 @@ class _TrackingPageButtons extends StatelessWidget {
     required this.trackingUtils,
     required this.onStart,
     required this.onStop,
-    Key? key,
-  }) : super(key: key);
+    // ignore: unused_element
+    super.key,
+  });
 
   final TrackingUtils trackingUtils;
   final VoidCallback? onStart;

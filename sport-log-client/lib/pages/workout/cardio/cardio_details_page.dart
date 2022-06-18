@@ -18,8 +18,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 class CardioDetailsPage extends StatefulWidget {
-  const CardioDetailsPage({Key? key, required this.cardioSessionDescription})
-      : super(key: key);
+  const CardioDetailsPage({required this.cardioSessionDescription, super.key});
 
   final CardioSessionDescription cardioSessionDescription;
 

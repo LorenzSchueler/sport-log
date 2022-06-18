@@ -13,7 +13,7 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
 class PlatformOverviewPage extends StatefulWidget {
-  const PlatformOverviewPage({Key? key}) : super(key: key);
+  const PlatformOverviewPage({super.key});
 
   @override
   State<PlatformOverviewPage> createState() => _PlatformOverviewPageState();
@@ -83,8 +83,7 @@ class _PlatformOverviewPageState extends State<PlatformOverviewPage> {
 }
 
 class PlatformCard extends StatelessWidget {
-  const PlatformCard({Key? key, required this.platformDescription})
-      : super(key: key);
+  const PlatformCard({required this.platformDescription, super.key});
 
   final PlatformDescription platformDescription;
 
@@ -158,8 +157,7 @@ class PlatformCard extends StatelessWidget {
 }
 
 class PlatformCredentialDialog extends StatefulWidget {
-  const PlatformCredentialDialog(this.platformDescription, {Key? key})
-      : super(key: key);
+  const PlatformCredentialDialog(this.platformDescription, {super.key});
   final PlatformDescription platformDescription;
 
   @override

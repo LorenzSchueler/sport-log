@@ -19,8 +19,8 @@ class ActionRuleEditPage extends StatefulWidget {
   const ActionRuleEditPage({
     required this.actionProviderDescription,
     required this.actionRule,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final ActionProviderDescription actionProviderDescription;
   final ActionRule? actionRule;

@@ -25,7 +25,7 @@ enum LoginType {
 }
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({required this.loginType, Key? key}) : super(key: key);
+  const LoginPage({required this.loginType, super.key});
 
   final LoginType loginType;
 

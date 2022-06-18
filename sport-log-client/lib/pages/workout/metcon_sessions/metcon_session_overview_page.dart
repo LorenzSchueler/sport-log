@@ -19,7 +19,7 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
 class MetconSessionsPage extends StatefulWidget {
-  const MetconSessionsPage({Key? key}) : super(key: key);
+  const MetconSessionsPage({super.key});
 
   @override
   State<MetconSessionsPage> createState() => _MetconSessionsPageState();
@@ -198,9 +198,8 @@ class MetconSessionCard extends StatelessWidget {
   MetconSessionCard({
     required this.metconSessionDescription,
     required MetconRecords metconRecords,
-    Key? key,
-  })  : metconRecord = metconRecords.isMetconRecord(metconSessionDescription),
-        super(key: key);
+    super.key,
+  }) : metconRecord = metconRecords.isMetconRecord(metconSessionDescription);
 
   final MetconSessionDescription metconSessionDescription;
   final bool metconRecord;

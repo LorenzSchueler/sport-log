@@ -4,7 +4,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({required this.content, Key? key}) : super(key: key);
+  const WelcomeScreen({required this.content, super.key});
 
   final Widget content;
 

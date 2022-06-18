@@ -23,8 +23,8 @@ Future<Metcon?> showMetconPicker({
 class MetconPickerDialog extends StatefulWidget {
   const MetconPickerDialog({
     required this.selectedMetcon,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final Metcon? selectedMetcon;
 

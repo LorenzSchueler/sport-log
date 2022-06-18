@@ -12,15 +12,13 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 class MovementEditPage extends StatefulWidget {
   const MovementEditPage({
     required this.movementDescription,
-    Key? key,
-  })  : name = null,
-        super(key: key);
+    super.key,
+  }) : name = null;
 
   const MovementEditPage.fromName({
     required String this.name,
-    Key? key,
-  })  : movementDescription = null,
-        super(key: key);
+    super.key,
+  }) : movementDescription = null;
 
   final MovementDescription? movementDescription;
   final String? name;

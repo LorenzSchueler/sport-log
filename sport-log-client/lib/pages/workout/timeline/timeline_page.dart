@@ -22,7 +22,7 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
 class TimelinePage extends StatefulWidget {
-  const TimelinePage({Key? key}) : super(key: key);
+  const TimelinePage({super.key});
 
   @override
   State<TimelinePage> createState() => _TimelinePageState();

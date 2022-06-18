@@ -7,7 +7,7 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 
 class App extends StatelessWidget {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   static final navigatorKey = GlobalKey<NavigatorState>();
   static BuildContext get globalContext =>

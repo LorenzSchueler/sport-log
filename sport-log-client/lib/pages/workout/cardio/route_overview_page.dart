@@ -19,7 +19,7 @@ import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RoutePage extends StatefulWidget {
-  const RoutePage({Key? key}) : super(key: key);
+  const RoutePage({super.key});
 
   @override
   State<RoutePage> createState() => _RoutePageState();
@@ -117,7 +117,7 @@ class _RoutePageState extends State<RoutePage> {
 }
 
 class RouteCard extends StatelessWidget {
-  const RouteCard({required this.route, Key? key}) : super(key: key);
+  const RouteCard({required this.route, super.key});
 
   final Route route;
 

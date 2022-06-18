@@ -23,8 +23,8 @@ class StrengthSessionEditPage extends StatefulWidget {
   const StrengthSessionEditPage({
     required this.strengthSessionDescription,
     required this.isNew,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final StrengthSessionDescription strengthSessionDescription;
   final bool isNew;

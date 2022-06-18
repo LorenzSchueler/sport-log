@@ -41,12 +41,12 @@ enum AggregatorType {
 
 class DateTimeChart extends StatelessWidget {
   const DateTimeChart({
-    Key? key,
     required this.chartValues,
     required this.dateFilterState,
     required this.yFromZero,
     required this.aggregatorType,
-  }) : super(key: key);
+    super.key,
+  });
 
   final List<DateTimeChartValue> chartValues;
   final DateFilterState dateFilterState;

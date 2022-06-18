@@ -25,7 +25,7 @@ import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class CardioSessionsPage extends StatefulWidget {
-  const CardioSessionsPage({Key? key}) : super(key: key);
+  const CardioSessionsPage({super.key});
 
   @override
   State<CardioSessionsPage> createState() => _CardioSessionsPageState();
@@ -211,8 +211,7 @@ class _CardioSessionsPageState extends State<CardioSessionsPage> {
 }
 
 class CardioSessionCard extends StatelessWidget {
-  const CardioSessionCard({Key? key, required this.cardioSessionDescription})
-      : super(key: key);
+  const CardioSessionCard({required this.cardioSessionDescription, super.key});
 
   final CardioSessionDescription cardioSessionDescription;
 

@@ -9,9 +9,9 @@ import 'package:sport_log/widgets/app_icons.dart';
 
 class MetconDetailsPage extends StatefulWidget {
   const MetconDetailsPage({
-    Key? key,
     required this.metconDescription,
-  }) : super(key: key);
+    super.key,
+  });
 
   final MetconDescription metconDescription;
 

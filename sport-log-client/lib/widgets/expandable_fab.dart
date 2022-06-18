@@ -6,10 +6,10 @@ import 'package:sport_log/widgets/app_icons.dart';
 @immutable
 class ExpandableFab extends StatefulWidget {
   const ExpandableFab({
-    Key? key,
     required this.icon,
     required this.buttons,
-  }) : super(key: key);
+    super.key,
+  });
 
   final Icon icon;
   final List<ActionButton> buttons;
@@ -142,15 +142,15 @@ class _ExpandableFabState extends State<ExpandableFab>
   }
 }
 
-@immutable
 class _ExpandingActionButton extends StatelessWidget {
   const _ExpandingActionButton({
-    Key? key,
     required this.directionInDegrees,
     required this.maxDistance,
     required this.progress,
     required this.child,
-  }) : super(key: key);
+    // ignore: unused_element
+    super.key,
+  });
 
   final double directionInDegrees;
   final double maxDistance;
@@ -183,13 +183,12 @@ class _ExpandingActionButton extends StatelessWidget {
   }
 }
 
-@immutable
 class ActionButton extends StatelessWidget {
   const ActionButton({
-    Key? key,
     this.onPressed,
     required this.icon,
-  }) : super(key: key);
+    super.key,
+  });
 
   final VoidCallback? onPressed;
   final Widget icon;

@@ -3,13 +3,12 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 
 class ValueUnitDescription extends StatelessWidget {
   const ValueUnitDescription({
-    Key? key,
     required String? value,
     required this.unit,
     required this.description,
     this.scale = 1,
-  })  : value = value ?? "--",
-        super(key: key);
+    super.key,
+  }) : value = value ?? "--";
 
   ValueUnitDescription.ascent(int? ascent, {Key? key})
       : this(

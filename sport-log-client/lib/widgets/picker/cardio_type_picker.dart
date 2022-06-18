@@ -14,7 +14,7 @@ Future<CardioType?> showCardioTypePicker({
 }
 
 class CardioTypePickerDialog extends StatelessWidget {
-  const CardioTypePickerDialog({Key? key}) : super(key: key);
+  const CardioTypePickerDialog({super.key});
 
   @override
   Widget build(BuildContext context) {

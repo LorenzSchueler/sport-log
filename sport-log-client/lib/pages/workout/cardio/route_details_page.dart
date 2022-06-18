@@ -15,7 +15,7 @@ import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RouteDetailsPage extends StatefulWidget {
-  const RouteDetailsPage({required this.route, Key? key}) : super(key: key);
+  const RouteDetailsPage({required this.route, super.key});
 
   final Route route;
 

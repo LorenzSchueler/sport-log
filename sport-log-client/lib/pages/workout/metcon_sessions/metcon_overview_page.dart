@@ -13,7 +13,7 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
 class MetconsPage extends StatefulWidget {
-  const MetconsPage({Key? key}) : super(key: key);
+  const MetconsPage({super.key});
 
   @override
   State<StatefulWidget> createState() => _MetconsPageState();
@@ -121,8 +121,7 @@ class _MetconsPageState extends State<MetconsPage> {
 }
 
 class MetconCard extends StatelessWidget {
-  const MetconCard({Key? key, required this.metconDescription})
-      : super(key: key);
+  const MetconCard({required this.metconDescription, super.key});
 
   final MetconDescription metconDescription;
 

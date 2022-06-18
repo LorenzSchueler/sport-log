@@ -14,7 +14,7 @@ Future<Weekday?> showWeekdayPicker({
 }
 
 class WeekdayPickerDialog extends StatelessWidget {
-  const WeekdayPickerDialog({Key? key}) : super(key: key);
+  const WeekdayPickerDialog({super.key});
 
   @override
   Widget build(BuildContext context) {

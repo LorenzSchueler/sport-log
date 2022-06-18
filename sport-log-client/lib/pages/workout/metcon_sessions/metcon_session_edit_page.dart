@@ -20,8 +20,8 @@ class MetconSessionEditPage extends StatefulWidget {
   const MetconSessionEditPage({
     required this.metconSessionDescription,
     required this.isNew,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final MetconSessionDescription metconSessionDescription;
   final bool isNew;

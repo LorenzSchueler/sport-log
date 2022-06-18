@@ -12,7 +12,7 @@ import 'package:sport_log/widgets/picker/date_picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class DiaryEditPage extends StatefulWidget {
-  const DiaryEditPage({Key? key, this.diary}) : super(key: key);
+  const DiaryEditPage({this.diary, super.key});
 
   final Diary? diary;
 

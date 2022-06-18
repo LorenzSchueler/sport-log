@@ -19,9 +19,9 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 
 class MetconEditPage extends StatefulWidget {
   const MetconEditPage({
-    Key? key,
     required this.metconDescription,
-  }) : super(key: key);
+    super.key,
+  });
 
   final MetconDescription? metconDescription;
 
@@ -358,8 +358,8 @@ class MetconMovementCard extends StatelessWidget {
     required this.deleteMetconMovement,
     required this.editMetconMovementDescription,
     required this.mmd,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final MetconMovementDescription mmd;
   final void Function(MetconMovementDescription) editMetconMovementDescription;

@@ -19,9 +19,7 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
 class StrengthSessionsPage extends StatefulWidget {
-  const StrengthSessionsPage({
-    Key? key,
-  }) : super(key: key);
+  const StrengthSessionsPage({super.key});
 
   @override
   State<StrengthSessionsPage> createState() => _StrengthSessionsPageState();
@@ -182,12 +180,11 @@ class _StrengthSessionsPageState extends State<StrengthSessionsPage> {
 
 class StrengthSessionCard extends StatelessWidget {
   StrengthSessionCard({
-    Key? key,
     required this.strengthSessionDescription,
     required this.strengthRecords,
-  })  : strengthRecordTypes =
-            strengthRecords.getCombinedRecordTypes(strengthSessionDescription),
-        super(key: key);
+    super.key,
+  }) : strengthRecordTypes =
+            strengthRecords.getCombinedRecordTypes(strengthSessionDescription);
 
   final StrengthSessionDescription strengthSessionDescription;
   final StrengthRecords strengthRecords;
@@ -266,11 +263,10 @@ class StrengthSessionCard extends StatelessWidget {
 
 class StrengthRecodsCard extends StatelessWidget {
   StrengthRecodsCard({
-    Key? key,
     required this.movement,
     required StrengthRecords strengthRecords,
-  })  : strengthRecord = strengthRecords[movement.id],
-        super(key: key);
+    super.key,
+  }) : strengthRecord = strengthRecords[movement.id];
 
   final Movement movement;
   final StrengthRecord? strengthRecord;
@@ -350,9 +346,9 @@ class StrengthRecodsCard extends StatelessWidget {
 
 class StrengthRecordMarkers extends StatelessWidget {
   const StrengthRecordMarkers({
-    Key? key,
     required this.strengthRecordTypes,
-  }) : super(key: key);
+    super.key,
+  });
 
   final List<StrengthRecordType> strengthRecordTypes;
 

@@ -11,8 +11,8 @@ class MetconSessionResultsCard extends StatelessWidget {
     required this.metconSessionDescription,
     required this.metconSessionDescriptions,
     required this.metconRecords,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final MetconSessionDescription? metconSessionDescription;
   final List<MetconSessionDescription> metconSessionDescriptions;

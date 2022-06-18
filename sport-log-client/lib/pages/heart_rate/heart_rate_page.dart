@@ -10,7 +10,7 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
 class HeartRatePage extends StatelessWidget {
-  const HeartRatePage({Key? key}) : super(key: key);
+  const HeartRatePage({super.key});
 
   @override
   Widget build(BuildContext context) {

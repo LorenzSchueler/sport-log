@@ -14,7 +14,7 @@ import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class OfflineMapsPage extends StatefulWidget {
-  const OfflineMapsPage({Key? key}) : super(key: key);
+  const OfflineMapsPage({super.key});
 
   @override
   State<OfflineMapsPage> createState() => _OfflineMapsPageState();
@@ -189,8 +189,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
 }
 
 class RegionCard extends StatelessWidget {
-  const RegionCard({required this.region, required this.onDelete, Key? key})
-      : super(key: key);
+  const RegionCard({required this.region, required this.onDelete, super.key});
 
   final OfflineRegion region;
   final VoidCallback onDelete;

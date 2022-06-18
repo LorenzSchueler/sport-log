@@ -19,7 +19,7 @@ import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class RouteEditPage extends StatefulWidget {
-  const RouteEditPage({Key? key, required this.route}) : super(key: key);
+  const RouteEditPage({required this.route, super.key});
 
   final Route? route;
 

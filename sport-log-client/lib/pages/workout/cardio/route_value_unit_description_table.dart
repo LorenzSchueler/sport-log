@@ -6,8 +6,8 @@ import 'package:sport_log/widgets/value_unit_description.dart';
 class RouteValueUnitDescriptionTable extends StatelessWidget {
   const RouteValueUnitDescriptionTable({
     required this.route,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final Route route;
 

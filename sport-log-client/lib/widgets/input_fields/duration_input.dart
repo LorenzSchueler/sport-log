@@ -6,10 +6,10 @@ import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
 
 class DurationInput extends StatefulWidget {
   const DurationInput({
-    Key? key,
     required this.setDuration,
     required this.initialDuration,
-  }) : super(key: key);
+    super.key,
+  });
 
   final void Function(Duration)? setDuration;
   final Duration? initialDuration;
