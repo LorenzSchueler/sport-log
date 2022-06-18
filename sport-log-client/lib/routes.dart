@@ -41,6 +41,7 @@ import 'package:sport_log/pages/workout/strength_sessions/strength_edit_page.dar
 import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page.dart';
 import 'package:sport_log/pages/workout/timeline/timeline_page.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 abstract class Routes {
   static const landing = '/landing';
@@ -65,11 +66,19 @@ abstract class Routes {
     return Settings.instance.userExists() ? builder() : const LandingPage();
   }
 
-  static Widget _checkLoginAndroidIos(Widget Function() builder) {
+  static Widget _checkLoginAndroidIos(
+    BuildContext context,
+    Widget Function() builder,
+  ) {
     return Settings.instance.userExists()
         ? Config.isAndroid || Config.isIOS
             ? builder()
-            : const PlatformNotSupportedPage()
+            : ModalRoute.of(context)!.isFirst
+                ? const PlatformNotSupportedPage()
+                : const MessageDialog(
+                    text: "The selected page is not supported on you platform.",
+                    title: null,
+                  )
         : const LandingPage();
   }
 
@@ -86,10 +95,12 @@ abstract class Routes {
     Routes.noAccount: (_) =>
         _checkNotLogin(() => const LoginPage(loginType: LoginType.noAccount)),
     Routes.timer: (_) => _checkLogin(() => const TimerPage()),
-    Routes.map: (_) => _checkLoginAndroidIos(() => const MapPage()),
-    Routes.offlineMaps: (_) =>
-        _checkLoginAndroidIos(() => const OfflineMapsPage()),
-    Routes.heartRate: (_) => _checkLoginAndroidIos(() => const HeartRatePage()),
+    Routes.map: (context) =>
+        _checkLoginAndroidIos(context, () => const MapPage()),
+    Routes.offlineMaps: (context) =>
+        _checkLoginAndroidIos(context, () => const OfflineMapsPage()),
+    Routes.heartRate: (context) =>
+        _checkLoginAndroidIos(context, () => const HeartRatePage()),
     Routes.settings: (_) => _checkLogin(() => const SettingsPage()),
     Routes.about: (_) => _checkLogin(() => const AboutPage()),
     // Action
@@ -204,9 +215,11 @@ abstract class Routes {
     // cardio
     Routes.cardio.overview: (_) =>
         _checkLogin(() => const CardioSessionsPage()),
-    Routes.cardio.trackingSettings: (_) =>
-        _checkLoginAndroidIos(() => const CardioTrackingSettingsPage()),
-    Routes.cardio.tracking: (context) => _checkLoginAndroidIos(() {
+    Routes.cardio.trackingSettings: (context) => _checkLoginAndroidIos(
+          context,
+          () => const CardioTrackingSettingsPage(),
+        ),
+    Routes.cardio.tracking: (context) => _checkLoginAndroidIos(context, () {
           final args =
               ModalRoute.of(context)!.settings.arguments! as List<dynamic>;
           return CardioTrackingPage(
@@ -262,6 +275,7 @@ abstract class Routes {
   };
 
   static Map<String, Widget Function(BuildContext)> get all => _routeList;
+
   static Widget Function(BuildContext) get(String routeName) =>
       _routeList[routeName]!;
 }
