@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -6,32 +5,19 @@ import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';
 
 /// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
-class MonthChart extends StatelessWidget {
-  const MonthChart({
-    required this.chartValues,
-    required this.yFromZero,
-    required this.isTime,
+class MonthChart extends DateTimePeriodChart {
+  MonthChart({
+    required super.chartValues,
+    required super.yFromZero,
+    required super.isTime,
     required this.startDateTime,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
-  final List<DateTimeChartValue> chartValues;
-  final bool yFromZero;
-  final bool isTime;
   final DateTime startDateTime;
 
   @override
   Widget build(BuildContext context) {
-    double minY = yFromZero
-        ? 0.0
-        : (chartValues.map((v) => v.value).minOrNull ?? 0).floor().toDouble();
-    double maxY =
-        (chartValues.map((v) => v.value).maxOrNull ?? 0).ceil().toDouble();
-    if (maxY == minY) {
-      maxY += 1;
-      minY -= 1;
-    }
-
     return LineChart(
       LineChartData(
         lineBarsData: [
@@ -51,28 +37,9 @@ class MonthChart extends StatelessWidget {
         maxX: startDateTime.numDaysInMonth.toDouble(),
         minY: minY,
         maxY: maxY,
-        titlesData: FlTitlesData(
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              interval: 1,
-              getTitlesWidget: (value, _) => value % 2 == 0
-                  ? Text(value.round().toString())
-                  : const Text(""),
-            ),
-          ),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: isTime ? 60 : 40,
-              getTitlesWidget: isTime
-                  ? (value, _) =>
-                      Text(Duration(milliseconds: value.round()).formatMsMill)
-                  : null,
-            ),
-          ),
+        titlesData: titlesData(
+          getBottomTitles: (value, _) =>
+              value % 2 == 0 ? Text(value.round().toString()) : const Text(""),
         ),
         gridData: FlGridData(
           getDrawingHorizontalLine: gridLineDrawer(context),

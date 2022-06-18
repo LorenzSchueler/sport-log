@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/charts/all.dart';
@@ -123,5 +124,64 @@ class DateTimeChart extends StatelessWidget {
       default:
         return dateTime.beginningOfMonth().add(const Duration(days: 15));
     }
+  }
+}
+
+abstract class DateTimePeriodChart extends StatelessWidget {
+  DateTimePeriodChart({
+    required this.chartValues,
+    required this.yFromZero,
+    required this.isTime,
+    super.key,
+  })  : _maxY =
+            (chartValues.map((v) => v.value).maxOrNull ?? 0).ceil().toDouble(),
+        _minY = yFromZero
+            ? 0.0
+            : (chartValues.map((v) => v.value).minOrNull ?? 0)
+                .floor()
+                .toDouble();
+
+  final List<DateTimeChartValue> chartValues;
+  final bool isTime;
+  final bool yFromZero;
+  final double _maxY;
+  final double _minY;
+
+  double get maxY => _maxY == _minY ? _maxY + 1 : _maxY;
+
+  double get minY => _maxY == _minY ? _minY - 1 : _minY;
+
+  FlTitlesData titlesData({
+    Widget Function(double, TitleMeta)? getBottomTitles,
+    double? reservedSize,
+  }) =>
+      FlTitlesData(
+        topTitles: _noAxisTitles,
+        rightTitles: _noAxisTitles,
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            interval: 1,
+            getTitlesWidget: getBottomTitles,
+            reservedSize: reservedSize,
+          ),
+        ),
+        leftTitles: _leftAxisTitles,
+      );
+
+  static final AxisTitles _noAxisTitles =
+      AxisTitles(sideTitles: SideTitles(showTitles: false));
+
+  AxisTitles get _leftAxisTitles {
+    return AxisTitles(
+      sideTitles: SideTitles(
+        showTitles: true,
+        reservedSize: isTime ? 60 : 40,
+        getTitlesWidget: isTime
+            ? (value, _) =>
+                Text(Duration(milliseconds: value.round()).formatMsMill)
+            : null,
+      ),
+    );
   }
 }

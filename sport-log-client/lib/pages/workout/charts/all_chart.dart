@@ -6,29 +6,16 @@ import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';
 
 /// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
-class AllChart extends StatelessWidget {
-  const AllChart({
-    required this.chartValues,
-    required this.yFromZero,
-    required this.isTime,
-    Key? key,
-  }) : super(key: key);
-
-  final List<DateTimeChartValue> chartValues;
-  final bool yFromZero;
-  final bool isTime;
+class AllChart extends DateTimePeriodChart {
+  AllChart({
+    required super.chartValues,
+    required super.yFromZero,
+    required super.isTime,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    double minY = yFromZero
-        ? 0.0
-        : (chartValues.map((v) => v.value).minOrNull ?? 0).floor().toDouble();
-    double maxY =
-        (chartValues.map((v) => v.value).maxOrNull ?? 0).ceil().toDouble();
-    if (maxY == minY) {
-      maxY += 1;
-      minY -= 1;
-    }
     final startDateTime = chartValues.firstOrNull?.datetime.beginningOfDay() ??
         DateTime.now().beginningOfYear();
     final endDateTime =
@@ -70,32 +57,14 @@ class AllChart extends StatelessWidget {
           ],
           minY: minY,
           maxY: maxY,
-          titlesData: FlTitlesData(
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: 1,
-                getTitlesWidget: (value, _) {
-                  final date = startDateTime.add(Duration(days: value.round()));
-                  return date.day == 15 && markedMonths.contains(date.month)
-                      ? Text("${date.shortMonthName}\n${date.year}")
-                      : const Text("");
-                },
-                reservedSize: 35,
-              ),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: isTime ? 60 : 40,
-                getTitlesWidget: isTime
-                    ? (value, _) =>
-                        Text(Duration(milliseconds: value.round()).formatMsMill)
-                    : null,
-              ),
-            ),
+          titlesData: titlesData(
+            getBottomTitles: (value, _) {
+              final date = startDateTime.add(Duration(days: value.round()));
+              return date.day == 15 && markedMonths.contains(date.month)
+                  ? Text("${date.shortMonthName}\n${date.year}")
+                  : const Text("");
+            },
+            reservedSize: 35,
           ),
           gridData: FlGridData(
             getDrawingHorizontalLine: gridLineDrawer(context),
