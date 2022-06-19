@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>org.sport-log.sport-log-client</id>
+    <name>Sport Log Client</name>
+    <summary>Log your sport archivements.</summary>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-3.0-only</project_license>
+    <recommends>
+        <control>pointing</control>
+        <control>keyboard</control>
+        <control>touch</control>
+    </recommends>
+    <developer_name>sport-log.org</developer_name>
+    <!--<url type="homepage">https://sport-log.org</url>-->
+    <description>
+        <p>Here goes the description.</p>
+        <p>Features</p>
+        <ul>
+            <li>1</li>
+        </ul>
+    </description>
+    <screenshots>
+        <screenshot>
+            <image type="source">https://url-to-image1</image>
+            <image type="source">https://url-to-image2</image>
+        </screenshot>
+    </screenshots>
+    <launchable type="desktop-id">org.sport-log.sport-log-client.desktop</launchable>
+    <releases>
+        <release version="0.1.0" date="2022-03-20" />
+    </releases>
+</component>
