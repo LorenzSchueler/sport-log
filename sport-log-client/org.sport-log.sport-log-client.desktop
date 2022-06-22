@@ -1,7 +1,7 @@
 [Desktop Entry]
+Name=Sport Log
 Type=Application
-Name=Sport Log Client
 Icon=org.sport_log.sport_log_client
-#Exec=env GDK_GL=gles  flatpak run org.sport_log.sport_log_client
-Exec=org.sport_log.sport_log_client
+# Exec = command of flatpak yml config
+Exec=sport_log_client
 Keywords=Sport;Log;Diary
