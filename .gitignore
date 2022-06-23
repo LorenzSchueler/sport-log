@@ -10,8 +10,8 @@
 /sport-log-client/sport-log-client.yaml
 /sport-log-client/build.sh
 /sport-log-client/flutter_checks.sh
-/sport-log-client/flatpak-build
-/sport-log-client/.flatpak-builder
+flatpak-build
+.flatpak-builder
 .env
 geckodriver
 rust_checks.sh

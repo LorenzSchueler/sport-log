@@ -45,9 +45,13 @@ modules:
 
 # flutter build linux 
 
-# flatpak-builder flatpak-build --force-clean org.sport-log.sport-log-client.yml
+# build only
+# flatpak-builder --user --force-clean flatpak-build --state-dir ../.flatpak-builder ../flatpak-build flatpak/org.sport-log.sport-log-client.yml
 
-# flatpak-builder --user --install --force-clean flatpak-build org.sport-log.sport-log-client.yml
+# build and install
+# flatpak-builder --user --install --force-clean --state-dir ../.flatpak-builder ../flatpak-build flatpak/org.sport-log.sport-log-client.yml
+
+# run
 # flatpak run org.sport_log.sport_log_client
 
 # flatpak-builder --force-clean --repo flatpak-repo flatpak-build org.sport-log.sport-log-client.yml
