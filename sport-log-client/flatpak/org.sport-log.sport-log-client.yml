@@ -42,7 +42,7 @@ modules:
       - type: file
         path: app_icon.png
 
-# flutter build linux 
+# flutter build linux --debug
 
 # build only
 # flatpak-builder --user --force-clean --state-dir ../.flatpak-builder ../flatpak-build flatpak/org.sport-log.sport-log-client.yml
