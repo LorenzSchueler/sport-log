@@ -84,3 +84,10 @@ jobs:
       run: flutter build linux
       env:
         SDK_REGISTRY_TOKEN: ${{ secrets.SDK_REGISTRY_TOKEN }}
+    - name: Setup Flatpak
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y flatpak-builder
+    - name: Build Flatpak
+      working-directory: sport-log-client
+      run: flatpak-builder --user --install --force-clean --state-dir ../.flatpak-builder ../flatpak-build flatpak/org.sport-log.sport-log-client.yml
