@@ -1,9 +1,16 @@
-# Sport Log Client
+<p align="center">
+  <img src="../icon.png" height="100" align="center">
+</p>
+
+<h1 align="center">Sport Log Client</h1>
+
+![](https://img.shields.io/github/workflow/status/LorenzSchueler/sport-log/Flutter/master?label=Pipeline)
+![](https://img.shields.io/github/license/LorenzSchueler/sport-log)
 
 ## Config
 
 * `cp sport-log-client/sport-log-client.yaml.template sport-log-client/sport-log-client.yaml` and insert your mapbox access token
-* in order to compile to project `SDK_REGISTRY_TOKEN` must be in your path. you can set it directly or use `.vscode/launch.json` (see below)
+* to compile the project `SDK_REGISTRY_TOKEN` must be set as an env var
 
 ### Config Options
 * `access_token` (String) maxbox access token needed to create map instances
@@ -15,11 +22,13 @@
 * `output_response_json` (bool; default: `false`) log response json
 * `output_db_statement` (bool; default: `false`) log executed db statements
 
-**VS Code**
+### VS Code
 
 * `cp .vscode/launch.json.template .vscode/launch.json` (in root folder) and insert you mapbox registry token
 
-**Run on real Android device**
+## Build & Run 
+
+### Run on real Android device
 
 1. enable Developer Options on your Android phone (Settings &#8594; About phone &#8594; tap Build number 7 times)
 2. enable USB debugging (Settings &#8594; System &#8594; Developer options)
@@ -27,13 +36,28 @@
 4. set `server_address=<address:port>` with the IP address of your machine (where the server is running on; must be in same Wifi network as your phone)
 5. remember to bind the IP address of the server to `0.0.0.0` (in `sport-log-server/sport-log-server-config`, see [Server Setup instructions](../sport-log-server/README.md))
 
-**Run on Android Emulator**
+### Run on Android Emulator
 
 * server address `10.0.2.2:8000` will be used which will be mapped to localhost
 * to copy the database to your computer, use
 ```bash
 adb root  # restart adb daemon as root
 adb pull /data/user/0/org.sport_log.sport_log_client/databases/database.sqlite <folder> # pull file to local storage
+```
+
+### Build Flatpak
+
+* install `flatpak` and `flatpak-builder` and freedesktop platform and SDK
+```bash
+sudo apt-get install -y flatpak flatpak-builder
+flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak install --user -y flathub org.freedesktop.Platform//21.08 org.freedesktop.Sdk//21.08
+```
+* set `SDK_REGISTRY_TOKEN` as env var
+* build linux app and install it using flatpak
+```bash
+flutter build linux --debug
+flatpak-builder --user --install --force-clean --state-dir ../.flatpak-builder ../flatpak-build flatpak/org.sport-log.sport-log-client.yml
 ```
 
 ## Client Server Synchronization

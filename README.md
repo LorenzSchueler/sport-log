@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="sport-log-client/launcher_icon.png" height="100" align="center">
+  <img src="icon.png" height="100" align="center">
 </p>
 
 <h1 align="center">Sport Log</h1>
@@ -45,9 +45,9 @@ The server and action providers as well as helper tools and libraries are struct
 
 The flutter app lives in [**sport-log-client**](sport-log-client)
 
-## Setup
+## Documentation
 
-refer to [server setup](sport-log-server/README.md) and [client setup](sport-log-client/README.md)
+refer to [server docs](sport-log-server/README.md) and [client docs](sport-log-client/README.md)
 
 ## Contributing
 

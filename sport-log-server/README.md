@@ -1,4 +1,11 @@
-# Sport Log Server
+<p align="center">
+  <img src="../icon.png" height="100" align="center">
+</p>
+
+<h1 align="center">Sport Log Server</h1>
+
+![](https://img.shields.io/github/workflow/status/LorenzSchueler/sport-log/Rust/master?label=Pipeline)
+![](https://img.shields.io/github/license/LorenzSchueler/sport-log)
 
 ## Setup
 
@@ -71,29 +78,33 @@ postgres=# \password sport_admin
 ```
 
 ## SystemD Setup for deployment
-service template 
+### Setup 
 1. create new user `sport-admin`
     ```bash
     adduser --system --no-create-home sport-admin
     ```
-1. install executable at: */usr/local/bin/sport-log-server*
+2. install executable at: */usr/local/bin/sport-log-server*
     ```bash
     cargo build --release
     sudo cp ../target/release/sport-log-server /usr/local/bin/sport-log-server
     sudo chmod 740 /usr/local/bin/sport-log-server
     sudo chown sport-admin /usr/local/bin/sport-log-server
     ```
-1. install config at: */etc/sport-log-server/sport-log-server.toml*
+3. install config at: */etc/sport-log-server/sport-log-server.toml*
     ```bash
     sudo mkdir -p /etc/sport-log-server
     sudo cp sport-log-server.toml /etc/sport-log-server/sport-log-server.toml
     sudo chmod 600 /etc/sport-log-server/sport-log-server.toml
     sudo chown -R sport-admin /etc/sport-log-server
     ```
-1. install systemd start script
+4. install systemd start script
     ```bash
     sudo cp sport-log-server.service /etc/systemd/system/sport-log-server.service
     ```
+
+### On Update
+1. [Setup](README.md#setup-1) step 2
+2. restart systemd deamon
 
 ## SystemD service
 
@@ -103,7 +114,7 @@ service template
     systemctl status sport-log-server.service
     ```
 
-- start/ stop systemd deamon
+- start/ stop/ restart systemd deamon
 
     ```bash
     systemctl start sport-log-server.service
@@ -111,6 +122,10 @@ service template
 
     ```bash
     systemctl stop sport-log-server.service
+    ```
+
+    ```bash
+    systemctl restart sport-log-server.service
     ```
 
 - enable/ disable start of service at startup

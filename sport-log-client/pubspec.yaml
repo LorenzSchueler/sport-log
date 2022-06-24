@@ -85,7 +85,7 @@ dev_dependencies:
   json_serializable: ^6.1.4 # json
 
 flutter_icons:
-  image_path: "launcher_icon.png"
+  image_path: "../icon.png"
   android: true
   ios: true
   linux: true
