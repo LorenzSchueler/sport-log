@@ -12,6 +12,7 @@ import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
 import 'package:sport_log/pages/workout/charts/duration_chart.dart';
+import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -205,9 +206,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                 if (_cardioSessionDescription.cardioSession.comments !=
                     null) ...[
                   Defaults.sizedBox.vertical.normal,
-                  Text(
-                    _cardioSessionDescription.cardioSession.comments!,
-                    textAlign: TextAlign.left,
+                  CommentsBox(
+                    comments: _cardioSessionDescription.cardioSession.comments!,
                   ),
                 ]
               ],

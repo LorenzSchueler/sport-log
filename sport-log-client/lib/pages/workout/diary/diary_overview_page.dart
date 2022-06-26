@@ -5,6 +5,7 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
+import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -181,11 +182,7 @@ class DiaryCard extends StatelessWidget {
               if (diary.comments != null) ...[
                 Defaults.sizedBox.horizontal.normal,
                 Expanded(
-                  child: Text(
-                    diary.comments!,
-                    textAlign: TextAlign.start,
-                    softWrap: true,
-                  ),
+                  child: CommentsBox(comments: diary.comments!),
                 ),
               ]
             ],

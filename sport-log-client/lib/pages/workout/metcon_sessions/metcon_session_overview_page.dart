@@ -6,6 +6,7 @@ import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/metcon/metcon_records.dart';
+import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_description_card.dart';
@@ -218,52 +219,63 @@ class MetconSessionCard extends StatelessWidget {
         margin: EdgeInsets.zero,
         child: Padding(
           padding: Defaults.edgeInsets.normal,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      metconSessionDescription.metconSession.datetime
-                          .toHumanDateTime(),
-                    ),
-                    Defaults.sizedBox.vertical.normal,
-                    Text(
-                      metconSessionDescription.metconDescription.metcon.name,
-                      style: Theme.of(context).textTheme.subtitle1,
-                    ),
-                    if (metconRecord) ...[
-                      Defaults.sizedBox.vertical.normal,
-                      const Icon(
-                        AppIcons.medal,
-                        color: Colors.orange,
-                        size: 20,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(metconSessionDescription.longResultDescription),
-                    Defaults.sizedBox.vertical.normal,
-                    Row(
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Rx "),
-                        Icon(
-                          metconSessionDescription.metconSession.rx
-                              ? AppIcons.check
-                              : AppIcons.close,
+                        Text(
+                          metconSessionDescription.metconSession.datetime
+                              .toHumanDateTime(),
+                        ),
+                        Defaults.sizedBox.vertical.normal,
+                        Text(
+                          metconSessionDescription
+                              .metconDescription.metcon.name,
+                          style: Theme.of(context).textTheme.subtitle1,
+                        ),
+                        if (metconRecord) ...[
+                          Defaults.sizedBox.vertical.normal,
+                          const Icon(
+                            AppIcons.medal,
+                            color: Colors.orange,
+                            size: 20,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(metconSessionDescription.longResultDescription),
+                        Defaults.sizedBox.vertical.normal,
+                        Row(
+                          children: [
+                            const Text("Rx "),
+                            Icon(
+                              metconSessionDescription.metconSession.rx
+                                  ? AppIcons.check
+                                  : AppIcons.close,
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+              if (metconSessionDescription.metconSession.comments != null) ...[
+                const Divider(),
+                CommentsBox(
+                  comments: metconSessionDescription.metconSession.comments!,
+                ),
+              ],
             ],
           ),
         ),

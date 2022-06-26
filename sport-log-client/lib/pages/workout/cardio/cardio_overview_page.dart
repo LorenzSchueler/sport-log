@@ -11,6 +11,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
+import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -298,18 +299,30 @@ class CardioSessionCard extends StatelessWidget {
                   ),
             Padding(
               padding: Defaults.edgeInsets.normal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
                 children: [
-                  ValueUnitDescription.timeSmall(
-                    cardioSessionDescription.cardioSession.time,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ValueUnitDescription.timeSmall(
+                        cardioSessionDescription.cardioSession.time,
+                      ),
+                      ValueUnitDescription.distanceSmall(
+                        cardioSessionDescription.cardioSession.distance,
+                      ),
+                      ValueUnitDescription.speedSmall(
+                        cardioSessionDescription.cardioSession.speed,
+                      ),
+                    ],
                   ),
-                  ValueUnitDescription.distanceSmall(
-                    cardioSessionDescription.cardioSession.distance,
-                  ),
-                  ValueUnitDescription.speedSmall(
-                    cardioSessionDescription.cardioSession.speed,
-                  ),
+                  if (cardioSessionDescription.cardioSession.comments !=
+                      null) ...[
+                    const Divider(),
+                    CommentsBox(
+                      comments:
+                          cardioSessionDescription.cardioSession.comments!,
+                    ),
+                  ],
                 ],
               ),
             ),

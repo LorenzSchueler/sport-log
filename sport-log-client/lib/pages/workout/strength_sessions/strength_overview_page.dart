@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/models/strength/strength_records.dart';
+import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -234,7 +235,9 @@ class StrengthSessionCard extends StatelessWidget {
                     if (strengthSessionDescription.session.comments !=
                         null) ...[
                       Defaults.sizedBox.vertical.normal,
-                      Text(strengthSessionDescription.session.comments!),
+                      CommentsBox(
+                        comments: strengthSessionDescription.session.comments!,
+                      ),
                     ],
                   ],
                 ),
