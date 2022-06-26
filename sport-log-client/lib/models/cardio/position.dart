@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:latlong2/latlong.dart' as latlong;
 import 'package:mapbox_gl/mapbox_gl.dart';
@@ -88,7 +87,7 @@ class Position {
 
   @override
   int get hashCode =>
-      hashValues(longitude, latitude, elevation, distance, time);
+      Object.hash(longitude, latitude, elevation, distance, time);
 
   LatLng get latLng => LatLng(latitude, longitude);
 

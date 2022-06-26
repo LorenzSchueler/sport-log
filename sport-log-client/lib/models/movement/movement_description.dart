@@ -1,5 +1,4 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
@@ -33,19 +32,12 @@ class MovementDescription extends CompoundEntity {
 
   @override
   bool isValidBeforeSanitazion() {
-    return validate(
-      movement.isValidBeforeSanitazion(),
-      'MovementDescription: movement is not valid',
-    );
+    return movement.isValidBeforeSanitazion();
   }
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() &&
-        validate(
-          movement.isValid(),
-          'MovementDescription: movement is not valid',
-        );
+    return isValidBeforeSanitazion() && movement.isValid();
   }
 
   @override

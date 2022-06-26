@@ -44,10 +44,8 @@ class CardioSessionDescription extends CompoundEntity {
   @override
   bool isValidBeforeSanitazion() {
     return cardioSession.isValidBeforeSanitazion() &&
-        validate(
-          route == null || route!.isValid(),
-          'CardioSessionDescription: route is not valid',
-        ) &&
+        (route?.isValid() ?? true) &&
+        movement.isValid() &&
         validate(
           route == null || cardioSession.routeId != null,
           'CardioSessionDescription: cardio session route id is null',
@@ -57,10 +55,6 @@ class CardioSessionDescription extends CompoundEntity {
           'CardioSessionDescription: route id mismatch',
         ) &&
         validate(
-          movement.isValid(),
-          'CardioSessionDescription: movement is not valid',
-        ) &&
-        validate(
           cardioSession.movementId == movement.id,
           'CardioSessionDescription: movement id mismatch',
         );
@@ -68,7 +62,7 @@ class CardioSessionDescription extends CompoundEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion();
+    return isValidBeforeSanitazion() && cardioSession.isValid();
   }
 
   @override

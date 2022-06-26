@@ -32,8 +32,7 @@ class PlatformDescription extends CompoundEntity {
   @override
   bool isValidBeforeSanitazion() {
     return platform.isValidBeforeSanitazion() &&
-        (platformCredential == null ||
-            platformCredential!.isValidBeforeSanitazion()) &&
+        (platformCredential?.isValidBeforeSanitazion() ?? true) &&
         actionProviders.every((a) => a.isValidBeforeSanitazion()) &&
         validate(
           !platform.credential || platformCredential != null,
@@ -45,7 +44,7 @@ class PlatformDescription extends CompoundEntity {
   bool isValid() {
     return isValidBeforeSanitazion() &&
         platform.isValid() &&
-        (platformCredential == null || platformCredential!.isValid()) &&
+        (platformCredential?.isValid() ?? true) &&
         actionProviders.every((a) => a.isValid());
   }
 

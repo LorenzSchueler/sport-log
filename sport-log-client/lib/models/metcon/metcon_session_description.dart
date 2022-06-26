@@ -80,20 +80,17 @@ class MetconSessionDescription extends CompoundEntity {
         );
         break;
     }
-    return validate(
-          metconDescription.isValidBeforeSanitazion(),
-          'MetconSessionDescription: metcon description not valid',
-        ) &&
-        validate(
-          metconSession.metconId == metconDescription.metcon.id,
-          'MetconSessionDescription: metcon id mismatch',
-        ) &&
+    return metconSession.isValidBeforeSanitazion() &&
+        metconDescription.isValidBeforeSanitazion() &&
+        metconSession.metconId == metconDescription.metcon.id &&
         metconMetconDescriptionChecks;
   }
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion();
+    return isValidBeforeSanitazion() &&
+        metconSession.isValid() &&
+        metconDescription.isValid();
   }
 
   @override

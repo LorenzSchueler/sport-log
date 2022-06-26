@@ -62,10 +62,9 @@ class StrengthSessionDescription extends CompoundEntity {
 
   @override
   bool isValidBeforeSanitazion() {
-    return validate(
-          session.isValidBeforeSanitazion(),
-          'StrengthSessionDescription: strength session not valid',
-        ) &&
+    return session.isValidBeforeSanitazion() &&
+        movement.isValid() &&
+        sets.every((ss) => ss.isValidBeforeSanitazion()) &&
         validate(
           sets.isNotEmpty,
           'StrengthSessionDescription: strength sets empty',
@@ -77,10 +76,6 @@ class StrengthSessionDescription extends CompoundEntity {
         validate(
           sets.everyIndexed((index, ss) => ss.setNumber == index),
           'StrengthSessionDescription: strengthSets indices wrong',
-        ) &&
-        validate(
-          sets.every((ss) => ss.isValidBeforeSanitazion()),
-          'StrengthSessionDescription: strengthSets not valid',
         ) &&
         validate(
           session.movementId == movement.id,
@@ -95,14 +90,8 @@ class StrengthSessionDescription extends CompoundEntity {
   @override
   bool isValid() {
     return isValidBeforeSanitazion() &&
-        validate(
-          session.isValid(),
-          'StrengthSessionDescription: strength session not valid',
-        ) &&
-        validate(
-          sets.every((ss) => ss.isValid()),
-          'StrengthSessionDescription: strengthSets not valid',
-        );
+        session.isValid() &&
+        sets.every((ss) => ss.isValid());
   }
 
   @override
