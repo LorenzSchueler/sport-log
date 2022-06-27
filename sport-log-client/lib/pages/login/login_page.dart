@@ -37,18 +37,13 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
   String _serverUrl = Settings.instance.serverUrl;
-  String _username = "";
-  String _password = "";
-  // ignore: unused_field
-  String _password2 = "";
-  String _email = "";
 
-  User get user => User(
-        id: randomId(),
-        email: _email,
-        username: _username,
-        password: _password,
-      );
+  final _user = User(
+    id: randomId(),
+    email: "",
+    username: "",
+    password: "",
+  );
 
   bool _loginPending = false;
 
@@ -142,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
       onChanged: (username) async {
         final validated = Validator.validateUsername(username);
         if (validated == null) {
-          setState(() => _username = username);
+          setState(() => _user.username = username);
         }
       },
       decoration: Theme.of(context).textFormFieldDecoration.copyWith(
@@ -164,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
       onChanged: (password) async {
         final validated = Validator.validatePassword(password);
         if (validated == null) {
-          setState(() => _password = password);
+          setState(() => _user.password = password);
         }
       },
       decoration: Theme.of(context).textFormFieldDecoration.copyWith(
@@ -186,18 +181,12 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _passwordInput2(BuildContext context) {
     return TextFormField(
-      onChanged: (password2) async {
-        final validated = Validator.validatePassword2(_password, password2);
-        if (validated == null) {
-          setState(() => _password2 = password2);
-        }
-      },
       decoration: Theme.of(context).textFormFieldDecoration.copyWith(
             icon: const Icon(AppIcons.key),
             labelText: "Repeat password",
           ),
       validator: (password2) =>
-          Validator.validatePassword2(_password, password2),
+          Validator.validatePassword2(_user.password, password2),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
       style: _loginPending
@@ -213,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
       onChanged: (email) async {
         final validated = Validator.validateEmail(email);
         if (validated == null) {
-          setState(() => _email = email);
+          setState(() => _user.email = email);
         }
       },
       decoration: Theme.of(context).textFormFieldDecoration.copyWith(
@@ -244,20 +233,16 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _submit(BuildContext context) async {
     if (widget.loginType.isNoAccount) {
-      Account.noAccount(user);
+      Account.noAccount(_user);
       await Navigator.of(context).newBase(Routes.timeline.overview);
       return;
     }
-    setState(() {
-      _loginPending = true;
-    });
+    setState(() => _loginPending = true);
     final Result<User, ApiError> result = widget.loginType.isRegister
-        ? await Account.register(_serverUrl, user)
-        : await Account.login(_serverUrl, _username, _password);
+        ? await Account.register(_serverUrl, _user)
+        : await Account.login(_serverUrl, _user.username, _user.password);
     if (mounted) {
-      setState(() {
-        _loginPending = false;
-      });
+      setState(() => _loginPending = true);
     }
     if (result.isSuccess) {
       if (mounted) {
