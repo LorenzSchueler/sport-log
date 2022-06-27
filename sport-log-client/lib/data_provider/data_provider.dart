@@ -132,8 +132,9 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   }
 
   Future<DbResult> createMultiple(List<T> objects, {bool notify = true}) async {
-    // ignore: avoid_function_literals_in_foreach_calls
-    objects.forEach((object) => object.sanitize());
+    for (final object in objects) {
+      object.sanitize();
+    }
     assert(objects.every((object) => object.isValid()));
     final result = await db.createMultiple(objects);
     if (result.isFailure()) {
@@ -146,8 +147,9 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   }
 
   Future<DbResult> updateMultiple(List<T> objects, {bool notify = true}) async {
-    // ignore: avoid_function_literals_in_foreach_calls
-    objects.forEach((object) => object.sanitize());
+    for (final object in objects) {
+      object.sanitize();
+    }
     assert(objects.every((object) => object.isValid()));
     final result = await db.updateMultiple(objects);
     if (result.isFailure()) {

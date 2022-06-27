@@ -148,8 +148,6 @@ class _ExpandingActionButton extends StatelessWidget {
     required this.maxDistance,
     required this.progress,
     required this.child,
-    // ignore: unused_element
-    super.key,
   });
 
   final double directionInDegrees;

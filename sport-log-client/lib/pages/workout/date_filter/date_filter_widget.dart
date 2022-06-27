@@ -14,8 +14,7 @@ class DateFilter extends StatefulWidget {
   final void Function(DateFilterState) onFilterChanged;
 
   @override
-  // ignore: library_private_types_in_public_api
-  _DateFilterState createState() => _DateFilterState();
+  State<DateFilter> createState() => _DateFilterState();
 }
 
 class _DateFilterState extends State<DateFilter> {

@@ -150,8 +150,7 @@ void testActionRule(User sampleUser) {
 }
 
 Future<void> main() async {
-  // ignore: no_leading_underscores_for_local_identifiers
-  await for (final _ in initialize()) {}
+  await initialize().drain<void>();
 
   group("", () {
     // sample user group

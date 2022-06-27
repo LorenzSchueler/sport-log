@@ -334,8 +334,6 @@ class _TrackingPageButtons extends StatelessWidget {
     required this.trackingUtils,
     required this.onStart,
     required this.onStop,
-    // ignore: unused_element
-    super.key,
   });
 
   final TrackingUtils trackingUtils;
