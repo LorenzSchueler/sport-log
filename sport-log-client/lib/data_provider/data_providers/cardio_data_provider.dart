@@ -124,9 +124,9 @@ class CardioSessionDescriptionDataProvider
   }
 
   Future<List<CardioSessionDescription>> getByTimerangeAndMovement({
-    Movement? movement,
-    DateTime? from,
-    DateTime? until,
+    required Movement? movement,
+    required DateTime? from,
+    required DateTime? until,
   }) async {
     return _cardioSessionDescriptionDb.getByTimerangeAndMovement(
       from: from,
