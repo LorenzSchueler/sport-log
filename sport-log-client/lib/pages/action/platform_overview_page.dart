@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/platform/platform_credential.dart';
 import 'package:sport_log/models/platform/platform_description.dart';
 import 'package:sport_log/routes.dart';
@@ -9,74 +8,51 @@ import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/overview_data_provider.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
-import 'package:sport_log/widgets/snackbar.dart';
+import 'package:sport_log/widgets/provider_consumer.dart';
 
-class PlatformOverviewPage extends StatefulWidget {
+class PlatformOverviewPage extends StatelessWidget {
   const PlatformOverviewPage({super.key});
-
-  @override
-  State<PlatformOverviewPage> createState() => _PlatformOverviewPageState();
-}
-
-class _PlatformOverviewPageState extends State<PlatformOverviewPage> {
-  final _logger = Logger('PlatformOverviewPage');
-  List<PlatformDescription> _platformDescriptions = [];
-  final _dataProvider = PlatformDescriptionDataProvider();
-
-  @override
-  void initState() {
-    super.initState();
-    _dataProvider
-      ..addListener(_update)
-      ..onNoInternetConnection =
-          () => showSimpleToast(context, 'No Internet connection.');
-    _update();
-  }
-
-  @override
-  void dispose() {
-    _dataProvider
-      ..removeListener(_update)
-      ..onNoInternetConnection = null;
-    super.dispose();
-  }
-
-  Future<void> _update() async {
-    _logger.d('Updating platform page');
-    final platformDescriptions = await _dataProvider.getNonDeleted();
-    setState(() => _platformDescriptions = platformDescriptions);
-  }
 
   @override
   Widget build(BuildContext context) {
     return NeverPop(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Server Actions"),
-        ),
-        body: RefreshIndicator(
-          onRefresh: _dataProvider.pullFromServer,
-          child: _platformDescriptions.isEmpty
-              ? const Center(
-                  child: Text(
-                    "looks like there are no platforms 😔",
-                    textAlign: TextAlign.center,
-                  ),
-                )
-              : Container(
-                  padding: Defaults.edgeInsets.normal,
-                  child: ListView.separated(
-                    itemBuilder: (_, index) => PlatformCard(
-                      platformDescription: _platformDescriptions[index],
+      child: ProviderConsumer<
+          OverviewDataProvider<PlatformDescription, void,
+              PlatformDescriptionDataProvider, String>>(
+        create: (_) => OverviewDataProvider(
+          dataProvider: PlatformDescriptionDataProvider(),
+          entityAccessor: (dataProvider) =>
+              (_, __, ___) => dataProvider.getNonDeleted(),
+          recordAccessor: (_) => () async {},
+          loggerName: "PlatformOverviewPage",
+        )..init(),
+        builder: (_, dataProvider, __) => Scaffold(
+          appBar: AppBar(title: const Text("Server Actions")),
+          body: RefreshIndicator(
+            onRefresh: dataProvider.pullFromServer,
+            child: dataProvider.entities.isEmpty
+                ? const Center(
+                    child: Text(
+                      "looks like there are no platforms 😔",
+                      textAlign: TextAlign.center,
                     ),
-                    separatorBuilder: (_, __) =>
-                        Defaults.sizedBox.vertical.normal,
-                    itemCount: _platformDescriptions.length,
+                  )
+                : Container(
+                    padding: Defaults.edgeInsets.normal,
+                    child: ListView.separated(
+                      itemBuilder: (_, index) => PlatformCard(
+                        platformDescription: dataProvider.entities[index],
+                      ),
+                      separatorBuilder: (_, __) =>
+                          Defaults.sizedBox.vertical.normal,
+                      itemCount: dataProvider.entities.length,
+                    ),
                   ),
-                ),
+          ),
+          drawer: MainDrawer(selectedRoute: Routes.action.platformOverview),
         ),
-        drawer: MainDrawer(selectedRoute: Routes.action.platformOverview),
       ),
     );
   }

@@ -88,10 +88,10 @@ enum SessionsPageTab {
     }
   }
 
-  static BottomNavigationBar bottomNavigationBar(
-    BuildContext context,
-    SessionsPageTab sessionsPageTab,
-  ) {
+  static BottomNavigationBar bottomNavigationBar({
+    required BuildContext context,
+    required SessionsPageTab sessionsPageTab,
+  }) {
     return BottomNavigationBar(
       items: SessionsPageTab.bottomNavItems,
       currentIndex: sessionsPageTab.indexOf(),

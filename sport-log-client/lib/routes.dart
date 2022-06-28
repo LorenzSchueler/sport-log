@@ -128,7 +128,7 @@ abstract class Routes {
           );
         }),
     // movement
-    Routes.movement.overview: (_) => _checkLogin(() => const MovementsPage()),
+    Routes.movement.overview: (_) => _checkLogin(MovementsPage.new),
     Routes.movement.edit: (context) => _checkLogin(() {
           final arg = ModalRoute.of(context)?.settings.arguments;
           if (arg is MovementDescription) {
@@ -139,7 +139,7 @@ abstract class Routes {
           return const MovementEditPage(movementDescription: null);
         }),
     // metcon
-    Routes.metcon.overview: (_) => _checkLogin(() => const MetconsPage()),
+    Routes.metcon.overview: (_) => _checkLogin(MetconsPage.new),
     Routes.metcon.details: (context) => _checkLogin(() {
           final metconDescription =
               ModalRoute.of(context)!.settings.arguments! as MetconDescription;

@@ -17,8 +17,7 @@ String actionName(
   Int64 actionId,
 ) =>
     actionProviderDescription.actions
-        .where((action) => action.id == actionId)
-        .first
+        .firstWhere((action) => action.id == actionId)
         .name;
 
 class ActionProviderOverviewPage extends StatefulWidget {

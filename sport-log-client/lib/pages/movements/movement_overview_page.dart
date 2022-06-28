@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
@@ -9,104 +8,79 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/overview_data_provider.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
-import 'package:sport_log/widgets/snackbar.dart';
+import 'package:sport_log/widgets/provider_consumer.dart';
 
-class MovementsPage extends StatefulWidget {
-  const MovementsPage({super.key});
+class MovementsPage extends StatelessWidget {
+  MovementsPage({super.key});
 
-  @override
-  State<MovementsPage> createState() => _MovementsPageState();
-}
-
-class _MovementsPageState extends State<MovementsPage> {
-  final _logger = Logger('MovementsPage');
-  final _dataProvider = MovementDescriptionDataProvider();
   final _searchBar = FocusNode();
-  List<MovementDescription> _movementDescriptions = [];
-  String? _movementName;
-
-  @override
-  void initState() {
-    super.initState();
-    _dataProvider
-      ..addListener(_update)
-      ..onNoInternetConnection =
-          () => showSimpleToast(context, 'No Internet connection.');
-    _update();
-  }
-
-  @override
-  void dispose() {
-    _dataProvider
-      ..removeListener(_update)
-      ..onNoInternetConnection = null;
-    super.dispose();
-  }
-
-  Future<void> _update() async {
-    _logger.d('Updating movement page');
-    final movementDescriptions = await _dataProvider.getByName(_movementName);
-    setState(() => _movementDescriptions = movementDescriptions);
-  }
 
   @override
   Widget build(BuildContext context) {
     return NeverPop(
-      child: Scaffold(
-        appBar: AppBar(
-          title: _movementName == null
-              ? const Text("Movements")
-              : TextFormField(
-                  focusNode: _searchBar,
-                  onChanged: (name) {
-                    _movementName = name;
-                    _update();
-                  },
-                  decoration: Theme.of(context).textFormFieldDecoration,
+      child: ProviderConsumer<
+          OverviewDataProvider<MovementDescription, void,
+              MovementDescriptionDataProvider, String>>(
+        create: (_) => OverviewDataProvider(
+          dataProvider: MovementDescriptionDataProvider(),
+          entityAccessor: (dataProvider) =>
+              (_, __, movement) => dataProvider.getByName(movement),
+          recordAccessor: (_) => () async {},
+          loggerName: "MovementsPage",
+        )..init(),
+        builder: (_, dataProvider, __) => Scaffold(
+          appBar: AppBar(
+            title: dataProvider.isSelected
+                ? const Text("Movements")
+                : TextFormField(
+                    focusNode: _searchBar,
+                    onChanged: (name) => dataProvider.selected = name,
+                    decoration: Theme.of(context).textFormFieldDecoration,
+                  ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  dataProvider.selected = dataProvider.isSelected ? null : "";
+                  if (dataProvider.isSelected) {
+                    _searchBar.requestFocus();
+                  }
+                },
+                icon: Icon(
+                  dataProvider.isSelected ? AppIcons.close : AppIcons.search,
                 ),
-          actions: [
-            IconButton(
-              onPressed: () {
-                _movementName = _movementName == null ? "" : null;
-                _update();
-                if (_movementName != null) {
-                  _searchBar.requestFocus();
-                }
-              },
-              icon: Icon(
-                _movementName != null ? AppIcons.close : AppIcons.search,
               ),
-            ),
-          ],
-        ),
-        drawer: MainDrawer(selectedRoute: Routes.movement.overview),
-        body: RefreshIndicator(
-          onRefresh: _dataProvider.pullFromServer,
-          child: _movementDescriptions.isEmpty
-              ? const Center(
-                  child: Text(
-                    "looks like there are no movements there yet 😔 \npress ＋ to create a new one",
-                    textAlign: TextAlign.center,
-                  ),
-                )
-              : Container(
-                  padding: Defaults.edgeInsets.normal,
-                  child: ListView.separated(
-                    itemBuilder: (_, index) => MovementCard(
-                      movementDescription: _movementDescriptions[index],
+            ],
+          ),
+          drawer: MainDrawer(selectedRoute: Routes.movement.overview),
+          body: RefreshIndicator(
+            onRefresh: dataProvider.pullFromServer,
+            child: dataProvider.entities.isEmpty
+                ? const Center(
+                    child: Text(
+                      "looks like there are no movements there yet 😔 \npress ＋ to create a new one",
+                      textAlign: TextAlign.center,
                     ),
-                    separatorBuilder: (_, __) =>
-                        Defaults.sizedBox.vertical.normal,
-                    itemCount: _movementDescriptions.length,
+                  )
+                : Container(
+                    padding: Defaults.edgeInsets.normal,
+                    child: ListView.separated(
+                      itemBuilder: (_, index) => MovementCard(
+                        movementDescription: dataProvider.entities[index],
+                      ),
+                      separatorBuilder: (_, __) =>
+                          Defaults.sizedBox.vertical.normal,
+                      itemCount: dataProvider.entities.length,
+                    ),
                   ),
-                ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(AppIcons.add),
-          onPressed: () async {
-            await Navigator.pushNamed(context, Routes.movement.edit);
-          },
+          ),
+          floatingActionButton: FloatingActionButton(
+            child: const Icon(AppIcons.add),
+            onPressed: () async {
+              await Navigator.pushNamed(context, Routes.movement.edit);
+            },
+          ),
         ),
       ),
     );

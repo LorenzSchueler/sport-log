@@ -6,7 +6,6 @@ import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
@@ -14,102 +13,81 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/overview_data_provider.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
-import 'package:sport_log/widgets/snackbar.dart';
+import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
-class RoutePage extends StatefulWidget {
+class RoutePage extends StatelessWidget {
   const RoutePage({super.key});
-
-  @override
-  State<RoutePage> createState() => _RoutePageState();
-}
-
-class _RoutePageState extends State<RoutePage> {
-  final _logger = Logger('RoutePage');
-  final _dataProvider = RouteDataProvider();
-  List<Route> _routes = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _dataProvider
-      ..addListener(_update)
-      ..onNoInternetConnection =
-          () => showSimpleToast(context, 'No Internet connection.');
-    _update();
-  }
-
-  @override
-  void dispose() {
-    _dataProvider
-      ..removeListener(_update)
-      ..onNoInternetConnection = null;
-    super.dispose();
-  }
-
-  Future<void> _update() async {
-    _logger.d('Updating route page');
-    final routes = await _dataProvider.getNonDeleted();
-    setState(() => _routes = routes);
-  }
 
   @override
   Widget build(BuildContext context) {
     return NeverPop(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Routes"),
-          actions: [
-            IconButton(
-              onPressed: () =>
-                  Navigator.of(context).newBase(Routes.cardio.overview),
-              icon: const Icon(AppIcons.heartbeat),
-            ),
-          ],
-        ),
-        body: RefreshIndicator(
-          onRefresh: _dataProvider.pullFromServer,
-          child: _routes.isEmpty
-              ? const Center(
-                  child: Text(
-                    "looks like there are no routes there yet 😔 \npress ＋ to create a new one",
-                    textAlign: TextAlign.center,
+      child: ProviderConsumer<
+          OverviewDataProvider<Route, void, RouteDataProvider, void>>(
+        create: (_) => OverviewDataProvider(
+          dataProvider: RouteDataProvider(),
+          entityAccessor: (dataProvider) =>
+              (_, __, ___) => dataProvider.getNonDeleted(),
+          recordAccessor: (_) => () async {},
+          loggerName: "RoutePage",
+        )..init(),
+        builder: (_, dataProvider, __) => Scaffold(
+          appBar: AppBar(
+            title: const Text("Routes"),
+            actions: [
+              IconButton(
+                onPressed: () =>
+                    Navigator.of(context).newBase(Routes.cardio.overview),
+                icon: const Icon(AppIcons.heartbeat),
+              ),
+            ],
+          ),
+          body: RefreshIndicator(
+            onRefresh: dataProvider.pullFromServer,
+            child: dataProvider.entities.isEmpty
+                ? const Center(
+                    child: Text(
+                      "looks like there are no routes there yet 😔 \npress ＋ to create a new one",
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : Container(
+                    padding: Defaults.edgeInsets.normal,
+                    child: ListView.separated(
+                      itemBuilder: (_, index) =>
+                          RouteCard(route: dataProvider.entities[index]),
+                      separatorBuilder: (_, __) =>
+                          Defaults.sizedBox.vertical.normal,
+                      itemCount: dataProvider.entities.length,
+                    ),
                   ),
-                )
-              : Container(
-                  padding: Defaults.edgeInsets.normal,
-                  child: ListView.separated(
-                    itemBuilder: (_, index) => RouteCard(route: _routes[index]),
-                    separatorBuilder: (_, __) =>
-                        Defaults.sizedBox.vertical.normal,
-                    itemCount: _routes.length,
-                  ),
+          ),
+          bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
+            context: context,
+            sessionsPageTab: SessionsPageTab.cardio,
+          ),
+          drawer: MainDrawer(selectedRoute: Routes.cardio.routeOverview),
+          floatingActionButton: ExpandableFab(
+            icon: const Icon(AppIcons.add),
+            buttons: [
+              ActionButton(
+                icon: const Icon(AppIcons.route),
+                onPressed: () => Navigator.pushNamed(
+                  context,
+                  Routes.cardio.routeEdit,
                 ),
-        ),
-        bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
-          context,
-          SessionsPageTab.cardio,
-        ),
-        drawer: MainDrawer(selectedRoute: Routes.cardio.routeOverview),
-        floatingActionButton: ExpandableFab(
-          icon: const Icon(AppIcons.add),
-          buttons: [
-            ActionButton(
-              icon: const Icon(AppIcons.route),
-              onPressed: () => Navigator.pushNamed(
-                context,
-                Routes.cardio.routeEdit,
               ),
-            ),
-            ActionButton(
-              icon: const Icon(AppIcons.upload),
-              onPressed: () => Navigator.pushNamed(
-                context,
-                Routes.cardio.routeUpload,
+              ActionButton(
+                icon: const Icon(AppIcons.upload),
+                onPressed: () => Navigator.pushNamed(
+                  context,
+                  Routes.cardio.routeUpload,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

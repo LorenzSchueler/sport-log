@@ -2,118 +2,92 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/overview_data_provider.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
-import 'package:sport_log/widgets/snackbar.dart';
+import 'package:sport_log/widgets/provider_consumer.dart';
 
-class MetconsPage extends StatefulWidget {
-  const MetconsPage({super.key});
+class MetconsPage extends StatelessWidget {
+  MetconsPage({super.key});
 
-  @override
-  State<StatefulWidget> createState() => _MetconsPageState();
-}
-
-class _MetconsPageState extends State<MetconsPage> {
-  final _logger = Logger('MetconsPage');
   final _searchBar = FocusNode();
-  final _dataProvider = MetconDescriptionDataProvider();
-  List<MetconDescription> _metconDescriptions = [];
-  String? _metconName;
-
-  @override
-  void initState() {
-    super.initState();
-    _dataProvider
-      ..addListener(_update)
-      ..onNoInternetConnection =
-          () => showSimpleToast(context, 'No Internet connection.');
-    _update();
-  }
-
-  @override
-  void dispose() {
-    _dataProvider
-      ..removeListener(_update)
-      ..onNoInternetConnection = null;
-    super.dispose();
-  }
-
-  Future<void> _update() async {
-    _logger.d('Updating metcon page filtered by name: $_metconName');
-    final metconDescriptions = await _dataProvider.getByMetconName(_metconName);
-    setState(() => _metconDescriptions = metconDescriptions);
-  }
 
   @override
   Widget build(BuildContext context) {
     return NeverPop(
-      child: Scaffold(
-        appBar: AppBar(
-          title: _metconName == null
-              ? const Text("Metcons")
-              : TextFormField(
-                  focusNode: _searchBar,
-                  onChanged: (name) {
-                    _metconName = name;
-                    _update();
-                  },
-                  decoration: Theme.of(context).textFormFieldDecoration,
+      child: ProviderConsumer<
+          OverviewDataProvider<MetconDescription, void,
+              MetconDescriptionDataProvider, String>>(
+        create: (_) => OverviewDataProvider(
+          dataProvider: MetconDescriptionDataProvider(),
+          entityAccessor: (dataProvider) =>
+              (_, __, metconName) => dataProvider.getByMetconName(metconName),
+          recordAccessor: (_) => () async {},
+          loggerName: "MetconsPage",
+        )..init(),
+        builder: (_, dataProvider, __) => Scaffold(
+          appBar: AppBar(
+            title: dataProvider.isSelected
+                ? TextFormField(
+                    focusNode: _searchBar,
+                    onChanged: (name) => dataProvider.selected = name,
+                    decoration: Theme.of(context).textFormFieldDecoration,
+                  )
+                : const Text("Metcons"),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  dataProvider.selected = dataProvider.isSelected ? null : "";
+                  if (dataProvider.isSelected) {
+                    _searchBar.requestFocus();
+                  }
+                },
+                icon: Icon(
+                  dataProvider.isSelected ? AppIcons.close : AppIcons.search,
                 ),
-          actions: [
-            IconButton(
-              onPressed: () {
-                _metconName = _metconName == null ? "" : null;
-                _update();
-                if (_metconName != null) {
-                  _searchBar.requestFocus();
-                }
-              },
-              icon: Icon(
-                _metconName != null ? AppIcons.close : AppIcons.search,
               ),
-            ),
-            IconButton(
-              onPressed: () =>
-                  Navigator.of(context).newBase(Routes.metcon.sessionOverview),
-              icon: const Icon(AppIcons.notes),
-            ),
-          ],
-        ),
-        body: RefreshIndicator(
-          onRefresh: _dataProvider.pullFromServer,
-          child: _metconDescriptions.isEmpty
-              ? const Center(
-                  child: Text(
-                    "looks like there are no metcons there yet 😔 \npress ＋ to create a new one",
-                    textAlign: TextAlign.center,
-                  ),
-                )
-              : Container(
-                  padding: Defaults.edgeInsets.normal,
-                  child: ListView.separated(
-                    itemBuilder: (_, index) => MetconCard(
-                      metconDescription: _metconDescriptions[index],
+              IconButton(
+                onPressed: () => Navigator.of(context)
+                    .newBase(Routes.metcon.sessionOverview),
+                icon: const Icon(AppIcons.notes),
+              ),
+            ],
+          ),
+          body: RefreshIndicator(
+            onRefresh: dataProvider.pullFromServer,
+            child: dataProvider.entities.isEmpty
+                ? const Center(
+                    child: Text(
+                      "looks like there are no metcons there yet 😔 \npress ＋ to create a new one",
+                      textAlign: TextAlign.center,
                     ),
-                    separatorBuilder: (_, __) =>
-                        Defaults.sizedBox.vertical.normal,
-                    itemCount: _metconDescriptions.length,
+                  )
+                : Container(
+                    padding: Defaults.edgeInsets.normal,
+                    child: ListView.separated(
+                      itemBuilder: (_, index) => MetconCard(
+                        metconDescription: dataProvider.entities[index],
+                      ),
+                      separatorBuilder: (_, __) =>
+                          Defaults.sizedBox.vertical.normal,
+                      itemCount: dataProvider.entities.length,
+                    ),
                   ),
-                ),
-        ),
-        bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
-          context,
-          SessionsPageTab.metcon,
-        ),
-        drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(AppIcons.add),
-          onPressed: () => Navigator.pushNamed(context, Routes.metcon.edit),
+          ),
+          bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
+            context: context,
+            sessionsPageTab: SessionsPageTab.metcon,
+          ),
+          drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
+          floatingActionButton: FloatingActionButton(
+            child: const Icon(AppIcons.add),
+            onPressed: () => Navigator.pushNamed(context, Routes.metcon.edit),
+          ),
         ),
       ),
     );
