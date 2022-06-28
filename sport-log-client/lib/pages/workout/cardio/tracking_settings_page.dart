@@ -22,7 +22,7 @@ class CardioTrackingSettingsPage extends StatefulWidget {
 class CardioTrackingSettingsPageState
     extends State<CardioTrackingSettingsPage> {
   Movement? _movement;
-  CardioType? _cardioType;
+  CardioType _cardioType = CardioType.training;
   Route? _route;
   final HeartRateUtils _heartRateUtils = HeartRateUtils();
 
@@ -54,18 +54,20 @@ class CardioTrackingSettingsPageState
               EditTile(
                 leading: AppIcons.sports,
                 caption: "Cardio Type",
-                child: Text(_cardioType?.toString() ?? ""),
+                child: Text("$_cardioType"),
                 onTap: () async {
-                  CardioType? cardioType = await showCardioTypePicker(
+                  final cardioType = await showCardioTypePicker(
                     context: context,
                   );
-                  setState(() => _cardioType = cardioType);
+                  if (cardioType != null) {
+                    setState(() => _cardioType = cardioType);
+                  }
                 },
               ),
               EditTile(
                 leading: AppIcons.map,
                 caption: "Route to follow",
-                child: Text(_route?.name ?? ""),
+                child: Text(_route?.name ?? "No Route"),
                 onTap: () async {
                   Route? route = await showRoutePicker(
                     context: context,
@@ -116,13 +118,13 @@ class CardioTrackingSettingsPageState
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _movement != null && _cardioType != null
+                  onPressed: _movement != null
                       ? () => Navigator.pushNamed(
                             context,
                             Routes.cardio.tracking,
                             arguments: [
                               _movement!,
-                              _cardioType!,
+                              _cardioType,
                               _route,
                               _heartRateUtils.deviceId != null
                                   ? _heartRateUtils

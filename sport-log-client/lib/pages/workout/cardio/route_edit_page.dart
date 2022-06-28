@@ -338,9 +338,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
                   Form(
                     key: _formKey,
                     child: TextFormField(
-                      onTap: () => setState(() {
-                        _listExpanded = false;
-                      }),
+                      onTap: () => setState(() => _listExpanded = false),
                       onChanged: (name) => setState(() => _route.name = name),
                       initialValue: _route.name,
                       validator: Validator.validateStringNotEmpty,

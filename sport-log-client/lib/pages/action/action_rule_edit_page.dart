@@ -142,8 +142,9 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                       labelText: "Arguments",
                     ),
                 initialValue: _actionRule.arguments,
-                onChanged: (arguments) => _actionRule.arguments =
-                    arguments.isEmpty ? null : arguments,
+                onChanged: (arguments) => setState(() {
+                  _actionRule.arguments = arguments.isEmpty ? null : arguments;
+                }),
               ),
             ],
           ),

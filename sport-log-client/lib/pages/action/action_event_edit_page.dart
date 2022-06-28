@@ -132,8 +132,9 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
                       labelText: "Arguments",
                     ),
                 initialValue: _actionEvent.arguments,
-                onChanged: (arguments) => _actionEvent.arguments =
-                    arguments.isEmpty ? null : arguments,
+                onChanged: (arguments) => setState(() {
+                  _actionEvent.arguments = arguments.isEmpty ? null : arguments;
+                }),
               ),
             ],
           ),

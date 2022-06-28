@@ -135,8 +135,9 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
                   keyboardType: TextInputType.multiline,
                   minLines: 1,
                   maxLines: 5,
-                  onChanged: (comments) =>
-                      _diary.comments = comments.isEmpty ? null : comments,
+                  onChanged: (comments) => setState(() {
+                    _diary.comments = comments.isEmpty ? null : comments;
+                  }),
                 ),
               ],
             ),
