@@ -24,6 +24,7 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/provider_consumer.dart';
 
 class CardioTrackingPage extends StatefulWidget {
   const CardioTrackingPage({
@@ -295,30 +296,28 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
             ),
             Container(
               padding: Defaults.edgeInsets.normal,
-              child: ChangeNotifierProvider.value(
+              child: ProviderConsumer<TrackingUtils>.value(
                 value: _trackingUtils,
-                child: Consumer<TrackingUtils>(
-                  builder: (context, trackingUtils, _) => Column(
-                    children: [
-                      CardioValueUnitDescriptionTable(
-                        cardioSessionDescription: _cardioSessionDescription,
-                        currentDuration: trackingUtils.currentDuration,
-                      ),
-                      Defaults.sizedBox.vertical.normal,
-                      _TrackingPageButtons(
-                        trackingUtils: trackingUtils,
-                        onStart: widget.heartRateUtils == null ||
-                                widget.heartRateUtils!.isActive
-                            ? () {
-                                trackingUtils.start();
-                                _cardioSessionDescription
-                                    .cardioSession.datetime = DateTime.now();
-                              }
-                            : null,
-                        onStop: _saveDialog,
-                      ),
-                    ],
-                  ),
+                builder: (context, trackingUtils, _) => Column(
+                  children: [
+                    CardioValueUnitDescriptionTable(
+                      cardioSessionDescription: _cardioSessionDescription,
+                      currentDuration: trackingUtils.currentDuration,
+                    ),
+                    Defaults.sizedBox.vertical.normal,
+                    _TrackingPageButtons(
+                      trackingUtils: trackingUtils,
+                      onStart: widget.heartRateUtils == null ||
+                              widget.heartRateUtils!.isActive
+                          ? () {
+                              trackingUtils.start();
+                              _cardioSessionDescription.cardioSession.datetime =
+                                  DateTime.now();
+                            }
+                          : null,
+                      onStop: _saveDialog,
+                    ),
+                  ],
                 ),
               ),
             ),
