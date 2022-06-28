@@ -9,7 +9,7 @@ import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
-import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
+import 'package:sport_log/pages/workout/cardio/cardio_chart.dart';
 import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -95,21 +95,11 @@ class CardioSessionsPage extends StatelessWidget {
                         child: Column(
                           children: [
                             if (dataProvider.isSelected) ...[
-                              DateTimeChart(
-                                chartValues: dataProvider.entities
-                                    .map(
-                                      (s) => DateTimeChartValue(
-                                        datetime: s.cardioSession.datetime,
-                                        value: (s.cardioSession.distance
-                                                    ?.toDouble() ??
-                                                0.0) /
-                                            1000,
-                                      ),
-                                    )
+                              CardioChart(
+                                cardioSessions: dataProvider.entities
+                                    .map((e) => e.cardioSession)
                                     .toList(),
                                 dateFilterState: dataProvider.dateFilter,
-                                yFromZero: true,
-                                aggregatorType: AggregatorType.sum,
                               ),
                               Defaults.sizedBox.vertical.normal,
                             ],

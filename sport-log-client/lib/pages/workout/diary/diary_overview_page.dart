@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/diary_data_provider.dart';
 import 'package:sport_log/defaults.dart';
@@ -57,13 +58,16 @@ class DiaryPage extends StatelessWidget {
                                 .any((d) => d.bodyweight != null)) ...[
                               DateTimeChart(
                                 chartValues: dataProvider.entities
-                                    .where((d) => d.bodyweight != null)
-                                    .map(
-                                      (s) => DateTimeChartValue(
-                                        datetime: s.date,
-                                        value: s.bodyweight ?? 0,
-                                      ),
-                                    )
+                                    .map((s) {
+                                      final value = s.bodyweight;
+                                      return value == null
+                                          ? null
+                                          : DateTimeChartValue(
+                                              datetime: s.date,
+                                              value: value,
+                                            );
+                                    })
+                                    .whereNotNull()
                                     .toList(),
                                 dateFilterState: dataProvider.dateFilter,
                                 yFromZero: false,

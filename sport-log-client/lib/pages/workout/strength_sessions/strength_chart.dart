@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -8,7 +9,7 @@ import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 
-enum SeriesType {
+enum _SeriesType {
   maxDistance, // m
   minTime, // mSecs
   sumCalories, // cal
@@ -21,91 +22,91 @@ enum SeriesType {
   @override
   String toString() {
     switch (this) {
-      case SeriesType.maxDistance:
+      case _SeriesType.maxDistance:
         return 'Best Distance';
-      case SeriesType.minTime:
+      case _SeriesType.minTime:
         return 'Best Time';
-      case SeriesType.sumCalories:
+      case _SeriesType.sumCalories:
         return 'Total Calories';
-      case SeriesType.maxEorm:
+      case _SeriesType.maxEorm:
         return 'Eorm';
-      case SeriesType.maxWeight:
+      case _SeriesType.maxWeight:
         return 'Max Weight';
-      case SeriesType.maxReps:
+      case _SeriesType.maxReps:
         return 'Max Reps';
-      case SeriesType.avgReps:
+      case _SeriesType.avgReps:
         return 'Avg Reps';
-      case SeriesType.sumVolume:
+      case _SeriesType.sumVolume:
         return 'Total Volume';
     }
   }
 
-  double statValue(StrengthSessionStats stats) {
+  double? value(StrengthSessionStats stats) {
     switch (this) {
-      case SeriesType.maxDistance:
+      case _SeriesType.maxDistance:
         return stats.maxCount.toDouble();
-      case SeriesType.minTime:
+      case _SeriesType.minTime:
         return stats.minCount.toDouble();
-      case SeriesType.sumCalories:
+      case _SeriesType.sumCalories:
         return stats.sumCount.toDouble();
-      case SeriesType.maxEorm:
-        return stats.maxEorm ?? 0;
-      case SeriesType.maxWeight:
-        return stats.maxWeight ?? 0;
-      case SeriesType.maxReps:
+      case _SeriesType.maxEorm:
+        return stats.maxEorm;
+      case _SeriesType.maxWeight:
+        return stats.maxWeight;
+      case _SeriesType.maxReps:
         return stats.maxCount.toDouble();
-      case SeriesType.avgReps:
+      case _SeriesType.avgReps:
         return stats.avgCount;
-      case SeriesType.sumVolume:
-        return stats.sumVolume ?? 0;
+      case _SeriesType.sumVolume:
+        return stats.sumVolume;
     }
   }
 
-  AggregatorType statAggregator() {
+  AggregatorType aggregator() {
     switch (this) {
-      case SeriesType.maxDistance:
+      case _SeriesType.maxDistance:
         return AggregatorType.max;
-      case SeriesType.minTime:
+      case _SeriesType.minTime:
         return AggregatorType.min;
-      case SeriesType.sumCalories:
+      case _SeriesType.sumCalories:
         return AggregatorType.sum;
-      case SeriesType.maxEorm:
+      case _SeriesType.maxEorm:
         return AggregatorType.max;
-      case SeriesType.maxWeight:
+      case _SeriesType.maxWeight:
         return AggregatorType.max;
-      case SeriesType.maxReps:
+      case _SeriesType.maxReps:
         return AggregatorType.max;
-      case SeriesType.avgReps:
+      case _SeriesType.avgReps:
         return AggregatorType.avg;
-      case SeriesType.sumVolume:
+      case _SeriesType.sumVolume:
         return AggregatorType.sum;
     }
   }
 
-  bool statYFromZero() => [
-        SeriesType.maxDistance,
-        SeriesType.maxReps,
-        SeriesType.avgReps,
-        SeriesType.sumVolume
+  bool isYFromZero() => [
+        _SeriesType.maxDistance,
+        _SeriesType.maxReps,
+        _SeriesType.avgReps,
+        _SeriesType.sumVolume
       ].contains(this);
 }
 
-List<SeriesType> getAvailableSeries(MovementDimension dim) {
+List<_SeriesType> _getAvailableSeries(MovementDimension dim) {
   switch (dim) {
     case MovementDimension.reps:
       return [
-        SeriesType.maxEorm,
-        SeriesType.maxWeight,
-        SeriesType.maxReps,
-        SeriesType.avgReps,
-        SeriesType.sumVolume,
+        _SeriesType.maxEorm,
+        _SeriesType.maxWeight,
+        _SeriesType.maxReps,
+        _SeriesType.avgReps,
+        _SeriesType.sumVolume,
       ];
     case MovementDimension.energy:
-      return [SeriesType.sumCalories];
+      return [_SeriesType.sumCalories];
     case MovementDimension.distance:
-      return [SeriesType.maxDistance];
+      return [_SeriesType.maxDistance];
     case MovementDimension.time:
-      return [SeriesType.minTime];
+      return [_SeriesType.minTime];
   }
 }
 
@@ -125,12 +126,12 @@ class StrengthChart extends StatefulWidget {
 
 class _StrengthChartState extends State<StrengthChart> {
   final _logger = Logger('StrengthChart');
-  late final availableSeries = getAvailableSeries(movementDimension);
+  late final availableSeries = _getAvailableSeries(movementDimension);
   MovementDimension get movementDimension =>
       widget.strengthSessionDescriptions.first.movement.dimension;
   bool get isTime => movementDimension == MovementDimension.time;
 
-  late SeriesType _selectedSeries = availableSeries.first;
+  late _SeriesType _selectedSeries = availableSeries.first;
   late List<StrengthSessionStats> _strengthSessionStats;
 
   @override
@@ -166,10 +167,10 @@ class _StrengthChartState extends State<StrengthChart> {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: SelectionBar(
-              onChange: (SeriesType type) =>
+              onChange: (_SeriesType type) =>
                   setState(() => _selectedSeries = type),
               items: availableSeries,
-              getLabel: (SeriesType type) => type.toString(),
+              getLabel: (_SeriesType type) => type.toString(),
               selectedItem: _selectedSeries,
             ),
           ),
@@ -177,16 +178,17 @@ class _StrengthChartState extends State<StrengthChart> {
         Defaults.sizedBox.vertical.small,
         DateTimeChart(
           chartValues: _strengthSessionStats
-              .map(
-                (s) => DateTimeChartValue(
-                  datetime: s.datetime,
-                  value: _selectedSeries.statValue(s),
-                ),
-              )
+              .map((s) {
+                final value = _selectedSeries.value(s);
+                return value == null
+                    ? null
+                    : DateTimeChartValue(datetime: s.datetime, value: value);
+              })
+              .whereNotNull()
               .toList(),
           dateFilterState: widget.dateFilterState,
-          yFromZero: _selectedSeries.statYFromZero(),
-          aggregatorType: _selectedSeries.statAggregator(),
+          yFromZero: _selectedSeries.isYFromZero(),
+          aggregatorType: _selectedSeries.aggregator(),
         ),
       ],
     );
