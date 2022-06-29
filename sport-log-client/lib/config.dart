@@ -26,7 +26,8 @@ class Config extends JsonSerializable {
 
   factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
 
-  static late final Config instance;
+  static late final Config _instance;
+  static Config get instance => _instance;
 
   static Future<void> init() async {
     try {
@@ -35,14 +36,12 @@ class Config extends JsonSerializable {
               : loadYaml(await rootBundle.loadString('sport-log-client.yaml')))
           as YamlMap;
 
-      if (releaseMode) {
-        instance = Config.fromJson(map["release"]! as Map<String, dynamic>);
-      } else if (profileMode) {
-        instance = Config.fromJson(map["profile"]! as Map<String, dynamic>);
-      } else {
-        instance =
-            Config.fromJson((map["debug"]! as YamlMap).cast<String, dynamic>());
-      }
+      final instance = releaseMode
+          ? map["release"]! as YamlMap
+          : profileMode
+              ? map["profile"]! as YamlMap
+              : map["debug"]! as YamlMap;
+      _instance = Config.fromJson(instance.cast<String, dynamic>());
     } on YamlException catch (e) {
       _logger.i("sport-log-client.yaml is not a valid YAML file: $e");
       exit(1);
