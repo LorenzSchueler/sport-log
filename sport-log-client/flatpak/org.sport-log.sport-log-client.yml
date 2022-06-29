@@ -33,7 +33,7 @@ modules:
       - install -Dm644 app_icon.png /app/share/icons/hicolor/256x256/apps/org.sport_log.sport_log_client.png
     sources:
       - type: dir
-        path: ../build/linux/x64/debug/bundle
+        path: ../build/linux/x64/release/bundle
         dest: bundle
       - type: file
         path: org.sport-log.sport-log-client.desktop
@@ -42,7 +42,7 @@ modules:
       - type: file
         path: app_icon.png
 
-# flutter build linux --debug
+# flutter build linux --release
 
 # build only
 # flatpak-builder --user --force-clean --state-dir ../.flatpak-builder ../flatpak-build flatpak/org.sport-log.sport-log-client.yml

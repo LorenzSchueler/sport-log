@@ -60,7 +60,7 @@ jobs:
       run: flutter pub get
     - name: Build APK
       working-directory: sport-log-client
-      run: flutter build apk --flavor production
+      run: flutter build apk --release --flavor production
       env:
         SDK_REGISTRY_TOKEN: ${{ secrets.SDK_REGISTRY_TOKEN }}
 
@@ -81,7 +81,7 @@ jobs:
       run: flutter config --enable-linux-desktop
     - name: Build Linux
       working-directory: sport-log-client
-      run: flutter build linux --debug
+      run: flutter build linux --release
       env:
         SDK_REGISTRY_TOKEN: ${{ secrets.SDK_REGISTRY_TOKEN }}
     - name: Setup Flatpak
