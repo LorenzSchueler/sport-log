@@ -190,9 +190,11 @@ class DurationChart extends StatelessWidget {
               ),
             ),
             gridData: FlGridData(
-              getDrawingHorizontalLine: gridLineDrawer(context),
+              getDrawingHorizontalLine:
+                  gridLineDrawer(context: context, color: Colors.black),
               verticalInterval: xInterval,
-              getDrawingVerticalLine: gridLineDrawer(context),
+              getDrawingVerticalLine:
+                  gridLineDrawer(context: context, color: Colors.black),
             ),
             borderData: FlBorderData(show: false),
           ),

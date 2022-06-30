@@ -42,7 +42,7 @@ class WeekChart extends DateTimePeriodChart {
               Text(shortWeekdayNameOfInt(value.round())),
         ),
         gridData: FlGridData(
-          getDrawingHorizontalLine: gridLineDrawer(context),
+          getDrawingHorizontalLine: gridLineDrawer(context: context),
           drawVerticalLine: false,
         ),
         borderData: FlBorderData(show: false),

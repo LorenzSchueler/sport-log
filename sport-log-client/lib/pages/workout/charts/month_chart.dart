@@ -42,9 +42,9 @@ class MonthChart extends DateTimePeriodChart {
               value % 2 == 0 ? Text(value.round().toString()) : const Text(""),
         ),
         gridData: FlGridData(
-          getDrawingHorizontalLine: gridLineDrawer(context),
+          getDrawingHorizontalLine: gridLineDrawer(context: context),
           verticalInterval: 1,
-          getDrawingVerticalLine: gridLineDrawer(context),
+          getDrawingVerticalLine: gridLineDrawer(context: context),
         ),
         borderData: FlBorderData(show: false),
       ),

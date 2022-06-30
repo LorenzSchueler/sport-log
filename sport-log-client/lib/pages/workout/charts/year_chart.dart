@@ -48,11 +48,11 @@ class YearChart extends DateTimePeriodChart {
                   : const Text(""),
         ),
         gridData: FlGridData(
-          getDrawingHorizontalLine: gridLineDrawer(context),
+          getDrawingHorizontalLine: gridLineDrawer(context: context),
           verticalInterval: 1,
           checkToShowVerticalLine: (value) =>
               startDateTime.add(Duration(days: value.round())).day == 1,
-          getDrawingVerticalLine: gridLineDrawer(context),
+          getDrawingVerticalLine: gridLineDrawer(context: context),
         ),
         borderData: FlBorderData(show: false),
       ),
