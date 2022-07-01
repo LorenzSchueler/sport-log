@@ -184,6 +184,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
+    // TODO filter GPS jumps (but allow initial ones)
     _locationInfo = """provider:   ${location.provider}
 accuracy: ${location.accuracy?.toInt()} m
 time: ${location.time! ~/ 1000} s

@@ -56,8 +56,10 @@ class RoutePage extends StatelessWidget {
                 : Container(
                     padding: Defaults.edgeInsets.normal,
                     child: ListView.separated(
-                      itemBuilder: (_, index) =>
-                          RouteCard(route: dataProvider.entities[index]),
+                      itemBuilder: (_, index) => RouteCard(
+                        route: dataProvider.entities[index],
+                        key: ValueKey(dataProvider.entities[index].id),
+                      ),
                       separatorBuilder: (_, __) =>
                           Defaults.sizedBox.vertical.normal,
                       itemCount: dataProvider.entities.length,
