@@ -100,8 +100,9 @@ class TimerUtils {
     Wakelock.enable();
   }
 
-  final AudioCache _player = AudioCache(prefix: "assets/audio/")
-    ..loadAll(['beep_long.mp3', 'beep_short.mp3']);
+  final _player = AudioPlayer();
+  final _beepLong = AssetSource('audio/beep_long.mp3');
+  final _beepShort = AssetSource('audio/beep_short.mp3');
 
   static const initialCountdown = Duration(seconds: 10);
 
@@ -128,11 +129,11 @@ class TimerUtils {
   void _tickCallback() {
     onTick();
     if (_currentTime.inSeconds == 0) {
-      _player.play('beep_long.mp3');
+      _player.play(_beepLong);
     } else if (_currentTime >=
         totalTime * (timerType == TimerType.interval ? rounds : 1)) {
       stopTimer();
-      _player.play('beep_long.mp3');
+      _player.play(_beepLong);
     } else if (_currentTime.inSeconds > 0 && timerType == TimerType.interval) {
       final roundStart =
           Duration(seconds: _currentTime.inSeconds % totalTime.inSeconds)
@@ -143,7 +144,7 @@ class TimerUtils {
           ).inSeconds ==
           0;
       if (roundStart || restStart) {
-        _player.play('beep_short.mp3');
+        _player.play(_beepShort);
       }
     }
   }
