@@ -31,8 +31,16 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   late CardioSessionDescription _cardioSessionDescription;
 
   late MapboxMapController _mapController;
-  List<double>? currentChartXValues;
-  List<double>? currentChartYValues;
+  Circle? _circle;
+  double? _speed;
+  int? _elevation;
+  int? _heartRate;
+  int? _cadence;
+
+  static const _speedColor = Colors.blue;
+  static const _elevationColor = Colors.white;
+  static const _heartRateColor = Colors.orange;
+  static const _cadenceColor = Colors.green;
 
   @override
   void initState() {
@@ -151,39 +159,56 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                     ),
                   ),
                 ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: currentChartYValues
-                                ?.map((e) => Text(e.toString()))
-                                .toList() ??
-                            [],
-                      ),
-                      DurationChart(
-                        chartLines: [
-                          _speedLine(),
-                          _elevationLine(),
-                          _cadenceLine(),
-                          _heartRateLine()
+                if (_cardioSessionDescription.cardioSession.track != null)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      color: const Color.fromARGB(120, 0, 0, 0),
+                      child: Column(
+                        children: [
+                          if (_speed != null &&
+                              _elevation != null &&
+                              _heartRate != null &&
+                              _cadence != null)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  "${_speed} km/h",
+                                  style: const TextStyle(color: _speedColor),
+                                ),
+                                Text(
+                                  "${_elevation} m",
+                                  style:
+                                      const TextStyle(color: _elevationColor),
+                                ),
+                                Text(
+                                  "${_heartRate} bpm",
+                                  style:
+                                      const TextStyle(color: _heartRateColor),
+                                ),
+                                Text(
+                                  "${_cadence} rpm",
+                                  style: const TextStyle(color: _cadenceColor),
+                                ),
+                              ],
+                            ),
+                          DurationChart(
+                            chartLines: [
+                              _speedLine(),
+                              _elevationLine(),
+                              _cadenceLine(),
+                              _heartRateLine()
+                            ],
+                            yFromZero: true,
+                            touchCallback: _touchCallback,
+                          ),
                         ],
-                        yFromZero: true,
-                        rightYScaleFactor: 5,
-                        touchCallback: (xValues, yValues) {
-                          setState(() {
-                            currentChartXValues = xValues;
-                            currentChartYValues = yValues;
-                          });
-                        },
                       ),
-                    ],
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -192,13 +217,6 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
             color: Theme.of(context).colorScheme.background,
             child: Column(
               children: [
-                // TODO remove
-                if (_cardioSessionDescription.cardioSession.track != null &&
-                    _cardioSessionDescription.cardioSession.track!.isNotEmpty)
-                  IconButton(
-                    onPressed: _exportFile,
-                    icon: const Icon(AppIcons.download),
-                  ),
                 CardioValueUnitDescriptionTable(
                   cardioSessionDescription: _cardioSessionDescription,
                   currentDuration: null,
@@ -219,7 +237,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   }
 
   DurationChartLine _speedLine() => DurationChartLine.fromUngroupedChartValues(
-        chartValues: _cardioSessionDescription.cardioSession.track
+        ungroupedChartValues: _cardioSessionDescription.cardioSession.track
                 ?.groupListsBy(
                   (p) => Duration(minutes: p.time.inMinutes),
                 )
@@ -240,13 +258,12 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
           ..sort(
             (v1, v2) => v1.duration.compareTo(v2.duration),
           ),
-        lineColor: Colors.blue,
-        isRight: true,
+        lineColor: _speedColor,
       );
 
   DurationChartLine _elevationLine() =>
       DurationChartLine.fromUngroupedChartValues(
-        chartValues: _cardioSessionDescription.cardioSession.track
+        ungroupedChartValues: _cardioSessionDescription.cardioSession.track
                 ?.map(
                   (t) => DurationChartValue(
                     duration: t.time,
@@ -255,20 +272,17 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                 )
                 .toList() ??
             [],
-        lineColor: Colors.white,
-        isRight: true,
+        lineColor: _elevationColor,
       );
 
   DurationChartLine _heartRateLine() => DurationChartLine.fromDurationList(
         durations: _cardioSessionDescription.cardioSession.heartRate ?? [],
-        lineColor: Colors.red,
-        isRight: false,
+        lineColor: _heartRateColor,
       );
 
   DurationChartLine _cadenceLine() => DurationChartLine.fromDurationList(
         durations: _cardioSessionDescription.cardioSession.cadence ?? [],
-        lineColor: Colors.orange,
-        isRight: false,
+        lineColor: _cadenceColor,
       );
 
   Future<void> _exportFile() async {
@@ -282,5 +296,31 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
         text: 'Track exported to $file',
       );
     }
+  }
+
+  Future<void> _touchCallback(Duration? y) async {
+    final pos = y != null
+        ? _cardioSessionDescription.cardioSession.track?.reversed
+            .firstWhereOrNull((pos) => pos.time <= y)
+        : null;
+
+    setState(() {
+      double? speed = pos != null
+          ? _cardioSessionDescription.cardioSession.currentSpeed(pos.time)
+          : null;
+      if (speed != null) {
+        speed = (speed * 10).round() / 10;
+      }
+      _speed = speed;
+      _elevation = pos?.elevation.round();
+      _heartRate = pos != null
+          ? _cardioSessionDescription.cardioSession.currentHeartRate(pos.time)
+          : null;
+      _cadence = pos != null
+          ? _cardioSessionDescription.cardioSession.currentCadence(pos.time)
+          : null;
+    });
+
+    _circle = await _mapController.updateLocationMarker(_circle, pos?.latLng);
   }
 }

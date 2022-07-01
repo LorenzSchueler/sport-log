@@ -9,51 +9,62 @@ import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';
 class DurationChartValue {
   DurationChartValue({required this.duration, required this.value});
 
-  final Duration duration;
-  final double value;
+  Duration duration;
+  double value;
 
   @override
   String toString() => "$duration: $value";
 }
 
 class DurationChartLine {
-  DurationChartLine.fromUngroupedChartValues({
-    required List<DurationChartValue> chartValues,
-    required this.lineColor,
-    required this.isRight,
-  }) : chartValues = chartValues
-            .groupListsBy((v) => _groupFunction(v.duration))
-            .entries
-            .map(
-              (entry) => DurationChartValue(
-                duration: entry.key,
-                value: entry.value.map((v) => v.value).average,
-              ),
-            )
-            .toList()
-          ..sort((v1, v2) => v1.duration.compareTo(v2.duration));
+  DurationChartLine._(this.chartValues, this.lineColor);
 
-  DurationChartLine.fromDurationList({
+  factory DurationChartLine.fromUngroupedChartValues({
+    required List<DurationChartValue> ungroupedChartValues,
+    required Color lineColor,
+  }) {
+    final List<DurationChartValue> chartValues = ungroupedChartValues
+        .groupListsBy((v) => _groupFunction(v.duration))
+        .entries
+        .map(
+          (entry) => DurationChartValue(
+            duration: entry.key,
+            value: entry.value.map((v) => v.value).average,
+          ),
+        )
+        .toList()
+      ..sort((v1, v2) => v1.duration.compareTo(v2.duration));
+    final maxValue = chartValues.map((e) => e.value).maxOrNull;
+    if (maxValue != null && maxValue > 0) {
+      chartValues.map((e) => e..value /= maxValue).toList();
+    }
+    return DurationChartLine._(chartValues, lineColor);
+  }
+
+  factory DurationChartLine.fromDurationList({
     required List<Duration> durations,
-    required this.lineColor,
-    required this.isRight,
-  }) : chartValues = durations
-            .groupListsBy(_groupFunction)
-            .entries
-            .map(
-              (entry) => DurationChartValue(
-                duration: entry.key,
-                value: entry.value.length.toDouble(),
-              ),
-            )
-            .toList()
-          ..sort((v1, v2) => v1.duration.compareTo(v2.duration));
+    required Color lineColor,
+  }) {
+    final chartValues = durations
+        .groupListsBy(_groupFunction)
+        .entries
+        .map(
+          (entry) => DurationChartValue(
+            duration: entry.key,
+            value: entry.value.length.toDouble(),
+          ),
+        )
+        .toList()
+      ..sort((v1, v2) => v1.duration.compareTo(v2.duration));
+    final maxValue = chartValues.map((e) => e.value).maxOrNull;
+    if (maxValue != null) {
+      chartValues.map((e) => e..value /= maxValue).toList();
+    }
+    return DurationChartLine._(chartValues, lineColor);
+  }
 
   final List<DurationChartValue> chartValues;
   final Color lineColor;
-  final bool isRight;
-
-  int yScaleFactor(int yScaleFactor) => isRight ? yScaleFactor : 1;
 
   static Duration _groupFunction(Duration duration) {
     // if max - min duration > ...
@@ -61,79 +72,68 @@ class DurationChartLine {
   }
 }
 
-class DurationChart extends StatelessWidget {
-  const DurationChart({
+class DurationChart extends StatefulWidget {
+  DurationChart({
     required this.chartLines,
     required this.yFromZero,
-    required this.rightYScaleFactor,
     this.touchCallback,
     super.key,
-  });
+  })  : xInterval = chartLines
+            .map(
+              (chartLine) =>
+                  max(
+                    1.0,
+                    (chartLine.chartValues.lastOrNull?.duration.inMinutes ??
+                            0) /
+                        6,
+                  ).ceil().toDouble() *
+                  60 *
+                  1000,
+            )
+            .max,
+        maxX = chartLines
+            .map(
+              (chartLine) =>
+                  ((chartLine.chartValues.lastOrNull?.duration.inMinutes ?? 0) +
+                      1) *
+                  60 *
+                  1000,
+            )
+            .max
+            .toDouble();
 
   final List<DurationChartLine> chartLines;
   final bool yFromZero;
-  final int rightYScaleFactor;
-  final Function(List<double>? x, List<double>? y)? touchCallback;
+  final Function(Duration? x)? touchCallback;
+
+  final double xInterval;
+  final double maxX;
+
+  static Color color = Colors.black;
+
+  @override
+  State<DurationChart> createState() => _DurationChartState();
+}
+
+class _DurationChartState extends State<DurationChart> {
+  double? lastX;
 
   @override
   Widget build(BuildContext context) {
-    double minY = yFromZero
-        ? 0.0
-        : chartLines
-            .map(
-              (chartLine) =>
-                  (chartLine.chartValues.map((v) => v.value).minOrNull ?? 0) /
-                  chartLine.yScaleFactor(rightYScaleFactor).floor().toDouble(),
-            )
-            .min;
-    double maxY = chartLines
-        .map(
-          (chartLine) =>
-              (chartLine.chartValues.map((v) => v.value).maxOrNull ?? 0) /
-              chartLine.yScaleFactor(rightYScaleFactor).ceil().toDouble(),
-        )
-        .max;
-    if (maxY == minY) {
-      maxY += 1;
-      minY -= 1;
-    }
-
-    double xInterval = chartLines
-        .map(
-          (chartLine) =>
-              max(
-                1.0,
-                (chartLine.chartValues.lastOrNull?.duration.inMinutes ?? 0) / 6,
-              ).ceil().toDouble() *
-              60 *
-              1000,
-        )
-        .max;
-    double maxX = chartLines
-        .map(
-          (chartLine) =>
-              ((chartLine.chartValues.lastOrNull?.duration.inMinutes ?? 0) +
-                  1) *
-              60 *
-              1000,
-        )
-        .max
-        .toDouble();
-
     return Padding(
-      padding: const EdgeInsets.fromLTRB(5, 0, 25, 0),
+      padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
       child: AspectRatio(
         aspectRatio: 1.8,
         child: LineChart(
           LineChartData(
             lineBarsData: [
-              for (final chartLine in chartLines)
+              for (final chartLine in widget.chartLines)
                 LineChartBarData(
                   spots: chartLine.chartValues
                       .map(
                         (v) => FlSpot(
                           v.duration.inMilliseconds.toDouble(),
-                          v.value / chartLine.yScaleFactor(rightYScaleFactor),
+                          v.value,
                         ),
                       )
                       .toList(),
@@ -141,58 +141,59 @@ class DurationChart extends StatelessWidget {
                   dotData: FlDotData(show: false),
                 ),
             ],
-            minY: minY,
-            maxY: maxY,
+            minY: 0,
+            maxY: 1,
             minX: 0.0,
-            maxX: maxX,
+            maxX: widget.maxX,
+            extraLinesData: lastX == null
+                ? null
+                : ExtraLinesData(verticalLines: [VerticalLine(x: lastX!)]),
             lineTouchData: LineTouchData(
+              enabled: false,
               touchSpotThreshold: double.infinity, // always get nearest point
               touchCallback: (event, response) {
-                if (event is FlPanDownEvent || event is FlPanUpdateEvent) {
-                  final yValues =
-                      response?.lineBarSpots?.map((e) => e.y).toList();
+                if (event is FlLongPressStart ||
+                    event is FlLongPressMoveUpdate) {
                   final xValues =
                       response?.lineBarSpots?.map((e) => e.x).toList();
-                  touchCallback?.call(xValues, yValues);
-                } else if (event is FlPanCancelEvent ||
-                    event is FlPanEndEvent) {
-                  touchCallback?.call(null, null);
+                  final xValue = xValues == null || xValues.isEmpty
+                      ? null
+                      : xValues[xValues.length ~/ 2]; // median
+                  if (xValue != null && xValue != lastX) {
+                    setState(() => lastX = xValue);
+                    widget.touchCallback
+                        ?.call(Duration(milliseconds: xValue.round()));
+                  }
+                } else if (event is FlLongPressEnd) {
+                  widget.touchCallback?.call(null);
+                  setState(() => lastX = null);
                 }
               },
             ),
             titlesData: FlTitlesData(
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 30,
-                  getTitlesWidget: (value, _) =>
-                      Text((value * rightYScaleFactor).round().toString()),
-                ),
-              ),
+              rightTitles:
+                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  interval: xInterval,
+                  interval: widget.xInterval,
                   getTitlesWidget: (value, _) => Text(
-                    value.round() % xInterval.round() == 0
+                    value.round() % widget.xInterval.round() == 0 &&
+                            value.round() > 0
                         ? Duration(milliseconds: value.round()).formatHm
-                        : "", // remove label at last value
+                        : "", // remove label at 0 and last value
+                    style: TextStyle(color: DurationChart.color),
                   ),
-                  reservedSize: 35,
+                  reservedSize: 20,
                 ),
               ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 30,
-                ),
-              ),
+              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
             gridData: FlGridData(
               getDrawingHorizontalLine:
                   gridLineDrawer(context: context, color: Colors.black),
-              verticalInterval: xInterval,
+              verticalInterval: widget.xInterval,
               getDrawingVerticalLine:
                   gridLineDrawer(context: context, color: Colors.black),
             ),

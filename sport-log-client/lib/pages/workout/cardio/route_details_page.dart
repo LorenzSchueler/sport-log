@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:provider/provider.dart';
@@ -7,12 +8,12 @@ import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/gpx.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/cardio/route.dart';
-import 'package:sport_log/pages/workout/charts/duration_chart.dart';
+import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
+import 'package:sport_log/pages/workout/charts/distance_chart.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
-import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RouteDetailsPage extends StatefulWidget {
   const RouteDetailsPage({required this.route, super.key});
@@ -27,8 +28,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
   late Route _route;
 
   late MapboxMapController _mapController;
-  List<double>? currentChartXValues;
-  List<double>? currentChartYValues;
+  Circle? _circle;
 
   @override
   void initState() {
@@ -38,13 +38,6 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    TableRow rowSpacer = TableRow(
-      children: [
-        Defaults.sizedBox.vertical.normal,
-        Defaults.sizedBox.vertical.normal,
-      ],
-    );
-
     return Scaffold(
       appBar: AppBar(
         title: Text(_route.name),
@@ -112,66 +105,28 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
                           ],
                         ),
                       ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: currentChartYValues
-                                ?.map((e) => Text(e.toString()))
-                                .toList() ??
-                            [],
-                      ),
-                      DurationChart(
+                if (_route.track != null)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      color: const Color.fromARGB(120, 0, 0, 0),
+                      child: DistanceChart(
                         chartLines: [_elevationLine()],
                         yFromZero: true,
-                        rightYScaleFactor: 5,
-                        touchCallback: (xValues, yValues) {
-                          setState(() {
-                            currentChartXValues = xValues;
-                            currentChartYValues = yValues;
-                          });
-                        },
+                        touchCallback: _touchCallback,
                       ),
-                    ],
+                    ),
                   ),
-                ),
               ],
             ),
           ),
           Container(
             padding: Defaults.edgeInsets.normal,
             color: Theme.of(context).colorScheme.background,
-            child: Column(
-              children: [
-                // TODO remove
-                if (_route.track != null && _route.track!.isNotEmpty)
-                  IconButton(
-                    onPressed: _exportFile,
-                    icon: const Icon(AppIcons.download),
-                  ),
-                Table(
-                  children: [
-                    TableRow(
-                      children: [
-                        ValueUnitDescription.distance(_route.distance),
-                        ValueUnitDescription.name(_route.name)
-                      ],
-                    ),
-                    rowSpacer,
-                    TableRow(
-                      children: [
-                        ValueUnitDescription.ascent(_route.ascent),
-                        ValueUnitDescription.descent(_route.descent),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+            child: RouteValueUnitDescriptionTable(
+              route: _route,
             ),
           ),
         ],
@@ -179,19 +134,18 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
     );
   }
 
-  DurationChartLine _elevationLine() =>
-      DurationChartLine.fromUngroupedChartValues(
+  DistanceChartLine _elevationLine() =>
+      DistanceChartLine.fromUngroupedChartValues(
         chartValues: _route.track
                 ?.map(
-                  (t) => DurationChartValue(
-                    duration: t.time,
+                  (t) => DistanceChartValue(
+                    distance: t.distance,
                     value: t.elevation,
                   ),
                 )
                 .toList() ??
             [],
         lineColor: Colors.white,
-        isRight: true,
       );
 
   Future<void> _exportFile() async {
@@ -202,5 +156,15 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
         text: 'Track exported to $file',
       );
     }
+  }
+
+  Future<void> _touchCallback(Duration? y) async {
+    final latLng = y != null
+        ? _route.track?.reversed
+            .firstWhereOrNull((pos) => pos.time <= y)
+            ?.latLng
+        : null;
+
+    _circle = await _mapController.updateLocationMarker(_circle, latLng);
   }
 }
