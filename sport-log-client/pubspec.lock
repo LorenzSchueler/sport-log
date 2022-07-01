@@ -93,7 +93,7 @@ packages:
     source: hosted
     version: "1.0.0"
   audioplayers_web:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: audioplayers_web
       url: "https://pub.dartlang.org"
