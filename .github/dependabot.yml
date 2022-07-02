@@ -3,9 +3,13 @@
 # Please see the documentation for all configuration options:
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 
-version: 1
+version: 2
 updates:
   - package-ecosystem: "cargo" # See documentation for possible values
     directory: "/" # Location of package manifests
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "pub" # See documentation for possible values
+    directory: "/sport-log-client/" # Location of package manifests
     schedule:
       interval: "daily"
