@@ -38,7 +38,7 @@ class _MapPageState extends State<MapPage> {
   List<MapBoxPlace> _searchResults = [];
   bool _searchResultsVisible = false;
 
-  List<Circle> _circles = [];
+  List<Circle> _currentLocationMarker = [];
   double _metersPerPixel = 1;
   String _mapStyle = MapboxStyles.OUTDOORS;
   bool _hillshade = false;
@@ -72,8 +72,8 @@ class _MapPageState extends State<MapPage> {
 
   Future<void> _onLocationUpdate(LocationData location) async {
     await _mapController.animateCenter(location.latLng);
-    _circles = await _mapController.updateCurrentLocationMarker(
-      _circles,
+    _currentLocationMarker = await _mapController.updateCurrentLocationMarker(
+      _currentLocationMarker,
       location.latLng,
     );
   }
@@ -204,10 +204,11 @@ class _MapPageState extends State<MapPage> {
                       onPressed: () async {
                         if (_locationUtils.enabled) {
                           _locationUtils.stopLocationStream();
-                          if (_circles.isNotEmpty) {
-                            await _mapController.removeCircles(_circles);
+                          if (_currentLocationMarker.isNotEmpty) {
+                            await _mapController
+                                .removeCircles(_currentLocationMarker);
                           }
-                          _circles = [];
+                          _currentLocationMarker = [];
                         } else {
                           await _locationUtils.startLocationStream();
                         }

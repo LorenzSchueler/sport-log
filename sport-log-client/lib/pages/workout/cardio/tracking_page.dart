@@ -60,7 +60,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
 
   late final MapboxMapController _mapController;
   late Line _line;
-  List<Circle> _circles = [];
+  List<Circle> _currentLocationMarker = [];
 
   @override
   void initState() {
@@ -193,8 +193,8 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
 
     await _mapController.animateCenter(location.latLng);
 
-    _circles = await _mapController.updateCurrentLocationMarker(
-      _circles,
+    _currentLocationMarker = await _mapController.updateCurrentLocationMarker(
+      _currentLocationMarker,
       location.latLng,
     );
 

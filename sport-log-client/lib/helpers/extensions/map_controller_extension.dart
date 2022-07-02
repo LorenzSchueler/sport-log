@@ -81,6 +81,23 @@ extension MapControllerExtension on MapboxMapController {
     );
   }
 
+  Future<Line?> updateRouteLine(Line? line, List<Position>? track) async {
+    if (line != null) {
+      await removeLine(line);
+      line = null;
+    }
+    if (track != null) {
+      line = await addLine(
+        LineOptions(
+          lineColor: Defaults.mapbox.routeLineColor,
+          lineWidth: 2,
+          geometry: track.latLngs,
+        ),
+      );
+    }
+    return line;
+  }
+
   Future<Line> addTrackLine(List<Position> track) {
     return addLine(
       LineOptions(
@@ -91,11 +108,21 @@ extension MapControllerExtension on MapboxMapController {
     );
   }
 
-  Future<void> updateTrackLine(Line line, List<Position> track) async {
-    await updateLine(
-      line,
-      LineOptions(geometry: track.latLngs),
-    );
+  Future<Line?> updateTrackLine(Line? line, List<Position>? track) async {
+    if (line != null) {
+      await removeLine(line);
+      line = null;
+    }
+    if (track != null) {
+      line = await addLine(
+        LineOptions(
+          lineColor: Defaults.mapbox.trackLineColor,
+          lineWidth: 2,
+          geometry: track.latLngs,
+        ),
+      );
+    }
+    return line;
   }
 
   Future<List<Circle>> addCurrentLocationMarker(LatLng latLng) {
