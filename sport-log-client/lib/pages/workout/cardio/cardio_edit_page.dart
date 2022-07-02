@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:provider/provider.dart';
@@ -47,6 +48,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
   late CardioSessionDescription _cardioSessionDescription;
   Duration? _cutStartDuration;
   Duration? _cutEndDuration;
+  Circle? _cutStartLocationMarker;
+  Circle? _cutEndLocationMarker;
 
   @override
   void initState() {
@@ -101,7 +104,30 @@ class _CardioEditPageState extends State<CardioEditPage> {
     _cutStartDuration = null;
     _cutEndDuration = null;
     setState(() {});
+    _updateCutLocationMarker();
     _setBoundsAndLines();
+  }
+
+  Future<void> _updateCutLocationMarker() async {
+    final startLatLng = _cutStartDuration != null
+        ? _cardioSessionDescription.cardioSession.track
+            ?.firstWhereOrNull((pos) => pos.time >= _cutStartDuration!)
+            ?.latLng
+        : null;
+    final endLatLng = _cutEndDuration != null
+        ? _cardioSessionDescription.cardioSession.track?.reversed
+            .firstWhereOrNull((pos) => pos.time <= _cutEndDuration!)
+            ?.latLng
+        : null;
+
+    _cutStartLocationMarker = await _mapController?.updateLocationMarker(
+      _cutStartLocationMarker,
+      startLatLng,
+    );
+    _cutEndLocationMarker = await _mapController?.updateLocationMarker(
+      _cutEndLocationMarker,
+      endLatLng,
+    );
   }
 
   Future<void> _setBoundsAndLines() async {
@@ -136,11 +162,14 @@ class _CardioEditPageState extends State<CardioEditPage> {
             if (_cutStartDuration == null &&
                 _cardioSessionDescription.cardioSession.time != null)
               IconButton(
-                onPressed: () => setState(() {
-                  _cutStartDuration = Duration.zero;
-                  _cutEndDuration =
-                      _cardioSessionDescription.cardioSession.time;
-                }),
+                onPressed: () {
+                  setState(() {
+                    _cutStartDuration = Duration.zero;
+                    _cutEndDuration =
+                        _cardioSessionDescription.cardioSession.time;
+                  });
+                  _updateCutLocationMarker();
+                },
                 icon: const Icon(AppIcons.cut),
               ),
             IconButton(
@@ -153,29 +182,28 @@ class _CardioEditPageState extends State<CardioEditPage> {
             )
           ],
         ),
-        body: Container(
-          padding: Defaults.edgeInsets.normal,
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              children: [
-                if (_cardioSessionDescription.cardioSession.track != null)
-                  SizedBox(
-                    height: 150,
-                    child: MapboxMap(
-                      accessToken: Config.instance.accessToken,
-                      styleString: MapboxStyles.OUTDOORS,
-                      initialCameraPosition:
-                          context.read<Settings>().lastMapPosition,
-                      onMapCreated: (MapboxMapController controller) =>
-                          _mapController = controller,
-                      onStyleLoadedCallback: _setBoundsAndLines,
-                    ),
-                  ),
-                _cutStartDuration != null && _cutEndDuration != null
-                    ? Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
+        body: Column(
+          children: [
+            if (_cardioSessionDescription.cardioSession.track != null)
+              SizedBox(
+                height: 250,
+                child: MapboxMap(
+                  accessToken: Config.instance.accessToken,
+                  styleString: MapboxStyles.OUTDOORS,
+                  initialCameraPosition:
+                      context.read<Settings>().lastMapPosition,
+                  onMapCreated: (MapboxMapController controller) =>
+                      _mapController = controller,
+                  onStyleLoadedCallback: _setBoundsAndLines,
+                ),
+              ),
+            Form(
+              key: _formKey,
+              child: Expanded(
+                child: ListView(
+                  padding: Defaults.edgeInsets.normal,
+                  children: _cutStartDuration != null && _cutEndDuration != null
+                      ? [
                           Defaults.sizedBox.vertical.normal,
                           Row(
                             children: [
@@ -194,6 +222,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                                       setState(
                                         () => _cutStartDuration = duration,
                                       );
+                                      await _updateCutLocationMarker();
                                     }
                                   },
                                 ),
@@ -213,12 +242,16 @@ class _CardioEditPageState extends State<CardioEditPage> {
                                       setState(
                                         () => _cutEndDuration = duration,
                                       );
+                                      await _updateCutLocationMarker();
                                     }
                                   },
-                                  onCancel: () => setState(() {
-                                    _cutStartDuration = null;
-                                    _cutEndDuration = null;
-                                  }),
+                                  onCancel: () {
+                                    setState(() {
+                                      _cutStartDuration = null;
+                                      _cutEndDuration = null;
+                                    });
+                                    _updateCutLocationMarker();
+                                  },
                                 ),
                               ),
                             ],
@@ -235,11 +268,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
                               ],
                             ),
                           ),
-                        ],
-                      )
-                    : Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
+                        ]
+                      : [
                           EditTile(
                             leading: AppIcons.exercise,
                             caption: "Movement",
@@ -556,10 +586,10 @@ class _CardioEditPageState extends State<CardioEditPage> {
                             maxLines: 5,
                           ),
                         ],
-                      ),
-              ],
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
