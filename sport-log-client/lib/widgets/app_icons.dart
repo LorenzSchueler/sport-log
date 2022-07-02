@@ -44,6 +44,7 @@ class AppIcons {
   static const IconData fileDownload = Icons.file_download_rounded;
   static const IconData dragHandle = Icons.drag_handle_rounded;
   static const IconData upload = Icons.upload_rounded;
+  static const IconData cut = Icons.cut_rounded;
 
   // arrows
   static const IconData arrowBack = Icons.arrow_back_rounded;

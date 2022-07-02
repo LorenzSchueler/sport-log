@@ -30,10 +30,10 @@ class CardioDetailsPage extends StatefulWidget {
 class _CardioDetailsPageState extends State<CardioDetailsPage> {
   late CardioSessionDescription _cardioSessionDescription;
 
-  late MapboxMapController _mapController;
+  MapboxMapController? _mapController;
   Line? _trackLine;
   Line? _routeLine;
-  Circle? _circle;
+  Circle? _touchLocationMarker;
 
   double? _speed;
   int? _elevation;
@@ -52,16 +52,16 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   }
 
   Future<void> _setBoundsAndLines() async {
-    await _mapController.setBoundsFromTracks(
+    await _mapController?.setBoundsFromTracks(
       _cardioSessionDescription.cardioSession.track,
       _cardioSessionDescription.route?.track,
       padded: true,
     );
-    _trackLine = await _mapController.updateTrackLine(
+    _trackLine = await _mapController?.updateTrackLine(
       _trackLine,
       _cardioSessionDescription.cardioSession.track,
     );
-    _routeLine = await _mapController.updateRouteLine(
+    _routeLine = await _mapController?.updateRouteLine(
       _routeLine,
       _cardioSessionDescription.route?.track,
     );
@@ -324,6 +324,9 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
           : null;
     });
 
-    _circle = await _mapController.updateLocationMarker(_circle, pos?.latLng);
+    _touchLocationMarker = await _mapController?.updateLocationMarker(
+      _touchLocationMarker,
+      pos?.latLng,
+    );
   }
 }
