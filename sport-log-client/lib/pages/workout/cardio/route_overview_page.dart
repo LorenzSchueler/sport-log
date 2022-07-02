@@ -126,6 +126,8 @@ class RouteCard extends StatelessWidget {
                 ? SizedBox(
                     height: 150,
                     child: MapboxMap(
+                      key:
+                          ObjectKey(route), // update on relaod to get new track
                       accessToken: Config.instance.accessToken,
                       styleString: MapboxStyles.OUTDOORS,
                       initialCameraPosition:

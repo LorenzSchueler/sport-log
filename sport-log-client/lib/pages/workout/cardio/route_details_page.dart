@@ -36,6 +36,17 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
     super.initState();
   }
 
+  void _setBoundsAndLine() {
+    _mapController.setBoundsFromTracks(
+      _route.track,
+      null,
+      padded: true,
+    );
+    if (_route.track != null) {
+      _mapController.addRouteLine(_route.track!);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,6 +72,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
                   setState(() {
                     _route = returnObj.payload;
                   });
+                  _setBoundsAndLine();
                 }
               }
             },
@@ -81,16 +93,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
                             context.read<Settings>().lastMapPosition,
                         onMapCreated: (MapboxMapController controller) =>
                             _mapController = controller,
-                        onStyleLoadedCallback: () {
-                          _mapController.setBoundsFromTracks(
-                            _route.track,
-                            null,
-                            padded: true,
-                          );
-                          if (_route.track != null) {
-                            _mapController.addRouteLine(_route.track!);
-                          }
-                        },
+                        onStyleLoadedCallback: _setBoundsAndLine,
                       )
                     : Center(
                         child: Row(

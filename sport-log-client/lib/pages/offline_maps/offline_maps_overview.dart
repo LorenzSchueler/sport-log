@@ -171,6 +171,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                         itemBuilder: (_, index) => RegionCard(
                           region: _regions[index],
                           onDelete: _updateRegions,
+                          key: ValueKey(_regions[index].id),
                         ),
                         separatorBuilder: (_, __) =>
                             Defaults.sizedBox.vertical.normal,

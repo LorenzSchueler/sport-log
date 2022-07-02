@@ -203,6 +203,9 @@ class CardioSessionCard extends StatelessWidget {
                 ? SizedBox(
                     height: 150,
                     child: MapboxMap(
+                      key: ObjectKey(
+                        cardioSessionDescription,
+                      ), // update on reload to get new track
                       accessToken: Config.instance.accessToken,
                       styleString: MapboxStyles.OUTDOORS,
                       initialCameraPosition:
