@@ -31,7 +31,10 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   late CardioSessionDescription _cardioSessionDescription;
 
   late MapboxMapController _mapController;
+  Line? _trackLine;
+  Line? _routeLine;
   Circle? _circle;
+
   double? _speed;
   int? _elevation;
   int? _heartRate;
@@ -46,6 +49,22 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   void initState() {
     _cardioSessionDescription = widget.cardioSessionDescription.clone();
     super.initState();
+  }
+
+  Future<void> _setBoundsAndLines() async {
+    await _mapController.setBoundsFromTracks(
+      _cardioSessionDescription.cardioSession.track,
+      _cardioSessionDescription.route?.track,
+      padded: true,
+    );
+    _trackLine = await _mapController.updateTrackLine(
+      _trackLine,
+      _cardioSessionDescription.cardioSession.track,
+    );
+    _routeLine = await _mapController.updateRouteLine(
+      _routeLine,
+      _cardioSessionDescription.route?.track,
+    );
   }
 
   @override
@@ -89,6 +108,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                   setState(() {
                     _cardioSessionDescription = returnObj.payload;
                   });
+                  await _setBoundsAndLines();
                 }
               }
             },
@@ -109,24 +129,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                             context.read<Settings>().lastMapPosition,
                         onMapCreated: (MapboxMapController controller) =>
                             _mapController = controller,
-                        onStyleLoadedCallback: () {
-                          _mapController.setBoundsFromTracks(
-                            _cardioSessionDescription.cardioSession.track,
-                            _cardioSessionDescription.route?.track,
-                            padded: true,
-                          );
-                          if (_cardioSessionDescription.cardioSession.track !=
-                              null) {
-                            _mapController.addTrackLine(
-                              _cardioSessionDescription.cardioSession.track!,
-                            );
-                          }
-                          if (_cardioSessionDescription.route?.track != null) {
-                            _mapController.addRouteLine(
-                              _cardioSessionDescription.route!.track!,
-                            );
-                          }
-                        },
+                        onStyleLoadedCallback: _setBoundsAndLines,
                       )
                     : Center(
                         child: Row(
@@ -176,21 +179,21 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Text(
-                                  "${_speed} km/h",
+                                  "$_speed km/h",
                                   style: const TextStyle(color: _speedColor),
                                 ),
                                 Text(
-                                  "${_elevation} m",
+                                  "$_elevation m",
                                   style:
                                       const TextStyle(color: _elevationColor),
                                 ),
                                 Text(
-                                  "${_heartRate} bpm",
+                                  "$_heartRate bpm",
                                   style:
                                       const TextStyle(color: _heartRateColor),
                                 ),
                                 Text(
-                                  "${_cadence} rpm",
+                                  "$_cadence rpm",
                                   style: const TextStyle(color: _cadenceColor),
                                 ),
                               ],
