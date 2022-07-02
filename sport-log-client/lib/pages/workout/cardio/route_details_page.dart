@@ -28,7 +28,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
   late Route _route;
 
   late MapboxMapController _mapController;
-  Circle? _circle;
+  Circle? _touchLocationMarker;
 
   @override
   void initState() {
@@ -165,6 +165,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
             ?.latLng
         : null;
 
-    _circle = await _mapController.updateLocationMarker(_circle, latLng);
+    _touchLocationMarker =
+        await _mapController.updateLocationMarker(_touchLocationMarker, latLng);
   }
 }

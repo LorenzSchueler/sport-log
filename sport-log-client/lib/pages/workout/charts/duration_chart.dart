@@ -35,8 +35,19 @@ class DurationChartLine {
         .toList()
       ..sort((v1, v2) => v1.duration.compareTo(v2.duration));
     final maxValue = chartValues.map((e) => e.value).maxOrNull;
-    if (maxValue != null && maxValue > 0) {
-      chartValues.map((e) => e..value /= maxValue).toList();
+    final minValue = chartValues.map((e) => e.value).minOrNull;
+    if (maxValue != null && minValue != null) {
+      final diff = maxValue - minValue;
+      chartValues.map((chartValue) {
+        if (diff > 0) {
+          chartValue
+            ..value -= minValue
+            ..value /= diff;
+        } else {
+          chartValue.value = 0.5;
+        }
+        return chartValue;
+      }).toList();
     }
     return DurationChartLine._(chartValues, lineColor);
   }
@@ -57,8 +68,19 @@ class DurationChartLine {
         .toList()
       ..sort((v1, v2) => v1.duration.compareTo(v2.duration));
     final maxValue = chartValues.map((e) => e.value).maxOrNull;
-    if (maxValue != null) {
-      chartValues.map((e) => e..value /= maxValue).toList();
+    final minValue = chartValues.map((e) => e.value).minOrNull;
+    if (maxValue != null && minValue != null) {
+      final diff = maxValue - minValue;
+      chartValues.map((chartValue) {
+        if (diff > 0) {
+          chartValue
+            ..value -= minValue
+            ..value /= diff;
+        } else {
+          chartValue.value = 0.5;
+        }
+        return chartValue;
+      }).toList();
     }
     return DurationChartLine._(chartValues, lineColor);
   }
@@ -180,7 +202,8 @@ class _DurationChartState extends State<DurationChart> {
                   interval: widget.xInterval,
                   getTitlesWidget: (value, _) => Text(
                     value.round() % widget.xInterval.round() == 0 &&
-                            value.round() > 0
+                            value.round() > 0 &&
+                            value.round() < widget.maxX
                         ? Duration(milliseconds: value.round()).formatHm
                         : "", // remove label at 0 and last value
                     style: TextStyle(color: DurationChart.color),
@@ -191,8 +214,6 @@ class _DurationChartState extends State<DurationChart> {
               leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
             gridData: FlGridData(
-              getDrawingHorizontalLine:
-                  gridLineDrawer(context: context, color: Colors.black),
               verticalInterval: widget.xInterval,
               getDrawingVerticalLine:
                   gridLineDrawer(context: context, color: Colors.black),

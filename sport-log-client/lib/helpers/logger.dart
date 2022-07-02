@@ -3,7 +3,7 @@ import 'package:sport_log/config.dart';
 
 export 'package:logger/logger.dart' show Level;
 
-void logInfo(Object message) {
+void logInfo(Object? message) {
   Logger("logInfo").i(message);
 }
 

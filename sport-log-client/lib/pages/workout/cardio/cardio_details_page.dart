@@ -171,33 +171,33 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                       color: const Color.fromARGB(120, 0, 0, 0),
                       child: Column(
                         children: [
-                          if (_speed != null &&
-                              _elevation != null &&
-                              _heartRate != null &&
-                              _cadence != null)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              if (_speed != null)
                                 Text(
                                   "$_speed km/h",
                                   style: const TextStyle(color: _speedColor),
                                 ),
+                              if (_elevation != null)
                                 Text(
                                   "$_elevation m",
                                   style:
                                       const TextStyle(color: _elevationColor),
                                 ),
+                              if (_heartRate != null)
                                 Text(
                                   "$_heartRate bpm",
                                   style:
                                       const TextStyle(color: _heartRateColor),
                                 ),
+                              if (_cadence != null)
                                 Text(
                                   "$_cadence rpm",
                                   style: const TextStyle(color: _cadenceColor),
                                 ),
-                              ],
-                            ),
+                            ],
+                          ),
                           DurationChart(
                             chartLines: [
                               _speedLine(),
