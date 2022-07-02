@@ -56,8 +56,21 @@ flatpak install --user -y flathub org.freedesktop.Platform//21.08 org.freedeskto
 * set `SDK_REGISTRY_TOKEN` as env var
 * build linux app and install it using flatpak
 ```bash
-flutter build linux --debug
+flutter build linux --release
 flatpak-builder --user --install --force-clean --state-dir ../.flatpak-builder ../flatpak-build flatpak/org.sport-log.sport-log-client.yml
+```
+* run flatpak
+```bash
+flatpak run org.sport_log.sport_log_client
+```
+* build bundle (build in repo -> build bundle)
+```bash
+flatpak-builder --user --force-clean --repo ../flatpak-repo ../flatpak-build flatpak/org.sport-log.sport-log-client.yml
+flatpak build-bundle ../flatpak-repo ~/Downloads/sport-log-client.flatpak org.sport_log.sport_log_client
+```
+* install from bundle
+```bash
+flatpak install --user ~/Downloads/sport-log-client.flatpak
 ```
 
 ## Client Server Synchronization

@@ -11,6 +11,7 @@
 /sport-log-client/build.sh
 /sport-log-client/flutter_checks.sh
 flatpak-build
+flatpak-repo
 .flatpak-builder
 .env
 geckodriver
