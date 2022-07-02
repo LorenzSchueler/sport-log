@@ -10,6 +10,36 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  format:
+    name: "Rust: Check Formatting"
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        components: rustfmt
+    - name: Cargo fmt
+      run: cargo fmt --all -- --check
+
+  clippy:
+    name: "Rust: Run Clippy"
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: 1.61.0 # stable TODO
+        components: clippy
+    - name: Cargo clippy
+      run: cargo clippy --all-targets -- -D warnings
+
   build:
     name: "Rust: Build"
     runs-on: ubuntu-latest
@@ -29,41 +59,6 @@ jobs:
            cargo check --manifest-path sport-log-server/Cargo.toml &&
            cargo check --manifest-path sport-log-types/Cargo.toml &&
            cargo check --manifest-path sport-log-types-derive/Cargo.toml
+
     #- name: Run tests
     #  run: cargo test --verbose
-  
-  format:
-    name: "Rust: Check Formatting"
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        components: rustfmt
-    - name: Cargo fmt
-      uses: actions-rs/cargo@v1
-      with:
-        command: fmt
-        args: --all -- --check
-
-  clippy:
-    name: "Rust: Run Clippy"
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        components: clippy
-    - name: Cargo clippy
-      uses: actions-rs/cargo@v1
-      with:
-        command: clippy
-        args: --all-targets -- -D warnings
