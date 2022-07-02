@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
@@ -189,10 +190,7 @@ class CardioSession extends AtomicEntity {
     }
   }
 
-  void setDistance() {
-    distance =
-        track == null || track!.isEmpty ? null : track?.last.distance.round();
-  }
+  void setDistance() => distance = track?.lastOrNull?.distance.round();
 
   void setAscentDescent() {
     if (track == null || track!.isEmpty) {
@@ -227,6 +225,51 @@ class CardioSession extends AtomicEntity {
             heartRate == null
         ? null
         : (heartRate!.length / (time!.inMilliseconds / (1000 * 60))).round();
+  }
+
+  void cut(Duration start, Duration end) {
+    time = end - start;
+    if (track != null && track!.isNotEmpty) {
+      final newTrack =
+          track!.where((pos) => pos.time >= start && pos.time <= end);
+      if (newTrack.isNotEmpty) {
+        final distanceOffset = newTrack.first.distance;
+        final timeOffset = newTrack.first.time;
+        track = newTrack
+            .map(
+              (pos) => pos
+                ..distance -= distanceOffset
+                ..time -= timeOffset,
+            )
+            .toList();
+      } else {
+        track = [];
+      }
+      setDistance();
+      setAscentDescent();
+    }
+    if (cadence != null && cadence!.isNotEmpty) {
+      final newCadence = cadence!.where((time) => time >= start && time <= end);
+      if (newCadence.isNotEmpty) {
+        final timeOffset = newCadence.first;
+
+        cadence = newCadence.map((time) => time - timeOffset).toList();
+      } else {
+        cadence = [];
+      }
+      setAvgCadence();
+    }
+    if (heartRate != null && heartRate!.isNotEmpty) {
+      final newHeartRate =
+          heartRate!.where((time) => time >= start && time <= end);
+      if (newHeartRate.isNotEmpty) {
+        final timeOffset = newHeartRate.first;
+        heartRate = newHeartRate.map((time) => time - timeOffset).toList();
+      } else {
+        heartRate = [];
+      }
+      setAvgHeartRate();
+    }
   }
 
   @override
