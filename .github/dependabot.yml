@@ -9,7 +9,9 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
+    target-branch: "develop"
   - package-ecosystem: "pub" # See documentation for possible values
     directory: "/sport-log-client/" # Location of package manifests
     schedule:
       interval: "daily"
+    target-branch: "develop"
