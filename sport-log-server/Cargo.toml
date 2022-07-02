@@ -13,7 +13,7 @@ rocket_sync_db_pools = { version = "0.1.0-rc.1", features = ["diesel_postgres_po
 diesel = { version = "1.4", features = ["postgres", "r2d2", "chrono"] }
 diesel_migrations = "1.4"
 serde = { version = "1.0", features = ["derive"]}
-serde_json = "1.0.59"
+serde_json = "1.0.82"
 chrono = { version = "0.4", features = ["serde"] }
 tracing = "0.1"
 tracing-subscriber = "0.3"
