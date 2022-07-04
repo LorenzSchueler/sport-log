@@ -12,6 +12,7 @@ use lazy_static::lazy_static;
 use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
 use sport_log_types::{ActionEventId, ExecutableActionEvent};
+use sysinfo::{ProcessExt, System, SystemExt};
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use tracing::{debug, error, info};
 
@@ -23,6 +24,8 @@ const NAME: &str = "wodify-login";
 const DESCRIPTION: &str =
     "Wodify Login can reserve spots in classes. The action names correspond to the class types.";
 const PLATFORM_NAME: &str = "wodify";
+
+const GECKODRIVER: &str = "geckodriver";
 
 #[derive(Debug, StdError)]
 enum Error {
@@ -177,7 +180,11 @@ async fn login(mode: Mode) -> Result<()> {
         return Ok(());
     }
 
-    let mut webdriver = Command::new("geckodriver")
+    for p in System::new_all().processes_by_name(GECKODRIVER) {
+        p.kill();
+    }
+
+    let mut webdriver = Command::new(GECKODRIVER)
         .stdout(Stdio::null())
         .spawn()
         .map_err(Error::Io)?;
