@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:mapbox_api/mapbox_api.dart';
@@ -17,6 +19,7 @@ import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 class RouteEditPage extends StatefulWidget {
   const RouteEditPage({required this.route, super.key});
@@ -101,19 +104,26 @@ class _RouteEditPageState extends State<RouteEditPage> {
   }
 
   Future<void> _matchLocations() async {
-    DirectionsApiResponse response =
-        await Defaults.mapboxApi.directions.request(
-      profile: NavigationProfile.WALKING,
-      geometries: NavigationGeometries.POLYLINE,
-      coordinates: _route.markedPositions!
-          .map((e) => [e.latitude, e.longitude])
-          .toList(),
-    );
+    DirectionsApiResponse response;
+    try {
+      response = await Defaults.mapboxApi.directions.request(
+        profile: NavigationProfile.WALKING,
+        geometries: NavigationGeometries.POLYLINE,
+        coordinates: _route.markedPositions!
+            .map((e) => [e.latitude, e.longitude])
+            .toList(),
+      );
+    } on SocketException {
+      showSimpleToast(context, 'No Internet connection.');
+      return;
+    }
     if (response.error != null) {
       if (response.error is NavigationNoRouteError) {
         _logger.i(response.error);
       } else if (response.error is NavigationNoSegmentError) {
         _logger.i(response.error);
+      } else {
+        _logger.i(response.error.runtimeType);
       }
     } else if (response.routes != null && response.routes!.isNotEmpty) {
       NavigationRoute navRoute = response.routes![0];

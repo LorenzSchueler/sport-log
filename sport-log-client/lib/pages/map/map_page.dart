@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -30,13 +32,12 @@ class _MapPageState extends State<MapPage> {
   late LocationUtils _locationUtils;
   late MapboxMapController _mapController;
   final _searchBar = FocusNode();
-  final placesSearch =
+  final _placesSearch =
       PlacesSearch(apiKey: Config.instance.accessToken, limit: 10);
 
   bool _showOverlays = true;
   String? _search;
   List<MapBoxPlace> _searchResults = [];
-  bool _searchResultsVisible = false;
 
   List<Circle> _currentLocationMarker = [];
   double _metersPerPixel = 1;
@@ -78,6 +79,19 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+  Future<void> _searchPlaces(String name) async {
+    setState(() => _search = name);
+    List<MapBoxPlace>? places;
+    try {
+      places = await _placesSearch.getPlaces(_search!);
+    } on SocketException {
+      showSimpleToast(context, 'No Internet connection.');
+    }
+    if (mounted) {
+      setState(() => _searchResults = places ?? []);
+    }
+  }
+
   static const _searchBackgroundColor = Color.fromARGB(150, 255, 255, 255);
 
   @override
@@ -114,14 +128,8 @@ class _MapPageState extends State<MapPage> {
                     ? null
                     : TextFormField(
                         focusNode: _searchBar,
-                        onChanged: (name) async {
-                          _search = name;
-                          final places = await placesSearch.getPlaces(_search!);
-                          setState(() {
-                            _searchResults = places ?? [];
-                            _searchResultsVisible = true;
-                          });
-                        },
+                        onChanged: _searchPlaces,
+                        onTap: () => _searchPlaces(_search ?? ""),
                         decoration: Theme.of(context).textFormFieldDecoration,
                         style: Theme.of(context)
                             .textTheme
@@ -135,7 +143,6 @@ class _MapPageState extends State<MapPage> {
                         _search = _search == null ? "" : null;
                         if (_search == null) {
                           _searchResults = [];
-                          _searchResultsVisible = false;
                         }
                       });
                       if (_search != null) {
@@ -226,7 +233,7 @@ class _MapPageState extends State<MapPage> {
                   ],
                 ),
               ),
-            if (_showOverlays && _searchResultsVisible)
+            if (_showOverlays && _searchResults.isNotEmpty)
               Positioned(
                 top: 56,
                 right: 0,
@@ -244,7 +251,6 @@ class _MapPageState extends State<MapPage> {
                         padding: EdgeInsets.zero,
                         itemBuilder: (context, index) => GestureDetector(
                           onTap: () {
-                            setState(() => _searchResultsVisible = false);
                             FocusManager.instance.primaryFocus?.unfocus();
                             final coords = _searchResults[index].center!;
                             final latLng = LatLng(coords[1], coords[0]);
@@ -263,6 +269,7 @@ class _MapPageState extends State<MapPage> {
                             } else {
                               _mapController.animateZoom(16);
                             }
+                            setState(() => _searchResults = []);
                           },
                           child: Text(
                             _searchResults[index].toString(),
