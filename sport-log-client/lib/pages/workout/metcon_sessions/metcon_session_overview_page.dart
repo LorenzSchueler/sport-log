@@ -49,8 +49,9 @@ class MetconSessionsPage extends StatelessWidget {
                 icon: const Icon(AppIcons.notes),
               ),
               IconButton(
+                // ignore: prefer-extracting-callbacks
                 onPressed: () async {
-                  final Metcon? metcon = await showMetconPicker(
+                  final metcon = await showMetconPicker(
                     context: context,
                     selectedMetcon: dataProvider.selected,
                   );

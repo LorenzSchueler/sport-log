@@ -36,6 +36,23 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
     }
   }
 
+  Future<void> _pushEditPage() async {
+    final returnObj = await Navigator.pushNamed(
+      context,
+      Routes.metcon.edit,
+      arguments: _metconDescription,
+    );
+    if (returnObj is ReturnObject<MetconDescription> && mounted) {
+      if (returnObj.action == ReturnAction.deleted) {
+        Navigator.pop(context);
+      } else {
+        setState(() {
+          _metconDescription = returnObj.payload;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,22 +74,7 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
             ),
           if (widget.metconDescription.metcon.userId != null)
             IconButton(
-              onPressed: () async {
-                final returnObj = await Navigator.pushNamed(
-                  context,
-                  Routes.metcon.edit,
-                  arguments: _metconDescription,
-                );
-                if (returnObj is ReturnObject<MetconDescription> && mounted) {
-                  if (returnObj.action == ReturnAction.deleted) {
-                    Navigator.pop(context);
-                  } else {
-                    setState(() {
-                      _metconDescription = returnObj.payload;
-                    });
-                  }
-                }
-              },
+              onPressed: _pushEditPage,
               icon: const Icon(AppIcons.edit),
             )
         ],

@@ -144,12 +144,18 @@ extension MapControllerExtension on MapboxMapController {
     ]);
   }
 
-  Future<List<Circle>> updateCurrentLocationMarker(
-    List<Circle> circles,
-    LatLng latLng,
+  Future<List<Circle>?> updateCurrentLocationMarker(
+    List<Circle>? circles,
+    LatLng? latLng,
   ) async {
-    await removeCircles(circles);
-    return addCurrentLocationMarker(latLng);
+    if (circles != null) {
+      await removeCircles(circles);
+      circles = null;
+    }
+    if (latLng != null) {
+      circles = await addCurrentLocationMarker(latLng);
+    }
+    return circles;
   }
 
   Future<Circle> addLocationMarker(LatLng latLng) {

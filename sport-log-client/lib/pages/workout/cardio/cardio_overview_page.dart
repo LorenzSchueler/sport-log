@@ -54,8 +54,9 @@ class CardioSessionsPage extends StatelessWidget {
                 icon: const Icon(AppIcons.route),
               ),
               IconButton(
+                // ignore: prefer-extracting-callbacks
                 onPressed: () async {
-                  final Movement? movement = await showMovementPicker(
+                  final movement = await showMovementPicker(
                     context: context,
                     selectedMovement: dataProvider.selected,
                   );
@@ -172,9 +173,29 @@ class CardioSessionCard extends StatelessWidget {
     );
   }
 
+  Future<void> _setBoundsAndTracks(
+    MapboxMapController sessionMapController,
+  ) async {
+    await sessionMapController.setBoundsFromTracks(
+      cardioSessionDescription.cardioSession.track,
+      cardioSessionDescription.route?.track,
+      padded: true,
+    );
+    if (cardioSessionDescription.cardioSession.track != null) {
+      await sessionMapController.addTrackLine(
+        cardioSessionDescription.cardioSession.track!,
+      );
+    }
+    if (cardioSessionDescription.route?.track != null) {
+      await sessionMapController.addRouteLine(
+        cardioSessionDescription.route!.track!,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    late MapboxMapController sessionMapController;
+    late final MapboxMapController sessionMapController;
 
     return GestureDetector(
       onTap: () => showDetails(context),
@@ -216,24 +237,8 @@ class CardioSessionCard extends StatelessWidget {
                       zoomGesturesEnabled: false,
                       onMapCreated: (MapboxMapController controller) =>
                           sessionMapController = controller,
-                      onStyleLoadedCallback: () {
-                        sessionMapController.setBoundsFromTracks(
-                          cardioSessionDescription.cardioSession.track,
-                          cardioSessionDescription.route?.track,
-                          padded: true,
-                        );
-                        if (cardioSessionDescription.cardioSession.track !=
-                            null) {
-                          sessionMapController.addTrackLine(
-                            cardioSessionDescription.cardioSession.track!,
-                          );
-                        }
-                        if (cardioSessionDescription.route?.track != null) {
-                          sessionMapController.addRouteLine(
-                            cardioSessionDescription.route!.track!,
-                          );
-                        }
-                      },
+                      onStyleLoadedCallback: () =>
+                          _setBoundsAndTracks(sessionMapController),
                       onMapClick: (_, __) => showDetails(context),
                     ),
                   )

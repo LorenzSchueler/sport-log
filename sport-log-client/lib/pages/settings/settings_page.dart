@@ -30,6 +30,160 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
+  Future<void> _setSyncEnabled(BuildContext context, bool syncEnabled) async {
+    context.read<Settings>().syncEnabled = syncEnabled;
+    if (syncEnabled) {
+      await checkSync(context);
+      await Sync.instance.startSync();
+    } else {
+      Sync.instance.stopSync();
+    }
+  }
+
+  Future<void> _createAccount(BuildContext context) async {
+    final settings = context.read<Settings>()
+      ..accountCreated = true
+      ..syncEnabled = true;
+    final result = await Account.register(
+      settings.serverUrl,
+      settings.user!,
+    );
+    if (result.isFailure) {
+      await showMessageDialog(
+        context: context,
+        title: "An Error occured:",
+        text: result.failure.toString(),
+      );
+      settings
+        ..accountCreated = false
+        ..syncEnabled = false;
+    }
+  }
+
+  Future<void> _setServerUrl(BuildContext context, String serverUrl) async {
+    final validated = Validator.validateUrl(serverUrl);
+    if (validated == null) {
+      context.read<Settings>().serverUrl = serverUrl;
+      Sync.instance.stopSync();
+      await checkSync(context);
+      await Sync.instance.startSync();
+    } else {
+      await showMessageDialog(
+        context: context,
+        text: validated,
+      );
+    }
+  }
+
+  Future<void> _setUsername(BuildContext context, String username) async {
+    final validated = Validator.validateUsername(username);
+    if (validated == null) {
+      final result = await Account.editUser(username: username);
+      if (result.isFailure) {
+        await showMessageDialog(
+          context: context,
+          title: "Changing Username Failed",
+          text: result.failure.toString(),
+        );
+      }
+    } else {
+      await showMessageDialog(
+        context: context,
+        text: validated,
+      );
+    }
+  }
+
+  Future<void> _setPassword(BuildContext context, String password) async {
+    final validated = Validator.validatePassword(password);
+    if (validated == null) {
+      final result = await Account.editUser(password: password);
+      if (result.isFailure) {
+        await showMessageDialog(
+          context: context,
+          title: "Changing Password Failed",
+          text: result.failure.toString(),
+        );
+      }
+    } else {
+      await showMessageDialog(
+        context: context,
+        text: validated,
+      );
+    }
+  }
+
+  Future<void> _setEmail(BuildContext context, String email) async {
+    final validated = Validator.validateEmail(email);
+    if (validated == null) {
+      final result = await Account.editUser(email: email);
+      if (result.isFailure) {
+        await showMessageDialog(
+          context: context,
+          title: "Changing Email Failed",
+          text: result.failure.toString(),
+        );
+      }
+    } else {
+      await showMessageDialog(
+        context: context,
+        text: validated,
+      );
+    }
+  }
+
+  Future<void> _initSync(BuildContext context) async {
+    final approved = await showApproveDialog(
+      context: context,
+      title: "Warning",
+      text: "Conflicting entries will get lost.",
+    );
+    if (approved) {
+      final result = await Account.newInitSync();
+      if (result.isFailure) {
+        await showMessageDialog(
+          context: context,
+          text: result.failure.toString(),
+        );
+      }
+    }
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    final navigator = Navigator.of(context);
+    final approved = await showApproveDialog(
+      context: context,
+      title: "Logout",
+      text:
+          "Make sure you know you credentials before logging out. Otherwise you will lose access to your account and all your data.",
+    );
+    if (approved) {
+      await Account.logout();
+      await navigator.newBase(Routes.landing);
+    }
+  }
+
+  Future<void> _deleteAccount(BuildContext context) async {
+    final navigator = Navigator.of(context);
+    final approved = await showApproveDialog(
+      context: context,
+      title: "Delete Account",
+      text: "If you delete your account all data will be permanently lost.",
+    );
+    if (approved) {
+      final result = await Account.delete();
+      if (result.isFailure) {
+        await showMessageDialog(
+          context: context,
+          text:
+              "An error occured while deleting your account:\n${result.failure}",
+        );
+      } else {
+        await navigator.newBase(Routes.landing);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return NeverPop(
@@ -53,15 +207,8 @@ class SettingsPage extends StatelessWidget {
                           width: 34,
                           child: Switch(
                             value: settings.syncEnabled,
-                            onChanged: (syncEnabled) async {
-                              settings.syncEnabled = syncEnabled;
-                              if (syncEnabled) {
-                                await checkSync(context);
-                                await Sync.instance.startSync();
-                              } else {
-                                Sync.instance.stopSync();
-                              }
-                            },
+                            onChanged: (enabled) =>
+                                _setSyncEnabled(context, enabled),
                             materialTapTargetSize:
                                 MaterialTapTargetSize.shrinkWrap,
                           ),
@@ -72,25 +219,7 @@ class SettingsPage extends StatelessWidget {
                               Theme.of(context).colorScheme.errorContainer,
                             ),
                           ),
-                          onPressed: () async {
-                            settings
-                              ..accountCreated = true
-                              ..syncEnabled = true;
-                            final result = await Account.register(
-                              settings.serverUrl,
-                              settings.user!,
-                            );
-                            if (result.isFailure) {
-                              await showMessageDialog(
-                                context: context,
-                                title: "An Error occured:",
-                                text: result.failure.toString(),
-                              );
-                              settings
-                                ..accountCreated = false
-                                ..syncEnabled = false;
-                            }
-                          },
+                          onPressed: () => _createAccount(context),
                           child: const Text('Create Account'),
                         ),
                 ),
@@ -103,20 +232,8 @@ class SettingsPage extends StatelessWidget {
                   initialValue: settings.serverUrl,
                   validator: Validator.validateUrl,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  onFieldSubmitted: (serverUrl) async {
-                    final validated = Validator.validateUrl(serverUrl);
-                    if (validated == null) {
-                      settings.serverUrl = serverUrl;
-                      Sync.instance.stopSync();
-                      await checkSync(context);
-                      await Sync.instance.startSync();
-                    } else {
-                      await showMessageDialog(
-                        context: context,
-                        text: validated,
-                      );
-                    }
-                  },
+                  onFieldSubmitted: (serverUrl) =>
+                      _setServerUrl(context, serverUrl),
                 ),
                 if (settings.syncEnabled)
                   EditTile(
@@ -145,24 +262,8 @@ class SettingsPage extends StatelessWidget {
                   initialValue: settings.username,
                   validator: Validator.validateUsername,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  onFieldSubmitted: (username) async {
-                    final validated = Validator.validateUsername(username);
-                    if (validated == null) {
-                      final result = await Account.editUser(username: username);
-                      if (result.isFailure) {
-                        await showMessageDialog(
-                          context: context,
-                          title: "Changing Username Failed",
-                          text: result.failure.toString(),
-                        );
-                      }
-                    } else {
-                      await showMessageDialog(
-                        context: context,
-                        text: validated,
-                      );
-                    }
-                  },
+                  onFieldSubmitted: (username) =>
+                      _setUsername(context, username),
                 ),
                 TextFormField(
                   key: UniqueKey(),
@@ -174,24 +275,8 @@ class SettingsPage extends StatelessWidget {
                   initialValue: settings.password,
                   validator: Validator.validatePassword,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  onFieldSubmitted: (password) async {
-                    final validated = Validator.validatePassword(password);
-                    if (validated == null) {
-                      final result = await Account.editUser(password: password);
-                      if (result.isFailure) {
-                        await showMessageDialog(
-                          context: context,
-                          title: "Changing Password Failed",
-                          text: result.failure.toString(),
-                        );
-                      }
-                    } else {
-                      await showMessageDialog(
-                        context: context,
-                        text: validated,
-                      );
-                    }
-                  },
+                  onFieldSubmitted: (password) =>
+                      _setPassword(context, password),
                 ),
                 TextFormField(
                   key: UniqueKey(),
@@ -204,24 +289,7 @@ class SettingsPage extends StatelessWidget {
                   validator: Validator.validateEmail,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   keyboardType: TextInputType.emailAddress,
-                  onFieldSubmitted: (email) async {
-                    final validated = Validator.validateEmail(email);
-                    if (validated == null) {
-                      final result = await Account.editUser(email: email);
-                      if (result.isFailure) {
-                        await showMessageDialog(
-                          context: context,
-                          title: "Changing Email Failed",
-                          text: result.failure.toString(),
-                        );
-                      }
-                    } else {
-                      await showMessageDialog(
-                        context: context,
-                        text: validated,
-                      );
-                    }
-                  },
+                  onFieldSubmitted: (email) => _setEmail(context, email),
                 ),
                 Consumer<Sync>(
                   builder: (context, sync, _) => TextTile(
@@ -238,24 +306,7 @@ class SettingsPage extends StatelessWidget {
                               ),
                               onPressed: sync.isSyncing
                                   ? null
-                                  : () async {
-                                      final approved = await showApproveDialog(
-                                        context: context,
-                                        title: "Warning",
-                                        text:
-                                            "Conflicting entries will get lost.",
-                                      );
-                                      if (approved) {
-                                        final result =
-                                            await Account.newInitSync();
-                                        if (result.isFailure) {
-                                          await showMessageDialog(
-                                            context: context,
-                                            text: result.failure.toString(),
-                                          );
-                                        }
-                                      }
-                                    },
+                                  : () => _initSync(context),
                               child: const Text('Init Sync'),
                             ),
                           ),
@@ -268,21 +319,8 @@ class SettingsPage extends StatelessWidget {
                                 Theme.of(context).colorScheme.error,
                               ),
                             ),
-                            onPressed: sync.isSyncing
-                                ? null
-                                : () async {
-                                    final navigator = Navigator.of(context);
-                                    final approved = await showApproveDialog(
-                                      context: context,
-                                      title: "Logout",
-                                      text:
-                                          "Make sure you know you credentials before logging out. Otherwise you will lose access to your account and all your data.",
-                                    );
-                                    if (approved) {
-                                      await Account.logout();
-                                      await navigator.newBase(Routes.landing);
-                                    }
-                                  },
+                            onPressed:
+                                sync.isSyncing ? null : () => _logout(context),
                             child: const Text('Logout'),
                           ),
                         ),
@@ -297,28 +335,7 @@ class SettingsPage extends StatelessWidget {
                               ),
                               onPressed: sync.isSyncing
                                   ? null
-                                  : () async {
-                                      final navigator = Navigator.of(context);
-                                      final approved = await showApproveDialog(
-                                        context: context,
-                                        title: "Delete Account",
-                                        text:
-                                            "If you delete your account all data will be permanently lost.",
-                                      );
-                                      if (approved) {
-                                        final result = await Account.delete();
-                                        if (result.isFailure) {
-                                          await showMessageDialog(
-                                            context: context,
-                                            text:
-                                                "An error occured while deleting your account:\n${result.failure}",
-                                          );
-                                        } else {
-                                          await navigator
-                                              .newBase(Routes.landing);
-                                        }
-                                      }
-                                    },
+                                  : () => _deleteAccount(context),
                               child: const Text('Delete Account'),
                             ),
                           ),

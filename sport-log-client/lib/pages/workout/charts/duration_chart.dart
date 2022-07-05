@@ -140,6 +140,22 @@ class DurationChart extends StatefulWidget {
 class _DurationChartState extends State<DurationChart> {
   double? lastX;
 
+  void _onLongPress(FlTouchEvent event, LineTouchResponse? response) {
+    if (event is FlLongPressStart || event is FlLongPressMoveUpdate) {
+      final xValues = response?.lineBarSpots?.map((e) => e.x).toList();
+      final xValue = xValues == null || xValues.isEmpty
+          ? null
+          : xValues[xValues.length ~/ 2]; // median
+      if (xValue != null && xValue != lastX) {
+        setState(() => lastX = xValue);
+        widget.touchCallback?.call(Duration(milliseconds: xValue.round()));
+      }
+    } else if (event is FlLongPressEnd) {
+      widget.touchCallback?.call(null);
+      setState(() => lastX = null);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -173,24 +189,7 @@ class _DurationChartState extends State<DurationChart> {
             lineTouchData: LineTouchData(
               enabled: false,
               touchSpotThreshold: double.infinity, // always get nearest point
-              touchCallback: (event, response) {
-                if (event is FlLongPressStart ||
-                    event is FlLongPressMoveUpdate) {
-                  final xValues =
-                      response?.lineBarSpots?.map((e) => e.x).toList();
-                  final xValue = xValues == null || xValues.isEmpty
-                      ? null
-                      : xValues[xValues.length ~/ 2]; // median
-                  if (xValue != null && xValue != lastX) {
-                    setState(() => lastX = xValue);
-                    widget.touchCallback
-                        ?.call(Duration(milliseconds: xValue.round()));
-                  }
-                } else if (event is FlLongPressEnd) {
-                  widget.touchCallback?.call(null);
-                  setState(() => lastX = null);
-                }
-              },
+              touchCallback: _onLongPress,
             ),
             titlesData: FlTitlesData(
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),

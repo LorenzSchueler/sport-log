@@ -96,6 +96,14 @@ class _CardioEditPageState extends State<CardioEditPage> {
     }
   }
 
+  void _showCutInputs() {
+    setState(() {
+      _cutStartDuration = Duration.zero;
+      _cutEndDuration = _cardioSessionDescription.cardioSession.time;
+    });
+    _updateCutLocationMarker();
+  }
+
   void _cutCardioSession() {
     if (_cutStartDuration != null && _cutEndDuration != null) {
       _cardioSessionDescription.cardioSession
@@ -162,14 +170,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
             if (_cutStartDuration == null &&
                 _cardioSessionDescription.cardioSession.time != null)
               IconButton(
-                onPressed: () {
-                  setState(() {
-                    _cutStartDuration = Duration.zero;
-                    _cutEndDuration =
-                        _cardioSessionDescription.cardioSession.time;
-                  });
-                  _updateCutLocationMarker();
-                },
+                onPressed: _showCutInputs,
                 icon: const Icon(AppIcons.cut),
               ),
             IconButton(

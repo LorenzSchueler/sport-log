@@ -181,7 +181,8 @@ class Table {
         columns.where((c) => c.getIsPrimaryKey()).map((c) => c.name).toList();
     final primaryKeyStr =
         primaryKey.isEmpty ? '' : 'primary key(${primaryKey.join(', ')})';
-    final tableSetup = '''create table $name (
+    final tableSetup = '''
+    create table $name (
       ${[
       ...columns.map((c) => c.setUpSql()),
       primaryKeyStr,
@@ -189,12 +190,12 @@ class Table {
     );
     ''';
     final uniqueIndicesSetup = uniqueIndices.map((u) => u.setupSql);
-    final updateTrigger =
-        '''create trigger ${name}_update before update on $name
-    begin
-      update $name set sync_status = 1 where id = new.id and sync_status = 0;
-    end;
-    ''';
+    final updateTrigger = '''
+      create trigger ${name}_update before update on $name
+      begin
+        update $name set sync_status = 1 where id = new.id and sync_status = 0;
+      end;
+      ''';
 
     return [tableSetup, ...uniqueIndicesSetup, updateTrigger, ...rawSql];
   }

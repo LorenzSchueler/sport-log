@@ -47,6 +47,24 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
     }
   }
 
+  Future<void> _pushEditPage() async {
+    final returnObj = await Navigator.pushNamed(
+      context,
+      Routes.cardio.routeEdit,
+      arguments: _route,
+    );
+    if (returnObj is ReturnObject<Route> && mounted) {
+      if (returnObj.action == ReturnAction.deleted) {
+        Navigator.pop(context);
+      } else {
+        setState(() {
+          _route = returnObj.payload;
+        });
+        _setBoundsAndLine();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,23 +77,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
               icon: const Icon(AppIcons.download),
             ),
           IconButton(
-            onPressed: () async {
-              final returnObj = await Navigator.pushNamed(
-                context,
-                Routes.cardio.routeEdit,
-                arguments: _route,
-              );
-              if (returnObj is ReturnObject<Route> && mounted) {
-                if (returnObj.action == ReturnAction.deleted) {
-                  Navigator.pop(context);
-                } else {
-                  setState(() {
-                    _route = returnObj.payload;
-                  });
-                  _setBoundsAndLine();
-                }
-              }
-            },
+            onPressed: _pushEditPage,
             icon: const Icon(AppIcons.edit),
           )
         ],

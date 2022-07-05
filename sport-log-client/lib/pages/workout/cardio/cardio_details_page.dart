@@ -67,6 +67,24 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
     );
   }
 
+  Future<void> _pushEditPage() async {
+    final returnObj = await Navigator.pushNamed(
+      context,
+      Routes.cardio.cardioEdit,
+      arguments: _cardioSessionDescription,
+    );
+    if (returnObj is ReturnObject<CardioSessionDescription> && mounted) {
+      if (returnObj.action == ReturnAction.deleted) {
+        Navigator.pop(context);
+      } else {
+        setState(() {
+          _cardioSessionDescription = returnObj.payload;
+        });
+        await _setBoundsAndLines();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,24 +112,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
               icon: const Icon(AppIcons.download),
             ),
           IconButton(
-            onPressed: () async {
-              final returnObj = await Navigator.pushNamed(
-                context,
-                Routes.cardio.cardioEdit,
-                arguments: _cardioSessionDescription,
-              );
-              if (returnObj is ReturnObject<CardioSessionDescription> &&
-                  mounted) {
-                if (returnObj.action == ReturnAction.deleted) {
-                  Navigator.pop(context);
-                } else {
-                  setState(() {
-                    _cardioSessionDescription = returnObj.payload;
-                  });
-                  await _setBoundsAndLines();
-                }
-              }
-            },
+            onPressed: _pushEditPage,
             icon: const Icon(AppIcons.edit),
           )
         ],

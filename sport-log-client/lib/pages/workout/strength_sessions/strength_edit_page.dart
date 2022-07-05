@@ -94,6 +94,29 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     }
   }
 
+  void _addNewSet(int count, double? weight) {
+    final newSet = StrengthSet(
+      id: randomId(),
+      strengthSessionId: _strengthSessionDescription.session.id,
+      setNumber: _strengthSessionDescription.sets.length,
+      count: count,
+      weight: weight,
+      deleted: false,
+    );
+    setState(() {
+      _strengthSessionDescription.sets.add(newSet);
+      _strengthSessionDescription.orderSets();
+    });
+    Future.delayed(
+      const Duration(milliseconds: 100),
+      () => _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.decelerate,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DiscardWarningOnPop(
@@ -129,28 +152,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
                   _strengthSessionDescription.session.comments == null)
                 _buttonBar,
               NewSetInput(
-                onNewSet: (count, weight, _, __) {
-                  final newSet = StrengthSet(
-                    id: randomId(),
-                    strengthSessionId: _strengthSessionDescription.session.id,
-                    setNumber: _strengthSessionDescription.sets.length,
-                    count: count,
-                    weight: weight,
-                    deleted: false,
-                  );
-                  setState(() {
-                    _strengthSessionDescription.sets.add(newSet);
-                    _strengthSessionDescription.orderSets();
-                  });
-                  Future.delayed(
-                    const Duration(milliseconds: 100),
-                    () => _scrollController.animateTo(
-                      _scrollController.position.maxScrollExtent,
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.decelerate,
-                    ),
-                  );
-                },
+                onNewSet: (count, weight, _, __) => _addNewSet(count, weight),
                 confirmChanges: true,
                 dimension: _strengthSessionDescription.movement.dimension,
                 editWeightUnit: false,

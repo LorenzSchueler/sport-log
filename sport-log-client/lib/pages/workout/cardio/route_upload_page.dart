@@ -8,7 +8,6 @@ import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/gpx.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
-import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
 import 'package:sport_log/settings.dart';
@@ -88,14 +87,11 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
                 onMapCreated: (MapboxMapController controller) async {
                   _mapController = controller;
                 },
-                onStyleLoadedCallback: () async {
-                  await _mapController.setBoundsFromTracks(
-                    _route.track,
-                    _route.markedPositions,
-                    padded: true,
-                  );
-                  _line ??= await _mapController.addRouteLine([]);
-                },
+                onStyleLoadedCallback: () => _mapController.setBoundsFromTracks(
+                  _route.track,
+                  _route.markedPositions,
+                  padded: true,
+                ),
               ),
             ),
             Padding(
@@ -149,13 +145,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
           ..setDistance()
           ..setAscentDescent();
       });
-      await _mapController.updateLine(
-        _line!,
-        LineOptions(
-          lineWidth: 2,
-          geometry: _route.track?.latLngs,
-        ),
-      );
+      await _mapController.updateRouteLine(_line, _route.track);
     }
   }
 }

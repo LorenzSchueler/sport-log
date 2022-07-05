@@ -105,6 +105,19 @@ class RouteCard extends StatelessWidget {
     Navigator.pushNamed(context, Routes.cardio.routeDetails, arguments: route);
   }
 
+  Future<void> _setBoundsAndTrack(
+    MapboxMapController sessionMapController,
+  ) async {
+    await sessionMapController.setBoundsFromTracks(
+      route.track,
+      null,
+      padded: true,
+    );
+    if (route.track != null) {
+      await sessionMapController.addRouteLine(route.track!);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     late MapboxMapController sessionMapController;
@@ -138,16 +151,8 @@ class RouteCard extends StatelessWidget {
                       zoomGesturesEnabled: false,
                       onMapCreated: (MapboxMapController controller) =>
                           sessionMapController = controller,
-                      onStyleLoadedCallback: () {
-                        sessionMapController.setBoundsFromTracks(
-                          route.track,
-                          null,
-                          padded: true,
-                        );
-                        if (route.track != null) {
-                          sessionMapController.addRouteLine(route.track!);
-                        }
-                      },
+                      onStyleLoadedCallback: () =>
+                          _setBoundsAndTrack(sessionMapController),
                       onMapClick: (_, __) => showDetails(context),
                     ),
                   )

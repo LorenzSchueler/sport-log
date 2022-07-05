@@ -61,6 +61,72 @@ class _CountWeightInputState extends State<CountWeightInput> {
     super.initState();
   }
 
+  void _setValue() {
+    if (!widget.confirmChanges) {
+      widget.setValue(
+        _count,
+        _weight,
+        _secondWeight,
+        _distanceUnit,
+      );
+    }
+  }
+
+  void _setCount(int count) {
+    setState(() => _count = count);
+    _setValue();
+  }
+
+  void _setDistanceUnit(dynamic unit) {
+    if (unit != null && unit is DistanceUnit) {
+      setState(() => _distanceUnit = unit);
+      _setValue();
+    }
+  }
+
+  void _setUnit(dynamic unit) {
+    if (unit != null && unit is String && unit != _weightUnit) {
+      setState(() {
+        _weightUnit = unit;
+        _weight = _weightUnit == "lb" ? _weight! * _lbToKg : _weight! / _lbToKg;
+        if (_secondWeight != null) {
+          _secondWeight = _weightUnit == "lb"
+              ? _secondWeight! * _lbToKg
+              : _secondWeight! / _lbToKg;
+        }
+      });
+      _setValue();
+    }
+  }
+
+  void _setWeight(double weight) {
+    weight = _weightUnit == "lb" ? weight * _lbToKg : weight;
+    setState(() => _weight = weight);
+    _setValue();
+  }
+
+  void _setFemaleWeight(double weight) {
+    weight = _weightUnit == "lb" ? weight * _lbToKg : weight;
+    setState(() => _secondWeight = weight);
+    _setValue();
+  }
+
+  void _addWeight() {
+    setState(() {
+      _weight = 0;
+      _secondWeight = 0;
+    });
+    _setValue();
+  }
+
+  void _removeWeight() {
+    setState(() {
+      _weight = null;
+      _secondWeight = null;
+    });
+    _setValue();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -89,19 +155,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
                                 ),
                               )
                               .toList(),
-                          onChanged: (unit) {
-                            if (unit != null && unit is DistanceUnit) {
-                              setState(() => _distanceUnit = unit);
-                              if (!widget.confirmChanges) {
-                                widget.setValue(
-                                  _count,
-                                  _weight,
-                                  _secondWeight,
-                                  _distanceUnit,
-                                );
-                              }
-                            }
-                          },
+                          onChanged: _setDistanceUnit,
                         ),
                       ),
                     ),
@@ -113,17 +167,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
                       : "${widget.dimension}",
                   child: IntInput(
                     initialValue: _count,
-                    setValue: (count) {
-                      setState(() => _count = count);
-                      if (!widget.confirmChanges) {
-                        widget.setValue(
-                          _count,
-                          _weight,
-                          _secondWeight,
-                          _distanceUnit,
-                        );
-                      }
-                    },
+                    setValue: _setCount,
                   ),
                 ),
                 if (_weight != null && widget.editWeightUnit)
@@ -145,31 +189,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
                               child: Text("lb"),
                             ),
                           ],
-                          onChanged: (unit) {
-                            if (unit != null &&
-                                unit is String &&
-                                unit != _weightUnit) {
-                              setState(() {
-                                _weightUnit = unit;
-                                _weight = _weightUnit == "lb"
-                                    ? _weight! * _lbToKg
-                                    : _weight! / _lbToKg;
-                                if (_secondWeight != null) {
-                                  _secondWeight = _weightUnit == "lb"
-                                      ? _secondWeight! * _lbToKg
-                                      : _secondWeight! / _lbToKg;
-                                }
-                              });
-                              if (!widget.confirmChanges) {
-                                widget.setValue(
-                                  _count,
-                                  _weight,
-                                  _secondWeight,
-                                  _distanceUnit,
-                                );
-                              }
-                            }
-                          },
+                          onChanged: _setUnit,
                         ),
                       ),
                     ),
@@ -182,19 +202,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
                       initialValue:
                           _weightUnit == "lb" ? _weight! / _lbToKg : _weight!,
                       stepSize: settings.weightIncrement,
-                      setValue: (weight) {
-                        weight =
-                            _weightUnit == "lb" ? weight * _lbToKg : weight;
-                        setState(() => _weight = weight);
-                        if (!widget.confirmChanges) {
-                          widget.setValue(
-                            _count,
-                            _weight,
-                            _secondWeight,
-                            _distanceUnit,
-                          );
-                        }
-                      },
+                      setValue: _setWeight,
                     ),
                   ),
                 if (widget.secondWeight && _secondWeight != null)
@@ -206,57 +214,19 @@ class _CountWeightInputState extends State<CountWeightInput> {
                           ? _secondWeight! / _lbToKg
                           : _secondWeight!,
                       stepSize: settings.weightIncrement,
-                      setValue: (weight) {
-                        weight =
-                            _weightUnit == "lb" ? weight * _lbToKg : weight;
-                        setState(() => _secondWeight = weight);
-                        if (!widget.confirmChanges) {
-                          widget.setValue(
-                            _count,
-                            _weight,
-                            _secondWeight,
-                            _distanceUnit,
-                          );
-                        }
-                      },
+                      setValue: _setFemaleWeight,
                     ),
                   ),
                 _weight == null
                     ? ActionChip(
                         avatar: const Icon(AppIcons.add),
                         label: const Text("Add Weight"),
-                        onPressed: () {
-                          setState(() {
-                            _weight = 0;
-                            _secondWeight = 0;
-                          });
-                          if (!widget.confirmChanges) {
-                            widget.setValue(
-                              _count,
-                              _weight,
-                              _secondWeight,
-                              _distanceUnit,
-                            );
-                          }
-                        },
+                        onPressed: _addWeight,
                       )
                     : ActionChip(
                         avatar: const Icon(AppIcons.close),
                         label: const Text("Remove Weight"),
-                        onPressed: () {
-                          setState(() {
-                            _weight = null;
-                            _secondWeight = null;
-                          });
-                          if (!widget.confirmChanges) {
-                            widget.setValue(
-                              _count,
-                              _weight,
-                              _secondWeight,
-                              _distanceUnit,
-                            );
-                          }
-                        },
+                        onPressed: _removeWeight,
                       ),
               ],
             ),
@@ -269,12 +239,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
                 icon: const Icon(AppIcons.check),
                 iconSize: 40,
                 onPressed: _count > 0 && (_weight == null || _weight! > 0)
-                    ? () => widget.setValue(
-                          _count,
-                          _weight,
-                          _secondWeight,
-                          _distanceUnit,
-                        )
+                    ? _setValue
                     : null,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),

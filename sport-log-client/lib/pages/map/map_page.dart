@@ -39,7 +39,7 @@ class _MapPageState extends State<MapPage> {
   String? _search;
   List<MapBoxPlace> _searchResults = [];
 
-  List<Circle> _currentLocationMarker = [];
+  List<Circle>? _currentLocationMarker = [];
   double _metersPerPixel = 1;
   String _mapStyle = MapboxStyles.OUTDOORS;
   bool _hillshade = false;
@@ -79,6 +79,18 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+  Future<void> _openDrawer() async {
+    await SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+    );
+    await SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp],
+    );
+    if (mounted) {
+      Scaffold.of(context).openDrawer();
+    }
+  }
+
   Future<void> _searchPlaces(String name) async {
     setState(() => _search = name);
     List<MapBoxPlace>? places;
@@ -89,6 +101,53 @@ class _MapPageState extends State<MapPage> {
     }
     if (mounted) {
       setState(() => _searchResults = places ?? []);
+    }
+  }
+
+  Future<void> _toggleSearch() async {
+    setState(() {
+      _search = _search == null ? "" : null;
+      if (_search == null) {
+        _searchResults = [];
+      }
+    });
+    if (_search != null) {
+      _searchBar.requestFocus();
+    }
+  }
+
+  void _goToSearchItem(int index) {
+    FocusManager.instance.primaryFocus?.unfocus();
+    final coords = _searchResults[index].center!;
+    final latLng = LatLng(coords[1], coords[0]);
+    _mapController.animateCenter(latLng);
+
+    final bbox = _searchResults[index].bbox;
+    if (bbox != null) {
+      final bounds =
+          [LatLng(bbox[1], bbox[0]), LatLng(bbox[3], bbox[2])].latLngBounds!;
+      _mapController.animateBounds(
+        bounds,
+        padded: false,
+      );
+    } else {
+      _mapController.animateZoom(16);
+    }
+    setState(() => _searchResults = []);
+  }
+
+  Future<void> _toggleCurrentLocation() async {
+    if (_locationUtils.enabled) {
+      _locationUtils.stopLocationStream();
+      _currentLocationMarker = await _mapController.updateCurrentLocationMarker(
+        _currentLocationMarker,
+        null,
+      );
+    } else {
+      await _locationUtils.startLocationStream();
+    }
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -111,17 +170,7 @@ class _MapPageState extends State<MapPage> {
                 leading: Builder(
                   builder: (context) => IconButton(
                     icon: const Icon(AppIcons.drawer),
-                    onPressed: () async {
-                      await SystemChrome.setEnabledSystemUIMode(
-                        SystemUiMode.edgeToEdge,
-                      );
-                      await SystemChrome.setPreferredOrientations(
-                        [DeviceOrientation.portraitUp],
-                      );
-                      if (mounted) {
-                        Scaffold.of(context).openDrawer();
-                      }
-                    },
+                    onPressed: _openDrawer,
                   ),
                 ),
                 title: _search == null
@@ -138,17 +187,7 @@ class _MapPageState extends State<MapPage> {
                       ),
                 actions: [
                   IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _search = _search == null ? "" : null;
-                        if (_search == null) {
-                          _searchResults = [];
-                        }
-                      });
-                      if (_search != null) {
-                        _searchBar.requestFocus();
-                      }
-                    },
+                    onPressed: _toggleSearch,
                     icon: Icon(
                       _search != null ? AppIcons.close : AppIcons.search,
                     ),
@@ -203,26 +242,12 @@ class _MapPageState extends State<MapPage> {
                     Defaults.sizedBox.vertical.normal,
                     FloatingActionButton.small(
                       heroTag: null,
+                      onPressed: _toggleCurrentLocation,
                       child: Icon(
                         _locationUtils.enabled
                             ? AppIcons.myLocation
                             : AppIcons.myLocationDisabled,
                       ),
-                      onPressed: () async {
-                        if (_locationUtils.enabled) {
-                          _locationUtils.stopLocationStream();
-                          if (_currentLocationMarker.isNotEmpty) {
-                            await _mapController
-                                .removeCircles(_currentLocationMarker);
-                          }
-                          _currentLocationMarker = [];
-                        } else {
-                          await _locationUtils.startLocationStream();
-                        }
-                        if (mounted) {
-                          setState(() {});
-                        }
-                      },
                     ),
                     Defaults.sizedBox.vertical.normal,
                     FloatingActionButton.small(
@@ -250,27 +275,7 @@ class _MapPageState extends State<MapPage> {
                       child: ListView.separated(
                         padding: EdgeInsets.zero,
                         itemBuilder: (context, index) => GestureDetector(
-                          onTap: () {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                            final coords = _searchResults[index].center!;
-                            final latLng = LatLng(coords[1], coords[0]);
-                            _mapController.animateCenter(latLng);
-
-                            final bbox = _searchResults[index].bbox;
-                            if (bbox != null) {
-                              final bounds = [
-                                LatLng(bbox[1], bbox[0]),
-                                LatLng(bbox[3], bbox[2])
-                              ].latLngBounds!;
-                              _mapController.animateBounds(
-                                bounds,
-                                padded: false,
-                              );
-                            } else {
-                              _mapController.animateZoom(16);
-                            }
-                            setState(() => _searchResults = []);
-                          },
+                          onTap: () => _goToSearchItem(index),
                           child: Text(
                             _searchResults[index].toString(),
                             style: Theme.of(context)
@@ -351,6 +356,36 @@ class MapStylesBottomSheet extends StatelessWidget {
     padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
   );
 
+  void _changeStyle(BuildContext context, String style) {
+    onStyleChange(style);
+    onHillshadeChange(false);
+    Navigator.of(context).pop();
+  }
+
+  void _toggleHillshade() {
+    if (hillshade) {
+      mapController.removeLayer("custom-hillshade");
+    } else {
+      mapController
+        ..addSource(
+          'dem',
+          const RasterDemSourceProperties(
+            url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+          ),
+        )
+        ..addHillshadeLayer(
+          "dem",
+          "custom-hillshade",
+          HillshadeLayerProperties(
+            hillshadeShadowColor:
+                const Color.fromARGB(255, 60, 60, 60).toHexStringRGB(),
+            hillshadeHighlightColor:
+                const Color.fromARGB(255, 60, 60, 60).toHexStringRGB(),
+          ),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -362,29 +397,18 @@ class MapStylesBottomSheet extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                onPressed: () {
-                  onStyleChange(MapboxStyles.OUTDOORS);
-                  onHillshadeChange(false);
-                  Navigator.of(context).pop();
-                },
+                onPressed: () => _changeStyle(context, MapboxStyles.OUTDOORS),
                 style: style,
                 child: const Icon(AppIcons.mountains),
               ),
               ElevatedButton(
-                onPressed: () {
-                  onStyleChange(MapboxStyles.MAPBOX_STREETS);
-                  onHillshadeChange(false);
-                  Navigator.of(context).pop();
-                },
+                onPressed: () =>
+                    _changeStyle(context, MapboxStyles.MAPBOX_STREETS),
                 style: style,
                 child: const Icon(AppIcons.car),
               ),
               ElevatedButton(
-                onPressed: () {
-                  onStyleChange(MapboxStyles.SATELLITE);
-                  onHillshadeChange(false);
-                  Navigator.of(context).pop();
-                },
+                onPressed: () => _changeStyle(context, MapboxStyles.SATELLITE),
                 style: style,
                 child: const Icon(AppIcons.satellite),
               ),
@@ -392,6 +416,7 @@ class MapStylesBottomSheet extends StatelessWidget {
           ),
           Defaults.sizedBox.vertical.normal,
           ElevatedButton(
+            onPressed: _toggleHillshade,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -400,33 +425,6 @@ class MapStylesBottomSheet extends StatelessWidget {
                 const Text("Hillshade"),
               ],
             ),
-            onPressed: () {
-              if (hillshade) {
-                mapController.removeLayer("custom-hillshade");
-              } else {
-                mapController
-                  ..addSource(
-                    'dem',
-                    const RasterDemSourceProperties(
-                      url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
-                    ),
-                  )
-                  ..addHillshadeLayer(
-                    "dem",
-                    "custom-hillshade",
-                    HillshadeLayerProperties(
-                      hillshadeShadowColor:
-                          const Color.fromARGB(255, 60, 60, 60)
-                              .toHexStringRGB(),
-                      hillshadeHighlightColor:
-                          const Color.fromARGB(255, 60, 60, 60)
-                              .toHexStringRGB(),
-                    ),
-                  );
-              }
-              onHillshadeChange(!hillshade);
-              Navigator.of(context).pop();
-            },
           ),
         ],
       ),

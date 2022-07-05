@@ -37,10 +37,10 @@ class MovementTable extends TableAccessor<Movement> {
         notDeleted,
         TableAccessor.cardioOnlyOfTable(cardioOnly),
         TableAccessor.distanceOnlyOfTable(distanceOnly),
-        '''(${Columns.userId} IS NOT NULL
-          OR NOT EXISTS (
-            SELECT * FROM $tableName m2
-            WHERE ${TableAccessor.combineFilter([
+        '''
+        (${Columns.userId} IS NOT NULL OR NOT EXISTS (
+          SELECT * FROM $tableName m2
+          WHERE ${TableAccessor.combineFilter([
               "$tableName.${Columns.id} <> m2.${Columns.id}",
               "$tableName.${Columns.name} = m2.${Columns.name}",
               "$tableName.${Columns.dimension} = m2.${Columns.dimension}",
@@ -59,36 +59,36 @@ class MovementDescriptionTable {
     const hasReference = 'has_reference';
     final records = await AppDatabase.database!.rawQuery(
       '''
-    SELECT
-      ${AppDatabase.movements.table.allColumns},
-      (
-        EXISTS (
-          SELECT * FROM ${Tables.metconMovement}
-          WHERE ${Tables.metconMovement}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
-        ) OR EXISTS (
-          SELECT * FROM ${Tables.cardioSession}
-          WHERE ${Tables.cardioSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
-        ) OR EXISTS (
-          SELECT * FROM ${Tables.strengthSession}
-          WHERE ${Tables.strengthSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
-        )
-      ) AS $hasReference
-    FROM ${Tables.movement}
-    WHERE ${TableAccessor.combineFilter([
+      SELECT
+        ${AppDatabase.movements.table.allColumns},
+        (
+          EXISTS (
+            SELECT * FROM ${Tables.metconMovement}
+            WHERE ${Tables.metconMovement}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+          ) OR EXISTS (
+            SELECT * FROM ${Tables.cardioSession}
+            WHERE ${Tables.cardioSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+          ) OR EXISTS (
+            SELECT * FROM ${Tables.strengthSession}
+            WHERE ${Tables.strengthSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+          )
+        ) AS $hasReference
+      FROM ${Tables.movement}
+      WHERE ${TableAccessor.combineFilter([
             TableAccessor.notDeletedOfTable(Tables.movement),
-            """(${Columns.userId} IS NOT NULL
-        OR NOT EXISTS (
-          SELECT * FROM ${Tables.movement} m2
-          WHERE ${TableAccessor.combineFilter([
+            """
+            (${Columns.userId} IS NOT NULL OR NOT EXISTS (
+              SELECT * FROM ${Tables.movement} m2
+              WHERE ${TableAccessor.combineFilter([
                   "${Tables.movement}.${Columns.id} <> m2.${Columns.id}",
                   "${Tables.movement}.${Columns.name} = m2.${Columns.name}",
                   "${Tables.movement}.${Columns.dimension} = m2.${Columns.dimension}",
                   "m2.${Columns.userId} IS NOT NULL",
                 ])}
-        ))"""
+            ))"""
           ])}
-    ORDER BY ${TableAccessor.orderByNameOfTable(Tables.movement)}
-    ''',
+      ORDER BY ${TableAccessor.orderByNameOfTable(Tables.movement)}
+      ''',
     );
     return records
         .map(
@@ -108,38 +108,38 @@ class MovementDescriptionTable {
     const hasReference = 'has_reference';
     final records = await AppDatabase.database!.rawQuery(
       '''
-    SELECT
-      ${AppDatabase.movements.table.allColumns},
-      (
-        EXISTS (
-          SELECT * FROM ${Tables.metconMovement}
-          WHERE ${Tables.metconMovement}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
-        ) OR EXISTS (
-          SELECT * FROM ${Tables.cardioSession}
-          WHERE ${Tables.cardioSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
-        ) OR EXISTS (
-          SELECT * FROM ${Tables.strengthSession}
-          WHERE ${Tables.strengthSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
-        )
-      ) AS $hasReference
-    FROM ${Tables.movement}
-    WHERE ${TableAccessor.combineFilter([
+      SELECT
+        ${AppDatabase.movements.table.allColumns},
+        (
+          EXISTS (
+            SELECT * FROM ${Tables.metconMovement}
+            WHERE ${Tables.metconMovement}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+          ) OR EXISTS (
+            SELECT * FROM ${Tables.cardioSession}
+            WHERE ${Tables.cardioSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+          ) OR EXISTS (
+            SELECT * FROM ${Tables.strengthSession}
+            WHERE ${Tables.strengthSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+          )
+        ) AS $hasReference
+      FROM ${Tables.movement}
+      WHERE ${TableAccessor.combineFilter([
             TableAccessor.notDeletedOfTable(Tables.movement),
             TableAccessor.cardioOnlyOfTable(cardioOnly),
             TableAccessor.distanceOnlyOfTable(distanceOnly),
-            """(${Columns.userId} IS NOT NULL
-        OR NOT EXISTS (
-          SELECT * FROM ${Tables.movement} m2
-          WHERE ${TableAccessor.combineFilter([
+            """
+            (${Columns.userId} IS NOT NULL OR NOT EXISTS (
+            SELECT * FROM ${Tables.movement} m2
+            WHERE ${TableAccessor.combineFilter([
                   "${Tables.movement}.${Columns.id} <> m2.${Columns.id}",
                   "${Tables.movement}.${Columns.name} = m2.${Columns.name}",
                   "${Tables.movement}.${Columns.dimension} = m2.${Columns.dimension}",
                   "m2.${Columns.userId} IS NOT NULL",
                 ])}
-        ))"""
+            ))"""
           ])}
-    ORDER BY ${TableAccessor.orderByNameOfTable(Tables.movement)}
-    ''',
+      ORDER BY ${TableAccessor.orderByNameOfTable(Tables.movement)}
+      ''',
     );
     return records
         .map(

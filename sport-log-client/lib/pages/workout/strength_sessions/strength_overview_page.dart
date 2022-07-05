@@ -44,8 +44,9 @@ class StrengthSessionsPage extends StatelessWidget {
             title: Text(dataProvider.selected?.name ?? "Strength Sessions"),
             actions: [
               IconButton(
+                // ignore: prefer-extracting-callbacks
                 onPressed: () async {
-                  final Movement? movement = await showMovementPicker(
+                  final movement = await showMovementPicker(
                     context: context,
                     selectedMovement: dataProvider.selected,
                   );

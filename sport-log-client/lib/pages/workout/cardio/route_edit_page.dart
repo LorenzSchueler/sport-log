@@ -157,13 +157,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
 
   Future<void> _updateLine() async {
     await _matchLocations();
-    await _mapController.updateLine(
-      _line!,
-      LineOptions(
-        lineWidth: 2,
-        geometry: _route.track?.latLngs,
-      ),
-    );
+    await _mapController.updateRouteLine(_line, _route.track);
   }
 
   Future<void> _addPoint(LatLng latLng, int number) async {
@@ -289,6 +283,16 @@ class _RouteEditPageState extends State<RouteEditPage> {
           );
   }
 
+  Future<void> _setBoundsAndPointsAndLine() async {
+    await _mapController.setBoundsFromTracks(
+      _route.track,
+      _route.markedPositions,
+      padded: true,
+    );
+    await _updatePoints();
+    await _updateLine();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DiscardWarningOnPop(
@@ -320,19 +324,9 @@ class _RouteEditPageState extends State<RouteEditPage> {
                 trackCameraPosition: true,
                 compassEnabled: true,
                 compassViewPosition: CompassViewPosition.TopRight,
-                onMapCreated: (MapboxMapController controller) async {
-                  _mapController = controller;
-                },
-                onStyleLoadedCallback: () async {
-                  await _mapController.setBoundsFromTracks(
-                    _route.track,
-                    _route.markedPositions,
-                    padded: true,
-                  );
-                  _line ??= await _mapController.addRouteLine([]);
-                  await _updatePoints();
-                  await _updateLine();
-                },
+                onMapCreated: (MapboxMapController controller) =>
+                    _mapController = controller,
+                onStyleLoadedCallback: _setBoundsAndPointsAndLine,
                 onMapLongClick: (point, LatLng latLng) => _extendLine(latLng),
               ),
             ),

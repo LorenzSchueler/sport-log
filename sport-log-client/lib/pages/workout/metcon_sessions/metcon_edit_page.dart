@@ -310,16 +310,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
         );
       },
       itemCount: _metconDescription.moves.length,
-      onReorder: (int oldIndex, int newIndex) {
-        FocusManager.instance.primaryFocus?.unfocus();
-        if (oldIndex < newIndex) {
-          newIndex -= 1;
-        }
-        setState(() {
-          final oldMove = _metconDescription.moves.removeAt(oldIndex);
-          _metconDescription.moves.insert(newIndex, oldMove);
-        });
-      },
+      onReorder: _reorder,
     );
   }
 
@@ -349,6 +340,17 @@ class _MetconEditPageState extends State<MetconEditPage> {
           movement: movement,
         ),
       );
+    });
+  }
+
+  void _reorder(int oldIndex, int newIndex) {
+    FocusManager.instance.primaryFocus?.unfocus();
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    setState(() {
+      final oldMove = _metconDescription.moves.removeAt(oldIndex);
+      _metconDescription.moves.insert(newIndex, oldMove);
     });
   }
 }

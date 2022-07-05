@@ -31,6 +31,8 @@ linter:
     cast_nullable_to_non_nullable: true
     directives_ordering: true
     eol_at_end_of_file: true
+    join_return_with_assignment: true
+    leading_newlines_in_multiline_strings: true
     no_default_cases: true
     # prefer_single_quotes: true
     # prefer_double_quotes: true
@@ -91,8 +93,10 @@ dart_code_metrics:
     - prefer-async-await
     - prefer-conditional-expressions
     - prefer-immediate-return 
-    # - prefer-extracting-callbacks:
-        # ignored-named-arguments:
-          # - onPressed
+    - prefer-extracting-callbacks:
+        ignored-named-arguments:
+          - onChanged
+          - onTap
+        allowed-line-count: 5
   rules-exclude:
     - "**/*.g.dart"

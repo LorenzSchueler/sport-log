@@ -76,6 +76,22 @@ class DistanceChart extends StatelessWidget {
 
   double? lastX;
 
+  void _onLongPress(FlTouchEvent event, LineTouchResponse? response) {
+    if (event is FlLongPressStart || event is FlLongPressMoveUpdate) {
+      final xValues = response?.lineBarSpots?.map((e) => e.x).toList();
+      final xValue = xValues == null || xValues.isEmpty
+          ? null
+          : xValues[xValues.length ~/ 2]; // median
+      if (xValue != null && xValue != lastX) {
+        touchCallback?.call(Duration(milliseconds: xValue.round()));
+      }
+      lastX = xValue;
+    } else if (event is FlLongPressEnd) {
+      touchCallback?.call(null);
+      lastX = null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double minY = yFromZero
@@ -134,23 +150,7 @@ class DistanceChart extends StatelessWidget {
             minX: 0.0,
             lineTouchData: LineTouchData(
               touchSpotThreshold: double.infinity, // always get nearest point
-              touchCallback: (event, response) {
-                if (event is FlLongPressStart ||
-                    event is FlLongPressMoveUpdate) {
-                  final xValues =
-                      response?.lineBarSpots?.map((e) => e.x).toList();
-                  final xValue = xValues == null || xValues.isEmpty
-                      ? null
-                      : xValues.average;
-                  if (xValue != null && xValue != lastX) {
-                    touchCallback?.call(Duration(milliseconds: xValue.round()));
-                  }
-                  lastX = xValue;
-                } else if (event is FlLongPressEnd) {
-                  touchCallback?.call(null);
-                  lastX = null;
-                }
-              },
+              touchCallback: _onLongPress,
             ),
             titlesData: FlTitlesData(
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),

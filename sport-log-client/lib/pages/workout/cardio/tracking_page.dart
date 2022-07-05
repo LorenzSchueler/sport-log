@@ -60,7 +60,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
 
   late final MapboxMapController _mapController;
   late Line _line;
-  List<Circle> _currentLocationMarker = [];
+  List<Circle>? _currentLocationMarker;
 
   @override
   void initState() {
@@ -185,7 +185,8 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
 
   Future<void> _onLocationUpdate(LocationData location) async {
     // TODO filter GPS jumps (but allow initial ones)
-    _locationInfo = """provider:   ${location.provider}
+    _locationInfo = """
+provider:   ${location.provider}
 accuracy: ${location.accuracy?.toInt()} m
 time: ${location.time! ~/ 1000} s
 satelites:  ${location.satelliteNumber}
@@ -250,6 +251,18 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
     );
   }
 
+  Future<void> _setTracks() async {
+    if (_cardioSessionDescription.route?.track != null) {
+      await _mapController.addRouteLine(
+        _cardioSessionDescription.route!.track!,
+      );
+    }
+    _line = await _mapController.addTrackLine(
+      _cardioSessionDescription.cardioSession.track!,
+    ); // init with empty track
+    await _startStreams();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DiscardWarningOnPop(
@@ -282,17 +295,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                 compassViewPosition: CompassViewPosition.TopRight,
                 onMapCreated: (MapboxMapController controller) =>
                     _mapController = controller,
-                onStyleLoadedCallback: () async {
-                  if (_cardioSessionDescription.route?.track != null) {
-                    await _mapController.addRouteLine(
-                      _cardioSessionDescription.route!.track!,
-                    );
-                  }
-                  _line = await _mapController.addTrackLine(
-                    _cardioSessionDescription.cardioSession.track!,
-                  ); // init with empty track
-                  await _startStreams();
-                },
+                onStyleLoadedCallback: _setTracks,
               ),
             ),
             Container(

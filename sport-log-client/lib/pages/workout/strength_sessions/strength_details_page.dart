@@ -42,6 +42,23 @@ class StrengthSessionDetailsPageState
     }
   }
 
+  Future<void> _pushEditPage() async {
+    final returnObj = await Navigator.pushNamed(
+      context,
+      Routes.strength.edit,
+      arguments: _strengthSessionDescription,
+    );
+    if (returnObj is ReturnObject<StrengthSessionDescription> && mounted) {
+      if (returnObj.action == ReturnAction.deleted) {
+        Navigator.pop(context);
+      } else {
+        setState(() {
+          _strengthSessionDescription = returnObj.payload;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,23 +70,7 @@ class StrengthSessionDetailsPageState
             icon: const Icon(AppIcons.delete),
           ),
           IconButton(
-            onPressed: () async {
-              final returnObj = await Navigator.pushNamed(
-                context,
-                Routes.strength.edit,
-                arguments: _strengthSessionDescription,
-              );
-              if (returnObj is ReturnObject<StrengthSessionDescription> &&
-                  mounted) {
-                if (returnObj.action == ReturnAction.deleted) {
-                  Navigator.pop(context);
-                } else {
-                  setState(() {
-                    _strengthSessionDescription = returnObj.payload;
-                  });
-                }
-              }
-            },
+            onPressed: _pushEditPage,
             icon: const Icon(AppIcons.edit),
           ),
         ],

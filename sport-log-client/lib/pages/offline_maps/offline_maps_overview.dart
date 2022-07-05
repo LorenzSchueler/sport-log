@@ -195,10 +195,22 @@ class RegionCard extends StatelessWidget {
   final OfflineRegion region;
   final VoidCallback onDelete;
 
+  Future<void> _setBoundsAndBoundingBoxLine(
+    MapboxMapController sessionMapController,
+  ) async {
+    await sessionMapController.setBounds(
+      region.definition.bounds,
+      padded: true,
+    );
+    await sessionMapController.addBoundingBoxLine(
+      region.definition.bounds.northeast,
+      region.definition.bounds.southwest,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    late MapboxMapController sessionMapController;
-
+    late final MapboxMapController sessionMapController;
     return Stack(
       children: [
         SizedBox(
@@ -213,16 +225,8 @@ class RegionCard extends StatelessWidget {
             zoomGesturesEnabled: false,
             onMapCreated: (MapboxMapController controller) =>
                 sessionMapController = controller,
-            onStyleLoadedCallback: () async {
-              await sessionMapController.setBounds(
-                region.definition.bounds,
-                padded: true,
-              );
-              await sessionMapController.addBoundingBoxLine(
-                region.definition.bounds.northeast,
-                region.definition.bounds.southwest,
-              );
-            },
+            onStyleLoadedCallback: () =>
+                _setBoundsAndBoundingBoxLine(sessionMapController),
           ),
         ),
         Positioned(
