@@ -72,14 +72,8 @@ class Settings extends ChangeNotifier {
     }
     if (override) {
       await _storage!.delete(_id);
-    }
-    if (override) {
       await _storage!.delete(_username);
-    }
-    if (override) {
       await _storage!.delete(_password);
-    }
-    if (override) {
       await _storage!.delete(_email);
     }
     if (!_storage!.containsKey(_lastMapPosition) || override) {
