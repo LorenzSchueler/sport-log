@@ -42,6 +42,9 @@ jobs:
     - name: Analyze
       working-directory: sport-log-client
       run: flutter analyze
+    - name: Run Code Metrics
+      working-directory: sport-log-client
+      run: flutter pub run dart_code_metrics:metrics analyze --set-exit-on-violation-level=warning lib
 
   build-android:
     name: "Flutter: Build Android"
