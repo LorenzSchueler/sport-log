@@ -59,8 +59,10 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   late final StepCountUtils _stepUtils;
 
   late final MapboxMapController _mapController;
-  late Line _line;
+  Line? _line;
   List<Circle>? _currentLocationMarker;
+
+  static const maxSpeed = 250;
 
   @override
   void initState() {
@@ -184,7 +186,22 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
-    // TODO filter GPS jumps (but allow initial ones)
+    // filter GPS jumps in tracking mode
+    if (_trackingUtils.isTracking &&
+        _cardioSessionDescription.cardioSession.track!.isNotEmpty) {
+      final lastPosition = _cardioSessionDescription.cardioSession.track!.last;
+      final km =
+          lastPosition.distanceTo(location.latitude!, location.longitude!) /
+              1000;
+      final hour =
+          (_trackingUtils.currentDuration - lastPosition.time).inMilliseconds /
+              (1000 * 60 * 60);
+      final speed = km / hour;
+      if (speed > maxSpeed) {
+        return;
+      }
+    }
+
     _locationInfo = """
 provider:   ${location.provider}
 accuracy: ${location.accuracy?.toInt()} m
@@ -214,7 +231,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
       );
       await _mapController.updateTrackLine(
         _line,
-        _cardioSessionDescription.cardioSession.track!,
+        _cardioSessionDescription.cardioSession.track,
       );
     }
   }
@@ -251,15 +268,12 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
     );
   }
 
-  Future<void> _setTracks() async {
+  Future<void> _setTrackAndStartStreams() async {
     if (_cardioSessionDescription.route?.track != null) {
       await _mapController.addRouteLine(
         _cardioSessionDescription.route!.track!,
       );
     }
-    _line = await _mapController.addTrackLine(
-      _cardioSessionDescription.cardioSession.track!,
-    ); // init with empty track
     await _startStreams();
   }
 
@@ -295,7 +309,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                 compassViewPosition: CompassViewPosition.TopRight,
                 onMapCreated: (MapboxMapController controller) =>
                     _mapController = controller,
-                onStyleLoadedCallback: _setTracks,
+                onStyleLoadedCallback: _setTrackAndStartStreams,
               ),
             ),
             Container(
