@@ -16,6 +16,8 @@ jobs:
       uses: actions/checkout@v3
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
+      with:
+        cache: true
     - name: Format
       working-directory: sport-log-client
       run: flutter format --set-exit-if-changed .
@@ -34,6 +36,8 @@ jobs:
         java-version: '17'
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
+      with:
+        cache: true
     - name: Get Dependencies
       working-directory: sport-log-client
       run: |
@@ -60,6 +64,8 @@ jobs:
         java-version: '11'
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
+      with:
+        cache: true
     - name: Get Dependencies
       working-directory: sport-log-client
       run: flutter pub get
@@ -80,6 +86,8 @@ jobs:
       uses: actions/checkout@v3
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
+      with:
+        cache: true
     - name: Setup Linux Dependencies
       run: |
         sudo apt-get update -y

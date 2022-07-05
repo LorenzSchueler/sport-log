@@ -21,6 +21,7 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
+        override: true
         components: rustfmt
     - name: Cargo fmt
       run: cargo fmt --all -- --check
@@ -36,7 +37,10 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         toolchain: 1.61.0 # stable TODO
+        override: true
         components: clippy
+    - name: Load cache
+      uses: Swatinem/rust-cache@v1
     - name: Cargo clippy
       run: cargo clippy --all-targets -- -D warnings
 
@@ -47,6 +51,13 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+    - name: Load cache
+      uses: Swatinem/rust-cache@v1
     - name: Build
       run: cargo check --manifest-path sport-log-action-provider-map-matcher/Cargo.toml &&
            cargo check --manifest-path sport-log-action-provider-sportstracker/Cargo.toml &&
