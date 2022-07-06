@@ -62,7 +62,7 @@ dependencies:
   polar: ^1.14.0
   provider: ^6.0.2 # state management
   result_type: ^0.1.0 # convenience for returning something that can either be a success or failure
-  sqflite: ^2.0.0+3 # sqlite database
+  sqflite: ^2.0.3 # sqlite database
   sqflite_common_ffi: ^2.1.1
   url_launcher: ^6.0.20
   validators: ^3.0.0
