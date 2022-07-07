@@ -151,7 +151,8 @@ insert into movement (id, user_id, name, description, movement_dimension, cardio
     (150, null, 'Barbell Biceps Curl', null, 'reps', false),
     (151, null, 'Dumbbell Biceps Curl', null, 'reps', false),
     (152, null, 'Kettlebell Overhead Press', null, 'reps', false),
-    (153, null, 'Snowboarding', null, 'distance', true);
+    (153, null, 'Snowboarding', null, 'distance', true),
+    (154, null, 'Strict Ring Dip', null, 'reps', false);
 
 insert into eorm (reps, percentage) values
     (1, 1.0),
