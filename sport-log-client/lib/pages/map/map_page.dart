@@ -30,7 +30,7 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   late LocationUtils _locationUtils;
-  late MapboxMapController _mapController;
+  MapboxMapController? _mapController;
   final _searchBar = FocusNode();
   final _placesSearch =
       PlacesSearch(apiKey: Config.instance.accessToken, limit: 10);
@@ -42,7 +42,6 @@ class _MapPageState extends State<MapPage> {
   List<Circle>? _currentLocationMarker = [];
   double _metersPerPixel = 1;
   String _mapStyle = MapboxStyles.OUTDOORS;
-  bool _hillshade = false;
 
   @override
   void initState() {
@@ -53,27 +52,28 @@ class _MapPageState extends State<MapPage> {
   @override
   void dispose() {
     _locationUtils.stopLocationStream();
-    if (_mapController.cameraPosition != null) {
-      Settings.instance.lastMapPosition = _mapController.cameraPosition!;
+    final cameraPosition = _mapController?.cameraPosition;
+    if (cameraPosition != null) {
+      Settings.instance.lastMapPosition = cameraPosition;
     }
     if (_locationUtils.lastLatLng != null) {
       Settings.instance.lastGpsLatLng = _locationUtils.lastLatLng!;
     }
-    _mapController.removeListener(_mapControllerListener);
+    _mapController?.removeListener(_mapControllerListener);
     super.dispose();
   }
 
   Future<void> _mapControllerListener() async {
-    final latitude = _mapController.cameraPosition!.target.latitude;
+    final latitude = _mapController!.cameraPosition!.target.latitude;
 
     final metersPerPixel =
-        await _mapController.getMetersPerPixelAtLatitude(latitude);
+        await _mapController!.getMetersPerPixelAtLatitude(latitude);
     setState(() => _metersPerPixel = metersPerPixel);
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
-    await _mapController.animateCenter(location.latLng);
-    _currentLocationMarker = await _mapController.updateCurrentLocationMarker(
+    await _mapController?.animateCenter(location.latLng);
+    _currentLocationMarker = await _mapController?.updateCurrentLocationMarker(
       _currentLocationMarker,
       location.latLng,
     );
@@ -120,18 +120,18 @@ class _MapPageState extends State<MapPage> {
     FocusManager.instance.primaryFocus?.unfocus();
     final coords = _searchResults[index].center!;
     final latLng = LatLng(coords[1], coords[0]);
-    _mapController.animateCenter(latLng);
+    _mapController?.animateCenter(latLng);
 
     final bbox = _searchResults[index].bbox;
     if (bbox != null) {
       final bounds =
           [LatLng(bbox[1], bbox[0]), LatLng(bbox[3], bbox[2])].latLngBounds!;
-      _mapController.animateBounds(
+      _mapController?.animateBounds(
         bounds,
         padded: false,
       );
     } else {
-      _mapController.animateZoom(16);
+      _mapController?.animateZoom(16);
     }
     setState(() => _searchResults = []);
   }
@@ -139,7 +139,8 @@ class _MapPageState extends State<MapPage> {
   Future<void> _toggleCurrentLocation() async {
     if (_locationUtils.enabled) {
       _locationUtils.stopLocationStream();
-      _currentLocationMarker = await _mapController.updateCurrentLocationMarker(
+      _currentLocationMarker =
+          await _mapController?.updateCurrentLocationMarker(
         _currentLocationMarker,
         null,
       );
@@ -218,26 +219,16 @@ class _MapPageState extends State<MapPage> {
               right: 10,
               child: MapScale(metersPerPixel: _metersPerPixel),
             ),
-            if (_showOverlays)
+            if (_showOverlays && _mapController != null)
               Positioned(
                 top: 120,
                 right: 15,
                 child: Column(
                   children: [
-                    FloatingActionButton.small(
-                      heroTag: null,
-                      child: const Icon(AppIcons.layers),
-                      onPressed: () => showModalBottomSheet<void>(
-                        context: context,
-                        builder: (context) => MapStylesBottomSheet(
-                          hillshade: _hillshade,
-                          mapController: _mapController,
-                          onStyleChange: (style) =>
-                              setState(() => _mapStyle = style),
-                          onHillshadeChange: (hillshade) =>
-                              setState(() => _hillshade = hillshade),
-                        ),
-                      ),
+                    ShowMapStylesButton(
+                      mapController: _mapController!,
+                      onStyleChange: (style) =>
+                          setState(() => _mapStyle = style),
                     ),
                     Defaults.sizedBox.vertical.normal,
                     FloatingActionButton.small(
@@ -250,7 +241,7 @@ class _MapPageState extends State<MapPage> {
                       ),
                     ),
                     Defaults.sizedBox.vertical.normal,
-                    SetNorthButton(mapController: _mapController),
+                    SetNorthButton(mapController: _mapController!),
                   ],
                 ),
               ),
@@ -351,52 +342,80 @@ class SetNorthButton extends StatelessWidget {
   }
 }
 
-class MapStylesBottomSheet extends StatelessWidget {
-  MapStylesBottomSheet({
-    required this.hillshade,
+class ShowMapStylesButton extends StatelessWidget {
+  const ShowMapStylesButton({
     required this.mapController,
     required this.onStyleChange,
-    required this.onHillshadeChange,
     super.key,
   });
 
-  final bool hillshade;
+  final MapboxMapController mapController;
+  final void Function(String) onStyleChange;
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton.small(
+      heroTag: null,
+      child: const Icon(AppIcons.layers),
+      onPressed: () => showModalBottomSheet<void>(
+        context: context,
+        builder: (context) => MapStylesBottomSheet(
+          mapController: mapController,
+          onStyleChange: onStyleChange,
+        ),
+      ),
+    );
+  }
+}
+
+class MapStylesBottomSheet extends StatefulWidget {
+  const MapStylesBottomSheet({
+    required this.mapController,
+    required this.onStyleChange,
+    super.key,
+  });
+
   final MapboxMapController mapController;
   final void Function(String style) onStyleChange;
-  final void Function(bool hillshade) onHillshadeChange;
+
+  @override
+  State<MapStylesBottomSheet> createState() => _MapStylesBottomSheetState();
+}
+
+class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
+  bool _hillshade = false;
+
+  static const _hillshadeSourceId = "mapbox-terrain-dem-v1";
+  static const _hillshadeLayerId = "custom-hillshade";
 
   final style = ButtonStyle(
     shape: MaterialStateProperty.all(const CircleBorder()),
     padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
   );
 
-  void _changeStyle(BuildContext context, String style) {
-    onStyleChange(style);
-    onHillshadeChange(false);
-    Navigator.of(context).pop();
-  }
-
-  void _toggleHillshade() {
-    if (hillshade) {
-      mapController.removeLayer("custom-hillshade");
+  Future<void> _toggleHillshade() async {
+    if (_hillshade) {
+      setState(() => _hillshade = false);
+      await widget.mapController.removeLayer(_hillshadeLayerId);
+      await widget.mapController.removeSource(_hillshadeSourceId);
     } else {
-      mapController
-        ..addSource(
-          'dem',
-          const RasterDemSourceProperties(
-            url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
-          ),
-        )
-        ..addHillshadeLayer(
-          "dem",
-          "custom-hillshade",
-          HillshadeLayerProperties(
-            hillshadeShadowColor:
-                const Color.fromARGB(255, 60, 60, 60).toHexStringRGB(),
-            hillshadeHighlightColor:
-                const Color.fromARGB(255, 60, 60, 60).toHexStringRGB(),
-          ),
-        );
+      setState(() => _hillshade = true);
+      await widget.mapController.addSource(
+        _hillshadeSourceId,
+        const RasterDemSourceProperties(
+          url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+        ),
+      );
+      await widget.mapController.addHillshadeLayer(
+        _hillshadeSourceId,
+        _hillshadeLayerId,
+        HillshadeLayerProperties(
+          hillshadeShadowColor:
+              const Color.fromARGB(255, 60, 60, 60).toHexStringRGB(),
+          hillshadeHighlightColor:
+              const Color.fromARGB(255, 60, 60, 60).toHexStringRGB(),
+        ),
+      );
     }
   }
 
@@ -411,18 +430,18 @@ class MapStylesBottomSheet extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                onPressed: () => _changeStyle(context, MapboxStyles.OUTDOORS),
+                onPressed: () => widget.onStyleChange(MapboxStyles.OUTDOORS),
                 style: style,
                 child: const Icon(AppIcons.mountains),
               ),
               ElevatedButton(
                 onPressed: () =>
-                    _changeStyle(context, MapboxStyles.MAPBOX_STREETS),
+                    widget.onStyleChange(MapboxStyles.MAPBOX_STREETS),
                 style: style,
                 child: const Icon(AppIcons.car),
               ),
               ElevatedButton(
-                onPressed: () => _changeStyle(context, MapboxStyles.SATELLITE),
+                onPressed: () => widget.onStyleChange(MapboxStyles.SATELLITE),
                 style: style,
                 child: const Icon(AppIcons.satellite),
               ),
@@ -434,7 +453,7 @@ class MapStylesBottomSheet extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(hillshade ? AppIcons.close : AppIcons.add),
+                Icon(_hillshade ? AppIcons.close : AppIcons.add),
                 Defaults.sizedBox.horizontal.normal,
                 const Text("Hillshade"),
               ],
