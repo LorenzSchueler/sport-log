@@ -32,7 +32,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
 
   late MapboxMapController _mapController;
 
-  late Route _route;
+  late final Route _route;
 
   @override
   void initState() {

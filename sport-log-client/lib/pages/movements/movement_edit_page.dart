@@ -31,18 +31,16 @@ class _MovementEditPageState extends State<MovementEditPage> {
   final _dataProvider = MovementDataProvider();
   final _formKey = GlobalKey<FormState>();
   final _descriptionFocusNode = FocusNode();
-  late MovementDescription _movementDescription;
+  late final MovementDescription _movementDescription;
 
   @override
   void initState() {
-    if (widget.movementDescription != null) {
-      _movementDescription = widget.movementDescription!.clone();
-    } else {
-      _movementDescription = MovementDescription.defaultValue();
-      if (widget.name != null) {
-        _movementDescription.movement.name = widget.name!;
-      }
+    _movementDescription = widget.movementDescription?.clone() ??
+        MovementDescription.defaultValue();
+    if (widget.name != null) {
+      _movementDescription.movement.name = widget.name!;
     }
+
     super.initState();
   }
 

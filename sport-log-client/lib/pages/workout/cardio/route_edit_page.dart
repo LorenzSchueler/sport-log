@@ -43,7 +43,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
 
   late MapboxMapController _mapController;
 
-  late Route _route;
+  late final Route _route;
 
   @override
   void initState() {

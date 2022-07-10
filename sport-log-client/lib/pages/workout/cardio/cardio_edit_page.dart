@@ -45,7 +45,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
   Line? _trackLine;
   Line? _routeLine;
 
-  late CardioSessionDescription _cardioSessionDescription;
+  late final CardioSessionDescription _cardioSessionDescription;
   Duration? _cutStartDuration;
   Duration? _cutEndDuration;
   Circle? _cutStartLocationMarker;

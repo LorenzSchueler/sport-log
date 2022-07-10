@@ -31,7 +31,7 @@ class ActionRuleEditPage extends StatefulWidget {
 
 class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
   final _dataProvider = ActionRuleDataProvider();
-  late ActionRule _actionRule;
+  late final ActionRule _actionRule;
 
   @override
   void initState() {

@@ -24,7 +24,7 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = DiaryDataProvider();
 
-  late Diary _diary;
+  late final Diary _diary;
 
   @override
   void initState() {

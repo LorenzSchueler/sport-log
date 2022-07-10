@@ -29,7 +29,7 @@ class ActionEventEditPage extends StatefulWidget {
 
 class _ActionEventEditPageState extends State<ActionEventEditPage> {
   final _dataProvider = ActionEventDataProvider();
-  late ActionEvent _actionEvent;
+  late final ActionEvent _actionEvent;
 
   @override
   void initState() {

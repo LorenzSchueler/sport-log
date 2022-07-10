@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _loginPending = false;
 
-  late TextEditingController _serverUrlInputController;
+  late final TextEditingController _serverUrlInputController;
 
   @override
   void initState() {

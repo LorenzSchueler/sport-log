@@ -29,7 +29,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  late LocationUtils _locationUtils;
+  late final LocationUtils _locationUtils;
   MapboxMapController? _mapController;
   final _searchBar = FocusNode();
   final _placesSearch =

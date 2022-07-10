@@ -41,7 +41,12 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
 
   final _commentsNode = FocusNode();
   final _scrollController = ScrollController();
-  late final StreamSubscription<bool> _keyboardSubscription;
+  final StreamSubscription<bool> _keyboardSubscription =
+      KeyboardVisibilityController().onChange.listen((isVisible) {
+    if (!isVisible) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+  });
 
   @override
   void initState() {
@@ -49,12 +54,6 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     final strengthSessionDescription =
         widget.strengthSessionDescription.clone();
     _strengthSessionDescription = strengthSessionDescription;
-    _keyboardSubscription =
-        KeyboardVisibilityController().onChange.listen((isVisible) {
-      if (!isVisible) {
-        FocusManager.instance.primaryFocus?.unfocus();
-      }
-    });
   }
 
   @override
