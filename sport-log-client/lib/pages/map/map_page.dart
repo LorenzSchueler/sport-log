@@ -250,11 +250,7 @@ class _MapPageState extends State<MapPage> {
                       ),
                     ),
                     Defaults.sizedBox.vertical.normal,
-                    FloatingActionButton.small(
-                      heroTag: null,
-                      child: const Icon(AppIcons.compass),
-                      onPressed: () => _mapController.setNorth(),
-                    ),
+                    SetNorthButton(mapController: _mapController),
                   ],
                 ),
               ),
@@ -333,6 +329,24 @@ class MapScale extends StatelessWidget {
             : "$_scaleLength m",
         textAlign: TextAlign.center,
       ),
+    );
+  }
+}
+
+class SetNorthButton extends StatelessWidget {
+  const SetNorthButton({
+    required this.mapController,
+    super.key,
+  });
+
+  final MapboxMapController mapController;
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton.small(
+      heroTag: null,
+      onPressed: mapController.setNorth,
+      child: const Icon(AppIcons.compass),
     );
   }
 }
