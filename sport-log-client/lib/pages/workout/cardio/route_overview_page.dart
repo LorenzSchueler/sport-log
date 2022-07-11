@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:provider/provider.dart';
-import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
@@ -9,10 +7,10 @@ import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
 import 'package:sport_log/widgets/overview_data_provider.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
@@ -138,17 +136,9 @@ class RouteCard extends StatelessWidget {
             route.track != null && route.track!.isNotEmpty
                 ? SizedBox(
                     height: 150,
-                    child: MapboxMap(
+                    child: StaticMapboxMap(
                       key:
                           ObjectKey(route), // update on relaod to get new track
-                      accessToken: Config.instance.accessToken,
-                      styleString: MapboxStyles.OUTDOORS,
-                      initialCameraPosition:
-                          context.read<Settings>().lastMapPosition,
-                      rotateGesturesEnabled: false,
-                      tiltGesturesEnabled: false,
-                      scrollGesturesEnabled: false,
-                      zoomGesturesEnabled: false,
                       onMapCreated: (MapboxMapController controller) =>
                           sessionMapController = controller,
                       onStyleLoadedCallback: () =>

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:provider/provider.dart';
-import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -14,10 +12,10 @@ import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
 import 'package:sport_log/widgets/overview_data_provider.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
@@ -223,18 +221,10 @@ class CardioSessionCard extends StatelessWidget {
                     cardioSessionDescription.route != null
                 ? SizedBox(
                     height: 150,
-                    child: MapboxMap(
+                    child: StaticMapboxMap(
                       key: ObjectKey(
                         cardioSessionDescription,
                       ), // update on reload to get new track
-                      accessToken: Config.instance.accessToken,
-                      styleString: MapboxStyles.OUTDOORS,
-                      initialCameraPosition:
-                          context.read<Settings>().lastMapPosition,
-                      rotateGesturesEnabled: false,
-                      tiltGesturesEnabled: false,
-                      scrollGesturesEnabled: false,
-                      zoomGesturesEnabled: false,
                       onMapCreated: (MapboxMapController controller) =>
                           sessionMapController = controller,
                       onStyleLoadedCallback: () =>

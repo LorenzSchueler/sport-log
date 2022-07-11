@@ -35,7 +35,6 @@ class MapboxMapWrapper extends StatefulWidget {
     this.zoomGesturesEnabled = true,
     this.tiltGesturesEnabled = true,
     this.doubleClickZoomEnabled,
-    this.dragEnabled = true,
     super.key,
   });
 
@@ -63,7 +62,6 @@ class MapboxMapWrapper extends StatefulWidget {
   final bool zoomGesturesEnabled;
   final bool tiltGesturesEnabled;
   final bool? doubleClickZoomEnabled;
-  final bool dragEnabled;
 
   @override
   State<MapboxMapWrapper> createState() => _MapboxMapWrapperState();
@@ -146,7 +144,7 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
           zoomGesturesEnabled: widget.zoomGesturesEnabled,
           tiltGesturesEnabled: widget.tiltGesturesEnabled,
           doubleClickZoomEnabled: widget.doubleClickZoomEnabled,
-          dragEnabled: widget.dragEnabled,
+          dragEnabled: false,
         ),
         if (widget.showScale)
           widget.scaleAtTop

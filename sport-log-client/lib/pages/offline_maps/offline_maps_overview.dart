@@ -11,6 +11,7 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class OfflineMapsPage extends StatefulWidget {
@@ -125,7 +126,6 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                     styleString: MapboxStyles.OUTDOORS,
                     initialCameraPosition:
                         context.read<Settings>().lastMapPosition,
-                    trackCameraPosition: true,
                     onMapCreated: (MapboxMapController controller) =>
                         _mapController = controller,
                     onMapLongClick: (_, latLng) => _point1 == null
@@ -216,14 +216,7 @@ class RegionCard extends StatelessWidget {
       children: [
         SizedBox(
           height: 150,
-          child: MapboxMap(
-            accessToken: Config.instance.accessToken,
-            styleString: MapboxStyles.OUTDOORS,
-            initialCameraPosition: context.read<Settings>().lastMapPosition,
-            rotateGesturesEnabled: false,
-            tiltGesturesEnabled: false,
-            scrollGesturesEnabled: false,
-            zoomGesturesEnabled: false,
+          child: StaticMapboxMap(
             onMapCreated: (MapboxMapController controller) =>
                 sessionMapController = controller,
             onStyleLoadedCallback: () =>
