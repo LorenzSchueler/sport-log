@@ -28,6 +28,8 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
   late MapboxMapController _mapController;
   Circle? _touchLocationMarker;
 
+  bool fullScreen = false;
+
   @override
   void initState() {
     _route = widget.route.clone();
@@ -69,11 +71,18 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
       appBar: AppBar(
         title: Text(_route.name),
         actions: [
-          if (_route.track != null && _route.track!.isNotEmpty)
+          if (_route.track != null && _route.track!.isNotEmpty) ...[
+            IconButton(
+              onPressed: () => setState(() => fullScreen = !fullScreen),
+              icon: Icon(
+                fullScreen ? AppIcons.closeFullScreen : AppIcons.fullScreen,
+              ),
+            ),
             IconButton(
               onPressed: _exportFile,
               icon: const Icon(AppIcons.download),
             ),
+          ],
           IconButton(
             onPressed: _pushEditPage,
             icon: const Icon(AppIcons.edit),
@@ -109,7 +118,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
                           ],
                         ),
                       ),
-                if (_route.track != null)
+                if (_route.track != null && !fullScreen)
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -126,13 +135,14 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
               ],
             ),
           ),
-          Container(
-            padding: Defaults.edgeInsets.normal,
-            color: Theme.of(context).colorScheme.background,
-            child: RouteValueUnitDescriptionTable(
-              route: _route,
+          if (!fullScreen)
+            Container(
+              padding: Defaults.edgeInsets.normal,
+              color: Theme.of(context).colorScheme.background,
+              child: RouteValueUnitDescriptionTable(
+                route: _route,
+              ),
             ),
-          ),
         ],
       ),
     );

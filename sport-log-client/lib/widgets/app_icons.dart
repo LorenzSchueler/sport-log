@@ -45,6 +45,8 @@ class AppIcons {
   static const IconData dragHandle = Icons.drag_handle_rounded;
   static const IconData upload = Icons.upload_rounded;
   static const IconData cut = Icons.cut_rounded;
+  static const IconData fullScreen = Icons.fullscreen_rounded;
+  static const IconData closeFullScreen = Icons.close_fullscreen_rounded;
 
   // arrows
   static const IconData arrowBack = Icons.arrow_back_rounded;
@@ -57,7 +59,7 @@ class AppIcons {
   static const IconData filterFilled = Icons.filter_alt_rounded;
   static const IconData filter = Icons.filter_alt_outlined;
 
-  // fiels
+  // fields
   static const IconData settings = Icons.settings_rounded;
   static const IconData questionmark = Icons.question_mark_rounded;
   static const IconData email = Icons.email_outlined;

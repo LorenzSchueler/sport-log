@@ -31,6 +31,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   Line? _routeLine;
   Circle? _touchLocationMarker;
 
+  bool fullScreen = false;
+
   double? _speed;
   int? _elevation;
   int? _heartRate;
@@ -88,11 +90,18 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
         title: Text(_cardioSessionDescription.movement.name),
         actions: [
           if (_cardioSessionDescription.cardioSession.track != null &&
-              _cardioSessionDescription.cardioSession.track!.isNotEmpty)
+              _cardioSessionDescription.cardioSession.track!.isNotEmpty) ...[
+            IconButton(
+              onPressed: () => setState(() => fullScreen = !fullScreen),
+              icon: Icon(
+                fullScreen ? AppIcons.closeFullScreen : AppIcons.fullScreen,
+              ),
+            ),
             IconButton(
               onPressed: _exportFile,
               icon: const Icon(AppIcons.download),
             ),
+          ],
           IconButton(
             onPressed: _pushEditPage,
             icon: const Icon(AppIcons.edit),
@@ -128,7 +137,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                           ],
                         ),
                       ),
-                if (_cardioSessionDescription.cardioSession.track != null)
+                if (_cardioSessionDescription.cardioSession.track != null &&
+                    !fullScreen)
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -181,26 +191,28 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
               ],
             ),
           ),
-          Container(
-            padding: Defaults.edgeInsets.normal,
-            color: Theme.of(context).colorScheme.background,
-            child: Column(
-              children: [
-                CardioValueUnitDescriptionTable(
-                  cardioSessionDescription: _cardioSessionDescription,
-                  currentDuration: null,
-                  showDatetimeCardioType: true,
-                ),
-                if (_cardioSessionDescription.cardioSession.comments !=
-                    null) ...[
-                  Defaults.sizedBox.vertical.normal,
-                  CommentsBox(
-                    comments: _cardioSessionDescription.cardioSession.comments!,
+          if (!fullScreen)
+            Container(
+              padding: Defaults.edgeInsets.normal,
+              color: Theme.of(context).colorScheme.background,
+              child: Column(
+                children: [
+                  CardioValueUnitDescriptionTable(
+                    cardioSessionDescription: _cardioSessionDescription,
+                    currentDuration: null,
+                    showDatetimeCardioType: true,
                   ),
-                ]
-              ],
+                  if (_cardioSessionDescription.cardioSession.comments !=
+                      null) ...[
+                    Defaults.sizedBox.vertical.normal,
+                    CommentsBox(
+                      comments:
+                          _cardioSessionDescription.cardioSession.comments!,
+                    ),
+                  ]
+                ],
+              ),
             ),
-          ),
         ],
       ),
     );
