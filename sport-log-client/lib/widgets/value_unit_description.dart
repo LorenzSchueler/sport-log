@@ -113,6 +113,15 @@ class ValueUnitDescription extends StatelessWidget {
           key: key,
         );
 
+  ValueUnitDescription.elevation(int? elevation, {Key? key})
+      : this(
+          value: elevation?.toString(),
+          unit: "m",
+          description: "Elevation",
+          scale: 1.3,
+          key: key,
+        );
+
   const ValueUnitDescription.name(String? name, {Key? key})
       : this(
           value: name,

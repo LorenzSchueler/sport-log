@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -8,12 +9,14 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
     required this.cardioSessionDescription,
     required this.currentDuration,
     this.showDatetimeCardioType = false,
+    this.showCurrentElevation = false,
     super.key,
   });
 
   final CardioSessionDescription cardioSessionDescription;
   final Duration? currentDuration;
   final bool showDatetimeCardioType;
+  final bool showCurrentElevation;
 
   @override
   Widget build(BuildContext context) {
@@ -101,6 +104,19 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
             ),
           ],
         ),
+        if (showCurrentElevation) ...[
+          rowSpacer,
+          TableRow(
+            children: [
+              ValueUnitDescription.elevation(
+                cardioSessionDescription
+                    .cardioSession.track?.lastOrNull?.elevation
+                    .round(),
+              ),
+              Container()
+            ],
+          ),
+        ],
         ...currentDuration != null
             ? [
                 rowSpacer,

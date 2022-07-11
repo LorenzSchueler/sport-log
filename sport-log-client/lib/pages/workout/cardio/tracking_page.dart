@@ -317,6 +317,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                     CardioValueUnitDescriptionTable(
                       cardioSessionDescription: _cardioSessionDescription,
                       currentDuration: trackingUtils.currentDuration,
+                      showCurrentElevation: true,
                     ),
                     Defaults.sizedBox.vertical.normal,
                     _TrackingPageButtons(
