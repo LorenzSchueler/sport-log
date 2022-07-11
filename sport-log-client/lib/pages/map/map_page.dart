@@ -58,7 +58,7 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  Future<void> _toggleSearch() async {
+  void _toggleSearch() {
     setState(() {
       _search = _search == null ? "" : null;
       if (_search == null) {
@@ -70,24 +70,23 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  void _goToSearchItem(int index) {
+  Future<void> _goToSearchItem(int index) async {
     FocusManager.instance.primaryFocus?.unfocus();
-    final coords = _searchResults[index].center!;
-    final latLng = LatLng(coords[1], coords[0]);
-    _mapController?.animateCenter(latLng);
+    final item = _searchResults[index];
+    setState(() => _searchResults = []);
 
-    final bbox = _searchResults[index].bbox;
+    final coords = item.center!;
+    await _mapController?.animateCenter(LatLng(coords[1], coords[0]));
+
+    final bbox = item.bbox;
     if (bbox != null) {
-      final bounds =
-          [LatLng(bbox[1], bbox[0]), LatLng(bbox[3], bbox[2])].latLngBounds!;
-      _mapController?.animateBounds(
-        bounds,
+      await _mapController?.animateBounds(
+        [LatLng(bbox[1], bbox[0]), LatLng(bbox[3], bbox[2])].latLngBounds!,
         padded: false,
       );
     } else {
-      _mapController?.animateZoom(16);
+      await _mapController?.animateZoom(16);
     }
-    setState(() => _searchResults = []);
   }
 
   static const _searchBackgroundColor = Color.fromARGB(150, 255, 255, 255);
@@ -158,36 +157,58 @@ class _MapPageState extends State<MapPage> {
                 top: 56, // height of AppBar
                 right: 0,
                 left: 0,
-                child: Container(
-                  padding: Defaults.edgeInsets.normal,
-                  color: _searchBackgroundColor,
-                  constraints: const BoxConstraints(maxHeight: 200),
-                  child: MediaQuery.removePadding(
-                    context: context,
-                    removeTop: true,
-                    child: Scrollbar(
-                      thumbVisibility: true,
-                      child: ListView.separated(
-                        padding: EdgeInsets.zero,
-                        itemBuilder: (context, index) => GestureDetector(
-                          onTap: () => _goToSearchItem(index),
-                          child: Text(
-                            _searchResults[index].toString(),
-                            style: Theme.of(context)
-                                .textTheme
-                                .subtitle1!
-                                .copyWith(color: Colors.black),
-                          ),
-                        ),
-                        itemCount: _searchResults.length,
-                        separatorBuilder: (context, index) => const Divider(),
-                        shrinkWrap: true,
-                      ),
-                    ),
-                  ),
+                child: MapSearchResults(
+                  searchResults: _searchResults,
+                  backgroundColor: _searchBackgroundColor,
+                  onItemTap: _goToSearchItem,
                 ),
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class MapSearchResults extends StatelessWidget {
+  const MapSearchResults({
+    required this.searchResults,
+    required this.backgroundColor,
+    required this.onItemTap,
+    super.key,
+  });
+
+  final List<MapBoxPlace> searchResults;
+  final Color backgroundColor;
+  final void Function(int) onItemTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: Defaults.edgeInsets.normal,
+      color: backgroundColor,
+      constraints: const BoxConstraints(maxHeight: 200),
+      child: MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        child: Scrollbar(
+          thumbVisibility: true,
+          child: ListView.separated(
+            padding: EdgeInsets.zero,
+            itemBuilder: (context, index) => GestureDetector(
+              onTap: () => onItemTap(index),
+              child: Text(
+                searchResults[index].toString(),
+                style: Theme.of(context)
+                    .textTheme
+                    .subtitle1!
+                    .copyWith(color: Colors.black),
+              ),
+            ),
+            itemCount: searchResults.length,
+            separatorBuilder: (context, index) => const Divider(),
+            shrinkWrap: true,
+          ),
         ),
       ),
     );
