@@ -2,24 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:mapbox_search/mapbox_search.dart';
-import 'package:provider/provider.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
-import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
-import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/map_widgets/map_scale.dart';
-import 'package:sport_log/widgets/map_widgets/map_styles.dart';
-import 'package:sport_log/widgets/map_widgets/set_north.dart';
+import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
@@ -31,7 +24,6 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  late final LocationUtils _locationUtils;
   MapboxMapController? _mapController;
   final _searchBar = FocusNode();
   final _placesSearch =
@@ -41,47 +33,7 @@ class _MapPageState extends State<MapPage> {
   String? _search;
   List<MapBoxPlace> _searchResults = [];
 
-  List<Circle>? _currentLocationMarker = [];
-  double _metersPerPixel = 1;
-  String _mapStyle = MapboxStyles.OUTDOORS;
-
-  @override
-  void initState() {
-    _locationUtils = LocationUtils(_onLocationUpdate);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _locationUtils.stopLocationStream();
-    final cameraPosition = _mapController?.cameraPosition;
-    if (cameraPosition != null) {
-      Settings.instance.lastMapPosition = cameraPosition;
-    }
-    if (_locationUtils.lastLatLng != null) {
-      Settings.instance.lastGpsLatLng = _locationUtils.lastLatLng!;
-    }
-    _mapController?.removeListener(_mapControllerListener);
-    super.dispose();
-  }
-
-  Future<void> _mapControllerListener() async {
-    final latitude = _mapController!.cameraPosition!.target.latitude;
-
-    final metersPerPixel =
-        await _mapController!.getMetersPerPixelAtLatitude(latitude);
-    setState(() => _metersPerPixel = metersPerPixel);
-  }
-
-  Future<void> _onLocationUpdate(LocationData location) async {
-    await _mapController?.animateCenter(location.latLng);
-    _currentLocationMarker = await _mapController?.updateCurrentLocationMarker(
-      _currentLocationMarker,
-      location.latLng,
-    );
-  }
-
-  Future<void> _openDrawer() async {
+  Future<void> _openDrawer(BuildContext context) async {
     await SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.edgeToEdge,
     );
@@ -138,22 +90,6 @@ class _MapPageState extends State<MapPage> {
     setState(() => _searchResults = []);
   }
 
-  Future<void> _toggleCurrentLocation() async {
-    if (_locationUtils.enabled) {
-      _locationUtils.stopLocationStream();
-      _currentLocationMarker =
-          await _mapController?.updateCurrentLocationMarker(
-        _currentLocationMarker,
-        null,
-      );
-    } else {
-      await _locationUtils.startLocationStream();
-    }
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   static const _searchBackgroundColor = Color.fromARGB(150, 255, 255, 255);
 
   @override
@@ -173,7 +109,7 @@ class _MapPageState extends State<MapPage> {
                 leading: Builder(
                   builder: (context) => IconButton(
                     icon: const Icon(AppIcons.drawer),
-                    onPressed: _openDrawer,
+                    onPressed: () => _openDrawer(context),
                   ),
                 ),
                 title: _search == null
@@ -205,51 +141,21 @@ class _MapPageState extends State<MapPage> {
         body: Stack(
           alignment: Alignment.center,
           children: [
-            MapboxMap(
-              accessToken: Config.instance.accessToken,
-              styleString: _mapStyle,
-              initialCameraPosition: context.read<Settings>().lastMapPosition,
-              trackCameraPosition: true,
-              onMapCreated: (MapboxMapController controller) => _mapController =
-                  controller..addListener(_mapControllerListener),
+            MapboxMapWrapper(
+              showScale: true,
+              showMapStylesButton: _showOverlays,
+              showCurrentLocationButton: _showOverlays,
+              showSetNorthButton: _showOverlays,
+              onMapCreated: (MapboxMapController controller) => setState(() {
+                _mapController = controller;
+              }),
               onMapClick: (_, __) => setState(() {
                 _showOverlays = !_showOverlays;
               }),
             ),
-            Positioned(
-              bottom: 10,
-              right: 10,
-              child: MapScale(metersPerPixel: _metersPerPixel),
-            ),
-            if (_showOverlays && _mapController != null)
-              Positioned(
-                top: 120,
-                right: 15,
-                child: Column(
-                  children: [
-                    MapStylesButton(
-                      mapController: _mapController!,
-                      onStyleChange: (style) =>
-                          setState(() => _mapStyle = style),
-                    ),
-                    Defaults.sizedBox.vertical.normal,
-                    FloatingActionButton.small(
-                      heroTag: null,
-                      onPressed: _toggleCurrentLocation,
-                      child: Icon(
-                        _locationUtils.enabled
-                            ? AppIcons.myLocation
-                            : AppIcons.myLocationDisabled,
-                      ),
-                    ),
-                    Defaults.sizedBox.vertical.normal,
-                    SetNorthButton(mapController: _mapController!),
-                  ],
-                ),
-              ),
             if (_showOverlays && _searchResults.isNotEmpty)
               Positioned(
-                top: 56,
+                top: 56, // height of AppBar
                 right: 0,
                 left: 0,
                 child: Container(
