@@ -145,6 +145,7 @@ class _MapPageState extends State<MapPage> {
               showMapStylesButton: _showOverlays,
               showCurrentLocationButton: _showOverlays,
               showSetNorthButton: _showOverlays,
+              buttonTopOffset: 120,
               onMapCreated: (MapboxMapController controller) => setState(() {
                 _mapController = controller;
               }),

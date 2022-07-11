@@ -4,8 +4,6 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:mapbox_api/mapbox_api.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:provider/provider.dart';
-import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
@@ -14,10 +12,10 @@ import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
@@ -51,14 +49,6 @@ class _RouteEditPageState extends State<RouteEditPage> {
     _route.track ??= [];
     _route.markedPositions ??= [];
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    if (_mapController.cameraPosition != null) {
-      Settings.instance.lastMapPosition = _mapController.cameraPosition!;
-    }
-    super.dispose();
   }
 
   Future<void> _saveRoute() async {
@@ -317,13 +307,11 @@ class _RouteEditPageState extends State<RouteEditPage> {
         body: Column(
           children: [
             Expanded(
-              child: MapboxMap(
-                accessToken: Config.instance.accessToken,
-                styleString: MapboxStyles.OUTDOORS,
-                initialCameraPosition: context.read<Settings>().lastMapPosition,
-                trackCameraPosition: true,
-                compassEnabled: true,
-                compassViewPosition: CompassViewPosition.TopRight,
+              child: MapboxMapWrapper(
+                showScale: true,
+                showMapStylesButton: true,
+                showCurrentLocationButton: false,
+                showSetNorthButton: true,
                 onMapCreated: (MapboxMapController controller) =>
                     _mapController = controller,
                 onStyleLoadedCallback: _setBoundsAndPointsAndLine,

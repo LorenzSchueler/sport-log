@@ -21,6 +21,8 @@ class MapboxMapWrapper extends StatefulWidget {
     required this.showMapStylesButton,
     required this.showCurrentLocationButton,
     required this.showSetNorthButton,
+    this.buttonTopOffset = 0,
+    this.scaleAtTop = false,
     this.styleString,
     this.initialCameraPosition,
     this.trackCameraPosition = false,
@@ -41,6 +43,8 @@ class MapboxMapWrapper extends StatefulWidget {
   final bool showMapStylesButton;
   final bool showCurrentLocationButton;
   final bool showSetNorthButton;
+  final int buttonTopOffset;
+  final bool scaleAtTop;
 
   /// defaults to [MapboxStyles.OUTDOORS]
   final String? styleString;
@@ -145,14 +149,20 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
           dragEnabled: widget.dragEnabled,
         ),
         if (widget.showScale)
-          Positioned(
-            bottom: 10,
-            right: 10,
-            child: MapScale(metersPerPixel: _metersPerPixel),
-          ),
+          widget.scaleAtTop
+              ? Positioned(
+                  top: 10,
+                  left: 10,
+                  child: MapScale(metersPerPixel: _metersPerPixel),
+                )
+              : Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: MapScale(metersPerPixel: _metersPerPixel),
+                ),
         if (_mapController != null)
           Positioned(
-            top: 120,
+            top: widget.buttonTopOffset + 15,
             right: 15,
             child: Column(
               children: [

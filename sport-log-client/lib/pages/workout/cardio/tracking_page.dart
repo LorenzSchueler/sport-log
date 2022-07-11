@@ -7,7 +7,6 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:polar/polar.dart';
 import 'package:provider/provider.dart';
-import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -23,6 +22,7 @@ import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_tab
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 
@@ -91,9 +91,6 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
     _stepUtils.stopStepCountStream();
     _locationUtils.stopLocationStream();
     widget.heartRateUtils?.stopHeartRateStream();
-    if (_mapController.cameraPosition != null) {
-      Settings.instance.lastMapPosition = _mapController.cameraPosition!;
-    }
     if (_locationUtils.lastLatLng != null) {
       Settings.instance.lastGpsLatLng = _locationUtils.lastLatLng!;
     }
@@ -297,16 +294,15 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
               ),
             ),
             Expanded(
-              child: MapboxMap(
-                accessToken: Config.instance.accessToken,
-                styleString: MapboxStyles.OUTDOORS,
+              child: MapboxMapWrapper(
+                showScale: true,
+                showMapStylesButton: true,
+                showCurrentLocationButton: false,
+                showSetNorthButton: true,
                 initialCameraPosition: CameraPosition(
                   zoom: 15.0,
                   target: context.read<Settings>().lastGpsLatLng,
                 ),
-                trackCameraPosition: true,
-                compassEnabled: true,
-                compassViewPosition: CompassViewPosition.TopRight,
                 onMapCreated: (MapboxMapController controller) =>
                     _mapController = controller,
                 onStyleLoadedCallback: _setTrackAndStartStreams,

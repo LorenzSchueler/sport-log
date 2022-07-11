@@ -2,8 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:provider/provider.dart';
-import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
@@ -14,9 +12,9 @@ import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_tab
 import 'package:sport_log/pages/workout/charts/duration_chart.dart';
 import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 
 class CardioDetailsPage extends StatefulWidget {
   const CardioDetailsPage({required this.cardioSessionDescription, super.key});
@@ -123,11 +121,12 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
             child: Stack(
               children: [
                 _cardioSessionDescription.cardioSession.track != null
-                    ? MapboxMap(
-                        accessToken: Config.instance.accessToken,
-                        styleString: MapboxStyles.OUTDOORS,
-                        initialCameraPosition:
-                            context.read<Settings>().lastMapPosition,
+                    ? MapboxMapWrapper(
+                        showScale: true,
+                        showMapStylesButton: true,
+                        showCurrentLocationButton: false,
+                        showSetNorthButton: true,
+                        scaleAtTop: true,
                         onMapCreated: (MapboxMapController controller) =>
                             _mapController = controller,
                         onStyleLoadedCallback: _setBoundsAndLines,

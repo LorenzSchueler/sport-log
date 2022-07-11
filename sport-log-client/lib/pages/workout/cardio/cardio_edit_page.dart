@@ -1,8 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:provider/provider.dart';
-import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -11,11 +9,11 @@ import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
+import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/picker/cardio_type_picker.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
@@ -188,11 +186,11 @@ class _CardioEditPageState extends State<CardioEditPage> {
             if (_cardioSessionDescription.cardioSession.track != null)
               SizedBox(
                 height: 250,
-                child: MapboxMap(
-                  accessToken: Config.instance.accessToken,
-                  styleString: MapboxStyles.OUTDOORS,
-                  initialCameraPosition:
-                      context.read<Settings>().lastMapPosition,
+                child: MapboxMapWrapper(
+                  showScale: true,
+                  showMapStylesButton: true,
+                  showCurrentLocationButton: false,
+                  showSetNorthButton: true,
                   onMapCreated: (MapboxMapController controller) =>
                       _mapController = controller,
                   onStyleLoadedCallback: _setBoundsAndLines,

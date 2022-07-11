@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:provider/provider.dart';
-import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
@@ -10,10 +8,10 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class RouteUploadPage extends StatefulWidget {
@@ -77,13 +75,11 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
         body: Column(
           children: [
             Expanded(
-              child: MapboxMap(
-                accessToken: Config.instance.accessToken,
-                styleString: MapboxStyles.OUTDOORS,
-                initialCameraPosition: context.read<Settings>().lastMapPosition,
-                trackCameraPosition: true,
-                compassEnabled: true,
-                compassViewPosition: CompassViewPosition.TopRight,
+              child: MapboxMapWrapper(
+                showScale: true,
+                showMapStylesButton: true,
+                showCurrentLocationButton: false,
+                showSetNorthButton: true,
                 onMapCreated: (MapboxMapController controller) async {
                   _mapController = controller;
                 },

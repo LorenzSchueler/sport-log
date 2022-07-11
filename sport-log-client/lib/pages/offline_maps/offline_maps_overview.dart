@@ -131,6 +131,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                     onMapLongClick: (_, latLng) => _point1 == null
                         ? _updatePoint1(latLng)
                         : _updatePoint2(latLng),
+                    rotateGesturesEnabled: false,
                   ),
                 ),
                 Positioned(
