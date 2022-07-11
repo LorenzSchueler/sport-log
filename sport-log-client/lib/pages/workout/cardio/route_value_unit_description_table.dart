@@ -15,8 +15,8 @@ class RouteValueUnitDescriptionTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final TableRow rowSpacer = TableRow(
       children: [
-        Defaults.sizedBox.vertical.normal,
-        Defaults.sizedBox.vertical.normal,
+        Defaults.sizedBox.vertical.small,
+        Defaults.sizedBox.vertical.small,
       ],
     );
 

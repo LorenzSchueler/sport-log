@@ -7,22 +7,37 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
   const CardioValueUnitDescriptionTable({
     required this.cardioSessionDescription,
     required this.currentDuration,
+    this.showDatetimeCardioType = false,
     super.key,
   });
 
   final CardioSessionDescription cardioSessionDescription;
   final Duration? currentDuration;
+  final bool showDatetimeCardioType;
 
   @override
   Widget build(BuildContext context) {
     TableRow rowSpacer = TableRow(
       children: [
-        Defaults.sizedBox.vertical.normal,
-        Defaults.sizedBox.vertical.normal,
+        Defaults.sizedBox.vertical.small,
+        Defaults.sizedBox.vertical.small,
       ],
     );
     return Table(
       children: [
+        if (showDatetimeCardioType) ...[
+          TableRow(
+            children: [
+              ValueUnitDescription.datetime(
+                cardioSessionDescription.cardioSession.datetime,
+              ),
+              ValueUnitDescription.cardioType(
+                cardioSessionDescription.cardioSession.cardioType,
+              ),
+            ],
+          ),
+          rowSpacer,
+        ],
         TableRow(
           children: [
             ValueUnitDescription.time(

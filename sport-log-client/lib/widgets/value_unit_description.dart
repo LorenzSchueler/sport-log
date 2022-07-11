@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/models/cardio/cardio_session.dart';
 
 class ValueUnitDescription extends StatelessWidget {
   const ValueUnitDescription({
@@ -56,6 +57,24 @@ class ValueUnitDescription extends StatelessWidget {
           value: calories?.toString(),
           unit: "cal",
           description: "Energy",
+          scale: 1.3,
+          key: key,
+        );
+
+  ValueUnitDescription.cardioType(CardioType cardioType, {Key? key})
+      : this(
+          value: cardioType.toString(),
+          unit: null,
+          description: "Type",
+          scale: 1.3,
+          key: key,
+        );
+
+  ValueUnitDescription.datetime(DateTime datetime, {Key? key})
+      : this(
+          value: datetime.toHumanDateTime(),
+          unit: null,
+          description: "Date",
           scale: 1.3,
           key: key,
         );

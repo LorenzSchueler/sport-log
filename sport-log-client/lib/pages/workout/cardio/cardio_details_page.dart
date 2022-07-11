@@ -1,9 +1,7 @@
 import 'package:collection/collection.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/gpx.dart';
 import 'package:sport_log/helpers/page_return.dart';
@@ -87,21 +85,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: "${_cardioSessionDescription.movement.name}  ",
-                style: Theme.of(context).textTheme.headline6,
-              ),
-              TextSpan(
-                text: describeEnum(
-                  _cardioSessionDescription.cardioSession.cardioType,
-                ),
-              )
-            ],
-          ),
-        ),
+        title: Text(_cardioSessionDescription.movement.name),
         actions: [
           if (_cardioSessionDescription.cardioSession.track != null &&
               _cardioSessionDescription.cardioSession.track!.isNotEmpty)
@@ -144,24 +128,6 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                           ],
                         ),
                       ),
-                Positioned(
-                  top: 5,
-                  left: 0,
-                  right: 0,
-                  child: Text(
-                    _cardioSessionDescription.cardioSession.datetime
-                        .toHumanDateTime(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color:
-                          _cardioSessionDescription.cardioSession.track != null
-                              ? Theme.of(context).colorScheme.background
-                              : Theme.of(context).colorScheme.onBackground,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
                 if (_cardioSessionDescription.cardioSession.track != null)
                   Positioned(
                     bottom: 0,
@@ -223,6 +189,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                 CardioValueUnitDescriptionTable(
                   cardioSessionDescription: _cardioSessionDescription,
                   currentDuration: null,
+                  showDatetimeCardioType: true,
                 ),
                 if (_cardioSessionDescription.cardioSession.comments !=
                     null) ...[
