@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,6 +17,9 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/map_widgets/map_scale.dart';
+import 'package:sport_log/widgets/map_widgets/map_styles.dart';
+import 'package:sport_log/widgets/map_widgets/set_north.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
@@ -225,7 +227,7 @@ class _MapPageState extends State<MapPage> {
                 right: 15,
                 child: Column(
                   children: [
-                    ShowMapStylesButton(
+                    MapStylesButton(
                       mapController: _mapController!,
                       onStyleChange: (style) =>
                           setState(() => _mapStyle = style),
@@ -281,185 +283,6 @@ class _MapPageState extends State<MapPage> {
               ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class MapScale extends StatelessWidget {
-  const MapScale({required this.metersPerPixel, super.key});
-
-  final double metersPerPixel;
-
-  double get _scaleWidth {
-    const maxWidth = 200;
-    final maxWidthMeters = maxWidth * metersPerPixel;
-    final fac = maxWidthMeters / pow(10, (log(maxWidthMeters) / ln10).floor());
-    if (fac >= 1 && fac < 2) {
-      return maxWidth / fac;
-    } else if (fac < 5) {
-      return maxWidth / fac * 2;
-    } else {
-      // fac < 10
-      return maxWidth / fac * 5;
-    }
-  }
-
-  int get _scaleLength {
-    return (_scaleWidth * metersPerPixel).round();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: _scaleWidth,
-      color: Theme.of(context).colorScheme.background,
-      child: Text(
-        _scaleLength >= 1000
-            ? "${(_scaleLength / 1000).round()} km"
-            : "$_scaleLength m",
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-}
-
-class SetNorthButton extends StatelessWidget {
-  const SetNorthButton({
-    required this.mapController,
-    super.key,
-  });
-
-  final MapboxMapController mapController;
-
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton.small(
-      heroTag: null,
-      onPressed: mapController.setNorth,
-      child: const Icon(AppIcons.compass),
-    );
-  }
-}
-
-class ShowMapStylesButton extends StatelessWidget {
-  const ShowMapStylesButton({
-    required this.mapController,
-    required this.onStyleChange,
-    super.key,
-  });
-
-  final MapboxMapController mapController;
-  final void Function(String) onStyleChange;
-
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton.small(
-      heroTag: null,
-      child: const Icon(AppIcons.layers),
-      onPressed: () => showModalBottomSheet<void>(
-        context: context,
-        builder: (context) => MapStylesBottomSheet(
-          mapController: mapController,
-          onStyleChange: onStyleChange,
-        ),
-      ),
-    );
-  }
-}
-
-class MapStylesBottomSheet extends StatefulWidget {
-  const MapStylesBottomSheet({
-    required this.mapController,
-    required this.onStyleChange,
-    super.key,
-  });
-
-  final MapboxMapController mapController;
-  final void Function(String style) onStyleChange;
-
-  @override
-  State<MapStylesBottomSheet> createState() => _MapStylesBottomSheetState();
-}
-
-class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
-  bool _hillshade = false;
-
-  static const _hillshadeSourceId = "mapbox-terrain-dem-v1";
-  static const _hillshadeLayerId = "custom-hillshade";
-
-  final style = ButtonStyle(
-    shape: MaterialStateProperty.all(const CircleBorder()),
-    padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
-  );
-
-  Future<void> _toggleHillshade() async {
-    if (_hillshade) {
-      setState(() => _hillshade = false);
-      await widget.mapController.removeLayer(_hillshadeLayerId);
-      await widget.mapController.removeSource(_hillshadeSourceId);
-    } else {
-      setState(() => _hillshade = true);
-      await widget.mapController.addSource(
-        _hillshadeSourceId,
-        const RasterDemSourceProperties(
-          url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
-        ),
-      );
-      await widget.mapController.addHillshadeLayer(
-        _hillshadeSourceId,
-        _hillshadeLayerId,
-        HillshadeLayerProperties(
-          hillshadeShadowColor:
-              const Color.fromARGB(255, 60, 60, 60).toHexStringRGB(),
-          hillshadeHighlightColor:
-              const Color.fromARGB(255, 60, 60, 60).toHexStringRGB(),
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: Defaults.edgeInsets.normal,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () => widget.onStyleChange(MapboxStyles.OUTDOORS),
-                style: style,
-                child: const Icon(AppIcons.mountains),
-              ),
-              ElevatedButton(
-                onPressed: () =>
-                    widget.onStyleChange(MapboxStyles.MAPBOX_STREETS),
-                style: style,
-                child: const Icon(AppIcons.car),
-              ),
-              ElevatedButton(
-                onPressed: () => widget.onStyleChange(MapboxStyles.SATELLITE),
-                style: style,
-                child: const Icon(AppIcons.satellite),
-              ),
-            ],
-          ),
-          Defaults.sizedBox.vertical.normal,
-          ElevatedButton(
-            onPressed: _toggleHillshade,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(_hillshade ? AppIcons.close : AppIcons.add),
-                Defaults.sizedBox.horizontal.normal,
-                const Text("Hillshade"),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
