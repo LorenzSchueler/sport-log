@@ -1,23 +1,68 @@
-import 'package:fuzzywuzzy/applicable.dart';
-import 'package:fuzzywuzzy/fuzzywuzzy.dart';
+import 'dart:math';
 
-class _SortAlgorithm implements Applicable {
-  @override
-  int apply(String s1, String s2) => tokenSortRatio(s1, s2);
+class SortItem<T> {
+  const SortItem(this.score, this.item);
+
+  final int score;
+  final T item;
 }
 
 extension SortExtension<T> on List<T> {
-  List<T> fuzzySortByKey({
-    required String? key,
+  List<T> fuzzySort({
+    required String? query,
     required String Function(T) toString,
   }) {
-    return key == null || key.isEmpty
-        ? this
-        : extractAllSorted(
-            query: key,
-            choices: this,
-            getter: toString,
-            ratio: _SortAlgorithm(),
-          ).map((e) => e.choice).toList();
+    if (query == null || query.isEmpty) return this;
+    final sortedItems = map((e) => SortItem<T>(distance(query, toString(e)), e))
+        .toList()
+      ..sort((x, y) => x.score.compareTo(y.score));
+    return sortedItems.map((e) => e.item).toList();
   }
+}
+
+int distance(
+  String query,
+  String canditate, {
+  int insert = 1,
+  int edit = 3,
+  int delete = 6,
+}) {
+  if (query == canditate) {
+    return 0;
+  }
+
+  if (query.isEmpty) {
+    return canditate.length * insert;
+  }
+
+  if (canditate.isEmpty) {
+    return query.length * delete;
+  }
+
+  List<int> v0 = List<int>.generate(
+    canditate.length + 1,
+    (i) => i * insert,
+    growable: false,
+  );
+  List<int> v1 = List<int>.filled(canditate.length + 1, 0, growable: false);
+  List<int> vtemp;
+
+  for (var i = 1; i <= query.length; i++) {
+    v1[0] = i * delete;
+
+    for (var j = 1; j <= canditate.length; j++) {
+      int cost = edit;
+      if (query.codeUnitAt(i - 1) == canditate.codeUnitAt(j - 1)) {
+        cost = 0;
+      }
+      v1[j] =
+          [v1[j - 1] + insert, v0[j] + delete, v0[j - 1] + cost].reduce(min);
+    }
+
+    vtemp = v0;
+    v0 = v1;
+    v1 = vtemp;
+  }
+
+  return v0[canditate.length];
 }
