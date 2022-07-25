@@ -39,6 +39,8 @@ dependencies:
     sdk: flutter
   flutter_blue: ^0.8.0
   flutter_keyboard_visibility: ^5.0.3
+  flutter_localizations:
+    sdk: flutter
   flutter_polyline_points: ^1.0.0
   flutter_time_picker_spinner: ^2.0.0
   fluttertoast: ^8.0.8

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/main.dart';
 import 'package:sport_log/routes.dart';
@@ -27,6 +28,12 @@ class App extends StatelessWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: ThemeMode.dark,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale("en", "US"), Locale("en", "GB")],
           builder: ignoreSystemTextScaleFactor,
         ),
       ),

@@ -13,5 +13,6 @@ Future<DateTime?> showDatePickerWithDefaults({
       lastDate: future
           ? DateTime.now().add(const Duration(days: 365))
           : DateTime.now(),
+      locale: const Locale("en", "GB"),
     ))
         ?.beginningOfDay();
