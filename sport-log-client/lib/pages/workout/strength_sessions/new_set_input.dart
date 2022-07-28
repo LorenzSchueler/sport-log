@@ -43,7 +43,7 @@ class NewSetInput extends StatelessWidget {
             confirmChanges: confirmChanges,
           )
         : CountWeightInput(
-            setValue: onNewSet,
+            onNewSet: onNewSet,
             confirmChanges: confirmChanges,
             dimension: dimension,
             editWeightUnit: editWeightUnit,

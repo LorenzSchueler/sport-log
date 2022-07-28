@@ -10,7 +10,7 @@ import 'package:sport_log/widgets/input_fields/int_input.dart';
 class CountWeightInput extends StatefulWidget {
   /// If [this.dimension == MovementDimension.distance] [distanceUnit] and [editDistanceUnit] must not be null.
   const CountWeightInput({
-    required this.setValue,
+    required this.onNewSet,
     required this.confirmChanges,
     required this.dimension,
     required this.editWeightUnit,
@@ -28,7 +28,7 @@ class CountWeightInput extends StatefulWidget {
     double? weight,
     double? secondWeight,
     DistanceUnit? distanceUnit,
-  ) setValue;
+  ) onNewSet;
   final bool confirmChanges;
   final MovementDimension dimension;
   final bool editWeightUnit;
@@ -61,9 +61,9 @@ class _CountWeightInputState extends State<CountWeightInput> {
     super.initState();
   }
 
-  void _setValue() {
-    if (!widget.confirmChanges) {
-      widget.setValue(
+  void _submit({bool confirmed = false}) {
+    if (!widget.confirmChanges || confirmed) {
+      widget.onNewSet(
         _count,
         _weight,
         _secondWeight,
@@ -74,13 +74,13 @@ class _CountWeightInputState extends State<CountWeightInput> {
 
   void _setCount(int count) {
     setState(() => _count = count);
-    _setValue();
+    _submit();
   }
 
   void _setDistanceUnit(dynamic unit) {
     if (unit != null && unit is DistanceUnit) {
       setState(() => _distanceUnit = unit);
-      _setValue();
+      _submit();
     }
   }
 
@@ -95,20 +95,20 @@ class _CountWeightInputState extends State<CountWeightInput> {
               : _secondWeight! / _lbToKg;
         }
       });
-      _setValue();
+      _submit();
     }
   }
 
   void _setWeight(double weight) {
     weight = _weightUnit == "lb" ? weight * _lbToKg : weight;
     setState(() => _weight = weight);
-    _setValue();
+    _submit();
   }
 
   void _setFemaleWeight(double weight) {
     weight = _weightUnit == "lb" ? weight * _lbToKg : weight;
     setState(() => _secondWeight = weight);
-    _setValue();
+    _submit();
   }
 
   void _addWeight() {
@@ -116,7 +116,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
       _weight = 0;
       _secondWeight = 0;
     });
-    _setValue();
+    _submit();
   }
 
   void _removeWeight() {
@@ -124,7 +124,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
       _weight = null;
       _secondWeight = null;
     });
-    _setValue();
+    _submit();
   }
 
   @override
@@ -239,7 +239,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
                 icon: const Icon(AppIcons.check),
                 iconSize: 40,
                 onPressed: _count > 0 && (_weight == null || _weight! > 0)
-                    ? _setValue
+                    ? () => _submit(confirmed: true)
                     : null,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
