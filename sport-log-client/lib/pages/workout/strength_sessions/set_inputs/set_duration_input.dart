@@ -33,34 +33,38 @@ class _SetDurationInputState extends State<SetDurationInput> {
   final _secondsKey = GlobalKey<_PaddedIntInputState>();
   final _millisecondsKey = GlobalKey<_PaddedIntInputState>();
 
-  void _submit() {
-    final duration = Duration(
-      hours: _hours,
-      minutes: _minutes,
-      seconds: _seconds,
-      milliseconds: _milliseconds,
-    );
-    widget.onNewSet(duration.inMilliseconds, null, null);
+  void _submit({bool confirmed = false}) {
+    if (!widget.confirmChanges || confirmed) {
+      final duration = Duration(
+        hours: _hours,
+        minutes: _minutes,
+        seconds: _seconds,
+        milliseconds: _milliseconds,
+      );
+      widget.onNewSet(duration.inMilliseconds, null, null);
 
-    // clear all inputs
-    _hoursKey.currentState?.clear();
-    _minutesKey.currentState?.clear();
-    _secondsKey.currentState?.clear();
-    _millisecondsKey.currentState?.clear();
+      if (confirmed) {
+        // clear all inputs
+        _hoursKey.currentState?.clear();
+        _minutesKey.currentState?.clear();
+        _secondsKey.currentState?.clear();
+        _millisecondsKey.currentState?.clear();
 
-    // request focus on the right input
-    if ((_hoursKey.currentState?.hasFocus ?? false) ||
-        (_minutesKey.currentState?.hasFocus ?? false) ||
-        (_secondsKey.currentState?.hasFocus ?? false) ||
-        (_millisecondsKey.currentState?.hasFocus ?? false)) {
-      if (duration.inHours != 0) {
-        _hoursKey.currentState?.requestFocus();
-      } else if (duration.inMinutes != 0) {
-        _minutesKey.currentState?.requestFocus();
-      } else if (duration.inSeconds != 0) {
-        _secondsKey.currentState?.requestFocus();
-      } else if (duration.inMilliseconds != 0) {
-        _millisecondsKey.currentState?.requestFocus();
+        // request focus on the right input
+        if ((_hoursKey.currentState?.hasFocus ?? false) ||
+            (_minutesKey.currentState?.hasFocus ?? false) ||
+            (_secondsKey.currentState?.hasFocus ?? false) ||
+            (_millisecondsKey.currentState?.hasFocus ?? false)) {
+          if (duration.inHours != 0) {
+            _hoursKey.currentState?.requestFocus();
+          } else if (duration.inMinutes != 0) {
+            _minutesKey.currentState?.requestFocus();
+          } else if (duration.inSeconds != 0) {
+            _secondsKey.currentState?.requestFocus();
+          } else if (duration.inMilliseconds != 0) {
+            _millisecondsKey.currentState?.requestFocus();
+          }
+        }
       }
     }
   }
@@ -84,14 +88,14 @@ class _SetDurationInputState extends State<SetDurationInput> {
     return IconButton(
       icon: const Icon(AppIcons.check),
       color: isSubmittable ? Theme.of(context).colorScheme.primary : null,
-      iconSize: PaddedIntInput.fontSize,
-      onPressed: isSubmittable ? _submit : null,
+      iconSize: _PaddedIntInput.fontSize,
+      onPressed: isSubmittable ? () => _submit(confirmed: true) : null,
     );
   }
 
   Widget get _timeInput {
     return DefaultTextStyle(
-      style: TextStyle(fontSize: PaddedIntInput.fontSize),
+      style: TextStyle(fontSize: _PaddedIntInput.fontSize),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -109,62 +113,59 @@ class _SetDurationInputState extends State<SetDurationInput> {
   }
 
   Widget get _hoursInput {
-    return PaddedIntInput(
+    return _PaddedIntInput(
       initialValue: _hours,
       key: _hoursKey,
       placeholder: 0,
       caption: 'h',
       numberOfDigits: 2,
-      onChanged: (value) {
-        setState(() => _hours = value);
-        if (!widget.confirmChanges) {
-          _submit();
-        }
+      onChanged: (value) => setState(() => _hours = value),
+      onSubmitted: () {
+        _submit();
+        _minutesKey.currentState?.requestFocus();
       },
-      onSubmitted: () => _minutesKey.currentState?.requestFocus(),
       submitOnDigitsReached: true,
+      textInputAction: TextInputAction.next,
     );
   }
 
   Widget get _minutesInput {
-    return PaddedIntInput(
+    return _PaddedIntInput(
       initialValue: _minutes,
       key: _minutesKey,
       placeholder: 0,
       caption: 'm',
       numberOfDigits: 2,
       maxValue: 59,
-      onChanged: (value) {
-        setState(() => _minutes = value);
-        if (!widget.confirmChanges) {
-          _submit();
-        }
+      onChanged: (value) => setState(() => _minutes = value),
+      onSubmitted: () {
+        _submit();
+        _secondsKey.currentState?.requestFocus();
       },
-      onSubmitted: () => _secondsKey.currentState?.requestFocus(),
       submitOnDigitsReached: true,
+      textInputAction: TextInputAction.next,
     );
   }
 
   Widget get _secondsInput {
-    return PaddedIntInput(
+    return _PaddedIntInput(
       initialValue: _seconds,
       key: _secondsKey,
       placeholder: 0,
       caption: 's',
       numberOfDigits: 2,
-      onChanged: (value) {
-        setState(() => _seconds = value);
-        if (!widget.confirmChanges) {
-          _submit();
-        }
+      onChanged: (value) => setState(() => _seconds = value),
+      onSubmitted: () {
+        _submit();
+        _millisecondsKey.currentState?.requestFocus();
       },
-      onSubmitted: () => _millisecondsKey.currentState?.requestFocus(),
       submitOnDigitsReached: true,
+      textInputAction: TextInputAction.next,
     );
   }
 
   Widget get _millisecondsInput {
-    return PaddedIntInput(
+    return _PaddedIntInput(
       initialValue: _milliseconds,
       key: _millisecondsKey,
       placeholder: 0,
@@ -172,10 +173,9 @@ class _SetDurationInputState extends State<SetDurationInput> {
       numberOfDigits: 3,
       onChanged: (value) {
         setState(() => _milliseconds = value);
-        if (!widget.confirmChanges) {
-          _submit();
-        }
       },
+      onSubmitted: _submit,
+      textInputAction: TextInputAction.done,
     );
   }
 }
@@ -187,6 +187,7 @@ class _CaptionTextField extends StatelessWidget {
     required this.onChanged,
     required this.caption,
     required this.placeholder,
+    required this.textInputAction,
     required this.formatFn,
     this.onSubmitted,
     required this.onTap,
@@ -199,6 +200,7 @@ class _CaptionTextField extends StatelessWidget {
   final void Function(String) onChanged;
   final String caption;
   final String placeholder;
+  final TextInputAction textInputAction;
   final TextInputFormatFunction formatFn;
   final VoidCallback? onSubmitted;
   final VoidCallback onTap;
@@ -237,7 +239,7 @@ class _CaptionTextField extends StatelessWidget {
       onFieldSubmitted: (_) => onSubmitted?.call(),
       focusNode: focusNode,
       onTap: onTap,
-      textInputAction: TextInputAction.next,
+      textInputAction: textInputAction,
       inputFormatters: [
         TextInputFormatter.withFunction(formatFn),
       ],
@@ -258,13 +260,14 @@ class _CaptionTextField extends StatelessWidget {
 }
 
 /// Text Field with box that only accepts non-negative ints
-class PaddedIntInput extends StatefulWidget {
-  const PaddedIntInput({
+class _PaddedIntInput extends StatefulWidget {
+  const _PaddedIntInput({
     required this.initialValue,
     required this.placeholder,
     required this.onChanged,
     required this.caption,
     required this.numberOfDigits,
+    required this.textInputAction,
     this.submitOnDigitsReached = false,
     this.onSubmitted,
     this.maxValue,
@@ -277,16 +280,17 @@ class PaddedIntInput extends StatefulWidget {
   final VoidCallback? onSubmitted;
   final String caption;
   final int numberOfDigits;
+  final TextInputAction textInputAction;
   final int? maxValue;
   final bool submitOnDigitsReached;
 
   static double get fontSize => _CaptionTextField.textFontSize;
 
   @override
-  State<PaddedIntInput> createState() => _PaddedIntInputState();
+  State<_PaddedIntInput> createState() => _PaddedIntInputState();
 }
 
-class _PaddedIntInputState extends State<PaddedIntInput> {
+class _PaddedIntInputState extends State<_PaddedIntInput> {
   static const double _widthPerDigit = 31;
 
   final _focusNode = FocusNode();
@@ -320,6 +324,7 @@ class _PaddedIntInputState extends State<PaddedIntInput> {
       width: _widthPerDigit * widget.numberOfDigits,
       onTap: requestFocus,
       scrollable: false,
+      textInputAction: widget.textInputAction,
     );
   }
 
