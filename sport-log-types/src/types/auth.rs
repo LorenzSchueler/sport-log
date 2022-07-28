@@ -13,9 +13,7 @@ fn parse_username_password(request: &'_ Request<'_>) -> Option<(String, String)>
     let auth_header = request.headers().get("Authorization").next()?;
     if auth_header.len() >= 7 && &auth_header[..6] == "Basic " {
         let auth_str = String::from_utf8(base64::decode(&auth_header[6..]).ok()?).ok()?;
-        let mut username_password = auth_str.splitn(2, ':');
-        let username = username_password.next()?;
-        let password = username_password.next()?;
+        let (username, password) = auth_str.split_once(':')?;
 
         Some((username.to_owned(), password.to_owned()))
     } else {

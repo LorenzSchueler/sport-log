@@ -282,28 +282,28 @@ async fn try_login(
         .await
         .map_err(Error::WebDriver)?;
     driver
-        .get("https://app.wodify.com/Schedule/CalendarListView.aspx")
+        .goto("https://app.wodify.com/Schedule/CalendarListView.aspx")
         .await
         .map_err(Error::WebDriver)?;
 
     time::sleep(StdDuration::from_secs(3)).await;
 
     driver
-        .find_element(By::Id("Input_UserName"))
+        .find(By::Id("Input_UserName"))
         .await
         .map_err(Error::WebDriver)?
         .send_keys(username)
         .await
         .map_err(Error::WebDriver)?;
     driver
-        .find_element(By::Id("Input_Password"))
+        .find(By::Id("Input_Password"))
         .await
         .map_err(Error::WebDriver)?
         .send_keys(password)
         .await
         .map_err(Error::WebDriver)?;
     driver
-        .find_element(By::ClassName("signin-btn"))
+        .find(By::ClassName("signin-btn"))
         .await
         .map_err(Error::WebDriver)?
         .click()
@@ -313,7 +313,7 @@ async fn try_login(
     time::sleep(StdDuration::from_secs(2)).await;
 
     if driver
-        .find_element(By::Id("AthleteTheme_wt6_block_wt9_wtLogoutLink"))
+        .find(By::Id("AthleteTheme_wt6_block_wt9_wtLogoutLink"))
         .await
         .is_err()
     {
@@ -332,14 +332,14 @@ async fn try_login(
         debug!("reload done");
 
         let rows = driver
-            .find_elements(By::XPath("//table[@class='TableRecords']/tbody/tr"))
+            .find_all(By::XPath("//table[@class='TableRecords']/tbody/tr"))
             .await
             .map_err(Error::WebDriver)?;
 
         let mut row_number = rows.len();
         for (i, row) in rows.iter().enumerate() {
             if let Ok(day) = row
-                .find_element(By::XPath("./td[1]/span[contains(@class, \"h3\")]"))
+                .find(By::XPath("./td[1]/span[contains(@class, \"h3\")]"))
                 .await
             {
                 if day
@@ -355,32 +355,35 @@ async fn try_login(
         }
 
         for row in &rows[row_number + 1..] {
-            if let Ok(label) = row.find_element(By::XPath("./td[1]/div/span")).await {
-                if let Some(title) = label
-                    .get_attribute("title")
+            if row
+                .find(By::XPath("./td[1]/div/span"))
+                .await
+                .map_err(Error::WebDriver)?
+                .attr("title")
+                .await
+                .map_err(Error::WebDriver)?
+                .map(|title| {
+                    title.contains(&exec_action_event.action_name) && title.contains(&time)
+                })
+                .unwrap_or(false)
+            {
+                let icon = row
+                    .find(By::XPath("./td[3]/div"))
                     .await
-                    .map_err(Error::WebDriver)?
-                {
-                    if title.contains(&exec_action_event.action_name) && title.contains(&time) {
-                        let icon = row
-                            .find_element(By::XPath("./td[3]/div"))
-                            .await
-                            .map_err(Error::WebDriver)?;
-                        icon.scroll_into_view().await.map_err(Error::WebDriver)?;
-                        icon.click().await.map_err(Error::WebDriver)?;
-                        info!(
-                            "reservation for {} at {}",
-                            exec_action_event.datetime,
-                            Utc::now()
-                        );
+                    .map_err(Error::WebDriver)?;
+                icon.scroll_into_view().await.map_err(Error::WebDriver)?;
+                icon.click().await.map_err(Error::WebDriver)?;
+                info!(
+                    "reservation for {} at {}",
+                    exec_action_event.datetime,
+                    Utc::now()
+                );
 
-                        if mode == Mode::Interactive {
-                            time::sleep(StdDuration::from_secs(3)).await;
-                        }
-
-                        return Ok(exec_action_event.action_event_id);
-                    }
+                if mode == Mode::Interactive {
+                    time::sleep(StdDuration::from_secs(3)).await;
                 }
+
+                return Ok(exec_action_event.action_event_id);
             }
         }
     }

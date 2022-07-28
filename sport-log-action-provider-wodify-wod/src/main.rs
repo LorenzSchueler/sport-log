@@ -273,28 +273,28 @@ async fn try_get_wod(
         .await
         .map_err(Error::WebDriver)?;
     driver
-        .get("https://app.wodify.com/WOD/WODEntry.aspx")
+        .goto("https://app.wodify.com/WOD/WODEntry.aspx")
         .await
         .map_err(Error::WebDriver)?;
 
     time::sleep(StdDuration::from_secs(3)).await;
 
     driver
-        .find_element(By::Id("Input_UserName"))
+        .find(By::Id("Input_UserName"))
         .await
         .map_err(Error::WebDriver)?
         .send_keys(username)
         .await
         .map_err(Error::WebDriver)?;
     driver
-        .find_element(By::Id("Input_Password"))
+        .find(By::Id("Input_Password"))
         .await
         .map_err(Error::WebDriver)?
         .send_keys(password)
         .await
         .map_err(Error::WebDriver)?;
     driver
-        .find_element(By::ClassName("signin-btn"))
+        .find(By::ClassName("signin-btn"))
         .await
         .map_err(Error::WebDriver)?
         .click()
@@ -303,7 +303,7 @@ async fn try_get_wod(
     time::sleep(StdDuration::from_secs(2)).await;
 
     if driver
-        .find_element(By::Id("AthleteTheme_wtLayoutNormal_block_wt9_wtLogoutLink"))
+        .find(By::Id("AthleteTheme_wtLayoutNormal_block_wt9_wtLogoutLink"))
         .await
         .is_err()
     {
@@ -314,7 +314,7 @@ async fn try_get_wod(
 
     // select wod type
     //let type_picker = driver
-    //.find_element(By::Id(
+    //.find(By::Id(
     //"AthleteTheme_wtLayoutNormal_block_wtSubNavigation_wtcbDate",
     //))
     //.await?;
@@ -323,20 +323,20 @@ async fn try_get_wod(
     //time::sleep(StdDuration::from_secs(2)).await;
 
     if let Ok(wod) = driver
-        .find_element(By::Id(
+        .find(By::Id(
             "AthleteTheme_wtLayoutNormal_block_wtMainContent_WOD_UI_wt9_block_wtWODComponentsList",
         ))
         .await
     {
         let elements = wod
-            .find_elements(By::ClassName("component_show_wrapper"))
+            .find_all(By::ClassName("component_show_wrapper"))
             .await
             .map_err(Error::WebDriver)?;
 
         let mut description = "".to_owned();
         for element in elements {
             let name = element
-                .find_element(By::ClassName("component_name"))
+                .find(By::ClassName("component_name"))
                 .await
                 .map_err(Error::WebDriver)?
                 .inner_html()
@@ -348,7 +348,7 @@ async fn try_get_wod(
             description += "\n";
 
             let content = element
-                .find_element(By::ClassName("component_wrapper"))
+                .find(By::ClassName("component_wrapper"))
                 .await
                 .map_err(Error::WebDriver)?
                 .inner_html()
