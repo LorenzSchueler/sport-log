@@ -41,6 +41,7 @@ class NewSetInput extends StatelessWidget {
             onNewSet: (count, weight, secondWeight) =>
                 onNewSet(count, weight, secondWeight, null),
             confirmChanges: confirmChanges,
+            initialCount: initialCount,
           )
         : CountWeightInput(
             onNewSet: onNewSet,

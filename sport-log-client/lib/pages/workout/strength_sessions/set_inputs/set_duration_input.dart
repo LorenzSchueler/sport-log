@@ -7,24 +7,26 @@ import 'package:sport_log/helpers/extensions/text_editing_controller_extension.d
 import 'package:sport_log/widgets/app_icons.dart';
 
 class SetDurationInput extends StatefulWidget {
-  const SetDurationInput({
+  SetDurationInput({
     required this.onNewSet,
     required this.confirmChanges,
+    required int initialCount,
     super.key,
-  });
+  }) : initialDuration = Duration(milliseconds: initialCount);
 
   final void Function(int count, double? weight, double? secondWeight) onNewSet;
   final bool confirmChanges;
+  final Duration initialDuration;
 
   @override
   State<SetDurationInput> createState() => _SetDurationInputState();
 }
 
 class _SetDurationInputState extends State<SetDurationInput> {
-  int _hours = 0;
-  int _minutes = 0;
-  int _seconds = 0;
-  int _milliseconds = 0;
+  late int _hours = widget.initialDuration.inHours;
+  late int _minutes = widget.initialDuration.inMinutes % 60;
+  late int _seconds = widget.initialDuration.inSeconds % 60;
+  late int _milliseconds = widget.initialDuration.inMilliseconds % 1000;
 
   final _hoursKey = GlobalKey<_PaddedIntInputState>();
   final _minutesKey = GlobalKey<_PaddedIntInputState>();
@@ -108,6 +110,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
 
   Widget get _hoursInput {
     return PaddedIntInput(
+      initialValue: _hours,
       key: _hoursKey,
       placeholder: 0,
       caption: 'h',
@@ -125,6 +128,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
 
   Widget get _minutesInput {
     return PaddedIntInput(
+      initialValue: _minutes,
       key: _minutesKey,
       placeholder: 0,
       caption: 'm',
@@ -143,6 +147,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
 
   Widget get _secondsInput {
     return PaddedIntInput(
+      initialValue: _seconds,
       key: _secondsKey,
       placeholder: 0,
       caption: 's',
@@ -160,6 +165,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
 
   Widget get _millisecondsInput {
     return PaddedIntInput(
+      initialValue: _milliseconds,
       key: _millisecondsKey,
       placeholder: 0,
       caption: 'ms',
@@ -225,10 +231,10 @@ class _CaptionTextField extends StatelessWidget {
   }
 
   Widget get _textField {
-    return TextField(
+    return TextFormField(
       controller: controller,
       onChanged: onChanged,
-      onSubmitted: (_) => onSubmitted?.call(),
+      onFieldSubmitted: (_) => onSubmitted?.call(),
       focusNode: focusNode,
       onTap: onTap,
       textInputAction: TextInputAction.next,
@@ -254,6 +260,7 @@ class _CaptionTextField extends StatelessWidget {
 /// Text Field with box that only accepts non-negative ints
 class PaddedIntInput extends StatefulWidget {
   const PaddedIntInput({
+    required this.initialValue,
     required this.placeholder,
     required this.onChanged,
     required this.caption,
@@ -264,6 +271,7 @@ class PaddedIntInput extends StatefulWidget {
     super.key,
   }) : assert(numberOfDigits > 0);
 
+  final int? initialValue;
   final int placeholder;
   final void Function(int) onChanged;
   final VoidCallback? onSubmitted;
@@ -282,7 +290,9 @@ class _PaddedIntInputState extends State<PaddedIntInput> {
   static const double _widthPerDigit = 31;
 
   final _focusNode = FocusNode();
-  final _controller = TextEditingController();
+  late final _controller = TextEditingController(
+    text: widget.initialValue?.toString().padLeft(widget.numberOfDigits, '0'),
+  );
 
   void requestFocus() {
     _focusNode.requestFocus();
