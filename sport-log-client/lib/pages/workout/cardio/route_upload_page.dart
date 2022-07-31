@@ -78,8 +78,9 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
               child: MapboxMapWrapper(
                 showScale: true,
                 showMapStylesButton: true,
-                showCurrentLocationButton: false,
                 showSetNorthButton: true,
+                showCurrentLocationButton: false,
+                showSelectRouteButton: false,
                 onMapCreated: (MapboxMapController controller) async {
                   _mapController = controller;
                 },

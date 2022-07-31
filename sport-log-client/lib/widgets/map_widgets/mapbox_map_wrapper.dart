@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Route;
 import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:provider/provider.dart';
@@ -13,14 +13,16 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/map_widgets/map_scale.dart';
 import 'package:sport_log/widgets/map_widgets/map_styles.dart';
+import 'package:sport_log/widgets/map_widgets/select_route.dart';
 import 'package:sport_log/widgets/map_widgets/set_north.dart';
 
 class MapboxMapWrapper extends StatefulWidget {
   const MapboxMapWrapper({
     required this.showScale,
     required this.showMapStylesButton,
-    required this.showCurrentLocationButton,
     required this.showSetNorthButton,
+    required this.showCurrentLocationButton,
+    required this.showSelectRouteButton,
     this.buttonTopOffset = 0,
     this.scaleAtTop = false,
     this.styleString,
@@ -40,8 +42,9 @@ class MapboxMapWrapper extends StatefulWidget {
 
   final bool showScale;
   final bool showMapStylesButton;
-  final bool showCurrentLocationButton;
   final bool showSetNorthButton;
+  final bool showCurrentLocationButton;
+  final bool showSelectRouteButton;
   final int buttonTopOffset;
   final bool scaleAtTop;
 
@@ -171,6 +174,10 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                   ),
                   Defaults.sizedBox.vertical.normal,
                 ],
+                if (widget.showSetNorthButton) ...[
+                  SetNorthButton(mapController: _mapController!),
+                  Defaults.sizedBox.vertical.normal,
+                ],
                 if (widget.showCurrentLocationButton) ...[
                   FloatingActionButton.small(
                     heroTag: null,
@@ -183,8 +190,8 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                   ),
                   Defaults.sizedBox.vertical.normal,
                 ],
-                if (widget.showSetNorthButton)
-                  SetNorthButton(mapController: _mapController!),
+                if (widget.showSelectRouteButton)
+                  SelectRouteButton(mapController: _mapController!),
               ],
             ),
           ),

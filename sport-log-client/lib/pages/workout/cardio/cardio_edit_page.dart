@@ -189,8 +189,9 @@ class _CardioEditPageState extends State<CardioEditPage> {
                 child: MapboxMapWrapper(
                   showScale: true,
                   showMapStylesButton: true,
-                  showCurrentLocationButton: false,
                   showSetNorthButton: true,
+                  showCurrentLocationButton: false,
+                  showSelectRouteButton: false,
                   onMapCreated: (MapboxMapController controller) =>
                       _mapController = controller,
                   onStyleLoadedCallback: _setBoundsAndLines,

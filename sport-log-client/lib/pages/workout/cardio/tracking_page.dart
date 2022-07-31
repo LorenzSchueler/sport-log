@@ -297,8 +297,9 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
               child: MapboxMapWrapper(
                 showScale: true,
                 showMapStylesButton: true,
-                showCurrentLocationButton: false,
                 showSetNorthButton: true,
+                showCurrentLocationButton: false,
+                showSelectRouteButton: false,
                 initialCameraPosition: CameraPosition(
                   zoom: 15.0,
                   target: context.read<Settings>().lastGpsLatLng,

@@ -98,8 +98,9 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
                     ? MapboxMapWrapper(
                         showScale: true,
                         showMapStylesButton: true,
-                        showCurrentLocationButton: false,
                         showSetNorthButton: true,
+                        showCurrentLocationButton: false,
+                        showSelectRouteButton: false,
                         scaleAtTop: true,
                         onMapCreated: (MapboxMapController controller) =>
                             _mapController = controller,
