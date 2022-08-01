@@ -1,14 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart' hide Route;
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:mapbox_api/mapbox_api.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
+import 'package:sport_log/helpers/route_planning_utils.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
@@ -17,7 +14,6 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
-import 'package:sport_log/widgets/snackbar.dart';
 
 class RouteEditPage extends StatefulWidget {
   const RouteEditPage({required this.route, super.key});
@@ -93,49 +89,10 @@ class _RouteEditPageState extends State<RouteEditPage> {
     }
   }
 
-  Future<void> _matchLocations() async {
-    DirectionsApiResponse response;
-    try {
-      response = await Defaults.mapboxApi.directions.request(
-        profile: NavigationProfile.WALKING,
-        geometries: NavigationGeometries.POLYLINE,
-        coordinates: _route.markedPositions!
-            .map((e) => [e.latitude, e.longitude])
-            .toList(),
-      );
-    } on SocketException {
-      showSimpleToast(context, 'No Internet connection.');
-      return;
-    }
-    if (response.error != null) {
-      if (response.error is NavigationNoRouteError) {
-        _logger.i(response.error);
-      } else if (response.error is NavigationNoSegmentError) {
-        _logger.i(response.error);
-      } else {
-        _logger.i(response.error.runtimeType);
-      }
-    } else if (response.routes != null && response.routes!.isNotEmpty) {
-      NavigationRoute navRoute = response.routes![0];
-      List<Position> track = [];
-      for (final pointLatLng
-          in PolylinePoints().decodePolyline(navRoute.geometry as String)) {
-        track.add(
-          Position(
-            latitude: pointLatLng.latitude,
-            longitude: pointLatLng.longitude,
-            elevation: 0, // TODO
-            distance: track.isEmpty
-                ? 0
-                : track.last
-                    .addDistanceTo(pointLatLng.latitude, pointLatLng.longitude),
-            time: Duration.zero,
-          ),
-        );
-      }
-      _logger
-        ..i("mapbox distance ${navRoute.distance}")
-        ..i("own distance ${track.last.distance}");
+  Future<void> _updateLine() async {
+    final track = await RoutePlanningUtils()
+        .matchLocations(context, _route.markedPositions!);
+    if (track != null) {
       setState(() {
         _route
           ..track = track
@@ -143,10 +100,6 @@ class _RouteEditPageState extends State<RouteEditPage> {
           ..setAscentDescent();
       });
     }
-  }
-
-  Future<void> _updateLine() async {
-    await _matchLocations();
     await _mapController.updateRouteLine(_line, _route.track);
   }
 
@@ -225,7 +178,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
     await _updateLine();
   }
 
-  Widget _buildExpandableListContainer() {
+  Widget _expandableListContainer() {
     return _listExpanded
         ? Column(
             mainAxisSize: MainAxisSize.min,
@@ -323,7 +276,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
               padding: Defaults.edgeInsets.normal,
               child: Column(
                 children: [
-                  _buildExpandableListContainer(),
+                  _expandableListContainer(),
                   const Divider(),
                   Defaults.sizedBox.vertical.normal,
                   RouteValueUnitDescriptionTable(route: _route),
