@@ -14,6 +14,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 class RouteEditPage extends StatefulWidget {
   const RouteEditPage({required this.route, super.key});
@@ -90,17 +91,23 @@ class _RouteEditPageState extends State<RouteEditPage> {
   }
 
   Future<void> _updateLine() async {
-    final track = await RoutePlanningUtils()
-        .matchLocations(context, _route.markedPositions!);
-    if (track != null) {
-      setState(() {
-        _route
-          ..track = track
-          ..setDistance()
-          ..setAscentDescent();
-      });
+    if (_route.markedPositions!.length >= 2) {
+      final track =
+          await RoutePlanningUtils.matchLocations(_route.markedPositions!);
+      if (mounted) {
+        if (track.isFailure) {
+          showSimpleToast(context, track.failure.message);
+        } else {
+          setState(() {
+            _route
+              ..track = track.success
+              ..setDistance()
+              ..setAscentDescent();
+          });
+          await _mapController.updateRouteLine(_line, _route.track);
+        }
+      }
     }
-    await _mapController.updateRouteLine(_line, _route.track);
   }
 
   Future<void> _addPoint(LatLng latLng, int number) async {
@@ -135,12 +142,15 @@ class _RouteEditPageState extends State<RouteEditPage> {
       );
       return;
     }
+    final elevationResult = await RoutePlanningUtils.getElevations([location]);
+    final elevation =
+        elevationResult.isSuccess ? elevationResult.success[0] : 0;
     setState(() {
       _route.markedPositions!.add(
         Position(
           latitude: location.latitude,
           longitude: location.longitude,
-          elevation: 0, // TODO
+          elevation: elevation.toDouble(),
           distance: 0,
           time: Duration.zero,
         ),
