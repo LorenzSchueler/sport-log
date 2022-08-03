@@ -36,14 +36,27 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
     super.initState();
   }
 
-  void _setBoundsAndLine() {
-    _mapController.setBoundsFromTracks(
+  Future<void> _setBoundsAndLine() async {
+    await _mapController.setBoundsFromTracks(
       _route.track,
-      null,
+      _route.markedPositions,
       padded: true,
     );
     if (_route.track != null) {
-      _mapController.addRouteLine(_route.track!);
+      await _mapController.addRouteLine(_route.track!);
+    }
+    if (_route.markedPositions != null) {
+      for (int i = 0; i < _route.markedPositions!.length; i++) {
+        final latLng = _route.markedPositions![i].latLng;
+        await _mapController.addLocationMarker(latLng);
+        await _mapController.addSymbol(
+          SymbolOptions(
+            textField: "${i + 1}",
+            textOffset: const Offset(0, 1),
+            geometry: latLng,
+          ),
+        );
+      }
     }
   }
 
@@ -60,7 +73,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
         setState(() {
           _route = returnObj.payload;
         });
-        _setBoundsAndLine();
+        await _setBoundsAndLine();
       }
     }
   }
