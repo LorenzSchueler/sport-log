@@ -70,7 +70,7 @@ class DistanceChart extends StatelessWidget {
 
   final List<DistanceChartLine> chartLines;
   final bool yFromZero;
-  final Function(Duration? x)? touchCallback;
+  final Function(double? distance)? touchCallback;
 
   static Color color = Colors.black;
 
@@ -83,7 +83,7 @@ class DistanceChart extends StatelessWidget {
           ? null
           : xValues[xValues.length ~/ 2]; // median
       if (xValue != null && xValue != lastX) {
-        touchCallback?.call(Duration(milliseconds: xValue.round()));
+        touchCallback?.call(xValue * 1000);
       }
       lastX = xValue;
     } else if (event is FlLongPressEnd) {

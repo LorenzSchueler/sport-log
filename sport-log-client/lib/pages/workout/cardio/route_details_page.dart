@@ -186,10 +186,10 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
     }
   }
 
-  Future<void> _touchCallback(Duration? y) async {
-    final latLng = y != null
+  Future<void> _touchCallback(double? distance) async {
+    final latLng = distance != null
         ? _route.track?.reversed
-            .firstWhereOrNull((pos) => pos.time <= y)
+            .firstWhereOrNull((pos) => pos.distance <= distance)
             ?.latLng
         : null;
 
