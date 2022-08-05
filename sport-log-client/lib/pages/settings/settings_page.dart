@@ -11,6 +11,7 @@ import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/input_fields/text_tile.dart';
@@ -181,6 +182,17 @@ class SettingsPage extends StatelessWidget {
       } else {
         await navigator.newBase(Routes.landing);
       }
+    }
+  }
+
+  void _setDurationIncrement(BuildContext context, Duration increment) {
+    if (increment.inSeconds > 0) {
+      context.read<Settings>().durationIncrement = increment;
+    } else {
+      showMessageDialog(
+        context: context,
+        text: "Duration Increment must be greater 0",
+      );
     }
   }
 
@@ -387,6 +399,17 @@ class SettingsPage extends StatelessWidget {
                       settings.weightIncrement = double.parse(increment);
                     }
                   },
+                ),
+                Defaults.sizedBox.vertical.small,
+                EditTile(
+                  leading: AppIcons.timeInterval,
+                  caption: "Duration Increment",
+                  child: DurationInput(
+                    initialDuration: settings.durationIncrement,
+                    setDuration: (increment) =>
+                        _setDurationIncrement(context, increment),
+                    durationIncrement: const Duration(minutes: 1),
+                  ),
                 ),
                 Defaults.sizedBox.vertical.small,
                 const Divider(),
