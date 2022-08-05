@@ -32,6 +32,7 @@ class Settings extends ChangeNotifier {
   static const String _lastSync = "lastSync";
   static const String _units = "units";
   static const String _weightIncrement = "weightIncrement";
+  static const String _durationIncrement = "durationIncrement";
   static const String _id = "id";
   static const String _username = "username";
   static const String _password = "password";
@@ -69,6 +70,9 @@ class Settings extends ChangeNotifier {
     }
     if (!_storage!.containsKey(_weightIncrement) || override) {
       await _storage!.put(_weightIncrement, 2.5);
+    }
+    if (!_storage!.containsKey(_durationIncrement) || override) {
+      await _storage!.put(_durationIncrement, const Duration(minutes: 1));
     }
     if (override) {
       await _storage!.delete(_id);
@@ -184,6 +188,14 @@ class Settings extends ChangeNotifier {
 
   set weightIncrement(double incement) {
     _put(_weightIncrement, incement);
+  }
+
+  Duration get durationIncrement {
+    return _getDuration(_durationIncrement);
+  }
+
+  set durationIncrement(Duration incement) {
+    _put(_durationIncrement, incement);
   }
 
   Int64? get userId {
