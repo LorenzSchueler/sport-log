@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
 
 class IntInput extends StatefulWidget {
@@ -70,6 +71,12 @@ class _IntInputState extends State<IntInput> {
                     null) {
                   final v = int.parse(value);
                   setState(() => _value = v);
+                } else {
+                  showMessageDialog(
+                    context: context,
+                    text:
+                        "value must be between ${widget.minValue} and ${widget.maxValue}",
+                  );
                 }
               },
               decoration: const InputDecoration(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sport_log/helpers/validation.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
 
@@ -8,11 +9,13 @@ class DurationInput extends StatefulWidget {
   const DurationInput({
     required this.setDuration,
     required this.initialDuration,
+    this.durationIncrement,
     super.key,
   });
 
   final void Function(Duration)? setDuration;
   final Duration? initialDuration;
+  final Duration? durationIncrement;
 
   @override
   State<DurationInput> createState() => _DurationInputState();
@@ -25,9 +28,11 @@ class _DurationInputState extends State<DurationInput> {
   late final TextEditingController _secondsController;
 
   static const double _textWidth = 13; // width of subtitle1 = 20 + cursor
-  static const Duration _timeStep = Duration(minutes: 1);
   static const Duration _minTime = Duration.zero;
   static const Duration _maxTime = Duration(seconds: 60 * 100 - 1);
+
+  late final _durationIncrement =
+      widget.durationIncrement ?? Settings.instance.durationIncrement;
 
   @override
   void initState() {
@@ -58,7 +63,7 @@ class _DurationInputState extends State<DurationInput> {
         RepeatIconButton(
           icon: const Icon(AppIcons.subtractBox),
           onClick: _duration > _minTime
-              ? () => _setDuration(_duration - _timeStep)
+              ? () => _setDuration(_duration - _durationIncrement)
               : null,
         ),
         SizedBox(
@@ -161,7 +166,7 @@ class _DurationInputState extends State<DurationInput> {
         RepeatIconButton(
           icon: const Icon(AppIcons.addBox),
           onClick: _duration < _maxTime
-              ? () => _setDuration(_duration + _timeStep)
+              ? () => _setDuration(_duration + _durationIncrement)
               : null,
         ),
       ],

@@ -7,7 +7,7 @@ class DoubleInput extends StatefulWidget {
   const DoubleInput({
     required this.setValue,
     this.initialValue = 0,
-    this.stepSize = 2.5,
+    this.stepSize = 1,
     super.key,
   });
 
