@@ -109,7 +109,7 @@ class TimerPage extends StatelessWidget {
                     ],
                   ),
                 ),
-                drawer: const MainDrawer(selectedRoute: Routes.settings),
+                drawer: const MainDrawer(selectedRoute: Routes.timer),
               );
             },
           ),
