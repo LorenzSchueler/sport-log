@@ -1,16 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart' hide Route;
-import 'package:location/location.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/location_data_extension.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
-import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/settings.dart';
-import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/map_widgets/current_location_button.dart';
 import 'package:sport_log/widgets/map_widgets/map_scale.dart';
 import 'package:sport_log/widgets/map_widgets/map_styles.dart';
 import 'package:sport_log/widgets/map_widgets/select_route.dart';
@@ -81,19 +77,13 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
   MapboxMapController? _mapController;
   late String _mapStyle = widget.styleString ?? MapboxStyles.OUTDOORS;
   double _metersPerPixel = 1;
-  List<Circle>? _currentLocationMarker = [];
-  late final LocationUtils _locationUtils = LocationUtils(_onLocationUpdate);
 
   @override
   void dispose() {
-    _locationUtils.stopLocationStream();
     _mapController?.removeListener(_mapControllerListener);
     final cameraPosition = _mapController?.cameraPosition;
     if (cameraPosition != null) {
       Settings.instance.lastMapPosition = cameraPosition;
-    }
-    if (_locationUtils.lastLatLng != null) {
-      Settings.instance.lastGpsLatLng = _locationUtils.lastLatLng!;
     }
     super.dispose();
   }
@@ -104,30 +94,6 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
     final metersPerPixel =
         await _mapController!.getMetersPerPixelAtLatitude(latitude);
     setState(() => _metersPerPixel = metersPerPixel);
-  }
-
-  Future<void> _toggleCurrentLocation() async {
-    if (_locationUtils.enabled) {
-      _locationUtils.stopLocationStream();
-      _currentLocationMarker =
-          await _mapController?.updateCurrentLocationMarker(
-        _currentLocationMarker,
-        null,
-      );
-    } else {
-      await _locationUtils.startLocationStream();
-    }
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  Future<void> _onLocationUpdate(LocationData location) async {
-    await _mapController?.animateCenter(location.latLng);
-    _currentLocationMarker = await _mapController?.updateCurrentLocationMarker(
-      _currentLocationMarker,
-      location.latLng,
-    );
   }
 
   @override
@@ -190,15 +156,7 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                   Defaults.sizedBox.vertical.normal,
                 ],
                 if (widget.showCurrentLocationButton) ...[
-                  FloatingActionButton.small(
-                    heroTag: null,
-                    onPressed: _toggleCurrentLocation,
-                    child: Icon(
-                      _locationUtils.enabled
-                          ? AppIcons.myLocation
-                          : AppIcons.myLocationDisabled,
-                    ),
-                  ),
+                  CurrentLocationButton(mapController: _mapController!),
                   Defaults.sizedBox.vertical.normal,
                 ],
                 if (widget.showSelectRouteButton)
