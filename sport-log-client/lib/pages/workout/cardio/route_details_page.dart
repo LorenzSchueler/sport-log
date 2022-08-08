@@ -80,84 +80,86 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_route.name),
-        actions: [
-          if (_route.track != null && _route.track!.isNotEmpty) ...[
-            IconButton(
-              onPressed: () => setState(() => fullScreen = !fullScreen),
-              icon: Icon(
-                fullScreen ? AppIcons.closeFullScreen : AppIcons.fullScreen,
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_route.name),
+          actions: [
+            if (_route.track != null && _route.track!.isNotEmpty) ...[
+              IconButton(
+                onPressed: () => setState(() => fullScreen = !fullScreen),
+                icon: Icon(
+                  fullScreen ? AppIcons.closeFullScreen : AppIcons.fullScreen,
+                ),
               ),
-            ),
+              IconButton(
+                onPressed: _exportFile,
+                icon: const Icon(AppIcons.download),
+              ),
+            ],
             IconButton(
-              onPressed: _exportFile,
-              icon: const Icon(AppIcons.download),
-            ),
+              onPressed: _pushEditPage,
+              icon: const Icon(AppIcons.edit),
+            )
           ],
-          IconButton(
-            onPressed: _pushEditPage,
-            icon: const Icon(AppIcons.edit),
-          )
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                _route.track != null
-                    ? MapboxMapWrapper(
-                        showScale: true,
-                        showMapStylesButton: true,
-                        showSetNorthButton: true,
-                        showCurrentLocationButton: false,
-                        showSelectRouteButton: false,
-                        scaleAtTop: true,
-                        onMapCreated: (MapboxMapController controller) =>
-                            _mapController = controller,
-                        onStyleLoadedCallback: _setBoundsAndLine,
-                      )
-                    : Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              AppIcons.route,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            Defaults.sizedBox.horizontal.normal,
-                            const Text("no track available"),
-                          ],
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  _route.track != null
+                      ? MapboxMapWrapper(
+                          showScale: true,
+                          showMapStylesButton: true,
+                          showSetNorthButton: true,
+                          showCurrentLocationButton: false,
+                          showSelectRouteButton: false,
+                          scaleAtTop: true,
+                          onMapCreated: (MapboxMapController controller) =>
+                              _mapController = controller,
+                          onStyleLoadedCallback: _setBoundsAndLine,
+                        )
+                      : Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                AppIcons.route,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              Defaults.sizedBox.horizontal.normal,
+                              const Text("no track available"),
+                            ],
+                          ),
+                        ),
+                  if (_route.track != null && !fullScreen)
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        color: const Color.fromARGB(120, 0, 0, 0),
+                        child: DistanceChart(
+                          chartLines: [_elevationLine()],
+                          yFromZero: true,
+                          touchCallback: _touchCallback,
                         ),
                       ),
-                if (_route.track != null && !fullScreen)
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      color: const Color.fromARGB(120, 0, 0, 0),
-                      child: DistanceChart(
-                        chartLines: [_elevationLine()],
-                        yFromZero: true,
-                        touchCallback: _touchCallback,
-                      ),
                     ),
-                  ),
-              ],
-            ),
-          ),
-          if (!fullScreen)
-            Container(
-              padding: Defaults.edgeInsets.normal,
-              color: Theme.of(context).colorScheme.background,
-              child: RouteValueUnitDescriptionTable(
-                route: _route,
+                ],
               ),
             ),
-        ],
+            if (!fullScreen)
+              Container(
+                padding: Defaults.edgeInsets.normal,
+                color: Theme.of(context).colorScheme.background,
+                child: RouteValueUnitDescriptionTable(
+                  route: _route,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
