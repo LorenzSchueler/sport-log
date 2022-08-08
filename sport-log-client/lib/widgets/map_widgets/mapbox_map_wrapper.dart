@@ -76,24 +76,14 @@ class MapboxMapWrapper extends StatefulWidget {
 class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
   MapboxMapController? _mapController;
   late String _mapStyle = widget.styleString ?? MapboxStyles.OUTDOORS;
-  double _metersPerPixel = 1;
 
   @override
   void dispose() {
-    _mapController?.removeListener(_mapControllerListener);
     final cameraPosition = _mapController?.cameraPosition;
     if (cameraPosition != null) {
       Settings.instance.lastMapPosition = cameraPosition;
     }
     super.dispose();
-  }
-
-  Future<void> _mapControllerListener() async {
-    final latitude = _mapController!.cameraPosition!.target.latitude;
-
-    final metersPerPixel =
-        await _mapController!.getMetersPerPixelAtLatitude(latitude);
-    setState(() => _metersPerPixel = metersPerPixel);
   }
 
   @override
@@ -107,9 +97,7 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
               context.read<Settings>().lastMapPosition,
           trackCameraPosition: widget.showScale || widget.trackCameraPosition,
           onMapCreated: (MapboxMapController controller) {
-            setState(() {
-              _mapController = controller..addListener(_mapControllerListener);
-            });
+            setState(() => _mapController = controller);
             widget.onMapCreated?.call(controller);
           },
           onStyleLoadedCallback: widget.onStyleLoadedCallback,
@@ -122,17 +110,17 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
           doubleClickZoomEnabled: widget.doubleClickZoomEnabled,
           dragEnabled: false,
         ),
-        if (widget.showScale)
+        if (_mapController != null && widget.showScale)
           widget.scaleAtTop
               ? Positioned(
                   top: 10,
                   left: 10,
-                  child: MapScale(metersPerPixel: _metersPerPixel),
+                  child: MapScale(mapController: _mapController!),
                 )
               : Positioned(
                   bottom: 10,
                   right: 10,
-                  child: MapScale(metersPerPixel: _metersPerPixel),
+                  child: MapScale(mapController: _mapController!),
                 ),
         if (_mapController != null && widget.showOverlays)
           Positioned(

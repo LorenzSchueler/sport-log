@@ -304,7 +304,8 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                   showSetNorthButton: true,
                   showCurrentLocationButton: false,
                   showSelectRouteButton: false,
-                  onFullscreenToggle: (fullscreen) => setState(()=>_fullscreen = fullscreen),
+                  onFullscreenToggle: (fullscreen) =>
+                      setState(() => _fullscreen = fullscreen),
                   initialCameraPosition: CameraPosition(
                     zoom: 15.0,
                     target: context.read<Settings>().lastGpsLatLng,
@@ -315,34 +316,34 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                 ),
               ),
               if (!_fullscreen)
-              Container(
-                padding: Defaults.edgeInsets.normal,
-                child: ProviderConsumer<TrackingUtils>.value(
-                  value: _trackingUtils,
-                  builder: (context, trackingUtils, _) => Column(
-                    children: [
-                      CardioValueUnitDescriptionTable(
-                        cardioSessionDescription: _cardioSessionDescription,
-                        currentDuration: trackingUtils.currentDuration,
-                        showCurrentElevation: true,
-                      ),
-                      Defaults.sizedBox.vertical.normal,
-                      _TrackingPageButtons(
-                        trackingUtils: trackingUtils,
-                        onStart: widget.heartRateUtils == null ||
-                                widget.heartRateUtils!.isActive
-                            ? () {
-                                trackingUtils.start();
-                                _cardioSessionDescription
-                                    .cardioSession.datetime = DateTime.now();
-                              }
-                            : null,
-                        onStop: _saveDialog,
-                      ),
-                    ],
+                Container(
+                  padding: Defaults.edgeInsets.normal,
+                  child: ProviderConsumer<TrackingUtils>.value(
+                    value: _trackingUtils,
+                    builder: (context, trackingUtils, _) => Column(
+                      children: [
+                        CardioValueUnitDescriptionTable(
+                          cardioSessionDescription: _cardioSessionDescription,
+                          currentDuration: trackingUtils.currentDuration,
+                          showCurrentElevation: true,
+                        ),
+                        Defaults.sizedBox.vertical.normal,
+                        _TrackingPageButtons(
+                          trackingUtils: trackingUtils,
+                          onStart: widget.heartRateUtils == null ||
+                                  widget.heartRateUtils!.isActive
+                              ? () {
+                                  trackingUtils.start();
+                                  _cardioSessionDescription
+                                      .cardioSession.datetime = DateTime.now();
+                                }
+                              : null,
+                          onStop: _saveDialog,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),

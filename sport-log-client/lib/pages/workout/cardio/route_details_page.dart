@@ -85,7 +85,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
         appBar: AppBar(
           title: Text(_route.name),
           actions: [
-            if (_route.track != null && _route.track!.isNotEmpty) 
+            if (_route.track != null && _route.track!.isNotEmpty)
               IconButton(
                 onPressed: _exportFile,
                 icon: const Icon(AppIcons.download),
@@ -104,13 +104,14 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
                   _route.track != null
                       ? MapboxMapWrapper(
                           showScale: true,
-                          showFullscreenButton: 
-            _route.track != null && _route.track!.isNotEmpty,
+                          showFullscreenButton:
+                              _route.track != null && _route.track!.isNotEmpty,
                           showMapStylesButton: true,
                           showSetNorthButton: true,
                           showCurrentLocationButton: false,
                           showSelectRouteButton: false,
-                          onFullscreenToggle: (fullscreen) => setState(() => _fullscreen = fullscreen),
+                          onFullscreenToggle: (fullscreen) =>
+                              setState(() => _fullscreen = fullscreen),
                           scaleAtTop: true,
                           onMapCreated: (MapboxMapController controller) =>
                               _mapController = controller,
