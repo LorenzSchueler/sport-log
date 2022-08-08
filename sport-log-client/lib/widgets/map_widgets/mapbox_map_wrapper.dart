@@ -23,6 +23,7 @@ class MapboxMapWrapper extends StatefulWidget {
     required this.showSetNorthButton,
     required this.showCurrentLocationButton,
     required this.showSelectRouteButton,
+    this.showOverlays = true,
     this.buttonTopOffset = 0,
     this.scaleAtTop = false,
     this.styleString,
@@ -45,6 +46,7 @@ class MapboxMapWrapper extends StatefulWidget {
   final bool showSetNorthButton;
   final bool showCurrentLocationButton;
   final bool showSelectRouteButton;
+  final bool showOverlays;
   final int buttonTopOffset;
   final bool scaleAtTop;
 
@@ -161,7 +163,7 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                   right: 10,
                   child: MapScale(metersPerPixel: _metersPerPixel),
                 ),
-        if (_mapController != null)
+        if (_mapController != null && widget.showOverlays)
           Positioned(
             top: widget.buttonTopOffset + 15,
             right: 15,

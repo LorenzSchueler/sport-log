@@ -19,7 +19,7 @@ class TimerState extends ChangeNotifier {
   TimerUtils? _timerUtils;
 
   bool get isRunning => _timerUtils != null;
-  bool get isNotRunning => _timerUtils == null;
+  bool get isNotRunning => !isRunning;
 
   Duration get time => _time;
   set time(Duration time) {

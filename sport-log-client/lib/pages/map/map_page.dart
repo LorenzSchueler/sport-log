@@ -142,17 +142,16 @@ class _MapPageState extends State<MapPage> {
           children: [
             MapboxMapWrapper(
               showScale: true,
-              showMapStylesButton: _showOverlays,
-              showSetNorthButton: _showOverlays,
-              showCurrentLocationButton: _showOverlays,
+              showMapStylesButton: true,
+              showSetNorthButton: true,
+              showCurrentLocationButton: true,
               showSelectRouteButton: true,
+              showOverlays: _showOverlays,
               buttonTopOffset: 120,
-              onMapCreated: (MapboxMapController controller) => setState(() {
-                _mapController = controller;
-              }),
-              onMapClick: (_, __) => setState(() {
-                _showOverlays = !_showOverlays;
-              }),
+              onMapCreated: (controller) =>
+                  setState(() => _mapController = controller),
+              onMapClick: (_, __) =>
+                  setState(() => _showOverlays = !_showOverlays),
             ),
             if (_showOverlays && _searchResults.isNotEmpty)
               Positioned(
