@@ -49,6 +49,8 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
 
   late final CardioSessionDescription _cardioSessionDescription;
 
+  bool _fullscreen = false;
+
   String _locationInfo = "no data";
   String _stepInfo = "no data";
   String _heartRateInfo = "no data";
@@ -277,67 +279,72 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
   @override
   Widget build(BuildContext context) {
     return DiscardWarningOnPop(
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 25, bottom: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(_locationInfo),
-                  Text(_stepInfo),
-                  Text(_heartRateInfo),
-                ],
-              ),
-            ),
-            Expanded(
-              child: MapboxMapWrapper(
-                showScale: true,
-                showMapStylesButton: true,
-                showSetNorthButton: true,
-                showCurrentLocationButton: false,
-                showSelectRouteButton: false,
-                initialCameraPosition: CameraPosition(
-                  zoom: 15.0,
-                  target: context.read<Settings>().lastGpsLatLng,
-                ),
-                onMapCreated: (MapboxMapController controller) =>
-                    _mapController = controller,
-                onStyleLoadedCallback: _setTrackAndStartStreams,
-              ),
-            ),
-            Container(
-              padding: Defaults.edgeInsets.normal,
-              child: ProviderConsumer<TrackingUtils>.value(
-                value: _trackingUtils,
-                builder: (context, trackingUtils, _) => Column(
+      child: SafeArea(
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          body: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 25, bottom: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CardioValueUnitDescriptionTable(
-                      cardioSessionDescription: _cardioSessionDescription,
-                      currentDuration: trackingUtils.currentDuration,
-                      showCurrentElevation: true,
-                    ),
-                    Defaults.sizedBox.vertical.normal,
-                    _TrackingPageButtons(
-                      trackingUtils: trackingUtils,
-                      onStart: widget.heartRateUtils == null ||
-                              widget.heartRateUtils!.isActive
-                          ? () {
-                              trackingUtils.start();
-                              _cardioSessionDescription.cardioSession.datetime =
-                                  DateTime.now();
-                            }
-                          : null,
-                      onStop: _saveDialog,
-                    ),
+                    Text(_locationInfo),
+                    Text(_stepInfo),
+                    Text(_heartRateInfo),
                   ],
                 ),
               ),
-            ),
-          ],
+              Expanded(
+                child: MapboxMapWrapper(
+                  showScale: true,
+                  showFullscreenButton: true,
+                  showMapStylesButton: true,
+                  showSetNorthButton: true,
+                  showCurrentLocationButton: false,
+                  showSelectRouteButton: false,
+                  onFullscreenToggle: (fullscreen) => setState(()=>_fullscreen = fullscreen),
+                  initialCameraPosition: CameraPosition(
+                    zoom: 15.0,
+                    target: context.read<Settings>().lastGpsLatLng,
+                  ),
+                  onMapCreated: (MapboxMapController controller) =>
+                      _mapController = controller,
+                  onStyleLoadedCallback: _setTrackAndStartStreams,
+                ),
+              ),
+              if (!_fullscreen)
+              Container(
+                padding: Defaults.edgeInsets.normal,
+                child: ProviderConsumer<TrackingUtils>.value(
+                  value: _trackingUtils,
+                  builder: (context, trackingUtils, _) => Column(
+                    children: [
+                      CardioValueUnitDescriptionTable(
+                        cardioSessionDescription: _cardioSessionDescription,
+                        currentDuration: trackingUtils.currentDuration,
+                        showCurrentElevation: true,
+                      ),
+                      Defaults.sizedBox.vertical.normal,
+                      _TrackingPageButtons(
+                        trackingUtils: trackingUtils,
+                        onStart: widget.heartRateUtils == null ||
+                                widget.heartRateUtils!.isActive
+                            ? () {
+                                trackingUtils.start();
+                                _cardioSessionDescription
+                                    .cardioSession.datetime = DateTime.now();
+                              }
+                            : null,
+                        onStop: _saveDialog,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -77,6 +77,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
             Expanded(
               child: MapboxMapWrapper(
                 showScale: true,
+                showFullscreenButton: false,
                 showMapStylesButton: true,
                 showSetNorthButton: true,
                 showCurrentLocationButton: false,

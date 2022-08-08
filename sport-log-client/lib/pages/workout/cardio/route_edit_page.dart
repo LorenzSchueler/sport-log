@@ -272,6 +272,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
             Expanded(
               child: MapboxMapWrapper(
                 showScale: true,
+                showFullscreenButton: false,
                 showMapStylesButton: true,
                 showSetNorthButton: true,
                 showCurrentLocationButton: false,

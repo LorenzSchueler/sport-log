@@ -15,10 +15,12 @@ import 'package:sport_log/widgets/map_widgets/map_scale.dart';
 import 'package:sport_log/widgets/map_widgets/map_styles.dart';
 import 'package:sport_log/widgets/map_widgets/select_route.dart';
 import 'package:sport_log/widgets/map_widgets/set_north.dart';
+import 'package:sport_log/widgets/map_widgets/toggle_fullscreen_button.dart';
 
 class MapboxMapWrapper extends StatefulWidget {
   const MapboxMapWrapper({
     required this.showScale,
+    required this.showFullscreenButton,
     required this.showMapStylesButton,
     required this.showSetNorthButton,
     required this.showCurrentLocationButton,
@@ -26,6 +28,7 @@ class MapboxMapWrapper extends StatefulWidget {
     this.showOverlays = true,
     this.buttonTopOffset = 0,
     this.scaleAtTop = false,
+    this.onFullscreenToggle,
     this.styleString,
     this.initialCameraPosition,
     this.trackCameraPosition = false,
@@ -42,6 +45,7 @@ class MapboxMapWrapper extends StatefulWidget {
   });
 
   final bool showScale;
+  final bool showFullscreenButton;
   final bool showMapStylesButton;
   final bool showSetNorthButton;
   final bool showCurrentLocationButton;
@@ -49,6 +53,7 @@ class MapboxMapWrapper extends StatefulWidget {
   final bool showOverlays;
   final int buttonTopOffset;
   final bool scaleAtTop;
+  final void Function(bool)? onFullscreenToggle;
 
   /// defaults to [MapboxStyles.OUTDOORS]
   final String? styleString;
@@ -169,6 +174,10 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
             right: 15,
             child: Column(
               children: [
+                if (widget.showFullscreenButton) ...[
+                  ToggleFullscreenButton(onToggle: widget.onFullscreenToggle),
+                  Defaults.sizedBox.vertical.normal,
+                ],
                 if (widget.showMapStylesButton) ...[
                   MapStylesButton(
                     mapController: _mapController!,

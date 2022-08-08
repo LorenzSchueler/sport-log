@@ -116,6 +116,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                 _cardioSessionDescription.cardioSession.track != null
                     ? MapboxMapWrapper(
                         showScale: true,
+                        showFullscreenButton: false,
                         showMapStylesButton: true,
                         showSetNorthButton: true,
                         showCurrentLocationButton: false,

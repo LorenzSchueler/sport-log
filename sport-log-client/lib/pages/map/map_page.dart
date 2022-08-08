@@ -142,6 +142,7 @@ class _MapPageState extends State<MapPage> {
           children: [
             MapboxMapWrapper(
               showScale: true,
+              showFullscreenButton: false,
               showMapStylesButton: true,
               showSetNorthButton: true,
               showCurrentLocationButton: true,
