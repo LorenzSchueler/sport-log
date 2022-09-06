@@ -25,7 +25,7 @@ class SelectionBar<T> extends StatelessWidget {
           style: isSelected
               ? OutlinedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
-                  primary: Theme.of(context).colorScheme.onPrimary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 )
               : OutlinedButton.styleFrom(
                   side: BorderSide.none,

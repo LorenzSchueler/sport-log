@@ -372,7 +372,7 @@ class _TrackingPageButtons extends StatelessWidget {
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).colorScheme.error,
+                  backgroundColor: Theme.of(context).colorScheme.error,
                 ),
                 onPressed: trackingUtils.pause,
                 child: const Text("Pause"),
@@ -386,7 +386,7 @@ class _TrackingPageButtons extends StatelessWidget {
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).colorScheme.errorContainer,
+                  backgroundColor: Theme.of(context).colorScheme.errorContainer,
                 ),
                 onPressed: trackingUtils.resume,
                 child: const Text("Resume"),
@@ -396,7 +396,7 @@ class _TrackingPageButtons extends StatelessWidget {
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).colorScheme.error,
+                  backgroundColor: Theme.of(context).colorScheme.error,
                 ),
                 onPressed: onStop,
                 child: const Text("Save"),
@@ -410,7 +410,7 @@ class _TrackingPageButtons extends StatelessWidget {
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).colorScheme.errorContainer,
+                  backgroundColor: Theme.of(context).colorScheme.errorContainer,
                 ),
                 onPressed: onStart,
                 child:
@@ -421,7 +421,7 @@ class _TrackingPageButtons extends StatelessWidget {
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).colorScheme.error,
+                  backgroundColor: Theme.of(context).colorScheme.error,
                 ),
                 onPressed: () => Navigator.pop(context),
                 child: const Text("Cancel"),
