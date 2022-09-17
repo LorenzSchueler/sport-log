@@ -2,21 +2,27 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sport_log/defaults.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/helpers/extensions/text_editing_controller_extension.dart';
+import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/input_fields/double_input.dart';
+import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 
 class SetDurationInput extends StatefulWidget {
   SetDurationInput({
     required this.onNewSet,
     required this.confirmChanges,
     required int initialCount,
+    required this.initialWeight,
     super.key,
   }) : initialDuration = Duration(milliseconds: initialCount);
 
-  final void Function(int count, double? weight, double? secondWeight) onNewSet;
+  final void Function(int count, double? weight) onNewSet;
   final bool confirmChanges;
   final Duration initialDuration;
+  final double? initialWeight;
 
   @override
   State<SetDurationInput> createState() => _SetDurationInputState();
@@ -27,6 +33,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
   late int _minutes = widget.initialDuration.inMinutes % 60;
   late int _seconds = widget.initialDuration.inSeconds % 60;
   late int _milliseconds = widget.initialDuration.inMilliseconds % 1000;
+  late double? _weight = widget.initialWeight;
 
   final _hoursKey = GlobalKey<_PaddedIntInputState>();
   final _minutesKey = GlobalKey<_PaddedIntInputState>();
@@ -41,7 +48,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
         seconds: _seconds,
         milliseconds: _milliseconds,
       );
-      widget.onNewSet(duration.inMilliseconds, null, null);
+      widget.onNewSet(duration.inMilliseconds, _weight);
 
       if (confirmed) {
         // clear all inputs
@@ -69,33 +76,82 @@ class _SetDurationInputState extends State<SetDurationInput> {
     }
   }
 
+  void _setWeight(double weight) {
+    setState(() => _weight = weight);
+    _submit();
+  }
+
+  void _addWeight() {
+    setState(() => _weight = 0);
+    _submit();
+  }
+
+  void _removeWeight() {
+    setState(() => _weight = null);
+    _submit();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _timeInput,
-        if (widget.confirmChanges) ...[
-          Defaults.sizedBox.horizontal.normal,
-          _addButton,
-        ]
+        SizedBox(
+          width: 247,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _timeInput,
+              ..._weightInput,
+            ],
+          ),
+        ),
+        Expanded(
+          child: Center(
+            child: SubmitSetButton(
+              isSubmittable: (_hours != 0 ||
+                      _minutes != 0 ||
+                      _seconds != 0 ||
+                      _milliseconds != 0) &&
+                  (_weight == null || _weight! > 0),
+              onSubmitted: () => _submit(confirmed: true),
+            ),
+          ),
+        )
       ],
     );
   }
 
-  Widget get _addButton {
-    final isSubmittable =
-        _hours != 0 || _minutes != 0 || _seconds != 0 || _milliseconds != 0;
-    return IconButton(
-      icon: const Icon(AppIcons.check),
-      color: isSubmittable ? Theme.of(context).colorScheme.primary : null,
-      iconSize: _PaddedIntInput.fontSize,
-      onPressed: isSubmittable ? () => _submit(confirmed: true) : null,
-    );
+  List<Widget> get _weightInput {
+    return [
+      if (_weight != null)
+        EditTile(
+          leading: null,
+          caption: "Weight",
+          child: Consumer<Settings>(
+            builder: (context, settings, _) => DoubleInput(
+              initialValue: _weight!,
+              stepSize: settings.weightIncrement,
+              setValue: _setWeight,
+            ),
+          ),
+        ),
+      _weight == null
+          ? ActionChip(
+              avatar: const Icon(AppIcons.add),
+              label: const Text("Add Weight"),
+              onPressed: _addWeight,
+            )
+          : ActionChip(
+              avatar: const Icon(AppIcons.close),
+              label: const Text("Remove Weight"),
+              onPressed: _removeWeight,
+            )
+    ];
   }
 
   Widget get _timeInput {
     return DefaultTextStyle(
-      style: TextStyle(fontSize: _PaddedIntInput.fontSize),
+      style: const TextStyle(fontSize: _PaddedIntInput._textFontSize),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -180,85 +236,6 @@ class _SetDurationInputState extends State<SetDurationInput> {
   }
 }
 
-class _CaptionTextField extends StatelessWidget {
-  const _CaptionTextField({
-    required this.controller,
-    required this.focusNode,
-    required this.onChanged,
-    required this.caption,
-    required this.placeholder,
-    required this.textInputAction,
-    required this.formatFn,
-    this.onSubmitted,
-    required this.onTap,
-    required this.width,
-    required this.scrollable,
-  });
-
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final void Function(String) onChanged;
-  final String caption;
-  final String placeholder;
-  final TextInputAction textInputAction;
-  final TextInputFormatFunction formatFn;
-  final VoidCallback? onSubmitted;
-  final VoidCallback onTap;
-  final double width;
-  final bool scrollable;
-
-  static const double captionFontSize = 15;
-  static const double textFontSize = 40;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text(
-            caption,
-            style: Theme.of(context)
-                .textTheme
-                .caption!
-                .copyWith(fontSize: captionFontSize),
-          ),
-          _textField,
-        ],
-      ),
-    );
-  }
-
-  Widget get _textField {
-    return TextFormField(
-      controller: controller,
-      onChanged: onChanged,
-      onFieldSubmitted: (_) => onSubmitted?.call(),
-      focusNode: focusNode,
-      onTap: onTap,
-      textInputAction: textInputAction,
-      inputFormatters: [
-        TextInputFormatter.withFunction(formatFn),
-      ],
-      keyboardType: TextInputType.number,
-      textAlign: TextAlign.right,
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: placeholder,
-        isDense: true,
-        contentPadding: EdgeInsets.zero,
-      ),
-      style: const TextStyle(
-        fontSize: textFontSize,
-      ),
-      scrollPhysics: scrollable ? null : const NeverScrollableScrollPhysics(),
-    );
-  }
-}
-
 /// Text Field with box that only accepts non-negative ints
 class _PaddedIntInput extends StatefulWidget {
   const _PaddedIntInput({
@@ -284,15 +261,15 @@ class _PaddedIntInput extends StatefulWidget {
   final int? maxValue;
   final bool submitOnDigitsReached;
 
-  static double get fontSize => _CaptionTextField.textFontSize;
+  static const double _captionFontSize = 14;
+  static const double _textFontSize = 30;
+  static const double _widthPerDigit = 25;
 
   @override
   State<_PaddedIntInput> createState() => _PaddedIntInputState();
 }
 
 class _PaddedIntInputState extends State<_PaddedIntInput> {
-  static const double _widthPerDigit = 31;
-
   final _focusNode = FocusNode();
   late final _controller = TextEditingController(
     text: widget.initialValue?.toString().padLeft(widget.numberOfDigits, '0'),
@@ -312,23 +289,47 @@ class _PaddedIntInputState extends State<_PaddedIntInput> {
 
   @override
   Widget build(BuildContext context) {
-    return _CaptionTextField(
-      controller: _controller,
-      focusNode: _focusNode,
-      onChanged: _onChanged,
-      caption: widget.caption,
-      placeholder:
-          widget.placeholder.toString().padLeft(widget.numberOfDigits, '0'),
-      formatFn: _inputFormatter,
-      onSubmitted: widget.onSubmitted,
-      width: _widthPerDigit * widget.numberOfDigits,
-      onTap: requestFocus,
-      scrollable: false,
-      textInputAction: widget.textInputAction,
+    return Container(
+      width: _PaddedIntInput._widthPerDigit * widget.numberOfDigits,
+      padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            widget.caption,
+            style: Theme.of(context)
+                .textTheme
+                .caption!
+                .copyWith(fontSize: _PaddedIntInput._captionFontSize),
+          ),
+          TextFormField(
+            controller: _controller,
+            onChanged: _onChanged,
+            onFieldSubmitted: (_) => widget.onSubmitted?.call(),
+            focusNode: _focusNode,
+            onTap: requestFocus,
+            textInputAction: widget.textInputAction,
+            inputFormatters: [TextInputFormatter.withFunction(_inputFormatter)],
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.right,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: widget.placeholder
+                  .toString()
+                  .padLeft(widget.numberOfDigits, '0'),
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
+            ),
+            style: const TextStyle(fontSize: _PaddedIntInput._textFontSize),
+            scrollPhysics: const NeverScrollableScrollPhysics(),
+          ),
+        ],
+      ),
     );
   }
 
-  void _onChanged(String text) {
+  void _onChanged(String _) {
     if (_controller.text.trim().isEmpty) {
       widget.onChanged(widget.placeholder);
       return;
