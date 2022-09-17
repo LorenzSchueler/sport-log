@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/strength_session_description.dart';
 import 'package:sport_log/models/strength/strength_session_stats.dart';
@@ -91,25 +90,6 @@ enum _SeriesType {
       ].contains(this);
 }
 
-List<_SeriesType> _getAvailableSeries(MovementDimension dim) {
-  switch (dim) {
-    case MovementDimension.reps:
-      return [
-        _SeriesType.maxEorm,
-        _SeriesType.maxWeight,
-        _SeriesType.maxReps,
-        _SeriesType.avgReps,
-        _SeriesType.sumVolume,
-      ];
-    case MovementDimension.energy:
-      return [_SeriesType.sumCalories];
-    case MovementDimension.distance:
-      return [_SeriesType.maxDistance];
-    case MovementDimension.time:
-      return [_SeriesType.minTime];
-  }
-}
-
 class StrengthChart extends StatefulWidget {
   const StrengthChart({
     required this.strengthSessionDescriptions,
@@ -125,38 +105,47 @@ class StrengthChart extends StatefulWidget {
 }
 
 class _StrengthChartState extends State<StrengthChart> {
-  final _logger = Logger('StrengthChart');
-  late final availableSeries = _getAvailableSeries(movementDimension);
-  MovementDimension get movementDimension =>
-      widget.strengthSessionDescriptions.first.movement.dimension;
-  bool get isTime => movementDimension == MovementDimension.time;
-
-  late _SeriesType _selectedSeries = availableSeries.first;
-  late List<StrengthSessionStats> _strengthSessionStats;
+  late List<StrengthSessionStats> _strengthSessionStats = calculateStats();
+  late List<_SeriesType> _availableSeries = _getAvailableSeries();
+  late _SeriesType _selectedSeries = _availableSeries.first;
 
   @override
-  void initState() {
-    calculateStats();
-    _logger.i("date filter: ${widget.dateFilterState.name}");
-    super.initState();
-  }
-
-  @override
-  void didUpdateWidget(covariant StrengthChart oldWidget) {
-    calculateStats();
+  void didUpdateWidget(StrengthChart oldWidget) {
+    _strengthSessionStats = calculateStats();
+    _availableSeries = _getAvailableSeries();
+    _selectedSeries = _availableSeries.first;
     super.didUpdateWidget(oldWidget);
   }
 
-  void calculateStats() {
-    _strengthSessionStats = widget.strengthSessionDescriptions
-        .map(
-          (e) => StrengthSessionStats.fromStrengthSets(
-            e.session.datetime,
-            movementDimension,
-            e.sets,
-          ),
-        )
-        .toList();
+  List<StrengthSessionStats> calculateStats() =>
+      widget.strengthSessionDescriptions.map((d) => d.stats).toList();
+
+  List<_SeriesType> _getAvailableSeries() {
+    switch (widget.strengthSessionDescriptions.first.movement.dimension) {
+      case MovementDimension.reps:
+        return [
+          _SeriesType.maxEorm,
+          _SeriesType.maxWeight,
+          _SeriesType.maxReps,
+          _SeriesType.avgReps,
+          _SeriesType.sumVolume,
+        ];
+      case MovementDimension.energy:
+        return [
+          _SeriesType.sumCalories,
+          _SeriesType.maxWeight,
+        ];
+      case MovementDimension.distance:
+        return [
+          _SeriesType.maxDistance,
+          _SeriesType.maxWeight,
+        ];
+      case MovementDimension.time:
+        return [
+          _SeriesType.minTime,
+          _SeriesType.maxWeight,
+        ];
+    }
   }
 
   @override
@@ -169,7 +158,7 @@ class _StrengthChartState extends State<StrengthChart> {
             child: SelectionBar(
               onChange: (_SeriesType type) =>
                   setState(() => _selectedSeries = type),
-              items: availableSeries,
+              items: _availableSeries,
               getLabel: (_SeriesType type) => type.toString(),
               selectedItem: _selectedSeries,
             ),

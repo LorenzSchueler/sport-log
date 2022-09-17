@@ -27,7 +27,7 @@ class _DateFilterState extends State<DateFilter> {
   }
 
   @override
-  void didUpdateWidget(covariant DateFilter oldWidget) {
+  void didUpdateWidget(DateFilter oldWidget) {
     _state = widget.initialState;
     super.didUpdateWidget(oldWidget);
   }
