@@ -5,6 +5,11 @@ class SortItem<T> {
 
   final int score;
   final T item;
+
+  @override
+  String toString() {
+    return "$item: $score";
+  }
 }
 
 extension SortExtension<T> on List<T> {
@@ -13,9 +18,13 @@ extension SortExtension<T> on List<T> {
     required String Function(T) toString,
   }) {
     if (query == null || query.isEmpty) return this;
-    final sortedItems = map((e) => SortItem<T>(distance(query, toString(e)), e))
-        .toList()
+
+    final sortedItems = map(
+      (candidate) =>
+          SortItem<T>(distance(query, toString(candidate)), candidate),
+    ).toList()
       ..sort((x, y) => x.score.compareTo(y.score));
+
     return sortedItems.map((e) => e.item).toList();
   }
 }
@@ -27,6 +36,9 @@ int distance(
   int edit = 3,
   int delete = 6,
 }) {
+  query = query.toLowerCase().replaceAll("-", " ");
+  canditate = canditate.toLowerCase().replaceAll("-", " ");
+
   if (query == canditate) {
     return 0;
   }
@@ -64,5 +76,7 @@ int distance(
     v1 = vtemp;
   }
 
-  return v0[canditate.length];
+  final directMatch = canditate.contains(query) ? 0 : 1000;
+
+  return v0[canditate.length] + directMatch;
 }
