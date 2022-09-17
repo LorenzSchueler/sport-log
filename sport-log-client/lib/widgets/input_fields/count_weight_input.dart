@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/double_input.dart';
@@ -44,22 +45,13 @@ class CountWeightInput extends StatefulWidget {
 }
 
 class _CountWeightInputState extends State<CountWeightInput> {
-  late int _count;
-  late double? _weight;
-  late double? _secondWeight;
-  late DistanceUnit? _distanceUnit;
+  late int _count = widget.initialCount;
+  late double? _weight = widget.initialWeight;
+  late double? _secondWeight = widget.initialSecondWeight;
+  late DistanceUnit? _distanceUnit = widget.distanceUnit;
   String _weightUnit = "kg";
 
   static const double _lbToKg = 0.45359237;
-
-  @override
-  void initState() {
-    _count = widget.initialCount;
-    _weight = widget.initialWeight;
-    _secondWeight = widget.initialSecondWeight;
-    _distanceUnit = widget.distanceUnit;
-    super.initState();
-  }
 
   void _submit({bool confirmed = false}) {
     if (!widget.confirmChanges || confirmed) {
@@ -235,14 +227,9 @@ class _CountWeightInputState extends State<CountWeightInput> {
         if (widget.confirmChanges)
           Expanded(
             child: Center(
-              child: IconButton(
-                icon: const Icon(AppIcons.check),
-                iconSize: 40,
-                onPressed: _count > 0 && (_weight == null || _weight! > 0)
-                    ? () => _submit(confirmed: true)
-                    : null,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
+              child: SubmitSetButton(
+                isSubmittable: _count > 0 && (_weight == null || _weight! > 0),
+                onSubmitted: () => _submit(confirmed: true),
               ),
             ),
           ),

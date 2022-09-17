@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/strength_sessions/set_inputs/set_duration_input.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/count_weight_input.dart';
 
 class NewSetInput extends StatelessWidget {
@@ -55,5 +56,27 @@ class NewSetInput extends StatelessWidget {
             secondWeight: secondWeight,
             initialSecondWeight: initialSecondWeight,
           );
+  }
+}
+
+class SubmitSetButton extends StatelessWidget {
+  const SubmitSetButton({
+    required this.isSubmittable,
+    required this.onSubmitted,
+    super.key,
+  });
+
+  final bool isSubmittable;
+  final void Function() onSubmitted;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: const Icon(AppIcons.check),
+      iconSize: 40,
+      onPressed: isSubmittable ? onSubmitted : null,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(),
+    );
   }
 }
