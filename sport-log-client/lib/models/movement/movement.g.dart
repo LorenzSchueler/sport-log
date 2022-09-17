@@ -24,7 +24,7 @@ Map<String, dynamic> _$MovementToJson(Movement instance) => <String, dynamic>{
       'description': instance.description,
       'cardio': instance.cardio,
       'deleted': instance.deleted,
-      'movement_dimension': _$MovementDimensionEnumMap[instance.dimension],
+      'movement_dimension': _$MovementDimensionEnumMap[instance.dimension]!,
     };
 
 const _$MovementDimensionEnumMap = {

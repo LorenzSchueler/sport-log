@@ -41,7 +41,7 @@ Map<String, dynamic> _$CardioSessionToJson(CardioSession instance) =>
           const OptionalIdConverter().toJson(instance.cardioBlueprintId),
       'user_id': const IdConverter().toJson(instance.userId),
       'movement_id': const IdConverter().toJson(instance.movementId),
-      'cardio_type': _$CardioTypeEnumMap[instance.cardioType],
+      'cardio_type': _$CardioTypeEnumMap[instance.cardioType]!,
       'datetime': const DateTimeConverter().toJson(instance.datetime),
       'distance': instance.distance,
       'ascent': instance.ascent,

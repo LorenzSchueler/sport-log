@@ -22,7 +22,7 @@ Map<String, dynamic> _$MetconToJson(Metcon instance) => <String, dynamic>{
       'id': const IdConverter().toJson(instance.id),
       'user_id': const OptionalIdConverter().toJson(instance.userId),
       'name': instance.name,
-      'metcon_type': _$MetconTypeEnumMap[instance.metconType],
+      'metcon_type': _$MetconTypeEnumMap[instance.metconType]!,
       'rounds': instance.rounds,
       'timecap': const OptionalDurationConverter().toJson(instance.timecap),
       'description': instance.description,

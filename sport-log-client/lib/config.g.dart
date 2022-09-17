@@ -27,7 +27,7 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
       'access_token': instance.accessToken,
       'server_address': instance.serverAddress,
-      'min_log_level': _$LevelEnumMap[instance.minLogLevel],
+      'min_log_level': _$LevelEnumMap[instance.minLogLevel]!,
       'delete_database': instance.deleteDatabase,
       'output_request_json': instance.outputRequestJson,
       'output_request_headers': instance.outputRequestHeaders,

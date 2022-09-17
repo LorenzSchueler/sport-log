@@ -22,7 +22,7 @@ Map<String, dynamic> _$ActionRuleToJson(ActionRule instance) =>
       'id': const IdConverter().toJson(instance.id),
       'user_id': const IdConverter().toJson(instance.userId),
       'action_id': const IdConverter().toJson(instance.actionId),
-      'weekday': _$WeekdayEnumMap[instance.weekday],
+      'weekday': _$WeekdayEnumMap[instance.weekday]!,
       'time': const DateTimeConverter().toJson(instance.time),
       'arguments': instance.arguments,
       'enabled': instance.enabled,
