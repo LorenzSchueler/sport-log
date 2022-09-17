@@ -1,7 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:sport_log/database/table.dart';
-import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -14,13 +12,14 @@ class StrengthSessionStats extends JsonSerializable {
   StrengthSessionStats({
     required this.datetime,
     required this.numSets,
+    required this.maxWeight,
+    required this.avgWeight,
     required this.minCount,
     required this.maxCount,
     required this.sumCount,
     required this.avgCount,
     required this.maxEorm,
     required this.sumVolume,
-    required this.maxWeight,
   });
 
   factory StrengthSessionStats.fromStrengthSets(
@@ -28,42 +27,28 @@ class StrengthSessionStats extends JsonSerializable {
     MovementDimension movementDimension,
     List<StrengthSet> sets,
   ) {
+    int numSets = sets.length;
+    double? maxWeight = sets.map((s) => s.weight).whereNotNull().maxOrNull;
+    double? avgWeight = sets.map((s) => s.weight).whereNotNull().sum / numSets;
     int minCount = sets.map((s) => s.count).minOrNull ?? 0;
     int maxCount = sets.map((s) => s.count).maxOrNull ?? 0;
     int sumCount = sets.map((s) => s.count).sum;
-    double? maxWeight = sets.map((s) => s.weight).whereNotNull().maxOrNull;
+    double avgCount = sets.isEmpty ? 0 : sumCount / numSets;
     double? maxEorm =
         sets.map((s) => s.eorm(movementDimension)).whereNotNull().maxOrNull;
     double? sumVolume = sets.map((s) => s.volume).whereNotNull().sum;
-    double avgCount = sets.isEmpty ? 0 : sumCount / sets.length;
 
     return StrengthSessionStats(
       datetime: datetime,
-      numSets: sets.length,
+      numSets: numSets,
+      maxWeight: maxWeight,
+      avgWeight: avgWeight,
       minCount: minCount,
       maxCount: maxCount,
       sumCount: sumCount,
       avgCount: avgCount,
       maxEorm: maxEorm,
       sumVolume: sumVolume,
-      maxWeight: maxWeight,
-    );
-  }
-
-  factory StrengthSessionStats.fromDbRecord(DbRecord r, {String prefix = ''}) {
-    final numSets = r[prefix + Columns.numSets]! as int;
-    final sumCount = r[prefix + Columns.sumCount]! as int;
-    double avgCount = numSets == 0 ? 0 : sumCount / numSets;
-    return StrengthSessionStats(
-      datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
-      numSets: numSets,
-      minCount: r[prefix + Columns.minCount]! as int,
-      maxCount: r[prefix + Columns.maxCount]! as int,
-      sumCount: sumCount,
-      avgCount: avgCount,
-      maxEorm: r[prefix + Columns.maxEorm] as double?,
-      maxWeight: r[prefix + Columns.maxWeight] as double?,
-      sumVolume: r[prefix + Columns.sumVolume] as double?,
     );
   }
 
@@ -71,6 +56,8 @@ class StrengthSessionStats extends JsonSerializable {
       _$StrengthSessionStatsFromJson(json);
 
   DateTime datetime;
+  double? maxWeight;
+  double? avgWeight;
   int numSets;
   int minCount;
   int maxCount;
@@ -78,7 +65,6 @@ class StrengthSessionStats extends JsonSerializable {
   double avgCount;
   double? maxEorm;
   double? sumVolume;
-  double? maxWeight;
 
   @override
   Map<String, dynamic> toJson() => _$StrengthSessionStatsToJson(this);
