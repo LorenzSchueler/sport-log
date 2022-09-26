@@ -88,4 +88,5 @@ class AppIcons {
   static const IconData drawer = Icons.dehaze_rounded;
   static const IconData mountains = Icons.filter_hdr_rounded;
   static const IconData layers = Icons.layers_rounded;
+  static const IconData developerMode = Icons.developer_mode;
 }

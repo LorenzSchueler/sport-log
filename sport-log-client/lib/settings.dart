@@ -39,6 +39,7 @@ class Settings extends ChangeNotifier {
   static const String _email = "email";
   static const String _lastMapPosition = "lastMapPosition";
   static const String _lastGpsLatLng = "lastGpsLatLng";
+  static const String _developer = "developer";
 
   Future<void> init({bool override = false}) async {
     Hive
@@ -88,6 +89,9 @@ class Settings extends ChangeNotifier {
     }
     if (!_storage!.containsKey(_lastGpsLatLng) || override) {
       await _storage!.put(_lastGpsLatLng, Defaults.mapbox.cameraPosition);
+    }
+    if (!_storage!.containsKey(_developer) || override) {
+      await _storage!.put(_developer, false);
     }
   }
 
@@ -279,6 +283,14 @@ class Settings extends ChangeNotifier {
 
   set lastGpsLatLng(LatLng latLng) {
     _put(_lastGpsLatLng, latLng);
+  }
+
+  bool get developerMode {
+    return _getBool(_developer);
+  }
+
+  set developerMode(bool developerMode) {
+    _put(_developer, developerMode);
   }
 }
 

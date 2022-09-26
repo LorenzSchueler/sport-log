@@ -196,6 +196,10 @@ class SettingsPage extends StatelessWidget {
     }
   }
 
+  void _setDeveloperMode(BuildContext context, bool developerMode) {
+    context.read<Settings>().developerMode = developerMode;
+  }
+
   @override
   Widget build(BuildContext context) {
     return NeverPop(
@@ -413,6 +417,22 @@ class SettingsPage extends StatelessWidget {
                 ),
                 Defaults.sizedBox.vertical.small,
                 const Divider(),
+                const CaptionTile(caption: "Developer Mode"),
+                EditTile(
+                  caption: "Developer Mode",
+                  leading: AppIcons.developerMode,
+                  child: SizedBox(
+                    height: 20,
+                    width: 34,
+                    child: Switch(
+                      value: settings.developerMode,
+                      onChanged: (enabled) =>
+                          _setDeveloperMode(context, enabled),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                ),
+                const Divider(),
                 const CaptionTile(caption: "About"),
                 GestureDetector(
                   child: const TextTile(
@@ -420,7 +440,7 @@ class SettingsPage extends StatelessWidget {
                     child: Text('About'),
                   ),
                   onTap: () => Navigator.pushNamed(context, Routes.about),
-                )
+                ),
               ],
             ),
           ),
