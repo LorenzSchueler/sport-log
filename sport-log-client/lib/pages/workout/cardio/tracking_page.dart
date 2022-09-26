@@ -284,18 +284,19 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
           resizeToAvoidBottomInset: false,
           body: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 25, bottom: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(_locationInfo),
-                    Text(_stepInfo),
-                    Text(_heartRateInfo),
-                  ],
+              if (context.read<Settings>().developerMode)
+                Padding(
+                  padding: const EdgeInsets.only(top: 25, bottom: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(_locationInfo),
+                      Text(_stepInfo),
+                      Text(_heartRateInfo),
+                    ],
+                  ),
                 ),
-              ),
               Expanded(
                 child: MapboxMapWrapper(
                   showScale: true,
