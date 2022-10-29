@@ -397,7 +397,7 @@ async fn get_token(
     username: &str,
     password: &str,
 ) -> Result<Option<(&'static str, String)>, ReqwestError> {
-    let credentials = [("l", username), ("p", password)];
+    let credentials = [("l", username), ("p", password), ("captchaToken", "0")];
     let user: User = client
         .post("https://api.sports-tracker.com/apiserver/v1/login")
         .form(&credentials)
