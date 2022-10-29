@@ -57,7 +57,9 @@ fn main() {
         env::set_var("RUST_LOG", "warn");
     }
 
-    tracing_subscriber::fmt::init();
+    tracing_subscriber::fmt()
+        .with_writer(std::io::stderr)
+        .init();
 
     let config: Config = match fs::read_to_string(CONFIG_FILE) {
         Ok(file) => match toml::from_str(&file) {

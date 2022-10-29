@@ -108,7 +108,10 @@ fn rocket() -> Rocket<Build> {
     } else {
         env::set_var("RUST_LOG", "warn");
     }
-    tracing_subscriber::fmt::try_init().unwrap_or(());
+
+    tracing_subscriber::fmt()
+        .with_writer(std::io::stderr)
+        .init();
 
     use handler::*;
     rocket::custom(figment)

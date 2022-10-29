@@ -86,7 +86,9 @@ async fn main() {
         env::set_var("RUST_LOG", "warn");
     }
 
-    tracing_subscriber::fmt::init();
+    tracing_subscriber::fmt()
+        .with_writer(std::io::stderr)
+        .init();
 
     match &env::args().collect::<Vec<_>>()[1..] {
         [] => {
