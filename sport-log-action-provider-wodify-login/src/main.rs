@@ -310,7 +310,7 @@ async fn try_login(
         .await
         .map_err(Error::WebDriver)?;
 
-    time::sleep(StdDuration::from_secs(2)).await;
+    time::sleep(StdDuration::from_secs(5)).await;
 
     if driver
         .find(By::Id("AthleteTheme_wt6_block_wt9_wtLogoutLink"))
