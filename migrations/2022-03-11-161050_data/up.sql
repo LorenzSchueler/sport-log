@@ -124,8 +124,8 @@ insert into movement (id, user_id, name, description, movement_dimension, cardio
     (123, null, 'Legless Rope Climb', null, 'reps', false),
     (124, null, 'Wall Ball', null, 'reps', false), -- ball
     (125, null, 'Med Ball Clean', null, 'reps', false),
-    (126, null, 'Back Extension', null, 'reps', false), -- GHD
-    (127, null, 'Hip Extension', null, 'reps', false),
+    (126, null, 'GHD Back Extension', null, 'reps', false), -- GHD
+    (127, null, 'GHD Hip Extension', null, 'reps', false),
     (128, null, 'GHD Sit Up', null, 'reps', false),
     (129, null, 'Box Step Up', null, 'reps', false), -- jumps
     (130, null, 'Box Jump', null, 'reps', false),
@@ -152,7 +152,12 @@ insert into movement (id, user_id, name, description, movement_dimension, cardio
     (151, null, 'Dumbbell Biceps Curl', null, 'reps', false),
     (152, null, 'Kettlebell Overhead Press', null, 'reps', false),
     (153, null, 'Snowboarding', null, 'distance', true),
-    (154, null, 'Strict Ring Dip', null, 'reps', false);
+    (154, null, 'Strict Ring Dip', null, 'reps', false),
+    (155, null, 'Sandbag Carry', null, 'distance', false),
+    (156, null, 'Sandbag Clean', null, 'reps', false),
+    (157, null, 'GHD Hip Extension & Nordic Curl', null, 'reps', false),
+    (158, null, 'Nordic Curl', null, 'reps', false),
+    (159, null, 'Seal Row', null, 'reps', false);
 
 insert into eorm (reps, percentage) values
     (1, 1.0),
