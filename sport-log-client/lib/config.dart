@@ -51,7 +51,7 @@ class Config extends JsonSerializable {
       exit(1);
     } on TypeError catch (e) {
       _logger.i(
-        "sport-log-client.yaml has a invalid format or contains invalid datatypes for some fields: $e",
+        "sport-log-client.yaml has a invalid format or contains invalid data types for some fields: $e",
       );
       exit(1);
     } catch (e) {
@@ -62,8 +62,7 @@ class Config extends JsonSerializable {
     final bool isAndroidEmulator;
     if (isAndroid) {
       final androidInfo = await DeviceInfoPlugin().androidInfo;
-      final isPhysicalDevice = androidInfo.isPhysicalDevice;
-      isAndroidEmulator = isPhysicalDevice != null && !isPhysicalDevice;
+      isAndroidEmulator = !androidInfo.isPhysicalDevice;
     } else {
       isAndroidEmulator = false;
     }

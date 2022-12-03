@@ -74,9 +74,11 @@ class StrengthSet extends AtomicEntity {
     final weightStr = weight == null ? null : formatWeight(weight!);
     switch (dim) {
       case MovementDimension.reps:
+        final eormVal = withEorm ? eorm(dim) : null;
+        final eormStr = eormVal != null ? formatWeight(eormVal) : null;
         return weightStr != null
-            ? withEorm
-                ? '$count x $weightStr  # ${formatWeight(eorm(dim)!)}'
+            ? eormStr != null
+                ? '$count x $weightStr  # $eormStr'
                 : '$count x $weightStr'
             : '$count reps';
       case MovementDimension.time:

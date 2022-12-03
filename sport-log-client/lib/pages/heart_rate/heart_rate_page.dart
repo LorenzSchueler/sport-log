@@ -45,7 +45,7 @@ class HeartRatePage extends StatelessWidget {
                                 },
                           child: Text(
                             heartRateUtils.isSearching
-                                ? "Seaching..."
+                                ? "Searching..."
                                 : "Search Devices",
                           ),
                         ),

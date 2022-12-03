@@ -14,10 +14,12 @@ class HeartRateUtils extends ChangeNotifier {
   static final _polar = Polar();
   static final FlutterBlue _flutterBlue = FlutterBlue.instance;
 
-  static const searchDuration = Duration(seconds: 10);
+  static const _searchDuration = Duration(seconds: 10);
 
-  bool isSearching = false;
-  Map<String, String> devices = {};
+  bool _isSearching = false;
+  bool get isSearching => _isSearching;
+  Map<String, String> _devices = {};
+  Map<String, String> get devices => _devices;
   String? deviceId;
   void Function(PolarHeartRateEvent)? onHeartRateEvent;
 
@@ -36,7 +38,7 @@ class HeartRateUtils extends ChangeNotifier {
   }
 
   Future<void> searchDevices() async {
-    isSearching = true;
+    _isSearching = true;
     notifyListeners();
     while (!await _flutterBlue.isOn) {
       final ignore = await showSystemSettingsDialog(
@@ -53,20 +55,20 @@ class HeartRateUtils extends ChangeNotifier {
       return;
     }
 
-    devices = {
+    _devices = {
       await for (final d in _flutterBlue
-          .scan(timeout: searchDuration)
+          .scan(timeout: _searchDuration)
           .where((d) => d.device.name.toLowerCase().contains("polar h")))
         d.device.name: d.device.id.toString()
     };
 
     deviceId = devices.values.firstOrNull;
-    isSearching = false;
+    _isSearching = false;
     notifyListeners();
   }
 
   void reset() {
-    devices = {};
+    _devices = {};
     deviceId = null;
     notifyListeners();
   }
