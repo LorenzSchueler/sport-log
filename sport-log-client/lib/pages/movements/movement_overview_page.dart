@@ -33,12 +33,12 @@ class MovementsPage extends StatelessWidget {
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
             title: dataProvider.isSelected
-                ? const Text("Movements")
-                : TextFormField(
+                ? TextFormField(
                     focusNode: _searchBar,
                     onChanged: (name) => dataProvider.selected = name,
                     decoration: Theme.of(context).textFormFieldDecoration,
-                  ),
+                  )
+                : const Text("Movements"),
             actions: [
               IconButton(
                 onPressed: () {
