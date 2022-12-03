@@ -40,6 +40,9 @@ class HeartRateUtils extends ChangeNotifier {
   Future<void> searchDevices() async {
     _isSearching = true;
     notifyListeners();
+
+    await stopHeartRateStream();
+
     while (!await _flutterBlue.isOn) {
       final ignore = await showSystemSettingsDialog(
         text:
@@ -56,6 +59,11 @@ class HeartRateUtils extends ChangeNotifier {
     }
 
     _devices = {
+      //await for (final d in _polar.searchForDevice().timeout(
+      //_searchDuration,
+      //onTimeout: (sink) => sink.close(),
+      //))
+      //d.name: d.deviceId.toString()
       await for (final d in _flutterBlue
           .scan(timeout: _searchDuration)
           .where((d) => d.device.name.toLowerCase().contains("polar h")))
@@ -75,7 +83,7 @@ class HeartRateUtils extends ChangeNotifier {
 
   bool get canStartStream => deviceId != null;
 
-  bool startHeartRateStream() {
+  Future<bool> startHeartRateStream() async {
     if (deviceId == null) {
       return false;
     }
@@ -90,19 +98,19 @@ class HeartRateUtils extends ChangeNotifier {
         _battery = event.level;
         notifyListeners();
       });
-      _polar.connectToDevice(deviceId!);
+      await _polar.connectToDevice(deviceId!);
       notifyListeners();
     }
     return true;
   }
 
-  void stopHeartRateStream() {
-    _heartRateSubscription?.cancel();
+  Future<void> stopHeartRateStream() async {
+    await _heartRateSubscription?.cancel();
     _heartRateSubscription = null;
-    _batterySubscription?.cancel();
+    await _batterySubscription?.cancel();
     _batterySubscription = null;
     if (deviceId != null) {
-      _polar.disconnectFromDevice(deviceId!);
+      await _polar.disconnectFromDevice(deviceId!);
     }
     deviceId = null;
     _hr = null;

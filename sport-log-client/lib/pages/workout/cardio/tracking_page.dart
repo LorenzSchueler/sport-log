@@ -139,7 +139,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   Future<void> _startStreams() async {
     await _locationUtils.startLocationStream();
     await _stepUtils.startStepCountStream();
-    widget.heartRateUtils?.startHeartRateStream();
+    await widget.heartRateUtils?.startHeartRateStream();
   }
 
   void _onHeartRateUpdate(PolarHeartRateEvent event) {

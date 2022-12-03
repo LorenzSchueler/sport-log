@@ -33,7 +33,6 @@ class HeartRatePage extends StatelessWidget {
                           onPressed: heartRateUtils.isSearching
                               ? null
                               : () async {
-                                  heartRateUtils.stopHeartRateStream();
                                   await heartRateUtils.searchDevices();
                                   if (heartRateUtils.devices.isEmpty) {
                                     // ignore: use_build_context_synchronously
