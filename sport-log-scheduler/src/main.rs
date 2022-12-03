@@ -39,7 +39,7 @@ pub const CONFIG_FILE: &str = "sport-log-scheduler.toml";
 ///
 /// `admin_password` is the password for the admin endpoints.
 ///
-/// `server_url` is the left part of the URL (everthing before `/<version>/...`)
+/// `server_url` is the left part of the URL (everything before `/<version>/...`)
 ///
 /// `garbage_collection_min_days` is the number of days for which an entry has to been deleted and not changed in order to get hard deleted.
 /// If set to `0` garbage collection is disabled.
@@ -78,20 +78,20 @@ fn main() {
     let client = Client::new();
     if let Err(error) = create_action_events(&client, &config) {
         error!(
-            "while creating new action events an error occured: {}",
+            "while creating new action events an error occurred: {}",
             error
         );
     }
     if let Err(error) = delete_action_events(&client, &config) {
         error!(
-            "while deleting old action events an error occured: {}",
+            "while deleting old action events an error occurred: {}",
             error
         );
     }
 
     if let Err(error) = garbage_collection(&client, &config) {
         error!(
-            "while running garbage collection an error occured: {}",
+            "while running garbage collection an error occurred: {}",
             error
         );
     }

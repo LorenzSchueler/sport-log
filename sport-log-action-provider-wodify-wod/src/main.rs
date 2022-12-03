@@ -46,7 +46,7 @@ type Result<T> = StdResult<T, Error>;
 ///
 /// `admin_password` is the password for the admin endpoints.
 ///
-/// `base_url` is the left part of the URL (everthing before `/<version>/...`)
+/// `base_url` is the left part of the URL (everything before `/<version>/...`)
 #[derive(Deserialize, Debug)]
 struct Config {
     password: String,
