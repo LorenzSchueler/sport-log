@@ -284,10 +284,11 @@ async fn fetch() -> Result<(), ReqwestError> {
                                 CardioType::Freetime
                             },
                             datetime: DateTime::from_utc(
-                                NaiveDateTime::from_timestamp(
+                                NaiveDateTime::from_timestamp_opt(
                                     workout_stats.start_time as i64 / 1000,
                                     0,
-                                ),
+                                )
+                                .unwrap(),
                                 Utc,
                             ),
                             distance: Some(workout_stats.total_distance as i32),

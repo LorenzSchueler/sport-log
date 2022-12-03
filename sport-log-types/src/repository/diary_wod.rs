@@ -15,9 +15,7 @@ impl Diary {
     ) -> QueryResult<Vec<Self>> {
         diary::table
             .filter(diary::columns::user_id.eq(user_id))
-            .filter(
-                diary::columns::date.between(start.date().naive_local(), end.date().naive_local()),
-            )
+            .filter(diary::columns::date.between(start.date_naive(), end.date_naive()))
             .order_by(diary::columns::date)
             .get_results(conn)
     }
@@ -32,9 +30,7 @@ impl Wod {
     ) -> QueryResult<Vec<Self>> {
         wod::table
             .filter(wod::columns::user_id.eq(user_id))
-            .filter(
-                wod::columns::date.between(start.date().naive_local(), end.date().naive_local()),
-            )
+            .filter(wod::columns::date.between(start.date_naive(), end.date_naive()))
             .order_by(wod::columns::date)
             .get_results(conn)
     }

@@ -18,14 +18,14 @@ impl Activity {
 
         activities.extend(diarys.into_iter().map(|diary| {
             (
-                DateTime::from_utc(diary.date.and_hms(0, 0, 0), Utc),
+                DateTime::from_utc(diary.date.and_hms_opt(0, 0, 0).unwrap(), Utc),
                 Activity::Diary(diary),
             )
         }));
 
         activities.extend(wods.into_iter().map(|wod| {
             (
-                DateTime::from_utc(wod.date.and_hms(0, 0, 0), Utc),
+                DateTime::from_utc(wod.date.and_hms_opt(0, 0, 0).unwrap(), Utc),
                 Activity::Wod(wod),
             )
         }));

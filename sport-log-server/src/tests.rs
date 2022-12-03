@@ -549,7 +549,8 @@ async fn create_diary<'c>(
     let diary = Diary {
         id: diary_id,
         user_id: UserId(user_id),
-        date: NaiveDate::from_num_days_from_ce(rand::thread_rng().gen::<i32>() % 1_500_000),
+        date: NaiveDate::from_num_days_from_ce_opt(rand::thread_rng().gen::<i32>() % 1_500_000)
+            .unwrap(),
         bodyweight: None,
         comments: None,
         last_change: Utc::now(),
@@ -611,7 +612,8 @@ async fn foreign_update() {
     let diary = Diary {
         id: diary_id,
         user_id: USER_ID,
-        date: NaiveDate::from_num_days_from_ce(rand::thread_rng().gen::<i32>() % 1_500_000),
+        date: NaiveDate::from_num_days_from_ce_opt(rand::thread_rng().gen::<i32>() % 1_500_000)
+            .unwrap(),
         bodyweight: None,
         comments: None,
         last_change: Utc::now(),
@@ -729,7 +731,8 @@ async fn update_non_existing() {
     let diary = Diary {
         id: DiaryId(rand::thread_rng().gen()),
         user_id: USER_ID,
-        date: NaiveDate::from_num_days_from_ce(rand::thread_rng().gen::<i32>() % 1_500_000),
+        date: NaiveDate::from_num_days_from_ce_opt(rand::thread_rng().gen::<i32>() % 1_500_000)
+            .unwrap(),
         bodyweight: None,
         comments: None,
         last_change: Utc::now(),

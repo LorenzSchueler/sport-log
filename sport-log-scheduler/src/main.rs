@@ -21,7 +21,7 @@
 
 use std::{env, fs};
 
-use chrono::{Datelike, Duration, Utc};
+use chrono::{DateTime, Datelike, Days, Duration, Utc};
 use rand::Rng;
 use reqwest::{blocking::Client, Error as ReqwestError};
 use serde::Deserialize;
@@ -118,15 +118,17 @@ fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
 
     let mut action_events = vec![];
     for creatable_action_rule in creatable_action_rules {
-        let datetime = Utc::today()
-            .checked_add_signed(Duration::days(
-                (creatable_action_rule.weekday.to_u32() as i64
-                    - Utc::today().weekday().num_days_from_monday() as i64)
-                    .rem_euclid(7),
-            ))
-            .unwrap()
-            .and_time(creatable_action_rule.time.time())
-            .unwrap();
+        let datetime = DateTime::from_utc(
+            Utc::now()
+                .date_naive()
+                .and_time(creatable_action_rule.time.time())
+                + Days::new(
+                    (creatable_action_rule.weekday.to_u32() as i64
+                        - Utc::now().weekday().num_days_from_monday() as i64)
+                        .rem_euclid(7) as u64,
+                ),
+            creatable_action_rule.time.timezone(),
+        );
 
         for weeks in 0.. {
             let datetime = datetime + Duration::weeks(weeks);

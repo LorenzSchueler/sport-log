@@ -365,7 +365,7 @@ async fn try_get_wod(
         let wod = Wod {
             id: WodId(rand::thread_rng().gen()),
             user_id: exec_action_event.user_id,
-            date: Local::today().naive_local(),
+            date: Utc::now().date_naive(),
             description: Some(description.clone()),
             last_change: Utc::now(),
             deleted: false,
@@ -383,7 +383,7 @@ async fn try_get_wod(
             .map_err(Error::Reqwest)?;
         match response.status() {
             StatusCode::CONFLICT => {
-                let today = Local::today().naive_local().format("%Y-%m-%d");
+                let today = Local::now().date_naive().format("%Y-%m-%d");
                 let wods: Vec<Wod> = client
                     .get(format!(
                         "{}/v0.2/wod/timespan/{}/{}",
