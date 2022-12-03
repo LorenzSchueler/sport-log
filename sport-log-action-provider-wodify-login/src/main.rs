@@ -14,7 +14,7 @@ use serde::Deserialize;
 use sport_log_types::{ActionEventId, ExecutableActionEvent};
 use sysinfo::{ProcessExt, System, SystemExt};
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, warn};
 
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use tokio::{process::Command, time};
@@ -26,6 +26,7 @@ const DESCRIPTION: &str =
 const PLATFORM_NAME: &str = "wodify";
 
 const GECKODRIVER: &str = "geckodriver";
+const WEBDRIVER_ADDRESS: &str = "http://localhost:4444/";
 
 #[derive(Debug, StdError)]
 enum Error {
@@ -101,12 +102,12 @@ async fn main() {
     match &env::args().collect::<Vec<_>>()[1..] {
         [] => {
             if let Err(error) = login(Mode::Headless).await {
-                error!("login failed: {}", error);
+                warn!("login failed: {}", error);
             }
         }
         [option] if option == "--interactive" => {
             if let Err(error) = login(Mode::Interactive).await {
-                error!("login failed: {}", error);
+                warn!("login failed: {}", error);
             }
         }
         [option] if option == "--setup" => {
@@ -133,7 +134,7 @@ async fn setup() -> Result<()> {
             ("Open Fridge", "Reserve a spot in a Open Fridge class."),
             ("Open Gym", "Reserve a spot in a Open Gym class."),
             ("Gymnastics", "Reserve a spot in a Gymnastics class."),
-            ("Strongman", "Reserve a spot in a Strongman class."),
+            ("Strongmen", "Reserve a spot in a Strongmen class."),
             ("Yoga", "Reserve a spot in a Yoga class."),
             ("Swim WOD", "Reserve a spot in a Swim class."),
         ],
@@ -203,7 +204,7 @@ async fn login(mode: Mode) -> Result<()> {
 
             match (&exec_action_event.username, &exec_action_event.password) {
                 (Some(username), Some(password)) => {
-                    let driver = WebDriver::new("http://localhost:4444/", caps)
+                    let driver = WebDriver::new(WEBDRIVER_ADDRESS, caps)
                         .await
                         .map_err(Error::WebDriver)?;
 
@@ -236,9 +237,9 @@ async fn login(mode: Mode) -> Result<()> {
                 Err(Error::Timeout(_)) => {
                     info!("timeout")
                 }
-                Err(error) => error!("{}", error),
+                Err(error) => warn!("{}", error),
             },
-            Err(join_error) => error!("execution of action event failed: {}", join_error),
+            Err(join_error) => warn!("execution of action event failed: {}", join_error),
         }
     }
 
@@ -257,7 +258,7 @@ async fn login(mode: Mode) -> Result<()> {
         .map_err(Error::Reqwest)?;
     }
 
-    info!("terminating webdriver");
+    debug!("terminating webdriver");
     let _ = webdriver.kill().await;
 
     Ok(())
@@ -312,12 +313,7 @@ async fn try_login(
 
     time::sleep(StdDuration::from_secs(5)).await;
 
-    if driver
-        .find(By::Id("AthleteTheme_wt6_block_wt9_wtLogoutLink"))
-        .await
-        .is_err()
-    {
-        info!("login failed");
+    if driver.find(By::LinkText("Logout")).await.is_err() {
         return Err(Error::LoginFailed(exec_action_event.action_event_id));
     }
     debug!("login successful");
@@ -329,14 +325,14 @@ async fn try_login(
 
     for _ in 0..10 {
         driver.refresh().await.map_err(Error::WebDriver)?; // TODO can this be removed?
-        debug!("reload done");
+        info!("reload done at {}", Utc::now());
 
         let rows = driver
             .find_all(By::XPath("//table[@class='TableRecords']/tbody/tr"))
             .await
             .map_err(Error::WebDriver)?;
 
-        let mut row_number = rows.len();
+        let mut start_row_number = rows.len();
         for (i, row) in rows.iter().enumerate() {
             if let Ok(day) = row
                 .find(By::XPath("./td[1]/span[contains(@class, \"h3\")]"))
@@ -348,13 +344,25 @@ async fn try_login(
                     .map_err(Error::WebDriver)?
                     .contains(&date)
                 {
-                    row_number = i;
+                    start_row_number = i + 1;
                     break;
                 }
             }
         }
 
-        for row in &rows[row_number + 1..] {
+        let mut end_row_number = rows.len();
+        for (i, row) in rows[start_row_number..].iter().enumerate() {
+            if row
+                .find(By::XPath("./td[1]/span[contains(@class, \"h3\")]"))
+                .await
+                .is_ok()
+            {
+                end_row_number = start_row_number + i;
+                break;
+            }
+        }
+
+        for row in &rows[start_row_number..end_row_number] {
             if row
                 .find(By::XPath("./td[1]/div/span"))
                 .await
@@ -386,6 +394,11 @@ async fn try_login(
                 return Ok(exec_action_event.action_event_id);
             }
         }
+
+        info!(
+            "no {} class at {} found",
+            &exec_action_event.action_name, &exec_action_event.datetime
+        );
     }
 
     Err(Error::Timeout(exec_action_event.action_event_id))
