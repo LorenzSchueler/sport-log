@@ -92,7 +92,7 @@ insert into movement (id, user_id, name, description, movement_dimension, cardio
     (91, null, 'Farmers Carry', null, 'distance', false), -- strongman
     (92, null, 'Yoke Carry', null, 'distance', false),
     (93, null, 'Sled Push', null, 'distance', false),
-    (94, null, 'Sled Pull', null, 'distance', false),
+    (94, null, 'Rope Pull', null, 'distance', false),
     (95, null, 'Air Squat', null, 'reps', false), -- bodyweight
     (96, null, 'Pistol', null, 'reps', false),
     (97, null, 'Push Up', null, 'reps', false),
@@ -157,7 +157,15 @@ insert into movement (id, user_id, name, description, movement_dimension, cardio
     (156, null, 'Sandbag Clean', null, 'reps', false),
     (157, null, 'GHD Hip Extension & Nordic Curl', null, 'reps', false),
     (158, null, 'Nordic Curl', null, 'reps', false),
-    (159, null, 'Seal Row', null, 'reps', false);
+    (159, null, 'Seal Row', null, 'reps', false),
+    (160, null, 'Strict Ring Dip', null, 'reps', false),
+    (161, null, 'Reverse Sled Pull', null, 'distance', false),
+    (162, null, 'Harness Sled Pull', null, 'distance', false),
+    (163, null, 'Cluster', null, 'reps', false),
+    (164, null, 'Log Clean', null, 'reps', false),
+    (165, null, 'Log Press', null, 'reps', false),
+    (166, null, 'Log Clean & Press', null, 'reps', false),
+    (167, null, 'Wall Facing Strict Hand Stand Push Up', null, 'reps', false);
 
 insert into eorm (reps, percentage) values
     (1, 1.0),
