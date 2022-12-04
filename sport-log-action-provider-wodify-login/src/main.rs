@@ -17,7 +17,7 @@ use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use tracing::{debug, error, info, warn};
 
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
-use tokio::{process::Command, time};
+use tokio::{process::Command, task::JoinError, time};
 
 const CONFIG_FILE: &str = "sport-log-action-provider-wodify-login.toml";
 const NAME: &str = "wodify-login";
@@ -36,15 +36,33 @@ enum Error {
     Io(IoError),
     #[error(display = "{}", _0)]
     WebDriver(WebDriverError),
-    #[error(display = "ExecutableActionEvent doesn't contain credentials")]
-    NoCredential(ActionEventId),
-    #[error(display = "login failed")]
-    LoginFailed(ActionEventId),
-    #[error(display = "the class could not be found within the timeout")]
-    Timeout(ActionEventId),
+    #[error(display = "{}", _0)]
+    Join(JoinError),
 }
 
 type Result<T> = StdResult<T, Error>;
+
+#[derive(Debug, StdError)]
+enum UserError {
+    #[error(display = "can not log in: no credentials provided")]
+    NoCredential(ActionEventId),
+    #[error(display = "can not log in: login failed")]
+    LoginFailed(ActionEventId),
+    #[error(display = "the class could not be found within the timeout")]
+    ClassNotFound(ActionEventId),
+}
+
+impl UserError {
+    fn action_event_id(&self) -> ActionEventId {
+        match self {
+            Self::NoCredential(action_event_id) => *action_event_id,
+            Self::LoginFailed(action_event_id) => *action_event_id,
+            Self::ClassNotFound(action_event_id) => *action_event_id,
+        }
+    }
+}
+
+type UserResult<T> = StdResult<T, UserError>;
 
 /// The config for [sport-log-action-provider-wodify-login](crate).
 ///
@@ -52,7 +70,7 @@ type Result<T> = StdResult<T, Error>;
 ///
 /// `admin_password` is the password for the admin endpoints.
 ///
-/// `base_url` is the left part of the URL (everthing before `/<version>/...`)
+/// `base_url` is the left part of the URL (everything before `/<version>/...`)
 #[derive(Deserialize, Debug)]
 struct Config {
     password: String,
@@ -110,17 +128,13 @@ async fn main() {
                 warn!("login failed: {}", error);
             }
         }
-        [option] if option == "--setup" => {
-            if let Err(error) = setup().await {
-                error!("setup failed: {}", error);
-            }
-        }
+        [option] if option == "--setup" => setup().await,
         [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
         _ => wrong_use(),
     }
 }
 
-async fn setup() -> Result<()> {
+async fn setup() {
     setup_db(
         &CONFIG.server_url,
         NAME,
@@ -142,7 +156,7 @@ async fn setup() -> Result<()> {
         0,
     )
     .await
-    .map_err(Error::Reqwest)
+    .unwrap();
 }
 
 fn help() {
@@ -192,7 +206,7 @@ async fn login(mode: Mode) -> Result<()> {
 
     let mut caps = DesiredCapabilities::firefox();
     if mode == Mode::Headless {
-        caps.set_headless().unwrap_or(());
+        caps.set_headless().map_err(Error::WebDriver)?;
     }
 
     let mut tasks = vec![];
@@ -209,42 +223,36 @@ async fn login(mode: Mode) -> Result<()> {
                         .map_err(Error::WebDriver)?;
 
                     let result =
-                        try_login(&driver, username, password, &exec_action_event, mode).await;
+                        wodify_login(&driver, username, password, &exec_action_event, mode).await;
 
                     debug!("closing browser");
                     driver.quit().await.map_err(Error::WebDriver)?;
 
                     result
                 }
-                _ => Err(Error::NoCredential(exec_action_event.action_event_id)),
+                _ => Ok(Err(UserError::NoCredential(
+                    exec_action_event.action_event_id,
+                ))),
             }
         }));
     }
 
     let mut disable_action_event_ids = vec![];
     for task in tasks {
-        match task.await {
-            Ok(result) => match result {
-                Ok(action_event_id) => disable_action_event_ids.push(action_event_id),
-                Err(Error::NoCredential(action_event_id)) => {
-                    info!("can not log in: no credential provided");
-                    disable_action_event_ids.push(action_event_id)
-                }
-                Err(Error::LoginFailed(action_event_id)) => {
-                    info!("can not log in: login failed");
-                    disable_action_event_ids.push(action_event_id)
-                }
-                Err(Error::Timeout(_)) => {
-                    info!("timeout")
-                }
-                Err(error) => warn!("{}", error),
-            },
-            Err(join_error) => warn!("execution of action event failed: {}", join_error),
+        match task.await.map_err(Error::Join)?? {
+            Ok(action_event_id) => disable_action_event_ids.push(action_event_id),
+            Err(error) => {
+                info!("{error}");
+                disable_action_event_ids.push(error.action_event_id())
+            }
         }
     }
 
-    debug!("deleting {} action event", disable_action_event_ids.len());
-    debug!("disable event ids: {:?}", disable_action_event_ids);
+    debug!(
+        "deleting {} action events ({:?})",
+        disable_action_event_ids.len(),
+        disable_action_event_ids
+    );
 
     if !disable_action_event_ids.is_empty() {
         disable_events(
@@ -259,18 +267,18 @@ async fn login(mode: Mode) -> Result<()> {
     }
 
     debug!("terminating webdriver");
-    let _ = webdriver.kill().await;
+    webdriver.kill().await.map_err(Error::Io)?;
 
     Ok(())
 }
 
-async fn try_login(
+async fn wodify_login(
     driver: &WebDriver,
     username: &str,
     password: &str,
     exec_action_event: &ExecutableActionEvent,
     mode: Mode,
-) -> Result<ActionEventId> {
+) -> Result<UserResult<ActionEventId>> {
     let time = exec_action_event
         .datetime
         .with_timezone(&Local)
@@ -314,16 +322,18 @@ async fn try_login(
     time::sleep(StdDuration::from_secs(5)).await;
 
     if driver.find(By::LinkText("Logout")).await.is_err() {
-        return Err(Error::LoginFailed(exec_action_event.action_event_id));
+        return Ok(Err(UserError::LoginFailed(
+            exec_action_event.action_event_id,
+        )));
     }
     debug!("login successful");
 
     if let Ok(duration) = (exec_action_event.datetime - Duration::days(1) - Utc::now()).to_std() {
         time::sleep(duration).await;
     }
-    debug!("ready");
+    info!("ready at {}", Utc::now());
 
-    for _ in 0..10 {
+    for _ in 0..3 {
         driver.refresh().await.map_err(Error::WebDriver)?; // TODO can this be removed?
         info!("reload done at {}", Utc::now());
 
@@ -391,7 +401,7 @@ async fn try_login(
                     time::sleep(StdDuration::from_secs(3)).await;
                 }
 
-                return Ok(exec_action_event.action_event_id);
+                return Ok(Ok(exec_action_event.action_event_id));
             }
         }
 
@@ -401,5 +411,7 @@ async fn try_login(
         );
     }
 
-    Err(Error::Timeout(exec_action_event.action_event_id))
+    Ok(Err(UserError::ClassNotFound(
+        exec_action_event.action_event_id,
+    )))
 }
