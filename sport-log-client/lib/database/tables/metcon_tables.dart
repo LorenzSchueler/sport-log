@@ -147,10 +147,11 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
         .isNotEmpty;
   }
 
-  Future<List<MetconSession>> getByTimerangeAndMetcon({
-    Metcon? metconValue,
+  Future<List<MetconSession>> getByTimerangeAndMetconAndComment({
     DateTime? from,
     DateTime? until,
+    Metcon? metconValue,
+    String? comment,
   }) async {
     final records = await database.query(
       tableName,
@@ -158,7 +159,8 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
         notDeleted,
         fromFilter(from),
         untilFilter(until),
-        metconValue == null ? "" : "${Columns.metconId} = ${metconValue.id}"
+        metconValue == null ? "" : "${Columns.metconId} = ${metconValue.id}",
+        commentFilter(comment),
       ]),
       groupBy: groupById,
       orderBy: orderByDatetime,

@@ -123,15 +123,17 @@ class CardioSessionDescriptionDataProvider
     return _cardioDataProvider.pushUpdatedToServer();
   }
 
-  Future<List<CardioSessionDescription>> getByTimerangeAndMovement({
-    required Movement? movement,
+  Future<List<CardioSessionDescription>> getByTimerangeAndMovementAndComment({
     required DateTime? from,
     required DateTime? until,
+    required Movement? movement,
+    required String? comment,
   }) async {
-    return _cardioSessionDescriptionDb.getByTimerangeAndMovement(
+    return _cardioSessionDescriptionDb.getByTimerangeAndMovementAndComment(
       from: from,
       until: until,
       movementValue: movement,
+      comment: comment,
     );
   }
 }

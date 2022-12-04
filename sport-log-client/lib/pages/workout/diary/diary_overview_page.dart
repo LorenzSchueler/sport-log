@@ -9,6 +9,7 @@ import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/overview_data_provider.dart';
@@ -17,7 +18,9 @@ import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class DiaryPage extends StatelessWidget {
-  const DiaryPage({super.key});
+  DiaryPage({super.key});
+
+  final _searchBar = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +29,37 @@ class DiaryPage extends StatelessWidget {
           OverviewDataProvider<Diary, void, DiaryDataProvider, void>>(
         create: (_) => OverviewDataProvider(
           dataProvider: DiaryDataProvider(),
-          entityAccessor: (dataProvider) => (start, end, _) =>
-              dataProvider.getByTimerange(from: start, until: end),
+          entityAccessor: (dataProvider) =>
+              (start, end, _, search) => dataProvider.getByTimerangeAndComment(
+                    from: start,
+                    until: end,
+                    comment: search,
+                  ),
           recordAccessor: (_) => () async {},
           loggerName: "DiaryPage",
         )..init(),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
-            title: const Text("Diary"),
+            title: dataProvider.isSearch
+                ? TextFormField(
+                    focusNode: _searchBar,
+                    onChanged: (comment) => dataProvider.search = comment,
+                    decoration: Theme.of(context).textFormFieldDecoration,
+                  )
+                : const Text("Diary"),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  dataProvider.search = dataProvider.isSearch ? null : "";
+                  if (dataProvider.isSearch) {
+                    _searchBar.requestFocus();
+                  }
+                },
+                icon: Icon(
+                  dataProvider.isSearch ? AppIcons.close : AppIcons.search,
+                ),
+              ),
+            ],
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(40),
               child: DateFilter(

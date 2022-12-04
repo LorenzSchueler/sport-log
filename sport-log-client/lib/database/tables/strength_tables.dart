@@ -162,10 +162,11 @@ class StrengthSessionDescriptionTable {
     );
   }
 
-  Future<List<StrengthSessionDescription>> getByTimerangeAndMovement({
-    Movement? movementValue,
+  Future<List<StrengthSessionDescription>> getByTimerangeAndMovementAndComment({
     DateTime? from,
     DateTime? until,
+    Movement? movementValue,
+    String? comment,
   }) async {
     final records = await AppDatabase.database!.rawQuery(
       '''
@@ -183,6 +184,7 @@ class StrengthSessionDescriptionTable {
               Tables.strengthSession,
               movementValue,
             ),
+            TableAccessor.commentFilterOfTable(Tables.strengthSession, comment),
           ])}
       GROUP BY ${TableAccessor.groupByIdOfTable(Tables.strengthSession)}
       ORDER BY ${TableAccessor.orderByDatetimeOfTable(Tables.strengthSession)}

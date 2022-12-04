@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
@@ -79,11 +78,12 @@ abstract class TableAccessor<T extends AtomicEntity> {
   String movementIdFilter(Movement? movement) =>
       movementIdFilterOfTable(tableName, movement);
 
-  static String nameFilterOfTable(String tableName, String? name) =>
-      name == null || name.isEmpty
+  static String commentFilterOfTable(String tableName, String? comment) =>
+      comment == null || comment.isEmpty
           ? ''
-          : "$tableName.${Columns.name} like '%$name%'";
-  String nameFilter(String? name) => nameFilterOfTable(tableName, name);
+          : "$tableName.${Columns.comments} like '%$comment%'";
+  String commentFilter(String? comment) =>
+      commentFilterOfTable(tableName, comment);
 
   static String groupByIdOfTable(String tableName) =>
       "$tableName.${Columns.id}";
@@ -291,7 +291,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
     return DbResult.catchError(() async {
       final batch = database.batch();
       for (final object in objects) {
-        // changes comming from server win over local changes
+        // changes coming from server win over local changes
         batch.insert(
           tableName,
           {

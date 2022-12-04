@@ -83,7 +83,7 @@ abstract class Routes {
   }
 
   static Widget _checkNotLogin(Widget Function() builder) {
-    return Settings.instance.userExists() ? const TimelinePage() : builder();
+    return Settings.instance.userExists() ? TimelinePage() : builder();
   }
 
   static final Map<String, Widget Function(BuildContext)> _routeList = {
@@ -151,10 +151,9 @@ abstract class Routes {
           return MetconEditPage(metconDescription: metconDescription);
         }),
     // timeline
-    Routes.timeline.overview: (_) => _checkLogin(() => const TimelinePage()),
+    Routes.timeline.overview: (_) => _checkLogin(TimelinePage.new),
     // metcon session
-    Routes.metcon.sessionOverview: (_) =>
-        _checkLogin(() => const MetconSessionsPage()),
+    Routes.metcon.sessionOverview: (_) => _checkLogin(MetconSessionsPage.new),
     Routes.metcon.sessionDetails: (context) => _checkLogin(() {
           final metconSessionDescription = ModalRoute.of(context)!
               .settings
@@ -187,8 +186,7 @@ abstract class Routes {
                 );
         }),
     // strength
-    Routes.strength.overview: (_) =>
-        _checkLogin(() => const StrengthSessionsPage()),
+    Routes.strength.overview: (_) => _checkLogin(StrengthSessionsPage.new),
     Routes.strength.details: (context) => _checkLogin(() {
           final strengthSessionDescription = ModalRoute.of(context)!
               .settings
@@ -213,8 +211,7 @@ abstract class Routes {
                 );
         }),
     // cardio
-    Routes.cardio.overview: (_) =>
-        _checkLogin(() => const CardioSessionsPage()),
+    Routes.cardio.overview: (_) => _checkLogin(CardioSessionsPage.new),
     Routes.cardio.trackingSettings: (context) => _checkLoginAndroidIos(
           context,
           () => const CardioTrackingSettingsPage(),
@@ -253,7 +250,7 @@ abstract class Routes {
             cardioSessionDescription: cardioSessionDescription,
           );
         }),
-    Routes.cardio.routeOverview: (_) => _checkLogin(() => const RoutePage()),
+    Routes.cardio.routeOverview: (_) => _checkLogin(RoutePage.new),
     Routes.cardio.routeUpload: (_) =>
         _checkLogin(() => const RouteUploadPage()),
     Routes.cardio.routeEdit: (context) => _checkLogin(() {
@@ -267,7 +264,7 @@ abstract class Routes {
           return RouteDetailsPage(route: route);
         }),
     // diary
-    Routes.diary.overview: (_) => _checkLogin(() => const DiaryPage()),
+    Routes.diary.overview: (_) => _checkLogin(DiaryPage.new),
     Routes.diary.edit: (context) => _checkLogin(() {
           final diary = ModalRoute.of(context)?.settings.arguments as Diary?;
           return DiaryEditPage(diary: diary);

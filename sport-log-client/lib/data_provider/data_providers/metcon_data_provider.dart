@@ -72,15 +72,17 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
 
   Future<bool> existsByMetcon(Metcon metcon) => db.existsByMetcon(metcon);
 
-  Future<List<MetconSession>> getByTimerangeAndMetcon({
-    Metcon? metcon,
-    DateTime? from,
-    DateTime? until,
+  Future<List<MetconSession>> getByTimerangeAndMetconAndComment({
+    required DateTime? from,
+    required DateTime? until,
+    required Metcon? metcon,
+    required String? comment,
   }) =>
-      db.getByTimerangeAndMetcon(
-        metconValue: metcon,
+      db.getByTimerangeAndMetconAndComment(
         from: from,
         until: until,
+        metconValue: metcon,
+        comment: comment,
       );
 
   Future<MetconRecords> getMetconRecords() => db.getMetconRecords();
@@ -318,16 +320,18 @@ class MetconSessionDescriptionDataProvider
     return _metconSessionDataProvider.pushUpdatedToServer();
   }
 
-  Future<List<MetconSessionDescription>> getByTimerangeAndMetcon({
-    Metcon? metcon,
-    DateTime? from,
-    DateTime? until,
+  Future<List<MetconSessionDescription>> getByTimerangeAndMetconAndComment({
+    required DateTime? from,
+    required DateTime? until,
+    required Metcon? metcon,
+    required String? comment,
   }) async {
     return _mapToDescription(
-      await _metconSessionDataProvider.getByTimerangeAndMetcon(
+      await _metconSessionDataProvider.getByTimerangeAndMetconAndComment(
         from: from,
         until: until,
         metcon: metcon,
+        comment: comment,
       ),
     );
   }

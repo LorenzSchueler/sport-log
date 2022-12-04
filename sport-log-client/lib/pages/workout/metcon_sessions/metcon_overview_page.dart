@@ -22,33 +22,33 @@ class MetconsPage extends StatelessWidget {
     return NeverPop(
       child: ProviderConsumer<
           OverviewDataProvider<MetconDescription, void,
-              MetconDescriptionDataProvider, String>>(
+              MetconDescriptionDataProvider, void>>(
         create: (_) => OverviewDataProvider(
           dataProvider: MetconDescriptionDataProvider(),
           entityAccessor: (dataProvider) =>
-              (_, __, metconName) => dataProvider.getByMetconName(metconName),
+              (_, __, ___, search) => dataProvider.getByMetconName(search),
           recordAccessor: (_) => () async {},
           loggerName: "MetconsPage",
         )..init(),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
-            title: dataProvider.isSelected
+            title: dataProvider.isSearch
                 ? TextFormField(
                     focusNode: _searchBar,
-                    onChanged: (name) => dataProvider.selected = name,
+                    onChanged: (name) => dataProvider.search = name,
                     decoration: Theme.of(context).textFormFieldDecoration,
                   )
                 : const Text("Metcons"),
             actions: [
               IconButton(
                 onPressed: () {
-                  dataProvider.selected = dataProvider.isSelected ? null : "";
-                  if (dataProvider.isSelected) {
+                  dataProvider.search = dataProvider.isSearch ? null : "";
+                  if (dataProvider.isSearch) {
                     _searchBar.requestFocus();
                   }
                 },
                 icon: Icon(
-                  dataProvider.isSelected ? AppIcons.close : AppIcons.search,
+                  dataProvider.isSearch ? AppIcons.close : AppIcons.search,
                 ),
               ),
               IconButton(

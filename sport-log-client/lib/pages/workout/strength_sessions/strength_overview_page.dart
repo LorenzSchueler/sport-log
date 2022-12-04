@@ -11,6 +11,7 @@ import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_chart.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/overview_data_provider.dart';
@@ -19,7 +20,9 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 
 class StrengthSessionsPage extends StatelessWidget {
-  const StrengthSessionsPage({super.key});
+  StrengthSessionsPage({super.key});
+
+  final _searchBar = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -29,20 +32,38 @@ class StrengthSessionsPage extends StatelessWidget {
               StrengthSessionDescriptionDataProvider, Movement>>(
         create: (_) => OverviewDataProvider(
           dataProvider: StrengthSessionDescriptionDataProvider(),
-          entityAccessor: (dataProvider) =>
-              (start, end, movement) => dataProvider.getByTimerangeAndMovement(
-                    from: start,
-                    until: end,
-                    movement: movement,
-                  ),
+          entityAccessor: (dataProvider) => (start, end, movement, search) =>
+              dataProvider.getByTimerangeAndMovementAndComment(
+                from: start,
+                until: end,
+                movement: movement,
+                comment: search,
+              ),
           recordAccessor: (dataProvider) =>
               () => dataProvider.getStrengthRecords(),
           loggerName: "StrengthSessionsPage",
         )..init(),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
-            title: Text(dataProvider.selected?.name ?? "Strength Sessions"),
+            title: dataProvider.isSearch
+                ? TextFormField(
+                    focusNode: _searchBar,
+                    onChanged: (comment) => dataProvider.search = comment,
+                    decoration: Theme.of(context).textFormFieldDecoration,
+                  )
+                : Text(dataProvider.selected?.name ?? "Strength Sessions"),
             actions: [
+              IconButton(
+                onPressed: () {
+                  dataProvider.search = dataProvider.isSearch ? null : "";
+                  if (dataProvider.isSearch) {
+                    _searchBar.requestFocus();
+                  }
+                },
+                icon: Icon(
+                  dataProvider.isSearch ? AppIcons.close : AppIcons.search,
+                ),
+              ),
               IconButton(
                 // ignore: prefer-extracting-callbacks
                 onPressed: () async {
@@ -92,7 +113,7 @@ class StrengthSessionsPage extends StatelessWidget {
                                 dateFilterState: dataProvider.dateFilter,
                               ),
                               Defaults.sizedBox.vertical.normal,
-                              StrengthRecodsCard(
+                              StrengthRecordsCard(
                                 strengthRecords: dataProvider.records ?? {},
                                 movement: dataProvider.selected!,
                               ),
@@ -222,8 +243,8 @@ class StrengthSessionCard extends StatelessWidget {
   }
 }
 
-class StrengthRecodsCard extends StatelessWidget {
-  StrengthRecodsCard({
+class StrengthRecordsCard extends StatelessWidget {
+  StrengthRecordsCard({
     required this.movement,
     required StrengthRecords strengthRecords,
     super.key,

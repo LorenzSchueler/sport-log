@@ -27,9 +27,10 @@ class DiaryTable extends TableAccessor<Diary> {
     ],
   );
 
-  Future<List<Diary>> getByTimerange(
+  Future<List<Diary>> getByTimerangeAndComment(
     DateTime? from,
     DateTime? until,
+    String? comment,
   ) async {
     final records = await database.query(
       Tables.diary,
@@ -37,6 +38,7 @@ class DiaryTable extends TableAccessor<Diary> {
         notDeleted,
         fromFilter(from, dateOnly: true),
         untilFilter(until, dateOnly: true),
+        commentFilter(comment),
       ]),
       orderBy: orderByDate,
     );

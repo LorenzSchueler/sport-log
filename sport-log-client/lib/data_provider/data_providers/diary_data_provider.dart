@@ -22,10 +22,11 @@ class DiaryDataProvider extends EntityDataProvider<Diary> {
   List<Diary> getFromAccountData(AccountData accountData) =>
       accountData.diaries;
 
-  Future<List<Diary>> getByTimerange({
+  Future<List<Diary>> getByTimerangeAndComment({
     required DateTime? from,
     required DateTime? until,
+    required String? comment,
   }) async {
-    return db.getByTimerange(from, until);
+    return db.getByTimerangeAndComment(from, until, comment);
   }
 }

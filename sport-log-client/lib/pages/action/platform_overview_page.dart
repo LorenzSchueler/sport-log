@@ -20,11 +20,11 @@ class PlatformOverviewPage extends StatelessWidget {
     return NeverPop(
       child: ProviderConsumer<
           OverviewDataProvider<PlatformDescription, void,
-              PlatformDescriptionDataProvider, String>>(
+              PlatformDescriptionDataProvider, void>>(
         create: (_) => OverviewDataProvider(
           dataProvider: PlatformDescriptionDataProvider(),
           entityAccessor: (dataProvider) =>
-              (_, __, ___) => dataProvider.getNonDeleted(),
+              (_, __, ___, ____) => dataProvider.getNonDeleted(),
           recordAccessor: (_) => () async {},
           loggerName: "PlatformOverviewPage",
         )..init(),

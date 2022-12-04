@@ -37,8 +37,11 @@ class _MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
 
   Future<void> _loadOtherSessions() async {
     final metconSessionDescriptions =
-        await _dataProvider.getByTimerangeAndMetcon(
+        await _dataProvider.getByTimerangeAndMetconAndComment(
+      from: null,
+      until: null,
       metcon: _metconSessionDescription.metconDescription.metcon,
+      comment: null,
     );
     final records = await _dataProvider.getMetconRecords();
     setState(() {

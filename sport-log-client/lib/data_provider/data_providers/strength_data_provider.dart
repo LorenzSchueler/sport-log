@@ -180,15 +180,17 @@ class StrengthSessionDescriptionDataProvider
   Future<StrengthSessionDescription?> getById(Int64 id) =>
       _strengthSessionDescriptionDb.getById(id);
 
-  Future<List<StrengthSessionDescription>> getByTimerangeAndMovement({
-    Movement? movement,
-    DateTime? from,
-    DateTime? until,
+  Future<List<StrengthSessionDescription>> getByTimerangeAndMovementAndComment({
+    required DateTime? from,
+    required DateTime? until,
+    required Movement? movement,
+    required String? comment,
   }) async {
-    return _strengthSessionDescriptionDb.getByTimerangeAndMovement(
+    return _strengthSessionDescriptionDb.getByTimerangeAndMovementAndComment(
       from: from,
       until: until,
       movementValue: movement,
+      comment: comment,
     );
   }
 

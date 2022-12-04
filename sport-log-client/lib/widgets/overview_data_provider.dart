@@ -18,7 +18,7 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
   final Logger _logger;
   final D _dataProvider;
   Future<bool> pullFromServer() => _dataProvider.pullFromServer();
-  final Future<List<T>> Function(DateTime?, DateTime?, S?) Function(D)
+  final Future<List<T>> Function(DateTime?, DateTime?, S?, String?) Function(D)
       entityAccessor;
   final Future<R> Function() Function(D) recordAccessor;
 
@@ -38,7 +38,17 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
     _update();
   }
 
-  bool get isSelected => selected != null;
+  bool get isSelected => _selected != null;
+
+  String? _search;
+  String? get search => _search;
+  set search(String? search) {
+    _search = search;
+    notifyListeners();
+    _update();
+  }
+
+  bool get isSearch => _search != null;
 
   List<T> _entities = [];
   List<T> get entities => _entities;
@@ -74,6 +84,7 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
       _dateFilter.start,
       _dateFilter.end,
       selected,
+      search,
     );
     _records = await recordAccessor(_dataProvider)();
     _isLoading = false;

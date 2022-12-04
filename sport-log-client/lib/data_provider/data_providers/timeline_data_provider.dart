@@ -69,32 +69,37 @@ class TimelineDataProvider extends DataProvider<TimelineUnion> {
     return _diaryDataProvider.pullFromServer();
   }
 
-  Future<List<TimelineUnion>> getByTimerange({
-    DateTime? from,
-    DateTime? until,
+  Future<List<TimelineUnion>> getByTimerangeAndComment({
+    required DateTime? from,
+    required DateTime? until,
+    required String? comment,
   }) async =>
       _combineAndSort(
         strengthSessionsDescription:
-            await _strengthDataProvider.getByTimerangeAndMovement(
+            await _strengthDataProvider.getByTimerangeAndMovementAndComment(
           from: from,
           until: until,
           movement: null,
+          comment: comment,
         ),
         metconSessionsDescription:
-            await _metconDataProvider.getByTimerangeAndMetcon(
+            await _metconDataProvider.getByTimerangeAndMetconAndComment(
           from: from,
           until: until,
           metcon: null,
+          comment: comment,
         ),
         cardioSessionsDescription:
-            await _cardioDataProvider.getByTimerangeAndMovement(
+            await _cardioDataProvider.getByTimerangeAndMovementAndComment(
           from: from,
           until: until,
           movement: null,
+          comment: comment,
         ),
-        diaries: await _diaryDataProvider.getByTimerange(
+        diaries: await _diaryDataProvider.getByTimerangeAndComment(
           from: from,
           until: until,
+          comment: comment,
         ),
       );
 

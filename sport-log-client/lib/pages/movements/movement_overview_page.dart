@@ -22,33 +22,33 @@ class MovementsPage extends StatelessWidget {
     return NeverPop(
       child: ProviderConsumer<
           OverviewDataProvider<MovementDescription, void,
-              MovementDescriptionDataProvider, String>>(
+              MovementDescriptionDataProvider, void>>(
         create: (_) => OverviewDataProvider(
           dataProvider: MovementDescriptionDataProvider(),
           entityAccessor: (dataProvider) =>
-              (_, __, movement) => dataProvider.getByName(movement),
+              (_, __, ___, search) => dataProvider.getByName(search),
           recordAccessor: (_) => () async {},
           loggerName: "MovementsPage",
         )..init(),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
-            title: dataProvider.isSelected
+            title: dataProvider.isSearch
                 ? TextFormField(
                     focusNode: _searchBar,
-                    onChanged: (name) => dataProvider.selected = name,
+                    onChanged: (name) => dataProvider.search = name,
                     decoration: Theme.of(context).textFormFieldDecoration,
                   )
                 : const Text("Movements"),
             actions: [
               IconButton(
                 onPressed: () {
-                  dataProvider.selected = dataProvider.isSelected ? null : "";
-                  if (dataProvider.isSelected) {
+                  dataProvider.search = dataProvider.isSearch ? null : "";
+                  if (dataProvider.isSearch) {
                     _searchBar.requestFocus();
                   }
                 },
                 icon: Icon(
-                  dataProvider.isSelected ? AppIcons.close : AppIcons.search,
+                  dataProvider.isSearch ? AppIcons.close : AppIcons.search,
                 ),
               ),
             ],

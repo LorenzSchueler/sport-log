@@ -12,6 +12,7 @@ import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -23,7 +24,9 @@ import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class CardioSessionsPage extends StatelessWidget {
-  const CardioSessionsPage({super.key});
+  CardioSessionsPage({super.key});
+
+  final _searchBar = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -33,23 +36,36 @@ class CardioSessionsPage extends StatelessWidget {
               CardioSessionDescriptionDataProvider, Movement>>(
         create: (_) => OverviewDataProvider(
           dataProvider: CardioSessionDescriptionDataProvider(),
-          entityAccessor: (dataProvider) =>
-              (start, end, movement) => dataProvider.getByTimerangeAndMovement(
-                    from: start,
-                    until: end,
-                    movement: movement,
-                  ),
+          entityAccessor: (dataProvider) => (start, end, movement, search) =>
+              dataProvider.getByTimerangeAndMovementAndComment(
+                from: start,
+                until: end,
+                movement: movement,
+                comment: search,
+              ),
           recordAccessor: (_) => () async {},
           loggerName: "CardioSessionsPage",
         )..init(),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
-            title: Text(dataProvider.selected?.name ?? "Cardio Sessions"),
+            title: dataProvider.isSearch
+                ? TextFormField(
+                    focusNode: _searchBar,
+                    onChanged: (comment) => dataProvider.search = comment,
+                    decoration: Theme.of(context).textFormFieldDecoration,
+                  )
+                : Text(dataProvider.selected?.name ?? "Cardio Sessions"),
             actions: [
               IconButton(
-                onPressed: () =>
-                    Navigator.of(context).newBase(Routes.cardio.routeOverview),
-                icon: const Icon(AppIcons.route),
+                onPressed: () {
+                  dataProvider.search = dataProvider.isSearch ? null : "";
+                  if (dataProvider.isSearch) {
+                    _searchBar.requestFocus();
+                  }
+                },
+                icon: Icon(
+                  dataProvider.isSearch ? AppIcons.close : AppIcons.search,
+                ),
               ),
               IconButton(
                 // ignore: prefer-extracting-callbacks
@@ -71,6 +87,11 @@ class CardioSessionsPage extends StatelessWidget {
                       ? AppIcons.filterFilled
                       : AppIcons.filter,
                 ),
+              ),
+              IconButton(
+                onPressed: () =>
+                    Navigator.of(context).newBase(Routes.cardio.routeOverview),
+                icon: const Icon(AppIcons.route),
               ),
             ],
             bottom: PreferredSize(

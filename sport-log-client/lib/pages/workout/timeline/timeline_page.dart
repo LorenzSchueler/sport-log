@@ -9,13 +9,17 @@ import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_overview_
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/theme.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/overview_data_provider.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 
 class TimelinePage extends StatelessWidget {
-  const TimelinePage({super.key});
+  TimelinePage({super.key});
+
+  final _searchBar = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -26,16 +30,36 @@ class TimelinePage extends StatelessWidget {
         create: (_) => OverviewDataProvider(
           dataProvider: TimelineDataProvider(),
           entityAccessor: (dataProvider) =>
-              (start, end, movement) => dataProvider.getByTimerange(
+              (start, end, _, search) => dataProvider.getByTimerangeAndComment(
                     from: start,
                     until: end,
+                    comment: search,
                   ),
           recordAccessor: (dataProvider) => () => dataProvider.getRecords(),
           loggerName: "TimelinePage",
         )..init(),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
-            title: const Text("Timeline"),
+            title: dataProvider.isSearch
+                ? TextFormField(
+                    focusNode: _searchBar,
+                    onChanged: (comment) => dataProvider.search = comment,
+                    decoration: Theme.of(context).textFormFieldDecoration,
+                  )
+                : const Text("Timeline"),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  dataProvider.search = dataProvider.isSearch ? null : "";
+                  if (dataProvider.isSearch) {
+                    _searchBar.requestFocus();
+                  }
+                },
+                icon: Icon(
+                  dataProvider.isSearch ? AppIcons.close : AppIcons.search,
+                ),
+              ),
+            ],
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(40),
               child: DateFilter(

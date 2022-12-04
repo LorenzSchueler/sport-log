@@ -11,6 +11,7 @@ import 'package:sport_log/pages/workout/metcon_sessions/metcon_description_card.
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_results_card.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/overview_data_provider.dart';
@@ -19,7 +20,9 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 
 class MetconSessionsPage extends StatelessWidget {
-  const MetconSessionsPage({super.key});
+  MetconSessionsPage({super.key});
+
+  final _searchBar = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -29,24 +32,37 @@ class MetconSessionsPage extends StatelessWidget {
               MetconSessionDescriptionDataProvider, Metcon>>(
         create: (_) => OverviewDataProvider(
           dataProvider: MetconSessionDescriptionDataProvider(),
-          entityAccessor: (dataProvider) =>
-              (start, end, metcon) => dataProvider.getByTimerangeAndMetcon(
-                    from: start,
-                    until: end,
-                    metcon: metcon,
-                  ),
+          entityAccessor: (dataProvider) => (start, end, metcon, search) =>
+              dataProvider.getByTimerangeAndMetconAndComment(
+                from: start,
+                until: end,
+                metcon: metcon,
+                comment: search,
+              ),
           recordAccessor: (dataProvider) =>
               () => dataProvider.getMetconRecords(),
           loggerName: "MetconSessionsPage",
         )..init(),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
-            title: Text(dataProvider.selected?.name ?? "Metcon Sessions"),
+            title: dataProvider.isSearch
+                ? TextFormField(
+                    focusNode: _searchBar,
+                    onChanged: (comment) => dataProvider.search = comment,
+                    decoration: Theme.of(context).textFormFieldDecoration,
+                  )
+                : Text(dataProvider.selected?.name ?? "Metcon Sessions"),
             actions: [
               IconButton(
-                onPressed: () =>
-                    Navigator.of(context).newBase(Routes.metcon.overview),
-                icon: const Icon(AppIcons.notes),
+                onPressed: () {
+                  dataProvider.search = dataProvider.isSearch ? null : "";
+                  if (dataProvider.isSearch) {
+                    _searchBar.requestFocus();
+                  }
+                },
+                icon: Icon(
+                  dataProvider.isSearch ? AppIcons.close : AppIcons.search,
+                ),
               ),
               IconButton(
                 // ignore: prefer-extracting-callbacks
@@ -68,6 +84,11 @@ class MetconSessionsPage extends StatelessWidget {
                       ? AppIcons.filterFilled
                       : AppIcons.filter,
                 ),
+              ),
+              IconButton(
+                onPressed: () =>
+                    Navigator.of(context).newBase(Routes.metcon.overview),
+                icon: const Icon(AppIcons.notes),
               ),
             ],
             bottom: PreferredSize(

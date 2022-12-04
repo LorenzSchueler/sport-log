@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -17,7 +18,9 @@ import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class RoutePage extends StatelessWidget {
-  const RoutePage({super.key});
+  RoutePage({super.key});
+
+  final _searchBar = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +30,31 @@ class RoutePage extends StatelessWidget {
         create: (_) => OverviewDataProvider(
           dataProvider: RouteDataProvider(),
           entityAccessor: (dataProvider) =>
-              (_, __, ___) => dataProvider.getNonDeleted(),
+              (_, __, ___, search) => dataProvider.getByName(search),
           recordAccessor: (_) => () async {},
           loggerName: "RoutePage",
         )..init(),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
-            title: const Text("Routes"),
+            title: dataProvider.isSearch
+                ? TextFormField(
+                    focusNode: _searchBar,
+                    onChanged: (name) => dataProvider.search = name,
+                    decoration: Theme.of(context).textFormFieldDecoration,
+                  )
+                : const Text("Routes"),
             actions: [
+              IconButton(
+                onPressed: () {
+                  dataProvider.search = dataProvider.isSearch ? null : "";
+                  if (dataProvider.isSearch) {
+                    _searchBar.requestFocus();
+                  }
+                },
+                icon: Icon(
+                  dataProvider.isSearch ? AppIcons.close : AppIcons.search,
+                ),
+              ),
               IconButton(
                 onPressed: () =>
                     Navigator.of(context).newBase(Routes.cardio.overview),
@@ -138,7 +158,7 @@ class RouteCard extends StatelessWidget {
                     height: 150,
                     child: StaticMapboxMap(
                       key:
-                          ObjectKey(route), // update on relaod to get new track
+                          ObjectKey(route), // update on reload to get new track
                       onMapCreated: (MapboxMapController controller) =>
                           sessionMapController = controller,
                       onStyleLoadedCallback: () =>

@@ -106,10 +106,11 @@ class CardioSessionDescriptionTable {
   static RouteTable get _routeTable => AppDatabase.routes;
   static MovementTable get _movementTable => AppDatabase.movements;
 
-  Future<List<CardioSessionDescription>> getByTimerangeAndMovement({
-    Movement? movementValue,
+  Future<List<CardioSessionDescription>> getByTimerangeAndMovementAndComment({
     DateTime? from,
     DateTime? until,
+    Movement? movementValue,
+    String? comment,
   }) async {
     final records = await AppDatabase.database!.rawQuery(
       '''
@@ -132,6 +133,7 @@ class CardioSessionDescriptionTable {
               Tables.cardioSession,
               movementValue,
             ),
+            TableAccessor.commentFilterOfTable(Tables.cardioSession, comment),
           ])}
       GROUP BY ${TableAccessor.groupByIdOfTable(Tables.cardioSession)}
       ORDER BY ${TableAccessor.orderByDatetimeOfTable(Tables.cardioSession)}

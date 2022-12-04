@@ -65,8 +65,8 @@ class DbResult {
 
   DbResult.success() : result = Success(null);
 
-  DbResult.fromBool(bool cond)
-      : result = cond ? Success(null) : Failure(DbError.unknown(null));
+  DbResult.fromBool(bool condition)
+      : result = condition ? Success(null) : Failure(DbError.unknown(null));
 
   Result<void, DbError> result;
 
