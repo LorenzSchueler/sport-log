@@ -189,7 +189,7 @@ class StrengthSessionDescriptionDataProvider
     return _strengthSessionDescriptionDb.getByTimerangeAndMovementAndComment(
       from: from,
       until: until,
-      movementValue: movement,
+      movement: movement,
       comment: comment,
     );
   }

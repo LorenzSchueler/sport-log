@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
 
@@ -11,9 +12,9 @@ class AppTheme {
   static final darkTheme = _themeDataFromColors(
     const ColorScheme.dark(
       primary: Color(0xffa8d8ff),
-      background: Color.fromRGBO(15, 15, 15, 1),
-      surface: Color.fromRGBO(30, 30, 30, 1),
-      surfaceVariant: Color.fromRGBO(45, 45, 45, 1),
+      background: Color.fromARGB(255, 15, 15, 15),
+      surface: Color.fromARGB(255, 30, 30, 30),
+      surfaceVariant: Color.fromARGB(255, 45, 45, 45),
       onSurfaceVariant: Colors.white,
       error: _warning,
       errorContainer: _ok, // used for opposite of error like ok, start, ...
@@ -25,8 +26,8 @@ class AppTheme {
     const ColorScheme.light(
       primary: Color(0xff1f67a3),
       background: Colors.white,
-      surface: Color.fromRGBO(230, 230, 230, 1),
-      surfaceVariant: Color.fromRGBO(215, 215, 215, 1),
+      surface: Color.fromARGB(255, 230, 230, 230),
+      surfaceVariant: Color.fromARGB(255, 215, 215, 215),
       onSurfaceVariant: Colors.black,
       error: _warning,
       errorContainer: _ok, // used for opposite of error like ok, start, ...
@@ -160,21 +161,21 @@ class AppTheme {
   static int _tintValue(int value, double factor) =>
       max(0, min((value + ((255 - value) * factor)).round(), 255));
 
-  static Color _tintColor(Color color, double factor) => Color.fromRGBO(
+  static Color _tintColor(Color color, double factor) => Color.fromARGB(
+        255,
         _tintValue(color.red, factor),
         _tintValue(color.green, factor),
         _tintValue(color.blue, factor),
-        1,
       );
 
   static int _shadeValue(int value, double factor) =>
       max(0, min(value - (value * factor).round(), 255));
 
-  static Color _shadeColor(Color color, double factor) => Color.fromRGBO(
+  static Color _shadeColor(Color color, double factor) => Color.fromARGB(
+        255,
         _shadeValue(color.red, factor),
         _shadeValue(color.green, factor),
         _shadeValue(color.blue, factor),
-        1,
       );
 }
 

@@ -165,7 +165,7 @@ class StrengthSessionDescriptionTable {
   Future<List<StrengthSessionDescription>> getByTimerangeAndMovementAndComment({
     DateTime? from,
     DateTime? until,
-    Movement? movementValue,
+    Movement? movement,
     String? comment,
   }) async {
     final records = await AppDatabase.database!.rawQuery(
@@ -182,7 +182,7 @@ class StrengthSessionDescriptionTable {
             TableAccessor.untilFilterOfTable(Tables.strengthSession, until),
             TableAccessor.movementIdFilterOfTable(
               Tables.strengthSession,
-              movementValue,
+              movement,
             ),
             TableAccessor.commentFilterOfTable(Tables.strengthSession, comment),
           ])}

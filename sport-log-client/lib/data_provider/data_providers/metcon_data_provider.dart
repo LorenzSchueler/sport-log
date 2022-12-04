@@ -81,7 +81,7 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
       db.getByTimerangeAndMetconAndComment(
         from: from,
         until: until,
-        metconValue: metcon,
+        metcon: metcon,
         comment: comment,
       );
 

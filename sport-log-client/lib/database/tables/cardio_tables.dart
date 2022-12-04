@@ -109,7 +109,7 @@ class CardioSessionDescriptionTable {
   Future<List<CardioSessionDescription>> getByTimerangeAndMovementAndComment({
     DateTime? from,
     DateTime? until,
-    Movement? movementValue,
+    Movement? movement,
     String? comment,
   }) async {
     final records = await AppDatabase.database!.rawQuery(
@@ -131,7 +131,7 @@ class CardioSessionDescriptionTable {
             TableAccessor.untilFilterOfTable(Tables.cardioSession, until),
             TableAccessor.movementIdFilterOfTable(
               Tables.cardioSession,
-              movementValue,
+              movement,
             ),
             TableAccessor.commentFilterOfTable(Tables.cardioSession, comment),
           ])}

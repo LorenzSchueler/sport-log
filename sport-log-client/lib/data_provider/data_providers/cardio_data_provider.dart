@@ -132,7 +132,7 @@ class CardioSessionDescriptionDataProvider
     return _cardioSessionDescriptionDb.getByTimerangeAndMovementAndComment(
       from: from,
       until: until,
-      movementValue: movement,
+      movement: movement,
       comment: comment,
     );
   }
