@@ -47,7 +47,7 @@ class ActionProvider extends AtomicEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
+  bool isValidBeforeSanitation() {
     return validate(!deleted, 'ActionProvider: deleted is true') &&
         validate(
           name.length >= 2 && name.length <= 80,
@@ -61,10 +61,10 @@ class ActionProvider extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() &&
+    return isValidBeforeSanitation() &&
         validate(
           description == null || description!.isNotEmpty,
-          'ActionProvider: desciption is empty but not null',
+          'ActionProvider: description is empty but not null',
         );
   }
 

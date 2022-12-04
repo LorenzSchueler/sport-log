@@ -4,11 +4,11 @@ import 'package:sport_log/models/cardio/cardio_session.dart';
 
 Future<CardioType?> showCardioTypePicker({
   required BuildContext context,
-  bool dismissable = true,
+  bool dismissible = true,
 }) async {
   return showDialog<CardioType>(
     builder: (_) => const CardioTypePickerDialog(),
-    barrierDismissible: dismissable,
+    barrierDismissible: dismissible,
     context: context,
   );
 }

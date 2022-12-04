@@ -1,19 +1,19 @@
 //! Central server for **Sport Log**.
 //!
-//! **Sport Log Server** is a multi-user server backend which stores user data and provides synchonization.
+//! **Sport Log Server** is a multi-user server backend which stores user data and provides synchronization.
 //!
 //! # Usage
 //!
-//! **Sport Log Server** should be started at system startup, perferably as a systemd service.
+//! **Sport Log Server** should be started at system startup, preferably as a systemd service.
 //! It listens on port 8000 for HTTP request.
-//! It is highly recommended to use an HTTP server linke apache or nginx and configure it as a reverse proxy.
+//! It is highly recommended to use an HTTP server like apache or nginx and configure it as a reverse proxy.
 //! Make sure only connections via HTTPS are allowed since otherwise you data will be send in clear text.
 //!
 //! # Config
 //!
 //! The config supports configuration of different profiles and must at least contain all fields of [Config](sport_log_types::Config).
 //! The name of the config file is specified in [CONFIG_FILE].
-//! Additionally it can also be used to configure the webserver itself. Herefore please refer to [rocket::config].
+//! Additionally it can also be used to configure the webserver itself (please refer to [rocket::config]).
 
 use std::env;
 
@@ -305,7 +305,7 @@ async fn main() -> Result<(), rocket::Error> {
     info!("running migrations...");
     let db = Db::get_one(&rocket).await.unwrap();
     if let Err(error) = db.run(|c| embedded_migrations::run(c)).await {
-        error!("an error occured while running new migrations: {}", error);
+        error!("an error occurred while running new migrations: {}", error);
     }
     info!("db is up to date");
 

@@ -42,7 +42,7 @@ pub enum CardioType {
 
 /// A GPS position.
 ///
-/// `latitude` and `longitude` are meassured in decimal degrees.
+/// `latitude` and `longitude` are measured in decimal degrees.
 ///
 /// `elevation` is the elevation above sea level in in meter.
 ///

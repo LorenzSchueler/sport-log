@@ -20,7 +20,7 @@ enum RoutePlanningError {
   String get message {
     return this == RoutePlanningError.noInternet
         ? 'No Internet connection.'
-        : 'An unknow Error occured.';
+        : 'An unknown Error occurred.';
   }
 }
 

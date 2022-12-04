@@ -51,7 +51,7 @@ class StrengthSet extends AtomicEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
+  bool isValidBeforeSanitation() {
     return validate(!deleted, 'StrengthSet: deleted == true') &&
         validate(setNumber >= 0, 'StrengthSet: setNumber < 0') &&
         validate(count >= 1, 'StrengthSet: count < 1') &&
@@ -60,7 +60,7 @@ class StrengthSet extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion();
+    return isValidBeforeSanitation();
   }
 
   @override

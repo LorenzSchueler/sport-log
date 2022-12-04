@@ -45,7 +45,7 @@ class StrengthSession extends AtomicEntity {
   Map<String, dynamic> toJson() => _$StrengthSessionToJson(this);
 
   @override
-  bool isValidBeforeSanitazion() {
+  bool isValidBeforeSanitation() {
     return validate(!deleted, 'StrengthSession: deleted == true') &&
         validate(
           interval == null || interval! > Duration.zero,
@@ -55,7 +55,7 @@ class StrengthSession extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() &&
+    return isValidBeforeSanitation() &&
         validate(
           comments == null || comments!.isNotEmpty,
           'StrengthSession: comments are empty but not null',

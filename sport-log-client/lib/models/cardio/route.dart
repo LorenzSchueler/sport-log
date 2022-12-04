@@ -96,7 +96,7 @@ class Route extends AtomicEntity with Comparable<Route> {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
+  bool isValidBeforeSanitation() {
     return validate(!deleted, 'Route: deleted == true') &&
         validate(
           name.length >= 2 && name.length <= 80,
@@ -109,7 +109,7 @@ class Route extends AtomicEntity with Comparable<Route> {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() &&
+    return isValidBeforeSanitation() &&
         validate(
           track == null || track!.isNotEmpty,
           'Route: track is empty but not null',

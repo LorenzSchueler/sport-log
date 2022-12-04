@@ -15,7 +15,7 @@ impl Create for ActionProvider {
         let salt = SaltString::generate(&mut OsRng);
         action_provider.password = Argon2::default()
             .hash_password(action_provider.password.as_bytes(), salt.as_ref())
-            .map_err(|_| Error::RollbackTransaction)? // this shoud not happen but prevents panic
+            .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
             .to_string();
 
         diesel::insert_into(action_provider::table)
@@ -36,7 +36,7 @@ impl ActionProvider {
                 .get_result(conn)?;
 
         let password_hash =
-            PasswordHash::new(password_hash.as_str()).map_err(|_| Error::RollbackTransaction)?; // this shoud not happen but prevents panic
+            PasswordHash::new(password_hash.as_str()).map_err(|_| Error::RollbackTransaction)?; // this should not happen but prevents panic
         if Argon2::default()
             .verify_password(password.as_bytes(), &password_hash)
             .is_ok()
@@ -63,7 +63,7 @@ impl ActionProvider {
                 .get_result(conn)?;
 
         let password_hash =
-            PasswordHash::new(password_hash.as_str()).map_err(|_| Error::RollbackTransaction)?; // this shoud not happen but prevents panic
+            PasswordHash::new(password_hash.as_str()).map_err(|_| Error::RollbackTransaction)?; // this should not happen but prevents panic
         if Argon2::default()
             .verify_password(password.as_bytes(), &password_hash)
             .is_ok()

@@ -190,16 +190,16 @@ class Settings extends ChangeNotifier {
     return _getDouble(_weightIncrement);
   }
 
-  set weightIncrement(double incement) {
-    _put(_weightIncrement, incement);
+  set weightIncrement(double increment) {
+    _put(_weightIncrement, increment);
   }
 
   Duration get durationIncrement {
     return _getDuration(_durationIncrement);
   }
 
-  set durationIncrement(Duration incement) {
-    _put(_durationIncrement, incement);
+  set durationIncrement(Duration increment) {
+    _put(_durationIncrement, increment);
   }
 
   Int64? get userId {

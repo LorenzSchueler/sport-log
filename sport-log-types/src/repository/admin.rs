@@ -14,7 +14,7 @@ impl Admin {
         _conn: &PgConnection,
     ) -> QueryResult<()> {
         let password_hash =
-            PasswordHash::new(admin_password).map_err(|_| Error::RollbackTransaction)?; // this shoud not happen but prevents panic
+            PasswordHash::new(admin_password).map_err(|_| Error::RollbackTransaction)?; // this should not happen but prevents panic
         if username == ADMIN_USERNAME
             && Argon2::default()
                 .verify_password(password.as_bytes(), &password_hash)

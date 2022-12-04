@@ -41,7 +41,7 @@ class MetconSessionDescription extends CompoundEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
+  bool isValidBeforeSanitation() {
     bool metconMetconDescriptionChecks;
     switch (metconDescription.metcon.metconType) {
       case MetconType.amrap:
@@ -80,15 +80,15 @@ class MetconSessionDescription extends CompoundEntity {
         );
         break;
     }
-    return metconSession.isValidBeforeSanitazion() &&
-        metconDescription.isValidBeforeSanitazion() &&
+    return metconSession.isValidBeforeSanitation() &&
+        metconDescription.isValidBeforeSanitation() &&
         metconSession.metconId == metconDescription.metcon.id &&
         metconMetconDescriptionChecks;
   }
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() &&
+    return isValidBeforeSanitation() &&
         metconSession.isValid() &&
         metconDescription.isValid();
   }

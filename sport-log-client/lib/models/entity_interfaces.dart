@@ -15,7 +15,7 @@ abstract class Entity extends JsonSerializable {
   bool isValid();
 
   /// Check if entity would be valid after [sanitize] is applied.
-  bool isValidBeforeSanitazion();
+  bool isValidBeforeSanitation();
 
   /// set empty lists to null, set fields <= 0 to null if they are (check > 0), ...
   void sanitize();

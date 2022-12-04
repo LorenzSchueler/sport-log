@@ -13,7 +13,7 @@
 //!
 //! # Usage
 //!
-//! The **Sport Log Scheduler** has do be executed periodically, perferably as a cron job every hour.
+//! The **Sport Log Scheduler** has do be executed periodically, preferably as a cron job every hour.
 //!
 //! # Config
 //!

@@ -31,8 +31,8 @@ class MetconMovementDescription extends CompoundEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
-    return metconMovement.isValidBeforeSanitazion() &&
+  bool isValidBeforeSanitation() {
+    return metconMovement.isValidBeforeSanitation() &&
         movement.isValid() &&
         validate(
           movement.id == metconMovement.movementId,
@@ -42,7 +42,7 @@ class MetconMovementDescription extends CompoundEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() && metconMovement.isValid();
+    return isValidBeforeSanitation() && metconMovement.isValid();
   }
 
   @override

@@ -40,7 +40,7 @@ class Platform extends AtomicEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
+  bool isValidBeforeSanitation() {
     return validate(!deleted, 'Platform: deleted == true') &&
         validate(
           name.length >= 2 && name.length <= 80,
@@ -50,7 +50,7 @@ class Platform extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion();
+    return isValidBeforeSanitation();
   }
 
   @override

@@ -242,7 +242,7 @@ pub fn unverified_inner_int_to_sql(input: TokenStream) -> TokenStream {
 ///
 /// This macro only works if the type implements `sport_log_types::FromI64` which can also be derived using [FromI64].
 #[proc_macro_derive(FromSql)]
-pub fn unverified_inner_int_drom_sql(input: TokenStream) -> TokenStream {
+pub fn unverified_inner_int_from_sql(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_from_sql(&ast)
 }

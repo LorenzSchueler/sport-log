@@ -37,7 +37,7 @@ class User extends NonDeletableAtomicEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
+  bool isValidBeforeSanitation() {
     return validate(username.isNotEmpty, 'User: username is empty') &&
         validate(username.length >= 2, 'User: username.length < 2') &&
         validate(password.isNotEmpty, 'User: password is empty') &&
@@ -49,7 +49,7 @@ class User extends NonDeletableAtomicEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion();
+    return isValidBeforeSanitation();
   }
 
   @override

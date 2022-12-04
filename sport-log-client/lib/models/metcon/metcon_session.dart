@@ -94,7 +94,7 @@ class MetconSession extends AtomicEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
+  bool isValidBeforeSanitation() {
     return validate(!deleted, 'MetconSession: deleted == true') &&
         validate(
           time == null || time! > Duration.zero,
@@ -106,7 +106,7 @@ class MetconSession extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() &&
+    return isValidBeforeSanitation() &&
         validate(
           comments == null || comments!.isNotEmpty,
           'MetconSession: comments are empty but not null',

@@ -13,7 +13,7 @@ impl Create for User {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
             .hash_password(user.password.as_bytes(), &salt)
-            .map_err(|_| Error::RollbackTransaction)? // this shoud not happen but prevents panic
+            .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
             .to_string();
 
         diesel::insert_into(user::table)
@@ -27,7 +27,7 @@ impl Update for User {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
             .hash_password(user.password.as_bytes(), &salt)
-            .map_err(|_| Error::RollbackTransaction)? // this shoud not happen but prevents panic
+            .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
             .to_string();
 
         diesel::update(user::table.find(user.id))
@@ -43,7 +43,7 @@ impl Update for User {
                     let salt = SaltString::generate(&mut OsRng);
                     user.password = Argon2::default()
                         .hash_password(user.password.as_bytes(), &salt)
-                        .map_err(|_| Error::RollbackTransaction)? // this shoud not happen but prevents panic
+                        .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
                         .to_string();
 
                     diesel::update(user::table.find(user.id))

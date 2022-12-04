@@ -5,11 +5,11 @@ import 'package:sport_log/models/action/action.dart';
 Future<Action?> showActionPicker({
   required List<Action> actions,
   required BuildContext context,
-  bool dismissable = true,
+  bool dismissible = true,
 }) async {
   return showDialog<Action>(
     builder: (_) => ActionPickerDialog(actions: actions),
-    barrierDismissible: dismissable,
+    barrierDismissible: dismissible,
     context: context,
   );
 }

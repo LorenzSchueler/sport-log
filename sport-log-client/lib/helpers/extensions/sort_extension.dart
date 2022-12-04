@@ -31,40 +31,40 @@ extension SortExtension<T> on List<T> {
 
 int distance(
   String query,
-  String canditate, {
+  String candidate, {
   int insert = 1,
   int edit = 3,
   int delete = 6,
 }) {
   query = query.toLowerCase().replaceAll("-", " ");
-  canditate = canditate.toLowerCase().replaceAll("-", " ");
+  candidate = candidate.toLowerCase().replaceAll("-", " ");
 
-  if (query == canditate) {
+  if (query == candidate) {
     return 0;
   }
 
   if (query.isEmpty) {
-    return canditate.length * insert;
+    return candidate.length * insert;
   }
 
-  if (canditate.isEmpty) {
+  if (candidate.isEmpty) {
     return query.length * delete;
   }
 
   List<int> v0 = List<int>.generate(
-    canditate.length + 1,
+    candidate.length + 1,
     (i) => i * insert,
     growable: false,
   );
-  List<int> v1 = List<int>.filled(canditate.length + 1, 0, growable: false);
+  List<int> v1 = List<int>.filled(candidate.length + 1, 0, growable: false);
   List<int> vtemp;
 
   for (var i = 1; i <= query.length; i++) {
     v1[0] = i * delete;
 
-    for (var j = 1; j <= canditate.length; j++) {
+    for (var j = 1; j <= candidate.length; j++) {
       int cost = edit;
-      if (query.codeUnitAt(i - 1) == canditate.codeUnitAt(j - 1)) {
+      if (query.codeUnitAt(i - 1) == candidate.codeUnitAt(j - 1)) {
         cost = 0;
       }
       v1[j] =
@@ -76,7 +76,7 @@ int distance(
     v1 = vtemp;
   }
 
-  final directMatch = canditate.contains(query) ? 0 : 1000;
+  final directMatch = candidate.contains(query) ? 0 : 1000;
 
-  return v0[canditate.length] + directMatch;
+  return v0[candidate.length] + directMatch;
 }

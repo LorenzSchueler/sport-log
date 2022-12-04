@@ -133,7 +133,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
     if (track == null) {
       await showMessageDialog(
         context: context,
-        title: "An Error occured",
+        title: "An Error occurred",
         text: "Parsing file failed.",
       );
     } else {

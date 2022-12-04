@@ -24,7 +24,7 @@ All tables (which can be modified by users) have the fields `sync_status integer
 
 ## Client synchronization logic
 * When an object is created or updated (including deleted), it will be written to the database with `sync_status` = 1 (update) or `sync_status` = 2 (creation).
-* On user request or every couple of minutes (according to `sync interval` set in settings) the syncing endpoint of the server will be used to fetch changes. Every object from server will be upserted into the database.
+* On user request or every couple of minutes (according to `sync interval` set in settings) the syncing endpoint of the server will be used to fetch changes. Every object from the server will be upserted into the database.
 * After successfully fetching the latest changes from the server, the client will push its changes to the server and set `sync_status` of the corresponding entries to 0.
 * After successfully synchronizing with the server, the timestamp is saved in the settings variable `last_sync`.
 

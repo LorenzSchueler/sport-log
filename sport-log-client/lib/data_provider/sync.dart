@@ -59,7 +59,7 @@ class Sync extends ChangeNotifier {
       final serverVersionResult = await Api.getServerVersion();
       if (serverVersionResult.isSuccess) {
         serverVersion = serverVersionResult.success;
-        if (!serverVersion!.comatibleWithClientApiVersion()) {
+        if (!serverVersion!.compatibleWithClientApiVersion()) {
           await showMessageDialog(
             context: App.globalContext,
             text:

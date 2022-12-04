@@ -102,7 +102,7 @@ class Metcon extends AtomicEntity {
   }
 
   @override
-  bool isValidBeforeSanitazion() {
+  bool isValidBeforeSanitation() {
     return validate(!deleted, 'Metcon: deleted == true') &&
         validate(
           name.length >= 2 && name.length <= 80,
@@ -118,7 +118,7 @@ class Metcon extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() &&
+    return isValidBeforeSanitation() &&
         validate(
           description == null || description!.isNotEmpty,
           'Metcon: description is empty but not null',

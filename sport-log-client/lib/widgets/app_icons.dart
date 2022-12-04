@@ -61,7 +61,7 @@ class AppIcons {
 
   // fields
   static const IconData settings = Icons.settings_rounded;
-  static const IconData questionmark = Icons.question_mark_rounded;
+  static const IconData questionMark = Icons.question_mark_rounded;
   static const IconData email = Icons.email_outlined;
   static const IconData key = Icons.key_outlined;
   static const IconData map = Icons.map_rounded;

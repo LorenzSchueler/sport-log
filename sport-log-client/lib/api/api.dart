@@ -59,7 +59,7 @@ enum ApiErrorCode {
       case ApiErrorCode.unknownServerError:
         return "An unknown server error.";
       case ApiErrorCode.serverUnreachable:
-        return "It was not possible to etablish a connection with the server.";
+        return "It was not possible to establish a connection with the server.";
       case ApiErrorCode.badJson:
         return "Got bad json from server.";
       case ApiErrorCode.unknownRequestError:
@@ -199,7 +199,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   T _fromJson(Map<String, dynamic> json);
   String get _singularRoute; // everything after url base, e. g. '/v1.0/user'
 
-  // default impls
+  // default implementations
   String get _pluralRoute => '${_singularRoute}s';
   Map<String, dynamic> _toJson(T object) => object.toJson();
 

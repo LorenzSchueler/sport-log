@@ -4,11 +4,11 @@ import 'package:sport_log/models/action/weekday.dart';
 
 Future<Weekday?> showWeekdayPicker({
   required BuildContext context,
-  bool dismissable = true,
+  bool dismissible = true,
 }) async {
   return showDialog<Weekday>(
     builder: (_) => const WeekdayPickerDialog(),
-    barrierDismissible: dismissable,
+    barrierDismissible: dismissible,
     context: context,
   );
 }

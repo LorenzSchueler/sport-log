@@ -205,7 +205,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
 provider:   ${location.provider}
 accuracy: ${location.accuracy?.toInt()} m
 time: ${location.time! ~/ 1000} s
-satelites:  ${location.satelliteNumber}
+satellites: ${location.satelliteNumber}
 points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
 
     await _mapController.animateCenter(location.latLng);
@@ -257,7 +257,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
             child: const Text("Back"),
           ),
           TextButton(
-            onPressed: _cardioSessionDescription.isValidBeforeSanitazion()
+            onPressed: _cardioSessionDescription.isValidBeforeSanitation()
                 ? _saveCardioSession
                 : null,
             child: const Text("Save"),

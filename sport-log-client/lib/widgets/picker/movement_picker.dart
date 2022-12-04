@@ -11,7 +11,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 Future<Movement?> showMovementPicker({
   required BuildContext context,
   Movement? selectedMovement,
-  bool dismissable = true,
+  bool dismissible = true,
   bool cardioOnly = false,
   bool distanceOnly = false,
 }) async {
@@ -21,7 +21,7 @@ Future<Movement?> showMovementPicker({
       cardioOnly: cardioOnly,
       distanceOnly: distanceOnly,
     ),
-    barrierDismissible: dismissable,
+    barrierDismissible: dismissible,
     context: context,
   );
 }

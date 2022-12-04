@@ -6,5 +6,4 @@ class WodApi extends Api<Wod> {
 
   @override
   String get _singularRoute => '$apiVersion/wod';
-  String get x => (Wod).runtimeType.toString();
 }

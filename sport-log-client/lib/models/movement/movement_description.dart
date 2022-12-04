@@ -31,13 +31,13 @@ class MovementDescription extends CompoundEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
-    return movement.isValidBeforeSanitazion();
+  bool isValidBeforeSanitation() {
+    return movement.isValidBeforeSanitation();
   }
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() && movement.isValid();
+    return isValidBeforeSanitation() && movement.isValid();
   }
 
   @override

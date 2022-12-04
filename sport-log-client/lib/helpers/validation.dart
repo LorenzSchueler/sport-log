@@ -107,7 +107,7 @@ class Validator {
     }
   }
 
-  /// incluse range [lowerBound, upperBound]
+  /// inclusive range [lowerBound, upperBound]
   static String? validateIntBetween(
     String? value,
     int lowerBound,

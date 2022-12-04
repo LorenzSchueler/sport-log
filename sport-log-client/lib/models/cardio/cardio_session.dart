@@ -298,7 +298,7 @@ class CardioSession extends AtomicEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
+  bool isValidBeforeSanitation() {
     return validate(!deleted, 'CardioSession: deleted is true') &&
         validate(
           ascent == null || ascent! >= 0,
@@ -340,7 +340,7 @@ class CardioSession extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() &&
+    return isValidBeforeSanitation() &&
         validate(
           distance == null || distance! > 0,
           'CardioSession: distance <= 0',

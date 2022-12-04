@@ -67,13 +67,13 @@ class ActionRule extends AtomicEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
+  bool isValidBeforeSanitation() {
     return validate(!deleted, 'ActionRule: deleted is true');
   }
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() &&
+    return isValidBeforeSanitation() &&
         validate(
           arguments == null || arguments!.isNotEmpty,
           'ActionRule: arguments is empty but not null',

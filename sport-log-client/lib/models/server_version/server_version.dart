@@ -34,7 +34,7 @@ class ServerVersion extends JsonSerializable {
   @override
   String toString() => "$min - $max";
 
-  bool comatibleWithClientApiVersion() {
+  bool compatibleWithClientApiVersion() {
     return Config.apiVersion.compareTo(min) >= 0 &&
         Config.apiVersion.compareTo(max) <= 0;
   }

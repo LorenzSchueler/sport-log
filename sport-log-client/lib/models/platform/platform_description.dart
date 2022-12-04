@@ -30,19 +30,19 @@ class PlatformDescription extends CompoundEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
-    return platform.isValidBeforeSanitazion() &&
-        (platformCredential?.isValidBeforeSanitazion() ?? true) &&
-        actionProviders.every((a) => a.isValidBeforeSanitazion()) &&
+  bool isValidBeforeSanitation() {
+    return platform.isValidBeforeSanitation() &&
+        (platformCredential?.isValidBeforeSanitation() ?? true) &&
+        actionProviders.every((a) => a.isValidBeforeSanitation()) &&
         validate(
           !platform.credential || platformCredential != null,
-          'PlatformDesciption: credentials required but null',
+          'PlatformDescription: credentials required but null',
         );
   }
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() &&
+    return isValidBeforeSanitation() &&
         platform.isValid() &&
         (platformCredential?.isValid() ?? true) &&
         actionProviders.every((a) => a.isValid());

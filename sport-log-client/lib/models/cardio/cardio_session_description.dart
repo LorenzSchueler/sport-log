@@ -42,8 +42,8 @@ class CardioSessionDescription extends CompoundEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
-    return cardioSession.isValidBeforeSanitazion() &&
+  bool isValidBeforeSanitation() {
+    return cardioSession.isValidBeforeSanitation() &&
         (route?.isValid() ?? true) &&
         movement.isValid() &&
         validate(
@@ -62,7 +62,7 @@ class CardioSessionDescription extends CompoundEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() && cardioSession.isValid();
+    return isValidBeforeSanitation() && cardioSession.isValid();
   }
 
   @override

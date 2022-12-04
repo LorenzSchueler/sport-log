@@ -127,7 +127,7 @@ where
     }
 }
 
-/// Wrapper around an incomming id for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
+/// Wrapper around an incoming id for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///
 /// The id can be retrieved by using the appropriate verification function.
 #[cfg(feature = "server")]
@@ -189,7 +189,7 @@ pub trait Create {
 /// For restrictions on the types for derive to work please see [sport_log_types_derive::CreateMultiple].
 #[cfg(feature = "server")]
 pub trait CreateMultiple {
-    fn create_multiple(enteties: Vec<Self>, conn: &PgConnection) -> QueryResult<Vec<Self>>
+    fn create_multiple(entities: Vec<Self>, conn: &PgConnection) -> QueryResult<Vec<Self>>
     where
         Self: Sized;
 }
@@ -240,7 +240,7 @@ pub trait GetByUser {
         Self: Sized;
 }
 
-/// A type for which entries can be retrieved by user and the timestamp of the last synchonization from the database.
+/// A type for which entries can be retrieved by user and the timestamp of the last synchronization from the database.
 ///
 /// ### Deriving
 ///
@@ -258,7 +258,7 @@ pub trait GetByUserSync {
         Self: Sized;
 }
 
-/// A type for which entries can be retrieved by the timestamp of the last synchonization from the database.
+/// A type for which entries can be retrieved by the timestamp of the last synchronization from the database.
 ///
 /// ### Deriving
 ///
@@ -306,9 +306,9 @@ pub trait Update {
 
 /// A type for which all soft deleted entities can be hard deleted.
 ///
-/// This is only inteded for garbage collection triggered by `sport_log_scheduler`.
+/// This is only intended for garbage collection triggered by `sport_log_scheduler`.
 ///
-/// The function [hard_delete](HardDelete::hard_delete) will permanentily delete all entities that are already soft deleted and which have not been changed since `last_change`.
+/// The function [hard_delete](HardDelete::hard_delete) will permanently delete all entities that are already soft deleted and which have not been changed since `last_change`.
 ///
 /// ### Deriving
 ///

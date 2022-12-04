@@ -52,7 +52,7 @@ class SettingsPage extends StatelessWidget {
     if (result.isFailure) {
       await showMessageDialog(
         context: context,
-        title: "An Error occured:",
+        title: "An Error occurred:",
         text: result.failure.toString(),
       );
       settings
@@ -177,7 +177,7 @@ class SettingsPage extends StatelessWidget {
         await showMessageDialog(
           context: context,
           text:
-              "An error occured while deleting your account:\n${result.failure}",
+              "An error occurred while deleting your account:\n${result.failure}",
         );
       } else {
         await navigator.newBase(Routes.landing);
@@ -436,7 +436,7 @@ class SettingsPage extends StatelessWidget {
                 const CaptionTile(caption: "About"),
                 GestureDetector(
                   child: const TextTile(
-                    leading: AppIcons.questionmark,
+                    leading: AppIcons.questionMark,
                     child: Text('About'),
                   ),
                   onTap: () => Navigator.pushNamed(context, Routes.about),

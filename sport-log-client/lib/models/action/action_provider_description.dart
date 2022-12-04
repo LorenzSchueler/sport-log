@@ -32,16 +32,16 @@ class ActionProviderDescription extends CompoundEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
-    return actionProvider.isValidBeforeSanitazion() &&
-        actions.every((a) => a.isValidBeforeSanitazion()) &&
-        actionRules.every((a) => a.isValidBeforeSanitazion()) &&
-        actionEvents.every((a) => a.isValidBeforeSanitazion());
+  bool isValidBeforeSanitation() {
+    return actionProvider.isValidBeforeSanitation() &&
+        actions.every((a) => a.isValidBeforeSanitation()) &&
+        actionRules.every((a) => a.isValidBeforeSanitation()) &&
+        actionEvents.every((a) => a.isValidBeforeSanitation());
   }
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() &&
+    return isValidBeforeSanitation() &&
         actionProvider.isValid() &&
         actions.every((a) => a.isValid()) &&
         actionRules.every((a) => a.isValid()) &&

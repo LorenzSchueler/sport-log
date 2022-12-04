@@ -46,9 +46,9 @@ class MetconDescription extends CompoundEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
-    return metcon.isValidBeforeSanitazion() &&
-        moves.every((mm) => mm.isValidBeforeSanitazion()) &&
+  bool isValidBeforeSanitation() {
+    return metcon.isValidBeforeSanitation() &&
+        moves.every((mm) => mm.isValidBeforeSanitation()) &&
         validate(moves.isNotEmpty, 'MetconDescription: moves empty') &&
         validate(
           moves.every((mmd) => mmd.metconMovement.metconId == metcon.id),
@@ -64,7 +64,7 @@ class MetconDescription extends CompoundEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() &&
+    return isValidBeforeSanitation() &&
         metcon.isValid() &&
         moves.every((mm) => mm.isValid());
   }

@@ -44,8 +44,8 @@ class PlatformCredentialDataProvider
   List<PlatformCredential> getFromAccountData(AccountData accountData) =>
       accountData.platformCredentials;
 
-  Future<PlatformCredential?> getByPlatform(Platform platfrom) =>
-      db.getByPlatform(platfrom);
+  Future<PlatformCredential?> getByPlatform(Platform platform) =>
+      db.getByPlatform(platform);
 }
 
 class PlatformDescriptionDataProvider

@@ -11,11 +11,11 @@ import 'package:sport_log/widgets/app_icons.dart';
 Future<Metcon?> showMetconPicker({
   required BuildContext context,
   Metcon? selectedMetcon,
-  bool dismissable = true,
+  bool dismissible = true,
 }) async {
   return showDialog<Metcon>(
     builder: (_) => MetconPickerDialog(selectedMetcon: selectedMetcon),
-    barrierDismissible: dismissable,
+    barrierDismissible: dismissible,
     context: context,
   );
 }

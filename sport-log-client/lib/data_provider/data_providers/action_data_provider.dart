@@ -24,8 +24,8 @@ class ActionProviderDataProvider extends EntityDataProvider<ActionProvider> {
   List<ActionProvider> getFromAccountData(AccountData accountData) =>
       accountData.actionProviders;
 
-  Future<List<ActionProvider>> getByPlatform(Platform platfrom) =>
-      db.getByPlatform(platfrom);
+  Future<List<ActionProvider>> getByPlatform(Platform platform) =>
+      db.getByPlatform(platform);
 }
 
 class ActionDataProvider extends EntityDataProvider<Action> {

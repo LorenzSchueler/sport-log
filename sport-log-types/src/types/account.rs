@@ -7,7 +7,7 @@ use crate::{
     StrengthSet, TrainingPlan, User, Wod,
 };
 
-/// A representation of all or recentily updated data belonging to a user account.
+/// A representation of all or recently updated data belonging to a user account.
 ///
 /// This struct is used for the `account_data` endpoints.
 #[derive(Serialize, Deserialize, Debug, Clone)]

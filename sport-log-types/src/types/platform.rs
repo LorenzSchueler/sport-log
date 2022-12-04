@@ -34,7 +34,7 @@ use crate::{
 #[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct PlatformId(pub i64);
 
-/// A represantation for an external resource for which [ActionProvider](crate::ActionProvider) can provide [Actions](crate::Action).
+/// A representation for an external resource for which [ActionProvider](crate::ActionProvider) can provide [Actions](crate::Action).
 ///
 /// `credential` is true if the external resource is only useable with credentials which the [User](crate::User) has to supply as [PlatformCredential].
 ///

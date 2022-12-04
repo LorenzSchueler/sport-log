@@ -80,7 +80,7 @@ class MetconMovement extends AtomicEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
+  bool isValidBeforeSanitation() {
     return validate(!deleted, 'MetconMovement: deleted == true') &&
         validate(movementNumber >= 0, 'MetconMovement: movement number < 0') &&
         validate(count > 0, 'MetconMovement: count <= 0') &&
@@ -96,7 +96,7 @@ class MetconMovement extends AtomicEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion();
+    return isValidBeforeSanitation();
   }
 
   @override

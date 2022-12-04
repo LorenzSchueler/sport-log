@@ -61,10 +61,10 @@ class StrengthSessionDescription extends CompoundEntity {
       );
 
   @override
-  bool isValidBeforeSanitazion() {
-    return session.isValidBeforeSanitazion() &&
+  bool isValidBeforeSanitation() {
+    return session.isValidBeforeSanitation() &&
         movement.isValid() &&
-        sets.every((ss) => ss.isValidBeforeSanitazion()) &&
+        sets.every((ss) => ss.isValidBeforeSanitation()) &&
         validate(
           sets.isNotEmpty,
           'StrengthSessionDescription: strength sets empty',
@@ -89,7 +89,7 @@ class StrengthSessionDescription extends CompoundEntity {
 
   @override
   bool isValid() {
-    return isValidBeforeSanitazion() &&
+    return isValidBeforeSanitation() &&
         session.isValid() &&
         sets.every((ss) => ss.isValid());
   }
