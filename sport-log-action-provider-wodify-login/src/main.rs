@@ -204,6 +204,8 @@ async fn login(mode: Mode) -> Result<()> {
         .spawn()
         .map_err(Error::Io)?;
 
+    time::sleep(StdDuration::from_secs(1)).await; // make sure geckodriver is available
+
     let mut caps = DesiredCapabilities::firefox();
     if mode == Mode::Headless {
         caps.set_headless().map_err(Error::WebDriver)?;
