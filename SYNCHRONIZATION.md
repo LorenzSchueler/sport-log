@@ -12,21 +12,24 @@ All tables (which can be modified by users) have the fields `sync_status integer
 ## Deletes
 * In general objects are only created and updated but not deleted.
 * Deletions are implemented as soft deletes and can therefore be treated as updates.
-* The exception to this is that if a user account gets deleted all data from this user is hard-deleted, thus making sure the user can erase all of its data from the server permanently.
+* The only exception is that when a user account gets deleted, all data from this user is hard-deleted, ensuring users can erase all of their data from the server permanently.
 * Soft and hard deletes are cascading (with few exceptions where they are set null).
 * In order to get cascading soft deletes on the server, every (modifiable) table has a corresponding archive table which inherits all fields from this table. Every entry that gets soft deleted is moved into the archive table using triggers. Because soft deleted entries are moved to the inherited archive table, they are technically hard deleted from the normal table causing cascading deletes. This idea was taken from [this stackoverflow answer](https://stackoverflow.com/questions/506432/cascading-soft-delete). All unique indices are only implemented on the normal table, in order to make it possible to create entries that would otherwise clash with deleted entries. 
 * On the client side there are no hard deletes at all since the only reason for hard deletes is deleting a user account in which case the whole database gets dropped anyway. Soft deletes are not cascading, but the data providers delete all related entries.
 
 ## General synchronization logic
-* The server has to be able to provide clients with all changes since their last synchronization without sending everything. In order to be able to do so it saves the timestamp of the last change of every entry in the field `last_change` and can then send all entries that have changed since a given point in time.
+* The server saves the timestamp of the last modification of every entry in the field `last_change`. 
 * Clients save the timestamp of their last synchronization and can thus request all changes from the server since this point in time.
-* Clients only use one server. This means they only have to keep track of what the server already knows and what was created or updated. Every modifiable entry has therefore the field `sync_status`.
+* When the client request all changes since its last synchronization, the server returns all entries which have been modified after the given timestamp.
+* Clients only use one server. Therefore, they only need to keep track of which entries already exist on the server and which are newly created or updated. The field `sync_status` is used to store this information.
 
 ## Client synchronization logic
-* When an object is created or updated (including deleted), it will be written to the database with `sync_status` = 1 (update) or `sync_status` = 2 (creation).
-* On user request or every couple of minutes (according to `sync interval` set in settings) the syncing endpoint of the server will be used to fetch changes. Every object from the server will be upserted into the database.
-* After successfully fetching the latest changes from the server, the client will push its changes to the server and set `sync_status` of the corresponding entries to 0.
+* When an object is created or updated (including deleted), its `sync_status` is set to 1 (update) or 2 (creation).
+* On user request or every couple of minutes (set by `sync interval` in settings) the changes since the last synchronization are fetched from the server and upserted into the database.
+* After successfully fetching the latest changes from the server, the client pushes its changes to the server and sets `sync_status` of the corresponding entries to 0.
 * After successfully synchronizing with the server, the timestamp is saved in the settings variable `last_sync`.
+* *Changes from another device that are sent to the server after the changes are fetched but before the synchronization finishes and `last_sync` is set will never be synchronized with the device. If `last_sync` would be set to the time when the synchronization starts, changes that are made to entries which were modified and synchronized during the last synchronization, would be overridden.*
+* *The user can trigger an **Init Sync** in the settings. This drops the database and fetches all data from the server. It resolves all conflicts, but entries that were not synchronized will be lost.*
 
 ## Which change wins?
 The system supports multiple clients for the same user account. 
@@ -36,6 +39,6 @@ Creations should in general not influence each other as long as they do not clas
 If they do clash the entry that reaches the server first wins, regardless of the order in which they are made.
 Changes of different entries should also not influence each other as log as they do not clash on unique indices.
 If they do clash the same logic as for creations applies.
-For both conflicts on creations and changes of different entries the client will show a dialog in which the user can choose to fix the conflict by hand or let all conflicting entries be hard deleted automatically.
+For conflicts when creating new entries and modifying different entries the client shows a dialog in which the user can choose to fix the conflict by hand or let all conflicting entries be hard deleted automatically.
 
 If the user changes the same entry on different devices, the change which reaches the server first wins and the entry on the other device will silently be overridden during the next down sync.

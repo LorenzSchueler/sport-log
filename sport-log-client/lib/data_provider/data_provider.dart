@@ -291,11 +291,14 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     return DbResult.success();
   }
 
-  static Future<void> pushAllToServer() async {
+  static Future<bool> pushAllToServer() async {
     // !!! order matters => no parallel execution possible
     for (final dp in EntityDataProvider.all) {
-      await dp.pushToServer();
+      if (!await dp.pushToServer()) {
+        return false;
+      }
     }
+    return true;
   }
 
   static Future<void> upsertAccountData(

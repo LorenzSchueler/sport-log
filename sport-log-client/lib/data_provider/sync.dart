@@ -73,23 +73,20 @@ class Sync extends ChangeNotifier {
         }
       }
     }
-    final syncStart = DateTime.now();
-    final downSyncSuccessful = await _downSync(onNoInternet: onNoInternet);
-    if (downSyncSuccessful) {
-      await _upSync();
-      _logger.i('Setting last sync to $syncStart.');
-      // make sure sync intervals overlap slightly in case client and server clocks differ a little bit
-      Settings.instance.lastSync =
-          syncStart.subtract(const Duration(seconds: 10));
+    bool syncSuccessful = await _downSync(onNoInternet: onNoInternet);
+    if (syncSuccessful) {
+      syncSuccessful = await _upSync();
+      // account for time difference
+      final now = DateTime.now().add(const Duration(milliseconds: 100));
+      _logger.i('Setting last sync to $now.');
+      Settings.instance.lastSync = now;
     }
     _isSyncing = false;
     notifyListeners();
-    return downSyncSuccessful;
+    return syncSuccessful;
   }
 
-  Future<void> _upSync() async {
-    await EntityDataProvider.pushAllToServer();
-  }
+  Future<bool> _upSync() => EntityDataProvider.pushAllToServer();
 
   Future<bool> _downSync({VoidCallback? onNoInternet}) async {
     final accountDataResult =
