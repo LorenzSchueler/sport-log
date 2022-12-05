@@ -8,3 +8,6 @@ void showSimpleToast(BuildContext context, String text) {
     textColor: Theme.of(context).colorScheme.onSurfaceVariant,
   );
 }
+
+void showNoInternetToast(BuildContext context) =>
+    showSimpleToast(context, 'No Internet Connection.');

@@ -51,7 +51,7 @@ class _MapPageState extends State<MapPage> {
     try {
       places = await _placesSearch.getPlaces(_search!);
     } on SocketException {
-      showSimpleToast(context, 'No Internet connection.');
+      showNoInternetToast(context);
     }
     if (mounted) {
       setState(() => _searchResults = places ?? []);

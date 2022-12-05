@@ -61,8 +61,7 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
   void init() {
     _dataProvider
       ..addListener(_update)
-      ..onNoInternetConnection =
-          () => showSimpleToast(App.globalContext, 'No Internet connection.');
+      ..onNoInternetConnection = () => showNoInternetToast(App.globalContext);
     _update();
   }
 
@@ -78,7 +77,7 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
     _isLoading = true;
     notifyListeners();
     _logger.d(
-      'Updating with start = ${_dateFilter.start}, end = ${_dateFilter.end}, selected = $selected',
+      'Updating with start = ${_dateFilter.start}, end = ${_dateFilter.end}, selected = $_selected, search = $_search',
     );
     _entities = await entityAccessor(_dataProvider)(
       _dateFilter.start,
