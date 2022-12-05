@@ -7,9 +7,11 @@ import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/conflict_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
@@ -25,22 +27,10 @@ abstract class DataProvider<T> extends ChangeNotifier {
 
   Future<List<T>> getNonDeleted();
 
-  Future<bool> pushUpdatedToServer();
-
-  Future<bool> pushCreatedToServer();
-
-  Future<bool> pushToServer() async {
-    return (await Future.wait([
-      pushUpdatedToServer(),
-      pushCreatedToServer(),
-    ]))
-        .every((result) => result);
-  }
-
-  static Future<ConflictResolution?> handleApiError(
-    ApiError error, {
+  static Future<ConflictResolution?> _handleApiError(
+    ApiError error,
     VoidCallback? onNoInternet,
-  }) async {
+  ) async {
     _logger.e('Api error: $error', error.errorCode);
     switch (error.errorCode) {
       case ApiErrorCode.serverUnreachable:
@@ -122,6 +112,10 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     return DbResult.success();
   }
 
+  @override
+  Future<List<T>> getNonDeleted() async => db.getNonDeleted();
+
+  /// used in compound data providers impl of createSingle
   Future<DbResult> createMultiple(List<T> objects, {bool notify = true}) async {
     for (final object in objects) {
       object.sanitize();
@@ -137,6 +131,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     return DbResult.success();
   }
 
+  /// used in compound data providers impl of updateSingle
   Future<DbResult> updateMultiple(List<T> objects, {bool notify = true}) async {
     for (final object in objects) {
       object.sanitize();
@@ -152,6 +147,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     return DbResult.success();
   }
 
+  /// used in compound data providers impl of deleteSingle
   Future<DbResult> deleteMultiple(List<T> objects, {bool notify = true}) async {
     final result = await db.deleteMultiple(objects);
     if (result.isFailure()) {
@@ -163,8 +159,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     return DbResult.success();
   }
 
-  @override
-  Future<List<T>> getNonDeleted() async => db.getNonDeleted();
+  Future<T?> getById(Int64 id) async => db.getById(id);
 
   Future<bool> _resolveConflict(
     ConflictResolution conflictResolution,
@@ -194,11 +189,12 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     Future<ApiResult<void>> Function(List<T>) fnMultiple,
     Future<ApiResult<void>> Function(T) fnSingle,
     List<T> records,
+    VoidCallback? onNoInternet,
   ) async {
     final result = await fnMultiple(records);
     if (result.isFailure) {
       final conflictResolution =
-          await DataProvider.handleApiError(result.failure);
+          await DataProvider._handleApiError(result.failure, onNoInternet);
       return conflictResolution != null
           ? await _resolveConflict(conflictResolution, fnSingle, records)
           : false;
@@ -207,13 +203,13 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
   }
 
-  @override
-  Future<bool> pushUpdatedToServer() async {
+  Future<bool> _pushUpdatedToServer(VoidCallback? onNoInternet) async {
     final recordsToUpdate = await db.getWithSyncStatus(SyncStatus.updated);
     if (await _pushEntriesToServer(
       api.putMultiple,
       api.putSingle,
       recordsToUpdate,
+      onNoInternet,
     )) {
       await db.setAllUpdatedSynchronized();
       return true;
@@ -222,13 +218,13 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
   }
 
-  @override
-  Future<bool> pushCreatedToServer() async {
+  Future<bool> _pushCreatedToServer(VoidCallback? onNoInternet) async {
     final recordsToCreate = await db.getWithSyncStatus(SyncStatus.created);
     if (await _pushEntriesToServer(
       api.postMultiple,
       api.postSingle,
       recordsToCreate,
+      onNoInternet,
     )) {
       await db.setAllCreatedSynchronized();
       return true;
@@ -237,13 +233,13 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
   }
 
-  Future<T?> getById(Int64 id) async => db.getById(id);
-
-  Future<DbResult> upsertFromAccountData(AccountData accountData) =>
-      upsertMultiple(
-        getFromAccountData(accountData),
-        synchronized: true,
-      );
+  Future<bool> _pushToServer(VoidCallback? onNoInternet) async {
+    return (await Future.wait([
+      _pushUpdatedToServer(onNoInternet),
+      _pushCreatedToServer(onNoInternet),
+    ]))
+        .every((result) => result);
+  }
 
   Future<DbResult> upsertMultiple(
     List<T> objects, {
@@ -263,23 +259,38 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     return DbResult.success();
   }
 
-  static Future<bool> pushAllToServer() async {
-    // !!! order matters => no parallel execution possible
+  static Future<bool> upSync({required VoidCallback? onNoInternet}) async {
+    // order matters => no parallel execution possible
     for (final dp in EntityDataProvider.all) {
-      if (!await dp.pushToServer()) {
+      if (!await dp._pushToServer(onNoInternet)) {
         return false;
       }
     }
     return true;
   }
 
-  static Future<void> upsertAccountData(
-    AccountData data, {
-    required bool synchronized,
-  }) async {
-    // !!! order matters => no parallel execution possible
-    for (final dp in EntityDataProvider.all) {
-      await dp.upsertFromAccountData(data);
+  static Future<bool> downSync({required VoidCallback? onNoInternet}) async {
+    final accountDataResult =
+        await Api.accountData.get(Settings.instance.lastSync);
+    if (accountDataResult.isFailure) {
+      await DataProvider._handleApiError(
+        accountDataResult.failure,
+        onNoInternet,
+      );
+      return false;
+    } else {
+      final accountData = accountDataResult.success;
+      if (accountData.user != null) {
+        Account.updateUserFromDownSync(accountData.user!);
+      }
+      // order matters => no parallel execution possible
+      for (final dp in EntityDataProvider.all) {
+        await dp.upsertMultiple(
+          dp.getFromAccountData(accountData),
+          synchronized: true,
+        );
+      }
+      return true;
     }
   }
 

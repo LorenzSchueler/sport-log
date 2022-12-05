@@ -8,7 +8,6 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
-import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -73,9 +72,11 @@ class Sync extends ChangeNotifier {
         }
       }
     }
-    bool syncSuccessful = await _downSync(onNoInternet: onNoInternet);
+    bool syncSuccessful =
+        await EntityDataProvider.downSync(onNoInternet: onNoInternet);
     if (syncSuccessful) {
-      syncSuccessful = await _upSync();
+      syncSuccessful =
+          await EntityDataProvider.upSync(onNoInternet: onNoInternet);
       // account for time difference
       final now = DateTime.now().add(const Duration(milliseconds: 100));
       _logger.i('Setting last sync to $now.');
@@ -84,30 +85,6 @@ class Sync extends ChangeNotifier {
     _isSyncing = false;
     notifyListeners();
     return syncSuccessful;
-  }
-
-  Future<bool> _upSync() => EntityDataProvider.pushAllToServer();
-
-  Future<bool> _downSync({VoidCallback? onNoInternet}) async {
-    final accountDataResult =
-        await Api.accountData.get(Settings.instance.lastSync);
-    if (accountDataResult.isFailure) {
-      await DataProvider.handleApiError(
-        accountDataResult.failure,
-        onNoInternet: onNoInternet,
-      );
-      return false;
-    } else {
-      final accountData = accountDataResult.success;
-      if (accountData.user != null) {
-        Account.updateUserFromDownSync(accountData.user!);
-      }
-      await EntityDataProvider.upsertAccountData(
-        accountData,
-        synchronized: true,
-      );
-      return true;
-    }
   }
 
   Future<void> startSync() async {
@@ -134,11 +111,9 @@ class Sync extends ChangeNotifier {
   }
 
   void stopSync() {
+    _logger.d('Stopping synchronization.');
     serverVersion = null;
-    if (_syncTimer != null) {
-      _logger.d('Stopping sync timer...');
-      _syncTimer?.cancel();
-      _syncTimer = null;
-    }
+    _syncTimer?.cancel();
+    _syncTimer = null;
   }
 }

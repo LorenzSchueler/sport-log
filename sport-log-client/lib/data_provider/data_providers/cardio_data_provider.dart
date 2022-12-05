@@ -102,16 +102,6 @@ class CardioSessionDescriptionDataProvider
     );
   }
 
-  @override
-  Future<bool> pushCreatedToServer() async {
-    return _cardioDataProvider.pushCreatedToServer();
-  }
-
-  @override
-  Future<bool> pushUpdatedToServer() async {
-    return _cardioDataProvider.pushUpdatedToServer();
-  }
-
   Future<List<CardioSessionDescription>> getByTimerangeAndMovementAndComment({
     required DateTime? from,
     required DateTime? until,

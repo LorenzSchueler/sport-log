@@ -74,16 +74,6 @@ class MovementDescriptionDataProvider
     return _movementDescriptionDb.getNonDeleted();
   }
 
-  @override
-  Future<bool> pushCreatedToServer() async {
-    return _dataProvider.pushCreatedToServer();
-  }
-
-  @override
-  Future<bool> pushUpdatedToServer() async {
-    return _dataProvider.pushUpdatedToServer();
-  }
-
   Future<List<MovementDescription>> getByName(
     String? name, {
     bool cardioOnly = false,

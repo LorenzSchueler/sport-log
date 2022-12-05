@@ -49,12 +49,6 @@ class TimelineDataProvider extends DataProvider<TimelineUnion> {
         diaries: await _diaryDataProvider.getNonDeleted(),
       );
 
-  @override
-  Future<bool> pushUpdatedToServer() => throw UnimplementedError();
-
-  @override
-  Future<bool> pushCreatedToServer() => throw UnimplementedError();
-
   Future<List<TimelineUnion>> getByTimerangeAndComment({
     required DateTime? from,
     required DateTime? until,

@@ -153,22 +153,6 @@ class StrengthSessionDescriptionDataProvider
     );
   }
 
-  @override
-  Future<bool> pushUpdatedToServer() async {
-    if (!await _strengthSessionDataProvider.pushUpdatedToServer()) {
-      return false;
-    }
-    return _strengthSetDataProvider.pushUpdatedToServer();
-  }
-
-  @override
-  Future<bool> pushCreatedToServer() async {
-    if (!await _strengthSessionDataProvider.pushCreatedToServer()) {
-      return false;
-    }
-    return _strengthSetDataProvider.pushCreatedToServer();
-  }
-
   Future<StrengthSessionDescription?> getById(Int64 id) =>
       _strengthSessionDescriptionDb.getById(id);
 

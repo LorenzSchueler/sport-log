@@ -145,22 +145,6 @@ class ActionProviderDescriptionDataProvider
     throw UnimplementedError();
   }
 
-  @override
-  Future<bool> pushUpdatedToServer() async {
-    if (!await _actionRuleDataProvider.pushUpdatedToServer()) {
-      return false;
-    }
-    return _actionEventDataProvider.pushUpdatedToServer();
-  }
-
-  @override
-  Future<bool> pushCreatedToServer() async {
-    if (!await _actionRuleDataProvider.pushCreatedToServer()) {
-      return false;
-    }
-    return _actionEventDataProvider.pushCreatedToServer();
-  }
-
   Future<ActionProviderDescription?> getByActionProvider(
     ActionProvider actionProvider,
   ) async {

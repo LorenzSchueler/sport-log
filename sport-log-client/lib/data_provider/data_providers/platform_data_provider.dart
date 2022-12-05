@@ -113,14 +113,4 @@ class PlatformDescriptionDataProvider
           .toList(),
     );
   }
-
-  @override
-  Future<bool> pushCreatedToServer() async {
-    return _platformCredentialDataProvider.pushCreatedToServer();
-  }
-
-  @override
-  Future<bool> pushUpdatedToServer() async {
-    return _platformCredentialDataProvider.pushUpdatedToServer();
-  }
 }
