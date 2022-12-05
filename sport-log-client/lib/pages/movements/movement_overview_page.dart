@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
+import 'package:sport_log/data_provider/overview_data_provider.dart';
+import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/routes.dart';
@@ -8,9 +11,9 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/overview_data_provider.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 class MovementsPage extends StatelessWidget {
   MovementsPage({super.key});
@@ -54,26 +57,32 @@ class MovementsPage extends StatelessWidget {
             ],
           ),
           drawer: MainDrawer(selectedRoute: Routes.movement.overview),
-          body: RefreshIndicator(
-            onRefresh: dataProvider.pullFromServer,
-            child: dataProvider.entities.isEmpty
-                ? const Center(
-                    child: Text(
-                      "looks like there are no movements there yet 😔 \npress ＋ to create a new one",
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                : Container(
-                    padding: Defaults.edgeInsets.normal,
-                    child: ListView.separated(
-                      itemBuilder: (_, index) => MovementCard(
-                        movementDescription: dataProvider.entities[index],
+          body: Consumer<Sync>(
+            builder: (context, sync, _) {
+              return RefreshIndicator(
+                onRefresh: () => sync.sync(
+                  onNoInternet: () => showNoInternetToast(context),
+                ),
+                child: dataProvider.entities.isEmpty
+                    ? const Center(
+                        child: Text(
+                          "looks like there are no movements there yet 😔 \npress ＋ to create a new one",
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    : Container(
+                        padding: Defaults.edgeInsets.normal,
+                        child: ListView.separated(
+                          itemBuilder: (_, index) => MovementCard(
+                            movementDescription: dataProvider.entities[index],
+                          ),
+                          separatorBuilder: (_, __) =>
+                              Defaults.sizedBox.vertical.normal,
+                          itemCount: dataProvider.entities.length,
+                        ),
                       ),
-                      separatorBuilder: (_, __) =>
-                          Defaults.sizedBox.vertical.normal,
-                      itemCount: dataProvider.entities.length,
-                    ),
-                  ),
+              );
+            },
           ),
           floatingActionButton: FloatingActionButton(
             child: const Icon(AppIcons.add),

@@ -161,14 +161,6 @@ class ActionProviderDescriptionDataProvider
     return _actionEventDataProvider.pushCreatedToServer();
   }
 
-  @override
-  Future<bool> pullFromServer() async {
-    if (!await _actionRuleDataProvider.pullFromServer(notify: false)) {
-      return false;
-    }
-    return _actionEventDataProvider.pullFromServer();
-  }
-
   Future<ActionProviderDescription?> getByActionProvider(
     ActionProvider actionProvider,
   ) async {

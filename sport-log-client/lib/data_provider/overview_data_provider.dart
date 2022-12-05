@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
-import 'package:sport_log/widgets/snackbar.dart';
 
 class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
     extends ChangeNotifier {
@@ -17,7 +15,6 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
 
   final Logger _logger;
   final D _dataProvider;
-  Future<bool> pullFromServer() => _dataProvider.pullFromServer();
   final Future<List<T>> Function(DateTime?, DateTime?, S?, String?) Function(D)
       entityAccessor;
   final Future<R> Function() Function(D) recordAccessor;
@@ -59,17 +56,13 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
   bool get isLoading => _isLoading;
 
   void init() {
-    _dataProvider
-      ..addListener(_update)
-      ..onNoInternetConnection = () => showNoInternetToast(App.globalContext);
+    _dataProvider.addListener(_update);
     _update();
   }
 
   @override
   void dispose() {
-    _dataProvider
-      ..removeListener(_update)
-      ..onNoInternetConnection = null;
+    _dataProvider.removeListener(_update);
     super.dispose();
   }
 

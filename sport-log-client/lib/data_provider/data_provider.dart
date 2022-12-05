@@ -29,21 +29,12 @@ abstract class DataProvider<T> extends ChangeNotifier {
 
   Future<bool> pushCreatedToServer();
 
-  Future<bool> pullFromServer(); // used in page refresh
-
   Future<bool> pushToServer() async {
     return (await Future.wait([
       pushUpdatedToServer(),
       pushCreatedToServer(),
     ]))
         .every((result) => result);
-  }
-
-  /// only called if internet connection is needed
-  VoidCallback? _onNoInternet;
-
-  set onNoInternetConnection(VoidCallback? callback) {
-    _onNoInternet = callback;
   }
 
   static Future<ConflictResolution?> handleApiError(
@@ -174,25 +165,6 @@ abstract class EntityDataProvider<T extends AtomicEntity>
 
   @override
   Future<List<T>> getNonDeleted() async => db.getNonDeleted();
-
-  @override
-  Future<bool> pullFromServer({bool notify = true}) async {
-    final result = await api.getMultiple();
-    if (result.isFailure) {
-      await DataProvider.handleApiError(
-        result.failure,
-        onNoInternet: _onNoInternet,
-      );
-      return false;
-    } else {
-      return (await upsertMultiple(
-        result.success,
-        synchronized: true,
-        notify: notify,
-      ))
-          .isSuccess();
-    }
-  }
 
   Future<bool> _resolveConflict(
     ConflictResolution conflictResolution,

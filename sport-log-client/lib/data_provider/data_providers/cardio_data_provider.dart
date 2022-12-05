@@ -103,17 +103,6 @@ class CardioSessionDescriptionDataProvider
   }
 
   @override
-  Future<bool> pullFromServer() async {
-    if (!await _movementDataProvider.pullFromServer(notify: false)) {
-      return false;
-    }
-    if (!await _routeDataProvider.pullFromServer(notify: false)) {
-      return false;
-    }
-    return _cardioDataProvider.pullFromServer();
-  }
-
-  @override
   Future<bool> pushCreatedToServer() async {
     return _cardioDataProvider.pushCreatedToServer();
   }

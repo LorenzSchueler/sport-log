@@ -55,20 +55,6 @@ class TimelineDataProvider extends DataProvider<TimelineUnion> {
   @override
   Future<bool> pushCreatedToServer() => throw UnimplementedError();
 
-  @override
-  Future<bool> pullFromServer() async {
-    if (!await _strengthDataProvider.pullFromServer()) {
-      return false;
-    }
-    if (!await _metconDataProvider.pullFromServer()) {
-      return false;
-    }
-    if (!await _cardioDataProvider.pullFromServer()) {
-      return false;
-    }
-    return _diaryDataProvider.pullFromServer();
-  }
-
   Future<List<TimelineUnion>> getByTimerangeAndComment({
     required DateTime? from,
     required DateTime? until,

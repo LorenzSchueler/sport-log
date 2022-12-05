@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
+import 'package:sport_log/data_provider/overview_data_provider.dart';
+import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
@@ -17,10 +20,10 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
-import 'package:sport_log/widgets/overview_data_provider.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class CardioSessionsPage extends StatelessWidget {
@@ -106,41 +109,48 @@ class CardioSessionsPage extends StatelessWidget {
           body: Stack(
             alignment: Alignment.topCenter,
             children: [
-              RefreshIndicator(
-                onRefresh: dataProvider.pullFromServer,
-                child: dataProvider.entities.isEmpty
-                    ? SessionsPageTab.cardio.noEntriesText
-                    : Container(
-                        padding: Defaults.edgeInsets.normal,
-                        child: Column(
-                          children: [
-                            if (dataProvider.isSelected) ...[
-                              CardioChart(
-                                cardioSessions: dataProvider.entities
-                                    .map((e) => e.cardioSession)
-                                    .toList(),
-                                dateFilterState: dataProvider.dateFilter,
-                              ),
-                              Defaults.sizedBox.vertical.normal,
-                            ],
-                            Expanded(
-                              child: ListView.separated(
-                                itemBuilder: (_, index) => CardioSessionCard(
-                                  cardioSessionDescription:
-                                      dataProvider.entities[index],
-                                  key: ValueKey(
-                                    dataProvider
-                                        .entities[index].cardioSession.id,
+              Consumer<Sync>(
+                builder: (context, sync, _) {
+                  return RefreshIndicator(
+                    onRefresh: () => sync.sync(
+                      onNoInternet: () => showNoInternetToast(context),
+                    ),
+                    child: dataProvider.entities.isEmpty
+                        ? SessionsPageTab.cardio.noEntriesText
+                        : Container(
+                            padding: Defaults.edgeInsets.normal,
+                            child: Column(
+                              children: [
+                                if (dataProvider.isSelected) ...[
+                                  CardioChart(
+                                    cardioSessions: dataProvider.entities
+                                        .map((e) => e.cardioSession)
+                                        .toList(),
+                                    dateFilterState: dataProvider.dateFilter,
+                                  ),
+                                  Defaults.sizedBox.vertical.normal,
+                                ],
+                                Expanded(
+                                  child: ListView.separated(
+                                    itemBuilder: (_, index) =>
+                                        CardioSessionCard(
+                                      cardioSessionDescription:
+                                          dataProvider.entities[index],
+                                      key: ValueKey(
+                                        dataProvider
+                                            .entities[index].cardioSession.id,
+                                      ),
+                                    ),
+                                    separatorBuilder: (_, __) =>
+                                        Defaults.sizedBox.vertical.normal,
+                                    itemCount: dataProvider.entities.length,
                                   ),
                                 ),
-                                separatorBuilder: (_, __) =>
-                                    Defaults.sizedBox.vertical.normal,
-                                itemCount: dataProvider.entities.length,
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                  );
+                },
               ),
               if (dataProvider.isLoading)
                 const Positioned(

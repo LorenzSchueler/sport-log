@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
+import 'package:sport_log/data_provider/overview_data_provider.dart';
+import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/models/platform/platform_credential.dart';
 import 'package:sport_log/models/platform/platform_description.dart';
@@ -8,9 +11,9 @@ import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/overview_data_provider.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 class PlatformOverviewPage extends StatelessWidget {
   const PlatformOverviewPage({super.key});
@@ -30,26 +33,32 @@ class PlatformOverviewPage extends StatelessWidget {
         )..init(),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(title: const Text("Server Actions")),
-          body: RefreshIndicator(
-            onRefresh: dataProvider.pullFromServer,
-            child: dataProvider.entities.isEmpty
-                ? const Center(
-                    child: Text(
-                      "looks like there are no platforms 😔",
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                : Container(
-                    padding: Defaults.edgeInsets.normal,
-                    child: ListView.separated(
-                      itemBuilder: (_, index) => PlatformCard(
-                        platformDescription: dataProvider.entities[index],
+          body: Consumer<Sync>(
+            builder: (context, sync, _) {
+              return RefreshIndicator(
+                onRefresh: () => sync.sync(
+                  onNoInternet: () => showNoInternetToast(context),
+                ),
+                child: dataProvider.entities.isEmpty
+                    ? const Center(
+                        child: Text(
+                          "looks like there are no platforms 😔",
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    : Container(
+                        padding: Defaults.edgeInsets.normal,
+                        child: ListView.separated(
+                          itemBuilder: (_, index) => PlatformCard(
+                            platformDescription: dataProvider.entities[index],
+                          ),
+                          separatorBuilder: (_, __) =>
+                              Defaults.sizedBox.vertical.normal,
+                          itemCount: dataProvider.entities.length,
+                        ),
                       ),
-                      separatorBuilder: (_, __) =>
-                          Defaults.sizedBox.vertical.normal,
-                      itemCount: dataProvider.entities.length,
-                    ),
-                  ),
+              );
+            },
           ),
           drawer: MainDrawer(selectedRoute: Routes.action.platformOverview),
         ),

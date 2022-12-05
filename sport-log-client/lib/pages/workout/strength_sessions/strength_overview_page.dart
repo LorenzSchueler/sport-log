@@ -1,6 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
+import 'package:sport_log/data_provider/overview_data_provider.dart';
+import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -14,10 +17,10 @@ import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/overview_data_provider.dart';
 import 'package:sport_log/widgets/picker/movement_picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 class StrengthSessionsPage extends StatelessWidget {
   StrengthSessionsPage({super.key});
@@ -98,43 +101,50 @@ class StrengthSessionsPage extends StatelessWidget {
           body: Stack(
             alignment: Alignment.topCenter,
             children: [
-              RefreshIndicator(
-                onRefresh: dataProvider.pullFromServer,
-                child: dataProvider.entities.isEmpty
-                    ? SessionsPageTab.strength.noEntriesText
-                    : Container(
-                        padding: Defaults.edgeInsets.normal,
-                        child: Column(
-                          children: [
-                            if (dataProvider.isSelected) ...[
-                              StrengthChart(
-                                strengthSessionDescriptions:
-                                    dataProvider.entities,
-                                dateFilterState: dataProvider.dateFilter,
-                              ),
-                              Defaults.sizedBox.vertical.normal,
-                              StrengthRecordsCard(
-                                strengthRecords: dataProvider.records ?? {},
-                                movement: dataProvider.selected!,
-                              ),
-                              Defaults.sizedBox.vertical.normal,
-                            ],
-                            Expanded(
-                              child: ListView.separated(
-                                itemBuilder: (context, index) =>
-                                    StrengthSessionCard(
-                                  strengthSessionDescription:
-                                      dataProvider.entities[index],
-                                  strengthRecords: dataProvider.records ?? {},
+              Consumer<Sync>(
+                builder: (context, sync, _) {
+                  return RefreshIndicator(
+                    onRefresh: () => sync.sync(
+                      onNoInternet: () => showNoInternetToast(context),
+                    ),
+                    child: dataProvider.entities.isEmpty
+                        ? SessionsPageTab.strength.noEntriesText
+                        : Container(
+                            padding: Defaults.edgeInsets.normal,
+                            child: Column(
+                              children: [
+                                if (dataProvider.isSelected) ...[
+                                  StrengthChart(
+                                    strengthSessionDescriptions:
+                                        dataProvider.entities,
+                                    dateFilterState: dataProvider.dateFilter,
+                                  ),
+                                  Defaults.sizedBox.vertical.normal,
+                                  StrengthRecordsCard(
+                                    strengthRecords: dataProvider.records ?? {},
+                                    movement: dataProvider.selected!,
+                                  ),
+                                  Defaults.sizedBox.vertical.normal,
+                                ],
+                                Expanded(
+                                  child: ListView.separated(
+                                    itemBuilder: (context, index) =>
+                                        StrengthSessionCard(
+                                      strengthSessionDescription:
+                                          dataProvider.entities[index],
+                                      strengthRecords:
+                                          dataProvider.records ?? {},
+                                    ),
+                                    separatorBuilder: (_, __) =>
+                                        Defaults.sizedBox.vertical.normal,
+                                    itemCount: dataProvider.entities.length,
+                                  ),
                                 ),
-                                separatorBuilder: (_, __) =>
-                                    Defaults.sizedBox.vertical.normal,
-                                itemCount: dataProvider.entities.length,
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                  );
+                },
               ),
               if (dataProvider.isLoading)
                 const Positioned(

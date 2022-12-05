@@ -75,11 +75,6 @@ class MovementDescriptionDataProvider
   }
 
   @override
-  Future<bool> pullFromServer() async {
-    return _dataProvider.pullFromServer();
-  }
-
-  @override
   Future<bool> pushCreatedToServer() async {
     return _dataProvider.pushCreatedToServer();
   }

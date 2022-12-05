@@ -169,14 +169,6 @@ class StrengthSessionDescriptionDataProvider
     return _strengthSetDataProvider.pushCreatedToServer();
   }
 
-  @override
-  Future<bool> pullFromServer() async {
-    if (!await _strengthSessionDataProvider.pullFromServer(notify: false)) {
-      return false;
-    }
-    return _strengthSetDataProvider.pullFromServer();
-  }
-
   Future<StrengthSessionDescription?> getById(Int64 id) =>
       _strengthSessionDescriptionDb.getById(id);
 

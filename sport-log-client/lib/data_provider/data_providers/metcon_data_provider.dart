@@ -191,14 +191,6 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     return _metconMovementDataProvider.pushCreatedToServer();
   }
 
-  @override
-  Future<bool> pullFromServer() async {
-    if (await _metconDataProvider.pullFromServer(notify: false)) {
-      return false;
-    }
-    return _metconMovementDataProvider.pullFromServer();
-  }
-
   Future<List<MetconMovementDescription>> _getMmdByMetcon(Metcon metcon) async {
     final metconMovements =
         await _metconMovementDataProvider.getByMetcon(metcon);
@@ -294,20 +286,6 @@ class MetconSessionDescriptionDataProvider
     return _mapToDescription(
       await _metconSessionDataProvider.getNonDeleted(),
     );
-  }
-
-  @override
-  Future<bool> pullFromServer() async {
-    if (!await _movementDataProvider.pullFromServer(notify: false)) {
-      return false;
-    }
-    if (!await _metconDataProvider.pullFromServer(notify: false)) {
-      return false;
-    }
-    if (!await _metconMovementDataProvider.pullFromServer(notify: false)) {
-      return false;
-    }
-    return _metconSessionDataProvider.pullFromServer();
   }
 
   @override

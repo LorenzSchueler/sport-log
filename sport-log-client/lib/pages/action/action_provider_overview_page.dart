@@ -1,6 +1,8 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/data_provider/data_providers/action_data_provider.dart';
+import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -38,19 +40,14 @@ class _ActionProviderOverviewPageState
 
   @override
   void initState() {
-    _dataProvider
-      ..addListener(_update)
-      ..onNoInternetConnection =
-          () => showSimpleToast(context, 'No Internet connection.');
+    _dataProvider.addListener(_update);
     _update();
     super.initState();
   }
 
   @override
   void dispose() {
-    _dataProvider
-      ..removeListener(_update)
-      ..onNoInternetConnection = null;
+    _dataProvider.removeListener(_update);
     super.dispose();
   }
 
@@ -79,26 +76,35 @@ class _ActionProviderOverviewPageState
       ),
       body: _actionProviderDescription == null
           ? const CircularProgressIndicator()
-          : RefreshIndicator(
-              onRefresh: _dataProvider.pullFromServer,
-              child: Container(
-                padding: Defaults.edgeInsets.normal,
-                child: ListView(
-                  children: [
-                    ActionsCard(
-                      actionProviderDescription: _actionProviderDescription!,
+          : Consumer<Sync>(
+              builder: (context, sync, _) {
+                return RefreshIndicator(
+                  onRefresh: () => sync.sync(
+                    onNoInternet: () => showNoInternetToast(context),
+                  ),
+                  child: Container(
+                    padding: Defaults.edgeInsets.normal,
+                    child: ListView(
+                      children: [
+                        ActionsCard(
+                          actionProviderDescription:
+                              _actionProviderDescription!,
+                        ),
+                        Defaults.sizedBox.vertical.normal,
+                        ActionRulesCard(
+                          actionProviderDescription:
+                              _actionProviderDescription!,
+                        ),
+                        Defaults.sizedBox.vertical.normal,
+                        ActionEventsCard(
+                          actionProviderDescription:
+                              _actionProviderDescription!,
+                        ),
+                      ],
                     ),
-                    Defaults.sizedBox.vertical.normal,
-                    ActionRulesCard(
-                      actionProviderDescription: _actionProviderDescription!,
-                    ),
-                    Defaults.sizedBox.vertical.normal,
-                    ActionEventsCard(
-                      actionProviderDescription: _actionProviderDescription!,
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             ),
     );
   }

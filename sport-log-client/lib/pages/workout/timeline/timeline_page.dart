@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/data_provider/data_providers/timeline_data_provider.dart';
+import 'package:sport_log/data_provider/overview_data_provider.dart';
+import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/models/timeline_union.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_overview_page.dart';
@@ -12,9 +15,9 @@ import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
-import 'package:sport_log/widgets/overview_data_provider.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
+import 'package:sport_log/widgets/snackbar.dart';
 
 class TimelinePage extends StatelessWidget {
   TimelinePage({super.key});
@@ -72,22 +75,28 @@ class TimelinePage extends StatelessWidget {
           body: Stack(
             alignment: Alignment.topCenter,
             children: [
-              RefreshIndicator(
-                onRefresh: dataProvider.pullFromServer,
-                child: dataProvider.entities.isEmpty
-                    ? SessionsPageTab.timeline.noEntriesWithoutAddText
-                    : Container(
-                        padding: Defaults.edgeInsets.normal,
-                        child: ListView.separated(
-                          itemBuilder: (context, index) => _itemCard(
-                            dataProvider.entities[index],
-                            dataProvider.records ?? TimelineRecords({}, {}),
+              Consumer<Sync>(
+                builder: (context, sync, _) {
+                  return RefreshIndicator(
+                    onRefresh: () => sync.sync(
+                      onNoInternet: () => showNoInternetToast(context),
+                    ),
+                    child: dataProvider.entities.isEmpty
+                        ? SessionsPageTab.timeline.noEntriesWithoutAddText
+                        : Container(
+                            padding: Defaults.edgeInsets.normal,
+                            child: ListView.separated(
+                              itemBuilder: (context, index) => _itemCard(
+                                dataProvider.entities[index],
+                                dataProvider.records ?? TimelineRecords({}, {}),
+                              ),
+                              separatorBuilder: (_, __) =>
+                                  Defaults.sizedBox.vertical.normal,
+                              itemCount: dataProvider.entities.length,
+                            ),
                           ),
-                          separatorBuilder: (_, __) =>
-                              Defaults.sizedBox.vertical.normal,
-                          itemCount: dataProvider.entities.length,
-                        ),
-                      ),
+                  );
+                },
               ),
               if (dataProvider.isLoading)
                 const Positioned(

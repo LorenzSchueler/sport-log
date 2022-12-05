@@ -115,17 +115,6 @@ class PlatformDescriptionDataProvider
   }
 
   @override
-  Future<bool> pullFromServer() async {
-    if (!await _platformDataProvider.pullFromServer(notify: false)) {
-      return false;
-    }
-    if (!await _platformCredentialDataProvider.pullFromServer(notify: false)) {
-      return false;
-    }
-    return _actionProviderDataProvider.pullFromServer();
-  }
-
-  @override
   Future<bool> pushCreatedToServer() async {
     return _platformCredentialDataProvider.pushCreatedToServer();
   }
