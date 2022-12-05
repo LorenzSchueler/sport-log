@@ -170,26 +170,6 @@ class StrengthSessionDescriptionDataProvider
     );
   }
 
-  Future<void> upsertMultipleSessions(
-    List<StrengthSession> sessions, {
-    required bool synchronized,
-  }) async {
-    await _strengthSessionDataProvider.upsertMultiple(
-      sessions,
-      synchronized: synchronized,
-    );
-  }
-
-  Future<void> upsertMultipleSets(
-    List<StrengthSet> sets, {
-    required bool synchronized,
-  }) async {
-    await _strengthSetDataProvider.upsertMultiple(
-      sets,
-      synchronized: synchronized,
-    );
-  }
-
   Future<StrengthRecords> getStrengthRecords() =>
       _strengthSetDataProvider.getStrengthRecords();
 }
