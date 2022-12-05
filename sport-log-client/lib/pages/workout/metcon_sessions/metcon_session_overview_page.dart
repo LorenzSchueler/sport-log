@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/overview_data_provider.dart';
-import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
@@ -20,7 +18,7 @@ import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/picker/metcon_picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
-import 'package:sport_log/widgets/snackbar.dart';
+import 'package:sport_log/widgets/sync_refresh_indicator.dart';
 
 class MetconSessionsPage extends StatelessWidget {
   MetconSessionsPage({super.key});
@@ -106,60 +104,50 @@ class MetconSessionsPage extends StatelessWidget {
           body: Stack(
             alignment: Alignment.topCenter,
             children: [
-              Consumer<Sync>(
-                builder: (context, sync, _) {
-                  return RefreshIndicator(
-                    onRefresh: () => sync.sync(
-                      onNoInternet: () => showNoInternetToast(context),
-                    ),
-                    child: dataProvider.entities.isEmpty
-                        ? SessionsPageTab.metcon.noEntriesText
-                        : Container(
-                            padding: Defaults.edgeInsets.normal,
-                            child: dataProvider.selected != null &&
-                                    dataProvider.entities.isNotEmpty
-                                ? ListView.separated(
-                                    itemBuilder: (_, index) {
-                                      if (index == 0) {
-                                        return MetconDescriptionCard(
-                                          metconDescription: dataProvider
-                                              .entities.first.metconDescription,
-                                        );
-                                      } else if (index == 1) {
-                                        return MetconSessionResultsCard(
-                                          metconSessionDescription: null,
-                                          metconSessionDescriptions:
-                                              dataProvider.entities,
-                                          metconRecords:
-                                              dataProvider.records ?? {},
-                                        );
-                                      } else {
-                                        return MetconSessionCard(
-                                          metconSessionDescription:
-                                              dataProvider.entities[index - 2],
-                                          metconRecords:
-                                              dataProvider.records ?? {},
-                                        );
-                                      }
-                                    },
-                                    separatorBuilder: (_, __) =>
-                                        Defaults.sizedBox.vertical.normal,
-                                    itemCount: dataProvider.entities.length + 2,
-                                  )
-                                : ListView.separated(
-                                    itemBuilder: (_, index) =>
-                                        MetconSessionCard(
-                                      metconSessionDescription:
-                                          dataProvider.entities[index],
+              SyncRefreshIndicator(
+                child: dataProvider.entities.isEmpty
+                    ? SessionsPageTab.metcon.noEntriesText
+                    : Container(
+                        padding: Defaults.edgeInsets.normal,
+                        child: dataProvider.selected != null &&
+                                dataProvider.entities.isNotEmpty
+                            ? ListView.separated(
+                                itemBuilder: (_, index) {
+                                  if (index == 0) {
+                                    return MetconDescriptionCard(
+                                      metconDescription: dataProvider
+                                          .entities.first.metconDescription,
+                                    );
+                                  } else if (index == 1) {
+                                    return MetconSessionResultsCard(
+                                      metconSessionDescription: null,
+                                      metconSessionDescriptions:
+                                          dataProvider.entities,
                                       metconRecords: dataProvider.records ?? {},
-                                    ),
-                                    separatorBuilder: (_, __) =>
-                                        Defaults.sizedBox.vertical.normal,
-                                    itemCount: dataProvider.entities.length,
-                                  ),
-                          ),
-                  );
-                },
+                                    );
+                                  } else {
+                                    return MetconSessionCard(
+                                      metconSessionDescription:
+                                          dataProvider.entities[index - 2],
+                                      metconRecords: dataProvider.records ?? {},
+                                    );
+                                  }
+                                },
+                                separatorBuilder: (_, __) =>
+                                    Defaults.sizedBox.vertical.normal,
+                                itemCount: dataProvider.entities.length + 2,
+                              )
+                            : ListView.separated(
+                                itemBuilder: (_, index) => MetconSessionCard(
+                                  metconSessionDescription:
+                                      dataProvider.entities[index],
+                                  metconRecords: dataProvider.records ?? {},
+                                ),
+                                separatorBuilder: (_, __) =>
+                                    Defaults.sizedBox.vertical.normal,
+                                itemCount: dataProvider.entities.length,
+                              ),
+                      ),
               ),
               if (dataProvider.isLoading)
                 const Positioned(

@@ -1,9 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:sport_log/data_provider/data_providers/diary_data_provider.dart';
 import 'package:sport_log/data_provider/overview_data_provider.dart';
-import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/models/diary/diary.dart';
@@ -17,7 +15,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
-import 'package:sport_log/widgets/snackbar.dart';
+import 'package:sport_log/widgets/sync_refresh_indicator.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class DiaryPage extends StatelessWidget {
@@ -75,54 +73,47 @@ class DiaryPage extends StatelessWidget {
           body: Stack(
             alignment: Alignment.topCenter,
             children: [
-              Consumer<Sync>(
-                builder: (context, sync, _) {
-                  return RefreshIndicator(
-                    onRefresh: () => sync.sync(
-                      onNoInternet: () => showNoInternetToast(context),
-                    ),
-                    child: dataProvider.entities.isEmpty
-                        ? SessionsPageTab.diary.noEntriesText
-                        : Container(
-                            padding: Defaults.edgeInsets.normal,
-                            child: Column(
-                              children: [
-                                if (dataProvider.entities
-                                    .any((d) => d.bodyweight != null)) ...[
-                                  DateTimeChart(
-                                    chartValues: dataProvider.entities
-                                        .map((s) {
-                                          final value = s.bodyweight;
-                                          return value == null
-                                              ? null
-                                              : DateTimeChartValue(
-                                                  datetime: s.date,
-                                                  value: value,
-                                                );
-                                        })
-                                        .whereNotNull()
-                                        .toList(),
-                                    dateFilterState: dataProvider.dateFilter,
-                                    yFromZero: false,
-                                    aggregatorType: AggregatorType.avg,
-                                  ),
-                                  Defaults.sizedBox.vertical.normal,
-                                ],
-                                Expanded(
-                                  child: ListView.separated(
-                                    itemBuilder: (_, index) => DiaryCard(
-                                      diary: dataProvider.entities[index],
-                                    ),
-                                    separatorBuilder: (_, __) =>
-                                        Defaults.sizedBox.vertical.normal,
-                                    itemCount: dataProvider.entities.length,
-                                  ),
+              SyncRefreshIndicator(
+                child: dataProvider.entities.isEmpty
+                    ? SessionsPageTab.diary.noEntriesText
+                    : Container(
+                        padding: Defaults.edgeInsets.normal,
+                        child: Column(
+                          children: [
+                            if (dataProvider.entities
+                                .any((d) => d.bodyweight != null)) ...[
+                              DateTimeChart(
+                                chartValues: dataProvider.entities
+                                    .map((s) {
+                                      final value = s.bodyweight;
+                                      return value == null
+                                          ? null
+                                          : DateTimeChartValue(
+                                              datetime: s.date,
+                                              value: value,
+                                            );
+                                    })
+                                    .whereNotNull()
+                                    .toList(),
+                                dateFilterState: dataProvider.dateFilter,
+                                yFromZero: false,
+                                aggregatorType: AggregatorType.avg,
+                              ),
+                              Defaults.sizedBox.vertical.normal,
+                            ],
+                            Expanded(
+                              child: ListView.separated(
+                                itemBuilder: (_, index) => DiaryCard(
+                                  diary: dataProvider.entities[index],
                                 ),
-                              ],
+                                separatorBuilder: (_, __) =>
+                                    Defaults.sizedBox.vertical.normal,
+                                itemCount: dataProvider.entities.length,
+                              ),
                             ),
-                          ),
-                  );
-                },
+                          ],
+                        ),
+                      ),
               ),
               if (dataProvider.isLoading)
                 const Positioned(

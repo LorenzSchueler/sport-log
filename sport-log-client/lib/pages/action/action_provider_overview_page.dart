@@ -1,8 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:sport_log/data_provider/data_providers/action_data_provider.dart';
-import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -12,7 +10,7 @@ import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
-import 'package:sport_log/widgets/snackbar.dart';
+import 'package:sport_log/widgets/sync_refresh_indicator.dart';
 
 String actionName(
   ActionProviderDescription actionProviderDescription,
@@ -76,35 +74,25 @@ class _ActionProviderOverviewPageState
       ),
       body: _actionProviderDescription == null
           ? const CircularProgressIndicator()
-          : Consumer<Sync>(
-              builder: (context, sync, _) {
-                return RefreshIndicator(
-                  onRefresh: () => sync.sync(
-                    onNoInternet: () => showNoInternetToast(context),
-                  ),
-                  child: Container(
-                    padding: Defaults.edgeInsets.normal,
-                    child: ListView(
-                      children: [
-                        ActionsCard(
-                          actionProviderDescription:
-                              _actionProviderDescription!,
-                        ),
-                        Defaults.sizedBox.vertical.normal,
-                        ActionRulesCard(
-                          actionProviderDescription:
-                              _actionProviderDescription!,
-                        ),
-                        Defaults.sizedBox.vertical.normal,
-                        ActionEventsCard(
-                          actionProviderDescription:
-                              _actionProviderDescription!,
-                        ),
-                      ],
+          : SyncRefreshIndicator(
+              child: Container(
+                padding: Defaults.edgeInsets.normal,
+                child: ListView(
+                  children: [
+                    ActionsCard(
+                      actionProviderDescription: _actionProviderDescription!,
                     ),
-                  ),
-                );
-              },
+                    Defaults.sizedBox.vertical.normal,
+                    ActionRulesCard(
+                      actionProviderDescription: _actionProviderDescription!,
+                    ),
+                    Defaults.sizedBox.vertical.normal,
+                    ActionEventsCard(
+                      actionProviderDescription: _actionProviderDescription!,
+                    ),
+                  ],
+                ),
+              ),
             ),
     );
   }
