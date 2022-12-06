@@ -42,7 +42,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
   Future<void> _saveRoute() async {
     _logger.i("saving route");
     final result = await _dataProvider.createSingle(_route);
-    if (result.isSuccess()) {
+    if (result.isSuccess) {
       _formKey.currentState!.deactivate();
       if (mounted) {
         Navigator.pop(context);

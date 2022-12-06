@@ -53,7 +53,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
     final result = widget.route != null
         ? await _dataProvider.updateSingle(_route)
         : await _dataProvider.createSingle(_route);
-    if (result.isSuccess()) {
+    if (result.isSuccess) {
       _formKey.currentState!.deactivate();
       if (mounted) {
         Navigator.pop(

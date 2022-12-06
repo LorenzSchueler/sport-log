@@ -36,7 +36,7 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
     final result = widget.diary != null
         ? await _dataProvider.updateSingle(_diary)
         : await _dataProvider.createSingle(_diary);
-    if (result.isSuccess()) {
+    if (result.isSuccess) {
       _formKey.currentState!.deactivate();
       if (mounted) {
         Navigator.pop(context);

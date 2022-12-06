@@ -62,6 +62,17 @@ abstract class DataProvider<T> extends ChangeNotifier {
         return null;
     }
   }
+
+  static Future<void> _handleDbError(
+    DbError error,
+  ) async {
+    _logger.e('Db error: $error');
+    await showMessageDialog(
+      context: App.globalContext,
+      title: "An error occurred.",
+      text: error.toString(),
+    );
+  }
 }
 
 abstract class EntityDataProvider<T extends AtomicEntity>
@@ -77,7 +88,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     object.sanitize();
     assert(object.isValid());
     final result = await db.createSingle(object);
-    if (result.isSuccess() && notify) {
+    if (result.isSuccess && notify) {
       notifyListeners();
     }
     return result;
@@ -88,7 +99,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     object.sanitize();
     assert(object.isValid());
     final result = await db.updateSingle(object);
-    if (result.isSuccess() && notify) {
+    if (result.isSuccess && notify) {
       notifyListeners();
     }
     return result;
@@ -97,7 +108,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   @override
   Future<DbResult> deleteSingle(T object, {bool notify = true}) async {
     final result = await db.deleteSingle(object.id);
-    if (result.isSuccess() && notify) {
+    if (result.isSuccess && notify) {
       notifyListeners();
     }
     return result;
@@ -113,7 +124,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
     assert(objects.every((object) => object.isValid()));
     final result = await db.createMultiple(objects);
-    if (result.isSuccess() && notify) {
+    if (result.isSuccess && notify) {
       notifyListeners();
     }
     return result;
@@ -126,7 +137,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
     assert(objects.every((object) => object.isValid()));
     final result = await db.updateMultiple(objects);
-    if (result.isSuccess() && notify) {
+    if (result.isSuccess && notify) {
       notifyListeners();
     }
     return result;
@@ -135,7 +146,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   /// used in compound data providers impl of deleteSingle
   Future<DbResult> deleteMultiple(List<T> objects, {bool notify = true}) async {
     final result = await db.deleteMultiple(objects);
-    if (result.isSuccess() && notify) {
+    if (result.isSuccess && notify) {
       notifyListeners();
     }
     return result;
@@ -221,7 +232,6 @@ abstract class EntityDataProvider<T extends AtomicEntity>
         .every((result) => result);
   }
 
-
   Future<bool> _upsertMultiple(
     List<T> objects, {
     required bool synchronized,
@@ -231,10 +241,13 @@ abstract class EntityDataProvider<T extends AtomicEntity>
       return true;
     }
     final result = await db.upsertMultiple(objects, synchronized: synchronized);
-    if (result.isSuccess() && notify) {
+    if (result.isFailure) {
+      await DataProvider._handleDbError(result.failure);
+    }
+    if (result.isSuccess && notify) {
       notifyListeners();
     }
-    return result.isSuccess();
+    return result.isSuccess;
   }
 
   static Future<bool> upSync({required VoidCallback? onNoInternet}) async {

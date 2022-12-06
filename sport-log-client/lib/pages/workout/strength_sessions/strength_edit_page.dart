@@ -66,7 +66,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     final result = widget.isNew
         ? await _dataProvider.createSingle(_strengthSessionDescription)
         : await _dataProvider.updateSingle(_strengthSessionDescription);
-    if (result.isSuccess()) {
+    if (result.isSuccess) {
       if (mounted) {
         Navigator.pop(
           context,

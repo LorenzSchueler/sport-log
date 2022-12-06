@@ -51,7 +51,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
     final result = widget.metconDescription != null
         ? await _dataProvider.updateSingle(_metconDescription)
         : await _dataProvider.createSingle(_metconDescription);
-    if (result.isSuccess()) {
+    if (result.isSuccess) {
       MetconDescription.defaultMetconDescription ??= _metconDescription;
       _formKey.currentState!.deactivate();
       if (mounted) {

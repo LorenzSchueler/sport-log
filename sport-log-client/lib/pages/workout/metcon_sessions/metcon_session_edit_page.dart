@@ -52,7 +52,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
     final result = widget.isNew
         ? await _dataProvider.createSingle(_metconSessionDescription)
         : await _dataProvider.updateSingle(_metconSessionDescription);
-    if (result.isSuccess()) {
+    if (result.isSuccess) {
       _formKey.currentState!.deactivate();
       if (mounted) {
         Navigator.pop(

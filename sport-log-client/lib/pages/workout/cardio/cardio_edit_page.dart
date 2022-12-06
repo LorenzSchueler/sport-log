@@ -59,7 +59,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
     final result = widget.isNew
         ? await _dataProvider.createSingle(_cardioSessionDescription)
         : await _dataProvider.updateSingle(_cardioSessionDescription);
-    if (result.isSuccess()) {
+    if (result.isSuccess) {
       _formKey.currentState!.deactivate();
       if (mounted) {
         Navigator.pop(

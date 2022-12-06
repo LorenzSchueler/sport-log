@@ -44,7 +44,7 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
     final result = widget.actionEvent != null
         ? await _dataProvider.updateSingle(_actionEvent)
         : await _dataProvider.createSingle(_actionEvent);
-    if (result.isSuccess()) {
+    if (result.isSuccess) {
       if (mounted) {
         Navigator.pop(context);
       }

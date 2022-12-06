@@ -108,7 +108,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
     _cardioSessionDescription.cardioSession.setAvgHeartRate();
     _cardioSessionDescription.cardioSession.setDistance();
     final result = await _dataProvider.createSingle(_cardioSessionDescription);
-    if (result.isSuccess()) {
+    if (result.isSuccess) {
       if (mounted) {
         Navigator.pop(context); // pop dialog
         Navigator.pop(context); // pop tracking page

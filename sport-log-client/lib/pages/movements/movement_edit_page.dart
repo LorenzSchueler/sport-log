@@ -50,7 +50,7 @@ class _MovementEditPageState extends State<MovementEditPage> {
     final result = widget.movementDescription != null
         ? await _dataProvider.updateSingle(_movementDescription.movement)
         : await _dataProvider.createSingle(_movementDescription.movement);
-    if (result.isSuccess()) {
+    if (result.isSuccess) {
       Movement.defaultMovement ??= _movementDescription.movement;
       _formKey.currentState!.deactivate();
       if (mounted) {

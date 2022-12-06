@@ -46,7 +46,7 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
     final result = widget.actionRule != null
         ? await _dataProvider.updateSingle(_actionRule)
         : await _dataProvider.createSingle(_actionRule);
-    if (result.isSuccess()) {
+    if (result.isSuccess) {
       if (mounted) {
         Navigator.pop(context);
       }

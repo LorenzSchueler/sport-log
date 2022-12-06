@@ -78,9 +78,9 @@ class DbResult {
     }
   }
 
-  bool isSuccess() => result.isSuccess;
+  bool get isSuccess => result.isSuccess;
 
-  bool isFailure() => result.isFailure;
+  bool get isFailure => result.isFailure;
 
   DbError get failure => result.failure;
 }
