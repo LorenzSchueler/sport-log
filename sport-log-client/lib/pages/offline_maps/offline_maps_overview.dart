@@ -57,10 +57,10 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
   Future<void> _onMapDownload(DownloadRegionStatus status) async {
     if (status.runtimeType == Success) {
       setState(() => _progress = null);
-      await showMessageDialog(context: context, text: "Download Successful");
       await _updateRegions();
       await _updatePoint2(null);
       await _updatePoint1(null);
+      await showMessageDialog(context: context, text: "Download Successful");
     } else if (status.runtimeType == InProgress) {
       setState(() => _progress = (status as InProgress).progress / 100);
     } else if (status.runtimeType == Error) {

@@ -231,7 +231,7 @@ packages:
       name: dart_code_metrics
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.1.0"
+    version: "5.2.1"
   dart_style:
     dependency: transitive
     description:
@@ -273,7 +273,7 @@ packages:
       name: faker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.1.0"
   ffi:
     dependency: transitive
     description:
@@ -811,7 +811,7 @@ packages:
       name: polar
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.4.1"
+    version: "3.7.0"
   pool:
     dependency: transitive
     description:
@@ -935,7 +935,7 @@ packages:
       name: sqflite
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.2.1"
+    version: "2.2.2"
   sqflite_common:
     dependency: transitive
     description:
