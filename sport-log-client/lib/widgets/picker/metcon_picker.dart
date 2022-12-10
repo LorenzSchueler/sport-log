@@ -34,19 +34,18 @@ class MetconPickerDialog extends StatefulWidget {
 
 class _MetconPickerDialogState extends State<MetconPickerDialog> {
   final _dataProvider = MetconDataProvider();
-  late final StreamSubscription<bool> _keyboardSubscription;
+  late final StreamSubscription<bool> _keyboardSubscription =
+      KeyboardVisibilityController().onChange.listen((isVisible) {
+    if (!isVisible) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+  });
 
   List<Metcon> _metcons = [];
   String _search = '';
 
   @override
   void initState() {
-    _keyboardSubscription =
-        KeyboardVisibilityController().onChange.listen((isVisible) {
-      if (!isVisible) {
-        FocusManager.instance.primaryFocus?.unfocus();
-      }
-    });
     _update('');
     super.initState();
   }

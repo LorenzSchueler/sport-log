@@ -31,16 +31,10 @@ class ActionRuleEditPage extends StatefulWidget {
 
 class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
   final _dataProvider = ActionRuleDataProvider();
-  late final ActionRule _actionRule;
-
-  @override
-  void initState() {
-    _actionRule = widget.actionRule?.clone() ??
-        ActionRule.defaultValue(
-          widget.actionProviderDescription.actions.first.id,
-        );
-    super.initState();
-  }
+  late final ActionRule _actionRule = widget.actionRule?.clone() ??
+      ActionRule.defaultValue(
+        widget.actionProviderDescription.actions.first.id,
+      );
 
   Future<void> _saveActionRule() async {
     final result = widget.actionRule != null

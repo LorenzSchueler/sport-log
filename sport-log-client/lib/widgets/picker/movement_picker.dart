@@ -44,19 +44,18 @@ class MovementPickerDialog extends StatefulWidget {
 
 class _MovementPickerDialogState extends State<MovementPickerDialog> {
   final _dataProvider = MovementDataProvider();
-  late final StreamSubscription<bool> _keyboardSubscription;
+  late final StreamSubscription<bool> _keyboardSubscription =
+      KeyboardVisibilityController().onChange.listen((isVisible) {
+    if (!isVisible) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+  });
 
   List<Movement> _movements = [];
   String _search = '';
 
   @override
   void initState() {
-    _keyboardSubscription =
-        KeyboardVisibilityController().onChange.listen((isVisible) {
-      if (!isVisible) {
-        FocusManager.instance.primaryFocus?.unfocus();
-      }
-    });
     _update('');
     super.initState();
   }

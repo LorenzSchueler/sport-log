@@ -47,13 +47,8 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _loginPending = false;
 
-  late final TextEditingController _serverUrlInputController;
-
-  @override
-  void initState() {
-    super.initState();
-    _serverUrlInputController = TextEditingController(text: _serverUrl);
-  }
+  late final TextEditingController _serverUrlInputController =
+      TextEditingController(text: _serverUrl);
 
   @override
   Widget build(BuildContext context) {

@@ -142,17 +142,12 @@ class PlatformCredentialDialog extends StatefulWidget {
 }
 
 class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
-  late PlatformDescription platformDescription;
+  late PlatformDescription platformDescription =
+      widget.platformDescription.clone()
+        ..platformCredential ??= PlatformCredential.defaultValue(
+          widget.platformDescription.platform.id,
+        );
   final _dataProvider = PlatformDescriptionDataProvider();
-
-  @override
-  void initState() {
-    platformDescription = widget.platformDescription.clone();
-    platformDescription.platformCredential ??= PlatformCredential.defaultValue(
-      widget.platformDescription.platform.id,
-    );
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {

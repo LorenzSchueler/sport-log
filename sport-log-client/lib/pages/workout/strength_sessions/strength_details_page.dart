@@ -27,13 +27,8 @@ class StrengthSessionDetailsPage extends StatefulWidget {
 class StrengthSessionDetailsPageState
     extends State<StrengthSessionDetailsPage> {
   final _dataProvider = StrengthSessionDescriptionDataProvider();
-  late StrengthSessionDescription _strengthSessionDescription;
-
-  @override
-  void initState() {
-    _strengthSessionDescription = widget.strengthSessionDescription.clone();
-    super.initState();
-  }
+  late StrengthSessionDescription _strengthSessionDescription =
+      widget.strengthSessionDescription.clone();
 
   Future<void> _deleteStrengthSession() async {
     await _dataProvider.deleteSingle(_strengthSessionDescription);

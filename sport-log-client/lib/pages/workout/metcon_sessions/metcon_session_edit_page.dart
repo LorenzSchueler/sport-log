@@ -36,16 +36,9 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
   final _dataProvider = MetconSessionDescriptionDataProvider();
   final _metconDescriptionDataProvider = MetconDescriptionDataProvider();
 
-  late final MetconSessionDescription _metconSessionDescription;
-  late bool _finished;
-
-  @override
-  void initState() {
-    super.initState();
-    final metconSessionDescription = widget.metconSessionDescription.clone();
-    _metconSessionDescription = metconSessionDescription;
-    _finished = _metconSessionDescription.metconSession.time != null;
-  }
+  late final MetconSessionDescription _metconSessionDescription =
+      widget.metconSessionDescription.clone();
+  late bool _finished = _metconSessionDescription.metconSession.time != null;
 
   Future<void> _saveMetconSession() async {
     _logger.i("saving metcon session: $_metconSessionDescription");

@@ -24,7 +24,8 @@ class CardioDetailsPage extends StatefulWidget {
 }
 
 class _CardioDetailsPageState extends State<CardioDetailsPage> {
-  late CardioSessionDescription _cardioSessionDescription;
+  late CardioSessionDescription _cardioSessionDescription =
+      widget.cardioSessionDescription.clone();
 
   MapboxMapController? _mapController;
   Line? _trackLine;
@@ -42,12 +43,6 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   static const _elevationColor = Colors.white;
   static const _heartRateColor = Colors.orange;
   static const _cadenceColor = Colors.green;
-
-  @override
-  void initState() {
-    _cardioSessionDescription = widget.cardioSessionDescription.clone();
-    super.initState();
-  }
 
   Future<void> _setBoundsAndLines() async {
     await _mapController?.setBoundsFromTracks(

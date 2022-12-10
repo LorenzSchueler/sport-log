@@ -29,16 +29,10 @@ class ActionEventEditPage extends StatefulWidget {
 
 class _ActionEventEditPageState extends State<ActionEventEditPage> {
   final _dataProvider = ActionEventDataProvider();
-  late final ActionEvent _actionEvent;
-
-  @override
-  void initState() {
-    _actionEvent = widget.actionEvent?.clone() ??
-        ActionEvent.defaultValue(
-          widget.actionProviderDescription.actions.first.id,
-        );
-    super.initState();
-  }
+  late final ActionEvent _actionEvent = widget.actionEvent?.clone() ??
+      ActionEvent.defaultValue(
+        widget.actionProviderDescription.actions.first.id,
+      );
 
   Future<void> _saveActionEvent() async {
     final result = widget.actionEvent != null

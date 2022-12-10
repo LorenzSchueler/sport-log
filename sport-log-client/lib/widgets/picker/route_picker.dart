@@ -34,19 +34,18 @@ class RoutePickerDialog extends StatefulWidget {
 
 class _RoutePickerDialogState extends State<RoutePickerDialog> {
   final _dataProvider = RouteDataProvider();
-  late final StreamSubscription<bool> _keyboardSubscription;
+  late final StreamSubscription<bool> _keyboardSubscription =
+      KeyboardVisibilityController().onChange.listen((isVisible) {
+    if (!isVisible) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+  });
 
   List<Route> _routes = [];
   String _search = '';
 
   @override
   void initState() {
-    _keyboardSubscription =
-        KeyboardVisibilityController().onChange.listen((isVisible) {
-      if (!isVisible) {
-        FocusManager.instance.primaryFocus?.unfocus();
-      }
-    });
     _update('');
     super.initState();
   }

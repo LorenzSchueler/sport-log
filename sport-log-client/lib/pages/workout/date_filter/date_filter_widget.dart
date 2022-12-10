@@ -18,13 +18,7 @@ class DateFilter extends StatefulWidget {
 }
 
 class _DateFilterState extends State<DateFilter> {
-  late DateFilterState _state;
-
-  @override
-  void initState() {
-    super.initState();
-    _state = widget.initialState;
-  }
+  late DateFilterState _state = widget.initialState;
 
   @override
   void didUpdateWidget(DateFilter oldWidget) {

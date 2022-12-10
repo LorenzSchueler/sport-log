@@ -30,14 +30,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
 
   late MapboxMapController _mapController;
 
-  late final Route _route;
-
-  @override
-  void initState() {
-    _route = Route.defaultValue();
-    _route.track ??= [];
-    super.initState();
-  }
+  late final Route _route = Route.defaultValue()..track = [];
 
   Future<void> _saveRoute() async {
     _logger.i("saving route");

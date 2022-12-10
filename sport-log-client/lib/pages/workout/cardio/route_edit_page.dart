@@ -38,15 +38,9 @@ class _RouteEditPageState extends State<RouteEditPage> {
 
   late MapboxMapController _mapController;
 
-  late final Route _route;
-
-  @override
-  void initState() {
-    _route = widget.route?.clone() ?? Route.defaultValue();
-    _route.track ??= [];
-    _route.markedPositions ??= [];
-    super.initState();
-  }
+  late final Route _route = (widget.route?.clone() ?? Route.defaultValue())
+    ..track ??= []
+    ..markedPositions ??= [];
 
   Future<void> _saveRoute() async {
     _logger.i("saving route");

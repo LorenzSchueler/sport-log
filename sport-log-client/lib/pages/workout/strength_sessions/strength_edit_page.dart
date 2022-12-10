@@ -37,7 +37,8 @@ class StrengthSessionEditPage extends StatefulWidget {
 class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   final _dataProvider = StrengthSessionDescriptionDataProvider();
 
-  late final StrengthSessionDescription _strengthSessionDescription;
+  late final StrengthSessionDescription _strengthSessionDescription =
+      widget.strengthSessionDescription.clone();
 
   final _commentsNode = FocusNode();
   final _scrollController = ScrollController();
@@ -47,14 +48,6 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       FocusManager.instance.primaryFocus?.unfocus();
     }
   });
-
-  @override
-  void initState() {
-    super.initState();
-    final strengthSessionDescription =
-        widget.strengthSessionDescription.clone();
-    _strengthSessionDescription = strengthSessionDescription;
-  }
 
   @override
   void dispose() {

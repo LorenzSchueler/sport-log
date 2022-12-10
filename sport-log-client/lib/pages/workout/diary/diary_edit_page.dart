@@ -24,13 +24,7 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = DiaryDataProvider();
 
-  late final Diary _diary;
-
-  @override
-  void initState() {
-    _diary = widget.diary?.clone() ?? Diary.defaultValue();
-    super.initState();
-  }
+  late final Diary _diary = widget.diary?.clone() ?? Diary.defaultValue();
 
   Future<void> _saveDiary() async {
     final result = widget.diary != null

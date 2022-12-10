@@ -21,13 +21,7 @@ class MetconDetailsPage extends StatefulWidget {
 
 class _MetconDetailsPageState extends State<MetconDetailsPage> {
   final _dataProvider = MetconDescriptionDataProvider();
-  late MetconDescription _metconDescription;
-
-  @override
-  void initState() {
-    _metconDescription = widget.metconDescription.clone();
-    super.initState();
-  }
+  late MetconDescription _metconDescription = widget.metconDescription.clone();
 
   Future<void> _deleteMetcon() async {
     await _dataProvider.deleteSingle(widget.metconDescription);

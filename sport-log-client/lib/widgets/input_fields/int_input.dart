@@ -25,16 +25,10 @@ class IntInput extends StatefulWidget {
 }
 
 class _IntInputState extends State<IntInput> {
-  late int _value;
+  late int _value = widget.initialValue;
 
-  late final TextEditingController _textController;
-
-  @override
-  void initState() {
-    _value = widget.initialValue;
-    _textController = TextEditingController(text: _value.toString());
-    super.initState();
-  }
+  late final TextEditingController _textController =
+      TextEditingController(text: _value.toString());
 
   void _setValue(int value) {
     setState(() => _value = value);

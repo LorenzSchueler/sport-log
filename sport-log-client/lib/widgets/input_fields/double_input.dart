@@ -20,16 +20,10 @@ class DoubleInput extends StatefulWidget {
 }
 
 class _DoubleInputState extends State<DoubleInput> {
-  late double _value;
+  late double _value = widget.initialValue;
 
-  late final TextEditingController _textController;
-
-  @override
-  void initState() {
-    _value = widget.initialValue;
-    _textController = TextEditingController(text: _value.toStringAsFixed(2));
-    super.initState();
-  }
+  late final TextEditingController _textController =
+      TextEditingController(text: _value.toStringAsFixed(2));
 
   void _setValue(double value) {
     setState(() => _value = value);

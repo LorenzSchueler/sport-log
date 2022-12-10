@@ -24,13 +24,13 @@ class MetconSessionDetailsPage extends StatefulWidget {
 
 class _MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
   final _dataProvider = MetconSessionDescriptionDataProvider();
-  late MetconSessionDescription _metconSessionDescription;
+  late MetconSessionDescription _metconSessionDescription =
+      widget.metconSessionDescription.clone();
   List<MetconSessionDescription> _metconSessionDescriptions = [];
   MetconRecords _metconRecords = {};
 
   @override
   void initState() {
-    _metconSessionDescription = widget.metconSessionDescription.clone();
     _loadOtherSessions();
     super.initState();
   }

@@ -23,18 +23,12 @@ class RouteDetailsPage extends StatefulWidget {
 }
 
 class _RouteDetailsPageState extends State<RouteDetailsPage> {
-  late Route _route;
+  late Route _route = widget.route.clone();
 
   late MapboxMapController _mapController;
   Circle? _touchLocationMarker;
 
   bool _fullscreen = false;
-
-  @override
-  void initState() {
-    _route = widget.route.clone();
-    super.initState();
-  }
 
   Future<void> _setBoundsAndLine() async {
     await _mapController.setBoundsFromTracks(

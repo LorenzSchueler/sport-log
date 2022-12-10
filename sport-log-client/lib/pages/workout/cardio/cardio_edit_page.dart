@@ -43,17 +43,12 @@ class _CardioEditPageState extends State<CardioEditPage> {
   Line? _trackLine;
   Line? _routeLine;
 
-  late final CardioSessionDescription _cardioSessionDescription;
+  late final CardioSessionDescription _cardioSessionDescription =
+      widget.cardioSessionDescription.clone();
   Duration? _cutStartDuration;
   Duration? _cutEndDuration;
   Circle? _cutStartLocationMarker;
   Circle? _cutEndLocationMarker;
-
-  @override
-  void initState() {
-    _cardioSessionDescription = widget.cardioSessionDescription.clone();
-    super.initState();
-  }
 
   Future<void> _saveCardioSession() async {
     final result = widget.isNew

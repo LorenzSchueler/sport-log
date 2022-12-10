@@ -22,10 +22,14 @@ class DurationInput extends StatefulWidget {
 }
 
 class _DurationInputState extends State<DurationInput> {
-  late Duration _duration;
+  late Duration _duration = widget.initialDuration ?? Duration.zero;
 
-  late final TextEditingController _minutesController;
-  late final TextEditingController _secondsController;
+  late final TextEditingController _minutesController = TextEditingController(
+    text: _duration.inMinutes.toString().padLeft(2, '0'),
+  );
+  late final TextEditingController _secondsController = TextEditingController(
+    text: (_duration.inSeconds % 60).toString().padLeft(2, '0'),
+  );
 
   static const double _textWidth = 13; // width of subtitle1 = 20 + cursor
   static const Duration _minTime = Duration.zero;
@@ -33,18 +37,6 @@ class _DurationInputState extends State<DurationInput> {
 
   late final _durationIncrement =
       widget.durationIncrement ?? Settings.instance.durationIncrement;
-
-  @override
-  void initState() {
-    super.initState();
-    _duration = widget.initialDuration ?? Duration.zero;
-    _minutesController = TextEditingController(
-      text: _duration.inMinutes.toString().padLeft(2, '0'),
-    );
-    _secondsController = TextEditingController(
-      text: (_duration.inSeconds % 60).toString().padLeft(2, '0'),
-    );
-  }
 
   void _setDuration(Duration duration) {
     setState(() => _duration = duration);

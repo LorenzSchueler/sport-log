@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/all.dart';
@@ -30,19 +29,11 @@ class MetconEditPage extends StatefulWidget {
 }
 
 class _MetconEditPageState extends State<MetconEditPage> {
-  final _logger = Logger('EditMetconPage');
   final _formKey = GlobalKey<FormState>();
-  late final MetconDescription _metconDescription;
+  late final MetconDescription _metconDescription =
+      widget.metconDescription?.clone() ?? MetconDescription.defaultValue();
   final _descriptionFocusNode = FocusNode();
   final _dataProvider = MetconDescriptionDataProvider();
-
-  @override
-  void initState() {
-    _logger.i("got ${widget.metconDescription}");
-    _metconDescription =
-        widget.metconDescription?.clone() ?? MetconDescription.defaultValue();
-    super.initState();
-  }
 
   Future<void> _saveMetcon() async {
     if (_metconDescription.metcon.description == "") {
