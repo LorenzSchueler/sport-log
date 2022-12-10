@@ -24,7 +24,6 @@ class CardioTrackingSettingsPageState
   Movement? _movement;
   CardioType _cardioType = CardioType.training;
   Route? _route;
-  final HeartRateUtils _heartRateUtils = HeartRateUtils();
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +33,8 @@ class CardioTrackingSettingsPageState
       ),
       body: Container(
         padding: Defaults.edgeInsets.normal,
-        child: ProviderConsumer<HeartRateUtils>.value(
-          value: _heartRateUtils,
+        child: ProviderConsumer<HeartRateUtils>(
+          create: (_) => HeartRateUtils.consumer(),
           builder: (_, heartRateUtils, __) => Column(
             children: [
               EditTile(
@@ -126,8 +125,8 @@ class CardioTrackingSettingsPageState
                               _movement!,
                               _cardioType,
                               _route,
-                              _heartRateUtils.deviceId != null
-                                  ? _heartRateUtils
+                              heartRateUtils.deviceId != null
+                                  ? heartRateUtils
                                   : null,
                             ],
                           )

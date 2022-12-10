@@ -47,7 +47,18 @@ class CardioTrackingPage extends StatefulWidget {
 class _CardioTrackingPageState extends State<CardioTrackingPage> {
   final _dataProvider = CardioSessionDescriptionDataProvider();
 
-  late final CardioSessionDescription _cardioSessionDescription;
+  late final CardioSessionDescription _cardioSessionDescription =
+      CardioSessionDescription(
+    cardioSession: CardioSession.defaultValue(widget.movement.id)
+      ..cardioType = widget.cardioType
+      ..time = Duration.zero
+      ..track = []
+      ..cadence = []
+      ..heartRate = widget.heartRateUtils != null ? [] : null
+      ..routeId = widget.route?.id,
+    movement: widget.movement,
+    route: widget.route,
+  );
 
   bool _fullscreen = false;
 
@@ -55,10 +66,13 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   String _stepInfo = "no data";
   String _heartRateInfo = "no data";
 
-  late final Timer _timer;
+  late final Timer _timer =
+      Timer.periodic(const Duration(seconds: 1), (Timer t) => _refresh());
   final TrackingUtils _trackingUtils = TrackingUtils();
-  late final LocationUtils _locationUtils;
-  late final StepCountUtils _stepUtils;
+  late final LocationUtils _locationUtils = LocationUtils(_onLocationUpdate);
+  late final StepCountUtils _stepUtils = StepCountUtils(_onStepCountUpdate);
+  late final HeartRateUtils _heartRateUtils =
+      HeartRateUtils(_onHeartRateUpdate);
 
   late final MapboxMapController _mapController;
   Line? _line;
@@ -67,32 +81,14 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   static const maxSpeed = 250;
 
   @override
-  void initState() {
-    _cardioSessionDescription = CardioSessionDescription(
-      cardioSession: CardioSession.defaultValue(widget.movement.id)
-        ..cardioType = widget.cardioType
-        ..time = Duration.zero
-        ..track = []
-        ..cadence = []
-        ..heartRate = widget.heartRateUtils != null ? [] : null
-        ..routeId = widget.route?.id,
-      movement: widget.movement,
-      route: widget.route,
-    );
-    _locationUtils = LocationUtils(_onLocationUpdate);
-    _stepUtils = StepCountUtils(_onStepCountUpdate);
-    widget.heartRateUtils?.onHeartRateEvent = _onHeartRateUpdate;
-    _timer =
-        Timer.periodic(const Duration(seconds: 1), (Timer t) => _refresh());
-    super.initState();
-  }
-
-  @override
   void dispose() {
     _timer.cancel();
     _stepUtils.stopStepCountStream();
     _locationUtils.stopLocationStream();
-    widget.heartRateUtils?.stopHeartRateStream();
+    _heartRateUtils.stopHeartRateStream();
+    if (_mapController.cameraPosition != null) {
+      Settings.instance.lastMapPosition = _mapController.cameraPosition!;
+    }
     if (_locationUtils.lastLatLng != null) {
       Settings.instance.lastGpsLatLng = _locationUtils.lastLatLng!;
     }

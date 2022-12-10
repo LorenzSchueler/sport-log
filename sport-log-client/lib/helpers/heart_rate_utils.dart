@@ -9,7 +9,10 @@ import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
 
 class HeartRateUtils extends ChangeNotifier {
-  HeartRateUtils();
+  HeartRateUtils(void Function(PolarHeartRateEvent) onHeartRateEvent)
+      : _onHeartRateEvent = onHeartRateEvent;
+
+  HeartRateUtils.consumer();
 
   static final _polar = Polar();
   static final FlutterBlue _flutterBlue = FlutterBlue.instance;
@@ -21,7 +24,7 @@ class HeartRateUtils extends ChangeNotifier {
   Map<String, String> _devices = {};
   Map<String, String> get devices => _devices;
   String? deviceId;
-  void Function(PolarHeartRateEvent)? onHeartRateEvent;
+  void Function(PolarHeartRateEvent)? _onHeartRateEvent;
 
   StreamSubscription? _heartRateSubscription;
   StreamSubscription? _batterySubscription;
@@ -91,7 +94,7 @@ class HeartRateUtils extends ChangeNotifier {
     if (_heartRateSubscription == null) {
       _heartRateSubscription = _polar.heartRateStream.listen((event) {
         _hr = event.data.hr;
-        onHeartRateEvent?.call(event);
+        _onHeartRateEvent?.call(event);
         notifyListeners();
       });
       _batterySubscription = _polar.batteryLevelStream.listen((event) {

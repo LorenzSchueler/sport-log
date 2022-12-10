@@ -22,7 +22,7 @@ class HeartRatePage extends StatelessWidget {
           padding: Defaults.edgeInsets.normal,
           child: Center(
             child: ProviderConsumer<HeartRateUtils>(
-              create: (_) => HeartRateUtils(),
+              create: (_) => HeartRateUtils.consumer(),
               builder: (_, heartRateUtils, __) => Column(
                 children: [
                   SizedBox(
