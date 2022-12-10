@@ -51,7 +51,13 @@ class InitAppWrapperState extends State<InitAppWrapper> {
 
   @override
   void initState() {
-    _initialize();
+    initialize().listen(
+      (progress) => setState(() => _progress = progress),
+      onDone: () {
+        NewCredentialsDialog.isShown = false;
+        setState(() => _progress = null);
+      },
+    );
     super.initState();
   }
 
@@ -78,13 +84,5 @@ class InitAppWrapperState extends State<InitAppWrapper> {
             ),
             builder: ignoreSystemTextScaleFactor,
           );
-  }
-
-  Future<void> _initialize() async {
-    await for (final double progress in initialize()) {
-      setState(() => _progress = progress);
-    }
-    NewCredentialsDialog.isShown = false;
-    setState(() => _progress = null);
   }
 }
