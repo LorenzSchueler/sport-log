@@ -11,7 +11,8 @@ use tracing::{debug, error, info, warn};
 
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{
-    ActionEventId, CardioSession, CardioSessionId, CardioType, Movement, Position,
+    ActionEventId, CardioSession, CardioSessionId, CardioType, ExecutableActionEvent, Movement,
+    Position,
 };
 
 const CONFIG_FILE: &str = "sport-log-action-provider-sportstracker.toml";
@@ -33,6 +34,13 @@ enum UserError {
     NoCredential(ActionEventId),
     #[error(display = "can not log in: login failed")]
     LoginFailed(ActionEventId),
+    #[error(
+        display = "failed to create cardio session: unknown activity id {}",
+        _0
+    )]
+    UnknownActivityId(u32, ActionEventId),
+    #[error(display = "failed to create cardio session: unknown movement {}", _0)]
+    UnknownMovement(&'static str, ActionEventId),
 }
 
 impl UserError {
@@ -40,6 +48,8 @@ impl UserError {
         match self {
             Self::NoCredential(action_event_id) => *action_event_id,
             Self::LoginFailed(action_event_id) => *action_event_id,
+            Self::UnknownActivityId(_, action_event_id) => *action_event_id,
+            Self::UnknownMovement(_, action_event_id) => *action_event_id,
         }
     }
 }
@@ -226,7 +236,7 @@ async fn fetch() -> Result<(), Error> {
             debug!("processing {:#?}", exec_action_event);
 
             let (username, password) =
-                match (exec_action_event.username, exec_action_event.password) {
+                match (&exec_action_event.username, &exec_action_event.password) {
                     (Some(username), Some(password)) => (username, password),
                     _ => {
                         return Ok(Err(UserError::NoCredential(
@@ -237,8 +247,8 @@ async fn fetch() -> Result<(), Error> {
 
             let token = match get_token(
                 &client,
-                &username,
-                &password,
+                username,
+                password,
                 exec_action_event.action_event_id,
             )
             .await
@@ -274,73 +284,14 @@ async fn fetch() -> Result<(), Error> {
                 let workout_track =
                     get_workout_track(&client, &token, &workout_key.workout_key).await?;
 
-                let activity = match workout_stats.activity_id {
-                    1 => "running",
-                    2 => "biking",
-                    11 => "hiking",
-                    22 => "trailrunning",
-                    31 => "skitouring",
-                    _ => continue,
-                };
-
-                let movement_id = match movements.iter().find(|movement| movement.name == activity)
-                {
-                    Some(movement) => movement.id,
-                    None => continue,
-                };
-
-                let avg_cadence = (workout_stats.step_count as f64
-                    / (workout_stats.total_time / 60.) as f64)
-                    as i32;
-
-                let cardio_session = CardioSession {
-                    id: CardioSessionId(rand::thread_rng().gen()),
-                    user_id: exec_action_event.user_id,
-                    cardio_blueprint_id: None,
-                    movement_id,
-                    cardio_type: if activity == "running" || activity == "trailrunning" {
-                        CardioType::Training
-                    } else {
-                        CardioType::Freetime
-                    },
-                    datetime: DateTime::from_utc(
-                        NaiveDateTime::from_timestamp_opt(
-                            workout_stats.start_time as i64 / 1000,
-                            0,
-                        )
-                        .unwrap(),
-                        Utc,
-                    ),
-                    distance: Some(workout_stats.total_distance as i32),
-                    ascent: Some(workout_stats.total_ascent as i32),
-                    descent: Some(workout_stats.total_descent as i32),
-                    time: Some(workout_stats.total_time as i32 * 1000),
-                    calories: Some(workout_stats.energy_consumption as i32),
-                    track: Some(
-                        workout_track
-                            .locations
-                            .into_iter()
-                            .map(|location| Position {
-                                latitude: location.la,
-                                longitude: location.ln,
-                                elevation: location.h as f64,
-                                distance: location.s as f64,
-                                time: location.t as i32 * 1000,
-                            })
-                            .collect(),
-                    ),
-                    avg_cadence: if avg_cadence > 0 {
-                        Some(avg_cadence)
-                    } else {
-                        None
-                    },
-                    cadence: None,
-                    avg_heart_rate: None,
-                    heart_rate: None,
-                    route_id: None,
-                    comments: workout_stats.description,
-                    last_change: Utc::now(),
-                    deleted: false,
+                let cardio_session = match to_cardio_session(
+                    workout_stats,
+                    workout_track,
+                    &exec_action_event,
+                    &movements,
+                ) {
+                    Ok(cardio_session) => cardio_session,
+                    Err(err) => return Ok(Err(err)),
                 };
 
                 let response = client
@@ -405,6 +356,86 @@ async fn fetch() -> Result<(), Error> {
     }
 
     Ok(())
+}
+
+fn to_cardio_session(
+    workout_stats: WorkoutStats,
+    workout_track: WorkoutTrack,
+    exec_action_event: &ExecutableActionEvent,
+    movements: &[Movement],
+) -> Result<CardioSession, UserError> {
+    let activity = match workout_stats.activity_id {
+        1 => "running",
+        2 => "biking",
+        11 => "hiking",
+        22 => "trailrunning",
+        31 => "skitouring",
+        id => {
+            return Err(UserError::UnknownActivityId(
+                id,
+                exec_action_event.action_event_id,
+            ))
+        } // unknown movement
+    };
+
+    let movement_id = movements
+        .iter()
+        .find(|movement| movement.name == activity)
+        .map(|movement| movement.id)
+        .ok_or(UserError::UnknownMovement(
+            activity,
+            exec_action_event.action_event_id,
+        ))?; // movement does no exist in sport log
+
+    let cardio_type = if activity == "running" || activity == "trailrunning" {
+        CardioType::Training
+    } else {
+        CardioType::Freetime
+    };
+
+    let avg_cadence = if workout_stats.step_count > 0 {
+        Some((workout_stats.step_count as f64 / (workout_stats.total_time as f64 / 60.)) as i32)
+    } else {
+        None
+    };
+
+    let track = workout_track
+        .locations
+        .into_iter()
+        .map(|location| Position {
+            latitude: location.la,
+            longitude: location.ln,
+            elevation: location.h as f64,
+            distance: location.s as f64,
+            time: location.t as i32 * 1000,
+        })
+        .collect();
+
+    Ok(CardioSession {
+        id: CardioSessionId(rand::thread_rng().gen()),
+        user_id: exec_action_event.user_id,
+        cardio_blueprint_id: None,
+        movement_id,
+        cardio_type,
+        datetime: DateTime::from_utc(
+            NaiveDateTime::from_timestamp_opt(workout_stats.start_time as i64 / 1000, 0).unwrap(),
+            Utc,
+        ),
+        distance: Some(workout_stats.total_distance as i32),
+        ascent: Some(workout_stats.total_ascent as i32),
+        descent: Some(workout_stats.total_descent as i32),
+        time: Some(workout_stats.total_time as i32 * 1000),
+        calories: Some(workout_stats.energy_consumption as i32),
+        track: Some(track),
+        avg_cadence,
+        cadence: None,
+        avg_heart_rate: None,
+        heart_rate: None,
+        route_id: None,
+        comments: workout_stats.description,
+        last_change: Utc::now(),
+        deleted: false,
+    })
 }
 
 async fn get_token(
