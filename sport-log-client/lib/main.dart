@@ -6,6 +6,7 @@ import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/pages/login/welcome_screen.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
@@ -13,11 +14,22 @@ import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+class InitException implements Exception {
+  const InitException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => "InitException: $message";
+}
+
 Stream<double> initialize() async* {
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  if (!Config.isWeb) {
+    await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  }
   yield 0.1;
-  await Config.init();
+  await Config.init(); // throws InitException error
   yield 0.2;
   await Hive.initFlutter();
   yield 0.4;
@@ -49,6 +61,8 @@ class InitAppWrapperState extends State<InitAppWrapper> {
 
   double? _progress = 0.0;
 
+  Object? _error;
+
   @override
   void initState() {
     initialize().listen(
@@ -57,6 +71,8 @@ class InitAppWrapperState extends State<InitAppWrapper> {
         NewCredentialsDialog.isShown = false;
         setState(() => _progress = null);
       },
+      onError: (Object error) => setState(() => _error = error),
+      cancelOnError: true,
     );
     super.initState();
   }
@@ -79,7 +95,21 @@ class InitAppWrapperState extends State<InitAppWrapper> {
             navigatorKey: navigatorKey,
             home: WelcomeScreen(
               content: Center(
-                child: LinearProgressIndicator(value: _progress),
+                child: Column(
+                  children: [
+                    LinearProgressIndicator(value: _progress),
+                    if (_error != null) ...[
+                      Defaults.sizedBox.vertical.normal,
+                      Text(
+                        _error.toString(),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            ?.copyWith(color: Colors.red),
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ),
             builder: ignoreSystemTextScaleFactor,
