@@ -67,8 +67,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   String _stepInfo = "no data";
   String _heartRateInfo = "no data";
 
-  late final Timer _timer =
-      Timer.periodic(const Duration(seconds: 1), (Timer t) => _refresh());
+  late final Timer _timer;
   final TrackingUtils _trackingUtils = TrackingUtils();
   late final LocationUtils _locationUtils = LocationUtils(_onLocationUpdate);
   late final StepCountUtils _stepUtils = StepCountUtils(_onStepCountUpdate);
@@ -80,6 +79,12 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   List<Circle>? _currentLocationMarker;
 
   static const maxSpeed = 250;
+
+  @override
+  void initState() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _refresh());
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -119,10 +124,8 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   void _refresh() {
     // called every second
     setState(() {
-      if (_trackingUtils.isTracking) {
-        _cardioSessionDescription.cardioSession.time =
-            _trackingUtils.currentDuration;
-      }
+      _cardioSessionDescription.cardioSession.time =
+          _trackingUtils.currentDuration;
       _cardioSessionDescription.cardioSession.setAscentDescent();
       _cardioSessionDescription.cardioSession.setAvgCadence();
       _cardioSessionDescription.cardioSession.setAvgHeartRate();
