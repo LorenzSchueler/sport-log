@@ -47,6 +47,8 @@ class AppIcons {
   static const IconData cut = Icons.cut_rounded;
   static const IconData fullScreen = Icons.fullscreen_rounded;
   static const IconData closeFullScreen = Icons.close_fullscreen_rounded;
+  static const IconData visibility = Icons.visibility_outlined;
+  static const IconData visibilityOff = Icons.visibility_off_outlined;
 
   // arrows
   static const IconData arrowBack = Icons.arrow_back_rounded;

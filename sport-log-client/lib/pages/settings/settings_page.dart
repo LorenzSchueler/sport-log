@@ -281,18 +281,30 @@ class SettingsPage extends StatelessWidget {
                   onFieldSubmitted: (username) =>
                       _setUsername(context, username),
                 ),
-                TextFormField(
-                  key: UniqueKey(),
-                  decoration:
-                      Theme.of(context).textFormFieldDecoration.copyWith(
-                            icon: const Icon(AppIcons.key),
-                            labelText: "Password",
-                          ),
-                  initialValue: settings.password,
-                  validator: Validator.validatePassword,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  onFieldSubmitted: (password) =>
-                      _setPassword(context, password),
+                VisibilityToggle(
+                  // ignore: prefer-extracting-callbacks
+                  builder: (visible, toggle) {
+                    return TextFormField(
+                      key: UniqueKey(),
+                      decoration:
+                          Theme.of(context).textFormFieldDecoration.copyWith(
+                                icon: const Icon(AppIcons.key),
+                                labelText: "Password",
+                                suffixIcon: IconButton(
+                                  icon: visible
+                                      ? const Icon(AppIcons.visibilityOff)
+                                      : const Icon(AppIcons.visibility),
+                                  onPressed: toggle,
+                                ),
+                              ),
+                      obscureText: !visible,
+                      initialValue: settings.password,
+                      validator: Validator.validatePassword,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      onFieldSubmitted: (password) =>
+                          _setPassword(context, password),
+                    );
+                  },
                 ),
                 TextFormField(
                   key: UniqueKey(),
@@ -448,5 +460,23 @@ class SettingsPage extends StatelessWidget {
         drawer: const MainDrawer(selectedRoute: Routes.settings),
       ),
     );
+  }
+}
+
+class VisibilityToggle extends StatefulWidget {
+  const VisibilityToggle({required this.builder, super.key});
+
+  final Widget Function(bool, void Function()) builder;
+
+  @override
+  State<VisibilityToggle> createState() => _VisibilityToggleState();
+}
+
+class _VisibilityToggleState extends State<VisibilityToggle> {
+  bool _visible = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.builder(_visible, () => setState(() => _visible = !_visible));
   }
 }
