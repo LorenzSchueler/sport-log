@@ -36,7 +36,7 @@ class HeartRateUtils extends ChangeNotifier {
 
   @override
   void dispose() {
-    stopHeartRateStream();
+    stopHeartRateStream(dispose: true);
     super.dispose();
   }
 
@@ -44,7 +44,7 @@ class HeartRateUtils extends ChangeNotifier {
     _isSearching = true;
     notifyListeners();
 
-    await stopHeartRateStream();
+    await stopHeartRateStream(dispose: false);
 
     while (!await _flutterBlue.isOn) {
       final ignore = await showSystemSettingsDialog(
@@ -107,7 +107,7 @@ class HeartRateUtils extends ChangeNotifier {
     return true;
   }
 
-  Future<void> stopHeartRateStream() async {
+  Future<void> stopHeartRateStream({required bool dispose}) async {
     await _heartRateSubscription?.cancel();
     _heartRateSubscription = null;
     await _batterySubscription?.cancel();
@@ -118,7 +118,9 @@ class HeartRateUtils extends ChangeNotifier {
     deviceId = null;
     _hr = null;
     _battery = null;
-    notifyListeners();
+    if (!dispose) {
+      notifyListeners();
+    }
   }
 
   bool get isActive => _heartRateSubscription != null;

@@ -85,7 +85,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
     _timer.cancel();
     _stepUtils.stopStepCountStream();
     _locationUtils.stopLocationStream();
-    _heartRateUtils.stopHeartRateStream();
+    _heartRateUtils.stopHeartRateStream(dispose: true);
     if (_mapController.cameraPosition != null) {
       Settings.instance.lastMapPosition = _mapController.cameraPosition!;
     }
