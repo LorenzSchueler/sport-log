@@ -11,6 +11,7 @@ import 'package:sport_log/widgets/map_widgets/map_scale.dart';
 import 'package:sport_log/widgets/map_widgets/map_styles.dart';
 import 'package:sport_log/widgets/map_widgets/select_route.dart';
 import 'package:sport_log/widgets/map_widgets/set_north.dart';
+import 'package:sport_log/widgets/map_widgets/toggle_center_location_button.dart';
 import 'package:sport_log/widgets/map_widgets/toggle_fullscreen_button.dart';
 
 class MapboxMapWrapper extends StatefulWidget {
@@ -18,13 +19,15 @@ class MapboxMapWrapper extends StatefulWidget {
     required this.showScale,
     required this.showFullscreenButton,
     required this.showMapStylesButton,
+    required this.showSelectRouteButton,
     required this.showSetNorthButton,
     required this.showCurrentLocationButton,
-    required this.showSelectRouteButton,
+    required this.showCenterLocationButton,
     this.showOverlays = true,
     this.buttonTopOffset = 0,
     this.scaleAtTop = false,
     this.onFullscreenToggle,
+    this.onCenterLocationToggle,
     this.styleString,
     this.initialCameraPosition,
     this.trackCameraPosition = false,
@@ -43,13 +46,15 @@ class MapboxMapWrapper extends StatefulWidget {
   final bool showScale;
   final bool showFullscreenButton;
   final bool showMapStylesButton;
+  final bool showSelectRouteButton;
   final bool showSetNorthButton;
   final bool showCurrentLocationButton;
-  final bool showSelectRouteButton;
+  final bool showCenterLocationButton;
   final bool showOverlays;
   final int buttonTopOffset;
   final bool scaleAtTop;
   final void Function(bool)? onFullscreenToggle;
+  final void Function(bool)? onCenterLocationToggle;
 
   /// defaults to [MapboxStyles.OUTDOORS]
   final String? styleString;
@@ -75,7 +80,10 @@ class MapboxMapWrapper extends StatefulWidget {
 
 class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
   MapboxMapController? _mapController;
+
   late String _mapStyle = widget.styleString ?? MapboxStyles.OUTDOORS;
+
+  bool _centerLocation = true;
 
   @override
   void dispose() {
@@ -139,16 +147,30 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                   ),
                   Defaults.sizedBox.vertical.normal,
                 ],
+                if (widget.showSelectRouteButton) ...[
+                  SelectRouteButton(mapController: _mapController!),
+                  Defaults.sizedBox.vertical.normal,
+                ],
                 if (widget.showSetNorthButton) ...[
                   SetNorthButton(mapController: _mapController!),
                   Defaults.sizedBox.vertical.normal,
                 ],
                 if (widget.showCurrentLocationButton) ...[
-                  CurrentLocationButton(mapController: _mapController!),
+                  CurrentLocationButton(
+                    mapController: _mapController!,
+                    centerLocation: _centerLocation,
+                  ),
                   Defaults.sizedBox.vertical.normal,
                 ],
-                if (widget.showSelectRouteButton)
-                  SelectRouteButton(mapController: _mapController!),
+                if (widget.showCenterLocationButton) ...[
+                  ToggleCenterLocationButton(
+                    onToggle: (centerLocation) {
+                      setState(() => _centerLocation = centerLocation);
+                      widget.onCenterLocationToggle?.call(centerLocation);
+                    },
+                  ),
+                  Defaults.sizedBox.vertical.normal,
+                ],
               ],
             ),
           ),

@@ -101,9 +101,10 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
                           showFullscreenButton:
                               _route.track != null && _route.track!.isNotEmpty,
                           showMapStylesButton: true,
+                          showSelectRouteButton: false,
                           showSetNorthButton: true,
                           showCurrentLocationButton: false,
-                          showSelectRouteButton: false,
+                          showCenterLocationButton: false,
                           onFullscreenToggle: (fullscreen) =>
                               setState(() => _fullscreen = fullscreen),
                           scaleAtTop: true,

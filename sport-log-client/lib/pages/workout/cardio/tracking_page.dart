@@ -61,6 +61,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   );
 
   bool _fullscreen = false;
+  bool _centerLocation = true;
 
   String _locationInfo = "no data";
   String _stepInfo = "no data";
@@ -86,9 +87,6 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
     _stepUtils.stopStepCountStream();
     _locationUtils.stopLocationStream();
     _heartRateUtils.stopHeartRateStream(dispose: true);
-    if (_mapController.cameraPosition != null) {
-      Settings.instance.lastMapPosition = _mapController.cameraPosition!;
-    }
     if (_locationUtils.lastLatLng != null) {
       Settings.instance.lastGpsLatLng = _locationUtils.lastLatLng!;
     }
@@ -204,7 +202,9 @@ time: ${location.time! ~/ 1000} s
 satellites: ${location.satelliteNumber}
 points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
 
-    await _mapController.animateCenter(location.latLng);
+    if (_centerLocation) {
+      await _mapController.animateCenter(location.latLng);
+    }
 
     _currentLocationMarker = await _mapController.updateCurrentLocationMarker(
       _currentLocationMarker,
@@ -298,11 +298,19 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                   showScale: true,
                   showFullscreenButton: true,
                   showMapStylesButton: true,
+                  showSelectRouteButton: false,
                   showSetNorthButton: true,
                   showCurrentLocationButton: false,
-                  showSelectRouteButton: false,
+                  showCenterLocationButton: true,
                   onFullscreenToggle: (fullscreen) =>
                       setState(() => _fullscreen = fullscreen),
+                  onCenterLocationToggle: (centerLocation) async {
+                    _centerLocation = centerLocation;
+                    final lastLatLng = _locationUtils.lastLatLng;
+                    if (_centerLocation && lastLatLng != null) {
+                      await _mapController.animateCenter(lastLatLng);
+                    }
+                  },
                   initialCameraPosition: CameraPosition(
                     zoom: 15.0,
                     target: context.read<Settings>().lastGpsLatLng,

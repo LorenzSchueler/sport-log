@@ -113,9 +113,10 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                         showScale: true,
                         showFullscreenButton: false,
                         showMapStylesButton: true,
+                        showSelectRouteButton: false,
                         showSetNorthButton: true,
                         showCurrentLocationButton: false,
-                        showSelectRouteButton: false,
+                        showCenterLocationButton: false,
                         scaleAtTop: true,
                         onMapCreated: (MapboxMapController controller) =>
                             _mapController = controller,

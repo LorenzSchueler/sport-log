@@ -10,10 +10,12 @@ import 'package:sport_log/widgets/app_icons.dart';
 class CurrentLocationButton extends StatefulWidget {
   const CurrentLocationButton({
     required this.mapController,
+    required this.centerLocation,
     super.key,
   });
 
   final MapboxMapController mapController;
+  final bool centerLocation;
 
   @override
   State<CurrentLocationButton> createState() => _CurrentLocationButtonState();
@@ -49,7 +51,9 @@ class _CurrentLocationButtonState extends State<CurrentLocationButton> {
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
-    await widget.mapController.animateCenter(location.latLng);
+    if (widget.centerLocation) {
+      await widget.mapController.animateCenter(location.latLng);
+    }
     _currentLocationMarker =
         await widget.mapController.updateCurrentLocationMarker(
       _currentLocationMarker,

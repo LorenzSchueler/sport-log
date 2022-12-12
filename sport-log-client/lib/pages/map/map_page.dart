@@ -144,9 +144,10 @@ class _MapPageState extends State<MapPage> {
               showScale: true,
               showFullscreenButton: false,
               showMapStylesButton: true,
+              showSelectRouteButton: true,
               showSetNorthButton: true,
               showCurrentLocationButton: true,
-              showSelectRouteButton: true,
+              showCenterLocationButton: true,
               showOverlays: _showOverlays,
               buttonTopOffset: 120,
               onMapCreated: (controller) =>
