@@ -5,6 +5,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
+import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/route_planning_utils.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
@@ -30,7 +31,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = RouteDataProvider();
 
-  Line? _line;
+  final NullablePointer<Line> _line = NullablePointer.nullPointer();
   List<Circle> _circles = [];
   List<Symbol> _symbols = [];
 

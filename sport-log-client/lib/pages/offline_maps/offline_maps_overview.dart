@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/map_download_utils.dart';
+import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -28,9 +29,9 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
 
   LatLng? _point1;
   LatLng? _point2;
-  Circle? _point1Marker;
-  Circle? _point2Marker;
-  Line? _boundingBoxLine;
+  final NullablePointer<Circle> _point1Marker = NullablePointer.nullPointer();
+  final NullablePointer<Circle> _point2Marker = NullablePointer.nullPointer();
+  final NullablePointer<Line> _boundingBoxLine = NullablePointer.nullPointer();
 
   @override
   void dispose() {
@@ -67,15 +68,13 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
 
   Future<void> _updatePoint1(LatLng? latLng) async {
     setState(() => _point1 = latLng);
-    _point1Marker =
-        await _mapController.updateLocationMarker(_point1Marker, _point1);
+    await _mapController.updateLocationMarker(_point1Marker, _point1);
   }
 
   Future<void> _updatePoint2(LatLng? latLng) async {
     setState(() => _point2 = latLng);
-    _point2Marker =
-        await _mapController.updateLocationMarker(_point2Marker, _point2);
-    _boundingBoxLine = await _mapController.updateBoundingBoxLine(
+    await _mapController.updateLocationMarker(_point2Marker, _point2);
+    await _mapController.updateBoundingBoxLine(
       _boundingBoxLine,
       _point1,
       _point2,

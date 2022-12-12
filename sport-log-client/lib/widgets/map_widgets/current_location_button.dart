@@ -4,6 +4,7 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/location_utils.dart';
+import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
@@ -22,7 +23,8 @@ class CurrentLocationButton extends StatefulWidget {
 }
 
 class _CurrentLocationButtonState extends State<CurrentLocationButton> {
-  List<Circle>? _currentLocationMarker = [];
+  final NullablePointer<List<Circle>> _currentLocationMarker =
+      NullablePointer.nullPointer();
   late final LocationUtils _locationUtils = LocationUtils(_onLocationUpdate);
 
   @override
@@ -37,8 +39,7 @@ class _CurrentLocationButtonState extends State<CurrentLocationButton> {
   Future<void> _toggleCurrentLocation() async {
     if (_locationUtils.enabled) {
       _locationUtils.stopLocationStream();
-      _currentLocationMarker =
-          await widget.mapController.updateCurrentLocationMarker(
+      await widget.mapController.updateCurrentLocationMarker(
         _currentLocationMarker,
         null,
       );
@@ -54,8 +55,7 @@ class _CurrentLocationButtonState extends State<CurrentLocationButton> {
     if (widget.centerLocation) {
       await widget.mapController.animateCenter(location.latLng);
     }
-    _currentLocationMarker =
-        await widget.mapController.updateCurrentLocationMarker(
+    await widget.mapController.updateCurrentLocationMarker(
       _currentLocationMarker,
       location.latLng,
     );

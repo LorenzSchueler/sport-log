@@ -5,6 +5,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/gpx.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
@@ -26,7 +27,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = RouteDataProvider();
 
-  Line? _line;
+  final NullablePointer<Line> _line = NullablePointer.nullPointer();
 
   late MapboxMapController _mapController;
 

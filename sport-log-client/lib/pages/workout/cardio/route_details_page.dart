@@ -5,6 +5,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/gpx.dart';
 import 'package:sport_log/helpers/page_return.dart';
+import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
 import 'package:sport_log/pages/workout/charts/distance_chart.dart';
@@ -26,7 +27,8 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
   late Route _route = widget.route.clone();
 
   late MapboxMapController _mapController;
-  Circle? _touchLocationMarker;
+  final NullablePointer<Circle> _touchLocationMarker =
+      NullablePointer.nullPointer();
 
   bool _fullscreen = false;
 
@@ -187,7 +189,6 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
             ?.latLng
         : null;
 
-    _touchLocationMarker =
-        await _mapController.updateLocationMarker(_touchLocationMarker, latLng);
+    await _mapController.updateLocationMarker(_touchLocationMarker, latLng);
   }
 }

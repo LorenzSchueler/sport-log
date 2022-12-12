@@ -14,6 +14,7 @@ import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/location_utils.dart';
+import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
 import 'package:sport_log/helpers/tracking_utils.dart';
 import 'package:sport_log/models/all.dart';
@@ -75,8 +76,9 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
       HeartRateUtils(_onHeartRateUpdate);
 
   late final MapboxMapController _mapController;
-  Line? _line;
-  List<Circle>? _currentLocationMarker;
+  final NullablePointer<Line> _line = NullablePointer.nullPointer();
+  final NullablePointer<List<Circle>> _currentLocationMarker =
+      NullablePointer.nullPointer();
 
   static const maxSpeed = 250;
 
@@ -209,7 +211,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
       await _mapController.animateCenter(location.latLng);
     }
 
-    _currentLocationMarker = await _mapController.updateCurrentLocationMarker(
+    await _mapController.updateCurrentLocationMarker(
       _currentLocationMarker,
       location.latLng,
     );

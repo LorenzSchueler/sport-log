@@ -5,6 +5,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/gpx.dart';
 import 'package:sport_log/helpers/page_return.dart';
+import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
 import 'package:sport_log/pages/workout/charts/duration_chart.dart';
@@ -28,9 +29,10 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
       widget.cardioSessionDescription.clone();
 
   MapboxMapController? _mapController;
-  Line? _trackLine;
-  Line? _routeLine;
-  Circle? _touchLocationMarker;
+  final NullablePointer<Line> _trackLine = NullablePointer.nullPointer();
+  final NullablePointer<Line> _routeLine = NullablePointer.nullPointer();
+  final NullablePointer<Circle> _touchLocationMarker =
+      NullablePointer.nullPointer();
 
   bool fullScreen = false;
 
@@ -50,11 +52,11 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
       _cardioSessionDescription.route?.track,
       padded: true,
     );
-    _trackLine = await _mapController?.updateTrackLine(
+    await _mapController?.updateTrackLine(
       _trackLine,
       _cardioSessionDescription.cardioSession.track,
     );
-    _routeLine = await _mapController?.updateRouteLine(
+    await _mapController?.updateRouteLine(
       _routeLine,
       _cardioSessionDescription.route?.track,
     );
@@ -301,7 +303,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
           : null;
     });
 
-    _touchLocationMarker = await _mapController?.updateLocationMarker(
+    await _mapController?.updateLocationMarker(
       _touchLocationMarker,
       pos?.latLng,
     );
