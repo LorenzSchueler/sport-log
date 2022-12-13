@@ -34,7 +34,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   final NullablePointer<Circle> _touchLocationMarker =
       NullablePointer.nullPointer();
 
-  bool fullScreen = false;
+  bool _fullScreen = false;
 
   double? _speed;
   int? _elevation;
@@ -87,18 +87,11 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
         title: Text(_cardioSessionDescription.movement.name),
         actions: [
           if (_cardioSessionDescription.cardioSession.track != null &&
-              _cardioSessionDescription.cardioSession.track!.isNotEmpty) ...[
-            IconButton(
-              onPressed: () => setState(() => fullScreen = !fullScreen),
-              icon: Icon(
-                fullScreen ? AppIcons.closeFullScreen : AppIcons.fullScreen,
-              ),
-            ),
+              _cardioSessionDescription.cardioSession.track!.isNotEmpty)
             IconButton(
               onPressed: _exportFile,
               icon: const Icon(AppIcons.download),
             ),
-          ],
           IconButton(
             onPressed: _pushEditPage,
             icon: const Icon(AppIcons.edit),
@@ -113,13 +106,15 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                 _cardioSessionDescription.cardioSession.track != null
                     ? MapboxMapWrapper(
                         showScale: true,
-                        showFullscreenButton: false,
+                        showFullscreenButton: true,
                         showMapStylesButton: true,
                         showSelectRouteButton: false,
                         showSetNorthButton: true,
                         showCurrentLocationButton: false,
                         showCenterLocationButton: false,
                         scaleAtTop: true,
+                        onFullscreenToggle: (fullScreen) =>
+                            setState(() => _fullScreen = fullScreen),
                         onMapCreated: (MapboxMapController controller) =>
                             _mapController = controller,
                         onStyleLoadedCallback: _setBoundsAndLines,
@@ -138,7 +133,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                         ),
                       ),
                 if (_cardioSessionDescription.cardioSession.track != null &&
-                    !fullScreen)
+                    !_fullScreen)
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -191,7 +186,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
               ],
             ),
           ),
-          if (!fullScreen)
+          if (!_fullScreen)
             Container(
               padding: Defaults.edgeInsets.normal,
               color: Theme.of(context).colorScheme.background,
