@@ -65,12 +65,14 @@ class DistanceChart extends StatelessWidget {
     required this.chartLines,
     required this.yFromZero,
     this.touchCallback,
+    this.height = 200,
     super.key,
   });
 
   final List<DistanceChartLine> chartLines;
   final bool yFromZero;
   final Function(double? distance)? touchCallback;
+  final double height;
 
   static Color color = Colors.black;
 
@@ -126,8 +128,8 @@ class DistanceChart extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(5, 10, 15, 0),
-      child: AspectRatio(
-        aspectRatio: 1.8,
+      child: SizedBox(
+        height: height,
         child: LineChart(
           LineChartData(
             lineBarsData: [

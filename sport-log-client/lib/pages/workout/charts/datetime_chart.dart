@@ -45,6 +45,7 @@ class DateTimeChart extends StatelessWidget {
     required this.dateFilterState,
     required this.yFromZero,
     required this.aggregatorType,
+    this.height = 200,
     super.key,
   });
 
@@ -52,11 +53,12 @@ class DateTimeChart extends StatelessWidget {
   final DateFilterState dateFilterState;
   final bool yFromZero;
   final AggregatorType aggregatorType;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1.8,
+    return SizedBox(
+      height: height,
       child: _chart(),
     );
   }

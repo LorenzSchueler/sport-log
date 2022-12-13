@@ -99,6 +99,7 @@ class DurationChart extends StatefulWidget {
     required this.chartLines,
     required this.yFromZero,
     this.touchCallback,
+    this.height = 200,
     super.key,
   })  : xInterval = chartLines
             .map(
@@ -127,6 +128,7 @@ class DurationChart extends StatefulWidget {
   final List<DurationChartLine> chartLines;
   final bool yFromZero;
   final Function(Duration? x)? touchCallback;
+  final double height;
 
   final double xInterval;
   final double maxX;
@@ -160,8 +162,8 @@ class _DurationChartState extends State<DurationChart> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
-      child: AspectRatio(
-        aspectRatio: 1.8,
+      child: SizedBox(
+        height: widget.height,
         child: LineChart(
           LineChartData(
             lineBarsData: [

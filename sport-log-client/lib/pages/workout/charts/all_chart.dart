@@ -5,7 +5,7 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';
 
-/// needs to wrapped into something that constrains the size (e. g. an [AspectRatio])
+/// needs to wrapped into something that constrains the size.
 class AllChart extends DateTimePeriodChart {
   AllChart({
     required super.chartValues,
