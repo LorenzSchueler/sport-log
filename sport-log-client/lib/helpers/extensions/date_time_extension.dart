@@ -45,6 +45,7 @@ extension FormatDuration on Duration {
     return "0$n";
   }
 
+  String get _twoDigitHours => _twoDigits(inHours);
   String get _twoDigitMinutes =>
       _twoDigits(inMinutes.remainder(Duration.minutesPerHour));
   String get _twoDigitSeconds =>
@@ -52,9 +53,9 @@ extension FormatDuration on Duration {
   String get _threeDigitMillis =>
       _threeDigits(inMilliseconds.remainder(Duration.millisecondsPerSecond));
 
-  String get formatHms => "$inHours:$_twoDigitMinutes:$_twoDigitSeconds";
+  String get formatHms => "$_twoDigitHours:$_twoDigitMinutes:$_twoDigitSeconds";
 
-  String get formatHm => "$inHours:$_twoDigitMinutes";
+  String get formatHm => "$_twoDigitHours:$_twoDigitMinutes";
 
   String get formatTimeShort =>
       inSeconds < 3600 ? "$_twoDigitMinutes:$_twoDigitSeconds" : formatHms;
