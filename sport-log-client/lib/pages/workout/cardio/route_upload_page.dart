@@ -131,7 +131,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
         title: "An Error occurred",
         text: "Parsing file failed.",
       );
-    } else {
+    } else if (mounted) {
       setState(() {
         _route
           ..track = track

@@ -88,7 +88,7 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
     BuildContext context,
   ) {
     return TextFormField(
-      onChanged: (username) async {
+      onChanged: (username) {
         final validated = Validator.validateUsername(username);
         if (validated == null) {
           setState(() => _username = username);
@@ -113,7 +113,7 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
     BuildContext context,
   ) {
     return TextFormField(
-      onChanged: (password) async {
+      onChanged: (password) {
         final validated = Validator.validatePassword(password);
         if (validated == null) {
           setState(() => _password = password);
@@ -148,25 +148,19 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
   }
 
   Future<void> _submit(BuildContext context) async {
-    setState(() {
-      _loginPending = true;
-    });
+    setState(() => _loginPending = true);
     final result = await Account.login(
       context.read<Settings>().serverUrl,
       _username,
       _password,
     );
-    setState(() {
-      _loginPending = false;
-    });
-    if (result.isSuccess) {
-      if (mounted) {
+    if (mounted) {
+      setState(() => _loginPending = false);
+      if (result.isSuccess) {
         Navigator.pop(context, result.success);
+      } else {
+        setState(() => _errorMessage = result.failure.toString());
       }
-    } else {
-      setState(() {
-        _errorMessage = result.failure.toString();
-      });
     }
     _formKey.currentState!.deactivate();
   }

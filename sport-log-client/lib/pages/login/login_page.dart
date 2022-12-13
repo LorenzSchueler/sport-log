@@ -96,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _serverUrlInput(BuildContext context) {
     return TextFormField(
-      onChanged: (serverUrl) async {
+      onChanged: (serverUrl) {
         final validated = Validator.validateUrl(serverUrl);
         if (validated == null) {
           setState(() => _serverUrl = serverUrl);
@@ -129,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _usernameInput(BuildContext context) {
     return TextFormField(
-      onChanged: (username) async {
+      onChanged: (username) {
         final validated = Validator.validateUsername(username);
         if (validated == null) {
           setState(() => _user.username = username);
@@ -151,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _passwordInput(BuildContext context) {
     return TextFormField(
-      onChanged: (password) async {
+      onChanged: (password) {
         final validated = Validator.validatePassword(password);
         if (validated == null) {
           setState(() => _user.password = password);
@@ -194,7 +194,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _emailInput(BuildContext context) {
     return TextFormField(
-      onChanged: (email) async {
+      onChanged: (email) {
         final validated = Validator.validateEmail(email);
         if (validated == null) {
           setState(() => _user.email = email);

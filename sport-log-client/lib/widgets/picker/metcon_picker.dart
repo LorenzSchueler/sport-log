@@ -65,10 +65,12 @@ class _MetconPickerDialogState extends State<MetconPickerDialog> {
         metcons.insert(0, metcons.removeAt(index));
       }
     }
-    setState(() {
-      _metcons = metcons;
-      _search = newSearch;
-    });
+    if (mounted) {
+      setState(() {
+        _metcons = metcons;
+        _search = newSearch;
+      });
+    }
   }
 
   @override

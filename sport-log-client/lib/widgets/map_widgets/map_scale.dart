@@ -34,10 +34,12 @@ class _MapScaleState extends State<MapScale> {
     final latitude = widget.mapController.cameraPosition!.target.latitude;
     final metersPerPixel =
         await widget.mapController.getMetersPerPixelAtLatitude(latitude);
-    setState(() {
-      _width = _calcWidth(metersPerPixel);
-      _scaleLength = _calcScaleLength(metersPerPixel);
-    });
+    if (mounted) {
+      setState(() {
+        _width = _calcWidth(metersPerPixel);
+        _scaleLength = _calcScaleLength(metersPerPixel);
+      });
+    }
   }
 
   double _calcWidth(double metersPerPixel) {

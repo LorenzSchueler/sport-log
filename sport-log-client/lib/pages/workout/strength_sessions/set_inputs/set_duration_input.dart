@@ -227,9 +227,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
       placeholder: 0,
       caption: 'ms',
       numberOfDigits: 3,
-      onChanged: (value) {
-        setState(() => _milliseconds = value);
-      },
+      onChanged: (value) => setState(() => _milliseconds = value),
       onSubmitted: _submit,
       textInputAction: TextInputAction.done,
     );

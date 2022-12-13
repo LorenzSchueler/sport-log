@@ -44,10 +44,12 @@ class _MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
       comment: null,
     );
     final records = await _dataProvider.getMetconRecords();
-    setState(() {
-      _metconSessionDescriptions = metconSessionDescriptions;
-      _metconRecords = records;
-    });
+    if (mounted) {
+      setState(() {
+        _metconSessionDescriptions = metconSessionDescriptions;
+        _metconRecords = records;
+      });
+    }
   }
 
   Future<void> _deleteMetconSession() async {

@@ -281,7 +281,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                                 context: context,
                                 cardioOnly: true,
                               );
-                              if (movement != null) {
+                              if (mounted && movement != null) {
                                 setState(() {
                                   _cardioSessionDescription
                                       .cardioSession.movementId = movement.id;
@@ -300,7 +300,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                               final cardioType = await showCardioTypePicker(
                                 context: context,
                               );
-                              if (cardioType != null) {
+                              if (mounted && cardioType != null) {
                                 setState(() {
                                   _cardioSessionDescription
                                       .cardioSession.cardioType = cardioType;
@@ -321,7 +321,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                                 initial: _cardioSessionDescription
                                     .cardioSession.datetime,
                               );
-                              if (datetime != null) {
+                              if (mounted && datetime != null) {
                                 setState(() {
                                   _cardioSessionDescription
                                       .cardioSession.datetime = datetime;
@@ -339,7 +339,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                               Route? route = await showRoutePicker(
                                 context: context,
                               );
-                              if (route != null) {
+                              if (mounted && route != null) {
                                 setState(() {
                                   _cardioSessionDescription
                                       .cardioSession.routeId = route.id;
@@ -466,7 +466,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                                       initialDuration: _cardioSessionDescription
                                           .cardioSession.time,
                                     );
-                                    if (duration != null) {
+                                    if (mounted && duration != null) {
                                       setState(
                                         () => _cardioSessionDescription
                                             .cardioSession.time = duration,

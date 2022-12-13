@@ -100,7 +100,7 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                     actions: widget.actionProviderDescription.actions,
                     context: context,
                   );
-                  if (action != null) {
+                  if (mounted && action != null) {
                     setState(() => _actionRule.actionId = action.id);
                   }
                 },
@@ -111,7 +111,7 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                 child: Text("${_actionRule.weekday}"),
                 onTap: () async {
                   Weekday? weekday = await showWeekdayPicker(context: context);
-                  if (weekday != null) {
+                  if (mounted && weekday != null) {
                     setState(() => _actionRule.weekday = weekday);
                   }
                 },
@@ -125,7 +125,7 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                     context: context,
                     initialTime: _actionRule.time,
                   );
-                  if (time != null) {
+                  if (mounted && time != null) {
                     setState(() => _actionRule.time = time);
                   }
                 },

@@ -166,7 +166,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       leading: AppIcons.exercise,
       onTap: () async {
         final movement = await showMovementPicker(context: context);
-        if (movement != null) {
+        if (mounted && movement != null) {
           setState(() {
             _strengthSessionDescription.session.movementId = movement.id;
             _strengthSessionDescription.movement = movement;
@@ -217,7 +217,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
           context: context,
           initial: _strengthSessionDescription.session.datetime,
         );
-        if (datetime != null) {
+        if (mounted && datetime != null) {
           setState(() {
             _strengthSessionDescription.session.datetime = datetime;
           });

@@ -79,10 +79,12 @@ class _MovementPickerDialogState extends State<MovementPickerDialog> {
         movements.insert(0, movements.removeAt(index));
       }
     }
-    setState(() {
-      _movements = movements;
-      _search = newSearch;
-    });
+    if (mounted) {
+      setState(() {
+        _movements = movements;
+        _search = newSearch;
+      });
+    }
   }
 
   @override

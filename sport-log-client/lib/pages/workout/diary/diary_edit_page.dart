@@ -91,7 +91,7 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
                       context: context,
                       initialDate: _diary.date,
                     );
-                    if (date != null) {
+                    if (mounted && date != null) {
                       setState(() {
                         _diary.date = date;
                       });

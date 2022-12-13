@@ -61,7 +61,7 @@ class _ActionProviderOverviewPageState
       if (mounted) {
         Navigator.of(context).pop();
       }
-    } else {
+    } else if (mounted) {
       setState(() => _actionProviderDescription = actionProviderDescription);
     }
   }

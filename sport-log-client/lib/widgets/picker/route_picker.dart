@@ -65,10 +65,12 @@ class _RoutePickerDialogState extends State<RoutePickerDialog> {
         routes.insert(0, routes.removeAt(index));
       }
     }
-    setState(() {
-      _routes = routes;
-      _search = newSearch;
-    });
+    if (mounted) {
+      setState(() {
+        _routes = routes;
+        _search = newSearch;
+      });
+    }
   }
 
   @override

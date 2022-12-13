@@ -47,7 +47,9 @@ class CardioTrackingSettingsPageState
                     cardioOnly: true,
                     distanceOnly: true,
                   );
-                  setState(() => _movement = movement);
+                  if (mounted && movement != null) {
+                    setState(() => _movement = movement);
+                  }
                 },
               ),
               EditTile(
@@ -58,7 +60,7 @@ class CardioTrackingSettingsPageState
                   final cardioType = await showCardioTypePicker(
                     context: context,
                   );
-                  if (cardioType != null) {
+                  if (mounted && cardioType != null) {
                     setState(() => _cardioType = cardioType);
                   }
                 },
@@ -71,7 +73,9 @@ class CardioTrackingSettingsPageState
                   Route? route = await showRoutePicker(
                     context: context,
                   );
-                  setState(() => _route = route);
+                  if (mounted) {
+                    setState(() => _route = route);
+                  }
                 },
               ),
               heartRateUtils.devices.isEmpty

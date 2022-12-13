@@ -98,7 +98,7 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
                     actions: widget.actionProviderDescription.actions,
                     context: context,
                   );
-                  if (action != null) {
+                  if (mounted && action != null) {
                     setState(() => _actionEvent.actionId = action.id);
                   }
                 },
@@ -112,7 +112,7 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
                     initial: _actionEvent.datetime,
                     future: true,
                   );
-                  if (datetime != null) {
+                  if (mounted && datetime != null) {
                     setState(() {
                       _actionEvent.datetime = datetime;
                     });

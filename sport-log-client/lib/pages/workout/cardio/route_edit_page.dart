@@ -140,25 +140,25 @@ class _RouteEditPageState extends State<RouteEditPage> {
     final elevationResult = await RoutePlanningUtils.getElevations([location]);
     final elevation =
         elevationResult.isSuccess ? elevationResult.success[0] : 0;
-    setState(() {
-      _route.markedPositions!.add(
-        Position(
-          latitude: location.latitude,
-          longitude: location.longitude,
-          elevation: elevation.toDouble(),
-          distance: 0,
-          time: Duration.zero,
-        ),
-      );
-    });
+    if (mounted) {
+      setState(() {
+        _route.markedPositions!.add(
+          Position(
+            latitude: location.latitude,
+            longitude: location.longitude,
+            elevation: elevation.toDouble(),
+            distance: 0,
+            time: Duration.zero,
+          ),
+        );
+      });
+    }
     await _addPoint(location, _route.markedPositions!.length);
     await _updateLine();
   }
 
   Future<void> _removePoint(int index) async {
-    setState(() {
-      _route.markedPositions!.removeAt(index);
-    });
+    setState(() => _route.markedPositions!.removeAt(index));
     await _updatePoints();
     await _updateLine();
   }

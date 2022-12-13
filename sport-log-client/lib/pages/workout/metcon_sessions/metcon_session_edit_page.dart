@@ -123,35 +123,42 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                       final metconDescription =
                           await _metconDescriptionDataProvider
                               .getByMetcon(metcon);
-                      setState(() {
-                        _metconSessionDescription.metconDescription =
-                            metconDescription;
-                        _metconSessionDescription.metconSession.metconId =
-                            _metconSessionDescription
-                                .metconDescription.metcon.id;
-                        switch (_metconSessionDescription
-                            .metconDescription.metcon.metconType) {
-                          case MetconType.amrap:
-                            _metconSessionDescription.metconSession.time = null;
-                            _metconSessionDescription.metconSession.rounds = 0;
-                            _metconSessionDescription.metconSession.reps = 0;
-                            break;
-                          case MetconType.emom:
-                            _metconSessionDescription.metconSession.time = null;
-                            _metconSessionDescription.metconSession.rounds =
-                                null;
-                            _metconSessionDescription.metconSession.reps = null;
-                            break;
-                          case MetconType.forTime:
-                            _metconSessionDescription.metconSession.time =
-                                Duration.zero;
-                            _metconSessionDescription.metconSession.rounds =
-                                null;
-                            _metconSessionDescription.metconSession.reps = null;
-                            _finished = true;
-                            break;
-                        }
-                      });
+                      if (mounted) {
+                        setState(() {
+                          _metconSessionDescription.metconDescription =
+                              metconDescription;
+                          _metconSessionDescription.metconSession.metconId =
+                              _metconSessionDescription
+                                  .metconDescription.metcon.id;
+                          switch (_metconSessionDescription
+                              .metconDescription.metcon.metconType) {
+                            case MetconType.amrap:
+                              _metconSessionDescription.metconSession.time =
+                                  null;
+                              _metconSessionDescription.metconSession.rounds =
+                                  0;
+                              _metconSessionDescription.metconSession.reps = 0;
+                              break;
+                            case MetconType.emom:
+                              _metconSessionDescription.metconSession.time =
+                                  null;
+                              _metconSessionDescription.metconSession.rounds =
+                                  null;
+                              _metconSessionDescription.metconSession.reps =
+                                  null;
+                              break;
+                            case MetconType.forTime:
+                              _metconSessionDescription.metconSession.time =
+                                  Duration.zero;
+                              _metconSessionDescription.metconSession.rounds =
+                                  null;
+                              _metconSessionDescription.metconSession.reps =
+                                  null;
+                              _finished = true;
+                              break;
+                          }
+                        });
+                      }
                     }
                   },
                 ),
@@ -167,7 +174,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                       context: context,
                       initial: _metconSessionDescription.metconSession.datetime,
                     );
-                    if (datetime != null) {
+                    if (mounted && datetime != null) {
                       setState(() {
                         _metconSessionDescription.metconSession.datetime =
                             datetime;
