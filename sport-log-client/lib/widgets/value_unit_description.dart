@@ -8,6 +8,7 @@ class ValueUnitDescription extends StatelessWidget {
     required this.unit,
     required this.description,
     this.scale = 1,
+    this.smallValue = false,
     super.key,
   }) : value = value ?? "--";
 
@@ -67,6 +68,7 @@ class ValueUnitDescription extends StatelessWidget {
           unit: null,
           description: "Type",
           scale: 1.3,
+          smallValue: true,
           key: key,
         );
 
@@ -76,6 +78,7 @@ class ValueUnitDescription extends StatelessWidget {
           unit: null,
           description: "Date",
           scale: 1.3,
+          smallValue: true,
           key: key,
         );
 
@@ -175,12 +178,10 @@ class ValueUnitDescription extends StatelessWidget {
         );
 
   final String value;
-
   final String? unit;
-
   final String? description;
-
   final double scale;
+  final bool smallValue;
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +190,7 @@ class ValueUnitDescription extends StatelessWidget {
         children: [
           TextSpan(
             text: unit == null ? value : "$value ",
-            style: TextStyle(fontSize: scale * 20),
+            style: TextStyle(fontSize: scale * (smallValue ? 14 : 20)),
           ),
           if (unit != null)
             TextSpan(
