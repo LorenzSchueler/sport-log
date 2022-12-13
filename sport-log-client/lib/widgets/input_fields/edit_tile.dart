@@ -26,6 +26,7 @@ class EditTile extends StatelessWidget {
     this.caption,
     this.onTap,
     this.onCancel,
+    this.shrink = false,
     super.key,
   });
 
@@ -34,6 +35,7 @@ class EditTile extends StatelessWidget {
   final IconData? leading;
   final VoidCallback? onTap;
   final VoidCallback? onCancel;
+  final bool shrink;
 
   @override
   Widget build(BuildContext context) {
@@ -41,23 +43,23 @@ class EditTile extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Row(
+        mainAxisSize: shrink ? MainAxisSize.min : MainAxisSize.max,
         children: [
           if (leading != null) ...[
             Icon(leading, color: Colors.white70),
             const SizedBox(width: 15),
           ],
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (caption != null) CaptionTile(caption: caption!),
-                DefaultTextStyle(
-                  style: Theme.of(context).textTheme.subtitle1!,
-                  child: child,
-                ),
-              ],
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (caption != null) CaptionTile(caption: caption!),
+              DefaultTextStyle(
+                style: Theme.of(context).textTheme.subtitle1!,
+                child: child,
+              ),
+            ],
           ),
+          if (!shrink) Expanded(child: Container()),
           if (onCancel != null)
             IconButton(
               padding: EdgeInsets.zero,
