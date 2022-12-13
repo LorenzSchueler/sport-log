@@ -10,11 +10,9 @@ class Pointer<T> {
 /// An object holding a nullable object.
 ///
 /// Used for passing by reference.
-class NullablePointer<T> {
-  NullablePointer(this.object);
-  NullablePointer.nullPointer() : object = null;
-
-  T? object;
+class NullablePointer<T> extends Pointer<T?> {
+  NullablePointer(super.object);
+  NullablePointer.nullPointer() : this(null);
 
   void setNull() => object = null;
 
