@@ -228,6 +228,7 @@ class CardioSession extends AtomicEntity {
   }
 
   void cut(Duration start, Duration end) {
+    assert(start < end);
     time = end - start;
     if (track != null && track!.isNotEmpty) {
       final newTrack =
@@ -243,7 +244,7 @@ class CardioSession extends AtomicEntity {
             )
             .toList();
       } else {
-        track = [];
+        track = null;
       }
       setDistance();
       setAscentDescent();
@@ -252,10 +253,9 @@ class CardioSession extends AtomicEntity {
       final newCadence = cadence!.where((time) => time >= start && time <= end);
       if (newCadence.isNotEmpty) {
         final timeOffset = newCadence.first;
-
         cadence = newCadence.map((time) => time - timeOffset).toList();
       } else {
-        cadence = [];
+        cadence = null;
       }
       setAvgCadence();
     }
@@ -266,7 +266,7 @@ class CardioSession extends AtomicEntity {
         final timeOffset = newHeartRate.first;
         heartRate = newHeartRate.map((time) => time - timeOffset).toList();
       } else {
-        heartRate = [];
+        heartRate = null;
       }
       setAvgHeartRate();
     }

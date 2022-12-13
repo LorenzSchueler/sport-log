@@ -12,6 +12,7 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
@@ -92,24 +93,26 @@ class _CardioEditPageState extends State<CardioEditPage> {
     }
   }
 
-  void _showCutInputs() {
-    setState(() {
-      _cutStartDuration = Duration.zero;
-      _cutEndDuration = _cardioSessionDescription.cardioSession.time;
-    });
-    _updateCutLocationMarker();
+  void _showCut() {
+    if (_cardioSessionDescription.cardioSession.time != null) {
+      setState(() {
+        _mapController =
+            null; // map gets replaced and new map has new controller
+        _cutStartDuration = Duration.zero;
+        _cutEndDuration = _cardioSessionDescription.cardioSession.time;
+        // _updateCutLocationMarker gets called once map is initialized
+      });
+    }
   }
 
-  void _cutCardioSession() {
-    if (_cutStartDuration != null && _cutEndDuration != null) {
-      _cardioSessionDescription.cardioSession
-          .cut(_cutStartDuration!, _cutEndDuration!);
-    }
-    _cutStartDuration = null;
-    _cutEndDuration = null;
-    setState(() {});
-    _updateCutLocationMarker();
-    _setBoundsAndLines();
+  void _hideCut() {
+    setState(() {
+      _mapController = null; // map gets replaced and new map has new controller
+      _cutStartDuration = null;
+      _cutEndDuration = null;
+      _cutStartLocationMarker.setNull();
+      _cutEndLocationMarker.setNull();
+    });
   }
 
   Future<void> _updateCutLocationMarker() async {
@@ -132,6 +135,26 @@ class _CardioEditPageState extends State<CardioEditPage> {
       _cutEndLocationMarker,
       endLatLng,
     );
+  }
+
+  Future<void> _cutCardioSession() async {
+    if (_cutStartDuration != null &&
+        _cutEndDuration != null &&
+        _cutStartDuration! < _cutEndDuration!) {
+      final approved = await showApproveDialog(
+        context: context,
+        title: "Cut Cardio Session",
+        text:
+            "This can not be reversed. All cut out data will be permanently lost.",
+      );
+      if (approved) {
+        _cardioSessionDescription.cardioSession
+            .cut(_cutStartDuration!, _cutEndDuration!);
+        if (mounted) {
+          _hideCut();
+        }
+      }
+    }
   }
 
   Future<void> _setBoundsAndLines() async {
@@ -158,118 +181,151 @@ class _CardioEditPageState extends State<CardioEditPage> {
           title: Text(
             widget.isNew ? "Create Cardio Session" : "Edit Cardio Session",
           ),
-          actions: [
-            IconButton(
-              onPressed: _deleteCardioSession,
-              icon: const Icon(AppIcons.delete),
-            ),
-            if (_cutStartDuration == null &&
-                _cardioSessionDescription.cardioSession.time != null)
-              IconButton(
-                onPressed: _showCutInputs,
-                icon: const Icon(AppIcons.cut),
-              ),
-            IconButton(
-              onPressed: _formKey.currentContext != null &&
-                      _formKey.currentState!.validate() &&
-                      _cardioSessionDescription.isValid()
-                  ? _saveCardioSession
-                  : null,
-              icon: const Icon(AppIcons.save),
-            )
-          ],
+          actions: _cutStartDuration == null
+              ? [
+                  IconButton(
+                    onPressed: _deleteCardioSession,
+                    icon: const Icon(AppIcons.delete),
+                  ),
+                  if (_cardioSessionDescription.cardioSession.time != null)
+                    IconButton(
+                      onPressed: _showCut,
+                      icon: const Icon(AppIcons.cut),
+                    ),
+                  IconButton(
+                    onPressed: _formKey.currentContext != null &&
+                            _formKey.currentState!.validate() &&
+                            _cardioSessionDescription.isValid()
+                        ? _saveCardioSession
+                        : null,
+                    icon: const Icon(AppIcons.save),
+                  )
+                ]
+              : null,
         ),
         body: Column(
-          children: [
-            if (_cardioSessionDescription.cardioSession.track != null)
-              SizedBox(
-                height: 250,
-                child: MapboxMapWrapper(
-                  showScale: true,
-                  showFullscreenButton: false,
-                  showMapStylesButton: true,
-                  showSelectRouteButton: false,
-                  showSetNorthButton: true,
-                  showCurrentLocationButton: false,
-                  showCenterLocationButton: false,
-                  onMapCreated: (MapboxMapController controller) =>
-                      _mapController = controller,
-                  onStyleLoadedCallback: _setBoundsAndLines,
-                ),
-              ),
-            Form(
-              key: _formKey,
-              child: Expanded(
-                child: ListView(
-                  padding: Defaults.edgeInsets.normal,
-                  children: _cutStartDuration != null && _cutEndDuration != null
-                      ? [
-                          Defaults.sizedBox.vertical.normal,
-                          Row(
-                            children: [
-                              Expanded(
-                                child: EditTile(
-                                  leading: null,
-                                  caption: "Start",
-                                  child: Text(_cutStartDuration!.formatHms),
-                                  onTap: () async {
-                                    final duration =
-                                        await showScrollableDurationPicker(
-                                      context: context,
-                                      initialDuration: _cutStartDuration,
-                                    );
-                                    if (duration != null) {
-                                      setState(
-                                        () => _cutStartDuration = duration,
-                                      );
-                                      await _updateCutLocationMarker();
-                                    }
-                                  },
-                                ),
-                              ),
-                              Expanded(
-                                child: EditTile(
-                                  leading: null,
-                                  caption: "End",
-                                  child: Text(_cutEndDuration!.formatHms),
-                                  onTap: () async {
-                                    final duration =
-                                        await showScrollableDurationPicker(
-                                      context: context,
-                                      initialDuration: _cutEndDuration,
-                                    );
-                                    if (duration != null) {
-                                      setState(
-                                        () => _cutEndDuration = duration,
-                                      );
-                                      await _updateCutLocationMarker();
-                                    }
-                                  },
-                                  onCancel: () {
-                                    setState(() {
-                                      _cutStartDuration = null;
-                                      _cutEndDuration = null;
-                                    });
-                                    _updateCutLocationMarker();
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                          Defaults.sizedBox.vertical.normal,
-                          ElevatedButton(
-                            onPressed: _cutCardioSession,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(AppIcons.cut),
-                                Defaults.sizedBox.horizontal.normal,
-                                const Text("Cut"),
-                              ],
-                            ),
-                          ),
-                        ]
-                      : [
+          children: _cutStartDuration != null && _cutEndDuration != null
+              ? [
+                  if (_cardioSessionDescription.cardioSession.track != null)
+                    Expanded(
+                      child: MapboxMapWrapper(
+                        showScale: true,
+                        showFullscreenButton: false,
+                        showMapStylesButton: true,
+                        showSelectRouteButton: false,
+                        showSetNorthButton: true,
+                        showCurrentLocationButton: false,
+                        showCenterLocationButton: false,
+                        onMapCreated: (MapboxMapController controller) =>
+                            _mapController = controller,
+                        onStyleLoadedCallback: () async {
+                          await _setBoundsAndLines();
+                          await _updateCutLocationMarker();
+                        },
+                      ),
+                    ),
+                  Defaults.sizedBox.vertical.normal,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      EditTile(
+                        leading: null,
+                        caption: "Start",
+                        shrink: true,
+                        onTap: () async {
+                          final duration = await showScrollableDurationPicker(
+                            context: context,
+                            initialDuration: _cutStartDuration,
+                          );
+                          if (mounted && duration != null) {
+                            if (duration > _cutEndDuration!) {
+                              await showMessageDialog(
+                                context: context,
+                                text: "Start time can not be after End time.",
+                              );
+                            } else {
+                              setState(() => _cutStartDuration = duration);
+                              await _updateCutLocationMarker();
+                            }
+                          }
+                        },
+                        child: Text(_cutStartDuration!.formatHms),
+                      ),
+                      EditTile(
+                        leading: null,
+                        caption: "End",
+                        shrink: true,
+                        onTap: () async {
+                          final duration = await showScrollableDurationPicker(
+                            context: context,
+                            initialDuration: _cutEndDuration,
+                          );
+                          if (mounted && duration != null) {
+                            if (duration < _cutStartDuration!) {
+                              await showMessageDialog(
+                                context: context,
+                                text: "End time can not be before Start time.",
+                              );
+                            } else {
+                              setState(() => _cutEndDuration = duration);
+                              await _updateCutLocationMarker();
+                            }
+                          }
+                        },
+                        child: Text(_cutEndDuration!.formatHms),
+                      ),
+                    ],
+                  ),
+                  Defaults.sizedBox.vertical.normal,
+                  ElevatedButton(
+                    onPressed: _cutCardioSession,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(AppIcons.cut),
+                        Defaults.sizedBox.horizontal.normal,
+                        const Text("Cut"),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: _hideCut,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(AppIcons.close),
+                        Defaults.sizedBox.horizontal.normal,
+                        const Text("Cancel"),
+                      ],
+                    ),
+                  ),
+                ]
+              : [
+                  if (_cardioSessionDescription.cardioSession.track != null)
+                    SizedBox(
+                      height: 250,
+                      child: MapboxMapWrapper(
+                        showScale: true,
+                        showFullscreenButton: false,
+                        showMapStylesButton: true,
+                        showSelectRouteButton: false,
+                        showSetNorthButton: true,
+                        showCurrentLocationButton: false,
+                        showCenterLocationButton: false,
+                        onMapCreated: (MapboxMapController controller) =>
+                            _mapController = controller,
+                        onStyleLoadedCallback: _setBoundsAndLines,
+                      ),
+                    ),
+                  Form(
+                    key: _formKey,
+                    child: Expanded(
+                      child: ListView(
+                        padding: Defaults.edgeInsets.normal,
+                        children: [
                           EditTile(
                             leading: AppIcons.exercise,
                             caption: "Movement",
@@ -586,10 +642,10 @@ class _CardioEditPageState extends State<CardioEditPage> {
                             maxLines: 5,
                           ),
                         ],
-                ),
-              ),
-            ),
-          ],
+                      ),
+                    ),
+                  ),
+                ],
         ),
       ),
     );
