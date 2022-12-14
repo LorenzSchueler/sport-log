@@ -3,10 +3,8 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:gpx/gpx.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/write_to_file.dart';
 import 'package:sport_log/models/cardio/position.dart';
 
 final _logger = Logger("Gpx");
@@ -64,31 +62,18 @@ Future<String?> saveTrackAsGpx(
   List<Position> track, {
   DateTime? startTime,
 }) async {
-  if (!(await Permission.storage.request()).isGranted ||
-      !(await Permission.accessMediaLocation.request()).isGranted) {
-    _logger.i("permission denied");
-    return null;
-  }
-  final dir = Config.isAndroid
-      ? '/storage/emulated/0/Download'
-      : Config.isIOS
-          ? await getApplicationDocumentsDirectory()
-          : (await getDownloadsDirectory())!;
-  var file = File("$dir/track.gpx");
-  var index = 1;
-  while (await file.exists()) {
-    file = File("$dir/track$index.gpx");
-    index++;
-  }
   final gpxString = trackToGpx(track, startTime: startTime);
-  try {
-    await file.writeAsString(gpxString, flush: true);
-  } on FileSystemException catch (e) {
-    _logger.w(e.toString());
-    return null;
+  final path = await writeToFile(
+    content: gpxString,
+    filename: "track",
+    fileExtension: "gpx",
+  );
+
+  if (path != null) {
+    _logger.i("track exported to $path");
   }
-  _logger.i("track exported to ${file.path}");
-  return file.path;
+
+  return path;
 }
 
 Future<List<Position>?> loadTrackFromGpxFile() async {
