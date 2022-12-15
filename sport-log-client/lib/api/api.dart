@@ -28,7 +28,7 @@ part 'accessors/wod_api.dart';
 
 String apiVersion = '/v${Config.apiVersion}';
 
-enum ApiErrorCode {
+enum ApiErrorType {
   // http error
   badRequest, // 400
   unauthorized, // 401
@@ -44,43 +44,47 @@ enum ApiErrorCode {
 
   String get description {
     switch (this) {
-      case ApiErrorCode.badRequest:
+      case ApiErrorType.badRequest:
         return "Request was not valid.";
-      case ApiErrorCode.unauthorized:
+      case ApiErrorType.unauthorized:
         return "User unauthorized";
-      case ApiErrorCode.forbidden:
+      case ApiErrorType.forbidden:
         return "Access to resource is forbidden.";
-      case ApiErrorCode.notFound:
+      case ApiErrorType.notFound:
         return "Resource not found.";
-      case ApiErrorCode.conflict:
+      case ApiErrorType.conflict:
         return "Conflict with resource.";
-      case ApiErrorCode.internalServerError:
+      case ApiErrorType.internalServerError:
         return "Internal server error.";
-      case ApiErrorCode.unknownServerError:
-        return "An unknown server error.";
-      case ApiErrorCode.serverUnreachable:
+      case ApiErrorType.unknownServerError:
+        return "Unknown server error.";
+      case ApiErrorType.serverUnreachable:
         return "It was not possible to establish a connection with the server.";
-      case ApiErrorCode.badJson:
+      case ApiErrorType.badJson:
         return "Got bad json from server.";
-      case ApiErrorCode.unknownRequestError:
+      case ApiErrorType.unknownRequestError:
         return "Unhandled request error.";
     }
   }
 }
 
 class ApiError {
-  ApiError(this.errorCode, [this.message]);
+  ApiError(this.errorType, this.errorCode, [this.message]);
 
-  final ApiErrorCode errorCode;
+  final ApiErrorType errorType;
+  final int? errorCode;
 
   /// contains always only one entry
   final Map<String, ConflictDescriptor>? message;
 
   @override
   String toString() {
-    return message != null
-        ? "${errorCode.description}\n${message!.keys.first} in table ${message!.values.first.table} on columns ${message!.values.first.columns.join(', ')}"
-        : errorCode.description;
+    final description = errorType.description;
+    final errorCodeStr = errorCode != null ? " ($errorCode)" : "";
+    final messageStr = message != null
+        ? "\n${message!.keys.first} in table ${message!.values.first.table} on columns ${message!.values.first.columns.join(', ')}"
+        : "";
+    return "$description$errorCodeStr$messageStr";
   }
 }
 
@@ -99,22 +103,28 @@ extension _ToApiResult on Response {
         return fromJson == null
             ? Success(null)
             : Failure(
-                ApiError(ApiErrorCode.unknownServerError),
+                ApiError(ApiErrorType.unknownServerError, statusCode),
               ); // value needed but nothing returned
       case 400:
-        return Failure(ApiError(ApiErrorCode.badRequest, _message));
+        return Failure(ApiError(ApiErrorType.badRequest, statusCode, _message));
       case 401:
-        return Failure(ApiError(ApiErrorCode.unauthorized, _message));
+        return Failure(
+          ApiError(ApiErrorType.unauthorized, statusCode, _message),
+        );
       case 403:
-        return Failure(ApiError(ApiErrorCode.forbidden, _message));
+        return Failure(ApiError(ApiErrorType.forbidden, statusCode, _message));
       case 404:
-        return Failure(ApiError(ApiErrorCode.notFound, _message));
+        return Failure(ApiError(ApiErrorType.notFound, statusCode, _message));
       case 409:
-        return Failure(ApiError(ApiErrorCode.conflict, _message));
+        return Failure(ApiError(ApiErrorType.conflict, statusCode, _message));
       case 500:
-        return Failure(ApiError(ApiErrorCode.internalServerError, _message));
+        return Failure(
+          ApiError(ApiErrorType.internalServerError, statusCode, _message),
+        );
       default:
-        return Failure(ApiError(ApiErrorCode.unknownServerError, _message));
+        return Failure(
+          ApiError(ApiErrorType.unknownServerError, statusCode, _message),
+        );
     }
   }
 
@@ -140,12 +150,12 @@ extension ApiResultFromRequest on ApiResult {
     try {
       return await request();
     } on SocketException {
-      return Failure(ApiError(ApiErrorCode.serverUnreachable));
+      return Failure(ApiError(ApiErrorType.serverUnreachable, null));
     } on TypeError {
-      return Failure(ApiError(ApiErrorCode.badJson));
+      return Failure(ApiError(ApiErrorType.badJson, null));
     } catch (e) {
       ApiLogging.logger.e("Unhandled error", e);
-      return Failure(ApiError(ApiErrorCode.unknownRequestError));
+      return Failure(ApiError(ApiErrorType.unknownRequestError, null));
     }
   }
 

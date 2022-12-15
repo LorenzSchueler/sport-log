@@ -67,7 +67,7 @@ Future<void> handleError(
   );
 }
 
-Future<void> main() async {
+void main() {
   runZonedGuarded(
     () {
       WidgetsFlutterBinding.ensureInitialized();
