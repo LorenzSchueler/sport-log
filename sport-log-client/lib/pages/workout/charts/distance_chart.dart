@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_log/helpers/extensions/double_extension.dart';
 import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';
 
 class DistanceChartValue {
@@ -26,7 +27,7 @@ class DistanceChartLine {
               (entry) => DistanceChartValue(
                 distance: entry.key,
                 value:
-                    (entry.value.map((v) => v.value).average * 10).round() / 10,
+                    entry.value.map((v) => v.value).average.roundToPrecision(1),
               ),
             )
             .toList()

@@ -282,13 +282,11 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
         : null;
 
     setState(() {
-      double? speed = pos != null
-          ? _cardioSessionDescription.cardioSession.currentSpeed(pos.time)
+      _speed = pos != null
+          ? _cardioSessionDescription.cardioSession
+              .currentSpeed(pos.time)
+              ?.roundToPrecision(1)
           : null;
-      if (speed != null) {
-        speed = (speed * 10).round() / 10;
-      }
-      _speed = speed;
       _elevation = pos?.elevation.round();
       _heartRate = pos != null
           ? _cardioSessionDescription.cardioSession.currentHeartRate(pos.time)
