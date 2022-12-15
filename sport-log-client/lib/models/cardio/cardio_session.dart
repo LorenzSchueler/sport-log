@@ -121,7 +121,9 @@ class CardioSession extends AtomicEntity {
         final km = (endPos.distance - startPos.distance) / 1000;
         final hours =
             (endPos.time - startPos.time).inMilliseconds / (1000 * 60 * 60);
-        return km / hours;
+        if (hours > 0) {
+          return km / hours;
+        }
       }
     }
     return null;
@@ -154,7 +156,9 @@ class CardioSession extends AtomicEntity {
         final endCadence = cadence![endIndex];
         double minutes =
             (endCadence - startCadence).inMilliseconds / (1000 * 60);
-        return ((endIndex - startIndex) / minutes).round();
+        if (minutes > 0) {
+          return ((endIndex - startIndex) / minutes).round();
+        }
       }
     }
     return null;
@@ -171,7 +175,9 @@ class CardioSession extends AtomicEntity {
         final startHR = heartRate![startIndex];
         final endHR = heartRate![endIndex];
         double minutes = (endHR - startHR).inMilliseconds / (1000 * 60);
-        return ((endIndex - startIndex) / minutes).round();
+        if (minutes > 0) {
+          return ((endIndex - startIndex) / minutes).round();
+        }
       }
     }
     return null;
