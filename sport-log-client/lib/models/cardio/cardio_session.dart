@@ -6,6 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/helpers/id_generation.dart';
+import 'package:sport_log/helpers/search.dart';
 import 'package:sport_log/helpers/serialization/db_serialization.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/cardio/position.dart';
@@ -100,8 +101,6 @@ class CardioSession extends AtomicEntity {
   @override
   bool deleted;
 
-  static const _currentDurationOffset = Duration(minutes: 1);
-
   /// km/h
   double? get speed {
     return time == null || time!.inMilliseconds == 0 || distance == null
@@ -110,23 +109,22 @@ class CardioSession extends AtomicEntity {
   }
 
   /// km/h
-  double? currentSpeed(Duration currentDuration) {
-    if (time == null || time!.inMilliseconds == 0 || track == null) {
-      return null;
-    } else {
-      final lastPositions = track!.where(
-        (position) => position.time >= currentDuration - _currentDurationOffset,
-      );
-      final distance = lastPositions.isEmpty
-          ? 0.0
-          : lastPositions.last.distance - lastPositions.first.distance;
-      final time = lastPositions.isEmpty
-          ? Duration.zero
-          : lastPositions.last.time - lastPositions.first.time;
-      return time.inMilliseconds == 0
-          ? null
-          : (distance / 1000) / (time.inMilliseconds / (1000 * 60 * 60));
+  double? currentSpeed(Duration start, Duration end) {
+    if (track != null) {
+      final startIndex =
+          binarySearchSmallestGE(track!, (Position p) => p.time, start);
+      final endIndex =
+          binarySearchLargestLE(track!, (Position p) => p.time, end);
+      if (startIndex != null && endIndex != null) {
+        final startPos = track![startIndex];
+        final endPos = track![endIndex];
+        final km = (endPos.distance - startPos.distance) / 1000;
+        final hours =
+            (endPos.time - startPos.time).inMilliseconds / (1000 * 60 * 60);
+        return km / hours;
+      }
     }
+    return null;
   }
 
   /// min/km
@@ -138,44 +136,45 @@ class CardioSession extends AtomicEntity {
   }
 
   /// min/km
-  Duration? currentTempo(Duration currentDuration) {
-    final speed = currentSpeed(currentDuration);
+  Duration? currentTempo(Duration start, Duration end) {
+    final speed = currentSpeed(start, end);
     return speed == null || speed == 0
         ? null
         : Duration(milliseconds: (60 * 60 * 1000 / speed).round());
   }
 
   /// rpm
-  int? currentCadence(Duration currentDuration) {
-    if (time == null || time!.inMilliseconds == 0 || cadence == null) {
-      return null;
-    } else {
-      final lastCadence =
-          cadence!.where((d) => d >= currentDuration - _currentDurationOffset);
-      final time = lastCadence.isEmpty
-          ? Duration.zero
-          : lastCadence.last - lastCadence.first;
-      return time.inMilliseconds == 0 || lastCadence.isEmpty
-          ? null
-          : (lastCadence.length / (time.inMilliseconds / (1000 * 60))).round();
+  int? currentCadence(Duration start, Duration end) {
+    if (cadence != null) {
+      final startIndex =
+          binarySearchSmallestGE(cadence!, (Duration d) => d, start);
+      final endIndex = binarySearchLargestLE(cadence!, (Duration d) => d, end);
+      if (startIndex != null && endIndex != null) {
+        final startCadence = cadence![startIndex];
+        final endCadence = cadence![endIndex];
+        double minutes =
+            (endCadence - startCadence).inMilliseconds / (1000 * 60);
+        return ((endIndex - startIndex) / minutes).round();
+      }
     }
+    return null;
   }
 
   /// bpm
-  int? currentHeartRate(Duration currentDuration) {
-    if (time == null || time!.inMilliseconds == 0 || heartRate == null) {
-      return null;
-    } else {
-      final lastHeartRate = heartRate!
-          .where((d) => d >= currentDuration - _currentDurationOffset);
-      final time = lastHeartRate.isEmpty
-          ? Duration.zero
-          : lastHeartRate.last - lastHeartRate.first;
-      return time.inMilliseconds == 0 || lastHeartRate.isEmpty
-          ? null
-          : (lastHeartRate.length / (time.inMilliseconds / (1000 * 60)))
-              .round();
+  int? currentHeartRate(Duration start, Duration end) {
+    if (heartRate != null) {
+      final startIndex =
+          binarySearchSmallestGE(heartRate!, (Duration d) => d, start);
+      final endIndex =
+          binarySearchLargestLE(heartRate!, (Duration d) => d, end);
+      if (startIndex != null && endIndex != null) {
+        final startHR = heartRate![startIndex];
+        final endHR = heartRate![endIndex];
+        double minutes = (endHR - startHR).inMilliseconds / (1000 * 60);
+        return ((endIndex - startIndex) / minutes).round();
+      }
     }
+    return null;
   }
 
   void setEmptyListsToNull() {

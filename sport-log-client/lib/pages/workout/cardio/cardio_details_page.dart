@@ -2,11 +2,14 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/double_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/gpx.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/pointer.dart';
+import 'package:sport_log/helpers/search.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
+import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
 import 'package:sport_log/pages/workout/charts/duration_chart.dart';
 import 'package:sport_log/pages/workout/comments_box.dart';
@@ -275,30 +278,54 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
     }
   }
 
-  Future<void> _touchCallback(Duration? y) async {
-    final pos = y != null
-        ? _cardioSessionDescription.cardioSession.track?.reversed
-            .firstWhereOrNull((pos) => pos.time <= y)
-        : null;
+  Future<void> _touchCallback(Duration? touchDuration) async {
+    const currentDurationOffset = Duration(minutes: 1);
 
-    setState(() {
-      _speed = pos != null
-          ? _cardioSessionDescription.cardioSession
-              .currentSpeed(pos.time)
-              ?.roundToPrecision(1)
-          : null;
-      _elevation = pos?.elevation.round();
-      _heartRate = pos != null
-          ? _cardioSessionDescription.cardioSession.currentHeartRate(pos.time)
-          : null;
-      _cadence = pos != null
-          ? _cardioSessionDescription.cardioSession.currentCadence(pos.time)
-          : null;
-    });
+    if (touchDuration != null) {
+      final session = _cardioSessionDescription.cardioSession;
+      final track = session.track;
 
-    await _mapController?.updateLocationMarker(
-      _touchLocationMarker,
-      pos?.latLng,
-    );
+      final Position? pos;
+      if (track != null) {
+        final index = binarySearchLargestLE(
+          track,
+          (Position pos) => pos.time,
+          touchDuration,
+        );
+        pos = index != null ? track[index] : null;
+      } else {
+        pos = null;
+      }
+
+      setState(() {
+        _speed = session
+            .currentSpeed(touchDuration - currentDurationOffset, touchDuration)
+            ?.roundToPrecision(1);
+        _elevation = pos?.elevation.round();
+        _heartRate = session.currentHeartRate(
+          touchDuration - currentDurationOffset,
+          touchDuration,
+        );
+        _cadence = session.currentCadence(
+          touchDuration - currentDurationOffset,
+          touchDuration,
+        );
+      });
+      await _mapController?.updateLocationMarker(
+        _touchLocationMarker,
+        pos?.latLng,
+      );
+    } else {
+      setState(() {
+        _speed = null;
+        _elevation = null;
+        _heartRate = null;
+        _cadence = null;
+      });
+      await _mapController?.updateLocationMarker(
+        _touchLocationMarker,
+        null,
+      );
+    }
   }
 }

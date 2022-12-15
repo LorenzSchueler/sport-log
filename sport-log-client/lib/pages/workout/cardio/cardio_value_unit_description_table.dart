@@ -18,6 +18,8 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
   final bool showDatetimeCardioType;
   final bool showCurrentElevation;
 
+  static const _currentDurationOffset = Duration(minutes: 1);
+
   @override
   Widget build(BuildContext context) {
     TableRow rowSpacer = TableRow(
@@ -60,8 +62,10 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
                       cardioSessionDescription.cardioSession.speed,
                     ),
                     ValueUnitDescription.speed(
-                      cardioSessionDescription.cardioSession
-                          .currentSpeed(currentDuration!),
+                      cardioSessionDescription.cardioSession.currentSpeed(
+                        currentDuration! - _currentDurationOffset,
+                        currentDuration!,
+                      ),
                       current: true,
                     ),
                   ],
@@ -73,8 +77,10 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
                       cardioSessionDescription.cardioSession.tempo,
                     ),
                     ValueUnitDescription.tempo(
-                      cardioSessionDescription.cardioSession
-                          .currentTempo(currentDuration!),
+                      cardioSessionDescription.cardioSession.currentTempo(
+                        currentDuration! - _currentDurationOffset,
+                        currentDuration!,
+                      ),
                       current: true,
                     ),
                   ],
@@ -126,8 +132,10 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
                       cardioSessionDescription.cardioSession.avgCadence,
                     ),
                     ValueUnitDescription.avgCadence(
-                      cardioSessionDescription.cardioSession
-                          .currentCadence(currentDuration!),
+                      cardioSessionDescription.cardioSession.currentCadence(
+                        currentDuration! - _currentDurationOffset,
+                        currentDuration!,
+                      ),
                       current: true,
                     ),
                   ],
@@ -139,8 +147,10 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
                       cardioSessionDescription.cardioSession.avgHeartRate,
                     ),
                     ValueUnitDescription.avgHeartRate(
-                      cardioSessionDescription.cardioSession
-                          .currentHeartRate(currentDuration!),
+                      cardioSessionDescription.cardioSession.currentHeartRate(
+                        currentDuration! - _currentDurationOffset,
+                        currentDuration!,
+                      ),
                       current: true,
                     ),
                   ],
