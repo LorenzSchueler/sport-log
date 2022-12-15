@@ -27,6 +27,7 @@ use figment::{
     Figment,
 };
 use rocket::{
+    data::ToByteUnit,
     fairing::{AdHoc, Fairing, Info, Kind},
     http::{Header, Method, Status},
     Build, Request, Response, Rocket,
@@ -100,7 +101,9 @@ pub async fn get_version() -> JsonResult<Version> {
 }
 
 fn rocket() -> Rocket<Build> {
-    let figment = Figment::from(rocket::Config::default()).merge(Toml::file(CONFIG_FILE).nested());
+    let mut default_config = rocket::Config::default();
+    default_config.limits = default_config.limits.limit("json", 10.mebibytes());
+    let figment = Figment::from(default_config).merge(Toml::file(CONFIG_FILE).nested());
     if cfg!(test) {
         env::set_var("RUST_LOG", "error");
     } else if figment.profile() == "debug" {
