@@ -67,6 +67,7 @@ class DistanceChart extends StatelessWidget {
     required this.yFromZero,
     this.touchCallback,
     this.height = 200,
+    this.labelColor = Colors.white,
     super.key,
   });
 
@@ -74,8 +75,7 @@ class DistanceChart extends StatelessWidget {
   final bool yFromZero;
   final Function(double? distance)? touchCallback;
   final double height;
-
-  static Color color = Colors.black;
+  final Color labelColor;
 
   double? lastX;
 
@@ -167,7 +167,7 @@ class DistanceChart extends StatelessWidget {
                     (km * 1000).round() % xInterval.round() == 0
                         ? km.toStringAsFixed(1)
                         : "", // remove label at last value
-                    style: TextStyle(color: color),
+                    style: TextStyle(color: labelColor),
                   ),
                   reservedSize: 20,
                 ),
@@ -178,7 +178,7 @@ class DistanceChart extends StatelessWidget {
                   reservedSize: 30,
                   getTitlesWidget: (value, _) => Text(
                     value.round().toString(),
-                    style: TextStyle(color: color),
+                    style: TextStyle(color: labelColor),
                   ),
                 ),
               ),

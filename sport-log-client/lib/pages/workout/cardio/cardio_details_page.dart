@@ -146,7 +146,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                     left: 0,
                     right: 0,
                     child: Container(
-                      color: const Color.fromARGB(120, 0, 0, 0),
+                      color: const Color.fromARGB(150, 0, 0, 0),
                       child: Column(
                         children: [
                           Row(

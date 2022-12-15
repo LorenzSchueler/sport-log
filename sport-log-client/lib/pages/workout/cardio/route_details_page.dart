@@ -133,7 +133,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
                       left: 0,
                       right: 0,
                       child: Container(
-                        color: const Color.fromARGB(120, 0, 0, 0),
+                        color: const Color.fromARGB(150, 0, 0, 0),
                         child: DistanceChart(
                           chartLines: [_elevationLine()],
                           yFromZero: true,

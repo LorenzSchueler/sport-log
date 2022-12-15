@@ -100,6 +100,7 @@ class DurationChart extends StatefulWidget {
     required this.yFromZero,
     this.touchCallback,
     this.height = 200,
+    this.labelColor = Colors.white,
     super.key,
   })  : xInterval = chartLines
             .map(
@@ -129,11 +130,10 @@ class DurationChart extends StatefulWidget {
   final bool yFromZero;
   final Function(Duration? x)? touchCallback;
   final double height;
+  final Color labelColor;
 
   final double xInterval;
   final double maxX;
-
-  static Color color = Colors.black;
 
   @override
   State<DurationChart> createState() => _DurationChartState();
@@ -207,7 +207,7 @@ class _DurationChartState extends State<DurationChart> {
                             value.round() < widget.maxX
                         ? Duration(milliseconds: value.round()).formatHm
                         : "", // remove label at 0 and last value
-                    style: TextStyle(color: DurationChart.color),
+                    style: TextStyle(color: widget.labelColor),
                   ),
                   reservedSize: 20,
                 ),
