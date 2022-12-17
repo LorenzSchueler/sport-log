@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/main.dart';
 import 'package:sport_log/models/server_version/server_version.dart';
 import 'package:yaml/yaml.dart';
 
@@ -46,12 +45,12 @@ class Config extends JsonSerializable {
     } on YamlException catch (e) {
       _logger.i("sport-log-client.yaml is not a valid YAML file: $e");
       // ignore: avoid-throw-in-catch-block
-      throw InitException("sport-log-client.yaml is not a valid YAML file: $e");
+      throw Exception("sport-log-client.yaml is not a valid YAML file: $e");
     } on MissingRequiredKeysException catch (e) {
       _logger
           .i("sport-log-client.yaml does not contain keys: ${e.missingKeys}");
       // ignore: avoid-throw-in-catch-block
-      throw InitException(
+      throw Exception(
         "sport-log-client.yaml does not contain keys: ${e.missingKeys}",
       );
     } on TypeError catch (e) {
@@ -59,13 +58,13 @@ class Config extends JsonSerializable {
         "sport-log-client.yaml has a invalid format or contains invalid data types for some fields: $e",
       );
       // ignore: avoid-throw-in-catch-block
-      throw InitException(
+      throw Exception(
         "sport-log-client.yaml has a invalid format or contains invalid data types for some fields: $e",
       );
     } catch (e) {
       _logger.i("sport-log-client.yaml could not be parsed: $e");
       // ignore: avoid-throw-in-catch-block
-      throw InitException("sport-log-client.yaml could not be parsed: $e");
+      throw Exception("sport-log-client.yaml could not be parsed: $e");
     }
 
     final bool isAndroidEmulator;

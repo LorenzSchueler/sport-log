@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -10,22 +9,13 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/write_to_file.dart';
+import 'package:sport_log/global_error_handler.dart';
 import 'package:sport_log/pages/login/welcome_screen.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-
-class InitException implements Exception {
-  const InitException(this.message);
-
-  final String message;
-
-  @override
-  String toString() => "InitException: $message";
-}
 
 Stream<double> initialize() async* {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,46 +39,10 @@ Stream<double> initialize() async* {
   yield 1.0;
 }
 
-Future<void> handleError(
-  String caughtBy,
-  Object error,
-  StackTrace? stackTrace, [
-  DiagnosticsNode? context,
-  String? library,
-]) async {
-  final now = DateTime.now();
-  final description =
-      "time: $now\ncaught by: $caughtBy\ncontext: $context\nlibrary: $library\n\nerror:\n$error\n\nstack trace:\n$stackTrace\n\n\n";
-  await writeToFile(
-    content: description,
-    filename: Config.debugMode ? "sport-log(debug)" : "sport-log",
-    fileExtension: "log",
-    append: true,
-  );
-}
-
 void main() {
-  runZonedGuarded(
-    () {
-      WidgetsFlutterBinding.ensureInitialized();
-      FlutterError.onError = (details) {
-        FlutterError.presentError(details);
-        handleError(
-          "FlutterError",
-          details.exception,
-          details.stack,
-          details.context,
-          details.library,
-        );
-      };
-      PlatformDispatcher.instance.onError = (error, stackTrace) {
-        handleError("PlatformDispatcher", error, stackTrace);
-        return true;
-      };
-
-      runApp(const InitAppWrapper());
-    },
-    (error, stackTrace) => handleError("runZoneGuarded", error, stackTrace),
+  WidgetsFlutterBinding.ensureInitialized();
+  GlobalErrorHandler.run(
+    () => runApp(const InitAppWrapper()),
   );
 }
 
