@@ -55,6 +55,8 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool _disposed = false;
+
   void init() {
     _dataProvider.addListener(_update);
     _update();
@@ -62,6 +64,7 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
 
   @override
   void dispose() {
+    _disposed = true;
     _dataProvider.removeListener(_update);
     super.dispose();
   }
@@ -80,7 +83,9 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
     );
     _records = await recordAccessor(_dataProvider)();
     _isLoading = false;
-    notifyListeners();
+    if (!_disposed) {
+      notifyListeners();
+    }
     _logger.d("Update finished.");
   }
 }

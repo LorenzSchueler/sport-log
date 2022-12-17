@@ -83,12 +83,20 @@ abstract class EntityDataProvider<T extends AtomicEntity>
 
   List<T> getFromAccountData(AccountData accountData);
 
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
   @override
   Future<DbResult> createSingle(T object, {bool notify = true}) async {
     object.sanitize();
     assert(object.isValid());
     final result = await db.createSingle(object);
-    if (result.isSuccess && notify) {
+    if (result.isSuccess && notify && !_disposed) {
       notifyListeners();
     }
     return result;
@@ -99,7 +107,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     object.sanitize();
     assert(object.isValid());
     final result = await db.updateSingle(object);
-    if (result.isSuccess && notify) {
+    if (result.isSuccess && notify && !_disposed) {
       notifyListeners();
     }
     return result;
@@ -108,7 +116,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   @override
   Future<DbResult> deleteSingle(T object, {bool notify = true}) async {
     final result = await db.deleteSingle(object.id);
-    if (result.isSuccess && notify) {
+    if (result.isSuccess && notify && !_disposed) {
       notifyListeners();
     }
     return result;
@@ -124,7 +132,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
     assert(objects.every((object) => object.isValid()));
     final result = await db.createMultiple(objects);
-    if (result.isSuccess && notify) {
+    if (result.isSuccess && notify && !_disposed) {
       notifyListeners();
     }
     return result;
@@ -137,7 +145,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
     assert(objects.every((object) => object.isValid()));
     final result = await db.updateMultiple(objects);
-    if (result.isSuccess && notify) {
+    if (result.isSuccess && notify && !_disposed) {
       notifyListeners();
     }
     return result;
@@ -146,7 +154,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   /// used in compound data providers impl of deleteSingle
   Future<DbResult> deleteMultiple(List<T> objects, {bool notify = true}) async {
     final result = await db.deleteMultiple(objects);
-    if (result.isSuccess && notify) {
+    if (result.isSuccess && notify && !_disposed) {
       notifyListeners();
     }
     return result;
@@ -244,7 +252,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     if (result.isFailure) {
       await DataProvider._handleDbError(result.failure);
     }
-    if (result.isSuccess && notify) {
+    if (result.isSuccess && notify && !_disposed) {
       notifyListeners();
     }
     return result.isSuccess;

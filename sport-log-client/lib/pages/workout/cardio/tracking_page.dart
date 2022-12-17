@@ -93,7 +93,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
     _timer.cancel();
     _stepUtils.stopStepCountStream();
     _locationUtils.stopLocationStream();
-    _heartRateUtils.stopHeartRateStream(dispose: true);
+    _heartRateUtils.stopHeartRateStream();
     if (_locationUtils.lastLatLng != null) {
       Settings.instance.lastGpsLatLng = _locationUtils.lastLatLng!;
     }

@@ -25,9 +25,19 @@ class MapDownloadUtils extends ChangeNotifier {
   double? _progress;
   double? get progress => _progress;
 
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
   Future<void> _updateRegions() async {
     _regions = await getListOfRegions(accessToken: Config.instance.accessToken);
-    notifyListeners();
+    if (!_disposed) {
+      notifyListeners();
+    }
   }
 
   Future<void> deleteRegion(OfflineRegion region) async {
@@ -36,18 +46,20 @@ class MapDownloadUtils extends ChangeNotifier {
   }
 
   Future<void> _onMapDownload(DownloadRegionStatus status) async {
-    if (status.runtimeType == Success) {
-      _progress = null;
-      await _updateRegions();
-      notifyListeners();
-      await onSuccess?.call();
-    } else if (status.runtimeType == InProgress) {
-      _progress = (status as InProgress).progress / 100;
-      notifyListeners();
-    } else if (status.runtimeType == Error) {
-      _progress = null;
-      notifyListeners();
-      await onError?.call();
+    if (!_disposed) {
+      if (status.runtimeType == Success) {
+        _progress = null;
+        await _updateRegions();
+        notifyListeners();
+        await onSuccess?.call();
+      } else if (status.runtimeType == InProgress) {
+        _progress = (status as InProgress).progress / 100;
+        notifyListeners();
+      } else if (status.runtimeType == Error) {
+        _progress = null;
+        notifyListeners();
+        await onError?.call();
+      }
     }
   }
 
