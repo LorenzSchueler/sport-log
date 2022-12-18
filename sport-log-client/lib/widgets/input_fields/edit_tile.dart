@@ -35,7 +35,22 @@ class EditTile extends StatelessWidget {
   final IconData? leading;
   final VoidCallback? onTap;
   final VoidCallback? onCancel;
+
+  /// if enabled [child] must have a bounded width
   final bool shrink;
+
+  Widget _captionChildColumn(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (caption != null) CaptionTile(caption: caption!),
+        DefaultTextStyle(
+          style: Theme.of(context).textTheme.subtitle1!,
+          child: child,
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,17 +64,9 @@ class EditTile extends StatelessWidget {
             Icon(leading, color: Colors.white70),
             const SizedBox(width: 15),
           ],
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (caption != null) CaptionTile(caption: caption!),
-              DefaultTextStyle(
-                style: Theme.of(context).textTheme.subtitle1!,
-                child: child,
-              ),
-            ],
-          ),
-          if (!shrink) Expanded(child: Container()),
+          shrink
+              ? _captionChildColumn(context)
+              : Expanded(child: _captionChildColumn(context)),
           if (onCancel != null)
             IconButton(
               padding: EdgeInsets.zero,

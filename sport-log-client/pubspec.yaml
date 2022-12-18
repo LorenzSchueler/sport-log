@@ -55,6 +55,7 @@ dependencies:
   logger: ^1.0.0
   mapbox_api: ^1.0.0
   mapbox_gl: ^0.16.0 # mapping lib for osm
+  # mapbox_maps_flutter: ^0.3.0
   mapbox_search: ^3.0.1+2
   package_info_plus: ^3.0.1
   path_provider: ^2.0.10
