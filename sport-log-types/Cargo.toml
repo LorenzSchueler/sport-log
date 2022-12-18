@@ -6,13 +6,13 @@ edition = "2021"
 [dependencies]
 sport-log-types-derive = { path = "../sport-log-types-derive" }
 
-rocket = { version = "0.5.0-rc.1", features = ["json"], optional = true }
-rocket_sync_db_pools = { version = "0.1.0-rc.1", features = ["diesel_postgres_pool"], optional = true }
+rocket = { version = "0.5.0-rc.2", features = ["json"], optional = true }
+rocket_sync_db_pools = { version = "0.1.0-rc.2", features = ["diesel_postgres_pool"], optional = true }
 diesel = { version = "1.4", features = ["postgres", "r2d2", "chrono"], optional = true }
 diesel-derive-enum = { version = "1.1", features = ["postgres"], optional = true }
 serde = { version = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
-base64 = { version = "0.13", optional = true }
+base64 = { version = "0.20", optional = true }
 toml = { version = "0.5", optional = true }
 argon2 = { version = "0.4", optional = true }
 rand_core = { version = "0.6", features = ["std"], optional = true }

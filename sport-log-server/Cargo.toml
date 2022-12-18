@@ -8,8 +8,8 @@ default-run = "sport-log-server"
 sport-log-types = { path = "../sport-log-types", features = ["server"] }
 
 tokio = { version = "1.9", features = ["full"] }
-rocket = { version = "0.5.0-rc.1", features = ["json"] }
-rocket_sync_db_pools = { version = "0.1.0-rc.1", features = ["diesel_postgres_pool"] }
+rocket = { version = "0.5.0-rc.2", features = ["json"] }
+rocket_sync_db_pools = { version = "0.1.0-rc.2", features = ["diesel_postgres_pool"] }
 diesel = { version = "1.4", features = ["postgres", "r2d2", "chrono"] }
 diesel_migrations = "1.4"
 serde = { version = "1.0", features = ["derive"]}
@@ -20,5 +20,5 @@ tracing-subscriber = "0.3"
 figment = { version = "0.10", features = ["toml"] }
 
 [dev-dependencies]
-base64 = "0.13"
+base64 = "0.20"
 rand = "0.8"
