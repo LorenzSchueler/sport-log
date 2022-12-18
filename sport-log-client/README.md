@@ -4,7 +4,7 @@
 
 <h1 align="center">Sport Log Client</h1>
 
-![](https://img.shields.io/github/workflow/status/LorenzSchueler/sport-log/Flutter/master?label=Pipeline)
+![](https://img.shields.io/github/actions/workflow/status/LorenzSchueler/sport-log/flutter.yml?branch=master&label=Flutter%20Pipeline)
 ![](https://img.shields.io/github/license/LorenzSchueler/sport-log)
 
 ## Config

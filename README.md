@@ -4,8 +4,8 @@
 
 <h1 align="center">Sport Log</h1>
   
-![](https://img.shields.io/github/workflow/status/LorenzSchueler/sport-log/Rust/master?label=Rust%20Pipeline)
-![](https://img.shields.io/github/workflow/status/LorenzSchueler/sport-log/Flutter/master?label=Flutter%20Pipeline)
+![](https://img.shields.io/github/actions/workflow/status/LorenzSchueler/sport-log/rust.yml?branch=master&label=Rust%20Pipeline)
+![](https://img.shields.io/github/actions/workflow/status/LorenzSchueler/sport-log/flutter.yml?branch=master&label=Flutter%20Pipeline)
 ![](https://img.shields.io/github/license/LorenzSchueler/sport-log)
 ![](https://img.shields.io/github/contributors/LorenzSchueler/sport-log)
 
