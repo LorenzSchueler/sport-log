@@ -1,515 +1,394 @@
-use rocket::{http::Status, State};
+use std::sync::Arc;
+
+use axum::{
+    extract::{Query, State},
+    http::StatusCode,
+    Json,
+};
 
 use sport_log_types::{
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
-    ActionRuleId, AuthAP, AuthAdmin, AuthUser, Config, CreatableActionRule, Create, CreateMultiple,
-    Db, DeletableActionEvent, ExecutableActionEvent, GetAll, GetById, GetByUser, Unverified,
+    ActionRuleId, AuthAP, AuthAdmin, AuthUser, Config, CreatableActionRule, Create, DbConn,
+    DeletableActionEvent, ExecutableActionEvent, GetAll, GetById, GetByUser, Unverified,
     UnverifiedId, UnverifiedIds, Update, VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb,
-    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForUser,
-    VerifyIdUnchecked, VerifyIdsForActionProvider, VerifyIdsForAdmin,
+    VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin,
+    VerifyIdForUser, VerifyIdUnchecked, VerifyIdsForActionProvider, VerifyIdsForAdmin,
     VerifyMultipleForActionProviderWithoutDb, VerifyMultipleForAdminWithoutDb,
     VerifyMultipleForUserWithDb, VerifyMultipleForUserWithoutDb, VerifyUnchecked,
 };
 
-use crate::handler::{DateTimeWrapper, IntoJson, JsonError, JsonResult};
+use crate::handler::{
+    ErrorMessage, HandlerError, HandlerResult, IdOption, Ids, TimeSpanOption, UnverifiedSingleOrVec,
+};
 
-#[post(
-    "/adm/action_provider",
-    format = "application/json",
-    data = "<action_provider>"
-)]
-pub async fn adm_create_action_provider(
-    action_provider: Unverified<ActionProvider>,
+pub async fn adm_create_action_providers(
     auth: AuthAdmin,
-    conn: Db,
-) -> JsonResult<ActionProvider> {
-    let action_provider = action_provider
-        .verify_adm(&auth)
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(|c| ActionProvider::create(action_provider, c))
-        .await
-        .into_json()
+    db: DbConn,
+    Json(action_providers): Json<UnverifiedSingleOrVec<ActionProvider>>,
+) -> HandlerResult<StatusCode> {
+    match action_providers {
+        UnverifiedSingleOrVec::Single(action_provider) => {
+            let action_provider = action_provider.verify_adm(auth)?;
+            ActionProvider::create(action_provider, &db)
+        }
+        UnverifiedSingleOrVec::Vec(action_providers) => {
+            let action_providers = action_providers.verify_adm(auth)?;
+            ActionProvider::create_multiple(action_providers, &db)
+        }
+    }
+    .map(|_| StatusCode::OK)
+    .map_err(Into::into)
 }
 
-#[post(
-    "/ap/action_provider",
-    format = "application/json",
-    data = "<action_provider>"
-)]
 pub async fn ap_create_action_provider(
-    action_provider: Unverified<ActionProvider>,
-    config: &State<Config>,
-    conn: Db,
-) -> JsonResult<ActionProvider> {
+    State(config): State<Arc<Config>>,
+    db: DbConn,
+    Json(action_provider): Json<Unverified<ActionProvider>>,
+) -> HandlerResult<StatusCode> {
     if !config.ap_self_registration {
-        return Err(JsonError {
-            status: Status::Forbidden,
-            message: None,
+        return Err(HandlerError {
+            status: StatusCode::FORBIDDEN,
+            message: Some(ErrorMessage::Other(
+                "action provider self registration is disabled".to_owned(),
+            )),
         });
     }
-    let action_provider = action_provider
-        .verify_unchecked()
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(|c| ActionProvider::create(action_provider, c))
-        .await
-        .into_json()
+
+    let action_provider = action_provider.verify_unchecked()?;
+    ActionProvider::create(action_provider, &db)
+        .map(|_| StatusCode::OK)
+        .map_err(Into::into)
 }
 
-#[get("/adm/action_provider")]
 pub async fn adm_get_action_providers(
-    _auth: AuthAdmin,
-    conn: Db,
-) -> JsonResult<Vec<ActionProvider>> {
-    conn.run(|c| ActionProvider::get_all(c)).await.into_json()
+    auth: AuthAdmin,
+    Query(IdOption { id }): Query<IdOption<UnverifiedId<ActionProviderId>>>,
+    db: DbConn,
+) -> HandlerResult<Json<Vec<ActionProvider>>> {
+    match id {
+        Some(id) => {
+            let action_provider_id = id.verify_adm(auth)?;
+            ActionProvider::get_by_id(action_provider_id, &db).map(|a| vec![a])
+        }
+        None => ActionProvider::get_all(&db),
+    }
+    .map(Json)
+    .map_err(Into::into)
 }
 
-#[get("/ap/action_provider")]
-pub async fn ap_get_action_provider(auth: AuthAP, conn: Db) -> JsonResult<ActionProvider> {
-    conn.run(move |c| ActionProvider::get_by_id(*auth, c))
-        .await
-        .into_json()
-}
-
-#[get("/action_provider")]
-pub async fn get_action_providers(_auth: AuthUser, conn: Db) -> JsonResult<Vec<ActionProvider>> {
-    conn.run(|c| ActionProvider::get_all(c)).await.into_json()
-}
-
-#[post("/ap/action", format = "application/json", data = "<action>")]
-pub async fn ap_create_action(
-    action: Unverified<Action>,
+pub async fn ap_get_action_provider(
     auth: AuthAP,
-    conn: Db,
-) -> JsonResult<Action> {
-    let action = action
-        .verify_ap_without_db(&auth)
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(|c| Action::create(action, c)).await.into_json()
+    db: DbConn,
+) -> HandlerResult<Json<ActionProvider>> {
+    ActionProvider::get_by_id(*auth, &db)
+        .map(Json)
+        .map_err(Into::into)
 }
 
-#[post("/ap/actions", format = "application/json", data = "<actions>")]
+pub async fn get_action_providers(
+    _auth: AuthUser,
+    Query(IdOption { id }): Query<IdOption<UnverifiedId<ActionProviderId>>>,
+    db: DbConn,
+) -> HandlerResult<Json<Vec<ActionProvider>>> {
+    match id {
+        Some(id) => {
+            let action_provider_id = id.verify_unchecked()?;
+            ActionProvider::get_by_id(action_provider_id, &db).map(|a| vec![a])
+        }
+        None => ActionProvider::get_all(&db),
+    }
+    .map(Json)
+    .map_err(Into::into)
+}
+
 pub async fn ap_create_actions(
-    actions: Unverified<Vec<Action>>,
     auth: AuthAP,
-    conn: Db,
-) -> JsonResult<Vec<Action>> {
-    let actions = actions
-        .verify_ap_without_db(&auth)
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(|c| Action::create_multiple(actions, c))
-        .await
-        .into_json()
+    db: DbConn,
+    Json(actions): Json<UnverifiedSingleOrVec<Action>>,
+) -> HandlerResult<StatusCode> {
+    match actions {
+        UnverifiedSingleOrVec::Single(action) => {
+            let action = action.verify_ap_without_db(auth)?;
+            Action::create(action, &db)
+        }
+        UnverifiedSingleOrVec::Vec(actions) => {
+            let actions = actions.verify_ap_without_db(auth)?;
+            Action::create_multiple(actions, &db)
+        }
+    }
+    .map(|_| StatusCode::OK)
+    .map_err(Into::into)
 }
 
-#[get("/ap/action/<action_id>")]
-pub async fn ap_get_action(
-    action_id: UnverifiedId<ActionId>,
+pub async fn ap_get_actions(
     auth: AuthAP,
-    conn: Db,
-) -> JsonResult<Action> {
-    let action_id = conn
-        .run(move |c| action_id.verify_ap(&auth, c))
-        .await
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(move |c| Action::get_by_id(action_id, c))
-        .await
-        .into_json()
+    Query(IdOption { id }): Query<IdOption<UnverifiedId<ActionId>>>,
+    db: DbConn,
+) -> HandlerResult<Json<Vec<Action>>> {
+    match id {
+        Some(id) => {
+            let action_id = id.verify_ap(auth, &db)?;
+            Action::get_by_id(action_id, &db).map(|a| vec![a])
+        }
+        None => Action::get_by_action_provider(*auth, &db),
+    }
+    .map(Json)
+    .map_err(Into::into)
 }
 
-#[get("/ap/action")]
-pub async fn ap_get_actions(auth: AuthAP, conn: Db) -> JsonResult<Vec<Action>> {
-    conn.run(move |c| Action::get_by_action_provider(*auth, c))
-        .await
-        .into_json()
+pub async fn get_actions(
+    _auth: AuthUser,
+    Query(IdOption { id }): Query<IdOption<UnverifiedId<ActionId>>>,
+    db: DbConn,
+) -> HandlerResult<Json<Vec<Action>>> {
+    match id {
+        Some(id) => {
+            let action_id = id.verify_unchecked()?;
+            Action::get_by_id(action_id, &db).map(|a| vec![a])
+        }
+        None => Action::get_all(&db),
+    }
+    .map(Json)
+    .map_err(Into::into)
 }
 
-#[get("/action")]
-pub async fn get_actions(_auth: AuthUser, conn: Db) -> JsonResult<Vec<Action>> {
-    conn.run(|c| Action::get_all(c)).await.into_json()
-}
-
-#[post("/action_rule", format = "application/json", data = "<action_rule>")]
-pub async fn create_action_rule(
-    action_rule: Unverified<ActionRule>,
-    auth: AuthUser,
-    conn: Db,
-) -> JsonResult<ActionRule> {
-    let action_rule = action_rule
-        .verify_user_without_db(&auth)
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(|c| ActionRule::create(action_rule, c))
-        .await
-        .into_json()
-}
-
-#[post("/action_rules", format = "application/json", data = "<action_rules>")]
 pub async fn create_action_rules(
-    action_rules: Unverified<Vec<ActionRule>>,
     auth: AuthUser,
-    conn: Db,
-) -> JsonResult<Vec<ActionRule>> {
-    let action_rules = action_rules
-        .verify_user_without_db(&auth)
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(|c| ActionRule::create_multiple(action_rules, c))
-        .await
-        .into_json()
+    db: DbConn,
+    Json(action_rules): Json<UnverifiedSingleOrVec<ActionRule>>,
+) -> HandlerResult<StatusCode> {
+    match action_rules {
+        UnverifiedSingleOrVec::Single(action_rule) => {
+            let action_rule = action_rule.verify_user_without_db(auth)?;
+            ActionRule::create(action_rule, &db)
+        }
+        UnverifiedSingleOrVec::Vec(action_rules) => {
+            let action_rules = action_rules.verify_user_without_db(auth)?;
+            ActionRule::create_multiple(action_rules, &db)
+        }
+    }
+    .map(|_| StatusCode::OK)
+    .map_err(Into::into)
 }
 
-#[get("/action_rule/<action_rule_id>")]
-pub async fn get_action_rule(
-    action_rule_id: UnverifiedId<ActionRuleId>,
+pub async fn get_action_rules(
     auth: AuthUser,
-    conn: Db,
-) -> JsonResult<ActionRule> {
-    let action_rule_id = conn
-        .run(move |c| action_rule_id.verify_user(&auth, c))
-        .await
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(move |c| ActionRule::get_by_id(action_rule_id, c))
-        .await
-        .into_json()
+    Query(IdOption { id }): Query<IdOption<UnverifiedId<ActionRuleId>>>,
+    db: DbConn,
+) -> HandlerResult<Json<Vec<ActionRule>>> {
+    match id {
+        Some(id) => {
+            let action_rule_id = id.verify_user(auth, &db)?;
+            ActionRule::get_by_id(action_rule_id, &db).map(|a| vec![a])
+        }
+        None => ActionRule::get_by_user(*auth, &db),
+    }
+    .map(Json)
+    .map_err(Into::into)
 }
 
-#[get("/action_rule")]
-pub async fn get_action_rules(auth: AuthUser, conn: Db) -> JsonResult<Vec<ActionRule>> {
-    conn.run(move |c| ActionRule::get_by_user(*auth, c))
-        .await
-        .into_json()
-}
+//#[get("/action_rule/action_provider/<action_provider_id>")]
+//pub async fn get_action_rules_by_action_provider(
+//auth: AuthUser,
+//Path(action_provider_id): Path<UnverifiedId<ActionProviderId>>,
+//db: DbConn,
+//) -> HandlerResult<Json<Vec<ActionRule>>> {
+//
+//let action_provider_id = action_provider_id.verify_unchecked().map_err(Error::from)?;
+//ActionRule::get_by_user_and_action_provider(*auth, action_provider_id, &db)
+//.map(Json)
+//.map_err(Into::into)
+//}
 
-#[get("/action_rule/action_provider/<action_provider_id>")]
-pub async fn get_action_rules_by_action_provider(
-    action_provider_id: UnverifiedId<ActionProviderId>,
-    auth: AuthUser,
-    conn: Db,
-) -> JsonResult<Vec<ActionRule>> {
-    let action_provider_id = action_provider_id
-        .verify_unchecked()
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(move |c| ActionRule::get_by_user_and_action_provider(*auth, action_provider_id, c))
-        .await
-        .into_json()
-}
-
-#[put("/action_rule", format = "application/json", data = "<action_rule>")]
-pub async fn update_action_rule(
-    action_rule: Unverified<ActionRule>,
-    auth: AuthUser,
-    conn: Db,
-) -> JsonResult<ActionRule> {
-    let action_rule = conn
-        .run(move |c| action_rule.verify_user(&auth, c))
-        .await
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(|c| ActionRule::update(action_rule, c))
-        .await
-        .into_json()
-}
-
-#[put("/action_rules", format = "application/json", data = "<action_rules>")]
 pub async fn update_action_rules(
-    action_rules: Unverified<Vec<ActionRule>>,
     auth: AuthUser,
-    conn: Db,
-) -> JsonResult<Vec<ActionRule>> {
-    let action_rules = conn
-        .run(move |c| action_rules.verify_user(&auth, c))
-        .await
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(|c| ActionRule::update_multiple(action_rules, c))
-        .await
-        .into_json()
+    db: DbConn,
+    Json(action_rules): Json<UnverifiedSingleOrVec<ActionRule>>,
+) -> HandlerResult<StatusCode> {
+    match action_rules {
+        UnverifiedSingleOrVec::Single(action_rule) => {
+            let action_rule = action_rule.verify_user_without_db(auth)?;
+            ActionRule::update(action_rule, &db)
+        }
+        UnverifiedSingleOrVec::Vec(action_rules) => {
+            let action_rules = action_rules.verify_user(auth, &db)?;
+            ActionRule::update_multiple(action_rules, &db)
+        }
+    }
+    .map(|_| StatusCode::OK)
+    .map_err(Into::into)
 }
 
-#[post("/action_event", format = "application/json", data = "<action_event>")]
-pub async fn create_action_event(
-    action_event: Unverified<ActionEvent>,
-    auth: AuthUser,
-    conn: Db,
-) -> JsonResult<ActionEvent> {
-    let action_event = action_event
-        .verify_user_without_db(&auth)
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(|c| ActionEvent::create(action_event, c))
-        .await
-        .into_json()
-}
-
-#[post(
-    "/action_events",
-    format = "application/json",
-    data = "<action_events>"
-)]
 pub async fn create_action_events(
-    action_events: Unverified<Vec<ActionEvent>>,
     auth: AuthUser,
-    conn: Db,
-) -> JsonResult<Vec<ActionEvent>> {
-    let action_events = action_events
-        .verify_user_without_db(&auth)
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(|c| ActionEvent::create_multiple(action_events, c))
-        .await
-        .into_json()
+    db: DbConn,
+    Json(action_events): Json<UnverifiedSingleOrVec<ActionEvent>>,
+) -> HandlerResult<StatusCode> {
+    match action_events {
+        UnverifiedSingleOrVec::Single(action_event) => {
+            let action_event = action_event.verify_user_without_db(auth)?;
+            ActionEvent::create(action_event, &db)
+        }
+        UnverifiedSingleOrVec::Vec(action_events) => {
+            let action_events = action_events.verify_user_without_db(auth)?;
+            ActionEvent::create_multiple(action_events, &db)
+        }
+    }
+    .map(|_| StatusCode::OK)
+    .map_err(Into::into)
 }
 
-#[post(
-    "/adm/action_events",
-    format = "application/json",
-    data = "<action_events>"
-)]
 pub async fn adm_create_action_events(
-    action_events: Unverified<Vec<ActionEvent>>,
     auth: AuthAdmin,
-    conn: Db,
-) -> JsonResult<Vec<ActionEvent>> {
-    let action_events = action_events
-        .verify_adm(&auth)
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(|c| ActionEvent::create_multiple_ignore_conflict(action_events, c))
-        .await
-        .into_json()
+    db: DbConn,
+    Json(action_events): Json<UnverifiedSingleOrVec<ActionEvent>>,
+) -> HandlerResult<StatusCode> {
+    match action_events {
+        UnverifiedSingleOrVec::Single(action_event) => {
+            let action_event = action_event.verify_adm(auth)?;
+            ActionEvent::create(action_event, &db)
+        }
+        UnverifiedSingleOrVec::Vec(action_events) => {
+            let action_events = action_events.verify_adm(auth)?;
+            ActionEvent::create_multiple_ignore_conflict(action_events, &db)
+        }
+    }
+    .map(|_| StatusCode::OK)
+    .map_err(Into::into)
 }
 
-#[get("/action_event/<action_event_id>")]
-pub async fn get_action_event(
-    action_event_id: UnverifiedId<ActionEventId>,
+pub async fn get_action_events(
     auth: AuthUser,
-    conn: Db,
-) -> JsonResult<ActionEvent> {
-    let action_event_id = conn
-        .run(move |c| action_event_id.verify_user(&auth, c))
-        .await
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(move |c| ActionEvent::get_by_id(action_event_id, c))
-        .await
-        .into_json()
+    Query(IdOption { id }): Query<IdOption<UnverifiedId<ActionEventId>>>,
+    db: DbConn,
+) -> HandlerResult<Json<Vec<ActionEvent>>> {
+    match id {
+        Some(id) => {
+            let action_event_id = id.verify_user(auth, &db)?;
+            ActionEvent::get_by_id(action_event_id, &db).map(|a| vec![a])
+        }
+        None => ActionEvent::get_by_user(*auth, &db),
+    }
+    .map(Json)
+    .map_err(Into::into)
 }
 
-#[get("/action_event")]
-pub async fn get_action_events(auth: AuthUser, conn: Db) -> JsonResult<Vec<ActionEvent>> {
-    conn.run(move |c| ActionEvent::get_by_user(*auth, c))
-        .await
-        .into_json()
-}
+//#[get("/action_event/action_provider/<action_provider_id>")]
+//pub async fn get_action_events_by_action_provider(
+//auth: AuthUser,
+//Path(action_provider_id): Path<UnverifiedId<ActionProviderId>>,
+//db: DbConn,
+//) -> HandlerResult<Json<Vec<ActionEvent>>> {
+//
+//let action_provider_id = action_provider_id.verify_unchecked().map_err(Error::from)?;
+//ActionEvent::get_by_user_and_action_provider(*auth, action_provider_id, &db)
+//.map(Json)
+//.map_err(Into::into)
+//}
 
-#[get("/action_event/action_provider/<action_provider_id>")]
-pub async fn get_action_events_by_action_provider(
-    action_provider_id: UnverifiedId<ActionProviderId>,
-    auth: AuthUser,
-    conn: Db,
-) -> JsonResult<Vec<ActionEvent>> {
-    let action_provider_id = action_provider_id
-        .verify_unchecked()
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(move |c| ActionEvent::get_by_user_and_action_provider(*auth, action_provider_id, c))
-        .await
-        .into_json()
-}
-
-#[put("/action_event", format = "application/json", data = "<action_event>")]
-pub async fn update_action_event(
-    action_event: Unverified<ActionEvent>,
-    auth: AuthUser,
-    conn: Db,
-) -> JsonResult<ActionEvent> {
-    let action_event = conn
-        .run(move |c| action_event.verify_user(&auth, c))
-        .await
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(|c| ActionEvent::update(action_event, c))
-        .await
-        .into_json()
-}
-
-#[put(
-    "/action_events",
-    format = "application/json",
-    data = "<action_events>"
-)]
 pub async fn update_action_events(
-    action_events: Unverified<Vec<ActionEvent>>,
     auth: AuthUser,
-    conn: Db,
-) -> JsonResult<Vec<ActionEvent>> {
-    let action_events = conn
-        .run(move |c| action_events.verify_user(&auth, c))
-        .await
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(|c| ActionEvent::update_multiple(action_events, c))
-        .await
-        .into_json()
+    db: DbConn,
+    Json(action_events): Json<UnverifiedSingleOrVec<ActionEvent>>,
+) -> HandlerResult<StatusCode> {
+    match action_events {
+        UnverifiedSingleOrVec::Single(action_event) => {
+            let action_event = action_event.verify_user(auth, &db)?;
+            ActionEvent::update(action_event, &db)
+        }
+        UnverifiedSingleOrVec::Vec(action_events) => {
+            let action_events = action_events.verify_user(auth, &db)?;
+            ActionEvent::update_multiple(action_events, &db)
+        }
+    }
+    .map(|_| StatusCode::OK)
+    .map_err(Into::into)
 }
 
-#[put(
-    "/adm/action_event",
-    format = "application/json",
-    data = "<action_event>"
-)]
-pub async fn adm_update_action_event(
-    action_event: Unverified<ActionEvent>,
+pub async fn adm_update_action_events(
     auth: AuthAdmin,
-    conn: Db,
-) -> JsonResult<ActionEvent> {
-    let action_event = conn
-        .run(move |_| action_event.verify_adm(&auth))
-        .await
-        .map_err(|status| JsonError {
-            status,
-            message: None,
-        })?;
-    conn.run(|c| ActionEvent::update(action_event, c))
-        .await
-        .into_json()
+    db: DbConn,
+    Json(action_events): Json<UnverifiedSingleOrVec<ActionEvent>>,
+) -> HandlerResult<StatusCode> {
+    match action_events {
+        UnverifiedSingleOrVec::Single(action_event) => {
+            let action_event = action_event.verify_adm(auth)?;
+            ActionEvent::update(action_event, &db)
+        }
+        UnverifiedSingleOrVec::Vec(action_events) => {
+            let action_events = action_events.verify_adm(auth)?;
+            ActionEvent::update_multiple(action_events, &db)
+        }
+    }
+    .map(|_| StatusCode::OK)
+    .map_err(Into::into)
 }
 
-#[delete(
-    "/ap/action_events",
-    format = "application/json",
-    data = "<action_event_ids>"
-)]
 pub async fn ap_disable_action_events(
-    action_event_ids: UnverifiedIds<ActionEventId>,
     auth: AuthAP,
-    conn: Db,
-) -> Result<Status, JsonError> {
-    conn.run(move |c| {
-        ActionEvent::disable_multiple(
-            action_event_ids
-                .verify_ap(&auth, c)
-                .map_err(|status| JsonError {
-                    status,
-                    message: None,
-                })?,
-            c,
-        )
-        .map(|_| Status::NoContent)
-        .map_err(|_| JsonError {
-            status: Status::InternalServerError,
+    Query(Ids { ids }): Query<Ids<UnverifiedIds<ActionEventId>>>,
+    db: DbConn,
+) -> HandlerResult<StatusCode> {
+    ActionEvent::disable_multiple(
+        ids.verify_ap(auth, &db).map_err(|status| HandlerError {
+            status,
             message: None,
-        })
-    })
-    .await
+        })?,
+        &db,
+    )
+    .map(|_| StatusCode::OK)
+    .map_err(Into::into)
 }
 
-#[delete(
-    "/adm/action_events",
-    format = "application/json",
-    data = "<action_event_ids>"
-)]
 pub async fn adm_delete_action_events(
-    action_event_ids: UnverifiedIds<ActionEventId>,
     auth: AuthAdmin,
-    conn: Db,
-) -> Result<Status, Status> {
-    conn.run(move |c| {
-        ActionEvent::delete_multiple(action_event_ids.verify_adm(&auth)?, c)
-            .map(|_| Status::NoContent)
-            .map_err(|_| Status::InternalServerError)
-    })
-    .await
+    Query(Ids { ids }): Query<Ids<UnverifiedIds<ActionEventId>>>,
+    db: DbConn,
+) -> HandlerResult<StatusCode> {
+    ActionEvent::delete_multiple(ids.verify_adm(auth)?, &db)
+        .map(|_| StatusCode::OK)
+        .map_err(Into::into)
 }
 
-#[get("/adm/creatable_action_rule")]
 pub async fn adm_get_creatable_action_rules(
     _auth: AuthAdmin,
-    conn: Db,
-) -> JsonResult<Vec<CreatableActionRule>> {
-    conn.run(move |c| CreatableActionRule::get_all(c))
-        .await
-        .into_json()
+    db: DbConn,
+) -> HandlerResult<Json<Vec<CreatableActionRule>>> {
+    CreatableActionRule::get_all(&db)
+        .map(Json)
+        .map_err(Into::into)
 }
 
-#[get("/ap/executable_action_event")]
 pub async fn ap_get_executable_action_events(
     auth: AuthAP,
-    conn: Db,
-) -> JsonResult<Vec<ExecutableActionEvent>> {
-    conn.run(move |c| ExecutableActionEvent::get_by_action_provider(*auth, c))
-        .await
-        .into_json()
+    Query(TimeSpanOption { start, end }): Query<TimeSpanOption>,
+    db: DbConn,
+) -> HandlerResult<Json<Vec<ExecutableActionEvent>>> {
+    match (start, end) {
+        (Some(start), Some(end)) => {
+            ExecutableActionEvent::get_ordered_by_action_provider_and_timespan(
+                *auth, start, end, &db,
+            )
+        }
+        (None, None) => ExecutableActionEvent::get_by_action_provider(*auth, &db),
+        _ => {
+            return Err(HandlerError {
+                status: StatusCode::BAD_REQUEST,
+                message: Some(ErrorMessage::Other(
+                    "'start' and 'end' must be either specified both or neither of them".to_owned(),
+                )),
+            })
+        }
+    }
+    .map(Json)
+    .map_err(Into::into)
 }
 
-#[get("/ap/executable_action_event/timespan/<start_datetime>/<end_datetime>")]
-pub async fn ap_get_ordered_executable_action_events_by_timespan(
-    start_datetime: DateTimeWrapper,
-    end_datetime: DateTimeWrapper,
-    auth: AuthAP,
-    conn: Db,
-) -> JsonResult<Vec<ExecutableActionEvent>> {
-    conn.run(move |c| {
-        ExecutableActionEvent::get_ordered_by_action_provider_and_timespan(
-            *auth,
-            *start_datetime,
-            *end_datetime,
-            c,
-        )
-    })
-    .await
-    .into_json()
-}
-
-#[get("/adm/deletable_action_event")]
 pub async fn adm_get_deletable_action_events(
     _auth: AuthAdmin,
-    conn: Db,
-) -> JsonResult<Vec<DeletableActionEvent>> {
-    conn.run(move |c| DeletableActionEvent::get_all(c))
-        .await
-        .into_json()
+    db: DbConn,
+) -> HandlerResult<Json<Vec<DeletableActionEvent>>> {
+    DeletableActionEvent::get_all(&db)
+        .map(Json)
+        .map_err(Into::into)
 }

@@ -1,11 +1,13 @@
-use chrono::{DateTime, Utc};
 #[cfg(feature = "server")]
-use rocket::http::Status;
+use axum::http::StatusCode;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use sport_log_types_derive::{FromI64, ToI64};
 #[cfg(feature = "server")]
-use sport_log_types_derive::{FromSql, GetById, GetByIds, ToSql, VerifyUnchecked};
+use sport_log_types_derive::{
+    FromSql, GetById, GetByIds, ToSql, VerifyForAdminWithoutDb, VerifyUnchecked,
+};
 
 use crate::{from_str, to_str};
 #[cfg(feature = "server")]
@@ -33,6 +35,7 @@ pub struct UserId(pub i64);
         GetById,
         GetByIds,
         VerifyUnchecked,
+        VerifyForAdminWithoutDb,
     )
 )]
 #[cfg_attr(feature = "server", table_name = "user")]
@@ -52,15 +55,15 @@ pub struct User {
 impl VerifyForUserWithDb for Unverified<User> {
     type Entity = User;
 
-    fn verify_user(self, auth: &AuthUser, conn: &PgConnection) -> Result<Self::Entity, Status> {
-        let user = self.0.into_inner();
-        if user.id == **auth
-            && User::check_user_id(user.id, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
+    fn verify_user(self, auth: AuthUser, db: &PgConnection) -> Result<Self::Entity, StatusCode> {
+        let user = self.0;
+        if user.id == *auth
+            && User::check_user_id(user.id, *auth, db)
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(user)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }

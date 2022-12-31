@@ -1,17 +1,25 @@
-use sport_log_types::{AccountData, AuthUser, Db};
+use axum::{extract::Query, Json};
+use chrono::{DateTime, Utc};
+use serde::Deserialize;
+use sport_log_types::{AccountData, AuthUser, DbConn};
 
-use crate::handler::{DateTimeWrapper, IntoJson, JsonResult};
+use crate::handler::HandlerResult;
 
-#[get("/account_data")]
-pub async fn get_account_data(auth: AuthUser, conn: Db) -> JsonResult<AccountData> {
-    conn.run(move |c| AccountData::get_by_user(*auth, c))
-        .await
-        .into_json()
+#[derive(Debug, Deserialize)]
+pub struct LastSync {
+    #[serde(default)]
+    pub last_sync: Option<DateTime<Utc>>,
 }
 
-#[get("/account_data/<last_sync>")]
-pub async fn sync(last_sync: DateTimeWrapper, auth: AuthUser, conn: Db) -> JsonResult<AccountData> {
-    conn.run(move |c| AccountData::get_by_user_and_last_sync(*auth, *last_sync, c))
-        .await
-        .into_json()
+pub async fn get_account_data(
+    auth: AuthUser,
+    Query(LastSync { last_sync }): Query<LastSync>,
+    db: DbConn,
+) -> HandlerResult<Json<AccountData>> {
+    match last_sync {
+        Some(last_sync) => AccountData::get_by_user_and_last_sync(*auth, last_sync, &db),
+        None => AccountData::get_by_user(*auth, &db),
+    }
+    .map(Json)
+    .map_err(Into::into)
 }

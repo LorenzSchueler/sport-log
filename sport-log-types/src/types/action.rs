@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
-    CheckAPId, CheckUserId, Create, CreateMultiple, FromSql, GetAll, GetById, GetByIds, GetBySync,
-    GetByUser, GetByUserSync, HardDelete, ToSql, Update, VerifyForActionProviderWithDb,
+    CheckAPId, CheckUserId, Create, FromSql, GetAll, GetById, GetByIds, GetBySync, GetByUser,
+    GetByUserSync, HardDelete, ToSql, Update, VerifyForActionProviderWithDb,
     VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
     VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
     VerifyIdUnchecked, VerifyUnchecked,
@@ -86,6 +86,7 @@ pub struct ActionProvider {
         AsExpression,
         ToSql,
         FromSql,
+        VerifyIdUnchecked,
         VerifyIdForActionProvider
     )
 )]
@@ -102,7 +103,6 @@ pub struct ActionId(pub i64);
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         GetAll,
@@ -179,7 +179,6 @@ pub struct ActionRuleId(pub i64);
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         GetByUser,
@@ -244,7 +243,6 @@ pub struct ActionEventId(pub i64);
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         GetByUser,

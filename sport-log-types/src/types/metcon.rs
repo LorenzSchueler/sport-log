@@ -1,17 +1,16 @@
+#[cfg(feature = "server")]
+use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 #[cfg(feature = "server")]
 use diesel::PgConnection;
 #[cfg(feature = "server")]
 use diesel_derive_enum::DbEnum;
-#[cfg(feature = "server")]
-use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
-    CheckUserId, Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync,
-    HardDelete, ToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
-    VerifyIdForUserOrAP,
+    CheckUserId, Create, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, ToSql,
+    Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
 };
 use sport_log_types_derive::{FromI64, ToI64};
 
@@ -61,11 +60,11 @@ pub struct MetconId(pub i64);
 impl VerifyIdForUserOrAP for UnverifiedId<MetconId> {
     type Id = MetconId;
 
-    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
-        if Metcon::check_optional_user_id(self.0, **auth, conn).map_err(|_| Status::Forbidden)? {
+    fn verify_user_ap(self, auth: AuthUserOrAP, db: &PgConnection) -> Result<Self::Id, StatusCode> {
+        if Metcon::check_optional_user_id(self.0, *auth, db).map_err(|_| StatusCode::FORBIDDEN)? {
             Ok(self.0)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -76,13 +75,13 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconId> {
 
     fn verify_user_ap(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Id>, Status> {
-        if Metcon::check_optional_user_ids(&self.0, **auth, conn).map_err(|_| Status::Forbidden)? {
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Vec<Self::Id>, StatusCode> {
+        if Metcon::check_optional_user_ids(&self.0, *auth, db).map_err(|_| StatusCode::FORBIDDEN)? {
             Ok(self.0)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -106,7 +105,6 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconId> {
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         Update,
@@ -144,17 +142,17 @@ impl VerifyForUserOrAPWithDb for Unverified<Metcon> {
 
     fn verify_user_ap(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Self::Entity, Status> {
-        let metcon = self.0.into_inner();
-        if metcon.user_id == Some(**auth)
-            && Metcon::check_user_id(metcon.id, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Self::Entity, StatusCode> {
+        let metcon = self.0;
+        if metcon.user_id == Some(*auth)
+            && Metcon::check_user_id(metcon.id, *auth, db)
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcon)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -165,18 +163,18 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Metcon>> {
 
     fn verify_user_ap(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Entity>, Status> {
-        let metcons = self.0.into_inner();
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, StatusCode> {
+        let metcons = self.0;
         let metcon_ids: Vec<_> = metcons.iter().map(|metcon| metcon.id).collect();
-        if metcons.iter().all(|metcon| metcon.user_id == Some(**auth))
-            && Metcon::check_user_ids(&metcon_ids, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
+        if metcons.iter().all(|metcon| metcon.user_id == Some(*auth))
+            && Metcon::check_user_ids(&metcon_ids, *auth, db)
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcons)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -185,12 +183,12 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Metcon>> {
 impl VerifyForUserOrAPWithoutDb for Unverified<Metcon> {
     type Entity = Metcon;
 
-    fn verify_user_ap_without_db(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status> {
-        let metcon = self.0.into_inner();
-        if metcon.user_id == Some(**auth) {
+    fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Self::Entity, StatusCode> {
+        let metcon = self.0;
+        if metcon.user_id == Some(*auth) {
             Ok(metcon)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -199,12 +197,15 @@ impl VerifyForUserOrAPWithoutDb for Unverified<Metcon> {
 impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Metcon>> {
     type Entity = Metcon;
 
-    fn verify_user_ap_without_db(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status> {
-        let metcons = self.0.into_inner();
-        if metcons.iter().all(|metcon| metcon.user_id == Some(**auth)) {
+    fn verify_user_ap_without_db(
+        self,
+        auth: AuthUserOrAP,
+    ) -> Result<Vec<Self::Entity>, StatusCode> {
+        let metcons = self.0;
+        if metcons.iter().all(|metcon| metcon.user_id == Some(*auth)) {
             Ok(metcons)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -223,13 +224,13 @@ pub struct MetconMovementId(pub i64);
 impl VerifyIdForUserOrAP for UnverifiedId<MetconMovementId> {
     type Id = MetconMovementId;
 
-    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
-        if MetconMovement::check_optional_user_id(self.0, **auth, conn)
-            .map_err(|_| Status::Forbidden)?
+    fn verify_user_ap(self, auth: AuthUserOrAP, db: &PgConnection) -> Result<Self::Id, StatusCode> {
+        if MetconMovement::check_optional_user_id(self.0, *auth, db)
+            .map_err(|_| StatusCode::FORBIDDEN)?
         {
             Ok(self.0)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -240,15 +241,15 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconMovementId> {
 
     fn verify_user_ap(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Id>, Status> {
-        if MetconMovement::check_optional_user_ids(&self.0, **auth, conn)
-            .map_err(|_| Status::Forbidden)?
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Vec<Self::Id>, StatusCode> {
+        if MetconMovement::check_optional_user_ids(&self.0, *auth, db)
+            .map_err(|_| StatusCode::FORBIDDEN)?
         {
             Ok(self.0)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -263,7 +264,6 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconMovementId> {
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         Update,
@@ -302,16 +302,16 @@ impl VerifyForUserOrAPWithDb for Unverified<MetconMovement> {
 
     fn verify_user_ap(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Self::Entity, Status> {
-        let metcon_movement = self.0.into_inner();
-        if MetconMovement::check_user_id(metcon_movement.id, **auth, conn)
-            .map_err(|_| Status::InternalServerError)?
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Self::Entity, StatusCode> {
+        let metcon_movement = self.0;
+        if MetconMovement::check_user_id(metcon_movement.id, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcon_movement)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -322,20 +322,20 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
 
     fn verify_user_ap(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Entity>, Status> {
-        let metcon_movements = self.0.into_inner();
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, StatusCode> {
+        let metcon_movements = self.0;
         let metcon_movement_ids: Vec<_> = metcon_movements
             .iter()
             .map(|metcon_movement| metcon_movement.id)
             .collect();
-        if MetconMovement::check_user_ids(&metcon_movement_ids, **auth, conn)
-            .map_err(|_| Status::InternalServerError)?
+        if MetconMovement::check_user_ids(&metcon_movement_ids, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcon_movements)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -346,16 +346,16 @@ impl VerifyForUserOrAPCreate for Unverified<MetconMovement> {
 
     fn verify_user_ap_create(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Self::Entity, Status> {
-        let metcon_movement = self.0.into_inner();
-        if Metcon::check_user_id(metcon_movement.metcon_id, **auth, conn)
-            .map_err(|_| Status::InternalServerError)?
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Self::Entity, StatusCode> {
+        let metcon_movement = self.0;
+        if Metcon::check_user_id(metcon_movement.metcon_id, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcon_movement)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -366,22 +366,22 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconMovement>> {
 
     fn verify_user_ap_create(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Entity>, Status> {
-        let metcon_movements = self.0.into_inner();
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, StatusCode> {
+        let metcon_movements = self.0;
         let mut metcon_ids: Vec<_> = metcon_movements
             .iter()
             .map(|metcon_movement| metcon_movement.metcon_id)
             .collect();
         metcon_ids.sort_unstable();
         metcon_ids.dedup();
-        if Metcon::check_user_ids(&metcon_ids, **auth, conn)
-            .map_err(|_| Status::InternalServerError)?
+        if Metcon::check_user_ids(&metcon_ids, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcon_movements)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -406,7 +406,6 @@ pub struct MetconSessionId(pub i64);
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         GetByUser,
@@ -467,7 +466,6 @@ pub struct MetconItemId(pub i64);
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         Update,
@@ -499,16 +497,16 @@ impl VerifyForUserOrAPWithDb for Unverified<MetconItem> {
 
     fn verify_user_ap(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Self::Entity, Status> {
-        let metcon_item = self.0.into_inner();
-        if MetconItem::check_user_id(metcon_item.id, **auth, conn)
-            .map_err(|_| Status::InternalServerError)?
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Self::Entity, StatusCode> {
+        let metcon_item = self.0;
+        if MetconItem::check_user_id(metcon_item.id, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcon_item)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -519,20 +517,20 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconItem>> {
 
     fn verify_user_ap(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Entity>, Status> {
-        let metcon_items = self.0.into_inner();
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, StatusCode> {
+        let metcon_items = self.0;
         let metcon_item_ids: Vec<_> = metcon_items
             .iter()
             .map(|metcon_item| metcon_item.id)
             .collect();
-        if MetconItem::check_user_ids(&metcon_item_ids, **auth, conn)
-            .map_err(|_| Status::InternalServerError)?
+        if MetconItem::check_user_ids(&metcon_item_ids, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcon_items)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -543,16 +541,16 @@ impl VerifyForUserOrAPCreate for Unverified<MetconItem> {
 
     fn verify_user_ap_create(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Self::Entity, Status> {
-        let metcon_item = self.0.into_inner();
-        if Metcon::check_optional_user_id(metcon_item.metcon_id, **auth, conn)
-            .map_err(|_| Status::InternalServerError)?
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Self::Entity, StatusCode> {
+        let metcon_item = self.0;
+        if Metcon::check_optional_user_id(metcon_item.metcon_id, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcon_item)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -563,22 +561,22 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconItem>> {
 
     fn verify_user_ap_create(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Entity>, Status> {
-        let metcon_items = self.0.into_inner();
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, StatusCode> {
+        let metcon_items = self.0;
         let mut metcon_ids: Vec<_> = metcon_items
             .iter()
             .map(|metcon_item| metcon_item.metcon_id)
             .collect();
         metcon_ids.sort_unstable();
         metcon_ids.dedup();
-        if Metcon::check_optional_user_ids(&metcon_ids, **auth, conn)
-            .map_err(|_| Status::InternalServerError)?
+        if Metcon::check_optional_user_ids(&metcon_ids, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcon_items)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }

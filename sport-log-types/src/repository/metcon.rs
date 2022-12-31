@@ -9,14 +9,14 @@ use crate::{
 };
 
 impl GetByUser for Metcon {
-    fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_by_user(user_id: UserId, db: &PgConnection) -> QueryResult<Vec<Self>> {
         metcon::table
             .filter(
                 metcon::columns::user_id
                     .eq(user_id)
                     .or(metcon::columns::user_id.is_null()),
             )
-            .get_results(conn)
+            .get_results(db)
     }
 }
 
@@ -24,7 +24,7 @@ impl GetByUserSync for Metcon {
     fn get_by_user_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<Vec<Self>>
     where
         Self: Sized,
@@ -36,7 +36,7 @@ impl GetByUserSync for Metcon {
                     .or(metcon::columns::user_id.is_null()),
             )
             .filter(metcon::columns::last_change.ge(last_sync))
-            .get_results(conn)
+            .get_results(db)
     }
 }
 
@@ -46,7 +46,7 @@ impl CheckOptionalUserId for Metcon {
     fn check_optional_user_id(
         id: Self::Id,
         user_id: UserId,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<bool> {
         metcon::table
             .filter(metcon::columns::id.eq(id))
@@ -56,14 +56,14 @@ impl CheckOptionalUserId for Metcon {
                     .or(metcon::columns::user_id.is_null()),
             )
             .count()
-            .get_result(conn)
+            .get_result(db)
             .map(|count: i64| count == 1)
     }
 
     fn check_optional_user_ids(
         ids: &[Self::Id],
         user_id: UserId,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<bool> {
         metcon::table
             .filter(metcon::columns::id.eq_any(ids))
@@ -73,7 +73,7 @@ impl CheckOptionalUserId for Metcon {
                     .or(metcon::columns::user_id.is_null()),
             )
             .count()
-            .get_result(conn)
+            .get_result(db)
             .map(|count: i64| count == ids.len() as i64)
     }
 }
@@ -83,18 +83,18 @@ impl MetconSession {
         user_id: UserId,
         start_datetime: DateTime<Utc>,
         end_datetime: DateTime<Utc>,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         metcon_session::table
             .filter(metcon_session::columns::user_id.eq(user_id))
             .filter(metcon_session::columns::datetime.between(start_datetime, end_datetime))
             .order_by(metcon_session::columns::datetime)
-            .get_results(conn)
+            .get_results(db)
     }
 }
 
 impl GetByUser for MetconMovement {
-    fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_by_user(user_id: UserId, db: &PgConnection) -> QueryResult<Vec<Self>> {
         metcon_movement::table
             .filter(
                 metcon_movement::columns::metcon_id.eq_any(
@@ -107,7 +107,7 @@ impl GetByUser for MetconMovement {
                         .select(metcon::columns::id),
                 ),
             )
-            .get_results(conn)
+            .get_results(db)
     }
 }
 
@@ -115,7 +115,7 @@ impl GetByUserSync for MetconMovement {
     fn get_by_user_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<Vec<Self>>
     where
         Self: Sized,
@@ -133,14 +133,14 @@ impl GetByUserSync for MetconMovement {
                 ),
             )
             .filter(metcon_movement::columns::last_change.ge(last_sync))
-            .get_results(conn)
+            .get_results(db)
     }
 }
 
 impl CheckUserId for MetconMovement {
     type Id = MetconMovementId;
 
-    fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+    fn check_user_id(id: Self::Id, user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
             .inner_join(movement::table)
@@ -152,11 +152,11 @@ impl CheckUserId for MetconMovement {
                     .or(movement::columns::user_id.is_null()),
             )
             .count()
-            .get_result(conn)
+            .get_result(db)
             .map(|count: i64| count == 1)
     }
 
-    fn check_user_ids(ids: &[Self::Id], user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+    fn check_user_ids(ids: &[Self::Id], user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
             .inner_join(movement::table)
@@ -168,7 +168,7 @@ impl CheckUserId for MetconMovement {
                     .or(movement::columns::user_id.is_null()),
             )
             .count()
-            .get_result(conn)
+            .get_result(db)
             .map(|count: i64| count == ids.len() as i64)
     }
 }
@@ -179,7 +179,7 @@ impl CheckOptionalUserId for MetconMovement {
     fn check_optional_user_id(
         id: Self::Id,
         user_id: UserId,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
@@ -196,14 +196,14 @@ impl CheckOptionalUserId for MetconMovement {
                     .or(movement::columns::user_id.is_null()),
             )
             .count()
-            .get_result(conn)
+            .get_result(db)
             .map(|count: i64| count == 1)
     }
 
     fn check_optional_user_ids(
         ids: &[Self::Id],
         user_id: UserId,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
@@ -220,21 +220,21 @@ impl CheckOptionalUserId for MetconMovement {
                     .or(movement::columns::user_id.is_null()),
             )
             .count()
-            .get_result(conn)
+            .get_result(db)
             .map(|count: i64| count == ids.len() as i64)
     }
 }
 
 impl MetconMovement {
-    pub fn get_by_metcon(metcon_id: MetconId, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+    pub fn get_by_metcon(metcon_id: MetconId, db: &PgConnection) -> QueryResult<Vec<Self>> {
         metcon_movement::table
             .filter(metcon_movement::columns::metcon_id.eq(metcon_id))
-            .get_results(conn)
+            .get_results(db)
     }
 }
 
 impl GetByUser for MetconItem {
-    fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_by_user(user_id: UserId, db: &PgConnection) -> QueryResult<Vec<Self>> {
         metcon_item::table
             .filter(
                 metcon_item::columns::training_plan_id.eq_any(
@@ -243,7 +243,7 @@ impl GetByUser for MetconItem {
                         .select(training_plan::columns::id),
                 ),
             )
-            .get_results(conn)
+            .get_results(db)
     }
 }
 
@@ -251,7 +251,7 @@ impl GetByUserSync for MetconItem {
     fn get_by_user_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<Vec<Self>>
     where
         Self: Sized,
@@ -265,14 +265,14 @@ impl GetByUserSync for MetconItem {
                 ),
             )
             .filter(metcon_item::columns::last_change.ge(last_sync))
-            .get_results(conn)
+            .get_results(db)
     }
 }
 
 impl CheckUserId for MetconItem {
     type Id = MetconItemId;
 
-    fn check_user_id(id: Self::Id, user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+    fn check_user_id(id: Self::Id, user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
         metcon_item::table
             .inner_join(metcon::table)
             .inner_join(training_plan::table)
@@ -280,11 +280,11 @@ impl CheckUserId for MetconItem {
             .filter(metcon::columns::user_id.eq(user_id))
             .filter(training_plan::columns::user_id.eq(user_id))
             .count()
-            .get_result(conn)
+            .get_result(db)
             .map(|count: i64| count == 1)
     }
 
-    fn check_user_ids(ids: &[Self::Id], user_id: UserId, conn: &PgConnection) -> QueryResult<bool> {
+    fn check_user_ids(ids: &[Self::Id], user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
         metcon_item::table
             .inner_join(metcon::table)
             .inner_join(training_plan::table)
@@ -292,7 +292,7 @@ impl CheckUserId for MetconItem {
             .filter(metcon::columns::user_id.eq(user_id))
             .filter(training_plan::columns::user_id.eq(user_id))
             .count()
-            .get_result(conn)
+            .get_result(db)
             .map(|count: i64| count == ids.len() as i64)
     }
 }
@@ -303,7 +303,7 @@ impl CheckOptionalUserId for MetconItem {
     fn check_optional_user_id(
         id: Self::Id,
         user_id: UserId,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<bool> {
         metcon_item::table
             .inner_join(metcon::table)
@@ -316,14 +316,14 @@ impl CheckOptionalUserId for MetconItem {
             )
             .filter(training_plan::columns::user_id.eq(user_id))
             .count()
-            .get_result(conn)
+            .get_result(db)
             .map(|count: i64| count == 1)
     }
 
     fn check_optional_user_ids(
         ids: &[Self::Id],
         user_id: UserId,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<bool> {
         metcon_item::table
             .inner_join(metcon::table)
@@ -336,7 +336,7 @@ impl CheckOptionalUserId for MetconItem {
             )
             .filter(training_plan::columns::user_id.eq(user_id))
             .count()
-            .get_result(conn)
+            .get_result(db)
             .map(|count: i64| count == ids.len() as i64)
     }
 }
@@ -344,27 +344,27 @@ impl CheckOptionalUserId for MetconItem {
 impl GetById for MetconSessionDescription {
     type Id = MetconSessionId;
 
-    fn get_by_id(metcon_session_id: Self::Id, conn: &PgConnection) -> QueryResult<Self> {
-        let metcon_session = MetconSession::get_by_id(metcon_session_id, conn)?;
-        MetconSessionDescription::from_session(metcon_session, conn)
+    fn get_by_id(metcon_session_id: Self::Id, db: &PgConnection) -> QueryResult<Self> {
+        let metcon_session = MetconSession::get_by_id(metcon_session_id, db)?;
+        MetconSessionDescription::from_session(metcon_session, db)
     }
 }
 
 impl GetByUser for MetconSessionDescription {
-    fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>> {
-        let metcon_sessions = MetconSession::get_by_user(user_id, conn)?;
-        MetconSessionDescription::from_sessions(metcon_sessions, conn)
+    fn get_by_user(user_id: UserId, db: &PgConnection) -> QueryResult<Vec<Self>> {
+        let metcon_sessions = MetconSession::get_by_user(user_id, db)?;
+        MetconSessionDescription::from_sessions(metcon_sessions, db)
     }
 }
 
 impl MetconSessionDescription {
-    fn from_session(metcon_session: MetconSession, conn: &PgConnection) -> QueryResult<Self> {
-        let metcon = Metcon::get_by_id(metcon_session.metcon_id, conn)?;
+    fn from_session(metcon_session: MetconSession, db: &PgConnection) -> QueryResult<Self> {
+        let metcon = Metcon::get_by_id(metcon_session.metcon_id, db)?;
         let metcon_movements: Vec<MetconMovement> =
-            MetconMovement::belonging_to(&metcon).get_results(conn)?;
+            MetconMovement::belonging_to(&metcon).get_results(db)?;
         let mut movements = vec![];
         for metcon_movement in &metcon_movements {
-            movements.push(Movement::get_by_id(metcon_movement.movement_id, conn)?);
+            movements.push(Movement::get_by_id(metcon_movement.movement_id, db)?);
         }
         let movements = metcon_movements.into_iter().zip(movements).collect();
         Ok(MetconSessionDescription {
@@ -376,14 +376,14 @@ impl MetconSessionDescription {
 
     fn from_sessions(
         metcon_sessions: Vec<MetconSession>,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         let mut metcons = vec![];
         for metcon_session in &metcon_sessions {
-            metcons.push(Metcon::get_by_id(metcon_session.metcon_id, conn)?);
+            metcons.push(Metcon::get_by_id(metcon_session.metcon_id, db)?);
         }
         let metcon_movements: Vec<Vec<MetconMovement>> = MetconMovement::belonging_to(&metcons)
-            .get_results(conn)?
+            .get_results(db)?
             .grouped_by(&metcons);
         let mut movements = vec![];
         let mut movements_len;
@@ -392,7 +392,7 @@ impl MetconSessionDescription {
             movements_len = movements.len();
             for metcon_session in metcon_movements {
                 movements[movements_len - 1]
-                    .push(Movement::get_by_id(metcon_session.movement_id, conn)?);
+                    .push(Movement::get_by_id(metcon_session.movement_id, db)?);
             }
         }
         let movements: Vec<Vec<(MetconMovement, Movement)>> = metcon_movements
@@ -420,14 +420,14 @@ impl MetconSessionDescription {
         user_id: UserId,
         start_datetime: DateTime<Utc>,
         end_datetime: DateTime<Utc>,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         let metcon_sessions = MetconSession::get_ordered_by_user_and_timespan(
             user_id,
             start_datetime,
             end_datetime,
-            conn,
+            db,
         )?;
-        MetconSessionDescription::from_sessions(metcon_sessions, conn)
+        MetconSessionDescription::from_sessions(metcon_sessions, db)
     }
 }

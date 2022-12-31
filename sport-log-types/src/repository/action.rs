@@ -11,7 +11,7 @@ use crate::{
 };
 
 impl Create for ActionProvider {
-    fn create(mut action_provider: Self, conn: &PgConnection) -> QueryResult<Self> {
+    fn create(mut action_provider: Self, db: &PgConnection) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         action_provider.password = Argon2::default()
             .hash_password(action_provider.password.as_bytes(), salt.as_ref())
@@ -20,12 +20,26 @@ impl Create for ActionProvider {
 
         diesel::insert_into(action_provider::table)
             .values(action_provider)
-            .get_result(conn)
+            .execute(db)
+    }
+
+    fn create_multiple(mut action_providers: Vec<Self>, db: &PgConnection) -> QueryResult<usize> {
+        for action_provider in &mut action_providers {
+            let salt = SaltString::generate(&mut OsRng);
+            action_provider.password = Argon2::default()
+                .hash_password(action_provider.password.as_bytes(), salt.as_ref())
+                .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
+                .to_string();
+        }
+
+        diesel::insert_into(action_provider::table)
+            .values(action_providers)
+            .execute(db)
     }
 }
 
 impl ActionProvider {
-    pub fn auth(name: &str, password: &str, conn: &PgConnection) -> QueryResult<ActionProviderId> {
+    pub fn auth(name: &str, password: &str, db: &PgConnection) -> QueryResult<ActionProviderId> {
         let (action_provider_id, password_hash): (ActionProviderId, String) =
             action_provider::table
                 .filter(action_provider::columns::name.eq(name))
@@ -33,7 +47,7 @@ impl ActionProvider {
                     action_provider::columns::id,
                     action_provider::columns::password,
                 ))
-                .get_result(conn)?;
+                .get_result(db)?;
 
         let password_hash =
             PasswordHash::new(password_hash.as_str()).map_err(|_| Error::RollbackTransaction)?; // this should not happen but prevents panic
@@ -51,7 +65,7 @@ impl ActionProvider {
         name: &str,
         password: &str,
         user_id: UserId,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<AuthApForUser> {
         let (action_provider_id, password_hash): (ActionProviderId, String) =
             action_provider::table
@@ -60,7 +74,7 @@ impl ActionProvider {
                     action_provider::columns::id,
                     action_provider::columns::password,
                 ))
-                .get_result(conn)?;
+                .get_result(db)?;
 
         let password_hash =
             PasswordHash::new(password_hash.as_str()).map_err(|_| Error::RollbackTransaction)?; // this should not happen but prevents panic
@@ -75,7 +89,7 @@ impl ActionProvider {
                 .filter(action_event::columns::enabled.eq(true))
                 .filter(action_event::columns::deleted.eq(false))
                 .count()
-                .get_result(conn)?;
+                .get_result(db)?;
 
             if action_events > 0 {
                 Ok(AuthApForUser::Allowed(action_provider_id))
@@ -91,18 +105,18 @@ impl ActionProvider {
 impl Action {
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action::table
             .filter(action::columns::action_provider_id.eq(action_provider_id))
-            .get_results(conn)
+            .get_results(db)
     }
 }
 
 impl ActionRule {
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action_rule::table
             .filter(
@@ -112,13 +126,13 @@ impl ActionRule {
                         .filter(action::columns::action_provider_id.eq(action_provider_id)),
                 ),
             )
-            .get_results(conn)
+            .get_results(db)
     }
 
     pub fn get_by_user_and_action_provider(
         user_id: UserId,
         action_provider_id: ActionProviderId,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action_rule::table
             .filter(action_rule::columns::user_id.eq(user_id))
@@ -129,38 +143,34 @@ impl ActionRule {
                         .filter(action::columns::action_provider_id.eq(action_provider_id)),
                 ),
             )
-            .get_results(conn)
+            .get_results(db)
     }
 }
 
 impl CheckAPId for ActionEvent {
     type Id = ActionEventId;
 
-    fn check_ap_id(
-        id: Self::Id,
-        ap_id: ActionProviderId,
-        conn: &PgConnection,
-    ) -> QueryResult<bool> {
+    fn check_ap_id(id: Self::Id, ap_id: ActionProviderId, db: &PgConnection) -> QueryResult<bool> {
         action_event::table
             .inner_join(action::table)
             .filter(action_event::columns::id.eq(id))
             .filter(action::columns::action_provider_id.eq(ap_id))
             .count()
-            .get_result(conn)
+            .get_result(db)
             .map(|count: i64| count == 1)
     }
 
     fn check_ap_ids(
         ids: &[Self::Id],
         ap_id: ActionProviderId,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<bool> {
         action_event::table
             .inner_join(action::table)
             .filter(action_event::columns::id.eq_any(ids))
             .filter(action::columns::action_provider_id.eq(ap_id))
             .count()
-            .get_result(conn)
+            .get_result(db)
             .map(|count: i64| count == ids.len() as i64)
     }
 }
@@ -168,17 +178,17 @@ impl CheckAPId for ActionEvent {
 impl ActionEvent {
     pub fn create_multiple_ignore_conflict(
         action_events: Vec<ActionEvent>,
-        conn: &PgConnection,
-    ) -> QueryResult<Vec<ActionEvent>> {
+        db: &PgConnection,
+    ) -> QueryResult<usize> {
         diesel::insert_into(action_event::table)
             .values(action_events)
             .on_conflict_do_nothing()
-            .get_results(conn)
+            .execute(db)
     }
 
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action_event::table
             .filter(
@@ -188,13 +198,13 @@ impl ActionEvent {
                         .filter(action::columns::action_provider_id.eq(action_provider_id)),
                 ),
             )
-            .get_results(conn)
+            .get_results(db)
     }
 
     pub fn get_by_user_and_action_provider(
         user_id: UserId,
         action_provider_id: ActionProviderId,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action_event::table
             .filter(action_event::columns::user_id.eq(user_id))
@@ -205,34 +215,34 @@ impl ActionEvent {
                         .select(action::columns::id),
                 ),
             )
-            .get_results(conn)
+            .get_results(db)
     }
 
     pub fn disable_multiple(
         action_event_ids: Vec<ActionEventId>,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<usize> {
         diesel::update(
             action_event::table.filter(action_event::columns::id.eq_any(action_event_ids)),
         )
         .set(action_event::columns::enabled.eq(false))
-        .execute(conn)
+        .execute(db)
     }
 
     pub fn delete_multiple(
         action_event_ids: Vec<ActionEventId>,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<usize> {
         diesel::update(
             action_event::table.filter(action_event::columns::id.eq_any(action_event_ids)),
         )
         .set(action_event::columns::deleted.eq(true))
-        .execute(conn)
+        .execute(db)
     }
 }
 
 impl GetAll for CreatableActionRule {
-    fn get_all(conn: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_all(db: &PgConnection) -> QueryResult<Vec<Self>> {
         action_rule::table
             .inner_join(action::table)
             .filter(action_rule::columns::enabled.eq(true))
@@ -246,14 +256,14 @@ impl GetAll for CreatableActionRule {
                 action_rule::columns::arguments,
                 action::columns::create_before,
             ))
-            .get_results(conn)
+            .get_results(db)
     }
 }
 
 impl ExecutableActionEvent {
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
@@ -274,14 +284,14 @@ impl ExecutableActionEvent {
                 platform_credential::columns::username.nullable(),
                 platform_credential::columns::password.nullable(),
             ))
-            .get_results(conn)
+            .get_results(db)
     }
 
     pub fn get_ordered_by_action_provider_and_timespan(
         action_provider_id: ActionProviderId,
         start_datetime: DateTime<Utc>,
         end_datetime: DateTime<Utc>,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
@@ -304,12 +314,12 @@ impl ExecutableActionEvent {
                 platform_credential::columns::password.nullable(),
             ))
             .order_by(action_event::columns::datetime)
-            .get_results(conn)
+            .get_results(db)
     }
 }
 
 impl GetAll for DeletableActionEvent {
-    fn get_all(conn: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_all(db: &PgConnection) -> QueryResult<Vec<Self>> {
         action_event::table
             .inner_join(action::table)
             .filter(action_event::columns::deleted.eq(false))
@@ -318,6 +328,6 @@ impl GetAll for DeletableActionEvent {
                 action_event::columns::datetime,
                 action::columns::delete_after,
             ))
-            .get_results(conn)
+            .get_results(db)
     }
 }

@@ -1,24 +1,22 @@
-use sport_log_types::{Activity, AuthUserOrAP, Db, GetByUser};
+use axum::Json;
+use sport_log_types::{Activity, AuthUserOrAP, DbConn, GetByUser};
 
-use crate::handler::{DateTimeWrapper, IntoJson, JsonResult};
+use crate::handler::HandlerResult;
 
-#[get("/activity")]
-pub async fn get_activities(auth: AuthUserOrAP, conn: Db) -> JsonResult<Vec<Activity>> {
-    conn.run(move |c| Activity::get_by_user(*auth, c))
-        .await
-        .into_json()
+pub async fn get_activities(auth: AuthUserOrAP, db: DbConn) -> HandlerResult<Json<Vec<Activity>>> {
+    Activity::get_by_user(*auth, &db)
+        .map(Json)
+        .map_err(Into::into)
 }
 
-#[get("/activity/timespan/<start_datetime>/<end_datetime>")]
-pub async fn get_ordered_activities_by_timespan(
-    start_datetime: DateTimeWrapper,
-    end_datetime: DateTimeWrapper,
-    auth: AuthUserOrAP,
-    conn: Db,
-) -> JsonResult<Vec<Activity>> {
-    conn.run(move |c| {
-        Activity::get_ordered_by_user_and_timespan(*auth, *start_datetime, *end_datetime, c)
-    })
-    .await
-    .into_json()
-}
+//#[get("/activity/timespan/<start_datetime>/<end_datetime>")]
+//pub async fn get_ordered_activities_by_timespan(
+//auth: AuthUserOrAP,
+//Path(start_datetime): Path<DateTime<Utc>>,
+//Path(end_datetime): Path<DateTime<Utc>>,
+//db: DbConn,
+//) -> HandlerResult<Json<Vec<Activity>>> {
+//Activity::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &db)
+//.map(Json)
+//.map_err(Into::into)
+//}

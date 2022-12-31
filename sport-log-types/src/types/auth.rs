@@ -1,34 +1,26 @@
-use std::ops::Deref;
+use std::{ops::Deref, sync::Arc};
 
-use rocket::{
-    http::Status,
-    outcome::Outcome,
-    request::{FromRequest, Request},
-    State,
+use axum::{
+    async_trait,
+    extract::{FromRef, FromRequestParts, State},
+    headers::{authorization::Basic, Authorization},
+    http::{request::Parts, StatusCode},
+    TypedHeader,
 };
 
-use crate::{ActionProvider, ActionProviderId, Admin, Config, Db, User, UserId};
+use crate::{
+    error::HandlerError, ActionProvider, ActionProviderId, Admin, AppState, Config, User, UserId,
+};
 
-fn parse_username_password(request: &'_ Request<'_>) -> Option<(String, String)> {
-    let auth_header = request.headers().get("Authorization").next()?;
-    if auth_header.len() >= 7 && &auth_header[..6] == "Basic " {
-        let auth_str = String::from_utf8(base64::decode(&auth_header[6..]).ok()?).ok()?;
-        let (username, password) = auth_str.split_once(':')?;
-
-        Some((username.to_owned(), password.to_owned()))
-    } else {
-        None
-    }
-}
-
-/// [AuthUser] is used as a request guard to ensure that the endpoint can only be accessed by the user who owns the data.
+/// [AuthUser] is used as a request guard to authenticate a user.
 ///
 /// For the creation of an [AuthUser] the username and password have to be transmitted via HTTP basic auth.
 ///
 /// [Admin] can also use endpoints with an [AuthUser] as request guard.
 ///
-/// In order to do so, the username has to be set to `admin$id$<user_id>` and the password is the password of the [Admin] as configured in [Config](crate::Config).
-#[derive(Debug, Clone)]
+/// In order to do so, the username has to be set to `admin$id$<user_id>`
+/// and the password must be the `admin_password` as configured in `sport-log-server.toml`.
+#[derive(Debug, Clone, Copy)]
 pub struct AuthUser(UserId);
 
 impl Deref for AuthUser {
@@ -39,60 +31,58 @@ impl Deref for AuthUser {
     }
 }
 
-#[rocket::async_trait]
-impl<'r> FromRequest<'r> for AuthUser {
-    type Error = ();
+#[async_trait]
+impl<S> FromRequestParts<S> for AuthUser
+where
+    S: Send + Sync,
+    AppState: FromRef<S>,
+{
+    type Rejection = HandlerError;
 
-    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
-        let (username, password) = match parse_username_password(request) {
-            Some((username, password)) => (username, password),
-            None => return Outcome::Failure((Status::Unauthorized, ())),
-        };
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let TypedHeader(auth) =
+            TypedHeader::<Authorization<Basic>>::from_request_parts(parts, state).await?;
+        let username = auth.username();
+        let password = auth.password();
 
-        let conn = match Db::from_request(request).await {
-            Outcome::Success(conn) => conn,
-            Outcome::Failure(f) => return Outcome::Failure(f),
-            Outcome::Forward(f) => return Outcome::Forward(f),
-        };
-        let config = match <&'r State<Config>>::from_request(request).await {
-            Outcome::Success(config) => config,
-            Outcome::Failure(f) => return Outcome::Failure(f),
-            Outcome::Forward(f) => return Outcome::Forward(f),
-        }
-        .inner();
-        let admin_password = config.admin_password.clone();
-        conn.run(move |c| match User::auth(&username, &password, c) {
-            Ok(id) => Outcome::Success(AuthUser(id)),
+        let State(AppState { config, db_pool }) =
+            State::<AppState>::from_request_parts(parts, state).await?;
+
+        let db = db_pool.get()?;
+
+        let admin_password = &config.admin_password;
+
+        match User::auth(username, password, &db) {
+            Ok(id) => Ok(AuthUser(id)),
             Err(_) => {
                 if let Some((name, Ok(user_id))) = username
                     .split_once("$id$")
                     .map(|(name, id)| (name, id.parse().map(UserId)))
                 {
-                    if Admin::auth(name, &password, &admin_password, c).is_ok() {
-                        return Outcome::Success(AuthUser(user_id));
+                    if Admin::auth(name, password, admin_password).is_ok() {
+                        return Ok(AuthUser(user_id));
                     }
                 };
-                Outcome::Failure((Status::Unauthorized, ()))
+                Err(StatusCode::UNAUTHORIZED.into())
             }
-        })
-        .await
+        }
     }
 }
 
-/// [AuthUserOrAP] is used as a request guard to ensure that the endpoint can only be accessed by the user who owns the data.
+/// [AuthUserOrAP] is used as a request guard to authenticate a user.
 ///
 /// For the creation of an [AuthUserOrAP] the username and password have to be transmitted via HTTP basic auth.
 ///
 /// [ActionProvider] can also use endpoints with an [AuthUserOrAP] as request guard
-/// if there is an [ActionEvent](crate::ActionEvent) which references an [Action](crate::Action) that is provided by the [ActionProvider]
-/// and the [ActionEvent](crate::ActionEvent) is owned by the [User] the [ActionProvider] is trying to authenticate as.
+/// if the user has an enabled [ActionEvent](crate::ActionEvent) for an [Action](crate::Action) of this [ActionProvider].
 ///
 /// In this case the username has to be set to `<ap_name>$id$<user_id>` and the password is the password of the [ActionProvider].
 ///
 /// [Admin] can also use endpoints with an [AuthUserOrAP] as request guard.
 ///
-/// In order to do so, the username has to be set to `admin$id$<user_id>` and the password is the password of the [Admin] as configured in [Config](crate::Config).
-#[derive(Debug, Clone)]
+/// In order to do so, the username has to be set to `admin$id$<user_id>`
+/// and the password must be the `admin_password` as configured in `sport-log-server.toml`.
+#[derive(Debug, Clone, Copy)]
 pub struct AuthUserOrAP(UserId);
 
 impl Deref for AuthUserOrAP {
@@ -103,49 +93,47 @@ impl Deref for AuthUserOrAP {
     }
 }
 
-#[rocket::async_trait]
-impl<'r> FromRequest<'r> for AuthUserOrAP {
-    type Error = ();
+#[async_trait]
+impl<S> FromRequestParts<S> for AuthUserOrAP
+where
+    S: Send + Sync,
+    AppState: FromRef<S>,
+{
+    type Rejection = HandlerError;
 
-    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
-        let (username, password) = match parse_username_password(request) {
-            Some((username, password)) => (username, password),
-            None => return Outcome::Failure((Status::Unauthorized, ())),
-        };
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let TypedHeader(auth) =
+            TypedHeader::<Authorization<Basic>>::from_request_parts(parts, state).await?;
+        let username = auth.username();
+        let password = auth.password();
 
-        let conn = match Db::from_request(request).await {
-            Outcome::Success(conn) => conn,
-            Outcome::Failure(f) => return Outcome::Failure(f),
-            Outcome::Forward(f) => return Outcome::Forward(f),
-        };
-        let config = match <&'r State<Config>>::from_request(request).await {
-            Outcome::Success(config) => config,
-            Outcome::Failure(f) => return Outcome::Failure(f),
-            Outcome::Forward(f) => return Outcome::Forward(f),
-        }
-        .inner();
-        let admin_password = config.admin_password.clone();
-        conn.run(move |c| match User::auth(&username, &password, c) {
-            Ok(id) => Outcome::Success(AuthUserOrAP(id)),
+        let State(AppState { config, db_pool }) =
+            State::<AppState>::from_request_parts(parts, state).await?;
+
+        let db = db_pool.get()?;
+
+        let admin_password = &config.admin_password;
+
+        match User::auth(username, password, &db) {
+            Ok(id) => Ok(AuthUserOrAP(id)),
             Err(_) => {
                 if let Some((name, Ok(user_id))) = username
                     .split_once("$id$")
                     .map(|(name, id)| (name, id.parse().map(UserId)))
                 {
-                    match ActionProvider::auth_as_user(name, &password, user_id, c) {
-                        Ok(AuthApForUser::Allowed(_)) => Outcome::Success(AuthUserOrAP(user_id)),
-                        Ok(AuthApForUser::Forbidden) => Outcome::Failure((Status::Forbidden, ())),
-                        Err(_) => match Admin::auth(name, &password, &admin_password, c) {
-                            Ok(()) => Outcome::Success(AuthUserOrAP(user_id)),
-                            Err(_) => Outcome::Failure((Status::Unauthorized, ())),
+                    match ActionProvider::auth_as_user(name, password, user_id, &db) {
+                        Ok(AuthApForUser::Allowed(_)) => Ok(AuthUserOrAP(user_id)),
+                        Ok(AuthApForUser::Forbidden) => Err(StatusCode::FORBIDDEN.into()),
+                        Err(_) => match Admin::auth(name, password, admin_password) {
+                            Ok(()) => Ok(AuthUserOrAP(user_id)),
+                            Err(_) => Err(StatusCode::UNAUTHORIZED.into()),
                         },
                     }
                 } else {
-                    Outcome::Failure((Status::Unauthorized, ()))
+                    Err(StatusCode::UNAUTHORIZED.into())
                 }
             }
-        })
-        .await
+        }
     }
 }
 
@@ -154,14 +142,15 @@ pub enum AuthApForUser {
     Forbidden,
 }
 
-/// [AuthAP] is used as a request guard to ensure that the endpoint can only be accessed by the [ActionProvider] who provides the [ActionEvent](crate::ActionEvent).
+/// [AuthAP] is used as a request guard to authenticate an action provider.
 ///
 /// For the creation of an [AuthAP] the username and password have to be transmitted via HTTP basic auth.
 ///
 /// [Admin] can also use endpoints with an [AuthAP] as request guard.
 ///
-/// In order to do so, the username has to be set to `admin$id$<action_provider_id>` and the password is the password of the [Admin] as configured in [Config](crate::Config).
-#[derive(Debug, Clone)]
+/// In order to do so, the username has to be set to `admin$id$<action_provider_id>`
+/// and the password must be the `admin_password` as configured in `sport-log-server.toml`.
+#[derive(Debug, Clone, Copy)]
 pub struct AuthAP(ActionProviderId);
 
 impl Deref for AuthAP {
@@ -172,83 +161,73 @@ impl Deref for AuthAP {
     }
 }
 
-#[rocket::async_trait]
-impl<'r> FromRequest<'r> for AuthAP {
-    type Error = ();
+#[async_trait]
+impl<S> FromRequestParts<S> for AuthAP
+where
+    S: Send + Sync,
+    AppState: FromRef<S>,
+{
+    type Rejection = HandlerError;
 
-    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
-        let (username, password) = match parse_username_password(request) {
-            Some((username, password)) => (username, password),
-            None => return Outcome::Failure((Status::Unauthorized, ())),
-        };
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let TypedHeader(auth) =
+            TypedHeader::<Authorization<Basic>>::from_request_parts(parts, state).await?;
+        let username = auth.username();
+        let password = auth.password();
 
-        let conn = match Db::from_request(request).await {
-            Outcome::Success(conn) => conn,
-            Outcome::Failure(f) => return Outcome::Failure(f),
-            Outcome::Forward(f) => return Outcome::Forward(f),
-        };
-        let config = match <&'r State<Config>>::from_request(request).await {
-            Outcome::Success(config) => config,
-            Outcome::Failure(f) => return Outcome::Failure(f),
-            Outcome::Forward(f) => return Outcome::Forward(f),
+        let State(AppState { config, db_pool }) =
+            State::<AppState>::from_request_parts(parts, state).await?;
+
+        let db = db_pool.get()?;
+
+        let admin_password = &config.admin_password;
+
+        match ActionProvider::auth(username, password, &db) {
+            Ok(id) => Ok(AuthAP(id)),
+            Err(_) => {
+                if let Some((name, Ok(id))) = username
+                    .split_once("$id$")
+                    .map(|(name, id)| (name, id.parse()))
+                {
+                    if Admin::auth(name, password, admin_password).is_ok() {
+                        return Ok(AuthAP(ActionProviderId(id)));
+                    }
+                };
+                Err(StatusCode::UNAUTHORIZED.into())
+            }
         }
-        .inner();
-        let admin_password = config.admin_password.clone();
-        conn.run(
-            move |c| match ActionProvider::auth(&username, &password, c) {
-                Ok(id) => Outcome::Success(AuthAP(id)),
-                Err(_) => {
-                    if let Some((name, Ok(id))) = username
-                        .split_once("$id$")
-                        .map(|(name, id)| (name, id.parse()))
-                    {
-                        if Admin::auth(name, &password, &admin_password, c).is_ok() {
-                            return Outcome::Success(AuthAP(ActionProviderId(id)));
-                        }
-                    };
-                    Outcome::Failure((Status::Unauthorized, ()))
-                }
-            },
-        )
-        .await
     }
 }
 
-/// [AuthAdmin] is used as a request guard to ensure that the endpoint can only be accessed by the [Admin].
+/// [AuthAdmin] is used as a request guard to authenticate the admin.
 ///
 /// For the creation of an [AuthAdmin] the username and password have to be transmitted via HTTP basic auth.
 ///
-/// The username has to be set to `admin` and the password is the password of the [Admin] as configured in [Config](crate::Config).
+/// The username has to be set to `admin` and the password must be the `admin_password` as configured in `sport-log-server.toml`.
+#[derive(Debug, Clone, Copy)]
 pub struct AuthAdmin;
 
-#[rocket::async_trait]
-impl<'r> FromRequest<'r> for AuthAdmin {
-    type Error = ();
+#[async_trait]
+impl<S> FromRequestParts<S> for AuthAdmin
+where
+    S: Send + Sync,
+    Arc<Config>: FromRef<S>,
+{
+    type Rejection = HandlerError;
 
-    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, (Status, Self::Error), ()> {
-        let (username, password) = match parse_username_password(request) {
-            Some((username, password)) => (username, password),
-            None => return Outcome::Failure((Status::Unauthorized, ())),
-        };
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let TypedHeader(auth) =
+            TypedHeader::<Authorization<Basic>>::from_request_parts(parts, state).await?;
+        let username = auth.username();
+        let password = auth.password();
 
-        let conn = match Db::from_request(request).await {
-            Outcome::Success(conn) => conn,
-            Outcome::Failure(f) => return Outcome::Failure(f),
-            Outcome::Forward(f) => return Outcome::Forward(f),
-        };
-        let config = match <&'r State<Config>>::from_request(request).await {
-            Outcome::Success(config) => config,
-            Outcome::Failure(f) => return Outcome::Failure(f),
-            Outcome::Forward(f) => return Outcome::Forward(f),
+        let State(config) = State::<Arc<Config>>::from_request_parts(parts, state).await?;
+
+        let admin_password = &config.admin_password;
+
+        match Admin::auth(username, password, admin_password) {
+            Ok(_) => Ok(AuthAdmin),
+            Err(_) => Err(StatusCode::UNAUTHORIZED.into()),
         }
-        .inner();
-        let admin_password = config.admin_password.clone();
-        conn.run(
-            move |c| match Admin::auth(&username, &password, &admin_password, c) {
-                Ok(_) => Outcome::Success(AuthAdmin),
-                Err(_) => Outcome::Failure((Status::Unauthorized, ())),
-            },
-        )
-        .await
     }
 }

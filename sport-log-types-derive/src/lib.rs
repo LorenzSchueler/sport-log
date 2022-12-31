@@ -21,18 +21,6 @@ pub fn create_derive(input: TokenStream) -> TokenStream {
     impl_create(&ast)
 }
 
-/// Derives `sport_log_types::CreateMultiple`.
-///
-/// This macro only works if the following conditions are satisfied:
-///
-/// - the corresponding table has the same name like this type but in snake_case
-/// - there is a type called `New[ThisTypeName]` that implements `diesel::prelude::Insertable` for this table
-#[proc_macro_derive(CreateMultiple)]
-pub fn create_multiple_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_create_multiple(&ast)
-}
-
 /// Derives `sport_log_types::GetById`.
 ///
 /// This macro only works if the following conditions are satisfied:

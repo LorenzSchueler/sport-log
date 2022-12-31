@@ -1,3 +1,5 @@
+use std::net::SocketAddr;
+
 use serde::{Deserialize, Serialize};
 
 /// Server configuration.
@@ -12,4 +14,7 @@ pub struct Config {
     pub admin_password: String,
     pub user_self_registration: bool,
     pub ap_self_registration: bool,
+    pub database_url: String,
+    pub release_address: SocketAddr,
+    pub debug_address: SocketAddr,
 }

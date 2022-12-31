@@ -2,17 +2,12 @@ use argon2::{
     password_hash::{PasswordHash, PasswordVerifier},
     Argon2,
 };
-use diesel::{result::Error, PgConnection, QueryResult};
+use diesel::{result::Error, QueryResult};
 
 use crate::{Admin, ADMIN_USERNAME};
 
 impl Admin {
-    pub fn auth(
-        username: &str,
-        password: &str,
-        admin_password: &str,
-        _conn: &PgConnection,
-    ) -> QueryResult<()> {
+    pub fn auth(username: &str, password: &str, admin_password: &str) -> QueryResult<()> {
         let password_hash =
             PasswordHash::new(admin_password).map_err(|_| Error::RollbackTransaction)?; // this should not happen but prevents panic
         if username == ADMIN_USERNAME

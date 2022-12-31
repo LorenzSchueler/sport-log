@@ -69,28 +69,26 @@ impl Activity {
         user_id: UserId,
         start: DateTime<Utc>,
         end: DateTime<Utc>,
-        conn: &PgConnection,
+        db: &PgConnection,
     ) -> QueryResult<Vec<Self>> {
         Ok(Self::join_and_order(
-            Diary::get_ordered_by_user_and_timespan(user_id, start, end, conn)?,
-            Wod::get_ordered_by_user_and_timespan(user_id, start, end, conn)?,
-            StrengthSessionDescription::get_ordered_by_user_and_timespan(
-                user_id, start, end, conn,
-            )?,
-            MetconSessionDescription::get_ordered_by_user_and_timespan(user_id, start, end, conn)?,
-            CardioSessionDescription::get_ordered_by_user_and_timespan(user_id, start, end, conn)?,
+            Diary::get_ordered_by_user_and_timespan(user_id, start, end, db)?,
+            Wod::get_ordered_by_user_and_timespan(user_id, start, end, db)?,
+            StrengthSessionDescription::get_ordered_by_user_and_timespan(user_id, start, end, db)?,
+            MetconSessionDescription::get_ordered_by_user_and_timespan(user_id, start, end, db)?,
+            CardioSessionDescription::get_ordered_by_user_and_timespan(user_id, start, end, db)?,
         ))
     }
 }
 
 impl GetByUser for Activity {
-    fn get_by_user(user_id: UserId, conn: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_by_user(user_id: UserId, db: &PgConnection) -> QueryResult<Vec<Self>> {
         Ok(Self::join_and_order(
-            Diary::get_by_user(user_id, conn)?,
-            Wod::get_by_user(user_id, conn)?,
-            StrengthSessionDescription::get_by_user(user_id, conn)?,
-            MetconSessionDescription::get_by_user(user_id, conn)?,
-            CardioSessionDescription::get_by_user(user_id, conn)?,
+            Diary::get_by_user(user_id, db)?,
+            Wod::get_by_user(user_id, db)?,
+            StrengthSessionDescription::get_by_user(user_id, db)?,
+            MetconSessionDescription::get_by_user(user_id, db)?,
+            CardioSessionDescription::get_by_user(user_id, db)?,
         ))
     }
 }

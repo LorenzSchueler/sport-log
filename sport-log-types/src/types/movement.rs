@@ -1,14 +1,14 @@
+#[cfg(feature = "server")]
+use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 #[cfg(feature = "server")]
 use diesel_derive_enum::DbEnum;
-#[cfg(feature = "server")]
-use rocket::http::Status;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
-    CheckUserId, Create, CreateMultiple, FromSql, GetAll, GetById, GetByIds, HardDelete, ToSql,
-    Update, VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
+    CheckUserId, Create, FromSql, GetAll, GetById, GetByIds, HardDelete, ToSql, Update,
+    VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
 };
 use sport_log_types_derive::{FromI64, ToI64};
 
@@ -54,11 +54,11 @@ pub struct MovementId(pub i64);
 impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
     type Id = MovementId;
 
-    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
-        if Movement::check_optional_user_id(self.0, **auth, conn).map_err(|_| Status::Forbidden)? {
+    fn verify_user_ap(self, auth: AuthUserOrAP, db: &PgConnection) -> Result<Self::Id, StatusCode> {
+        if Movement::check_optional_user_id(self.0, *auth, db).map_err(|_| StatusCode::FORBIDDEN)? {
             Ok(self.0)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -69,15 +69,15 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
 
     fn verify_user_ap(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Id>, Status> {
-        if Movement::check_optional_user_ids(&self.0, **auth, conn)
-            .map_err(|_| Status::Forbidden)?
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Vec<Self::Id>, StatusCode> {
+        if Movement::check_optional_user_ids(&self.0, *auth, db)
+            .map_err(|_| StatusCode::FORBIDDEN)?
         {
             Ok(self.0)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -97,7 +97,6 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         Update,
@@ -133,19 +132,19 @@ impl VerifyForUserOrAPWithDb for Unverified<Movement> {
 
     fn verify_user_ap(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Self::Entity, Status> {
-        let movement = self.0.into_inner();
-        if movement.user_id == Some(**auth)
-            && Movement::get_by_id(movement.id, conn)
-                .map_err(|_| Status::InternalServerError)?
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Self::Entity, StatusCode> {
+        let movement = self.0;
+        if movement.user_id == Some(*auth)
+            && Movement::get_by_id(movement.id, db)
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
                 .user_id
-                == Some(**auth)
+                == Some(*auth)
         {
             Ok(movement)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -156,20 +155,20 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Movement>> {
 
     fn verify_user_ap(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Entity>, Status> {
-        let movements = self.0.into_inner();
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, StatusCode> {
+        let movements = self.0;
         let movement_ids: Vec<_> = movements.iter().map(|movement| movement.id).collect();
         if movements
             .iter()
-            .all(|movement| movement.user_id == Some(**auth))
-            && Movement::check_user_ids(&movement_ids, **auth, conn)
-                .map_err(|_| Status::InternalServerError)?
+            .all(|movement| movement.user_id == Some(*auth))
+            && Movement::check_user_ids(&movement_ids, *auth, db)
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(movements)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -178,12 +177,12 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Movement>> {
 impl VerifyForUserOrAPWithoutDb for Unverified<Movement> {
     type Entity = Movement;
 
-    fn verify_user_ap_without_db(self, auth: &AuthUserOrAP) -> Result<Self::Entity, Status> {
-        let movement = self.0.into_inner();
-        if movement.user_id == Some(**auth) {
+    fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Self::Entity, StatusCode> {
+        let movement = self.0;
+        if movement.user_id == Some(*auth) {
             Ok(movement)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -192,15 +191,18 @@ impl VerifyForUserOrAPWithoutDb for Unverified<Movement> {
 impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
     type Entity = Movement;
 
-    fn verify_user_ap_without_db(self, auth: &AuthUserOrAP) -> Result<Vec<Self::Entity>, Status> {
-        let movements = self.0.into_inner();
+    fn verify_user_ap_without_db(
+        self,
+        auth: AuthUserOrAP,
+    ) -> Result<Vec<Self::Entity>, StatusCode> {
+        let movements = self.0;
         if movements
             .iter()
-            .all(|movement| movement.user_id == Some(**auth))
+            .all(|movement| movement.user_id == Some(*auth))
         {
             Ok(movements)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -251,13 +253,13 @@ pub struct MovementMuscleId(pub i64);
 impl VerifyIdForUserOrAP for UnverifiedId<MovementMuscleId> {
     type Id = MovementMuscleId;
 
-    fn verify_user_ap(self, auth: &AuthUserOrAP, conn: &PgConnection) -> Result<Self::Id, Status> {
-        if MovementMuscle::check_optional_user_id(self.0, **auth, conn)
-            .map_err(|_| Status::Forbidden)?
+    fn verify_user_ap(self, auth: AuthUserOrAP, db: &PgConnection) -> Result<Self::Id, StatusCode> {
+        if MovementMuscle::check_optional_user_id(self.0, *auth, db)
+            .map_err(|_| StatusCode::FORBIDDEN)?
         {
             Ok(self.0)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -268,15 +270,15 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementMuscleId> {
 
     fn verify_user_ap(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Id>, Status> {
-        if MovementMuscle::check_optional_user_ids(&self.0, **auth, conn)
-            .map_err(|_| Status::Forbidden)?
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Vec<Self::Id>, StatusCode> {
+        if MovementMuscle::check_optional_user_ids(&self.0, *auth, db)
+            .map_err(|_| StatusCode::FORBIDDEN)?
         {
             Ok(self.0)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -291,7 +293,6 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementMuscleId> {
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         Update,
@@ -323,16 +324,16 @@ impl VerifyForUserOrAPWithDb for Unverified<MovementMuscle> {
 
     fn verify_user_ap(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Self::Entity, Status> {
-        let movement_muscle = self.0.into_inner();
-        if MovementMuscle::check_user_id(movement_muscle.id, **auth, conn)
-            .map_err(|_| Status::InternalServerError)?
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Self::Entity, StatusCode> {
+        let movement_muscle = self.0;
+        if MovementMuscle::check_user_id(movement_muscle.id, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(movement_muscle)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -343,20 +344,20 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MovementMuscle>> {
 
     fn verify_user_ap(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Entity>, Status> {
-        let movement_muscle = self.0.into_inner();
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, StatusCode> {
+        let movement_muscle = self.0;
         let movement_muscle_ids: Vec<_> = movement_muscle
             .iter()
             .map(|metcon_movement| metcon_movement.id)
             .collect();
-        if MovementMuscle::check_user_ids(&movement_muscle_ids, **auth, conn)
-            .map_err(|_| Status::InternalServerError)?
+        if MovementMuscle::check_user_ids(&movement_muscle_ids, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(movement_muscle)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -367,16 +368,16 @@ impl VerifyForUserOrAPCreate for Unverified<MovementMuscle> {
 
     fn verify_user_ap_create(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Self::Entity, Status> {
-        let movement_muscle = self.0.into_inner();
-        if Movement::check_user_id(movement_muscle.movement_id, **auth, conn)
-            .map_err(|_| Status::InternalServerError)?
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Self::Entity, StatusCode> {
+        let movement_muscle = self.0;
+        if Movement::check_user_id(movement_muscle.movement_id, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(movement_muscle)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }
@@ -387,22 +388,22 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MovementMuscle>> {
 
     fn verify_user_ap_create(
         self,
-        auth: &AuthUserOrAP,
-        conn: &PgConnection,
-    ) -> Result<Vec<Self::Entity>, Status> {
-        let movement_muscle = self.0.into_inner();
+        auth: AuthUserOrAP,
+        db: &PgConnection,
+    ) -> Result<Vec<Self::Entity>, StatusCode> {
+        let movement_muscle = self.0;
         let mut movement_ids: Vec<_> = movement_muscle
             .iter()
             .map(|metcon_movement| metcon_movement.movement_id)
             .collect();
         movement_ids.sort_unstable();
         movement_ids.dedup();
-        if Movement::check_user_ids(&movement_ids, **auth, conn)
-            .map_err(|_| Status::InternalServerError)?
+        if Movement::check_user_ids(&movement_ids, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(movement_muscle)
         } else {
-            Err(Status::Forbidden)
+            Err(StatusCode::FORBIDDEN)
         }
     }
 }

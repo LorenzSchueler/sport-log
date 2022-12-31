@@ -3,8 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
-    Create, CreateMultiple, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete,
-    ToSql, Update,
+    Create, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, ToSql, Update,
 };
 use sport_log_types_derive::{FromI64, ToI64};
 
@@ -40,7 +39,6 @@ pub struct GroupId(pub i64);
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         Update,
@@ -79,7 +77,6 @@ pub struct GroupUserId(pub i64);
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         GetByUser,
@@ -127,7 +124,6 @@ pub struct SharedMetconSessionId(pub i64);
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         Update,
@@ -173,7 +169,6 @@ pub struct SharedStrengthSessionId(pub i64);
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         Update,
@@ -219,7 +214,6 @@ pub struct SharedCardioSessionId(pub i64);
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         Update,
@@ -265,7 +259,6 @@ pub struct SharedDiaryId(pub i64);
         Queryable,
         AsChangeset,
         Create,
-        CreateMultiple,
         GetById,
         GetByIds,
         Update,
