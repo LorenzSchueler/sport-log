@@ -3,8 +3,11 @@ use sport_log_types::{Activity, AuthUserOrAP, DbConn, GetByUser};
 
 use crate::handler::HandlerResult;
 
-pub async fn get_activities(auth: AuthUserOrAP, db: DbConn) -> HandlerResult<Json<Vec<Activity>>> {
-    Activity::get_by_user(*auth, &db)
+pub async fn get_activities(
+    auth: AuthUserOrAP,
+    mut db: DbConn,
+) -> HandlerResult<Json<Vec<Activity>>> {
+    Activity::get_by_user(*auth, &mut db)
         .map(Json)
         .map_err(Into::into)
 }
@@ -14,9 +17,9 @@ pub async fn get_activities(auth: AuthUserOrAP, db: DbConn) -> HandlerResult<Jso
 //auth: AuthUserOrAP,
 //Path(start_datetime): Path<DateTime<Utc>>,
 //Path(end_datetime): Path<DateTime<Utc>>,
-//db: DbConn,
+//mut db: DbConn,
 //) -> HandlerResult<Json<Vec<Activity>>> {
-//Activity::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &db)
+//Activity::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}

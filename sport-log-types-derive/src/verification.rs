@@ -17,11 +17,11 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
             fn verify_user(
                 self,
                 auth: crate::AuthUser,
-                db: &diesel::pg::PgConnection,
+                db: &mut diesel::pg::PgConnection,
             ) -> Result<Self::Id, axum::http::StatusCode> {
                 use crate::CheckUserId;
 
-                if #typename::check_user_id(self.0, *auth, &db)
+                if #typename::check_user_id(self.0, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(self.0)
@@ -37,11 +37,11 @@ pub fn impl_verify_id_for_user(ast: &syn::DeriveInput) -> TokenStream {
             fn verify_user(
                 self,
                 auth: crate::AuthUser,
-                db: &diesel::pg::PgConnection,
+                db: &mut diesel::pg::PgConnection,
             ) -> Result<Vec<Self::Id>, axum::http::StatusCode> {
                 use crate::CheckUserId;
 
-                if #typename::check_user_ids(&self.0, *auth, &db)
+                if #typename::check_user_ids(&self.0, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(self.0)
@@ -69,11 +69,11 @@ pub fn impl_verify_id_for_user_or_ap(ast: &syn::DeriveInput) -> TokenStream {
             fn verify_user_ap(
                 self,
                 auth: crate::AuthUserOrAP,
-                db: &diesel::pg::PgConnection,
+                db: &mut diesel::pg::PgConnection,
             ) -> Result<Self::Id, axum::http::StatusCode> {
                 use crate::CheckUserId;
 
-                if #typename::check_user_id(self.0, *auth, &db)
+                if #typename::check_user_id(self.0, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(self.0)
@@ -89,11 +89,11 @@ pub fn impl_verify_id_for_user_or_ap(ast: &syn::DeriveInput) -> TokenStream {
             fn verify_user_ap(
                 self,
                 auth: crate::AuthUserOrAP,
-                db: &diesel::pg::PgConnection,
+                db: &mut diesel::pg::PgConnection,
             ) -> Result<Vec<Self::Id>, axum::http::StatusCode> {
                 use crate::CheckUserId;
 
-                if #typename::check_user_ids(&self.0, *auth, &db)
+                if #typename::check_user_ids(&self.0, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(self.0)
@@ -121,11 +121,11 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
             fn verify_ap(
                 self,
                 auth: crate::AuthAP,
-                db: &diesel::pg::PgConnection,
+                db: &mut diesel::pg::PgConnection,
             ) -> Result<crate::#id_typename, axum::http::StatusCode> {
                 use crate::CheckAPId;
 
-                if #typename::check_ap_id(self.0, *auth, &db)
+                if #typename::check_ap_id(self.0, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(self.0)
@@ -141,11 +141,11 @@ pub fn impl_verify_id_for_action_provider(ast: &syn::DeriveInput) -> TokenStream
             fn verify_ap(
                 self,
                 auth: crate::AuthAP,
-                db: &diesel::pg::PgConnection,
+                db: &mut diesel::pg::PgConnection,
             ) -> Result<Vec<crate::#id_typename>, axum::http::StatusCode> {
                 use crate::CheckAPId;
 
-                if #typename::check_ap_ids(&self.0, *auth, &db)
+                if #typename::check_ap_ids(&self.0, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(self.0)
@@ -214,13 +214,13 @@ pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
             fn verify_user(
                 self,
                 auth: crate::AuthUser,
-                db: &diesel::pg::PgConnection,
+                db: &mut diesel::pg::PgConnection,
             ) -> Result<Self::Entity, axum::http::StatusCode> {
                 use crate::CheckUserId;
 
                 let entity = self.0;
                 if entity.user_id == *auth
-                    && #typename::check_user_id(entity.id, *auth, &db)
+                    && #typename::check_user_id(entity.id, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(entity)
@@ -236,14 +236,14 @@ pub fn impl_verify_for_user_with_db(ast: &syn::DeriveInput) -> TokenStream {
             fn verify_user(
                 self,
                 auth: crate::AuthUser,
-                db: &diesel::pg::PgConnection,
+                db: &mut diesel::pg::PgConnection,
             ) -> Result<Vec<Self::Entity>, axum::http::StatusCode> {
                 use crate::CheckUserId;
 
                 let entities = self.0;
                 let ids: Vec<_> = entities.iter().map(|entity| entity.id).collect();
                 if entities.iter().all(|entity| entity.user_id == *auth)
-                    && #typename::check_user_ids(&ids, *auth, &db)
+                    && #typename::check_user_ids(&ids, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(entities)
@@ -266,13 +266,13 @@ pub fn impl_verify_for_user_or_ap_with_db(ast: &syn::DeriveInput) -> TokenStream
             fn verify_user_ap(
                 self,
                 auth: crate::AuthUserOrAP,
-                db: &diesel::pg::PgConnection,
+                db: &mut diesel::pg::PgConnection,
             ) -> Result<Self::Entity, axum::http::StatusCode> {
                 use crate::CheckUserId;
 
                 let entity = self.0;
                 if entity.user_id == *auth
-                    && #typename::check_user_id(entity.id, *auth, &db)
+                    && #typename::check_user_id(entity.id, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(entity)
@@ -288,14 +288,14 @@ pub fn impl_verify_for_user_or_ap_with_db(ast: &syn::DeriveInput) -> TokenStream
             fn verify_user_ap(
                 self,
                 auth: crate::AuthUserOrAP,
-                db: &diesel::pg::PgConnection,
+                db: &mut diesel::pg::PgConnection,
             ) -> Result<Vec<Self::Entity>, axum::http::StatusCode> {
                 use crate::CheckUserId;
 
                 let entities = self.0;
                 let ids: Vec<_> = entities.iter().map(|entity| entity.id).collect();
                 if entities.iter().all(|entity| entity.user_id == *auth)
-                    && #typename::check_user_ids(&ids, *auth, &db)
+                    && #typename::check_user_ids(&ids, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(entities)
@@ -396,13 +396,13 @@ pub fn impl_verify_for_action_provider_with_db(ast: &syn::DeriveInput) -> TokenS
             fn verify_ap(
                 self,
                 auth: crate::AuthAP,
-                db: &diesel::pg::PgConnection,
+                db: &mut diesel::pg::PgConnection,
             ) -> Result<Self::Entity, axum::http::StatusCode> {
                 use crate::CheckAPId;
 
                 let entity = self.0;
                 if entity.action_provider_id == *auth
-                    && #typename::check_ap_id(entity.id, *auth, &db)
+                    && #typename::check_ap_id(entity.id, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(entity)

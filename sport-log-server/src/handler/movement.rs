@@ -9,17 +9,17 @@ use crate::handler::{HandlerResult, IdOption, UnverifiedSingleOrVec};
 
 pub async fn create_movements(
     auth: AuthUserOrAP,
-    db: DbConn,
+    mut db: DbConn,
     Json(movements): Json<UnverifiedSingleOrVec<Movement>>,
 ) -> HandlerResult<StatusCode> {
     match movements {
         UnverifiedSingleOrVec::Single(movement) => {
             let movement = movement.verify_user_ap_without_db(auth)?;
-            Movement::create(movement, &db)
+            Movement::create(movement, &mut db)
         }
         UnverifiedSingleOrVec::Vec(movements) => {
             let movements = movements.verify_user_ap_without_db(auth)?;
-            Movement::create_multiple(movements, &db)
+            Movement::create_multiple(movements, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -29,14 +29,14 @@ pub async fn create_movements(
 pub async fn get_movements(
     auth: AuthUserOrAP,
     Query(IdOption { id }): Query<IdOption<UnverifiedId<MovementId>>>,
-    db: DbConn,
+    mut db: DbConn,
 ) -> HandlerResult<Json<Vec<Movement>>> {
     match id {
         Some(id) => {
-            let movement_id = id.verify_user_ap(auth, &db)?;
-            Movement::get_by_id(movement_id, &db).map(|m| vec![m])
+            let movement_id = id.verify_user_ap(auth, &mut db)?;
+            Movement::get_by_id(movement_id, &mut db).map(|m| vec![m])
         }
-        None => Movement::get_by_user(*auth, &db),
+        None => Movement::get_by_user(*auth, &mut db),
     }
     .map(Json)
     .map_err(Into::into)
@@ -44,17 +44,17 @@ pub async fn get_movements(
 
 pub async fn update_movements(
     auth: AuthUserOrAP,
-    db: DbConn,
+    mut db: DbConn,
     Json(movements): Json<UnverifiedSingleOrVec<Movement>>,
 ) -> HandlerResult<StatusCode> {
     match movements {
         UnverifiedSingleOrVec::Single(movement) => {
             let movement = movement.verify_user_ap_without_db(auth)?;
-            Movement::update(movement, &db)
+            Movement::update(movement, &mut db)
         }
         UnverifiedSingleOrVec::Vec(movements) => {
-            let movements = movements.verify_user_ap(auth, &db)?;
-            Movement::update_multiple(movements, &db)
+            let movements = movements.verify_user_ap(auth, &mut db)?;
+            Movement::update_multiple(movements, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -68,13 +68,13 @@ pub async fn update_movements(
 ////)]
 //pub async fn create_movement_muscle(
 //auth: AuthUserOrAP,
-//db: DbConn,
+//mut db: DbConn,
 //Json(movement_muscle): Json<Unverified<MovementMuscle>>,
 //) -> HandlerResult<Json<MovementMuscle>> {
 //let movement_muscle = movement_muscle
-//.verify_user_ap_create(auth, &db)
+//.verify_user_ap_create(auth, &mut db)
 //.map_err(Error::from)?;
-//MovementMuscle::create(movement_muscle, &db)
+//MovementMuscle::create(movement_muscle, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -86,16 +86,16 @@ pub async fn update_movements(
 ////)]
 //pub async fn create_movement_muscles(
 //auth: AuthUserOrAP,
-//db: DbConn,
+//mut db: DbConn,
 //Json(movement_muscles): Json<UnverifiedSingleOrVec<MovementMuscle>>>,
 //) -> HandlerResult<Json<Vec<MovementMuscle>>> {
 //let movement_muscles = movement_muscles
-//.verify_user_ap_create(auth, &db)
+//.verify_user_ap_create(auth, &mut db)
 //.map_err(|status| Error {
 //status,
 //message: None,
 //})?;
-//MovementMuscle::create_multiple(movement_muscles, &db)
+//MovementMuscle::create_multiple(movement_muscles, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -104,12 +104,12 @@ pub async fn update_movements(
 //pub async fn get_movement_muscle(
 //auth: AuthUserOrAP,
 //Path(movement_muscle_id): Path<UnverifiedId<MovementMuscleId>>,
-//db: DbConn,
+//mut db: DbConn,
 //) -> HandlerResult<Json<MovementMuscle>> {
 //let movement_muscle_id = movement_muscle_id
-//.verify_user_ap(auth, &db)
+//.verify_user_ap(auth, &mut db)
 //.map_err(Error::from)?;
-//MovementMuscle::get_by_id(movement_muscle_id, &db)
+//MovementMuscle::get_by_id(movement_muscle_id, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -117,9 +117,9 @@ pub async fn update_movements(
 ////#[get("/movement_muscle")]
 //pub async fn get_movement_muscles(
 //auth: AuthUserOrAP,
-//db: DbConn,
+//mut db: DbConn,
 //) -> HandlerResult<Json<Vec<MovementMuscle>>> {
-//MovementMuscle::get_by_user(*auth, &db)
+//MovementMuscle::get_by_user(*auth, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -131,13 +131,13 @@ pub async fn update_movements(
 ////)]
 //pub async fn update_movement_muscle(
 //auth: AuthUserOrAP,
-//db: DbConn,
+//mut db: DbConn,
 //Json(movement_muscle): Json<Unverified<MovementMuscle>>,
 //) -> HandlerResult<Json<MovementMuscle>> {
 //let movement_muscle = movement_muscle
-//.verify_user_ap(auth, &db)
+//.verify_user_ap(auth, &mut db)
 //.map_err(Error::from)?;
-//MovementMuscle::update(movement_muscle, &db)
+//MovementMuscle::update(movement_muscle, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -149,13 +149,13 @@ pub async fn update_movements(
 ////)]
 //pub async fn update_movement_muscles(
 //auth: AuthUserOrAP,
-//db: DbConn,
+//mut db: DbConn,
 //Json(movement_muscles): Json<UnverifiedSingleOrVec<MovementMuscle>>>,
 //) -> HandlerResult<Json<Vec<MovementMuscle>>> {
 //let movement_muscles = movement_muscles
-//.verify_user_ap(auth, &db)
+//.verify_user_ap(auth, &mut db)
 //.map_err(Error::from)?;
-//MovementMuscle::update_multiple(movement_muscles, &db)
+//MovementMuscle::update_multiple(movement_muscles, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -163,11 +163,11 @@ pub async fn update_movements(
 ////#[get("/muscle_group")]
 //pub async fn get_muscle_groups(
 //_auth: AuthUserOrAP,
-//db: DbConn,
+//mut db: DbConn,
 //) -> HandlerResult<Json<Vec<MuscleGroup>>> {
-//MuscleGroup::get_all(&db).map(Json).map_err(Into::into)
+//MuscleGroup::get_all(&mut db).map(Json).map_err(Into::into)
 //}
 
-pub async fn get_eorms(_auth: AuthUserOrAP, db: DbConn) -> HandlerResult<Json<Vec<Eorm>>> {
-    Eorm::get_all(&db).map(Json).map_err(Into::into)
+pub async fn get_eorms(_auth: AuthUserOrAP, mut db: DbConn) -> HandlerResult<Json<Vec<Eorm>>> {
+    Eorm::get_all(&mut db).map(Json).map_err(Into::into)
 }

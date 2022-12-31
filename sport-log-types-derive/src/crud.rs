@@ -26,13 +26,13 @@ pub fn impl_create(ast: &syn::DeriveInput) -> TokenStream {
         use diesel::prelude::*;
 
         impl crate::Create for #typename {
-            fn create(#param_name: Self, db: &PgConnection) -> QueryResult<usize> {
+            fn create(#param_name: Self, db: &mut PgConnection) -> QueryResult<usize> {
                 diesel::insert_into(#tablename::table)
                     .values(#param_name)
                     .execute(db)
             }
 
-            fn create_multiple(#param_name: Vec<Self>, db: &PgConnection) -> QueryResult<usize> {
+            fn create_multiple(#param_name: Vec<Self>, db: &mut PgConnection) -> QueryResult<usize> {
                 diesel::insert_into(#tablename::table)
                     .values(&#param_name)
                     .execute(db)
@@ -52,7 +52,7 @@ pub fn impl_get_by_id(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::GetById for #typename {
             type Id = #id_type_name;
 
-            fn get_by_id(#id_param_name: Self::Id, db: &PgConnection) -> QueryResult<Self> {
+            fn get_by_id(#id_param_name: Self::Id, db: &mut PgConnection) -> QueryResult<Self> {
                 #tablename::table.find(#id_param_name).get_result(db)
             }
         }
@@ -70,7 +70,7 @@ pub fn impl_get_by_ids(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::GetByIds for #typename {
             type Id = #id_type_name;
 
-            fn get_by_ids(ids: &[Self::Id], db: &PgConnection) -> QueryResult<Vec<Self>> {
+            fn get_by_ids(ids: &[Self::Id], db: &mut PgConnection) -> QueryResult<Vec<Self>> {
                 #tablename::table.filter(#tablename::columns::id.eq_any(ids)).get_results(db)
             }
         }
@@ -86,7 +86,7 @@ pub fn impl_get_by_user(ast: &syn::DeriveInput) -> TokenStream {
         use diesel::prelude::*;
 
         impl crate::GetByUser for #typename {
-            fn get_by_user(user_id: crate::UserId, db: &PgConnection) -> QueryResult<Vec<Self>> {
+            fn get_by_user(user_id: crate::UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
                 #tablename::table
                     .filter(#tablename::columns::user_id.eq(user_id))
                     .get_results(db)
@@ -107,7 +107,7 @@ pub fn impl_get_by_user_and_last_sync(ast: &syn::DeriveInput) -> TokenStream {
             fn get_by_user_and_last_sync(
                 user_id: crate::UserId,
                 last_sync: DateTime<Utc>,
-                db: &PgConnection
+                db: &mut PgConnection
             ) -> QueryResult<Vec<Self>> {
                 #tablename::table
                     .filter(#tablename::columns::user_id.eq(user_id))
@@ -127,7 +127,7 @@ pub fn impl_get_by_last_sync(ast: &syn::DeriveInput) -> TokenStream {
         use diesel::prelude::*;
 
         impl crate::GetBySync for #typename {
-            fn get_by_last_sync(last_sync: DateTime<Utc>, db: &PgConnection) -> QueryResult<Vec<Self>> {
+            fn get_by_last_sync(last_sync: DateTime<Utc>, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
                 #tablename::table
                     .filter(#tablename::columns::last_change.ge(last_sync))
                     .get_results(db)
@@ -145,7 +145,7 @@ pub fn impl_get_all(ast: &syn::DeriveInput) -> TokenStream {
         use diesel::prelude::*;
 
         impl crate::GetAll for #typename {
-            fn get_all(db: &PgConnection) -> QueryResult<Vec<Self>> {
+            fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self>> {
                 #tablename::table.load(db)
             }
         }
@@ -161,14 +161,14 @@ pub fn impl_update(ast: &syn::DeriveInput) -> TokenStream {
         use diesel::prelude::*;
 
         impl crate::Update for #typename {
-            fn update(#param_name: #typename, db: &PgConnection) -> QueryResult<usize> {
+            fn update(#param_name: #typename, db: &mut PgConnection) -> QueryResult<usize> {
                 diesel::update(#tablename::table.find(#param_name.id))
                     .set(#param_name)
                     .execute(db)
             }
 
-            fn update_multiple(#param_name: Vec<#typename>, db: &PgConnection) -> QueryResult<usize> {
-                db.transaction(|| {
+            fn update_multiple(#param_name: Vec<#typename>, db: &mut PgConnection) -> QueryResult<usize> {
+                db.transaction(|db| {
                     let len = #param_name.len();
                     for entity in #param_name {
                         diesel::update(#tablename::table.find(entity.id))
@@ -192,7 +192,7 @@ pub fn impl_hard_delete(ast: &syn::DeriveInput) -> TokenStream {
         use diesel::prelude::*;
 
         impl crate::HardDelete for #typename {
-            fn hard_delete(last_change: DateTime<Utc>, db: &PgConnection) -> QueryResult<usize> {
+            fn hard_delete(last_change: DateTime<Utc>, db: &mut PgConnection) -> QueryResult<usize> {
                 diesel::delete(
                     #tablename::table
                         .filter(#tablename::columns::deleted.eq(true))
@@ -214,7 +214,7 @@ pub fn impl_check_user_id(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::CheckUserId for #typename {
             type Id = #id_type_name;
 
-            fn check_user_id(id: Self::Id, user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+            fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
                 #tablename::table
                     .filter(#tablename::columns::id.eq(id))
                     .filter(#tablename::columns::user_id.eq(user_id))
@@ -226,7 +226,7 @@ pub fn impl_check_user_id(ast: &syn::DeriveInput) -> TokenStream {
             fn check_user_ids(
                 ids: &[Self::Id],
                 user_id: UserId,
-                db: &PgConnection,
+                db: &mut PgConnection,
             ) -> QueryResult<bool> {
                 #tablename::table
                     .filter(#tablename::columns::id.eq_any(ids))
@@ -250,7 +250,7 @@ pub fn impl_check_ap_id(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::CheckAPId for #typename {
             type Id = #id_type_name;
 
-            fn check_ap_id(id: Self::Id, ap_id: ActionProviderId, db: &PgConnection) -> QueryResult<bool> {
+            fn check_ap_id(id: Self::Id, ap_id: ActionProviderId, db: &mut PgConnection) -> QueryResult<bool> {
                 #tablename::table
                     .filter(#tablename::columns::id.eq(id))
                     .filter(#tablename::columns::action_provider_id.eq(ap_id))
@@ -262,7 +262,7 @@ pub fn impl_check_ap_id(ast: &syn::DeriveInput) -> TokenStream {
             fn check_ap_ids(
                 ids: &[Self::Id],
                 ap_id: ActionProviderId,
-                db: &PgConnection,
+                db: &mut PgConnection,
             ) -> QueryResult<bool> {
                 #tablename::table
                     .filter(#tablename::columns::id.eq_any(ids))

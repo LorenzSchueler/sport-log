@@ -8,7 +8,7 @@ use crate::{
 };
 
 impl GetByUser for Movement {
-    fn get_by_user(user_id: UserId, db: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
         movement::table
             .filter(
                 movement::columns::user_id
@@ -23,7 +23,7 @@ impl GetByUserSync for Movement {
     fn get_by_user_and_last_sync(
         user_id: UserId,
         last_sync: chrono::DateTime<chrono::Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>>
     where
         Self: Sized,
@@ -45,7 +45,7 @@ impl CheckOptionalUserId for Movement {
     fn check_optional_user_id(
         id: Self::Id,
         user_id: UserId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<bool> {
         movement::table
             .filter(movement::columns::id.eq(id))
@@ -62,7 +62,7 @@ impl CheckOptionalUserId for Movement {
     fn check_optional_user_ids(
         ids: &[Self::Id],
         user_id: UserId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<bool> {
         movement::table
             .filter(movement::columns::id.eq_any(ids))
@@ -78,7 +78,7 @@ impl CheckOptionalUserId for Movement {
 }
 
 impl GetByUser for MovementMuscle {
-    fn get_by_user(user_id: UserId, db: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
         movement_muscle::table
             .filter(
                 movement_muscle::columns::movement_id.eq_any(
@@ -99,7 +99,7 @@ impl GetByUserSync for MovementMuscle {
     fn get_by_user_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>>
     where
         Self: Sized,
@@ -124,7 +124,7 @@ impl GetByUserSync for MovementMuscle {
 impl CheckUserId for MovementMuscle {
     type Id = MovementMuscleId;
 
-    fn check_user_id(id: Self::Id, user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         movement_muscle::table
             .inner_join(movement::table)
             .filter(movement_muscle::columns::id.eq(id))
@@ -134,7 +134,11 @@ impl CheckUserId for MovementMuscle {
             .map(|count: i64| count == 1)
     }
 
-    fn check_user_ids(ids: &[Self::Id], user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_ids(
+        ids: &[Self::Id],
+        user_id: UserId,
+        db: &mut PgConnection,
+    ) -> QueryResult<bool> {
         movement_muscle::table
             .inner_join(movement::table)
             .filter(movement_muscle::columns::id.eq_any(ids))
@@ -151,7 +155,7 @@ impl CheckOptionalUserId for MovementMuscle {
     fn check_optional_user_id(
         id: Self::Id,
         user_id: UserId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<bool> {
         movement_muscle::table
             .inner_join(movement::table)
@@ -169,7 +173,7 @@ impl CheckOptionalUserId for MovementMuscle {
     fn check_optional_user_ids(
         ids: &[Self::Id],
         user_id: UserId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<bool> {
         movement_muscle::table
             .inner_join(movement::table)

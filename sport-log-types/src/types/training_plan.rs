@@ -1,6 +1,7 @@
 use chrono::{DateTime, NaiveDate, Utc};
+#[cfg(feature = "server")]
+use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
-
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, ToSql,
@@ -17,9 +18,9 @@ use crate::{schema::training_plan, User};
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct TrainingPlanId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -41,10 +42,9 @@ pub struct TrainingPlanId(pub i64);
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb,
         CheckUserId
-    )
+    ),
+    diesel(table_name = training_plan,belongs_to(User))
 )]
-#[cfg_attr(feature = "server", table_name = "training_plan")]
-#[cfg_attr(feature = "server", belongs_to(User))]
 pub struct TrainingPlan {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]

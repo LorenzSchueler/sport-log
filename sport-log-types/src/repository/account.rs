@@ -10,7 +10,7 @@ use crate::{
 };
 
 impl AccountData {
-    pub fn get_by_user(user_id: UserId, db: &PgConnection) -> QueryResult<Self> {
+    pub fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Self> {
         Ok(AccountData {
             user: Some(User::get_by_id(user_id, db)?),
             diaries: Diary::get_by_user(user_id, db)?,
@@ -41,7 +41,7 @@ impl AccountData {
     pub fn get_by_user_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Self> {
         Ok(AccountData {
             user: User::get_by_id_and_last_sync(user_id, last_sync, db)?,

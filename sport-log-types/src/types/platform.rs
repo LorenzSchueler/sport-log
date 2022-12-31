@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
+#[cfg(feature = "server")]
+use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
-
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, FromSql, GetAll, GetById, GetByIds, GetBySync, GetByUser, GetByUserSync,
@@ -29,9 +30,9 @@ use crate::{
         FromSql,
         VerifyIdForAdmin,
         VerifyIdUnchecked
-    )
+    ),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct PlatformId(pub i64);
 
 /// A representation for an external resource for which [ActionProvider](crate::ActionProvider) can provide [Actions](crate::Action).
@@ -44,7 +45,6 @@ pub struct PlatformId(pub i64);
     feature = "server",
     derive(
         Insertable,
-        Associations,
         Identifiable,
         Queryable,
         AsChangeset,
@@ -56,9 +56,9 @@ pub struct PlatformId(pub i64);
         HardDelete,
         VerifyForAdminWithoutDb,
         VerifyUnchecked
-    )
+    ),
+    diesel(table_name = platform)
 )]
-#[cfg_attr(feature = "server", table_name = "platform")]
 pub struct Platform {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -76,9 +76,9 @@ pub struct Platform {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUser)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUser),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct PlatformCredentialId(pub i64);
 
 /// Credentials of a [User](crate::User) for a [Platform].
@@ -103,11 +103,9 @@ pub struct PlatformCredentialId(pub i64);
         CheckUserId,
         VerifyForUserWithDb,
         VerifyForUserWithoutDb
-    )
+    ),
+    diesel(table_name = platform_credential, belongs_to(User), belongs_to(Platform))
 )]
-#[cfg_attr(feature = "server", table_name = "platform_credential")]
-#[cfg_attr(feature = "server", belongs_to(User))]
-#[cfg_attr(feature = "server", belongs_to(Platform))]
 pub struct PlatformCredential {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]

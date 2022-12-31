@@ -2,11 +2,10 @@
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 #[cfg(feature = "server")]
-use diesel::PgConnection;
+use diesel::{sql_types::BigInt, PgConnection};
 #[cfg(feature = "server")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
-
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, ToSql,
@@ -51,16 +50,20 @@ pub enum DistanceUnit {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql,)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct MetconId(pub i64);
 
 #[cfg(feature = "server")]
 impl VerifyIdForUserOrAP for UnverifiedId<MetconId> {
     type Id = MetconId;
 
-    fn verify_user_ap(self, auth: AuthUserOrAP, db: &PgConnection) -> Result<Self::Id, StatusCode> {
+    fn verify_user_ap(
+        self,
+        auth: AuthUserOrAP,
+        db: &mut PgConnection,
+    ) -> Result<Self::Id, StatusCode> {
         if Metcon::check_optional_user_id(self.0, *auth, db).map_err(|_| StatusCode::FORBIDDEN)? {
             Ok(self.0)
         } else {
@@ -76,7 +79,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconId> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Id>, StatusCode> {
         if Metcon::check_optional_user_ids(&self.0, *auth, db).map_err(|_| StatusCode::FORBIDDEN)? {
             Ok(self.0)
@@ -110,10 +113,9 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconId> {
         Update,
         HardDelete,
         CheckUserId,
-    )
+    ),
+    diesel(table_name = metcon,belongs_to(User))
 )]
-#[cfg_attr(feature = "server", table_name = "metcon")]
-#[cfg_attr(feature = "server", belongs_to(User))]
 pub struct Metcon {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -143,7 +145,7 @@ impl VerifyForUserOrAPWithDb for Unverified<Metcon> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Self::Entity, StatusCode> {
         let metcon = self.0;
         if metcon.user_id == Some(*auth)
@@ -164,7 +166,7 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Metcon>> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode> {
         let metcons = self.0;
         let metcon_ids: Vec<_> = metcons.iter().map(|metcon| metcon.id).collect();
@@ -215,16 +217,20 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Metcon>> {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct MetconMovementId(pub i64);
 
 #[cfg(feature = "server")]
 impl VerifyIdForUserOrAP for UnverifiedId<MetconMovementId> {
     type Id = MetconMovementId;
 
-    fn verify_user_ap(self, auth: AuthUserOrAP, db: &PgConnection) -> Result<Self::Id, StatusCode> {
+    fn verify_user_ap(
+        self,
+        auth: AuthUserOrAP,
+        db: &mut PgConnection,
+    ) -> Result<Self::Id, StatusCode> {
         if MetconMovement::check_optional_user_id(self.0, *auth, db)
             .map_err(|_| StatusCode::FORBIDDEN)?
         {
@@ -242,7 +248,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconMovementId> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Id>, StatusCode> {
         if MetconMovement::check_optional_user_ids(&self.0, *auth, db)
             .map_err(|_| StatusCode::FORBIDDEN)?
@@ -268,11 +274,9 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconMovementId> {
         GetByIds,
         Update,
         HardDelete,
-    )
+    ),
+    diesel(table_name = metcon_movement, belongs_to(Movement), belongs_to(Metcon))
 )]
-#[cfg_attr(feature = "server", table_name = "metcon_movement")]
-#[cfg_attr(feature = "server", belongs_to(Movement))]
-#[cfg_attr(feature = "server", belongs_to(Metcon))]
 pub struct MetconMovement {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -303,7 +307,7 @@ impl VerifyForUserOrAPWithDb for Unverified<MetconMovement> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Self::Entity, StatusCode> {
         let metcon_movement = self.0;
         if MetconMovement::check_user_id(metcon_movement.id, *auth, db)
@@ -323,7 +327,7 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode> {
         let metcon_movements = self.0;
         let metcon_movement_ids: Vec<_> = metcon_movements
@@ -347,7 +351,7 @@ impl VerifyForUserOrAPCreate for Unverified<MetconMovement> {
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Self::Entity, StatusCode> {
         let metcon_movement = self.0;
         if Metcon::check_user_id(metcon_movement.metcon_id, *auth, db)
@@ -367,7 +371,7 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconMovement>> {
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode> {
         let metcon_movements = self.0;
         let mut metcon_ids: Vec<_> = metcon_movements
@@ -391,9 +395,9 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconMovement>> {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct MetconSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -415,11 +419,9 @@ pub struct MetconSessionId(pub i64);
         CheckUserId,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb
-    )
+    ),
+    diesel(table_name = metcon_session, belongs_to(User), belongs_to(Metcon))
 )]
-#[cfg_attr(feature = "server", table_name = "metcon_session")]
-#[cfg_attr(feature = "server", belongs_to(User))]
-#[cfg_attr(feature = "server", belongs_to(Metcon))]
 pub struct MetconSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -451,9 +453,9 @@ pub struct MetconSession {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct MetconItemId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -470,11 +472,9 @@ pub struct MetconItemId(pub i64);
         GetByIds,
         Update,
         HardDelete,
-    )
+    ),
+    diesel(table_name = metcon_item, belongs_to(TrainingPlan), belongs_to(Metcon))
 )]
-#[cfg_attr(feature = "server", table_name = "metcon_item")]
-#[cfg_attr(feature = "server", belongs_to(TrainingPlan))]
-#[cfg_attr(feature = "server", belongs_to(Metcon))]
 pub struct MetconItem {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -498,7 +498,7 @@ impl VerifyForUserOrAPWithDb for Unverified<MetconItem> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Self::Entity, StatusCode> {
         let metcon_item = self.0;
         if MetconItem::check_user_id(metcon_item.id, *auth, db)
@@ -518,7 +518,7 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconItem>> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode> {
         let metcon_items = self.0;
         let metcon_item_ids: Vec<_> = metcon_items
@@ -542,7 +542,7 @@ impl VerifyForUserOrAPCreate for Unverified<MetconItem> {
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Self::Entity, StatusCode> {
         let metcon_item = self.0;
         if Metcon::check_optional_user_id(metcon_item.metcon_id, *auth, db)
@@ -562,7 +562,7 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconItem>> {
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode> {
         let metcon_items = self.0;
         let mut metcon_ids: Vec<_> = metcon_items

@@ -151,11 +151,11 @@ pub struct UnverifiedIds<I>(Vec<I>);
 /// For restrictions on the types for derive to work please see [sport_log_types_derive::Create].
 #[cfg(feature = "server")]
 pub trait Create {
-    fn create(entity: Self, db: &PgConnection) -> QueryResult<usize>
+    fn create(entity: Self, db: &mut PgConnection) -> QueryResult<usize>
     where
         Self: Sized;
 
-    fn create_multiple(entities: Vec<Self>, db: &PgConnection) -> QueryResult<usize>
+    fn create_multiple(entities: Vec<Self>, db: &mut PgConnection) -> QueryResult<usize>
     where
         Self: Sized;
 }
@@ -171,7 +171,7 @@ pub trait Create {
 pub trait GetById {
     type Id;
 
-    fn get_by_id(id: Self::Id, db: &PgConnection) -> QueryResult<Self>
+    fn get_by_id(id: Self::Id, db: &mut PgConnection) -> QueryResult<Self>
     where
         Self: Sized;
 }
@@ -187,7 +187,7 @@ pub trait GetById {
 pub trait GetByIds {
     type Id;
 
-    fn get_by_ids(ids: &[Self::Id], db: &PgConnection) -> QueryResult<Vec<Self>>
+    fn get_by_ids(ids: &[Self::Id], db: &mut PgConnection) -> QueryResult<Vec<Self>>
     where
         Self: Sized;
 }
@@ -201,7 +201,7 @@ pub trait GetByIds {
 /// For restrictions on the types for derive to work please see [sport_log_types_derive::GetByUser].
 #[cfg(feature = "server")]
 pub trait GetByUser {
-    fn get_by_user(user_id: UserId, db: &PgConnection) -> QueryResult<Vec<Self>>
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>>
     where
         Self: Sized;
 }
@@ -218,7 +218,7 @@ pub trait GetByUserSync {
     fn get_by_user_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>>
     where
         Self: Sized;
@@ -233,7 +233,7 @@ pub trait GetByUserSync {
 /// For restrictions on the types for derive to work please see [sport_log_types_derive::GetBySync].
 #[cfg(feature = "server")]
 pub trait GetBySync {
-    fn get_by_last_sync(last_sync: DateTime<Utc>, db: &PgConnection) -> QueryResult<Vec<Self>>
+    fn get_by_last_sync(last_sync: DateTime<Utc>, db: &mut PgConnection) -> QueryResult<Vec<Self>>
     where
         Self: Sized;
 }
@@ -247,7 +247,7 @@ pub trait GetBySync {
 /// For restrictions on the types for derive to work please see [sport_log_types_derive::GetAll].
 #[cfg(feature = "server")]
 pub trait GetAll {
-    fn get_all(db: &PgConnection) -> QueryResult<Vec<Self>>
+    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self>>
     where
         Self: Sized;
 }
@@ -261,11 +261,11 @@ pub trait GetAll {
 /// For restrictions on the types for derive to work please see [sport_log_types_derive::Update].
 #[cfg(feature = "server")]
 pub trait Update {
-    fn update(entity: Self, db: &PgConnection) -> QueryResult<usize>
+    fn update(entity: Self, db: &mut PgConnection) -> QueryResult<usize>
     where
         Self: Sized;
 
-    fn update_multiple(entities: Vec<Self>, db: &PgConnection) -> QueryResult<usize>
+    fn update_multiple(entities: Vec<Self>, db: &mut PgConnection) -> QueryResult<usize>
     where
         Self: Sized;
 }
@@ -283,7 +283,7 @@ pub trait Update {
 /// For restrictions on the types for derive to work please see [sport_log_types_derive::HardDelete].
 #[cfg(feature = "server")]
 pub trait HardDelete {
-    fn hard_delete(last_change: DateTime<Utc>, db: &PgConnection) -> QueryResult<usize>;
+    fn hard_delete(last_change: DateTime<Utc>, db: &mut PgConnection) -> QueryResult<usize>;
 }
 
 /// A type which can be checked if it belongs to a User.
@@ -296,10 +296,14 @@ pub trait CheckUserId {
     type Id;
 
     /// Check if the entry with id `id` in the database belongs to the [User] with `user_id`.
-    fn check_user_id(id: Self::Id, user_id: UserId, db: &PgConnection) -> QueryResult<bool>;
+    fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool>;
 
     /// Check if the entries with an id in `ids` in the database belong to the [User] with `user_id`.
-    fn check_user_ids(ids: &[Self::Id], user_id: UserId, db: &PgConnection) -> QueryResult<bool>;
+    fn check_user_ids(
+        ids: &[Self::Id],
+        user_id: UserId,
+        db: &mut PgConnection,
+    ) -> QueryResult<bool>;
 }
 
 /// A type which can be checked if it belongs to a User or is public.
@@ -311,14 +315,14 @@ pub trait CheckOptionalUserId {
     fn check_optional_user_id(
         id: Self::Id,
         user_id: UserId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<bool>;
 
     /// Check if the entries with an id in `ids` in the database belong to the [User] with `user_id` or are public (`user_id` is None).
     fn check_optional_user_ids(
         ids: &[Self::Id],
         user_id: UserId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<bool>;
 }
 
@@ -326,12 +330,16 @@ pub trait CheckOptionalUserId {
 pub trait CheckAPId {
     type Id;
 
-    fn check_ap_id(id: Self::Id, ap_id: ActionProviderId, db: &PgConnection) -> QueryResult<bool>;
+    fn check_ap_id(
+        id: Self::Id,
+        ap_id: ActionProviderId,
+        db: &mut PgConnection,
+    ) -> QueryResult<bool>;
 
     fn check_ap_ids(
         ids: &[Self::Id],
         ap_id: ActionProviderId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<bool>;
 }
 
@@ -339,21 +347,29 @@ pub trait CheckAPId {
 pub trait VerifyIdForUser {
     type Id;
 
-    fn verify_user(self, auth: AuthUser, db: &PgConnection) -> Result<Self::Id, StatusCode>;
+    fn verify_user(self, auth: AuthUser, db: &mut PgConnection) -> Result<Self::Id, StatusCode>;
 }
 
 #[cfg(feature = "server")]
 pub trait VerifyIdsForUser {
     type Id;
 
-    fn verify_user(self, auth: AuthUser, db: &PgConnection) -> Result<Vec<Self::Id>, StatusCode>;
+    fn verify_user(
+        self,
+        auth: AuthUser,
+        db: &mut PgConnection,
+    ) -> Result<Vec<Self::Id>, StatusCode>;
 }
 
 #[cfg(feature = "server")]
 pub trait VerifyIdForUserOrAP {
     type Id;
 
-    fn verify_user_ap(self, auth: AuthUserOrAP, db: &PgConnection) -> Result<Self::Id, StatusCode>;
+    fn verify_user_ap(
+        self,
+        auth: AuthUserOrAP,
+        db: &mut PgConnection,
+    ) -> Result<Self::Id, StatusCode>;
 }
 
 #[cfg(feature = "server")]
@@ -363,7 +379,7 @@ pub trait VerifyIdsForUserOrAP {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Id>, StatusCode>;
 }
 
@@ -371,14 +387,14 @@ pub trait VerifyIdsForUserOrAP {
 pub trait VerifyIdForActionProvider {
     type Id;
 
-    fn verify_ap(self, auth: AuthAP, db: &PgConnection) -> Result<Self::Id, StatusCode>;
+    fn verify_ap(self, auth: AuthAP, db: &mut PgConnection) -> Result<Self::Id, StatusCode>;
 }
 
 #[cfg(feature = "server")]
 pub trait VerifyIdsForActionProvider {
     type Id;
 
-    fn verify_ap(self, auth: AuthAP, db: &PgConnection) -> Result<Vec<Self::Id>, StatusCode>;
+    fn verify_ap(self, auth: AuthAP, db: &mut PgConnection) -> Result<Vec<Self::Id>, StatusCode>;
 }
 
 #[cfg(feature = "server")]
@@ -406,7 +422,8 @@ pub trait VerifyIdUnchecked {
 pub trait VerifyForUserWithDb {
     type Entity;
 
-    fn verify_user(self, auth: AuthUser, db: &PgConnection) -> Result<Self::Entity, StatusCode>;
+    fn verify_user(self, auth: AuthUser, db: &mut PgConnection)
+        -> Result<Self::Entity, StatusCode>;
 }
 
 #[cfg(feature = "server")]
@@ -416,7 +433,7 @@ pub trait VerifyMultipleForUserWithDb {
     fn verify_user(
         self,
         auth: AuthUser,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode>;
 }
 
@@ -441,7 +458,7 @@ pub trait VerifyForUserOrAPWithDb {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Self::Entity, StatusCode>;
 }
 
@@ -452,7 +469,7 @@ pub trait VerifyMultipleForUserOrAPWithDb {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode>;
 }
 
@@ -463,7 +480,7 @@ pub trait VerifyForUserOrAPCreate {
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Self::Entity, StatusCode>;
 }
 
@@ -474,7 +491,7 @@ pub trait VerifyMultipleForUserOrAPCreate {
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode>;
 }
 
@@ -497,7 +514,7 @@ pub trait VerifyMultipleForUserOrAPWithoutDb {
 pub trait VerifyForActionProviderWithDb {
     type Entity;
 
-    fn verify_ap(self, auth: AuthAP, db: &PgConnection) -> Result<Self::Entity, StatusCode>;
+    fn verify_ap(self, auth: AuthAP, db: &mut PgConnection) -> Result<Self::Entity, StatusCode>;
 }
 
 #[cfg(feature = "server")]

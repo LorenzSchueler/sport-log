@@ -9,17 +9,17 @@ use crate::handler::{HandlerResult, IdOption, UnverifiedSingleOrVec};
 
 pub async fn create_wods(
     auth: AuthUserOrAP,
-    db: DbConn,
+    mut db: DbConn,
     Json(wods): Json<UnverifiedSingleOrVec<Wod>>,
 ) -> HandlerResult<StatusCode> {
     match wods {
         UnverifiedSingleOrVec::Single(wod) => {
             let wod = wod.verify_user_ap_without_db(auth)?;
-            Wod::create(wod, &db)
+            Wod::create(wod, &mut db)
         }
         UnverifiedSingleOrVec::Vec(wods) => {
             let wods = wods.verify_user_ap_without_db(auth)?;
-            Wod::create_multiple(wods, &db)
+            Wod::create_multiple(wods, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -31,9 +31,9 @@ pub async fn create_wods(
 //auth: AuthUserOrAP,
 //Path(start_datetime): Path<DateTime<Utc>>,
 //Path(end_datetime): Path<DateTime<Utc>>,
-//db: DbConn,
+//mut db: DbConn,
 //) -> HandlerResult<Json<Vec<Wod>>> {
-//Wod::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &db)
+//Wod::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -41,14 +41,14 @@ pub async fn create_wods(
 pub async fn get_wods(
     auth: AuthUserOrAP,
     Query(IdOption { id }): Query<IdOption<UnverifiedId<WodId>>>,
-    db: DbConn,
+    mut db: DbConn,
 ) -> HandlerResult<Json<Vec<Wod>>> {
     match id {
         Some(id) => {
-            let wod_id = id.verify_user_ap(auth, &db)?;
-            Wod::get_by_id(wod_id, &db).map(|w| vec![w])
+            let wod_id = id.verify_user_ap(auth, &mut db)?;
+            Wod::get_by_id(wod_id, &mut db).map(|w| vec![w])
         }
-        None => Wod::get_by_user(*auth, &db),
+        None => Wod::get_by_user(*auth, &mut db),
     }
     .map(Json)
     .map_err(Into::into)
@@ -56,17 +56,17 @@ pub async fn get_wods(
 
 pub async fn update_wods(
     auth: AuthUserOrAP,
-    db: DbConn,
+    mut db: DbConn,
     Json(wods): Json<UnverifiedSingleOrVec<Wod>>,
 ) -> HandlerResult<StatusCode> {
     match wods {
         UnverifiedSingleOrVec::Single(wod) => {
-            let wod = wod.verify_user_ap(auth, &db)?;
-            Wod::update(wod, &db)
+            let wod = wod.verify_user_ap(auth, &mut db)?;
+            Wod::update(wod, &mut db)
         }
         UnverifiedSingleOrVec::Vec(wods) => {
-            let wods = wods.verify_user_ap(auth, &db)?;
-            Wod::update_multiple(wods, &db)
+            let wods = wods.verify_user_ap(auth, &mut db)?;
+            Wod::update_multiple(wods, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -75,17 +75,17 @@ pub async fn update_wods(
 
 pub async fn create_diaries(
     auth: AuthUserOrAP,
-    db: DbConn,
+    mut db: DbConn,
     Json(diaries): Json<UnverifiedSingleOrVec<Diary>>,
 ) -> HandlerResult<StatusCode> {
     match diaries {
         UnverifiedSingleOrVec::Single(diary) => {
             let diary = diary.verify_user_ap_without_db(auth)?;
-            Diary::create(diary, &db)
+            Diary::create(diary, &mut db)
         }
         UnverifiedSingleOrVec::Vec(diaries) => {
             let diaries = diaries.verify_user_ap_without_db(auth)?;
-            Diary::create_multiple(diaries, &db)
+            Diary::create_multiple(diaries, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -95,14 +95,14 @@ pub async fn create_diaries(
 pub async fn get_diaries(
     auth: AuthUserOrAP,
     Query(IdOption { id }): Query<IdOption<UnverifiedId<DiaryId>>>,
-    db: DbConn,
+    mut db: DbConn,
 ) -> HandlerResult<Json<Vec<Diary>>> {
     match id {
         Some(id) => {
-            let diary_id = id.verify_user_ap(auth, &db)?;
-            Diary::get_by_id(diary_id, &db).map(|d| vec![d])
+            let diary_id = id.verify_user_ap(auth, &mut db)?;
+            Diary::get_by_id(diary_id, &mut db).map(|d| vec![d])
         }
-        None => Diary::get_by_user(*auth, &db),
+        None => Diary::get_by_user(*auth, &mut db),
     }
     .map(Json)
     .map_err(Into::into)
@@ -113,26 +113,26 @@ pub async fn get_diaries(
 //auth: AuthUserOrAP,
 //Path(start_datetime): Path<DateTime<Utc>>,
 //Path(end_datetime): Path<DateTime<Utc>>,
-//db: DbConn,
+//mut db: DbConn,
 //) -> HandlerResult<Json<Vec<Diary>>> {
-//Diary::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &db)
+//Diary::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
 
 pub async fn update_diaries(
     auth: AuthUserOrAP,
-    db: DbConn,
+    mut db: DbConn,
     Json(diaries): Json<UnverifiedSingleOrVec<Diary>>,
 ) -> HandlerResult<StatusCode> {
     match diaries {
         UnverifiedSingleOrVec::Single(diary) => {
-            let diary = diary.verify_user_ap(auth, &db)?;
-            Diary::update(diary, &db)
+            let diary = diary.verify_user_ap(auth, &mut db)?;
+            Diary::update(diary, &mut db)
         }
         UnverifiedSingleOrVec::Vec(diaries) => {
-            let diaries = diaries.verify_user_ap(auth, &db)?;
-            Diary::update_multiple(diaries, &db)
+            let diaries = diaries.verify_user_ap(auth, &mut db)?;
+            Diary::update_multiple(diaries, &mut db)
         }
     }
     .map(|_| StatusCode::OK)

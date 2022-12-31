@@ -1,8 +1,9 @@
 #[cfg(feature = "server")]
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
+#[cfg(feature = "server")]
+use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
-
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     Create, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, ToSql, Update,
@@ -26,9 +27,9 @@ use crate::{
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct StrengthBlueprintId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -49,12 +50,9 @@ pub struct StrengthBlueprintId(pub i64);
         HardDelete,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb
-    )
+    ),
+    diesel(table_name = strength_blueprint,belongs_to(User), belongs_to(TrainingPlan), belongs_to(Movement))
 )]
-#[cfg_attr(feature = "server", table_name = "strength_blueprint")]
-#[cfg_attr(feature = "server", belongs_to(User))]
-#[cfg_attr(feature = "server", belongs_to(TrainingPlan))]
-#[cfg_attr(feature = "server", belongs_to(Movement))]
 pub struct StrengthBlueprint {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -84,9 +82,9 @@ pub struct StrengthBlueprint {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct StrengthBlueprintSetId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -103,10 +101,9 @@ pub struct StrengthBlueprintSetId(pub i64);
         GetByIds,
         Update,
         HardDelete,
-    )
+    ),
+    diesel(table_name = strength_blueprint_set, belongs_to(StrengthBlueprint))
 )]
-#[cfg_attr(feature = "server", table_name = "strength_blueprint_set")]
-#[cfg_attr(feature = "server", belongs_to(StrengthBlueprint))]
 pub struct StrengthBlueprintSet {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -131,7 +128,7 @@ impl VerifyForUserOrAPWithDb for Unverified<StrengthBlueprintSet> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Self::Entity, StatusCode> {
         let strength_blueprint_set = self.0;
         if StrengthBlueprintSet::check_user_id(strength_blueprint_set.id, *auth, db)
@@ -151,7 +148,7 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthBlueprintSet>> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode> {
         let strength_blueprint_sets = self.0;
         let strength_blueprint_set_ids: Vec<_> = strength_blueprint_sets
@@ -175,7 +172,7 @@ impl VerifyForUserOrAPCreate for Unverified<StrengthBlueprintSet> {
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Self::Entity, StatusCode> {
         let strength_blueprint_set = self.0;
         if StrengthBlueprint::check_user_id(strength_blueprint_set.strength_blueprint_id, *auth, db)
@@ -195,7 +192,7 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthBlueprintSet>> {
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode> {
         let strength_blueprint_sets = self.0;
         let mut strength_blueprint_ids: Vec<_> = strength_blueprint_sets
@@ -219,9 +216,9 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthBlueprintSet>> {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct StrengthSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -242,12 +239,9 @@ pub struct StrengthSessionId(pub i64);
         HardDelete,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb
-    )
+    ),
+    diesel(table_name = strength_session,belongs_to(User), belongs_to(StrengthBlueprint), belongs_to(Movement))
 )]
-#[cfg_attr(feature = "server", table_name = "strength_session")]
-#[cfg_attr(feature = "server", belongs_to(User))]
-#[cfg_attr(feature = "server", belongs_to(StrengthBlueprint))]
-#[cfg_attr(feature = "server", belongs_to(Movement))]
 pub struct StrengthSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -278,9 +272,9 @@ pub struct StrengthSession {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct StrengthSetId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -297,10 +291,9 @@ pub struct StrengthSetId(pub i64);
         GetByIds,
         Update,
         HardDelete,
-    )
+    ),
+    diesel(table_name = strength_set, belongs_to(StrengthSession))
 )]
-#[cfg_attr(feature = "server", table_name = "strength_set")]
-#[cfg_attr(feature = "server", belongs_to(StrengthSession))]
 pub struct StrengthSet {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -325,7 +318,7 @@ impl VerifyForUserOrAPWithDb for Unverified<StrengthSet> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Self::Entity, StatusCode> {
         let strength_set = self.0;
         if StrengthSet::check_user_id(strength_set.id, *auth, db)
@@ -345,7 +338,7 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthSet>> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode> {
         let strength_sets = self.0;
         let strength_set_ids: Vec<_> = strength_sets
@@ -369,7 +362,7 @@ impl VerifyForUserOrAPCreate for Unverified<StrengthSet> {
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Self::Entity, StatusCode> {
         let strength_set = self.0;
         if StrengthSession::check_user_id(strength_set.strength_session_id, *auth, db)
@@ -389,7 +382,7 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthSet>> {
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode> {
         let strength_sets = self.0;
         let mut strength_session_ids: Vec<StrengthSessionId> = strength_sets

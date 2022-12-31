@@ -48,11 +48,11 @@ where
         let State(AppState { config, db_pool }) =
             State::<AppState>::from_request_parts(parts, state).await?;
 
-        let db = db_pool.get()?;
+        let mut db = db_pool.get()?;
 
         let admin_password = &config.admin_password;
 
-        match User::auth(username, password, &db) {
+        match User::auth(username, password, &mut db) {
             Ok(id) => Ok(AuthUser(id)),
             Err(_) => {
                 if let Some((name, Ok(user_id))) = username
@@ -110,18 +110,18 @@ where
         let State(AppState { config, db_pool }) =
             State::<AppState>::from_request_parts(parts, state).await?;
 
-        let db = db_pool.get()?;
+        let mut db = db_pool.get()?;
 
         let admin_password = &config.admin_password;
 
-        match User::auth(username, password, &db) {
+        match User::auth(username, password, &mut db) {
             Ok(id) => Ok(AuthUserOrAP(id)),
             Err(_) => {
                 if let Some((name, Ok(user_id))) = username
                     .split_once("$id$")
                     .map(|(name, id)| (name, id.parse().map(UserId)))
                 {
-                    match ActionProvider::auth_as_user(name, password, user_id, &db) {
+                    match ActionProvider::auth_as_user(name, password, user_id, &mut db) {
                         Ok(AuthApForUser::Allowed(_)) => Ok(AuthUserOrAP(user_id)),
                         Ok(AuthApForUser::Forbidden) => Err(StatusCode::FORBIDDEN.into()),
                         Err(_) => match Admin::auth(name, password, admin_password) {
@@ -178,11 +178,11 @@ where
         let State(AppState { config, db_pool }) =
             State::<AppState>::from_request_parts(parts, state).await?;
 
-        let db = db_pool.get()?;
+        let mut db = db_pool.get()?;
 
         let admin_password = &config.admin_password;
 
-        match ActionProvider::auth(username, password, &db) {
+        match ActionProvider::auth(username, password, &mut db) {
             Ok(id) => Ok(AuthAP(id)),
             Err(_) => {
                 if let Some((name, Ok(id))) = username

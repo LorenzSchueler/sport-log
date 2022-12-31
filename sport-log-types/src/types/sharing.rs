@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
+#[cfg(feature = "server")]
+use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
-
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     Create, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, ToSql, Update,
@@ -24,9 +25,9 @@ use crate::{
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct GroupId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -34,7 +35,6 @@ pub struct GroupId(pub i64);
     feature = "server",
     derive(
         Insertable,
-        Associations,
         Identifiable,
         Queryable,
         AsChangeset,
@@ -43,9 +43,9 @@ pub struct GroupId(pub i64);
         GetByIds,
         Update,
         HardDelete,
-    )
+    ),
+    diesel(table_name = group)
 )]
-#[cfg_attr(feature = "server", table_name = "group")]
 pub struct Group {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -62,9 +62,9 @@ pub struct Group {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct GroupUserId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -83,11 +83,9 @@ pub struct GroupUserId(pub i64);
         GetByUserSync,
         Update,
         HardDelete,
-    )
+    ),
+    diesel(table_name = group_user, belongs_to(Group), belongs_to(User))
 )]
-#[cfg_attr(feature = "server", table_name = "group_user")]
-#[cfg_attr(feature = "server", belongs_to(Group))]
-#[cfg_attr(feature = "server", belongs_to(User))]
 pub struct GroupUser {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -109,9 +107,9 @@ pub struct GroupUser {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct SharedMetconSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -128,11 +126,9 @@ pub struct SharedMetconSessionId(pub i64);
         GetByIds,
         Update,
         HardDelete,
-    )
+    ),
+    diesel(table_name = shared_metcon_session, belongs_to(Group), belongs_to(MetconSession))
 )]
-#[cfg_attr(feature = "server", table_name = "shared_metcon_session")]
-#[cfg_attr(feature = "server", belongs_to(Group))]
-#[cfg_attr(feature = "server", belongs_to(MetconSession))]
 pub struct SharedMetconSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -154,9 +150,9 @@ pub struct SharedMetconSession {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct SharedStrengthSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -173,11 +169,9 @@ pub struct SharedStrengthSessionId(pub i64);
         GetByIds,
         Update,
         HardDelete,
-    )
+    ),
+    diesel(table_name = shared_strength_session, belongs_to(Group), belongs_to(StrengthSession))
 )]
-#[cfg_attr(feature = "server", table_name = "shared_strength_session")]
-#[cfg_attr(feature = "server", belongs_to(Group))]
-#[cfg_attr(feature = "server", belongs_to(StrengthSession))]
 pub struct SharedStrengthSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -199,9 +193,9 @@ pub struct SharedStrengthSession {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct SharedCardioSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -218,11 +212,9 @@ pub struct SharedCardioSessionId(pub i64);
         GetByIds,
         Update,
         HardDelete,
-    )
+    ),
+    diesel(table_name = shared_cardio_session, belongs_to(Group), belongs_to(CardioSession))
 )]
-#[cfg_attr(feature = "server", table_name = "shared_cardio_session")]
-#[cfg_attr(feature = "server", belongs_to(Group))]
-#[cfg_attr(feature = "server", belongs_to(CardioSession))]
 pub struct SharedCardioSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -244,9 +236,9 @@ pub struct SharedCardioSession {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct SharedDiaryId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -263,11 +255,9 @@ pub struct SharedDiaryId(pub i64);
         GetByIds,
         Update,
         HardDelete,
-    )
-)]
-#[cfg_attr(feature = "server", table_name = "shared_diary")]
-#[cfg_attr(feature = "server", belongs_to(Group))]
-#[cfg_attr(feature = "server", belongs_to(Diary))]
+    ),
+diesel(table_name = shared_diary,belongs_to(Group),
+belongs_to(Diary)))]
 pub struct SharedDiary {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]

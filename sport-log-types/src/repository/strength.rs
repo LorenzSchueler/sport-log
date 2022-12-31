@@ -13,7 +13,7 @@ use crate::{
 impl CheckUserId for StrengthBlueprint {
     type Id = StrengthBlueprintId;
 
-    fn check_user_id(id: Self::Id, user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         strength_blueprint::table
             .inner_join(movement::table)
             .filter(strength_blueprint::columns::id.eq(id))
@@ -28,7 +28,11 @@ impl CheckUserId for StrengthBlueprint {
             .map(|count: i64| count == 1)
     }
 
-    fn check_user_ids(ids: &[Self::Id], user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_ids(
+        ids: &[Self::Id],
+        user_id: UserId,
+        db: &mut PgConnection,
+    ) -> QueryResult<bool> {
         strength_blueprint::table
             .inner_join(movement::table)
             .filter(strength_blueprint::columns::id.eq_any(ids))
@@ -45,7 +49,7 @@ impl CheckUserId for StrengthBlueprint {
 }
 
 impl GetByUser for StrengthBlueprintSet {
-    fn get_by_user(user_id: UserId, db: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
         strength_blueprint_set::table
             .filter(
                 strength_blueprint_set::columns::strength_blueprint_id.eq_any(
@@ -62,7 +66,7 @@ impl GetByUserSync for StrengthBlueprintSet {
     fn get_by_user_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>>
     where
         Self: Sized,
@@ -83,7 +87,7 @@ impl GetByUserSync for StrengthBlueprintSet {
 impl CheckUserId for StrengthBlueprintSet {
     type Id = StrengthBlueprintSetId;
 
-    fn check_user_id(id: Self::Id, user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         strength_blueprint_set::table
             .inner_join(strength_blueprint::table)
             .filter(strength_blueprint_set::columns::id.eq(id))
@@ -93,7 +97,11 @@ impl CheckUserId for StrengthBlueprintSet {
             .map(|count: i64| count == 1)
     }
 
-    fn check_user_ids(ids: &[Self::Id], user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_ids(
+        ids: &[Self::Id],
+        user_id: UserId,
+        db: &mut PgConnection,
+    ) -> QueryResult<bool> {
         strength_blueprint_set::table
             .inner_join(strength_blueprint::table)
             .filter(strength_blueprint_set::columns::id.eq_any(ids))
@@ -107,7 +115,7 @@ impl CheckUserId for StrengthBlueprintSet {
 impl StrengthBlueprintSet {
     pub fn get_by_strength_blueprint(
         strength_blueprint_id: StrengthBlueprintId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         strength_blueprint_set::table
             .filter(
@@ -120,7 +128,7 @@ impl StrengthBlueprintSet {
 impl CheckUserId for StrengthSession {
     type Id = StrengthSessionId;
 
-    fn check_user_id(id: Self::Id, user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         strength_session::table
             .inner_join(movement::table)
             .filter(strength_session::columns::id.eq(id))
@@ -135,7 +143,11 @@ impl CheckUserId for StrengthSession {
             .map(|count: i64| count == 1)
     }
 
-    fn check_user_ids(ids: &[Self::Id], user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_ids(
+        ids: &[Self::Id],
+        user_id: UserId,
+        db: &mut PgConnection,
+    ) -> QueryResult<bool> {
         strength_session::table
             .inner_join(movement::table)
             .filter(strength_session::columns::id.eq_any(ids))
@@ -156,7 +168,7 @@ impl StrengthSession {
         user_id: UserId,
         start_datetime: DateTime<Utc>,
         end_datetime: DateTime<Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         strength_session::table
             .filter(strength_session::columns::user_id.eq(user_id))
@@ -167,7 +179,7 @@ impl StrengthSession {
 }
 
 impl GetByUser for StrengthSet {
-    fn get_by_user(user_id: UserId, db: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
         strength_set::table
             .filter(
                 strength_set::columns::strength_session_id.eq_any(
@@ -184,7 +196,7 @@ impl GetByUserSync for StrengthSet {
     fn get_by_user_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>>
     where
         Self: Sized,
@@ -205,7 +217,7 @@ impl GetByUserSync for StrengthSet {
 impl CheckUserId for StrengthSet {
     type Id = StrengthSetId;
 
-    fn check_user_id(id: Self::Id, user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         strength_set::table
             .inner_join(strength_session::table)
             .filter(strength_set::columns::id.eq(id))
@@ -215,7 +227,11 @@ impl CheckUserId for StrengthSet {
             .map(|count: i64| count == 1)
     }
 
-    fn check_user_ids(ids: &[Self::Id], user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_ids(
+        ids: &[Self::Id],
+        user_id: UserId,
+        db: &mut PgConnection,
+    ) -> QueryResult<bool> {
         strength_set::table
             .inner_join(strength_session::table)
             .filter(strength_set::columns::id.eq_any(ids))
@@ -229,7 +245,7 @@ impl CheckUserId for StrengthSet {
 impl StrengthSet {
     pub fn get_by_strength_session(
         strength_session_id: StrengthSessionId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         strength_set::table
             .filter(strength_set::columns::strength_session_id.eq(strength_session_id))
@@ -240,21 +256,21 @@ impl StrengthSet {
 impl GetById for StrengthSessionDescription {
     type Id = StrengthSessionId;
 
-    fn get_by_id(strength_session_id: Self::Id, db: &PgConnection) -> QueryResult<Self> {
+    fn get_by_id(strength_session_id: Self::Id, db: &mut PgConnection) -> QueryResult<Self> {
         let strength_session = StrengthSession::get_by_id(strength_session_id, db)?;
         StrengthSessionDescription::from_session(strength_session, db)
     }
 }
 
 impl GetByUser for StrengthSessionDescription {
-    fn get_by_user(user_id: UserId, db: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
         let strength_sessions = StrengthSession::get_by_user(user_id, db)?;
         StrengthSessionDescription::from_sessions(strength_sessions, db)
     }
 }
 
 impl StrengthSessionDescription {
-    fn from_session(strength_session: StrengthSession, db: &PgConnection) -> QueryResult<Self> {
+    fn from_session(strength_session: StrengthSession, db: &mut PgConnection) -> QueryResult<Self> {
         let strength_sets = StrengthSet::belonging_to(&strength_session).get_results(db)?;
         let movement = Movement::get_by_id(strength_session.movement_id, db)?;
         Ok(StrengthSessionDescription {
@@ -266,7 +282,7 @@ impl StrengthSessionDescription {
 
     fn from_sessions(
         strength_sessions: Vec<StrengthSession>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         let strength_sets = StrengthSet::belonging_to(&strength_sessions)
             .get_results(db)?
@@ -293,7 +309,7 @@ impl StrengthSessionDescription {
         user_id: UserId,
         start_datetime: DateTime<Utc>,
         end_datetime: DateTime<Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         let strength_sessions = StrengthSession::get_ordered_by_user_and_timespan(
             user_id,

@@ -6,7 +6,7 @@ impl PlatformCredential {
     pub fn get_by_user_and_platform(
         user_id: UserId,
         platform_id: PlatformId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Self> {
         platform_credential::table
             .filter(platform_credential::columns::user_id.eq(user_id))

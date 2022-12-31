@@ -18,14 +18,13 @@ use axum::{
 use chrono::{Duration, Utc};
 use mime::APPLICATION_JSON;
 use rand::Rng;
-use tower::{Service, ServiceExt};
-
 use sport_log_types::{
     uri::{ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER},
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, AppState,
     Config, Create, DbPool, Diary, DiaryId, HardDelete, Platform, PlatformId, Update, User, UserId,
     ADMIN_USERNAME,
 };
+use tower::{Service, ServiceExt};
 
 use crate::{get_config, get_db_pool, router, MAX_VERSION};
 
@@ -99,7 +98,7 @@ async fn init() -> (Router, DbPool, Config) {
 #[tokio::test]
 async fn aa_setup() {
     let (_, db_pool, _) = init().await;
-    let db = db_pool.get().unwrap();
+    let mut db = db_pool.get().unwrap();
 
     let user = User {
         id: USER_ID,
@@ -108,7 +107,7 @@ async fn aa_setup() {
         email: "email123456789".to_owned(),
         last_change: Utc::now(),
     };
-    User::create(user, &db).unwrap();
+    User::create(user, &mut db).unwrap();
 
     let user2 = User {
         id: USER2_ID,
@@ -117,7 +116,7 @@ async fn aa_setup() {
         email: "email2123456789".to_owned(),
         last_change: Utc::now(),
     };
-    User::create(user2, &db).unwrap();
+    User::create(user2, &mut db).unwrap();
 
     let platform = Platform {
         id: PLATFORM_ID,
@@ -126,7 +125,7 @@ async fn aa_setup() {
         last_change: Utc::now(),
         deleted: false,
     };
-    Platform::create(platform, &db).unwrap();
+    Platform::create(platform, &mut db).unwrap();
 
     let ap = ActionProvider {
         id: AP_ID,
@@ -137,7 +136,7 @@ async fn aa_setup() {
         last_change: Utc::now(),
         deleted: false,
     };
-    ActionProvider::create(ap, &db).unwrap();
+    ActionProvider::create(ap, &mut db).unwrap();
 
     let action = Action {
         id: ACTION_ID,
@@ -149,16 +148,16 @@ async fn aa_setup() {
         last_change: Utc::now(),
         deleted: false,
     };
-    Action::create(action, &db).unwrap();
+    Action::create(action, &mut db).unwrap();
 }
 
 #[tokio::test]
 async fn zz_teardown() {
     let (_, db_pool, _) = init().await;
-    let db = db_pool.get().unwrap();
+    let mut db = db_pool.get().unwrap();
 
-    User::delete(USER_ID, &db).unwrap();
-    User::delete(USER2_ID, &db).unwrap();
+    User::delete(USER_ID, &mut db).unwrap();
+    User::delete(USER2_ID, &mut db).unwrap();
 
     let platform = Platform {
         id: PLATFORM_ID,
@@ -167,10 +166,10 @@ async fn zz_teardown() {
         last_change: Utc::now(),
         deleted: true,
     };
-    Platform::update(platform, &db).unwrap();
-    Platform::hard_delete(Utc::now(), &db).unwrap();
-    Action::hard_delete(Utc::now(), &db).unwrap();
-    ActionProvider::hard_delete(Utc::now(), &db).unwrap();
+    Platform::update(platform, &mut db).unwrap();
+    Platform::hard_delete(Utc::now(), &mut db).unwrap();
+    Action::hard_delete(Utc::now(), &mut db).unwrap();
+    ActionProvider::hard_delete(Utc::now(), &mut db).unwrap();
 }
 
 //async fn assert_cors(response: &Response) {
@@ -549,7 +548,7 @@ async fn user_ap_auth_without_credentials() {
 #[tokio::test]
 async fn ap_as_user_ap_auth() {
     let (mut router, db_pool, _) = init().await;
-    let db = db_pool.get().unwrap();
+    let mut db = db_pool.get().unwrap();
 
     // create ActionEvent to ensure access permission for user
     let mut action_event = ActionEvent {
@@ -562,7 +561,7 @@ async fn ap_as_user_ap_auth() {
         last_change: Utc::now(),
         deleted: false,
     };
-    ActionEvent::create(action_event.clone(), &db).unwrap();
+    ActionEvent::create(action_event.clone(), &mut db).unwrap();
 
     auth_as(
         &mut router,
@@ -574,13 +573,13 @@ async fn ap_as_user_ap_auth() {
     .await;
 
     action_event.deleted = true;
-    ActionEvent::update(action_event, &db).unwrap();
+    ActionEvent::update(action_event, &mut db).unwrap();
 }
 
 #[tokio::test]
 async fn ap_as_user_ap_auth_no_event() {
     let (mut router, db_pool, _) = init().await;
-    let db = db_pool.get().unwrap();
+    let mut db = db_pool.get().unwrap();
 
     // create disabled ActionEvent
     let mut action_event1 = ActionEvent {
@@ -593,7 +592,7 @@ async fn ap_as_user_ap_auth_no_event() {
         last_change: Utc::now(),
         deleted: false,
     };
-    ActionEvent::create(action_event1.clone(), &db).unwrap();
+    ActionEvent::create(action_event1.clone(), &mut db).unwrap();
 
     // create deleted ActionEvent
     let mut action_event2 = ActionEvent {
@@ -606,7 +605,7 @@ async fn ap_as_user_ap_auth_no_event() {
         last_change: Utc::now(),
         deleted: true,
     };
-    ActionEvent::create(action_event2.clone(), &db).unwrap();
+    ActionEvent::create(action_event2.clone(), &mut db).unwrap();
 
     //  check that ap has no access
     auth_as_not_allowed(
@@ -619,15 +618,15 @@ async fn ap_as_user_ap_auth_no_event() {
     .await;
 
     action_event1.deleted = true;
-    ActionEvent::update(action_event1, &db).unwrap();
+    ActionEvent::update(action_event1, &mut db).unwrap();
     action_event2.deleted = true;
-    ActionEvent::update(action_event2, &db).unwrap();
+    ActionEvent::update(action_event2, &mut db).unwrap();
 }
 
 #[tokio::test]
 async fn ap_as_user_ap_auth_wrong_credentials() {
     let (mut router, db_pool, _) = init().await;
-    let db = db_pool.get().unwrap();
+    let mut db = db_pool.get().unwrap();
 
     // create ActionEvent to ensure access permission for user
     let mut action_event = ActionEvent {
@@ -640,18 +639,18 @@ async fn ap_as_user_ap_auth_wrong_credentials() {
         last_change: Utc::now(),
         deleted: false,
     };
-    ActionEvent::create(action_event.clone(), &db).unwrap();
+    ActionEvent::create(action_event.clone(), &mut db).unwrap();
 
     auth_as_wrong_credentials(&mut router, &route(DIARY), AP_USERNAME, USER_ID.0).await;
 
     action_event.deleted = true;
-    ActionEvent::update(action_event, &db).unwrap();
+    ActionEvent::update(action_event, &mut db).unwrap();
 }
 
 #[tokio::test]
 async fn ap_as_user_ap_auth_without_credentials() {
     let (mut router, db_pool, _) = init().await;
-    let db = db_pool.get().unwrap();
+    let mut db = db_pool.get().unwrap();
 
     // create ActionEvent to ensure access permission for user
     let action_event = ActionEvent {
@@ -664,7 +663,7 @@ async fn ap_as_user_ap_auth_without_credentials() {
         last_change: Utc::now(),
         deleted: false,
     };
-    ActionEvent::create(action_event, &db).unwrap();
+    ActionEvent::create(action_event, &mut db).unwrap();
 
     auth_as_without_credentials(&mut router, &route(DIARY), USER_ID.0).await;
 }
@@ -856,7 +855,7 @@ async fn foreign_update() {
 #[tokio::test]
 async fn user_self_registration() {
     let (mut router, db_pool, config) = init().await;
-    let db = db_pool.get().unwrap();
+    let mut db = db_pool.get().unwrap();
 
     let user_id = UserId(rnd());
     let user = User {
@@ -887,7 +886,7 @@ async fn user_self_registration() {
         assert_status(&response, StatusCode::FORBIDDEN);
     }
 
-    User::delete(user_id, &db).unwrap();
+    User::delete(user_id, &mut db).unwrap();
 }
 
 #[tokio::test]

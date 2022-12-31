@@ -11,7 +11,7 @@ use crate::{
 };
 
 impl Create for ActionProvider {
-    fn create(mut action_provider: Self, db: &PgConnection) -> QueryResult<usize> {
+    fn create(mut action_provider: Self, db: &mut PgConnection) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         action_provider.password = Argon2::default()
             .hash_password(action_provider.password.as_bytes(), salt.as_ref())
@@ -23,7 +23,10 @@ impl Create for ActionProvider {
             .execute(db)
     }
 
-    fn create_multiple(mut action_providers: Vec<Self>, db: &PgConnection) -> QueryResult<usize> {
+    fn create_multiple(
+        mut action_providers: Vec<Self>,
+        db: &mut PgConnection,
+    ) -> QueryResult<usize> {
         for action_provider in &mut action_providers {
             let salt = SaltString::generate(&mut OsRng);
             action_provider.password = Argon2::default()
@@ -39,7 +42,11 @@ impl Create for ActionProvider {
 }
 
 impl ActionProvider {
-    pub fn auth(name: &str, password: &str, db: &PgConnection) -> QueryResult<ActionProviderId> {
+    pub fn auth(
+        name: &str,
+        password: &str,
+        db: &mut PgConnection,
+    ) -> QueryResult<ActionProviderId> {
         let (action_provider_id, password_hash): (ActionProviderId, String) =
             action_provider::table
                 .filter(action_provider::columns::name.eq(name))
@@ -65,7 +72,7 @@ impl ActionProvider {
         name: &str,
         password: &str,
         user_id: UserId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<AuthApForUser> {
         let (action_provider_id, password_hash): (ActionProviderId, String) =
             action_provider::table
@@ -105,7 +112,7 @@ impl ActionProvider {
 impl Action {
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action::table
             .filter(action::columns::action_provider_id.eq(action_provider_id))
@@ -116,7 +123,7 @@ impl Action {
 impl ActionRule {
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action_rule::table
             .filter(
@@ -132,7 +139,7 @@ impl ActionRule {
     pub fn get_by_user_and_action_provider(
         user_id: UserId,
         action_provider_id: ActionProviderId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action_rule::table
             .filter(action_rule::columns::user_id.eq(user_id))
@@ -150,7 +157,11 @@ impl ActionRule {
 impl CheckAPId for ActionEvent {
     type Id = ActionEventId;
 
-    fn check_ap_id(id: Self::Id, ap_id: ActionProviderId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_ap_id(
+        id: Self::Id,
+        ap_id: ActionProviderId,
+        db: &mut PgConnection,
+    ) -> QueryResult<bool> {
         action_event::table
             .inner_join(action::table)
             .filter(action_event::columns::id.eq(id))
@@ -163,7 +174,7 @@ impl CheckAPId for ActionEvent {
     fn check_ap_ids(
         ids: &[Self::Id],
         ap_id: ActionProviderId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<bool> {
         action_event::table
             .inner_join(action::table)
@@ -178,7 +189,7 @@ impl CheckAPId for ActionEvent {
 impl ActionEvent {
     pub fn create_multiple_ignore_conflict(
         action_events: Vec<ActionEvent>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<usize> {
         diesel::insert_into(action_event::table)
             .values(action_events)
@@ -188,7 +199,7 @@ impl ActionEvent {
 
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action_event::table
             .filter(
@@ -204,7 +215,7 @@ impl ActionEvent {
     pub fn get_by_user_and_action_provider(
         user_id: UserId,
         action_provider_id: ActionProviderId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action_event::table
             .filter(action_event::columns::user_id.eq(user_id))
@@ -220,7 +231,7 @@ impl ActionEvent {
 
     pub fn disable_multiple(
         action_event_ids: Vec<ActionEventId>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<usize> {
         diesel::update(
             action_event::table.filter(action_event::columns::id.eq_any(action_event_ids)),
@@ -231,7 +242,7 @@ impl ActionEvent {
 
     pub fn delete_multiple(
         action_event_ids: Vec<ActionEventId>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<usize> {
         diesel::update(
             action_event::table.filter(action_event::columns::id.eq_any(action_event_ids)),
@@ -242,7 +253,7 @@ impl ActionEvent {
 }
 
 impl GetAll for CreatableActionRule {
-    fn get_all(db: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self>> {
         action_rule::table
             .inner_join(action::table)
             .filter(action_rule::columns::enabled.eq(true))
@@ -263,7 +274,7 @@ impl GetAll for CreatableActionRule {
 impl ExecutableActionEvent {
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
@@ -291,7 +302,7 @@ impl ExecutableActionEvent {
         action_provider_id: ActionProviderId,
         start_datetime: DateTime<Utc>,
         end_datetime: DateTime<Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
@@ -319,7 +330,7 @@ impl ExecutableActionEvent {
 }
 
 impl GetAll for DeletableActionEvent {
-    fn get_all(db: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self>> {
         action_event::table
             .inner_join(action::table)
             .filter(action_event::columns::deleted.eq(false))

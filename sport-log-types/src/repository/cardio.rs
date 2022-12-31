@@ -10,7 +10,7 @@ use crate::{
 impl CheckUserId for CardioBlueprint {
     type Id = CardioBlueprintId;
 
-    fn check_user_id(id: Self::Id, user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         cardio_blueprint::table
             .inner_join(movement::table)
             .filter(cardio_blueprint::columns::id.eq(id))
@@ -25,7 +25,11 @@ impl CheckUserId for CardioBlueprint {
             .map(|count: i64| count == 1)
     }
 
-    fn check_user_ids(ids: &[Self::Id], user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_ids(
+        ids: &[Self::Id],
+        user_id: UserId,
+        db: &mut PgConnection,
+    ) -> QueryResult<bool> {
         cardio_blueprint::table
             .inner_join(movement::table)
             .filter(cardio_blueprint::columns::id.eq_any(ids))
@@ -44,7 +48,7 @@ impl CheckUserId for CardioBlueprint {
 impl CheckUserId for CardioSession {
     type Id = CardioSessionId;
 
-    fn check_user_id(id: Self::Id, user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         cardio_session::table
             .inner_join(movement::table)
             .filter(cardio_session::columns::id.eq(id))
@@ -59,7 +63,11 @@ impl CheckUserId for CardioSession {
             .map(|count: i64| count == 1)
     }
 
-    fn check_user_ids(ids: &[Self::Id], user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_ids(
+        ids: &[Self::Id],
+        user_id: UserId,
+        db: &mut PgConnection,
+    ) -> QueryResult<bool> {
         cardio_session::table
             .inner_join(movement::table)
             .filter(cardio_session::columns::id.eq_any(ids))
@@ -80,7 +88,7 @@ impl CardioSession {
         user_id: UserId,
         start_datetime: DateTime<Utc>,
         end_datetime: DateTime<Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         cardio_session::table
             .filter(cardio_session::columns::user_id.eq(user_id))
@@ -93,21 +101,21 @@ impl CardioSession {
 impl GetById for CardioSessionDescription {
     type Id = CardioSessionId;
 
-    fn get_by_id(cardio_session_id: Self::Id, db: &PgConnection) -> QueryResult<Self> {
+    fn get_by_id(cardio_session_id: Self::Id, db: &mut PgConnection) -> QueryResult<Self> {
         let cardio_session = CardioSession::get_by_id(cardio_session_id, db)?;
         CardioSessionDescription::from_session(cardio_session, db)
     }
 }
 
 impl GetByUser for CardioSessionDescription {
-    fn get_by_user(user_id: UserId, db: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
         let cardio_sessions = CardioSession::get_by_user(user_id, db)?;
         CardioSessionDescription::from_sessions(cardio_sessions, db)
     }
 }
 
 impl CardioSessionDescription {
-    fn from_session(cardio_session: CardioSession, db: &PgConnection) -> QueryResult<Self> {
+    fn from_session(cardio_session: CardioSession, db: &mut PgConnection) -> QueryResult<Self> {
         let route = match cardio_session.route_id {
             Some(route_id) => Some(Route::get_by_id(route_id, db)?),
             None => None,
@@ -122,7 +130,7 @@ impl CardioSessionDescription {
 
     fn from_sessions(
         cardio_sessions: Vec<CardioSession>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         let mut routes = vec![];
         for cardio_session in &cardio_sessions {
@@ -153,7 +161,7 @@ impl CardioSessionDescription {
         user_id: UserId,
         start_datetime: DateTime<Utc>,
         end_datetime: DateTime<Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         let cardio_sessions = CardioSession::get_ordered_by_user_and_timespan(
             user_id,

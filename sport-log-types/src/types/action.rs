@@ -1,8 +1,9 @@
 use chrono::{DateTime, Utc};
 #[cfg(feature = "server")]
+use diesel::sql_types::BigInt;
+#[cfg(feature = "server")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
-
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckAPId, CheckUserId, Create, FromSql, GetAll, GetById, GetByIds, GetBySync, GetByUser,
@@ -33,9 +34,9 @@ use crate::{
         FromSql,
         VerifyIdForAdmin,
         VerifyIdUnchecked
-    )
+    ),
+    diesel(sql_type = diesel::sql_types::BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct ActionProviderId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -54,10 +55,9 @@ pub struct ActionProviderId(pub i64);
         HardDelete,
         VerifyForAdminWithoutDb,
         VerifyUnchecked,
-    )
+    ),
+    diesel(table_name = action_provider, belongs_to(Platform))
 )]
-#[cfg_attr(feature = "server", table_name = "action_provider")]
-#[cfg_attr(feature = "server", belongs_to(Platform))]
 pub struct ActionProvider {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -88,9 +88,9 @@ pub struct ActionProvider {
         FromSql,
         VerifyIdUnchecked,
         VerifyIdForActionProvider
-    )
+    ),
+    diesel(sql_type = diesel::sql_types::BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct ActionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -111,10 +111,9 @@ pub struct ActionId(pub i64);
         CheckAPId,
         VerifyForActionProviderWithDb,
         VerifyForActionProviderWithoutDb,
-    )
+    ),
+    diesel(table_name = action, belongs_to(ActionProvider))
 )]
-#[cfg_attr(feature = "server", table_name = "action")]
-#[cfg_attr(feature = "server", belongs_to(ActionProvider))]
 pub struct Action {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -135,6 +134,7 @@ pub struct Action {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "server", derive(DbEnum))]
+
 pub enum Weekday {
     Monday,
     Tuesday,
@@ -164,9 +164,9 @@ impl Weekday {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUser)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUser),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct ActionRuleId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -188,11 +188,9 @@ pub struct ActionRuleId(pub i64);
         CheckUserId,
         VerifyForUserWithDb,
         VerifyForUserWithoutDb,
-    )
+    ),
+    diesel(table_name = action_rule,belongs_to(User),belongs_to(Action))
 )]
-#[cfg_attr(feature = "server", table_name = "action_rule")]
-#[cfg_attr(feature = "server", belongs_to(User))]
-#[cfg_attr(feature = "server", belongs_to(Action))]
 pub struct ActionRule {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -228,9 +226,9 @@ pub struct ActionRule {
         VerifyIdForUser,
         VerifyIdForActionProvider,
         VerifyIdForAdmin
-    )
+    ),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct ActionEventId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -253,11 +251,9 @@ pub struct ActionEventId(pub i64);
         VerifyForUserWithDb,
         VerifyForUserWithoutDb,
         VerifyForAdminWithoutDb,
-    )
+    ),
+    diesel(table_name = action_event, belongs_to(User), belongs_to(Action))
 )]
-#[cfg_attr(feature = "server", table_name = "action_event")]
-#[cfg_attr(feature = "server", belongs_to(User))]
-#[cfg_attr(feature = "server", belongs_to(Action))]
 pub struct ActionEvent {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]

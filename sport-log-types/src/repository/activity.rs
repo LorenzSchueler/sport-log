@@ -69,7 +69,7 @@ impl Activity {
         user_id: UserId,
         start: DateTime<Utc>,
         end: DateTime<Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         Ok(Self::join_and_order(
             Diary::get_ordered_by_user_and_timespan(user_id, start, end, db)?,
@@ -82,7 +82,7 @@ impl Activity {
 }
 
 impl GetByUser for Activity {
-    fn get_by_user(user_id: UserId, db: &PgConnection) -> QueryResult<Vec<Self>> {
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
         Ok(Self::join_and_order(
             Diary::get_by_user(user_id, db)?,
             Wod::get_by_user(user_id, db)?,

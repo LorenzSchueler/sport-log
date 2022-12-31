@@ -1,8 +1,9 @@
 #[cfg(feature = "server")]
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
+#[cfg(feature = "server")]
+use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
-
 use sport_log_types_derive::{FromI64, ToI64};
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
@@ -18,9 +19,9 @@ use crate::{schema::user, AuthUser, CheckUserId, Unverified, VerifyForUserWithDb
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct UserId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -28,7 +29,6 @@ pub struct UserId(pub i64);
     feature = "server",
     derive(
         Insertable,
-        Associations,
         Identifiable,
         Queryable,
         AsChangeset,
@@ -36,9 +36,9 @@ pub struct UserId(pub i64);
         GetByIds,
         VerifyUnchecked,
         VerifyForAdminWithoutDb,
-    )
+    ),
+    diesel(table_name = user)
 )]
-#[cfg_attr(feature = "server", table_name = "user")]
 pub struct User {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -55,7 +55,11 @@ pub struct User {
 impl VerifyForUserWithDb for Unverified<User> {
     type Entity = User;
 
-    fn verify_user(self, auth: AuthUser, db: &PgConnection) -> Result<Self::Entity, StatusCode> {
+    fn verify_user(
+        self,
+        auth: AuthUser,
+        db: &mut PgConnection,
+    ) -> Result<Self::Entity, StatusCode> {
         let user = self.0;
         if user.id == *auth
             && User::check_user_id(user.id, *auth, db)

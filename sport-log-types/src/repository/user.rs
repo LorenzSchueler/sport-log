@@ -9,7 +9,7 @@ use rand_core::OsRng;
 use crate::{schema::user, CheckUserId, Create, Update, User, UserId};
 
 impl Create for User {
-    fn create(mut user: Self, db: &PgConnection) -> QueryResult<usize> {
+    fn create(mut user: Self, db: &mut PgConnection) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
             .hash_password(user.password.as_bytes(), &salt)
@@ -19,7 +19,7 @@ impl Create for User {
         diesel::insert_into(user::table).values(user).execute(db)
     }
 
-    fn create_multiple(mut users: Vec<Self>, db: &PgConnection) -> QueryResult<usize> {
+    fn create_multiple(mut users: Vec<Self>, db: &mut PgConnection) -> QueryResult<usize> {
         for user in &mut users {
             let salt = SaltString::generate(&mut OsRng);
             user.password = Argon2::default()
@@ -33,7 +33,7 @@ impl Create for User {
 }
 
 impl Update for User {
-    fn update(mut user: Self, db: &PgConnection) -> QueryResult<usize> {
+    fn update(mut user: Self, db: &mut PgConnection) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
             .hash_password(user.password.as_bytes(), &salt)
@@ -45,8 +45,8 @@ impl Update for User {
             .execute(db)
     }
 
-    fn update_multiple(users: Vec<Self>, db: &PgConnection) -> QueryResult<usize> {
-        db.transaction(|| {
+    fn update_multiple(users: Vec<Self>, db: &mut PgConnection) -> QueryResult<usize> {
+        db.transaction(|db| {
             let len = users.len();
 
             for mut user in users {
@@ -69,7 +69,7 @@ impl Update for User {
 impl CheckUserId for User {
     type Id = UserId;
 
-    fn check_user_id(id: Self::Id, user_id: UserId, db: &PgConnection) -> QueryResult<bool> {
+    fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         user::table
             .filter(user::columns::id.eq(id))
             .filter(user::columns::id.eq(user_id))
@@ -81,14 +81,14 @@ impl CheckUserId for User {
     fn check_user_ids(
         _ids: &[Self::Id],
         _user_id: UserId,
-        _db: &PgConnection,
+        _db: &mut PgConnection,
     ) -> QueryResult<bool> {
         Ok(false) // it is not allowed to request data for multiple users
     }
 }
 
 impl User {
-    pub fn auth(username: &str, password: &str, db: &PgConnection) -> QueryResult<UserId> {
+    pub fn auth(username: &str, password: &str, db: &mut PgConnection) -> QueryResult<UserId> {
         let (user_id, password_hash): (UserId, String) = user::table
             .filter(user::columns::username.eq(username))
             .select((user::columns::id, user::columns::password))
@@ -109,7 +109,7 @@ impl User {
     pub fn get_by_id_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Option<User>> {
         user::table
             .filter(user::columns::id.eq(user_id))
@@ -118,7 +118,7 @@ impl User {
             .optional()
     }
 
-    pub fn delete(user_id: UserId, db: &PgConnection) -> QueryResult<usize> {
+    pub fn delete(user_id: UserId, db: &mut PgConnection) -> QueryResult<usize> {
         diesel::delete(user::table.find(user_id)).execute(db)
     }
 }

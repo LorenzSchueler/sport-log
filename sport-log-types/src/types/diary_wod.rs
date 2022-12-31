@@ -1,6 +1,7 @@
 use chrono::{DateTime, NaiveDate, Utc};
+#[cfg(feature = "server")]
+use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
-
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, ToSql,
@@ -21,9 +22,9 @@ use crate::{
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct DiaryId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -46,10 +47,9 @@ pub struct DiaryId(pub i64);
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb,
         VerifyUnchecked
-    )
+    ),
+    diesel(table_name = diary,belongs_to(User))
 )]
-#[cfg_attr(feature = "server", table_name = "diary")]
-#[cfg_attr(feature = "server", belongs_to(User))]
 pub struct Diary {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -73,9 +73,9 @@ pub struct Diary {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct WodId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -98,10 +98,9 @@ pub struct WodId(pub i64);
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb,
         VerifyUnchecked
-    )
+    ),
+    diesel(table_name = wod,belongs_to(User))
 )]
-#[cfg_attr(feature = "server", table_name = "wod")]
-#[cfg_attr(feature = "server", belongs_to(User))]
 pub struct Wod {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]

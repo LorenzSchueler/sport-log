@@ -2,9 +2,10 @@
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 #[cfg(feature = "server")]
+use diesel::sql_types::BigInt;
+#[cfg(feature = "server")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
-
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, FromSql, GetAll, GetById, GetByIds, HardDelete, ToSql, Update,
@@ -45,16 +46,20 @@ pub enum MovementDimension {
         FromSql,
         VerifyIdForAdmin,
         VerifyIdUnchecked
-    )
+    ),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct MovementId(pub i64);
 
 #[cfg(feature = "server")]
 impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
     type Id = MovementId;
 
-    fn verify_user_ap(self, auth: AuthUserOrAP, db: &PgConnection) -> Result<Self::Id, StatusCode> {
+    fn verify_user_ap(
+        self,
+        auth: AuthUserOrAP,
+        db: &mut PgConnection,
+    ) -> Result<Self::Id, StatusCode> {
         if Movement::check_optional_user_id(self.0, *auth, db).map_err(|_| StatusCode::FORBIDDEN)? {
             Ok(self.0)
         } else {
@@ -70,7 +75,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Id>, StatusCode> {
         if Movement::check_optional_user_ids(&self.0, *auth, db)
             .map_err(|_| StatusCode::FORBIDDEN)?
@@ -103,10 +108,9 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
         HardDelete,
         CheckUserId,
         VerifyForAdminWithoutDb
-    )
+    ),
+    diesel(table_name = movement, belongs_to(User))
 )]
-#[cfg_attr(feature = "server", table_name = "movement")]
-#[cfg_attr(feature = "server", belongs_to(User))]
 pub struct Movement {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -133,7 +137,7 @@ impl VerifyForUserOrAPWithDb for Unverified<Movement> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Self::Entity, StatusCode> {
         let movement = self.0;
         if movement.user_id == Some(*auth)
@@ -156,7 +160,7 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Movement>> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode> {
         let movements = self.0;
         let movement_ids: Vec<_> = movements.iter().map(|movement| movement.id).collect();
@@ -212,25 +216,17 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForAdmin)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForAdmin),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct MuscleGroupId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "server",
-    derive(
-        Insertable,
-        Associations,
-        Identifiable,
-        Queryable,
-        GetById,
-        GetByIds,
-        GetAll
-    )
+    derive(Insertable, Identifiable, Queryable, GetById, GetByIds, GetAll),
+    diesel(table_name = muscle_group)
 )]
-#[cfg_attr(feature = "server", table_name = "muscle_group")]
 pub struct MuscleGroup {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -244,16 +240,20 @@ pub struct MuscleGroup {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct MovementMuscleId(pub i64);
 
 #[cfg(feature = "server")]
 impl VerifyIdForUserOrAP for UnverifiedId<MovementMuscleId> {
     type Id = MovementMuscleId;
 
-    fn verify_user_ap(self, auth: AuthUserOrAP, db: &PgConnection) -> Result<Self::Id, StatusCode> {
+    fn verify_user_ap(
+        self,
+        auth: AuthUserOrAP,
+        db: &mut PgConnection,
+    ) -> Result<Self::Id, StatusCode> {
         if MovementMuscle::check_optional_user_id(self.0, *auth, db)
             .map_err(|_| StatusCode::FORBIDDEN)?
         {
@@ -271,7 +271,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementMuscleId> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Id>, StatusCode> {
         if MovementMuscle::check_optional_user_ids(&self.0, *auth, db)
             .map_err(|_| StatusCode::FORBIDDEN)?
@@ -297,11 +297,9 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementMuscleId> {
         GetByIds,
         Update,
         HardDelete,
-    )
+    ),
+    diesel(table_name = movement_muscle, belongs_to(Movement), belongs_to(MuscleGroup))
 )]
-#[cfg_attr(feature = "server", table_name = "movement_muscle")]
-#[cfg_attr(feature = "server", belongs_to(Movement))]
-#[cfg_attr(feature = "server", belongs_to(MuscleGroup))]
 pub struct MovementMuscle {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -325,7 +323,7 @@ impl VerifyForUserOrAPWithDb for Unverified<MovementMuscle> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Self::Entity, StatusCode> {
         let movement_muscle = self.0;
         if MovementMuscle::check_user_id(movement_muscle.id, *auth, db)
@@ -345,7 +343,7 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MovementMuscle>> {
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode> {
         let movement_muscle = self.0;
         let movement_muscle_ids: Vec<_> = movement_muscle
@@ -369,7 +367,7 @@ impl VerifyForUserOrAPCreate for Unverified<MovementMuscle> {
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Self::Entity, StatusCode> {
         let movement_muscle = self.0;
         if Movement::check_user_id(movement_muscle.movement_id, *auth, db)
@@ -389,7 +387,7 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MovementMuscle>> {
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> Result<Vec<Self::Entity>, StatusCode> {
         let movement_muscle = self.0;
         let mut movement_ids: Vec<_> = movement_muscle
@@ -413,25 +411,17 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MovementMuscle>> {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForAdmin)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForAdmin),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct EormId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "server",
-    derive(
-        Insertable,
-        Associations,
-        Identifiable,
-        Queryable,
-        GetById,
-        GetByIds,
-        GetAll
-    )
+    derive(Insertable, Identifiable, Queryable, GetById, GetByIds, GetAll),
+    diesel(table_name = eorm)
 )]
-#[cfg_attr(feature = "server", table_name = "eorm")]
 pub struct Eorm {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]

@@ -15,19 +15,16 @@
 
 use std::{env, sync::Arc};
 
-#[macro_use]
-extern crate diesel_migrations;
-
 use axum::{Router, Server};
 use diesel::{
     r2d2::{ConnectionManager, Pool},
     PgConnection,
 };
+use diesel_migrations::{EmbeddedMigrations, HarnessWithOutput, MigrationHarness};
+use sport_log_types::{AppState, Config, DbPool};
 use tokio::fs;
 use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
-
-use sport_log_types::{AppState, Config, DbPool};
 
 mod handler;
 mod router;
@@ -39,6 +36,8 @@ const CONFIG_FILE: &str = "sport-log-server.toml";
 const VERSION: &str = "0.3";
 const MIN_VERSION: &str = VERSION;
 const MAX_VERSION: &str = VERSION;
+
+const MIGRATIONS: EmbeddedMigrations = diesel_migrations::embed_migrations!();
 
 fn tracing_setup() {
     if cfg!(test) {
@@ -67,13 +66,13 @@ async fn get_db_pool(config: &Config) -> Result<DbPool, String> {
         .map_err(|err| format!("failed to create database connection pool: {err}"))?;
 
     if !cfg!(test) {
-        diesel_migrations::embed_migrations!();
-        let db = pool.get().map_err(|err| {
+        let mut db = pool.get().map_err(|err| {
             format!("failed to retrieve database connection from connection pool: {err}")
         })?;
 
         info!("running database migrations...");
-        embedded_migrations::run(&db)
+        HarnessWithOutput::new(&mut db, std::io::stderr())
+            .run_pending_migrations(MIGRATIONS)
             .map_err(|err| format!("failed to run database migrations: {err}"))?;
         info!("database is up to date");
     }

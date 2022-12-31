@@ -1,19 +1,15 @@
-#[cfg(feature = "server")]
-use std::io::Write;
-
 use chrono::{DateTime, Utc};
 #[cfg(feature = "server")]
 use diesel::{
-    deserialize,
+    backend::RawValue,
+    deserialize::{self, FromSql},
     pg::Pg,
-    serialize::{self, Output, WriteTuple},
-    sql_types::{Double, Integer},
-    types::{FromSql, Record, ToSql},
+    serialize::{self, Output, ToSql, WriteTuple},
+    sql_types::{BigInt, Double, Integer, Nullable, Record},
 };
 #[cfg(feature = "server")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
-
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, ToSql,
@@ -49,8 +45,11 @@ pub enum CardioType {
 ///
 /// `time` is the time in seconds since the start of the recording.
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "server", derive(SqlType,))]
-#[cfg_attr(feature = "server", postgres(type_name = "position"))]
+#[cfg_attr(
+    feature = "server",
+    derive(FromSqlRow, AsExpression),
+    diesel(sql_type = crate::schema::sql_types::Position)
+)]
 pub struct Position {
     #[serde(rename(serialize = "lo", deserialize = "lo"))]
     pub longitude: f64,
@@ -65,8 +64,8 @@ pub struct Position {
 }
 
 #[cfg(feature = "server")]
-impl ToSql<Position, Pg> for Position {
-    fn to_sql<W: Write>(&self, out: &mut Output<W, Pg>) -> serialize::Result {
+impl ToSql<crate::schema::sql_types::Position, Pg> for Position {
+    fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
         WriteTuple::<(Double, Double, Double, Double, Integer)>::write_tuple(
             &(
                 self.longitude,
@@ -81,8 +80,8 @@ impl ToSql<Position, Pg> for Position {
 }
 
 #[cfg(feature = "server")]
-impl FromSql<Position, Pg> for Position {
-    fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
+impl FromSql<crate::schema::sql_types::Position, Pg> for Position {
+    fn from_sql(bytes: RawValue<'_, Pg>) -> deserialize::Result<Self> {
         let (longitude, latitude, elevation, distance, time) =
             FromSql::<Record<(Double, Double, Double, Double, Integer)>, Pg>::from_sql(bytes)?;
         Ok(Position {
@@ -100,9 +99,9 @@ impl FromSql<Position, Pg> for Position {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct RouteId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -124,10 +123,9 @@ pub struct RouteId(pub i64);
         CheckUserId,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb
-    )
+    ),
+    diesel(table_name = route, belongs_to(User))
 )]
-#[cfg_attr(feature = "server", table_name = "route")]
-#[cfg_attr(feature = "server", belongs_to(User))]
 pub struct Route {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -156,9 +154,9 @@ pub struct Route {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct CardioBlueprintId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -179,13 +177,9 @@ pub struct CardioBlueprintId(pub i64);
         HardDelete,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb
-    )
+    ),
+    diesel(table_name = cardio_blueprint, belongs_to(User), belongs_to(TrainingPlan), belongs_to(Movement), belongs_to(Route))
 )]
-#[cfg_attr(feature = "server", table_name = "cardio_blueprint")]
-#[cfg_attr(feature = "server", belongs_to(User))]
-#[cfg_attr(feature = "server", belongs_to(TrainingPlan))]
-#[cfg_attr(feature = "server", belongs_to(Movement))]
-#[cfg_attr(feature = "server", belongs_to(Route))]
 pub struct CardioBlueprint {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]
@@ -230,9 +224,9 @@ pub struct CardioBlueprint {
 )]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP)
+    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    diesel(sql_type = BigInt)
 )]
-#[cfg_attr(feature = "server", sql_type = "diesel::sql_types::BigInt")]
 pub struct CardioSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -253,13 +247,9 @@ pub struct CardioSessionId(pub i64);
         HardDelete,
         VerifyForUserOrAPWithDb,
         VerifyForUserOrAPWithoutDb
-    )
+    ),
+    diesel(table_name = cardio_session, belongs_to(User), belongs_to(CardioBlueprint), belongs_to(Movement), belongs_to(Route))
 )]
-#[cfg_attr(feature = "server", table_name = "cardio_session")]
-#[cfg_attr(feature = "server", belongs_to(User))]
-#[cfg_attr(feature = "server", belongs_to(CardioBlueprint))]
-#[cfg_attr(feature = "server", belongs_to(Movement))]
-#[cfg_attr(feature = "server", belongs_to(Route))]
 pub struct CardioSession {
     #[serde(serialize_with = "to_str")]
     #[serde(deserialize_with = "from_str")]

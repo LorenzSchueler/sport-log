@@ -11,7 +11,7 @@ impl Diary {
         user_id: UserId,
         start: DateTime<Utc>,
         end: DateTime<Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         diary::table
             .filter(diary::columns::user_id.eq(user_id))
@@ -26,7 +26,7 @@ impl Wod {
         user_id: UserId,
         start: DateTime<Utc>,
         end: DateTime<Utc>,
-        db: &PgConnection,
+        db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         wod::table
             .filter(wod::columns::user_id.eq(user_id))
