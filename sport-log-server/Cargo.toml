@@ -11,7 +11,6 @@ tokio = { version = "1.9", features = ["full"] }
 axum = "0.6"
 tower = { version = "0.4", features = [ "util" ] }
 tower-http = {version = "0.3", features = [ "trace", "sensitive-headers" ] }
-r2d2 = "0.8"
 diesel = { version = "2", features = ["postgres", "r2d2", "chrono"] }
 diesel_migrations = "2"
 serde = { version = "1.0", features = ["derive"]}

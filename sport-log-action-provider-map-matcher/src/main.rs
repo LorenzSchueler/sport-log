@@ -36,11 +36,10 @@ use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError};
 use serde::{Deserialize, Serialize};
-use tokio::process::Command;
-use tracing::{debug, error, info};
-
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{ActionEventId, CardioSession, CardioSessionId, Position, Route, RouteId};
+use tokio::process::Command;
+use tracing::{debug, error, info};
 
 pub const CONFIG_FILE: &str = "sport-log-action-provider-map-matcher.toml";
 const NAME: &str = "map-matcher";

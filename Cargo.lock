@@ -1749,7 +1749,6 @@ dependencies = [
  "diesel",
  "diesel_migrations",
  "mime",
- "r2d2",
  "rand",
  "serde",
  "serde_json",

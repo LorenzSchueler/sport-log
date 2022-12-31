@@ -1,31 +1,18 @@
-0a2
-> #![allow(unused_imports)]
-> 
-46c46
-<         weekday -> Weekday,
+131c131
+<         track -> Nullable<Array<Nullable<Position>>>,
 ---
->         weekday -> WeekdayMapping,
-59c59
-<         cardio_type -> Cardio_type,
+>         track -> Nullable<Array<Position>>,
+133c133
+<         cadence -> Nullable<Array<Nullable<Int4>>>,
 ---
->         cardio_type -> CardioTypeMapping,
-78c78
-<         cardio_type -> Cardio_type,
+>         cadence -> Nullable<Array<Int4>>,
+135c135
+<         heart_rate -> Nullable<Array<Nullable<Int4>>>,
 ---
->         cardio_type -> CardioTypeMapping,
-108c108
-<         metcon_type -> Metcon_type,
+>         heart_rate -> Nullable<Array<Int4>>,
+330,331c330,331
+<         track -> Nullable<Array<Nullable<Position>>>,
+<         marked_positions -> Nullable<Array<Nullable<Position>>>,
 ---
->         metcon_type -> MetconTypeMapping,
-205c205
-<         distance_unit -> Nullable<Distance_unit>,
----
->         distance_unit -> Nullable<DistanceUnitMapping>,
-217c217
-<         movement_dimension -> Movement_dimension,
----
->         movement_dimension -> MovementDimensionMapping,
-290c290
-<         weekday -> Nullable<Weekday>,
----
->         weekday -> Nullable<WeekdayMapping>,
+>         track -> Nullable<Array<Position>>,
+>         marked_positions -> Nullable<Array<Position>>,

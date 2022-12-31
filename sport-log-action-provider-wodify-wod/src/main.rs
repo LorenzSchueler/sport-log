@@ -9,12 +9,11 @@ use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError, StatusCode};
 use serde::Deserialize;
+use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
+use sport_log_types::{ActionEventId, ExecutableActionEvent, Wod, WodId};
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use tokio::{process::Command, time};
 use tracing::{debug, error, info, warn};
-
-use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
-use sport_log_types::{ActionEventId, ExecutableActionEvent, Wod, WodId};
 
 const CONFIG_FILE: &str = "sport-log-action-provider-wodify-wod.toml";
 const NAME: &str = "wodify-wod";

@@ -11,13 +11,12 @@ use err_derive::Error as StdError;
 use lazy_static::lazy_static;
 use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
+use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{ActionEventId, ExecutableActionEvent};
 use sysinfo::{ProcessExt, System, SystemExt};
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
-use tracing::{debug, error, info, warn};
-
-use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use tokio::{process::Command, task::JoinError, time};
+use tracing::{debug, error, info, warn};
 
 const CONFIG_FILE: &str = "sport-log-action-provider-wodify-login.toml";
 const NAME: &str = "wodify-login";

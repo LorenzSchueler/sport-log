@@ -3,12 +3,11 @@
 use chrono::{Duration, Utc};
 use rand::Rng;
 use reqwest::{Client, Error, StatusCode};
-use tracing::{error, info};
-
 use sport_log_types::{
     Action, ActionEventId, ActionId, ActionProvider, ActionProviderId, ExecutableActionEvent,
     Platform, PlatformId,
 };
+use tracing::{error, info};
 
 #[allow(clippy::too_many_arguments)]
 pub async fn setup(

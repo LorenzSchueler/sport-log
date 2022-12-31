@@ -1,6 +1,6 @@
 [print_schema]
 file = "src/schema.rs"
-import_types = ["diesel::sql_types::*", "crate::*"]
+import_types = ["diesel::sql_types::*"]
 patch_file = "src/schema.patch"
 
 [print_schema.filter]

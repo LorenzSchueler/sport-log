@@ -28,7 +28,6 @@ pub mod sql_types {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     action (id) {
         id -> Int8,
@@ -44,7 +43,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     action_event (id) {
         id -> Int8,
@@ -60,7 +58,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     action_provider (id) {
         id -> Int8,
@@ -75,7 +72,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
     use super::sql_types::Weekday;
 
     action_rule (id) {
@@ -93,7 +89,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
     use super::sql_types::CardioType;
 
     cardio_blueprint (id) {
@@ -118,7 +113,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
     use super::sql_types::CardioType;
     use super::sql_types::Position;
 
@@ -148,7 +142,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     diary (id) {
         id -> Int8,
@@ -163,7 +156,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     eorm (id) {
         id -> Int8,
@@ -174,7 +166,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     group (id) {
         id -> Int8,
@@ -186,7 +177,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     group_user (id) {
         id -> Int8,
@@ -199,7 +189,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
     use super::sql_types::MetconType;
 
     metcon (id) {
@@ -217,7 +206,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     metcon_item (id) {
         id -> Int8,
@@ -230,7 +218,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
     use super::sql_types::DistanceUnit;
 
     metcon_movement (id) {
@@ -249,7 +236,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     metcon_session (id) {
         id -> Int8,
@@ -268,7 +254,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
     use super::sql_types::MovementDimension;
 
     movement (id) {
@@ -285,7 +270,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     movement_muscle (id) {
         id -> Int8,
@@ -298,7 +282,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     muscle_group (id) {
         id -> Int8,
@@ -309,7 +292,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     platform (id) {
         id -> Int8,
@@ -322,7 +304,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     platform_credential (id) {
         id -> Int8,
@@ -337,7 +318,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
     use super::sql_types::Position;
 
     route (id) {
@@ -356,7 +336,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     shared_cardio_session (id) {
         id -> Int8,
@@ -369,7 +348,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     shared_diary (id) {
         id -> Int8,
@@ -382,7 +360,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     shared_metcon_session (id) {
         id -> Int8,
@@ -395,7 +372,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     shared_strength_session (id) {
         id -> Int8,
@@ -408,7 +384,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     strength_blueprint (id) {
         id -> Int8,
@@ -425,7 +400,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     strength_blueprint_set (id) {
         id -> Int8,
@@ -440,7 +414,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     strength_session (id) {
         id -> Int8,
@@ -457,7 +430,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     strength_set (id) {
         id -> Int8,
@@ -472,7 +444,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
     use super::sql_types::Weekday;
 
     training_plan (id) {
@@ -489,7 +460,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     user (id) {
         id -> Int8,
@@ -502,7 +472,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::*;
 
     wod (id) {
         id -> Int8,

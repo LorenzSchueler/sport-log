@@ -6,14 +6,13 @@ use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError, StatusCode};
 use serde::Deserialize;
-use tokio::task::JoinError;
-use tracing::{debug, error, info, warn};
-
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{
     ActionEventId, CardioSession, CardioSessionId, CardioType, ExecutableActionEvent, Movement,
     Position,
 };
+use tokio::task::JoinError;
+use tracing::{debug, error, info, warn};
 
 const CONFIG_FILE: &str = "sport-log-action-provider-sportstracker.toml";
 const NAME: &str = "sportstracker-fetch";

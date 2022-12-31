@@ -25,11 +25,10 @@ use chrono::{DateTime, Datelike, Days, Duration, Utc};
 use rand::Rng;
 use reqwest::{blocking::Client, Error as ReqwestError};
 use serde::Deserialize;
-use tracing::{debug, error, info};
-
 use sport_log_types::{
     ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent, ADMIN_USERNAME,
 };
+use tracing::{debug, error, info};
 
 pub const CONFIG_FILE: &str = "sport-log-scheduler.toml";
 
