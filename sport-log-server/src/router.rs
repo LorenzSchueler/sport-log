@@ -15,7 +15,7 @@ use tower_http::{
 };
 use tracing::{debug, trace, warn, Span};
 
-use crate::{handler::*, MAX_VERSION, MIN_VERSION};
+use crate::handler::*;
 
 async fn handler_404() -> HandlerError {
     HandlerError {

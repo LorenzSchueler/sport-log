@@ -33,10 +33,6 @@ mod tests;
 
 const CONFIG_FILE: &str = "sport-log-server.toml";
 
-const VERSION: &str = "0.3";
-const MIN_VERSION: &str = VERSION;
-const MAX_VERSION: &str = VERSION;
-
 const MIGRATIONS: EmbeddedMigrations = diesel_migrations::embed_migrations!();
 
 fn tracing_setup() {

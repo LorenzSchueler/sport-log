@@ -2,6 +2,21 @@ use const_format::concatcp;
 
 pub const VERSION: &str = "/version";
 
+pub const VERSION_0_1: &str = "0.3";
+pub const VERSION_0_2: &str = "0.3";
+pub const VERSION_0_3: &str = "0.3";
+pub const MIN_VERSION: &str = VERSION_0_3;
+pub const MAX_VERSION: &str = VERSION_0_3;
+
+pub fn route(version: &str, route: &str) -> String {
+    format!("/v{version}{route}")
+}
+
+#[inline(always)]
+pub fn route_max_version(route: &str) -> String {
+    format!("/v{MAX_VERSION}{route}")
+}
+
 // user URIs
 
 pub const ACCOUNT_DATA: &str = "/account_data";
