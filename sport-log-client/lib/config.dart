@@ -114,7 +114,7 @@ class Config extends JsonSerializable {
   @JsonKey(ignore: true)
   late final Version version;
 
-  static final Version apiVersion = Version(0, 2);
+  static final Version apiVersion = Version(0, 3);
   static const String databaseName = 'database.sqlite';
   static const String hiveBoxName = 'settings';
   static const Duration httpTimeout = Duration(seconds: 20);

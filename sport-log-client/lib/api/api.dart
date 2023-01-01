@@ -26,8 +26,6 @@ part 'accessors/strength_api.dart';
 part 'accessors/user_api.dart';
 part 'accessors/wod_api.dart';
 
-String apiVersion = '/v${Config.apiVersion}';
-
 enum ApiErrorType {
   // http error
   badRequest, // 400
@@ -207,22 +205,23 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
 
   // things needed to be overridden
   T _fromJson(Map<String, dynamic> json);
-  String get _singularRoute; // everything after url base, e. g. '/v1.0/user'
 
-  // default implementations
-  String get _pluralRoute => '${_singularRoute}s';
+  /// everything after version, e. g. '/user'
+  String get _route;
+
+  String get _path => "/v${Config.apiVersion}$_route";
   Map<String, dynamic> _toJson(T object) => object.toJson();
 
   Future<ApiResult<T>> getSingle(Int64 id) async {
     return _getRequest(
-      '$_singularRoute/$id',
+      '$_path?id=$id',
       (dynamic json) => _fromJson(json as Map<String, dynamic>),
     );
   }
 
   Future<ApiResult<List<T>>> getMultiple() async {
     return _getRequest(
-      _singularRoute,
+      _path,
       (dynamic json) => (json as List<dynamic>)
           .map((dynamic json) => _fromJson(json as Map<String, dynamic>))
           .toList(),
@@ -233,9 +232,9 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = _toJson(object);
       final headers = _ApiHeaders._defaultHeaders;
-      _logRequest('POST', _singularRoute, headers, body);
+      _logRequest('POST', _path, headers, body);
       final response = await client.post(
-        UriFromRoute.fromRoute(_singularRoute),
+        UriFromRoute.fromRoute(_path),
         headers: headers,
         body: jsonEncode(body),
       );
@@ -251,9 +250,9 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = objects.map(_toJson).toList();
       final headers = _ApiHeaders._defaultHeaders;
-      _logRequest('POST', _pluralRoute, headers, body);
+      _logRequest('POST', _path, headers, body);
       final response = await client.post(
-        UriFromRoute.fromRoute(_pluralRoute),
+        UriFromRoute.fromRoute(_path),
         headers: headers,
         body: jsonEncode(body),
       );
@@ -266,9 +265,9 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = _toJson(object);
       final headers = _ApiHeaders._defaultHeaders;
-      _logRequest('PUT', _singularRoute, headers, body);
+      _logRequest('PUT', _path, headers, body);
       final response = await client.put(
-        UriFromRoute.fromRoute(_singularRoute),
+        UriFromRoute.fromRoute(_path),
         headers: headers,
         body: jsonEncode(body),
       );
@@ -284,9 +283,9 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = objects.map(_toJson).toList();
       final headers = _ApiHeaders._defaultHeaders;
-      _logRequest('PUT', _pluralRoute, headers, body);
+      _logRequest('PUT', _path, headers, body);
       final response = await client.put(
-        UriFromRoute.fromRoute(_pluralRoute),
+        UriFromRoute.fromRoute(_path),
         headers: headers,
         body: jsonEncode(body),
       );

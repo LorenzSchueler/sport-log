@@ -5,7 +5,7 @@ class PlatformApi extends Api<Platform> {
   Platform _fromJson(Map<String, dynamic> json) => Platform.fromJson(json);
 
   @override
-  String get _singularRoute => '$apiVersion/platform';
+  String get _route => '/platform';
 }
 
 class PlatformCredentialApi extends Api<PlatformCredential> {
@@ -14,5 +14,5 @@ class PlatformCredentialApi extends Api<PlatformCredential> {
       PlatformCredential.fromJson(json);
 
   @override
-  String get _singularRoute => '$apiVersion/platform_credential';
+  String get _route => '/platform_credential';
 }
