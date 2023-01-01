@@ -4,6 +4,10 @@ use chrono::{Duration, Utc};
 use rand::Rng;
 use reqwest::{Client, Error, StatusCode};
 use sport_log_types::{
+    uri::{
+        route_max_version, AP_ACTION, AP_ACTION_EVENT, AP_ACTION_PROVIDER,
+        AP_EXECUTABLE_ACTION_EVENT, AP_PLATFORM,
+    },
     Action, ActionEventId, ActionId, ActionProvider, ActionProviderId, ExecutableActionEvent,
     Platform, PlatformId,
 };
@@ -33,7 +37,7 @@ pub async fn setup(
     };
 
     let response = client
-        .post(format!("{}/v0.2/ap/platform", base_url))
+        .post(route_max_version(base_url, AP_PLATFORM, &[]))
         .json(&platform)
         .send()
         .await?;
@@ -46,7 +50,7 @@ pub async fn setup(
         StatusCode::CONFLICT => {
             info!("platform already exists");
             let platforms: Vec<Platform> = client
-                .get(format!("{}/v0.2/ap/platform", base_url))
+                .get(route_max_version(base_url, AP_PLATFORM, &[]))
                 .send()
                 .await?
                 .json()
@@ -77,7 +81,7 @@ pub async fn setup(
     };
 
     let response = client
-        .post(format!("{}/v0.2/ap/action_provider", base_url))
+        .post(route_max_version(base_url, AP_ACTION_PROVIDER, &[]))
         .basic_auth(name, Some(&password))
         .json(&action_provider)
         .send()
@@ -91,7 +95,7 @@ pub async fn setup(
         StatusCode::CONFLICT => {
             info!("action provider already exists");
             let action_provider: ActionProvider = client
-                .get(format!("{}/v0.2/ap/action_provider", base_url))
+                .get(route_max_version(base_url, AP_ACTION_PROVIDER, &[]))
                 .basic_auth(name, Some(&password))
                 .send()
                 .await?
@@ -123,7 +127,7 @@ pub async fn setup(
         .collect();
 
     match client
-        .post(format!("{}/v0.2/ap/actions", base_url))
+        .post(route_max_version(base_url, AP_ACTION, &[]))
         .basic_auth(name, Some(&password))
         .json(&actions)
         .send()
@@ -150,9 +154,10 @@ pub async fn get_events(
     let datetime_end = (now + end_offset).to_rfc3339();
 
     let exec_action_events: Vec<ExecutableActionEvent> = client
-        .get(format!(
-            "{}/v0.2/ap/executable_action_event/timespan/{}/{}",
-            base_url, datetime_start, datetime_end
+        .get(route_max_version(
+            base_url,
+            AP_EXECUTABLE_ACTION_EVENT,
+            &[("start", &datetime_start), ("end", &datetime_end)],
         ))
         .basic_auth(name, Some(&password))
         .send()
@@ -170,7 +175,7 @@ pub async fn disable_events(
     action_event_ids: &[ActionEventId],
 ) -> Result<(), Error> {
     client
-        .delete(format!("{}/v0.2/ap/action_events", base_url,))
+        .delete(route_max_version(base_url, AP_ACTION_EVENT, &[]))
         .basic_auth(name, Some(&password))
         .json(action_event_ids)
         .send()

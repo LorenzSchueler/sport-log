@@ -8,6 +8,7 @@ use reqwest::{Client, Error as ReqwestError, StatusCode};
 use serde::Deserialize;
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{
+    uri::{route_max_version, CARDIO_SESSION, MOVEMENT},
     ActionEventId, CardioSession, CardioSessionId, CardioType, ExecutableActionEvent, Movement,
     Position,
 };
@@ -263,7 +264,7 @@ async fn fetch() -> Result<(), Error> {
 
             let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
             let movements: Vec<Movement> = client
-                .get(format!("{}/v0.2/movement", CONFIG.server_url))
+                .get(route_max_version(&CONFIG.server_url, MOVEMENT, &[]))
                 .basic_auth(&username, Some(&CONFIG.password))
                 .send()
                 .await?
@@ -294,7 +295,7 @@ async fn fetch() -> Result<(), Error> {
                 };
 
                 let response = client
-                    .post(format!("{}/v0.2/cardio_session", CONFIG.server_url))
+                    .post(route_max_version(&CONFIG.server_url, CARDIO_SESSION, &[]))
                     .basic_auth(&username, Some(&CONFIG.password))
                     .json(&cardio_session)
                     .send()

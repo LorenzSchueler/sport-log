@@ -37,7 +37,10 @@ use rand::Rng;
 use reqwest::{Client, Error as ReqwestError};
 use serde::{Deserialize, Serialize};
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
-use sport_log_types::{ActionEventId, CardioSession, CardioSessionId, Position, Route, RouteId};
+use sport_log_types::{
+    uri::{route_max_version, CARDIO_SESSION, ROUTE},
+    ActionEventId, CardioSession, CardioSessionId, Position, Route, RouteId,
+};
 use tokio::process::Command;
 use tracing::{debug, error, info};
 
@@ -211,9 +214,10 @@ async fn map_match() -> Result<()> {
                 ))?;
 
             let mut cardio_session: CardioSession = client
-                .get(format!(
-                    "{}/v0.2/cardio_session/{}",
-                    CONFIG.base_url, cardio_session_id.0
+                .get(route_max_version(
+                    &CONFIG.base_url,
+                    CARDIO_SESSION,
+                    &[("id", &cardio_session_id.0.to_string())],
                 ))
                 .basic_auth(&username, Some(&CONFIG.password))
                 .send()
@@ -226,7 +230,7 @@ async fn map_match() -> Result<()> {
             let route = match_to_map(&cardio_session, exec_action_event.action_event_id).await?;
 
             let routes: Vec<Route> = client
-                .get(format!("{}/v0.2/route", CONFIG.base_url))
+                .get(route_max_version(&CONFIG.base_url, ROUTE, &[]))
                 .basic_auth(&username, Some(&CONFIG.password))
                 .send()
                 .await
@@ -239,7 +243,7 @@ async fn map_match() -> Result<()> {
                 cardio_session.route_id = Some(route_id);
             } else {
                 client
-                    .post(format!("{}/v0.2/route", CONFIG.base_url))
+                    .post(route_max_version(&CONFIG.base_url, ROUTE, &[]))
                     .basic_auth(&username, Some(&CONFIG.password))
                     .json(&route)
                     .send()
@@ -248,7 +252,7 @@ async fn map_match() -> Result<()> {
             }
 
             client
-                .put(format!("{}/v0.2/cardio_session", CONFIG.base_url))
+                .put(route_max_version(&CONFIG.base_url, CARDIO_SESSION, &[]))
                 .basic_auth(&username, Some(&CONFIG.password))
                 .json(&cardio_session)
                 .send()

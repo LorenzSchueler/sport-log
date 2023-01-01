@@ -8,13 +8,22 @@ pub const VERSION_0_3: &str = "0.3";
 pub const MIN_VERSION: &str = VERSION_0_3;
 pub const MAX_VERSION: &str = VERSION_0_3;
 
-pub fn route(version: &str, route: &str) -> String {
-    format!("/v{version}{route}")
+fn format_query(query: &[(&str, &str)]) -> String {
+    let mut string: String = query
+        .iter()
+        .flat_map(|(key, value)| [key, "=", value, "&"])
+        .collect();
+    string.pop();
+    string
 }
 
-#[inline(always)]
-pub fn route_max_version(route: &str) -> String {
-    format!("/v{MAX_VERSION}{route}")
+pub fn route_max_version(address: &str, route: &str, query: &[(&str, &str)]) -> String {
+    if query.is_empty() {
+        format!("{address}/v{MAX_VERSION}{route}")
+    } else {
+        let query_string = format_query(query);
+        format!("{address}/v{MAX_VERSION}{route}?{query_string}")
+    }
 }
 
 // user URIs
@@ -39,7 +48,7 @@ pub const METCON: &str = "/metcon";
 pub const METCON_MOVEMENT: &str = "/metcon_movement";
 
 pub const CARDIO_SESSION: &str = "/cardio_session";
-pub const ROUTES: &str = "/routes";
+pub const ROUTE: &str = "/route";
 
 pub const DIARY: &str = "/diary";
 pub const WOD: &str = "/wod";

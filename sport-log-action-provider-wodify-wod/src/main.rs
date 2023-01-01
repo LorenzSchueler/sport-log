@@ -10,7 +10,10 @@ use rand::Rng;
 use reqwest::{Client, Error as ReqwestError, StatusCode};
 use serde::Deserialize;
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
-use sport_log_types::{ActionEventId, ExecutableActionEvent, Wod, WodId};
+use sport_log_types::{
+    uri::{route_max_version, WOD},
+    ActionEventId, ExecutableActionEvent, Wod, WodId,
+};
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use tokio::{process::Command, time};
 use tracing::{debug, error, info, warn};
@@ -370,7 +373,7 @@ async fn try_get_wod(
         };
 
         let response = client
-            .post(format!("{}/v0.2/wod", CONFIG.base_url,))
+            .post(route_max_version(&CONFIG.base_url, WOD, &[]))
             .basic_auth(
                 format!("{}$id${}", NAME, exec_action_event.user_id.0),
                 Some(&CONFIG.password),
@@ -381,11 +384,12 @@ async fn try_get_wod(
             .map_err(Error::Reqwest)?;
         match response.status() {
             StatusCode::CONFLICT => {
-                let today = Local::now().date_naive().format("%Y-%m-%d");
+                let today = Local::now().date_naive().format("%Y-%m-%d").to_string();
                 let wods: Vec<Wod> = client
-                    .get(format!(
-                        "{}/v0.2/wod/timespan/{}/{}",
-                        CONFIG.base_url, today, today
+                    .get(route_max_version(
+                        &CONFIG.base_url,
+                        WOD,
+                        &[("start", &today), ("end", &today)],
                     ))
                     .basic_auth(
                         format!("{}$id${}", NAME, exec_action_event.user_id.0),
@@ -407,7 +411,7 @@ async fn try_get_wod(
                     wod.description = Some(description);
                 }
                 client
-                    .put(format!("{}/v0.2/wod", CONFIG.base_url,))
+                    .put(route_max_version(&CONFIG.base_url, WOD, &[]))
                     .basic_auth(
                         format!("{}$id${}", NAME, exec_action_event.user_id.0),
                         Some(&CONFIG.password),

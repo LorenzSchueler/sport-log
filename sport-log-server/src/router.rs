@@ -139,7 +139,7 @@ pub async fn get_router(state: AppState) -> Router {
                 .put(update_cardio_sessions),
         )
         .route(
-            ROUTES,
+            ROUTE,
             post(create_routes).get(get_routes).put(update_routes),
         )
         .route(

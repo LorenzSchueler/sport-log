@@ -26,6 +26,10 @@ use rand::Rng;
 use reqwest::{blocking::Client, Error as ReqwestError};
 use serde::Deserialize;
 use sport_log_types::{
+    uri::{
+        route_max_version, ADM_ACTION_EVENT, ADM_CREATABLE_ACTION_RULE, ADM_DELETABLE_ACTION_EVENT,
+        ADM_GARBAGE_COLLECTION,
+    },
     ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent, ADMIN_USERNAME,
 };
 use tracing::{debug, error, info};
@@ -98,9 +102,10 @@ fn main() {
 
 fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestError> {
     let creatable_action_rules: Vec<CreatableActionRule> = client
-        .get(format!(
-            "{}/v0.2/adm/creatable_action_rule",
-            config.server_url
+        .get(route_max_version(
+            &config.server_url,
+            ADM_CREATABLE_ACTION_RULE,
+            &[],
         ))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .send()?
@@ -152,7 +157,7 @@ fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     debug!("{:#?}", action_events);
 
     client
-        .post(format!("{}/v0.2/adm/action_events", config.server_url))
+        .post(route_max_version(&config.server_url, ADM_ACTION_EVENT, &[]))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .json(&action_events)
         .send()?
@@ -165,9 +170,10 @@ fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
 
 fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestError> {
     let deletable_action_events: Vec<DeletableActionEvent> = client
-        .get(format!(
-            "{}/v0.2/adm/deletable_action_event",
-            config.server_url
+        .get(route_max_version(
+            &config.server_url,
+            ADM_DELETABLE_ACTION_EVENT,
+            &[],
         ))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .send()?
@@ -194,7 +200,7 @@ fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     debug!("{:#?}", action_event_ids);
 
     client
-        .delete(format!("{}/v0.2/adm/action_events", config.server_url,))
+        .delete(route_max_version(&config.server_url, ADM_ACTION_EVENT, &[]))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .json(&action_event_ids)
         .send()?
@@ -213,10 +219,14 @@ fn garbage_collection(client: &Client, config: &Config) -> Result<(), ReqwestErr
         );
 
         client
-            .delete(format!(
-                "{}/v0.2/adm/garbage_collection/{}",
-                config.server_url,
-                Utc::now() - Duration::days(config.garbage_collection_min_days as i64)
+            .delete(route_max_version(
+                &config.server_url,
+                ADM_GARBAGE_COLLECTION,
+                &[(
+                    "last_change",
+                    &(Utc::now() - Duration::days(config.garbage_collection_min_days as i64))
+                        .to_string(),
+                )],
             ))
             .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
             .send()?
