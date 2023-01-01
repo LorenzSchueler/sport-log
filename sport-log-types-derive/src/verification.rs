@@ -499,29 +499,3 @@ pub fn impl_verify_unchecked(ast: &syn::DeriveInput) -> TokenStream {
     };
     gen.into()
 }
-
-pub fn impl_from_i64(ast: &syn::DeriveInput) -> TokenStream {
-    let id_typename = &ast.ident;
-
-    let gen = quote! {
-        impl crate::FromI64 for #id_typename {
-            fn from_i64(value: i64) -> Self {
-                Self(value)
-            }
-        }
-    };
-    gen.into()
-}
-
-pub fn impl_to_i64(ast: &syn::DeriveInput) -> TokenStream {
-    let id_typename = &ast.ident;
-
-    let gen = quote! {
-        impl crate::ToI64 for #id_typename {
-            fn to_i64(&self) -> i64 {
-                self.0
-            }
-        }
-    };
-    gen.into()
-}

@@ -8,15 +8,10 @@ use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
-    CheckUserId, Create, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, ToSql,
-    Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    CheckUserId, Create, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, IdFromSql,
+    IdToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
 };
-use sport_log_types_derive::{FromI64, ToI64};
 
-use crate::{
-    from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, TrainingPlanId,
-    UserId,
-};
 #[cfg(feature = "server")]
 use crate::{
     schema::{metcon, metcon_item, metcon_movement, metcon_session},
@@ -26,6 +21,7 @@ use crate::{
     VerifyMultipleForUserOrAPCreate, VerifyMultipleForUserOrAPWithDb,
     VerifyMultipleForUserOrAPWithoutDb,
 };
+use crate::{Movement, MovementId, TrainingPlanId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "server", derive(DbEnum))]
@@ -45,12 +41,11 @@ pub enum DistanceUnit {
     Mile,
 }
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
 pub struct MetconId(pub i64);
@@ -117,12 +112,8 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconId> {
     diesel(table_name = metcon,belongs_to(User))
 )]
 pub struct Metcon {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: MetconId,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
-    #[serde(serialize_with = "to_str_optional")]
-    #[serde(deserialize_with = "from_str_optional")]
     pub user_id: Option<UserId>,
     pub name: String,
     pub metcon_type: MetconType,
@@ -212,12 +203,11 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Metcon>> {
     }
 }
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
 pub struct MetconMovementId(pub i64);
@@ -278,14 +268,8 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconMovementId> {
     diesel(table_name = metcon_movement, belongs_to(Movement), belongs_to(Metcon))
 )]
 pub struct MetconMovement {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: MetconMovementId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub metcon_id: MetconId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub movement_id: MovementId,
     pub distance_unit: Option<DistanceUnit>,
     pub movement_number: i32,
@@ -390,12 +374,11 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconMovement>> {
     }
 }
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),
     diesel(sql_type = BigInt)
 )]
 pub struct MetconSessionId(pub i64);
@@ -423,14 +406,8 @@ pub struct MetconSessionId(pub i64);
     diesel(table_name = metcon_session, belongs_to(User), belongs_to(Metcon))
 )]
 pub struct MetconSession {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: MetconSessionId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub metcon_id: MetconId,
     pub datetime: DateTime<Utc>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
@@ -448,12 +425,11 @@ pub struct MetconSession {
     pub deleted: bool,
 }
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),
     diesel(sql_type = BigInt)
 )]
 pub struct MetconItemId(pub i64);
@@ -476,14 +452,8 @@ pub struct MetconItemId(pub i64);
     diesel(table_name = metcon_item, belongs_to(TrainingPlan), belongs_to(Metcon))
 )]
 pub struct MetconItem {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: MetconItemId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub training_plan_id: TrainingPlanId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub metcon_id: MetconId,
     #[serde(skip)]
     #[serde(default = "Utc::now")]

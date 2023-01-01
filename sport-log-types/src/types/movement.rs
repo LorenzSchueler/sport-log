@@ -8,12 +8,11 @@ use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
-    CheckUserId, Create, FromSql, GetAll, GetById, GetByIds, HardDelete, ToSql, Update,
+    CheckUserId, Create, GetAll, GetById, GetByIds, HardDelete, IdFromSql, IdToSql, Update,
     VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
 };
-use sport_log_types_derive::{FromI64, ToI64};
 
-use crate::{from_str, from_str_optional, to_str, to_str_optional, UserId};
+use crate::UserId;
 #[cfg(feature = "server")]
 use crate::{
     schema::{eorm, movement, movement_muscle, muscle_group},
@@ -33,17 +32,16 @@ pub enum MovementDimension {
     Distance,
 }
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
     derive(
         Hash,
         FromSqlRow,
         AsExpression,
-        ToSql,
-        FromSql,
+        IdToSql,
+        IdFromSql,
         VerifyIdForAdmin,
         VerifyIdUnchecked
     ),
@@ -112,12 +110,8 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
     diesel(table_name = movement, belongs_to(User))
 )]
 pub struct Movement {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: MovementId,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
-    #[serde(serialize_with = "to_str_optional")]
-    #[serde(deserialize_with = "from_str_optional")]
     pub user_id: Option<UserId>,
     pub name: String,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
@@ -211,12 +205,11 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
     }
 }
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForAdmin),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForAdmin),
     diesel(sql_type = BigInt)
 )]
 pub struct MuscleGroupId(pub i64);
@@ -228,19 +221,16 @@ pub struct MuscleGroupId(pub i64);
     diesel(table_name = muscle_group)
 )]
 pub struct MuscleGroup {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: MuscleGroupId,
     pub name: String,
     pub description: Option<String>,
 }
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
 pub struct MovementMuscleId(pub i64);
@@ -301,14 +291,8 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementMuscleId> {
     diesel(table_name = movement_muscle, belongs_to(Movement), belongs_to(MuscleGroup))
 )]
 pub struct MovementMuscle {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: MovementMuscleId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub movement_id: MovementId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub muscle_group_id: MuscleGroupId,
     #[serde(skip)]
     #[serde(default = "Utc::now")]
@@ -406,12 +390,11 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MovementMuscle>> {
     }
 }
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForAdmin),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForAdmin),
     diesel(sql_type = BigInt)
 )]
 pub struct EormId(pub i64);
@@ -423,8 +406,6 @@ pub struct EormId(pub i64);
     diesel(table_name = eorm)
 )]
 pub struct Eorm {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: EormId,
     pub reps: i32,
     pub percentage: f32,

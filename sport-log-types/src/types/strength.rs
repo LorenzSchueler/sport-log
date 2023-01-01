@@ -6,28 +6,23 @@ use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
-    Create, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, ToSql, Update,
+    Create, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, IdFromSql, IdToSql, Update,
     VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
 };
-use sport_log_types_derive::{FromI64, ToI64};
 
-use crate::{
-    from_str, from_str_optional, to_str, to_str_optional, Movement, MovementId, TrainingPlanId,
-    UserId,
-};
 #[cfg(feature = "server")]
 use crate::{
     schema::{strength_blueprint, strength_blueprint_set, strength_session, strength_set},
     AuthUserOrAP, CheckUserId, TrainingPlan, Unverified, User, VerifyForUserOrAPCreate,
     VerifyForUserOrAPWithDb, VerifyMultipleForUserOrAPCreate, VerifyMultipleForUserOrAPWithDb,
 };
+use crate::{Movement, MovementId, TrainingPlanId, UserId};
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),
     diesel(sql_type = BigInt)
 )]
 pub struct StrengthBlueprintId(pub i64);
@@ -54,20 +49,12 @@ pub struct StrengthBlueprintId(pub i64);
     diesel(table_name = strength_blueprint,belongs_to(User), belongs_to(TrainingPlan), belongs_to(Movement))
 )]
 pub struct StrengthBlueprint {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: StrengthBlueprintId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub training_plan_id: TrainingPlanId,
     pub name: String,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub movement_id: MovementId,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub interval: Option<i32>,
@@ -77,12 +64,11 @@ pub struct StrengthBlueprint {
     pub deleted: bool,
 }
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),
     diesel(sql_type = BigInt)
 )]
 pub struct StrengthBlueprintSetId(pub i64);
@@ -105,11 +91,7 @@ pub struct StrengthBlueprintSetId(pub i64);
     diesel(table_name = strength_blueprint_set, belongs_to(StrengthBlueprint))
 )]
 pub struct StrengthBlueprintSet {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: StrengthBlueprintSetId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub strength_blueprint_id: StrengthBlueprintId,
     pub set_number: i32,
     pub count: i32,
@@ -211,12 +193,11 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthBlueprintSet>> {
     }
 }
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),
     diesel(sql_type = BigInt)
 )]
 pub struct StrengthSessionId(pub i64);
@@ -243,19 +224,11 @@ pub struct StrengthSessionId(pub i64);
     diesel(table_name = strength_session,belongs_to(User), belongs_to(StrengthBlueprint), belongs_to(Movement))
 )]
 pub struct StrengthSession {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: StrengthSessionId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
-    #[serde(serialize_with = "to_str_optional")]
-    #[serde(deserialize_with = "from_str_optional")]
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub strength_blueprint_id: Option<StrengthBlueprintId>,
     pub datetime: DateTime<Utc>,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub movement_id: MovementId,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub interval: Option<i32>,
@@ -267,12 +240,11 @@ pub struct StrengthSession {
     pub deleted: bool,
 }
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),
     diesel(sql_type = BigInt)
 )]
 pub struct StrengthSetId(pub i64);
@@ -295,11 +267,7 @@ pub struct StrengthSetId(pub i64);
     diesel(table_name = strength_set, belongs_to(StrengthSession))
 )]
 pub struct StrengthSet {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: StrengthSetId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub strength_session_id: StrengthSessionId,
     pub set_number: i32,
     pub count: i32,

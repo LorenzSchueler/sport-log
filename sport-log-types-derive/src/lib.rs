@@ -199,38 +199,20 @@ pub fn verify_unchecked_derive(input: TokenStream) -> TokenStream {
     impl_verify_unchecked(&ast)
 }
 
-/// Derives `sport_log_types::FromI64`.
-///
-/// This macro only works if the type is a one tuple struct of i64.
-#[proc_macro_derive(FromI64)]
-pub fn form_i64_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_from_i64(&ast)
-}
-
-/// Derives `sport_log_types::ToI64`.
-///
-/// This macro only works if the type is a one tuple struct of i64.
-#[proc_macro_derive(ToI64)]
-pub fn to_i64_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_to_i64(&ast)
-}
-
 /// Derives `diesel::types::ToSql<diesel::sql_types::BigInt, diesel::pg::Pg>`.
 ///
-/// This macro only works if the type implements `sport_log_types::FromI64` which can also be derived using [FromI64].
-#[proc_macro_derive(ToSql)]
+/// This macro only works if the type is a one tuple struct of i64.
+#[proc_macro_derive(IdToSql)]
 pub fn unverified_inner_int_to_sql(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_to_sql(&ast)
+    impl_id_to_sql(&ast)
 }
 
-/// Derives `diesel::types::FromSql<diesel::sql_types::BigInt, diesel::pg::Pg>`.
+/// Derives `diesel::types::IdFromSql<diesel::sql_types::BigInt, diesel::pg::Pg>`.
 ///
-/// This macro only works if the type implements `sport_log_types::FromI64` which can also be derived using [FromI64].
-#[proc_macro_derive(FromSql)]
+/// This macro only works if the type is a one tuple struct of i64.
+#[proc_macro_derive(IdFromSql)]
 pub fn unverified_inner_int_from_sql(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
-    impl_from_sql(&ast)
+    impl_id_from_sql(&ast)
 }

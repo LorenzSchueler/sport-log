@@ -4,25 +4,23 @@ use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
-    CheckUserId, Create, FromSql, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, ToSql,
-    Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
+    CheckUserId, Create, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, IdFromSql,
+    IdToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
     VerifyUnchecked,
 };
-use sport_log_types_derive::{FromI64, ToI64};
 
-use crate::{from_str, to_str, UserId};
+use crate::UserId;
 #[cfg(feature = "server")]
 use crate::{
     schema::{diary, wod},
     User,
 };
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),
     diesel(sql_type = BigInt)
 )]
 pub struct DiaryId(pub i64);
@@ -51,11 +49,7 @@ pub struct DiaryId(pub i64);
     diesel(table_name = diary,belongs_to(User))
 )]
 pub struct Diary {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: DiaryId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
     pub date: NaiveDate,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
@@ -68,12 +62,11 @@ pub struct Diary {
     pub deleted: bool,
 }
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUserOrAP),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),
     diesel(sql_type = BigInt)
 )]
 pub struct WodId(pub i64);
@@ -102,11 +95,7 @@ pub struct WodId(pub i64);
     diesel(table_name = wod,belongs_to(User))
 )]
 pub struct Wod {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: WodId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
     pub date: NaiveDate,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]

@@ -4,30 +4,28 @@ use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
-    CheckUserId, Create, FromSql, GetAll, GetById, GetByIds, GetBySync, GetByUser, GetByUserSync,
-    HardDelete, ToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb,
+    CheckUserId, Create, GetAll, GetById, GetByIds, GetBySync, GetByUser, GetByUserSync,
+    HardDelete, IdFromSql, IdToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb,
     VerifyForUserWithoutDb, VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked, VerifyUnchecked,
 };
-use sport_log_types_derive::{FromI64, ToI64};
 
-use crate::{from_str, to_str, UserId};
+use crate::UserId;
 #[cfg(feature = "server")]
 use crate::{
     schema::{platform, platform_credential},
     User,
 };
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
     derive(
         Hash,
         FromSqlRow,
         AsExpression,
-        ToSql,
-        FromSql,
+        IdToSql,
+        IdFromSql,
         VerifyIdForAdmin,
         VerifyIdUnchecked
     ),
@@ -60,8 +58,6 @@ pub struct PlatformId(pub i64);
     diesel(table_name = platform)
 )]
 pub struct Platform {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: PlatformId,
     pub name: String,
     pub credential: bool,
@@ -71,12 +67,11 @@ pub struct Platform {
     pub deleted: bool,
 }
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql, VerifyIdForUser),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUser),
     diesel(sql_type = BigInt)
 )]
 pub struct PlatformCredentialId(pub i64);
@@ -107,14 +102,8 @@ pub struct PlatformCredentialId(pub i64);
     diesel(table_name = platform_credential, belongs_to(User), belongs_to(Platform))
 )]
 pub struct PlatformCredential {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: PlatformCredentialId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub user_id: UserId,
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub platform_id: PlatformId,
     pub username: String,
     pub password: String,

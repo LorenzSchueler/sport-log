@@ -4,22 +4,19 @@ use chrono::{DateTime, Utc};
 #[cfg(feature = "server")]
 use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
-use sport_log_types_derive::{FromI64, ToI64};
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
-    FromSql, GetById, GetByIds, ToSql, VerifyForAdminWithoutDb, VerifyUnchecked,
+    GetById, GetByIds, IdFromSql, IdToSql, VerifyForAdminWithoutDb, VerifyUnchecked,
 };
 
-use crate::{from_str, to_str};
 #[cfg(feature = "server")]
 use crate::{schema::user, AuthUser, CheckUserId, Unverified, VerifyForUserWithDb};
 
-#[derive(
-    Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, FromI64, ToI64,
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(transparent)]
 #[cfg_attr(
     feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, ToSql, FromSql),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
 pub struct UserId(pub i64);
@@ -40,8 +37,6 @@ pub struct UserId(pub i64);
     diesel(table_name = user)
 )]
 pub struct User {
-    #[serde(serialize_with = "to_str")]
-    #[serde(deserialize_with = "from_str")]
     pub id: UserId,
     pub username: String,
     pub password: String,

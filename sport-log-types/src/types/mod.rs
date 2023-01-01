@@ -4,7 +4,8 @@ use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 #[cfg(feature = "server")]
 use diesel::{PgConnection, QueryResult};
-use serde::{de, Deserialize, Deserializer, Serializer};
+#[cfg(feature = "server")]
+use serde::Deserialize;
 
 mod account;
 mod action;
@@ -58,73 +59,6 @@ pub use version::*;
 #[derive(Debug, Deserialize)]
 #[serde(transparent)]
 pub struct Unverified<T>(T);
-
-//#[cfg(feature = "server")]
-//#[async_trait]
-//impl<'r, S, B, T: Deserialize<'r>> FromRequest<S, B> for Unverified<T>
-//where
-//S: Send + Sync,
-//B: Send + 'static,
-//{
-//type Rejection = StatusCode;
-
-//async fn from_request(req: Request<B>, state: &S<'r>) -> Result<Self, Self::Rejection> {
-//let data = Json::<T>::from_request(req, state).await?;
-//Ok(Unverified(data))
-//}
-//}
-
-/// Indicated that the type can be build from an [i64].
-pub trait FromI64 {
-    fn from_i64(value: i64) -> Self;
-}
-
-/// Indicated that the type can be converted into an [i64].
-pub trait ToI64 {
-    fn to_i64(&self) -> i64;
-}
-
-pub fn from_str<'de, T, D>(deserializer: D) -> Result<T, D::Error>
-where
-    T: FromI64,
-    D: Deserializer<'de>,
-{
-    let s = String::deserialize(deserializer)?
-        .parse()
-        .map_err(de::Error::custom)?;
-    Ok(T::from_i64(s))
-}
-
-pub fn to_str<T, S>(id: &T, serializer: S) -> Result<S::Ok, S::Error>
-where
-    T: ToI64,
-    S: Serializer,
-{
-    serializer.serialize_str(&id.to_i64().to_string())
-}
-
-pub fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
-where
-    T: FromI64,
-    D: Deserializer<'de>,
-{
-    let s = Option::<String>::deserialize(deserializer)?;
-    Ok(match s {
-        Some(string) => Some(T::from_i64(string.parse().map_err(de::Error::custom)?)),
-        None => None,
-    })
-}
-
-pub fn to_str_optional<T, S>(id: &Option<T>, serializer: S) -> Result<S::Ok, S::Error>
-where
-    T: ToI64,
-    S: Serializer,
-{
-    match id {
-        Some(t) => serializer.serialize_str(&t.to_i64().to_string()),
-        None => serializer.serialize_none(),
-    }
-}
 
 /// Wrapper around an incoming id for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///
