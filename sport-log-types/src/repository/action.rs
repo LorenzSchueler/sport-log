@@ -116,6 +116,7 @@ impl Action {
     ) -> QueryResult<Vec<Self>> {
         action::table
             .filter(action::columns::action_provider_id.eq(action_provider_id))
+            .select(Action::as_select())
             .get_results(db)
     }
 }
@@ -133,6 +134,7 @@ impl ActionRule {
                         .filter(action::columns::action_provider_id.eq(action_provider_id)),
                 ),
             )
+            .select(ActionRule::as_select())
             .get_results(db)
     }
 
@@ -150,6 +152,7 @@ impl ActionRule {
                         .filter(action::columns::action_provider_id.eq(action_provider_id)),
                 ),
             )
+            .select(ActionRule::as_select())
             .get_results(db)
     }
 }
@@ -209,6 +212,7 @@ impl ActionEvent {
                         .filter(action::columns::action_provider_id.eq(action_provider_id)),
                 ),
             )
+            .select(ActionEvent::as_select())
             .get_results(db)
     }
 
@@ -226,6 +230,7 @@ impl ActionEvent {
                         .select(action::columns::id),
                 ),
             )
+            .select(ActionEvent::as_select())
             .get_results(db)
     }
 

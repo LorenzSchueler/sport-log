@@ -1,4 +1,4 @@
-use chrono::{DateTime, NaiveDate, Utc};
+use chrono::NaiveDate;
 #[cfg(feature = "server")]
 use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
@@ -29,6 +29,7 @@ pub struct TrainingPlanId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -53,8 +54,5 @@ pub struct TrainingPlan {
     pub date: Option<NaiveDate>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub weekday: Option<Weekday>,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }

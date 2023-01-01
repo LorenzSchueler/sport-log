@@ -29,7 +29,6 @@ pub async fn setup(
         id: PlatformId(rng.gen()),
         name: platform_name.to_owned(),
         credential,
-        last_change: Utc::now(),
         deleted: false,
     };
 
@@ -74,7 +73,6 @@ pub async fn setup(
         password: password.to_owned(),
         platform_id,
         description: Some(description.to_owned()),
-        last_change: Utc::now(),
         deleted: false,
     };
 
@@ -120,7 +118,6 @@ pub async fn setup(
             description: Some(action.1.to_owned()),
             create_before,
             delete_after,
-            last_change: Utc::now(),
             deleted: false,
         })
         .collect();

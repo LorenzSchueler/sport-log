@@ -140,7 +140,6 @@ fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
                     datetime,
                     arguments: creatable_action_rule.arguments.clone(),
                     enabled: true,
-                    last_change: Utc::now(),
                     deleted: false,
                 });
             } else {

@@ -15,6 +15,7 @@ impl GetByUser for Movement {
                     .eq(user_id)
                     .or(movement::columns::user_id.is_null()),
             )
+            .select(Movement::as_select())
             .get_results(db)
     }
 }
@@ -35,6 +36,7 @@ impl GetByUserSync for Movement {
                     .or(movement::columns::user_id.is_null()),
             )
             .filter(movement::columns::last_change.ge(last_sync))
+            .select(Movement::as_select())
             .get_results(db)
     }
 }
@@ -91,6 +93,7 @@ impl GetByUser for MovementMuscle {
                         .select(movement::columns::id),
                 ),
             )
+            .select(MovementMuscle::as_select())
             .get_results(db)
     }
 }
@@ -117,6 +120,7 @@ impl GetByUserSync for MovementMuscle {
                 ),
             )
             .filter(movement_muscle::columns::last_change.ge(last_sync))
+            .select(MovementMuscle::as_select())
             .get_results(db)
     }
 }

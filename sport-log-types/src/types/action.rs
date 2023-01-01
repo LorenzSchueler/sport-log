@@ -45,6 +45,7 @@ pub struct ActionProviderId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         GetById,
         GetByIds,
@@ -64,9 +65,6 @@ pub struct ActionProvider {
     pub platform_id: PlatformId,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -95,6 +93,7 @@ pub struct ActionId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -116,9 +115,6 @@ pub struct Action {
     pub description: Option<String>,
     pub create_before: i32,
     pub delete_after: i32,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -166,6 +162,7 @@ pub struct ActionRuleId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -189,9 +186,6 @@ pub struct ActionRule {
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub arguments: Option<String>,
     pub enabled: bool,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -221,6 +215,7 @@ pub struct ActionEventId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -244,9 +239,6 @@ pub struct ActionEvent {
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub arguments: Option<String>,
     pub enabled: bool,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 

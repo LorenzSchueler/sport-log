@@ -94,6 +94,7 @@ impl CardioSession {
             .filter(cardio_session::columns::user_id.eq(user_id))
             .filter(cardio_session::columns::datetime.between(start_datetime, end_datetime))
             .order_by(cardio_session::columns::datetime)
+            .select(CardioSession::as_select())
             .get_results(db)
     }
 }

@@ -366,7 +366,6 @@ async fn try_get_wod(
             user_id: exec_action_event.user_id,
             date: Utc::now().date_naive(),
             description: Some(description.clone()),
-            last_change: Utc::now(),
             deleted: false,
         };
 

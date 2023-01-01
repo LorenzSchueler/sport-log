@@ -1,6 +1,5 @@
 #[cfg(feature = "server")]
 use axum::http::StatusCode;
-use chrono::{DateTime, Utc};
 #[cfg(feature = "server")]
 use diesel::sql_types::BigInt;
 #[cfg(feature = "server")]
@@ -98,6 +97,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -118,9 +118,6 @@ pub struct Movement {
     pub description: Option<String>,
     pub movement_dimension: MovementDimension,
     pub cardio: bool,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -217,7 +214,7 @@ pub struct MuscleGroupId(pub i64);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "server",
-    derive(Insertable, Identifiable, Queryable, GetById, GetByIds, GetAll),
+    derive(Insertable, Identifiable, Queryable, Selectable, GetById, GetByIds, GetAll),
     diesel(table_name = muscle_group)
 )]
 pub struct MuscleGroup {
@@ -281,6 +278,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MovementMuscleId> {
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -294,9 +292,6 @@ pub struct MovementMuscle {
     pub id: MovementMuscleId,
     pub movement_id: MovementId,
     pub muscle_group_id: MuscleGroupId,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -402,7 +397,7 @@ pub struct EormId(pub i64);
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "server",
-    derive(Insertable, Identifiable, Queryable, GetById, GetByIds, GetAll),
+    derive(Insertable, Identifiable, Queryable, Selectable, GetById, GetByIds, GetAll),
     diesel(table_name = eorm)
 )]
 pub struct Eorm {

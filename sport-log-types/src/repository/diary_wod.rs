@@ -17,6 +17,7 @@ impl Diary {
             .filter(diary::columns::user_id.eq(user_id))
             .filter(diary::columns::date.between(start.date_naive(), end.date_naive()))
             .order_by(diary::columns::date)
+            .select(Diary::as_select())
             .get_results(db)
     }
 }
@@ -32,6 +33,7 @@ impl Wod {
             .filter(wod::columns::user_id.eq(user_id))
             .filter(wod::columns::date.between(start.date_naive(), end.date_naive()))
             .order_by(wod::columns::date)
+            .select(Wod::as_select())
             .get_results(db)
     }
 }

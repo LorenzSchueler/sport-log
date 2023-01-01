@@ -53,7 +53,10 @@ pub fn impl_get_by_id(ast: &syn::DeriveInput) -> TokenStream {
             type Id = #id_type_name;
 
             fn get_by_id(#id_param_name: Self::Id, db: &mut PgConnection) -> QueryResult<Self> {
-                #tablename::table.find(#id_param_name).get_result(db)
+                #tablename::table
+                    .find(#id_param_name)
+                    .select(#typename::as_select())
+                    .get_result(db)
             }
         }
     };
@@ -71,7 +74,10 @@ pub fn impl_get_by_ids(ast: &syn::DeriveInput) -> TokenStream {
             type Id = #id_type_name;
 
             fn get_by_ids(ids: &[Self::Id], db: &mut PgConnection) -> QueryResult<Vec<Self>> {
-                #tablename::table.filter(#tablename::columns::id.eq_any(ids)).get_results(db)
+                #tablename::table
+                    .filter(#tablename::columns::id.eq_any(ids))
+                    .select(#typename::as_select())
+                    .get_results(db)
             }
         }
     };
@@ -89,6 +95,7 @@ pub fn impl_get_by_user(ast: &syn::DeriveInput) -> TokenStream {
             fn get_by_user(user_id: crate::UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
                 #tablename::table
                     .filter(#tablename::columns::user_id.eq(user_id))
+                    .select(#typename::as_select())
                     .get_results(db)
             }
         }
@@ -106,12 +113,13 @@ pub fn impl_get_by_user_and_last_sync(ast: &syn::DeriveInput) -> TokenStream {
         impl crate::GetByUserSync for #typename {
             fn get_by_user_and_last_sync(
                 user_id: crate::UserId,
-                last_sync: DateTime<Utc>,
+                last_sync: chrono::DateTime<chrono::Utc>,
                 db: &mut PgConnection
             ) -> QueryResult<Vec<Self>> {
                 #tablename::table
                     .filter(#tablename::columns::user_id.eq(user_id))
                     .filter(#tablename::columns::last_change.ge(last_sync))
+                    .select(#typename::as_select())
                     .get_results(db)
             }
         }
@@ -127,9 +135,10 @@ pub fn impl_get_by_last_sync(ast: &syn::DeriveInput) -> TokenStream {
         use diesel::prelude::*;
 
         impl crate::GetBySync for #typename {
-            fn get_by_last_sync(last_sync: DateTime<Utc>, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
+            fn get_by_last_sync(last_sync: chrono::DateTime<chrono::Utc>, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
                 #tablename::table
                     .filter(#tablename::columns::last_change.ge(last_sync))
+                    .select(#typename::as_select())
                     .get_results(db)
             }
         }
@@ -146,7 +155,7 @@ pub fn impl_get_all(ast: &syn::DeriveInput) -> TokenStream {
 
         impl crate::GetAll for #typename {
             fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self>> {
-                #tablename::table.load(db)
+                #tablename::table.select(#typename::as_select()).load(db)
             }
         }
     };
@@ -192,7 +201,7 @@ pub fn impl_hard_delete(ast: &syn::DeriveInput) -> TokenStream {
         use diesel::prelude::*;
 
         impl crate::HardDelete for #typename {
-            fn hard_delete(last_change: DateTime<Utc>, db: &mut PgConnection) -> QueryResult<usize> {
+            fn hard_delete(last_change: chrono::DateTime<chrono::Utc>, db: &mut PgConnection) -> QueryResult<usize> {
                 diesel::delete(
                     #tablename::table
                         .filter(#tablename::columns::deleted.eq(true))

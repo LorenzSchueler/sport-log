@@ -16,6 +16,7 @@ impl GetByUser for Metcon {
                     .eq(user_id)
                     .or(metcon::columns::user_id.is_null()),
             )
+            .select(Metcon::as_select())
             .get_results(db)
     }
 }
@@ -36,6 +37,7 @@ impl GetByUserSync for Metcon {
                     .or(metcon::columns::user_id.is_null()),
             )
             .filter(metcon::columns::last_change.ge(last_sync))
+            .select(Metcon::as_select())
             .get_results(db)
     }
 }
@@ -89,6 +91,7 @@ impl MetconSession {
             .filter(metcon_session::columns::user_id.eq(user_id))
             .filter(metcon_session::columns::datetime.between(start_datetime, end_datetime))
             .order_by(metcon_session::columns::datetime)
+            .select(MetconSession::as_select())
             .get_results(db)
     }
 }
@@ -107,6 +110,7 @@ impl GetByUser for MetconMovement {
                         .select(metcon::columns::id),
                 ),
             )
+            .select(MetconMovement::as_select())
             .get_results(db)
     }
 }
@@ -133,6 +137,7 @@ impl GetByUserSync for MetconMovement {
                 ),
             )
             .filter(metcon_movement::columns::last_change.ge(last_sync))
+            .select(MetconMovement::as_select())
             .get_results(db)
     }
 }
@@ -233,6 +238,7 @@ impl MetconMovement {
     pub fn get_by_metcon(metcon_id: MetconId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
         metcon_movement::table
             .filter(metcon_movement::columns::metcon_id.eq(metcon_id))
+            .select(MetconMovement::as_select())
             .get_results(db)
     }
 }
@@ -247,6 +253,7 @@ impl GetByUser for MetconItem {
                         .select(training_plan::columns::id),
                 ),
             )
+            .select(MetconItem::as_select())
             .get_results(db)
     }
 }
@@ -269,6 +276,7 @@ impl GetByUserSync for MetconItem {
                 ),
             )
             .filter(metcon_item::columns::last_change.ge(last_sync))
+            .select(MetconItem::as_select())
             .get_results(db)
     }
 }
@@ -368,8 +376,9 @@ impl GetByUser for MetconSessionDescription {
 impl MetconSessionDescription {
     fn from_session(metcon_session: MetconSession, db: &mut PgConnection) -> QueryResult<Self> {
         let metcon = Metcon::get_by_id(metcon_session.metcon_id, db)?;
-        let metcon_movements: Vec<MetconMovement> =
-            MetconMovement::belonging_to(&metcon).get_results(db)?;
+        let metcon_movements: Vec<MetconMovement> = MetconMovement::belonging_to(&metcon)
+            .select(MetconMovement::as_select())
+            .get_results(db)?;
         let mut movements = vec![];
         for metcon_movement in &metcon_movements {
             movements.push(Movement::get_by_id(metcon_movement.movement_id, db)?);
@@ -391,6 +400,7 @@ impl MetconSessionDescription {
             metcons.push(Metcon::get_by_id(metcon_session.metcon_id, db)?);
         }
         let metcon_movements: Vec<Vec<MetconMovement>> = MetconMovement::belonging_to(&metcons)
+            .select(MetconMovement::as_select())
             .get_results(db)?
             .grouped_by(&metcons);
         let mut movements = vec![];

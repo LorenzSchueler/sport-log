@@ -1,4 +1,3 @@
-use chrono::{DateTime, Utc};
 #[cfg(feature = "server")]
 use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
@@ -33,6 +32,7 @@ pub struct GroupId(pub i64);
         Insertable,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -45,9 +45,6 @@ pub struct GroupId(pub i64);
 pub struct Group {
     pub id: GroupId,
     pub name: String,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -68,6 +65,7 @@ pub struct GroupUserId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -83,9 +81,6 @@ pub struct GroupUser {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub user_id: UserId,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -106,6 +101,7 @@ pub struct SharedMetconSessionId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -119,9 +115,6 @@ pub struct SharedMetconSession {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub metcon_session_id: MetconSessionId,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -142,6 +135,7 @@ pub struct SharedStrengthSessionId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -155,9 +149,6 @@ pub struct SharedStrengthSession {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub strength_session_id: StrengthSessionId,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -178,6 +169,7 @@ pub struct SharedCardioSessionId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -191,9 +183,6 @@ pub struct SharedCardioSession {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub cardio_session_id: CardioSessionId,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -214,6 +203,7 @@ pub struct SharedDiaryId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -227,8 +217,5 @@ pub struct SharedDiary {
     pub id: GroupUserId,
     pub group_id: GroupId,
     pub diary_id: DiaryId,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }

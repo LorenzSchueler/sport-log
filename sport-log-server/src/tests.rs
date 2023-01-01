@@ -105,7 +105,6 @@ async fn aa_setup() {
         username: USER_USERNAME.to_owned(),
         password: USER_PASSWORD.to_owned(),
         email: "email123456789".to_owned(),
-        last_change: Utc::now(),
     };
     User::create(user, &mut db).unwrap();
 
@@ -114,7 +113,6 @@ async fn aa_setup() {
         username: USER2_USERNAME.to_owned(),
         password: USER2_PASSWORD.to_owned(),
         email: "email2123456789".to_owned(),
-        last_change: Utc::now(),
     };
     User::create(user2, &mut db).unwrap();
 
@@ -122,7 +120,6 @@ async fn aa_setup() {
         id: PLATFORM_ID,
         name: "platform123456789".to_owned(),
         credential: false,
-        last_change: Utc::now(),
         deleted: false,
     };
     Platform::create(platform, &mut db).unwrap();
@@ -133,7 +130,6 @@ async fn aa_setup() {
         password: AP_PASSWORD.to_owned(),
         platform_id: PLATFORM_ID,
         description: None,
-        last_change: Utc::now(),
         deleted: false,
     };
     ActionProvider::create(ap, &mut db).unwrap();
@@ -145,7 +141,6 @@ async fn aa_setup() {
         description: None,
         create_before: 1,
         delete_after: 1,
-        last_change: Utc::now(),
         deleted: false,
     };
     Action::create(action, &mut db).unwrap();
@@ -163,7 +158,6 @@ async fn zz_teardown() {
         id: PLATFORM_ID,
         name: "platform123456789".to_owned(),
         credential: false,
-        last_change: Utc::now(),
         deleted: true,
     };
     Platform::update(platform, &mut db).unwrap();
@@ -558,7 +552,6 @@ async fn ap_as_user_ap_auth() {
         datetime: Utc::now() + Duration::days(1),
         arguments: None,
         enabled: true,
-        last_change: Utc::now(),
         deleted: false,
     };
     ActionEvent::create(action_event.clone(), &mut db).unwrap();
@@ -589,7 +582,6 @@ async fn ap_as_user_ap_auth_no_event() {
         datetime: Utc::now() + Duration::days(1),
         arguments: None,
         enabled: false,
-        last_change: Utc::now(),
         deleted: false,
     };
     ActionEvent::create(action_event1.clone(), &mut db).unwrap();
@@ -602,7 +594,6 @@ async fn ap_as_user_ap_auth_no_event() {
         datetime: Utc::now() + Duration::days(1),
         arguments: None,
         enabled: true,
-        last_change: Utc::now(),
         deleted: true,
     };
     ActionEvent::create(action_event2.clone(), &mut db).unwrap();
@@ -636,7 +627,6 @@ async fn ap_as_user_ap_auth_wrong_credentials() {
         datetime: Utc::now() + Duration::days(1),
         arguments: None,
         enabled: true,
-        last_change: Utc::now(),
         deleted: false,
     };
     ActionEvent::create(action_event.clone(), &mut db).unwrap();
@@ -660,7 +650,6 @@ async fn ap_as_user_ap_auth_without_credentials() {
         datetime: Utc::now() + Duration::days(1),
         arguments: None,
         enabled: true,
-        last_change: Utc::now(),
         deleted: false,
     };
     ActionEvent::create(action_event, &mut db).unwrap();
@@ -709,7 +698,6 @@ async fn create_diary(
         date: Utc::now().date_naive() - Duration::days(rnd() % 10000),
         bodyweight: None,
         comments: None,
-        last_change: Utc::now(),
         deleted: false,
     };
 
@@ -807,7 +795,6 @@ async fn foreign_update() {
         date: Utc::now().date_naive() - Duration::days(rnd() % 10000),
         bodyweight: None,
         comments: None,
-        last_change: Utc::now(),
         deleted: false,
     };
 
@@ -863,7 +850,6 @@ async fn user_self_registration() {
         username: format!("user{}", user_id.0),
         password: "password".to_owned(),
         email: format!("email{}", user_id.0),
-        last_change: Utc::now(),
     };
 
     let route = route(USER);
@@ -898,7 +884,6 @@ async fn ap_self_registration() {
         id: platform_id,
         name: format!("platform{}", platform_id.0),
         credential: false,
-        last_change: Utc::now(),
         deleted: false,
     };
 
@@ -948,7 +933,6 @@ async fn ap_self_registration() {
         password: "password".to_owned(),
         platform_id: PLATFORM_ID,
         description: None,
-        last_change: Utc::now(),
         deleted: false,
     };
 
@@ -985,7 +969,6 @@ async fn update_non_existing() {
         date: Utc::now().date_naive() - Duration::days(rnd() % 10000),
         bodyweight: None,
         comments: None,
-        last_change: Utc::now(),
         deleted: false,
     };
 

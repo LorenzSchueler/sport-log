@@ -107,6 +107,7 @@ pub struct RouteId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -134,9 +135,6 @@ pub struct Route {
     pub track: Option<Vec<Position>>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub marked_positions: Option<Vec<Position>>,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -157,6 +155,7 @@ pub struct CardioBlueprintId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -193,9 +192,6 @@ pub struct CardioBlueprint {
     pub avg_heart_rate: Option<i32>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub route_id: Option<RouteId>,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -216,6 +212,7 @@ pub struct CardioSessionId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -260,9 +257,6 @@ pub struct CardioSession {
     pub route_id: Option<RouteId>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 

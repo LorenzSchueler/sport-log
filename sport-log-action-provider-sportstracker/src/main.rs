@@ -432,7 +432,6 @@ fn to_cardio_session(
         heart_rate: None,
         route_id: None,
         comments: workout_stats.description,
-        last_change: Utc::now(),
         deleted: false,
     })
 }

@@ -58,6 +58,7 @@ impl GetByUser for StrengthBlueprintSet {
                         .select(strength_blueprint::columns::id),
                 ),
             )
+            .select(StrengthBlueprintSet::as_select())
             .get_results(db)
     }
 }
@@ -80,6 +81,7 @@ impl GetByUserSync for StrengthBlueprintSet {
                 ),
             )
             .filter(strength_blueprint_set::columns::last_change.ge(last_sync))
+            .select(StrengthBlueprintSet::as_select())
             .get_results(db)
     }
 }
@@ -121,6 +123,7 @@ impl StrengthBlueprintSet {
             .filter(
                 strength_blueprint_set::columns::strength_blueprint_id.eq(strength_blueprint_id),
             )
+            .select(StrengthBlueprintSet::as_select())
             .get_results(db)
     }
 }
@@ -174,6 +177,7 @@ impl StrengthSession {
             .filter(strength_session::columns::user_id.eq(user_id))
             .filter(strength_session::columns::datetime.between(start_datetime, end_datetime))
             .order_by(strength_session::columns::datetime)
+            .select(StrengthSession::as_select())
             .get_results(db)
     }
 }
@@ -188,6 +192,7 @@ impl GetByUser for StrengthSet {
                         .select(strength_session::columns::id),
                 ),
             )
+            .select(StrengthSet::as_select())
             .get_results(db)
     }
 }
@@ -210,6 +215,7 @@ impl GetByUserSync for StrengthSet {
                 ),
             )
             .filter(strength_set::columns::last_change.ge(last_sync))
+            .select(StrengthSet::as_select())
             .get_results(db)
     }
 }
@@ -249,6 +255,7 @@ impl StrengthSet {
     ) -> QueryResult<Vec<Self>> {
         strength_set::table
             .filter(strength_set::columns::strength_session_id.eq(strength_session_id))
+            .select(StrengthSet::as_select())
             .get_results(db)
     }
 }
@@ -271,7 +278,9 @@ impl GetByUser for StrengthSessionDescription {
 
 impl StrengthSessionDescription {
     fn from_session(strength_session: StrengthSession, db: &mut PgConnection) -> QueryResult<Self> {
-        let strength_sets = StrengthSet::belonging_to(&strength_session).get_results(db)?;
+        let strength_sets = StrengthSet::belonging_to(&strength_session)
+            .select(StrengthSet::as_select())
+            .get_results(db)?;
         let movement = Movement::get_by_id(strength_session.movement_id, db)?;
         Ok(StrengthSessionDescription {
             strength_session,
@@ -285,6 +294,7 @@ impl StrengthSessionDescription {
         db: &mut PgConnection,
     ) -> QueryResult<Vec<Self>> {
         let strength_sets = StrengthSet::belonging_to(&strength_sessions)
+            .select(StrengthSet::as_select())
             .get_results(db)?
             .grouped_by(&strength_sessions);
         let mut movements = vec![];

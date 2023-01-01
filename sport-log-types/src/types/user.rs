@@ -1,6 +1,5 @@
 #[cfg(feature = "server")]
 use axum::http::StatusCode;
-use chrono::{DateTime, Utc};
 #[cfg(feature = "server")]
 use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
@@ -28,6 +27,7 @@ pub struct UserId(pub i64);
         Insertable,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         GetById,
         GetByIds,
@@ -41,9 +41,6 @@ pub struct User {
     pub username: String,
     pub password: String,
     pub email: String,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
 }
 
 #[cfg(feature = "server")]

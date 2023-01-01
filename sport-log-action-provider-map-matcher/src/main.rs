@@ -27,7 +27,7 @@ use std::{
     result::Result as StdResult,
 };
 
-use chrono::{Duration, Utc};
+use chrono::Duration;
 use err_derive::Error as StdError;
 use geo_types::Point;
 use geoutils::Location as GeoLocation;
@@ -427,7 +427,6 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Result<Route> {
         descent: Some(descent.round() as i32),
         track: Some(positions),
         marked_positions: None,
-        last_change: Utc::now(),
         deleted: false,
     })
 }

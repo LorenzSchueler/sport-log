@@ -114,6 +114,7 @@ impl User {
         user::table
             .filter(user::columns::id.eq(user_id))
             .filter(user::columns::last_change.ge(last_sync))
+            .select(User::as_select())
             .get_result(db)
             .optional()
     }

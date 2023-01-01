@@ -1,4 +1,4 @@
-use chrono::{DateTime, NaiveDate, Utc};
+use chrono::NaiveDate;
 #[cfg(feature = "server")]
 use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
@@ -33,6 +33,7 @@ pub struct DiaryId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -56,9 +57,6 @@ pub struct Diary {
     pub bodyweight: Option<f32>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -79,6 +77,7 @@ pub struct WodId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -100,8 +99,5 @@ pub struct Wod {
     pub date: NaiveDate,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }

@@ -101,6 +101,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconId> {
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -123,9 +124,6 @@ pub struct Metcon {
     pub timecap: Option<i32>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -258,6 +256,7 @@ impl VerifyIdsForUserOrAP for UnverifiedIds<MetconMovementId> {
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -278,9 +277,6 @@ pub struct MetconMovement {
     pub male_weight: Option<f32>,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub female_weight: Option<f32>,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -391,6 +387,7 @@ pub struct MetconSessionId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -419,9 +416,6 @@ pub struct MetconSession {
     pub rx: bool,
     #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -442,6 +436,7 @@ pub struct MetconItemId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -455,9 +450,6 @@ pub struct MetconItem {
     pub id: MetconItemId,
     pub training_plan_id: TrainingPlanId,
     pub metcon_id: MetconId,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 

@@ -1,4 +1,3 @@
-use chrono::{DateTime, Utc};
 #[cfg(feature = "server")]
 use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
@@ -45,6 +44,7 @@ pub struct PlatformId(pub i64);
         Insertable,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetAll,
@@ -61,9 +61,6 @@ pub struct Platform {
     pub id: PlatformId,
     pub name: String,
     pub credential: bool,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }
 
@@ -87,6 +84,7 @@ pub struct PlatformCredentialId(pub i64);
         Associations,
         Identifiable,
         Queryable,
+        Selectable,
         AsChangeset,
         Create,
         GetById,
@@ -107,8 +105,5 @@ pub struct PlatformCredential {
     pub platform_id: PlatformId,
     pub username: String,
     pub password: String,
-    #[serde(skip)]
-    #[serde(default = "Utc::now")]
-    pub last_change: DateTime<Utc>,
     pub deleted: bool,
 }

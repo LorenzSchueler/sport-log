@@ -11,6 +11,7 @@ impl PlatformCredential {
         platform_credential::table
             .filter(platform_credential::columns::user_id.eq(user_id))
             .filter(platform_credential::columns::platform_id.eq(platform_id))
+            .select(PlatformCredential::as_select())
             .get_result(db)
     }
 }
