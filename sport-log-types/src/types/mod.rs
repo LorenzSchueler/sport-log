@@ -4,8 +4,7 @@ use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 #[cfg(feature = "server")]
 use diesel::{PgConnection, QueryResult};
-#[cfg(feature = "server")]
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 mod account;
 mod action;
@@ -51,6 +50,10 @@ pub use strength::*;
 pub use training_plan::*;
 pub use user::*;
 pub use version::*;
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(transparent)]
+struct IdString(String);
 
 /// Wrapper around incoming json data for which the access permissions for the [AuthUserOrAP], [AuthAP] or [AuthAdmin] have not been checked.
 ///

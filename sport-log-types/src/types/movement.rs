@@ -5,13 +5,13 @@ use diesel::sql_types::BigInt;
 #[cfg(feature = "server")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
+use sport_log_types_derive::IdString;
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, GetAll, GetById, GetByIds, HardDelete, IdFromSql, IdToSql, Update,
     VerifyForAdminWithoutDb, VerifyIdForAdmin, VerifyIdUnchecked,
 };
 
-use crate::UserId;
 #[cfg(feature = "server")]
 use crate::{
     schema::{eorm, movement, movement_muscle, muscle_group},
@@ -21,8 +21,9 @@ use crate::{
     VerifyMultipleForUserOrAPCreate, VerifyMultipleForUserOrAPWithDb,
     VerifyMultipleForUserOrAPWithoutDb,
 };
+use crate::{types::IdString, UserId};
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "server", derive(DbEnum))]
 pub enum MovementDimension {
     Reps,
@@ -31,8 +32,8 @@ pub enum MovementDimension {
     Distance,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "server",
     derive(
@@ -202,8 +203,8 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForAdmin),
@@ -223,8 +224,8 @@ pub struct MuscleGroup {
     pub description: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
@@ -385,8 +386,8 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MovementMuscle>> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForAdmin),

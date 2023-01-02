@@ -10,6 +10,7 @@ use diesel::{
 #[cfg(feature = "server")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
+use sport_log_types_derive::IdString;
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, IdFromSql,
@@ -21,9 +22,9 @@ use crate::{
     schema::{cardio_blueprint, cardio_session, route},
     TrainingPlan, User,
 };
-use crate::{Movement, MovementId, TrainingPlanId, UserId};
+use crate::{types::IdString, Movement, MovementId, TrainingPlanId, UserId};
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "server", derive(DbEnum))]
 pub enum CardioType {
     Training,
@@ -90,8 +91,8 @@ impl FromSql<crate::schema::sql_types::Position, Pg> for Position {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),
@@ -138,8 +139,8 @@ pub struct Route {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),
@@ -195,8 +196,8 @@ pub struct CardioBlueprint {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),

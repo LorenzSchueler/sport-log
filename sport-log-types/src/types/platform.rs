@@ -1,6 +1,7 @@
 #[cfg(feature = "server")]
 use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
+use sport_log_types_derive::IdString;
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, GetAll, GetById, GetByIds, GetBySync, GetByUser, GetByUserSync,
@@ -8,15 +9,15 @@ use sport_log_types_derive::{
     VerifyForUserWithoutDb, VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked, VerifyUnchecked,
 };
 
-use crate::UserId;
 #[cfg(feature = "server")]
 use crate::{
     schema::{platform, platform_credential},
     User,
 };
+use crate::{types::IdString, UserId};
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "server",
     derive(
@@ -64,8 +65,8 @@ pub struct Platform {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUser),

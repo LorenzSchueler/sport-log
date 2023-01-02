@@ -3,10 +3,10 @@
 use proc_macro::TokenStream;
 
 mod crud;
-mod to_from_sql;
+mod from_to;
 mod verification;
 use crud::*;
-use to_from_sql::*;
+use from_to::*;
 use verification::*;
 
 /// Derives `sport_log_types::Create`.
@@ -215,4 +215,13 @@ pub fn unverified_inner_int_to_sql(input: TokenStream) -> TokenStream {
 pub fn unverified_inner_int_from_sql(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_id_from_sql(&ast)
+}
+
+/// Derives `TryFrom<IdString>` and `Into<IdString>`.
+///
+/// This macro only works if the type is a one tuple struct of i64.
+#[proc_macro_derive(IdString)]
+pub fn unverified_id_string(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_id_string(&ast)
 }

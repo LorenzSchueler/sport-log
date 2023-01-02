@@ -27,3 +27,27 @@ pub fn impl_id_from_sql(ast: &syn::DeriveInput) -> TokenStream {
     };
     gen.into()
 }
+
+pub fn impl_id_string(ast: &syn::DeriveInput) -> TokenStream {
+    let typename = &ast.ident;
+
+    let gen = quote! {
+        impl TryFrom<crate::types::IdString> for #typename {
+            type Error = <i64 as std::str::FromStr>::Err;
+
+            fn try_from(id_string: IdString) -> Result<Self, Self::Error> {
+                use std::str::FromStr;
+
+                id_string.0.parse().map(Self)
+            }
+        }
+
+        #[allow(clippy::from_over_into)]
+        impl Into<crate::types::IdString> for #typename {
+            fn into(self) -> crate::types::IdString {
+                crate::types::IdString(self.0.to_string())
+            }
+        }
+    };
+    gen.into()
+}

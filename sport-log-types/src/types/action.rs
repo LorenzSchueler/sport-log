@@ -4,6 +4,7 @@ use diesel::sql_types::BigInt;
 #[cfg(feature = "server")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
+use sport_log_types_derive::IdString;
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckAPId, CheckUserId, Create, GetAll, GetById, GetByIds, GetBySync, GetByUser, GetByUserSync,
@@ -18,10 +19,10 @@ use crate::{
     schema::{action, action_event, action_provider, action_rule},
     Platform, User,
 };
-use crate::{PlatformId, UserId};
+use crate::{types::IdString, PlatformId, UserId};
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "server",
     derive(
@@ -68,8 +69,8 @@ pub struct ActionProvider {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "server",
     derive(
@@ -118,7 +119,7 @@ pub struct Action {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "server", derive(DbEnum))]
 
 pub enum Weekday {
@@ -145,8 +146,8 @@ impl Weekday {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUser),
@@ -189,8 +190,8 @@ pub struct ActionRule {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "server",
     derive(

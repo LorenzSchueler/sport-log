@@ -2,6 +2,7 @@ use chrono::NaiveDate;
 #[cfg(feature = "server")]
 use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
+use sport_log_types_derive::IdString;
 #[cfg(feature = "server")]
 use sport_log_types_derive::{
     CheckUserId, Create, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, IdFromSql,
@@ -10,10 +11,10 @@ use sport_log_types_derive::{
 
 #[cfg(feature = "server")]
 use crate::{schema::training_plan, User};
-use crate::{UserId, Weekday};
+use crate::{types::IdString, UserId, Weekday};
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "server",
     derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),
