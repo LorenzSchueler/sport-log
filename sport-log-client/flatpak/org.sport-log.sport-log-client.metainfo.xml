@@ -27,6 +27,7 @@
     </screenshots>
     <launchable type="desktop-id">org.sport_log.sport_log_client.desktop</launchable>
     <releases>
+        <release version="0.4.0" date="2023-01-02" />
         <release version="0.3.5" date="2022-09-17" />
         <release version="0.3.4" date="2022-08-13" />
         <release version="0.3.3" date="2022-08-05" />
