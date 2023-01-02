@@ -41,37 +41,49 @@ class Sync extends ChangeNotifier {
 
   Future<bool> sync({VoidCallback? onNoInternet}) async {
     if (!Settings.instance.syncEnabled) {
-      _logger.i("sync disabled.");
+      _logger.i("sync disabled");
       return false;
     }
     if (_isSyncing) {
-      _logger.d('Sync job already running.');
+      _logger.d('Sync job already running');
       return false;
     }
     if (!Settings.instance.userExists()) {
-      _logger.d('Sync cannot be run: no user.');
+      _logger.d('Sync cannot be run: no user');
       return false;
     }
+
     _isSyncing = true;
     notifyListeners();
+
     if (serverVersion == null) {
       final serverVersionResult = await Api.getServerVersion();
       if (serverVersionResult.isSuccess) {
         serverVersion = serverVersionResult.success;
         if (!serverVersion!.compatibleWithClientApiVersion()) {
-          await showMessageDialog(
-            context: App.globalContext,
-            text:
-                "Client api version ${Config.apiVersion} is not compatible with server versions: $serverVersion\n"
-                "Server synchronization is no longer possible. Please update the app.",
+          // must be unawaited to that callback finished even if dialog context dropped
+          unawaited(
+            showMessageDialog(
+              context: App.globalContext,
+              text:
+                  "Client api version ${Config.apiVersion} is not compatible with server api versions: $serverVersion\n"
+                  "Server synchronization is no longer possible. Please update the app.",
+            ),
           );
+          //stop sync completely
           stopSync();
           _isSyncing = false;
           notifyListeners();
           return false;
         }
+      } else {
+        // stop current sync but keep sync timer running
+        _isSyncing = false;
+        notifyListeners();
+        return false;
       }
     }
+
     bool syncSuccessful =
         await EntityDataProvider.downSync(onNoInternet: onNoInternet);
     if (syncSuccessful) {
@@ -82,8 +94,10 @@ class Sync extends ChangeNotifier {
       _logger.i('Setting last sync to $now.');
       Settings.instance.lastSync = now;
     }
+
     _isSyncing = false;
     notifyListeners();
+
     return syncSuccessful;
   }
 
@@ -98,6 +112,7 @@ class Sync extends ChangeNotifier {
       return;
     }
     _logger.d('Starting sync timer.');
+    _syncTimer = Timer.periodic(Settings.instance.syncInterval, (_) => sync());
     if (Settings.instance.lastSync == null) {
       await sync(); // wait to make sure movement 1 and metcon 1 exist
     } else {
@@ -106,7 +121,6 @@ class Sync extends ChangeNotifier {
     Movement.defaultMovement ??= await MovementDataProvider().getById(Int64(1));
     MetconDescription.defaultMetconDescription ??=
         await MetconDescriptionDataProvider().getById(Int64(1));
-    _syncTimer = Timer.periodic(Settings.instance.syncInterval, (_) => sync());
     return;
   }
 
