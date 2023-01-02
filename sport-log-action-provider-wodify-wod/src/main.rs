@@ -103,17 +103,13 @@ async fn main() {
                 error!("login failed: {}", error);
             }
         }
-        [option] if option == "--setup" => {
-            if let Err(error) = setup().await {
-                error!("login failed: {}", error);
-            }
-        }
+        [option] if option == "--setup" => setup().await,
         [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
         _ => wrong_use(),
     }
 }
 
-async fn setup() -> Result<()> {
+async fn setup() {
     setup_db(
         &CONFIG.base_url,
         NAME,
@@ -139,7 +135,7 @@ async fn setup() -> Result<()> {
         0,
     )
     .await
-    .map_err(Error::Reqwest)
+    .unwrap()
 }
 
 fn help() {

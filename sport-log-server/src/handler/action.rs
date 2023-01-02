@@ -17,7 +17,7 @@ use sport_log_types::{
 };
 
 use crate::handler::{
-    ErrorMessage, HandlerError, HandlerResult, IdOption, Ids, TimeSpanOption, UnverifiedSingleOrVec,
+    ErrorMessage, HandlerError, HandlerResult, IdOption, TimeSpanOption, UnverifiedSingleOrVec,
 };
 
 pub async fn adm_create_action_providers(
@@ -325,8 +325,8 @@ pub async fn adm_update_action_events(
 
 pub async fn ap_disable_action_events(
     auth: AuthAP,
-    Query(Ids { ids }): Query<Ids<UnverifiedIds<ActionEventId>>>,
     mut db: DbConn,
+    Json(ids): Json<UnverifiedIds<ActionEventId>>,
 ) -> HandlerResult<StatusCode> {
     ActionEvent::disable_multiple(
         ids.verify_ap(auth, &mut db)
@@ -342,8 +342,8 @@ pub async fn ap_disable_action_events(
 
 pub async fn adm_delete_action_events(
     auth: AuthAdmin,
-    Query(Ids { ids }): Query<Ids<UnverifiedIds<ActionEventId>>>,
     mut db: DbConn,
+    Json(ids): Json<UnverifiedIds<ActionEventId>>,
 ) -> HandlerResult<StatusCode> {
     ActionEvent::delete_multiple(ids.verify_adm(auth)?, &mut db)
         .map(|_| StatusCode::OK)

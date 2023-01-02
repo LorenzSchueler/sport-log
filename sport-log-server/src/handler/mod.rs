@@ -38,23 +38,18 @@ pub enum UnverifiedSingleOrVec<T> {
 
 #[derive(Debug, Deserialize)]
 pub struct IdOption<T> {
-    #[serde(default = "get_none")]
+    #[serde(default = "none")]
     pub id: Option<T>,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Ids<T> {
-    pub ids: T,
-}
-
-#[derive(Debug, Deserialize)]
 pub struct TimeSpanOption {
-    #[serde(default = "get_none")]
+    #[serde(default = "none")]
     pub start: Option<DateTime<Utc>>,
-    #[serde(default = "get_none")]
+    #[serde(default = "none")]
     pub end: Option<DateTime<Utc>>,
 }
 
-fn get_none<T>() -> Option<T> {
+fn none<T>() -> Option<T> {
     None
 }
