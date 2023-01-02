@@ -231,7 +231,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   Future<ApiResult<void>> postSingle(T object) async {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = _toJson(object);
-      final headers = _ApiHeaders._defaultHeaders;
+      final headers = _ApiHeaders._basicAuthContentTypeJson;
       _logRequest('POST', _path, headers, body);
       final response = await client.post(
         UriFromRoute.fromRoute(_path),
@@ -249,7 +249,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     }
     return ApiResultFromRequest.fromRequest((client) async {
       final body = objects.map(_toJson).toList();
-      final headers = _ApiHeaders._defaultHeaders;
+      final headers = _ApiHeaders._basicAuthContentTypeJson;
       _logRequest('POST', _path, headers, body);
       final response = await client.post(
         UriFromRoute.fromRoute(_path),
@@ -264,7 +264,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   Future<ApiResult<void>> putSingle(T object) async {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = _toJson(object);
-      final headers = _ApiHeaders._defaultHeaders;
+      final headers = _ApiHeaders._basicAuthContentTypeJson;
       _logRequest('PUT', _path, headers, body);
       final response = await client.put(
         UriFromRoute.fromRoute(_path),
@@ -282,7 +282,7 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     }
     return ApiResultFromRequest.fromRequest((client) async {
       final body = objects.map(_toJson).toList();
-      final headers = _ApiHeaders._defaultHeaders;
+      final headers = _ApiHeaders._basicAuthContentTypeJson;
       _logRequest('PUT', _path, headers, body);
       final response = await client.put(
         UriFromRoute.fromRoute(_path),
@@ -296,19 +296,27 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
 }
 
 class _ApiHeaders {
-  static Map<String, String> _basicAuth(String username, String password) {
-    final basicAuth =
-        'Basic ${base64Encode(utf8.encode('$username:$password'))}';
-    return {'authorization': basicAuth};
-  }
+  static Map<String, String> _basicAuthFromParts(
+    String username,
+    String password,
+  ) =>
+      {
+        'authorization':
+            'Basic ${base64Encode(utf8.encode('$username:$password'))}'
+      };
 
-  static const Map<String, String> _jsonContentType = {
+  static const Map<String, String> _contentTypeJson = {
     'Content-Type': 'application/json; charset=UTF-8',
   };
 
-  static Map<String, String> get _defaultHeaders => {
-        ..._basicAuth(Settings.instance.username!, Settings.instance.password!),
-        ..._jsonContentType,
+  static Map<String, String> get _basicAuth => _basicAuthFromParts(
+        Settings.instance.username!,
+        Settings.instance.password!,
+      );
+
+  static Map<String, String> get _basicAuthContentTypeJson => {
+        ..._basicAuth,
+        ..._contentTypeJson,
       };
 }
 
@@ -341,15 +349,12 @@ mixin ApiLogging {
   void _logResponse(Response response) {
     final body = utf8.decode(response.bodyBytes);
     final successful = response.statusCode >= 200 && response.statusCode < 300;
-    body.isNotEmpty && (!successful || Config.instance.outputResponseJson)
-        ? logger.log(
-            successful ? l.Level.debug : l.Level.error,
-            'response: ${response.statusCode}\n${_prettyJson(jsonDecode(body))}',
-          )
-        : logger.log(
-            successful ? l.Level.debug : l.Level.error,
-            'response: ${response.statusCode}',
-          );
+    logger.log(
+      successful ? l.Level.debug : l.Level.error,
+      body.isNotEmpty && (!successful || Config.instance.outputResponseJson)
+          ? 'response: ${response.statusCode}\n${_prettyJson(jsonDecode(body))}'
+          : 'response: ${response.statusCode}',
+    );
   }
 }
 
@@ -365,10 +370,7 @@ mixin ApiHelpers on ApiLogging {
   ) async {
     return ApiResultFromRequest.fromRequestWithValue<T>(
       (client) async {
-        final headers = _ApiHeaders._basicAuth(
-          Settings.instance.username!,
-          Settings.instance.password!,
-        );
+        final headers = _ApiHeaders._basicAuth;
         _logRequest('GET', route, headers);
         final response = await client.get(
           UriFromRoute.fromRoute(route),

@@ -8,7 +8,7 @@ class UserApi with ApiLogging, ApiHelpers {
   Future<ApiResult<User>> getSingle(String username, String password) {
     return ApiResultFromRequest.fromRequestWithValue<User>(
       (client) async {
-        final headers = _ApiHeaders._basicAuth(username, password);
+        final headers = _ApiHeaders._basicAuthFromParts(username, password);
         _logRequest('GET', _path, headers);
         final response = await client.get(
           UriFromRoute.fromRoute(_path),
@@ -25,7 +25,7 @@ class UserApi with ApiLogging, ApiHelpers {
   Future<ApiResult<void>> postSingle(User user) async {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = user.toJson();
-      const headers = _ApiHeaders._jsonContentType;
+      const headers = _ApiHeaders._contentTypeJson;
       _logRequest('POST', _path, headers, body);
       final response = await client.post(
         UriFromRoute.fromRoute(_path),
@@ -40,7 +40,7 @@ class UserApi with ApiLogging, ApiHelpers {
   Future<ApiResult<void>> putSingle(User user) async {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = user.toJson();
-      final headers = _ApiHeaders._defaultHeaders;
+      final headers = _ApiHeaders._basicAuthContentTypeJson;
       _logRequest('PUT', _path, headers, body);
       final response = await client.put(
         UriFromRoute.fromRoute(_path),
@@ -54,7 +54,7 @@ class UserApi with ApiLogging, ApiHelpers {
 
   Future<ApiResult<void>> deleteSingle() async {
     return ApiResultFromRequest.fromRequest((client) async {
-      final headers = _ApiHeaders._defaultHeaders;
+      final headers = _ApiHeaders._basicAuthContentTypeJson;
       _logRequest('DELETE', _path, headers);
       final response = await client.delete(
         UriFromRoute.fromRoute(_path),
