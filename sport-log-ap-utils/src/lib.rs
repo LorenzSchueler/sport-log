@@ -1,6 +1,6 @@
 //! Collection of functions for use in action providers.
 
-use chrono::{Duration, Utc};
+use chrono::{Duration, SecondsFormat, Utc};
 use rand::Rng;
 use reqwest::{Client, Error, StatusCode};
 use sport_log_types::{
@@ -150,8 +150,8 @@ pub async fn get_events(
     end_offset: Duration,
 ) -> Result<Vec<ExecutableActionEvent>, Error> {
     let now = Utc::now();
-    let datetime_start = (now + start_offset).to_rfc3339();
-    let datetime_end = (now + end_offset).to_rfc3339();
+    let datetime_start = (now + start_offset).to_rfc3339_opts(SecondsFormat::Secs, true);
+    let datetime_end = (now + end_offset).to_rfc3339_opts(SecondsFormat::Secs, true);
 
     let exec_action_events: Vec<ExecutableActionEvent> = client
         .get(route_max_version(
