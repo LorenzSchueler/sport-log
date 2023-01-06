@@ -2,30 +2,113 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'error_message.g.dart';
 
-@JsonSerializable()
-class ConflictDescriptor extends JsonSerializable {
-  ConflictDescriptor({required this.table, required this.columns});
-
-  factory ConflictDescriptor.fromJson(Map<String, dynamic> json) =>
-      _$ConflictDescriptorFromJson(json);
-
-  String table;
-  List<String> columns;
+enum ErrorMessageType {
+  primaryKeyViolation,
+  foreignKeyViolation,
+  uniqueViolation,
+  other;
 
   @override
-  Map<String, dynamic> toJson() => _$ConflictDescriptorToJson(this);
+  String toString() {
+    switch (this) {
+      case ErrorMessageType.primaryKeyViolation:
+        return "primary_key_violation";
+      case ErrorMessageType.foreignKeyViolation:
+        return "foreign_key_violation";
+      case ErrorMessageType.uniqueViolation:
+        return "unique_violation";
+      case ErrorMessageType.other:
+        return "other";
+    }
+  }
+}
+
+class ErrorMessage extends JsonSerializable {
+  ErrorMessage.primaryKeyViolation(this.table)
+      : type = ErrorMessageType.primaryKeyViolation,
+        column = null,
+        columns = null,
+        error = null;
+  ErrorMessage.foreignKeyViolation(this.table, this.column)
+      : type = ErrorMessageType.foreignKeyViolation,
+        columns = null,
+        error = null;
+  ErrorMessage.uniqueViolation(this.table, this.columns)
+      : type = ErrorMessageType.uniqueViolation,
+        column = null,
+        error = null;
+  ErrorMessage.other(this.error)
+      : type = ErrorMessageType.other,
+        table = null,
+        column = null,
+        columns = null;
+
+  factory ErrorMessage.fromJson(Map<String, dynamic> json) {
+    final type = json.keys.first;
+    final body = json[type] as Map<String, dynamic>;
+    switch (type) {
+      case "primary_key_violation":
+        return ErrorMessage.primaryKeyViolation(body["table"] as String);
+      case "foreign_key_violation":
+        return ErrorMessage.foreignKeyViolation(
+          body["table"] as String,
+          body["column"] as String,
+        );
+      case "unique_violation":
+        return ErrorMessage.uniqueViolation(
+          body["table"] as String,
+          (body["columns"] as List<dynamic>)
+              .map((dynamic c) => c as String)
+              .toList(),
+        );
+      case "other":
+        return ErrorMessage.other(body["error"] as String);
+      default:
+        throw TypeError();
+    }
+  }
+
+  final ErrorMessageType type;
+  final String? table; // not for other
+  final String? column; // only foreign key violation
+  final List<String>? columns; // only unique violation
+  final String? error; // only other
+
+  @override
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        '$type': <String, dynamic>{
+          'table': table,
+          'column': column,
+          'columns': columns,
+          'error': error,
+        }
+      };
+
+  @override
+  String toString() {
+    switch (type) {
+      case ErrorMessageType.primaryKeyViolation:
+        return "primary key violation in table $table";
+      case ErrorMessageType.foreignKeyViolation:
+        return "foreign key violation in table $table in column $column";
+      case ErrorMessageType.uniqueViolation:
+        return "unique violation in table $table in columns $columns";
+      case ErrorMessageType.other:
+        return "$error";
+    }
+  }
 }
 
 @JsonSerializable()
-class ErrorMessage extends JsonSerializable {
-  ErrorMessage({required this.status, required this.message});
+class HandlerError extends JsonSerializable {
+  HandlerError({required this.status, required this.message});
 
-  factory ErrorMessage.fromJson(Map<String, dynamic> json) =>
-      _$ErrorMessageFromJson(json);
+  factory HandlerError.fromJson(Map<String, dynamic> json) =>
+      _$HandlerErrorFromJson(json);
 
   int status;
-  Map<String, ConflictDescriptor>? message;
+  ErrorMessage? message;
 
   @override
-  Map<String, dynamic> toJson() => _$ErrorMessageToJson(this);
+  Map<String, dynamic> toJson() => _$HandlerErrorToJson(this);
 }

@@ -72,16 +72,13 @@ class ApiError {
   final ApiErrorType errorType;
   final int? errorCode;
 
-  /// contains always only one entry
-  final Map<String, ConflictDescriptor>? message;
+  final ErrorMessage? message;
 
   @override
   String toString() {
     final description = errorType.description;
-    final errorCodeStr = errorCode != null ? " ($errorCode)" : "";
-    final messageStr = message != null
-        ? "\n${message!.keys.first} in table ${message!.values.first.table} on columns ${message!.values.first.columns.join(', ')}"
-        : "";
+    final errorCodeStr = errorCode != null ? " (status $errorCode)" : "";
+    final messageStr = message != null ? "\n$message" : "";
     return "$description$errorCodeStr$messageStr";
   }
 }
@@ -89,7 +86,7 @@ class ApiError {
 typedef ApiResult<T> = Result<T, ApiError>;
 
 extension _ToApiResult on Response {
-  Map<String, ConflictDescriptor>? get _message => ErrorMessage.fromJson(
+  ErrorMessage? get _message => HandlerError.fromJson(
         jsonDecode(utf8.decode(bodyBytes)) as Map<String, dynamic>,
       ).message;
 

@@ -6,28 +6,14 @@ part of 'error_message.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-ConflictDescriptor _$ConflictDescriptorFromJson(Map<String, dynamic> json) =>
-    ConflictDescriptor(
-      table: json['table'] as String,
-      columns:
-          (json['columns'] as List<dynamic>).map((e) => e as String).toList(),
-    );
-
-Map<String, dynamic> _$ConflictDescriptorToJson(ConflictDescriptor instance) =>
-    <String, dynamic>{
-      'table': instance.table,
-      'columns': instance.columns,
-    };
-
-ErrorMessage _$ErrorMessageFromJson(Map<String, dynamic> json) => ErrorMessage(
+HandlerError _$HandlerErrorFromJson(Map<String, dynamic> json) => HandlerError(
       status: json['status'] as int,
-      message: (json['message'] as Map<String, dynamic>?)?.map(
-        (k, e) =>
-            MapEntry(k, ConflictDescriptor.fromJson(e as Map<String, dynamic>)),
-      ),
+      message: json['message'] == null
+          ? null
+          : ErrorMessage.fromJson(json['message'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$ErrorMessageToJson(ErrorMessage instance) =>
+Map<String, dynamic> _$HandlerErrorToJson(HandlerError instance) =>
     <String, dynamic>{
       'status': instance.status,
       'message': instance.message,

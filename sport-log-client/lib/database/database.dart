@@ -3,7 +3,6 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/all.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/models/error_message.dart';
 import 'package:sqflite/sqflite.dart';
 
 final _logger = Logger('DB');
@@ -14,10 +13,14 @@ enum DbErrorCode {
 }
 
 class DbError {
-  DbError.uniqueViolation(ConflictDescriptor this.conflictDescriptor)
-      : dbErrorCode = DbErrorCode.uniqueViolation;
+  DbError.uniqueViolation(this.table, this.columns)
+      : dbErrorCode = DbErrorCode.uniqueViolation,
+        databaseException = null;
 
-  DbError.unknown(this.databaseException) : dbErrorCode = DbErrorCode.unknown;
+  DbError.unknown(this.databaseException)
+      : dbErrorCode = DbErrorCode.unknown,
+        table = null,
+        columns = null;
 
   factory DbError.fromDbException(DatabaseException databaseException) {
     if (databaseException.isUniqueConstraintError()) {
@@ -29,9 +32,7 @@ class DbError {
             .split(", ");
         final table = longColumns[0].split(".")[0];
         final columns = longColumns.map((c) => c.split(".")[1]).toList();
-        final conflictDescriptor =
-            ConflictDescriptor(table: table, columns: columns);
-        return DbError.uniqueViolation(conflictDescriptor);
+        return DbError.uniqueViolation(table, columns);
       } on RangeError catch (_) {
         return DbError.unknown(databaseException);
       }
@@ -40,15 +41,16 @@ class DbError {
     }
   }
 
-  DbErrorCode dbErrorCode;
-  ConflictDescriptor? conflictDescriptor;
-  DatabaseException? databaseException;
+  final DbErrorCode dbErrorCode;
+  final String? table; // unique violation
+  final List<String>? columns; // unique violation
+  final DatabaseException? databaseException; // unknown
 
   @override
   String toString() {
     switch (dbErrorCode) {
       case DbErrorCode.uniqueViolation:
-        return "An entry with the same values for ${conflictDescriptor!.columns.join(', ')} already exists.";
+        return "An entry table $table with the same values for ${columns!.join(', ')} already exists.";
       case DbErrorCode.unknown:
         return databaseException != null
             ? "Unknown database error: $databaseException"
