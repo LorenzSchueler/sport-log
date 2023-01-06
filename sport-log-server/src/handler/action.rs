@@ -47,9 +47,9 @@ pub async fn ap_create_action_provider(
     if !config.ap_self_registration {
         return Err(HandlerError {
             status: StatusCode::FORBIDDEN,
-            message: Some(ErrorMessage::Other(
-                "action provider self registration is disabled".to_owned(),
-            )),
+            message: Some(ErrorMessage::Other {
+                error: "action provider self registration is disabled".to_owned(),
+            }),
         });
     }
 
@@ -374,9 +374,10 @@ pub async fn ap_get_executable_action_events(
         _ => {
             return Err(HandlerError {
                 status: StatusCode::BAD_REQUEST,
-                message: Some(ErrorMessage::Other(
-                    "'start' and 'end' must be either specified both or neither of them".to_owned(),
-                )),
+                message: Some(ErrorMessage::Other {
+                    error: "'start' and 'end' must be either specified both or neither of them"
+                        .to_owned(),
+                }),
             })
         }
     }

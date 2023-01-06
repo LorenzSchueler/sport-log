@@ -35,9 +35,9 @@ pub async fn create_user(
     if !config.user_self_registration {
         return Err(HandlerError {
             status: StatusCode::FORBIDDEN,
-            message: Some(ErrorMessage::Other(
-                "user self registration is disabled".to_owned(),
-            )),
+            message: Some(ErrorMessage::Other {
+                error: "user self registration is disabled".to_owned(),
+            }),
         });
     }
 

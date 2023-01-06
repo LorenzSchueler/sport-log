@@ -16,7 +16,6 @@ mod cardio;
 #[cfg(feature = "server")]
 mod config;
 mod diary_wod;
-#[cfg(feature = "server")]
 pub mod error;
 mod metcon;
 mod movement;
