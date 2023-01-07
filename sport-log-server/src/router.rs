@@ -2,6 +2,7 @@ use std::{iter, time::Duration};
 
 use axum::{
     body::{Body, Bytes},
+    extract::DefaultBodyLimit,
     http::{header::AUTHORIZATION, Request, StatusCode},
     response::Response,
     routing::{delete, get, post},
@@ -174,10 +175,7 @@ pub async fn get_router(state: AppState) -> Router {
                     debug!("response {}\n{:#?}", response.status(), response.headers(),);
                 })
                 .on_body_chunk(|chunk: &Bytes, _latency: Duration, _span: &Span| {
-                    match std::str::from_utf8(chunk) {
-                        Ok(string) => trace!("response body\n{}", string),
-                        Err(_) => trace!("response body\n{:?}", chunk),
-                    }
+                    trace!("response body\n{:?}", chunk);
                 })
                 .on_failure(
                     |error: ServerErrorsFailureClass, _latency: Duration, _span: &Span| match error
@@ -214,6 +212,10 @@ pub async fn get_router(state: AppState) -> Router {
                 .merge(user_router),
         )
         .fallback(handler_404)
-        .layer(trace_layer)
+        .layer(
+            ServiceBuilder::new()
+                .layer(trace_layer)
+                .layer(DefaultBodyLimit::max(5 * 1024 * 1024)),
+        )
         .with_state(state)
 }
