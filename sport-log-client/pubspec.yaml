@@ -28,7 +28,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   app_settings: ^4.1.1
-  audioplayers: ^1.0.1
+  audioplayers: ^2.0.0
   collection: ^1.16.0
   device_info_plus: ^8.0.0
   equatable: ^2.0.0 # makes classes equatable with little boilerplate code

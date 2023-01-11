@@ -70,8 +70,8 @@ class Metcon extends AtomicEntity {
   @override
   bool deleted;
 
-  static const Duration timecapDefaultValue = Duration(minutes: 30);
-  static const int roundsDefaultValue = 3;
+  static const timecapDefaultValue = Duration(minutes: 30);
+  static const roundsDefaultValue = 3;
 
   @override
   Map<String, dynamic> toJson() => _$MetconToJson(this);

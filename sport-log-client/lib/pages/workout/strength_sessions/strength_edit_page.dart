@@ -189,7 +189,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
             onPressed: () {
               setState(() {
                 _strengthSessionDescription.session.interval =
-                    const Duration(seconds: 90);
+                    StrengthSession.defaultInterval;
               });
             },
           ),

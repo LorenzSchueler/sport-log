@@ -403,7 +403,7 @@ class SettingsPage extends StatelessWidget {
                 TextFormField(
                   decoration:
                       Theme.of(context).textFormFieldDecoration.copyWith(
-                            icon: const Icon(AppIcons.timeInterval),
+                            icon: const Icon(AppIcons.dumbbell),
                             labelText: "Weight Increment",
                           ),
                   keyboardType: TextInputType.number,

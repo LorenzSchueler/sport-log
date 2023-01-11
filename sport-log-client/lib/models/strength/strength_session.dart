@@ -41,6 +41,8 @@ class StrengthSession extends AtomicEntity {
   @override
   bool deleted;
 
+  static const defaultInterval = Duration(seconds: 150);
+
   @override
   Map<String, dynamic> toJson() => _$StrengthSessionToJson(this);
 
