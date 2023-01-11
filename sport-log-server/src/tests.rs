@@ -3,8 +3,6 @@
 //! cargo test -- --test-threads=1
 //! ```
 
-use std::sync::Arc;
-
 use axum::{
     body::Body,
     headers::HeaderName,
@@ -83,7 +81,7 @@ async fn init() -> (Router, DbPool, Config) {
 
     let state = AppState {
         db_pool: db_pool.clone(),
-        config: Arc::new(config.clone()),
+        config: Box::leak(Box::new(config.clone())),
     };
 
     let router = router::get_router(state).await;

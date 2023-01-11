@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use axum::{
     extract::{Query, State},
     http::StatusCode,
@@ -35,7 +33,7 @@ pub async fn adm_create_platforms(
 }
 
 pub async fn ap_create_platform(
-    State(config): State<Arc<Config>>,
+    State(config): State<&Config>,
     mut db: DbConn,
     Json(platform): Json<Unverified<Platform>>,
 ) -> HandlerResult<StatusCode> {
@@ -70,7 +68,7 @@ pub async fn adm_get_platforms(
 
 pub async fn ap_get_platforms(
     Query(IdOption { id }): Query<IdOption<UnverifiedId<PlatformId>>>,
-    State(config): State<Arc<Config>>,
+    State(config): State<&Config>,
     mut db: DbConn,
 ) -> HandlerResult<Json<Vec<Platform>>> {
     if !config.ap_self_registration {

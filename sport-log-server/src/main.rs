@@ -13,7 +13,7 @@
 //! The config must be deserializable to [Config](sport_log_types::Config).
 //! The name of the config file is specified in [CONFIG_FILE].
 
-use std::{env, sync::Arc};
+use std::env;
 
 use axum::{Router, Server};
 use diesel::{
@@ -114,7 +114,7 @@ async fn main() {
 
     let state = AppState {
         db_pool,
-        config: Arc::new(config.clone()),
+        config: Box::leak(Box::new(config.clone())),
     };
 
     let router = router::get_router(state).await;

@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use axum::{
     extract::{Query, State},
     http::StatusCode,
@@ -40,7 +38,7 @@ pub async fn adm_create_action_providers(
 }
 
 pub async fn ap_create_action_provider(
-    State(config): State<Arc<Config>>,
+    State(config): State<&Config>,
     mut db: DbConn,
     Json(action_provider): Json<Unverified<ActionProvider>>,
 ) -> HandlerResult<StatusCode> {

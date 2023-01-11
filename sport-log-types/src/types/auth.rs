@@ -1,4 +1,4 @@
-use std::{ops::Deref, sync::Arc};
+use std::ops::Deref;
 
 use axum::{
     async_trait,
@@ -211,7 +211,7 @@ pub struct AuthAdmin;
 impl<S> FromRequestParts<S> for AuthAdmin
 where
     S: Send + Sync,
-    Arc<Config>: FromRef<S>,
+    &'static Config: FromRef<S>,
 {
     type Rejection = HandlerError;
 
@@ -221,7 +221,7 @@ where
         let username = auth.username();
         let password = auth.password();
 
-        let State(config) = State::<Arc<Config>>::from_request_parts(parts, state).await?;
+        let State(config) = State::<&Config>::from_request_parts(parts, state).await?;
 
         let admin_password = &config.admin_password;
 

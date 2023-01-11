@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use axum::{
     async_trait,
     extract::{FromRef, FromRequestParts},
@@ -12,15 +10,20 @@ use diesel::{
 
 use crate::Config;
 
-#[derive(Clone, FromRef)]
+#[derive(Clone)]
 pub struct AppState {
-    #[from_ref(skip)]
     pub db_pool: DbPool,
-    pub config: Arc<Config>,
+    pub config: &'static Config,
 }
 
 pub type DbPool = Pool<ConnectionManager<PgConnection>>;
 pub type DbConn = PooledConnection<ConnectionManager<PgConnection>>;
+
+impl FromRef<AppState> for &'static Config {
+    fn from_ref(state: &AppState) -> Self {
+        state.config
+    }
+}
 
 #[async_trait]
 impl FromRequestParts<AppState> for DbConn {

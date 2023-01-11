@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use axum::{extract::State, http::StatusCode, Json};
 use sport_log_types::{
     AuthAdmin, AuthUser, Config, Create, DbConn, GetById, Unverified, Update, User,
@@ -28,7 +26,7 @@ pub async fn adm_create_users(
 }
 
 pub async fn create_user(
-    State(config): State<Arc<Config>>,
+    State(config): State<&Config>,
     mut db: DbConn,
     Json(user): Json<Unverified<User>>,
 ) -> HandlerResult<StatusCode> {
