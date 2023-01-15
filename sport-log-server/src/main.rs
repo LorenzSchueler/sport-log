@@ -36,9 +36,7 @@ const CONFIG_FILE: &str = "sport-log-server.toml";
 const MIGRATIONS: EmbeddedMigrations = diesel_migrations::embed_migrations!();
 
 fn tracing_setup() {
-    if cfg!(test) {
-        env::set_var("RUST_LOG", "info");
-    } else if cfg!(debug_assertions) {
+    if cfg!(debug_assertions) {
         env::set_var("RUST_LOG", "info,sport_log_server=debug");
     } else {
         env::set_var("RUST_LOG", "warn,sport_log_server=info");
@@ -61,17 +59,15 @@ async fn get_db_pool(config: &Config) -> Result<DbPool, String> {
     let pool = Pool::new(ConnectionManager::<PgConnection>::new(&config.database_url))
         .map_err(|err| format!("failed to create database connection pool: {err}"))?;
 
-    if !cfg!(test) {
-        let mut db = pool.get().map_err(|err| {
-            format!("failed to retrieve database connection from connection pool: {err}")
-        })?;
+    let mut db = pool.get().map_err(|err| {
+        format!("failed to retrieve database connection from connection pool: {err}")
+    })?;
 
-        info!("running database migrations...");
-        HarnessWithOutput::new(&mut db, std::io::stderr())
-            .run_pending_migrations(MIGRATIONS)
-            .map_err(|err| format!("failed to run database migrations: {err}"))?;
-        info!("database is up to date");
-    }
+    info!("running database migrations...");
+    HarnessWithOutput::new(&mut db, std::io::stderr())
+        .run_pending_migrations(MIGRATIONS)
+        .map_err(|err| format!("failed to run database migrations: {err}"))?;
+    info!("database is up to date");
 
     Ok(pool)
 }
@@ -97,29 +93,26 @@ async fn main() {
     tracing_setup();
 
     let config = match get_config().await {
-        Ok(config) => config,
+        Ok(config) => Box::leak(Box::new(config)),
         Err(err) => {
             error!("{}", err);
             return;
         }
     };
 
-    let db_pool = match get_db_pool(&config).await {
-        Ok(config) => config,
+    let db_pool = match get_db_pool(config).await {
+        Ok(db_pool) => db_pool,
         Err(err) => {
             error!("{}", err);
             return;
         }
     };
 
-    let state = AppState {
-        db_pool,
-        config: Box::leak(Box::new(config.clone())),
-    };
+    let state = AppState { db_pool, config };
 
     let router = router::get_router(state).await;
 
-    if let Err(err) = run_server(router, &config).await {
+    if let Err(err) = run_server(router, config).await {
         error!("{}", err);
     }
 }

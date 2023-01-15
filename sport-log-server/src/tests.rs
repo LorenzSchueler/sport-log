@@ -1,8 +1,3 @@
-//! test must be run sequentially
-//! ```bash
-//! cargo test -- --test-threads=1
-//! ```
-
 use axum::{
     body::Body,
     headers::HeaderName,
@@ -14,17 +9,18 @@ use axum::{
     Router,
 };
 use chrono::{Duration, Utc};
+use diesel::r2d2::{ConnectionManager, CustomizeConnection, Pool};
 use mime::APPLICATION_JSON;
 use rand::Rng;
 use sport_log_types::{
     uri::{route_max_version, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER},
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, AppState,
-    Config, Create, DbPool, Diary, DiaryId, HardDelete, Platform, PlatformId, Update, User, UserId,
+    Config, Create, DbPool, Diary, DiaryId, Platform, PlatformId, Update, User, UserId,
     ADMIN_USERNAME,
 };
 use tower::{Service, ServiceExt};
 
-use crate::{get_config, get_db_pool, router};
+use crate::{get_config, router};
 
 const ADMIN_PASSWORD: &str = "admin-passwd";
 const AP_ID: ActionProviderId = ActionProviderId(123456789);
@@ -74,14 +70,42 @@ fn assert_json(response: &Response) {
     );
 }
 
-async fn init() -> (Router, DbPool, Config) {
-    let config = get_config().await.unwrap();
+#[derive(Debug, Clone, Copy)]
+pub struct TestConnectionCustomizer;
 
-    let db_pool = get_db_pool(&config).await.unwrap();
+impl<C, E> CustomizeConnection<C, E> for TestConnectionCustomizer
+where
+    C: diesel::Connection,
+{
+    fn on_acquire(&self, conn: &mut C) -> Result<(), E> {
+        conn.begin_test_transaction()
+            .expect("Failed to start test transaction");
+
+        Ok(())
+    }
+}
+
+fn get_test_db_pool(config: &Config) -> DbPool {
+    Pool::builder()
+        .connection_customizer(Box::new(TestConnectionCustomizer))
+        .max_size(1)
+        .build(ConnectionManager::new(&config.database_url))
+        .unwrap()
+}
+
+async fn init() -> (Router, DbPool, &'static Config) {
+    // Make sure to drop any reference to DbConn before invoking router,
+    // because otherwise handlers will time out trying to retrieve a connection from the pool.
+
+    let config = Box::leak(Box::new(get_config().await.unwrap()));
+
+    let db_pool = get_test_db_pool(config);
+
+    setup(&db_pool);
 
     let state = AppState {
         db_pool: db_pool.clone(),
-        config: Box::leak(Box::new(config.clone())),
+        config,
     };
 
     let router = router::get_router(state).await;
@@ -89,9 +113,7 @@ async fn init() -> (Router, DbPool, Config) {
     (router, db_pool, config)
 }
 
-#[tokio::test]
-async fn aa_setup() {
-    let (_, db_pool, _) = init().await;
+fn setup(db_pool: &DbPool) {
     let mut db = db_pool.get().unwrap();
 
     let user = User {
@@ -138,26 +160,6 @@ async fn aa_setup() {
         deleted: false,
     };
     Action::create(action, &mut db).unwrap();
-}
-
-#[tokio::test]
-async fn zz_teardown() {
-    let (_, db_pool, _) = init().await;
-    let mut db = db_pool.get().unwrap();
-
-    User::delete(USER_ID, &mut db).unwrap();
-    User::delete(USER2_ID, &mut db).unwrap();
-
-    let platform = Platform {
-        id: PLATFORM_ID,
-        name: "platform123456789".to_owned(),
-        credential: false,
-        deleted: true,
-    };
-    Platform::update(platform, &mut db).unwrap();
-    Platform::hard_delete(Utc::now(), &mut db).unwrap();
-    Action::hard_delete(Utc::now(), &mut db).unwrap();
-    ActionProvider::hard_delete(Utc::now(), &mut db).unwrap();
 }
 
 //async fn assert_cors(response: &Response) {
@@ -579,7 +581,6 @@ async fn user_ap_auth_without_credentials() {
 #[tokio::test]
 async fn ap_as_user_ap_auth() {
     let (mut router, db_pool, _) = init().await;
-    let mut db = db_pool.get().unwrap();
 
     // create ActionEvent to ensure access permission for user
     let mut action_event = ActionEvent {
@@ -591,7 +592,7 @@ async fn ap_as_user_ap_auth() {
         enabled: true,
         deleted: false,
     };
-    ActionEvent::create(action_event.clone(), &mut db).unwrap();
+    ActionEvent::create(action_event.clone(), &mut db_pool.get().unwrap()).unwrap();
 
     auth_as(
         &mut router,
@@ -603,13 +604,12 @@ async fn ap_as_user_ap_auth() {
     .await;
 
     action_event.deleted = true;
-    ActionEvent::update(action_event, &mut db).unwrap();
+    ActionEvent::update(action_event, &mut db_pool.get().unwrap()).unwrap();
 }
 
 #[tokio::test]
 async fn ap_as_user_ap_auth_no_event() {
     let (mut router, db_pool, _) = init().await;
-    let mut db = db_pool.get().unwrap();
 
     // create disabled ActionEvent
     let mut action_event1 = ActionEvent {
@@ -621,7 +621,7 @@ async fn ap_as_user_ap_auth_no_event() {
         enabled: false,
         deleted: false,
     };
-    ActionEvent::create(action_event1.clone(), &mut db).unwrap();
+    ActionEvent::create(action_event1.clone(), &mut db_pool.get().unwrap()).unwrap();
 
     // create deleted ActionEvent
     let mut action_event2 = ActionEvent {
@@ -633,7 +633,7 @@ async fn ap_as_user_ap_auth_no_event() {
         enabled: true,
         deleted: true,
     };
-    ActionEvent::create(action_event2.clone(), &mut db).unwrap();
+    ActionEvent::create(action_event2.clone(), &mut db_pool.get().unwrap()).unwrap();
 
     //  check that ap has no access
     auth_as_not_allowed(
@@ -646,15 +646,14 @@ async fn ap_as_user_ap_auth_no_event() {
     .await;
 
     action_event1.deleted = true;
-    ActionEvent::update(action_event1, &mut db).unwrap();
+    ActionEvent::update(action_event1, &mut db_pool.get().unwrap()).unwrap();
     action_event2.deleted = true;
-    ActionEvent::update(action_event2, &mut db).unwrap();
+    ActionEvent::update(action_event2, &mut db_pool.get().unwrap()).unwrap();
 }
 
 #[tokio::test]
 async fn ap_as_user_ap_auth_wrong_credentials() {
     let (mut router, db_pool, _) = init().await;
-    let mut db = db_pool.get().unwrap();
 
     // create ActionEvent to ensure access permission for user
     let mut action_event = ActionEvent {
@@ -666,7 +665,7 @@ async fn ap_as_user_ap_auth_wrong_credentials() {
         enabled: true,
         deleted: false,
     };
-    ActionEvent::create(action_event.clone(), &mut db).unwrap();
+    ActionEvent::create(action_event.clone(), &mut db_pool.get().unwrap()).unwrap();
 
     auth_as_wrong_credentials(
         &mut router,
@@ -677,13 +676,12 @@ async fn ap_as_user_ap_auth_wrong_credentials() {
     .await;
 
     action_event.deleted = true;
-    ActionEvent::update(action_event, &mut db).unwrap();
+    ActionEvent::update(action_event, &mut db_pool.get().unwrap()).unwrap();
 }
 
 #[tokio::test]
 async fn ap_as_user_ap_auth_without_credentials() {
     let (mut router, db_pool, _) = init().await;
-    let mut db = db_pool.get().unwrap();
 
     // create ActionEvent to ensure access permission for user
     let action_event = ActionEvent {
@@ -695,7 +693,7 @@ async fn ap_as_user_ap_auth_without_credentials() {
         enabled: true,
         deleted: false,
     };
-    ActionEvent::create(action_event, &mut db).unwrap();
+    ActionEvent::create(action_event, &mut db_pool.get().unwrap()).unwrap();
 
     auth_as_without_credentials(&mut router, &route_max_version("", DIARY, &[]), USER_ID.0).await;
 }
@@ -776,8 +774,6 @@ async fn foreign_create() {
     let (_, response) = create_diary(&mut router, USER_USERNAME, USER_PASSWORD, USER_ID.0).await;
     assert_status(&response, StatusCode::OK);
 
-    let (mut router, _, _) = init().await;
-
     // check that create does not work for other user
     let (_, response) = create_diary(&mut router, USER2_USERNAME, USER2_PASSWORD, USER_ID.0).await;
     assert_status(&response, StatusCode::FORBIDDEN);
@@ -790,8 +786,6 @@ async fn foreign_get() {
     let (diary_id, response) =
         create_diary(&mut router, USER_USERNAME, USER_PASSWORD, USER_ID.0).await;
     assert_status(&response, StatusCode::OK);
-
-    let (mut router, _, _) = init().await;
 
     // check that get works for same user
     let header = basic_auth(USER_USERNAME, USER_PASSWORD);
@@ -813,8 +807,6 @@ async fn foreign_get() {
         .unwrap();
 
     assert_status(&response, StatusCode::OK);
-
-    let (mut router, _, _) = init().await;
 
     // check that get does not work for other user
     let header = basic_auth(USER2_USERNAME, USER2_PASSWORD);
@@ -855,8 +847,6 @@ async fn foreign_update() {
         deleted: false,
     };
 
-    let (mut router, _, _) = init().await;
-
     // check that update works for same user
     let header = basic_auth(USER_USERNAME, USER_PASSWORD);
     let response = router
@@ -874,8 +864,6 @@ async fn foreign_update() {
         .unwrap();
 
     assert_status(&response, StatusCode::OK);
-
-    let (mut router, _, _) = init().await;
 
     // check that update does not work for other user
     let header = basic_auth(USER2_USERNAME, USER2_PASSWORD);
@@ -899,7 +887,6 @@ async fn foreign_update() {
 #[tokio::test]
 async fn user_self_registration() {
     let (mut router, db_pool, config) = init().await;
-    let mut db = db_pool.get().unwrap();
 
     let user_id = UserId(rnd());
     let user = User {
@@ -929,7 +916,7 @@ async fn user_self_registration() {
         assert_status(&response, StatusCode::FORBIDDEN);
     }
 
-    User::delete(user_id, &mut db).unwrap();
+    User::delete(user_id, &mut db_pool.get().unwrap()).unwrap();
 }
 
 #[tokio::test]
@@ -963,8 +950,6 @@ async fn ap_self_registration() {
         assert_status(&response, StatusCode::FORBIDDEN);
     }
 
-    let (mut router, _, _) = init().await;
-
     let response = router
         .ready()
         .await
@@ -992,8 +977,6 @@ async fn ap_self_registration() {
         description: None,
         deleted: false,
     };
-
-    let (mut router, _, _) = init().await;
 
     let ap_route = route_max_version("", AP_ACTION_PROVIDER, &[]);
     let response = router
@@ -1047,5 +1030,3 @@ async fn update_non_existing() {
 
     assert_status(&response, StatusCode::FORBIDDEN);
 }
-
-// TODO use test transaction
