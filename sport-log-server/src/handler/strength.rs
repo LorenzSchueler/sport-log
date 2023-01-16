@@ -22,7 +22,7 @@ use crate::handler::{HandlerResult, IdOption, UnverifiedSingleOrVec};
 //let strength_blueprint = strength_blueprint
 //.verify_user_ap_without_db(auth)
 //.map_err(Error::from)?;
-//StrengthBlueprint::create(strength_blueprint, &mut db)
+//StrengthBlueprint::create(&strength_blueprint, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -40,7 +40,7 @@ use crate::handler::{HandlerResult, IdOption, UnverifiedSingleOrVec};
 //let strength_blueprint = strength_blueprints
 //.verify_user_ap_without_db(auth)
 //.map_err(Error::from)?;
-//StrengthBlueprint::create_multiple(strength_blueprint, &mut db)
+//StrengthBlueprint::create_multiple(&strength_blueprint, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -86,7 +86,7 @@ use crate::handler::{HandlerResult, IdOption, UnverifiedSingleOrVec};
 //let strength_blueprint = strength_blueprint
 //.verify_user_ap(auth, &mut db)
 //.map_err(Error::from)?;
-//StrengthBlueprint::update(strength_blueprint, &mut db)
+//StrengthBlueprint::update(&strength_blueprint, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -104,7 +104,7 @@ use crate::handler::{HandlerResult, IdOption, UnverifiedSingleOrVec};
 //let strength_blueprints = strength_blueprints
 //.verify_user_ap(auth, &mut db)
 //.map_err(Error::from)?;
-//StrengthBlueprint::update_multiple(strength_blueprints, &mut db)
+//StrengthBlueprint::update_multiple(&strength_blueprints, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -122,7 +122,7 @@ use crate::handler::{HandlerResult, IdOption, UnverifiedSingleOrVec};
 //let strength_blueprint_set = strength_blueprint_set
 //.verify_user_ap_create(auth, &mut db)
 //.map_err(Error::from)?;
-//StrengthBlueprintSet::create(strength_blueprint_set, &mut db)
+//StrengthBlueprintSet::create(&strength_blueprint_set, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -140,7 +140,7 @@ use crate::handler::{HandlerResult, IdOption, UnverifiedSingleOrVec};
 //let strength_blueprint_set = strength_blueprint_sets
 //.verify_user_ap_create(auth, &mut db)
 //.map_err(Error::from)?;
-//StrengthBlueprintSet::create_multiple(strength_blueprint_set, &mut db)
+//StrengthBlueprintSet::create_multiple(&strength_blueprint_set, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -204,7 +204,7 @@ use crate::handler::{HandlerResult, IdOption, UnverifiedSingleOrVec};
 //status,
 //message: None,
 //})?;
-//StrengthBlueprintSet::update(strength_blueprint_set, &mut db)
+//StrengthBlueprintSet::update(&strength_blueprint_set, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -226,7 +226,7 @@ use crate::handler::{HandlerResult, IdOption, UnverifiedSingleOrVec};
 //status,
 //message: None,
 //})?;
-//StrengthBlueprintSet::update_multiple(strength_blueprint_sets, &mut db)
+//StrengthBlueprintSet::update_multiple(&strength_blueprint_sets, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -239,11 +239,11 @@ pub async fn create_strength_sessions(
     match strength_sessions {
         UnverifiedSingleOrVec::Single(strength_session) => {
             let strength_session = strength_session.verify_user_ap_without_db(auth)?;
-            StrengthSession::create(strength_session, &mut db)
+            StrengthSession::create(&strength_session, &mut db)
         }
         UnverifiedSingleOrVec::Vec(strength_sessions) => {
             let strength_sessions = strength_sessions.verify_user_ap_without_db(auth)?;
-            StrengthSession::create_multiple(strength_sessions, &mut db)
+            StrengthSession::create_multiple(&strength_sessions, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -274,11 +274,11 @@ pub async fn update_strength_sessions(
     match strength_sessions {
         UnverifiedSingleOrVec::Single(strength_session) => {
             let strength_session = strength_session.verify_user_ap(auth, &mut db)?;
-            StrengthSession::update(strength_session, &mut db)
+            StrengthSession::update(&strength_session, &mut db)
         }
         UnverifiedSingleOrVec::Vec(strength_sessions) => {
             let strength_sessions = strength_sessions.verify_user_ap(auth, &mut db)?;
-            StrengthSession::update_multiple(strength_sessions, &mut db)
+            StrengthSession::update_multiple(&strength_sessions, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -293,11 +293,11 @@ pub async fn create_strength_sets(
     match strength_sets {
         UnverifiedSingleOrVec::Single(strength_set) => {
             let strength_set = strength_set.verify_user_ap_create(auth, &mut db)?;
-            StrengthSet::create(strength_set, &mut db)
+            StrengthSet::create(&strength_set, &mut db)
         }
         UnverifiedSingleOrVec::Vec(strength_sets) => {
             let strength_sets = strength_sets.verify_user_ap_create(auth, &mut db)?;
-            StrengthSet::create_multiple(strength_sets, &mut db)
+            StrengthSet::create_multiple(&strength_sets, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -342,11 +342,11 @@ pub async fn update_strength_sets(
     match strength_sets {
         UnverifiedSingleOrVec::Single(strength_set) => {
             let strength_set = strength_set.verify_user_ap(auth, &mut db)?;
-            StrengthSet::update(strength_set, &mut db)
+            StrengthSet::update(&strength_set, &mut db)
         }
         UnverifiedSingleOrVec::Vec(strength_sets) => {
             let strength_sets = strength_sets.verify_user_ap(auth, &mut db)?;
-            StrengthSet::update_multiple(strength_sets, &mut db)
+            StrengthSet::update_multiple(&strength_sets, &mut db)
         }
     }
     .map(|_| StatusCode::OK)

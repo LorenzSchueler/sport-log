@@ -15,11 +15,11 @@ pub async fn create_training_plans(
     match training_plans {
         UnverifiedSingleOrVec::Single(training_plan) => {
             let training_plan = training_plan.verify_user_ap_without_db(auth)?;
-            TrainingPlan::create(training_plan, &mut db)
+            TrainingPlan::create(&training_plan, &mut db)
         }
         UnverifiedSingleOrVec::Vec(training_plans) => {
             let training_plans = training_plans.verify_user_ap_without_db(auth)?;
-            TrainingPlan::create_multiple(training_plans, &mut db)
+            TrainingPlan::create_multiple(&training_plans, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -50,11 +50,11 @@ pub async fn update_training_plans(
     match training_plans {
         UnverifiedSingleOrVec::Single(training_plan) => {
             let training_plan = training_plan.verify_user_ap(auth, &mut db)?;
-            TrainingPlan::update(training_plan, &mut db)
+            TrainingPlan::update(&training_plan, &mut db)
         }
         UnverifiedSingleOrVec::Vec(training_plans) => {
             let training_plans = training_plans.verify_user_ap(auth, &mut db)?;
-            TrainingPlan::update_multiple(training_plans, &mut db)
+            TrainingPlan::update_multiple(&training_plans, &mut db)
         }
     }
     .map(|_| StatusCode::OK)

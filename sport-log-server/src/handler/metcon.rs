@@ -17,11 +17,11 @@ pub async fn create_metcon_sessions(
     match metcon_sessions {
         UnverifiedSingleOrVec::Single(metcon_session) => {
             let metcon_session = metcon_session.verify_user_ap_without_db(auth)?;
-            MetconSession::create(metcon_session, &mut db)
+            MetconSession::create(&metcon_session, &mut db)
         }
         UnverifiedSingleOrVec::Vec(metcon_sessions) => {
             let metcon_sessions = metcon_sessions.verify_user_ap_without_db(auth)?;
-            MetconSession::create_multiple(metcon_sessions, &mut db)
+            MetconSession::create_multiple(&metcon_sessions, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -52,11 +52,11 @@ pub async fn update_metcon_sessions(
     match metcon_sessions {
         UnverifiedSingleOrVec::Single(metcon_session) => {
             let metcon_session = metcon_session.verify_user_ap(auth, &mut db)?;
-            MetconSession::update(metcon_session, &mut db)
+            MetconSession::update(&metcon_session, &mut db)
         }
         UnverifiedSingleOrVec::Vec(metcon_sessions) => {
             let metcon_sessions = metcon_sessions.verify_user_ap(auth, &mut db)?;
-            MetconSession::update_multiple(metcon_sessions, &mut db)
+            MetconSession::update_multiple(&metcon_sessions, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -71,11 +71,11 @@ pub async fn create_metcons(
     match metcons {
         UnverifiedSingleOrVec::Single(metcon) => {
             let metcon = metcon.verify_user_ap_without_db(auth)?;
-            Metcon::create(metcon, &mut db)
+            Metcon::create(&metcon, &mut db)
         }
         UnverifiedSingleOrVec::Vec(metcons) => {
             let metcons = metcons.verify_user_ap_without_db(auth)?;
-            Metcon::create_multiple(metcons, &mut db)
+            Metcon::create_multiple(&metcons, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -106,11 +106,11 @@ pub async fn update_metcons(
     match metcons {
         UnverifiedSingleOrVec::Single(metcon) => {
             let metcon = metcon.verify_user_ap(auth, &mut db)?;
-            Metcon::update(metcon, &mut db)
+            Metcon::update(&metcon, &mut db)
         }
         UnverifiedSingleOrVec::Vec(metcons) => {
             let metcons = metcons.verify_user_ap(auth, &mut db)?;
-            Metcon::update_multiple(metcons, &mut db)
+            Metcon::update_multiple(&metcons, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -125,11 +125,11 @@ pub async fn create_metcon_movements(
     match metcon_movements {
         UnverifiedSingleOrVec::Single(metcon_movement) => {
             let metcon_movement = metcon_movement.verify_user_ap_create(auth, &mut db)?;
-            MetconMovement::create(metcon_movement, &mut db)
+            MetconMovement::create(&metcon_movement, &mut db)
         }
         UnverifiedSingleOrVec::Vec(metcon_movements) => {
             let metcon_movements = metcon_movements.verify_user_ap_create(auth, &mut db)?;
-            MetconMovement::create_multiple(metcon_movements, &mut db)
+            MetconMovement::create_multiple(&metcon_movements, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -172,11 +172,11 @@ pub async fn update_metcon_movements(
     match metcon_movements {
         UnverifiedSingleOrVec::Single(metcon_movement) => {
             let metcon_movement = metcon_movement.verify_user_ap(auth, &mut db)?;
-            MetconMovement::update(metcon_movement, &mut db)
+            MetconMovement::update(&metcon_movement, &mut db)
         }
         UnverifiedSingleOrVec::Vec(metcon_movements) => {
             let metcon_movements = metcon_movements.verify_user_ap(auth, &mut db)?;
-            MetconMovement::update_multiple(metcon_movements, &mut db)
+            MetconMovement::update_multiple(&metcon_movements, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -192,7 +192,7 @@ pub async fn update_metcon_movements(
 //let metcon_item = metcon_item
 //.verify_user_ap_create(auth, &mut db)
 //.map_err(Error::from)?;
-//MetconItem::create(metcon_item, &mut db)
+//MetconItem::create(&metcon_item, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -206,7 +206,7 @@ pub async fn update_metcon_movements(
 //let metcon_items = metcon_items
 //.verify_user_ap_create(auth, &mut db)
 //;
-//MetconItem::create_multiple(metcon_items, &mut db)
+//MetconItem::create_multiple(&metcon_items, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -242,7 +242,7 @@ pub async fn update_metcon_movements(
 //Json(metcon_item): Json<Unverified<MetconItem>>,
 //) -> HandlerResult<Json<MetconItem>> {
 //let metcon_item = metcon_item.verify_user_ap(auth, &mut db).map_err(Error::from)?;
-//MetconItem::update(metcon_item, &mut db)
+//MetconItem::update(&metcon_item, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -256,7 +256,7 @@ pub async fn update_metcon_movements(
 //let metcon_items = metcon_items
 //.verify_user_ap(auth, &mut db)
 //;
-//MetconItem::update_multiple(metcon_items, &mut db)
+//MetconItem::update_multiple(&metcon_items, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}

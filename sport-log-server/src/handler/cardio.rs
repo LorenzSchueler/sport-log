@@ -15,11 +15,11 @@ pub async fn create_routes(
     match routes {
         UnverifiedSingleOrVec::Single(route) => {
             let route = route.verify_user_ap_without_db(auth)?;
-            Route::create(route, &mut db)
+            Route::create(&route, &mut db)
         }
         UnverifiedSingleOrVec::Vec(routes) => {
             let routes = routes.verify_user_ap_without_db(auth)?;
-            Route::create_multiple(routes, &mut db)
+            Route::create_multiple(&routes, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -50,11 +50,11 @@ pub async fn update_routes(
     match routes {
         UnverifiedSingleOrVec::Single(route) => {
             let route = route.verify_user_ap(auth, &mut db)?;
-            Route::update(route, &mut db)
+            Route::update(&route, &mut db)
         }
         UnverifiedSingleOrVec::Vec(routes) => {
             let routes = routes.verify_user_ap(auth, &mut db)?;
-            Route::update_multiple(routes, &mut db)
+            Route::update_multiple(&routes, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -74,7 +74,7 @@ pub async fn update_routes(
 //let cardio_blueprint = cardio_blueprint
 //.verify_user_ap_without_db(auth)
 //.map_err(Error::from)?;
-//CardioBlueprint::create(cardio_blueprint, &mut db)
+//CardioBlueprint::create(&cardio_blueprint, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -96,7 +96,7 @@ pub async fn update_routes(
 //status,
 //message: None,
 //})?;
-//CardioBlueprint::create_multiple(cardio_blueprints, &mut db)
+//CardioBlueprint::create_multiple(&cardio_blueprints, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -137,7 +137,7 @@ pub async fn update_routes(
 //let cardio_blueprint = cardio_blueprint
 //.verify_user_ap(auth, &mut db)
 //.map_err(Error::from)?;
-//CardioBlueprint::update(cardio_blueprint, &mut db)
+//CardioBlueprint::update(&cardio_blueprint, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -154,7 +154,7 @@ pub async fn update_routes(
 //) -> HandlerResult<Json<Vec<CardioBlueprint>>> {
 //let cardio_blueprints = cardio_blueprints
 //.verify_user_ap(auth, &mut db)?;
-//CardioBlueprint::update_multiple(cardio_blueprints, &mut db)
+//CardioBlueprint::update_multiple(&cardio_blueprints, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -167,11 +167,11 @@ pub async fn create_cardio_sessions(
     match cardio_sessions {
         UnverifiedSingleOrVec::Single(cardio_session) => {
             let cardio_session = cardio_session.verify_user_ap_without_db(auth)?;
-            CardioSession::create(cardio_session, &mut db)
+            CardioSession::create(&cardio_session, &mut db)
         }
         UnverifiedSingleOrVec::Vec(cardio_sessions) => {
             let cardio_sessions = cardio_sessions.verify_user_ap_without_db(auth)?;
-            CardioSession::create_multiple(cardio_sessions, &mut db)
+            CardioSession::create_multiple(&cardio_sessions, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -202,11 +202,11 @@ pub async fn update_cardio_sessions(
     match cardio_sessions {
         UnverifiedSingleOrVec::Single(cardio_session) => {
             let cardio_session = cardio_session.verify_user_ap(auth, &mut db)?;
-            CardioSession::update(cardio_session, &mut db)
+            CardioSession::update(&cardio_session, &mut db)
         }
         UnverifiedSingleOrVec::Vec(cardio_sessions) => {
             let cardio_sessions = cardio_sessions.verify_user_ap(auth, &mut db)?;
-            CardioSession::update_multiple(cardio_sessions, &mut db)
+            CardioSession::update_multiple(&cardio_sessions, &mut db)
         }
     }
     .map(|_| StatusCode::OK)

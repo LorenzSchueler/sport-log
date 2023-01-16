@@ -6,12 +6,13 @@ use rand_core::OsRng;
 use crate::{
     schema::{action, action_event, action_provider, action_rule, platform_credential},
     Action, ActionEvent, ActionEventId, ActionProvider, ActionProviderId, ActionRule,
-    AuthApForUser, CheckAPId, CreatableActionRule, Create, DeletableActionEvent,
-    ExecutableActionEvent, GetAll, UserId,
+    AuthApForUser, CheckAPId, CreatableActionRule, DeletableActionEvent, ExecutableActionEvent,
+    GetAll, UserId,
 };
 
-impl Create for ActionProvider {
-    fn create(mut action_provider: Self, db: &mut PgConnection) -> QueryResult<usize> {
+/// same api trait [Create](crate::Create) but with mutable references
+impl ActionProvider {
+    pub fn create(mut action_provider: &mut Self, db: &mut PgConnection) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         action_provider.password = Argon2::default()
             .hash_password(action_provider.password.as_bytes(), salt.as_ref())
@@ -19,15 +20,15 @@ impl Create for ActionProvider {
             .to_string();
 
         diesel::insert_into(action_provider::table)
-            .values(action_provider)
+            .values(&*action_provider)
             .execute(db)
     }
 
-    fn create_multiple(
-        mut action_providers: Vec<Self>,
+    pub fn create_multiple(
+        action_providers: &mut [Self],
         db: &mut PgConnection,
     ) -> QueryResult<usize> {
-        for action_provider in &mut action_providers {
+        for action_provider in &mut *action_providers {
             let salt = SaltString::generate(&mut OsRng);
             action_provider.password = Argon2::default()
                 .hash_password(action_provider.password.as_bytes(), salt.as_ref())
@@ -36,7 +37,7 @@ impl Create for ActionProvider {
         }
 
         diesel::insert_into(action_provider::table)
-            .values(action_providers)
+            .values(&*action_providers)
             .execute(db)
     }
 }

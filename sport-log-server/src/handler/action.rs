@@ -25,12 +25,12 @@ pub async fn adm_create_action_providers(
 ) -> HandlerResult<StatusCode> {
     match action_providers {
         UnverifiedSingleOrVec::Single(action_provider) => {
-            let action_provider = action_provider.verify_adm(auth)?;
-            ActionProvider::create(action_provider, &mut db)
+            let mut action_provider = action_provider.verify_adm(auth)?;
+            ActionProvider::create(&mut action_provider, &mut db)
         }
         UnverifiedSingleOrVec::Vec(action_providers) => {
-            let action_providers = action_providers.verify_adm(auth)?;
-            ActionProvider::create_multiple(action_providers, &mut db)
+            let mut action_providers = action_providers.verify_adm(auth)?;
+            ActionProvider::create_multiple(&mut action_providers, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -51,8 +51,8 @@ pub async fn ap_create_action_provider(
         });
     }
 
-    let action_provider = action_provider.verify_unchecked()?;
-    ActionProvider::create(action_provider, &mut db)
+    let mut action_provider = action_provider.verify_unchecked()?;
+    ActionProvider::create(&mut action_provider, &mut db)
         .map(|_| StatusCode::OK)
         .map_err(Into::into)
 }
@@ -106,11 +106,11 @@ pub async fn ap_create_actions(
     match actions {
         UnverifiedSingleOrVec::Single(action) => {
             let action = action.verify_ap_without_db(auth)?;
-            Action::create(action, &mut db)
+            Action::create(&action, &mut db)
         }
         UnverifiedSingleOrVec::Vec(actions) => {
             let actions = actions.verify_ap_without_db(auth)?;
-            Action::create_multiple(actions, &mut db)
+            Action::create_multiple(&actions, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -157,11 +157,11 @@ pub async fn create_action_rules(
     match action_rules {
         UnverifiedSingleOrVec::Single(action_rule) => {
             let action_rule = action_rule.verify_user_without_db(auth)?;
-            ActionRule::create(action_rule, &mut db)
+            ActionRule::create(&action_rule, &mut db)
         }
         UnverifiedSingleOrVec::Vec(action_rules) => {
             let action_rules = action_rules.verify_user_without_db(auth)?;
-            ActionRule::create_multiple(action_rules, &mut db)
+            ActionRule::create_multiple(&action_rules, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -205,11 +205,11 @@ pub async fn update_action_rules(
     match action_rules {
         UnverifiedSingleOrVec::Single(action_rule) => {
             let action_rule = action_rule.verify_user_without_db(auth)?;
-            ActionRule::update(action_rule, &mut db)
+            ActionRule::update(&action_rule, &mut db)
         }
         UnverifiedSingleOrVec::Vec(action_rules) => {
             let action_rules = action_rules.verify_user(auth, &mut db)?;
-            ActionRule::update_multiple(action_rules, &mut db)
+            ActionRule::update_multiple(&action_rules, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -224,11 +224,11 @@ pub async fn create_action_events(
     match action_events {
         UnverifiedSingleOrVec::Single(action_event) => {
             let action_event = action_event.verify_user_without_db(auth)?;
-            ActionEvent::create(action_event, &mut db)
+            ActionEvent::create(&action_event, &mut db)
         }
         UnverifiedSingleOrVec::Vec(action_events) => {
             let action_events = action_events.verify_user_without_db(auth)?;
-            ActionEvent::create_multiple(action_events, &mut db)
+            ActionEvent::create_multiple(&action_events, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -243,7 +243,7 @@ pub async fn adm_create_action_events(
     match action_events {
         UnverifiedSingleOrVec::Single(action_event) => {
             let action_event = action_event.verify_adm(auth)?;
-            ActionEvent::create(action_event, &mut db)
+            ActionEvent::create(&action_event, &mut db)
         }
         UnverifiedSingleOrVec::Vec(action_events) => {
             let action_events = action_events.verify_adm(auth)?;
@@ -291,11 +291,11 @@ pub async fn update_action_events(
     match action_events {
         UnverifiedSingleOrVec::Single(action_event) => {
             let action_event = action_event.verify_user(auth, &mut db)?;
-            ActionEvent::update(action_event, &mut db)
+            ActionEvent::update(&action_event, &mut db)
         }
         UnverifiedSingleOrVec::Vec(action_events) => {
             let action_events = action_events.verify_user(auth, &mut db)?;
-            ActionEvent::update_multiple(action_events, &mut db)
+            ActionEvent::update_multiple(&action_events, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -310,11 +310,11 @@ pub async fn adm_update_action_events(
     match action_events {
         UnverifiedSingleOrVec::Single(action_event) => {
             let action_event = action_event.verify_adm(auth)?;
-            ActionEvent::update(action_event, &mut db)
+            ActionEvent::update(&action_event, &mut db)
         }
         UnverifiedSingleOrVec::Vec(action_events) => {
             let action_events = action_events.verify_adm(auth)?;
-            ActionEvent::update_multiple(action_events, &mut db)
+            ActionEvent::update_multiple(&action_events, &mut db)
         }
     }
     .map(|_| StatusCode::OK)

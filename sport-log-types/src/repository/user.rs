@@ -6,21 +6,22 @@ use chrono::{DateTime, Utc};
 use diesel::{prelude::*, result::Error};
 use rand_core::OsRng;
 
-use crate::{schema::user, CheckUserId, Create, Update, User, UserId};
+use crate::{schema::user, CheckUserId, User, UserId};
 
-impl Create for User {
-    fn create(mut user: Self, db: &mut PgConnection) -> QueryResult<usize> {
+/// same api trait [Create](crate::Create) but with mutable references
+impl User {
+    pub fn create(mut user: &mut Self, db: &mut PgConnection) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
             .hash_password(user.password.as_bytes(), &salt)
             .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
             .to_string();
 
-        diesel::insert_into(user::table).values(user).execute(db)
+        diesel::insert_into(user::table).values(&*user).execute(db)
     }
 
-    fn create_multiple(mut users: Vec<Self>, db: &mut PgConnection) -> QueryResult<usize> {
-        for user in &mut users {
+    pub fn create_multiple(users: &mut [Self], db: &mut PgConnection) -> QueryResult<usize> {
+        for user in &mut *users {
             let salt = SaltString::generate(&mut OsRng);
             user.password = Argon2::default()
                 .hash_password(user.password.as_bytes(), &salt)
@@ -28,12 +29,13 @@ impl Create for User {
                 .to_string();
         }
 
-        diesel::insert_into(user::table).values(users).execute(db)
+        diesel::insert_into(user::table).values(&*users).execute(db)
     }
 }
 
-impl Update for User {
-    fn update(mut user: Self, db: &mut PgConnection) -> QueryResult<usize> {
+/// same api trait [Update](crate::Update) but with mutable references
+impl User {
+    pub fn update(mut user: &mut Self, db: &mut PgConnection) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
             .hash_password(user.password.as_bytes(), &salt)
@@ -41,15 +43,15 @@ impl Update for User {
             .to_string();
 
         diesel::update(user::table.find(user.id))
-            .set(user)
+            .set(&*user)
             .execute(db)
     }
 
-    fn update_multiple(users: Vec<Self>, db: &mut PgConnection) -> QueryResult<usize> {
+    pub fn update_multiple(users: &mut [Self], db: &mut PgConnection) -> QueryResult<usize> {
         db.transaction(|db| {
             let len = users.len();
 
-            for mut user in users {
+            for user in users {
                 let salt = SaltString::generate(&mut OsRng);
                 user.password = Argon2::default()
                     .hash_password(user.password.as_bytes(), &salt)
@@ -57,7 +59,7 @@ impl Update for User {
                     .to_string();
 
                 diesel::update(user::table.find(user.id))
-                    .set(user)
+                    .set(&*user)
                     .execute(db)?;
             }
 

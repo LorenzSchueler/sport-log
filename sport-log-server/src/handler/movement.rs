@@ -15,11 +15,11 @@ pub async fn create_movements(
     match movements {
         UnverifiedSingleOrVec::Single(movement) => {
             let movement = movement.verify_user_ap_without_db(auth)?;
-            Movement::create(movement, &mut db)
+            Movement::create(&movement, &mut db)
         }
         UnverifiedSingleOrVec::Vec(movements) => {
             let movements = movements.verify_user_ap_without_db(auth)?;
-            Movement::create_multiple(movements, &mut db)
+            Movement::create_multiple(&movements, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -50,11 +50,11 @@ pub async fn update_movements(
     match movements {
         UnverifiedSingleOrVec::Single(movement) => {
             let movement = movement.verify_user_ap_without_db(auth)?;
-            Movement::update(movement, &mut db)
+            Movement::update(&movement, &mut db)
         }
         UnverifiedSingleOrVec::Vec(movements) => {
             let movements = movements.verify_user_ap(auth, &mut db)?;
-            Movement::update_multiple(movements, &mut db)
+            Movement::update_multiple(&movements, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -74,7 +74,7 @@ pub async fn update_movements(
 //let movement_muscle = movement_muscle
 //.verify_user_ap_create(auth, &mut db)
 //.map_err(Error::from)?;
-//MovementMuscle::create(movement_muscle, &mut db)
+//MovementMuscle::create(&movement_muscle, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -95,7 +95,7 @@ pub async fn update_movements(
 //status,
 //message: None,
 //})?;
-//MovementMuscle::create_multiple(movement_muscles, &mut db)
+//MovementMuscle::create_multiple(&movement_muscles, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -137,7 +137,7 @@ pub async fn update_movements(
 //let movement_muscle = movement_muscle
 //.verify_user_ap(auth, &mut db)
 //.map_err(Error::from)?;
-//MovementMuscle::update(movement_muscle, &mut db)
+//MovementMuscle::update(&movement_muscle, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -155,7 +155,7 @@ pub async fn update_movements(
 //let movement_muscles = movement_muscles
 //.verify_user_ap(auth, &mut db)
 //.map_err(Error::from)?;
-//MovementMuscle::update_multiple(movement_muscles, &mut db)
+//MovementMuscle::update_multiple(&movement_muscles, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}

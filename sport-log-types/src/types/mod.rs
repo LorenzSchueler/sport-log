@@ -87,11 +87,11 @@ pub struct UnverifiedIds<I>(Vec<I>);
 /// For restrictions on the types for derive to work please see [sport_log_types_derive::Create].
 #[cfg(feature = "server")]
 pub trait Create {
-    fn create(entity: Self, db: &mut PgConnection) -> QueryResult<usize>
+    fn create(entity: &Self, db: &mut PgConnection) -> QueryResult<usize>
     where
         Self: Sized;
 
-    fn create_multiple(entities: Vec<Self>, db: &mut PgConnection) -> QueryResult<usize>
+    fn create_multiple(entities: &[Self], db: &mut PgConnection) -> QueryResult<usize>
     where
         Self: Sized;
 }
@@ -197,11 +197,11 @@ pub trait GetAll {
 /// For restrictions on the types for derive to work please see [sport_log_types_derive::Update].
 #[cfg(feature = "server")]
 pub trait Update {
-    fn update(entity: Self, db: &mut PgConnection) -> QueryResult<usize>
+    fn update(entity: &Self, db: &mut PgConnection) -> QueryResult<usize>
     where
         Self: Sized;
 
-    fn update_multiple(entities: Vec<Self>, db: &mut PgConnection) -> QueryResult<usize>
+    fn update_multiple(entities: &[Self], db: &mut PgConnection) -> QueryResult<usize>
     where
         Self: Sized;
 }

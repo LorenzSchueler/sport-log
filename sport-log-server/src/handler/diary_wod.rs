@@ -15,11 +15,11 @@ pub async fn create_wods(
     match wods {
         UnverifiedSingleOrVec::Single(wod) => {
             let wod = wod.verify_user_ap_without_db(auth)?;
-            Wod::create(wod, &mut db)
+            Wod::create(&wod, &mut db)
         }
         UnverifiedSingleOrVec::Vec(wods) => {
             let wods = wods.verify_user_ap_without_db(auth)?;
-            Wod::create_multiple(wods, &mut db)
+            Wod::create_multiple(&wods, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -62,11 +62,11 @@ pub async fn update_wods(
     match wods {
         UnverifiedSingleOrVec::Single(wod) => {
             let wod = wod.verify_user_ap(auth, &mut db)?;
-            Wod::update(wod, &mut db)
+            Wod::update(&wod, &mut db)
         }
         UnverifiedSingleOrVec::Vec(wods) => {
             let wods = wods.verify_user_ap(auth, &mut db)?;
-            Wod::update_multiple(wods, &mut db)
+            Wod::update_multiple(&wods, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -81,11 +81,11 @@ pub async fn create_diaries(
     match diaries {
         UnverifiedSingleOrVec::Single(diary) => {
             let diary = diary.verify_user_ap_without_db(auth)?;
-            Diary::create(diary, &mut db)
+            Diary::create(&diary, &mut db)
         }
         UnverifiedSingleOrVec::Vec(diaries) => {
             let diaries = diaries.verify_user_ap_without_db(auth)?;
-            Diary::create_multiple(diaries, &mut db)
+            Diary::create_multiple(&diaries, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -128,11 +128,11 @@ pub async fn update_diaries(
     match diaries {
         UnverifiedSingleOrVec::Single(diary) => {
             let diary = diary.verify_user_ap(auth, &mut db)?;
-            Diary::update(diary, &mut db)
+            Diary::update(&diary, &mut db)
         }
         UnverifiedSingleOrVec::Vec(diaries) => {
             let diaries = diaries.verify_user_ap(auth, &mut db)?;
-            Diary::update_multiple(diaries, &mut db)
+            Diary::update_multiple(&diaries, &mut db)
         }
     }
     .map(|_| StatusCode::OK)

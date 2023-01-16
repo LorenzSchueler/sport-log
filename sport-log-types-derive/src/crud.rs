@@ -26,15 +26,15 @@ pub fn impl_create(ast: &syn::DeriveInput) -> TokenStream {
         use diesel::prelude::*;
 
         impl crate::Create for #typename {
-            fn create(#param_name: Self, db: &mut PgConnection) -> QueryResult<usize> {
+            fn create(#param_name: &Self, db: &mut PgConnection) -> QueryResult<usize> {
                 diesel::insert_into(#tablename::table)
                     .values(#param_name)
                     .execute(db)
             }
 
-            fn create_multiple(#param_name: Vec<Self>, db: &mut PgConnection) -> QueryResult<usize> {
+            fn create_multiple(#param_name: &[Self], db: &mut PgConnection) -> QueryResult<usize> {
                 diesel::insert_into(#tablename::table)
-                    .values(&#param_name)
+                    .values(#param_name)
                     .execute(db)
             }
         }
@@ -170,13 +170,13 @@ pub fn impl_update(ast: &syn::DeriveInput) -> TokenStream {
         use diesel::prelude::*;
 
         impl crate::Update for #typename {
-            fn update(#param_name: #typename, db: &mut PgConnection) -> QueryResult<usize> {
+            fn update(#param_name: &#typename, db: &mut PgConnection) -> QueryResult<usize> {
                 diesel::update(#tablename::table.find(#param_name.id))
                     .set(#param_name)
                     .execute(db)
             }
 
-            fn update_multiple(#param_name: Vec<#typename>, db: &mut PgConnection) -> QueryResult<usize> {
+            fn update_multiple(#param_name: &[#typename], db: &mut PgConnection) -> QueryResult<usize> {
                 db.transaction(|db| {
                     let len = #param_name.len();
                     for entity in #param_name {

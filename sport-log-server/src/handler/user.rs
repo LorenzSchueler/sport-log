@@ -1,7 +1,7 @@
 use axum::{extract::State, http::StatusCode, Json};
 use sport_log_types::{
-    AuthAdmin, AuthUser, Config, Create, DbConn, GetById, Unverified, Update, User,
-    VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyMultipleForAdminWithoutDb, VerifyUnchecked,
+    AuthAdmin, AuthUser, Config, DbConn, GetById, Unverified, User, VerifyForAdminWithoutDb,
+    VerifyForUserWithDb, VerifyMultipleForAdminWithoutDb, VerifyUnchecked,
 };
 
 use crate::handler::{ErrorMessage, HandlerError, HandlerResult, UnverifiedSingleOrVec};
@@ -13,12 +13,12 @@ pub async fn adm_create_users(
 ) -> HandlerResult<StatusCode> {
     match users {
         UnverifiedSingleOrVec::Single(user) => {
-            let user = user.verify_adm(auth)?;
-            User::create(user, &mut db)
+            let mut user = user.verify_adm(auth)?;
+            User::create(&mut user, &mut db)
         }
         UnverifiedSingleOrVec::Vec(users) => {
-            let users = users.verify_adm(auth)?;
-            User::create_multiple(users, &mut db)
+            let mut users = users.verify_adm(auth)?;
+            User::create_multiple(&mut users, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -39,8 +39,8 @@ pub async fn create_user(
         });
     }
 
-    let user = user.verify_unchecked()?;
-    User::create(user, &mut db)
+    let mut user = user.verify_unchecked()?;
+    User::create(&mut user, &mut db)
         .map(|_| StatusCode::OK)
         .map_err(Into::into)
 }
@@ -56,8 +56,8 @@ pub async fn update_user(
     mut db: DbConn,
     Json(user): Json<Unverified<User>>,
 ) -> HandlerResult<StatusCode> {
-    let user = user.verify_user(auth, &mut db)?;
-    User::update(user, &mut db)
+    let mut user = user.verify_user(auth, &mut db)?;
+    User::update(&mut user, &mut db)
         .map(|_| StatusCode::OK)
         .map_err(Into::into)
 }

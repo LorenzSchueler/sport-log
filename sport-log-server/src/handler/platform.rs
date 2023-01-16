@@ -21,11 +21,11 @@ pub async fn adm_create_platforms(
     match platforms {
         UnverifiedSingleOrVec::Single(platform) => {
             let platform = platform.verify_adm(auth)?;
-            Platform::create(platform, &mut db)
+            Platform::create(&platform, &mut db)
         }
         UnverifiedSingleOrVec::Vec(platforms) => {
             let platforms = platforms.verify_adm(auth)?;
-            Platform::create_multiple(platforms, &mut db)
+            Platform::create_multiple(&platforms, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -45,7 +45,7 @@ pub async fn ap_create_platform(
     }
 
     let platform = platform.verify_unchecked()?;
-    Platform::create(platform, &mut db)
+    Platform::create(&platform, &mut db)
         .map(|_| StatusCode::OK)
         .map_err(Into::into)
 }
@@ -113,11 +113,11 @@ pub async fn adm_update_platforms(
     match platforms {
         UnverifiedSingleOrVec::Single(platform) => {
             let platform = platform.verify_adm(auth)?;
-            Platform::update(platform, &mut db)
+            Platform::update(&platform, &mut db)
         }
         UnverifiedSingleOrVec::Vec(platforms) => {
             let platforms = platforms.verify_adm(auth)?;
-            Platform::update_multiple(platforms, &mut db)
+            Platform::update_multiple(&platforms, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -138,7 +138,7 @@ pub async fn create_platform_credentials(
                         status,
                         message: None,
                     })?;
-            PlatformCredential::create(platform_credential, &mut db)
+            PlatformCredential::create(&platform_credential, &mut db)
         }
         UnverifiedSingleOrVec::Vec(platform_credentials) => {
             let platform_credentials =
@@ -148,7 +148,7 @@ pub async fn create_platform_credentials(
                         status,
                         message: None,
                     })?;
-            PlatformCredential::create_multiple(platform_credentials, &mut db)
+            PlatformCredential::create_multiple(&platform_credentials, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -179,11 +179,11 @@ pub async fn update_platform_credentials(
     match platform_credentials {
         UnverifiedSingleOrVec::Single(platform_credential) => {
             let platform_credential = platform_credential.verify_user(auth, &mut db)?;
-            PlatformCredential::update(platform_credential, &mut db)
+            PlatformCredential::update(&platform_credential, &mut db)
         }
         UnverifiedSingleOrVec::Vec(platform_credentials) => {
             let platform_credentials = platform_credentials.verify_user(auth, &mut db)?;
-            PlatformCredential::update_multiple(platform_credentials, &mut db)
+            PlatformCredential::update_multiple(&platform_credentials, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
