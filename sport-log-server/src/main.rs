@@ -16,6 +16,8 @@
 use std::env;
 
 use axum::{Router, Server};
+#[cfg_attr(test, macro_use)]
+extern crate lazy_static;
 use diesel::{
     r2d2::{ConnectionManager, Pool},
     PgConnection,

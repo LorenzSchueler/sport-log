@@ -1748,6 +1748,7 @@ dependencies = [
  "chrono",
  "diesel",
  "diesel_migrations",
+ "lazy_static",
  "mime",
  "rand",
  "serde",
