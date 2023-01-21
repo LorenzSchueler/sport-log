@@ -8,6 +8,7 @@ use axum::{
     response::Response,
     Router,
 };
+use base64::{engine::general_purpose::STANDARD, Engine};
 use chrono::{Duration, Utc};
 use diesel::r2d2::{ConnectionManager, CustomizeConnection, Pool};
 use mime::APPLICATION_JSON;
@@ -193,7 +194,7 @@ fn basic_auth(username: &str, password: &str) -> (HeaderName, String) {
         AUTHORIZATION,
         format!(
             "Basic {}",
-            base64::encode(format!("{}:{}", username, password))
+            STANDARD.encode(format!("{}:{}", username, password))
         ),
     )
 }
@@ -203,7 +204,7 @@ fn basic_auth_as(username: &str, id: i64, password: &str) -> (HeaderName, String
         AUTHORIZATION,
         format!(
             "Basic {}",
-            base64::encode(format!("{}$id${}:{}", username, id, password))
+            STANDARD.encode(format!("{}$id${}:{}", username, id, password))
         ),
     )
 }
