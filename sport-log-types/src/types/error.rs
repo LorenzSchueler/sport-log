@@ -4,12 +4,12 @@ use std::convert::Infallible;
 #[cfg(feature = "server")]
 use axum::{
     extract::rejection::{TypedHeaderRejection, TypedHeaderRejectionReason},
-    http::StatusCode,
     response::{IntoResponse, Response},
     Json,
 };
 #[cfg(feature = "server")]
 use diesel::result::{DatabaseErrorKind, Error as DieselError};
+use http::StatusCode;
 #[cfg(feature = "server")]
 use r2d2::Error as R2D2Error;
 use serde::{ser::SerializeStruct, Deserialize, Serialize};

@@ -1777,6 +1777,7 @@ dependencies = [
  "const_format",
  "diesel",
  "diesel-derive-enum",
+ "http",
  "r2d2",
  "rand_core",
  "serde",

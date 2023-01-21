@@ -109,9 +109,9 @@ class Config extends JsonSerializable {
   final bool outputResponseJson;
   @JsonKey(defaultValue: false)
   final bool outputDbStatement;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false)
   late final bool isAndroidEmulator;
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false)
   late final Version version;
 
   static final Version apiVersion = Version(0, 3);
