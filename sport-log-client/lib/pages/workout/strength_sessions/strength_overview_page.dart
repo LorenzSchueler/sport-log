@@ -8,7 +8,7 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/models/strength/strength_records.dart';
 import 'package:sport_log/pages/workout/comments_box.dart';
-import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_chart.dart';
 import 'package:sport_log/routes.dart';
@@ -87,13 +87,10 @@ class StrengthSessionsPage extends StatelessWidget {
                 ),
               ),
             ],
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(40),
-              child: DateFilter(
-                initialState: dataProvider.dateFilter,
-                onFilterChanged: (dateFilter) =>
-                    dataProvider.dateFilter = dateFilter,
-              ),
+            bottom: DateFilter(
+              initialState: dataProvider.dateFilter,
+              onFilterChanged: (dateFilter) =>
+                  dataProvider.dateFilter = dateFilter,
             ),
           ),
           body: Stack(

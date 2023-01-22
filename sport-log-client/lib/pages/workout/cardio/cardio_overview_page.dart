@@ -10,7 +10,7 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_chart.dart';
 import 'package:sport_log/pages/workout/comments_box.dart';
-import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
@@ -95,13 +95,10 @@ class CardioSessionsPage extends StatelessWidget {
                 icon: const Icon(AppIcons.route),
               ),
             ],
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(40),
-              child: DateFilter(
-                initialState: dataProvider.dateFilter,
-                onFilterChanged: (dateFilter) =>
-                    dataProvider.dateFilter = dateFilter,
-              ),
+            bottom: DateFilter(
+              initialState: dataProvider.dateFilter,
+              onFilterChanged: (dateFilter) =>
+                  dataProvider.dateFilter = dateFilter,
             ),
           ),
           body: Stack(

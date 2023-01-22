@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/metcon/metcon_records.dart';
 import 'package:sport_log/pages/workout/comments_box.dart';
-import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_description_card.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_results_card.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -92,13 +92,10 @@ class MetconSessionsPage extends StatelessWidget {
                 icon: const Icon(AppIcons.notes),
               ),
             ],
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(40),
-              child: DateFilter(
-                initialState: dataProvider.dateFilter,
-                onFilterChanged: (dateFilter) =>
-                    dataProvider.dateFilter = dateFilter,
-              ),
+            bottom: DateFilter(
+              initialState: dataProvider.dateFilter,
+              onFilterChanged: (dateFilter) =>
+                  dataProvider.dateFilter = dateFilter,
             ),
           ),
           body: Stack(

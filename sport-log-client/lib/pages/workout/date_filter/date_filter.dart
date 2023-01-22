@@ -4,12 +4,15 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
 import 'package:sport_log/widgets/picker/date_filter_state_picker.dart';
 
-class DateFilter extends StatefulWidget {
+class DateFilter extends StatefulWidget implements PreferredSizeWidget {
   const DateFilter({
     required this.initialState,
     required this.onFilterChanged,
     super.key,
   });
+
+  @override
+  Size get preferredSize => const Size.fromHeight(34); // height of Row
 
   final DateFilterState initialState;
   final void Function(DateFilterState) onFilterChanged;
@@ -36,8 +39,9 @@ class _DateFilterState extends State<DateFilter> {
 
   @override
   Widget build(BuildContext context) {
-    final onAppBar = Theme.of(context).appBarTheme.foregroundColor!;
+    final appBarColor = Theme.of(context).appBarTheme.foregroundColor!;
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: _dateFilterState is AllFilter
           ? MainAxisAlignment.center
           : MainAxisAlignment.spaceBetween,
@@ -46,16 +50,21 @@ class _DateFilterState extends State<DateFilter> {
           RepeatIconButton(
             icon: const Icon(AppIcons.arrowBackOpen),
             onClick: () => setDateFilterState(_dateFilterState.earlier),
-            color: onAppBar,
+            color: appBarColor,
           ),
         TextButton.icon(
           icon: Text(
             _dateFilterState.label,
-            style: TextStyle(color: onAppBar),
+            style: TextStyle(color: appBarColor),
           ),
           label: Icon(
             AppIcons.arrowDropDown,
-            color: onAppBar,
+            color: appBarColor,
+          ),
+          style: const ButtonStyle(
+            minimumSize: MaterialStatePropertyAll(Size.zero),
+            padding: MaterialStatePropertyAll(EdgeInsets.only(bottom: 10)),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
           // ignore: prefer-extracting-callbacks
           onPressed: () async {
@@ -74,7 +83,7 @@ class _DateFilterState extends State<DateFilter> {
             onClick: _dateFilterState.goingForwardPossible
                 ? () => setDateFilterState(_dateFilterState.later)
                 : null,
-            color: onAppBar,
+            color: appBarColor,
           ),
       ],
     );

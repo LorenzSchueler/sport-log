@@ -7,7 +7,7 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/comments_box.dart';
-import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
@@ -61,13 +61,10 @@ class DiaryPage extends StatelessWidget {
                 ),
               ),
             ],
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(40),
-              child: DateFilter(
-                initialState: dataProvider.dateFilter,
-                onFilterChanged: (dateFilter) =>
-                    dataProvider.dateFilter = dateFilter,
-              ),
+            bottom: DateFilter(
+              initialState: dataProvider.dateFilter,
+              onFilterChanged: (dateFilter) =>
+                  dataProvider.dateFilter = dateFilter,
             ),
           ),
           body: Stack(

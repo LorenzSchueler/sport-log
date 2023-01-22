@@ -4,7 +4,7 @@ import 'package:sport_log/data_provider/overview_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/models/timeline_union.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_overview_page.dart';
-import 'package:sport_log/pages/workout/date_filter/date_filter_widget.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter.dart';
 import 'package:sport_log/pages/workout/diary/diary_overview_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_overview_page.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -61,13 +61,10 @@ class TimelinePage extends StatelessWidget {
                 ),
               ),
             ],
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(40),
-              child: DateFilter(
-                initialState: dataProvider.dateFilter,
-                onFilterChanged: (dateFilter) =>
-                    dataProvider.dateFilter = dateFilter,
-              ),
+            bottom: DateFilter(
+              initialState: dataProvider.dateFilter,
+              onFilterChanged: (dateFilter) =>
+                  dataProvider.dateFilter = dateFilter,
             ),
           ),
           body: Stack(
