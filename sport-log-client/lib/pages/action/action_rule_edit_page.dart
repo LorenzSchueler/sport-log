@@ -98,6 +98,10 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                 onTap: () async {
                   Action? action = await showActionPicker(
                     actions: widget.actionProviderDescription.actions,
+                    currentAction:
+                        widget.actionProviderDescription.actions.firstWhere(
+                      (action) => action.id == _actionRule.actionId,
+                    ),
                     context: context,
                   );
                   if (mounted && action != null) {
@@ -110,7 +114,10 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                 caption: "Weekday",
                 child: Text("${_actionRule.weekday}"),
                 onTap: () async {
-                  Weekday? weekday = await showWeekdayPicker(context: context);
+                  Weekday? weekday = await showWeekdayPicker(
+                    selectedWeekday: _actionRule.weekday,
+                    context: context,
+                  );
                   if (mounted && weekday != null) {
                     setState(() => _actionRule.weekday = weekday);
                   }

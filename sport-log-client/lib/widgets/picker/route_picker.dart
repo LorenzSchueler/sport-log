@@ -10,7 +10,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 
 Future<Route?> showRoutePicker({
   required BuildContext context,
-  Route? selectedRoute,
+  required Route? selectedRoute,
   bool dismissible = true,
 }) async {
   return showDialog<Route>(

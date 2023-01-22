@@ -354,6 +354,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
                             ),
                             onTap: () async {
                               final cardioType = await showCardioTypePicker(
+                                selectedCardioType: _cardioSessionDescription
+                                    .cardioSession.cardioType,
                                 context: context,
                               );
                               if (mounted && cardioType != null) {
@@ -392,7 +394,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
                               _cardioSessionDescription.route?.name ?? "",
                             ),
                             onTap: () async {
-                              Route? route = await showRoutePicker(
+                              final route = await showRoutePicker(
+                                selectedRoute: _cardioSessionDescription.route,
                                 context: context,
                               );
                               if (mounted && route != null) {

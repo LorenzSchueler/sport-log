@@ -96,6 +96,10 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
                 onTap: () async {
                   Action? action = await showActionPicker(
                     actions: widget.actionProviderDescription.actions,
+                    currentAction:
+                        widget.actionProviderDescription.actions.firstWhere(
+                      (action) => action.id == _actionEvent.actionId,
+                    ),
                     context: context,
                   );
                   if (mounted && action != null) {

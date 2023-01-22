@@ -58,6 +58,7 @@ class CardioTrackingSettingsPageState
                 child: Text("$_cardioType"),
                 onTap: () async {
                   final cardioType = await showCardioTypePicker(
+                    selectedCardioType: _cardioType,
                     context: context,
                   );
                   if (mounted && cardioType != null) {
@@ -70,7 +71,8 @@ class CardioTrackingSettingsPageState
                 caption: "Route to follow",
                 child: Text(_route?.name ?? "No Route"),
                 onTap: () async {
-                  Route? route = await showRoutePicker(
+                  final route = await showRoutePicker(
+                    selectedRoute: _route,
                     context: context,
                   );
                   if (mounted) {
