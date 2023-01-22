@@ -27,15 +27,27 @@ abstract class DateFilterState {
   bool operator ==(Object other) =>
       other is DateFilterState && other.start == start && other.end == end;
 
+  static List<DateFilterState Function(DateFilterState)> all = [
+    (DateFilterState dateFilterState) =>
+        DayFilter(dateFilterState.start ?? DateTime.now()),
+    (DateFilterState dateFilterState) =>
+        WeekFilter(dateFilterState.start ?? DateTime.now()),
+    (DateFilterState dateFilterState) =>
+        MonthFilter(dateFilterState.start ?? DateTime.now()),
+    (DateFilterState dateFilterState) =>
+        YearFilter(dateFilterState.start ?? DateTime.now()),
+    (DateFilterState dateFilterState) => const AllFilter()
+  ];
+
   static DateFilterState get init => MonthFilter(DateTime.now());
 }
 
 class DayFilter extends DateFilterState {
-  const DayFilter._(this.start) : super();
-
-  factory DayFilter.current() {
-    return DayFilter._(DateTime.now().beginningOfDay());
+  factory DayFilter(DateTime date) {
+    return DayFilter._(date.beginningOfDay());
   }
+
+  const DayFilter._(this.start);
 
   @override
   final DateTime start;
@@ -57,11 +69,11 @@ class DayFilter extends DateFilterState {
 }
 
 class WeekFilter extends DateFilterState {
-  const WeekFilter._(this.start) : super();
-
-  factory WeekFilter.current() {
-    return WeekFilter._(DateTime.now().beginningOfWeek());
+  factory WeekFilter(DateTime date) {
+    return WeekFilter._(date.beginningOfWeek());
   }
+
+  const WeekFilter._(this.start);
 
   @override
   final DateTime start;
@@ -83,11 +95,11 @@ class WeekFilter extends DateFilterState {
 }
 
 class MonthFilter extends DateFilterState {
-  const MonthFilter._(this.start) : super();
-
-  factory MonthFilter.current() {
-    return MonthFilter._(DateTime.now().beginningOfMonth());
+  factory MonthFilter(DateTime date) {
+    return MonthFilter._(date.beginningOfMonth());
   }
+
+  const MonthFilter._(this.start);
 
   @override
   final DateTime start;
@@ -109,11 +121,11 @@ class MonthFilter extends DateFilterState {
 }
 
 class YearFilter extends DateFilterState {
-  const YearFilter._(this.start) : super();
-
-  factory YearFilter.current() {
-    return YearFilter._(DateTime.now().beginningOfYear());
+  factory YearFilter(DateTime date) {
+    return YearFilter._(date.beginningOfYear());
   }
+
+  const YearFilter._(this.start);
 
   @override
   final DateTime start;
@@ -134,8 +146,8 @@ class YearFilter extends DateFilterState {
   String get name => 'Year';
 }
 
-class NoFilter extends DateFilterState {
-  const NoFilter() : super();
+class AllFilter extends DateFilterState {
+  const AllFilter();
 
   @override
   String get label => 'All';

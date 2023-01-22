@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
+import 'package:sport_log/widgets/picker/date_filter_state_picker.dart';
 
 class DateFilter extends StatefulWidget {
   const DateFilter({
@@ -18,87 +19,64 @@ class DateFilter extends StatefulWidget {
 }
 
 class _DateFilterState extends State<DateFilter> {
-  late DateFilterState _state = widget.initialState;
+  late DateFilterState _dateFilterState = widget.initialState;
 
   @override
   void didUpdateWidget(DateFilter oldWidget) {
-    _state = widget.initialState;
+    _dateFilterState = widget.initialState;
     super.didUpdateWidget(oldWidget);
+  }
+
+  void setDateFilterState(DateFilterState dateFilterState) {
+    if (mounted) {
+      setState(() => _dateFilterState = dateFilterState);
+      widget.onFilterChanged(_dateFilterState);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final onAppBar = Theme.of(context).appBarTheme.foregroundColor!;
     return Row(
-      mainAxisAlignment: _state is NoFilter
+      mainAxisAlignment: _dateFilterState is AllFilter
           ? MainAxisAlignment.center
           : MainAxisAlignment.spaceBetween,
       children: [
-        if (_state is! NoFilter)
+        if (_dateFilterState is! AllFilter)
           RepeatIconButton(
             icon: const Icon(AppIcons.arrowBackOpen),
-            onClick: () {
-              setState(() => _state = _state.earlier);
-
-              widget.onFilterChanged(_state);
-            },
+            onClick: () => setDateFilterState(_dateFilterState.earlier),
             color: onAppBar,
           ),
         TextButton.icon(
           icon: Text(
-            _state.label,
+            _dateFilterState.label,
             style: TextStyle(color: onAppBar),
           ),
           label: Icon(
             AppIcons.arrowDropDown,
             color: onAppBar,
           ),
-          onPressed: () {
-            showDialog<void>(context: context, builder: _datePickerBuilder);
+          // ignore: prefer-extracting-callbacks
+          onPressed: () async {
+            final dateFilterState = await showDateFilterStatePicker(
+              context: context,
+              currentDateFilterState: _dateFilterState,
+            );
+            if (dateFilterState != null) {
+              setDateFilterState(dateFilterState);
+            }
           },
         ),
-        if (_state is! NoFilter)
+        if (_dateFilterState is! AllFilter)
           RepeatIconButton(
             icon: const Icon(AppIcons.arrowForwardOpen),
-            onClick: _state.goingForwardPossible
-                ? () {
-                    setState(() => _state = _state.later);
-                    widget.onFilterChanged(_state);
-                  }
+            onClick: _dateFilterState.goingForwardPossible
+                ? () => setDateFilterState(_dateFilterState.later)
                 : null,
             color: onAppBar,
           ),
       ],
-    );
-  }
-
-  Widget _datePickerBuilder(BuildContext context) {
-    return Dialog(
-      clipBehavior: Clip.antiAlias,
-      child: SizedBox(
-        width: 0,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DayFilter.current(),
-            WeekFilter.current(),
-            MonthFilter.current(),
-            YearFilter.current(),
-            const NoFilter()
-          ].map((filter) {
-            final selected = filter == _state;
-            return ListTile(
-              title: Center(child: Text(filter.name)),
-              onTap: () {
-                setState(() => _state = filter);
-                widget.onFilterChanged(_state);
-                Navigator.pop(context);
-              },
-              selected: selected,
-            );
-          }).toList(),
-        ),
-      ),
     );
   }
 }
