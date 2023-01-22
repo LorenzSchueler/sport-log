@@ -21,11 +21,13 @@ abstract class DateFilterState {
   String get name;
 
   @override
-  int get hashCode => Object.hash(runtimeType, start);
+  int get hashCode => Object.hash(runtimeType, start, end);
 
   @override
   bool operator ==(Object other) =>
       other is DateFilterState && other.start == start && other.end == end;
+
+  static DateFilterState get init => MonthFilter(DateTime.now());
 }
 
 class DayFilter extends DateFilterState {
@@ -51,7 +53,7 @@ class DayFilter extends DateFilterState {
   String get label => start.toHumanDay();
 
   @override
-  String get name => 'Today';
+  String get name => 'Day';
 }
 
 class WeekFilter extends DateFilterState {
@@ -77,7 +79,7 @@ class WeekFilter extends DateFilterState {
   String get label => start.toHumanWeek();
 
   @override
-  String get name => 'This Week';
+  String get name => 'Week';
 }
 
 class MonthFilter extends DateFilterState {
@@ -103,7 +105,7 @@ class MonthFilter extends DateFilterState {
   String get label => start.toHumanMonth();
 
   @override
-  String get name => 'This Month';
+  String get name => 'Month';
 }
 
 class YearFilter extends DateFilterState {
@@ -129,7 +131,7 @@ class YearFilter extends DateFilterState {
   String get label => start.toHumanYear();
 
   @override
-  String get name => 'This Year';
+  String get name => 'Year';
 }
 
 class NoFilter extends DateFilterState {
@@ -145,7 +147,7 @@ class NoFilter extends DateFilterState {
   DateFilterState get later => this;
 
   @override
-  String get name => 'Everything';
+  String get name => 'All';
 
   @override
   DateTime? get end => null;

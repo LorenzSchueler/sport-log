@@ -19,7 +19,7 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
       entityAccessor;
   final Future<R> Function() Function(D) recordAccessor;
 
-  DateFilterState _dateFilter = MonthFilter.current();
+  DateFilterState _dateFilter = DateFilterState.init;
   DateFilterState get dateFilter => _dateFilter;
   set dateFilter(DateFilterState dateFilter) {
     _dateFilter = dateFilter;
