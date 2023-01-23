@@ -41,7 +41,7 @@ class Picker<T> extends StatelessWidget {
           return ListTile(
             title: Text(title(item)),
             selected: selectedItem != null
-                ? compareWith(item) == compareWith(selectedItem!)
+                ? compareWith(item) == compareWith(selectedItem as T)
                 : false,
             onTap: () => Navigator.pop(context, item),
           );

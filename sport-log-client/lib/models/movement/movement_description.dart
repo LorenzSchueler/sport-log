@@ -46,7 +46,7 @@ class MovementDescription extends CompoundEntity {
   }
 
   @override
-  bool operator ==(other) =>
+  bool operator ==(Object other) =>
       other is MovementDescription &&
       other.hasReference == hasReference &&
       other.movement == movement;

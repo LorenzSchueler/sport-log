@@ -117,7 +117,7 @@ class Movement extends AtomicEntity {
   }
 
   @override
-  bool operator ==(other) =>
+  bool operator ==(Object other) =>
       other is Movement &&
       other.id == id &&
       other.userId == userId &&

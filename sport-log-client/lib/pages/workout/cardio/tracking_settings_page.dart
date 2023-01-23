@@ -111,7 +111,7 @@ class CardioTrackingSettingsPageState
                               )
                               .toList(),
                           onChanged: (deviceId) {
-                            if (deviceId != null && deviceId is String) {
+                            if (deviceId != null) {
                               heartRateUtils.deviceId = deviceId;
                             }
                           },

@@ -75,10 +75,8 @@ class Position {
 
   @override
   bool operator ==(Object other) {
-    if (other is! Position) {
-      return false;
-    }
-    return longitude == other.longitude &&
+    return other is Position &&
+        longitude == other.longitude &&
         latitude == other.latitude &&
         elevation == other.elevation &&
         distance == other.distance &&
