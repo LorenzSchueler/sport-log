@@ -28,42 +28,21 @@ part 'accessors/wod_api.dart';
 
 enum ApiErrorType {
   // http error
-  badRequest, // 400
-  unauthorized, // 401
-  forbidden, // 403
-  notFound, // 404
-  conflict, // 409
-  internalServerError, // 500
-  unknownServerError, // unknown status code != 200, 204, 400, 401, 403, 404, 409, 500
-  // request error
-  serverUnreachable,
-  badJson,
-  unknownRequestError; // unknown request error
+  badRequest("Request is not valid."), // 400
+  unauthorized("User unauthorized."), // 401
+  forbidden("Access to resource is forbidden."), // 403
+  notFound("Resource not found."), // 404
+  conflict("Conflict with resource."), // 409
+  internalServerError("Internal server error."), // 500
+  // unknown status code != 200, 204, 400, 401, 403, 404, 409, 500 request error
+  unknownServerError("Unknown server error."),
+  serverUnreachable("Unable to establish a connection with the server."),
+  badJson("Got bad json from server."),
+  unknownRequestError("Unhandled request error."); // unknown request error
 
-  String get description {
-    switch (this) {
-      case ApiErrorType.badRequest:
-        return "Request was not valid.";
-      case ApiErrorType.unauthorized:
-        return "User unauthorized";
-      case ApiErrorType.forbidden:
-        return "Access to resource is forbidden.";
-      case ApiErrorType.notFound:
-        return "Resource not found.";
-      case ApiErrorType.conflict:
-        return "Conflict with resource.";
-      case ApiErrorType.internalServerError:
-        return "Internal server error.";
-      case ApiErrorType.unknownServerError:
-        return "Unknown server error.";
-      case ApiErrorType.serverUnreachable:
-        return "It was not possible to establish a connection with the server.";
-      case ApiErrorType.badJson:
-        return "Got bad json from server.";
-      case ApiErrorType.unknownRequestError:
-        return "Unhandled request error.";
-    }
-  }
+  const ApiErrorType(this.description);
+
+  final String description;
 }
 
 class ApiError {

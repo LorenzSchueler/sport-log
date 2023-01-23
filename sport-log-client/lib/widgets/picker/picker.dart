@@ -206,7 +206,7 @@ Future<CardioType?> showCardioTypePicker({
     builder: (_) => Picker<CardioType>(
       items: CardioType.values,
       selectedItem: selectedCardioType,
-      title: (cardioType) => cardioType.toString(),
+      title: (cardioType) => cardioType.name,
       compareWith: (cardioType) => cardioType.index,
     ),
     barrierDismissible: dismissible,
@@ -263,7 +263,7 @@ Future<Movement?> showMovementPicker({
           .getByName(name, cardioOnly: cardioOnly, distanceOnly: distanceOnly),
       editRoute: Routes.movementEdit,
       title: (movement) => movement.name,
-      subtitle: (movement) => movement.dimension.toString(),
+      subtitle: (movement) => movement.dimension.name,
     ),
     barrierDismissible: dismissible,
     context: context,
@@ -297,7 +297,7 @@ Future<Weekday?> showWeekdayPicker({
     builder: (_) => Picker<Weekday>(
       items: Weekday.values,
       selectedItem: selectedWeekday,
-      title: (weekday) => weekday.toString(),
+      title: (weekday) => weekday.name,
       compareWith: (weekday) => weekday.index,
     ),
     barrierDismissible: dismissible,

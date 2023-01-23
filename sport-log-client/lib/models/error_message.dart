@@ -7,20 +7,6 @@ enum ErrorMessageType {
   foreignKeyViolation,
   uniqueViolation,
   other;
-
-  @override
-  String toString() {
-    switch (this) {
-      case ErrorMessageType.primaryKeyViolation:
-        return "primary_key_violation";
-      case ErrorMessageType.foreignKeyViolation:
-        return "foreign_key_violation";
-      case ErrorMessageType.uniqueViolation:
-        return "unique_violation";
-      case ErrorMessageType.other:
-        return "other";
-    }
-  }
 }
 
 class ErrorMessage extends JsonSerializable {

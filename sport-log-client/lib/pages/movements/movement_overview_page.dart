@@ -136,7 +136,7 @@ class MovementCard extends StatelessWidget {
                     ),
                   ),
                   Defaults.sizedBox.vertical.normal,
-                  Text("${movementDescription.movement.dimension}"),
+                  Text(movementDescription.movement.dimension.name),
                 ],
               ),
               if (movementDescription.movement.description != null) ...[

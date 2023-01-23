@@ -9,39 +9,21 @@ import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 
 enum _SeriesType {
-  maxWeight, // kg
-  avgWeight, // kg
-  maxDistance, // m
-  minTime, // mSecs
-  sumCalories, // cal
-  maxReps, // reps
-  avgReps, // reps
-  maxEorm, // kg
-  sumVolume; // kg
+  maxWeight('Max Weight', AggregatorType.max, false), // kg
+  avgWeight('Avg Weight', AggregatorType.avg, false), // kg
+  maxDistance('Max Distance', AggregatorType.max, true), // m
+  minTime('Best Time', AggregatorType.min, false), // mSecs
+  sumCalories('Total Calories', AggregatorType.sum, false), // cal
+  maxReps('Max Reps', AggregatorType.max, true), // reps
+  avgReps('Avg Reps', AggregatorType.avg, true), // reps
+  maxEorm('Eorm', AggregatorType.max, false), // kg
+  sumVolume('Total Volume', AggregatorType.sum, true); // kg
 
-  @override
-  String toString() {
-    switch (this) {
-      case _SeriesType.maxWeight:
-        return 'Max Weight';
-      case _SeriesType.avgWeight:
-        return 'Avg Weight';
-      case _SeriesType.maxDistance:
-        return 'Best Distance';
-      case _SeriesType.minTime:
-        return 'Best Time';
-      case _SeriesType.sumCalories:
-        return 'Total Calories';
-      case _SeriesType.maxEorm:
-        return 'Eorm';
-      case _SeriesType.maxReps:
-        return 'Max Reps';
-      case _SeriesType.avgReps:
-        return 'Avg Reps';
-      case _SeriesType.sumVolume:
-        return 'Total Volume';
-    }
-  }
+  const _SeriesType(this.name, this.aggregator, this.yFromZero);
+
+  final String name;
+  final AggregatorType aggregator;
+  final bool yFromZero;
 
   double? value(StrengthSessionStats stats) {
     switch (this) {
@@ -65,36 +47,6 @@ enum _SeriesType {
         return stats.sumVolume;
     }
   }
-
-  AggregatorType aggregator() {
-    switch (this) {
-      case _SeriesType.maxWeight:
-        return AggregatorType.max;
-      case _SeriesType.avgWeight:
-        return AggregatorType.avg;
-      case _SeriesType.maxDistance:
-        return AggregatorType.max;
-      case _SeriesType.minTime:
-        return AggregatorType.min;
-      case _SeriesType.sumCalories:
-        return AggregatorType.sum;
-      case _SeriesType.maxEorm:
-        return AggregatorType.max;
-      case _SeriesType.maxReps:
-        return AggregatorType.max;
-      case _SeriesType.avgReps:
-        return AggregatorType.avg;
-      case _SeriesType.sumVolume:
-        return AggregatorType.sum;
-    }
-  }
-
-  bool isYFromZero() => [
-        _SeriesType.maxDistance,
-        _SeriesType.maxReps,
-        _SeriesType.avgReps,
-        _SeriesType.sumVolume
-      ].contains(this);
 }
 
 class StrengthChart extends StatefulWidget {
@@ -167,10 +119,9 @@ class _StrengthChartState extends State<StrengthChart> {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: SelectionBar(
-              onChange: (_SeriesType type) =>
-                  setState(() => _selectedSeries = type),
+              onChange: (type) => setState(() => _selectedSeries = type),
               items: _availableSeries,
-              getLabel: (_SeriesType type) => type.toString(),
+              getLabel: (type) => type.name,
               selectedItem: _selectedSeries,
             ),
           ),
@@ -187,8 +138,8 @@ class _StrengthChartState extends State<StrengthChart> {
               .whereNotNull()
               .toList(),
           dateFilterState: widget.dateFilterState,
-          yFromZero: _selectedSeries.isYFromZero(),
-          aggregatorType: _selectedSeries.aggregator(),
+          yFromZero: _selectedSeries.yFromZero,
+          aggregatorType: _selectedSeries.aggregator,
         ),
       ],
     );

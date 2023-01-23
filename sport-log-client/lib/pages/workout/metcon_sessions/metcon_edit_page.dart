@@ -179,7 +179,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
     return SelectionBar<MetconType>(
       onChange: _setType,
       items: MetconType.values,
-      getLabel: (metconType) => "$metconType",
+      getLabel: (metconType) => metconType.name,
       selectedItem: _metconDescription.metcon.metconType,
     );
   }

@@ -185,10 +185,10 @@ class _MovementEditPageState extends State<MovementEditPage> {
 
   Widget get _dimInput {
     return SelectionBar<MovementDimension>(
-      onChange: (dim) =>
-          setState(() => _movementDescription.movement.dimension = dim),
+      onChange: (dimension) =>
+          setState(() => _movementDescription.movement.dimension = dimension),
       items: MovementDimension.values,
-      getLabel: (dim) => "$dim",
+      getLabel: (dimension) => dimension.name,
       selectedItem: _movementDescription.movement.dimension,
     );
   }

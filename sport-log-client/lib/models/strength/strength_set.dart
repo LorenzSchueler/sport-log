@@ -70,11 +70,11 @@ class StrengthSet extends AtomicEntity {
     }
   }
 
-  String toDisplayName(MovementDimension dim, {bool withEorm = false}) {
+  String toDisplayName(MovementDimension dimension, {bool withEorm = false}) {
     final weightStr = weight == null ? null : formatWeight(weight!);
-    switch (dim) {
+    switch (dimension) {
       case MovementDimension.reps:
-        final eormVal = withEorm ? eorm(dim) : null;
+        final eormVal = withEorm ? eorm(dimension) : null;
         final eormStr = eormVal != null ? formatWeight(eormVal) : null;
         return weightStr != null
             ? eormStr != null

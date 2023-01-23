@@ -349,7 +349,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
                             leading: AppIcons.sports,
                             caption: "Cardio Type",
                             child: Text(
-                              "${_cardioSessionDescription.cardioSession.cardioType}",
+                              _cardioSessionDescription
+                                  .cardioSession.cardioType.name,
                             ),
                             onTap: () async {
                               final cardioType = await showCardioTypePicker(

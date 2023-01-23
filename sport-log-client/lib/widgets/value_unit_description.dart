@@ -64,7 +64,7 @@ class ValueUnitDescription extends StatelessWidget {
 
   ValueUnitDescription.cardioType(CardioType cardioType, {Key? key})
       : this(
-          value: cardioType.toString(),
+          value: cardioType.name,
           unit: null,
           description: "Type",
           scale: 1.3,

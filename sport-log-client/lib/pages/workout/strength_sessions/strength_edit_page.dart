@@ -177,7 +177,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         }
       },
       child: Text(
-        '${_strengthSessionDescription.movement.name} (${_strengthSessionDescription.movement.dimension})',
+        '${_strengthSessionDescription.movement.name} (${_strengthSessionDescription.movement.dimension.name})',
       ),
     );
   }

@@ -2,37 +2,20 @@ import 'package:json_annotation/json_annotation.dart';
 
 enum Weekday {
   @JsonValue("Monday")
-  monday,
+  monday("Monday"),
   @JsonValue("Tuesday")
-  tuesday,
+  tuesday("Tuesday"),
   @JsonValue("Wednesday")
-  wednesday,
+  wednesday("Wednesday"),
   @JsonValue("Thursday")
-  thursday,
+  thursday("Thursday"),
   @JsonValue("Friday")
-  friday,
+  friday("Friday"),
   @JsonValue("Saturday")
-  saturday,
+  saturday("Saturday"),
   @JsonValue("Sunday")
-  sunday;
+  sunday("Sunday");
 
-  @override
-  String toString() {
-    switch (this) {
-      case Weekday.monday:
-        return "Monday";
-      case Weekday.tuesday:
-        return "Tuesday";
-      case Weekday.wednesday:
-        return "Wednesday";
-      case Weekday.thursday:
-        return "Thursday";
-      case Weekday.friday:
-        return "Friday";
-      case Weekday.saturday:
-        return "Saturday";
-      case Weekday.sunday:
-        return "Sunday";
-    }
-  }
+  const Weekday(this.name);
+  final String name;
 }

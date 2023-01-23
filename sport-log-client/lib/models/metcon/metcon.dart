@@ -12,23 +12,15 @@ part 'metcon.g.dart';
 
 enum MetconType {
   @JsonValue("Amrap")
-  amrap,
+  amrap("Amrap"),
   @JsonValue("Emom")
-  emom,
+  emom("Emom"),
   @JsonValue("ForTime")
-  forTime;
+  forTime("For Time");
 
-  @override
-  String toString() {
-    switch (this) {
-      case MetconType.amrap:
-        return "Amrap";
-      case MetconType.emom:
-        return "Emom";
-      case MetconType.forTime:
-        return "For Time";
-    }
-  }
+  const MetconType(this.name);
+
+  final String name;
 }
 
 @JsonSerializable()

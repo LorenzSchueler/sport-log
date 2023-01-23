@@ -18,23 +18,15 @@ part 'cardio_session.g.dart';
 
 enum CardioType {
   @JsonValue("Training")
-  training,
+  training("Training"),
   @JsonValue("ActiveRecovery")
-  activeRecovery,
+  activeRecovery("Active Recovery"),
   @JsonValue("Freetime")
-  freetime;
+  freetime("Freetime");
 
-  @override
-  String toString() {
-    switch (this) {
-      case CardioType.training:
-        return "Training";
-      case CardioType.activeRecovery:
-        return "Active Recovery";
-      case CardioType.freetime:
-        return "Freetime";
-    }
-  }
+  const CardioType(this.name);
+
+  final String name;
 }
 
 @JsonSerializable()

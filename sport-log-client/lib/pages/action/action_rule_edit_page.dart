@@ -111,7 +111,7 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
               EditTile(
                 leading: AppIcons.calendar,
                 caption: "Weekday",
-                child: Text("${_actionRule.weekday}"),
+                child: Text(_actionRule.weekday.name),
                 onTap: () async {
                   Weekday? weekday = await showWeekdayPicker(
                     selectedWeekday: _actionRule.weekday,

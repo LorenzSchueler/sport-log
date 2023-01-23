@@ -62,7 +62,7 @@ class MetconMovementDescription extends CompoundEntity {
     } else if (movement.dimension == MovementDimension.time) {
       unit = "";
     } else {
-      unit = "${movement.dimension}";
+      unit = movement.dimension.name;
     }
 
     final weight = metconMovement.maleWeight != null &&

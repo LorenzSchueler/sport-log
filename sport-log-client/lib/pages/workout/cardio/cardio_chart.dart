@@ -7,30 +7,18 @@ import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 
 enum _SeriesType {
-  sumDistance,
-  sumDuration,
-  avgSpeed,
-  avgTempo,
-  avgCadence,
-  avgHeartRate;
+  sumDistance('Sum Distance', AggregatorType.sum, true),
+  sumDuration('Sum Duration', AggregatorType.sum, true),
+  avgSpeed('Avg Speed', AggregatorType.avg, true),
+  avgTempo('Avg Tempo', AggregatorType.avg, true),
+  avgCadence('Avg Cadence', AggregatorType.avg, false),
+  avgHeartRate('Avg Heart Rate', AggregatorType.avg, false);
 
-  @override
-  String toString() {
-    switch (this) {
-      case _SeriesType.sumDistance:
-        return 'Sum Distance';
-      case _SeriesType.sumDuration:
-        return 'Sum Duration';
-      case _SeriesType.avgSpeed:
-        return 'Avg Speed';
-      case _SeriesType.avgTempo:
-        return 'Avg Tempo';
-      case _SeriesType.avgCadence:
-        return 'Avg Cadence';
-      case _SeriesType.avgHeartRate:
-        return 'Avg Heart Rate';
-    }
-  }
+  const _SeriesType(this.name, this.aggregator, this.yFromZero);
+
+  final String name;
+  final AggregatorType aggregator;
+  final bool yFromZero;
 
   double? value(CardioSession cardioSession) {
     switch (this) {
@@ -51,30 +39,6 @@ enum _SeriesType {
         return cardioSession.avgHeartRate?.toDouble();
     }
   }
-
-  AggregatorType aggregator() {
-    switch (this) {
-      case _SeriesType.sumDistance:
-        return AggregatorType.sum;
-      case _SeriesType.sumDuration:
-        return AggregatorType.sum;
-      case _SeriesType.avgSpeed:
-        return AggregatorType.avg;
-      case _SeriesType.avgTempo:
-        return AggregatorType.avg;
-      case _SeriesType.avgCadence:
-        return AggregatorType.avg;
-      case _SeriesType.avgHeartRate:
-        return AggregatorType.avg;
-    }
-  }
-
-  bool isYFromZero() => [
-        _SeriesType.sumDuration,
-        _SeriesType.sumDistance,
-        _SeriesType.avgSpeed,
-        _SeriesType.avgTempo,
-      ].contains(this);
 }
 
 class CardioChart extends StatefulWidget {
@@ -102,10 +66,9 @@ class _CardioChartState extends State<CardioChart> {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: SelectionBar(
-              onChange: (_SeriesType type) =>
-                  setState(() => _selectedSeries = type),
+              onChange: (type) => setState(() => _selectedSeries = type),
               items: _SeriesType.values,
-              getLabel: (_SeriesType type) => type.toString(),
+              getLabel: (type) => type.name,
               selectedItem: _selectedSeries,
             ),
           ),
@@ -122,8 +85,8 @@ class _CardioChartState extends State<CardioChart> {
               .whereNotNull()
               .toList(),
           dateFilterState: widget.dateFilterState,
-          yFromZero: _selectedSeries.isYFromZero(),
-          aggregatorType: _selectedSeries.aggregator(),
+          yFromZero: _selectedSeries.yFromZero,
+          aggregatorType: _selectedSeries.aggregator,
         ),
       ],
     );

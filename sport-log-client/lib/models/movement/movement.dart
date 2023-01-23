@@ -12,27 +12,17 @@ part 'movement.g.dart';
 
 enum MovementDimension {
   @JsonValue('Reps')
-  reps,
+  reps("Reps"),
   @JsonValue('Time')
-  time,
+  time("Time"),
   @JsonValue('Distance')
-  distance,
+  distance("Distance"),
   @JsonValue('Energy')
-  energy;
+  energy("Energy");
 
-  @override
-  String toString() {
-    switch (this) {
-      case MovementDimension.reps:
-        return 'Reps';
-      case MovementDimension.energy:
-        return 'Calories';
-      case MovementDimension.distance:
-        return 'Distance';
-      case MovementDimension.time:
-        return 'Time';
-    }
-  }
+  const MovementDimension(this.name);
+
+  final String name;
 }
 
 @JsonSerializable()
