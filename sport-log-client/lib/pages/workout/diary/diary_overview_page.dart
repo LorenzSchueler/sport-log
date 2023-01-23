@@ -123,10 +123,10 @@ class DiaryPage extends StatelessWidget {
             context: context,
             sessionsPageTab: SessionsPageTab.diary,
           ),
-          drawer: MainDrawer(selectedRoute: Routes.diary.overview),
+          drawer: const MainDrawer(selectedRoute: Routes.diaryOverview),
           floatingActionButton: FloatingActionButton(
             child: const Icon(AppIcons.add),
-            onPressed: () => Navigator.pushNamed(context, Routes.diary.edit),
+            onPressed: () => Navigator.pushNamed(context, Routes.diaryEdit),
           ),
         ),
       ),
@@ -143,7 +143,7 @@ class DiaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, Routes.diary.edit, arguments: diary);
+        Navigator.pushNamed(context, Routes.diaryEdit, arguments: diary);
       },
       child: Card(
         margin: EdgeInsets.zero,

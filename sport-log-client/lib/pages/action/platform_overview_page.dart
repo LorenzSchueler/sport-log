@@ -51,7 +51,7 @@ class PlatformOverviewPage extends StatelessWidget {
                     ),
                   ),
           ),
-          drawer: MainDrawer(selectedRoute: Routes.action.platformOverview),
+          drawer: const MainDrawer(selectedRoute: Routes.platformOverview),
         ),
       ),
     );
@@ -107,7 +107,7 @@ class PlatformCard extends StatelessWidget {
                 onTap: !platformDescription.platform.credential ||
                         platformDescription.platformCredential != null
                     ? () => Navigator.of(context).pushNamed(
-                          Routes.action.actionProviderOverview,
+                          Routes.actionProviderOverview,
                           arguments: actionProvider,
                         )
                     : () => showMessageDialog(

@@ -54,13 +54,42 @@ abstract class Routes {
   static const heartRate = "/heart_rate";
   static const settings = "/settings";
   static const about = "/about";
-  static const action = _ActionRoutes();
-  static const timeline = _TimelineRoutes();
-  static const metcon = _MetconRoutes();
-  static const movement = _MovementRoutes();
-  static const cardio = _CardioRoutes();
-  static const strength = _StrengthRoutes();
-  static const diary = _DiaryRoutes();
+  // platform & ap
+  static const String platformOverview = '/action/platform_overview';
+  static const String actionProviderOverview = '/action/action_overview';
+  static const String actionRuleEdit = '/action/action_rule_edit';
+  static const String actionEventEdit = '/action/action_event_edit';
+  // movement
+  static const String movementOverview = '/movement/overview';
+  static const String movementEdit = '/movement/edit';
+  // timeline
+  static const String timelineOverview = '/timeline/overview';
+  // strength
+  static const String strengthOverview = '/strength/overview';
+  static const String strengthDetails = '/strength/details';
+  static const String strengthEdit = '/strength/edit';
+  // metcon
+  static const String metconOverview = '/metcon/overview';
+  static const String metconDetails = '/metcon/details';
+  static const String metconEdit = '/metcon/edit';
+  // metcon session
+  static const String metconSessionOverview = '/metcon_session/overview';
+  static const String metconSessionDetails = '/metcon_session/details';
+  static const String metconSessionEdit = '/metcon_session/edit';
+  // route
+  static const String routeOverview = '/route/overview';
+  static const String routeDetails = '/route/details';
+  static const String routeEdit = '/route/edit';
+  static const String routeUpload = '/route/upload';
+  // cardio
+  static const String cardioOverview = '/cardio/overview';
+  static const String cardioDetails = '/cardio/details';
+  static const String cardioEdit = '/cardio/edit';
+  static const String trackingSettings = '/cardio/tracking_settings';
+  static const String tracking = '/cardio/tracking';
+  // diary
+  static const String diaryOverview = '/diary/overview';
+  static const String diaryEdit = '/diary/edit';
 
   static Widget _checkLogin(Widget Function() builder) {
     return Settings.instance.userExists() ? builder() : const LandingPage();
@@ -103,15 +132,15 @@ abstract class Routes {
         _checkLoginAndroidIos(context, () => const HeartRatePage()),
     Routes.settings: (_) => _checkLogin(() => const SettingsPage()),
     Routes.about: (_) => _checkLogin(() => const AboutPage()),
-    // Action
-    Routes.action.platformOverview: (_) =>
+    // platform & ap
+    Routes.platformOverview: (_) =>
         _checkLogin(() => const PlatformOverviewPage()),
-    Routes.action.actionProviderOverview: (context) => _checkLogin(() {
+    Routes.actionProviderOverview: (context) => _checkLogin(() {
           final actionProvider =
               ModalRoute.of(context)!.settings.arguments! as ActionProvider;
           return ActionProviderOverviewPage(actionProvider: actionProvider);
         }),
-    Routes.action.actionRuleEdit: (context) => _checkLogin(() {
+    Routes.actionRuleEdit: (context) => _checkLogin(() {
           final args =
               ModalRoute.of(context)!.settings.arguments! as List<dynamic>;
           return ActionRuleEditPage(
@@ -119,7 +148,7 @@ abstract class Routes {
             actionRule: args[1] as ActionRule?,
           );
         }),
-    Routes.action.actionEventEdit: (context) => _checkLogin(() {
+    Routes.actionEventEdit: (context) => _checkLogin(() {
           final args =
               ModalRoute.of(context)!.settings.arguments! as List<dynamic>;
           return ActionEventEditPage(
@@ -128,8 +157,8 @@ abstract class Routes {
           );
         }),
     // movement
-    Routes.movement.overview: (_) => _checkLogin(MovementsPage.new),
-    Routes.movement.edit: (context) => _checkLogin(() {
+    Routes.movementOverview: (_) => _checkLogin(MovementsPage.new),
+    Routes.movementEdit: (context) => _checkLogin(() {
           final arg = ModalRoute.of(context)?.settings.arguments;
           if (arg is MovementDescription) {
             return MovementEditPage(movementDescription: arg);
@@ -138,23 +167,48 @@ abstract class Routes {
           }
           return const MovementEditPage(movementDescription: null);
         }),
+    // timeline
+    Routes.timelineOverview: (_) => _checkLogin(TimelinePage.new),
+    // strength
+    Routes.strengthOverview: (_) => _checkLogin(StrengthSessionsPage.new),
+    Routes.strengthDetails: (context) => _checkLogin(() {
+          final strengthSessionDescription = ModalRoute.of(context)!
+              .settings
+              .arguments! as StrengthSessionDescription;
+          return StrengthSessionDetailsPage(
+            strengthSessionDescription: strengthSessionDescription,
+          );
+        }),
+    Routes.strengthEdit: (context) => _checkLogin(() {
+          var isNew = false;
+          var arg = ModalRoute.of(context)?.settings.arguments
+              as StrengthSessionDescription?;
+          if (arg == null) {
+            arg = StrengthSessionDescription.defaultValue();
+            isNew = true;
+          }
+          return arg == null
+              ? const MovementEditPage(movementDescription: null)
+              : StrengthSessionEditPage(
+                  strengthSessionDescription: arg,
+                  isNew: isNew,
+                );
+        }),
     // metcon
-    Routes.metcon.overview: (_) => _checkLogin(MetconsPage.new),
-    Routes.metcon.details: (context) => _checkLogin(() {
+    Routes.metconOverview: (_) => _checkLogin(MetconsPage.new),
+    Routes.metconDetails: (context) => _checkLogin(() {
           final metconDescription =
               ModalRoute.of(context)!.settings.arguments! as MetconDescription;
           return MetconDetailsPage(metconDescription: metconDescription);
         }),
-    Routes.metcon.edit: (context) => _checkLogin(() {
+    Routes.metconEdit: (context) => _checkLogin(() {
           final metconDescription =
               ModalRoute.of(context)?.settings.arguments as MetconDescription?;
           return MetconEditPage(metconDescription: metconDescription);
         }),
-    // timeline
-    Routes.timeline.overview: (_) => _checkLogin(TimelinePage.new),
     // metcon session
-    Routes.metcon.sessionOverview: (_) => _checkLogin(MetconSessionsPage.new),
-    Routes.metcon.sessionDetails: (context) => _checkLogin(() {
+    Routes.metconSessionOverview: (_) => _checkLogin(MetconSessionsPage.new),
+    Routes.metconSessionDetails: (context) => _checkLogin(() {
           final metconSessionDescription = ModalRoute.of(context)!
               .settings
               .arguments! as MetconSessionDescription;
@@ -162,7 +216,7 @@ abstract class Routes {
             metconSessionDescription: metconSessionDescription,
           );
         }),
-    Routes.metcon.sessionEdit: (context) => _checkLogin(() {
+    Routes.metconSessionEdit: (context) => _checkLogin(() {
           var arg = ModalRoute.of(context)?.settings.arguments;
           final bool isNew;
           final MetconSessionDescription? metconSessionDescription;
@@ -185,48 +239,30 @@ abstract class Routes {
                   isNew: isNew,
                 );
         }),
-    // strength
-    Routes.strength.overview: (_) => _checkLogin(StrengthSessionsPage.new),
-    Routes.strength.details: (context) => _checkLogin(() {
-          final strengthSessionDescription = ModalRoute.of(context)!
-              .settings
-              .arguments! as StrengthSessionDescription;
-          return StrengthSessionDetailsPage(
-            strengthSessionDescription: strengthSessionDescription,
+    // route
+    Routes.routeOverview: (_) => _checkLogin(RoutePage.new),
+    Routes.routeDetails: (context) => _checkLogin(() {
+          final route = ModalRoute.of(context)!.settings.arguments! as Route;
+          return RouteDetailsPage(route: route);
+        }),
+    Routes.routeEdit: (context) => _checkLogin(() {
+          final route = ModalRoute.of(context)?.settings.arguments as Route?;
+          return RouteEditPage(
+            route: route,
           );
         }),
-    Routes.strength.edit: (context) => _checkLogin(() {
-          var isNew = false;
-          var arg = ModalRoute.of(context)?.settings.arguments
-              as StrengthSessionDescription?;
-          if (arg == null) {
-            arg = StrengthSessionDescription.defaultValue();
-            isNew = true;
-          }
-          return arg == null
-              ? const MovementEditPage(movementDescription: null)
-              : StrengthSessionEditPage(
-                  strengthSessionDescription: arg,
-                  isNew: isNew,
-                );
-        }),
+    Routes.routeUpload: (_) => _checkLogin(() => const RouteUploadPage()),
     // cardio
-    Routes.cardio.overview: (_) => _checkLogin(CardioSessionsPage.new),
-    Routes.cardio.trackingSettings: (context) => _checkLoginAndroidIos(
-          context,
-          () => const CardioTrackingSettingsPage(),
-        ),
-    Routes.cardio.tracking: (context) => _checkLoginAndroidIos(context, () {
-          final args =
-              ModalRoute.of(context)!.settings.arguments! as List<dynamic>;
-          return CardioTrackingPage(
-            movement: args[0] as Movement,
-            cardioType: args[1] as CardioType,
-            route: args[2] as Route?,
-            heartRateUtils: args[3] as HeartRateUtils?,
+    Routes.cardioOverview: (_) => _checkLogin(CardioSessionsPage.new),
+    Routes.cardioDetails: (context) => _checkLogin(() {
+          final cardioSessionDescription = ModalRoute.of(context)!
+              .settings
+              .arguments! as CardioSessionDescription;
+          return CardioDetailsPage(
+            cardioSessionDescription: cardioSessionDescription,
           );
         }),
-    Routes.cardio.cardioEdit: (context) => _checkLogin(() {
+    Routes.cardioEdit: (context) => _checkLogin(() {
           var isNew = false;
           var cardioSessionDescription = ModalRoute.of(context)
               ?.settings
@@ -242,30 +278,23 @@ abstract class Routes {
                   isNew: isNew,
                 );
         }),
-    Routes.cardio.cardioDetails: (context) => _checkLogin(() {
-          final cardioSessionDescription = ModalRoute.of(context)!
-              .settings
-              .arguments! as CardioSessionDescription;
-          return CardioDetailsPage(
-            cardioSessionDescription: cardioSessionDescription,
+    Routes.trackingSettings: (context) => _checkLoginAndroidIos(
+          context,
+          () => const CardioTrackingSettingsPage(),
+        ),
+    Routes.tracking: (context) => _checkLoginAndroidIos(context, () {
+          final args =
+              ModalRoute.of(context)!.settings.arguments! as List<dynamic>;
+          return CardioTrackingPage(
+            movement: args[0] as Movement,
+            cardioType: args[1] as CardioType,
+            route: args[2] as Route?,
+            heartRateUtils: args[3] as HeartRateUtils?,
           );
-        }),
-    Routes.cardio.routeOverview: (_) => _checkLogin(RoutePage.new),
-    Routes.cardio.routeUpload: (_) =>
-        _checkLogin(() => const RouteUploadPage()),
-    Routes.cardio.routeEdit: (context) => _checkLogin(() {
-          final route = ModalRoute.of(context)?.settings.arguments as Route?;
-          return RouteEditPage(
-            route: route,
-          );
-        }),
-    Routes.cardio.routeDetails: (context) => _checkLogin(() {
-          final route = ModalRoute.of(context)!.settings.arguments! as Route;
-          return RouteDetailsPage(route: route);
         }),
     // diary
-    Routes.diary.overview: (_) => _checkLogin(DiaryPage.new),
-    Routes.diary.edit: (context) => _checkLogin(() {
+    Routes.diaryOverview: (_) => _checkLogin(DiaryPage.new),
+    Routes.diaryEdit: (context) => _checkLogin(() {
           final diary = ModalRoute.of(context)?.settings.arguments as Diary?;
           return DiaryEditPage(diary: diary);
         })
@@ -275,66 +304,4 @@ abstract class Routes {
 
   static Widget Function(BuildContext) get(String routeName) =>
       _routeList[routeName]!;
-}
-
-class _ActionRoutes {
-  const _ActionRoutes();
-
-  final String platformOverview = '/action/platform_overview';
-  final String actionProviderOverview = '/action/action_overview';
-  final String actionRuleEdit = '/action/action_rule_edit';
-  final String actionEventEdit = '/action/action_event_edit';
-}
-
-class _MovementRoutes {
-  const _MovementRoutes();
-
-  final String overview = '/movement/overview';
-  final String edit = '/movement/edit';
-}
-
-class _TimelineRoutes {
-  const _TimelineRoutes();
-
-  final String overview = '/timeline/overview';
-}
-
-class _MetconRoutes {
-  const _MetconRoutes();
-
-  final String overview = '/metcon/overview';
-  final String details = '/metcon/details';
-  final String edit = '/metcon/edit';
-  final String sessionOverview = '/metcon/session_overview';
-  final String sessionDetails = '/metcon/session_details';
-  final String sessionEdit = '/metcon/session_edit';
-}
-
-class _CardioRoutes {
-  const _CardioRoutes();
-
-  final String overview = '/cardio/overview';
-  final String trackingSettings = '/cardio/tracking_settings';
-  final String tracking = '/cardio/tracking';
-  final String cardioEdit = '/cardio/cardio_edit';
-  final String cardioDetails = '/cardio/cardio_details';
-  final String routeEdit = '/cardio/route_edit';
-  final String routeDetails = '/cardio/route_details';
-  final String routeUpload = '/cardio/route_upload';
-  final String routeOverview = '/cardio/route_overview';
-}
-
-class _StrengthRoutes {
-  const _StrengthRoutes();
-
-  final String overview = '/strength/overview';
-  final String details = '/strength/details';
-  final String edit = '/strength/edit';
-}
-
-class _DiaryRoutes {
-  const _DiaryRoutes();
-
-  final String overview = '/diary/overview';
-  final String edit = '/diary/edit';
 }

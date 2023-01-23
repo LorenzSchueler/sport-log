@@ -144,10 +144,10 @@ class StrengthSessionsPage extends StatelessWidget {
             context: context,
             sessionsPageTab: SessionsPageTab.strength,
           ),
-          drawer: MainDrawer(selectedRoute: Routes.strength.overview),
+          drawer: const MainDrawer(selectedRoute: Routes.strengthOverview),
           floatingActionButton: FloatingActionButton(
             child: const Icon(AppIcons.add),
-            onPressed: () => Navigator.pushNamed(context, Routes.strength.edit),
+            onPressed: () => Navigator.pushNamed(context, Routes.strengthEdit),
           ),
         ),
       ),
@@ -172,7 +172,7 @@ class StrengthSessionCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(
         context,
-        Routes.strength.details,
+        Routes.strengthDetails,
         arguments: strengthSessionDescription,
       ),
       child: Card(

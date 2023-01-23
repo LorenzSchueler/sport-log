@@ -229,7 +229,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _submit(BuildContext context) async {
     if (widget.loginType.isNoAccount) {
       Account.noAccount(_user);
-      await Navigator.of(context).newBase(Routes.timeline.overview);
+      await Navigator.of(context).newBase(Routes.timelineOverview);
       return;
     }
     setState(() => _loginPending = true);
@@ -241,7 +241,7 @@ class _LoginPageState extends State<LoginPage> {
     }
     if (result.isSuccess) {
       if (mounted) {
-        await Navigator.of(context).newBase(Routes.timeline.overview);
+        await Navigator.of(context).newBase(Routes.timelineOverview);
       }
     } else {
       await showMessageDialog(

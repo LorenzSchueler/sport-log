@@ -72,7 +72,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   Future<void> _pushEditPage() async {
     final returnObj = await Navigator.pushNamed(
       context,
-      Routes.cardio.cardioEdit,
+      Routes.cardioEdit,
       arguments: _cardioSessionDescription,
     );
     if (returnObj is ReturnObject<CardioSessionDescription> && mounted) {

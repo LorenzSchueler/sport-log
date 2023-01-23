@@ -30,9 +30,9 @@ class MainDrawer extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onBackground,
               ),
               onTap: () {
-                Navigator.of(context).newBase(Routes.timeline.overview);
+                Navigator.of(context).newBase(Routes.timelineOverview);
               },
-              selected: selectedRoute == Routes.timeline.overview,
+              selected: selectedRoute == Routes.timelineOverview,
             ),
             ListTile(
               title: const Text('Movements'),
@@ -41,8 +41,8 @@ class MainDrawer extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onBackground,
               ),
               onTap: () =>
-                  Navigator.of(context).newBase(Routes.movement.overview),
-              selected: selectedRoute == Routes.movement.overview,
+                  Navigator.of(context).newBase(Routes.movementOverview),
+              selected: selectedRoute == Routes.movementOverview,
             ),
             ListTile(
               leading: Icon(
@@ -87,8 +87,8 @@ class MainDrawer extends StatelessWidget {
               ),
               title: const Text('Server Actions'),
               onTap: () =>
-                  Navigator.of(context).newBase(Routes.action.platformOverview),
-              selected: selectedRoute == Routes.action.platformOverview,
+                  Navigator.of(context).newBase(Routes.platformOverview),
+              selected: selectedRoute == Routes.platformOverview,
             ),
             ListTile(
               leading: Icon(

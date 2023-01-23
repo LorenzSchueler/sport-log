@@ -33,7 +33,7 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
   Future<void> _pushEditPage() async {
     final returnObj = await Navigator.pushNamed(
       context,
-      Routes.metcon.edit,
+      Routes.metconEdit,
       arguments: _metconDescription,
     );
     if (returnObj is ReturnObject<MetconDescription> && mounted) {
@@ -55,7 +55,7 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
         actions: [
           IconButton(
             onPressed: () => Navigator.of(context).pushNamed(
-              Routes.metcon.sessionEdit,
+              Routes.metconSessionEdit,
               arguments: _metconDescription,
             ),
             icon: const Icon(AppIcons.add),

@@ -97,7 +97,7 @@ class TimelinePage extends StatelessWidget {
             context: context,
             sessionsPageTab: SessionsPageTab.timeline,
           ),
-          drawer: MainDrawer(selectedRoute: Routes.timeline.overview),
+          drawer: const MainDrawer(selectedRoute: Routes.timelineOverview),
           floatingActionButton: null,
         ),
       ),

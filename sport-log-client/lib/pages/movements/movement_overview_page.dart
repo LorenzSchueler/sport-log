@@ -54,7 +54,7 @@ class MovementsPage extends StatelessWidget {
               ),
             ],
           ),
-          drawer: MainDrawer(selectedRoute: Routes.movement.overview),
+          drawer: const MainDrawer(selectedRoute: Routes.movementOverview),
           body: SyncRefreshIndicator(
             child: dataProvider.entities.isEmpty
                 ? const Center(
@@ -78,7 +78,7 @@ class MovementsPage extends StatelessWidget {
           floatingActionButton: FloatingActionButton(
             child: const Icon(AppIcons.add),
             onPressed: () async {
-              await Navigator.pushNamed(context, Routes.movement.edit);
+              await Navigator.pushNamed(context, Routes.movementEdit);
             },
           ),
         ),
@@ -108,7 +108,7 @@ class MovementCard extends StatelessWidget {
           // ignore: use_build_context_synchronously
           await Navigator.pushNamed(
             context,
-            Routes.movement.edit,
+            Routes.movementEdit,
             arguments: movementDescription,
           );
         } else {

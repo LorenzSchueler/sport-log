@@ -58,7 +58,7 @@ class RoutePage extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () =>
-                    Navigator.of(context).newBase(Routes.cardio.overview),
+                    Navigator.of(context).newBase(Routes.cardioOverview),
                 icon: const Icon(AppIcons.heartbeat),
               ),
             ],
@@ -88,7 +88,7 @@ class RoutePage extends StatelessWidget {
             context: context,
             sessionsPageTab: SessionsPageTab.cardio,
           ),
-          drawer: MainDrawer(selectedRoute: Routes.cardio.routeOverview),
+          drawer: const MainDrawer(selectedRoute: Routes.routeOverview),
           floatingActionButton: ExpandableFab(
             icon: const Icon(AppIcons.add),
             buttons: [
@@ -96,14 +96,14 @@ class RoutePage extends StatelessWidget {
                 icon: const Icon(AppIcons.route),
                 onPressed: () => Navigator.pushNamed(
                   context,
-                  Routes.cardio.routeEdit,
+                  Routes.routeEdit,
                 ),
               ),
               ActionButton(
                 icon: const Icon(AppIcons.upload),
                 onPressed: () => Navigator.pushNamed(
                   context,
-                  Routes.cardio.routeUpload,
+                  Routes.routeUpload,
                 ),
               ),
             ],
@@ -120,7 +120,7 @@ class RouteCard extends StatelessWidget {
   final Route route;
 
   void showDetails(BuildContext context) {
-    Navigator.pushNamed(context, Routes.cardio.routeDetails, arguments: route);
+    Navigator.pushNamed(context, Routes.routeDetails, arguments: route);
   }
 
   Future<void> _setBoundsAndTrack(

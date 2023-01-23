@@ -156,7 +156,7 @@ class ActionRulesCard extends StatelessWidget {
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                   onPressed: () => Navigator.of(context).pushNamed(
-                    Routes.action.actionRuleEdit,
+                    Routes.actionRuleEdit,
                     arguments: [actionProviderDescription, null],
                   ),
                   icon: const Icon(AppIcons.add),
@@ -167,7 +167,7 @@ class ActionRulesCard extends StatelessWidget {
               const Divider(),
               GestureDetector(
                 onTap: () => Navigator.of(context).pushNamed(
-                  Routes.action.actionRuleEdit,
+                  Routes.actionRuleEdit,
                   arguments: [actionProviderDescription, actionRule],
                 ),
                 behavior: HitTestBehavior.opaque,
@@ -246,7 +246,7 @@ class ActionEventsCard extends StatelessWidget {
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                   onPressed: () => Navigator.of(context).pushNamed(
-                    Routes.action.actionEventEdit,
+                    Routes.actionEventEdit,
                     arguments: [actionProviderDescription, null],
                   ),
                   icon: const Icon(AppIcons.add),
@@ -258,7 +258,7 @@ class ActionEventsCard extends StatelessWidget {
               const Divider(),
               GestureDetector(
                 onTap: () => Navigator.of(context).pushNamed(
-                  Routes.action.actionEventEdit,
+                  Routes.actionEventEdit,
                   arguments: [actionProviderDescription, actionEvent],
                 ),
                 behavior: HitTestBehavior.opaque,

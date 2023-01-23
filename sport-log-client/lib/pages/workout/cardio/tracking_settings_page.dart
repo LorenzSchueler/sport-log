@@ -125,7 +125,7 @@ class CardioTrackingSettingsPageState
                   onPressed: _movement != null
                       ? () => Navigator.pushNamed(
                             context,
-                            Routes.cardio.tracking,
+                            Routes.tracking,
                             arguments: [
                               _movement!,
                               _cardioType,

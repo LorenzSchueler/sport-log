@@ -40,7 +40,7 @@ class StrengthSessionDetailsPageState
   Future<void> _pushEditPage() async {
     final returnObj = await Navigator.pushNamed(
       context,
-      Routes.strength.edit,
+      Routes.strengthEdit,
       arguments: _strengthSessionDescription,
     );
     if (returnObj is ReturnObject<StrengthSessionDescription> && mounted) {

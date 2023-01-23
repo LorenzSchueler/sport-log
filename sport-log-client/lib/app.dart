@@ -22,7 +22,7 @@ class App extends StatelessWidget {
         selector: (_, settings) => settings.userExists(),
         builder: (context, userExists, _) => MaterialApp(
           routes: Routes.all,
-          initialRoute: userExists ? Routes.timeline.overview : Routes.landing,
+          initialRoute: userExists ? Routes.timelineOverview : Routes.landing,
           navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,

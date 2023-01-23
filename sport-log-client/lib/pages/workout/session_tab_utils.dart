@@ -45,11 +45,11 @@ enum SessionsPageTab {
 
   static void onBottomNavItemTapped(BuildContext context, int index) {
     var sessionRoutes = [
-      Routes.timeline.overview,
-      Routes.strength.overview,
-      Routes.metcon.sessionOverview,
-      Routes.cardio.overview,
-      Routes.diary.overview,
+      Routes.timelineOverview,
+      Routes.strengthOverview,
+      Routes.metconSessionOverview,
+      Routes.cardioOverview,
+      Routes.diaryOverview,
     ];
     Navigator.of(context).newBase(sessionRoutes[index]);
   }

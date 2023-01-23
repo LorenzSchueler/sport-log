@@ -240,7 +240,7 @@ Future<Metcon?> showMetconPicker({
     builder: (_) => PickerWithSearch<Metcon>(
       selectedItem: selectedMetcon,
       getByName: (name) => MetconDataProvider().getByName(name),
-      editRoute: Routes.metcon.edit,
+      editRoute: Routes.metconEdit,
       title: (metcon) => metcon.name,
       subtitle: null,
     ),
@@ -261,7 +261,7 @@ Future<Movement?> showMovementPicker({
       selectedItem: selectedMovement,
       getByName: (name) => MovementDataProvider()
           .getByName(name, cardioOnly: cardioOnly, distanceOnly: distanceOnly),
-      editRoute: Routes.movement.edit,
+      editRoute: Routes.movementEdit,
       title: (movement) => movement.name,
       subtitle: (movement) => movement.dimension.toString(),
     ),
@@ -279,7 +279,7 @@ Future<Route?> showRoutePicker({
     builder: (_) => PickerWithSearch<Route>(
       selectedItem: selectedRoute,
       getByName: (name) => RouteDataProvider().getByName(name),
-      editRoute: Routes.cardio.routeEdit,
+      editRoute: Routes.routeEdit,
       title: (route) => route.name,
       subtitle: null,
     ),

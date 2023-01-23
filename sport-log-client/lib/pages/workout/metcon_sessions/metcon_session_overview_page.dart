@@ -88,7 +88,7 @@ class MetconSessionsPage extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () =>
-                    Navigator.of(context).newBase(Routes.metcon.overview),
+                    Navigator.of(context).newBase(Routes.metconOverview),
                 icon: const Icon(AppIcons.notes),
               ),
             ],
@@ -157,11 +157,11 @@ class MetconSessionsPage extends StatelessWidget {
             context: context,
             sessionsPageTab: SessionsPageTab.metcon,
           ),
-          drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
+          drawer: const MainDrawer(selectedRoute: Routes.metconOverview),
           floatingActionButton: FloatingActionButton(
             child: const Icon(AppIcons.add),
             onPressed: () {
-              Navigator.pushNamed(context, Routes.metcon.sessionEdit);
+              Navigator.pushNamed(context, Routes.metconSessionEdit);
             },
           ),
         ),
@@ -186,7 +186,7 @@ class MetconSessionCard extends StatelessWidget {
       onTap: () {
         Navigator.pushNamed(
           context,
-          Routes.metcon.sessionDetails,
+          Routes.metconSessionDetails,
           arguments: metconSessionDescription,
         );
       },

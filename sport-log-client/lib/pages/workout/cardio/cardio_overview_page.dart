@@ -91,7 +91,7 @@ class CardioSessionsPage extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () =>
-                    Navigator.of(context).newBase(Routes.cardio.routeOverview),
+                    Navigator.of(context).newBase(Routes.routeOverview),
                 icon: const Icon(AppIcons.route),
               ),
             ],
@@ -150,7 +150,7 @@ class CardioSessionsPage extends StatelessWidget {
             context: context,
             sessionsPageTab: SessionsPageTab.cardio,
           ),
-          drawer: MainDrawer(selectedRoute: Routes.cardio.overview),
+          drawer: const MainDrawer(selectedRoute: Routes.cardioOverview),
           floatingActionButton: ExpandableFab(
             icon: const Icon(AppIcons.add),
             buttons: [
@@ -158,14 +158,14 @@ class CardioSessionsPage extends StatelessWidget {
                 icon: const Icon(AppIcons.stopwatch),
                 onPressed: () => Navigator.pushNamed(
                   context,
-                  Routes.cardio.trackingSettings,
+                  Routes.trackingSettings,
                 ),
               ),
               ActionButton(
                 icon: const Icon(AppIcons.notes),
                 onPressed: () => Navigator.pushNamed(
                   context,
-                  Routes.cardio.cardioEdit,
+                  Routes.cardioEdit,
                 ),
               ),
             ],
@@ -184,7 +184,7 @@ class CardioSessionCard extends StatelessWidget {
   void showDetails(BuildContext context) {
     Navigator.pushNamed(
       context,
-      Routes.cardio.cardioDetails,
+      Routes.cardioDetails,
       arguments: cardioSessionDescription,
     );
   }

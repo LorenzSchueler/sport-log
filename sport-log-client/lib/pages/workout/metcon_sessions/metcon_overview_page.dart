@@ -53,8 +53,8 @@ class MetconsPage extends StatelessWidget {
                 ),
               ),
               IconButton(
-                onPressed: () => Navigator.of(context)
-                    .newBase(Routes.metcon.sessionOverview),
+                onPressed: () =>
+                    Navigator.of(context).newBase(Routes.metconSessionOverview),
                 icon: const Icon(AppIcons.notes),
               ),
             ],
@@ -83,10 +83,10 @@ class MetconsPage extends StatelessWidget {
             context: context,
             sessionsPageTab: SessionsPageTab.metcon,
           ),
-          drawer: MainDrawer(selectedRoute: Routes.metcon.overview),
+          drawer: const MainDrawer(selectedRoute: Routes.metconOverview),
           floatingActionButton: FloatingActionButton(
             child: const Icon(AppIcons.add),
-            onPressed: () => Navigator.pushNamed(context, Routes.metcon.edit),
+            onPressed: () => Navigator.pushNamed(context, Routes.metconEdit),
           ),
         ),
       ),
@@ -104,7 +104,7 @@ class MetconCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(
         context,
-        Routes.metcon.details,
+        Routes.metconDetails,
         arguments: metconDescription,
       ),
       child: Card(

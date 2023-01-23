@@ -62,7 +62,7 @@ class _MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
   Future<void> _pushEditPage() async {
     final returnObj = await Navigator.pushNamed(
       context,
-      Routes.metcon.sessionEdit,
+      Routes.metconSessionEdit,
       arguments: _metconSessionDescription,
     );
     if (returnObj is ReturnObject<MetconSessionDescription> && mounted) {

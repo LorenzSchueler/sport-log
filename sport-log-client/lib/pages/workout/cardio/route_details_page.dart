@@ -59,7 +59,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
   Future<void> _pushEditPage() async {
     final returnObj = await Navigator.pushNamed(
       context,
-      Routes.cardio.routeEdit,
+      Routes.routeEdit,
       arguments: _route,
     );
     if (returnObj is ReturnObject<Route> && mounted) {
