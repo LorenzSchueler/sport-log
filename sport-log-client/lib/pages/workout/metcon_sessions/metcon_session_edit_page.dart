@@ -13,7 +13,7 @@ import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
-import 'package:sport_log/widgets/picker/metcon_picker.dart';
+import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class MetconSessionEditPage extends StatefulWidget {
@@ -117,6 +117,8 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   ),
                   onTap: () async {
                     Metcon? metcon = await showMetconPicker(
+                      selectedMetcon:
+                          _metconSessionDescription.metconDescription.metcon,
                       context: context,
                     );
                     if (metcon != null) {

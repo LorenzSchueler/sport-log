@@ -16,7 +16,7 @@ import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/text_tile.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
-import 'package:sport_log/widgets/picker/movement_picker.dart';
+import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class StrengthSessionEditPage extends StatefulWidget {
@@ -165,7 +165,10 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       caption: 'Movement',
       leading: AppIcons.exercise,
       onTap: () async {
-        final movement = await showMovementPicker(context: context);
+        final movement = await showMovementPicker(
+          selectedMovement: _strengthSessionDescription.movement,
+          context: context,
+        );
         if (mounted && movement != null) {
           setState(() {
             _strengthSessionDescription.session.movementId = movement.id;

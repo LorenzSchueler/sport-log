@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
-import 'package:sport_log/widgets/picker/date_filter_state_picker.dart';
+import 'package:sport_log/widgets/picker/picker.dart';
 
 class DateFilter extends StatefulWidget implements PreferredSizeWidget {
   const DateFilter({
@@ -69,8 +69,8 @@ class _DateFilterState extends State<DateFilter> {
           // ignore: prefer-extracting-callbacks
           onPressed: () async {
             final dateFilterState = await showDateFilterStatePicker(
+              selectedDateFilterState: _dateFilterState,
               context: context,
-              currentDateFilterState: _dateFilterState,
             );
             if (dateFilterState != null) {
               setDateFilterState(dateFilterState);

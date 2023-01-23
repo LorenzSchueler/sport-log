@@ -16,11 +16,8 @@ import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
-import 'package:sport_log/widgets/picker/cardio_type_picker.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
-import 'package:sport_log/widgets/picker/movement_picker.dart';
-import 'package:sport_log/widgets/picker/route_picker.dart';
-import 'package:sport_log/widgets/picker/time_picker.dart';
+import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class CardioEditPage extends StatefulWidget {
@@ -334,8 +331,10 @@ class _CardioEditPageState extends State<CardioEditPage> {
                             ),
                             onTap: () async {
                               Movement? movement = await showMovementPicker(
-                                context: context,
+                                selectedMovement:
+                                    _cardioSessionDescription.movement,
                                 cardioOnly: true,
+                                context: context,
                               );
                               if (mounted && movement != null) {
                                 setState(() {

@@ -5,9 +5,7 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
-import 'package:sport_log/widgets/picker/cardio_type_picker.dart';
-import 'package:sport_log/widgets/picker/movement_picker.dart';
-import 'package:sport_log/widgets/picker/route_picker.dart';
+import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
@@ -43,9 +41,10 @@ class CardioTrackingSettingsPageState
                 child: Text(_movement?.name ?? ""),
                 onTap: () async {
                   Movement? movement = await showMovementPicker(
-                    context: context,
+                    selectedMovement: _movement,
                     cardioOnly: true,
                     distanceOnly: true,
+                    context: context,
                   );
                   if (mounted && movement != null) {
                     setState(() => _movement = movement);

@@ -4,7 +4,7 @@ import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/picker/route_picker.dart';
+import 'package:sport_log/widgets/picker/picker.dart';
 
 class SelectRouteButton extends StatefulWidget {
   const SelectRouteButton({required this.mapController, super.key});

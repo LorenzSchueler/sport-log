@@ -10,9 +10,8 @@ import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
-import 'package:sport_log/widgets/picker/action_picker.dart';
-import 'package:sport_log/widgets/picker/time_picker.dart';
-import 'package:sport_log/widgets/picker/weekday_picker.dart';
+import 'package:sport_log/widgets/picker/datetime_picker.dart';
+import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class ActionRuleEditPage extends StatefulWidget {
@@ -98,7 +97,7 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                 onTap: () async {
                   Action? action = await showActionPicker(
                     actions: widget.actionProviderDescription.actions,
-                    currentAction:
+                    selectedAction:
                         widget.actionProviderDescription.actions.firstWhere(
                       (action) => action.id == _actionRule.actionId,
                     ),

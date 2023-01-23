@@ -27,17 +27,13 @@ abstract class DateFilterState {
   bool operator ==(Object other) =>
       other is DateFilterState && other.start == start && other.end == end;
 
-  static List<DateFilterState Function(DateFilterState)> all = [
-    (DateFilterState dateFilterState) =>
+  static List<DateFilterState> all(DateFilterState dateFilterState) => [
         DayFilter(dateFilterState.start ?? DateTime.now()),
-    (DateFilterState dateFilterState) =>
         WeekFilter(dateFilterState.start ?? DateTime.now()),
-    (DateFilterState dateFilterState) =>
         MonthFilter(dateFilterState.start ?? DateTime.now()),
-    (DateFilterState dateFilterState) =>
         YearFilter(dateFilterState.start ?? DateTime.now()),
-    (DateFilterState dateFilterState) => const AllFilter()
-  ];
+        const AllFilter()
+      ];
 
   static DateFilterState get init => MonthFilter(DateTime.now());
 }

@@ -13,7 +13,7 @@ import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/input_fields/selection_bar.dart';
-import 'package:sport_log/widgets/picker/movement_picker.dart';
+import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class MetconEditPage extends StatefulWidget {
@@ -309,8 +309,12 @@ class _MetconEditPageState extends State<MetconEditPage> {
     return ActionChip(
       avatar: const Icon(AppIcons.add),
       label: const Text("Add movement"),
+      // ignore: prefer-extracting-callbacks
       onPressed: () async {
-        final movement = await showMovementPicker(context: context);
+        final movement = await showMovementPicker(
+          selectedMovement: null,
+          context: context,
+        );
         if (movement != null) {
           _addMetconMovementWithMovement(movement);
         }

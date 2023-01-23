@@ -18,7 +18,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
-import 'package:sport_log/widgets/picker/movement_picker.dart';
+import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/sync_refresh_indicator.dart';
