@@ -12,7 +12,6 @@ import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
-import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
@@ -111,6 +110,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
                   _nameInput(context),
                   _descriptionInput(),
                   _typeInput(),
+                  Defaults.sizedBox.vertical.small,
                   _additionalFieldsInput(),
                   const Divider(thickness: 2),
                   _metconMovementsList(),
@@ -175,11 +175,17 @@ class _MetconEditPageState extends State<MetconEditPage> {
   }
 
   Widget _typeInput() {
-    return SelectionBar<MetconType>(
-      onChange: _setType,
-      items: MetconType.values,
-      getLabel: (metconType) => metconType.name,
-      selectedItem: _metconDescription.metcon.metconType,
+    return SegmentedButton<MetconType>(
+      segments: MetconType.values
+          .map(
+            (md) => ButtonSegment(
+              value: md,
+              label: Text(md.name),
+            ),
+          )
+          .toList(),
+      selected: {_metconDescription.metcon.metconType},
+      onSelectionChanged: (selected) => _setType(selected.first),
     );
   }
 

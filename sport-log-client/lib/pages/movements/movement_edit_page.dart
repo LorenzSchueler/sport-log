@@ -6,7 +6,6 @@ import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
-import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class MovementEditPage extends StatefulWidget {
@@ -183,12 +182,19 @@ class _MovementEditPageState extends State<MovementEditPage> {
   }
 
   Widget get _dimInput {
-    return SelectionBar<MovementDimension>(
-      onChange: (dimension) =>
-          setState(() => _movementDescription.movement.dimension = dimension),
-      items: MovementDimension.values,
-      getLabel: (dimension) => dimension.name,
-      selectedItem: _movementDescription.movement.dimension,
+    return SegmentedButton<MovementDimension>(
+      segments: MovementDimension.values
+          .map(
+            (md) => ButtonSegment(
+              value: md,
+              label: Text(md.name),
+            ),
+          )
+          .toList(),
+      selected: {_movementDescription.movement.dimension},
+      onSelectionChanged: (selected) => setState(
+        () => _movementDescription.movement.dimension = selected.first,
+      ),
     );
   }
 

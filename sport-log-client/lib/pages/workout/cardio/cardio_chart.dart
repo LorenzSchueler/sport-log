@@ -4,7 +4,6 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
 import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
-import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 
 enum _SeriesType {
   sumDistance('Sum Distance', AggregatorType.sum, true),
@@ -65,15 +64,22 @@ class _CardioChartState extends State<CardioChart> {
         Scrollbar(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: SelectionBar(
-              onChange: (type) => setState(() => _selectedSeries = type),
-              items: _SeriesType.values,
-              getLabel: (type) => type.name,
-              selectedItem: _selectedSeries,
+            child: SegmentedButton<_SeriesType>(
+              segments: _SeriesType.values
+                  .map(
+                    (md) => ButtonSegment(
+                      value: md,
+                      label: Text(md.name),
+                    ),
+                  )
+                  .toList(),
+              selected: {_selectedSeries},
+              onSelectionChanged: (selected) =>
+                  setState(() => _selectedSeries = selected.first),
             ),
           ),
         ),
-        Defaults.sizedBox.vertical.small,
+        Defaults.sizedBox.vertical.normal,
         DateTimeChart(
           chartValues: widget.cardioSessions
               .map((s) {

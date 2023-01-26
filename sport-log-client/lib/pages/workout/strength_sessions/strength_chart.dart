@@ -6,7 +6,6 @@ import 'package:sport_log/models/strength/strength_session_description.dart';
 import 'package:sport_log/models/strength/strength_session_stats.dart';
 import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
-import 'package:sport_log/widgets/input_fields/selection_bar.dart';
 
 enum _SeriesType {
   maxWeight('Max Weight', AggregatorType.max, false), // kg
@@ -118,15 +117,22 @@ class _StrengthChartState extends State<StrengthChart> {
         Scrollbar(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: SelectionBar(
-              onChange: (type) => setState(() => _selectedSeries = type),
-              items: _availableSeries,
-              getLabel: (type) => type.name,
-              selectedItem: _selectedSeries,
+            child: SegmentedButton<_SeriesType>(
+              segments: _availableSeries
+                  .map(
+                    (md) => ButtonSegment(
+                      value: md,
+                      label: Text(md.name),
+                    ),
+                  )
+                  .toList(),
+              selected: {_selectedSeries},
+              onSelectionChanged: (selected) =>
+                  setState(() => _selectedSeries = selected.first),
             ),
           ),
         ),
-        Defaults.sizedBox.vertical.small,
+        Defaults.sizedBox.vertical.normal,
         DateTimeChart(
           chartValues: _strengthSessionStats
               .map((s) {
