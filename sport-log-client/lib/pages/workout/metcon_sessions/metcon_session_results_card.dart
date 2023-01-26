@@ -30,7 +30,7 @@ class MetconSessionResultsCard extends StatelessWidget {
           children: [
             Text(
               "Results",
-              style: Theme.of(context).textTheme.headline5,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
             if (metconSessionDescription != null)
               TextTile(

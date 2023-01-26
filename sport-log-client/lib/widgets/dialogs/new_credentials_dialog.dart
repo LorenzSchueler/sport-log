@@ -47,7 +47,7 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
           children: [
             Text(
               "Looks like you changed your credentials on another device.\nPlease update them below!",
-              style: Theme.of(context).textTheme.subtitle1,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             Defaults.sizedBox.vertical.big,
             Form(
@@ -162,6 +162,5 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
         setState(() => _errorMessage = result.failure.toString());
       }
     }
-    _formKey.currentState!.deactivate();
   }
 }

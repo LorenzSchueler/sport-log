@@ -31,7 +31,7 @@ class _DurationInputState extends State<DurationInput> {
     text: (_duration.inSeconds % 60).toString().padLeft(2, '0'),
   );
 
-  static const double _textWidth = 13; // width of subtitle1 = 20 + cursor
+  static const double _textWidth = 13; // width of titleMedium = 20 + cursor
   static const Duration _minTime = Duration.zero;
   static const Duration _maxTime = Duration(seconds: 60 * 100 - 1);
 
@@ -107,7 +107,7 @@ class _DurationInputState extends State<DurationInput> {
                   },
                 ),
               ),
-              Text(':', style: Theme.of(context).textTheme.subtitle1),
+              Text(':', style: Theme.of(context).textTheme.titleMedium),
               SizedBox(
                 width: _textWidth * 2,
                 child: Focus(

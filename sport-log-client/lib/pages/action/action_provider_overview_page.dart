@@ -53,16 +53,18 @@ class _ActionProviderOverviewPageState
     _logger.d('Updating action provider page');
     final actionProviderDescription =
         await _dataProvider.getByActionProvider(widget.actionProvider);
-    if (actionProviderDescription == null) {
-      await showMessageDialog(
-        context: context,
-        text: "Action Provider was deleted.",
-      );
-      if (mounted) {
-        Navigator.of(context).pop();
+    if (mounted) {
+      if (actionProviderDescription == null) {
+        await showMessageDialog(
+          context: context,
+          text: "Action Provider was deleted.",
+        );
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      } else {
+        setState(() => _actionProviderDescription = actionProviderDescription);
       }
-    } else if (mounted) {
-      setState(() => _actionProviderDescription = actionProviderDescription);
     }
   }
 

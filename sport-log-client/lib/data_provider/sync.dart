@@ -39,6 +39,7 @@ class Sync extends ChangeNotifier {
     }
   }
 
+  // ignore: long-method
   Future<bool> sync({VoidCallback? onNoInternet}) async {
     if (!Settings.instance.syncEnabled) {
       _logger.i("sync disabled");
@@ -61,15 +62,18 @@ class Sync extends ChangeNotifier {
       if (serverVersionResult.isSuccess) {
         serverVersion = serverVersionResult.success;
         if (!serverVersion!.compatibleWithClientApiVersion()) {
-          // must be unawaited to that callback finished even if dialog context dropped
-          unawaited(
-            showMessageDialog(
-              context: App.globalContext,
-              text:
-                  "Client api version ${Config.apiVersion} is not compatible with server api versions: $serverVersion\n"
-                  "Server synchronization is no longer possible. Please update the app.",
-            ),
-          );
+          final context = App.globalContext;
+          // must be unawaited so that callback finished even if dialog context dropped
+          if (context.mounted) {
+            unawaited(
+              showMessageDialog(
+                context: context,
+                text:
+                    "Client api version ${Config.apiVersion} is not compatible with server api versions: $serverVersion\n"
+                    "Server synchronization is no longer possible. Please update the app.",
+              ),
+            );
+          }
           //stop sync completely
           stopSync();
           _isSyncing = false;

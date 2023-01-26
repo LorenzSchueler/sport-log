@@ -105,12 +105,13 @@ class MovementCard extends StatelessWidget {
             );
             if (!approved) return;
           }
-          // ignore: use_build_context_synchronously
-          await Navigator.pushNamed(
-            context,
-            Routes.movementEdit,
-            arguments: movementDescription,
-          );
+          if (context.mounted) {
+            await Navigator.pushNamed(
+              context,
+              Routes.movementEdit,
+              arguments: movementDescription,
+            );
+          }
         } else {
           await showMessageDialog(
             context: context,
@@ -132,7 +133,7 @@ class MovementCard extends StatelessWidget {
                     width: 200,
                     child: Text(
                       movementDescription.movement.name,
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
                   Defaults.sizedBox.vertical.normal,

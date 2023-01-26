@@ -38,15 +38,15 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
     final result = widget.actionEvent != null
         ? await _dataProvider.updateSingle(_actionEvent)
         : await _dataProvider.createSingle(_actionEvent);
-    if (result.isSuccess) {
-      if (mounted) {
+    if (mounted) {
+      if (result.isSuccess) {
         Navigator.pop(context);
+      } else {
+        await showMessageDialog(
+          context: context,
+          text: 'Creating Action Event failed:\n${result.failure}',
+        );
       }
-    } else {
-      await showMessageDialog(
-        context: context,
-        text: 'Creating Action Event failed:\n${result.failure}',
-      );
     }
   }
 

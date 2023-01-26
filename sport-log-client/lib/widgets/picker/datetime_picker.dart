@@ -27,9 +27,9 @@ class _TimePickerDialogState extends State<TimePickerDialog> {
         onTimeChange: (datetime) => _datetime = datetime,
         normalTextStyle: Theme.of(context)
             .textTheme
-            .headline5!
+            .headlineSmall!
             .copyWith(color: Theme.of(context).disabledColor),
-        highlightedTextStyle: Theme.of(context).textTheme.headline5,
+        highlightedTextStyle: Theme.of(context).textTheme.headlineSmall,
         isForce2Digits: true,
         isShowSeconds: widget.withSeconds,
       ),
@@ -109,7 +109,7 @@ Future<DateTime?> showDateTimePicker({
     initialDate: initial,
     future: future,
   );
-  if (date != null) {
+  if (context.mounted && date != null) {
     final time = await showScrollableTimePicker(
       context: context,
       initialTime: initial,

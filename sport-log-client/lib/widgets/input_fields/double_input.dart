@@ -63,7 +63,7 @@ class _DoubleInputState extends State<DoubleInput> {
                 isDense: true,
                 border: InputBorder.none,
               ),
-              style: Theme.of(context).textTheme.subtitle1,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             onFocusChange: (focus) {
               if (!focus) {

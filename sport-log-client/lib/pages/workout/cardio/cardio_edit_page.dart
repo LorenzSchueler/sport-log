@@ -55,9 +55,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
     final result = widget.isNew
         ? await _dataProvider.createSingle(_cardioSessionDescription)
         : await _dataProvider.updateSingle(_cardioSessionDescription);
-    if (result.isSuccess) {
-      _formKey.currentState!.deactivate();
-      if (mounted) {
+    if (mounted) {
+      if (result.isSuccess) {
         Navigator.pop(
           context,
           ReturnObject(
@@ -65,12 +64,12 @@ class _CardioEditPageState extends State<CardioEditPage> {
             payload: _cardioSessionDescription,
           ), // needed for cardio details page
         );
+      } else {
+        await showMessageDialog(
+          context: context,
+          text: 'Creating Cardio Session failed:\n${result.failure}',
+        );
       }
-    } else {
-      await showMessageDialog(
-        context: context,
-        text: 'Creating Cardio Session failed:\n${result.failure}',
-      );
     }
   }
 
@@ -78,7 +77,6 @@ class _CardioEditPageState extends State<CardioEditPage> {
     if (!widget.isNew) {
       await _dataProvider.deleteSingle(_cardioSessionDescription);
     }
-    _formKey.currentState!.deactivate();
     if (mounted) {
       Navigator.pop(
         context,

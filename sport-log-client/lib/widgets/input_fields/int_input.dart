@@ -78,7 +78,7 @@ class _IntInputState extends State<IntInput> {
                 isDense: true,
                 border: InputBorder.none,
               ),
-              style: Theme.of(context).textTheme.subtitle1,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             onFocusChange: (focus) {
               if (!focus) {

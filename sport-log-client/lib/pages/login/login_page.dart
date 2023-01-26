@@ -238,16 +238,14 @@ class _LoginPageState extends State<LoginPage> {
         : await Account.login(_serverUrl, _user.username, _user.password);
     if (mounted) {
       setState(() => _loginPending = true);
-    }
-    if (result.isSuccess) {
-      if (mounted) {
+      if (result.isSuccess) {
         await Navigator.of(context).newBase(Routes.timelineOverview);
+      } else {
+        await showMessageDialog(
+          context: context,
+          text: result.failure.toString(),
+        );
       }
-    } else {
-      await showMessageDialog(
-        context: context,
-        text: result.failure.toString(),
-      );
     }
   }
 }

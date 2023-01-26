@@ -48,9 +48,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
     final result = widget.route != null
         ? await _dataProvider.updateSingle(_route)
         : await _dataProvider.createSingle(_route);
-    if (result.isSuccess) {
-      _formKey.currentState!.deactivate();
-      if (mounted) {
+    if (mounted) {
+      if (result.isSuccess) {
         Navigator.pop(
           context,
           ReturnObject(
@@ -60,12 +59,12 @@ class _RouteEditPageState extends State<RouteEditPage> {
             payload: _route,
           ), // needed for route details page
         );
+      } else {
+        await showMessageDialog(
+          context: context,
+          text: 'Creating Route Entry failed:\n${result.failure}',
+        );
       }
-    } else {
-      await showMessageDialog(
-        context: context,
-        text: 'Creating Route Entry failed:\n${result.failure}',
-      );
     }
   }
 
@@ -73,7 +72,6 @@ class _RouteEditPageState extends State<RouteEditPage> {
     if (widget.route != null) {
       await _dataProvider.deleteSingle(_route);
     }
-    _formKey.currentState!.deactivate();
     if (mounted) {
       Navigator.pop(
         context,
@@ -208,7 +206,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
                     ),
                     title: Text(
                       "${index + 1}",
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                     trailing: const Icon(AppIcons.dragHandle),
                     dense: true,

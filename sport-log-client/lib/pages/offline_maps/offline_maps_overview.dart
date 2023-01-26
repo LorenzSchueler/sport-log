@@ -43,10 +43,16 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
 
   MapDownloadUtils createMapDownloadUtils() {
     return MapDownloadUtils(
+      // ignore: prefer-extracting-callbacks
       onSuccess: () async {
         await _updatePoint2(null);
         await _updatePoint1(null);
-        await showMessageDialog(context: context, text: "Download Successful");
+        if (mounted) {
+          await showMessageDialog(
+            context: context,
+            text: "Download Successful",
+          );
+        }
       },
       onError: () async {
         await showMessageDialog(context: context, text: "Download Failed");
@@ -209,7 +215,7 @@ class RegionCard extends StatelessWidget {
           left: 10,
           child: Text(
             DateTime.parse(region.metadata["datetime"] as String).toHumanDate(),
-            style: Theme.of(context).textTheme.subtitle2!.copyWith(
+            style: Theme.of(context).textTheme.titleSmall!.copyWith(
                   color: Theme.of(context).colorScheme.background,
                 ),
           ),

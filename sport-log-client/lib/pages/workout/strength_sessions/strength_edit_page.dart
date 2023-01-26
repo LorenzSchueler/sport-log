@@ -59,8 +59,8 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     final result = widget.isNew
         ? await _dataProvider.createSingle(_strengthSessionDescription)
         : await _dataProvider.updateSingle(_strengthSessionDescription);
-    if (result.isSuccess) {
-      if (mounted) {
+    if (mounted) {
+      if (result.isSuccess) {
         Navigator.pop(
           context,
           ReturnObject(
@@ -68,12 +68,12 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
             payload: _strengthSessionDescription,
           ), // needed for return to details page
         );
+      } else {
+        await showMessageDialog(
+          context: context,
+          text: 'Creating Strength Session failed:\n${result.failure}',
+        );
       }
-    } else {
-      await showMessageDialog(
-        context: context,
-        text: 'Creating Strength Session failed:\n${result.failure}',
-      );
     }
   }
 

@@ -193,7 +193,7 @@ class StrengthSessionCard extends StatelessWidget {
                     Defaults.sizedBox.vertical.normal,
                     Text(
                       strengthSessionDescription.movement.name,
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                     if (strengthRecordTypes.isNotEmpty) ...[
                       Defaults.sizedBox.vertical.normal,
@@ -289,7 +289,7 @@ class StrengthRecordsCard extends StatelessWidget {
                     Defaults.sizedBox.horizontal.small,
                     Text(
                       "${strengthRecord!.maxWeight!.round()} kg",
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                     Defaults.sizedBox.horizontal.normal,
                   ],
@@ -301,7 +301,7 @@ class StrengthRecordsCard extends StatelessWidget {
                   Defaults.sizedBox.horizontal.small,
                   Text(
                     countText,
-                    style: Theme.of(context).textTheme.subtitle1,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   if (strengthRecord!.maxEorm != null) ...[
                     Defaults.sizedBox.horizontal.normal,
@@ -313,7 +313,7 @@ class StrengthRecordsCard extends StatelessWidget {
                     Defaults.sizedBox.horizontal.small,
                     Text(
                       "${strengthRecord!.maxEorm!.round()} kg",
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ],
                 ],

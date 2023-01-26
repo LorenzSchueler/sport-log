@@ -101,7 +101,7 @@ class InitAppWrapperState extends State<InitAppWrapper> {
                         _error.toString(),
                         style: Theme.of(context)
                             .textTheme
-                            .bodyText1
+                            .bodyLarge
                             ?.copyWith(color: Colors.red),
                       ),
                     ],

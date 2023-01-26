@@ -120,7 +120,7 @@ class _MapPageState extends State<MapPage> {
                         decoration: Theme.of(context).textFormFieldDecoration,
                         style: Theme.of(context)
                             .textTheme
-                            .headline6!
+                            .titleLarge!
                             .copyWith(color: Colors.black),
                       ),
                 actions: [
@@ -204,7 +204,7 @@ class MapSearchResults extends StatelessWidget {
                 searchResults[index].toString(),
                 style: Theme.of(context)
                     .textTheme
-                    .subtitle1!
+                    .titleMedium!
                     .copyWith(color: Colors.black),
               ),
             ),

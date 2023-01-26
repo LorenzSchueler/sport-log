@@ -36,16 +36,15 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
   Future<void> _saveRoute() async {
     _logger.i("saving route");
     final result = await _dataProvider.createSingle(_route);
-    if (result.isSuccess) {
-      _formKey.currentState!.deactivate();
-      if (mounted) {
+    if (mounted) {
+      if (result.isSuccess) {
         Navigator.pop(context);
+      } else {
+        await showMessageDialog(
+          context: context,
+          text: 'Creating Route Entry failed:\n${result.failure}',
+        );
       }
-    } else {
-      await showMessageDialog(
-        context: context,
-        text: 'Creating Route Entry failed:\n${result.failure}',
-      );
     }
   }
 
@@ -125,20 +124,22 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
 
   Future<void> _loadFile() async {
     final track = await loadTrackFromGpxFile();
-    if (track == null) {
-      await showMessageDialog(
-        context: context,
-        title: "An Error occurred",
-        text: "Parsing file failed.",
-      );
-    } else if (mounted) {
-      setState(() {
-        _route
-          ..track = track
-          ..setDistance()
-          ..setAscentDescent();
-      });
-      await _mapController.updateRouteLine(_line, _route.track);
+    if (mounted) {
+      if (track == null) {
+        await showMessageDialog(
+          context: context,
+          title: "An Error occurred",
+          text: "Parsing file failed.",
+        );
+      } else {
+        setState(() {
+          _route
+            ..track = track
+            ..setDistance()
+            ..setAscentDescent();
+        });
+        await _mapController.updateRouteLine(_line, _route.track);
+      }
     }
   }
 }

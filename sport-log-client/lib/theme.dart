@@ -38,6 +38,7 @@ class AppTheme {
   // ignore: long-method
   static ThemeData _themeDataFromColors(ColorScheme colorScheme) {
     return ThemeData(
+      //useMaterial3: true,
       colorScheme: colorScheme,
       primarySwatch: _generateMaterialColor(colorScheme.primary),
       scaffoldBackgroundColor: colorScheme.background,
@@ -75,7 +76,6 @@ class AppTheme {
         foregroundColor: colorScheme.onPrimary,
       ),
       cardTheme: CardTheme(color: colorScheme.surface),
-      toggleableActiveColor: colorScheme.primary,
       dialogTheme: DialogTheme(
         backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(
@@ -99,29 +99,26 @@ class AppTheme {
         //headline4    34.0  regular
         //Large text.
         //
-        //headline5    24.0  regular
+        //headlineSmall    24.0  regular
         //Used for large text in dialogs (e.g., the month and year in the dialog shown by showDatePicker).
         //
-        //headline6    20.0  medium
+        //titleLarge    20.0  medium
         //Used for the primary text in app bars and dialogs (e.g., AppBar.title and AlertDialog.title).
         //
-        //subtitle1    16.0  regular
+        //titleMedium    16.0  regular
         //Used for the primary text in lists (e.g., ListTile.title).
         // TextField, EditTile
-        subtitle1: TextStyle(
+        titleMedium: TextStyle(
           fontSize: 20,
           height: 1,
         ),
         //
-        //subtitle2    14.0  medium
-        //For medium emphasis text that's a little smaller than subtitle1.
+        //titleSmall    14.0  medium
+        //For medium emphasis text that's a little smaller than titleMedium.
         //
-        //bodyText1        16.0  regular
+        //bodyLarge        16.0  regular
         //Used for emphasizing text that would otherwise be bodyText2.
         // ListTile
-        bodyText1: TextStyle(
-          fontSize: 16,
-        ),
         //
         //bodyText2        14.0  regular
         //The default text style for Material.
@@ -129,10 +126,10 @@ class AppTheme {
         //button       14.0  medium
         //Used for text on ElevatedButton, TextButton and OutlinedButton.
         //
-        //caption      12.0  regular
+        //bodySmall      12.0  regular
         //Used for auxiliary text associated with images.
         // validator message
-        caption: TextStyle(
+        bodySmall: TextStyle(
           fontSize: 14,
         ),
         //

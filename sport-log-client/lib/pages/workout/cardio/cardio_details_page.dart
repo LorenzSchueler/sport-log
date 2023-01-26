@@ -274,7 +274,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
       _cardioSessionDescription.cardioSession.track ?? [],
       startTime: _cardioSessionDescription.cardioSession.datetime,
     );
-    if (file != null) {
+    if (mounted && file != null) {
       await showMessageDialog(
         context: context,
         text: 'Track exported to $file',

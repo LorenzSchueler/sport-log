@@ -50,14 +50,16 @@ class SettingsPage extends StatelessWidget {
       settings.user!,
     );
     if (result.isFailure) {
-      await showMessageDialog(
-        context: context,
-        title: "An Error occurred:",
-        text: result.failure.toString(),
-      );
       settings
         ..accountCreated = false
         ..syncEnabled = false;
+      if (context.mounted) {
+        await showMessageDialog(
+          context: context,
+          title: "An Error occurred:",
+          text: result.failure.toString(),
+        );
+      }
     }
   }
 
@@ -80,7 +82,7 @@ class SettingsPage extends StatelessWidget {
     final validated = Validator.validateUsername(username);
     if (validated == null) {
       final result = await Account.editUser(username: username);
-      if (result.isFailure) {
+      if (context.mounted && result.isFailure) {
         await showMessageDialog(
           context: context,
           title: "Changing Username Failed",
@@ -99,7 +101,7 @@ class SettingsPage extends StatelessWidget {
     final validated = Validator.validatePassword(password);
     if (validated == null) {
       final result = await Account.editUser(password: password);
-      if (result.isFailure) {
+      if (context.mounted && result.isFailure) {
         await showMessageDialog(
           context: context,
           title: "Changing Password Failed",
@@ -118,7 +120,7 @@ class SettingsPage extends StatelessWidget {
     final validated = Validator.validateEmail(email);
     if (validated == null) {
       final result = await Account.editUser(email: email);
-      if (result.isFailure) {
+      if (context.mounted && result.isFailure) {
         await showMessageDialog(
           context: context,
           title: "Changing Email Failed",
@@ -141,7 +143,7 @@ class SettingsPage extends StatelessWidget {
     );
     if (approved) {
       final result = await Account.newInitSync();
-      if (result.isFailure) {
+      if (context.mounted && result.isFailure) {
         await showMessageDialog(
           context: context,
           text: result.failure.toString(),
@@ -151,7 +153,6 @@ class SettingsPage extends StatelessWidget {
   }
 
   Future<void> _logout(BuildContext context) async {
-    final navigator = Navigator.of(context);
     final approved = await showApproveDialog(
       context: context,
       title: "Logout",
@@ -160,12 +161,13 @@ class SettingsPage extends StatelessWidget {
     );
     if (approved) {
       await Account.logout();
-      await navigator.newBase(Routes.landing);
+      if (context.mounted) {
+        await Navigator.of(context).newBase(Routes.landing);
+      }
     }
   }
 
   Future<void> _deleteAccount(BuildContext context) async {
-    final navigator = Navigator.of(context);
     final approved = await showApproveDialog(
       context: context,
       title: "Delete Account",
@@ -173,14 +175,16 @@ class SettingsPage extends StatelessWidget {
     );
     if (approved) {
       final result = await Account.delete();
-      if (result.isFailure) {
-        await showMessageDialog(
-          context: context,
-          text:
-              "An error occurred while deleting your account:\n${result.failure}",
-        );
-      } else {
-        await navigator.newBase(Routes.landing);
+      if (context.mounted) {
+        if (result.isFailure) {
+          await showMessageDialog(
+            context: context,
+            text:
+                "An error occurred while deleting your account:\n${result.failure}",
+          );
+        } else {
+          await Navigator.of(context).newBase(Routes.landing);
+        }
       }
     }
   }
@@ -282,8 +286,7 @@ class SettingsPage extends StatelessWidget {
                       _setUsername(context, username),
                 ),
                 VisibilityToggle(
-                  // ignore: prefer-extracting-callbacks
-                  builder: (visible, toggle) {
+                  builder: (_, visible, toggle) {
                     return TextFormField(
                       key: UniqueKey(),
                       decoration:
@@ -466,7 +469,7 @@ class SettingsPage extends StatelessWidget {
 class VisibilityToggle extends StatefulWidget {
   const VisibilityToggle({required this.builder, super.key});
 
-  final Widget Function(bool, void Function()) builder;
+  final Widget Function(BuildContext, bool, void Function()) builder;
 
   @override
   State<VisibilityToggle> createState() => _VisibilityToggleState();
@@ -477,6 +480,10 @@ class _VisibilityToggleState extends State<VisibilityToggle> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.builder(_visible, () => setState(() => _visible = !_visible));
+    return widget.builder(
+      context,
+      _visible,
+      () => setState(() => _visible = !_visible),
+    );
   }
 }

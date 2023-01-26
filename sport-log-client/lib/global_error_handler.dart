@@ -36,12 +36,12 @@ class GlobalErrorHandler {
     String caughtBy,
     Object error,
     StackTrace? stackTrace, [
-    DiagnosticsNode? context,
+    DiagnosticsNode? diagnosticsNode,
     String? library,
   ]) async {
     final now = DateTime.now();
     final description =
-        "time: $now\ncaught by: $caughtBy\ncontext: $context\nlibrary: $library\n\nerror:\n$error";
+        "time: $now\ncaught by: $caughtBy\ncontext: $diagnosticsNode\nlibrary: $library\n\nerror:\n$error";
     final descriptionAndStack =
         "$description\n\nstack trace:\n$stackTrace\n\n\n";
 
@@ -57,10 +57,13 @@ class GlobalErrorHandler {
       _logger.w("writing error logs failed");
     }
 
-    await showMessageDialog(
-      context: App.globalContext,
-      title: "An error occurred:",
-      text: description,
-    );
+    final context = App.globalContext;
+    if (context.mounted) {
+      await showMessageDialog(
+        context: context,
+        title: "An error occurred:",
+        text: description,
+      );
+    }
   }
 }

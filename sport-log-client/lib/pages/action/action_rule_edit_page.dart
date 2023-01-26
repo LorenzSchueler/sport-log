@@ -39,15 +39,15 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
     final result = widget.actionRule != null
         ? await _dataProvider.updateSingle(_actionRule)
         : await _dataProvider.createSingle(_actionRule);
-    if (result.isSuccess) {
-      if (mounted) {
+    if (mounted) {
+      if (result.isSuccess) {
         Navigator.pop(context);
+      } else {
+        await showMessageDialog(
+          context: context,
+          text: 'Creating Action Rule failed:\n${result.failure}',
+        );
       }
-    } else {
-      await showMessageDialog(
-        context: context,
-        text: 'Creating Action Rule failed:\n${result.failure}',
-      );
     }
   }
 

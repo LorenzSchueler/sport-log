@@ -298,7 +298,7 @@ class _PaddedIntInputState extends State<_PaddedIntInput> {
             widget.caption,
             style: Theme.of(context)
                 .textTheme
-                .caption!
+                .bodySmall!
                 .copyWith(fontSize: _PaddedIntInput._captionFontSize),
           ),
           TextFormField(

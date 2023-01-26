@@ -76,7 +76,7 @@ class PlatformCard extends StatelessWidget {
               children: [
                 Text(
                   platformDescription.platform.name,
-                  style: Theme.of(context).textTheme.subtitle1,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Defaults.sizedBox.horizontal.normal,
                 Icon(
@@ -119,7 +119,7 @@ class PlatformCard extends StatelessWidget {
                   children: [
                     Text(
                       actionProvider.name,
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ],
                 ),
@@ -226,13 +226,15 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
     final result = widget.platformDescription.platformCredential == null
         ? await _dataProvider.createSingle(platformDescription)
         : await _dataProvider.updateSingle(platformDescription);
-    if (result.isFailure) {
-      await showMessageDialog(
-        context: context,
-        text: 'Creating Credentials failed:\n${result.failure}',
-      );
-    } else if (mounted) {
-      Navigator.pop(context);
+    if (mounted) {
+      if (result.isFailure) {
+        await showMessageDialog(
+          context: context,
+          text: 'Creating Credentials failed:\n${result.failure}',
+        );
+      } else {
+        Navigator.pop(context);
+      }
     }
   }
 
@@ -252,13 +254,15 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
       Navigator.pop(context);
     } else {
       final result = await _dataProvider.deleteSingle(platformDescription);
-      if (result.isFailure) {
-        await showMessageDialog(
-          context: context,
-          text: 'Deleting Credentials failed:\n${result.failure}',
-        );
-      } else if (mounted) {
-        Navigator.pop(context);
+      if (mounted) {
+        if (result.isFailure) {
+          await showMessageDialog(
+            context: context,
+            text: 'Deleting Credentials failed:\n${result.failure}',
+          );
+        } else {
+          Navigator.pop(context);
+        }
       }
     }
   }

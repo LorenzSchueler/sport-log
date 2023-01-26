@@ -25,7 +25,7 @@ class TimerPage extends StatelessWidget {
           length: 3,
           child: Builder(
             builder: (context) {
-              final tabController = DefaultTabController.of(context)!;
+              final tabController = DefaultTabController.of(context);
               tabController.addListener(() {
                 if (!tabController.indexIsChanging) {
                   switch (tabController.index) {

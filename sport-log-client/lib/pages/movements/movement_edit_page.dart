@@ -52,11 +52,10 @@ class _MovementEditPageState extends State<MovementEditPage> {
         : await _dataProvider.createSingle(_movementDescription.movement);
     if (result.isSuccess) {
       Movement.defaultMovement ??= _movementDescription.movement;
-      _formKey.currentState!.deactivate();
       if (mounted) {
         Navigator.pop(context);
       }
-    } else {
+    } else if (mounted) {
       await showMessageDialog(
         context: context,
         text: 'Creating Movement failed:\n${result.failure}',
@@ -174,7 +173,7 @@ class _MovementEditPageState extends State<MovementEditPage> {
       },
       validator: Validator.validateStringNotEmpty,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      style: Theme.of(context).textTheme.headline6,
+      style: Theme.of(context).textTheme.titleLarge,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.text,
       decoration: Theme.of(context).textFormFieldDecoration.copyWith(

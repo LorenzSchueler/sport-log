@@ -44,7 +44,6 @@ class _MetconEditPageState extends State<MetconEditPage> {
         : await _dataProvider.createSingle(_metconDescription);
     if (result.isSuccess) {
       MetconDescription.defaultMetconDescription ??= _metconDescription;
-      _formKey.currentState!.deactivate();
       if (mounted) {
         Navigator.pop(
           context,
@@ -56,7 +55,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
           ), // needed for return to details page
         );
       }
-    } else {
+    } else if (mounted) {
       await showMessageDialog(
         context: context,
         text: 'Creating Metcon failed:\n${result.failure}',
@@ -132,7 +131,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
           setState(() => _metconDescription.metcon.name = name),
       validator: Validator.validateStringNotEmpty,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      style: Theme.of(context).textTheme.headline6,
+      style: Theme.of(context).textTheme.titleLarge,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.text,
       decoration: Theme.of(context).textFormFieldDecoration.copyWith(
@@ -374,7 +373,7 @@ class MetconMovementCard extends StatelessWidget {
               children: [
                 Text(
                   mmd.movement.name,
-                  style: Theme.of(context).textTheme.subtitle1,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const Spacer(),
                 IconButton(

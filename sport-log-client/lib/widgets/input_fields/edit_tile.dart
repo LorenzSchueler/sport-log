@@ -45,7 +45,7 @@ class EditTile extends StatelessWidget {
       children: [
         if (caption != null) CaptionTile(caption: caption!),
         DefaultTextStyle(
-          style: Theme.of(context).textTheme.subtitle1!,
+          style: Theme.of(context).textTheme.titleMedium!,
           child: child,
         ),
       ],

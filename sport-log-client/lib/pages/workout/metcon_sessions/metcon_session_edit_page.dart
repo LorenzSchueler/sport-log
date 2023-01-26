@@ -45,9 +45,8 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
     final result = widget.isNew
         ? await _dataProvider.createSingle(_metconSessionDescription)
         : await _dataProvider.updateSingle(_metconSessionDescription);
-    if (result.isSuccess) {
-      _formKey.currentState!.deactivate();
-      if (mounted) {
+    if (mounted) {
+      if (result.isSuccess) {
         Navigator.pop(
           context,
           ReturnObject(
@@ -55,12 +54,12 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
             payload: _metconSessionDescription,
           ), // needed for return to details page
         );
+      } else {
+        await showMessageDialog(
+          context: context,
+          text: 'Creating Metcon Session failed:\n${result.failure}',
+        );
       }
-    } else {
-      await showMessageDialog(
-        context: context,
-        text: 'Creating Metcon Session failed:\n${result.failure}',
-      );
     }
   }
 
@@ -68,7 +67,6 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
     if (!widget.isNew) {
       await _dataProvider.deleteSingle(_metconSessionDescription);
     }
-    _formKey.currentState!.deactivate();
     if (mounted) {
       Navigator.pop(
         context,

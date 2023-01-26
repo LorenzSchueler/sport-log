@@ -34,10 +34,11 @@ class HeartRatePage extends StatelessWidget {
                               ? null
                               : () async {
                                   await heartRateUtils.searchDevices();
-                                  if (heartRateUtils.devices.isEmpty) {
-                                    // ignore: use_build_context_synchronously
+                                  final context = App.globalContext;
+                                  if (context.mounted &&
+                                      heartRateUtils.devices.isEmpty) {
                                     showSimpleToast(
-                                      App.globalContext,
+                                      context,
                                       "No devices found.",
                                     );
                                   }
@@ -102,7 +103,7 @@ class HeartRatePage extends StatelessWidget {
                         const Icon(AppIcons.battery),
                         Text(
                           "${heartRateUtils.battery}%",
-                          style: Theme.of(context).textTheme.subtitle1,
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
                       ],
                     )

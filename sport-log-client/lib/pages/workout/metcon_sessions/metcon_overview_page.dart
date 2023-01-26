@@ -116,7 +116,7 @@ class MetconCard extends StatelessWidget {
             children: [
               Text(
                 metconDescription.metcon.name,
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               Defaults.sizedBox.vertical.normal,
               Text(
