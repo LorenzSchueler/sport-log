@@ -61,7 +61,7 @@ class DayFilter extends DateFilterState {
   String get label => start.toHumanDay();
 
   @override
-  String get name => 'Day';
+  final String name = 'Day';
 }
 
 class WeekFilter extends DateFilterState {
@@ -87,7 +87,7 @@ class WeekFilter extends DateFilterState {
   String get label => start.toHumanWeek();
 
   @override
-  String get name => 'Week';
+  final String name = 'Week';
 }
 
 class MonthFilter extends DateFilterState {
@@ -113,7 +113,7 @@ class MonthFilter extends DateFilterState {
   String get label => start.toHumanMonth();
 
   @override
-  String get name => 'Month';
+  final String name = 'Month';
 }
 
 class YearFilter extends DateFilterState {
@@ -139,14 +139,17 @@ class YearFilter extends DateFilterState {
   String get label => start.toHumanYear();
 
   @override
-  String get name => 'Year';
+  final String name = 'Year';
 }
 
 class AllFilter extends DateFilterState {
   const AllFilter();
 
   @override
-  String get label => 'All';
+  final DateTime? start = null;
+
+  @override
+  final DateTime? end = null;
 
   @override
   DateFilterState get earlier => this;
@@ -155,11 +158,8 @@ class AllFilter extends DateFilterState {
   DateFilterState get later => this;
 
   @override
-  String get name => 'All';
+  final String label = 'All';
 
   @override
-  DateTime? get end => null;
-
-  @override
-  DateTime? get start => null;
+  final String name = 'All';
 }

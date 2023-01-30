@@ -8,6 +8,7 @@ import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter.dart';
+import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
@@ -77,8 +78,9 @@ class DiaryPage extends StatelessWidget {
                         padding: Defaults.edgeInsets.normal,
                         child: Column(
                           children: [
-                            if (dataProvider.entities
-                                .any((d) => d.bodyweight != null)) ...[
+                            if (dataProvider.dateFilter is! DayFilter &&
+                                dataProvider.entities
+                                    .any((d) => d.bodyweight != null)) ...[
                               DateTimeChart(
                                 chartValues: dataProvider.entities
                                     .map((s) {
