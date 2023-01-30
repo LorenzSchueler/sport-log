@@ -54,10 +54,12 @@ pub struct Config {
 }
 
 fn main() {
-    if cfg!(debug_assertions) {
-        env::set_var("RUST_LOG", "warn,sport_log_scheduler=debug");
-    } else {
-        env::set_var("RUST_LOG", "warn");
+    if env::var("RUST_LOG").is_err() {
+        if cfg!(debug_assertions) {
+            env::set_var("RUST_LOG", "warn,sport_log_scheduler=debug");
+        } else {
+            env::set_var("RUST_LOG", "warn");
+        }
     }
 
     tracing_subscriber::fmt()

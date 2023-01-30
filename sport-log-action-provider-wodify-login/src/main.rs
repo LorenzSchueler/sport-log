@@ -100,16 +100,18 @@ enum Mode {
 
 #[tokio::main]
 async fn main() {
-    if cfg!(debug_assertions) {
-        env::set_var(
-            "RUST_LOG",
-            "info,sport_log_action_provider_wodify_login=debug",
-        );
-    } else {
-        env::set_var(
-            "RUST_LOG",
-            "warn,sport_log_action_provider_wodify_login=info",
-        );
+    if env::var("RUST_LOG").is_err() {
+        if cfg!(debug_assertions) {
+            env::set_var(
+                "RUST_LOG",
+                "info,sport_log_action_provider_wodify_login=debug",
+            );
+        } else {
+            env::set_var(
+                "RUST_LOG",
+                "warn,sport_log_action_provider_wodify_login=info",
+            );
+        }
     }
 
     tracing_subscriber::fmt()

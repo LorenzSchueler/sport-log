@@ -79,13 +79,15 @@ enum Mode {
 
 #[tokio::main]
 async fn main() {
-    if cfg!(debug_assertions) {
-        env::set_var(
-            "RUST_LOG",
-            "info,sport_log_action_provider_wodify_wod=debug",
-        );
-    } else {
-        env::set_var("RUST_LOG", "warn");
+    if env::var("RUST_LOG").is_err() {
+        if cfg!(debug_assertions) {
+            env::set_var(
+                "RUST_LOG",
+                "info,sport_log_action_provider_wodify_wod=debug",
+            );
+        } else {
+            env::set_var("RUST_LOG", "warn");
+        }
     }
 
     tracing_subscriber::fmt()

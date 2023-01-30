@@ -151,16 +151,18 @@ struct Location {
 
 #[tokio::main]
 async fn main() {
-    if cfg!(debug_assertions) {
-        env::set_var(
-            "RUST_LOG",
-            "info,sport_log_action_provider_sportstracker=debug",
-        );
-    } else {
-        env::set_var(
-            "RUST_LOG",
-            "warn,sport_log_action_provider_sportstracker=info",
-        );
+    if env::var("RUST_LOG").is_err() {
+        if cfg!(debug_assertions) {
+            env::set_var(
+                "RUST_LOG",
+                "info,sport_log_action_provider_sportstracker=debug",
+            );
+        } else {
+            env::set_var(
+                "RUST_LOG",
+                "warn,sport_log_action_provider_sportstracker=info",
+            );
+        }
     }
 
     tracing_subscriber::fmt()
