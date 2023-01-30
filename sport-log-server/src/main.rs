@@ -114,7 +114,7 @@ async fn main() {
 
     let state = AppState { db_pool, config };
 
-    let router = router::get_router(state).await;
+    let router = router::get_router(state);
 
     if let Err(err) = run_server(router, config).await {
         error!("{}", err);

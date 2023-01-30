@@ -488,8 +488,7 @@ async fn get_workout_stats(
 
     Ok(client
         .get(format!(
-            "https://api.sports-tracker.com/apiserver/v1/workouts/{}",
-            workout_key
+            "https://api.sports-tracker.com/apiserver/v1/workouts/{workout_key}",
         ))
         .query(&[token, samples])
         .send()
@@ -508,8 +507,7 @@ async fn get_workout_track(
 
     Ok(client
         .get(format!(
-            "https://api.sports-tracker.com/apiserver/v1/workouts/{}/data",
-            workout_key
+            "https://api.sports-tracker.com/apiserver/v1/workouts/{workout_key}/data"
         ))
         .query(&[token, samples])
         .send()

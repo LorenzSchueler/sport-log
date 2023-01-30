@@ -82,23 +82,23 @@ fn main() {
     let args: Vec<_> = env::args().collect();
     let (mut request, credentials, data) = match &args[1..] {
         [method, endpoint, data] if method == "POST" => {
-            let request = Client::new().post(format!("{}{}", BASE_URL, endpoint));
+            let request = Client::new().post(format!("{BASE_URL}{endpoint}"));
             (request, None, Some(data))
         }
         [method, endpoint, username, password, data] if method == "POST" => {
-            let request = Client::new().post(format!("{}{}", BASE_URL, endpoint));
+            let request = Client::new().post(format!("{BASE_URL}{endpoint}"));
             (request, Some((username, password)), Some(data))
         }
         [method, endpoint, username, password] if method == "GET" => {
-            let request = Client::new().get(format!("{}{}", BASE_URL, endpoint));
+            let request = Client::new().get(format!("{BASE_URL}{endpoint}"));
             (request, Some((username, password)), None)
         }
         [method, endpoint, username, password, data] if method == "PUT" => {
-            let request = Client::new().put(format!("{}{}", BASE_URL, endpoint));
+            let request = Client::new().put(format!("{BASE_URL}{endpoint}"));
             (request, Some((username, password)), Some(data))
         }
         [method, endpoint, username, password] if method == "DELETE" => {
-            let request = Client::new().delete(format!("{}{}", BASE_URL, endpoint));
+            let request = Client::new().delete(format!("{BASE_URL}{endpoint}"));
             (request, Some((username, password)), None)
         }
         _ => {

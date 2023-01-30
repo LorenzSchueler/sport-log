@@ -257,7 +257,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
     }
 
     info!("terminating webdriver");
-    let _ = webdriver.kill();
+    let _ = webdriver.kill().await;
 
     Ok(())
 }

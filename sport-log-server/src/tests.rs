@@ -106,7 +106,7 @@ async fn init() -> (Router, DbPool, &'static Config) {
         config,
     };
 
-    let router = router::get_router(state).await;
+    let router = router::get_router(state);
 
     let mut db = db_pool.get().unwrap();
 
@@ -194,7 +194,7 @@ fn basic_auth(username: &str, password: &str) -> (HeaderName, String) {
         AUTHORIZATION,
         format!(
             "Basic {}",
-            STANDARD.encode(format!("{}:{}", username, password))
+            STANDARD.encode(format!("{username}:{password}"))
         ),
     )
 }
@@ -204,7 +204,7 @@ fn basic_auth_as(username: &str, id: i64, password: &str) -> (HeaderName, String
         AUTHORIZATION,
         format!(
             "Basic {}",
-            STANDARD.encode(format!("{}$id${}:{}", username, id, password))
+            STANDARD.encode(format!("{username}$id${id}:{password}"))
         ),
     )
 }

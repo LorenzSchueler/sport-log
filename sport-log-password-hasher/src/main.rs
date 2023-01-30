@@ -33,7 +33,7 @@ fn main() {
                 .unwrap()
                 .to_string();
 
-            println!("{}", password_hash);
+            println!("{password_hash}");
         }
         [mode, hash, password] if mode == "-v" => {
             let hash = PasswordHash::new(hash.as_str()).unwrap();
