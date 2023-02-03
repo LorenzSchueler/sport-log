@@ -5,10 +5,9 @@ abstract class DateFilterState {
 
   DateTime? get start;
 
-  DateTime? get end;
+  DateTime get end;
 
-  bool get goingForwardPossible =>
-      end == null ? false : end!.isBefore(DateTime.now());
+  bool get goingForwardPossible => end.isBefore(DateTime.now());
 
   DateFilterState get earlier;
 
@@ -27,13 +26,18 @@ abstract class DateFilterState {
   bool operator ==(Object other) =>
       other is DateFilterState && other.start == start && other.end == end;
 
-  static List<DateFilterState> all(DateFilterState dateFilterState) => [
-        DayFilter(dateFilterState.start ?? DateTime.now()),
-        WeekFilter(dateFilterState.start ?? DateTime.now()),
-        MonthFilter(dateFilterState.start ?? DateTime.now()),
-        YearFilter(dateFilterState.start ?? DateTime.now()),
-        const AllFilter()
-      ];
+  static List<DateFilterState> all(DateFilterState dateFilterState) {
+    final now = DateTime.now();
+    final inclusiveEnd = dateFilterState.end.subtract(const Duration(days: 1));
+    final end = now.compareTo(inclusiveEnd) < 0 ? now : inclusiveEnd;
+    return [
+      DayFilter(end),
+      WeekFilter(end),
+      MonthFilter(end),
+      YearFilter(end),
+      const AllFilter()
+    ];
+  }
 
   static DateFilterState get init => MonthFilter(DateTime.now());
 }
@@ -149,7 +153,7 @@ class AllFilter extends DateFilterState {
   final DateTime? start = null;
 
   @override
-  final DateTime? end = null;
+  DateTime get end => DateTime.now();
 
   @override
   DateFilterState get earlier => this;
