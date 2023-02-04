@@ -152,7 +152,6 @@ insert into movement (id, user_id, name, description, movement_dimension, cardio
     (151, null, 'Dumbbell Biceps Curl', null, 'reps', false),
     (152, null, 'Kettlebell Overhead Press', null, 'reps', false),
     (153, null, 'Snowboarding', null, 'distance', true),
-    (154, null, 'Strict Ring Dip', null, 'reps', false),
     (155, null, 'Sandbag Carry', null, 'distance', false),
     (156, null, 'Sandbag Clean', null, 'reps', false),
     (157, null, 'GHD Hip Extension & Nordic Curl', null, 'reps', false),
