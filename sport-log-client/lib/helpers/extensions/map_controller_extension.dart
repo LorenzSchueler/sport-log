@@ -173,8 +173,10 @@ class CircleManager {
 
   static final _lock = Lock();
 
-  Future<List<CircleAnnotation>> addCurrentLocationMarker(LatLng latLng) {
-    return _manager.createMulti([
+  Future<List<CircleAnnotation>> addCurrentLocationMarker(
+    LatLng latLng,
+  ) async {
+    return (await _manager.createMulti([
       CircleAnnotationOptions(
         geometry: latLng.toJsonPoint(),
         circleRadius: 8.0,
@@ -187,7 +189,8 @@ class CircleManager {
         circleColor: Defaults.mapbox.markerColor,
         circleOpacity: 0.3,
       ),
-    ]) as Future<List<CircleAnnotation>>;
+    ]))
+        .cast<CircleAnnotation>();
   }
 
   Future<void> updateCurrentLocationMarker(
