@@ -1,186 +1,266 @@
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'dart:math';
+
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Position;
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
+import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:synchronized/synchronized.dart';
 
-extension MapControllerExtension on MapboxMapController {
-  static final _lock = Lock();
+extension MapControllerExtension on MapboxMap {
+  Future<LatLng> get center async =>
+      LatLng.fromMap((await getCameraState()).center);
 
-  Future<void> setNorth() => animateCamera(CameraUpdate.bearingTo(0));
+  Future<double> get zoom async => (await getCameraState()).zoom;
 
-  Future<void> setBounds(LatLngBounds bounds, {required bool padded}) {
-    if (padded) {
-      bounds = bounds.padded();
-    }
-    return moveCamera(CameraUpdate.newLatLngBounds(bounds));
+  Future<LatLngZoom> get latLngZoom async {
+    final state = await getCameraState();
+    return LatLngZoom(latLng: LatLng.fromMap(state.center), zoom: state.zoom);
   }
 
-  Future<void> animateBounds(LatLngBounds bounds, {required bool padded}) {
+  // TODO diff to flyTo ??
+  Future<void> animateCenter(LatLng center) =>
+      easeTo(center.toCameraOptions(), null);
+
+  Future<void> setZoom(double zoom) => flyTo(CameraOptions(zoom: zoom), null);
+
+  Future<void> setNorth() => flyTo(CameraOptions(bearing: 0), null);
+
+  Future<void> setBoundsX(LatLngBounds bounds, {required bool padded}) async {
     if (padded) {
       bounds = bounds.padded();
     }
-    return animateCamera(CameraUpdate.newLatLngBounds(bounds));
+    final center = bounds.center;
+    await setCamera(CameraOptions(center: center.toJsonPoint()));
+    final screenCorner =
+        await screenCoordToLatLng(ScreenCoordinate(x: 0, y: 0));
+    final northwest =
+        LatLng(lat: bounds.northeast.lat, lng: bounds.southwest.lng);
+    final latRatio =
+        (center.lat - screenCorner.lat) / (center.lat - northwest.lat);
+    final lngRatio =
+        (center.lng - screenCorner.lng) / (center.lng - northwest.lng);
+    final ratio = latRatio < lngRatio ? latRatio : lngRatio;
+    final zoomAdd = log(ratio) / log(2);
+    final cameraState = await getCameraState();
+    await setCamera(CameraOptions(zoom: cameraState.zoom + zoomAdd));
   }
 
   Future<void> setBoundsFromTracks(
-    List<Position>? track1,
-    List<Position>? track2, {
+    Iterable<Position>? track1,
+    Iterable<Position>? track2, {
     required bool padded,
   }) async {
-    final bounds = LatLngBoundsCombine.combinedBounds(
-      track1?.latLngBounds,
-      track2?.latLngBounds,
+    final bounds = LatLngBounds.combinedBounds(
+      track1?.map((p) => p.latLng).latLngBounds,
+      track2?.map((p) => p.latLng).latLngBounds,
     );
     if (bounds != null) {
-      await setBounds(bounds, padded: padded);
+      await setBoundsX(bounds, padded: padded);
     }
   }
 
-  Future<void> animateCenter(LatLng center) =>
-      animateCamera(CameraUpdate.newLatLng(center));
+  Future<LatLng> screenCoordToLatLng(
+    ScreenCoordinate screenCoordinate,
+  ) async =>
+      LatLng.fromMap(await coordinateForPixel(screenCoordinate));
 
-  Future<void> animateZoom(double zoom) =>
-      animateCamera(CameraUpdate.zoomTo(zoom));
+  Function(ScreenCoordinate)? invokeWithLatLng(Function(LatLng)? fn) {
+    return fn == null
+        ? null
+        : (ScreenCoordinate screenCoord) async {
+            final latLng = await screenCoordToLatLng(screenCoord);
+            fn(latLng);
+          };
+  }
+}
 
-  Future<Line> addBoundingBoxLine(LatLng point1, LatLng point2) {
-    return addLine(
-      LineOptions(
-        lineColor: Defaults.mapbox.trackLineColor,
+class LineManager {
+  LineManager(this._manager);
+
+  final PolylineAnnotationManager _manager;
+
+  static final _lock = Lock();
+
+  Future<PolylineAnnotation> addBoundingBoxLine(LatLngBounds bounds) async {
+    return _manager.create(
+      PolylineAnnotationOptions(
+        geometry: bounds.toGeoJsonLineString(),
         lineWidth: 2,
-        geometry: [
-          LatLng(point1.latitude, point1.longitude),
-          LatLng(point1.latitude, point2.longitude),
-          LatLng(point2.latitude, point2.longitude),
-          LatLng(point2.latitude, point1.longitude),
-          LatLng(point1.latitude, point1.longitude)
-        ],
+        lineColor: Defaults.mapbox.trackLineColor,
       ),
     );
   }
 
   Future<void> updateBoundingBoxLine(
-    NullablePointer<Line> line,
-    LatLng? point1,
-    LatLng? point2,
+    NullablePointer<PolylineAnnotation> line,
+    LatLngBounds? bounds,
   ) async {
     await _lock.synchronized(() async {
-      if (line.isNotNull) {
-        await removeLine(line.object!);
+      if (line.isNull && bounds != null) {
+        line.object = await addBoundingBoxLine(bounds);
+      } else if (line.isNotNull && bounds != null) {
+        line.object!.geometry = bounds.toGeoJsonLineString();
+        await _manager.update(line.object!);
+      } else if (line.isNotNull && bounds == null) {
+        await _manager.delete(line.object!);
         line.setNull();
-      }
-      if (point1 != null && point2 != null) {
-        line.object = await addBoundingBoxLine(point1, point2);
       }
     });
   }
 
-  Future<Line> addRouteLine(List<Position> track) {
-    return addLine(
-      LineOptions(
-        lineColor: Defaults.mapbox.routeLineColor,
+  Future<PolylineAnnotation> addRouteLine(Iterable<Position> route) {
+    return _manager.create(
+      PolylineAnnotationOptions(
+        geometry: route.map((p) => p.latLng).toGeoJsonLineString(),
         lineWidth: 2,
-        geometry: track.latLngs,
+        lineColor: Defaults.mapbox.routeLineColor,
       ),
     );
   }
 
   Future<void> updateRouteLine(
-    NullablePointer<Line> line,
-    List<Position>? track,
+    NullablePointer<PolylineAnnotation> line,
+    Iterable<Position>? track,
   ) async {
     await _lock.synchronized(() async {
-      if (line.isNotNull) {
-        await removeLine(line.object!);
-        line.setNull();
-      }
-      if (track != null) {
+      if (line.isNull && track != null) {
         line.object = await addRouteLine(track);
+      } else if (line.isNotNull && track != null) {
+        line.object!.geometry =
+            track.map((p) => p.latLng).toGeoJsonLineString();
+        await _manager.update(line.object!);
+      } else if (line.isNotNull && track == null) {
+        await _manager.delete(line.object!);
+        line.setNull();
       }
     });
   }
 
-  Future<Line> addTrackLine(List<Position> track) {
-    return addLine(
-      LineOptions(
-        lineColor: Defaults.mapbox.trackLineColor,
+  Future<PolylineAnnotation> addTrackLine(Iterable<Position> track) {
+    return _manager.create(
+      PolylineAnnotationOptions(
+        geometry: track.map((p) => p.latLng).toGeoJsonLineString(),
         lineWidth: 2,
-        geometry: track.latLngs,
+        lineColor: Defaults.mapbox.trackLineColor,
       ),
     );
   }
 
   Future<void> updateTrackLine(
-    NullablePointer<Line> line,
-    List<Position>? track,
+    NullablePointer<PolylineAnnotation> line,
+    Iterable<Position>? track,
   ) async {
     await _lock.synchronized(() async {
-      if (line.isNotNull) {
-        await removeLine(line.object!);
-        line.setNull();
-      }
-      if (track != null) {
+      if (line.isNull && track != null) {
         line.object = await addTrackLine(track);
+      } else if (line.isNotNull && track != null) {
+        line.object!.geometry =
+            track.map((p) => p.latLng).toGeoJsonLineString();
+        await _manager.update(line.object!);
+      } else if (line.isNotNull && track == null) {
+        await _manager.delete(line.object!);
+        line.setNull();
       }
     });
   }
+}
 
-  Future<List<Circle>> addCurrentLocationMarker(LatLng latLng) {
-    return addCircles([
-      CircleOptions(
+class CircleManager {
+  CircleManager(this._manager);
+
+  final CircleAnnotationManager _manager;
+
+  static final _lock = Lock();
+
+  Future<List<CircleAnnotation>> addCurrentLocationMarker(LatLng latLng) {
+    return _manager.createMulti([
+      CircleAnnotationOptions(
+        geometry: latLng.toJsonPoint(),
         circleRadius: 8.0,
         circleColor: Defaults.mapbox.markerColor,
         circleOpacity: 0.5,
-        geometry: latLng,
       ),
-      CircleOptions(
+      CircleAnnotationOptions(
+        geometry: latLng.toJsonPoint(),
         circleRadius: 20.0,
         circleColor: Defaults.mapbox.markerColor,
         circleOpacity: 0.3,
-        geometry: latLng,
       ),
-    ]);
+    ]) as Future<List<CircleAnnotation>>;
   }
 
   Future<void> updateCurrentLocationMarker(
-    NullablePointer<List<Circle>> circles,
+    NullablePointer<List<CircleAnnotation>> circles,
     LatLng? latLng,
   ) async {
     await _lock.synchronized(() async {
-      if (circles.isNotNull) {
-        await removeCircles(circles.object!);
-        circles.setNull();
-      }
-      if (latLng != null) {
+      if (circles.isNull && latLng != null) {
         circles.object = await addCurrentLocationMarker(latLng);
+      } else if (circles.isNotNull && latLng != null) {
+        circles.object = circles.object!
+            .map((c) => c..geometry = latLng.toJsonPoint())
+            .toList();
+        for (final circle in circles.object!) {
+          await _manager.update(circle);
+        }
+      } else if (circles.isNotNull && latLng == null) {
+        for (final circle in circles.object!) {
+          await _manager.delete(circle);
+        }
+        circles.setNull();
       }
     });
   }
 
-  Future<Circle> addLocationMarker(LatLng latLng) {
-    return addCircle(
-      CircleOptions(
+  Future<CircleAnnotation> addLocationMarker(LatLng latLng) {
+    return _manager.create(
+      CircleAnnotationOptions(
+        geometry: latLng.toJsonPoint(),
         circleRadius: 8.0,
         circleColor: Defaults.mapbox.markerColor,
         circleOpacity: 0.5,
-        geometry: latLng,
       ),
     );
   }
 
+  Future<void> removeLocationMarker(CircleAnnotation circle) =>
+      _manager.delete(circle);
+
   Future<void> updateLocationMarker(
-    NullablePointer<Circle> circle,
+    NullablePointer<CircleAnnotation> circle,
     LatLng? latLng,
   ) async {
     await _lock.synchronized(() async {
-      if (circle.isNotNull) {
-        await removeCircle(circle.object!);
-        circle.setNull();
-      }
-      if (latLng != null) {
+      if (circle.isNull && latLng != null) {
         circle.object = await addLocationMarker(latLng);
+      } else if (circle.isNotNull && latLng != null) {
+        circle.object!.geometry = latLng.toJsonPoint();
+        await _manager.update(circle.object!);
+      } else if (circle.isNotNull && latLng == null) {
+        await _manager.delete(circle.object!);
+        circle.setNull();
       }
     });
   }
+
+  Future<void> removeAll() => _manager.deleteAll();
+}
+
+class PointManager {
+  PointManager(this._manager);
+
+  final PointAnnotationManager _manager;
+
+  Future<PointAnnotation> addLocationLabel(LatLng latLng, String label) {
+    return _manager.create(
+      PointAnnotationOptions(
+        geometry: latLng.toJsonPoint(),
+        textField: label,
+        textOffset: [0, 1],
+      ),
+    );
+  }
+
+  Future<void> removeAll() => _manager.deleteAll();
 }

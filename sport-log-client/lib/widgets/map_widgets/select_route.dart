@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/models/cardio/route.dart';
@@ -7,9 +7,14 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/picker/picker.dart';
 
 class SelectRouteButton extends StatefulWidget {
-  const SelectRouteButton({required this.mapController, super.key});
+  const SelectRouteButton({
+    required this.mapController,
+    required this.lineManager,
+    super.key,
+  });
 
-  final MapboxMapController mapController;
+  final MapboxMap mapController;
+  final LineManager lineManager;
 
   @override
   State<SelectRouteButton> createState() => _SelectRouteButtonState();
@@ -17,7 +22,8 @@ class SelectRouteButton extends StatefulWidget {
 
 class _SelectRouteButtonState extends State<SelectRouteButton> {
   Route? selectedRoute;
-  final NullablePointer<Line> line = NullablePointer.nullPointer();
+  final NullablePointer<PolylineAnnotation> line =
+      NullablePointer.nullPointer();
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +46,8 @@ class _SelectRouteButtonState extends State<SelectRouteButton> {
     } else {
       selectedRoute = route;
     }
-    await widget.mapController.updateRouteLine(line, selectedRoute?.track);
-    if (selectedRoute != null) {
-      await widget.mapController
-          .setBoundsFromTracks(selectedRoute?.track, null, padded: true);
-    }
+    await widget.lineManager.updateRouteLine(line, selectedRoute?.track);
+    await widget.mapController
+        .setBoundsFromTracks(selectedRoute?.track, null, padded: true);
   }
 }

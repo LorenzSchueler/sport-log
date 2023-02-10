@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:provider/provider.dart';
-import 'package:sport_log/config.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
-import 'package:sport_log/helpers/map_download_utils.dart';
+import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
@@ -25,65 +21,80 @@ class OfflineMapsPage extends StatefulWidget {
 }
 
 class _OfflineMapsPageState extends State<OfflineMapsPage> {
-  late MapboxMapController _mapController;
+  MapboxMap? _mapController;
+  LineManager? _lineManager;
+  CircleManager? _circleManager;
 
   LatLng? _point1;
   LatLng? _point2;
-  final NullablePointer<Circle> _point1Marker = NullablePointer.nullPointer();
-  final NullablePointer<Circle> _point2Marker = NullablePointer.nullPointer();
-  final NullablePointer<Line> _boundingBoxLine = NullablePointer.nullPointer();
+  final NullablePointer<CircleAnnotation> _point1Marker =
+      NullablePointer.nullPointer();
+  final NullablePointer<CircleAnnotation> _point2Marker =
+      NullablePointer.nullPointer();
+  final NullablePointer<PolylineAnnotation> _boundingBoxLine =
+      NullablePointer.nullPointer();
 
   @override
-  void dispose() {
-    if (_mapController.cameraPosition != null) {
-      Settings.instance.lastMapPosition = _mapController.cameraPosition!;
-    }
+  Future<void> dispose() async {
     super.dispose();
-  }
-
-  MapDownloadUtils createMapDownloadUtils() {
-    return MapDownloadUtils(
-      // ignore: prefer-extracting-callbacks
-      onSuccess: () async {
-        await _updatePoint2(null);
-        await _updatePoint1(null);
-        if (mounted) {
-          await showMessageDialog(
-            context: context,
-            text: "Download Successful",
-          );
-        }
-      },
-      onError: () async {
-        await showMessageDialog(context: context, text: "Download Failed");
-      },
-    );
-  }
-
-  Future<void> _downloadMap(MapDownloadUtils mapDownloadUtils) async {
-    if (_point1 != null && _point2 != null) {
-      final bounds = [_point1!, _point2!].latLngBounds!;
-      await mapDownloadUtils.downloadRegion(bounds);
-    } else {
-      await showMessageDialog(
-        context: context,
-        text: "Please mark 2 points by long pressing on the map.",
-      );
+    final lastMapPosition = await _mapController?.latLngZoom;
+    if (lastMapPosition != null) {
+      Settings.instance.lastMapPosition = lastMapPosition;
     }
   }
+
+  Future<void> _onMapCreated(MapboxMap mapController) async {
+    _lineManager = LineManager(
+      await mapController.annotations.createPolylineAnnotationManager(),
+    );
+    _circleManager = CircleManager(
+      await mapController.annotations.createCircleAnnotationManager(),
+    );
+    _mapController = mapController;
+  }
+
+  //MapDownloadUtils createMapDownloadUtils() {
+  //return MapDownloadUtils(
+  //// ignore: prefer-extracting-callbacks
+  //onSuccess: () async {
+  //await _updatePoint2(null);
+  //await _updatePoint1(null);
+  //if (mounted) {
+  //await showMessageDialog(
+  //context: context,
+  //text: "Download Successful",
+  //);
+  //}
+  //},
+  //onError: () async {
+  //await showMessageDialog(context: context, text: "Download Failed");
+  //},
+  //);
+  //}
+
+  //Future<void> _downloadMap(MapDownloadUtils mapDownloadUtils) async {
+  //if (_point1 != null && _point2 != null) {
+  //final bounds = [_point1!, _point2!].latLngBounds!;
+  //await mapDownloadUtils.downloadRegion(bounds);
+  //} else {
+  //await showMessageDialog(
+  //context: context,
+  //text: "Please mark 2 points by long pressing on the map.",
+  //);
+  //}
+  //}
 
   Future<void> _updatePoint1(LatLng? latLng) async {
     setState(() => _point1 = latLng);
-    await _mapController.updateLocationMarker(_point1Marker, _point1);
+    await _circleManager?.updateLocationMarker(_point1Marker, _point1);
   }
 
   Future<void> _updatePoint2(LatLng? latLng) async {
     setState(() => _point2 = latLng);
-    await _mapController.updateLocationMarker(_point2Marker, _point2);
-    await _mapController.updateBoundingBoxLine(
+    await _circleManager?.updateLocationMarker(_point2Marker, _point2);
+    await _lineManager?.updateBoundingBoxLine(
       _boundingBoxLine,
-      _point1,
-      _point2,
+      [_point1, _point2].whereType<LatLng>().latLngBounds,
     );
   }
 
@@ -93,8 +104,9 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
       child: Scaffold(
         appBar: AppBar(title: const Text("Offline Maps")),
         drawer: const MainDrawer(selectedRoute: Routes.offlineMaps),
-        body: ProviderConsumer<MapDownloadUtils>(
-          create: (_) => createMapDownloadUtils(),
+        body: ProviderConsumer<ChangeNotifier>(
+          //<MapDownloadUtils>(
+          create: (_) => ChangeNotifier(), //createMapDownloadUtils(),
           builder: (context, mapDownloadUtils, _) {
             return Column(
               children: [
@@ -102,14 +114,16 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                   children: [
                     SizedBox(
                       height: 400,
-                      child: MapboxMap(
-                        accessToken: Config.instance.accessToken,
-                        styleString: MapboxStyles.OUTDOORS,
-                        initialCameraPosition:
-                            context.read<Settings>().lastMapPosition,
-                        onMapCreated: (MapboxMapController controller) =>
-                            _mapController = controller,
-                        onMapLongClick: (_, latLng) => _point1 == null
+                      child: MapboxMapWrapper(
+                        showScale: true,
+                        showFullscreenButton: false,
+                        showMapStylesButton: false,
+                        showSelectRouteButton: false,
+                        showSetNorthButton: false,
+                        showCurrentLocationButton: false,
+                        showCenterLocationButton: false,
+                        onMapCreated: _onMapCreated,
+                        onLongTap: (latLng) => _point1 == null
                             ? _updatePoint1(latLng)
                             : _updatePoint2(latLng),
                         rotateGesturesEnabled: false,
@@ -133,9 +147,10 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                     padding: Defaults.edgeInsets.normal,
                     child: Column(
                       children: [
-                        mapDownloadUtils.progress == null
+                        true //mapDownloadUtils.progress == null
                             ? ElevatedButton(
-                                onPressed: () => _downloadMap(mapDownloadUtils),
+                                onPressed:
+                                    null, //() => _downloadMap(mapDownloadUtils),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: const [
@@ -145,19 +160,19 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                                 ),
                               )
                             : LinearProgressIndicator(
-                                value: mapDownloadUtils.progress,
+                                value: 0, //mapDownloadUtils.progress,
                               ),
                         Defaults.sizedBox.vertical.normal,
                         Expanded(
                           child: ListView.separated(
                             itemBuilder: (_, index) => RegionCard(
-                              region: mapDownloadUtils.regions[index],
-                              mapDownloadUtils: mapDownloadUtils,
-                              key: ValueKey(mapDownloadUtils.regions[index].id),
-                            ),
+                                //region: mapDownloadUtils.regions[index],
+                                //mapDownloadUtils: mapDownloadUtils,
+                                //key: ValueKey(mapDownloadUtils.regions[index].id),
+                                ),
                             separatorBuilder: (_, __) =>
                                 Defaults.sizedBox.vertical.normal,
-                            itemCount: mapDownloadUtils.regions.length,
+                            itemCount: 0, //mapDownloadUtils.regions.length,
                           ),
                         ),
                       ],
@@ -175,46 +190,41 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
 
 class RegionCard extends StatelessWidget {
   const RegionCard({
-    required this.region,
-    required this.mapDownloadUtils,
+    //required this.region,
+    //required this.mapDownloadUtils,
     super.key,
   });
 
-  final OfflineRegion region;
-  final MapDownloadUtils mapDownloadUtils;
+  //final OfflineRegion region;
+  //final MapDownloadUtils mapDownloadUtils;
 
-  Future<void> _setBoundsAndBoundingBoxLine(
-    MapboxMapController sessionMapController,
-  ) async {
-    await sessionMapController.setBounds(
-      region.definition.bounds,
-      padded: true,
+  Future<void> _onMapCreated(MapboxMap mapController) async {
+    final lineManager = LineManager(
+      await mapController.annotations.createPolylineAnnotationManager(),
     );
-    await sessionMapController.addBoundingBoxLine(
-      region.definition.bounds.northeast,
-      region.definition.bounds.southwest,
-    );
+    //await mapController.setBoundsX(
+    //region.definition.bounds,
+    //padded: true,
+    //);
+    //await lineManager.addBoundingBoxLine([
+    //region.definition.bounds.northeast,
+    //region.definition.bounds.southwest
+    //].latLngBounds);
   }
 
   @override
   Widget build(BuildContext context) {
-    late final MapboxMapController sessionMapController;
     return Stack(
       children: [
         SizedBox(
           height: 150,
-          child: StaticMapboxMap(
-            onMapCreated: (MapboxMapController controller) =>
-                sessionMapController = controller,
-            onStyleLoadedCallback: () =>
-                _setBoundsAndBoundingBoxLine(sessionMapController),
-          ),
+          child: StaticMapboxMap(onMapCreated: _onMapCreated),
         ),
         Positioned(
           top: 10,
           left: 10,
           child: Text(
-            DateTime.parse(region.metadata["datetime"] as String).toHumanDate(),
+            "", // DateTime.parse(region.metadata["datetime"] as String).toHumanDate(),
             style: Theme.of(context).textTheme.titleSmall!.copyWith(
                   color: Theme.of(context).colorScheme.background,
                 ),
@@ -226,7 +236,7 @@ class RegionCard extends StatelessWidget {
           child: FloatingActionButton.small(
             heroTag: null,
             child: const Icon(AppIcons.delete),
-            onPressed: () => mapDownloadUtils.deleteRegion(region),
+            onPressed: null, //() => mapDownloadUtils.deleteRegion(region),
           ),
         ),
       ],

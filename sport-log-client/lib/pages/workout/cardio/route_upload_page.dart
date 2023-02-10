@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
@@ -27,9 +27,11 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = RouteDataProvider();
 
-  final NullablePointer<Line> _line = NullablePointer.nullPointer();
+  MapboxMap? _mapController;
+  LineManager? _lineManager;
 
-  late MapboxMapController _mapController;
+  final NullablePointer<PolylineAnnotation> _line =
+      NullablePointer.nullPointer();
 
   late final Route _route = Route.defaultValue()..track = [];
 
@@ -46,6 +48,18 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
         );
       }
     }
+  }
+
+  Future<void> _onMapCreated(MapboxMap mapController) async {
+    _mapController = mapController;
+    _lineManager = LineManager(
+      await mapController.annotations.createPolylineAnnotationManager(),
+    );
+    await _mapController?.setBoundsFromTracks(
+      _route.track,
+      _route.markedPositions,
+      padded: true,
+    );
   }
 
   @override
@@ -76,14 +90,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
                 showSetNorthButton: true,
                 showCurrentLocationButton: false,
                 showCenterLocationButton: false,
-                onMapCreated: (MapboxMapController controller) async {
-                  _mapController = controller;
-                },
-                onStyleLoadedCallback: () => _mapController.setBoundsFromTracks(
-                  _route.track,
-                  _route.markedPositions,
-                  padded: true,
-                ),
+                onMapCreated: _onMapCreated,
               ),
             ),
             Padding(
@@ -138,7 +145,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
             ..setDistance()
             ..setAscentDescent();
         });
-        await _mapController.updateRouteLine(_line, _route.track);
+        await _lineManager?.updateRouteLine(_line, _route.track);
       }
     }
   }

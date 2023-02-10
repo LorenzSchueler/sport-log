@@ -34,7 +34,7 @@ dependencies:
   equatable: ^2.0.0 # makes classes equatable with little boilerplate code
   file_picker: ^5.0.0
   fixnum: ^1.0.0 # used for ids (in web ints go only up to 2^53-1)
-  fl_chart: ^0.55.0
+  fl_chart: ^0.60.0
   flutter:
     sdk: flutter
   flutter_blue: ^0.8.0
@@ -45,7 +45,6 @@ dependencies:
   flutter_time_picker_spinner: ^2.0.0
   fluttertoast: ^8.0.8
   gpx: ^2.1.1
-  hive: ^2.0.4
   hive_flutter: ^1.1.0
   http: ^0.13.3
   intl: ^0.17.0  # used for date formatting
@@ -54,8 +53,12 @@ dependencies:
   location: ^4.3.0
   logger: ^1.0.0
   mapbox_api: ^1.0.0
-  mapbox_gl: ^0.16.0 # mapping lib for osm
-  # mapbox_maps_flutter: ^0.3.0
+  #mapbox_gl: ^0.16.0 # mapping lib for osm
+  #mapbox_maps_flutter: ^0.4.0
+  mapbox_maps_flutter: 
+    git:
+      url: https://github.com/mapbox/mapbox-maps-flutter
+      ref: main
   mapbox_search: ^3.0.1+2
   package_info_plus: ^3.0.1
   path_provider: ^2.0.10
@@ -87,7 +90,7 @@ dev_dependencies:
     # flutter pub run icons_launcher:create
   json_serializable: ^6.3.0 # json
 
-flutter_icons:
+icons_launcher:
   image_path: "../icon.png"
   android: true
   ios: true

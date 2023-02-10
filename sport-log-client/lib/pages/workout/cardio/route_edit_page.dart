@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart' hide Route;
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Position;
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
+import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/route_planning_utils.dart';
 import 'package:sport_log/helpers/validation.dart';
-import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -31,13 +32,17 @@ class _RouteEditPageState extends State<RouteEditPage> {
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = RouteDataProvider();
 
-  final NullablePointer<Line> _line = NullablePointer.nullPointer();
-  List<Circle> _circles = [];
-  List<Symbol> _symbols = [];
+  final NullablePointer<PolylineAnnotation> _line =
+      NullablePointer.nullPointer();
+  List<CircleAnnotation> _circles = [];
+  List<PointAnnotation> _labels = [];
 
   bool _listExpanded = false;
 
-  late MapboxMapController _mapController;
+  MapboxMap? _mapController;
+  LineManager? _lineManager;
+  CircleManager? _circleManager;
+  PointManager? _pointManager;
 
   late final Route _route = (widget.route?.clone() ?? Route.defaultValue())
     ..track ??= []
@@ -97,30 +102,24 @@ class _RouteEditPageState extends State<RouteEditPage> {
               ..setDistance()
               ..setAscentDescent();
           });
-          await _mapController.updateRouteLine(_line, _route.track);
+          await _lineManager?.updateRouteLine(_line, _route.track);
         }
       }
     }
   }
 
   Future<void> _addPoint(LatLng latLng, int number) async {
-    _symbols.add(
-      await _mapController.addSymbol(
-        SymbolOptions(
-          textField: "$number",
-          textOffset: const Offset(0, 1),
-          geometry: latLng,
-        ),
-      ),
-    );
-    _circles.add(await _mapController.addLocationMarker(latLng));
+    if (_pointManager != null && _circleManager != null) {
+      _labels.add(await _pointManager!.addLocationLabel(latLng, "$number"));
+      _circles.add(await _circleManager!.addLocationMarker(latLng));
+    }
   }
 
   Future<void> _updatePoints() async {
-    await _mapController.removeCircles(_circles);
+    await _circleManager?.removeAll();
     _circles = [];
-    await _mapController.removeSymbols(_symbols);
-    _symbols = [];
+    await _pointManager?.removeAll();
+    _labels = [];
     _route.markedPositions!.asMap().forEach((index, pos) {
       _addPoint(pos.latLng, index + 1);
     });
@@ -142,8 +141,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
       setState(() {
         _route.markedPositions!.add(
           Position(
-            latitude: location.latitude,
-            longitude: location.longitude,
+            latitude: location.lat,
+            longitude: location.lng,
             elevation: elevation.toDouble(),
             distance: 0,
             time: Duration.zero,
@@ -229,8 +228,18 @@ class _RouteEditPageState extends State<RouteEditPage> {
           );
   }
 
-  Future<void> _setBoundsAndPointsAndLine() async {
-    await _mapController.setBoundsFromTracks(
+  Future<void> _onMapCreated(MapboxMap mapController) async {
+    _mapController = mapController;
+    _lineManager = LineManager(
+      await mapController.annotations.createPolylineAnnotationManager(),
+    );
+    _circleManager = CircleManager(
+      await mapController.annotations.createCircleAnnotationManager(),
+    );
+    _pointManager = PointManager(
+      await mapController.annotations.createPointAnnotationManager(),
+    );
+    await _mapController?.setBoundsFromTracks(
       _route.track,
       _route.markedPositions,
       padded: true,
@@ -271,10 +280,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
                 showSetNorthButton: true,
                 showCurrentLocationButton: false,
                 showCenterLocationButton: false,
-                onMapCreated: (MapboxMapController controller) =>
-                    _mapController = controller,
-                onStyleLoadedCallback: _setBoundsAndPointsAndLine,
-                onMapLongClick: (point, LatLng latLng) => _extendLine(latLng),
+                onMapCreated: _onMapCreated,
+                onLongTap: _extendLine,
               ),
             ),
             Padding(

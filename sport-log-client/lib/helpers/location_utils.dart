@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:location/location.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
+import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
 

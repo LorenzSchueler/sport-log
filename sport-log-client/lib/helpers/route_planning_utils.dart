@@ -6,10 +6,10 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:http/http.dart';
 import 'package:http/io_client.dart';
 import 'package:mapbox_api/mapbox_api.dart';
-import 'package:mapbox_gl/mapbox_gl.dart' hide Success;
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/cardio/position.dart';
 
@@ -35,8 +35,7 @@ class RoutePlanningUtils {
   ) async {
     final trackMap = {
       "locations": [
-        for (final pos in track)
-          {"latitude": pos.latitude, "longitude": pos.longitude}
+        for (final pos in track) {"latitude": pos.lat, "longitude": pos.lng}
       ]
     };
     final Response response;
@@ -88,7 +87,7 @@ class RoutePlanningUtils {
       List<Position> track = [];
       final latLngs = PolylinePoints()
           .decodePolyline(navRoute.geometry as String)
-          .map((p) => LatLng(p.latitude, p.longitude))
+          .map((p) => LatLng(lat: p.latitude, lng: p.longitude))
           .toList();
       final elevations = await getElevations(latLngs);
       if (elevations.isFailure) {
@@ -100,14 +99,14 @@ class RoutePlanningUtils {
           final elevation = zip[1] as int;
           track.add(
             Position(
-              latitude: pointLatLng.latitude,
-              longitude: pointLatLng.longitude,
+              latitude: pointLatLng.lat,
+              longitude: pointLatLng.lng,
               elevation: elevation.toDouble(),
               distance: track.isEmpty
                   ? 0
                   : track.last.addDistanceTo(
-                      pointLatLng.latitude,
-                      pointLatLng.longitude,
+                      pointLatLng.lat,
+                      pointLatLng.lng,
                     ),
               time: Duration.zero,
             ),

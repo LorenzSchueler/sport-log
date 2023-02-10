@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/data_provider/overview_data_provider.dart';
 import 'package:sport_log/defaults.dart';
@@ -123,23 +123,18 @@ class RouteCard extends StatelessWidget {
     Navigator.pushNamed(context, Routes.routeDetails, arguments: route);
   }
 
-  Future<void> _setBoundsAndTrack(
-    MapboxMapController sessionMapController,
-  ) async {
-    await sessionMapController.setBoundsFromTracks(
-      route.track,
-      null,
-      padded: true,
+  Future<void> _onMapCreated(MapboxMap mapController) async {
+    final lineManager = LineManager(
+      await mapController.annotations.createPolylineAnnotationManager(),
     );
+    await mapController.setBoundsFromTracks(route.track, null, padded: true);
     if (route.track != null) {
-      await sessionMapController.addRouteLine(route.track!);
+      await lineManager.addRouteLine(route.track!);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    late MapboxMapController sessionMapController;
-
     return GestureDetector(
       onTap: () => showDetails(context),
       child: Card(
@@ -159,11 +154,8 @@ class RouteCard extends StatelessWidget {
                     child: StaticMapboxMap(
                       key:
                           ObjectKey(route), // update on reload to get new track
-                      onMapCreated: (MapboxMapController controller) =>
-                          sessionMapController = controller,
-                      onStyleLoadedCallback: () =>
-                          _setBoundsAndTrack(sessionMapController),
-                      onMapClick: (_, __) => showDetails(context),
+                      onMapCreated: _onMapCreated,
+                      onTap: (_) => showDetails(context),
                     ),
                   )
                 : Row(

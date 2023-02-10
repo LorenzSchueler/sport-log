@@ -1,9 +1,9 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hive/hive.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/user/user.dart';
 
@@ -84,7 +84,7 @@ class Settings extends ChangeNotifier {
     if (!_storage!.containsKey(_lastMapPosition) || override) {
       await _storage!.put(
         _lastMapPosition,
-        CameraPosition(target: Defaults.mapbox.cameraPosition),
+        LatLngZoom(latLng: Defaults.mapbox.cameraPosition, zoom: 12),
       );
     }
     if (!_storage!.containsKey(_lastGpsLatLng) || override) {
@@ -129,8 +129,8 @@ class Settings extends ChangeNotifier {
     return _storage!.get(key) as LatLng;
   }
 
-  CameraPosition _getCameraPosition(String key) {
-    return _storage!.get(key) as CameraPosition;
+  LatLngZoom _getLatLngZoom(String key) {
+    return _storage!.get(key) as LatLngZoom;
   }
 
   Future<void> _put(String key, dynamic value) async {
@@ -269,11 +269,11 @@ class Settings extends ChangeNotifier {
         : null;
   }
 
-  CameraPosition get lastMapPosition {
-    return _getCameraPosition(_lastMapPosition);
+  LatLngZoom get lastMapPosition {
+    return _getLatLngZoom(_lastMapPosition);
   }
 
-  set lastMapPosition(CameraPosition latLng) {
+  set lastMapPosition(LatLngZoom latLng) {
     _put(_lastMapPosition, latLng);
   }
 
@@ -316,32 +316,30 @@ class LatLngAdapter extends TypeAdapter<LatLng> {
   @override
   LatLng read(BinaryReader reader) {
     final values = reader.readDoubleList();
-    return LatLng(values[0], values[1]);
+    return LatLng(lat: values[0], lng: values[1]);
   }
 
   @override
   void write(BinaryWriter writer, LatLng obj) {
-    writer.writeDoubleList([obj.latitude, obj.longitude]);
+    writer.writeDoubleList([obj.lat, obj.lng]);
   }
 }
 
-class CameraPositionAdapter extends TypeAdapter<CameraPosition> {
+class CameraPositionAdapter extends TypeAdapter<LatLngZoom> {
   @override
   final typeId = 2;
 
   @override
-  CameraPosition read(BinaryReader reader) {
+  LatLngZoom read(BinaryReader reader) {
     final values = reader.readDoubleList();
-    return CameraPosition(
+    return LatLngZoom(
       zoom: values[0],
-      target: LatLng(values[1], values[2]),
+      latLng: LatLng(lat: values[1], lng: values[2]),
     );
   }
 
   @override
-  void write(BinaryWriter writer, CameraPosition obj) {
-    writer.writeDoubleList(
-      [obj.zoom, obj.target.latitude, obj.target.longitude],
-    );
+  void write(BinaryWriter writer, LatLngZoom obj) {
+    writer.writeDoubleList([obj.zoom, obj.latLng.lat, obj.latLng.lng]);
   }
 }

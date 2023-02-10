@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -38,17 +38,22 @@ class _CardioEditPageState extends State<CardioEditPage> {
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = CardioSessionDescriptionDataProvider();
 
-  MapboxMapController? _mapController;
-  final NullablePointer<Line> _trackLine = NullablePointer.nullPointer();
-  final NullablePointer<Line> _routeLine = NullablePointer.nullPointer();
+  MapboxMap? _mapController;
+  LineManager? _lineManager;
+  CircleManager? _circleManager;
+
+  final NullablePointer<PolylineAnnotation> _trackLine =
+      NullablePointer.nullPointer();
+  final NullablePointer<PolylineAnnotation> _routeLine =
+      NullablePointer.nullPointer();
 
   late final CardioSessionDescription _cardioSessionDescription =
       widget.cardioSessionDescription.clone();
   Duration? _cutStartDuration;
   Duration? _cutEndDuration;
-  final NullablePointer<Circle> _cutStartLocationMarker =
+  final NullablePointer<CircleAnnotation> _cutStartMarker =
       NullablePointer.nullPointer();
-  final NullablePointer<Circle> _cutEndLocationMarker =
+  final NullablePointer<CircleAnnotation> _cutEndMarker =
       NullablePointer.nullPointer();
 
   Future<void> _saveCardioSession() async {
@@ -88,6 +93,18 @@ class _CardioEditPageState extends State<CardioEditPage> {
     }
   }
 
+  Future<void> _onMapCreated(MapboxMap mapController) async {
+    _mapController = mapController;
+    _lineManager = LineManager(
+      await mapController.annotations.createPolylineAnnotationManager(),
+    );
+    _circleManager = CircleManager(
+      await mapController.annotations.createCircleAnnotationManager(),
+    );
+    await _setBoundsAndLines();
+    await _updateCutLocationMarker();
+  }
+
   void _showCut() {
     if (_cardioSessionDescription.cardioSession.time != null) {
       setState(() {
@@ -105,8 +122,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
       _mapController = null; // map gets replaced and new map has new controller
       _cutStartDuration = null;
       _cutEndDuration = null;
-      _cutStartLocationMarker.setNull();
-      _cutEndLocationMarker.setNull();
+      _cutStartMarker.setNull();
+      _cutEndMarker.setNull();
     });
   }
 
@@ -122,14 +139,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
             ?.latLng
         : null;
 
-    await _mapController?.updateLocationMarker(
-      _cutStartLocationMarker,
-      startLatLng,
-    );
-    await _mapController?.updateLocationMarker(
-      _cutEndLocationMarker,
-      endLatLng,
-    );
+    await _circleManager?.updateLocationMarker(_cutStartMarker, startLatLng);
+    await _circleManager?.updateLocationMarker(_cutEndMarker, endLatLng);
   }
 
   Future<void> _cutCardioSession() async {
@@ -158,11 +169,11 @@ class _CardioEditPageState extends State<CardioEditPage> {
       _cardioSessionDescription.route?.track,
       padded: true,
     );
-    await _mapController?.updateTrackLine(
+    await _lineManager?.updateTrackLine(
       _trackLine,
       _cardioSessionDescription.cardioSession.track,
     );
-    await _mapController?.updateRouteLine(
+    await _lineManager?.updateRouteLine(
       _routeLine,
       _cardioSessionDescription.route?.track,
     );
@@ -211,12 +222,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                         showSetNorthButton: true,
                         showCurrentLocationButton: false,
                         showCenterLocationButton: false,
-                        onMapCreated: (MapboxMapController controller) =>
-                            _mapController = controller,
-                        onStyleLoadedCallback: () async {
-                          await _setBoundsAndLines();
-                          await _updateCutLocationMarker();
-                        },
+                        onMapCreated: _onMapCreated,
                       ),
                     ),
                   Defaults.sizedBox.vertical.normal,
@@ -310,9 +316,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                         showSetNorthButton: true,
                         showCurrentLocationButton: false,
                         showCenterLocationButton: false,
-                        onMapCreated: (MapboxMapController controller) =>
-                            _mapController = controller,
-                        onStyleLoadedCallback: _setBoundsAndLines,
+                        onMapCreated: _onMapCreated,
                       ),
                     ),
                   Form(

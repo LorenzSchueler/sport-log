@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/location_utils.dart';
@@ -11,11 +11,13 @@ import 'package:sport_log/widgets/app_icons.dart';
 class CurrentLocationButton extends StatefulWidget {
   const CurrentLocationButton({
     required this.mapController,
+    required this.circleManager,
     required this.centerLocation,
     super.key,
   });
 
-  final MapboxMapController mapController;
+  final MapboxMap mapController;
+  final CircleManager circleManager;
   final bool centerLocation;
 
   @override
@@ -23,7 +25,7 @@ class CurrentLocationButton extends StatefulWidget {
 }
 
 class _CurrentLocationButtonState extends State<CurrentLocationButton> {
-  final NullablePointer<List<Circle>> _currentLocationMarker =
+  final NullablePointer<List<CircleAnnotation>> _currentLocationMarker =
       NullablePointer.nullPointer();
   late final LocationUtils _locationUtils = LocationUtils(_onLocationUpdate);
 
@@ -39,7 +41,7 @@ class _CurrentLocationButtonState extends State<CurrentLocationButton> {
   Future<void> _toggleCurrentLocation() async {
     if (_locationUtils.enabled) {
       _locationUtils.stopLocationStream();
-      await widget.mapController.updateCurrentLocationMarker(
+      await widget.circleManager.updateCurrentLocationMarker(
         _currentLocationMarker,
         null,
       );
@@ -55,7 +57,7 @@ class _CurrentLocationButtonState extends State<CurrentLocationButton> {
     if (widget.centerLocation) {
       await widget.mapController.animateCenter(location.latLng);
     }
-    await widget.mapController.updateCurrentLocationMarker(
+    await widget.circleManager.updateCurrentLocationMarker(
       _currentLocationMarker,
       location.latLng,
     );

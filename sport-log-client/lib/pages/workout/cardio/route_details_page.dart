@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/gpx.dart';
@@ -26,32 +26,44 @@ class RouteDetailsPage extends StatefulWidget {
 class _RouteDetailsPageState extends State<RouteDetailsPage> {
   late Route _route = widget.route.clone();
 
-  late MapboxMapController _mapController;
-  final NullablePointer<Circle> _touchLocationMarker =
+  MapboxMap? _mapController;
+  LineManager? _lineManager;
+  CircleManager? _circleManager;
+  PointManager? _pointManager;
+
+  final NullablePointer<CircleAnnotation> _touchLocationMarker =
       NullablePointer.nullPointer();
 
   bool _fullscreen = false;
 
+  Future<void> _onMapCreated(MapboxMap mapController) async {
+    _mapController = mapController;
+    _lineManager = LineManager(
+      await mapController.annotations.createPolylineAnnotationManager(),
+    );
+    _circleManager = CircleManager(
+      await mapController.annotations.createCircleAnnotationManager(),
+    );
+    _pointManager = PointManager(
+      await mapController.annotations.createPointAnnotationManager(),
+    );
+    await _setBoundsAndLine();
+  }
+
   Future<void> _setBoundsAndLine() async {
-    await _mapController.setBoundsFromTracks(
+    await _mapController?.setBoundsFromTracks(
       _route.track,
       _route.markedPositions,
       padded: true,
     );
     if (_route.track != null) {
-      await _mapController.addRouteLine(_route.track!);
+      await _lineManager?.addRouteLine(_route.track!);
     }
     if (_route.markedPositions != null) {
       for (int i = 0; i < _route.markedPositions!.length; i++) {
         final latLng = _route.markedPositions![i].latLng;
-        await _mapController.addLocationMarker(latLng);
-        await _mapController.addSymbol(
-          SymbolOptions(
-            textField: "${i + 1}",
-            textOffset: const Offset(0, 1),
-            geometry: latLng,
-          ),
-        );
+        await _circleManager?.addLocationMarker(latLng);
+        await _pointManager?.addLocationLabel(latLng, "${i + 1}");
       }
     }
   }
@@ -110,9 +122,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
                           onFullscreenToggle: (fullscreen) =>
                               setState(() => _fullscreen = fullscreen),
                           scaleAtTop: true,
-                          onMapCreated: (MapboxMapController controller) =>
-                              _mapController = controller,
-                          onStyleLoadedCallback: _setBoundsAndLine,
+                          onMapCreated: _onMapCreated,
                         )
                       : Center(
                           child: Row(
@@ -189,6 +199,6 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
             ?.latLng
         : null;
 
-    await _mapController.updateLocationMarker(_touchLocationMarker, latLng);
+    await _circleManager?.updateLocationMarker(_touchLocationMarker, latLng);
   }
 }

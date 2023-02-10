@@ -1,17 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:flutter/material.dart' hide Visibility;
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 class MapStylesButton extends StatelessWidget {
-  const MapStylesButton({
-    required this.mapController,
-    required this.onStyleChange,
-    super.key,
-  });
+  const MapStylesButton({required this.mapController, super.key});
 
-  final MapboxMapController mapController;
-  final void Function(String) onStyleChange;
+  final MapboxMap mapController;
 
   @override
   Widget build(BuildContext context) {
@@ -20,24 +15,16 @@ class MapStylesButton extends StatelessWidget {
       child: const Icon(AppIcons.layers),
       onPressed: () => showModalBottomSheet<void>(
         context: context,
-        builder: (context) => MapStylesBottomSheet(
-          mapController: mapController,
-          onStyleChange: onStyleChange,
-        ),
+        builder: (_) => MapStylesBottomSheet(mapController: mapController),
       ),
     );
   }
 }
 
 class MapStylesBottomSheet extends StatefulWidget {
-  const MapStylesBottomSheet({
-    required this.mapController,
-    required this.onStyleChange,
-    super.key,
-  });
+  const MapStylesBottomSheet({required this.mapController, super.key});
 
-  final MapboxMapController mapController;
-  final void Function(String style) onStyleChange;
+  final MapboxMap mapController;
 
   @override
   State<MapStylesBottomSheet> createState() => _MapStylesBottomSheetState();
@@ -57,24 +44,24 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
   Future<void> _toggleHillshade() async {
     if (_hillshade) {
       setState(() => _hillshade = false);
-      await widget.mapController.removeLayer(_hillshadeLayerId);
-      await widget.mapController.removeSource(_hillshadeSourceId);
+      await widget.mapController.style.removeStyleLayer(_hillshadeLayerId);
     } else {
       setState(() => _hillshade = true);
-      await widget.mapController.addSource(
-        _hillshadeSourceId,
-        const RasterDemSourceProperties(
-          url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
-        ),
-      );
-      await widget.mapController.addHillshadeLayer(
-        _hillshadeSourceId,
-        _hillshadeLayerId,
-        HillshadeLayerProperties(
-          hillshadeShadowColor:
-              const Color.fromARGB(255, 60, 60, 60).toHexStringRGB(),
-          hillshadeHighlightColor:
-              const Color.fromARGB(255, 60, 60, 60).toHexStringRGB(),
+      if (!await widget.mapController.style
+          .styleSourceExists(_hillshadeSourceId)) {
+        await widget.mapController.style.addSource(
+          RasterDemSource(
+            id: _hillshadeSourceId,
+            url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+          ),
+        );
+      }
+      await widget.mapController.style.addLayer(
+        HillshadeLayer(
+          id: _hillshadeLayerId,
+          sourceId: _hillshadeSourceId,
+          hillshadeShadowColor: 0x404040,
+          hillshadeHighlightColor: 0x404040,
         ),
       );
     }
@@ -91,18 +78,20 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                onPressed: () => widget.onStyleChange(MapboxStyles.OUTDOORS),
+                onPressed: () => widget.mapController.style
+                    .setStyleURI(MapboxStyles.OUTDOORS),
                 style: style,
                 child: const Icon(AppIcons.mountains),
               ),
               ElevatedButton(
-                onPressed: () =>
-                    widget.onStyleChange(MapboxStyles.MAPBOX_STREETS),
+                onPressed: () => widget.mapController.style
+                    .setStyleURI(MapboxStyles.MAPBOX_STREETS),
                 style: style,
                 child: const Icon(AppIcons.car),
               ),
               ElevatedButton(
-                onPressed: () => widget.onStyleChange(MapboxStyles.SATELLITE),
+                onPressed: () => widget.mapController.style
+                    .setStyleURI(MapboxStyles.SATELLITE),
                 style: style,
                 child: const Icon(AppIcons.satellite),
               ),

@@ -2,8 +2,7 @@ import 'dart:typed_data';
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:latlong2/latlong.dart' as latlong;
-import 'package:mapbox_gl/mapbox_gl.dart';
-import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
+import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/clone_extensions.dart';
 
@@ -87,7 +86,7 @@ class Position {
   int get hashCode =>
       Object.hash(longitude, latitude, elevation, distance, time);
 
-  LatLng get latLng => LatLng(latitude, longitude);
+  LatLng get latLng => LatLng(lat: latitude, lng: longitude);
 
   double distanceTo(double otherLatitude, double otherLongitude) {
     return const latlong.Distance().as(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mapbox_api/mapbox_api.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:sport_log/config.dart';
+import 'package:sport_log/helpers/lat_lng.dart';
 
 abstract class Defaults {
   static const sizedBox = _SizedBox();
@@ -60,8 +60,8 @@ class _BorderRadius {
 class _Mapbox {
   _Mapbox();
 
-  final markerColor = "#0060a0";
-  final trackLineColor = "red";
-  final routeLineColor = "blue";
-  final cameraPosition = const LatLng(47.27, 11.33);
+  final markerColor = 0xff0060a0;
+  final trackLineColor = 0xffff0000;
+  final routeLineColor = 0xff0000ff;
+  final cameraPosition = const LatLng(lat: 47.27, lng: 11.33);
 }

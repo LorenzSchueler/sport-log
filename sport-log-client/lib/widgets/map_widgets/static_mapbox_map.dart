@@ -1,41 +1,56 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:provider/provider.dart';
 import 'package:sport_log/config.dart';
+import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
+import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/settings.dart';
 
 class StaticMapboxMap extends StatelessWidget {
-  const StaticMapboxMap({
+  StaticMapboxMap({
     this.onMapCreated,
-    this.onStyleLoadedCallback,
-    this.onMapClick,
-    this.onMapLongClick,
+    this.onTap,
+    this.onLongTap,
     super.key,
   });
 
-  final void Function(MapboxMapController)? onMapCreated;
-  final void Function()? onStyleLoadedCallback;
-  final void Function(Point<double>, LatLng)? onMapClick;
-  final void Function(Point<double>, LatLng)? onMapLongClick;
+  final void Function(MapboxMap)? onMapCreated;
+  final void Function(LatLng)? onTap;
+  final void Function(LatLng)? onLongTap;
+
+  MapboxMap? _mapController;
+
+  Future<void> _onMapCreated(MapboxMap mapController) async {
+    _mapController = mapController;
+    await mapController.gestures.updateSettings(
+      GesturesSettings(
+        doubleTapToZoomInEnabled: false,
+        doubleTouchToZoomOutEnabled: false,
+        rotateEnabled: false,
+        scrollEnabled: false,
+        pitchEnabled: false,
+        pinchToZoomEnabled: false,
+        quickZoomEnabled: false,
+        pinchPanEnabled: false,
+        simultaneousRotateAndPinchToZoomEnabled: false,
+      ),
+    );
+    await mapController.scaleBar.updateSettings(
+      ScaleBarSettings(position: OrnamentPosition.BOTTOM_RIGHT),
+    );
+    onMapCreated?.call(mapController);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MapboxMap(
-      accessToken: Config.instance.accessToken,
-      styleString: MapboxStyles.OUTDOORS,
-      initialCameraPosition: context.read<Settings>().lastMapPosition,
-      onMapCreated: onMapCreated?.call,
-      onStyleLoadedCallback: onStyleLoadedCallback,
-      onMapClick: onMapClick,
-      onMapLongClick: onMapLongClick,
-      rotateGesturesEnabled: false,
-      scrollGesturesEnabled: false,
-      zoomGesturesEnabled: false,
-      tiltGesturesEnabled: false,
-      doubleClickZoomEnabled: false,
-      dragEnabled: false,
+    return MapWidget(
+      resourceOptions:
+          ResourceOptions(accessToken: Config.instance.accessToken),
+      styleUri: MapboxStyles.OUTDOORS,
+      cameraOptions: context.read<Settings>().lastMapPosition.toCameraOptions(),
+      onMapCreated: _onMapCreated,
+      onTapListener: _mapController?.invokeWithLatLng(onTap),
+      onLongTapListener: _mapController?.invokeWithLatLng(onLongTap),
     );
   }
 }

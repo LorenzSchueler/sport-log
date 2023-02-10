@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/data_provider/overview_data_provider.dart';
 import 'package:sport_log/defaults.dart';
@@ -181,6 +181,24 @@ class CardioSessionCard extends StatelessWidget {
 
   final CardioSessionDescription cardioSessionDescription;
 
+  Future<void> _onMapCreated(MapboxMap mapController) async {
+    final lineManager = LineManager(
+      await mapController.annotations.createPolylineAnnotationManager(),
+    );
+    await mapController.setBoundsFromTracks(
+      cardioSessionDescription.cardioSession.track,
+      cardioSessionDescription.route?.track,
+      padded: true,
+    );
+    if (cardioSessionDescription.cardioSession.track != null) {
+      await lineManager
+          .addTrackLine(cardioSessionDescription.cardioSession.track!);
+    }
+    if (cardioSessionDescription.route?.track != null) {
+      await lineManager.addRouteLine(cardioSessionDescription.route!.track!);
+    }
+  }
+
   void showDetails(BuildContext context) {
     Navigator.pushNamed(
       context,
@@ -189,30 +207,8 @@ class CardioSessionCard extends StatelessWidget {
     );
   }
 
-  Future<void> _setBoundsAndTracks(
-    MapboxMapController sessionMapController,
-  ) async {
-    await sessionMapController.setBoundsFromTracks(
-      cardioSessionDescription.cardioSession.track,
-      cardioSessionDescription.route?.track,
-      padded: true,
-    );
-    if (cardioSessionDescription.cardioSession.track != null) {
-      await sessionMapController.addTrackLine(
-        cardioSessionDescription.cardioSession.track!,
-      );
-    }
-    if (cardioSessionDescription.route?.track != null) {
-      await sessionMapController.addRouteLine(
-        cardioSessionDescription.route!.track!,
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    late final MapboxMapController sessionMapController;
-
     return GestureDetector(
       onTap: () => showDetails(context),
       child: Card(
@@ -243,11 +239,8 @@ class CardioSessionCard extends StatelessWidget {
                       key: ObjectKey(
                         cardioSessionDescription,
                       ), // update on reload to get new track
-                      onMapCreated: (MapboxMapController controller) =>
-                          sessionMapController = controller,
-                      onStyleLoadedCallback: () =>
-                          _setBoundsAndTracks(sessionMapController),
-                      onMapClick: (_, __) => showDetails(context),
+                      onMapCreated: _onMapCreated,
+                      onTap: (_) => showDetails(context),
                     ),
                   )
                 : Row(

@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:location/location.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart'
+    hide Settings, Position;
 import 'package:pedometer/pedometer.dart';
 import 'package:polar/polar.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +14,7 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
+import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
@@ -75,9 +77,13 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   late final HeartRateUtils _heartRateUtils =
       HeartRateUtils(_onHeartRateUpdate);
 
-  late final MapboxMapController _mapController;
-  final NullablePointer<Line> _line = NullablePointer.nullPointer();
-  final NullablePointer<List<Circle>> _currentLocationMarker =
+  MapboxMap? _mapController;
+  LineManager? _lineManager;
+  CircleManager? _circleManager;
+
+  final NullablePointer<PolylineAnnotation> _line =
+      NullablePointer.nullPointer();
+  final NullablePointer<List<CircleAnnotation>> _currentLocationMarker =
       NullablePointer.nullPointer();
 
   static const maxSpeed = 250;
@@ -208,10 +214,10 @@ satellites: ${location.satelliteNumber}
 points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
 
     if (_centerLocation) {
-      await _mapController.animateCenter(location.latLng);
+      await _mapController?.animateCenter(location.latLng);
     }
 
-    await _mapController.updateCurrentLocationMarker(
+    await _circleManager?.updateCurrentLocationMarker(
       _currentLocationMarker,
       location.latLng,
     );
@@ -229,7 +235,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
           time: _trackingUtils.currentDuration,
         ),
       );
-      await _mapController.updateTrackLine(
+      await _lineManager?.updateTrackLine(
         _line,
         _cardioSessionDescription.cardioSession.track,
       );
@@ -268,11 +274,16 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
     );
   }
 
-  Future<void> _setTrackAndStartStreams() async {
+  Future<void> _onMapCreated(MapboxMap mapController) async {
+    _mapController = mapController;
+    _lineManager = LineManager(
+      await mapController.annotations.createPolylineAnnotationManager(),
+    );
+    _circleManager = CircleManager(
+      await mapController.annotations.createCircleAnnotationManager(),
+    );
     if (_cardioSessionDescription.route?.track != null) {
-      await _mapController.addRouteLine(
-        _cardioSessionDescription.route!.track!,
-      );
+      await _lineManager?.addRouteLine(_cardioSessionDescription.route!.track!);
     }
     await _startStreams();
   }
@@ -313,16 +324,14 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                     _centerLocation = centerLocation;
                     final lastLatLng = _locationUtils.lastLatLng;
                     if (_centerLocation && lastLatLng != null) {
-                      await _mapController.animateCenter(lastLatLng);
+                      await _mapController?.animateCenter(lastLatLng);
                     }
                   },
-                  initialCameraPosition: CameraPosition(
-                    zoom: 15.0,
-                    target: context.read<Settings>().lastGpsLatLng,
+                  initialCameraPosition: LatLngZoom(
+                    latLng: context.read<Settings>().lastGpsLatLng,
+                    zoom: 15,
                   ),
-                  onMapCreated: (MapboxMapController controller) =>
-                      _mapController = controller,
-                  onStyleLoadedCallback: _setTrackAndStartStreams,
+                  onMapCreated: _onMapCreated,
                 ),
               ),
               if (!_fullscreen)

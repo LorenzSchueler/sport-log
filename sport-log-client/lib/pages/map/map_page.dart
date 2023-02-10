@@ -2,12 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:mapbox_search/mapbox_search.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/lat_lng_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
+import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -24,7 +24,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  MapboxMapController? _mapController;
+  MapboxMap? _mapController;
   final _searchBar = FocusNode();
   final _placesSearch =
       PlacesSearch(apiKey: Config.instance.accessToken, limit: 10);
@@ -76,16 +76,17 @@ class _MapPageState extends State<MapPage> {
     setState(() => _searchResults = []);
 
     final coords = item.center!;
-    await _mapController?.animateCenter(LatLng(coords[1], coords[0]));
+    await _mapController?.animateCenter(LatLng(lat: coords[1], lng: coords[0]));
 
     final bbox = item.bbox;
     if (bbox != null) {
-      await _mapController?.animateBounds(
-        [LatLng(bbox[1], bbox[0]), LatLng(bbox[3], bbox[2])].latLngBounds!,
+      await _mapController?.setBoundsX(
+        [LatLng(lat: bbox[1], lng: bbox[0]), LatLng(lat: bbox[3], lng: bbox[2])]
+            .latLngBounds!,
         padded: false,
       );
     } else {
-      await _mapController?.animateZoom(16);
+      await _mapController?.setZoom(16);
     }
   }
 
@@ -152,8 +153,7 @@ class _MapPageState extends State<MapPage> {
               buttonTopOffset: 120,
               onMapCreated: (controller) =>
                   setState(() => _mapController = controller),
-              onMapClick: (_, __) =>
-                  setState(() => _showOverlays = !_showOverlays),
+              onTap: (_) => setState(() => _showOverlays = !_showOverlays),
             ),
             if (_showOverlays && _searchResults.isNotEmpty)
               Positioned(

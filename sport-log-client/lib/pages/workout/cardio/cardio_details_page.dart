@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Position;
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/double_extension.dart';
 import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
@@ -32,10 +32,15 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   late CardioSessionDescription _cardioSessionDescription =
       widget.cardioSessionDescription.clone();
 
-  MapboxMapController? _mapController;
-  final NullablePointer<Line> _trackLine = NullablePointer.nullPointer();
-  final NullablePointer<Line> _routeLine = NullablePointer.nullPointer();
-  final NullablePointer<Circle> _touchLocationMarker =
+  MapboxMap? _mapController;
+  LineManager? _lineManager;
+  CircleManager? _circleManager;
+
+  final NullablePointer<PolylineAnnotation> _trackLine =
+      NullablePointer.nullPointer();
+  final NullablePointer<PolylineAnnotation> _routeLine =
+      NullablePointer.nullPointer();
+  final NullablePointer<CircleAnnotation> _touchMarker =
       NullablePointer.nullPointer();
 
   bool _fullScreen = false;
@@ -53,17 +58,28 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   static const _heartRateColor = Colors.orange;
   static const _cadenceColor = Colors.green;
 
+  Future<void> _onMapCreated(MapboxMap mapController) async {
+    _mapController = mapController;
+    _lineManager = LineManager(
+      await mapController.annotations.createPolylineAnnotationManager(),
+    );
+    _circleManager = CircleManager(
+      await mapController.annotations.createCircleAnnotationManager(),
+    );
+    await _setBoundsAndLines();
+  }
+
   Future<void> _setBoundsAndLines() async {
     await _mapController?.setBoundsFromTracks(
       _cardioSessionDescription.cardioSession.track,
       _cardioSessionDescription.route?.track,
       padded: true,
     );
-    await _mapController?.updateTrackLine(
+    await _lineManager?.updateTrackLine(
       _trackLine,
       _cardioSessionDescription.cardioSession.track,
     );
-    await _mapController?.updateRouteLine(
+    await _lineManager?.updateRouteLine(
       _routeLine,
       _cardioSessionDescription.route?.track,
     );
@@ -122,9 +138,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                         scaleAtTop: true,
                         onFullscreenToggle: (fullScreen) =>
                             setState(() => _fullScreen = fullScreen),
-                        onMapCreated: (MapboxMapController controller) =>
-                            _mapController = controller,
-                        onStyleLoadedCallback: _setBoundsAndLines,
+                        onMapCreated: _onMapCreated,
                       )
                     : Center(
                         child: Row(
@@ -320,10 +334,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
           touchDuration,
         );
       });
-      await _mapController?.updateLocationMarker(
-        _touchLocationMarker,
-        pos?.latLng,
-      );
+      await _circleManager?.updateLocationMarker(_touchMarker, pos?.latLng);
     } else {
       setState(() {
         _speed = null;
@@ -331,10 +342,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
         _heartRate = null;
         _cadence = null;
       });
-      await _mapController?.updateLocationMarker(
-        _touchLocationMarker,
-        null,
-      );
+      await _circleManager?.updateLocationMarker(_touchMarker, null);
     }
   }
 }
