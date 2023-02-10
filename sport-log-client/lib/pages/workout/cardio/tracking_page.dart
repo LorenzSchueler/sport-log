@@ -297,17 +297,14 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
           body: Column(
             children: [
               if (context.read<Settings>().developerMode)
-                Padding(
-                  padding: const EdgeInsets.only(top: 25, bottom: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(_locationInfo),
-                      Text(_stepInfo),
-                      Text(_heartRateInfo),
-                    ],
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(_locationInfo),
+                    Text(_stepInfo),
+                    Text(_heartRateInfo),
+                  ],
                 ),
               Expanded(
                 child: MapboxMapWrapper(
@@ -348,16 +345,18 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
                         ),
                         Defaults.sizedBox.vertical.normal,
                         _TrackingPageButtons(
-                          trackingUtils: trackingUtils,
-                          onStart: widget.heartRateUtils == null ||
-                                  widget.heartRateUtils!.isActive
-                              ? () {
-                                  trackingUtils.start();
-                                  _cardioSessionDescription
-                                      .cardioSession.datetime = DateTime.now();
-                                }
-                              : null,
-                          onStop: _saveDialog,
+                          trackingMode: trackingUtils.mode,
+                          onStart: () {
+                            trackingUtils.start();
+                            _cardioSessionDescription.cardioSession.datetime =
+                                DateTime.now();
+                          },
+                          onPause: trackingUtils.pause,
+                          onResume: trackingUtils.resume,
+                          onSave: _saveDialog,
+                          hasGPS: _locationUtils.lastLatLng != null,
+                          hasHR: widget.heartRateUtils == null ||
+                              widget.heartRateUtils!.isActive,
                         ),
                       ],
                     ),
@@ -373,18 +372,26 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
 
 class _TrackingPageButtons extends StatelessWidget {
   const _TrackingPageButtons({
-    required this.trackingUtils,
+    required this.trackingMode,
     required this.onStart,
-    required this.onStop,
+    required this.onPause,
+    required this.onResume,
+    required this.onSave,
+    required this.hasGPS,
+    required this.hasHR,
   });
 
-  final TrackingUtils trackingUtils;
-  final VoidCallback? onStart;
-  final VoidCallback onStop;
+  final TrackingMode trackingMode;
+  final VoidCallback onStart;
+  final VoidCallback onPause;
+  final VoidCallback onResume;
+  final VoidCallback onSave;
+  final bool hasGPS;
+  final bool hasHR;
 
   @override
   Widget build(BuildContext context) {
-    switch (trackingUtils.mode) {
+    switch (trackingMode) {
       case TrackingMode.tracking:
         return Row(
           children: [
@@ -393,7 +400,7 @@ class _TrackingPageButtons extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.error,
                 ),
-                onPressed: trackingUtils.pause,
+                onPressed: onPause,
                 child: const Text("Pause"),
               ),
             ),
@@ -407,7 +414,7 @@ class _TrackingPageButtons extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
                 ),
-                onPressed: trackingUtils.resume,
+                onPressed: onResume,
                 child: const Text("Resume"),
               ),
             ),
@@ -417,7 +424,7 @@ class _TrackingPageButtons extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.error,
                 ),
-                onPressed: onStop,
+                onPressed: onSave,
                 child: const Text("Save"),
               ),
             ),
@@ -431,9 +438,14 @@ class _TrackingPageButtons extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
                 ),
-                onPressed: onStart,
-                child:
-                    Text(onStart != null ? "Start" : "Waiting on HR Monitor"),
+                onPressed: hasGPS && hasHR ? onStart : null,
+                child: Text(
+                  !hasGPS
+                      ? "Waiting on GPS"
+                      : !hasHR
+                          ? "Waiting on HR Monitor"
+                          : "Start",
+                ),
               ),
             ),
             Defaults.sizedBox.horizontal.normal,
