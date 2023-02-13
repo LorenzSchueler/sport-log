@@ -180,10 +180,10 @@ pub trait HardDelete: Db {
 pub trait CheckUserId {
     type Id;
 
-    /// Check if the entry with id `id` in the database belongs to the [User] with `user_id`.
+    /// Check if the entry with id `id` in the database belongs to the [User](sport_log_types::User) with `user_id`.
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool>;
 
-    /// Check if the entries with an id in `ids` in the database belong to the [User] with `user_id`.
+    /// Check if the entries with an id in `ids` in the database belong to the [User](sport_log_types::User) with `user_id`.
     fn check_user_ids(
         ids: &[Self::Id],
         user_id: UserId,
@@ -195,14 +195,14 @@ pub trait CheckUserId {
 pub trait CheckOptionalUserId {
     type Id;
 
-    /// Check if the entry with id `id` in the database belongs to the [User] with `user_id` or is public (`user_id` is None).
+    /// Check if the entry with id `id` in the database belongs to the [User](sport_log_types::User) with `user_id` or is public (`user_id` is None).
     fn check_optional_user_id(
         id: Self::Id,
         user_id: UserId,
         db: &mut PgConnection,
     ) -> QueryResult<bool>;
 
-    /// Check if the entries with an id in `ids` in the database belong to the [User] with `user_id` or are public (`user_id` is None).
+    /// Check if the entries with an id in `ids` in the database belong to the [User](sport_log_types::User) with `user_id` or are public (`user_id` is None).
     fn check_optional_user_ids(
         ids: &[Self::Id],
         user_id: UserId,

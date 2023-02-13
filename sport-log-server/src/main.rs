@@ -10,7 +10,7 @@
 //!
 //! # Config
 //!
-//! The config must be deserializable to [Config](sport_log_types::Config).
+//! The config must be deserializable to [Config].
 //! The name of the config file is specified in [CONFIG_FILE].
 
 use std::env;

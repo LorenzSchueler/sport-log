@@ -19,7 +19,7 @@ use crate::{
 ///
 /// For the creation of an [AuthUser] the username and password have to be transmitted via HTTP basic auth.
 ///
-/// [Admin] can also use endpoints with an [AuthUser] as request guard.
+/// The admin can also use endpoints with an [AuthUser] as request guard.
 ///
 /// In order to do so, the username has to be set to `admin$id$<user_id>`
 /// and the password must be the `admin_password` as configured in `sport-log-server.toml`.
@@ -76,12 +76,12 @@ where
 ///
 /// For the creation of an [AuthUserOrAP] the username and password have to be transmitted via HTTP basic auth.
 ///
-/// [ActionProvider] can also use endpoints with an [AuthUserOrAP] as request guard
-/// if the user has an enabled [ActionEvent](crate::ActionEvent) for an [Action](crate::Action) of this [ActionProvider].
+/// [ActionProvider](sport_log_types::ActionProvider) can also use endpoints with an [AuthUserOrAP] as request guard
+/// if the user has an enabled [ActionEvent](sport_log_types::ActionEvent) for an [Action](sport_log_types::Action) of this [ActionProvider](sport_log_types::ActionProvider).
 ///
-/// In this case the username has to be set to `<ap_name>$id$<user_id>` and the password is the password of the [ActionProvider].
+/// In this case the username has to be set to `<ap_name>$id$<user_id>` and the password is the password of the [ActionProvider](sport_log_types::ActionProvider).
 ///
-/// [Admin] can also use endpoints with an [AuthUserOrAP] as request guard.
+/// The admin can also use endpoints with an [AuthUserOrAP] as request guard.
 ///
 /// In order to do so, the username has to be set to `admin$id$<user_id>`
 /// and the password must be the `admin_password` as configured in `sport-log-server.toml`.
@@ -149,7 +149,7 @@ pub enum AuthApForUser {
 ///
 /// For the creation of an [AuthAP] the username and password have to be transmitted via HTTP basic auth.
 ///
-/// [Admin] can also use endpoints with an [AuthAP] as request guard.
+/// The admin can also use endpoints with an [AuthAP] as request guard.
 ///
 /// In order to do so, the username has to be set to `admin$id$<action_provider_id>`
 /// and the password must be the `admin_password` as configured in `sport-log-server.toml`.
