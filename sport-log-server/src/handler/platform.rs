@@ -3,15 +3,15 @@ use axum::{
     http::StatusCode,
     Json,
 };
-use sport_log_types::{
-    AuthAdmin, AuthUser, Config, Create, DbConn, GetAll, GetById, GetByUser, Platform,
-    PlatformCredential, PlatformCredentialId, PlatformId, Unverified, UnverifiedId, Update,
-    VerifyForAdminWithoutDb, VerifyForUserWithDb, VerifyForUserWithoutDb, VerifyIdForAdmin,
-    VerifyIdForUser, VerifyIdUnchecked, VerifyMultipleForAdminWithoutDb,
-    VerifyMultipleForUserWithDb, VerifyMultipleForUserWithoutDb, VerifyUnchecked,
-};
+use sport_log_types::{Platform, PlatformCredential, PlatformCredentialId, PlatformId};
 
-use crate::handler::{HandlerError, HandlerResult, IdOption, UnverifiedSingleOrVec};
+use crate::{
+    auth::{AuthAdmin, AuthUser},
+    config::Config,
+    db::*,
+    handler::{HandlerError, HandlerResult, IdOption, UnverifiedSingleOrVec},
+    state::DbConn,
+};
 
 pub async fn adm_create_platforms(
     auth: AuthAdmin,
@@ -21,11 +21,11 @@ pub async fn adm_create_platforms(
     match platforms {
         UnverifiedSingleOrVec::Single(platform) => {
             let platform = platform.verify_adm(auth)?;
-            Platform::create(&platform, &mut db)
+            PlatformDb::create(&platform, &mut db)
         }
         UnverifiedSingleOrVec::Vec(platforms) => {
             let platforms = platforms.verify_adm(auth)?;
-            Platform::create_multiple(&platforms, &mut db)
+            PlatformDb::create_multiple(&platforms, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -45,7 +45,7 @@ pub async fn ap_create_platform(
     }
 
     let platform = platform.verify_unchecked()?;
-    Platform::create(&platform, &mut db)
+    PlatformDb::create(&platform, &mut db)
         .map(|_| StatusCode::OK)
         .map_err(Into::into)
 }
@@ -58,9 +58,9 @@ pub async fn adm_get_platforms(
     match id {
         Some(id) => {
             let platform_id = id.verify_adm(auth)?;
-            Platform::get_by_id(platform_id, &mut db).map(|p| vec![p])
+            PlatformDb::get_by_id(platform_id, &mut db).map(|p| vec![p])
         }
-        None => Platform::get_all(&mut db),
+        None => PlatformDb::get_all(&mut db),
     }
     .map(Json)
     .map_err(Into::into)
@@ -81,9 +81,9 @@ pub async fn ap_get_platforms(
     match id {
         Some(id) => {
             let platform_id = id.verify_unchecked()?;
-            Platform::get_by_id(platform_id, &mut db).map(|p| vec![p])
+            PlatformDb::get_by_id(platform_id, &mut db).map(|p| vec![p])
         }
-        None => Platform::get_all(&mut db),
+        None => PlatformDb::get_all(&mut db),
     }
     .map(Json)
     .map_err(Into::into)
@@ -97,9 +97,9 @@ pub async fn get_platforms(
     match id {
         Some(id) => {
             let platform_id = id.verify_unchecked()?;
-            Platform::get_by_id(platform_id, &mut db).map(|p| vec![p])
+            PlatformDb::get_by_id(platform_id, &mut db).map(|p| vec![p])
         }
-        None => Platform::get_all(&mut db),
+        None => PlatformDb::get_all(&mut db),
     }
     .map(Json)
     .map_err(Into::into)
@@ -113,11 +113,11 @@ pub async fn adm_update_platforms(
     match platforms {
         UnverifiedSingleOrVec::Single(platform) => {
             let platform = platform.verify_adm(auth)?;
-            Platform::update(&platform, &mut db)
+            PlatformDb::update(&platform, &mut db)
         }
         UnverifiedSingleOrVec::Vec(platforms) => {
             let platforms = platforms.verify_adm(auth)?;
-            Platform::update_multiple(&platforms, &mut db)
+            PlatformDb::update_multiple(&platforms, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -138,7 +138,7 @@ pub async fn create_platform_credentials(
                         status,
                         message: None,
                     })?;
-            PlatformCredential::create(&platform_credential, &mut db)
+            PlatformCredentialDb::create(&platform_credential, &mut db)
         }
         UnverifiedSingleOrVec::Vec(platform_credentials) => {
             let platform_credentials =
@@ -148,7 +148,7 @@ pub async fn create_platform_credentials(
                         status,
                         message: None,
                     })?;
-            PlatformCredential::create_multiple(&platform_credentials, &mut db)
+            PlatformCredentialDb::create_multiple(&platform_credentials, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -163,9 +163,9 @@ pub async fn get_platform_credentials(
     match id {
         Some(id) => {
             let platform_id = id.verify_user(auth, &mut db)?;
-            PlatformCredential::get_by_id(platform_id, &mut db).map(|p| vec![p])
+            PlatformCredentialDb::get_by_id(platform_id, &mut db).map(|p| vec![p])
         }
-        None => PlatformCredential::get_by_user(*auth, &mut db),
+        None => PlatformCredentialDb::get_by_user(*auth, &mut db),
     }
     .map(Json)
     .map_err(Into::into)
@@ -179,11 +179,11 @@ pub async fn update_platform_credentials(
     match platform_credentials {
         UnverifiedSingleOrVec::Single(platform_credential) => {
             let platform_credential = platform_credential.verify_user(auth, &mut db)?;
-            PlatformCredential::update(&platform_credential, &mut db)
+            PlatformCredentialDb::update(&platform_credential, &mut db)
         }
         UnverifiedSingleOrVec::Vec(platform_credentials) => {
             let platform_credentials = platform_credentials.verify_user(auth, &mut db)?;
-            PlatformCredential::update_multiple(&platform_credentials, &mut db)
+            PlatformCredentialDb::update_multiple(&platform_credentials, &mut db)
         }
     }
     .map(|_| StatusCode::OK)

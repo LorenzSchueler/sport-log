@@ -1,186 +1,192 @@
-extern crate proc_macro;
-
-use inflector::Inflector;
 use proc_macro::TokenStream;
-use proc_macro2::{Ident, Span};
 use quote::quote;
 
-pub fn get_identifiers(typename: &Ident) -> (Ident, Ident, Ident, Ident) {
-    let id_type_name = Ident::new((typename.to_string() + "Id").as_ref(), Span::call_site());
-    let id_param_name = Ident::new(
-        id_type_name.to_string().to_snake_case().as_ref(),
-        Span::call_site(),
-    );
-    let param_name = Ident::new(
-        typename.to_string().to_snake_case().as_ref(),
-        Span::call_site(),
-    );
-    (id_type_name, param_name.clone(), id_param_name, param_name)
-}
+use crate::Identifiers;
 
-pub fn impl_create(ast: &syn::DeriveInput) -> TokenStream {
-    let typename = &ast.ident;
-    let (_, param_name, _, tablename) = get_identifiers(typename);
-
-    let gen = quote! {
+pub(crate) fn impl_create(
+    Identifiers {
+        db_type,
+        entity_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
         use diesel::prelude::*;
 
-        impl crate::Create for #typename {
-            fn create(#param_name: &Self, db: &mut PgConnection) -> QueryResult<usize> {
-                diesel::insert_into(#tablename::table)
-                    .values(#param_name)
+        impl crate::db::Create for crate::db::#db_type {
+            fn create(#entity_name: &Self::Entity, db: &mut PgConnection) -> QueryResult<usize> {
+                diesel::insert_into(sport_log_types::schema::#entity_name::table)
+                    .values(#entity_name)
                     .execute(db)
             }
 
-            fn create_multiple(#param_name: &[Self], db: &mut PgConnection) -> QueryResult<usize> {
-                diesel::insert_into(#tablename::table)
-                    .values(#param_name)
+            fn create_multiple(#entity_name: &[Self::Entity], db: &mut PgConnection) -> QueryResult<usize> {
+                diesel::insert_into(sport_log_types::schema::#entity_name::table)
+                    .values(#entity_name)
                     .execute(db)
             }
         }
-    };
-    gen.into()
+    }
+    .into()
 }
 
-pub fn impl_get_by_id(ast: &syn::DeriveInput) -> TokenStream {
-    let typename = &ast.ident;
-    let (id_type_name, _, id_param_name, tablename) = get_identifiers(typename);
-
-    let gen = quote! {
+pub(crate) fn impl_get_by_id(
+    Identifiers {
+        db_type,
+        id_name,
+        entity_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
         use diesel::prelude::*;
 
-        impl crate::GetById for #typename {
-            type Id = #id_type_name;
-
-            fn get_by_id(#id_param_name: Self::Id, db: &mut PgConnection) -> QueryResult<Self> {
-                #tablename::table
-                    .find(#id_param_name)
-                    .select(#typename::as_select())
+        impl crate::db::GetById for crate::db::#db_type {
+            fn get_by_id(#id_name: Self::Id, db: &mut PgConnection) -> QueryResult<Self::Entity> {
+                sport_log_types::schema::#entity_name::table
+                    .find(#id_name)
+                    .select(Self::Entity::as_select())
                     .get_result(db)
             }
         }
-    };
-    gen.into()
+    }
+    .into()
 }
 
-pub fn impl_get_by_ids(ast: &syn::DeriveInput) -> TokenStream {
-    let typename = &ast.ident;
-    let (id_type_name, _, _, tablename) = get_identifiers(typename);
-
-    let gen = quote! {
+pub(crate) fn impl_get_by_ids(
+    Identifiers {
+        db_type,
+        entity_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
         use diesel::prelude::*;
 
-        impl crate::GetByIds for #typename {
-            type Id = #id_type_name;
-
-            fn get_by_ids(ids: &[Self::Id], db: &mut PgConnection) -> QueryResult<Vec<Self>> {
-                #tablename::table
-                    .filter(#tablename::columns::id.eq_any(ids))
-                    .select(#typename::as_select())
+        impl crate::db::GetByIds for crate::db::#db_type {
+            fn get_by_ids(ids: &[Self::Id], db: &mut PgConnection) -> QueryResult<Vec<Self::Entity>> {
+                sport_log_types::schema::#entity_name::table
+                    .filter(sport_log_types::schema::#entity_name::columns::id.eq_any(ids))
+                    .select(Self::Entity::as_select())
                     .get_results(db)
             }
         }
-    };
-    gen.into()
+    }
+    .into()
 }
 
-pub fn impl_get_by_user(ast: &syn::DeriveInput) -> TokenStream {
-    let typename = &ast.ident;
-    let (_, _, _, tablename) = get_identifiers(typename);
-
-    let gen = quote! {
+pub(crate) fn impl_get_by_user(
+    Identifiers {
+        db_type,
+        entity_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
         use diesel::prelude::*;
 
-        impl crate::GetByUser for #typename {
-            fn get_by_user(user_id: crate::UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
-                #tablename::table
-                    .filter(#tablename::columns::user_id.eq(user_id))
-                    .select(#typename::as_select())
+        impl crate::db::GetByUser for crate::db::#db_type {
+            fn get_by_user(user_id: sport_log_types::UserId, db: &mut PgConnection) -> QueryResult<Vec<Self::Entity>> {
+                sport_log_types::schema::#entity_name::table
+                    .filter(sport_log_types::schema::#entity_name::columns::user_id.eq(user_id))
+                    .select(Self::Entity::as_select())
                     .get_results(db)
             }
         }
-    };
-    gen.into()
+    }
+    .into()
 }
 
-pub fn impl_get_by_user_and_last_sync(ast: &syn::DeriveInput) -> TokenStream {
-    let typename = &ast.ident;
-    let (_, _, _, tablename) = get_identifiers(typename);
-
-    let gen = quote! {
+pub(crate) fn impl_get_by_user_and_last_sync(
+    Identifiers {
+        db_type,
+        entity_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
         use diesel::prelude::*;
 
-        impl crate::GetByUserSync for #typename {
+        impl crate::db::GetByUserSync for crate::db::#db_type {
             fn get_by_user_and_last_sync(
-                user_id: crate::UserId,
+                user_id: sport_log_types::UserId,
                 last_sync: chrono::DateTime<chrono::Utc>,
                 db: &mut PgConnection
-            ) -> QueryResult<Vec<Self>> {
-                #tablename::table
-                    .filter(#tablename::columns::user_id.eq(user_id))
-                    .filter(#tablename::columns::last_change.ge(last_sync))
-                    .select(#typename::as_select())
+            ) -> QueryResult<Vec<Self::Entity>> {
+                sport_log_types::schema::#entity_name::table
+                    .filter(sport_log_types::schema::#entity_name::columns::user_id.eq(user_id))
+                    .filter(sport_log_types::schema::#entity_name::columns::last_change.ge(last_sync))
+                    .select(Self::Entity::as_select())
                     .get_results(db)
             }
         }
-    };
-    gen.into()
+    }
+    .into()
 }
 
-pub fn impl_get_by_last_sync(ast: &syn::DeriveInput) -> TokenStream {
-    let typename = &ast.ident;
-    let (_, _, _, tablename) = get_identifiers(typename);
-
-    let gen = quote! {
+pub(crate) fn impl_get_by_last_sync(
+    Identifiers {
+        db_type,
+        entity_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
         use diesel::prelude::*;
 
-        impl crate::GetBySync for #typename {
-            fn get_by_last_sync(last_sync: chrono::DateTime<chrono::Utc>, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
-                #tablename::table
-                    .filter(#tablename::columns::last_change.ge(last_sync))
-                    .select(#typename::as_select())
+        impl crate::db::GetBySync for crate::db::#db_type {
+            fn get_by_last_sync(last_sync: chrono::DateTime<chrono::Utc>, db: &mut PgConnection) -> QueryResult<Vec<Self::Entity>> {
+                sport_log_types::schema::#entity_name::table
+                    .filter(sport_log_types::schema::#entity_name::columns::last_change.ge(last_sync))
+                    .select(Self::Entity::as_select())
                     .get_results(db)
             }
         }
-    };
-    gen.into()
+    }
+    .into()
 }
 
-pub fn impl_get_all(ast: &syn::DeriveInput) -> TokenStream {
-    let typename = &ast.ident;
-    let (_, _, _, tablename) = get_identifiers(typename);
-
-    let gen = quote! {
+pub(crate) fn impl_get_all(
+    Identifiers {
+        db_type,
+        entity_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
         use diesel::prelude::*;
 
-        impl crate::GetAll for #typename {
-            fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self>> {
-                #tablename::table.select(#typename::as_select()).load(db)
+        impl crate::db::GetAll for crate::db::#db_type {
+            fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self::Entity>> {
+                sport_log_types::schema::#entity_name::table.select(Self::Entity::as_select()).load(db)
             }
         }
-    };
-    gen.into()
+    }
+    .into()
 }
 
-pub fn impl_update(ast: &syn::DeriveInput) -> TokenStream {
-    let typename = &ast.ident;
-    let (_, param_name, _, tablename) = get_identifiers(typename);
-
-    let gen = quote! {
+pub(crate) fn impl_update(
+    Identifiers {
+        db_type,
+        entity_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
         use diesel::prelude::*;
 
-        impl crate::Update for #typename {
-            fn update(#param_name: &#typename, db: &mut PgConnection) -> QueryResult<usize> {
-                diesel::update(#tablename::table.find(#param_name.id))
-                    .set(#param_name)
+        impl crate::db::Update for crate::db::#db_type {
+            fn update(#entity_name: &Self::Entity, db: &mut PgConnection) -> QueryResult<usize> {
+                diesel::update(sport_log_types::schema::#entity_name::table.find(#entity_name.id))
+                    .set(#entity_name)
                     .execute(db)
             }
 
-            fn update_multiple(#param_name: &[#typename], db: &mut PgConnection) -> QueryResult<usize> {
+            fn update_multiple(#entity_name: &[Self::Entity], db: &mut PgConnection) -> QueryResult<usize> {
                 db.transaction(|db| {
-                    let len = #param_name.len();
-                    for entity in #param_name {
-                        diesel::update(#tablename::table.find(entity.id))
+                    let len = #entity_name.len();
+                    for entity in #entity_name {
+                        diesel::update(sport_log_types::schema::#entity_name::table.find(entity.id))
                             .set(entity)
                             .execute(db)?;
                     }
@@ -189,44 +195,51 @@ pub fn impl_update(ast: &syn::DeriveInput) -> TokenStream {
                 })
             }
         }
-    };
-    gen.into()
+    }
+    .into()
 }
 
-pub fn impl_hard_delete(ast: &syn::DeriveInput) -> TokenStream {
-    let typename = &ast.ident;
-    let (_, _, _, tablename) = get_identifiers(typename);
-
-    let gen = quote! {
+pub(crate) fn impl_hard_delete(
+    Identifiers {
+        db_type,
+        entity_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
         use diesel::prelude::*;
 
-        impl crate::HardDelete for #typename {
+        impl crate::db::HardDelete for crate::db::#db_type {
             fn hard_delete(last_change: chrono::DateTime<chrono::Utc>, db: &mut PgConnection) -> QueryResult<usize> {
                 diesel::delete(
-                    #tablename::table
-                        .filter(#tablename::columns::deleted.eq(true))
-                        .filter(#tablename::columns::last_change.le(last_change))
+                    sport_log_types::schema::#entity_name::table
+                        .filter(sport_log_types::schema::#entity_name::columns::deleted.eq(true))
+                        .filter(sport_log_types::schema::#entity_name::columns::last_change.le(last_change))
                 ).execute(db)
             }
         }
-    };
-    gen.into()
+    }
+    .into()
 }
 
-pub fn impl_check_user_id(ast: &syn::DeriveInput) -> TokenStream {
-    let typename = &ast.ident;
-    let (id_type_name, _, _, tablename) = get_identifiers(typename);
-
-    let gen = quote! {
+pub(crate) fn impl_check_user_id(
+    Identifiers {
+        db_type,
+        id_type,
+        entity_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
         use diesel::prelude::*;
 
-        impl crate::CheckUserId for #typename {
-            type Id = #id_type_name;
+        impl crate::db::CheckUserId for crate::db::#db_type {
+            type Id = sport_log_types::#id_type;
 
-            fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
-                #tablename::table
-                    .filter(#tablename::columns::id.eq(id))
-                    .filter(#tablename::columns::user_id.eq(user_id))
+            fn check_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut PgConnection) -> QueryResult<bool> {
+                sport_log_types::schema::#entity_name::table
+                    .filter(sport_log_types::schema::#entity_name::columns::id.eq(id))
+                    .filter(sport_log_types::schema::#entity_name::columns::user_id.eq(user_id))
                     .count()
                     .get_result(db)
                     .map(|count: i64| count == 1)
@@ -234,35 +247,39 @@ pub fn impl_check_user_id(ast: &syn::DeriveInput) -> TokenStream {
 
             fn check_user_ids(
                 ids: &[Self::Id],
-                user_id: UserId,
+                user_id: sport_log_types::UserId,
                 db: &mut PgConnection,
             ) -> QueryResult<bool> {
-                #tablename::table
-                    .filter(#tablename::columns::id.eq_any(ids))
-                    .filter(#tablename::columns::user_id.eq(user_id))
+                sport_log_types::schema::#entity_name::table
+                    .filter(sport_log_types::schema::#entity_name::columns::id.eq_any(ids))
+                    .filter(sport_log_types::schema::#entity_name::columns::user_id.eq(user_id))
                     .count()
                     .get_result(db)
                     .map(|count: i64| count == ids.len() as i64)
             }
         }
-    };
-    gen.into()
+    }
+    .into()
 }
 
-pub fn impl_check_ap_id(ast: &syn::DeriveInput) -> TokenStream {
-    let typename = &ast.ident;
-    let (id_type_name, _, _, tablename) = get_identifiers(typename);
-
-    let gen = quote! {
+pub(crate) fn impl_check_ap_id(
+    Identifiers {
+        db_type,
+        id_type,
+        entity_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
         use diesel::prelude::*;
 
-        impl crate::CheckAPId for #typename {
-            type Id = #id_type_name;
+        impl crate::db::CheckAPId for crate::db::#db_type {
+            type Id = sport_log_types::#id_type;
 
             fn check_ap_id(id: Self::Id, ap_id: ActionProviderId, db: &mut PgConnection) -> QueryResult<bool> {
-                #tablename::table
-                    .filter(#tablename::columns::id.eq(id))
-                    .filter(#tablename::columns::action_provider_id.eq(ap_id))
+                sport_log_types::schema::#entity_name::table
+                    .filter(sport_log_types::schema::#entity_name::columns::id.eq(id))
+                    .filter(sport_log_types::schema::#entity_name::columns::action_provider_id.eq(ap_id))
                     .count()
                     .get_result(db)
                     .map(|count: i64| count == 1)
@@ -273,14 +290,14 @@ pub fn impl_check_ap_id(ast: &syn::DeriveInput) -> TokenStream {
                 ap_id: ActionProviderId,
                 db: &mut PgConnection,
             ) -> QueryResult<bool> {
-                #tablename::table
-                    .filter(#tablename::columns::id.eq_any(ids))
-                    .filter(#tablename::columns::action_provider_id.eq(ap_id))
+                sport_log_types::schema::#entity_name::table
+                    .filter(sport_log_types::schema::#entity_name::columns::id.eq_any(ids))
+                    .filter(sport_log_types::schema::#entity_name::columns::action_provider_id.eq(ap_id))
                     .count()
                     .get_result(db)
                     .map(|count: i64| count == ids.len() as i64)
             }
         }
-    };
-    gen.into()
+    }
+    .into()
 }

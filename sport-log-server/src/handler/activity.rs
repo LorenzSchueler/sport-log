@@ -7,7 +7,7 @@ pub async fn get_activities(
     auth: AuthUserOrAP,
     mut db: DbConn,
 ) -> HandlerResult<Json<Vec<Activity>>> {
-    Activity::get_by_user(*auth, &mut db)
+    ActivityDb::get_by_user(*auth, &mut db)
         .map(Json)
         .map_err(Into::into)
 }
@@ -19,7 +19,7 @@ pub async fn get_activities(
 //Path(end_datetime): Path<DateTime<Utc>>,
 //mut db: DbConn,
 //) -> HandlerResult<Json<Vec<Activity>>> {
-//Activity::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &mut db)
+//ActivityDb::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}

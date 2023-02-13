@@ -1,20 +1,14 @@
 use chrono::{DateTime, Utc};
-#[cfg(feature = "server")]
+#[cfg(feature = "db")]
 use diesel::sql_types::BigInt;
-#[cfg(feature = "server")]
+#[cfg(feature = "db")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 use sport_log_types_derive::IdString;
-#[cfg(feature = "server")]
-use sport_log_types_derive::{
-    CheckAPId, CheckUserId, Create, GetAll, GetById, GetByIds, GetBySync, GetByUser, GetByUserSync,
-    HardDelete, IdFromSql, IdToSql, Update, VerifyForActionProviderWithDb,
-    VerifyForActionProviderWithoutDb, VerifyForAdminWithoutDb, VerifyForUserWithDb,
-    VerifyForUserWithoutDb, VerifyIdForActionProvider, VerifyIdForAdmin, VerifyIdForUser,
-    VerifyIdUnchecked, VerifyUnchecked,
-};
+#[cfg(feature = "db")]
+use sport_log_types_derive::{IdFromSql, IdToSql};
 
-#[cfg(feature = "server")]
+#[cfg(feature = "db")]
 use crate::{
     schema::{action, action_event, action_provider, action_rule},
     Platform, User,
@@ -24,15 +18,13 @@ use crate::{types::IdString, PlatformId, UserId};
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
-    feature = "server",
+    feature = "db",
     derive(
         Hash,
         FromSqlRow,
         AsExpression,
         IdToSql,
         IdFromSql,
-        VerifyIdForAdmin,
-        VerifyIdUnchecked
     ),
     diesel(sql_type = diesel::sql_types::BigInt)
 )]
@@ -40,7 +32,7 @@ pub struct ActionProviderId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "server",
+    feature = "db",
     derive(
         Insertable,
         Associations,
@@ -48,13 +40,6 @@ pub struct ActionProviderId(pub i64);
         Queryable,
         Selectable,
         AsChangeset,
-        GetById,
-        GetByIds,
-        GetAll,
-        GetBySync,
-        HardDelete,
-        VerifyForAdminWithoutDb,
-        VerifyUnchecked,
     ),
     diesel(table_name = action_provider, belongs_to(Platform))
 )]
@@ -64,7 +49,7 @@ pub struct ActionProvider {
     pub password: String,
 
     pub platform_id: PlatformId,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
     pub deleted: bool,
 }
@@ -72,15 +57,13 @@ pub struct ActionProvider {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
-    feature = "server",
+    feature = "db",
     derive(
         Hash,
         FromSqlRow,
         AsExpression,
         IdToSql,
         IdFromSql,
-        VerifyIdUnchecked,
-        VerifyIdForActionProvider
     ),
     diesel(sql_type = diesel::sql_types::BigInt)
 )]
@@ -88,7 +71,7 @@ pub struct ActionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "server",
+    feature = "db",
     derive(
         Insertable,
         Associations,
@@ -96,15 +79,6 @@ pub struct ActionId(pub i64);
         Queryable,
         Selectable,
         AsChangeset,
-        Create,
-        GetById,
-        GetByIds,
-        GetAll,
-        GetBySync,
-        HardDelete,
-        CheckAPId,
-        VerifyForActionProviderWithDb,
-        VerifyForActionProviderWithoutDb,
     ),
     diesel(table_name = action, belongs_to(ActionProvider))
 )]
@@ -112,7 +86,7 @@ pub struct Action {
     pub id: ActionId,
     pub name: String,
     pub action_provider_id: ActionProviderId,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
     pub create_before: i32,
     pub delete_after: i32,
@@ -120,7 +94,7 @@ pub struct Action {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(feature = "server", derive(DbEnum))]
+#[cfg_attr(feature = "db", derive(DbEnum))]
 
 pub enum Weekday {
     Monday,
@@ -149,15 +123,15 @@ impl Weekday {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
-    feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUser),
+    feature = "db",
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, ),
     diesel(sql_type = BigInt)
 )]
 pub struct ActionRuleId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "server",
+    feature = "db",
     derive(
         Insertable,
         Associations,
@@ -165,18 +139,8 @@ pub struct ActionRuleId(pub i64);
         Queryable,
         Selectable,
         AsChangeset,
-        Create,
-        GetById,
-        GetByIds,
-        GetByUser,
-        GetByUserSync,
-        Update,
-        HardDelete,
-        CheckUserId,
-        VerifyForUserWithDb,
-        VerifyForUserWithoutDb,
     ),
-    diesel(table_name = action_rule,belongs_to(User),belongs_to(Action))
+    diesel(table_name = action_rule, belongs_to(User), belongs_to(Action))
 )]
 pub struct ActionRule {
     pub id: ActionRuleId,
@@ -184,7 +148,7 @@ pub struct ActionRule {
     pub action_id: ActionId,
     pub weekday: Weekday,
     pub time: DateTime<Utc>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub arguments: Option<String>,
     pub enabled: bool,
     pub deleted: bool,
@@ -193,16 +157,13 @@ pub struct ActionRule {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
-    feature = "server",
+    feature = "db",
     derive(
         Hash,
         FromSqlRow,
         AsExpression,
         IdToSql,
         IdFromSql,
-        VerifyIdForUser,
-        VerifyIdForActionProvider,
-        VerifyIdForAdmin
     ),
     diesel(sql_type = BigInt)
 )]
@@ -210,7 +171,7 @@ pub struct ActionEventId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "server",
+    feature = "db",
     derive(
         Insertable,
         Associations,
@@ -218,17 +179,6 @@ pub struct ActionEventId(pub i64);
         Queryable,
         Selectable,
         AsChangeset,
-        Create,
-        GetById,
-        GetByIds,
-        GetByUser,
-        GetByUserSync,
-        Update,
-        HardDelete,
-        CheckUserId,
-        VerifyForUserWithDb,
-        VerifyForUserWithoutDb,
-        VerifyForAdminWithoutDb,
     ),
     diesel(table_name = action_event, belongs_to(User), belongs_to(Action))
 )]
@@ -237,42 +187,42 @@ pub struct ActionEvent {
     pub user_id: UserId,
     pub action_id: ActionId,
     pub datetime: DateTime<Utc>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub arguments: Option<String>,
     pub enabled: bool,
     pub deleted: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "server", derive(Queryable))]
+#[cfg_attr(feature = "db", derive(Queryable))]
 pub struct CreatableActionRule {
     pub action_rule_id: ActionRuleId,
     pub user_id: UserId,
     pub action_id: ActionId,
     pub weekday: Weekday,
     pub time: DateTime<Utc>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub arguments: Option<String>,
     pub create_before: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "server", derive(Queryable))]
+#[cfg_attr(feature = "db", derive(Queryable))]
 pub struct ExecutableActionEvent {
     pub action_event_id: ActionEventId,
     pub action_name: String,
     pub datetime: DateTime<Utc>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub arguments: Option<String>,
     pub user_id: UserId,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub username: Option<String>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub password: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(feature = "server", derive(Queryable))]
+#[cfg_attr(feature = "db", derive(Queryable))]
 pub struct DeletableActionEvent {
     pub action_event_id: ActionEventId,
     pub datetime: DateTime<Utc>,

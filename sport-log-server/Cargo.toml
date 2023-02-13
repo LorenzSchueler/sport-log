@@ -5,14 +5,18 @@ edition = "2021"
 default-run = "sport-log-server"
 
 [dependencies]
-sport-log-types = { path = "../sport-log-types", features = ["server"] }
+sport-log-types = { path = "../sport-log-types", features = ["db"] }
+sport-log-types-derive = { path = "../sport-log-types-derive" }
 
 tokio = { version = "1.9", features = ["full"] }
-axum = "0.6"
+axum = { version = "0.6", features = [ "headers", "macros" ] }
+r2d2 = { version = "0.8" }
 tower = { version = "0.4", features = [ "util" ] }
 tower-http = {version = "0.3", features = [ "trace", "sensitive-headers" ] }
 diesel = { version = "2", features = ["postgres", "r2d2", "chrono"] }
 diesel_migrations = "2"
+argon2 = { version = "0.4" }
+rand_core = { version = "0.6", features = ["std"] }
 serde = { version = "1.0", features = ["derive"]}
 serde_json = "1.0"
 toml = "0.7"

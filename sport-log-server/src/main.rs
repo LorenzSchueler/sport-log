@@ -23,13 +23,22 @@ use diesel::{
     PgConnection,
 };
 use diesel_migrations::{EmbeddedMigrations, HarnessWithOutput, MigrationHarness};
-use sport_log_types::{AppState, Config, DbPool};
 use tokio::fs;
 use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
 
+use crate::{
+    config::Config,
+    state::{AppState, DbPool},
+};
+
+mod auth;
+mod config;
+mod db;
+mod error;
 mod handler;
 mod router;
+mod state;
 #[cfg(test)]
 mod tests;
 

@@ -2,15 +2,24 @@ use argon2::{
     password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
 };
+use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 use diesel::{prelude::*, result::Error};
 use rand_core::OsRng;
+use sport_log_types::{schema::user, User, UserId};
+use sport_log_types_derive::*;
 
-use crate::{schema::user, CheckUserId, User, UserId};
+use crate::{auth::AuthUser, db::*};
+
+#[derive(Db, GetById, GetByIds, VerifyUnchecked, VerifyForAdminWithoutDb)]
+pub struct UserDb;
 
 /// same api trait [Create](crate::Create) but with mutable references
-impl User {
-    pub fn create(mut user: &mut Self, db: &mut PgConnection) -> QueryResult<usize> {
+impl UserDb {
+    pub fn create(
+        mut user: &mut <Self as Db>::Entity,
+        db: &mut PgConnection,
+    ) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
             .hash_password(user.password.as_bytes(), &salt)
@@ -20,7 +29,10 @@ impl User {
         diesel::insert_into(user::table).values(&*user).execute(db)
     }
 
-    pub fn create_multiple(users: &mut [Self], db: &mut PgConnection) -> QueryResult<usize> {
+    pub fn create_multiple(
+        users: &mut [<Self as Db>::Entity],
+        db: &mut PgConnection,
+    ) -> QueryResult<usize> {
         for user in &mut *users {
             let salt = SaltString::generate(&mut OsRng);
             user.password = Argon2::default()
@@ -33,9 +45,12 @@ impl User {
     }
 }
 
-/// same api trait [Update](crate::Update) but with mutable references
-impl User {
-    pub fn update(mut user: &mut Self, db: &mut PgConnection) -> QueryResult<usize> {
+/// same as trait [Update](crate::db::Update) but with mutable references
+impl UserDb {
+    pub fn update(
+        mut user: &mut <Self as Db>::Entity,
+        db: &mut PgConnection,
+    ) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = Argon2::default()
             .hash_password(user.password.as_bytes(), &salt)
@@ -46,29 +61,9 @@ impl User {
             .set(&*user)
             .execute(db)
     }
-
-    pub fn update_multiple(users: &mut [Self], db: &mut PgConnection) -> QueryResult<usize> {
-        db.transaction(|db| {
-            let len = users.len();
-
-            for user in users {
-                let salt = SaltString::generate(&mut OsRng);
-                user.password = Argon2::default()
-                    .hash_password(user.password.as_bytes(), &salt)
-                    .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
-                    .to_string();
-
-                diesel::update(user::table.find(user.id))
-                    .set(&*user)
-                    .execute(db)?;
-            }
-
-            Ok(len)
-        })
-    }
 }
 
-impl CheckUserId for User {
+impl CheckUserId for UserDb {
     type Id = UserId;
 
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
@@ -89,7 +84,7 @@ impl CheckUserId for User {
     }
 }
 
-impl User {
+impl UserDb {
     pub fn auth(username: &str, password: &str, db: &mut PgConnection) -> QueryResult<UserId> {
         let (user_id, password_hash): (UserId, String) = user::table
             .filter(user::columns::username.eq(username))
@@ -123,5 +118,25 @@ impl User {
 
     pub fn delete(user_id: UserId, db: &mut PgConnection) -> QueryResult<usize> {
         diesel::delete(user::table.find(user_id)).execute(db)
+    }
+}
+
+impl VerifyForUserWithDb for Unverified<User> {
+    type Entity = User;
+
+    fn verify_user(
+        self,
+        auth: AuthUser,
+        db: &mut PgConnection,
+    ) -> Result<Self::Entity, StatusCode> {
+        let user = self.0;
+        if user.id == *auth
+            && UserDb::check_user_id(user.id, *auth, db)
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        {
+            Ok(user)
+        } else {
+            Err(StatusCode::FORBIDDEN)
+        }
     }
 }

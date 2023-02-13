@@ -1752,7 +1752,6 @@ name = "sport-log-scheduler"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "err-derive",
  "rand",
  "reqwest",
  "serde",
@@ -1766,6 +1765,7 @@ dependencies = [
 name = "sport-log-server"
 version = "0.1.0"
 dependencies = [
+ "argon2",
  "axum",
  "base64 0.21.0",
  "chrono",
@@ -1773,10 +1773,13 @@ dependencies = [
  "diesel_migrations",
  "lazy_static",
  "mime",
+ "r2d2",
  "rand",
+ "rand_core",
  "serde",
  "serde_json",
  "sport-log-types",
+ "sport-log-types-derive",
  "tokio",
  "toml 0.7.0",
  "tower",
@@ -1789,18 +1792,12 @@ dependencies = [
 name = "sport-log-types"
 version = "0.1.0"
 dependencies = [
- "argon2",
- "axum",
  "chrono",
  "const_format",
  "diesel",
  "diesel-derive-enum",
- "http",
- "r2d2",
- "rand_core",
  "serde",
  "sport-log-types-derive",
- "tracing",
 ]
 
 [[package]]

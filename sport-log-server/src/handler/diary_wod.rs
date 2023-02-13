@@ -1,11 +1,12 @@
 use axum::{extract::Query, http::StatusCode, Json};
-use sport_log_types::{
-    AuthUserOrAP, Create, DbConn, Diary, DiaryId, GetById, GetByUser, UnverifiedId, Update,
-    VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
-    VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb, Wod, WodId,
-};
+use sport_log_types::{Diary, DiaryId, Wod, WodId};
 
-use crate::handler::{HandlerResult, IdOption, UnverifiedSingleOrVec};
+use crate::{
+    auth::AuthUserOrAP,
+    db::*,
+    handler::{HandlerResult, IdOption, UnverifiedSingleOrVec},
+    state::DbConn,
+};
 
 pub async fn create_wods(
     auth: AuthUserOrAP,
@@ -15,11 +16,11 @@ pub async fn create_wods(
     match wods {
         UnverifiedSingleOrVec::Single(wod) => {
             let wod = wod.verify_user_ap_without_db(auth)?;
-            Wod::create(&wod, &mut db)
+            WodDb::create(&wod, &mut db)
         }
         UnverifiedSingleOrVec::Vec(wods) => {
             let wods = wods.verify_user_ap_without_db(auth)?;
-            Wod::create_multiple(&wods, &mut db)
+            WodDb::create_multiple(&wods, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -33,7 +34,7 @@ pub async fn create_wods(
 //Path(end_datetime): Path<DateTime<Utc>>,
 //mut db: DbConn,
 //) -> HandlerResult<Json<Vec<Wod>>> {
-//Wod::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &mut db)
+//WodDb::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -46,9 +47,9 @@ pub async fn get_wods(
     match id {
         Some(id) => {
             let wod_id = id.verify_user_ap(auth, &mut db)?;
-            Wod::get_by_id(wod_id, &mut db).map(|w| vec![w])
+            WodDb::get_by_id(wod_id, &mut db).map(|w| vec![w])
         }
-        None => Wod::get_by_user(*auth, &mut db),
+        None => WodDb::get_by_user(*auth, &mut db),
     }
     .map(Json)
     .map_err(Into::into)
@@ -62,11 +63,11 @@ pub async fn update_wods(
     match wods {
         UnverifiedSingleOrVec::Single(wod) => {
             let wod = wod.verify_user_ap(auth, &mut db)?;
-            Wod::update(&wod, &mut db)
+            WodDb::update(&wod, &mut db)
         }
         UnverifiedSingleOrVec::Vec(wods) => {
             let wods = wods.verify_user_ap(auth, &mut db)?;
-            Wod::update_multiple(&wods, &mut db)
+            WodDb::update_multiple(&wods, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -81,11 +82,11 @@ pub async fn create_diaries(
     match diaries {
         UnverifiedSingleOrVec::Single(diary) => {
             let diary = diary.verify_user_ap_without_db(auth)?;
-            Diary::create(&diary, &mut db)
+            DiaryDb::create(&diary, &mut db)
         }
         UnverifiedSingleOrVec::Vec(diaries) => {
             let diaries = diaries.verify_user_ap_without_db(auth)?;
-            Diary::create_multiple(&diaries, &mut db)
+            DiaryDb::create_multiple(&diaries, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -100,9 +101,9 @@ pub async fn get_diaries(
     match id {
         Some(id) => {
             let diary_id = id.verify_user_ap(auth, &mut db)?;
-            Diary::get_by_id(diary_id, &mut db).map(|d| vec![d])
+            DiaryDb::get_by_id(diary_id, &mut db).map(|d| vec![d])
         }
-        None => Diary::get_by_user(*auth, &mut db),
+        None => DiaryDb::get_by_user(*auth, &mut db),
     }
     .map(Json)
     .map_err(Into::into)
@@ -115,7 +116,7 @@ pub async fn get_diaries(
 //Path(end_datetime): Path<DateTime<Utc>>,
 //mut db: DbConn,
 //) -> HandlerResult<Json<Vec<Diary>>> {
-//Diary::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &mut db)
+//DiaryDb::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -128,11 +129,11 @@ pub async fn update_diaries(
     match diaries {
         UnverifiedSingleOrVec::Single(diary) => {
             let diary = diary.verify_user_ap(auth, &mut db)?;
-            Diary::update(&diary, &mut db)
+            DiaryDb::update(&diary, &mut db)
         }
         UnverifiedSingleOrVec::Vec(diaries) => {
             let diaries = diaries.verify_user_ap(auth, &mut db)?;
-            Diary::update_multiple(&diaries, &mut db)
+            DiaryDb::update_multiple(&diaries, &mut db)
         }
     }
     .map(|_| StatusCode::OK)

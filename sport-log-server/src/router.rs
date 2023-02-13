@@ -8,7 +8,7 @@ use axum::{
     routing::{delete, get, post},
     Json, Router,
 };
-use sport_log_types::{uri::*, AppState, Version};
+use sport_log_types::{uri::*, Version};
 use tower::ServiceBuilder;
 use tower_http::{
     classify::ServerErrorsFailureClass, sensitive_headers::SetSensitiveRequestHeadersLayer,
@@ -16,7 +16,7 @@ use tower_http::{
 };
 use tracing::{debug, trace, warn, Span};
 
-use crate::handler::*;
+use crate::{error::HandlerError, handler::*, state::AppState};
 
 async fn handler_404() -> HandlerError {
     HandlerError {
@@ -169,10 +169,10 @@ pub fn get_router(state: AppState) -> Router {
                     )
                 })
                 .on_request(|request: &Request<Body>, _span: &Span| {
-                    debug!("request\n{:#?}", request.headers(),);
+                    debug!("request\n{:#?}", request.headers());
                 })
                 .on_response(|response: &Response, _latency: Duration, _span: &Span| {
-                    debug!("response {}\n{:#?}", response.status(), response.headers(),);
+                    debug!("response {}\n{:#?}", response.status(), response.headers());
                 })
                 .on_body_chunk(|chunk: &Bytes, _latency: Duration, _span: &Span| {
                     trace!("response body\n{:?}", chunk);

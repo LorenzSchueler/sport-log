@@ -15,12 +15,17 @@ use mime::APPLICATION_JSON;
 use rand::Rng;
 use sport_log_types::{
     uri::{route_max_version, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER},
-    Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, AppState,
-    Config, Create, DbPool, Diary, DiaryId, Platform, PlatformId, User, UserId, ADMIN_USERNAME,
+    Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, Diary, DiaryId,
+    Platform, PlatformId, User, UserId, ADMIN_USERNAME,
 };
 use tower::{Service, ServiceExt};
 
-use crate::{get_config, router};
+use crate::{
+    config::Config,
+    db::*,
+    get_config, router,
+    state::{AppState, DbPool},
+};
 
 const ADMIN_PASSWORD: &str = "admin-passwd";
 
@@ -110,11 +115,11 @@ async fn init() -> (Router, DbPool, &'static Config) {
 
     let mut db = db_pool.get().unwrap();
 
-    User::create(&mut TEST_USER.clone(), &mut db).unwrap();
-    User::create(&mut TEST_USER2.clone(), &mut db).unwrap();
-    Platform::create(&TEST_PLATFORM, &mut db).unwrap();
-    ActionProvider::create(&mut TEST_AP.clone(), &mut db).unwrap();
-    Action::create(&TEST_ACTION, &mut db).unwrap();
+    UserDb::create(&mut TEST_USER.clone(), &mut db).unwrap();
+    UserDb::create(&mut TEST_USER2.clone(), &mut db).unwrap();
+    PlatformDb::create(&TEST_PLATFORM, &mut db).unwrap();
+    ActionProviderDb::create(&mut TEST_AP.clone(), &mut db).unwrap();
+    ActionDb::create(&TEST_ACTION, &mut db).unwrap();
 
     (router, db_pool, config)
 }
@@ -596,7 +601,7 @@ async fn ap_as_user_ap_auth() {
         enabled: true,
         deleted: false,
     };
-    ActionEvent::create(&action_event, &mut db_pool.get().unwrap()).unwrap();
+    ActionEventDb::create(&action_event, &mut db_pool.get().unwrap()).unwrap();
 
     auth_as(
         &mut router,
@@ -622,7 +627,7 @@ async fn ap_as_user_ap_auth_no_event() {
         enabled: false,
         deleted: false,
     };
-    ActionEvent::create(&action_event1, &mut db_pool.get().unwrap()).unwrap();
+    ActionEventDb::create(&action_event1, &mut db_pool.get().unwrap()).unwrap();
 
     // create deleted ActionEvent
     let action_event2 = ActionEvent {
@@ -634,7 +639,7 @@ async fn ap_as_user_ap_auth_no_event() {
         enabled: true,
         deleted: true,
     };
-    ActionEvent::create(&action_event2, &mut db_pool.get().unwrap()).unwrap();
+    ActionEventDb::create(&action_event2, &mut db_pool.get().unwrap()).unwrap();
 
     //  check that ap has no access
     auth_as_not_allowed(
@@ -661,7 +666,7 @@ async fn ap_as_user_ap_auth_wrong_credentials() {
         enabled: true,
         deleted: false,
     };
-    ActionEvent::create(&action_event, &mut db_pool.get().unwrap()).unwrap();
+    ActionEventDb::create(&action_event, &mut db_pool.get().unwrap()).unwrap();
 
     auth_as_wrong_credentials(
         &mut router,
@@ -686,7 +691,7 @@ async fn ap_as_user_ap_auth_without_credentials() {
         enabled: true,
         deleted: false,
     };
-    ActionEvent::create(&action_event, &mut db_pool.get().unwrap()).unwrap();
+    ActionEventDb::create(&action_event, &mut db_pool.get().unwrap()).unwrap();
 
     auth_as_without_credentials(
         &mut router,
@@ -785,7 +790,7 @@ async fn foreign_create() {
 async fn own_get() {
     let (mut router, db_pool, _) = init().await;
 
-    Diary::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
+    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
 
     // check that get works for same user
     let header = basic_auth(&TEST_USER.username, &TEST_USER.password);
@@ -813,7 +818,7 @@ async fn own_get() {
 async fn foreign_get() {
     let (mut router, db_pool, _) = init().await;
 
-    Diary::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
+    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
 
     // check that get does not work for other user
     let header = basic_auth(&TEST_USER2.username, &TEST_USER2.password);
@@ -841,7 +846,7 @@ async fn foreign_get() {
 async fn own_update() {
     let (mut router, db_pool, _) = init().await;
 
-    Diary::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
+    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
 
     // check that update works for same user
     let header = basic_auth(&TEST_USER.username, &TEST_USER.password);
@@ -866,7 +871,7 @@ async fn own_update() {
 async fn foreign_update() {
     let (mut router, db_pool, _) = init().await;
 
-    Diary::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
+    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
 
     // check that update does not work for other user
     let header = basic_auth(&TEST_USER2.username, &TEST_USER2.password);

@@ -3,10 +3,11 @@ use argon2::{
     Argon2,
 };
 use diesel::{result::Error, QueryResult};
+use sport_log_types::ADMIN_USERNAME;
 
-use crate::{Admin, ADMIN_USERNAME};
+pub struct AdminDb;
 
-impl Admin {
+impl AdminDb {
     pub fn auth(username: &str, password: &str, admin_password: &str) -> QueryResult<()> {
         let password_hash =
             PasswordHash::new(admin_password).map_err(|_| Error::RollbackTransaction)?; // this should not happen but prevents panic

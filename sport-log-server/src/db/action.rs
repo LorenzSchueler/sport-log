@@ -2,17 +2,35 @@ use argon2::{password_hash::SaltString, Argon2, PasswordHash, PasswordHasher, Pa
 use chrono::{DateTime, Utc};
 use diesel::{prelude::*, result::Error};
 use rand_core::OsRng;
-
-use crate::{
+use sport_log_types::{
     schema::{action, action_event, action_provider, action_rule, platform_credential},
-    Action, ActionEvent, ActionEventId, ActionProvider, ActionProviderId, ActionRule,
-    AuthApForUser, CheckAPId, CreatableActionRule, DeletableActionEvent, ExecutableActionEvent,
-    GetAll, UserId,
+    Action, ActionEvent, ActionEventId, ActionProviderId, ActionRuleId, CreatableActionRule,
+    DeletableActionEvent, ExecutableActionEvent, UserId,
 };
+use sport_log_types_derive::*;
+
+use crate::{auth::*, db::*};
+
+#[derive(
+    Db,
+    VerifyIdForAdmin,
+    VerifyIdUnchecked,
+    GetById,
+    GetByIds,
+    GetAll,
+    GetBySync,
+    HardDelete,
+    VerifyForAdminWithoutDb,
+    VerifyUnchecked,
+)]
+pub struct ActionProviderDb;
 
 /// same api trait [Create](crate::Create) but with mutable references
-impl ActionProvider {
-    pub fn create(mut action_provider: &mut Self, db: &mut PgConnection) -> QueryResult<usize> {
+impl ActionProviderDb {
+    pub fn create(
+        mut action_provider: &mut <Self as Db>::Entity,
+        db: &mut PgConnection,
+    ) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         action_provider.password = Argon2::default()
             .hash_password(action_provider.password.as_bytes(), salt.as_ref())
@@ -25,7 +43,7 @@ impl ActionProvider {
     }
 
     pub fn create_multiple(
-        action_providers: &mut [Self],
+        action_providers: &mut [<Self as Db>::Entity],
         db: &mut PgConnection,
     ) -> QueryResult<usize> {
         for action_provider in &mut *action_providers {
@@ -42,7 +60,7 @@ impl ActionProvider {
     }
 }
 
-impl ActionProvider {
+impl ActionProviderDb {
     pub fn auth(
         name: &str,
         password: &str,
@@ -110,11 +128,27 @@ impl ActionProvider {
     }
 }
 
-impl Action {
+#[derive(
+    Db,
+    VerifyIdUnchecked,
+    VerifyIdForActionProvider,
+    Create,
+    GetById,
+    GetByIds,
+    GetAll,
+    GetBySync,
+    HardDelete,
+    CheckAPId,
+    VerifyForActionProviderWithDb,
+    VerifyForActionProviderWithoutDb,
+)]
+pub struct ActionDb;
+
+impl ActionDb {
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
+    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
         action::table
             .filter(action::columns::action_provider_id.eq(action_provider_id))
             .select(Action::as_select())
@@ -122,43 +156,42 @@ impl Action {
     }
 }
 
-impl ActionRule {
-    pub fn get_by_action_provider(
-        action_provider_id: ActionProviderId,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
-        action_rule::table
-            .filter(
-                action_rule::columns::action_id.eq_any(
-                    action::table
-                        .select(action::columns::id)
-                        .filter(action::columns::action_provider_id.eq(action_provider_id)),
-                ),
-            )
-            .select(ActionRule::as_select())
-            .get_results(db)
-    }
+#[derive(
+    Db,
+    VerifyIdForUser,
+    Create,
+    GetById,
+    GetByIds,
+    GetByUser,
+    GetByUserSync,
+    Update,
+    HardDelete,
+    CheckUserId,
+    VerifyForUserWithDb,
+    VerifyForUserWithoutDb,
+)]
+pub struct ActionRuleDb;
 
-    pub fn get_by_user_and_action_provider(
-        user_id: UserId,
-        action_provider_id: ActionProviderId,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
-        action_rule::table
-            .filter(action_rule::columns::user_id.eq(user_id))
-            .filter(
-                action_rule::columns::action_id.eq_any(
-                    action::table
-                        .select(action::columns::id)
-                        .filter(action::columns::action_provider_id.eq(action_provider_id)),
-                ),
-            )
-            .select(ActionRule::as_select())
-            .get_results(db)
-    }
-}
+#[derive(
+    Db,
+    VerifyIdForUser,
+    VerifyIdForActionProvider,
+    VerifyIdForAdmin,
+    Create,
+    GetById,
+    GetByIds,
+    GetByUser,
+    GetByUserSync,
+    Update,
+    HardDelete,
+    CheckUserId,
+    VerifyForUserWithDb,
+    VerifyForUserWithoutDb,
+    VerifyForAdminWithoutDb,
+)]
+pub struct ActionEventDb;
 
-impl CheckAPId for ActionEvent {
+impl CheckAPId for ActionEventDb {
     type Id = ActionEventId;
 
     fn check_ap_id(
@@ -190,7 +223,7 @@ impl CheckAPId for ActionEvent {
     }
 }
 
-impl ActionEvent {
+impl ActionEventDb {
     pub fn create_multiple_ignore_conflict(
         action_events: Vec<ActionEvent>,
         db: &mut PgConnection,
@@ -199,40 +232,6 @@ impl ActionEvent {
             .values(action_events)
             .on_conflict_do_nothing()
             .execute(db)
-    }
-
-    pub fn get_by_action_provider(
-        action_provider_id: ActionProviderId,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
-        action_event::table
-            .filter(
-                action_event::columns::action_id.eq_any(
-                    action::table
-                        .select(action::columns::id)
-                        .filter(action::columns::action_provider_id.eq(action_provider_id)),
-                ),
-            )
-            .select(ActionEvent::as_select())
-            .get_results(db)
-    }
-
-    pub fn get_by_user_and_action_provider(
-        user_id: UserId,
-        action_provider_id: ActionProviderId,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
-        action_event::table
-            .filter(action_event::columns::user_id.eq(user_id))
-            .filter(
-                action_event::columns::action_id.eq_any(
-                    action::table
-                        .filter(action::columns::action_provider_id.eq(action_provider_id))
-                        .select(action::columns::id),
-                ),
-            )
-            .select(ActionEvent::as_select())
-            .get_results(db)
     }
 
     pub fn disable_multiple(
@@ -258,8 +257,15 @@ impl ActionEvent {
     }
 }
 
-impl GetAll for CreatableActionRule {
-    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self>> {
+pub struct CreatableActionRuleDb;
+
+impl Db for CreatableActionRuleDb {
+    type Id = ActionRuleId;
+    type Entity = CreatableActionRule;
+}
+
+impl GetAll for CreatableActionRuleDb {
+    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Entity>> {
         action_rule::table
             .inner_join(action::table)
             .filter(action_rule::columns::enabled.eq(true))
@@ -277,11 +283,18 @@ impl GetAll for CreatableActionRule {
     }
 }
 
-impl ExecutableActionEvent {
+pub struct ExecutableActionEventDb;
+
+impl Db for ExecutableActionEventDb {
+    type Id = ActionEventId;
+    type Entity = ExecutableActionEvent;
+}
+
+impl ExecutableActionEventDb {
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
+    ) -> QueryResult<Vec<ExecutableActionEvent>> {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
             .left_outer_join(
@@ -309,7 +322,7 @@ impl ExecutableActionEvent {
         start_datetime: DateTime<Utc>,
         end_datetime: DateTime<Utc>,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
+    ) -> QueryResult<Vec<ExecutableActionEvent>> {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
             .left_outer_join(
@@ -335,8 +348,15 @@ impl ExecutableActionEvent {
     }
 }
 
-impl GetAll for DeletableActionEvent {
-    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self>> {
+pub struct DeletableActionEventDb;
+
+impl Db for DeletableActionEventDb {
+    type Id = ActionEventId;
+    type Entity = DeletableActionEvent;
+}
+
+impl GetAll for DeletableActionEventDb {
+    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Entity>> {
         action_event::table
             .inner_join(action::table)
             .filter(action_event::columns::deleted.eq(false))

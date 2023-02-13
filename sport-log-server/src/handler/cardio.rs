@@ -1,11 +1,12 @@
 use axum::{extract::Query, http::StatusCode, Json};
-use sport_log_types::{
-    AuthUserOrAP, CardioSession, CardioSessionId, Create, DbConn, GetById, GetByUser, Route,
-    RouteId, UnverifiedId, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb,
-    VerifyIdForUserOrAP, VerifyMultipleForUserOrAPWithDb, VerifyMultipleForUserOrAPWithoutDb,
-};
+use sport_log_types::{CardioSession, CardioSessionId, Route, RouteId};
 
-use crate::handler::{HandlerResult, IdOption, UnverifiedSingleOrVec};
+use crate::{
+    auth::AuthUserOrAP,
+    db::*,
+    handler::{HandlerResult, IdOption, UnverifiedSingleOrVec},
+    state::DbConn,
+};
 
 pub async fn create_routes(
     auth: AuthUserOrAP,
@@ -15,11 +16,11 @@ pub async fn create_routes(
     match routes {
         UnverifiedSingleOrVec::Single(route) => {
             let route = route.verify_user_ap_without_db(auth)?;
-            Route::create(&route, &mut db)
+            RouteDb::create(&route, &mut db)
         }
         UnverifiedSingleOrVec::Vec(routes) => {
             let routes = routes.verify_user_ap_without_db(auth)?;
-            Route::create_multiple(&routes, &mut db)
+            RouteDb::create_multiple(&routes, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -34,9 +35,9 @@ pub async fn get_routes(
     match id {
         Some(id) => {
             let route_id = id.verify_user_ap(auth, &mut db)?;
-            Route::get_by_id(route_id, &mut db).map(|r| vec![r])
+            RouteDb::get_by_id(route_id, &mut db).map(|r| vec![r])
         }
-        None => Route::get_by_user(*auth, &mut db),
+        None => RouteDb::get_by_user(*auth, &mut db),
     }
     .map(Json)
     .map_err(Into::into)
@@ -50,11 +51,11 @@ pub async fn update_routes(
     match routes {
         UnverifiedSingleOrVec::Single(route) => {
             let route = route.verify_user_ap(auth, &mut db)?;
-            Route::update(&route, &mut db)
+            RouteDb::update(&route, &mut db)
         }
         UnverifiedSingleOrVec::Vec(routes) => {
             let routes = routes.verify_user_ap(auth, &mut db)?;
-            Route::update_multiple(&routes, &mut db)
+            RouteDb::update_multiple(&routes, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -74,7 +75,7 @@ pub async fn update_routes(
 //let cardio_blueprint = cardio_blueprint
 //.verify_user_ap_without_db(auth)
 //.map_err(Error::from)?;
-//CardioBlueprint::create(&cardio_blueprint, &mut db)
+//CardioBlueprintDb::create(&cardio_blueprint, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -96,7 +97,7 @@ pub async fn update_routes(
 //status,
 //message: None,
 //})?;
-//CardioBlueprint::create_multiple(&cardio_blueprints, &mut db)
+//CardioBlueprintDb::create_multiple(&cardio_blueprints, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -109,7 +110,7 @@ pub async fn update_routes(
 //) -> HandlerResult<Json<CardioBlueprint>> {
 //let cardio_blueprint_id = cardio_blueprint_id
 //.verify_user_ap(auth, &mut db)?;
-//CardioBlueprint::get_by_id(cardio_blueprint_id, &mut db)
+//CardioBlueprintDb::get_by_id(cardio_blueprint_id, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -119,7 +120,7 @@ pub async fn update_routes(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
 //) -> HandlerResult<Json<Vec<CardioBlueprint>>> {
-//CardioBlueprint::get_by_user(*auth, &mut db)
+//CardioBlueprintDb::get_by_user(*auth, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -137,7 +138,7 @@ pub async fn update_routes(
 //let cardio_blueprint = cardio_blueprint
 //.verify_user_ap(auth, &mut db)
 //.map_err(Error::from)?;
-//CardioBlueprint::update(&cardio_blueprint, &mut db)
+//CardioBlueprintDb::update(&cardio_blueprint, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -154,7 +155,7 @@ pub async fn update_routes(
 //) -> HandlerResult<Json<Vec<CardioBlueprint>>> {
 //let cardio_blueprints = cardio_blueprints
 //.verify_user_ap(auth, &mut db)?;
-//CardioBlueprint::update_multiple(&cardio_blueprints, &mut db)
+//CardioBlueprintDb::update_multiple(&cardio_blueprints, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -167,11 +168,11 @@ pub async fn create_cardio_sessions(
     match cardio_sessions {
         UnverifiedSingleOrVec::Single(cardio_session) => {
             let cardio_session = cardio_session.verify_user_ap_without_db(auth)?;
-            CardioSession::create(&cardio_session, &mut db)
+            CardioSessionDb::create(&cardio_session, &mut db)
         }
         UnverifiedSingleOrVec::Vec(cardio_sessions) => {
             let cardio_sessions = cardio_sessions.verify_user_ap_without_db(auth)?;
-            CardioSession::create_multiple(&cardio_sessions, &mut db)
+            CardioSessionDb::create_multiple(&cardio_sessions, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -186,9 +187,9 @@ pub async fn get_cardio_sessions(
     match id {
         Some(id) => {
             let cardio_session_id = id.verify_user_ap(auth, &mut db)?;
-            CardioSession::get_by_id(cardio_session_id, &mut db).map(|c| vec![c])
+            CardioSessionDb::get_by_id(cardio_session_id, &mut db).map(|c| vec![c])
         }
-        None => CardioSession::get_by_user(*auth, &mut db),
+        None => CardioSessionDb::get_by_user(*auth, &mut db),
     }
     .map(Json)
     .map_err(Into::into)
@@ -202,11 +203,11 @@ pub async fn update_cardio_sessions(
     match cardio_sessions {
         UnverifiedSingleOrVec::Single(cardio_session) => {
             let cardio_session = cardio_session.verify_user_ap(auth, &mut db)?;
-            CardioSession::update(&cardio_session, &mut db)
+            CardioSessionDb::update(&cardio_session, &mut db)
         }
         UnverifiedSingleOrVec::Vec(cardio_sessions) => {
             let cardio_sessions = cardio_sessions.verify_user_ap(auth, &mut db)?;
-            CardioSession::update_multiple(&cardio_sessions, &mut db)
+            CardioSessionDb::update_multiple(&cardio_sessions, &mut db)
         }
     }
     .map(|_| StatusCode::OK)
@@ -222,7 +223,7 @@ pub async fn update_cardio_sessions(
 //let cardio_session_id = cardio_session_id
 //.verify_user_ap(auth, &mut db)
 //.map_err(Error::from)?;
-//CardioSessionDescription::get_by_id(cardio_session_id, &mut db)
+//CardioSessionDescriptionDb::get_by_id(cardio_session_id, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -232,7 +233,7 @@ pub async fn update_cardio_sessions(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
 //) -> HandlerResult<Json<Vec<CardioSessionDescription>>> {
-//CardioSessionDescription::get_by_user(*auth, &mut db)
+//CardioSessionDescriptionDb::get_by_user(*auth, &mut db)
 //.map(Json)
 //.map_err(Into::into)
 //}
@@ -244,7 +245,7 @@ pub async fn update_cardio_sessions(
 //Path(end_datetime): Path<DateTime<Utc>>,
 //mut db: DbConn,
 //) -> HandlerResult<Json<Vec<CardioSessionDescription>>> {
-//CardioSessionDescription::get_ordered_by_user_and_timespan(
+//CardioSessionDescriptionDb::get_ordered_by_user_and_timespan(
 //*auth,
 //start_datetime,
 //end_datetime,

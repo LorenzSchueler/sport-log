@@ -1,16 +1,33 @@
+use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
-
-use crate::{
+use sport_log_types::{
     schema::{
         movement, strength_blueprint, strength_blueprint_set, strength_session, strength_set,
     },
-    CheckUserId, GetById, GetByUser, GetByUserSync, Movement, StrengthBlueprint,
     StrengthBlueprintId, StrengthBlueprintSet, StrengthBlueprintSetId, StrengthSession,
     StrengthSessionDescription, StrengthSessionId, StrengthSet, StrengthSetId, UserId,
 };
+use sport_log_types_derive::*;
 
-impl CheckUserId for StrengthBlueprint {
+use crate::{auth::*, db::*};
+
+#[derive(
+    Db,
+    VerifyIdForUserOrAP,
+    Create,
+    GetById,
+    GetByIds,
+    GetByUser,
+    GetByUserSync,
+    Update,
+    HardDelete,
+    VerifyForUserOrAPWithDb,
+    VerifyForUserOrAPWithoutDb,
+)]
+pub struct StrengthBlueprintDb;
+
+impl CheckUserId for StrengthBlueprintDb {
     type Id = StrengthBlueprintId;
 
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
@@ -48,8 +65,14 @@ impl CheckUserId for StrengthBlueprint {
     }
 }
 
-impl GetByUser for StrengthBlueprintSet {
-    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
+#[derive(Db, VerifyIdForUserOrAP, Create, GetById, GetByIds, Update, HardDelete)]
+pub struct StrengthBlueprintSetDb;
+
+impl GetByUser for StrengthBlueprintSetDb {
+    fn get_by_user(
+        user_id: UserId,
+        db: &mut PgConnection,
+    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
         strength_blueprint_set::table
             .filter(
                 strength_blueprint_set::columns::strength_blueprint_id.eq_any(
@@ -63,12 +86,12 @@ impl GetByUser for StrengthBlueprintSet {
     }
 }
 
-impl GetByUserSync for StrengthBlueprintSet {
+impl GetByUserSync for StrengthBlueprintSetDb {
     fn get_by_user_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>>
+    ) -> QueryResult<Vec<Self::Entity>>
     where
         Self: Sized,
     {
@@ -86,7 +109,7 @@ impl GetByUserSync for StrengthBlueprintSet {
     }
 }
 
-impl CheckUserId for StrengthBlueprintSet {
+impl CheckUserId for StrengthBlueprintSetDb {
     type Id = StrengthBlueprintSetId;
 
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
@@ -114,21 +137,112 @@ impl CheckUserId for StrengthBlueprintSet {
     }
 }
 
-impl StrengthBlueprintSet {
-    pub fn get_by_strength_blueprint(
-        strength_blueprint_id: StrengthBlueprintId,
+impl VerifyForUserOrAPWithDb for Unverified<StrengthBlueprintSet> {
+    type Entity = StrengthBlueprintSet;
+
+    fn verify_user_ap(
+        self,
+        auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
-        strength_blueprint_set::table
-            .filter(
-                strength_blueprint_set::columns::strength_blueprint_id.eq(strength_blueprint_id),
-            )
-            .select(StrengthBlueprintSet::as_select())
-            .get_results(db)
+    ) -> Result<Self::Entity, StatusCode> {
+        let strength_blueprint_set = self.0;
+        if StrengthBlueprintSetDb::check_user_id(strength_blueprint_set.id, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        {
+            Ok(strength_blueprint_set)
+        } else {
+            Err(StatusCode::FORBIDDEN)
+        }
     }
 }
 
-impl CheckUserId for StrengthSession {
+impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthBlueprintSet>> {
+    type Entity = StrengthBlueprintSet;
+
+    fn verify_user_ap(
+        self,
+        auth: AuthUserOrAP,
+        db: &mut PgConnection,
+    ) -> Result<Vec<Self::Entity>, StatusCode> {
+        let strength_blueprint_sets = self.0;
+        let strength_blueprint_set_ids: Vec<_> = strength_blueprint_sets
+            .iter()
+            .map(|strength_set| strength_set.id)
+            .collect();
+        if StrengthBlueprintSetDb::check_user_ids(&strength_blueprint_set_ids, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        {
+            Ok(strength_blueprint_sets)
+        } else {
+            Err(StatusCode::FORBIDDEN)
+        }
+    }
+}
+
+impl VerifyForUserOrAPCreate for Unverified<StrengthBlueprintSet> {
+    type Entity = StrengthBlueprintSet;
+
+    fn verify_user_ap_create(
+        self,
+        auth: AuthUserOrAP,
+        db: &mut PgConnection,
+    ) -> Result<Self::Entity, StatusCode> {
+        let strength_blueprint_set = self.0;
+        if StrengthBlueprintDb::check_user_id(
+            strength_blueprint_set.strength_blueprint_id,
+            *auth,
+            db,
+        )
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        {
+            Ok(strength_blueprint_set)
+        } else {
+            Err(StatusCode::FORBIDDEN)
+        }
+    }
+}
+
+impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthBlueprintSet>> {
+    type Entity = StrengthBlueprintSet;
+
+    fn verify_user_ap_create(
+        self,
+        auth: AuthUserOrAP,
+        db: &mut PgConnection,
+    ) -> Result<Vec<Self::Entity>, StatusCode> {
+        let strength_blueprint_sets = self.0;
+        let mut strength_blueprint_ids: Vec<_> = strength_blueprint_sets
+            .iter()
+            .map(|strength_set| strength_set.strength_blueprint_id)
+            .collect();
+        strength_blueprint_ids.sort_unstable();
+        strength_blueprint_ids.dedup();
+        if StrengthBlueprintDb::check_user_ids(&strength_blueprint_ids, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        {
+            Ok(strength_blueprint_sets)
+        } else {
+            Err(StatusCode::FORBIDDEN)
+        }
+    }
+}
+
+#[derive(
+    Db,
+    VerifyIdForUserOrAP,
+    Create,
+    GetById,
+    GetByIds,
+    GetByUser,
+    GetByUserSync,
+    Update,
+    HardDelete,
+    VerifyForUserOrAPWithDb,
+    VerifyForUserOrAPWithoutDb,
+)]
+pub struct StrengthSessionDb;
+
+impl CheckUserId for StrengthSessionDb {
     type Id = StrengthSessionId;
 
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
@@ -166,24 +280,14 @@ impl CheckUserId for StrengthSession {
     }
 }
 
-impl StrengthSession {
-    pub fn get_ordered_by_user_and_timespan(
-        user_id: UserId,
-        start_datetime: DateTime<Utc>,
-        end_datetime: DateTime<Utc>,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
-        strength_session::table
-            .filter(strength_session::columns::user_id.eq(user_id))
-            .filter(strength_session::columns::datetime.between(start_datetime, end_datetime))
-            .order_by(strength_session::columns::datetime)
-            .select(StrengthSession::as_select())
-            .get_results(db)
-    }
-}
+#[derive(Db, VerifyIdForUserOrAP, Create, GetById, GetByIds, Update, HardDelete)]
+pub struct StrengthSetDb;
 
-impl GetByUser for StrengthSet {
-    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
+impl GetByUser for StrengthSetDb {
+    fn get_by_user(
+        user_id: UserId,
+        db: &mut PgConnection,
+    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
         strength_set::table
             .filter(
                 strength_set::columns::strength_session_id.eq_any(
@@ -197,12 +301,12 @@ impl GetByUser for StrengthSet {
     }
 }
 
-impl GetByUserSync for StrengthSet {
+impl GetByUserSync for StrengthSetDb {
     fn get_by_user_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>>
+    ) -> QueryResult<Vec<<Self as Db>::Entity>>
     where
         Self: Sized,
     {
@@ -220,7 +324,7 @@ impl GetByUserSync for StrengthSet {
     }
 }
 
-impl CheckUserId for StrengthSet {
+impl CheckUserId for StrengthSetDb {
     type Id = StrengthSetId;
 
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
@@ -248,40 +352,128 @@ impl CheckUserId for StrengthSet {
     }
 }
 
-impl StrengthSet {
-    pub fn get_by_strength_session(
-        strength_session_id: StrengthSessionId,
+impl VerifyForUserOrAPWithDb for Unverified<StrengthSet> {
+    type Entity = StrengthSet;
+
+    fn verify_user_ap(
+        self,
+        auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
-        strength_set::table
-            .filter(strength_set::columns::strength_session_id.eq(strength_session_id))
-            .select(StrengthSet::as_select())
-            .get_results(db)
+    ) -> Result<Self::Entity, StatusCode> {
+        let strength_set = self.0;
+        if StrengthSetDb::check_user_id(strength_set.id, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        {
+            Ok(strength_set)
+        } else {
+            Err(StatusCode::FORBIDDEN)
+        }
     }
 }
 
-impl GetById for StrengthSessionDescription {
+impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthSet>> {
+    type Entity = StrengthSet;
+
+    fn verify_user_ap(
+        self,
+        auth: AuthUserOrAP,
+        db: &mut PgConnection,
+    ) -> Result<Vec<Self::Entity>, StatusCode> {
+        let strength_sets = self.0;
+        let strength_set_ids: Vec<_> = strength_sets
+            .iter()
+            .map(|strength_set| strength_set.id)
+            .collect();
+        if StrengthSetDb::check_user_ids(&strength_set_ids, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        {
+            Ok(strength_sets)
+        } else {
+            Err(StatusCode::FORBIDDEN)
+        }
+    }
+}
+
+impl VerifyForUserOrAPCreate for Unverified<StrengthSet> {
+    type Entity = StrengthSet;
+
+    fn verify_user_ap_create(
+        self,
+        auth: AuthUserOrAP,
+        db: &mut PgConnection,
+    ) -> Result<Self::Entity, StatusCode> {
+        let strength_set = self.0;
+        if StrengthSessionDb::check_user_id(strength_set.strength_session_id, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        {
+            Ok(strength_set)
+        } else {
+            Err(StatusCode::FORBIDDEN)
+        }
+    }
+}
+
+impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthSet>> {
+    type Entity = StrengthSet;
+
+    fn verify_user_ap_create(
+        self,
+        auth: AuthUserOrAP,
+        db: &mut PgConnection,
+    ) -> Result<Vec<Self::Entity>, StatusCode> {
+        let strength_sets = self.0;
+        let mut strength_session_ids: Vec<StrengthSessionId> = strength_sets
+            .iter()
+            .map(|strength_set| strength_set.strength_session_id)
+            .collect();
+        strength_session_ids.sort_unstable();
+        strength_session_ids.dedup();
+        if StrengthSessionDb::check_user_ids(&strength_session_ids, *auth, db)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        {
+            Ok(strength_sets)
+        } else {
+            Err(StatusCode::FORBIDDEN)
+        }
+    }
+}
+
+pub struct StrengthSessionDescriptionDb;
+
+impl Db for StrengthSessionDescriptionDb {
     type Id = StrengthSessionId;
+    type Entity = StrengthSessionDescription;
+}
 
-    fn get_by_id(strength_session_id: Self::Id, db: &mut PgConnection) -> QueryResult<Self> {
-        let strength_session = StrengthSession::get_by_id(strength_session_id, db)?;
-        StrengthSessionDescription::from_session(strength_session, db)
+impl GetById for StrengthSessionDescriptionDb {
+    fn get_by_id(
+        strength_session_id: Self::Id,
+        db: &mut PgConnection,
+    ) -> QueryResult<<Self as Db>::Entity> {
+        let strength_session = StrengthSessionDb::get_by_id(strength_session_id, db)?;
+        StrengthSessionDescriptionDb::from_session(strength_session, db)
     }
 }
 
-impl GetByUser for StrengthSessionDescription {
-    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
-        let strength_sessions = StrengthSession::get_by_user(user_id, db)?;
-        StrengthSessionDescription::from_sessions(strength_sessions, db)
+impl GetByUser for StrengthSessionDescriptionDb {
+    fn get_by_user(
+        user_id: UserId,
+        db: &mut PgConnection,
+    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
+        let strength_sessions = StrengthSessionDb::get_by_user(user_id, db)?;
+        StrengthSessionDescriptionDb::from_sessions(strength_sessions, db)
     }
 }
 
-impl StrengthSessionDescription {
-    fn from_session(strength_session: StrengthSession, db: &mut PgConnection) -> QueryResult<Self> {
+impl StrengthSessionDescriptionDb {
+    fn from_session(
+        strength_session: StrengthSession,
+        db: &mut PgConnection,
+    ) -> QueryResult<<Self as Db>::Entity> {
         let strength_sets = StrengthSet::belonging_to(&strength_session)
             .select(StrengthSet::as_select())
             .get_results(db)?;
-        let movement = Movement::get_by_id(strength_session.movement_id, db)?;
+        let movement = MovementDb::get_by_id(strength_session.movement_id, db)?;
         Ok(StrengthSessionDescription {
             strength_session,
             strength_sets,
@@ -292,14 +484,14 @@ impl StrengthSessionDescription {
     fn from_sessions(
         strength_sessions: Vec<StrengthSession>,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
+    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
         let strength_sets = StrengthSet::belonging_to(&strength_sessions)
             .select(StrengthSet::as_select())
             .get_results(db)?
             .grouped_by(&strength_sessions);
         let mut movements = vec![];
         for strength_session in &strength_sessions {
-            movements.push(Movement::get_by_id(strength_session.movement_id, db)?);
+            movements.push(MovementDb::get_by_id(strength_session.movement_id, db)?);
         }
         Ok(strength_sessions
             .into_iter()
@@ -313,20 +505,5 @@ impl StrengthSessionDescription {
                 },
             )
             .collect())
-    }
-
-    pub fn get_ordered_by_user_and_timespan(
-        user_id: UserId,
-        start_datetime: DateTime<Utc>,
-        end_datetime: DateTime<Utc>,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
-        let strength_sessions = StrengthSession::get_ordered_by_user_and_timespan(
-            user_id,
-            start_datetime,
-            end_datetime,
-            db,
-        )?;
-        StrengthSessionDescription::from_sessions(strength_sessions, db)
     }
 }

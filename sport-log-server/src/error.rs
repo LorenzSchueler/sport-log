@@ -1,19 +1,14 @@
-#[cfg(feature = "server")]
 use std::convert::Infallible;
 
-#[cfg(feature = "server")]
 use axum::{
     extract::rejection::{TypedHeaderRejection, TypedHeaderRejectionReason},
+    http::StatusCode,
     response::{IntoResponse, Response},
     Json,
 };
-#[cfg(feature = "server")]
 use diesel::result::{DatabaseErrorKind, Error as DieselError};
-use http::StatusCode;
-#[cfg(feature = "server")]
 use r2d2::Error as R2D2Error;
 use serde::{ser::SerializeStruct, Deserialize, Serialize};
-#[cfg(feature = "server")]
 use tracing::info;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -45,7 +40,6 @@ impl Serialize for HandlerError {
 
 pub type HandlerResult<T> = Result<T, HandlerError>;
 
-#[cfg(feature = "server")]
 impl From<StatusCode> for HandlerError {
     fn from(status: StatusCode) -> Self {
         HandlerError {
@@ -55,7 +49,6 @@ impl From<StatusCode> for HandlerError {
     }
 }
 
-#[cfg(feature = "server")]
 impl From<TypedHeaderRejection> for HandlerError {
     fn from(rejection: TypedHeaderRejection) -> Self {
         match rejection.reason() {
@@ -81,7 +74,6 @@ impl From<TypedHeaderRejection> for HandlerError {
     }
 }
 
-#[cfg(feature = "server")]
 impl From<R2D2Error> for HandlerError {
     fn from(error: R2D2Error) -> Self {
         HandlerError {
@@ -93,7 +85,6 @@ impl From<R2D2Error> for HandlerError {
     }
 }
 
-#[cfg(feature = "server")]
 impl From<DieselError> for HandlerError {
     fn from(error: DieselError) -> Self {
         match error {
@@ -172,14 +163,12 @@ impl From<DieselError> for HandlerError {
     }
 }
 
-#[cfg(feature = "server")]
 impl From<Infallible> for HandlerError {
     fn from(_: Infallible) -> Self {
         unreachable!()
     }
 }
 
-#[cfg(feature = "server")]
 impl IntoResponse for HandlerError {
     fn into_response(self) -> Response {
         if let Some(message) = &self.message {

@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-#[cfg(feature = "server")]
+#[cfg(feature = "db")]
 use diesel::{
     backend::RawValue,
     deserialize::{self, FromSql},
@@ -7,17 +7,14 @@ use diesel::{
     serialize::{self, Output, ToSql, WriteTuple},
     sql_types::{BigInt, Double, Integer, Nullable, Record},
 };
-#[cfg(feature = "server")]
+#[cfg(feature = "db")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 use sport_log_types_derive::IdString;
-#[cfg(feature = "server")]
-use sport_log_types_derive::{
-    CheckUserId, Create, GetById, GetByIds, GetByUser, GetByUserSync, HardDelete, IdFromSql,
-    IdToSql, Update, VerifyForUserOrAPWithDb, VerifyForUserOrAPWithoutDb, VerifyIdForUserOrAP,
-};
+#[cfg(feature = "db")]
+use sport_log_types_derive::{IdFromSql, IdToSql};
 
-#[cfg(feature = "server")]
+#[cfg(feature = "db")]
 use crate::{
     schema::{cardio_blueprint, cardio_session, route},
     TrainingPlan, User,
@@ -25,7 +22,7 @@ use crate::{
 use crate::{types::IdString, Movement, MovementId, TrainingPlanId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(feature = "server", derive(DbEnum))]
+#[cfg_attr(feature = "db", derive(DbEnum))]
 pub enum CardioType {
     Training,
     ActiveRecovery,
@@ -43,7 +40,7 @@ pub enum CardioType {
 /// `time` is the time in seconds since the start of the recording.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "server",
+    feature = "db",
     derive(FromSqlRow, AsExpression),
     diesel(sql_type = crate::schema::sql_types::Position)
 )]
@@ -60,7 +57,7 @@ pub struct Position {
     pub time: i32,
 }
 
-#[cfg(feature = "server")]
+#[cfg(feature = "db")]
 impl ToSql<crate::schema::sql_types::Position, Pg> for Position {
     fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> serialize::Result {
         WriteTuple::<(Double, Double, Double, Double, Integer)>::write_tuple(
@@ -76,7 +73,7 @@ impl ToSql<crate::schema::sql_types::Position, Pg> for Position {
     }
 }
 
-#[cfg(feature = "server")]
+#[cfg(feature = "db")]
 impl FromSql<crate::schema::sql_types::Position, Pg> for Position {
     fn from_sql(bytes: RawValue<'_, Pg>) -> deserialize::Result<Self> {
         let (longitude, latitude, elevation, distance, time) =
@@ -94,15 +91,15 @@ impl FromSql<crate::schema::sql_types::Position, Pg> for Position {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
-    feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),
+    feature = "db",
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
 pub struct RouteId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "server",
+    feature = "db",
     derive(
         Insertable,
         Associations,
@@ -110,16 +107,6 @@ pub struct RouteId(pub i64);
         Queryable,
         Selectable,
         AsChangeset,
-        Create,
-        GetById,
-        GetByIds,
-        GetByUser,
-        GetByUserSync,
-        Update,
-        HardDelete,
-        CheckUserId,
-        VerifyForUserOrAPWithDb,
-        VerifyForUserOrAPWithoutDb
     ),
     diesel(table_name = route, belongs_to(User))
 )]
@@ -128,13 +115,13 @@ pub struct Route {
     pub user_id: UserId,
     pub name: String,
     pub distance: i32,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub ascent: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub descent: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub track: Option<Vec<Position>>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub marked_positions: Option<Vec<Position>>,
     pub deleted: bool,
 }
@@ -142,15 +129,15 @@ pub struct Route {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
-    feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),
+    feature = "db",
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
 pub struct CardioBlueprintId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "server",
+    feature = "db",
     derive(
         Insertable,
         Associations,
@@ -158,15 +145,6 @@ pub struct CardioBlueprintId(pub i64);
         Queryable,
         Selectable,
         AsChangeset,
-        Create,
-        GetById,
-        GetByIds,
-        GetByUser,
-        GetByUserSync,
-        Update,
-        HardDelete,
-        VerifyForUserOrAPWithDb,
-        VerifyForUserOrAPWithoutDb
     ),
     diesel(table_name = cardio_blueprint, belongs_to(User), belongs_to(TrainingPlan), belongs_to(Movement), belongs_to(Route))
 )]
@@ -175,23 +153,23 @@ pub struct CardioBlueprint {
     pub user_id: UserId,
     pub training_plan_id: TrainingPlanId,
     pub name: String,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub description: Option<String>,
     pub movement_id: MovementId,
     pub cardio_type: CardioType,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub distance: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub ascent: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub descent: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub time: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub calories: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub avg_heart_rate: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub route_id: Option<RouteId>,
     pub deleted: bool,
 }
@@ -199,15 +177,15 @@ pub struct CardioBlueprint {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
-    feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUserOrAP),
+    feature = "db",
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
 pub struct CardioSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "server",
+    feature = "db",
     derive(
         Insertable,
         Associations,
@@ -215,15 +193,6 @@ pub struct CardioSessionId(pub i64);
         Queryable,
         Selectable,
         AsChangeset,
-        Create,
-        GetById,
-        GetByIds,
-        GetByUser,
-        GetByUserSync,
-        Update,
-        HardDelete,
-        VerifyForUserOrAPWithDb,
-        VerifyForUserOrAPWithoutDb
     ),
     diesel(table_name = cardio_session, belongs_to(User), belongs_to(CardioBlueprint), belongs_to(Movement), belongs_to(Route))
 )]
@@ -234,29 +203,29 @@ pub struct CardioSession {
     pub movement_id: MovementId,
     pub cardio_type: CardioType,
     pub datetime: DateTime<Utc>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub distance: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub ascent: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub descent: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub time: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub calories: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub track: Option<Vec<Position>>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub avg_cadence: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub cadence: Option<Vec<i32>>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub avg_heart_rate: Option<i32>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub heart_rate: Option<Vec<i32>>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub route_id: Option<RouteId>,
-    #[cfg_attr(features = "server", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
     pub deleted: bool,
 }

@@ -1,11 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    Action, ActionEvent, ActionProvider, ActionRule, CardioBlueprint, CardioSession, Diary, Metcon,
-    MetconItem, MetconMovement, MetconSession, Movement, MovementMuscle, Platform,
-    PlatformCredential, Route, StrengthBlueprint, StrengthBlueprintSet, StrengthSession,
-    StrengthSet, TrainingPlan, User, Wod,
-};
+use crate::*;
 
 /// A representation of all or recently updated data belonging to a user account.
 ///

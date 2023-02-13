@@ -1,7 +1,8 @@
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
-pub use sport_log_types::error::*;
-use sport_log_types::Unverified;
+
+use crate::db::Unverified;
+pub use crate::error::*;
 
 mod account;
 mod action;

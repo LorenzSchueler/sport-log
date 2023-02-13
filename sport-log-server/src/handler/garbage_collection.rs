@@ -1,15 +1,8 @@
 use axum::{extract::Query, http::StatusCode};
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
-use sport_log_types::{
-    Action, ActionEvent, ActionProvider, ActionRule, AuthAdmin, CardioBlueprint, CardioSession,
-    DbConn, Diary, Group, GroupUser, HardDelete, Metcon, MetconItem, MetconMovement, MetconSession,
-    Movement, MovementMuscle, Platform, PlatformCredential, Route, SharedCardioSession,
-    SharedDiary, SharedMetconSession, SharedStrengthSession, StrengthBlueprint,
-    StrengthBlueprintSet, StrengthSession, StrengthSet, TrainingPlan, Wod,
-};
 
-use crate::handler::HandlerResult;
+use crate::{auth::AuthAdmin, db::*, error::HandlerResult, state::DbConn};
 
 #[derive(Debug, Deserialize)]
 pub struct LastChange {
@@ -21,34 +14,34 @@ pub async fn adm_do_garbage_collection(
     Query(LastChange { last_change }): Query<LastChange>,
     mut db: DbConn,
 ) -> HandlerResult<StatusCode> {
-    Platform::hard_delete(last_change, &mut db)?;
-    PlatformCredential::hard_delete(last_change, &mut db)?;
-    Action::hard_delete(last_change, &mut db)?;
-    ActionProvider::hard_delete(last_change, &mut db)?;
-    ActionRule::hard_delete(last_change, &mut db)?;
-    ActionEvent::hard_delete(last_change, &mut db)?;
-    Diary::hard_delete(last_change, &mut db)?;
-    Wod::hard_delete(last_change, &mut db)?;
-    Movement::hard_delete(last_change, &mut db)?;
-    MovementMuscle::hard_delete(last_change, &mut db)?;
-    TrainingPlan::hard_delete(last_change, &mut db)?;
-    StrengthBlueprint::hard_delete(last_change, &mut db)?;
-    StrengthBlueprintSet::hard_delete(last_change, &mut db)?;
-    StrengthSession::hard_delete(last_change, &mut db)?;
-    StrengthSet::hard_delete(last_change, &mut db)?;
-    Metcon::hard_delete(last_change, &mut db)?;
-    MetconMovement::hard_delete(last_change, &mut db)?;
-    MetconSession::hard_delete(last_change, &mut db)?;
-    MetconItem::hard_delete(last_change, &mut db)?;
-    Route::hard_delete(last_change, &mut db)?;
-    CardioBlueprint::hard_delete(last_change, &mut db)?;
-    CardioSession::hard_delete(last_change, &mut db)?;
-    Group::hard_delete(last_change, &mut db)?;
-    GroupUser::hard_delete(last_change, &mut db)?;
-    SharedDiary::hard_delete(last_change, &mut db)?;
-    SharedStrengthSession::hard_delete(last_change, &mut db)?;
-    SharedMetconSession::hard_delete(last_change, &mut db)?;
-    SharedCardioSession::hard_delete(last_change, &mut db)?;
+    PlatformDb::hard_delete(last_change, &mut db)?;
+    PlatformCredentialDb::hard_delete(last_change, &mut db)?;
+    ActionDb::hard_delete(last_change, &mut db)?;
+    ActionProviderDb::hard_delete(last_change, &mut db)?;
+    ActionRuleDb::hard_delete(last_change, &mut db)?;
+    ActionEventDb::hard_delete(last_change, &mut db)?;
+    DiaryDb::hard_delete(last_change, &mut db)?;
+    WodDb::hard_delete(last_change, &mut db)?;
+    MovementDb::hard_delete(last_change, &mut db)?;
+    MovementMuscleDb::hard_delete(last_change, &mut db)?;
+    TrainingPlanDb::hard_delete(last_change, &mut db)?;
+    StrengthBlueprintDb::hard_delete(last_change, &mut db)?;
+    StrengthBlueprintSetDb::hard_delete(last_change, &mut db)?;
+    StrengthSessionDb::hard_delete(last_change, &mut db)?;
+    StrengthSetDb::hard_delete(last_change, &mut db)?;
+    MetconDb::hard_delete(last_change, &mut db)?;
+    MetconMovementDb::hard_delete(last_change, &mut db)?;
+    MetconSessionDb::hard_delete(last_change, &mut db)?;
+    MetconItemDb::hard_delete(last_change, &mut db)?;
+    RouteDb::hard_delete(last_change, &mut db)?;
+    CardioBlueprintDb::hard_delete(last_change, &mut db)?;
+    CardioSessionDb::hard_delete(last_change, &mut db)?;
+    GroupDb::hard_delete(last_change, &mut db)?;
+    GroupUserDb::hard_delete(last_change, &mut db)?;
+    SharedDiaryDb::hard_delete(last_change, &mut db)?;
+    SharedStrengthSessionDb::hard_delete(last_change, &mut db)?;
+    SharedMetconSessionDb::hard_delete(last_change, &mut db)?;
+    SharedCardioSessionDb::hard_delete(last_change, &mut db)?;
 
     Ok(StatusCode::OK)
 }

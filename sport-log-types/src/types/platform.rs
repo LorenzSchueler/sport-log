@@ -1,15 +1,11 @@
-#[cfg(feature = "server")]
+#[cfg(feature = "db")]
 use diesel::sql_types::BigInt;
 use serde::{Deserialize, Serialize};
 use sport_log_types_derive::IdString;
-#[cfg(feature = "server")]
-use sport_log_types_derive::{
-    CheckUserId, Create, GetAll, GetById, GetByIds, GetBySync, GetByUser, GetByUserSync,
-    HardDelete, IdFromSql, IdToSql, Update, VerifyForAdminWithoutDb, VerifyForUserWithDb,
-    VerifyForUserWithoutDb, VerifyIdForAdmin, VerifyIdForUser, VerifyIdUnchecked, VerifyUnchecked,
-};
+#[cfg(feature = "db")]
+use sport_log_types_derive::{IdFromSql, IdToSql};
 
-#[cfg(feature = "server")]
+#[cfg(feature = "db")]
 use crate::{
     schema::{platform, platform_credential},
     User,
@@ -19,15 +15,13 @@ use crate::{types::IdString, UserId};
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
-    feature = "server",
+    feature = "db",
     derive(
         Hash,
         FromSqlRow,
         AsExpression,
         IdToSql,
         IdFromSql,
-        VerifyIdForAdmin,
-        VerifyIdUnchecked
     ),
     diesel(sql_type = BigInt)
 )]
@@ -40,21 +34,13 @@ pub struct PlatformId(pub i64);
 /// If `credential` is false the resource can be accessed without credentials. (This is f.ex. the case if the data if fetched from public websites or only data from **Sport Log** is used.)
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "server",
+    feature = "db",
     derive(
         Insertable,
         Identifiable,
         Queryable,
         Selectable,
         AsChangeset,
-        Create,
-        GetAll,
-        GetById,
-        GetBySync,
-        Update,
-        HardDelete,
-        VerifyForAdminWithoutDb,
-        VerifyUnchecked
     ),
     diesel(table_name = platform)
 )]
@@ -68,8 +54,8 @@ pub struct Platform {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
-    feature = "server",
-    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, VerifyIdForUser),
+    feature = "db",
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
 pub struct PlatformCredentialId(pub i64);
@@ -79,7 +65,7 @@ pub struct PlatformCredentialId(pub i64);
 /// [PlatformCredential] are needed for [Platforms](Platform) where `credential` is true.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
-    feature = "server",
+    feature = "db",
     derive(
         Insertable,
         Associations,
@@ -87,16 +73,6 @@ pub struct PlatformCredentialId(pub i64);
         Queryable,
         Selectable,
         AsChangeset,
-        Create,
-        GetById,
-        GetByIds,
-        GetByUser,
-        GetByUserSync,
-        Update,
-        HardDelete,
-        CheckUserId,
-        VerifyForUserWithDb,
-        VerifyForUserWithoutDb
     ),
     diesel(table_name = platform_credential, belongs_to(User), belongs_to(Platform))
 )]

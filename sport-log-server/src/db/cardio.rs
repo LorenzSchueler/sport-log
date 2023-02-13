@@ -1,13 +1,44 @@
-use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
-
-use crate::{
+use sport_log_types::{
     schema::{cardio_blueprint, cardio_session, movement},
-    CardioBlueprint, CardioBlueprintId, CardioSession, CardioSessionDescription, CardioSessionId,
-    CheckUserId, GetById, GetByUser, Movement, Route, UserId,
+    CardioBlueprintId, CardioSession, CardioSessionDescription, CardioSessionId, UserId,
 };
+use sport_log_types_derive::*;
 
-impl CheckUserId for CardioBlueprint {
+use crate::db::*;
+
+#[derive(
+    Db,
+    VerifyIdForUserOrAP,
+    Create,
+    GetById,
+    GetByIds,
+    GetByUser,
+    GetByUserSync,
+    Update,
+    HardDelete,
+    CheckUserId,
+    VerifyForUserOrAPWithDb,
+    VerifyForUserOrAPWithoutDb,
+)]
+pub struct RouteDb;
+
+#[derive(
+    Db,
+    VerifyIdForUserOrAP,
+    Create,
+    GetById,
+    GetByIds,
+    GetByUser,
+    GetByUserSync,
+    Update,
+    HardDelete,
+    VerifyForUserOrAPWithDb,
+    VerifyForUserOrAPWithoutDb,
+)]
+pub struct CardioBlueprintDb;
+
+impl CheckUserId for CardioBlueprintDb {
     type Id = CardioBlueprintId;
 
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
@@ -45,7 +76,22 @@ impl CheckUserId for CardioBlueprint {
     }
 }
 
-impl CheckUserId for CardioSession {
+#[derive(
+    Db,
+    VerifyIdForUserOrAP,
+    Create,
+    GetById,
+    GetByIds,
+    GetByUser,
+    GetByUserSync,
+    Update,
+    HardDelete,
+    VerifyForUserOrAPWithDb,
+    VerifyForUserOrAPWithoutDb,
+)]
+pub struct CardioSessionDb;
+
+impl CheckUserId for CardioSessionDb {
     type Id = CardioSessionId;
 
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
@@ -83,45 +129,43 @@ impl CheckUserId for CardioSession {
     }
 }
 
-impl CardioSession {
-    pub fn get_ordered_by_user_and_timespan(
-        user_id: UserId,
-        start_datetime: DateTime<Utc>,
-        end_datetime: DateTime<Utc>,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
-        cardio_session::table
-            .filter(cardio_session::columns::user_id.eq(user_id))
-            .filter(cardio_session::columns::datetime.between(start_datetime, end_datetime))
-            .order_by(cardio_session::columns::datetime)
-            .select(CardioSession::as_select())
-            .get_results(db)
-    }
-}
+pub struct CardioSessionDescriptionDb;
 
-impl GetById for CardioSessionDescription {
+impl Db for CardioSessionDescriptionDb {
     type Id = CardioSessionId;
+    type Entity = CardioSessionDescription;
+}
 
-    fn get_by_id(cardio_session_id: Self::Id, db: &mut PgConnection) -> QueryResult<Self> {
-        let cardio_session = CardioSession::get_by_id(cardio_session_id, db)?;
-        CardioSessionDescription::from_session(cardio_session, db)
+impl GetById for CardioSessionDescriptionDb {
+    fn get_by_id(
+        cardio_session_id: Self::Id,
+        db: &mut PgConnection,
+    ) -> QueryResult<<Self as Db>::Entity> {
+        let cardio_session = CardioSessionDb::get_by_id(cardio_session_id, db)?;
+        CardioSessionDescriptionDb::from_session(cardio_session, db)
     }
 }
 
-impl GetByUser for CardioSessionDescription {
-    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self>> {
-        let cardio_sessions = CardioSession::get_by_user(user_id, db)?;
-        CardioSessionDescription::from_sessions(cardio_sessions, db)
+impl GetByUser for CardioSessionDescriptionDb {
+    fn get_by_user(
+        user_id: UserId,
+        db: &mut PgConnection,
+    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
+        let cardio_sessions = CardioSessionDb::get_by_user(user_id, db)?;
+        CardioSessionDescriptionDb::from_sessions(cardio_sessions, db)
     }
 }
 
-impl CardioSessionDescription {
-    fn from_session(cardio_session: CardioSession, db: &mut PgConnection) -> QueryResult<Self> {
+impl CardioSessionDescriptionDb {
+    fn from_session(
+        cardio_session: CardioSession,
+        db: &mut PgConnection,
+    ) -> QueryResult<<Self as Db>::Entity> {
         let route = match cardio_session.route_id {
-            Some(route_id) => Some(Route::get_by_id(route_id, db)?),
+            Some(route_id) => Some(RouteDb::get_by_id(route_id, db)?),
             None => None,
         };
-        let movement = Movement::get_by_id(cardio_session.movement_id, db)?;
+        let movement = MovementDb::get_by_id(cardio_session.movement_id, db)?;
         Ok(CardioSessionDescription {
             cardio_session,
             route,
@@ -132,17 +176,17 @@ impl CardioSessionDescription {
     fn from_sessions(
         cardio_sessions: Vec<CardioSession>,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
+    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
         let mut routes = vec![];
         for cardio_session in &cardio_sessions {
             routes.push(match cardio_session.route_id {
-                Some(route_id) => Some(Route::get_by_id(route_id, db)?),
+                Some(route_id) => Some(RouteDb::get_by_id(route_id, db)?),
                 None => None,
             });
         }
         let mut movements = vec![];
         for cardio_session in &cardio_sessions {
-            movements.push(Movement::get_by_id(cardio_session.movement_id, db)?);
+            movements.push(MovementDb::get_by_id(cardio_session.movement_id, db)?);
         }
         Ok(cardio_sessions
             .into_iter()
@@ -156,20 +200,5 @@ impl CardioSessionDescription {
                 },
             )
             .collect())
-    }
-
-    pub fn get_ordered_by_user_and_timespan(
-        user_id: UserId,
-        start_datetime: DateTime<Utc>,
-        end_datetime: DateTime<Utc>,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self>> {
-        let cardio_sessions = CardioSession::get_ordered_by_user_and_timespan(
-            user_id,
-            start_datetime,
-            end_datetime,
-            db,
-        )?;
-        CardioSessionDescription::from_sessions(cardio_sessions, db)
     }
 }

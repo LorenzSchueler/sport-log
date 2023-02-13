@@ -7,9 +7,12 @@ use axum::{
     http::{request::Parts, StatusCode},
     TypedHeader,
 };
+use sport_log_types::{ActionProviderId, UserId};
 
 use crate::{
-    error::HandlerError, ActionProvider, ActionProviderId, Admin, AppState, Config, User, UserId,
+    db::{ActionProviderDb, AdminDb, UserDb},
+    error::HandlerError,
+    AppState, Config,
 };
 
 /// [AuthUser] is used as a request guard to authenticate a user.
@@ -52,14 +55,14 @@ where
 
         let admin_password = &config.admin_password;
 
-        match User::auth(username, password, &mut db) {
+        match UserDb::auth(username, password, &mut db) {
             Ok(id) => Ok(AuthUser(id)),
             Err(_) => {
                 if let Some((name, Ok(user_id))) = username
                     .split_once("$id$")
                     .map(|(name, id)| (name, id.parse().map(UserId)))
                 {
-                    if Admin::auth(name, password, admin_password).is_ok() {
+                    if AdminDb::auth(name, password, admin_password).is_ok() {
                         return Ok(AuthUser(user_id));
                     }
                 };
@@ -114,17 +117,17 @@ where
 
         let admin_password = &config.admin_password;
 
-        match User::auth(username, password, &mut db) {
+        match UserDb::auth(username, password, &mut db) {
             Ok(id) => Ok(AuthUserOrAP(id)),
             Err(_) => {
                 if let Some((name, Ok(user_id))) = username
                     .split_once("$id$")
                     .map(|(name, id)| (name, id.parse().map(UserId)))
                 {
-                    match ActionProvider::auth_as_user(name, password, user_id, &mut db) {
+                    match ActionProviderDb::auth_as_user(name, password, user_id, &mut db) {
                         Ok(AuthApForUser::Allowed(_)) => Ok(AuthUserOrAP(user_id)),
                         Ok(AuthApForUser::Forbidden) => Err(StatusCode::FORBIDDEN.into()),
-                        Err(_) => match Admin::auth(name, password, admin_password) {
+                        Err(_) => match AdminDb::auth(name, password, admin_password) {
                             Ok(()) => Ok(AuthUserOrAP(user_id)),
                             Err(_) => Err(StatusCode::UNAUTHORIZED.into()),
                         },
@@ -182,14 +185,14 @@ where
 
         let admin_password = &config.admin_password;
 
-        match ActionProvider::auth(username, password, &mut db) {
+        match ActionProviderDb::auth(username, password, &mut db) {
             Ok(id) => Ok(AuthAP(id)),
             Err(_) => {
                 if let Some((name, Ok(id))) = username
                     .split_once("$id$")
                     .map(|(name, id)| (name, id.parse()))
                 {
-                    if Admin::auth(name, password, admin_password).is_ok() {
+                    if AdminDb::auth(name, password, admin_password).is_ok() {
                         return Ok(AuthAP(ActionProviderId(id)));
                     }
                 };
@@ -225,7 +228,7 @@ where
 
         let admin_password = &config.admin_password;
 
-        match Admin::auth(username, password, admin_password) {
+        match AdminDb::auth(username, password, admin_password) {
             Ok(_) => Ok(AuthAdmin),
             Err(_) => Err(StatusCode::UNAUTHORIZED.into()),
         }

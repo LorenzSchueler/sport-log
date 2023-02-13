@@ -9,15 +9,8 @@ sport-log-types-derive = { path = "../sport-log-types-derive" }
 serde = { version = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
 const_format = "0.2.30"
-http = "0.2"
-
-axum = { version = "0.6", features = [ "headers", "macros" ], optional = true }
-r2d2 = { version = "0.8", optional = true }
 diesel = { version = "2", features = ["postgres", "r2d2", "chrono"], optional = true }
 diesel-derive-enum = { version = "2.0.0-rc.0", features = ["postgres"], optional = true }
-argon2 = { version = "0.4", optional = true }
-rand_core = { version = "0.6", features = ["std"], optional = true }
-tracing = { version = "0.1", optional = true }
 
 [features]
-server = [ "axum", "r2d2", "diesel", "diesel-derive-enum",  "argon2", "rand_core", "tracing"]
+db = [ "diesel", "diesel-derive-enum"]
