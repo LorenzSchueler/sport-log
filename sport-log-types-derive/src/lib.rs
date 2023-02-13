@@ -1,17 +1,13 @@
-//! Derive macros for `sport-log-types`.
+//! Derive macros for `sport-log-types` and `sport-log-server`.
 
 use inflector::Inflector;
 use proc_macro::TokenStream;
-
-mod crud;
-mod db;
-mod from_to;
-mod verification;
-use crud::*;
-use db::*;
-use from_to::*;
 use proc_macro2::{Ident, Span};
-use verification::*;
+
+mod server;
+mod types;
+use server::*;
+use types::*;
 
 struct Identifiers {
     db_type: Ident,
