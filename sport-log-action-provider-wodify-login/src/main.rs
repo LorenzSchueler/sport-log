@@ -296,7 +296,7 @@ async fn wodify_login(
         .await
         .map_err(Error::WebDriver)?;
     driver
-        .goto("https://app.wodify.com/Schedule/CalendarListView.aspx")
+        .goto("https://app.wodify.com")
         .await
         .map_err(Error::WebDriver)?;
 
@@ -333,17 +333,30 @@ async fn wodify_login(
     }
     debug!("login successful");
 
+    driver
+        .goto("https://app.wodify.com/Schedule/CalendarListViewEntry.aspx")
+        .await
+        .map_err(Error::WebDriver)?;
+
     if let Ok(duration) = (exec_action_event.datetime - Duration::days(1) - Utc::now()).to_std() {
         time::sleep(duration).await;
     }
     info!("ready at {}", Utc::now());
 
     for _ in 0..3 {
-        driver.refresh().await.map_err(Error::WebDriver)?; // TODO can this be removed?
+        driver.refresh().await.map_err(Error::WebDriver)?;
         info!("reload done at {}", Utc::now());
 
-        let rows = driver
-            .find_all(By::XPath("//table[@class='TableRecords']/tbody/tr"))
+        let table = driver
+            .find(By::ClassName("TableRecords"))
+            .await
+            .map_err(Error::WebDriver)?
+            .find(By::Tag("tbody"))
+            .await
+            .map_err(Error::WebDriver)?;
+
+        let rows = table
+            .find_all(By::Tag("tr"))
             .await
             .map_err(Error::WebDriver)?;
 
@@ -378,7 +391,7 @@ async fn wodify_login(
         }
 
         for row in &rows[start_row_number..end_row_number] {
-            if row
+            let row_matches = row
                 .find(By::XPath("./td[1]/div/span"))
                 .await
                 .map_err(Error::WebDriver)?
@@ -388,8 +401,9 @@ async fn wodify_login(
                 .map(|title| {
                     title.contains(&exec_action_event.action_name) && title.contains(&time)
                 })
-                .unwrap_or(false)
-            {
+                .unwrap_or(false);
+
+            if row_matches {
                 let icon = row
                     .find(By::XPath("./td[3]/div"))
                     .await
