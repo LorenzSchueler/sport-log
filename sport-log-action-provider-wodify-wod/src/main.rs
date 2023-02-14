@@ -17,6 +17,7 @@ use sport_log_types::{
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use tokio::{process::Command, time};
 use tracing::{debug, error, info, warn};
+use tracing_subscriber::EnvFilter;
 
 const CONFIG_FILE: &str = "sport-log-action-provider-wodify-wod.toml";
 const NAME: &str = "wodify-wod";
@@ -92,6 +93,7 @@ async fn main() {
 
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
+        .with_env_filter(EnvFilter::from_default_env())
         .init();
 
     match &env::args().collect::<Vec<_>>()[1..] {

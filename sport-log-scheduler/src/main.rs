@@ -33,6 +33,7 @@ use sport_log_types::{
     ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent, ADMIN_USERNAME,
 };
 use tracing::{debug, error, info};
+use tracing_subscriber::EnvFilter;
 
 pub const CONFIG_FILE: &str = "sport-log-scheduler.toml";
 
@@ -64,6 +65,7 @@ fn main() {
 
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
+        .with_env_filter(EnvFilter::from_default_env())
         .init();
 
     let config: Config = match fs::read_to_string(CONFIG_FILE) {

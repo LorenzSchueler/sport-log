@@ -14,6 +14,7 @@ use sport_log_types::{
 };
 use tokio::task::JoinError;
 use tracing::{debug, error, info, warn};
+use tracing_subscriber::EnvFilter;
 
 const CONFIG_FILE: &str = "sport-log-action-provider-sportstracker.toml";
 const NAME: &str = "sportstracker-fetch";
@@ -167,6 +168,7 @@ async fn main() {
 
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
+        .with_env_filter(EnvFilter::from_default_env())
         .init();
 
     match &env::args().collect::<Vec<_>>()[1..] {

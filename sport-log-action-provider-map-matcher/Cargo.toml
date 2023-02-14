@@ -19,4 +19,4 @@ geoutils = "0.5"
 err-derive = "0.3"
 lazy_static = "1.4"
 tracing = "0.1"
-tracing-subscriber = "0.3"
+tracing-subscriber = { version = "0.3", features = ["env-filter"]}

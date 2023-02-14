@@ -17,6 +17,7 @@ use sysinfo::{ProcessExt, System, SystemExt};
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use tokio::{process::Command, task::JoinError, time};
 use tracing::{debug, error, info, warn};
+use tracing_subscriber::EnvFilter;
 
 const CONFIG_FILE: &str = "sport-log-action-provider-wodify-login.toml";
 const NAME: &str = "wodify-login";
@@ -116,6 +117,7 @@ async fn main() {
 
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
+        .with_env_filter(EnvFilter::from_default_env())
         .init();
 
     match &env::args().collect::<Vec<_>>()[1..] {
