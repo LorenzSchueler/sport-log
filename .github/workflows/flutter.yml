@@ -20,7 +20,7 @@ jobs:
         cache: true
     - name: Format
       working-directory: sport-log-client
-      run: flutter format --set-exit-if-changed .
+      run: dart format --set-exit-if-changed .
 
   analyze:
     name: "Flutter: Analize"
