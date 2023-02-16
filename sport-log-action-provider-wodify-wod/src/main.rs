@@ -193,7 +193,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
         tasks.push(tokio::spawn(async move {
             info!("processing: {:#?}", exec_action_event);
 
-            let(Some(username), Some(password)) = 
+            let(Some(username), Some(password)) =
                 (&exec_action_event.username, &exec_action_event.password) else {
                 warn!("can not log in: no credential provided");
 

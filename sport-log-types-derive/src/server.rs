@@ -290,7 +290,7 @@ pub(crate) fn impl_check_optional_user_id(
                 sport_log_types::schema::#entity_name::table
                     .filter(sport_log_types::schema::#entity_name::columns::id.eq(id))
                     .select(sport_log_types::schema::#entity_name::columns::user_id
-                        .is_not_distinct_from(user_id)                    
+                        .is_not_distinct_from(user_id)
                         .or(sport_log_types::schema::#entity_name::columns::user_id.is_null())
                     )
                     .get_result(db)
@@ -306,7 +306,7 @@ pub(crate) fn impl_check_optional_user_id(
                 sport_log_types::schema::#entity_name::table
                     .filter(sport_log_types::schema::#entity_name::columns::id.eq_any(ids))
                     .select(sport_log_types::schema::#entity_name::columns::user_id
-                        .is_not_distinct_from(user_id)                    
+                        .is_not_distinct_from(user_id)
                         .or(sport_log_types::schema::#entity_name::columns::user_id.is_null())
                     )
                     .get_results(db)

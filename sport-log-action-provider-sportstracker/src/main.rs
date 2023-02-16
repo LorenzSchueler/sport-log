@@ -239,7 +239,7 @@ async fn fetch() -> Result<(), Error> {
         tasks.push(tokio::spawn(async move {
             debug!("processing {:#?}", exec_action_event);
 
-            let (Some(username), Some(password)) = 
+            let (Some(username), Some(password)) =
                 (&exec_action_event.username, &exec_action_event.password) else {
                 return Ok(Err(UserError::NoCredential(exec_action_event.action_event_id)));
             };

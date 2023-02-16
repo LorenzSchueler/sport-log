@@ -36,7 +36,7 @@ jobs:
     - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
-        toolchain: 1.61.0 # stable TODO
+        toolchain: stable
         override: true
         components: clippy
     - name: Load cache
