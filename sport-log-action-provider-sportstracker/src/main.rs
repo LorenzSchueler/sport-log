@@ -239,15 +239,10 @@ async fn fetch() -> Result<(), Error> {
         tasks.push(tokio::spawn(async move {
             debug!("processing {:#?}", exec_action_event);
 
-            let (username, password) =
-                match (&exec_action_event.username, &exec_action_event.password) {
-                    (Some(username), Some(password)) => (username, password),
-                    _ => {
-                        return Ok(Err(UserError::NoCredential(
-                            exec_action_event.action_event_id,
-                        )));
-                    }
-                };
+            let (Some(username), Some(password)) = 
+                (&exec_action_event.username, &exec_action_event.password) else {
+                return Ok(Err(UserError::NoCredential(exec_action_event.action_event_id)));
+            };
 
             let token = match get_token(
                 &client,
@@ -255,11 +250,10 @@ async fn fetch() -> Result<(), Error> {
                 password,
                 exec_action_event.action_event_id,
             )
-            .await
+            .await?
             {
-                Ok(Ok(token)) => token,
-                Ok(Err(error)) => return Ok(Err(error)),
-                Err(error) => return Err(error),
+                Ok(token) => token,
+                Err(error) => return Ok(Err(error)),
             };
 
             let token = (token.0, token.1.as_str());

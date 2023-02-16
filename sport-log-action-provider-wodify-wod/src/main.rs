@@ -193,33 +193,31 @@ async fn get_wod(mode: Mode) -> Result<()> {
         tasks.push(tokio::spawn(async move {
             info!("processing: {:#?}", exec_action_event);
 
-            match (&exec_action_event.username, &exec_action_event.password) {
-                (Some(username), Some(password)) => {
-                    let driver = WebDriver::new("http://localhost:4444/", caps)
-                        .await
-                        .map_err(Error::WebDriver)?;
+            let(Some(username), Some(password)) = 
+                (&exec_action_event.username, &exec_action_event.password) else {
+                warn!("can not log in: no credential provided");
 
-                    let result = try_get_wod(
-                        &driver,
-                        &client,
-                        username,
-                        password,
-                        &exec_action_event,
-                        mode,
-                    )
-                    .await;
+                return Err(Error::NoCredential(exec_action_event.action_event_id))
+            };
 
-                    info!("closing browser");
-                    driver.quit().await.map_err(Error::WebDriver)?;
+            let driver = WebDriver::new("http://localhost:4444/", caps)
+                .await
+                .map_err(Error::WebDriver)?;
 
-                    result
-                }
-                _ => {
-                    warn!("can not log in: no credential provided");
+            let result = try_get_wod(
+                &driver,
+                &client,
+                username,
+                password,
+                &exec_action_event,
+                mode,
+            )
+            .await;
 
-                    Err(Error::NoCredential(exec_action_event.action_event_id))
-                }
-            }
+            info!("closing browser");
+            driver.quit().await.map_err(Error::WebDriver)?;
+
+            result
         }));
     }
 

@@ -221,24 +221,21 @@ async fn login(mode: Mode) -> Result<()> {
         tasks.push(tokio::spawn(async move {
             debug!("processing {:#?}", exec_action_event);
 
-            match (&exec_action_event.username, &exec_action_event.password) {
-                (Some(username), Some(password)) => {
-                    let driver = WebDriver::new(WEBDRIVER_ADDRESS, caps)
-                        .await
-                        .map_err(Error::WebDriver)?;
+            let (Some(username), Some(password)) = 
+                (&exec_action_event.username, &exec_action_event.password) else {
+                return Ok(Err(UserError::NoCredential(exec_action_event.action_event_id)));
+            };
 
-                    let result =
-                        wodify_login(&driver, username, password, &exec_action_event, mode).await;
+            let driver = WebDriver::new(WEBDRIVER_ADDRESS, caps)
+                .await
+                .map_err(Error::WebDriver)?;
 
-                    debug!("closing browser");
-                    driver.quit().await.map_err(Error::WebDriver)?;
+            let result = wodify_login(&driver, username, password, &exec_action_event, mode).await;
 
-                    result
-                }
-                _ => Ok(Err(UserError::NoCredential(
-                    exec_action_event.action_event_id,
-                ))),
-            }
+            debug!("closing browser");
+            driver.quit().await.map_err(Error::WebDriver)?;
+
+            result
         }));
     }
 
