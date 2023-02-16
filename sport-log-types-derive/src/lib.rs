@@ -165,10 +165,22 @@ pub fn verify_id_for_action_provider_derive(input: TokenStream) -> TokenStream {
     impl_verify_id_for_action_provider(Identifiers::from_ast(&ast))
 }
 
+#[proc_macro_derive(VerifyIdsForActionProvider)]
+pub fn verify_ids_for_action_provider_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_verify_ids_for_action_provider(Identifiers::from_ast(&ast))
+}
+
 #[proc_macro_derive(VerifyIdForAdmin)]
 pub fn verify_id_for_admin_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_verify_id_for_admin(Identifiers::from_ast(&ast))
+}
+
+#[proc_macro_derive(VerifyIdsForAdmin)]
+pub fn verify_ids_for_admin_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_verify_ids_for_admin(Identifiers::from_ast(&ast))
 }
 
 #[proc_macro_derive(VerifyIdUnchecked)]

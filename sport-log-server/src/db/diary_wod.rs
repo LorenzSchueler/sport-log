@@ -13,7 +13,6 @@ use sport_log_types_derive::*;
     CheckUserId,
     VerifyForUserOrAPWithDb,
     VerifyForUserOrAPWithoutDb,
-    VerifyUnchecked,
 )]
 pub struct DiaryDb;
 
@@ -30,6 +29,5 @@ pub struct DiaryDb;
     CheckUserId,
     VerifyForUserOrAPWithDb,
     VerifyForUserOrAPWithoutDb,
-    VerifyUnchecked,
 )]
 pub struct WodDb;

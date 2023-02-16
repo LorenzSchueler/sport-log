@@ -104,24 +104,6 @@ impl VerifyIdForUserOrAP for UnverifiedId<MetconId> {
     }
 }
 
-impl VerifyIdsForUserOrAP for UnverifiedIds<MetconId> {
-    type Id = MetconId;
-
-    fn verify_user_ap(
-        self,
-        auth: AuthUserOrAP,
-        db: &mut PgConnection,
-    ) -> Result<Vec<Self::Id>, StatusCode> {
-        if MetconDb::check_optional_user_ids(&self.0, *auth, db)
-            .map_err(|_| StatusCode::FORBIDDEN)?
-        {
-            Ok(self.0)
-        } else {
-            Err(StatusCode::FORBIDDEN)
-        }
-    }
-}
-
 impl VerifyForUserOrAPWithDb for Unverified<Metcon> {
     type Entity = Metcon;
 
@@ -345,24 +327,6 @@ impl VerifyIdForUserOrAP for UnverifiedId<MetconMovementId> {
         db: &mut PgConnection,
     ) -> Result<Self::Id, StatusCode> {
         if MetconMovementDb::check_optional_user_id(self.0, *auth, db)
-            .map_err(|_| StatusCode::FORBIDDEN)?
-        {
-            Ok(self.0)
-        } else {
-            Err(StatusCode::FORBIDDEN)
-        }
-    }
-}
-
-impl VerifyIdsForUserOrAP for UnverifiedIds<MetconMovementId> {
-    type Id = MetconMovementId;
-
-    fn verify_user_ap(
-        self,
-        auth: AuthUserOrAP,
-        db: &mut PgConnection,
-    ) -> Result<Vec<Self::Id>, StatusCode> {
-        if MetconMovementDb::check_optional_user_ids(&self.0, *auth, db)
             .map_err(|_| StatusCode::FORBIDDEN)?
         {
             Ok(self.0)

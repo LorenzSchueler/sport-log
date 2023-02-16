@@ -116,24 +116,6 @@ impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
     }
 }
 
-impl VerifyIdsForUserOrAP for UnverifiedIds<MovementId> {
-    type Id = MovementId;
-
-    fn verify_user_ap(
-        self,
-        auth: AuthUserOrAP,
-        db: &mut PgConnection,
-    ) -> Result<Vec<Self::Id>, StatusCode> {
-        if MovementDb::check_optional_user_ids(&self.0, *auth, db)
-            .map_err(|_| StatusCode::FORBIDDEN)?
-        {
-            Ok(self.0)
-        } else {
-            Err(StatusCode::FORBIDDEN)
-        }
-    }
-}
-
 impl VerifyForUserOrAPWithDb for Unverified<Movement> {
     type Entity = Movement;
 
@@ -226,24 +208,6 @@ impl VerifyIdForUserOrAP for UnverifiedId<MovementMuscleId> {
         db: &mut PgConnection,
     ) -> Result<Self::Id, StatusCode> {
         if MovementMuscleDb::check_optional_user_id(self.0, *auth, db)
-            .map_err(|_| StatusCode::FORBIDDEN)?
-        {
-            Ok(self.0)
-        } else {
-            Err(StatusCode::FORBIDDEN)
-        }
-    }
-}
-
-impl VerifyIdsForUserOrAP for UnverifiedIds<MovementMuscleId> {
-    type Id = MovementMuscleId;
-
-    fn verify_user_ap(
-        self,
-        auth: AuthUserOrAP,
-        db: &mut PgConnection,
-    ) -> Result<Vec<Self::Id>, StatusCode> {
-        if MovementMuscleDb::check_optional_user_ids(&self.0, *auth, db)
             .map_err(|_| StatusCode::FORBIDDEN)?
         {
             Ok(self.0)

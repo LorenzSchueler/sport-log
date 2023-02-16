@@ -232,16 +232,6 @@ pub trait VerifyIdForUser {
     fn verify_user(self, auth: AuthUser, db: &mut PgConnection) -> Result<Self::Id, StatusCode>;
 }
 
-pub trait VerifyIdsForUser {
-    type Id;
-
-    fn verify_user(
-        self,
-        auth: AuthUser,
-        db: &mut PgConnection,
-    ) -> Result<Vec<Self::Id>, StatusCode>;
-}
-
 pub trait VerifyIdForUserOrAP {
     type Id;
 
@@ -250,16 +240,6 @@ pub trait VerifyIdForUserOrAP {
         auth: AuthUserOrAP,
         db: &mut PgConnection,
     ) -> Result<Self::Id, StatusCode>;
-}
-
-pub trait VerifyIdsForUserOrAP {
-    type Id;
-
-    fn verify_user_ap(
-        self,
-        auth: AuthUserOrAP,
-        db: &mut PgConnection,
-    ) -> Result<Vec<Self::Id>, StatusCode>;
 }
 
 pub trait VerifyIdForActionProvider {

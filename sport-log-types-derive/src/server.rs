@@ -344,26 +344,6 @@ pub(crate) fn impl_verify_id_for_user(
                 }
             }
         }
-
-        impl crate::db::VerifyIdsForUser for crate::db::UnverifiedIds<sport_log_types::#id_type> {
-            type Id = sport_log_types::#id_type;
-
-            fn verify_user(
-                self,
-                auth: crate::auth::AuthUser,
-                db: &mut diesel::pg::PgConnection,
-            ) -> Result<Vec<Self::Id>, axum::http::StatusCode> {
-                use crate::db::CheckUserId;
-
-                if crate::db::#db_type::check_user_ids(&self.0, *auth, db)
-                    .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
-                {
-                    Ok(self.0)
-                } else {
-                    Err(axum::http::StatusCode::FORBIDDEN)
-                }
-            }
-        }
     }
     .into()
 }
@@ -385,26 +365,6 @@ pub(crate) fn impl_verify_id_for_user_or_ap(
                 use crate::db::CheckUserId;
 
                 if crate::db::#db_type::check_user_id(self.0, *auth, db)
-                    .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
-                {
-                    Ok(self.0)
-                } else {
-                    Err(axum::http::StatusCode::FORBIDDEN)
-                }
-            }
-        }
-
-        impl crate::db::VerifyIdsForUserOrAP for crate::db::UnverifiedIds<sport_log_types::#id_type> {
-            type Id = sport_log_types::#id_type;
-
-            fn verify_user_ap(
-                self,
-                auth: crate::auth::AuthUserOrAP,
-                db: &mut diesel::pg::PgConnection,
-            ) -> Result<Vec<Self::Id>, axum::http::StatusCode> {
-                use crate::db::CheckUserId;
-
-                if crate::db::#db_type::check_user_ids(&self.0, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(self.0)
@@ -442,7 +402,16 @@ pub(crate) fn impl_verify_id_for_action_provider(
                 }
             }
         }
+    }
+    .into()
+}
 
+pub(crate) fn impl_verify_ids_for_action_provider(
+    Identifiers {
+        db_type, id_type, ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
         impl crate::db::VerifyIdsForActionProvider for crate::db::UnverifiedIds<sport_log_types::#id_type> {
             type Id = sport_log_types::#id_type;
 
@@ -478,7 +447,12 @@ pub(crate) fn impl_verify_id_for_admin(Identifiers { id_type, .. }: Identifiers)
                 Ok(self.0)
             }
         }
+    }
+    .into()
+}
 
+pub(crate) fn impl_verify_ids_for_admin(Identifiers { id_type, .. }: Identifiers) -> TokenStream {
+    quote! {
         impl crate::db::VerifyIdsForAdmin for crate::db::UnverifiedIds<sport_log_types::#id_type> {
             type Id = sport_log_types::#id_type;
 
